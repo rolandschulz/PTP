@@ -465,6 +465,7 @@
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="matchAll" type="xs:boolean" default="false"/>
+		<xs:attribute name="allowOverwrites" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="match-type">
 		<xs:sequence>

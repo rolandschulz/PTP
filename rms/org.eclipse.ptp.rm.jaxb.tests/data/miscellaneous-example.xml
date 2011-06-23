@@ -128,16 +128,103 @@
 					<match>
 						<expression>[-rwx+@]+.+[\d:]+[\s]+(.+)</expression>
 						<set field="name">
-						   <entry valueGroup="4"/>
+							<entry valueGroup="1"/>
 						</set>
 						<set field="readOnly">
-                     <entry value="true"/>
-                  </set>
-                  <set field="visible">
-                      <entry value="true"/>
-                  </set>
+							<entry value="true"/>
+						</set>
+						<set field="visible">
+							<entry value="true"/>
+						</set>
 						<set field="value">
 							<entry valueGroup="1"/>
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+		</start-up-command>
+		<start-up-command name="ompi_info">
+			<arg>ompi_info</arg>
+			<arg>-a</arg>
+			<arg>-parseable</arg>
+			<stdout-parser delim="\n">
+				<target type="attribute" allowOverwrites="true">
+					<match>
+						<expression>mca:.*:param:([^:]*):value:(.*)</expression>
+						<set field="name">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="visible">
+							<entry value="true"/>
+						</set>
+						<set field="value">
+							<entry valueGroup="2"/>
+						</set>
+					</match>
+					<match>
+						<expression>mca:.*:param:([^:]*):status:(.*)</expression>
+						<set field="name">
+                     <entry valueGroup="1"/>
+                  </set>
+						<set field="status">
+							<entry valueGroup="2"/>
+						</set>
+					</match>
+					<match>
+						<expression>mca:.*:param:([^:]*):help:(.*)</expression>
+						<set field="name">
+                     <entry valueGroup="1"/>
+                  </set>
+						<set field="tooltip">
+							<entry valueGroup="2"/>
+						</set>
+					</match>
+					<test op="EQ">
+						<value>#status</value>
+						<value>read-only</value>
+						<set field="readOnly">
+							<entry value="true"/>
+						</set>
+						<else>
+							<set field="readOnly">
+								<entry value="false"/>
+							</set>
+						</else>
+					</test>
+				</target>
+				<target type="attribute" allowOverwrites="true">
+					<match>
+						<expression>(.*):([^:]*):([^:]*):([^:]*)</expression>
+						<append field="name">
+							<entry valueGroup="1"/>
+							<entry valueGroup="2"/>
+							<entry valueGroup="3"/>
+						</append>
+						<set field="value">
+							<entry valueGroup="4"/>
+						</set>
+						<set field="visible">
+							<entry value="false"/>
+						</set>
+						<set field="readOnly">
+							<entry value="true"/>
+						</set>
+					</match>
+				</target>
+				<target type="attribute" allowOverwrites="true">
+					<match>
+						<expression>(.*):([^:]*)</expression>
+						<set field="name">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="value">
+							<entry valueGroup="2"/>
+						</set>
+						<set field="visible">
+							<entry value="false"/>
+						</set>
+						<set field="readOnly">
+							<entry value="true"/>
 						</set>
 					</match>
 				</target>

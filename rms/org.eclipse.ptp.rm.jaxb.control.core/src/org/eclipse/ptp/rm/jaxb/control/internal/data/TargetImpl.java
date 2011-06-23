@@ -61,8 +61,10 @@ public class TargetImpl implements IMatchable {
 	private final List<MatchImpl> matches;
 	private final List<TestImpl> tests;
 	private final List<Object> targets;
-	private Object refTarget;
 	private final boolean matchAll;
+	private final boolean allowOverwrites;
+
+	private Object refTarget;
 	private boolean selected;
 
 	/**
@@ -82,6 +84,7 @@ public class TargetImpl implements IMatchable {
 		ref = target.getRef();
 		type = target.getType();
 		matchAll = target.isMatchAll();
+		allowOverwrites = target.isAllowOverwrites();
 		matches = new ArrayList<MatchImpl>();
 		List<MatchType> mdata = target.getMatch();
 		for (MatchType m : mdata) {
@@ -263,106 +266,18 @@ public class TargetImpl implements IMatchable {
 	 *            Attribute
 	 * @throws Throwable
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void merge(AttributeType previous, AttributeType current) throws Throwable {
-		Object v0 = previous.getValue();
-		Object v1 = current.getValue();
-		if (v0 == null) {
-			previous.setValue(v1);
-		} else if (v1 != null) {
-			if (v0 instanceof Collection && v1 instanceof Collection) {
-				((Collection) v0).addAll((Collection) v1);
-			} else if (v0 instanceof Map && v1 instanceof Map) {
-				((Map) v0).putAll((Map) v1);
-			} else {
-				throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM
-						+ JAXBControlConstants.SP + v1);
-			}
-		}
-
-		String s0 = previous.getDefault();
-		String s1 = current.getDefault();
-		if (s0 == null) {
-			previous.setDefault(s1);
-		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
-					+ JAXBControlConstants.SP + s1);
-		}
-
-		s0 = previous.getType();
-		s1 = current.getType();
-		if (s0 == null) {
-			previous.setType(s1);
-		} else if (s1 != null && !s1.equals(s0)) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
-					+ JAXBControlConstants.SP + s1);
-		}
-
-		s0 = previous.getStatus();
-		s1 = current.getStatus();
-		if (s0 == null) {
-			previous.setStatus(s1);
-		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
-					+ JAXBControlConstants.SP + s1);
-		}
-
-		boolean b0 = previous.isReadOnly();
-		boolean b1 = current.isReadOnly();
-		if (!b0) {
-			previous.setReadOnly(b1);
-		}
-
-		b0 = previous.isVisible();
-		b1 = current.isVisible();
-		if (!b0) {
-			previous.setVisible(b1);
-		}
-
-		Integer i0 = previous.getMax();
-		Integer i1 = current.getMax();
-		if (i0 == null) {
-			previous.setMax(i1);
-		} else if (i1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + JAXBControlConstants.CM
-					+ JAXBControlConstants.SP + i1);
-		}
-
-		i0 = previous.getMin();
-		i1 = current.getMin();
-		if (i0 == null) {
-			previous.setMin(i1);
-		} else if (i1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + JAXBControlConstants.CM
-					+ JAXBControlConstants.SP + i1);
-		}
-
-		s0 = previous.getDescription();
-		s1 = current.getDescription();
-		if (s0 == null) {
-			previous.setDescription(s1);
-		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
-					+ JAXBControlConstants.SP + s1);
-		}
-
-		s0 = previous.getChoice();
-		s1 = current.getChoice();
-		if (s0 == null) {
-			previous.setChoice(s1);
-		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
-					+ JAXBControlConstants.SP + s1);
-		}
-
-		s0 = previous.getTooltip();
-		s1 = current.getTooltip();
-		if (s0 == null) {
-			previous.setTooltip(s1);
-		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
-					+ JAXBControlConstants.SP + s1);
-		}
+		previous.setValue(mergeObject(previous.getValue(), current.getValue()));
+		previous.setDefault(mergeString(previous.getDefault(), current.getDefault()));
+		previous.setType(mergeString(previous.getType(), current.getType()));
+		previous.setReadOnly(mergeBoolean(previous.isReadOnly(), current.isReadOnly()));
+		previous.setVisible(mergeBoolean(previous.isVisible(), current.isVisible()));
+		previous.setStatus(mergeString(previous.getStatus(), current.getStatus()));
+		previous.setMax(mergeInteger(previous.getMax(), current.getMax()));
+		previous.setMin(mergeInteger(previous.getMin(), current.getMin()));
+		previous.setDescription(mergeString(previous.getDescription(), current.getDescription()));
+		previous.setTooltip(mergeString(previous.getTooltip(), current.getTooltip()));
+		previous.setChoice(mergeString(previous.getChoice(), current.getChoice()));
 	}
 
 	/**
@@ -377,52 +292,12 @@ public class TargetImpl implements IMatchable {
 	 *            Property
 	 * @throws Throwable
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void merge(PropertyType previous, PropertyType current) throws Throwable {
-		Object v0 = previous.getValue();
-		Object v1 = current.getValue();
-		if (v0 == null) {
-			previous.setValue(v1);
-		} else if (v1 != null) {
-			if (v0 instanceof Collection && v1 instanceof Collection) {
-				((Collection) v0).addAll((Collection) v1);
-			} else if (v0 instanceof Map && v1 instanceof Map) {
-				((Map) v0).putAll((Map) v1);
-			} else {
-				throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM
-						+ JAXBControlConstants.SP + v1);
-			}
-		}
-
-		String s0 = previous.getDefault();
-		String s1 = current.getDefault();
-		if (s0 == null) {
-			previous.setDefault(s1);
-		} else if (s1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
-					+ JAXBControlConstants.SP + s1);
-		}
-
-		s0 = previous.getType();
-		s1 = current.getType();
-		if (s0 == null) {
-			previous.setType(s1);
-		} else if (s1 != null && !s1.equals(s0)) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
-					+ JAXBControlConstants.SP + s1);
-		}
-
-		boolean b0 = previous.isReadOnly();
-		boolean b1 = current.isReadOnly();
-		if (!b0) {
-			previous.setReadOnly(b1);
-		}
-
-		b0 = previous.isVisible();
-		b1 = current.isVisible();
-		if (!b0) {
-			previous.setVisible(b1);
-		}
+		previous.setValue(mergeObject(previous.getValue(), current.getValue()));
+		previous.setDefault(mergeString(previous.getDefault(), current.getDefault()));
+		previous.setType(mergeString(previous.getType(), current.getType()));
+		previous.setReadOnly(mergeBoolean(previous.isReadOnly(), current.isReadOnly()));
+		previous.setVisible(mergeBoolean(previous.isVisible(), current.isVisible()));
 	}
 
 	/**
@@ -457,6 +332,66 @@ public class TargetImpl implements IMatchable {
 	}
 
 	/**
+	 * Returns new value if first is false.
+	 * 
+	 * @param b0
+	 * @param b1
+	 * @return merged value
+	 */
+	private Boolean mergeBoolean(Boolean b0, Boolean b1) {
+		if (!b0) {
+			return b1;
+		}
+		return b0;
+	}
+
+	/**
+	 * Checks if overwrites are allowed.
+	 * 
+	 * @param i0
+	 * @param i1
+	 * @return merged value
+	 * @throws Throwable
+	 *             if duplicate and overwrites not allowed.
+	 */
+	private Integer mergeInteger(Integer i0, Integer i1) throws Throwable {
+		if (i0 == null) {
+			return i1;
+		} else if (i1 != null && !allowOverwrites) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + i1);
+		}
+		return i0;
+	}
+
+	/**
+	 * Checks if overwrites are allowed. If object is <code>Collection</code> or
+	 * <code>Map</code>, the merge will proceed anyway.
+	 * 
+	 * @param v0
+	 * @param v1
+	 * @return merged value
+	 * @throws Throwable
+	 *             if duplicate and overwrites not allowed.
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private Object mergeObject(Object v0, Object v1) throws Throwable {
+		if (v0 == null) {
+			return v1;
+		} else if (v1 != null) {
+			if (v0 instanceof Collection && v1 instanceof Collection) {
+				((Collection) v0).addAll((Collection) v1);
+			} else if (v0 instanceof Map && v1 instanceof Map) {
+				((Map) v0).putAll((Map) v1);
+			} else if (!allowOverwrites) {
+				throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM
+						+ JAXBControlConstants.SP + v1);
+			}
+		}
+		return v0;
+	}
+
+	/**
 	 * Properties are hashed against their name; properties with the same name
 	 * are merged into a single object. Nameless properties may occur from an
 	 * empty line at the end of the stream, and are simply discarded.
@@ -485,5 +420,24 @@ public class TargetImpl implements IMatchable {
 				hash.put(name, current);
 			}
 		}
+	}
+
+	/**
+	 * Checks if overwrites are allowed.
+	 * 
+	 * @param s0
+	 * @param s1
+	 * @return merged value
+	 * @throws Throwable
+	 *             if duplicate and overwrites not allowed.
+	 */
+	private String mergeString(String s0, String s1) throws Throwable {
+		if (s0 == null) {
+			return s1;
+		} else if (s1 != null && !allowOverwrites) {
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + s1);
+		}
+		return s0;
 	}
 }
