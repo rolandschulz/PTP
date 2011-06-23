@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +50,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	private final ICheckable viewer;
 	private final ColumnViewer columnViewer;
 	private final Map<String, Object> deselected;
+	private final boolean initialAllChecked;
 	private Button showOnlySelected;
 
 	/**
@@ -75,6 +75,8 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 *            output (produced from the pattern template) will be stored in
 	 *            the environment as the value of this name, and thus can be
 	 *            referenced by other widget models.
+	 * @param initialAllChecked
+	 *            default setting for all is checked; else all unchecked
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their
 	 *            values
@@ -85,10 +87,12 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 *            name-value pairs associated with the items of the viewer into
 	 *            a single output string
 	 */
-	public ViewerUpdateModel(String name, ValueUpdateHandler handler, ICheckable viewer, TemplateType template) {
+	public ViewerUpdateModel(String name, boolean initialAllChecked, ValueUpdateHandler handler, ICheckable viewer,
+			TemplateType template) {
 		super(name, handler);
 		this.viewer = viewer;
 		this.columnViewer = (ColumnViewer) viewer;
+		this.initialAllChecked = initialAllChecked;
 		pattern = template.getPattern();
 		String s = template.getSeparator();
 		separator = s == null ? JAXBControlUIConstants.ZEROSTR : s;
@@ -140,7 +144,6 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 * .jface.viewers.DoubleClickEvent)
 	 */
 	public void doubleClick(DoubleClickEvent event) {
-		List<CheckStateChangedEvent> csEvents = new ArrayList<CheckStateChangedEvent>();
 		try {
 			IStructuredSelection selection = (IStructuredSelection) ((ColumnViewer) viewer).getSelection();
 			List<?> selected = selection.toList();
@@ -150,18 +153,23 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 					if (o instanceof ICellEditorUpdateModel) {
 						ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
 						viewer.setChecked(model, !checked);
+						String name = model.getName();
+						if (!viewer.getChecked(model)) {
+							deselected.put(name, lcMap.remove(name));
+						} else if (lcMap.get(name) == null) {
+							lcMap.put(name, deselected.remove(name));
+							model.refreshValueFromMap();
+						}
 					} else {
 						viewer.setChecked(o, false);
 					}
-					csEvents.add(new CheckStateChangedEvent(viewer, o, !checked));
 				}
 			}
 		} catch (Throwable t) {
 			JAXBControlUIPlugin.log(t);
 		}
-		for (CheckStateChangedEvent e : csEvents) {
-			checkStateChanged(e);
-		}
+		storeValue();
+		handleUpdate(null);
 	}
 
 	/*
@@ -200,7 +208,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 			if (o instanceof ICellEditorUpdateModel) {
 				ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
 				if (allChecked.isEmpty()) {
-					checked = true;
+					checked = initialAllChecked;
 				} else {
 					checked = allChecked.containsKey(model.getName());
 				}

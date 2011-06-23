@@ -59,7 +59,7 @@ public class AppendImpl extends AbstractAssign {
 			}
 			int len = entries.size();
 			for (int i = 1; i < len; i++) {
-				v = getValue(entries.get(0), values);
+				v = getValue(entries.get(i), values);
 				if (v != null) {
 					if (separator != null) {
 						buffer.append(separator);

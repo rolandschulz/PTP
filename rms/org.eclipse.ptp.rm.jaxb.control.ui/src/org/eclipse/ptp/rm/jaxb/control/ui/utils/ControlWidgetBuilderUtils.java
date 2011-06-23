@@ -87,7 +87,7 @@ public class ControlWidgetBuilderUtils {
 	}
 
 	/**
-	 * Creates adapter with sorter for viewer.
+	 * Creates sorter adapter for viewer column.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.sorters.AttributeViewerSorter
 	 * 
@@ -96,17 +96,13 @@ public class ControlWidgetBuilderUtils {
 	 */
 	private static SelectionAdapter getAttributeViewerSelectionAdapter(final ColumnViewer viewer) {
 		return new SelectionAdapter() {
-			private boolean toggle = false;
-
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-
-				AttributeViewerSorter sorter = new AttributeViewerSorter();
-				if (toggle) {
+				AttributeViewerSorter sorter = (AttributeViewerSorter) viewer.getSorter();
+				if (sorter != null) {
 					sorter.toggle();
+					viewer.refresh();
 				}
-				viewer.setSorter(sorter);
-				toggle = !toggle;
 			}
 		};
 	}
@@ -170,6 +166,7 @@ public class ControlWidgetBuilderUtils {
 			if (JAXBControlUIConstants.COLUMN_NAME.equals(name)) {
 				if (sortOnName != null) {
 					if (sortOnName) {
+						viewer.setSorter(new AttributeViewerSorter());
 						column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
 					}
 				}
@@ -216,6 +213,7 @@ public class ControlWidgetBuilderUtils {
 			if (JAXBControlUIConstants.COLUMN_NAME.equals(name)) {
 				if (sortOnName != null) {
 					if (sortOnName) {
+						viewer.setSorter(new AttributeViewerSorter());
 						column.addSelectionListener(getAttributeViewerSelectionAdapter(viewer));
 					}
 				}

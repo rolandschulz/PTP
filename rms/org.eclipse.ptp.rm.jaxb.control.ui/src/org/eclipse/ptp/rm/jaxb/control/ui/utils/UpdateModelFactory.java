@@ -388,7 +388,7 @@ public class UpdateModelFactory {
 		String name = descriptor.getName();
 		TemplateType template = descriptor.getValue();
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
-		return new ViewerUpdateModel(name, handler, (ICheckable) viewer, template);
+		return new ViewerUpdateModel(name, descriptor.isInitialAllChecked(), handler, (ICheckable) viewer, template);
 	}
 
 	/**

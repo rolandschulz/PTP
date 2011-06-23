@@ -542,7 +542,7 @@
 					<layout>
 						<grid-layout numColumns="1"/>
 					</layout>
-					<viewer name="environment" style="SWT.BORDER | SWT.MULTI" sort="true" type="tree">
+					<viewer name="environment" style="SWT.BORDER | SWT.MULTI" sort="true" type="tree" initialAllChecked="false">
 						<layout-data>
 							<grid-data widthHint="600" heightHint="200" horizontalSpan="1"/>
 						</layout-data>
