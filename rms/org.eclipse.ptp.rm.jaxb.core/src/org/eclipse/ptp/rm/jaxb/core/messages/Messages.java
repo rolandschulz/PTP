@@ -25,10 +25,11 @@ public class Messages extends NLS {
 	public static String CachedDefinitionWarning;
 
 	public static String ForceXmlReload;
-	public static String ShowSegementPattern;
+	public static String ShowSegmentPattern;
 	public static String ShowMatchStatus;
 	public static String ShowActionsForMatch;
 	public static String ShowCreatedProperties;
+	public static String TokenizerLog;
 
 	static {
 		// initialize resource bundle

@@ -28,6 +28,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.IMatchable;
 import org.eclipse.ptp.rm.jaxb.control.internal.IStreamParserTokenizer;
 import org.eclipse.ptp.rm.jaxb.control.internal.data.TargetImpl;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.control.internal.utils.TokenizerLogger;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 import org.eclipse.ptp.rm.jaxb.core.data.TargetType;
@@ -176,6 +177,7 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	 * Calls {@link #read(BufferedReader)}.
 	 */
 	public void run() {
+		TokenizerLogger.initialize();
 		BufferedReader br = null;
 		try {
 			br = new BufferedReader(new InputStreamReader(in));

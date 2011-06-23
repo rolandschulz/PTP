@@ -35,6 +35,8 @@ public class JAXBRMPreferenceManager extends AbstractPreferenceInitializer {
 		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.MATCH_STATUS, false);
 		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS, false);
 		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES, false);
+		Preferences.setDefaultString(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.LOG_FILE,
+				JAXBCoreConstants.ZEROSTR);
 	}
 
 }

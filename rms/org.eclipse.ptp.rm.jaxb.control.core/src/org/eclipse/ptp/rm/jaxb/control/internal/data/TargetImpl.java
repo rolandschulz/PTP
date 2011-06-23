@@ -17,17 +17,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.IAssign;
 import org.eclipse.ptp.rm.jaxb.control.internal.IMatchable;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.control.internal.utils.TokenizerLogger;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
-import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
@@ -67,8 +65,6 @@ public class TargetImpl implements IMatchable {
 	private final boolean matchAll;
 	private boolean selected;
 
-	private final boolean reportProperties;
-
 	/**
 	 * Wraps the Property or Attribute to be acted upon.
 	 * 
@@ -98,8 +94,6 @@ public class TargetImpl implements IMatchable {
 		}
 		targets = new ArrayList<Object>();
 		selected = false;
-		reportProperties = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(),
-				JAXBRMPreferenceConstants.CREATED_PROPERTIES);
 	}
 
 	/**
@@ -213,14 +207,10 @@ public class TargetImpl implements IMatchable {
 	public synchronized void postProcess() throws Throwable {
 		if (refTarget == null) {
 			if (JAXBControlConstants.PROPERTY.equals(type)) {
-				if (reportProperties) {
-					JAXBCorePlugin.log(Messages.TargetImpl_0 + targets.size() + Messages.TargetImpl_1);
-				}
+				TokenizerLogger.getLogger().logPropertyInfo(Messages.TargetImpl_0 + targets.size() + Messages.TargetImpl_1);
 				mergeProperties(targets);
 			} else if (JAXBControlConstants.ATTRIBUTE.equals(type)) {
-				if (reportProperties) {
-					JAXBCorePlugin.log(Messages.TargetImpl_2 + targets.size() + Messages.TargetImpl_3);
-				}
+				TokenizerLogger.getLogger().logPropertyInfo(Messages.TargetImpl_2 + targets.size() + Messages.TargetImpl_3);
 				mergeAttributes(targets);
 			}
 			if (rmVarMap instanceof RMVariableMap) {
@@ -232,17 +222,13 @@ public class TargetImpl implements IMatchable {
 					}
 					if (JAXBControlConstants.PROPERTY.equals(type)) {
 						PropertyType p = (PropertyType) t;
-						if (reportProperties) {
-							JAXBCorePlugin.log(Messages.TargetImpl_4 + p.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP
-									+ p.getValue());
-						}
+						TokenizerLogger.getLogger().logPropertyInfo(
+								Messages.TargetImpl_4 + p.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP + p.getValue());
 						dmap.put(p.getName(), p);
 					} else if (JAXBControlConstants.ATTRIBUTE.equals(type)) {
 						AttributeType a = (AttributeType) t;
-						if (reportProperties) {
-							JAXBCorePlugin.log(Messages.TargetImpl_6 + a.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP
-									+ a.getValue());
-						}
+						TokenizerLogger.getLogger().logPropertyInfo(
+								Messages.TargetImpl_6 + a.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP + a.getValue());
 						dmap.put(a.getName(), a);
 					}
 				}

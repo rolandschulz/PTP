@@ -53,6 +53,7 @@ public class Messages extends NLS {
 	public static String AbstractAssign_1;
 	public static String AbstractAssign_2;
 	public static String AbstractAssign_3;
+	public static String AbstractAssign_4;
 	public static String MatchImpl_0;
 	public static String MatchImpl_1;
 	public static String MatchImpl_2;

@@ -15,13 +15,11 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.IAssign;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.control.internal.utils.TokenizerLogger;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AddType;
 import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
@@ -214,7 +212,6 @@ public abstract class AbstractAssign implements IAssign {
 	protected Object target;
 	protected int index;
 	protected IVariableMap rmVarMap;
-	protected final boolean report;
 
 	/**
 	 * @param rmVarMap
@@ -226,7 +223,6 @@ public abstract class AbstractAssign implements IAssign {
 		target = null;
 		index = 0;
 		this.rmVarMap = rmVarMap;
-		report = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS);
 	}
 
 	/**
@@ -241,10 +237,10 @@ public abstract class AbstractAssign implements IAssign {
 		Object[] value = getValue(previous, values);
 		set(target, field, value);
 		index++;
-		if (report) {
-			JAXBCorePlugin.log(Messages.AbstractAssign_0 + this + Messages.AbstractAssign_1 + target + Messages.AbstractAssign_2
-					+ field + Messages.AbstractAssign_3 + Arrays.asList(value));
-		}
+		TokenizerLogger.getLogger().logActionInfo(
+				Messages.AbstractAssign_0 + this + Messages.AbstractAssign_1 + target + Messages.AbstractAssign_2 + field
+						+ Messages.AbstractAssign_3 + Arrays.asList(value));
+		TokenizerLogger.getLogger().logActionInfo(this + Messages.AbstractAssign_4 + index);
 	}
 
 	/**

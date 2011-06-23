@@ -15,8 +15,11 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceManager;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rm.ui.preferences.AbstractRemoteRMPreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -25,18 +28,40 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Text;
 
-public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implements SelectionListener {
+/**
+ * 
+ * @author arossi
+ * 
+ */
+public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implements SelectionListener, ModifyListener {
 
 	private Button reloadOption;
 	private Button segmentPattern;
 	private Button matchStatus;
 	private Button actions;
 	private Button createdProperties;
+	private Text tokenizerLogFile;
 
 	@Override
 	public String getPreferenceQualifier() {
 		return JAXBCorePlugin.getUniqueIdentifier();
+	}
+
+	/*
+	 * Serves a listener for the preference widgets. (non-Javadoc) (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events
+	 * .ModifyEvent)
+	 */
+	public void modifyText(ModifyEvent e) {
+		Text source = (Text) e.getSource();
+		if (source == tokenizerLogFile) {
+			String text = tokenizerLogFile.getText();
+			Preferences.setString(getPreferenceQualifier(), JAXBRMPreferenceConstants.LOG_FILE, text);
+		}
 	}
 
 	@Override
@@ -55,7 +80,8 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 		actions.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.ACTIONS, false));
 		createdProperties.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(),
 				JAXBRMPreferenceConstants.CREATED_PROPERTIES, false));
-
+		tokenizerLogFile.setText(Preferences.getDefaultString(getPreferenceQualifier(), JAXBRMPreferenceConstants.LOG_FILE,
+				JAXBUIConstants.ZEROSTR));
 		updateApplyButton();
 	}
 
@@ -69,10 +95,26 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 		JAXBRMPreferenceManager.savePreferences();
 	}
 
+	/*
+	 * Serves a listener for the preference widgets. (non-Javadoc)
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
+	 * .swt.events.SelectionEvent)
+	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
 		widgetSelected(e);
 	}
 
+	/*
+	 * Serves a listener for the preference widgets. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
+	 * .events.SelectionEvent)
+	 */
 	public void widgetSelected(SelectionEvent e) {
 		Button source = (Button) e.getSource();
 		if (source == reloadOption) {
@@ -134,6 +176,23 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 		createdProperties.addSelectionListener(this);
 		createdProperties.setText(JAXBRMPreferenceConstants.CREATED_PROPERTIES);
 
+		Composite c = new Composite(optionsGroup, SWT.NONE);
+		c.setLayout(new GridLayout(7, false));
+		gd = new GridData();
+		gd.horizontalAlignment = GridData.BEGINNING;
+		gd.horizontalSpan = 7;
+		gd.grabExcessHorizontalSpace = false;
+		gd.grabExcessVerticalSpace = false;
+		c.setLayoutData(gd);
+		WidgetBuilderUtils.createLabel(c, JAXBRMPreferenceConstants.LOG_FILE, SWT.LEFT, 1);
+		gd = new GridData();
+		gd.horizontalAlignment = GridData.FILL;
+		gd.horizontalSpan = 6;
+		gd.grabExcessHorizontalSpace = true;
+		gd.grabExcessVerticalSpace = false;
+		gd.widthHint = 175;
+		tokenizerLogFile = WidgetBuilderUtils.createText(c, SWT.BORDER, gd, false, null, this, null);
+
 		loadSaved();
 		return optionsGroup;
 	}
@@ -161,5 +220,10 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 		b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES,
 				def, null);
 		createdProperties.setSelection(b);
+		String defText = Preferences.getDefaultString(getPreferenceQualifier(), JAXBRMPreferenceConstants.LOG_FILE,
+				JAXBUIConstants.ZEROSTR);
+		String text = Platform.getPreferencesService().getString(getPreferenceQualifier(), JAXBRMPreferenceConstants.LOG_FILE,
+				defText, null);
+		tokenizerLogFile.setText(text);
 	}
 }
