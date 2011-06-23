@@ -25,6 +25,7 @@ public class RegexImpl {
 	private String expression;
 	private final boolean split;
 	private final Pattern pattern;
+	private final String flags;
 	private int lastChar;
 
 	/**
@@ -39,7 +40,8 @@ public class RegexImpl {
 			expression = regex.getContent();
 		}
 		split = regex.isSplit();
-		pattern = Pattern.compile(expression, getFlags(regex.getFlags()));
+		flags = regex.getFlags();
+		pattern = Pattern.compile(expression, getFlags(flags));
 	}
 
 	/**
@@ -47,6 +49,10 @@ public class RegexImpl {
 	 */
 	public String getExpression() {
 		return expression;
+	}
+
+	public String getFlags() {
+		return flags;
 	}
 
 	/**

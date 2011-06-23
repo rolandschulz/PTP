@@ -24,6 +24,12 @@ public class Messages extends NLS {
 	public static String UsingCachedDefinition;
 	public static String CachedDefinitionWarning;
 
+	public static String ForceXmlReload;
+	public static String ShowSegementPattern;
+	public static String ShowMatchStatus;
+	public static String ShowActionsForMatch;
+	public static String ShowCreatedProperties;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

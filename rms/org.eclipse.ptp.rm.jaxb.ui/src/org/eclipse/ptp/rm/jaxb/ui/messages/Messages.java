@@ -26,6 +26,7 @@ public class Messages extends NLS {
 	public static String ResourceManagersNotExist_title;
 
 	public static String Preferences_options;
+	public static String Debug_options;
 
 	static {
 		// initialize resource bundle

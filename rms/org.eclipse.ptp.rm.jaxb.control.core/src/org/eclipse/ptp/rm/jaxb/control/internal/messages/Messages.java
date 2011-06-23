@@ -42,6 +42,23 @@ public class Messages extends NLS {
 	public static String RemoteConnectionError;
 	public static String StreamParserInconsistentPropertyWarning;
 	public static String JAXBServiceProvider_defaultDescription;
+	public static String TargetImpl_0;
+	public static String TargetImpl_1;
+	public static String TargetImpl_2;
+	public static String TargetImpl_3;
+	public static String TargetImpl_4;
+	public static String TargetImpl_6;
+
+	public static String AbstractAssign_0;
+	public static String AbstractAssign_1;
+	public static String AbstractAssign_2;
+	public static String AbstractAssign_3;
+	public static String MatchImpl_0;
+	public static String MatchImpl_1;
+	public static String MatchImpl_2;
+	public static String MatchImpl_3;
+	public static String MatchImpl_4;
+	public static String MatchImpl_5;
 
 	static {
 		// initialize resource bundle

@@ -10,11 +10,16 @@
 package org.eclipse.ptp.rm.jaxb.control.internal.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.jaxb.control.data.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.control.internal.IAssign;
+import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 
@@ -37,6 +42,9 @@ public class MatchImpl {
 	private List<IAssign> assign;
 	private final boolean moveToTop;
 	private boolean matched;
+
+	private final boolean reportPattern;
+	private final boolean reportStatus;
 
 	/**
 	 * @param uuid
@@ -66,6 +74,9 @@ public class MatchImpl {
 				AbstractAssign.add(uuid, o, this.assign, rmVarMap);
 			}
 		}
+
+		reportPattern = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN);
+		reportStatus = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.MATCH_STATUS);
 	}
 
 	/**
@@ -81,12 +92,23 @@ public class MatchImpl {
 		int end = 0;
 		String[] tokens = null;
 
+		if (reportPattern) {
+			JAXBCorePlugin.log(Messages.MatchImpl_0 + sequence);
+			JAXBCorePlugin.log(Messages.MatchImpl_1 + regex.getExpression() + Messages.MatchImpl_2 + regex.getFlags());
+		}
+
 		if (regex == null) {
 			matched = true;
+			if (reportStatus) {
+				JAXBCorePlugin.log(Messages.MatchImpl_3);
+			}
 			return sequence.length();
 		} else {
 			tokens = regex.getMatched(sequence);
 			if (tokens == null) {
+				if (reportStatus) {
+					JAXBCorePlugin.log(Messages.MatchImpl_4);
+				}
 				return end;
 			}
 			/*
@@ -94,6 +116,9 @@ public class MatchImpl {
 			 */
 			matched = true;
 			end = regex.getLastChar();
+			if (reportStatus) {
+				JAXBCorePlugin.log(Messages.MatchImpl_5 + Arrays.asList(tokens));
+			}
 		}
 
 		if (target == null || assign == null) {

@@ -9,9 +9,15 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
+import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
+
 /**
  * Constant definitions for plug-in preferences
  */
 public class JAXBRMPreferenceConstants {
-	public static final String FORCE_XML_RELOAD = "Always reload XML from URL"; //$NON-NLS-1$
+	public static final String FORCE_XML_RELOAD = Messages.ForceXmlReload;
+	public static final String SEGMENT_PATTERN = Messages.ShowSegementPattern;
+	public static final String MATCH_STATUS = Messages.ShowMatchStatus;
+	public static final String ACTIONS = Messages.ShowActionsForMatch;
+	public static final String CREATED_PROPERTIES = Messages.ShowCreatedProperties;
 }

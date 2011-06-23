@@ -12,11 +12,16 @@ package org.eclipse.ptp.rm.jaxb.control.internal.data;
 
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.IAssign;
+import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AddType;
 import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
@@ -33,152 +38,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.ThrowType;
  * 
  */
 public abstract class AbstractAssign implements IAssign {
-
-	protected String uuid;
-	protected String field;
-	protected Object target;
-	protected int index;
-	protected IVariableMap rmVarMap;
-
-	/**
-	 * @param rmVarMap
-	 *            resource manager environment
-	 */
-	protected AbstractAssign(IVariableMap rmVarMap) {
-		uuid = null;
-		field = null;
-		target = null;
-		index = 0;
-		this.rmVarMap = rmVarMap;
-	}
-
-	/**
-	 * Applies the assignment.
-	 * 
-	 * @param values
-	 *            from the expression parsing (groups or segments)
-	 * @throws Throwable
-	 */
-	public void assign(String[] values) throws Throwable {
-		Object previous = get(target, field);
-		set(target, field, getValue(previous, values));
-		index++;
-	}
-
-	/**
-	 * Used in the case of references to targets constructed in connection with
-	 * the tokenization. The assumption is that an Assign action will be applied
-	 * only once to any given target, in the order of their construction; this
-	 * index keeps track of where this particular assign action is in the list.
-	 * 
-	 * @return the index of the current target
-	 */
-	public int getIndex() {
-		return index;
-	}
-
-	/**
-	 * @param target
-	 *            the current property or attribute
-	 */
-	public void setTarget(Object target) {
-		this.target = target;
-	}
-
-	/**
-	 * Decides whether the index of the map key is a segment (from
-	 * regex.split()) or a regex group number.
-	 * 
-	 * @param entry
-	 *            from the target map
-	 * @return the key index
-	 */
-	protected int determineKeyIndex(EntryType entry) {
-		int index = entry.getKeyIndex();
-		int group = entry.getKeyGroup();
-		if (index == 0 && group != 0) {
-			index = group;
-		}
-		return index;
-	}
-
-	/**
-	 * Decides whether the index of the map value is a segment (from
-	 * regex.split()) or a regex group number.
-	 * 
-	 * @param entry
-	 *            carries the key and value indices
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.Entry
-	 * @return the value index
-	 */
-	protected int determineValueIndex(EntryType entry) {
-		int index = entry.getValueIndex();
-		int group = entry.getValueGroup();
-		if (index == 0 && group != 0) {
-			index = group;
-		}
-		return index;
-	}
-
-	/**
-	 * Find the map key
-	 * 
-	 * @param entry
-	 *            carries the key and value indices
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.Entry
-	 * @param values
-	 *            the parsed result of the expression match
-	 * @return key
-	 * @throws Throwable
-	 */
-	protected String getKey(EntryType entry, String[] values) throws Throwable {
-		String k = entry.getKey();
-		if (k != null) {
-			return (String) normalizedValue(target, uuid, k, false, rmVarMap);
-		}
-		int index = determineKeyIndex(entry);
-		if (values != null) {
-			return values[index];
-		}
-		return null;
-	}
-
-	/**
-	 * Find the map value
-	 * 
-	 * @param entry
-	 *            carries the key and value indices
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.Entry
-	 * @param values
-	 *            the parsed result of the expression match
-	 * @return value
-	 * @throws Throwable
-	 */
-	protected Object getValue(EntryType entry, String[] values) throws Throwable {
-		String v = entry.getValue();
-		if (v != null) {
-			return normalizedValue(target, uuid, v, true, rmVarMap);
-		}
-		int index = determineValueIndex(entry);
-		if (values != null) {
-			return values[index];
-		}
-		return null;
-	}
-
-	/**
-	 * Method specific to the assign type for retrieving the values from the
-	 * matched expression.
-	 * 
-	 * @param previous
-	 *            the value currently assigned to the field of the target in
-	 *            question.
-	 * @param values
-	 *            the parsed result of the expression match
-	 * @return the value(s) retrieved from the parsed result
-	 * @throws Throwable
-	 */
-	protected abstract Object[] getValue(Object previous, String[] values) throws Throwable;
 
 	/**
 	 * Auxiliary for adding a wrapper implementation.
@@ -349,4 +208,157 @@ public abstract class AbstractAssign implements IAssign {
 		}
 		setter.invoke(target, values);
 	}
+
+	protected String uuid;
+	protected String field;
+	protected Object target;
+	protected int index;
+	protected IVariableMap rmVarMap;
+	protected final boolean report;
+
+	/**
+	 * @param rmVarMap
+	 *            resource manager environment
+	 */
+	protected AbstractAssign(IVariableMap rmVarMap) {
+		uuid = null;
+		field = null;
+		target = null;
+		index = 0;
+		this.rmVarMap = rmVarMap;
+		report = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS);
+	}
+
+	/**
+	 * Applies the assignment.
+	 * 
+	 * @param values
+	 *            from the expression parsing (groups or segments)
+	 * @throws Throwable
+	 */
+	public void assign(String[] values) throws Throwable {
+		Object previous = get(target, field);
+		Object[] value = getValue(previous, values);
+		set(target, field, value);
+		index++;
+		if (report) {
+			JAXBCorePlugin.log(Messages.AbstractAssign_0 + this + Messages.AbstractAssign_1 + target + Messages.AbstractAssign_2
+					+ field + Messages.AbstractAssign_3 + Arrays.asList(value));
+		}
+	}
+
+	/**
+	 * Used in the case of references to targets constructed in connection with
+	 * the tokenization. The assumption is that an Assign action will be applied
+	 * only once to any given target, in the order of their construction; this
+	 * index keeps track of where this particular assign action is in the list.
+	 * 
+	 * @return the index of the current target
+	 */
+	public int getIndex() {
+		return index;
+	}
+
+	/**
+	 * @param target
+	 *            the current property or attribute
+	 */
+	public void setTarget(Object target) {
+		this.target = target;
+	}
+
+	/**
+	 * Decides whether the index of the map key is a segment (from
+	 * regex.split()) or a regex group number.
+	 * 
+	 * @param entry
+	 *            from the target map
+	 * @return the key index
+	 */
+	protected int determineKeyIndex(EntryType entry) {
+		int index = entry.getKeyIndex();
+		int group = entry.getKeyGroup();
+		if (index == 0 && group != 0) {
+			index = group;
+		}
+		return index;
+	}
+
+	/**
+	 * Decides whether the index of the map value is a segment (from
+	 * regex.split()) or a regex group number.
+	 * 
+	 * @param entry
+	 *            carries the key and value indices
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.Entry
+	 * @return the value index
+	 */
+	protected int determineValueIndex(EntryType entry) {
+		int index = entry.getValueIndex();
+		int group = entry.getValueGroup();
+		if (index == 0 && group != 0) {
+			index = group;
+		}
+		return index;
+	}
+
+	/**
+	 * Find the map key
+	 * 
+	 * @param entry
+	 *            carries the key and value indices
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.Entry
+	 * @param values
+	 *            the parsed result of the expression match
+	 * @return key
+	 * @throws Throwable
+	 */
+	protected String getKey(EntryType entry, String[] values) throws Throwable {
+		String k = entry.getKey();
+		if (k != null) {
+			return (String) normalizedValue(target, uuid, k, false, rmVarMap);
+		}
+		int index = determineKeyIndex(entry);
+		if (values != null) {
+			return values[index];
+		}
+		return null;
+	}
+
+	/**
+	 * Find the map value
+	 * 
+	 * @param entry
+	 *            carries the key and value indices
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.Entry
+	 * @param values
+	 *            the parsed result of the expression match
+	 * @return value
+	 * @throws Throwable
+	 */
+	protected Object getValue(EntryType entry, String[] values) throws Throwable {
+		String v = entry.getValue();
+		if (v != null) {
+			return normalizedValue(target, uuid, v, true, rmVarMap);
+		}
+		int index = determineValueIndex(entry);
+		if (values != null) {
+			return values[index];
+		}
+		return null;
+	}
+
+	/**
+	 * Method specific to the assign type for retrieving the values from the
+	 * matched expression.
+	 * 
+	 * @param previous
+	 *            the value currently assigned to the field of the target in
+	 *            question.
+	 * @param values
+	 *            the parsed result of the expression match
+	 * @return the value(s) retrieved from the parsed result
+	 * @throws Throwable
+	 */
+	protected abstract Object[] getValue(Object previous, String[] values) throws Throwable;
 }

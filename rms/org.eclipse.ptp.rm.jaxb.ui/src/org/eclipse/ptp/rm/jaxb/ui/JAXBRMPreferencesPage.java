@@ -29,6 +29,10 @@ import org.eclipse.swt.widgets.Group;
 public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implements SelectionListener {
 
 	private Button reloadOption;
+	private Button segmentPattern;
+	private Button matchStatus;
+	private Button actions;
+	private Button createdProperties;
 
 	@Override
 	public String getPreferenceQualifier() {
@@ -44,6 +48,14 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 	public void performDefaults() {
 		reloadOption.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(),
 				JAXBRMPreferenceConstants.FORCE_XML_RELOAD, false));
+		segmentPattern.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(),
+				JAXBRMPreferenceConstants.SEGMENT_PATTERN, false));
+		matchStatus.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.MATCH_STATUS,
+				false));
+		actions.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.ACTIONS, false));
+		createdProperties.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(),
+				JAXBRMPreferenceConstants.CREATED_PROPERTIES, false));
+
 		updateApplyButton();
 	}
 
@@ -62,8 +74,23 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 	}
 
 	public void widgetSelected(SelectionEvent e) {
-		boolean b = reloadOption.getSelection();
-		Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD, b);
+		Button source = (Button) e.getSource();
+		if (source == reloadOption) {
+			boolean b = reloadOption.getSelection();
+			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD, b);
+		} else if (source == segmentPattern) {
+			boolean b = segmentPattern.getSelection();
+			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN, b);
+		} else if (source == matchStatus) {
+			boolean b = matchStatus.getSelection();
+			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.MATCH_STATUS, b);
+		} else if (source == actions) {
+			boolean b = actions.getSelection();
+			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.ACTIONS, b);
+		} else if (source == createdProperties) {
+			boolean b = createdProperties.getSelection();
+			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES, b);
+		}
 	}
 
 	@Override
@@ -74,11 +101,39 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 		GridData gd = new GridData();
 		gd.horizontalAlignment = GridData.BEGINNING;
 		gd.horizontalSpan = 1;
-		gd.horizontalIndent = 10;
+		gd.grabExcessHorizontalSpace = true;
+		gd.grabExcessVerticalSpace = false;
 		optionsGroup.setLayoutData(gd);
 		reloadOption = new Button(optionsGroup, SWT.CHECK | SWT.LEFT);
 		reloadOption.addSelectionListener(this);
 		reloadOption.setText(JAXBRMPreferenceConstants.FORCE_XML_RELOAD);
+
+		optionsGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		optionsGroup.setText(Messages.Debug_options);
+		optionsGroup.setLayout(new GridLayout(1, true));
+		gd = new GridData();
+		gd.horizontalAlignment = GridData.BEGINNING;
+		gd.horizontalSpan = 1;
+		gd.grabExcessHorizontalSpace = true;
+		gd.grabExcessVerticalSpace = false;
+		optionsGroup.setLayoutData(gd);
+
+		segmentPattern = new Button(optionsGroup, SWT.CHECK | SWT.LEFT);
+		segmentPattern.addSelectionListener(this);
+		segmentPattern.setText(JAXBRMPreferenceConstants.SEGMENT_PATTERN);
+
+		matchStatus = new Button(optionsGroup, SWT.CHECK | SWT.LEFT);
+		matchStatus.addSelectionListener(this);
+		matchStatus.setText(JAXBRMPreferenceConstants.MATCH_STATUS);
+
+		actions = new Button(optionsGroup, SWT.CHECK | SWT.LEFT);
+		actions.addSelectionListener(this);
+		actions.setText(JAXBRMPreferenceConstants.ACTIONS);
+
+		createdProperties = new Button(optionsGroup, SWT.CHECK | SWT.LEFT);
+		createdProperties.addSelectionListener(this);
+		createdProperties.setText(JAXBRMPreferenceConstants.CREATED_PROPERTIES);
+
 		loadSaved();
 		return optionsGroup;
 	}
@@ -91,5 +146,20 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 		boolean b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(),
 				JAXBRMPreferenceConstants.FORCE_XML_RELOAD, def, null);
 		reloadOption.setSelection(b);
+		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN, false);
+		b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN, def,
+				null);
+		segmentPattern.setSelection(b);
+		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.MATCH_STATUS, false);
+		b = Platform.getPreferencesService()
+				.getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.MATCH_STATUS, def, null);
+		matchStatus.setSelection(b);
+		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.ACTIONS, false);
+		b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.ACTIONS, def, null);
+		actions.setSelection(b);
+		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES, false);
+		b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES,
+				def, null);
+		createdProperties.setSelection(b);
 	}
 }

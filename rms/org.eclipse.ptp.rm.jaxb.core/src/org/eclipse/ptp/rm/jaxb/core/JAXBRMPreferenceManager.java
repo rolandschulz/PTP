@@ -18,6 +18,10 @@ import org.eclipse.ptp.core.Preferences;
  */
 public class JAXBRMPreferenceManager extends AbstractPreferenceInitializer {
 
+	public static void savePreferences() {
+		Preferences.savePreferences(JAXBCorePlugin.getUniqueIdentifier());
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -27,10 +31,10 @@ public class JAXBRMPreferenceManager extends AbstractPreferenceInitializer {
 	@Override
 	public void initializeDefaultPreferences() {
 		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD, false);
-	}
-
-	public static void savePreferences() {
-		Preferences.savePreferences(JAXBCorePlugin.getUniqueIdentifier());
+		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN, false);
+		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.MATCH_STATUS, false);
+		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS, false);
+		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES, false);
 	}
 
 }

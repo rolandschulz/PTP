@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.IAssign;
@@ -24,6 +25,9 @@ import org.eclipse.ptp.rm.jaxb.control.internal.IMatchable;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
@@ -63,6 +67,8 @@ public class TargetImpl implements IMatchable {
 	private final boolean matchAll;
 	private boolean selected;
 
+	private final boolean reportProperties;
+
 	/**
 	 * Wraps the Property or Attribute to be acted upon.
 	 * 
@@ -92,6 +98,8 @@ public class TargetImpl implements IMatchable {
 		}
 		targets = new ArrayList<Object>();
 		selected = false;
+		reportProperties = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.CREATED_PROPERTIES);
 	}
 
 	/**
@@ -205,8 +213,14 @@ public class TargetImpl implements IMatchable {
 	public synchronized void postProcess() throws Throwable {
 		if (refTarget == null) {
 			if (JAXBControlConstants.PROPERTY.equals(type)) {
+				if (reportProperties) {
+					JAXBCorePlugin.log(Messages.TargetImpl_0 + targets.size() + Messages.TargetImpl_1);
+				}
 				mergeProperties(targets);
 			} else if (JAXBControlConstants.ATTRIBUTE.equals(type)) {
+				if (reportProperties) {
+					JAXBCorePlugin.log(Messages.TargetImpl_2 + targets.size() + Messages.TargetImpl_3);
+				}
 				mergeAttributes(targets);
 			}
 			if (rmVarMap instanceof RMVariableMap) {
@@ -217,9 +231,19 @@ public class TargetImpl implements IMatchable {
 						test.doTest();
 					}
 					if (JAXBControlConstants.PROPERTY.equals(type)) {
-						dmap.put(((PropertyType) t).getName(), t);
+						PropertyType p = (PropertyType) t;
+						if (reportProperties) {
+							JAXBCorePlugin.log(Messages.TargetImpl_4 + p.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP
+									+ p.getValue());
+						}
+						dmap.put(p.getName(), p);
 					} else if (JAXBControlConstants.ATTRIBUTE.equals(type)) {
-						dmap.put(((AttributeType) t).getName(), t);
+						AttributeType a = (AttributeType) t;
+						if (reportProperties) {
+							JAXBCorePlugin.log(Messages.TargetImpl_6 + a.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP
+									+ a.getValue());
+						}
+						dmap.put(a.getName(), a);
 					}
 				}
 			}
@@ -253,14 +277,21 @@ public class TargetImpl implements IMatchable {
 	 *            Attribute
 	 * @throws Throwable
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void merge(AttributeType previous, AttributeType current) throws Throwable {
 		Object v0 = previous.getValue();
 		Object v1 = current.getValue();
 		if (v0 == null) {
 			previous.setValue(v1);
 		} else if (v1 != null) {
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM
-					+ JAXBControlConstants.SP + v1);
+			if (v0 instanceof Collection && v1 instanceof Collection) {
+				((Collection) v0).addAll((Collection) v1);
+			} else if (v0 instanceof Map && v1 instanceof Map) {
+				((Map) v0).putAll((Map) v1);
+			} else {
+				throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM
+						+ JAXBControlConstants.SP + v1);
+			}
 		}
 
 		String s0 = previous.getDefault();
@@ -276,7 +307,7 @@ public class TargetImpl implements IMatchable {
 		s1 = current.getType();
 		if (s0 == null) {
 			previous.setType(s1);
-		} else if (s1 != null) {
+		} else if (s1 != null && !s1.equals(s0)) {
 			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
 					+ JAXBControlConstants.SP + s1);
 		}
