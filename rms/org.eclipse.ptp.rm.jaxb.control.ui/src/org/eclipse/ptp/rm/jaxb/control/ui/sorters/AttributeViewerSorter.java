@@ -12,7 +12,6 @@ package org.eclipse.ptp.rm.jaxb.control.ui.sorters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
-import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 
 /**
  * Sorts the viewer on the name column. Clicking a second time on the column
@@ -38,14 +37,15 @@ public class AttributeViewerSorter extends ViewerSorter {
 		if (o1 instanceof ICellEditorUpdateModel && o2 instanceof ICellEditorUpdateModel) {
 			ICellEditorUpdateModel c1 = (ICellEditorUpdateModel) o1;
 			ICellEditorUpdateModel c2 = (ICellEditorUpdateModel) o2;
-			String name1 = c1.getDisplayValue(JAXBControlUIConstants.COLUMN_NAME);
-			String name2 = c2.getDisplayValue(JAXBControlUIConstants.COLUMN_NAME);
-			result = name1.compareTo(name2);
+			result = c1.getName().compareTo(c2.getName());
 		}
 
 		return result * toggle;
 	}
 
+	/**
+	 * Changes direction of sort.
+	 */
 	public void toggle() {
 		toggle *= -1;
 	}

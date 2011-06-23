@@ -17,10 +17,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckable;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -42,7 +40,7 @@ import org.eclipse.swt.widgets.Button;
  * @author arossi
  * 
  */
-public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStateListener, IDoubleClickListener, SelectionListener {
+public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStateListener, SelectionListener {
 	private final StringBuffer checked;
 	private final StringBuffer templatedValue;
 	private final String pattern;
@@ -99,7 +97,6 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		checked = new StringBuffer();
 		templatedValue = new StringBuffer();
 		viewer.addCheckStateListener(this);
-		columnViewer.addDoubleClickListener(this);
 		deselected = new HashMap<String, Object>();
 	}
 
@@ -108,51 +105,29 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 * changes to checked, the checked values are stored, and the update handler
 	 * notified. Unchecked values get removed from the current environment and
 	 * placed in a temporary map; when rechecked, the current value in the
-	 * deselected map is removed and replaced into the environment.
-	 * (non-Javadoc)
+	 * deselected map is removed and replaced into the environment. Multiple
+	 * rows can be selected, in which case they will all receive the value of
+	 * the clicked row. (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse
 	 * .jface.viewers.CheckStateChangedEvent)
 	 */
 	public void checkStateChanged(CheckStateChangedEvent event) {
-		Object target = event.getElement();
-		if (!(target instanceof ICellEditorUpdateModel)) {
-			viewer.setChecked(target, false);
-		} else {
-			ICellEditorUpdateModel model = (ICellEditorUpdateModel) target;
-			String name = model.getName();
-			if (!viewer.getChecked(target)) {
-				deselected.put(name, lcMap.remove(name));
-			} else if (lcMap.get(name) == null) {
-				lcMap.put(name, deselected.remove(name));
-				model.refreshValueFromMap();
-			}
-		}
-		storeValue();
-		handleUpdate(null);
-	}
-
-	/*
-	 * Model serves as DoubleClickListener for the viewer. Multiple rows can be
-	 * selected, and their checked state toggled using a double-click. Each
-	 * toggle generates a CheckStateChangedEvent passed directly to the {@link
-	 * #checkStateChanged(CheckStateChangedEvent)} method.(non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse
-	 * .jface.viewers.DoubleClickEvent)
-	 */
-	public void doubleClick(DoubleClickEvent event) {
 		try {
 			IStructuredSelection selection = (IStructuredSelection) ((ColumnViewer) viewer).getSelection();
 			List<?> selected = selection.toList();
 			if (!selected.isEmpty()) {
+				Object element = event.getElement();
+				if (!(element instanceof ICellEditorUpdateModel)) {
+					viewer.setChecked(element, false);
+					return;
+				}
+				boolean checked = viewer.getChecked(event.getElement());
 				for (Object o : selected) {
-					boolean checked = viewer.getChecked(o);
 					if (o instanceof ICellEditorUpdateModel) {
 						ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
-						viewer.setChecked(model, !checked);
+						viewer.setChecked(model, checked);
 						String name = model.getName();
 						if (!viewer.getChecked(model)) {
 							deselected.put(name, lcMap.remove(name));
