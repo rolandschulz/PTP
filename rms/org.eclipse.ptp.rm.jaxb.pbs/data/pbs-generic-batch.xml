@@ -712,7 +712,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<grid-layout numColumns="1"/>
 					</layout>
 					<layout-data>
-						<grid-data widthHint="600" heightHint="900" horizontalSpan="1"/>
+						<grid-data widthHint="600" horizontalSpan="1"/>
 					</layout-data>
 					<!-- QUEUES remote path group -->
 					<composite group="true">
@@ -749,7 +749,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</widget>
 						<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" sort="true" type="tree">
 							<layout-data>
-								<grid-data widthHint="600" heightHint="400" horizontalSpan="1"/>
+								<grid-data widthHint="600" horizontalSpan="1"/>
 							</layout-data>
 							<column-data name="Name" width="175">
 								<tooltip>Double-click on selected rows toggles their checked value.</tooltip>
