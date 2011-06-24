@@ -164,8 +164,8 @@
 					<match>
 						<expression>mca:.*:param:([^:]*):status:(.*)</expression>
 						<set field="name">
-                     <entry valueGroup="1"/>
-                  </set>
+							<entry valueGroup="1"/>
+						</set>
 						<set field="status">
 							<entry valueGroup="2"/>
 						</set>
@@ -173,8 +173,8 @@
 					<match>
 						<expression>mca:.*:param:([^:]*):help:(.*)</expression>
 						<set field="name">
-                     <entry valueGroup="1"/>
-                  </set>
+							<entry valueGroup="1"/>
+						</set>
 						<set field="tooltip">
 							<entry valueGroup="2"/>
 						</set>
@@ -277,7 +277,7 @@
 					</widget>
 					<widget type="checkbox" saveValueTo="saveFiles" style="SWT.LEFT" translateBooleanAs="1,0">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false"  horizontalSpan="2"/>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
@@ -552,6 +552,25 @@
 						</items>
 						<value pattern="export @name='@value'" separator="; "/>
 					</viewer>
+				</composite>
+			</dynamic>
+			<dynamic>
+				<title>Advanced Open MPI</title>
+				<composite>
+					<layout>
+						<grid-layout numColumns="1"/>
+					</layout>
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
+					</layout-data>
+					<widget type="text" readOnly="true" style="SWT.LEFT | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="false" heightHint="25"/>
+						</layout-data>
+						<dynamic-text>
+							<arg>this is some text</arg>
+						</dynamic-text>
+					</widget>
 				</composite>
 			</dynamic>
 		</launch-tab>
