@@ -192,7 +192,7 @@ public class WidgetBuilderUtils {
 	public static Composite createComposite(Composite parent, Integer columns) {
 		GridLayout layout = createGridLayout(columns, false, JAXBUIConstants.DEFAULT, 1, JAXBUIConstants.DEFAULT,
 				JAXBUIConstants.DEFAULT);
-		return createComposite(parent, SWT.NONE, layout, null);
+		return createComposite(parent, SWT.NONE, layout, createDefaultDataForLayout(layout));
 	}
 
 	/**
@@ -205,7 +205,7 @@ public class WidgetBuilderUtils {
 	public static Composite createComposite(Composite parent, Integer style, Layout layout, Object layoutData) {
 		Composite composite = new Composite(parent, style);
 		composite.setLayout(layout);
-		composite.setData(layoutData);
+		composite.setLayoutData(layoutData);
 		return composite;
 	}
 
