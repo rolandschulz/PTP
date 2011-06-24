@@ -68,6 +68,9 @@ public class RMVariableMap implements IVariableMap {
 	 * @return the found Property or Attribute
 	 */
 	public Object get(String name) {
+		if (name == null) {
+			return null;
+		}
 		Object o = variables.get(name);
 		if (o == null) {
 			o = discovered.get(name);
@@ -140,7 +143,7 @@ public class RMVariableMap implements IVariableMap {
 	 *            interface (Launch Tab)
 	 */
 	public void maybeAddProperty(String name, Object value, boolean visible) {
-		if (value == null) {
+		if (name == null || value == null) {
 			return;
 		}
 		PropertyType p = new PropertyType();
@@ -191,6 +194,9 @@ public class RMVariableMap implements IVariableMap {
 	 *            of Property or Attribute
 	 */
 	public void put(String name, Object value) {
+		if (name == null) {
+			return;
+		}
 		variables.put(name, value);
 	}
 
@@ -203,6 +209,9 @@ public class RMVariableMap implements IVariableMap {
 	 * @return value of Property or Attribute
 	 */
 	public Object remove(String name) {
+		if (name == null) {
+			return null;
+		}
 		Object o = variables.remove(name);
 		if (o == null) {
 			o = discovered.remove(name);

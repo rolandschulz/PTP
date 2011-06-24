@@ -99,7 +99,6 @@ public class LaunchTabBuilder {
 						gridData.getWidthHint(), gridData.getHeightHint(), gridData.getMinWidth(), gridData.getMinHeight(),
 						gridData.getHorizontalSpan(), gridData.getVerticalSpan(), hAlign, vAlign, gridData.getHorizontalIndent(),
 						gridData.getVerticalIndent());
-
 			} else if (layoutData.getFormData() != null) {
 				FormDataType formData = layoutData.getFormData();
 				FormAttachment top = null;
@@ -382,6 +381,7 @@ public class LaunchTabBuilder {
 		} else {
 			composite = WidgetBuilderUtils.createComposite(parent, style, layout, data);
 		}
+
 		addChildren(descriptor.getTabFolderOrCompositeOrWidget(), composite);
 
 		String attr = descriptor.getBackground();

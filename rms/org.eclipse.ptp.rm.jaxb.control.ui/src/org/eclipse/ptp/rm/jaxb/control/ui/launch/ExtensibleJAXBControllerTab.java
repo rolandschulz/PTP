@@ -116,6 +116,7 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 				simpleTabItem.setControl(tabControl.getControl());
 			}
 		}
+		control.layout(true, true);
 	}
 
 	/*

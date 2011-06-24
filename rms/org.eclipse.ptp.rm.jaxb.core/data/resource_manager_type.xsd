@@ -91,7 +91,7 @@
 	</xs:complexType>
 	<xs:complexType name="script-type">
 		<xs:sequence>
-		   <xs:element name="file-staging-location" minOccurs="0" type="xs:string"/>
+			<xs:element name="file-staging-location" minOccurs="0" type="xs:string"/>
 			<xs:element name="line" maxOccurs="unbounded" type="rm:line-type"/>
 		</xs:sequence>
 		<xs:attribute name="insertEnvironmentAfter" type="xs:int" default="-1"/>
@@ -175,7 +175,7 @@
 		<xs:attribute name="includeWidgetValuesFrom" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="regex-type" mixed="true">
-	   <xs:attribute name="flags" type="xs:string"/>
+		<xs:attribute name="flags" type="xs:string"/>
 		<xs:attribute name="split" type="xs:boolean" default="false"/>
 		<xs:attribute name="expression" type="xs:string"/>
 	</xs:complexType>
@@ -284,7 +284,7 @@
 	</xs:complexType>
 	<xs:complexType name="grid-layout-type">
 		<xs:attribute name="numColumns" type="xs:int"/>
-		<xs:attribute name="makeColumnsEqualWidth" type="xs:boolean" default="true"/>
+		<xs:attribute name="makeColumnsEqualWidth" type="xs:boolean" default="false"/>
 		<xs:attribute name="marginHeight" type="xs:int"/>
 		<xs:attribute name="marginWidth" type="xs:int"/>
 		<xs:attribute name="marginTop" type="xs:int"/>
@@ -355,6 +355,7 @@
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="button-action" minOccurs="0" type="rm:button-action-type"/>
+			<xs:element name="state-rule" minOccurs="0" maxOccurs="unbounded" type="rm:control-state-rule-type"/>
 		</xs:sequence>
 		<xs:attribute name="type" default="text">
 			<xs:simpleType>
@@ -382,11 +383,11 @@
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="button-action-type">
-	  <xs:sequence>
-	     <xs:element name="action" type="xs:string"/>
-	  </xs:sequence>
-   	<xs:attribute name="clearValue" type="xs:string"/>
-      <xs:attribute name="refresh" type="xs:boolean" default="true"/>
+		<xs:sequence>
+			<xs:element name="action" type="xs:string"/>
+		</xs:sequence>
+		<xs:attribute name="clearValue" type="xs:string"/>
+		<xs:attribute name="refresh" type="xs:boolean" default="true"/>
 	</xs:complexType>
 	<xs:complexType name="button-group-type">
 		<xs:sequence>
@@ -430,6 +431,7 @@
 		<xs:sequence>
 			<xs:element name="include" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 			<xs:element name="exclude" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
+			<xs:element name="state-rule" minOccurs="0" maxOccurs="unbounded" type="rm:control-state-rule-type"/>
 		</xs:sequence>
 		<xs:attribute name="allPredefined" type="xs:boolean" default="false"/>
 		<xs:attribute name="allDiscovered" type="xs:boolean" default="false"/>
@@ -571,6 +573,19 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="control-state-rule-type">
+		<xs:choice>
+			<xs:sequence>
+				<xs:element name="not" minOccurs="0" type="rm:control-state-rule-type"/>
+				<xs:element name="and" minOccurs="0" maxOccurs="unbounded" type="rm:control-state-rule-type"/>
+				<xs:element name="or" minOccurs="0" maxOccurs="unbounded" type="rm:control-state-rule-type"/>
+			</xs:sequence>
+			<xs:sequence>
+				<xs:element name="eventType" type="xs:string"/>
+				<xs:element name="source" type="xs:string"/>
+			</xs:sequence>
+		</xs:choice>
 	</xs:complexType>
 	<xs:complexType name="monitor-type">
 		<xs:sequence>

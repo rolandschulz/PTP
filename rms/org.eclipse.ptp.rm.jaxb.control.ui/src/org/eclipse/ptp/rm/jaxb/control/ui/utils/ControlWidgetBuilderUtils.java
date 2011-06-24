@@ -6,7 +6,6 @@
  * 	
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
- *  M Venkataramana - set up editing: http://eclipse.dzone.com/users/venkat_r_m
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.utils;
 

@@ -162,26 +162,10 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 				MessageDialog.openWarning(parent.getShell(), Messages.ReadOnlyWarning_title, Messages.ReadOnlyWarning);
 			}
 		});
-
+		control.layout(true, true);
 		size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		selected = null;
 		updateControls();
-	}
-
-	/*
-	 * If there is a path selected, store it in the local map as the
-	 * SCRIPT_PATH. Also store or remove remote paths. (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab#
-	 * doRefreshLocal()
-	 */
-	@Override
-	protected void doRefreshLocal() {
-		if (selected != null) {
-			localMap.put(JAXBControlUIConstants.SCRIPT_PATH, selected);
-		}
-		maybeRefreshPaths();
 	}
 
 	/**
@@ -242,6 +226,109 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 */
 	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
 		return new RMLaunchValidation(true, null);
+	}
+
+	/*
+	 * Tab acts as listener for path text boxes. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events
+	 * .ModifyEvent)
+	 */
+	public void modifyText(ModifyEvent e) {
+		try {
+			if (stdoutText == e.getSource()) {
+				stdoutPath = stdoutText.getText().trim();
+			} else if (stderrText == e.getSource()) {
+				stderrPath = stderrText.getText().trim();
+			}
+			fireContentsChanged();
+		} catch (Throwable t) {
+			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ModifyError, Messages.ModifyErrorTitle, false);
+		}
+	}
+
+	/*
+	 * Nothing to do here. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+		return new RMLaunchValidation(true, null);
+	}
+
+	/*
+	 * Tab acts as listener for browse, clear and path buttons (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
+	 * .swt.events.SelectionEvent)
+	 */
+	public void widgetDefaultSelected(SelectionEvent e) {
+		widgetSelected(e);
+	}
+
+	/*
+	 * Tab acts as listener for browse, clear and path buttons (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
+	 * .events.SelectionEvent)
+	 */
+	public void widgetSelected(SelectionEvent e) {
+		Object source = e.getSource();
+		try {
+			if (source == browseWorkspace) {
+				selected = WidgetActionUtils.browseWorkspace(control.getShell());
+				updateContents();
+			} else if (source == clear) {
+				selected = null;
+				updateContents();
+			} else if (source == enableFetchStdout) {
+				boolean enabled = enableFetchStdout.getSelection();
+				if (enabled) {
+					stdoutText.setText(stdoutPath);
+					stdoutText.setEnabled(true);
+				} else {
+					stdoutText.setText(JAXBControlUIConstants.ZEROSTR);
+					stdoutText.setEnabled(false);
+				}
+				fireContentsChanged();
+			} else if (source == enableFetchStderr) {
+				boolean enabled = enableFetchStderr.getSelection();
+				if (enabled) {
+					stderrText.setText(stderrPath);
+					stderrText.setEnabled(true);
+				} else {
+					stderrText.setText(JAXBControlUIConstants.ZEROSTR);
+					stderrText.setEnabled(false);
+				}
+				fireContentsChanged();
+			}
+		} catch (Throwable t) {
+			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.WidgetSelectedError, Messages.WidgetSelectedErrorTitle,
+					false);
+		}
+	}
+
+	/*
+	 * If there is a path selected, store it in the local map as the
+	 * SCRIPT_PATH. Also store or remove remote paths. (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab#
+	 * doRefreshLocal()
+	 */
+	@Override
+	protected void doRefreshLocal() {
+		if (selected != null) {
+			localMap.put(JAXBControlUIConstants.SCRIPT_PATH, selected);
+		}
+		maybeRefreshPaths();
 	}
 
 	/**
@@ -342,39 +429,6 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	}
 
 	/*
-	 * Tab acts as listener for path text boxes. (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events
-	 * .ModifyEvent)
-	 */
-	public void modifyText(ModifyEvent e) {
-		try {
-			if (stdoutText == e.getSource()) {
-				stdoutPath = stdoutText.getText().trim();
-			} else if (stderrText == e.getSource()) {
-				stderrPath = stderrText.getText().trim();
-			}
-			fireContentsChanged();
-		} catch (Throwable t) {
-			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ModifyError, Messages.ModifyErrorTitle, false);
-		}
-	}
-
-	/*
-	 * Nothing to do here. (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
-	 * org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
-	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		return new RMLaunchValidation(true, null);
-	}
-
-	/*
 	 * Reads in the script if the selected path is set, then notifies the
 	 * ResourcesTab of the change.
 	 */
@@ -422,59 +476,5 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 			}
 		}
 		updateControls();
-	}
-
-	/*
-	 * Tab acts as listener for browse, clear and path buttons (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
-	 * .swt.events.SelectionEvent)
-	 */
-	public void widgetDefaultSelected(SelectionEvent e) {
-		widgetSelected(e);
-	}
-
-	/*
-	 * Tab acts as listener for browse, clear and path buttons (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
-	 * .events.SelectionEvent)
-	 */
-	public void widgetSelected(SelectionEvent e) {
-		Object source = e.getSource();
-		try {
-			if (source == browseWorkspace) {
-				selected = WidgetActionUtils.browseWorkspace(control.getShell());
-				updateContents();
-			} else if (source == clear) {
-				selected = null;
-				updateContents();
-			} else if (source == enableFetchStdout) {
-				boolean enabled = enableFetchStdout.getSelection();
-				if (enabled) {
-					stdoutText.setText(stdoutPath);
-					stdoutText.setEnabled(true);
-				} else {
-					stdoutText.setText(JAXBControlUIConstants.ZEROSTR);
-					stdoutText.setEnabled(false);
-				}
-				fireContentsChanged();
-			} else if (source == enableFetchStderr) {
-				boolean enabled = enableFetchStderr.getSelection();
-				if (enabled) {
-					stderrText.setText(stderrPath);
-					stderrText.setEnabled(true);
-				} else {
-					stderrText.setText(JAXBControlUIConstants.ZEROSTR);
-					stderrText.setEnabled(false);
-				}
-				fireContentsChanged();
-			}
-		} catch (Throwable t) {
-			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.WidgetSelectedError, Messages.WidgetSelectedErrorTitle,
-					false);
-		}
 	}
 }

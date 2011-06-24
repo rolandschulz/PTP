@@ -163,6 +163,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			CoreExceptionUtils.newException(Messages.CreateControlConfigurableError, t);
 		}
 		createViewScriptGroup(control);
+		control.layout(true, true);
 		size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 	}
 

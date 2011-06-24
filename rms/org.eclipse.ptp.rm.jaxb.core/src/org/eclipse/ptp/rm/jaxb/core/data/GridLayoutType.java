@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;attribute name="horizontalSpacing" type="{http://www.w3.org/2001/XMLSchema}int" />
- *       &lt;attribute name="makeColumnsEqualWidth" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" />
+ *       &lt;attribute name="makeColumnsEqualWidth" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="marginBottom" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="marginHeight" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="marginLeft" type="{http://www.w3.org/2001/XMLSchema}int" />
@@ -164,7 +164,7 @@ public class GridLayoutType {
 	 */
 	public boolean isMakeColumnsEqualWidth() {
 		if (makeColumnsEqualWidth == null) {
-			return true;
+			return false;
 		} else {
 			return makeColumnsEqualWidth;
 		}

@@ -96,6 +96,9 @@ public class LCVariableMap implements IVariableMap {
 	 * @return value of the Property or Attribute, or <code>null</code> if none
 	 */
 	public Object get(String name) {
+		if (name == null) {
+			return null;
+		}
 		return values.get(name);
 	}
 
@@ -123,6 +126,9 @@ public class LCVariableMap implements IVariableMap {
 	 *         if none
 	 */
 	public String getDefault(String name) {
+		if (name == null) {
+			return null;
+		}
 		return defaultValues.get(name);
 	}
 
@@ -207,6 +213,9 @@ public class LCVariableMap implements IVariableMap {
 	 *            of Property or Attribute
 	 */
 	public void put(String name, Object value) {
+		if (name == null) {
+			return;
+		}
 		if (value == null) {
 			values.remove(name);
 		} else {
@@ -255,6 +264,9 @@ public class LCVariableMap implements IVariableMap {
 	 * @return value of Property or Attribute
 	 */
 	public Object remove(String name) {
+		if (name == null) {
+			return null;
+		}
 		return values.remove(name);
 	}
 

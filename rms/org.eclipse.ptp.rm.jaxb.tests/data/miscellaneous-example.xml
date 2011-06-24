@@ -15,6 +15,7 @@
 		<property name="path2" visible="true"/>
 		<property name="path3" visible="true"/>
 		<property name="path4" visible="true"/>
+		<property name="check" visible="false"/>
 		<attribute name="e1" visible="true" status="valid" type="integer">
 			<description>it's "e1"</description>
 			<tooltip>use in conjunction with E1</tooltip>
@@ -407,6 +408,9 @@
 					<layout>
 						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
 					</layout>
+					<layout-data>
+						<grid-data horizontalSpan="4" widthHint="700"/>
+					</layout-data>
 					<!-- row 1 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
@@ -556,7 +560,7 @@
 			</dynamic>
 			<dynamic>
 				<title>Advanced Open MPI</title>
-				<composite>
+				<composite group="true">
 					<layout>
 						<grid-layout numColumns="1"/>
 					</layout>
@@ -570,6 +574,11 @@
 						<dynamic-text>
 							<arg>this is some text</arg>
 						</dynamic-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" heightHint="25"/>
+						</layout-data>
 					</widget>
 				</composite>
 			</dynamic>
