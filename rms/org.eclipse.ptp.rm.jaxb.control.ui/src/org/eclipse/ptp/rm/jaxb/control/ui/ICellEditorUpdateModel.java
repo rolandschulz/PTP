@@ -68,6 +68,12 @@ public interface ICellEditorUpdateModel extends IUpdateModel, IColumnViewerLabel
 	public void setBackground(Color[] background);
 
 	/**
+	 * @param checked
+	 *            whether this item (row) is checked in the viewer
+	 */
+	public void setChecked(boolean checked);
+
+	/**
 	 * @param font
 	 *            any defined fonts for each column of the viewer
 	 */

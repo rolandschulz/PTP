@@ -101,7 +101,7 @@ public class ControlWidgetBuilderUtils {
 				AttributeViewerSorter sorter = (AttributeViewerSorter) viewer.getSorter();
 				if (sorter != null) {
 					sorter.toggle();
-					viewer.refresh(false);
+					viewer.refresh();
 				}
 			}
 		};

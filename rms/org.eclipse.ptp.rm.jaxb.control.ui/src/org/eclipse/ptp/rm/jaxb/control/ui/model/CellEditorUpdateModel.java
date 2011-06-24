@@ -12,7 +12,6 @@ package org.eclipse.ptp.rm.jaxb.control.ui.model;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
-import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
@@ -53,6 +52,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	}
 
 	protected boolean readOnly;
+	protected boolean checked;
 	protected String tooltip;
 	protected String description;
 	protected String status;
@@ -67,7 +67,6 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	protected int index;
 	protected String[] items;
 	protected boolean booleanValue;
-
 	protected int integerValue;
 
 	/**
@@ -289,7 +288,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#isChecked()
 	 */
 	public boolean isChecked() {
-		return ((ICheckable) viewer.getControl()).getChecked(this);
+		return checked;
 	}
 
 	/*
@@ -356,6 +355,14 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 */
 	public void setBackground(Color[] background) {
 		this.background = background;
+	}
+
+	/**
+	 * @param checked
+	 *            whether item in viewer is checked
+	 */
+	public void setChecked(boolean checked) {
+		this.checked = checked;
 	}
 
 	/*

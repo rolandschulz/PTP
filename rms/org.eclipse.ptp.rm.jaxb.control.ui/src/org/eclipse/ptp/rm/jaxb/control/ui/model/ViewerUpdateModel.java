@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -113,23 +114,27 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 * org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse
 	 * .jface.viewers.CheckStateChangedEvent)
 	 */
+	@SuppressWarnings("unchecked")
 	public void checkStateChanged(CheckStateChangedEvent event) {
 		try {
+			Object element = event.getElement();
+			if (!(element instanceof ICellEditorUpdateModel)) {
+				viewer.setChecked(element, false);
+				return;
+			}
+			boolean checked = viewer.getChecked(element);
 			IStructuredSelection selection = (IStructuredSelection) ((ColumnViewer) viewer).getSelection();
-			List<?> selected = selection.toList();
+			List<Object> selected = new ArrayList<Object>();
+			selected.add(element);
+			selected.addAll(selection.toList());
 			if (!selected.isEmpty()) {
-				Object element = event.getElement();
-				if (!(element instanceof ICellEditorUpdateModel)) {
-					viewer.setChecked(element, false);
-					return;
-				}
-				boolean checked = viewer.getChecked(event.getElement());
 				for (Object o : selected) {
 					if (o instanceof ICellEditorUpdateModel) {
 						ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
+						model.setChecked(checked);
 						viewer.setChecked(model, checked);
 						String name = model.getName();
-						if (!viewer.getChecked(model)) {
+						if (!checked) {
 							deselected.put(name, lcMap.remove(name));
 						} else if (lcMap.get(name) == null) {
 							lcMap.put(name, deselected.remove(name));
@@ -187,6 +192,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 				} else {
 					checked = allChecked.containsKey(model.getName());
 				}
+				model.setChecked(checked);
 				viewer.setChecked(model, checked);
 			} else {
 				viewer.setChecked(o, false);
