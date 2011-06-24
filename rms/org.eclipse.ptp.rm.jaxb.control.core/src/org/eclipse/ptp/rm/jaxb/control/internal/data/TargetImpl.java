@@ -332,13 +332,16 @@ public class TargetImpl implements IMatchable {
 	}
 
 	/**
-	 * Returns new value if first is false.
+	 * Checks if overwrites are allowed.
 	 * 
 	 * @param b0
 	 * @param b1
 	 * @return merged value
 	 */
 	private Boolean mergeBoolean(Boolean b0, Boolean b1) {
+		if (allowOverwrites) {
+			return b1;
+		}
 		if (!b0) {
 			return b1;
 		}
@@ -357,7 +360,10 @@ public class TargetImpl implements IMatchable {
 	private Integer mergeInteger(Integer i0, Integer i1) throws Throwable {
 		if (i0 == null) {
 			return i1;
-		} else if (i1 != null && !allowOverwrites) {
+		} else if (i1 != null) {
+			if (allowOverwrites) {
+				return i1;
+			}
 			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + JAXBControlConstants.CM
 					+ JAXBControlConstants.SP + i1);
 		}
@@ -383,10 +389,11 @@ public class TargetImpl implements IMatchable {
 				((Collection) v0).addAll((Collection) v1);
 			} else if (v0 instanceof Map && v1 instanceof Map) {
 				((Map) v0).putAll((Map) v1);
-			} else if (!allowOverwrites) {
-				throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM
-						+ JAXBControlConstants.SP + v1);
+			} else if (allowOverwrites) {
+				return v1;
 			}
+			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM
+					+ JAXBControlConstants.SP + v1);
 		}
 		return v0;
 	}
@@ -434,7 +441,10 @@ public class TargetImpl implements IMatchable {
 	private String mergeString(String s0, String s1) throws Throwable {
 		if (s0 == null) {
 			return s1;
-		} else if (s1 != null && !allowOverwrites) {
+		} else if (s1 != null) {
+			if (allowOverwrites) {
+				return s1;
+			}
 			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
 					+ JAXBControlConstants.SP + s1);
 		}
