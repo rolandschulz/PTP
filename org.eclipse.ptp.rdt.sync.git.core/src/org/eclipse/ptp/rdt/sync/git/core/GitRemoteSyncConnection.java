@@ -444,7 +444,7 @@ public class GitRemoteSyncConnection implements IRemoteSyncConnection{
 				String fn = line.substring(2);
 				if (status == 'R') {
 					filesToDelete.add(fn);
-				} else if (!(fileFilter.shouldIgnore(fn))) {
+				} else if (!(fileFilter.shouldIgnore(fn) || pathFilter(fn))) {
 					filesToAdd.add(fn);
 				}
 			}
@@ -480,7 +480,7 @@ public class GitRemoteSyncConnection implements IRemoteSyncConnection{
 
 		Set<String> filesToBeIgnored = new HashSet<String>();
 		for (String fileName : filesToAdd) {
-			if (fileFilter.shouldIgnore(fileName)) {
+			if (fileFilter.shouldIgnore(fileName) || pathFilter(fileName)) {
 				filesToBeIgnored.add(fileName);
 			}
 		}
@@ -753,4 +753,12 @@ public class GitRemoteSyncConnection implements IRemoteSyncConnection{
 			}
 		}
 	}
+
+	public boolean pathFilter(String path){
+		if(path.equals("/.git")) //$NON-NLS-1$
+			return true;
+
+		return false;
+	}
+
 }

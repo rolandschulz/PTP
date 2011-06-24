@@ -349,8 +349,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	}
 	
 	// Paths that the Git sync provider can ignore.
+	// TODO: Make sure Delta refers to only one project
 	private boolean irrelevantPath(IResourceDelta delta) {
-		String path = delta.getFullPath().toString();
+		String path = delta.getProjectRelativePath().toString();
 		if (path.endsWith("/.git")) { //$NON-NLS-1$
 			return true;
 		} else if (path.endsWith("/.settings")){ //$NON-NLS-1$
@@ -360,17 +361,18 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 	
+	
 	private class FileFilter implements SyncFileFilter {
-		public boolean shouldIgnore(String fileName) {
-			if (fileName.equals(".cproject") || fileName.equals(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
+		public boolean shouldIgnore(String path) {
+			if (path.equals(".cproject") || path.equals(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
 				return true;
 			}
 
-			if (fileName.startsWith(".settings")) { //$NON-NLS-1$
+			if (path.startsWith(".settings")) { //$NON-NLS-1$
 				return true;
 			}
 
-			if (this.isBinaryFile(fileName)) {
+			if (this.isBinaryFile(path)) {
 				return true;
 			}
 
