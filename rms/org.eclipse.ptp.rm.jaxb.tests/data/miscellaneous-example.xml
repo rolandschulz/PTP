@@ -576,6 +576,129 @@
 					</viewer>
 				</composite>
 			</dynamic>
+			<dynamic>
+				<title>Basic Open MPI</title>
+				<layout>
+					<grid-layout numColumns="3"/>
+				</layout>
+				<widget type="label" style="SWT.NONE">
+					<fixed-text>Number of processes:</fixed-text>
+				</widget>
+				<widget type="spinner" style="SWT.BORDER" saveValueTo="numProcs">
+					<layout-data>
+						<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.CENTER" horizontalSpan="2"/>
+					</layout-data>
+				</widget>
+				<!-- Options group -->
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="4"/>
+					</layout>
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true" horizontalSpan="3"/>
+					</layout-data>
+					<title>Options</title>
+					<widget type="checkbox" title="By node"/>
+					<widget type="checkbox" title="By slot"/>
+					<widget type="checkbox" title="No oversubscribe"/>
+					<widget type="checkbox" title="No local"/>
+					<widget type="checkbox" title="Prefix:"/>
+					<widget type="text" style="SWT.BORDER" saveValueTo="prefix">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="3" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
+				</composite>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3"/>
+					</layout>
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="true"
+							horizontalSpan="2"/>
+					</layout-data>
+					<title>Hosts</title>
+					<widget type="checkbox" title="Host file:"/>
+					<widget type="browse" style="SWT.BORDER" title="Browse">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+						</layout-data>
+						<sub-layout-data>
+							<grid-data horizontalAlign="SWT.RIGHT" verticalAlign="SWT.CENTER"/>
+						</sub-layout-data>
+					</widget>
+					<widget type="checkbox" title="Host list:">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.TOP"/>
+						</layout-data>
+					</widget>
+					<widget type="text" style="SWT.V_SCROLL | SWT.BORDER" saveValueTo="host_list">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"
+								grabExcessVertical="true"/>
+						</layout-data>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic>
+				<title>Advanced Open MPI</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				<!-- Launch group -->
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="2"/>
+					</layout>
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+					</layout-data>
+					<title>Launch Arguments</title>
+					<widget type="checkbox" title="Use default arguments">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label">
+						<layout-data>
+							<grid-data/>
+						</layout-data>
+						<fixed-text>Arguments:</fixed-text>
+					</widget>
+					<widget type="text" readOnly="true" style="SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL">
+						<layout-data>
+							<grid-data heightHint="100" horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+						</layout-data>
+						<dynamic-text>
+							<arg>${ptp_rm:allAttributes#value}</arg>
+						</dynamic-text>
+					</widget>
+				</composite>
+				<!-- MCA group -->
+				<composite group="true">
+					<layout>
+						<grid-layout/>
+					</layout>
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="true"/>
+					</layout-data>
+					<title>MCA Parameters</title>
+					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" sort="true" type="table" initialAllChecked="false">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
+						</layout-data>
+						<column-data name="Name" width="175">
+							<tooltip>Double-click on selected rows toggles their checked value.</tooltip>
+						</column-data>
+						<column-data name="Value" width="200">
+							<tooltip>Click to activate value widget.</tooltip>
+						</column-data>
+						<items allDiscovered="true">
+						</items>
+						<value pattern="-mca @name &quot;@value&quot;"/>
+					</viewer>
+				</composite>
+			</dynamic>
 		</launch-tab>
 	</control-data>
 	<monitor-data schedulerType="Tabbed">

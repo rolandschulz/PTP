@@ -35,6 +35,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -277,7 +278,12 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 *            size of control
 	 */
 	private void resize(Point p) {
-		scrolledParent.setMinSize(getControl().computeSize(p.x + 25, p.y + 50));
+		Point size = getControl().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+		/*
+		 * So that the tabs of the controllers can be scrolled to.
+		 */
+		int x = Math.max(p.x, size.x);
+		scrolledParent.setMinSize(getControl().computeSize(x + 25, p.y + 50));
 	}
 
 	/**
