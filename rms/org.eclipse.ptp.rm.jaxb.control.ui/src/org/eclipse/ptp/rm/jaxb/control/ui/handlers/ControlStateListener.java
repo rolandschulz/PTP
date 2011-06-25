@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.handlers;
 
+import java.util.Map;
+
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.ControlStateRule;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType;
 import org.eclipse.swt.widgets.Button;
@@ -31,47 +33,44 @@ public class ControlStateListener implements Listener {
 
 	public enum Action {
 		ENABLE, DISABLE, SHOW, HIDE, SELECT, DESELECT, NONE;
-
-		public static Action get(String type) {
-			if ("ENABLE".equals(type)) { //$NON-NLS-1$
-				return ENABLE;
-			}
-			if ("DISABLE".equals(type)) { //$NON-NLS-1$
-				return DISABLE;
-			}
-			if ("SHOW".equals(type)) { //$NON-NLS-1$
-				return SHOW;
-			}
-			if ("HIDE".equals(type)) { //$NON-NLS-1$
-				return HIDE;
-			}
-			if ("SELECT".equals(type)) { //$NON-NLS-1$
-				return SELECT;
-			}
-			if ("DESELECT".equals(type)) { //$NON-NLS-1$
-				return DESELECT;
-			}
-			return NONE;
-		}
 	};
 
-	private ControlStateRule rule;
-	private Control target;
-	private Action action;
+	private final ControlStateRule rule;
+	private final Control target;
+	private final Action action;
 
-	public ControlStateListener(Control target, ControlStateRuleType rule, String action) {
-
+	/**
+	 * @param target
+	 *            control on which to set state
+	 * @param rule
+	 *            conditions under which to take action
+	 * @param action
+	 *            state setting to change on target
+	 * @param map
+	 *            control id to control
+	 */
+	public ControlStateListener(Control target, ControlStateRuleType rule, Action action, Map<String, Control> map) {
+		this.target = target;
+		this.action = action;
+		this.rule = new ControlStateRule(rule, map, this);
 	}
 
 	/*
-	 * Upon receipt of the event, the state of the controls in the rule is
-	 * reevaluated and the state of the target is set accordingly. (non-Javadoc)
+	 * Upon receipt of the event, calls {@link #setState()} (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.
 	 * Event)
 	 */
 	public void handleEvent(Event event) {
+		setState();
+	}
+
+	/**
+	 * State of the controls in the rule is reevaluated and the state of the
+	 * target is set accordingly.
+	 */
+	public void setState() {
 		if (rule.evaluate()) {
 			switch (action) {
 			case ENABLE:
@@ -123,9 +122,5 @@ public class ControlStateListener implements Listener {
 				break;
 			}
 		}
-	}
-
-	public void initialize() {
-
 	}
 }

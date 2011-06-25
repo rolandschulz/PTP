@@ -10,6 +10,8 @@
 package org.eclipse.ptp.rm.jaxb.control.ui.utils;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -20,6 +22,7 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
+import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ControlStateListener;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
@@ -29,6 +32,8 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
 import org.eclipse.ptp.rm.jaxb.core.data.ButtonGroupType;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.CompositeType;
+import org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType;
+import org.eclipse.ptp.rm.jaxb.core.data.ControlStateType;
 import org.eclipse.ptp.rm.jaxb.core.data.FillLayoutType;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.rm.jaxb.core.data.FormAttachmentType;
@@ -53,6 +58,7 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.TabFolder;
@@ -148,10 +154,14 @@ public class LaunchTabBuilder {
 	}
 
 	private final JAXBDynamicLaunchConfigurationTab tab;
-
 	private final IVariableMap rmVarMap;
-
 	private final Map<Object, IUpdateModel> localWidgets;
+
+	/*
+	 * temporary maps for wiring the widgets
+	 */
+	private final Map<String, Control> sources;
+	private final Map<ControlStateType, Control> targets;
 
 	/**
 	 * @param tab
@@ -161,6 +171,8 @@ public class LaunchTabBuilder {
 		this.tab = tab;
 		this.localWidgets = tab.getLocalWidgets();
 		this.rmVarMap = tab.getParent().getRmConfig().getRMVariableMap();
+		sources = new HashMap<String, Control>();
+		targets = new HashMap<ControlStateType, Control>();
 	}
 
 	/**
@@ -198,9 +210,7 @@ public class LaunchTabBuilder {
 			composite.setFont(WidgetBuilderUtils.getFont(fd));
 		}
 
-		/*
-		 * NEED TO POST-PROCESS MAP OF WIRED WIDGETS TODO
-		 */
+		maybeWireWidgets();
 		return composite;
 	}
 
@@ -243,6 +253,16 @@ public class LaunchTabBuilder {
 			showHide.addSelectionListener(model);
 			model.setShowAll(showHide);
 			localWidgets.put(viewer, model);
+
+			String id = descriptor.getId();
+			if (id != null) {
+				sources.put(id, viewer.getControl());
+			}
+
+			ControlStateType cst = descriptor.getControlState();
+			if (cst != null) {
+				targets.put(cst, viewer.getControl());
+			}
 		}
 	}
 
@@ -274,6 +294,16 @@ public class LaunchTabBuilder {
 		IUpdateModel model = UpdateModelFactory.createModel(descriptor, control, tab, rmVarMap);
 		if (model != null) {
 			localWidgets.put(control, model);
+		}
+
+		String id = descriptor.getId();
+		if (id != null) {
+			sources.put(id, control);
+		}
+
+		ControlStateType cst = descriptor.getControlState();
+		if (cst != null) {
+			targets.put(cst, control);
 		}
 	}
 
@@ -404,10 +434,22 @@ public class LaunchTabBuilder {
 		if (attr != null) {
 			composite.setBackground(WidgetBuilderUtils.getColor(attr));
 		}
+
 		FontType fd = descriptor.getFont();
 		if (fd != null) {
 			composite.setFont(WidgetBuilderUtils.getFont(fd));
 		}
+
+		String id = descriptor.getId();
+		if (id != null) {
+			sources.put(id, composite);
+		}
+
+		ControlStateType cst = descriptor.getControlState();
+		if (cst != null) {
+			targets.put(cst, composite);
+		}
+
 		return composite;
 	}
 
@@ -451,6 +493,14 @@ public class LaunchTabBuilder {
 		FontType fd = descriptor.getFont();
 		if (fd != null) {
 			folder.setFont(WidgetBuilderUtils.getFont(fd));
+		}
+		String id = descriptor.getId();
+		if (id != null) {
+			sources.put(id, folder);
+		}
+		ControlStateType cst = descriptor.getControlState();
+		if (cst != null) {
+			targets.put(cst, folder);
 		}
 		return folder;
 	}
@@ -499,8 +549,15 @@ public class LaunchTabBuilder {
 		if (fd != null) {
 			control.setFont(WidgetBuilderUtils.getFont(fd));
 		}
-
 		addChildren(descriptor.getCompositeOrTabFolderOrWidget(), control);
+		String id = descriptor.getId();
+		if (id != null) {
+			sources.put(id, control);
+		}
+		ControlStateType cst = descriptor.getControlState();
+		if (cst != null) {
+			targets.put(cst, control);
+		}
 	}
 
 	/**
@@ -591,7 +648,7 @@ public class LaunchTabBuilder {
 	 *            widget
 	 */
 	private void addWidget(Composite control, WidgetType widget) {
-		IUpdateModel model = UpdateModelFactory.createModel(control, widget, tab, rmVarMap);
+		IUpdateModel model = UpdateModelFactory.createModel(control, widget, tab, rmVarMap, sources, targets);
 		/*
 		 * Label models are not returned, since they cannot be updated
 		 */
@@ -648,5 +705,48 @@ public class LaunchTabBuilder {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Constructs a listener for each defined category of action on the target
+	 * and add it to the sources referenced in the rule.
+	 */
+	private void maybeWireWidgets() {
+		Collection<ControlStateListener> listeners = new HashSet<ControlStateListener>();
+
+		for (ControlStateType cst : targets.keySet()) {
+			Control target = targets.get(cst);
+			ControlStateRuleType rule = cst.getEnableIf();
+			if (rule != null) {
+				listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.ENABLE, sources));
+			} else {
+				rule = cst.getDisableIf();
+				if (rule != null) {
+					listeners.add(new ControlStateListener(targets.get(cst), rule, ControlStateListener.Action.DISABLE, sources));
+				}
+			}
+
+			rule = cst.getHideIf();
+			if (rule != null) {
+				listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.HIDE, sources));
+			} else {
+				rule = cst.getShowIf();
+				if (rule != null) {
+					listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.SHOW, sources));
+				}
+			}
+
+			rule = cst.getDeselectIf();
+			if (rule != null) {
+				listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.DESELECT, sources));
+			} else {
+				rule = cst.getSelectIf();
+				if (rule != null) {
+					listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.SELECT, sources));
+				}
+			}
+		}
+
+		tab.setListeners(listeners);
 	}
 }

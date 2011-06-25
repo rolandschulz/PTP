@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ControlStateListener;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 
@@ -49,32 +51,43 @@ public class ControlStateRule {
 	private EventType eventType;
 
 	/**
+	 * Composes the rule; also wires the source with the target listener.
+	 * 
 	 * @param rule
 	 *            JAXB element
 	 * @param map
 	 *            index of Widget controls
 	 */
-	public ControlStateRule(ControlStateRuleType rule, Map<String, Control> map) {
+	public ControlStateRule(ControlStateRuleType rule, Map<String, Control> map, ControlStateListener listener) {
 		ControlStateRuleType type = rule.getNot();
 		if (type != null) {
-			not = new ControlStateRule(type, map);
+			not = new ControlStateRule(type, map, listener);
 		} else {
 			List<ControlStateRuleType> list = rule.getAnd();
 			if (!list.isEmpty()) {
 				and = new ArrayList<ControlStateRule>();
 				for (ControlStateRuleType t : list) {
-					and.add(new ControlStateRule(t, map));
+					and.add(new ControlStateRule(t, map, listener));
 				}
 			} else {
 				list = rule.getOr();
 				if (!list.isEmpty()) {
 					or = new ArrayList<ControlStateRule>();
 					for (ControlStateRuleType t : list) {
-						or.add(new ControlStateRule(t, map));
+						or.add(new ControlStateRule(t, map, listener));
 					}
 				} else {
 					control = map.get(rule.getSource());
-					eventType = EventType.get(rule.getEventType());
+					if (control != null) {
+						eventType = EventType.get(rule.getEventType());
+						control.addListener(SWT.Activate, listener);
+						control.addListener(SWT.Deactivate, listener);
+						control.addListener(SWT.Show, listener);
+						control.addListener(SWT.Hide, listener);
+						if (control instanceof Button) {
+							control.addListener(SWT.Selection, listener);
+						}
+					}
 				}
 			}
 		}
@@ -109,11 +122,9 @@ public class ControlStateRule {
 		}
 		switch (eventType) {
 		case ENABLED:
-			control.getEnabled();
-			break;
+			return control.getEnabled();
 		case VISIBLE:
-			control.getVisible();
-			break;
+			return control.getVisible();
 		case SELECTED:
 			if (control instanceof Button) {
 				return ((Button) control).getSelection();

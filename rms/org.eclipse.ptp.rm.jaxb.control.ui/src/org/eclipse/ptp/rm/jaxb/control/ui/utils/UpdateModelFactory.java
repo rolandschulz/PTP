@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.jaxb.control.ui.utils;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
@@ -45,6 +46,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
 import org.eclipse.ptp.rm.jaxb.core.data.ButtonActionType;
 import org.eclipse.ptp.rm.jaxb.core.data.ButtonGroupType;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
+import org.eclipse.ptp.rm.jaxb.core.data.ControlStateType;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
@@ -407,9 +409,20 @@ public class UpdateModelFactory {
 	 * @return
 	 */
 	public static IUpdateModel createModel(Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab,
-			IVariableMap rmVarMap) {
+			IVariableMap rmVarMap, Map<String, Control> sources, Map<ControlStateType, Control> targets) {
 		ControlDescriptor cd = new ControlDescriptor(widget, rmVarMap);
 		Control control = createControl(parent, cd, tab);
+
+		String id = widget.getId();
+		if (id != null) {
+			sources.put(id, control);
+		}
+
+		ControlStateType cst = widget.getControlState();
+		if (cst != null) {
+			targets.put(cst, control);
+		}
+
 		if (control instanceof Label || JAXBControlUIConstants.ACTION.equals(widget.getType())) {
 			return null;
 		}
