@@ -7,9 +7,6 @@
 
 package org.eclipse.ptp.rm.jaxb.core.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -18,27 +15,27 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>
- * Java class for tab-folder-type complex type.
+ * Java class for push-button-type complex type.
  * 
  * <p>
  * The following schema fragment specifies the expected content contained within
  * this class.
  * 
  * <pre>
- * &lt;complexType name="tab-folder-type">
+ * &lt;complexType name="push-button-type">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="layout" type="{http://org.eclipse.ptp/rm}layout-type" minOccurs="0"/>
  *         &lt;element name="layout-data" type="{http://org.eclipse.ptp/rm}layout-data-type" minOccurs="0"/>
- *         &lt;element name="item" type="{http://org.eclipse.ptp/rm}tab-item-type" maxOccurs="unbounded"/>
- *         &lt;element name="tooltip" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="font" type="{http://org.eclipse.ptp/rm}font-type" minOccurs="0"/>
+ *         &lt;element name="tooltip" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="button-action" type="{http://org.eclipse.ptp/rm}button-action-type" minOccurs="0"/>
  *         &lt;element name="control-state" type="{http://org.eclipse.ptp/rm}control-state-type" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="background" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="foreground" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="style" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="title" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -47,24 +44,25 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tab-folder-type", propOrder = { "layout", "layoutData", "item", "tooltip", "font", "controlState" })
-public class TabFolderType {
+@XmlType(name = "push-button-type", propOrder = { "layoutData", "font", "tooltip", "buttonAction", "controlState" })
+public class PushButtonType {
 
-	protected LayoutType layout;
 	@XmlElement(name = "layout-data")
 	protected LayoutDataType layoutData;
-	@XmlElement(required = true)
-	protected List<TabItemType> item;
-	protected String tooltip;
 	protected FontType font;
+	protected String tooltip;
+	@XmlElement(name = "button-action")
+	protected ButtonActionType buttonAction;
 	@XmlElement(name = "control-state")
 	protected ControlStateType controlState;
 	@XmlAttribute
 	protected String background;
 	@XmlAttribute
+	protected String foreground;
+	@XmlAttribute
 	protected String id;
 	@XmlAttribute
-	protected String style;
+	protected String title;
 
 	/**
 	 * Gets the value of the background property.
@@ -74,6 +72,16 @@ public class TabFolderType {
 	 */
 	public String getBackground() {
 		return background;
+	}
+
+	/**
+	 * Gets the value of the buttonAction property.
+	 * 
+	 * @return possible object is {@link ButtonActionType }
+	 * 
+	 */
+	public ButtonActionType getButtonAction() {
+		return buttonAction;
 	}
 
 	/**
@@ -97,6 +105,16 @@ public class TabFolderType {
 	}
 
 	/**
+	 * Gets the value of the foreground property.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getForeground() {
+		return foreground;
+	}
+
+	/**
 	 * Gets the value of the id property.
 	 * 
 	 * @return possible object is {@link String }
@@ -104,46 +122,6 @@ public class TabFolderType {
 	 */
 	public String getId() {
 		return id;
-	}
-
-	/**
-	 * Gets the value of the item property.
-	 * 
-	 * <p>
-	 * This accessor method returns a reference to the live list, not a
-	 * snapshot. Therefore any modification you make to the returned list will
-	 * be present inside the JAXB object. This is why there is not a
-	 * <CODE>set</CODE> method for the item property.
-	 * 
-	 * <p>
-	 * For example, to add a new item, do as follows:
-	 * 
-	 * <pre>
-	 * getItem().add(newItem);
-	 * </pre>
-	 * 
-	 * 
-	 * <p>
-	 * Objects of the following type(s) are allowed in the list
-	 * {@link TabItemType }
-	 * 
-	 * 
-	 */
-	public List<TabItemType> getItem() {
-		if (item == null) {
-			item = new ArrayList<TabItemType>();
-		}
-		return this.item;
-	}
-
-	/**
-	 * Gets the value of the layout property.
-	 * 
-	 * @return possible object is {@link LayoutType }
-	 * 
-	 */
-	public LayoutType getLayout() {
-		return layout;
 	}
 
 	/**
@@ -157,13 +135,13 @@ public class TabFolderType {
 	}
 
 	/**
-	 * Gets the value of the style property.
+	 * Gets the value of the title property.
 	 * 
 	 * @return possible object is {@link String }
 	 * 
 	 */
-	public String getStyle() {
-		return style;
+	public String getTitle() {
+		return title;
 	}
 
 	/**
@@ -185,6 +163,17 @@ public class TabFolderType {
 	 */
 	public void setBackground(String value) {
 		this.background = value;
+	}
+
+	/**
+	 * Sets the value of the buttonAction property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link ButtonActionType }
+	 * 
+	 */
+	public void setButtonAction(ButtonActionType value) {
+		this.buttonAction = value;
 	}
 
 	/**
@@ -210,6 +199,17 @@ public class TabFolderType {
 	}
 
 	/**
+	 * Sets the value of the foreground property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setForeground(String value) {
+		this.foreground = value;
+	}
+
+	/**
 	 * Sets the value of the id property.
 	 * 
 	 * @param value
@@ -218,17 +218,6 @@ public class TabFolderType {
 	 */
 	public void setId(String value) {
 		this.id = value;
-	}
-
-	/**
-	 * Sets the value of the layout property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link LayoutType }
-	 * 
-	 */
-	public void setLayout(LayoutType value) {
-		this.layout = value;
 	}
 
 	/**
@@ -243,14 +232,14 @@ public class TabFolderType {
 	}
 
 	/**
-	 * Sets the value of the style property.
+	 * Sets the value of the title property.
 	 * 
 	 * @param value
 	 *            allowed object is {@link String }
 	 * 
 	 */
-	public void setStyle(String value) {
-		this.style = value;
+	public void setTitle(String value) {
+		this.title = value;
 	}
 
 	/**
