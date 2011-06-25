@@ -43,6 +43,7 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
+import org.eclipse.ptp.rm.jaxb.core.data.BrowseType;
 import org.eclipse.ptp.rm.jaxb.core.data.ButtonActionType;
 import org.eclipse.ptp.rm.jaxb.core.data.ButtonGroupType;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
@@ -50,6 +51,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ControlStateType;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.data.PushButtonType;
 import org.eclipse.ptp.rm.jaxb.core.data.TemplateType;
 import org.eclipse.ptp.rm.jaxb.core.data.WidgetType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
@@ -247,6 +249,16 @@ public class UpdateModelFactory {
 		private ButtonActionType action;
 		private String itemsFrom;
 
+		private ControlDescriptor(BrowseType browse, IVariableMap rmMap) {
+			setControlData(browse);
+			setMapDependentData(browse, rmMap);
+		}
+
+		private ControlDescriptor(PushButtonType button, IVariableMap rmMap) {
+			setControlData(button);
+			setMapDependentData(button, rmMap);
+		}
+
 		/**
 		 * @param widget
 		 *            JAXB data element describing widget
@@ -270,6 +282,49 @@ public class UpdateModelFactory {
 		 * Configure the fields which do not depend on the underlying data
 		 * object.
 		 * 
+		 * @param browse
+		 *            JAXB data element describing widget
+		 */
+		private void setControlData(BrowseType browse) {
+			widgetType = JAXBControlUIConstants.BROWSE;
+			title = browse.getTitle();
+			style = WidgetBuilderUtils.getStyle(browse.getTextStyle());
+			LayoutDataType layout = browse.getTextLayoutData();
+			layoutData = LaunchTabBuilder.createLayoutData(layout);
+			layout = browse.getButtonLayoutData();
+			subLayoutData = LaunchTabBuilder.createLayoutData(layout);
+			directory = browse.isDirectory();
+			returnUri = browse.isUri();
+			localOnly = browse.isLocalOnly();
+			background = browse.getBackground();
+			foreground = browse.getForeground();
+			font = browse.getFont();
+			tooltip = browse.getTooltip();
+		}
+
+		/**
+		 * Configure the fields which do not depend on the underlying data
+		 * object.
+		 * 
+		 * @param button
+		 *            JAXB data element describing widget
+		 */
+		private void setControlData(PushButtonType button) {
+			widgetType = JAXBControlUIConstants.ACTION;
+			title = button.getTitle();
+			LayoutDataType layout = button.getLayoutData();
+			layoutData = LaunchTabBuilder.createLayoutData(layout);
+			background = button.getBackground();
+			foreground = button.getForeground();
+			font = button.getFont();
+			tooltip = button.getTooltip();
+			action = button.getButtonAction();
+		}
+
+		/**
+		 * Configure the fields which do not depend on the underlying data
+		 * object.
+		 * 
 		 * @param widget
 		 *            JAXB data element describing widget
 		 */
@@ -278,12 +333,7 @@ public class UpdateModelFactory {
 			title = widget.getTitle();
 			LayoutDataType layout = widget.getLayoutData();
 			layoutData = LaunchTabBuilder.createLayoutData(layout);
-			layout = widget.getSubLayoutData();
-			subLayoutData = LaunchTabBuilder.createLayoutData(layout);
 			style = WidgetBuilderUtils.getStyle(widget.getStyle());
-			directory = widget.isDirectory();
-			returnUri = widget.isUri();
-			localOnly = widget.isLocalOnly();
 			readOnly = widget.isReadOnly();
 			if (readOnly) {
 				style |= SWT.READ_ONLY;
@@ -293,7 +343,6 @@ public class UpdateModelFactory {
 			font = widget.getFont();
 			tooltip = widget.getTooltip();
 			fixedText = widget.getFixedText();
-			action = widget.getButtonAction();
 		}
 
 		/**
@@ -320,7 +369,7 @@ public class UpdateModelFactory {
 		 * @param rmMap
 		 *            used to retrieve data object info
 		 */
-		private void setMapDependentData(WidgetType widget, IVariableMap rmMap) {
+		private void setMapDependentData(Object widget, IVariableMap rmMap) {
 			if (tooltip == null) {
 				tooltip = JAXBControlUIConstants.ZEROSTR;
 			} else {
@@ -330,13 +379,70 @@ public class UpdateModelFactory {
 			if (fixedText != null) {
 				fixedText = rmMap.getString(fixedText);
 			}
-			String s = widget.getSaveValueTo();
+
+			String s = null;
+			if (widget instanceof WidgetType) {
+				s = ((WidgetType) widget).getSaveValueTo();
+			} else if (widget instanceof BrowseType) {
+				s = ((BrowseType) widget).getSaveValueTo();
+			}
+
 			if (s != null) {
 				Object data = rmMap.get(s);
 				if (data != null) {
 					setData(data);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Constructs push-button which activates an external command. There is no
+	 * model generated for this widget.
+	 * 
+	 * @param parent
+	 *            control to which the widget belongs
+	 * @param button
+	 *            JAXB data object describing the widget to which this model is
+	 *            bound
+	 * @param tab
+	 *            launch tab being built
+	 * @param rmVarMap
+	 *            resource manager environment
+	 * @param sources
+	 *            map of widgets to check for state
+	 * @param targets
+	 *            map of widgets on which to set state
+	 * 
+	 */
+	public static void createPushButton(Composite parent, PushButtonType button, JAXBDynamicLaunchConfigurationTab tab,
+			IVariableMap rmVarMap, Map<String, Control> sources, Map<ControlStateType, Control> targets) {
+		ControlDescriptor cd = new ControlDescriptor(button, rmVarMap);
+		Control c = createActionButton(parent, cd, tab);
+
+		if (c != null) {
+			if (!JAXBControlUIConstants.ZEROSTR.equals(cd.tooltip)) {
+				c.setToolTipText(cd.tooltip);
+			}
+			if (cd.foreground != null) {
+				c.setForeground(WidgetBuilderUtils.getColor(cd.foreground));
+			}
+			if (cd.background != null) {
+				c.setBackground(WidgetBuilderUtils.getColor(cd.background));
+			}
+			if (cd.font != null) {
+				c.setFont(WidgetBuilderUtils.getFont(cd.font));
+			}
+		}
+
+		String id = button.getId();
+		if (id != null) {
+			sources.put(id, c);
+		}
+
+		ControlStateType cst = button.getControlState();
+		if (cst != null) {
+			targets.put(cst, c);
 		}
 	}
 
@@ -395,6 +501,45 @@ public class UpdateModelFactory {
 	}
 
 	/**
+	 * Constructs browse widget pair.
+	 * 
+	 * @param parent
+	 *            control to which the widget belongs
+	 * @param browse
+	 *            JAXB data object describing the widget to which this model is
+	 *            bound
+	 * @param tab
+	 *            launch tab being built
+	 * @param rmVarMap
+	 *            resource manager environment
+	 * @param sources
+	 *            map of widgets to check for state
+	 * @param targets
+	 *            map of widgets on which to set state
+	 * 
+	 */
+	public static IUpdateModel createModel(Composite parent, BrowseType browse, JAXBDynamicLaunchConfigurationTab tab,
+			IVariableMap rmVarMap, Map<String, Control> sources, Map<ControlStateType, Control> targets) {
+		ControlDescriptor cd = new ControlDescriptor(browse, rmVarMap);
+
+		Control control = createBrowse(parent, browse, cd, tab, sources, targets);
+
+		String name = browse.getSaveValueTo();
+		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
+		IUpdateModel model = null;
+		if (control instanceof Text) {
+			if (name != null && !JAXBControlUIConstants.ZEROSTR.equals(name)) {
+				model = new TextUpdateModel(name, handler, (Text) control);
+			}
+		}
+
+		if (name != null && !JAXBUIConstants.ZEROSTR.equals(name)) {
+			maybeAddValidator(model, rmVarMap.get(name), tab.getParent());
+		}
+		return model;
+	}
+
+	/**
 	 * Constructs the widget and its update model.
 	 * 
 	 * @param parent
@@ -406,7 +551,12 @@ public class UpdateModelFactory {
 	 *            launch tab being built
 	 * @param rmVarMap
 	 *            resource manager environment
-	 * @return
+	 * @param sources
+	 *            map of widgets to check for state
+	 * @param targets
+	 *            map of widgets on which to set state
+	 * 
+	 * @return update model if not a label
 	 */
 	public static IUpdateModel createModel(Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab,
 			IVariableMap rmVarMap, Map<String, Control> sources, Map<ControlStateType, Control> targets) {
@@ -423,7 +573,7 @@ public class UpdateModelFactory {
 			targets.put(cst, control);
 		}
 
-		if (control instanceof Label || JAXBControlUIConstants.ACTION.equals(widget.getType())) {
+		if (control instanceof Label) {
 			return null;
 		}
 
@@ -459,11 +609,7 @@ public class UpdateModelFactory {
 	}
 
 	/**
-	 * Constructs the cell editor and its update model. Calls
-	 * {@link #createModel(Object, TableViewer, List, JAXBDynamicLaunchConfigurationTab)}
-	 * or
-	 * {@link #createModel(Object, TreeViewer, List, JAXBDynamicLaunchConfigurationTab)}
-	 * .
+	 * Constructs the cell editor and its update model.
 	 * 
 	 * @param data
 	 *            Property or Attribute for this viewer row.
@@ -532,12 +678,18 @@ public class UpdateModelFactory {
 	 *            internal data object carrying model description info
 	 * @param tab
 	 *            launch tab being built
+	 * @param sources
+	 *            map of widgets to check for state
+	 * @param targets
+	 *            map of widgets on which to set state
+	 * 
 	 * @return the text widget carrying the browse selection
 	 */
-	private static Text createBrowse(final Composite parent, final ControlDescriptor cd, final JAXBDynamicLaunchConfigurationTab tab) {
+	private static Text createBrowse(final Composite parent, BrowseType d, final ControlDescriptor cd,
+			final JAXBDynamicLaunchConfigurationTab tab, Map<String, Control> sources, Map<ControlStateType, Control> targets) {
 		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, JAXBControlUIConstants.ZEROSTR);
-		Button b = WidgetBuilderUtils.createButton(parent, cd.subLayoutData, cd.title, SWT.NONE, new SelectionListener() {
 
+		Button b = WidgetBuilderUtils.createButton(parent, cd.subLayoutData, cd.title, SWT.NONE, new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
 			}
@@ -567,7 +719,42 @@ public class UpdateModelFactory {
 				}
 			}
 		});
+
 		SWTUtil.setButtonDimensionHint(b);
+
+		if (!JAXBControlUIConstants.ZEROSTR.equals(cd.tooltip)) {
+			t.setToolTipText(cd.tooltip);
+		}
+		if (cd.foreground != null) {
+			t.setForeground(WidgetBuilderUtils.getColor(cd.foreground));
+		}
+		if (cd.background != null) {
+			t.setBackground(WidgetBuilderUtils.getColor(cd.background));
+		}
+		if (cd.font != null) {
+			t.setFont(WidgetBuilderUtils.getFont(cd.font));
+		}
+
+		String id = d.getTextId();
+		if (id != null) {
+			sources.put(id, t);
+		}
+
+		id = d.getButtonId();
+		if (id != null) {
+			sources.put(id, b);
+		}
+
+		ControlStateType cst = d.getTextControlState();
+		if (cst != null) {
+			targets.put(cst, t);
+		}
+
+		cst = d.getButtonControlState();
+		if (cst != null) {
+			targets.put(cst, b);
+		}
+
 		return t;
 	}
 
@@ -595,16 +782,6 @@ public class UpdateModelFactory {
 	}
 
 	/**
-	 * Calls: {@link #createCombo(Composite, ControlDescriptor)},
-	 * {@link #createBrowseLocal(Composite, ControlDescriptor)},
-	 * {@link #createBrowseRemote(Composite, ControlDescriptor, JAXBDynamicLaunchConfigurationTab)}
-	 * ,
-	 * {@link WidgetBuilderUtils#createLabel(Composite, String, Integer, Object)}
-	 * ,
-	 * {@link WidgetBuilderUtils#createButton(Composite, Object, String, Integer, SelectionListener)}
-	 * ,
-	 * {@link WidgetBuilderUtils#createSpinner(Composite, Object, String, Integer, Integer, Integer, org.eclipse.swt.events.ModifyListener)}
-	 * .
 	 * 
 	 * @param parent
 	 *            to which the control belongs
@@ -640,10 +817,6 @@ public class UpdateModelFactory {
 			c = WidgetBuilderUtils.createSpinner(parent, cd.style, cd.layoutData, cd.title, cd.min, cd.max, cd.min, null);
 		} else if (JAXBControlUIConstants.COMBO.equals(cd.widgetType)) {
 			c = createCombo(parent, cd);
-		} else if (JAXBControlUIConstants.BROWSE.equals(cd.widgetType)) {
-			c = createBrowse(parent, cd, tab);
-		} else if (JAXBControlUIConstants.ACTION.equals(cd.widgetType)) {
-			c = createActionButton(parent, cd, tab);
 		}
 
 		if (c != null) {
@@ -702,8 +875,7 @@ public class UpdateModelFactory {
 	}
 
 	/**
-	 * Constructs CellEditor and model for table row. Calls
-	 * {@link #createEditor(CellDescriptor, Object, Composite)}.
+	 * Constructs CellEditor and model for table row.
 	 * 
 	 * @see org.eclipse.jface.viewers.CellEditor
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.TableRowUpdateModel
@@ -739,8 +911,7 @@ public class UpdateModelFactory {
 	}
 
 	/**
-	 * Constructs CellEditor and model for tree node. Calls
-	 * {@link #createEditor(CellDescriptor, Object, Composite)}.
+	 * Constructs CellEditor and model for tree node.
 	 * 
 	 * @see org.eclipse.jface.viewers.CellEditor
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.ValueTreeNodeUpdateModel

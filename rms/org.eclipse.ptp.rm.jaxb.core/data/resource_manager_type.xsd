@@ -174,6 +174,8 @@
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="composite" type="rm:composite-type"/>
 				<xs:element name="widget" type="rm:widget-type"/>
+				<xs:element name="browse" type="rm:browse-type"/>
+				<xs:element name="action" type="rm:push-button-type"/>
 				<xs:element name="button-group" type="rm:button-group-type"/>
 				<xs:element name="viewer" type="rm:attribute-viewer-type"/>
 			</xs:choice>
@@ -230,6 +232,8 @@
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="composite" type="rm:composite-type"/>
 				<xs:element name="widget" type="rm:widget-type"/>
+            <xs:element name="browse" type="rm:browse-type"/>
+            <xs:element name="action" type="rm:push-button-type"/>
 				<xs:element name="button-group" type="rm:button-group-type"/>
 				<xs:element name="viewer" type="rm:attribute-viewer-type"/>
 			</xs:choice>
@@ -251,6 +255,8 @@
 				<xs:element name="composite" type="rm:composite-type"/>
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="widget" type="rm:widget-type"/>
+            <xs:element name="browse" type="rm:browse-type"/>
+            <xs:element name="action" type="rm:push-button-type"/>
 				<xs:element name="button-group" type="rm:button-group-type"/>
 				<xs:element name="viewer" type="rm:attribute-viewer-type"/>
 			</xs:choice>
@@ -356,7 +362,6 @@
 	<xs:complexType name="widget-type">
 		<xs:sequence>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
-			<xs:element name="sub-layout-data" minOccurs="0" type="rm:layout-data-type"/>
 			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="items-from" minOccurs="0" type="xs:string"/>
@@ -380,29 +385,17 @@
 					<xs:enumeration value="radiobutton"/>
 					<xs:enumeration value="spinner"/>
 					<xs:enumeration value="combo"/>
-					<xs:enumeration value="browse"/>
-					<xs:enumeration value="action"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="id" type="xs:string"/>
 		<xs:attribute name="title" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>
-		<xs:attribute name="directory" type="xs:boolean" default="false"/>
-		<xs:attribute name="uri" type="xs:boolean" default="false"/>
-		<xs:attribute name="localOnly" type="xs:boolean" default="false"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
 		<xs:attribute name="saveValueTo" type="xs:string"/>
 		<xs:attribute name="translateBooleanAs" type="xs:string"/>
 		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
-	</xs:complexType>
-	<xs:complexType name="button-action-type">
-		<xs:sequence>
-			<xs:element name="action" type="xs:string"/>
-		</xs:sequence>
-		<xs:attribute name="clearValue" type="xs:string"/>
-		<xs:attribute name="refresh" type="xs:boolean" default="true"/>
 	</xs:complexType>
 	<xs:complexType name="button-group-type">
 		<xs:sequence>
@@ -418,6 +411,47 @@
 		<xs:attribute name="saveValueTo" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="browse-type">
+		<xs:sequence>
+			<xs:element name="text-layout-data" minOccurs="0" type="rm:layout-data-type"/>
+			<xs:element name="button-layout-data" minOccurs="0" type="rm:layout-data-type"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
+			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
+			<xs:element name="text-control-state" minOccurs="0" type="rm:control-state-type"/>
+			<xs:element name="button-control-state" minOccurs="0" type="rm:control-state-type"/>
+		</xs:sequence>
+		<xs:attribute name="textId" type="xs:string"/>
+		<xs:attribute name="buttonId" type="xs:string"/>
+		<xs:attribute name="title" type="xs:string"/>
+		<xs:attribute name="textStyle" type="xs:string"/>
+		<xs:attribute name="directory" type="xs:boolean" default="false"/>
+		<xs:attribute name="uri" type="xs:boolean" default="false"/>
+		<xs:attribute name="localOnly" type="xs:boolean" default="false"/>
+		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
+		<xs:attribute name="saveValueTo" type="xs:string"/>
+		<xs:attribute name="foreground" type="xs:string"/>
+		<xs:attribute name="background" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="push-button-type">
+		<xs:sequence>
+			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
+			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
+			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
+			<xs:element name="button-action" minOccurs="0" type="rm:button-action-type"/>
+			<xs:element name="control-state" minOccurs="0" type="rm:control-state-type"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="title" type="xs:string"/>
+		<xs:attribute name="foreground" type="xs:string"/>
+		<xs:attribute name="background" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="button-action-type">
+		<xs:sequence>
+			<xs:element name="action" type="xs:string"/>
+		</xs:sequence>
+		<xs:attribute name="clearValue" type="xs:string"/>
+		<xs:attribute name="refresh" type="xs:boolean" default="true"/>
 	</xs:complexType>
 	<xs:complexType name="attribute-viewer-type">
 		<xs:sequence>
@@ -602,21 +636,34 @@
 				<xs:element name="enable-if" minOccurs="0" type="rm:control-state-rule-type"/>
 				<xs:element name="disable-if" minOccurs="0" type="rm:control-state-rule-type"/>
 			</xs:choice>
-			<xs:choice minOccurs="0">
-				<xs:element name="select-if" minOccurs="0" type="rm:control-state-rule-type"/>
-				<xs:element name="deselect-if" minOccurs="0" type="rm:control-state-rule-type"/>
-			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="control-state-rule-type">
 		<xs:choice>
-			<xs:sequence>
-				<xs:element name="not" minOccurs="0" type="rm:control-state-rule-type"/>
-				<xs:element name="and" minOccurs="0" maxOccurs="unbounded" type="rm:control-state-rule-type"/>
-				<xs:element name="or" minOccurs="0" maxOccurs="unbounded" type="rm:control-state-rule-type"/>
-			</xs:sequence>
+			<xs:element name="not" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="rule" type="rm:control-state-rule-type"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="and" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="rule" maxOccurs="unbounded" type="rm:control-state-rule-type"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="or" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="rule" maxOccurs="unbounded" type="rm:control-state-rule-type"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="trigger" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 		</xs:choice>
-		<xs:attribute name="eventType" type="xs:string"/>
+		<xs:attribute name="state" type="xs:string"/>
 		<xs:attribute name="source" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="monitor-type">

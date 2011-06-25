@@ -29,6 +29,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
+import org.eclipse.ptp.rm.jaxb.core.data.BrowseType;
 import org.eclipse.ptp.rm.jaxb.core.data.ButtonGroupType;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.CompositeType;
@@ -44,6 +45,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.GridLayoutType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.data.PushButtonType;
 import org.eclipse.ptp.rm.jaxb.core.data.RowDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.RowLayoutType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
@@ -61,10 +63,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Layout;
-import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.Widget;
 
 /**
  * Object responsible for constructing the configurable JAXB Launch
@@ -80,13 +80,6 @@ public class LaunchTabBuilder {
 
 	/**
 	 * Create the layout data object. Calls
-	 * {@link WidgetBuilderUtils#createRowData(Integer, Integer, Boolean)},
-	 * {@link WidgetBuilderUtils#createGridData(Integer, Boolean, Boolean, Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer)}
-	 * , or
-	 * {@link WidgetBuilderUtils#createFormAttachment(String, Integer, Integer, Integer)}
-	 * and
-	 * {@link WidgetBuilderUtils#createFormData(Integer, Integer, FormAttachment, FormAttachment, FormAttachment, FormAttachment)}
-	 * .
 	 * 
 	 * @param layoutData
 	 *            JAXB data element describing the layout data object
@@ -176,8 +169,8 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Root call to build the SWT widget tree. Calls
-	 * {@link #addComposite(CompositeDescriptor, Composite)}<br>
+	 * Root call to build the SWT widget tree.<br>
+	 * <br>
 	 * Clears the widgets map, in the case or reinitializaton. <br>
 	 * <br>
 	 * This contents of this element are essentially the same as Composite.
@@ -216,8 +209,7 @@ public class LaunchTabBuilder {
 
 	/**
 	 * Constructs the viewer, its row items and their update models, and adds it
-	 * to the tree. Calls
-	 * {@link UpdateModelFactory#createModel(ColumnViewer, AttributeViewer, JAXBDynamicLaunchConfigurationTab)}
+	 * to the tree.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
@@ -267,8 +259,25 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Constructs a button group and its model, and adds it to the tree. Calls
-	 * {@link UpdateModelFactory#createModel(Group, List, String, JAXBDynamicLaunchConfigurationTab, IVariableMap)}
+	 * Constructs the widget pair and creates its update model. Adds the
+	 * widget-to-model mapping to the local widget map of the LaunchTab being
+	 * built.
+	 * 
+	 * @param browse
+	 *            JAXB data element describing type, style and layout data of
+	 *            widget
+	 * @param control
+	 *            to which to add the widget
+	 */
+	private void addBrowse(BrowseType browse, Composite control) {
+		IUpdateModel model = UpdateModelFactory.createModel(control, browse, tab, rmVarMap, sources, targets);
+		if (model != null) {
+			localWidgets.put(model.getControl(), model);
+		}
+	}
+
+	/**
+	 * Constructs a button group and its model, and adds it to the tree.
 	 * 
 	 * @see UpdateModelFactory#createModel(Group, List, String,
 	 *      JAXBDynamicLaunchConfigurationTab, IVariableMap)
@@ -308,9 +317,7 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Constructs and configures the SWT TableViewer. Calls
-	 * {@link WidgetBuilderUtils#createTable(Composite, Integer, Object)},
-	 * {@link WidgetBuilderUtils#setupAttributeTable(CheckboxTableViewer, List, org.eclipse.jface.viewers.ISelectionChangedListener, boolean, boolean, boolean, boolean)}
+	 * Constructs and configures the SWT TableViewer.
 	 * 
 	 * @see org.eclipse.jface.viewers.CheckboxTableViewer
 	 * 
@@ -339,9 +346,7 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Constructs and configures the SWT TreeViewer. Calls
-	 * {@link WidgetBuilderUtils#createTree(Composite, Integer, Object)},
-	 * {@link WidgetBuilderUtils#setupAttributeTree(CheckboxTreeViewer, List, org.eclipse.jface.viewers.ISelectionChangedListener, boolean, boolean, boolean, boolean)}
+	 * Constructs and configures the SWT TreeViewer.
 	 * 
 	 * @see org.eclipse.jface.viewers.CheckboxTreeViewer
 	 * 
@@ -370,9 +375,7 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Iterates through list and calls add for the type. Called by
-	 * {@link #addComposite(CompositeType, Composite)},
-	 * {@link #addItem(CTabFolder, TabItemType)},
+	 * Iterates through list and calls add for the type.
 	 * 
 	 * @param children
 	 *            list of types
@@ -384,9 +387,13 @@ public class LaunchTabBuilder {
 			} else if (o instanceof CompositeType) {
 				addComposite((CompositeType) o, control);
 			} else if (o instanceof WidgetType) {
-				addWidget(control, (WidgetType) o);
+				addWidget((WidgetType) o, control);
 			} else if (o instanceof ButtonGroupType) {
 				addButtonGroup((ButtonGroupType) o, control);
+			} else if (o instanceof PushButtonType) {
+				addPushButton((PushButtonType) o, control);
+			} else if (o instanceof BrowseType) {
+				addBrowse((BrowseType) o, control);
 			} else if (o instanceof AttributeViewerType) {
 				addAttributeViewer((AttributeViewerType) o, control);
 			}
@@ -394,13 +401,7 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Adds an SWT Composite widget. Calls
-	 * {@link WidgetBuilderUtils#createComposite(Composite, Integer, Layout, Object)}
-	 * ,
-	 * {@link WidgetBuilderUtils#createGroup(Composite, Integer, Layout, Object, String)}
-	 * , {@link #addComposite(CompositeType, Composite)},
-	 * {@link #addWidget(Composite, Widget)}, or
-	 * {@link #addAttributeViewer(AttributeViewer, Composite)}.
+	 * Adds an SWT Composite widget.
 	 * 
 	 * @see org.eclipse.swt.widgets.Composite
 	 * @see org.eclipse.swt.widgets.Group
@@ -454,8 +455,7 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Constructs and configures an SWT CTabFolder and its CTabItems. Calls
-	 * {@link #addItem(TabFolder, TabItemType, int)}.
+	 * Constructs and configures an SWT CTabFolder and its CTabItems.
 	 * 
 	 * @see org.eclipse.swt.custom.CTabFolder
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabFolderType
@@ -506,12 +506,7 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Adds an SWT TabItem to a TabFolder. Calls
-	 * {@link WidgetBuilderUtils#createTabItem(TabFolder, Integer, String, String, Integer)}
-	 * , {@link WidgetBuilderUtils#createComposite(Composite, Integer)},
-	 * {@link #addFolder(TabFolderType, Composite)},
-	 * {@link #addComposite(CompositeType, Composite)} or
-	 * {@link #addWidget(Composite, Widget)}.
+	 * Adds an SWT TabItem to a TabFolder.
 	 * 
 	 * @see org.eclipse.swt.custom.CTabFolder
 	 * @see org.eclipse.swt.custom.CTabItem
@@ -561,12 +556,23 @@ public class LaunchTabBuilder {
 	}
 
 	/**
+	 * Constructs the widget pair and creates its update model. Calls .
+	 * 
+	 * @param button
+	 *            JAXB data element describing type, style and layout data of
+	 *            widget
+	 * @param control
+	 *            to which to add the widget
+	 */
+	private void addPushButton(PushButtonType button, Composite control) {
+		UpdateModelFactory.createPushButton(control, button, tab, rmVarMap, sources, targets);
+	}
+
+	/**
 	 * Adds the row items to the table. The row item model is both a CellEditor
 	 * update model/listener, as well as the underlying data model for the
-	 * viewer provider. Calls
-	 * {@link UpdateModelFactory#createModel(Object, ColumnViewer, List, JAXBDynamicLaunchConfigurationTab)}
-	 * . Adds the cell editor-to-model mappings to the local widget map of the
-	 * LaunchTab being built.
+	 * viewer provider. Adds the cell editor-to-model mappings to the local
+	 * widget map of the LaunchTab being built.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
@@ -637,17 +643,15 @@ public class LaunchTabBuilder {
 	/**
 	 * Constructs the widget and creates its update model. Adds the
 	 * widget-to-model mapping to the local widget map of the LaunchTab being
-	 * built. Calls
-	 * {@link UpdateModelFactory#createModel(Composite, Widget, JAXBDynamicLaunchConfigurationTab)}
-	 * .
+	 * built.
 	 * 
-	 * @param control
-	 *            to which to add the widget
 	 * @param widget
 	 *            JAXB data element describing type, style and layout data of
 	 *            widget
+	 * @param control
+	 *            to which to add the widget
 	 */
-	private void addWidget(Composite control, WidgetType widget) {
+	private void addWidget(WidgetType widget, Composite control) {
 		IUpdateModel model = UpdateModelFactory.createModel(control, widget, tab, rmVarMap, sources, targets);
 		/*
 		 * Label models are not returned, since they cannot be updated
@@ -658,15 +662,7 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Creates the SWT layout. Calls
-	 * {@link WidgetBuilderUtils#createFillLayout(String, Integer, Integer, Integer)}
-	 * ,
-	 * {@link WidgetBuilderUtils#createRowLayout(Boolean, Boolean, Boolean, Boolean, Integer, Integer, Integer, Integer, Integer, Integer, Integer)}
-	 * ,
-	 * {@link WidgetBuilderUtils#createGridLayout(Integer, Boolean, Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer)}
-	 * or
-	 * {@link WidgetBuilderUtils#createFormLayout(Integer, Integer, Integer, Integer, Integer, Integer, Integer)}
-	 * .
+	 * Creates the SWT layout.
 	 * 
 	 * @see org.eclipse.swt.widgets.Layout
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.LayoutType
@@ -713,7 +709,6 @@ public class LaunchTabBuilder {
 	 */
 	private void maybeWireWidgets() {
 		Collection<ControlStateListener> listeners = new HashSet<ControlStateListener>();
-
 		for (ControlStateType cst : targets.keySet()) {
 			Control target = targets.get(cst);
 			ControlStateRuleType rule = cst.getEnableIf();
@@ -735,18 +730,7 @@ public class LaunchTabBuilder {
 					listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.SHOW, sources));
 				}
 			}
-
-			rule = cst.getDeselectIf();
-			if (rule != null) {
-				listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.DESELECT, sources));
-			} else {
-				rule = cst.getSelectIf();
-				if (rule != null) {
-					listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.SELECT, sources));
-				}
-			}
 		}
-
 		tab.setListeners(listeners);
 	}
 }

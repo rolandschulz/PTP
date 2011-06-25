@@ -427,14 +427,14 @@
 						</layout-data>
 						<fixed-text>Browse URI: </fixed-text>
 					</widget>
-					<widget type="browse" uri="true" style="SWT.BORDER" readOnly="false" title="Browse" saveValueTo="path1">
-						<layout-data>
+					<browse uri="true" textStyle="SWT.BORDER" readOnly="false" title="Browse" saveValueTo="path1">
+						<text-layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
-						</layout-data>
-						<sub-layout-data>
+						</text-layout-data>
+						<button-layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
-						</sub-layout-data>
-					</widget>
+						</button-layout-data>
+					</<browse uri="true" textStyle="SWT.BORDER" readOnly="false" title="Browse" saveValueTo="path1">>
 					<!-- row 2 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
@@ -442,14 +442,14 @@
 						</layout-data>
 						<fixed-text>Browse Dir Path: </fixed-text>
 					</widget>
-					<widget type="browse" uri="false" directory="true" style="SWT.BORDER" readOnly="true" title="Browse" saveValueTo="path2">
-						<layout-data>
+					<browse uri="false" directory="true" textStyle="SWT.BORDER" readOnly="true" title="Browse" saveValueTo="path2">
+						<text-layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
-						</layout-data>
-						<sub-layout-data>
+						</text-layout-data>
+						<button-layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
-						</sub-layout-data>
-					</widget>
+						</button-layout-data>
+					</browse>
 					<!-- row 3 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
@@ -457,14 +457,14 @@
 						</layout-data>
 						<fixed-text>Browse Local File: </fixed-text>
 					</widget>
-					<widget type="browse" style="SWT.BORDER | SWT.H_SCROLL" readOnly="true" localOnly="true" title="Browse" saveValueTo="path3">
-						<layout-data>
+					<browse textStyle="SWT.BORDER | SWT.H_SCROLL" readOnly="true" localOnly="true" title="Browse" saveValueTo="path3">
+						<text-layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
-						</layout-data>
-						<sub-layout-data>
+						</text-layout-data>
+						<button-layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
-						</sub-layout-data>
-					</widget>
+						</button-layout-data>
+					</browse>
 					<!-- row 4 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
@@ -472,15 +472,15 @@
 						</layout-data>
 						<fixed-text>Browse Local Dir URI: </fixed-text>
 					</widget>
-					<widget type="browse" directory="true" uri="true" style="SWT.BORDER" readOnly="true" localOnly="true" title="Browse"
+					<browse directory="true" uri="true" textStyle="SWT.BORDER" readOnly="true" localOnly="true" title="Browse"
 						saveValueTo="path4">
-						<layout-data>
+						<text-layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
-						</layout-data>
-						<sub-layout-data>
+						</text-layout-data>
+						<button-layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
-						</sub-layout-data>
-					</widget>
+						</button-layout-data>
+					</browse>
 				</composite>
 			</dynamic>
 			<dynamic>
@@ -619,14 +619,14 @@
 					</layout-data>
 					<title>Hosts</title>
 					<widget type="checkbox" title="Host file:"/>
-					<widget type="browse" style="SWT.BORDER" title="Browse">
-						<layout-data>
+					<browse type="browse" textStyle="SWT.BORDER" title="Browse">
+						<text-layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
-						</layout-data>
-						<sub-layout-data>
+						</text-layout-data>
+						<button-layout-data>
 							<grid-data horizontalAlign="SWT.RIGHT" verticalAlign="SWT.CENTER"/>
-						</sub-layout-data>
-					</widget>
+						</button-layout-data>
+					</browse>
 					<widget type="checkbox" title="Host list:">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.TOP"/>

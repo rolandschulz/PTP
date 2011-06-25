@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ControlStateListener;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 
@@ -27,18 +26,15 @@ import org.eclipse.swt.widgets.Control;
  */
 public class ControlStateRule {
 
-	public enum EventType {
-		VISIBLE, ENABLED, SELECTED, NONE;
+	public enum ControlState {
+		VISIBLE, ENABLED, NONE;
 
-		public static EventType get(String type) {
+		public static ControlState get(String type) {
 			if ("VISIBLE".equals(type)) { //$NON-NLS-1$
 				return VISIBLE;
 			}
 			if ("ENABLED".equals(type)) { //$NON-NLS-1$
 				return ENABLED;
-			}
-			if ("SELECTED".equals(type)) { //$NON-NLS-1$
-				return SELECTED;
 			}
 			return NONE;
 		}
@@ -48,7 +44,7 @@ public class ControlStateRule {
 	private List<ControlStateRule> and;
 	private List<ControlStateRule> or;
 	private Control control;
-	private EventType eventType;
+	private ControlState state;
 
 	/**
 	 * Composes the rule; also wires the source with the target listener.
@@ -59,33 +55,36 @@ public class ControlStateRule {
 	 *            index of Widget controls
 	 */
 	public ControlStateRule(ControlStateRuleType rule, Map<String, Control> map, ControlStateListener listener) {
-		ControlStateRuleType type = rule.getNot();
-		if (type != null) {
-			not = new ControlStateRule(type, map, listener);
+		ControlStateRuleType.Not not = rule.getNot();
+		if (not != null) {
+			this.not = new ControlStateRule(not.getRule(), map, listener);
 		} else {
-			List<ControlStateRuleType> list = rule.getAnd();
-			if (!list.isEmpty()) {
-				and = new ArrayList<ControlStateRule>();
-				for (ControlStateRuleType t : list) {
-					and.add(new ControlStateRule(t, map, listener));
+			ControlStateRuleType.And and = rule.getAnd();
+			if (and != null) {
+				List<ControlStateRuleType> list = and.getRule();
+				if (!list.isEmpty()) {
+					this.and = new ArrayList<ControlStateRule>();
+					for (ControlStateRuleType t : list) {
+						this.and.add(new ControlStateRule(t, map, listener));
+					}
 				}
 			} else {
-				list = rule.getOr();
-				if (!list.isEmpty()) {
-					or = new ArrayList<ControlStateRule>();
-					for (ControlStateRuleType t : list) {
-						or.add(new ControlStateRule(t, map, listener));
+				ControlStateRuleType.Or or = rule.getOr();
+				if (or != null) {
+					List<ControlStateRuleType> list = or.getRule();
+					if (!list.isEmpty()) {
+						this.or = new ArrayList<ControlStateRule>();
+						for (ControlStateRuleType t : list) {
+							this.or.add(new ControlStateRule(t, map, listener));
+						}
 					}
 				} else {
 					control = map.get(rule.getSource());
-					if (control != null) {
-						eventType = EventType.get(rule.getEventType());
-						control.addListener(SWT.Activate, listener);
-						control.addListener(SWT.Deactivate, listener);
-						control.addListener(SWT.Show, listener);
-						control.addListener(SWT.Hide, listener);
-						if (control instanceof Button) {
-							control.addListener(SWT.Selection, listener);
+					state = ControlState.get(rule.getState());
+					for (String trigger : rule.getTrigger()) {
+						Control t = map.get(trigger);
+						if (t != null && t instanceof Button) {
+							((Button) t).addSelectionListener(listener);
 						}
 					}
 				}
@@ -98,7 +97,7 @@ public class ControlStateRule {
 	 * Bottoms out in the check of the control state indicated by the eventType
 	 * element.
 	 * 
-	 * @return
+	 * @return whether the rule is satisfied
 	 */
 	public boolean evaluate() {
 		if (not != null) {
@@ -120,16 +119,11 @@ public class ControlStateRule {
 			}
 			return false;
 		}
-		switch (eventType) {
+		switch (state) {
 		case ENABLED:
 			return control.getEnabled();
 		case VISIBLE:
 			return control.getVisible();
-		case SELECTED:
-			if (control instanceof Button) {
-				return ((Button) control).getSelection();
-			}
-			break;
 		}
 		return false;
 	}

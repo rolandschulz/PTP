@@ -13,10 +13,9 @@ import java.util.Map;
 
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.ControlStateRule;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType;
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 
 /**
  * This untyped listener is added to the widgets on which the composed control
@@ -29,10 +28,10 @@ import org.eclipse.swt.widgets.Listener;
  * @author arossi
  * 
  */
-public class ControlStateListener implements Listener {
+public class ControlStateListener implements SelectionListener {
 
 	public enum Action {
-		ENABLE, DISABLE, SHOW, HIDE, SELECT, DESELECT, NONE;
+		ENABLE, DISABLE, SHOW, HIDE, NONE;
 	};
 
 	private final ControlStateRule rule;
@@ -55,17 +54,6 @@ public class ControlStateListener implements Listener {
 		this.rule = new ControlStateRule(rule, map, this);
 	}
 
-	/*
-	 * Upon receipt of the event, calls {@link #setState()} (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.
-	 * Event)
-	 */
-	public void handleEvent(Event event) {
-		setState();
-	}
-
 	/**
 	 * State of the controls in the rule is reevaluated and the state of the
 	 * target is set accordingly.
@@ -85,16 +73,6 @@ public class ControlStateListener implements Listener {
 			case HIDE:
 				target.setVisible(false);
 				break;
-			case SELECT:
-				if (target instanceof Button) {
-					((Button) target).setSelection(true);
-				}
-				break;
-			case DESELECT:
-				if (target instanceof Button) {
-					((Button) target).setSelection(false);
-				}
-				break;
 			}
 		} else {
 			switch (action) {
@@ -110,17 +88,29 @@ public class ControlStateListener implements Listener {
 			case HIDE:
 				target.setVisible(true);
 				break;
-			case SELECT:
-				if (target instanceof Button) {
-					((Button) target).setSelection(false);
-				}
-				break;
-			case DESELECT:
-				if (target instanceof Button) {
-					((Button) target).setSelection(true);
-				}
-				break;
 			}
 		}
+	}
+
+	/*
+	 * Upon receipt of the event, calls {@link #setState()} (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
+	 * .swt.events.SelectionEvent)
+	 */
+	public void widgetDefaultSelected(SelectionEvent e) {
+		setState();
+	}
+
+	/*
+	 * Upon receipt of the event, calls {@link #setState()} (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
+	 * .events.SelectionEvent)
+	 */
+	public void widgetSelected(SelectionEvent e) {
+		setState();
 	}
 }
