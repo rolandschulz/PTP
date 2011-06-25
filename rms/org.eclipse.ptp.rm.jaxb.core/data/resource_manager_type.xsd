@@ -373,7 +373,6 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="button-action" minOccurs="0" type="rm:button-action-type"/>
 			<xs:element name="control-state" minOccurs="0" type="rm:control-state-type"/>
 		</xs:sequence>
 		<xs:attribute name="type" default="text">

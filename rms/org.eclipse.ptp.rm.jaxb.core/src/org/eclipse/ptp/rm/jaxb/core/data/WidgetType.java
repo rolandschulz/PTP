@@ -44,7 +44,6 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element name="button-action" type="{http://org.eclipse.ptp/rm}button-action-type" minOccurs="0"/>
  *         &lt;element name="control-state" type="{http://org.eclipse.ptp/rm}control-state-type" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="background" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -76,7 +75,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "widget-type", propOrder = { "layoutData", "font", "tooltip", "itemsFrom", "fixedText", "dynamicText",
-		"buttonAction", "controlState" })
+		"controlState" })
 public class WidgetType {
 
 	@XmlElement(name = "layout-data")
@@ -89,8 +88,6 @@ public class WidgetType {
 	protected String fixedText;
 	@XmlElement(name = "dynamic-text")
 	protected WidgetType.DynamicText dynamicText;
-	@XmlElement(name = "button-action")
-	protected ButtonActionType buttonAction;
 	@XmlElement(name = "control-state")
 	protected ControlStateType controlState;
 	@XmlAttribute
@@ -236,27 +233,6 @@ public class WidgetType {
 	 */
 	public void setDynamicText(WidgetType.DynamicText value) {
 		this.dynamicText = value;
-	}
-
-	/**
-	 * Gets the value of the buttonAction property.
-	 * 
-	 * @return possible object is {@link ButtonActionType }
-	 * 
-	 */
-	public ButtonActionType getButtonAction() {
-		return buttonAction;
-	}
-
-	/**
-	 * Sets the value of the buttonAction property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link ButtonActionType }
-	 * 
-	 */
-	public void setButtonAction(ButtonActionType value) {
-		this.buttonAction = value;
 	}
 
 	/**
