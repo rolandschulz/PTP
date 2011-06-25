@@ -49,6 +49,7 @@ import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -155,7 +156,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
-		// control = WidgetBuilderUtils.createComposite(parent, 1);
 		try {
 			LaunchTabBuilder builder = new LaunchTabBuilder(this);
 			control = builder.build(parent);
@@ -467,12 +467,14 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
 
 		if (parentTab.hasScript()) {
-			WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, this);
+			Button b = WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, this);
+			SWTUtil.setButtonDimensionHint(b);
 		}
 
-		WidgetBuilderUtils.createPushButton(grp, Messages.ViewConfig, this);
+		Button b = WidgetBuilderUtils.createPushButton(grp, Messages.ViewConfig, this);
+		SWTUtil.setButtonDimensionHint(b);
 
-		WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, new SelectionListener() {
+		b = WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
 			}
@@ -481,6 +483,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				resetDefaults();
 			}
 		});
+		SWTUtil.setButtonDimensionHint(b);
 	}
 
 	/**

@@ -29,6 +29,7 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -140,7 +141,9 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 		String s = selected == null ? JAXBControlUIConstants.ZEROSTR : selected.toString();
 		choice = WidgetBuilderUtils.createText(comp, SWT.BORDER, gdsub, true, s);
 		browseWorkspace = WidgetBuilderUtils.createPushButton(comp, Messages.JAXBRMConfigurationSelectionWizardPage_1, this);
+		SWTUtil.setButtonDimensionHint(browseWorkspace);
 		clear = WidgetBuilderUtils.createPushButton(comp, Messages.ClearScript, this);
+		SWTUtil.setButtonDimensionHint(clear);
 
 		/*
 		 * text editor

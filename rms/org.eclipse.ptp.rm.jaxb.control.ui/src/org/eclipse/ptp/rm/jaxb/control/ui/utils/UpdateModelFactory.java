@@ -52,6 +52,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.TemplateType;
 import org.eclipse.ptp.rm.jaxb.core.data.WidgetType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
+import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -486,7 +487,7 @@ public class UpdateModelFactory {
 	 */
 	private static Control createActionButton(Composite parent, final ControlDescriptor cd,
 			final JAXBDynamicLaunchConfigurationTab tab) {
-		WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, SWT.PUSH, new SelectionListener() {
+		Button b = WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, SWT.PUSH, new SelectionListener() {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
@@ -500,6 +501,7 @@ public class UpdateModelFactory {
 				}
 			}
 		});
+		SWTUtil.setButtonDimensionHint(b);
 		return null;
 	}
 
@@ -521,7 +523,7 @@ public class UpdateModelFactory {
 	 */
 	private static Text createBrowse(final Composite parent, final ControlDescriptor cd, final JAXBDynamicLaunchConfigurationTab tab) {
 		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, JAXBControlUIConstants.ZEROSTR);
-		WidgetBuilderUtils.createButton(parent, cd.subLayoutData, cd.title, SWT.NONE, new SelectionListener() {
+		Button b = WidgetBuilderUtils.createButton(parent, cd.subLayoutData, cd.title, SWT.NONE, new SelectionListener() {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
@@ -552,6 +554,7 @@ public class UpdateModelFactory {
 				}
 			}
 		});
+		SWTUtil.setButtonDimensionHint(b);
 		return t;
 	}
 
