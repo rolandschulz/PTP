@@ -280,10 +280,11 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	private void resize(Point p) {
 		Point size = getControl().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		/*
-		 * So that the tabs of the controllers can be scrolled to.
+		 * So that tabs lying to the right of the child's right margin can be
+		 * scrolled to.
 		 */
 		int x = Math.max(p.x, size.x);
-		scrolledParent.setMinSize(getControl().computeSize(x + 25, p.y + 50));
+		scrolledParent.setMinSize(getControl().computeSize(x, p.y + 50));
 	}
 
 	/**

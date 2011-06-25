@@ -170,7 +170,6 @@
 			<xs:element name="layout" minOccurs="0" type="rm:layout-type"/>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
 			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
-			<xs:element name="title" minOccurs="0" type="xs:string"/>
 			<xs:choice minOccurs="0" maxOccurs="unbounded">
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="composite" type="rm:composite-type"/>
@@ -179,7 +178,6 @@
 				<xs:element name="viewer" type="rm:attribute-viewer-type"/>
 			</xs:choice>
 		</xs:sequence>
-		<xs:attribute name="group" type="xs:boolean" default="false"/>
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 		<xs:attribute name="includeWidgetValuesFrom" type="xs:string"/>
