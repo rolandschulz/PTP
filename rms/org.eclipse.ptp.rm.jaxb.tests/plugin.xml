@@ -19,6 +19,10 @@
             configurationFile="data/miscellaneous-example.xml"
             name="Miscellaneous Example">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/Open MPI (JAXB).xml"
+            name="Open MPI (JAXB)">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>

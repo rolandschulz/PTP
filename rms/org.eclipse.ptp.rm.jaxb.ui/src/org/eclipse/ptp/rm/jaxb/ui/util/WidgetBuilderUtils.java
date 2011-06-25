@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.FontRegistry;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
@@ -24,7 +23,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -46,7 +44,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 
@@ -59,16 +56,6 @@ import org.eclipse.swt.widgets.Tree;
 public class WidgetBuilderUtils {
 
 	private static final FontRegistry fonts = new FontRegistry();
-
-	public static TableColumn addTableColumn(final TableViewer viewer, String columnName, int style, int width,
-			final SelectionAdapter s) {
-		Table t = viewer.getTable();
-		TableColumn c = new TableColumn(t, style);
-		c.setText(columnName);
-		c.setWidth(width);
-		c.addSelectionListener(s);
-		return c;
-	}
 
 	/**
 	 * Tries to set monospace text on text area.
@@ -101,9 +88,6 @@ public class WidgetBuilderUtils {
 		Button button = new Button(parent, style);
 		if (label != null) {
 			button.setText(label);
-		}
-		if (layoutData == null) {
-			layoutData = createDefaultDataForLayout(parent.getLayout());
 		}
 		button.setLayoutData(layoutData);
 		if (null != listener) {
@@ -141,7 +125,7 @@ public class WidgetBuilderUtils {
 	 * @return check button
 	 */
 	public static Button createCheckButton(Composite parent, String label, SelectionListener listener) {
-		return createButton(parent, label, SWT.CHECK | SWT.LEFT, listener);
+		return createButton(parent, label, SWT.CHECK, listener);
 	}
 
 	/**
@@ -167,9 +151,6 @@ public class WidgetBuilderUtils {
 		if (items != null) {
 			combo.setItems(items);
 		}
-		if (data == null) {
-			data = createDefaultDataForLayout(parent.getLayout());
-		}
 		combo.setLayoutData(data);
 		if (initialValue != null) {
 			combo.setText(initialValue);
@@ -190,9 +171,9 @@ public class WidgetBuilderUtils {
 	 * @return composite
 	 */
 	public static Composite createComposite(Composite parent, Integer columns) {
-		GridLayout layout = createGridLayout(columns, false, JAXBUIConstants.DEFAULT, 1, JAXBUIConstants.DEFAULT,
-				JAXBUIConstants.DEFAULT);
-		return createComposite(parent, SWT.NONE, layout, createDefaultDataForLayout(layout));
+		GridLayout layout = createGridLayout(columns, false, JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT,
+				JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT);
+		return createComposite(parent, SWT.NONE, layout, null);
 	}
 
 	/**
@@ -339,6 +320,7 @@ public class WidgetBuilderUtils {
 	 */
 	public static GridData createGridData(Integer style, Boolean grabExcessHorizontal, Boolean grabExcessVertical,
 			Integer widthHint, Integer heightHint, Integer horizontalSpan, Integer verticalSpan) {
+		new GridData();
 		return createGridData(style, grabExcessHorizontal, grabExcessVertical, widthHint, heightHint, JAXBUIConstants.DEFAULT,
 				JAXBUIConstants.DEFAULT, horizontalSpan, verticalSpan, JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT,
 				JAXBUIConstants.DEFAULT, JAXBUIConstants.DEFAULT);
@@ -576,11 +558,7 @@ public class WidgetBuilderUtils {
 			text = JAXBUIConstants.ZEROSTR;
 		}
 		label.setText(text.trim());
-		if (layoutData == null) {
-			layoutData = createDefaultDataForLayout(container.getLayout());
-		}
 		label.setLayoutData(layoutData);
-
 		return label;
 	}
 
@@ -594,11 +572,9 @@ public class WidgetBuilderUtils {
 	 */
 	public static Button createPushButton(Composite parent, String label, SelectionListener listener) {
 		Button button = SWTUtil.createPushButton(parent, label, null);
-		Object data = createDefaultDataForLayout(parent.getLayout());
-		if (data instanceof GridData) {
-			((GridData) data).horizontalAlignment = SWT.FILL;
-		}
-		button.setLayoutData(data);
+		GridData gd = new GridData();
+		gd.horizontalAlignment = SWT.FILL;
+		button.setLayoutData(gd);
 		if (null != listener) {
 			button.addSelectionListener(listener);
 		}
@@ -699,23 +675,18 @@ public class WidgetBuilderUtils {
 	public static Spinner createSpinner(Composite parent, int style, Object layoutData, String label, Integer minimum,
 			Integer maximum, Integer initialValue, ModifyListener listener) {
 		if (label != null) {
-			createLabel(parent, label, SWT.RIGHT, 1);
+			createLabel(parent, label, SWT.NONE, 1);
 		}
 
 		Spinner s = new Spinner(parent, style);
-		if (maximum == null) {
-			maximum = Integer.MAX_VALUE;
+		if (maximum != null) {
+			s.setMaximum(maximum);
 		}
-		if (minimum == null) {
-			minimum = 0;
+		if (minimum != null) {
+			s.setMinimum(minimum);
 		}
-		s.setMaximum(maximum);
-		s.setMinimum(minimum);
 		if (initialValue != null) {
 			s.setSelection(initialValue);
-		}
-		if (layoutData == null) {
-			layoutData = createDefaultDataForLayout(parent.getLayout());
 		}
 		s.setLayoutData(layoutData);
 		if (listener != null) {
@@ -747,9 +718,6 @@ public class WidgetBuilderUtils {
 	 */
 	public static Table createTable(Composite parent, Integer style, Object layoutData) {
 		Integer cols = null;
-		if (layoutData == null) {
-			layoutData = createDefaultDataForLayout(parent.getLayout());
-		}
 		if (layoutData instanceof GridData) {
 			GridData gd = (GridData) layoutData;
 			cols = gd.horizontalSpan;
@@ -762,8 +730,6 @@ public class WidgetBuilderUtils {
 		}
 		Table t = new Table(parent, style);
 		t.setLayoutData(layoutData);
-		t.setHeaderVisible(true);
-		t.setLinesVisible(true);
 		return t;
 	}
 
@@ -792,9 +758,6 @@ public class WidgetBuilderUtils {
 	public static Text createText(Composite parent, Integer style, Object layoutData, Boolean readOnly, String initialValue,
 			ModifyListener listener, Color color) {
 		Text text = new Text(parent, style);
-		if (layoutData == null) {
-			layoutData = createDefaultDataForLayout(parent.getLayout());
-		}
 		text.setLayoutData(layoutData);
 		if (readOnly != null) {
 			text.setEditable(!readOnly);
@@ -819,9 +782,6 @@ public class WidgetBuilderUtils {
 	 */
 	public static Tree createTree(Composite parent, Integer style, Object layoutData) {
 		Integer cols = null;
-		if (layoutData == null) {
-			layoutData = createDefaultDataForLayout(parent.getLayout());
-		}
 		if (layoutData instanceof GridData) {
 			GridData gd = (GridData) layoutData;
 			cols = gd.horizontalSpan;
@@ -834,8 +794,6 @@ public class WidgetBuilderUtils {
 		}
 		Tree t = new Tree(parent, style);
 		t.setLayoutData(layoutData);
-		t.setHeaderVisible(true);
-		t.setLinesVisible(true);
 		return t;
 	}
 
@@ -1019,25 +977,6 @@ public class WidgetBuilderUtils {
 			}
 		}
 		return newLine.toString();
-	}
-
-	/**
-	 * Makes sure the data type matches the layout of the widget or of its
-	 * parent.
-	 * 
-	 * @param layout
-	 *            of widget or parent if widget layout is undefined
-	 * @return appropriate data type
-	 */
-	private static Object createDefaultDataForLayout(Layout layout) {
-		if (layout instanceof GridLayout) {
-			return createGridData(JAXBUIConstants.DEFAULT, 1);
-		} else if (layout instanceof RowLayout) {
-			return new RowData();
-		} else if (layout instanceof FormLayout) {
-			return new FormData();
-		}
-		return null;
 	}
 
 	/**

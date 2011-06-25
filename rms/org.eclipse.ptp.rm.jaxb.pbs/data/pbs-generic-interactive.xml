@@ -190,6 +190,9 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		<launch-tab>
 			<dynamic>
 				<title>Basic PBS Settings</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<!-- QUEUES remote path group -->
 				<composite group="true">
 					<layout>

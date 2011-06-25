@@ -323,7 +323,7 @@
 			</file>
 		</managed-files>
 		<script>
-		   <file-staging-location>${ptp_rm:directory#value}</file-staging-location>
+			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 			<line>
 				<arg>#!/bin/bash</arg>
 			</line>
@@ -532,6 +532,9 @@
 		<launch-tab>
 			<dynamic includeWidgetValuesFrom="Input">
 				<title>Job</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<composite>
 					<layout>
 						<fill-layout type="SWT.HORIZONTAL"/>
@@ -637,7 +640,10 @@
 				</composite>
 			</dynamic>
 			<dynamic includeWidgetValuesFrom="Job">
-			   <title>Input</title>
+				<title>Input</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<composite group="true">
 					<layout>
 						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
@@ -927,74 +933,74 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:zcntr#description}</fixed-text>
 					</widget>
-					    <widget type="label" style="SWT.LEFT">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <fixed-text>xrad:</fixed-text>
-               </widget>
-               <widget type="text" style="SWT.BORDER" saveValueTo="xrad">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-                  </layout-data>
-               </widget>
-               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <fixed-text>${ptp_rm:xrad#description}</fixed-text>
-               </widget>
-                     <widget type="label" style="SWT.LEFT">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <fixed-text>zrad:</fixed-text>
-               </widget>
-               <widget type="text" style="SWT.BORDER" saveValueTo="zrad">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-                  </layout-data>
-               </widget>
-               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <fixed-text>${ptp_rm:zrad#description}</fixed-text>
-               </widget>
-                     <widget type="label" style="SWT.LEFT">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <fixed-text>sndtype:</fixed-text>
-               </widget>
-               <widget type="text" style="SWT.BORDER" saveValueTo="sndtype">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-                  </layout-data>
-               </widget>
-               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <fixed-text>${ptp_rm:sndtype#description}</fixed-text>
-               </widget>
-                     <widget type="label" style="SWT.LEFT">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <fixed-text>inittype:</fixed-text>
-               </widget>
-               <widget type="text" style="SWT.BORDER" saveValueTo="inittype">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-                  </layout-data>
-               </widget>
-               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <fixed-text>${ptp_rm:inittype#description}</fixed-text>
-               </widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>xrad:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="xrad">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:xrad#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>zrad:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="zrad">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:zrad#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>sndtype:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="sndtype">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:sndtype#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>inittype:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" saveValueTo="inittype">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:inittype#description}</fixed-text>
+					</widget>
 				</composite>
 			</dynamic>
 		</launch-tab>

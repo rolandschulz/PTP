@@ -521,7 +521,7 @@ public class UpdateModelFactory {
 	 */
 	private static Text createBrowse(final Composite parent, final ControlDescriptor cd, final JAXBDynamicLaunchConfigurationTab tab) {
 		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, JAXBControlUIConstants.ZEROSTR);
-		WidgetBuilderUtils.createButton(parent, cd.subLayoutData, cd.title, SWT.PUSH, new SelectionListener() {
+		WidgetBuilderUtils.createButton(parent, cd.subLayoutData, cd.title, SWT.NONE, new SelectionListener() {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
@@ -608,14 +608,14 @@ public class UpdateModelFactory {
 			c = createText(parent, cd);
 		} else if (JAXBControlUIConstants.RADIOBUTTON.equals(cd.widgetType)) {
 			if (cd.style == SWT.NONE) {
-				cd.style = SWT.RADIO | SWT.LEFT;
+				cd.style = SWT.RADIO;
 			} else {
 				cd.style |= SWT.RADIO;
 			}
 			c = WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, cd.style, null);
 		} else if (JAXBControlUIConstants.CHECKBOX.equals(cd.widgetType)) {
 			if (cd.style == SWT.NONE) {
-				cd.style = SWT.CHECK | SWT.LEFT;
+				cd.style = SWT.CHECK;
 			} else {
 				cd.style |= SWT.CHECK;
 			}

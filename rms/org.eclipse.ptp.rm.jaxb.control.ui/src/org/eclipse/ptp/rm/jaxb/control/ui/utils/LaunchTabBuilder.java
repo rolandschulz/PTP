@@ -41,6 +41,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.LayoutType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.RowDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.RowLayoutType;
+import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabFolderType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabItemType;
 import org.eclipse.ptp.rm.jaxb.core.data.ViewerItemsType;
@@ -164,28 +165,43 @@ public class LaunchTabBuilder {
 
 	/**
 	 * Root call to build the SWT widget tree. Calls
-	 * {@link #addComposite(CompositeDescriptor, Composite)} or
-	 * {@link #addFolder(TabFolderDescriptor, Composite)}. <br>
+	 * {@link #addComposite(CompositeDescriptor, Composite)}<br>
+	 * Clears the widgets map, in the case or reinitializaton. <br>
 	 * <br>
-	 * Clears the widgets map, in the case or reinitializaton.
+	 * This contents of this element are essentially the same as Composite.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.CompositeDescriptor
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.TabFolderDescriptor
 	 * 
 	 * @param parent
-	 *            root control of the configurable launch tab
+	 *            control of the launch tab
+	 * @return top-level composite control
 	 * @throws Throwable
 	 */
-	public void build(Composite parent) throws Throwable {
+	public Composite build(Composite parent) throws Throwable {
 		localWidgets.clear();
-		List<Object> top = tab.getController().getTabFolderOrComposite();
-		for (Object o : top) {
-			if (o instanceof CompositeType) {
-				addComposite((CompositeType) o, parent);
-			} else if (o instanceof TabFolderType) {
-				addFolder((TabFolderType) o, parent);
-			}
+		TabControllerType top = tab.getController();
+		Layout layout = createLayout(top.getLayout());
+		Object data = createLayoutData(top.getLayoutData());
+		int style = WidgetBuilderUtils.getStyle(top.getStyle());
+
+		Composite composite = WidgetBuilderUtils.createComposite(parent, style, layout, data);
+
+		addChildren(top.getTabFolderOrCompositeOrWidget(), composite);
+
+		String attr = top.getBackground();
+		if (attr != null) {
+			composite.setBackground(WidgetBuilderUtils.getColor(attr));
 		}
+		FontType fd = top.getFont();
+		if (fd != null) {
+			composite.setFont(WidgetBuilderUtils.getFont(fd));
+		}
+
+		/*
+		 * NEED TO POST-PROCESS MAP OF WIRED WIDGETS TODO
+		 */
+		return composite;
 	}
 
 	/**

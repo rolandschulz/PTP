@@ -155,12 +155,12 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
-		control = WidgetBuilderUtils.createComposite(parent, 1);
+		// control = WidgetBuilderUtils.createComposite(parent, 1);
 		try {
 			LaunchTabBuilder builder = new LaunchTabBuilder(this);
-			builder.build(control);
+			control = builder.build(parent);
 		} catch (Throwable t) {
-			CoreExceptionUtils.newException(Messages.CreateControlConfigurableError, t);
+			throw CoreExceptionUtils.newException(Messages.CreateControlConfigurableError, t);
 		}
 		createViewScriptGroup(control);
 		control.layout(true, true);

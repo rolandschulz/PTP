@@ -106,7 +106,7 @@ of the letters 'u', 's', 'o'; default value: no hold.]]></tooltip>
 			<tooltip><![CDATA[Format: string up to 15 characters, 
 first character must be alphabetic; default value: 
 the base name of the job script or STDIN.]]></tooltip>
-         <default>ptp_job</default>
+			<default>ptp_job</default>
 			<validator>
 				<regex expression="[a-zA-Z_][0-9a-zA-Z_]*"/>
 				<error-message>must be at least one alphanumeric character</error-message>
@@ -230,9 +230,9 @@ in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 			<default>00:30:00</default>
 			<validator>
-            <regex expression="\d\d:\d\d:\d\d"/>
-            <error-message>format must be hh:mm:ss</error-message>
-         </validator>
+				<regex expression="\d\d:\d\d:\d\d"/>
+				<error-message>format must be hh:mm:ss</error-message>
+			</validator>
 		</attribute>
 		<attribute name="Shell_Path_List" type="string">
 			<description>A set of absolute paths of the program to process the job's script file.</description>
@@ -262,7 +262,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<description>This is the list of environment variables passed with the Queue Job batch request.</description>
 		</attribute>
 		<script insertEnvironmentAfter="35">
-		   <file-staging-location>${ptp_rm:directory#value}</file-staging-location>
+			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 			<line>
 				<arg>#!/bin/bash</arg>
 			</line>
@@ -457,13 +457,13 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					</match>
 				</target>
 				<target ref="@jobId">
-               <match>
-                  <expression flags="DOTALL">.*Job not submitted.*</expression>
-                  <set field="value">
-                     <entry value="FAILED"/>
-                  </set>
-               </match>
-            </target>
+					<match>
+						<expression flags="DOTALL">.*Job not submitted.*</expression>
+						<set field="value">
+							<entry value="FAILED"/>
+						</set>
+					</match>
+				</target>
 			</stdout-parser>
 			<stderr-parser delim="\n">
 				<target ref="@jobId">
@@ -547,6 +547,9 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 		<launch-tab>
 			<dynamic>
 				<title>Basic PBS Settings</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<!-- ATTRIBUTES group -->
 				<composite group="true">
 					<layout>
@@ -707,6 +710,9 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			</dynamic>
 			<dynamic>
 				<title>Advanced PBS Settings</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<composite>
 					<layout>
 						<grid-layout numColumns="1"/>

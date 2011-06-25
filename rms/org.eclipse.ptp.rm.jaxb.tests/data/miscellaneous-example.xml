@@ -247,6 +247,9 @@
 		<launch-tab>
 			<dynamic>
 				<title>Cores</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<composite group="true">
 					<layout>
 						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
@@ -324,6 +327,9 @@
 			</dynamic>
 			<dynamic includeWidgetValuesFrom="Cores,Paths">
 				<title>Settings</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<composite>
 					<layout>
 						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
@@ -404,6 +410,9 @@
 			</dynamic>
 			<dynamic includeWidgetValuesFrom="Cores">
 				<title>Paths</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<composite>
 					<layout>
 						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
@@ -477,6 +486,9 @@
 			<dynamic>
 				<!-- <dynamic includeWidgetValuesFrom="Settings"> -->
 				<title>Environment Table</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<composite group="true">
 					<layout>
 						<grid-layout numColumns="1"/>
@@ -507,6 +519,9 @@
 			<dynamic>
 				<!-- <dynamic includeWidgetValuesFrom="Settings"> -->
 				<title>Environment Tree</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<composite group="true">
 					<layout>
 						<grid-layout numColumns="1"/>
@@ -536,6 +551,9 @@
 			<dynamic>
 				<!-- <dynamic includeWidgetValuesFrom="Settings"> -->
 				<title>Environment Tree Value Only</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<composite group="true">
 					<layout>
 						<grid-layout numColumns="1"/>
@@ -556,30 +574,6 @@
 						</items>
 						<value pattern="export @name='@value'" separator="; "/>
 					</viewer>
-				</composite>
-			</dynamic>
-			<dynamic>
-				<title>Advanced Open MPI</title>
-				<composite group="true">
-					<layout>
-						<grid-layout numColumns="1"/>
-					</layout>
-					<layout-data>
-						<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
-					</layout-data>
-					<widget type="text" readOnly="true" style="SWT.LEFT | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="false" heightHint="25"/>
-						</layout-data>
-						<dynamic-text>
-							<arg>this is some text</arg>
-						</dynamic-text>
-					</widget>
-					<widget type="checkbox" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" heightHint="25"/>
-						</layout-data>
-					</widget>
 				</composite>
 			</dynamic>
 		</launch-tab>

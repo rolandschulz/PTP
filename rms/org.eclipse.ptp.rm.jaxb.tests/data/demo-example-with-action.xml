@@ -308,6 +308,9 @@
 		<launch-tab>
 			<dynamic>
 				<title>Demo Example</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<composite>
 					<layout>
 						<fill-layout type="SWT.HORIZONTAL"/>
@@ -456,16 +459,16 @@
 						<grid-layout numColumns="1" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
 					</layout>
 					<viewer name="environment" style="SWT.BORDER | SWT.MULTI" sort="true" type="table">
-                  <layout-data>
-                     <grid-data widthHint="600" heightHint="40" horizontalSpan="1"/>
-                  </layout-data>
-                  <column-data name="Name" width="175"/>
-                  <column-data name="Value" width="400"/>
-                  <items>
-                     <include>remote.input.file</include>
-                  </items>
-                  <value pattern="export @name='@value'" separator="; "/>
-               </viewer>
+						<layout-data>
+							<grid-data widthHint="600" heightHint="40" horizontalSpan="1"/>
+						</layout-data>
+						<column-data name="Name" width="175"/>
+						<column-data name="Value" width="400"/>
+						<items>
+							<include>remote.input.file</include>
+						</items>
+						<value pattern="export @name='@value'" separator="; "/>
+					</viewer>
 				</composite>
 			</dynamic>
 		</launch-tab>

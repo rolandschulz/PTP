@@ -91,8 +91,8 @@
 				<arg isUndefinedIfMatches="#PBS -l walltime=">#PBS -l walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			</line>
 			<line>
-            <arg>#PBS -V</arg>
-         </line>
+				<arg>#PBS -V</arg>
+			</line>
 			<line>
 				<arg>MPI_ARGS="-np ${ptp_rm:mpiCores#value}"</arg>
 			</line>
@@ -132,20 +132,20 @@
 			</line>
 		</script>
 		<start-up-command name="get-queues">
-         <arg>qstat</arg>
-         <arg>-Q</arg>
-         <arg>-f</arg>
-         <stdout-parser delim="\n">
-            <target ref="queues">
-               <match>
-                  <expression>Queue: ([\w\d]+)</expression>
-                  <add field="value">
-                     <entry valueGroup="1"/>
-                  </add>
-               </match>
-            </target>
-         </stdout-parser>
-      </start-up-command>
+			<arg>qstat</arg>
+			<arg>-Q</arg>
+			<arg>-f</arg>
+			<stdout-parser delim="\n">
+				<target ref="queues">
+					<match>
+						<expression>Queue: ([\w\d]+)</expression>
+						<add field="value">
+							<entry valueGroup="1"/>
+						</add>
+					</match>
+				</target>
+			</stdout-parser>
+		</start-up-command>
 		<submit-batch name="submit-batch" waitForId="true">
 			<arg>qsub</arg>
 			<arg>${ptp_rm:managed_file_for_script#value}</arg>
@@ -269,6 +269,9 @@
 		<launch-tab>
 			<dynamic>
 				<title>Demo Example</title>
+				<layout>
+					<grid-layout/>
+				</layout>
 				<composite>
 					<layout>
 						<fill-layout type="SWT.HORIZONTAL"/>
