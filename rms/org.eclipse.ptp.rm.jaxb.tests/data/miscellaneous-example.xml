@@ -434,7 +434,7 @@
 						<button-layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
 						</button-layout-data>
-					</<browse uri="true" textStyle="SWT.BORDER" readOnly="false" title="Browse" saveValueTo="path1">>
+					</browse>
 					<!-- row 2 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
@@ -472,8 +472,7 @@
 						</layout-data>
 						<fixed-text>Browse Local Dir URI: </fixed-text>
 					</widget>
-					<browse directory="true" uri="true" textStyle="SWT.BORDER" readOnly="true" localOnly="true" title="Browse"
-						saveValueTo="path4">
+					<browse directory="true" uri="true" textStyle="SWT.BORDER" readOnly="true" localOnly="true" title="Browse" saveValueTo="path4">
 						<text-layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</text-layout-data>
@@ -619,7 +618,7 @@
 					</layout-data>
 					<title>Hosts</title>
 					<widget type="checkbox" title="Host file:"/>
-					<browse type="browse" textStyle="SWT.BORDER" title="Browse">
+					<browse textStyle="SWT.BORDER" title="Browse">
 						<text-layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
 						</text-layout-data>

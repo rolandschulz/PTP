@@ -282,13 +282,23 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</layout-data>
 					<title>Hosts</title>
 					<widget type="checkbox" id="001" title="Host file:" saveValueTo="hostfilechecked"/>
-					<browse type="browse" textId="003" textStyle="SWT.BORDER" title="Browse">
+					<browse textId="003" textStyle="SWT.BORDER" title="Browse">
 						<text-layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
 						</text-layout-data>
 						<button-layout-data>
 							<grid-data horizontalAlign="SWT.RIGHT" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
+						<text-control-state>
+							<enable-if source="001" state="SELECTED">
+								<trigger>001</trigger>
+							</enable-if>
+						</text-control-state>
+						<button-control-state>
+							<enable-if source="003" state="ENABLED">
+								<trigger>001</trigger>
+							</enable-if>
+						</button-control-state>
 					</browse>
 					<widget type="checkbox" id="002" title="Host list:" saveValueTo="hostlistchecked">
 						<layout-data>
@@ -300,6 +310,16 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"
 								grabExcessVertical="true"/>
 						</layout-data>
+						<control-state>
+							<show-if source="003" state="ENABLED">
+								<trigger>002</trigger>
+								<trigger>001</trigger>
+							</show-if>
+							<enable-if source="002" state="SELECTED">
+                        <trigger>002</trigger>
+                        <trigger>001</trigger>
+                     </enable-if>
+						</control-state>
 					</widget>
 				</composite>
 			</dynamic>

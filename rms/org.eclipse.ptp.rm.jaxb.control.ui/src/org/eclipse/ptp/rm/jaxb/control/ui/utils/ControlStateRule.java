@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Control;
 public class ControlStateRule {
 
 	public enum ControlState {
-		VISIBLE, ENABLED, NONE;
+		VISIBLE, ENABLED, SELECTED, NONE;
 
 		public static ControlState get(String type) {
 			if ("VISIBLE".equals(type)) { //$NON-NLS-1$
@@ -35,6 +35,9 @@ public class ControlStateRule {
 			}
 			if ("ENABLED".equals(type)) { //$NON-NLS-1$
 				return ENABLED;
+			}
+			if ("SELECTED".equals(type)) { //$NON-NLS-1$
+				return SELECTED;
 			}
 			return NONE;
 		}
@@ -124,6 +127,10 @@ public class ControlStateRule {
 			return control.getEnabled();
 		case VISIBLE:
 			return control.getVisible();
+		case SELECTED:
+			if (control instanceof Button) {
+				return ((Button) control).getSelection();
+			}
 		}
 		return false;
 	}

@@ -59,35 +59,37 @@ public class ControlStateListener implements SelectionListener {
 	 * target is set accordingly.
 	 */
 	public void setState() {
-		if (rule.evaluate()) {
-			switch (action) {
-			case ENABLE:
-				target.setEnabled(true);
-				break;
-			case DISABLE:
-				target.setEnabled(false);
-				break;
-			case SHOW:
-				target.setVisible(true);
-				break;
-			case HIDE:
-				target.setVisible(false);
-				break;
-			}
-		} else {
-			switch (action) {
-			case ENABLE:
-				target.setEnabled(false);
-				break;
-			case DISABLE:
-				target.setEnabled(true);
-				break;
-			case SHOW:
-				target.setVisible(false);
-				break;
-			case HIDE:
-				target.setVisible(true);
-				break;
+		synchronized (ControlStateListener.class) {
+			if (rule.evaluate()) {
+				switch (action) {
+				case ENABLE:
+					target.setEnabled(true);
+					break;
+				case DISABLE:
+					target.setEnabled(false);
+					break;
+				case SHOW:
+					target.setVisible(true);
+					break;
+				case HIDE:
+					target.setVisible(false);
+					break;
+				}
+			} else {
+				switch (action) {
+				case ENABLE:
+					target.setEnabled(false);
+					break;
+				case DISABLE:
+					target.setEnabled(true);
+					break;
+				case SHOW:
+					target.setVisible(false);
+					break;
+				case HIDE:
+					target.setVisible(true);
+					break;
+				}
 			}
 		}
 	}
