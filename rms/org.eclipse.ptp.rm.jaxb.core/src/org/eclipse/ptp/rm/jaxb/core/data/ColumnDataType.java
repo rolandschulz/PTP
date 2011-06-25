@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="foreground" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="moveable" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="resizable" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" />
+ *       &lt;attribute name="resizable" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="width" type="{http://www.w3.org/2001/XMLSchema}int" default="-1" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -166,7 +166,7 @@ public class ColumnDataType {
 	 */
 	public boolean isResizable() {
 		if (resizable == null) {
-			return true;
+			return false;
 		} else {
 			return resizable;
 		}

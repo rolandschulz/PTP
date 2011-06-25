@@ -312,7 +312,7 @@
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="horizontalAlign" type="xs:string"/>
 		<xs:attribute name="verticalAlign" type="xs:string"/>
-		<xs:attribute name="grabExcessHorizontal" type="xs:boolean" default="true"/>
+		<xs:attribute name="grabExcessHorizontal" type="xs:boolean" default="false"/>
 		<xs:attribute name="grabExcessVertical" type="xs:boolean" default="false"/>
 		<xs:attribute name="horizontalSpan" type="xs:int"/>
 		<xs:attribute name="verticalSpan" type="xs:int"/>
@@ -491,7 +491,7 @@
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="width" type="xs:int" default="-1"/>
 		<xs:attribute name="alignment" type="xs:string"/>
-		<xs:attribute name="resizable" type="xs:boolean" default="true"/>
+		<xs:attribute name="resizable" type="xs:boolean" default="false"/>
 		<xs:attribute name="moveable" type="xs:boolean" default="false"/>
 		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>

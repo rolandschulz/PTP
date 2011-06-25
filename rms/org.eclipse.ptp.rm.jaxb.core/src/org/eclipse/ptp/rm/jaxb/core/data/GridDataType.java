@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType name="grid-data-type">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="grabExcessHorizontal" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" />
+ *       &lt;attribute name="grabExcessHorizontal" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="grabExcessVertical" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="heightHint" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="horizontalAlign" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -193,7 +193,7 @@ public class GridDataType {
 	 */
 	public boolean isGrabExcessHorizontal() {
 		if (grabExcessHorizontal == null) {
-			return true;
+			return false;
 		} else {
 			return grabExcessHorizontal;
 		}
