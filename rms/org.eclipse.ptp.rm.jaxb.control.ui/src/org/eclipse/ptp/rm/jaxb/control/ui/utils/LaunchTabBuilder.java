@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -705,32 +706,66 @@ public class LaunchTabBuilder {
 
 	/**
 	 * Constructs a listener for each defined category of action on the target
-	 * and add it to the sources referenced in the rule.
+	 * and adds it to the sources referenced in the rule. Also checks for
+	 * cyclical dependencies.
 	 */
-	private void maybeWireWidgets() {
+	private void maybeWireWidgets() throws Throwable {
 		Collection<ControlStateListener> listeners = new HashSet<ControlStateListener>();
+		Map<Control, ControlStateListener> enable = new HashMap<Control, ControlStateListener>();
+		Map<Control, ControlStateListener> show = new HashMap<Control, ControlStateListener>();
+		ControlStateRuleType rule = null;
 		for (ControlStateType cst : targets.keySet()) {
 			Control target = targets.get(cst);
-			ControlStateRuleType rule = cst.getEnableIf();
+			ControlStateListener listener = null;
+			rule = cst.getEnableIf();
 			if (rule != null) {
-				listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.ENABLE, sources));
+				listener = new ControlStateListener(target, rule, ControlStateListener.Action.ENABLE, sources);
 			} else {
 				rule = cst.getDisableIf();
 				if (rule != null) {
-					listeners.add(new ControlStateListener(targets.get(cst), rule, ControlStateListener.Action.DISABLE, sources));
+					listener = new ControlStateListener(targets.get(cst), rule, ControlStateListener.Action.DISABLE, sources);
 				}
+			}
+			if (listener != null) {
+				listeners.add(listener);
+				enable.put(target, listener);
 			}
 
 			rule = cst.getHideIf();
 			if (rule != null) {
-				listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.HIDE, sources));
+				listener = new ControlStateListener(target, rule, ControlStateListener.Action.HIDE, sources);
 			} else {
 				rule = cst.getShowIf();
 				if (rule != null) {
-					listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.SHOW, sources));
+					listener = new ControlStateListener(target, rule, ControlStateListener.Action.SHOW, sources);
 				}
 			}
+
+			if (listener != null) {
+				listeners.add(listener);
+				show.put(target, listener);
+			}
 		}
+
+		for (ControlStateListener listener : listeners) {
+			listener.addDependencies(enable);
+			listener.addDependencies(show);
+		}
+
+		enable.clear();
+		show.clear();
+
+		Set<ControlStateListener> dependSet = new HashSet<ControlStateListener>();
+
+		for (ControlStateListener listener : listeners) {
+			dependSet.clear();
+			listener.findCyclicalDependecies(dependSet);
+		}
+
+		for (ControlStateListener listener : listeners) {
+			listener.clearSources();
+		}
+
 		tab.setListeners(listeners);
 	}
 }

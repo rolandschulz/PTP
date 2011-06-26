@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.launch;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -21,7 +20,6 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
-import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ControlStateListener;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -52,7 +50,6 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	protected String title;
 	protected Composite control;
 	protected Point size;
-	protected Collection<ControlStateListener> listeners;
 
 	/**
 	 * @param parentTab
@@ -120,22 +117,9 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 				} catch (CoreException t) {
 					JAXBControlUIPlugin.log(t);
 				}
-				if (listeners != null) {
-					for (ControlStateListener l : listeners) {
-						l.setState();
-					}
-				}
 			}
 		}
 		return new RMLaunchValidation(true, null);
-	}
-
-	/**
-	 * @param listeners
-	 *            for wiring widgets together based on state events
-	 */
-	public void setListeners(Collection<ControlStateListener> listeners) {
-		this.listeners = listeners;
 	}
 
 	/**

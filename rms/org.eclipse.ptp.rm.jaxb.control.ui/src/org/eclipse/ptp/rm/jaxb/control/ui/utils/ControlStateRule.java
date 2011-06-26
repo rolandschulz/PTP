@@ -56,11 +56,16 @@ public class ControlStateRule {
 	 *            JAXB element
 	 * @param map
 	 *            index of Widget controls
+	 * @param listener
+	 *            target listener on which to set this rule
+	 * @param sources
+	 *            dependencies held by the rule
 	 */
-	public ControlStateRule(ControlStateRuleType rule, Map<String, Control> map, ControlStateListener listener) {
+	public ControlStateRule(ControlStateRuleType rule, Map<String, Control> map, ControlStateListener listener,
+			List<Control> sources) {
 		ControlStateRuleType.Not not = rule.getNot();
 		if (not != null) {
-			this.not = new ControlStateRule(not.getRule(), map, listener);
+			this.not = new ControlStateRule(not.getRule(), map, listener, sources);
 		} else {
 			ControlStateRuleType.And and = rule.getAnd();
 			if (and != null) {
@@ -68,7 +73,7 @@ public class ControlStateRule {
 				if (!list.isEmpty()) {
 					this.and = new ArrayList<ControlStateRule>();
 					for (ControlStateRuleType t : list) {
-						this.and.add(new ControlStateRule(t, map, listener));
+						this.and.add(new ControlStateRule(t, map, listener, sources));
 					}
 				}
 			} else {
@@ -78,11 +83,12 @@ public class ControlStateRule {
 					if (!list.isEmpty()) {
 						this.or = new ArrayList<ControlStateRule>();
 						for (ControlStateRuleType t : list) {
-							this.or.add(new ControlStateRule(t, map, listener));
+							this.or.add(new ControlStateRule(t, map, listener, sources));
 						}
 					}
 				} else {
 					control = map.get(rule.getSource());
+					sources.add(control);
 					state = ControlState.get(rule.getState());
 					for (String trigger : rule.getTrigger()) {
 						Control t = map.get(trigger);

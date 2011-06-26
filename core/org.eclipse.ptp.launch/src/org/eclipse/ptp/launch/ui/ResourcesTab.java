@@ -462,7 +462,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 					rmDynamicTab.initializeFrom(launchAttrsScrollComp, rm, queue, launchConfiguration);
 				} catch (CoreException e) {
 					setErrorMessage(e.getMessage());
-					PTPLaunchPlugin.errorDialog(e.getMessage(), e);
+					PTPLaunchPlugin.errorDialog(e.getMessage(), e.getCause());
 				}
 			}
 			launchAttrsScrollComp.layout(true);
