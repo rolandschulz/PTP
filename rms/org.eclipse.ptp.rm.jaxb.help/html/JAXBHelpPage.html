@@ -207,7 +207,7 @@
 		termination externally. Finally, a <b>button-action</b> is an
 		arbitrary command associated with a button exposed through the
 		<code>Launch Tab</code>
-		(see further <a href="#Widget">below</a>).
+		(see further <a href="#Action">below</a>).
 	</p>
 
 	<h3>
@@ -221,7 +221,7 @@
 		having four subdivisions:</p>
 
 	<ol>
-		<li>Configuration Variable Definitions (the «Environment»)</li>
+		<li>Configuration Variable Definitions (the <i>Environment</i>i)</li>
 		<li>Files and Scripts</li>
 		<li>External Commands and their Stream Parsers</li>
 		<li>UI Configuration (Launch Tab)</li>
@@ -305,11 +305,11 @@
 	<p>
 		<code>link-value-to</code>
 		works as follows: the property or attribute gets its value from the
-		property or attributed linked to, unless that property or attribute
-		has an undefined (empty) value; in the latter case, any default
-		defined on the present property or attribute will be used. This
-		feature is primarily intended for defining dependent properties or
-		attributes whose values are not directly modified by the user.
+		property or attribute linked to, unless that property or attribute has
+		an undefined (empty) value; in the latter case, any default defined on
+		the present property or attribute will be used. This feature is
+		primarily intended for defining dependent properties or attributes
+		whose values are not directly modified by the user.
 	</p>
 
 	<p>Attributes also carry optional validators which allow you to
@@ -1149,12 +1149,22 @@
 		controllers belong to the
 		<code>tab-controller-type</code>
 		. It contains an arbitrary number of
-		<code>tab-folder</code>
+		<code>tab-folder,</code>
+		<code>composite,</code>
+		<code>widget,</code>
+		<code>browse,</code>
+		<code>button-group,</code>
+		<code>action,</code>
 		or
+		<code>viewer</code>
+		elements; as will be seen shortly, the first two, which are
+		"containers", are potentially recursive elements, so that one can nest
+		widgets in the usual manner. For all intents and purposes, the
+		<code>tab-controller-type</code>
+		is the same as a
 		<code>composite</code>
-		elements; as will be seen shortly, these both have potentially
-		recursive elements, so that one can nest "containers" in the usual
-		manner.
+		, but with the <i>group</i> attribute and with the extra field for
+		controlling its widget-value set.
 	</p>
 
 	<img alt="TabController" src="images/14tab-controller.jpeg" />
@@ -1215,12 +1225,11 @@
 	<p>
 		The
 		<code>tab-item</code>
-		is an all-purpose "container" in which all widget types can be
-		embedded. It is distinguished from the
-		<code>composite group</code>
-		in that it can only be the child of a
+		is another all-purpose "container" in which all widget types can be
+		embedded, distinguished from the <a href="#Composite"><code>composite</code>
+		</a> only in that it can only be the child of a
 		<code>tab-folder</code>
-		, that it can have a tooltip (which appears on the tab).
+		and that it can have a tooltip (which appears on the tab).
 	</p>
 
 	<p>
@@ -1262,8 +1271,86 @@
 	<img alt="Composite" src="images/16composite.jpeg" />
 	<br>
 
+	<h4 align="CENTER">
+		<a name="ControlState">Control State Wiring</a>
+	</h4>
+
 	<p>
-		We now come to the three non-container widget elements with functional
+		It should be evident that all the XML elements corresponding to UI SWT
+		<code>control</code>
+		types have been given
+		<code>control-state</code>
+		children.
+	</p>
+
+	<img alt="Composite" src="images/22control-state.jpeg" />
+	<br>
+
+	<p>
+		The purpose of these elements is to provide an optional way of setting
+		the <b>enabled</b> and/or <b>visible</b> states of the control on the
+		basis of the state of other controls. One can define two such elements
+		per control, using one of the show/hide or enable/disable pairs. Each
+		of these is associated with a
+		<code>control-state-rule:</code>
+	</p>
+
+	<img alt="Composite" src="images/23control-state-rule.jpeg" />
+	<br>
+
+	<p>The rule consists of three parts:</p>
+
+	<ol>
+		<li>state to check (SELECTED, VISIBLE, ENABLED)</li>
+		<li>the source control to check</li>
+		<li>a set of trigger sources to subscribe to</li>
+	</ol>
+
+	<p>These can be nested to an arbitrary depth to form clauses
+		governed by the logical operators.</p>
+
+	<p>
+		There can be multiple trigger sources, but they all must be buttons
+		(checkbox, radio); a
+		<code>SelectionListener</code>
+		is created for this target which subscribes to all the triggers; when
+		it receives an event, it evaluates the rule, and if the result is
+		true, takes the associated action on this target. Notice that the
+		sources need not be the same as the triggers, and that other states
+		besides SELECTED can be checked.
+	</p>
+
+	<p>
+		When one wishes to wire two or more such controls in this way, their
+		optional <i>id</i> element must be given a value that is unique to the
+		resource manager.
+	</p>
+
+	<p>Here is an example which sets the enabled and visible properties
+		of a text field:</p>
+
+	<pre>
+              &lt;widget type="text" style="SWT.V_SCROLL | SWT.BORDER" saveValueTo="host_list"&gt;
+                  &lt;layout-data&gt;
+                     &lt;grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"
+                        grabExcessVertical="true"/&gt;
+                  &lt;/layout-data&gt;
+                  &lt;control-state&gt;
+                     &lt;show-if source="003" state="ENABLED"&gt;
+                        &lt;trigger&gt;002&lt;/trigger&gt;
+                        &lt;trigger&gt;001&lt;/trigger&gt;
+                     &lt;/show-if&gt;
+                     &lt;enable-if source="002" state="SELECTED"&gt;
+                        &lt;trigger&gt;002&lt;/trigger&gt;
+                        &lt;trigger&gt;001&lt;/trigger&gt;
+                     &lt;/enable-if&gt;
+                  &lt;/control-state&gt;
+               &lt;/widget&gt;
+   </pre>
+
+	<hr>
+	<p>
+		We now come to the five non-container widget elements with functional
 		characteristics. The first of these is the
 		<code>widget</code>
 		, which comprises a number of simple widget types.
@@ -1303,16 +1390,6 @@
 			<td><code>combo</code></td>
 			<td>select from a list of items</td>
 		</tr>
-		<tr>
-			<td><code>browse</code></td>
-			<td>a text widget followed by a push button allowing the user to
-				browse for directory or file.</td>
-		</tr>
-		<tr>
-			<td><code>action</code></td>
-			<td>a push button associated with a <code>button-action</code>
-				command</td>
-		</tr>
 	</table>
 	<br>
 	<p>
@@ -1325,31 +1402,14 @@
 		<tr>
 			<td><i>title</i>
 			</td>
-			<td>used with <code>checkbox</code> and <code>push button</code>
-				widgets (<code>browse, action</code>) for the button label</td>
+			<td>used with <code>checkbox</code> and <code>radiobutton</code>
+				widgets for the button label</td>
 		</tr>
 		<tr>
 			<td><i>style</i>
 			</td>
 			<td>carries the <code>SWT</code> style constants appropriate to
 				the widget type</td>
-		</tr>
-		<tr>
-			<td><i>directory</i>
-			</td>
-			<td>limit the <code>browse</code> widget to directories</td>
-		</tr>
-		<tr>
-			<td><i>uri</i>
-			</td>
-			<td>have the <code>browse</code> widget set a URI as the text
-				(default is false, in which case the text is an absolute path)</td>
-		</tr>
-		<tr>
-			<td><i>localOnly</i>
-			</td>
-			<td>limit the <code>browse</code> widget to the local file
-				system (otherwise, the choice of local or remote is enabled)</td>
 		</tr>
 		<tr>
 			<td><i>readOnly</i>
@@ -1374,13 +1434,6 @@
 				to be used as the actual value for the property or attribute set by
 				the widget<br> <i>Example</i>: "YES,NO" would mean true yields
 				the first string and false the second</td>
-		</tr>
-		<tr>
-			<td><code>sub-layout-data</code>
-			</td>
-			<td>applies to the <code>browse</code> widget; applies to the
-				button component, whereas <code>layout-data</code> applies to the
-				text area</td>
 		</tr>
 		<tr>
 			<td><code>items-from</code>
@@ -1408,19 +1461,6 @@
 			<td>applies only to (read-only) <code>text</code> widgets; text
 				is resolved each time there is an update of a value from the Launch
 				Tab</td>
-		</tr>
-		<tr>
-			<td><code>button-action</code>
-			</td>
-			<td>applies to the <code>action</code> widget; the <code>button-action-type</code>
-				specifies the name of a command (<code>action</code>) defined in the
-				XML; this can be one of the <code>start-up</code> or <code>shut-down</code>,
-				commands, or a special <code>button-action</code> command (<b>note
-			</b>that it cannot, however, be a <code>-job</code> command, as the
-				Launch Tab is not coupled to any submitted jobs); the <code>button-action-type</code>
-				also indicates whether the variable affected by the command should
-				be cleared prior to the command execution, and whether the launch
-				tab should be refreshed (default is true) afterwards</td>
 		</tr>
 	</table>
 	<br>
@@ -1464,10 +1504,82 @@
 	<br>
 
 	<h4 align="CENTER">
+		<a name="Browse">Browse</a>
+	</h4>
+
+	<br>
+	<img alt="BrowseType" src="images/190browse.jpeg" />
+	<br>
+
+	<p>
+		A special widget-pair, a text widget followed by a push button
+		allowing the user to browse for directory or file from either the
+		local or remote file system. Aside from the fields shared with the
+		<code>widget</code>
+		type, we note the following:
+	</p>
+	<br>
+	<table align="center" rules="all">
+		<tr>
+			<td><i>directory</i></td>
+			<td>limit the <code>browse</code> widget to directories</td>
+		</tr>
+		<tr>
+			<td><i>uri</i></td>
+			<td>have the <code>browse</code> widget set a URI as the text
+				(default is false, in which case the text is an absolute path)</td>
+		</tr>
+		<tr>
+			<td><i>localOnly</i></td>
+			<td>limit the <code>browse</code> widget to the local file
+				system (otherwise, the choice of local or remote is enabled)</td>
+		</tr>
+	</table>
+	<br>
+	<p>
+		Control ids,
+		<code>layout</code>
+		and
+		<code>control-state</code>
+		are specified as belonging to either the text or the button. Style
+		applies only to the text widget.
+	</p>
+
+	<h4 align="CENTER">
+		<a name="Action">Action Button</a>
+	</h4>
+
+	<br>
+	<img alt="ActionType" src="images/191push-button.jpeg" />
+	<br>
+
+	<p>
+		A push button which is associated with a
+		<code>button-action</code>
+		command. The
+		<code>button-action</code>
+		specifies the name of a command (
+		<code>action</code>
+		) defined in the XML; this can be one of the
+		<code>start-up</code>
+		or
+		<code>shut-down</code>
+		, commands, or a special
+		<code>button-action</code>
+		command (<b>note </b>that it cannot, however, be a
+		<code>-job</code>
+		command, as the Launch Tab is not coupled to any submitted jobs); the
+		<code>button-action-type</code>
+		also indicates whether the variable affected by the command should be
+		cleared prior to the command execution, and whether the launch tab
+		should be refreshed (default is true) afterwards
+	</p>
+
+	<h4 align="CENTER">
 		<a name="AttributeViewer">Attribute Viewer</a>
 	</h4>
 
-	<img alt="AttributeViewer" src="images/21attribute-viewer.jpeg" />
+	<img alt="AttributeViewerType" src="images/21attribute-viewer.jpeg" />
 
 	<p>
 		The last of the widget types, the
@@ -1628,7 +1740,7 @@
 		this may change in future releases, when certain hard-coded features
 		of the driver may be handed over to the client for configuration.</p>
 
-	<img alt="MonitorType" src="images/22monitor.jpeg" />
+	<img alt="MonitorType" src="images/24monitor.jpeg" />
 
 	<p>
 		This component can be furnished with its own set of properties
