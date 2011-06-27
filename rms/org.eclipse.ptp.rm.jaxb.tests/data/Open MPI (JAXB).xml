@@ -281,8 +281,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							horizontalSpan="2"/>
 					</layout-data>
 					<title>Hosts</title>
-					<widget type="checkbox" id="001" title="Host file:" saveValueTo="hostfilechecked"/>
-					<browse textId="003" buttonId="004" textStyle="SWT.BORDER" title="Browse">
+					<widget type="checkbox" buttonId="001" title="Host file:" saveValueTo="hostfilechecked"/>
+					<browse textStyle="SWT.BORDER" title="Browse">
 						<text-layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
 						</text-layout-data>
@@ -290,20 +290,19 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							<grid-data horizontalAlign="SWT.RIGHT" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<text-control-state>
-							<enable-if source="001" state="SELECTED">
-								<trigger>001</trigger>
-							</enable-if>
+							<enable-if button="001" selected="true"/>
 						</text-control-state>
 						<button-control-state>
-							<enable-if source="003" state="ENABLED">
-								<trigger>001</trigger>
-							</enable-if>
+							<enable-if button="001" selected="true"/>
 						</button-control-state>
 					</browse>
-					<widget type="checkbox" id="002" title="Host list:" saveValueTo="hostlistchecked">
+					<widget type="checkbox" buttonId="002" title="Host list:" saveValueTo="hostlistchecked">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.TOP"/>
 						</layout-data>
+						<control-state>
+							<show-if button="001" selected="true"/>
+						</control-state>
 					</widget>
 					<widget type="text" style="SWT.V_SCROLL | SWT.BORDER" saveValueTo="host_list">
 						<layout-data>
@@ -311,14 +310,13 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 								grabExcessVertical="true"/>
 						</layout-data>
 						<control-state>
-							<show-if source="003" state="ENABLED">
-								<trigger>002</trigger>
-								<trigger>001</trigger>
-							</show-if>
-							<enable-if source="002" state="SELECTED">
-                        <trigger>002</trigger>
-                        <trigger>001</trigger>
-                     </enable-if>
+							<show-if button="001" selected="true"/>
+							<enable-if>
+								<and>
+									<rule button="001" selected="true"/>
+									<rule button="002" selected="true"/>
+								</and>
+							</enable-if>
 						</control-state>
 					</widget>
 				</composite>
