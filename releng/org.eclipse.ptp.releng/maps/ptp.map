@@ -193,6 +193,7 @@ fragment@org.eclipse.ptp.etfw.parallel=@ptpTag@,:pserver:anonymous@dev.eclipse.o
 plugin@org.eclipse.ptp.rdt.core.tests=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.tests
 
 ! Orbit bundles
+plugin@javax.activation,1.1.0=GET,http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/bundles/javax.activation_1.1.0.v201005080500.jar
 plugin@javax.xml,1.3.4=GET,http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/bundles/javax.xml_1.3.4.v201005080400.jar
 plugin@javax.xml.stream,1.0.1=GET,http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/bundles/javax.xml.stream_1.0.1.v201004272200.jar
 plugin@javax.xml.bind,2.1.9=GET,http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/bundles/javax.xml.bind_2.1.9.v201005080401.jar
@@ -200,4 +201,4 @@ plugin@com.sun.xml.bind,2.1.9=GET,http://download.eclipse.org/tools/orbit/downlo
 
 ! JGit plugins
 !plugin@org.eclipse.jgit=GET,http://download.eclipse.org/jgit/maven/org/eclipse/jgit/org.eclipse.jgit/0.12.1/org.eclipse.jgit-0.12.1.jar
-plugin@org.eclipse.jgit=GET,http://download.eclipse.org/tools/ptp/builds/jgit/org.eclipse.jgit_0.12.1.jar
+!plugin@org.eclipse.jgit=GET,http://download.eclipse.org/tools/ptp/builds/jgit/org.eclipse.jgit_0.12.1.jar
