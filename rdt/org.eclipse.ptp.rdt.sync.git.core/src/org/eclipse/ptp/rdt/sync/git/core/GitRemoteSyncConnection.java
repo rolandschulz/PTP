@@ -440,7 +440,7 @@ public class GitRemoteSyncConnection {
 				String fn = line.substring(2);
 				if (status == 'R') {
 					filesToDelete.add(fn);
-				} else if (!(fileFilter.shouldIgnore(fn))) {
+				} else if (!fn.equals(".cproject") && !fn.equals(".project") && !fn.startsWith(".settings")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					filesToAdd.add(fn);
 				}
 			}

@@ -177,12 +177,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			
 			for(String envVar : env) {
 				String[] splitStr = envVar.split("="); //$NON-NLS-1$
-				if (splitStr.length > 1) {
-					remoteEnvMap.put(splitStr[0], splitStr[1]);
-				} else if (splitStr.length == 1){
-					// Empty environment variable 
-					remoteEnvMap.put(splitStr[0], ""); //$NON-NLS-1$
-				}
+				remoteEnvMap.put(splitStr[0], splitStr[1]);
 			}
 			
 			// set the directory in which to run the command

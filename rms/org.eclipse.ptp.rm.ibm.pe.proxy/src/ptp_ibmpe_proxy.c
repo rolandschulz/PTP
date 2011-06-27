@@ -65,7 +65,6 @@
 #include <limits.h>
 #include <dlfcn.h>
 #include <regex.h>
-#include <ctype.h>
 #ifdef __linux__
 #include <getopt.h>
 #endif
@@ -76,7 +75,7 @@
 #include <llapi.h>
 #endif
 
-#define PE_SCI_DEBUG				/* Include code for PE proxy support for the sci mode debugger.*/
+#define PE_DUAL_POE_DEBUG				/* Include code for PE proxy support for the dual poe debugger.*/
 
   /* #define DO_TIMING to obtain proxy timings */
 #ifdef DO_TIMING
@@ -97,7 +96,7 @@
 #ifndef POE
 #define POE "/usr/bin/poe"
 #endif /* POE */
-#define PMD_HELPER				"/usr/bin/pmdhelper"		/* default sci debugger helper */
+#define PMD_HELPER				"/usr/bin/pmdhelper"		/* default dual poe debugger helper */
 #define INFO_MESSAGE 0
 #define TRACE_MESSAGE 1
 #define TRACE_DETAIL_MESSAGE 2
@@ -145,6 +144,10 @@ typedef struct jobinfo
     pid_t poe_pid; /* Process id for main poe process      */
     pid_t task0_pid; /* Process id for app. task 0           */
     char *app_working_dir; /* Application working directory */
+#ifdef PE_DUAL_POE_DEBUG
+    jobinfoptr debugger_job; /* reference to debugger job */
+    jobinfoptr debuggee_job; /* reference to debuggee job */
+#endif
     int debugging; /* Job is being debugged 		*/
     char *sdm_debugdir; /* Directory path for SDM debugger      */
     char *sdm_debugname; /* Pathname to the top level debugger   */
@@ -250,8 +253,7 @@ static char **create_exec_parmlist(char *execname, char *targetname, int arg_cou
 static char **create_child_sdm_parmlist(char *debugger_path, char *debugger_name, int debug_args_count,
         char **debug_args);
 static char **create_debug_parmlist(char *debugger_name, int debug_args_count, char **debug_args);
-static char **create_env_array(char *args[], char *env_sh_path, int split_io,
-                               char *mp_buffer_mem, char *mp_rdma_count, char *debugger_id,
+static char **create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_count, char *debugger_id,
         int is_debugger);
 static void add_environment_variable(char *env_var);
 static int setup_stdout_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name, int *fd,
@@ -272,7 +274,7 @@ static void delete_noderef(char *hostname);
 static void *startup_monitor(void *pid);
 static void delete_task_list(int numtasks, taskinfo * tasks);
 static void *kill_process(void *pid);
-static void update_nodes(char *hostlist_path);
+static void update_nodes(int trans_id, FILE * hostlist);
 static void malloc_check(void *p, const char *function, int line);
 static node_refcount *add_node(char *key);
 static node_refcount *find_node(char *key);
@@ -387,30 +389,20 @@ static struct option longopts[] = {
     {   "runMiniproxy", no_argument, NULL, 'M'},
     {   NULL, 0, NULL, 0}
 };
-static char *libpath[] = {
-        NULL,
-        "/opt/ibmll/LoadL/full/lib/",
-        "/opt/ibmll/LoadL/so/lib/",
-        "/opt/ibmll/LoadL/scheduler/full/lib",
-        "/opt/ibmll/LoadL/scheduler/so/lib/",
-        "/opt/ibmll/LoadL/scheduler/full/lib64",
-        "/opt/ibmll/LoadL/scheduler/so/lib64/",
-        (char *) -1
-    };
+static char *libpath[] = {NULL,
+		"/opt/ibmll/LoadL/full/lib/",
+		"/opt/ibmll/LoadL/scheduler/full/lib",
+		"/opt/ibmll/LoadL/so/lib/", 
+		(char *) -1
+};
 static char *libname = "libllapi.so";
 #else
-static char *libpath[] = {
-        NULL,
-        "/usr/lpp/LoadL/full/lib",
-        "/usr/lpp/LoadL/so/lib",
-        "/usr/lpp/LoadL/scheduler/so/lib",
-        "/usr/lpp/LoadL/scheduler/full/lib",
-        "/opt/ibmll/LoadL/full/lib/",
-        "/opt/ibmll/LoadL/so/lib/",
-        "/opt/ibmll/LoadL/scheduler/so/lib/",
-        "/opt/ibmll/LoadL/scheduler/lib/",
-        (char *) -1
-};
+static char *libpath[] = { NULL,
+		"/usr/lpp/LoadL/full/lib",
+		"/usr/lpp/LoadL/so/lib",
+		"/opt/ibmll/LoadL/full/lib/",
+        	"/opt/ibmll/LoadL/so/lib/",
+		(char *) -1 };
 static char *libname = "libllapi.a";
 #endif
 
@@ -698,7 +690,7 @@ static enum_launch_attr
                         "Specify how node's CPU should be used (MP_CPU_USE)", "multiple", "multiple|unique" }, {
                         "MP_EUIDEVICE", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Adapter:",
                         "Specify adapter to use for message passing (MP_EUIDEVICE)", "",
-                        "en0|en1|fi0|tr0|sn_all|sn_single|ml0" }, { "MP_EUIDEVICE", ATTR_FOR_LINUX | ATTR_FOR_ALL_PROXY,
+                        "en0|fi0|tr0|sn_all|sn_single|ml0" }, { "MP_EUIDEVICE", ATTR_FOR_LINUX | ATTR_FOR_ALL_PROXY,
                         "Adapter:", "Specify adapter to use for message passing (MP_EUIDEVICE)", "",
                         "ethx|sn_all|sn_single" },
                 { "MP_EUILIB", ATTR_FOR_ALL_OS | ATTR_FOR_ALL_PROXY, "Communications Subsystem:",
@@ -953,7 +945,7 @@ int PE_start_events(int trans_id, int nargs, char *args[])
 int PE_submit_job(int trans_id, int nargs, char *args[])
 {
     /*
-     * Submit a Parallel Environment application for execution.
+     * Submit a Parallel Environmnent application for execution.
      * This function:
      * 1) parses the passed argument list
      * 2) sets the current working directory
@@ -982,12 +974,14 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     char *mp_buffer_mem_max;
     char *mp_rdma_count;
     char *mp_rdma_count_2;
-    char *env_sh_path = NULL;
     char **envp;
     jobinfo *job;
-    int debug_sci_mode = 0;
+    int debug_dual_poe_mode = 0;
     char pe_debugger_id[32] = { 0 }; // POE PID of parallel debugger.
     char *pmd_helper = 0;
+#ifdef PE_DUAL_POE_DEBUG
+    jobinfo *debugger_job;
+#endif
     int i;
     int argp_count;
     int argp_limit;
@@ -1061,13 +1055,18 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
                     }
                 }
                 else if ((!use_load_leveler) && (strcmp(args[i], "MP_HOSTFILE")) == 0) {
+                    FILE *hostlist;
                     /*
                      * Process host file, building new machine
                      * configuration if this is a unique hostfile.
                      * If LoadLeveler is used, then don't process hostfile since node status
                      * is handled by tracking Loadleveler's view of node status.
                      */
-                    update_nodes(cp + 1);
+                    hostlist = fopen((cp + 1), "r");
+                    if (hostlist != NULL) {
+                        update_nodes(trans_id, hostlist);
+                        fclose(hostlist);
+                    }
                 }
                 /*
                  * If MP_INFOLEVEL is > 1 char, then convert from label
@@ -1146,22 +1145,12 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
                     mp_rdma_count_2 = cp + 1;
                     mp_rdma_count_set = 1;
                 }
-                else if (strcmp(args[i], "PE_ENV_SCRIPT") == 0) {
-                    env_sh_path = strdup(cp + 1);
-                }
-#ifdef PE_SCI_DEBUG
+#ifdef PE_DUAL_POE_DEBUG
                 else if (strcmp(args[i], "PE_DEBUG_MODE") == 0) {
                     if (strcasecmp(cp + 1, "sdm") == 0)
                         debug_sdm_mode = 1;
-                    else if (strcasecmp(cp + 1, "sci") == 0) {
-                        debug_sci_mode++;
-                        if (!pmd_helper)
-                            pmd_helper = PMD_HELPER;
-                    }
-                    // temporarily leave check for "dual" for backwards
-                    // compatibility
                     else if (strcasecmp(cp + 1, "dual") == 0) {
-                        debug_sci_mode++;
+                        debug_dual_poe_mode++;
                         if (!pmd_helper)
                             pmd_helper = PMD_HELPER;
                     }
@@ -1281,17 +1270,17 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     job = (jobinfo *) malloc(sizeof(jobinfo));
     malloc_check(job, __FUNCTION__, __LINE__);
     memset(job, 0, sizeof(jobinfo));
-#ifdef PE_SCI_DEBUG
+#ifdef PE_DUAL_POE_DEBUG
     /*DEBUG*/
-    if (debug_sci_mode) {
+    if (debug_dual_poe_mode) {
         char *debugger_full_path;
 
         debug_sdm_mode = 0; // disable SDM debugger launch.
         /*
-         * If no path is specified, then try to locate executable.
+         * If no path is specified, then try to locate execuable.
          */
         if (debugger_path == NULL || debugger_name == NULL) {
-            post_submitjob_error(trans_id, jobid, "Debugger executable not found");
+            post_submitjob_error(trans_id, jobid, "Debugger executuable not found");
             if (current_hostlist != NULL) {
                 free(current_hostlist);
             }
@@ -1308,6 +1297,12 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             }
             return PTP_PROXY_RES_OK;
         }
+
+        debugger_job = (jobinfo *) malloc(sizeof(jobinfo));
+        malloc_check(debugger_job, __FUNCTION__, __LINE__);
+        memset(debugger_job, 0, sizeof(jobinfo));
+        debugger_job->debuggee_job = job;
+        job->debugger_job = debugger_job;
 
         TRACE_DETAIL("+++ Forking poe/debugger process\n");
         pid = fork();
@@ -1333,8 +1328,8 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             debugger_args[a] = NULL;
 
             snprintf(pe_debugger_id, sizeof pe_debugger_id, "PE_DEBUGGER_ID=%d", getpid());
-            debugger_envp = create_env_array(args, env_sh_path, 0, NULL, NULL,
-                                             pe_debugger_id, 1);
+            debugger_envp = create_env_array(args, 0, NULL, NULL, pe_debugger_id, 1);
+
             max_fd = sysconf(_SC_OPEN_MAX);
             for (i = STDERR_FILENO + 1; i < max_fd; i++) {
                 close(i);
@@ -1369,7 +1364,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
         /* Parent continues on... */
         /* Augment the application's environment to include a debug marker based upon the poe pid of the debugger. */
         snprintf(pe_debugger_id, sizeof pe_debugger_id, "PE_DEBUGGER_ID=%d", pid);
-       
+        debugger_job->poe_pid = pid;
         /* TODO: Do some more initialization of debugger_job here */
     }
 #endif
@@ -1432,8 +1427,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     job->discovered_job = 0;
     job->numtasks = -1;
     job->current_hostlist = current_hostlist;
-    envp = create_env_array(args, env_sh_path, split_io, mp_buffer_mem_value,
-                            mp_rdma_count_value, pe_debugger_id, 0);
+    envp = create_env_array(args, split_io, mp_buffer_mem_value, mp_rdma_count_value, pe_debugger_id, 0);
     TRACE_DETAIL("+++ Forking child process\n");
     pid = fork();
     if (pid == 0) {
@@ -1510,10 +1504,20 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     }
     else {
         if (pid == -1) {
+#ifdef PE_DUAL_POE_DEBUG
+            if (debug_dual_poe_mode) {
+                /* TODO: Take down debugger poe. */
+            }
+#endif
             post_submitjob_error(trans_id, jobid, "Fork failed");
             return PTP_PROXY_RES_OK;
         }
         else {
+#ifdef PE_DUAL_POE_DEBUG
+            if (debug_dual_poe_mode) {
+                job_enqueue(debugger_job, debugger_job->poe_pid);
+            }
+#endif
             if (!job->stdout_redirect) {
                 close(stdout_pipe[1]);
             }
@@ -1582,6 +1586,15 @@ int PE_terminate_job(int trans_id, int nargs, char *args[])
         job = GetListElement(jobs);
     }
     if (job != NULL) {
+#ifdef PE_DUAL_POE_DEBUG
+        /* Is this a debugger job? */
+        if (job->debuggee_job) {
+            jobinfo *debuggee_job = job->debuggee_job;
+            job->debuggee_job = NULL;
+            kill(debuggee_job->poe_pid, SIGTERM);
+            pthread_create(&kill_tid, &thread_attrs, kill_process, (void *) debuggee_job->poe_pid);
+        }
+#endif
         kill(job->poe_pid, SIGTERM);
         /*
          * Create a thread to kill the process with kill(9) if the
@@ -1745,6 +1758,10 @@ void job_enqueue(jobinfo *job, pid_t pid)
      */
     pthread_create(&job->startup_thread, &thread_attrs, startup_monitor, job);
     AddToList(jobs, job);
+#ifdef PE_DUAL_POE_DEBUG
+    if (job->debuggee_job)
+        return; // Don't report debugger
+#endif
     snprintf(jobname, sizeof jobname, "%s.%s", my_username, job->submit_jobid);
     jobname[sizeof jobname - 1] = '\0';
     sprintf(queue_id_str, "%d", queue_id);
@@ -2029,6 +2046,10 @@ startup_monitor(void *job_ident)
     free(cfginfo);
     job->tasks = tasks;
     job->numtasks = numtasks;
+#ifdef PE_DUAL_POE_DEBUG
+    if (job->debuggee_job != NULL) /* The debugger job doesn't report */
+        goto out;
+#endif
     /*
      * For each task in the application, send a new process event to the
      * GUI.
@@ -2228,6 +2249,9 @@ startup_monitor(void *job_ident)
             }
         }
     }
+#ifdef PE_DUAL_POE_DEBUG
+    out:
+#endif
     /*
      * The startup thread exits at this point, so clear the reference in
      * the job info
@@ -3414,7 +3438,7 @@ create_exec_parmlist(char *execname, char *targetname, int arg_count, char **arg
     malloc_check(argv, __FUNCTION__, __LINE__);
     i = 0;
     argv[i++] = execname;
-#ifdef PE_SCI_DEBUG
+#ifdef PE_DUAL_POE_DEBUG
     if (helper) {
         argv[i++] = helper;
     }
@@ -3474,8 +3498,8 @@ create_child_sdm_parmlist(char *debugdir, char *debugname, int debug_args_count,
 }
 
 char **
-create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_mem,
-                 char *mp_rdma_count, char *debugger_id, int is_debugger)
+create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_count, char *debugger_id,
+        int is_debugger)
 {
     /*
      * Set up the environment variable array for the target application.
@@ -3499,34 +3523,34 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
     env_array = (char **) malloc(sizeof(char *) * env_array_size);
     for (i = 0; args[i] != NULL; i++) {
         if (strncmp(args[i], "MP_", 3) == 0) {
-#ifdef PE_SCI_DEBUG
+#ifdef PE_DUAL_POE_DEBUG
             if (is_debugger && strncmp(args[i], "MP_PROCS=", 9) == 0) {
-                int nprocs = atoi(args[i] + 9);
+                int nprocs = atoi(args[i] + 9) + 1;
                 char procs_str[128];
 
                 snprintf(procs_str, sizeof(procs_str), "MP_PROCS=%d", nprocs);
-                add_environment_variable(procs_str);
+                add_environment_variable(strdup(procs_str));
                 has_mp_procs = 1;
             }
             else if (is_debugger && strncmp(args[i], "MP_MSG_API=", 11) == 0) {
                 /* Strip this out and replace with PE_DEBUG_MSG_API (see below) */;
             }
             else {
-                add_environment_variable(args[i]);
+                add_environment_variable(strdup(args[i]));
             }
 #else
-            add_environment_variable(args[i]);
+            add_environment_variable(strdup(args[i]));
 #endif
         }
         else {
             if (strncmp(args[i], "env=", 4) == 0) {
-                add_environment_variable(args[i] + 4);
+                add_environment_variable(strdup(args[i]) + 4);
             }
         }
     }
-#ifdef PE_SCI_DEBUG
+#ifdef PE_DUAL_POE_DEBUG
     if (is_debugger && !has_mp_procs)
-        add_environment_variable("MP_PROCS=1");
+        add_environment_variable("MP_PROCS=2");
 #endif
 
     if (split_io == 1) {
@@ -3538,7 +3562,7 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
     if (mp_rdma_count && mp_rdma_count[0] != '\0') {
         add_environment_variable(mp_rdma_count);
     }
-#ifdef PE_SCI_DEBUG
+#ifdef PE_DUAL_POE_DEBUG
     if (debugger_id && debugger_id[0] != '\0') {
         add_environment_variable(debugger_id);
     }
@@ -3547,59 +3571,8 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
         add_environment_variable("MP_RESD=yes");
         print_message(TRACE_DETAIL_MESSAGE, "PE Job uses LoadLeveler resource management\n");
     }
-      /*
-       * If env_sh_path is not null, this indicates that the user has 
-       * specified a 'setup script' to run to set the PE environment variables.
-       * In this case, no environment variable settings were passed across to 
-       * the proxy in the 'run' command, and all settings are in the file
-       * specified by env_sh_path. In this case, open the file specified by
-       * env_sh_path, read the file, and for each line that does not start with
-       * '#', trim leading and trailing spaces from the line and add the
-       * resulting value, which should be in the form "env_var=value" to the
-       * environment variable array for the target process.
-       */
-    if (env_sh_path != NULL) {
-        FILE * env_sh;
-        env_sh = fopen(env_sh_path, "r");
-        free(env_sh_path);
-        env_sh_path = NULL;
-        if (env_sh != NULL) {
-            char env_data[_POSIX_PATH_MAX + 30];
-            char *bufp;
-   
-            bufp = fgets(env_data, sizeof env_data, env_sh);
-            while (bufp != NULL) {
-                char *endp;
-                while (isblank(*bufp)) {
-                    bufp = bufp + 1;
-                }
-                if (*bufp != "#") {
-
-                    endp = bufp;
-                    while ((!isblank(*endp)) && (*endp != '\n') && 
-                           (*endp != '\0')) {
-                        endp = endp + 1;
-                    }
-                    *endp = '\0';
-                    add_environment_variable(bufp);
-                }
-                  /*
-                   * The proxy needs the list of nodes specified in the file
-                   * pointed to by the MP_HOSTFILE environment variable.
-                   * When this environment variable is seen in the input text,
-                   * call update_nodes to process the hostfile
-                   */
-		        endp = strchr(bufp, '=');
-                if (endp != NULL) {
-                    *endp = '\0';
-                    if (strcmp(bufp, "MP_HOSTFILE") == NULL) {
-                        update_nodes(endp + 1);
-                    }
-                }
-                bufp = fgets(env_data, sizeof env_data, env_sh);
-            }
-        }
-        fclose(env_sh);
+    else {
+        add_environment_variable("MP_RESD=no");
     }
     add_environment_variable(NULL);
     TRACE_EXIT;
@@ -3616,20 +3589,7 @@ void add_environment_variable(char *env_var)
         env_array = (char **) realloc(env_array, sizeof(char *) * env_array_size);
         malloc_check(env_array, __FUNCTION__, __LINE__);
     }
-      /*
-       * If env_var is not null, then create a new copy of the string to ensure
-       * it properly gets added to the environment space. This may appear to be
-       * a memory leak, but in reality should not be a problem since this
-       * function is only called on the child side of a fork to create a new
-       * process, and the exec() of the new process will implicitly release
-       * all memory held by the proxy in the child process address space
-       */
-    if (env_var == NULL) {
-        env_array[next_env_entry++] = NULL;
-    }
-    else {
-        env_array[next_env_entry++] = strdup(env_var);
-    }
+    env_array[next_env_entry++] = env_var;
 }
 
 /*
@@ -3764,7 +3724,7 @@ int setup_child_stderr(int run_trans_id, char *subid, int pipe_fd[])
     return status;
 }
 
-void update_nodes(char *hostlist_path)
+void update_nodes(int trans_id, FILE * hostlist)
 {
     /*
      * Create a node list, containing unique nodes, from the hostlist file.
@@ -3777,23 +3737,16 @@ void update_nodes(char *hostlist_path)
      * Multiple consecutive spaces in the message will cause parsing errors
      * in the Java code handling the response.
      */
-    int i;
-    int len;
     char *res;
     char *valstr;
     char hostname[256];
     List *new_nodes;
     struct timeval current_time;
-    FILE *hostlist;
 
     TRACE_ENTRY;
     RUN_GET_TIME("Start processing host list, time from run command start", &run_start_time);
     gettimeofday(&current_time, NULL);
     valstr = NULL;
-    hostlist = fopen(hostlist_path, "r");
-    if (hostlist == NULL) {
-        return;
-    }
     res = fgets(hostname, sizeof(hostname), hostlist);
     new_nodes = NewList();
         /*
@@ -3824,10 +3777,6 @@ void update_nodes(char *hostlist_path)
                 current_hostlist = realloc(current_hostlist, current_hostlist_size * sizeof(char *));
                 malloc_check(current_hostlist, __FUNCTION__, __LINE__);
             }
-	    len = strlen(cp);
-	    for (i = 0; i < len; i++) {
-		cp[i] = tolower(cp[i]);
-	    }
             current_hostlist[current_hostlist_size++] = strdup(cp);
             if (find_node(hostname) == NULL) {
                 node_refcount *node;
@@ -3838,7 +3787,6 @@ void update_nodes(char *hostlist_path)
         }
         res = fgets(hostname, sizeof(hostname), hostlist);
     }
-    fclose(hostlist);
     send_new_node_list(start_events_transid, machine_id, new_nodes);
     DestroyList(new_nodes, NULL);
     RUN_GET_TIME("End processing host list, elapsed time", &current_time);
@@ -5466,12 +5414,9 @@ int write_output(int fd, jobinfo * job, ioinfo * file_info)
 void check_bufsize(ioinfo * file_info)
 {
     if (file_info->remaining == 0) {
-		int prev_offset = file_info->cp - file_info->write_buf;
-		file_info->remaining = file_info->allocated;
-        file_info->allocated += file_info->allocated;
+        file_info->allocated = file_info->allocated * 2;
         file_info->write_buf = (char *) realloc(file_info->write_buf, file_info->allocated);
         malloc_check(file_info->write_buf, __FILE__, __LINE__);
-		file_info->cp = file_info->write_buf + prev_offset;
     }
 }
 

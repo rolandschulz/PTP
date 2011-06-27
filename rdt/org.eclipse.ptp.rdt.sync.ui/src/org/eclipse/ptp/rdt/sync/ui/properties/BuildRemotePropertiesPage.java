@@ -359,19 +359,12 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 * 				the configuration 
 	 */
 	private void setValues(IConfiguration config) {
-		// Disable for multi-configurations.
+		// Disable for multi-configurations. Note that we set parentComposite to invisible, not the tab, because we want to reappear when
+		// the configuration changes back to a single configuration.
 		if (config instanceof IMultiConfiguration) {
 			composite.setEnabled(false);
 			return;
 		}
-
-		// Disallow modifications to Workspace configuration and allow for all others
-		if (config.getName() != null && config.getName().equals(Messages.WorkspaceConfigName)) {
-			this.setEnabledForAllWidgets(false);
-		} else {
-			this.setEnabledForAllWidgets(true);
-		}
-
 		composite.setEnabled(true);
 		populateRemoteProviderCombo(fProviderCombo);
 		PageSettings settings = fConfigToPageSettings.get(getCfg().getId());
@@ -397,12 +390,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		fRootLocationText.setText(settings.rootLocation);
 	}
 	
-	private void setEnabledForAllWidgets(boolean shouldBeEnabled) {
-		fProviderCombo.setEnabled(shouldBeEnabled);
-		fConnectionCombo.setEnabled(shouldBeEnabled);
-		fRootLocationText.setEnabled(shouldBeEnabled);
-	}
-
 	/**
 	 * Handle change of configuration. Current page values must be stored and then updated
 	 * 

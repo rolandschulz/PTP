@@ -72,6 +72,47 @@ import org.eclipse.swt.widgets.Text;
  */
 public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfigurationDynamicTab {
 
+	protected Composite control;
+	protected Button useArgsDefaultsButton;
+	protected Text argsText;
+	protected Button useParamsDefaultsButton;
+	protected CheckboxTableViewer paramsViewer;
+	protected Table paramsTable;
+	protected OmpiInfo info;
+
+	/**
+	 * @since 2.0
+	 */
+	public AdvancedOpenMpiRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
+		super(dialog);
+		info = ((OpenMPIResourceManager) rm).getOmpiInfo();
+	}
+
+	private class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener implements ICheckStateListener {
+		public WidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
+			super(dynamicTab);
+		}
+
+		@Override
+		protected void doWidgetSelected(SelectionEvent e) {
+			if (e.getSource() == paramsViewer || e.getSource() == useArgsDefaultsButton) {
+				updateControls();
+			} else {
+				super.doWidgetSelected(e);
+			}
+		}
+
+		public void checkStateChanged(CheckStateChangedEvent event) {
+			if (isEnabled()) {
+				Object source = event.getSource();
+				if (source == paramsViewer) {
+					fireContentsChanged();
+					updateControls();
+				}
+			}
+		}
+	}
+
 	private class DataSource extends RMLaunchConfigurationDynamicTabDataSource {
 		private boolean useDefArgs;
 		private String args;
@@ -123,10 +164,6 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 			getConfigurationWorkingCopy().setAttribute(OpenMPILaunchConfiguration.ATTR_PARAMETERS, params);
 		}
 
-		protected boolean getUseDefArgs() {
-			return useDefArgs;
-		}
-
 		@Override
 		protected void loadDefault() {
 			args = OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS;
@@ -171,49 +208,30 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 				}
 			}
 		}
-	}
 
-	private class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener implements ICheckStateListener {
-		public WidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
-			super(dynamicTab);
-		}
-
-		public void checkStateChanged(CheckStateChangedEvent event) {
-			if (isEnabled()) {
-				Object source = event.getSource();
-				if (source == paramsViewer) {
-					fireContentsChanged();
-					updateControls();
-				}
-			}
-		}
-
-		@Override
-		protected void doWidgetSelected(SelectionEvent e) {
-			if (e.getSource() == paramsViewer || e.getSource() == useArgsDefaultsButton) {
-				updateControls();
-			} else {
-				super.doWidgetSelected(e);
-			}
+		protected boolean getUseDefArgs() {
+			return useDefArgs;
 		}
 	}
 
-	protected Composite control;
-	protected Button useArgsDefaultsButton;
-	protected Text argsText;
-	protected Button useParamsDefaultsButton;
-	protected CheckboxTableViewer paramsViewer;
+	@Override
+	protected RMLaunchConfigurationDynamicTabDataSource createDataSource() {
+		return new DataSource(this);
+	}
 
-	protected Table paramsTable;
+	@Override
+	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {
+		return new WidgetListener(this);
+	}
 
-	protected OmpiInfo info;
+	@Override
+	public Image getImage() {
+		return null;
+	}
 
-	/**
-	 * @since 2.0
-	 */
-	public AdvancedOpenMpiRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
-		super(dialog);
-		info = ((OpenMPIResourceManager) rm).getOmpiInfo();
+	@Override
+	public String getText() {
+		return Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Title;
 	}
 
 	/**
@@ -331,58 +349,6 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 
 	}
 
-	public Control getControl() {
-		return control;
-	}
-
-	@Override
-	public Image getImage() {
-		return null;
-	}
-
-	@Override
-	public String getText() {
-		return Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Title;
-	}
-
-	/**
-	 * @since 2.0
-	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
-				OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS);
-		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_ARGUMENTS, OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS);
-		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_USEDEFAULTPARAMETERS,
-				OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTPARAMETERS);
-		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_PARAMETERS, OpenMPILaunchConfigurationDefaults.ATTR_PARAMETERS);
-		return new RMLaunchValidation(true, null);
-	}
-
-	@Override
-	public void updateControls() {
-		argsText.setEnabled(!useArgsDefaultsButton.getSelection());
-		paramsTable.setEnabled(!useParamsDefaultsButton.getSelection());
-		if (getLocalDataSource().getUseDefArgs()) {
-			String launchArgs = ""; //$NON-NLS-1$
-			try {
-				launchArgs = OpenMPILaunchConfiguration.calculateArguments(getLocalDataSource().getConfiguration());
-			} catch (CoreException e) {
-				// ignore
-			}
-			argsText.setText(launchArgs);
-		}
-	}
-
-	@Override
-	protected RMLaunchConfigurationDynamicTabDataSource createDataSource() {
-		return new DataSource(this);
-	}
-
-	@Override
-	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {
-		return new WidgetListener(this);
-	}
-
 	/**
 	 * Add columns to the table viewer
 	 */
@@ -473,6 +439,38 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 			}
 		});
 
+	}
+
+	public Control getControl() {
+		return control;
+	}
+
+	/**
+	 * @since 2.0
+	 */
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
+				OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS);
+		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_ARGUMENTS, OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS);
+		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_USEDEFAULTPARAMETERS,
+				OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTPARAMETERS);
+		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_PARAMETERS, OpenMPILaunchConfigurationDefaults.ATTR_PARAMETERS);
+		return new RMLaunchValidation(true, null);
+	}
+
+	@Override
+	public void updateControls() {
+		argsText.setEnabled(!useArgsDefaultsButton.getSelection());
+		paramsTable.setEnabled(!useParamsDefaultsButton.getSelection());
+		if (getLocalDataSource().getUseDefArgs()) {
+			String launchArgs = ""; //$NON-NLS-1$
+			try {
+				launchArgs = OpenMPILaunchConfiguration.calculateArguments(getLocalDataSource().getConfiguration());
+			} catch (CoreException e) {
+				// ignore
+			}
+			argsText.setText(launchArgs);
+		}
 	}
 
 	private DataSource getLocalDataSource() {

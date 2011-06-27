@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<SampleXMLRoot>
-   <MyItem name="main is here" parent="mysample" file="sample.c" function="main" lineNo="14"  isFunction="true" id="0"/>
-   <MyItem name="loop is here" parent="mysample" file="sample.c" function="main" lineNo="16"  isFunction="true" id="1"/>
-   <MyItem name="this is return" parent="mysample" file="sample.c" function="turkey" lineNo="19"  isFunction="true" id="2"/>
-   <MyItem name="open brace" parent="braces" file="sample.c" function="turkey" lineNo="14"  isFunction="true" id="3"/>
-   <MyItem name="close brace" parent="braces" file="sample.c" function="turkey" lineNo="18"  isFunction="true" id="4"/>
-</SampleXMLRoot>

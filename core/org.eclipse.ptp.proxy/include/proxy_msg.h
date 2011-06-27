@@ -70,5 +70,4 @@ extern int			proxy_queue_msg(List *, proxy_msg *);
 extern void 		proxy_process_msgs(List *, void (*)(proxy_msg*, void *), void *);
 extern void			proxy_set_flow_control(int flag);
 extern int			proxy_get_flow_control();
-extern void			proxy_end();
 #endif /* !_PROXY_MSG_H_ */

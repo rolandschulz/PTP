@@ -1090,13 +1090,13 @@ int command_terminate(int gui_transmission_id, int nargs, char *args[])
 
 int command_suspend_events(int gui_transmission_id, int nargs, char *args[])
 {
-	proxy_set_flow_control(1);
+    proxy_set_flow_control(1);
     return PTP_PROXY_RES_OK;
 }
 
 int command_resume_events(int gui_transmission_id, int nargs, char *args[])
 {
-	proxy_set_flow_control(0);
+    proxy_set_flow_control(0);
     return PTP_PROXY_RES_OK;
 }
 
@@ -2877,29 +2877,12 @@ int server(char *name, char *host, int port, char *user_libpath)
   int connect_rc=0;
 #ifdef  __linux__
   char *libpath[] = {
-    NULL,
-    "/opt/ibmll/LoadL/full/lib/",
-    "/opt/ibmll/LoadL/so/lib/",
-    "/opt/ibmll/LoadL/scheduler/full/lib",
-    "/opt/ibmll/LoadL/scheduler/so/lib/",
-    "/opt/ibmll/LoadL/scheduler/full/lib64",
-    "/opt/ibmll/LoadL/scheduler/so/lib64/",
-    (char *) -1
+    NULL, "/opt/ibmll/LoadL/full/lib/", "/opt/ibmll/LoadL/so/lib/", "/opt/ibmll/LoadL/scheduler/full/lib", (char *) -1
   };
   char *libname = "libllapi.so";
 #else
   char *libpath[] = {
-    NULL,
-    "/usr/lpp/LoadL/full/lib",
-    "/usr/lpp/LoadL/so/lib",
-    "/usr/lpp/LoadL/scheduler/so/lib",
-    "/usr/lpp/LoadL/scheduler/full/lib",
-    "/opt/ibmll/LoadL/full/lib/",
-    "/opt/ibmll/LoadL/so/lib/",
-    "/opt/ibmll/LoadL/scheduler/so/lib/",
-    "/opt/ibmll/LoadL/scheduler/lib/",
-    (char *) -1
-
+    NULL, "/usr/lpp/LoadL/full/lib", "/usr/lpp/LoadL/so/lib", "/opt/ibmll/LoadL/full/lib/", "/opt/ibmll/LoadL/so/lib/", (char *) -1
   };
   char *libname = "libllapi.a";
 #endif

@@ -65,7 +65,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.part.ViewPart;
@@ -499,11 +498,7 @@ public class JobsListView extends ViewPart {
 	 * @param tableViewer
 	 */
 	private void createColumns(TableViewer tableViewer) {
-		Table t = tableViewer.getTable();
-		if (t.isDisposed()) {
-			return;
-		}
-		for (TableColumn column : t.getColumns()) {
+		for (TableColumn column : tableViewer.getTable().getColumns()) {
 			column.dispose();
 		}
 		colDefs.clear();
