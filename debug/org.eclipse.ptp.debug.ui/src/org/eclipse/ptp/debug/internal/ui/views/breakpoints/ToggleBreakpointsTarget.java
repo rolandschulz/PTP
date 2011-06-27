@@ -99,8 +99,9 @@ public class ToggleBreakpointsTarget implements IToggleBreakpointsTargetExtensio
 			if (provider != null) {
 				IPath location = provider.getPath(editorInput);
 				IFile[] files = root.findFilesForLocation(location);
-				if (files.length > 0)
+				if (files.length > 0) {
 					return files[0];
+				}
 			}
 		}
 		return root;
@@ -193,7 +194,7 @@ public class ToggleBreakpointsTarget implements IToggleBreakpointsTargetExtensio
 							String jobId = IPBreakpoint.GLOBAL;
 							String jobName = IPBreakpoint.GLOBAL;
 							if (job != null && job.getState() != JobAttributes.State.COMPLETED) {
-								IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(jobId);
+								IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job.getID());
 								if (session != null) {
 									jobId = job.getID();
 									jobName = job.getName();
@@ -289,10 +290,11 @@ public class ToggleBreakpointsTarget implements IToggleBreakpointsTargetExtensio
 	protected void report(String message, IWorkbenchPart part) {
 		IEditorStatusLine statusLine = (IEditorStatusLine) part.getAdapter(IEditorStatusLine.class);
 		if (statusLine != null) {
-			if (message != null)
+			if (message != null) {
 				statusLine.setMessage(true, message, null);
-			else
+			} else {
 				statusLine.setMessage(true, null, null);
+			}
 		}
 		if (message != null && PTPDebugUIPlugin.getActiveWorkbenchShell() != null) {
 			PTPDebugUIPlugin.getActiveWorkbenchShell().getDisplay().beep();
