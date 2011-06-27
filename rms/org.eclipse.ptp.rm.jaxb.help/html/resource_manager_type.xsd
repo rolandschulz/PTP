@@ -218,7 +218,6 @@
 			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 			<xs:element name="control-state" minOccurs="0" type="rm:control-state-type"/>
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
@@ -239,7 +238,6 @@
 			</xs:choice>
 			<xs:element name="control-state" minOccurs="0" type="rm:control-state-type"/>
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string"/>
 		<xs:attribute name="group" type="xs:boolean" default="false"/>
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
@@ -262,7 +260,6 @@
 			</xs:choice>
 			<xs:element name="control-state" minOccurs="0" type="rm:control-state-type"/>
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>
@@ -387,7 +384,7 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="buttonId" type="xs:string"/>
 		<xs:attribute name="title" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
@@ -405,7 +402,6 @@
 			<xs:element name="button" maxOccurs="unbounded" type="rm:widget-type"/>
 			<xs:element name="control-state" minOccurs="0" type="rm:control-state-type"/>
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string"/>
 		<xs:attribute name="group" type="xs:boolean" default="false"/>
 		<xs:attribute name="saveValueTo" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>
@@ -420,8 +416,6 @@
 			<xs:element name="text-control-state" minOccurs="0" type="rm:control-state-type"/>
 			<xs:element name="button-control-state" minOccurs="0" type="rm:control-state-type"/>
 		</xs:sequence>
-		<xs:attribute name="textId" type="xs:string"/>
-		<xs:attribute name="buttonId" type="xs:string"/>
 		<xs:attribute name="title" type="xs:string"/>
 		<xs:attribute name="textStyle" type="xs:string"/>
 		<xs:attribute name="directory" type="xs:boolean" default="false"/>
@@ -440,7 +434,6 @@
 			<xs:element name="button-action" minOccurs="0" type="rm:button-action-type"/>
 			<xs:element name="control-state" minOccurs="0" type="rm:control-state-type"/>
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string"/>
 		<xs:attribute name="title" type="xs:string"/>
 		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
@@ -470,7 +463,6 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="id" type="xs:string"/>
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="initialAllChecked" type="xs:boolean" default="true"/>
 		<xs:attribute name="sort" type="xs:boolean" default="true"/>
@@ -660,10 +652,9 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="trigger" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 		</xs:choice>
-		<xs:attribute name="state" type="xs:string"/>
-		<xs:attribute name="source" type="xs:string"/>
+		<xs:attribute name="button" type="xs:string"/>
+		<xs:attribute name="selected" type="xs:boolean" default="true"/>
 	</xs:complexType>
 	<xs:complexType name="monitor-type">
 		<xs:sequence>

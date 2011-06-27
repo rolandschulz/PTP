@@ -397,56 +397,6 @@ public class UpdateModelFactory {
 	}
 
 	/**
-	 * Constructs push-button which activates an external command. There is no
-	 * model generated for this widget.
-	 * 
-	 * @param parent
-	 *            control to which the widget belongs
-	 * @param button
-	 *            JAXB data object describing the widget to which this model is
-	 *            bound
-	 * @param tab
-	 *            launch tab being built
-	 * @param rmVarMap
-	 *            resource manager environment
-	 * @param sources
-	 *            map of widgets to check for state
-	 * @param targets
-	 *            map of widgets on which to set state
-	 * 
-	 */
-	public static void createPushButton(Composite parent, PushButtonType button, JAXBDynamicLaunchConfigurationTab tab,
-			IVariableMap rmVarMap, Map<String, Control> sources, Map<ControlStateType, Control> targets) {
-		ControlDescriptor cd = new ControlDescriptor(button, rmVarMap);
-		Control c = createActionButton(parent, cd, tab);
-
-		if (c != null) {
-			if (!JAXBControlUIConstants.ZEROSTR.equals(cd.tooltip)) {
-				c.setToolTipText(cd.tooltip);
-			}
-			if (cd.foreground != null) {
-				c.setForeground(WidgetBuilderUtils.getColor(cd.foreground));
-			}
-			if (cd.background != null) {
-				c.setBackground(WidgetBuilderUtils.getColor(cd.background));
-			}
-			if (cd.font != null) {
-				c.setFont(WidgetBuilderUtils.getFont(cd.font));
-			}
-		}
-
-		String id = button.getId();
-		if (id != null) {
-			sources.put(id, c);
-		}
-
-		ControlStateType cst = button.getControlState();
-		if (cst != null) {
-			targets.put(cst, c);
-		}
-	}
-
-	/**
 	 * Constructs button group update model.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.ButtonGroupUpdateModel
@@ -463,14 +413,24 @@ public class UpdateModelFactory {
 	 * @return
 	 */
 	public static IUpdateModel createModel(ButtonGroupType bGroupDescriptor, Composite bGroup,
-			JAXBDynamicLaunchConfigurationTab tab, IVariableMap rmVarMap) {
+			JAXBDynamicLaunchConfigurationTab tab, IVariableMap rmVarMap, Map<String, Button> sources,
+			Map<ControlStateType, Control> targets) {
 		List<WidgetType> bWidgets = bGroupDescriptor.getButton();
 		List<Button> buttons = new ArrayList<Button>();
 		for (WidgetType widget : bWidgets) {
 			ControlDescriptor cd = new ControlDescriptor(widget, rmVarMap);
 			Control control = createControl(bGroup, cd, tab);
 			if (control instanceof Button) {
-				buttons.add((Button) control);
+				Button b = (Button) control;
+				buttons.add(b);
+				String id = widget.getButtonId();
+				if (id != null) {
+					sources.put(id, b);
+				}
+			}
+			ControlStateType cst = widget.getControlState();
+			if (cst != null) {
+				targets.put(cst, control);
 			}
 		}
 		String name = bGroupDescriptor.getSaveValueTo();
@@ -519,10 +479,10 @@ public class UpdateModelFactory {
 	 * 
 	 */
 	public static IUpdateModel createModel(Composite parent, BrowseType browse, JAXBDynamicLaunchConfigurationTab tab,
-			IVariableMap rmVarMap, Map<String, Control> sources, Map<ControlStateType, Control> targets) {
+			IVariableMap rmVarMap, Map<ControlStateType, Control> targets) {
 		ControlDescriptor cd = new ControlDescriptor(browse, rmVarMap);
 
-		Control control = createBrowse(parent, browse, cd, tab, sources, targets);
+		Control control = createBrowse(parent, browse, cd, tab, targets);
 
 		String name = browse.getSaveValueTo();
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
@@ -559,13 +519,13 @@ public class UpdateModelFactory {
 	 * @return update model if not a label
 	 */
 	public static IUpdateModel createModel(Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab,
-			IVariableMap rmVarMap, Map<String, Control> sources, Map<ControlStateType, Control> targets) {
+			IVariableMap rmVarMap, Map<String, Button> sources, Map<ControlStateType, Control> targets) {
 		ControlDescriptor cd = new ControlDescriptor(widget, rmVarMap);
 		Control control = createControl(parent, cd, tab);
 
-		String id = widget.getId();
-		if (id != null) {
-			sources.put(id, control);
+		String id = widget.getButtonId();
+		if (id != null && control instanceof Button) {
+			sources.put(id, (Button) control);
 		}
 
 		ControlStateType cst = widget.getControlState();
@@ -634,6 +594,51 @@ public class UpdateModelFactory {
 	}
 
 	/**
+	 * Constructs push-button which activates an external command. There is no
+	 * model generated for this widget.
+	 * 
+	 * @param parent
+	 *            control to which the widget belongs
+	 * @param button
+	 *            JAXB data object describing the widget to which this model is
+	 *            bound
+	 * @param tab
+	 *            launch tab being built
+	 * @param rmVarMap
+	 *            resource manager environment
+	 * @param sources
+	 *            map of widgets to check for state
+	 * @param targets
+	 *            map of widgets on which to set state
+	 * 
+	 */
+	public static void createPushButton(Composite parent, PushButtonType button, JAXBDynamicLaunchConfigurationTab tab,
+			IVariableMap rmVarMap, Map<ControlStateType, Control> targets) {
+		ControlDescriptor cd = new ControlDescriptor(button, rmVarMap);
+		Control c = createActionButton(parent, cd, tab);
+
+		if (c != null) {
+			if (!JAXBControlUIConstants.ZEROSTR.equals(cd.tooltip)) {
+				c.setToolTipText(cd.tooltip);
+			}
+			if (cd.foreground != null) {
+				c.setForeground(WidgetBuilderUtils.getColor(cd.foreground));
+			}
+			if (cd.background != null) {
+				c.setBackground(WidgetBuilderUtils.getColor(cd.background));
+			}
+			if (cd.font != null) {
+				c.setFont(WidgetBuilderUtils.getFont(cd.font));
+			}
+		}
+
+		ControlStateType cst = button.getControlState();
+		if (cst != null) {
+			targets.put(cst, c);
+		}
+	}
+
+	/**
 	 * Creates a push-button and connects it to the command through a listener.
 	 * 
 	 * @see org.eclipse.swt.widgets.Text
@@ -686,7 +691,7 @@ public class UpdateModelFactory {
 	 * @return the text widget carrying the browse selection
 	 */
 	private static Text createBrowse(final Composite parent, BrowseType d, final ControlDescriptor cd,
-			final JAXBDynamicLaunchConfigurationTab tab, Map<String, Control> sources, Map<ControlStateType, Control> targets) {
+			final JAXBDynamicLaunchConfigurationTab tab, Map<ControlStateType, Control> targets) {
 		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, JAXBControlUIConstants.ZEROSTR);
 
 		Button b = WidgetBuilderUtils.createButton(parent, cd.subLayoutData, cd.title, SWT.NONE, new SelectionListener() {
@@ -733,16 +738,6 @@ public class UpdateModelFactory {
 		}
 		if (cd.font != null) {
 			t.setFont(WidgetBuilderUtils.getFont(cd.font));
-		}
-
-		String id = d.getTextId();
-		if (id != null) {
-			sources.put(id, t);
-		}
-
-		id = d.getButtonId();
-		if (id != null) {
-			sources.put(id, b);
 		}
 
 		ControlStateType cst = d.getTextControlState();

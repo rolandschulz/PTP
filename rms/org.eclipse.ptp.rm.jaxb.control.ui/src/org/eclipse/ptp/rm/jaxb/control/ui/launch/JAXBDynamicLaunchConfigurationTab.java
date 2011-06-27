@@ -99,7 +99,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	private final String[] shared;
 	private final Collection<IUpdateModel> sharedModels;
 	private Collection<ControlStateListener> listeners;
-
 	private ILaunchConfiguration listenerConfiguration;
 
 	/**
@@ -265,10 +264,10 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 
 			if (listeners != null) {
 				for (ControlStateListener l : listeners) {
-					l.fireSelected();
+					l.setState();
 				}
 			}
-
+			
 			for (Viewer v : viewers) {
 				v.refresh();
 			}
@@ -346,7 +345,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	public void setListeners(Collection<ControlStateListener> listeners) {
 		this.listeners = listeners;
 	}
-
+	
 	/*
 	 * Pull out the local maps from each and set them into the shared array.
 	 * (non-Javadoc)

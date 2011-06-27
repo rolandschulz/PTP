@@ -154,7 +154,7 @@ public class LaunchTabBuilder {
 	/*
 	 * temporary maps for wiring the widgets
 	 */
-	private final Map<String, Control> sources;
+	private final Map<String, Button> sources;
 	private final Map<ControlStateType, Control> targets;
 
 	/**
@@ -165,7 +165,7 @@ public class LaunchTabBuilder {
 		this.tab = tab;
 		this.localWidgets = tab.getLocalWidgets();
 		this.rmVarMap = tab.getParent().getRmConfig().getRMVariableMap();
-		sources = new HashMap<String, Control>();
+		sources = new HashMap<String, Button>();
 		targets = new HashMap<ControlStateType, Control>();
 	}
 
@@ -247,11 +247,6 @@ public class LaunchTabBuilder {
 			model.setShowAll(showHide);
 			localWidgets.put(viewer, model);
 
-			String id = descriptor.getId();
-			if (id != null) {
-				sources.put(id, viewer.getControl());
-			}
-
 			ControlStateType cst = descriptor.getControlState();
 			if (cst != null) {
 				targets.put(cst, viewer.getControl());
@@ -271,7 +266,7 @@ public class LaunchTabBuilder {
 	 *            to which to add the widget
 	 */
 	private void addBrowse(BrowseType browse, Composite control) {
-		IUpdateModel model = UpdateModelFactory.createModel(control, browse, tab, rmVarMap, sources, targets);
+		IUpdateModel model = UpdateModelFactory.createModel(control, browse, tab, rmVarMap, targets);
 		if (model != null) {
 			localWidgets.put(model.getControl(), model);
 		}
@@ -301,14 +296,9 @@ public class LaunchTabBuilder {
 		if (tooltip != null) {
 			control.setToolTipText(rmVarMap.getString(tooltip));
 		}
-		IUpdateModel model = UpdateModelFactory.createModel(descriptor, control, tab, rmVarMap);
+		IUpdateModel model = UpdateModelFactory.createModel(descriptor, control, tab, rmVarMap, sources, targets);
 		if (model != null) {
 			localWidgets.put(control, model);
-		}
-
-		String id = descriptor.getId();
-		if (id != null) {
-			sources.put(id, control);
 		}
 
 		ControlStateType cst = descriptor.getControlState();
@@ -442,11 +432,6 @@ public class LaunchTabBuilder {
 			composite.setFont(WidgetBuilderUtils.getFont(fd));
 		}
 
-		String id = descriptor.getId();
-		if (id != null) {
-			sources.put(id, composite);
-		}
-
 		ControlStateType cst = descriptor.getControlState();
 		if (cst != null) {
 			targets.put(cst, composite);
@@ -495,10 +480,6 @@ public class LaunchTabBuilder {
 		if (fd != null) {
 			folder.setFont(WidgetBuilderUtils.getFont(fd));
 		}
-		String id = descriptor.getId();
-		if (id != null) {
-			sources.put(id, folder);
-		}
 		ControlStateType cst = descriptor.getControlState();
 		if (cst != null) {
 			targets.put(cst, folder);
@@ -546,10 +527,6 @@ public class LaunchTabBuilder {
 			control.setFont(WidgetBuilderUtils.getFont(fd));
 		}
 		addChildren(descriptor.getCompositeOrTabFolderOrWidget(), control);
-		String id = descriptor.getId();
-		if (id != null) {
-			sources.put(id, control);
-		}
 		ControlStateType cst = descriptor.getControlState();
 		if (cst != null) {
 			targets.put(cst, control);
@@ -566,7 +543,7 @@ public class LaunchTabBuilder {
 	 *            to which to add the widget
 	 */
 	private void addPushButton(PushButtonType button, Composite control) {
-		UpdateModelFactory.createPushButton(control, button, tab, rmVarMap, sources, targets);
+		UpdateModelFactory.createPushButton(control, button, tab, rmVarMap, targets);
 	}
 
 	/**
@@ -706,64 +683,37 @@ public class LaunchTabBuilder {
 
 	/**
 	 * Constructs a listener for each defined category of action on the target
-	 * and adds it to the sources referenced in the rule. Also checks for
-	 * cyclical dependencies.
+	 * and add it to the sources referenced in the rule.
 	 */
 	private void maybeWireWidgets() throws Throwable {
 		Collection<ControlStateListener> listeners = new HashSet<ControlStateListener>();
-		Map<Control, ControlStateListener> enable = new HashMap<Control, ControlStateListener>();
-		Map<Control, ControlStateListener> show = new HashMap<Control, ControlStateListener>();
-		ControlStateRuleType rule = null;
 		for (ControlStateType cst : targets.keySet()) {
 			Control target = targets.get(cst);
-			ControlStateListener listener = null;
-			rule = cst.getEnableIf();
+			ControlStateRuleType rule = cst.getEnableIf();
 			if (rule != null) {
-				listener = new ControlStateListener(target, rule, ControlStateListener.Action.ENABLE, sources);
+				listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.ENABLE, sources));
 			} else {
 				rule = cst.getDisableIf();
 				if (rule != null) {
-					listener = new ControlStateListener(targets.get(cst), rule, ControlStateListener.Action.DISABLE, sources);
+					listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.DISABLE, sources));
 				}
-			}
-			if (listener != null) {
-				listeners.add(listener);
-				enable.put(target, listener);
 			}
 
 			rule = cst.getHideIf();
 			if (rule != null) {
-				listener = new ControlStateListener(target, rule, ControlStateListener.Action.HIDE, sources);
+				listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.HIDE, sources));
 			} else {
 				rule = cst.getShowIf();
 				if (rule != null) {
-					listener = new ControlStateListener(target, rule, ControlStateListener.Action.SHOW, sources);
+					listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.SHOW, sources));
 				}
 			}
-
-			if (listener != null) {
-				listeners.add(listener);
-				show.put(target, listener);
-			}
 		}
 
-		for (ControlStateListener listener : listeners) {
-			listener.addDependencies(enable);
-			listener.addDependencies(show);
-		}
-
-		enable.clear();
-		show.clear();
-
-		Set<ControlStateListener> dependSet = new HashSet<ControlStateListener>();
-
+		Set<Button> dependSet = new HashSet<Button>();
 		for (ControlStateListener listener : listeners) {
 			dependSet.clear();
 			listener.findCyclicalDependecies(dependSet);
-		}
-
-		for (ControlStateListener listener : listeners) {
-			listener.clearSources();
 		}
 
 		tab.setListeners(listeners);

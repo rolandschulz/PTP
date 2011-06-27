@@ -9,27 +9,26 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.handlers;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.ControlStateRule;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.TypedListener;
 
 /**
- * This untyped listener is added to the widgets on which the composed control
+ * This listener is added to the widgets on which the composed control
  * depends for its state.<br>
  * 
  * The listener is constructed on the basis of an event rule which is passed in
- * specifying these dependencies. The events here are limited to activation and
- * visibility for all widgets, and selection/deselection for buttons.
+ * specifying these dependencies.
  * 
  * @author arossi
  * 
@@ -43,8 +42,6 @@ public class ControlStateListener implements SelectionListener {
 	private final ControlStateRule rule;
 	private final Control target;
 	private final Action action;
-	private final List<Control> sources;
-	private final Set<ControlStateListener> children;
 
 	/**
 	 * @param target
@@ -56,67 +53,39 @@ public class ControlStateListener implements SelectionListener {
 	 * @param map
 	 *            control id to control
 	 */
-	public ControlStateListener(Control target, ControlStateRuleType rule, Action action, Map<String, Control> map) {
+	public ControlStateListener(Control target, ControlStateRuleType rule, Action action, Map<String, Button> map) throws Throwable {
 		this.target = target;
 		this.action = action;
-		this.sources = new ArrayList<Control>();
-		this.rule = new ControlStateRule(rule, map, this, sources);
-		this.children = new HashSet<ControlStateListener>();
+		this.rule = new ControlStateRule(rule, map, this);
 	}
 
 	/**
-	 * Adds dependency listeners.
-	 * 
-	 * @param nodes
-	 *            in the dependency graph
+	 * Checks for cyclical dependencies by looking at the targets getting their
+	 * listeners. The check is only done for listeners associated with buttons
+	 * as targets.
 	 */
-	public void addDependencies(Map<Control, ControlStateListener> nodes) {
-		for (Control source : sources) {
-			ControlStateListener child = nodes.get(source);
-			if (child != null && child != this) {
-				children.add(child);
+	public void findCyclicalDependecies(Set<Button> buttons) throws Throwable {
+		if (target instanceof Button) {
+			if (buttons.contains(target)) {
+				throw new Throwable(Messages.ControlStateListener_0 + target + Messages.ControlStateListener_1 + buttons);
+			}
+			Button b = (Button) target;
+			buttons.add(b);
+			Listener[] listeners = b.getListeners(SWT.Selection);
+			for (Listener listener : listeners) {
+				if (listener instanceof TypedListener) {
+					Object swtListener = ((TypedListener) listener).getEventListener();
+					if (swtListener instanceof ControlStateListener) {
+						((ControlStateListener) swtListener).findCyclicalDependecies(buttons);
+					}
+				}
 			}
 		}
 	}
 
 	/**
-	 * Not necessary to hold on to these after initialization
-	 */
-	public void clearSources() {
-		sources.clear();
-	}
-
-	/**
-	 * Checks for cyclical dependencies
-	 */
-	public void findCyclicalDependecies(Set<ControlStateListener> dependSet) throws Throwable {
-		if (dependSet.contains(this)) {
-			throw new Throwable(Messages.ControlStateListener_0 + target + Messages.ControlStateListener_1 + sources);
-		}
-		dependSet.add(this);
-		for (ControlStateListener child : children) {
-			child.findCyclicalDependecies(dependSet);
-		}
-	}
-
-	/**
-	 * Auxiliary, also called an initialization.
-	 */
-	public void fireSelected() {
-		for (ControlStateListener child : children) {
-			child.fireSelected();
-		}
-		setState();
-	}
-
-	/**
 	 * State of the controls in the rule is reevaluated and the state of the
-	 * target is set accordingly.<br>
-	 * <br>
-	 * Note: this method is also called by the
-	 * {@link AbstractJAXBLaunchConfigurationTab} after performApply(). It seems
-	 * that both the calls are necessary to ensure the rule is correctly
-	 * evaluated.
+	 * target is set accordingly.
 	 */
 	public void setState() {
 		synchronized (ControlStateListener.class) {
@@ -162,18 +131,17 @@ public class ControlStateListener implements SelectionListener {
 	 * .swt.events.SelectionEvent)
 	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
-		fireSelected();
+		setState();
 	}
 
 	/*
-	 * Upon receipt of the event, calls {@link #setState()} and recurs on
-	 * children. (non-Javadoc)
+	 * Upon receipt of the event, calls {@link #setState()} (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
 	 * .events.SelectionEvent)
 	 */
 	public void widgetSelected(SelectionEvent e) {
-		fireSelected();
+		setState();
 	}
 }

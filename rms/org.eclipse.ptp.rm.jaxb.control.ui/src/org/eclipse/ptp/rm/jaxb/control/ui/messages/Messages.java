@@ -54,6 +54,7 @@ public class Messages extends NLS {
 	public static String UninitializedRemoteServices;
 	public static String ControlStateListener_0;
 	public static String ControlStateListener_1;
+	public static String ControlStateRule_0;
 
 	static {
 		// initialize resource bundle

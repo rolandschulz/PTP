@@ -36,7 +36,7 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 	 * @param button
 	 *            the widget to which this model corresponds
 	 * @param translateBooleanAs
-	 *            a comma-delimited pair of strings corresponding to T,F to use
+	 *            a comma-delimite pair of strings corresponding to T,F to use
 	 *            as the value instead of the boolean (can be <code>null</code>)
 	 */
 	public ButtonUpdateModel(String name, ValueUpdateHandler handler, Button button, String translateBooleanAs) {
