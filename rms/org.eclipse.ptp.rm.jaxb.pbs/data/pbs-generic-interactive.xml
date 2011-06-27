@@ -212,6 +212,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<items-from>queues</items-from>
 					</widget>
 				</composite>
+				<widget type="label"/>
 				<!-- ATTRIBUTES group -->
 				<composite group="true">
 					<layout>
@@ -299,7 +300,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>MPI Number of Cores: </fixed-text>
 					</widget>
-					<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
+					<widget type="spinner" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCores">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
 						</layout-data>

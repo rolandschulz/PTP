@@ -391,11 +391,11 @@
 
 	<p>
 		By "managed file" is meant a local file required by the executable but
-		which may not automatically be present on the host on which the job
-		will run; hence, these files may either be external or may actually be
-		generated from the resource manager environment in conjunction with
-		the job submission, but in any case need to be copied to that host
-		just prior to it. The
+		which may not be present on the host on which the job will run; hence,
+		these files may either be external or may actually be generated from
+		the resource manager environment in conjunction with the job
+		submission, but in any case need to be copied to that host just prior
+		to it. The
 		<code>script</code>
 		file used in connection with scheduler (batch) jobs is a special
 		category of the
@@ -533,6 +533,7 @@
 		<code>line</code>
 		element was mentioned <a href="#Files">above</a> in connection with
 		managed file content; it is essentially a wrapper around a series of
+		whitespace separated
 		<code>arg</code>
 		elements, all of which are placed on a single line (that is, the group
 		is terminated by a line separator).
@@ -547,11 +548,9 @@
 		definition of commands. Its text element can contain variable
 		references to be resolved against the environment, but also allows for
 		the entire string to be treated as a literal by setting <i>resolve</i>
-		to false (default is true). This is useful in the context of the
-		<code>script</code>
-		definition inasmuch as it allows for the presence of batch-type
-		variables (e.g., ${HOME}) which should be resolved by the remote shell
-		and not inside the Eclipse client.
+		to false (default is true). This is useful inasmuch as it allows for
+		the presence of batch-type variables (e.g., ${HOME}) which should be
+		resolved by the remote shell and not inside the Eclipse client.
 	</p>
 	<p>
 		The default behavior of the argument resolver is not to write out or
@@ -591,11 +590,11 @@
 		<code>managed-file</code>
 		elements, are not known at configuration time (i.e., before the user
 		hits "Run"). While the former is made visible to the parsers and the
-		returned status object of the submit command, neither is available for
-		reference in other managed files or in the
+		returned status object of the submit command, neither is in the scope
+		of (available for reference in) other managed files or the
 		<code>script</code>
-		element, because the latter elements are generated prior to the actual
-		submission.
+		element, because these latter elements are generated just prior to the
+		actual submission.
 	</p>
 
 	<p>
@@ -644,7 +643,7 @@
 		element which bear detailed discussion here. <i>directory</i> of
 		course refers to where the command will be executed; <b>this
 			defaults to the "home" or working directory of the remote control
-			connection (= <code>control.working.dir</code> property)</b>; also as
+			connection (the <code>control.working.dir</code> property)</b>; also as
 		expected, <i>redirectStderr</i> means that both output and error
 		streams are sent back on
 		<code>stdout</code>
@@ -696,12 +695,12 @@
 		<code>input</code>
 		present, it is directed to the input stream of the command. If the <i>keepOpen</i>
 		attribute is true, a check will be made to see if there already exists
-		an open process (which is also alive), and use that; otherwise, the
-		arguments are executed, then the input arguments are given to the
-		process. With an open command/process, the input arguments can be fed
-		repeatedly to the same process; this allows, for instance, for
-		continuous testing of an interactive job in the same interactive
-		session.
+		an open process (which is also alive), which will then be used;
+		otherwise, the arguments are executed, then the input arguments are
+		given to the process. With an open command/process, the input
+		arguments can be fed repeatedly to the same process; this allows, for
+		instance, for continuous testing of an interactive job in the same
+		interactive session.
 	</p>
 
 	<h4 align="center">
@@ -733,7 +732,8 @@
 		a contribution to the
 		<code>org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer</code>
 		extension point, in which case this element should be set to its
-		extension id.
+		extension id (note however that such a parser is not configurable from
+		the XML document).
 	</p>
 
 	<p>
@@ -763,10 +763,10 @@
 		one may need to match a segment or segments whose position is defined
 		from the end of the output, but you do not know in advance the actual
 		stream length. In this case, one can opt to read until the end of the
-		stream (<i>all</i>="true"), retaining only the last N buffer-lengths
-		or delimited segments, as indicated by the <i>save</i> field. When the
-		parser reaches the end of the stream, it will then apply the various
-		targets to each saved segment in order.
+		stream (<i>all</i>="true"), retaining only the last <i>N</i>
+		buffer-lengths or delimited segments, as indicated by the <i>save</i>
+		field. When the parser reaches the end of the stream, it will then
+		apply the various targets to each saved segment in order.
 	</p>
 
 	<p>
@@ -828,8 +828,8 @@
 			operations which create a list or map; in these cases, the two
 			collections or maps will be combined into one. This does <i>NOT</i>
 			work, however, for <code>append</code> actions.) To allow duplicates,
-			set the <i>allowOverwrites</i> to true; in this case, duplicates
-			simply replace the preceding object. </b>
+			set the <i>allowOverwrites</i> to true; in this case, successive
+			duplicates simply replace the preceding object. </b>
 	</p>
 
 	<p>The default behavior of the tokenizer read-match sequence is as
@@ -903,7 +903,7 @@
 		</tr>
 		<tr>
 			<td><code>add</code></td>
-			<td>adds to a trst to which the value of that field will be set</td>
+			<td>adds to a list to which the value of that field will be set</td>
 		</tr>
 		<tr>
 			<td><code>put</code></td>
@@ -1120,6 +1120,19 @@
 		demostrated in the <a href="JAXBDemo.pdf">tutorial</a>.
 	</p>
 
+	<p>
+		<b> Throughout the following, it may generally be assumed that
+			fields such as <i>style</i>, <i>foreground</i>, <i>background</i>,
+			etc., take string equivalents of the corresponding <code>SWT</code>
+			constants (e.g., "SWT.LEFT", "SWT.VERTICAL", "SWT.NONE") which can be
+			OR'd (using "|") wherever they would be in Java code. We will <i>not</i>
+			exhaustively specify here which constants pertain to which widgets,
+			because in most cases we have tried to reflect very closely the names
+			of the <code>SWT</code> object types and fields, and this information
+			can be found by consulting the Javadocs relative to the widgets in
+			question. </b>
+	</p>
+
 	<img alt="LaunchTabType" src="images/13launch-tab.jpeg" />
 
 	<p>
@@ -1148,7 +1161,7 @@
 		<code>dynamic</code>
 		controllers belong to the
 		<code>tab-controller-type</code>
-		. It contains an arbitrary number of
+		, which contains an arbitrary number of
 		<code>tab-folder,</code>
 		<code>composite,</code>
 		<code>widget,</code>
@@ -1163,8 +1176,8 @@
 		<code>tab-controller-type</code>
 		is the same as a
 		<code>composite</code>
-		, but with the <i>group</i> attribute and with the extra field for
-		controlling its widget-value set.
+		, but without the <i>group</i> attribute and with the extra field for
+		controlling shared widgets.
 	</p>
 
 	<img alt="TabController" src="images/14tab-controller.jpeg" />
@@ -1173,35 +1186,23 @@
 		The <i>includeWidgetValuesFrom</i> field is important. By default, it
 		is set to empty, meaning that the subset of the total resource manager
 		environment represented by the controller's widgets is all that will
-		be passed to the actual job configuration when the job is launched.
-		This behavior can be changed by giving a comma-delimited list of the
+		be passed to the actual job configuration when the job is launched
+		from this tab. This behavior can be changed by giving a
+		comma-delimited list of the
 		<code>title</code>
 		values for other controllers. In this case, the configuration for the
 		job, when the "Run" button is pressed with this controller being the
 		visible one, will also include the values of the widgets on the listed
-		controllers. <b>NOTE:</b> while this field controls the inclusion or
-		exclusion of attribute and property names in the configuration, their
-		values are always shared across the controllers (there is only one
-		environment); thus if a variable value is changed on one controller,
-		and this variable is also exposed on another, the value for that
-		variable will also change on the other controller when it becomes
-		visible; similarly, if the user switches off a controller to another
-		having only a subset of the first controller's variables, the
-		variables not represented on the second controller will become
-		undefined or return to their defaults.
-	</p>
-
-	<p>
-		<b> Throughout the following, it may generally be assumed that
-			fields such as <i>style</i>, <i>foreground</i>, <i>background</i>,
-			etc., take string equivalents of the corresponding <code>SWT</code>
-			constants (e.g., "SWT.LEFT", "SWT.VERTICAL", "SWT.NONE") which can be
-			OR'd (using "|") wherever they would be in Java code. We will <i>not</i>
-			exhaustively specify here which constants pertain to which widgets,
-			because in most cases we have tried to reflect very closely the names
-			of the <code>SWT</code> object types and fields, and this information
-			can be found by consulting the Javadocs relative to the widgets in
-			question. </b>
+		but currently invisible controllers. <b>NOTE:</b> while this field
+		controls the inclusion or exclusion of attribute and property names in
+		the configuration, their values are always shared across the
+		controllers (there is only one environment); thus if a variable value
+		is changed on one controller, and this variable is also exposed on
+		another, the value for that variable will also change on the other
+		controller when it becomes visible; similarly, if the user switches
+		off a controller to another having only a subset of the first
+		controller's variables, the variables not represented on the second
+		controller will become undefined or return to their defaults.
 	</p>
 
 	<h4 align="CENTER">
@@ -1214,8 +1215,8 @@
 		The
 		<code>tab-folder</code>
 		is a container which looks like a file-folder, with tabs running
-		across the top or bottom ("SWT.TOP, SWT.BOTTOM"). Each tab label
-		corresponds to a
+		across the top or bottom (<i>style</i> includes SWT.TOP, SWT.BOTTOM).
+		Each tab label corresponds to a
 		<code>tab-item</code>
 		which provides the actual visible content. The
 		<code>tooltip</code>
@@ -1226,8 +1227,8 @@
 		The
 		<code>tab-item</code>
 		is another all-purpose "container" in which all widget types can be
-		embedded, distinguished from the <a href="#Composite"><code>composite</code>
-		</a> only in that it can only be the child of a
+		embedded, but distinguished from the <a href="#Composite"><code>composite</code>
+		</a> in that it can only be the child of a
 		<code>tab-folder</code>
 		and that it can have a tooltip (which appears on the tab).
 	</p>
@@ -1301,9 +1302,9 @@
 	<p>The rule consists of three parts:</p>
 
 	<ol>
-		<li>state to check (SELECTED, VISIBLE, ENABLED)</li>
-		<li>the source control to check</li>
-		<li>a set of trigger sources to subscribe to</li>
+		<li>state to check (SELECTED, VISIBLE, ENABLED);</li>
+		<li>the source control to check;</li>
+		<li>a set of trigger sources to subscribe to.</li>
 	</ol>
 
 	<p>These can be nested to an arbitrary depth to form clauses
@@ -1348,22 +1349,25 @@
                &lt;/widget&gt;
    </pre>
 
-	<hr>
+	<p>Note also that this implicit dependency graph is checked for
+		cycles; the building of the UI tab will be aborted if such a cycle is
+		discovered.</p>
+
+	<h4 align="CENTER">
+		<a name="Widget">Widget</a>
+	</h4>
+
 	<p>
 		We now come to the five non-container widget elements with functional
 		characteristics. The first of these is the
 		<code>widget</code>
 		, which comprises a number of simple widget types.
 	<p>
-	<h4 align="CENTER">
-		<a name="Widget">Widget</a>
-	</h4>
-
-	<img alt="Widget" src="images/19widget.jpeg" />
-
+	
 	<p>
 		The <i>type</i> of the widget can be one of the following:
 	</p>
+	
 	<br>
 	<table align="center" rules="all">
 		<tr>
@@ -1392,6 +1396,7 @@
 		</tr>
 	</table>
 	<br>
+	
 	<p>
 		Not all attributes and elements of the
 		<code>widget</code>
@@ -1400,35 +1405,30 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><i>title</i>
-			</td>
+			<td><i>title</i></td>
 			<td>used with <code>checkbox</code> and <code>radiobutton</code>
 				widgets for the button label</td>
 		</tr>
 		<tr>
-			<td><i>style</i>
-			</td>
+			<td><i>style</i></td>
 			<td>carries the <code>SWT</code> style constants appropriate to
 				the widget type</td>
 		</tr>
 		<tr>
-			<td><i>readOnly</i>
-			</td>
+			<td><i>readOnly</i></td>
 			<td>applies to <code>text</code> and <code>combo</code> widgets;
 				the text area in this case is not editable</td>
 		</tr>
 		<tr>
-			<td><i>saveValueTo</i>
-			</td>
-			<td>applies to all widgets except <code>label</code> and <code>action</code>;
+			<td><i>saveValueTo</i></td>
+			<td>applies to all widgets except <code>label</code>;
 				the name of the property or attribute whose value should be set on
 				the basis of the widget's "selected" value or text<br> <b>Note:</b>
 				use of this attribute is mutually exclusive with the <code>fixed-</code>
 				and <code>dynamic-text</code> elements.</td>
 		</tr>
 		<tr>
-			<td><i>translateBooleanAs</i>
-			</td>
+			<td><i>translateBooleanAs</i></td>
 			<td>applies to the <code>checkbox</code> widget; a
 				comma-delimited pair indicating a string equivalent for the boolean
 				to be used as the actual value for the property or attribute set by
@@ -1436,8 +1436,7 @@
 				the first string and false the second</td>
 		</tr>
 		<tr>
-			<td><code>items-from</code>
-			</td>
+			<td><code>items-from</code></td>
 			<td>applies to the <code>combo</code> widget; indicates a
 				property or attribute <i>value</i> (of type <code>java.util.Collection</code>)
 				to use to populate the items<br> <b>Note:</b> if a combo widget
@@ -1450,14 +1449,12 @@
 				choices)</td>
 		</tr>
 		<tr>
-			<td><code>fixed-text</code>
-			</td>
+			<td><code>fixed-text</code></td>
 			<td>applies to the <code>label</code> and (read-only) <code>text</code>
 				widgets; text is resolved once and remains constant thereafter</td>
 		</tr>
 		<tr>
-			<td><code>dynamic-text</code>
-			</td>
+			<td><code>dynamic-text</code></td>
 			<td>applies only to (read-only) <code>text</code> widgets; text
 				is resolved each time there is an update of a value from the Launch
 				Tab</td>
@@ -1483,7 +1480,7 @@
 		value to set. The
 		<code>button</code>
 		elements, which can be arranged horizontally or vertically using the <i>style</i>
-		attribute ("SWT.HORIZONTAL","SWT.VERTICAL"), will be
+		attribute (SWT.HORIZONTAL, SWT.VERTICAL), will be
 		<code>widget</code>
 		elements whose type is either <i>checkbox</i> or <i>radiobutton</i>
 		(if a different widget type is given, an error will occur); the <i>saveValueTo</i>
@@ -1512,8 +1509,8 @@
 	<br>
 
 	<p>
-		A special widget-pair, a text widget followed by a push button
-		allowing the user to browse for directory or file from either the
+		A special widget-pair -- a text widget followed by a push button --
+		allowing the user to browse directories or files from either the
 		local or remote file system. Aside from the fields shared with the
 		<code>widget</code>
 		type, we note the following:
@@ -1563,8 +1560,7 @@
 		) defined in the XML; this can be one of the
 		<code>start-up</code>
 		or
-		<code>shut-down</code>
-		, commands, or a special
+		<code>shut-down</code> commands, or a special
 		<code>button-action</code>
 		command (<b>note </b>that it cannot, however, be a
 		<code>-job</code>
@@ -1572,7 +1568,7 @@
 		<code>button-action-type</code>
 		also indicates whether the variable affected by the command should be
 		cleared prior to the command execution, and whether the launch tab
-		should be refreshed (default is true) afterwards
+		should be refreshed (default is true) afterward.
 	</p>
 
 	<h4 align="CENTER">
@@ -1594,7 +1590,7 @@
 		<code>items-from</code>
 		element is defined. (This is the only viable possibility for a combo
 		in the table, as there would also need to be a target to save the
-		selected item to, viz., the value of this same attribute).
+		selected item to, viz., the value of this same attribute.)
 	</p>
 
 	<p>Each entry in the viewer is provided with a checkbox to indicate
@@ -1602,7 +1598,7 @@
 		viewer to allow for filtering the unchecked items. The viewer outputs
 		its checked values to the environment (and on update removes
 		unselected ones). The name of the viewer is also stored against a
-		string of all selected values, constructed from a template ( further
+		string of all selected values, constructed from a template (further
 		discussion at the end of this section).</p>
 
 	<p>

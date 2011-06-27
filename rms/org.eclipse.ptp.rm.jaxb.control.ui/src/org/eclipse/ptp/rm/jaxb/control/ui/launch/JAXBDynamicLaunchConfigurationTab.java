@@ -36,6 +36,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
 import org.eclipse.ptp.rm.jaxb.control.ui.dialogs.ScrollingEditableMessageDialog;
+import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ControlStateListener;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
@@ -97,6 +98,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	private final Map<Object, IUpdateModel> localWidgets;
 	private final String[] shared;
 	private final Collection<IUpdateModel> sharedModels;
+	private Collection<ControlStateListener> listeners;
 
 	private ILaunchConfiguration listenerConfiguration;
 
@@ -163,7 +165,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			}
 			control = builder.build(parent);
 		} catch (Throwable t) {
-			throw CoreExceptionUtils.newException(Messages.CreateControlConfigurableError, t);
+			Throwable t1 = new Throwable(t.getLocalizedMessage());
+			throw CoreExceptionUtils.newException(Messages.CreateControlConfigurableError, t1);
 		}
 		createViewScriptGroup(control);
 		control.layout(true, true);
@@ -260,6 +263,12 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				}
 			}
 
+			if (listeners != null) {
+				for (ControlStateListener l : listeners) {
+					l.fireSelected();
+				}
+			}
+
 			for (Viewer v : viewers) {
 				v.refresh();
 			}
@@ -285,6 +294,9 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 
 	@Override
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+		if (control == null) {
+			return new RMLaunchValidation(false, null);
+		}
 		if (control.isVisible()) {
 			RMLaunchValidation v = validateWidgets();
 			if (!v.isSuccess()) {
@@ -325,6 +337,14 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 */
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		return new RMLaunchValidation(true, null);
+	}
+
+	/**
+	 * @param listeners
+	 *            for wiring widgets together based on state events
+	 */
+	public void setListeners(Collection<ControlStateListener> listeners) {
+		this.listeners = listeners;
 	}
 
 	/*
