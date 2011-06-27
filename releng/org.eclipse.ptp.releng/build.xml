@@ -391,10 +391,6 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.pldt.fortran-feature"/>
-			<param name="tagbranch" value="${ptpTagBranch}"/>
-		</antcall>		
-		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.pldt.lapi-feature"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
@@ -761,19 +757,11 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.mpi.fortran"/>
-			<param name="tagbranch" value="${ptpTagBranch}"/>
-		</antcall>
-		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.openmp.analysis"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.openmp.core"/>
-			<param name="tagbranch" value="${ptpTagBranch}"/>
-		</antcall>
-		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/pldt/org.eclipse.ptp.pldt.openmp.fortran"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
