@@ -60,8 +60,6 @@ public class PushButtonType {
 	@XmlAttribute
 	protected String foreground;
 	@XmlAttribute
-	protected String id;
-	@XmlAttribute
 	protected String title;
 
 	/**
@@ -112,16 +110,6 @@ public class PushButtonType {
 	 */
 	public String getForeground() {
 		return foreground;
-	}
-
-	/**
-	 * Gets the value of the id property.
-	 * 
-	 * @return possible object is {@link String }
-	 * 
-	 */
-	public String getId() {
-		return id;
 	}
 
 	/**
@@ -207,17 +195,6 @@ public class PushButtonType {
 	 */
 	public void setForeground(String value) {
 		this.foreground = value;
-	}
-
-	/**
-	 * Sets the value of the id property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link String }
-	 * 
-	 */
-	public void setId(String value) {
-		this.id = value;
 	}
 
 	/**
