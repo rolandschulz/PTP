@@ -6,7 +6,7 @@
       provider-name="%providerName"
       plugin="org.eclipse.ptp.rdt.sync.core"
       license-feature="org.eclipse.ptp.license"
-      license-feature-version="5.0.1.qualifier">
+      license-feature-version="1.0.0.qualifier">
 
    <description>
       %description

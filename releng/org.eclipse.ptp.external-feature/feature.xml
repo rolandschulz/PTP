@@ -6,7 +6,7 @@
       plugin="org.eclipse.ptp.debug.sdm"
       provider-name="%providerName"
       license-feature="org.eclipse.ptp.license"
-      license-feature-version="5.0.1.qualifier">
+      license-feature-version="1.0.0.qualifier">
 
    <description url="http://eclipse.org/ptp">
       %description
