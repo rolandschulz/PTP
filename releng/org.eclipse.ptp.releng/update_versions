@@ -29,13 +29,14 @@ PTP_FEATURES="\
 	org.eclipse.ptp.etfw.tau.fortran-feature \
 	org.eclipse.ptp.external-feature \
 	org.eclipse.ptp.gem-feature \
-	org.eclipse.ptp.master \
 	org.eclipse.ptp.pldt-feature \
 	org.eclipse.ptp.pldt.lapi-feature \
 	org.eclipse.ptp.pldt.upc-feature \
 	org.eclipse.ptp.rdt-feature \
 	org.eclipse.ptp.rdt.remotejars-feature \
 	org.eclipse.ptp.rdt.remotetools-feature \
+	org.eclipse.ptp.rdt.sync-feature \
+	org.eclipse.ptp.rdt.sync.fortran-feature \
 	org.eclipse.ptp.rdt.xlc-feature \
 	org.eclipse.ptp.remote-feature \
 	org.eclipse.ptp.remote.remotetools-feature \
@@ -43,9 +44,12 @@ PTP_FEATURES="\
 	org.eclipse.ptp.remotetools-feature \
 	org.eclipse.ptp.rm.ibm.ll-feature \
 	org.eclipse.ptp.rm.ibm.pe-feature \
+	org.eclipse.ptp.rm.jaxb-feature \
+	org.eclipse.ptp.rm.jaxb.pbs-feature \
+	org.eclipse.ptp.rm.lml_jaxb-feature \
+	org.eclipse.ptp.rm.lsl-feature \
 	org.eclipse.ptp.rm.mpich2-feature \
 	org.eclipse.ptp.rm.openmpi-feature \
-	org.eclipse.ptp.rm.pbs-feature \
 	org.eclipse.ptp.rm.slurm-feature \
 	org.eclipse.ptp.sci-feature \
 	org.eclipse.ptp.sdm-feature \
