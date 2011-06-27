@@ -222,7 +222,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 		// Explore delta only if it is not null
 		boolean hasRelevantChangedResources = false;
-		if (delta != null) {
+		if (fSyncConnection == null) {
+			hasRelevantChangedResources = true;
+		} else if (delta != null) {
 			SyncResourceDeltaVisitor visitor = new SyncResourceDeltaVisitor();
 			delta.accept(visitor);
 			hasRelevantChangedResources = visitor.isRelevant();
@@ -279,7 +281,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					// Open a remote sync connection
 					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(),
 															this.getProject().getLocation().toString(),	this.getLocation(),
-															new FileFilter(), progress);
+															new PathFilter(), progress);
 				}
 	
 				// Open remote connection if necessary
@@ -348,22 +350,22 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
 	}
 	
-	// Paths that the Git sync provider can ignore.
+	// Check if delta refers to a path that should not be sync'ed.
 	// TODO: Make sure Delta refers to only one project
 	private boolean irrelevantPath(IResourceDelta delta) {
+		PathFilter filter = new PathFilter();
 		String path = delta.getProjectRelativePath().toString();
-		if (path.endsWith("/.git")) { //$NON-NLS-1$
+		if(filter.shouldIgnore(path) || fSyncConnection.pathFilter(path)) 
 			return true;
-		} else if (path.endsWith("/.settings")){ //$NON-NLS-1$
-			return true;
-		} else {
-			return false;
-		}
+		
+		return false;
 	}
 	
 	
-	private class FileFilter implements SyncFileFilter {
+	private class PathFilter implements SyncFileFilter {
 		public boolean shouldIgnore(String path) {
+			if (path.length() == 0)
+				return false;
 			if (path.equals(".cproject") || path.equals(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
 				return true;
 			}

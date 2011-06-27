@@ -755,7 +755,7 @@ public class GitRemoteSyncConnection implements IRemoteSyncConnection{
 	}
 
 	public boolean pathFilter(String path){
-		if(path.equals("/.git")) //$NON-NLS-1$
+		if(path.equals(".git")) //$NON-NLS-1$
 			return true;
 
 		return false;
