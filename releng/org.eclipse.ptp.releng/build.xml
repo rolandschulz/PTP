@@ -35,8 +35,8 @@
 		<property name="forceContextQualifier" value="${timestamp}"/>
 		<property name="buildingOSGi" value="true"/>
 		<property name="buildDirectory" value="${basedir}/results"/>
-		<property name="releaseDir" value="/home/data/httpd/download.eclipse.org/tools/ptp/builds/${eclipseRelease}"/>
-		<property name="copyToDir" value="${releaseDir}/${buildType}.${buildId}"/>
+		<property name="buildsDir" value="/home/data/httpd/download.eclipse.org/tools/ptp/builds/${ptpBranchVersion}"/>
+		<property name="copyToDir" value="${buildsDir}/${buildType}.${buildId}"/>
 		<property name="testDirectory" value="${buildDirectory}/test"/>
 		<property name="baseLocation" value="${buildDirectory}/eclipse"/>
 		<property name="pde.build.scripts" value="${eclipse.pdebuild.scripts}"/>
@@ -210,24 +210,24 @@
 		<!-- symbolic links. The only option currenly is to exec the "rm" command. -->
 		<exec executable="rm">
 			<arg value="-f"/>
-			<arg value="${releaseDir}/latest"/>
+			<arg value="${buildsDir}/latest"/>
 		</exec>
-		<symlink link="${releaseDir}/latest" resource="${copyToDir}" overwrite="true" failonerror="false"/>
+		<symlink link="${buildsDir}/latest" resource="${copyToDir}" overwrite="true" failonerror="false"/>
 		<exec executable="rm">
 			<arg value="-f"/>
-			<arg value="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip"/>
+			<arg value="${buildsDir}/ptp-master-${ptpBranchVersion}-latest.zip"/>
 		</exec>
-		<symlink link="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${masterFile}" overwrite="true" failonerror="false"/>
+		<symlink link="${buildsDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${masterFile}" overwrite="true" failonerror="false"/>
 		<exec executable="rm">
 			<arg value="-f"/>
-			<arg value="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar"/>
+			<arg value="${buildsDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar"/>
 		</exec>
-		<symlink link="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true" failonerror="false"/>
+		<symlink link="${buildsDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true" failonerror="false"/>
 		<exec executable="rm">
 			<arg value="-f"/>
-			<arg value="${releaseDir}/rdt-server-aix-${ptpBranchVersion}-latest.tar"/>
+			<arg value="${buildsDir}/rdt-server-aix-${ptpBranchVersion}-latest.tar"/>
 		</exec>
-		<symlink link="${releaseDir}/rdt-server-aix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-aix-${ptpBranchVersion}.tar" overwrite="true" failonerror="false"/>
+		<symlink link="${buildsDir}/rdt-server-aix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-aix-${ptpBranchVersion}.tar" overwrite="true" failonerror="false"/>
 	</target>
 	
 	<target name="p2" depends="init" unless="hasErrors">
@@ -291,16 +291,16 @@
 	</target>
 	
 	<target name="update" depends="init" unless="hasErrors">
-		<replace file="${releaseDir}/index.html">
+		<replace file="${buildsDir}/index.html">
 			<replacetoken><![CDATA[  <!-- add here -->]]></replacetoken>
 			<replacevalue><![CDATA[  <!-- add here -->
 <li><a href="@buildType@.@buildId@/index.html">@buildId@</a></li>]]></replacevalue>
 		</replace>
-		<replace file="${releaseDir}/index.html">
+		<replace file="${buildsDir}/index.html">
 			<replacefilter token="@buildType@" value="${buildType}"/>
 			<replacefilter token="@buildId@" value="${buildId}"/>
 		</replace>
-		<chmod file="${releaseDir}/index.html" perm="664"/>
+		<chmod file="${buildsDir}/index.html" perm="664"/>
 	</target>
 		
 	<target name="tagone">
