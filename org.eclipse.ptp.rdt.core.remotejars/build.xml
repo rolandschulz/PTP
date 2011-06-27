@@ -19,7 +19,7 @@
 	<tstamp/>
 	<property name="serverBaseName" value="rdt-server"/>
 	<property name="serverJar" value="${basedir}/${serverBaseName}"/>
-	<property name="serverVersion" value="5.0.0"/>
+	<property name="serverVersion" value="5.0.1"/>
 	
 	<property name="stylesheet" value="${basedir}/jardesc.xsl"/>
 	<property name="downloads" value="${basedir}/downloads"/>
