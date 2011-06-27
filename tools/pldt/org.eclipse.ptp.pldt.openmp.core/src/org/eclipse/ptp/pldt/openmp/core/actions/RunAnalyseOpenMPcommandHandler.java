@@ -90,7 +90,7 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 				// null IASTTranslationUnit when we're doing C/C++ means we should quit.
 				// but want to continue to see if this is a fortran file we are analyzing.
 				if (atu == null) {// this is null for Fortran file during JUnit testing.
-					System.out.println("RunAnalyseOpenMPCommandHandler.doArtifactAnalysis(), atu is null (testing?)"); //$NON-NLS-1$
+					System.out.println("RunAnalyseOpenMPCommandHandler.doArtifactAnalysis(), atu is null (testing?)");
 					return msr;
 				}
 			}
@@ -102,7 +102,7 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 				// Instantiate using reflection to avoid static Photran
 				// dependencies
 				try {
-					Class<?> c = Class.forName("org.eclipse.ptp.pldt.openmp.fortran.actions.AnalyseOpenMPFortranHandler"); //$NON-NLS-1$
+					Class<?> c = Class.forName("org.eclipse.ptp.pldt.openmp.core.actions.AnalyseOpenMPFortranHandler"); //$NON-NLS-1$
 					Method method = c.getMethod("run", String.class, ITranslationUnit.class, String.class, ScanReturn.class); //$NON-NLS-1$
 					method.invoke(c.newInstance(), languageID, tu, fileName, msr);
 				} catch (Exception e) {
@@ -128,7 +128,8 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 	}
 
 	/**
-	 * Special processing to find #pragmas, since the CDT AST does not normally include them.<br>
+	 * Special processing to find #pragmas, since the CDT AST does not normally
+	 * include them.<br>
 	 * Also adds the "OpenMP Problems"
 	 * 
 	 * @param msr
@@ -148,9 +149,8 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 			if (pList[i] instanceof PASTPragma) {// was PASTOMPPragma
 
 				PASTPragma pop = (PASTPragma) pList[i];
-				if (traceOn) {
+				if (traceOn)
 					System.out.println("found #pragma, line " + pop.getStartingLine()); //$NON-NLS-1$
-				}
 				SourceInfo si = getSourceInfo(pop, Artifact.PRAGMA);
 				String shortName = pop.getContent();
 				if (shortName.length() == 0) {
@@ -192,7 +192,8 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 	}
 
 	/**
-	 * processResults - override from RunAnalyse base, to process both pragma artifacts and problems
+	 * processResults - override from RunAnalyse base, to process both pragma
+	 * artifacts and problems
 	 */
 	@Override
 	protected void processResults(ScanReturn results, IResource resource) {
@@ -210,13 +211,11 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		// DPP - put in stuff for problems view
 		// Just subclass scanreturn and create markers for problems view here
 		List<OpenMPError> problems = osr.getProblems();
-		if (traceOn) {
+		if (traceOn)
 			System.out.println("RunAnalyseOpenMP.processResults, have " + problems.size() + " problems."); //$NON-NLS-1$ //$NON-NLS-2$
-		}
 		try {
-			for (Iterator<OpenMPError> i = problems.iterator(); i.hasNext();) {
+			for (Iterator<OpenMPError> i = problems.iterator(); i.hasNext();)
 				processProblem(i.next(), resource);
-			}
 		} catch (CoreException e) {
 			System.out.println("RunAnalysisOpenMP.processResults exception: " //$NON-NLS-1$
 					+ e);
@@ -225,7 +224,8 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 	}
 
 	/**
-	 * Create problem marker which will put a problem on the OpenMP problems view
+	 * Create problem marker which will put a problem on the OpenMP problems
+	 * view
 	 * 
 	 * @param problem
 	 *            - OpenMPError

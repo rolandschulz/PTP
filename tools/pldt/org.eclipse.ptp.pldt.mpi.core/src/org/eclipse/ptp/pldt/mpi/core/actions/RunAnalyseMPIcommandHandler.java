@@ -35,7 +35,8 @@ import org.eclipse.ptp.pldt.mpi.internal.core.MpiIDs;
  * @author tibbitts
  * 
  */
-public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase {
+public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
+{
 	/**
 	 * Constructor for the "Run Analysis" action
 	 */
@@ -71,23 +72,25 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase {
 				// null IASTTranslationUnit when we're doing C/C++ means we should quit.
 				// but want to continue to see if this is a fortran file we are analyzing.
 				if (atu == null) {// this is null for Fortran file during JUnit testing.
-					System.out.println("RunAnalyseMPICommandHandler.doArtifactAnalysis(), atu is null (Fortran testing?)"); //$NON-NLS-1$
+					System.out.println("RunAnalyseMPICommandHandler.doArtifactAnalysis(), atu is null (Fortran testing?)");
 					return msr;
 				}
 			}
 			if (languageID.equals(GCCLanguage.ID)) {// C
 				atu.accept(new MpiCASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
-			} else if (languageID.equals(GPPLanguage.ID)) { // C++
+			}
+			else if (languageID.equals(GPPLanguage.ID)) { // C++
 				atu.accept(new MpiCPPASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
-			} else {
+			}
+			else {
 				// Attempt to handle Fortran
 				// Instantiate using reflection to avoid static Photran dependencies
 				try {
-					Class<?> c = Class.forName("org.eclipse.ptp.pldt.mpi.fortran.actions.AnalyseMPIFortranHandler"); //$NON-NLS-1$
-					Method method = c.getMethod("run", String.class, ITranslationUnit.class, String.class, ScanReturn.class); //$NON-NLS-1$
+					Class<?> c = Class.forName("org.eclipse.ptp.pldt.mpi.core.actions.AnalyseMPIFortranHandler");
+					Method method = c.getMethod("run", String.class, ITranslationUnit.class, String.class, ScanReturn.class);
 					method.invoke(c.newInstance(), languageID, tu, fileName, msr);
 				} catch (Exception e) {
-					System.err.println("RunAnalyseMPIcommandHandler.doArtifactAnalysis: Photran not installed"); //$NON-NLS-1$
+					System.err.println("RunAnalyseMPIcommandHandler.doArtifactAnalysis: Photran not installed");
 				}
 			}
 		} catch (CoreException e) {
