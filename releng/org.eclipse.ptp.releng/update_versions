@@ -47,7 +47,7 @@ PTP_FEATURES="\
 	org.eclipse.ptp.rm.jaxb-feature \
 	org.eclipse.ptp.rm.jaxb.pbs-feature \
 	org.eclipse.ptp.rm.lml_jaxb-feature \
-	org.eclipse.ptp.rm.lsl-feature \
+	org.eclipse.ptp.rm.lml-feature \
 	org.eclipse.ptp.rm.mpich2-feature \
 	org.eclipse.ptp.rm.openmpi-feature \
 	org.eclipse.ptp.rm.slurm-feature \
