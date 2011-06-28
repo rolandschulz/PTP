@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.handlers;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,11 +25,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TypedListener;
 
 /**
- * This listener is added to the widgets on which the composed control
- * depends for its state.<br>
- * 
- * The listener is constructed on the basis of an event rule which is passed in
- * specifying these dependencies.
+ * The listener is constructed on the basis of an event rule; it is added to the
+ * buttons on which the composed rule depends for its state.<br>
  * 
  * @author arossi
  * 
@@ -56,7 +54,11 @@ public class ControlStateListener implements SelectionListener {
 	public ControlStateListener(Control target, ControlStateRuleType rule, Action action, Map<String, Button> map) throws Throwable {
 		this.target = target;
 		this.action = action;
-		this.rule = new ControlStateRule(rule, map, this);
+		Set<Button> sources = new HashSet<Button>();
+		this.rule = new ControlStateRule(rule, map, sources);
+		for (Button b : sources) {
+			b.addSelectionListener(this);
+		}
 	}
 
 	/**

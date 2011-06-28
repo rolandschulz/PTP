@@ -12,8 +12,8 @@ package org.eclipse.ptp.rm.jaxb.control.ui.utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ControlStateListener;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType;
 import org.eclipse.swt.widgets.Button;
@@ -33,17 +33,20 @@ public class ControlStateRule {
 	private boolean selected;
 
 	/**
-	 * Composes the rule; also wires the source with the target listener.
+	 * Composes the rule; adds each button source to the set which the listener
+	 * will subscribe to for events.
 	 * 
 	 * @param rule
 	 *            JAXB element
 	 * @param map
 	 *            index of Widget controls
+	 * @param sources
+	 *            set of Buttons which are the sources in this rule
 	 */
-	public ControlStateRule(ControlStateRuleType rule, Map<String, Button> map, ControlStateListener listener) throws Throwable {
+	public ControlStateRule(ControlStateRuleType rule, Map<String, Button> map, Set<Button> sources) throws Throwable {
 		ControlStateRuleType.Not not = rule.getNot();
 		if (not != null) {
-			this.not = new ControlStateRule(not.getRule(), map, listener);
+			this.not = new ControlStateRule(not.getRule(), map, sources);
 		} else {
 			ControlStateRuleType.And and = rule.getAnd();
 			if (and != null) {
@@ -51,7 +54,7 @@ public class ControlStateRule {
 				if (!list.isEmpty()) {
 					this.and = new ArrayList<ControlStateRule>();
 					for (ControlStateRuleType t : list) {
-						this.and.add(new ControlStateRule(t, map, listener));
+						this.and.add(new ControlStateRule(t, map, sources));
 					}
 				}
 			} else {
@@ -61,7 +64,7 @@ public class ControlStateRule {
 					if (!list.isEmpty()) {
 						this.or = new ArrayList<ControlStateRule>();
 						for (ControlStateRuleType t : list) {
-							this.or.add(new ControlStateRule(t, map, listener));
+							this.or.add(new ControlStateRule(t, map, sources));
 						}
 					}
 				} else {
@@ -69,8 +72,8 @@ public class ControlStateRule {
 					if (button == null) {
 						throw new Throwable(Messages.ControlStateRule_0 + rule.getButton());
 					}
-					button.addSelectionListener(listener);
 					selected = rule.isSelected();
+					sources.add(button);
 				}
 			}
 		}
