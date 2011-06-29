@@ -1,19 +1,18 @@
 package org.eclipse.ptp.rdt.sync.rsync.core;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
+
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.rdt.sync.core.IRemoteSyncConnection;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 
-public class RsyncRemoteSyncConnection{
+public class RsyncRemoteSyncConnection implements IRemoteSyncConnection{
 //	private final static String remoteProjectName = "eclipse_auto";
 	public final static String ID = "org.eclipse.ptp.rdt.sync.rsync.core.RsyncRemoteSyncConnection";//$NON-NLS-1$
 	private final IRemoteConnection connection;
@@ -118,6 +117,14 @@ public class RsyncRemoteSyncConnection{
 			
 		}
 		return filesToBeExcluded;
+	}
+
+	public boolean pathFilter(String path) {
+		return false;
+	}
+	
+	public void pathChanged(IResourceDelta delta) throws RemoteSyncException {
+		
 	}
 }
 

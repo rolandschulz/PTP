@@ -10,14 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.git.core;
 
-import java.io.ByteArrayInputStream;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -191,7 +189,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		
 		// Make a visitor that explores the delta. At the moment, this visitor is responsible for two tasks (the list may grow in the future):
 		// 1) Find out if there are any "relevant" resource changes (changes that need to be mirrored remotely)
-		// 2) Add an empty ".gitignore" file to new directories so that Git will sync them
+		// 2) Notify connection of path change.
 		class SyncResourceDeltaVisitor implements IResourceDeltaVisitor {
 			private boolean relevantChangeFound = false;
 
@@ -204,14 +202,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					}
 				}
 
-				// Add .gitignore to empty directories
-				if (delta.getResource().getType() == IResource.FOLDER && (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
-					IFile emptyFile = getProject().getFile(delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore");  //$NON-NLS-1$
-					if (!(emptyFile.exists())) {
-						emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
-					}
-				}
-				
+				fSyncConnection.pathChanged(delta);
+
 				return true;
 			}
 

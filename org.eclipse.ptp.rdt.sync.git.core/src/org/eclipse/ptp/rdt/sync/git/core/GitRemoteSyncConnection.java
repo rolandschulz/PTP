@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rdt.sync.git.core;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -22,6 +23,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -761,4 +765,17 @@ public class GitRemoteSyncConnection implements IRemoteSyncConnection{
 		return false;
 	}
 
+	public void pathChanged(IResourceDelta delta) throws RemoteSyncException{
+		// Add .gitignore to empty directories
+		if (delta.getResource().getType() == IResource.FOLDER && (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
+			IFile emptyFile = delta.getResource().getProject().getFile(delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore");  //$NON-NLS-1$
+			if (!(emptyFile.exists())) {
+				try {
+					emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+				} catch (CoreException e) {
+					throw new RemoteSyncException(e);
+				}
+			}
+		}		
+	}
 }

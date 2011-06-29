@@ -1,4 +1,5 @@
-/* Copyright (c) 2011 Oak Ridge National Laboratory and others.
+/*******************************************************************************
+ * Copyright (c) 2011 Oak Ridge National Laboratory and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,29 +10,29 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.rsync.core;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.io.ByteArrayInputStream;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.filechooser.FileFilter;
-
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.ptp.rdt.sync.core.IRemoteSyncConnection;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.rsync.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -41,17 +42,17 @@ import org.eclipse.ptp.services.core.ServiceProvider;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 public class RSyncServiceProvider extends ServiceProvider implements ISyncServiceProvider {
-	public static final String ID = "org.eclipse.ptp.rdt.sync.rsync.core.RSyncServiceProvider"; //$NON-NLS-1$
+	public static final String ID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
 
-	private static final String GIT_LOCATION = "location"; //$NON-NLS-1$
+	private static final String LOCATION = "location"; //$NON-NLS-1$
 
-	private static final String GIT_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
-	private static final String GIT_SERVICES_ID = "servicesId"; //$NON-NLS-1$
-	private static final String GIT_PROJECT_NAME = "projectName"; //$NON-NLS-1$
+	private static final String CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
+	private static final String SERVICES_ID = "servicesId"; //$NON-NLS-1$
+	private static final String PROJECT_NAME = "projectName"; //$NON-NLS-1$
 	private IProject fProject = null;
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
-	private RsyncRemoteSyncConnection fSyncConnection = null;
+	private IRemoteSyncConnection fSyncConnection = null;
 	
 	private final ReentrantLock syncLock = new ReentrantLock();
 	private Integer syncTaskId = -1;  //ID for most recent synchronization task, functions as a time-stamp 
@@ -64,7 +65,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 */
 	public String getLocation() {
 		if (fLocation == null) {
-			fLocation = getString(GIT_LOCATION, null);
+			fLocation = getString(LOCATION, null);
 		}
 		return fLocation;
 	}
@@ -76,7 +77,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 */
 	public IProject getProject() {
 		if (fProject == null) {
-			final String name = getString(GIT_PROJECT_NAME, null);
+			final String name = getString(PROJECT_NAME, null);
 			if (name != null) {
 				fProject = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 			}
@@ -91,7 +92,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 */
 	public IRemoteConnection getRemoteConnection() {
 		if (fConnection == null) {
-			final String name = getString(GIT_CONNECTION_NAME, null);
+			final String name = getString(CONNECTION_NAME, null);
 			if (name != null) {
 				final IRemoteServices services = getRemoteServices();
 				if (services != null) {
@@ -108,7 +109,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 * @return remote services
 	 */
 	public IRemoteServices getRemoteServices() {
-		final String id = getString(GIT_SERVICES_ID, null);
+		final String id = getString(SERVICES_ID, null);
 		if (id != null) {
 			return PTPRemoteCorePlugin.getDefault().getRemoteServices(id);
 		}
@@ -133,10 +134,10 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 */
 	public void setLocation(String location) {
 		if (fLocation != null) {
- 			throw new RuntimeException(Messages.GSP_ChangeLocationError);
+			throw new RuntimeException(Messages.GSP_ChangeLocationError);
 		}
 		fLocation = location;
-		putString(GIT_LOCATION, location);
+		putString(LOCATION, location);
 	}
 
 	/**
@@ -150,7 +151,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 			throw new RuntimeException(Messages.GSP_ChangeProjectError);
 		}
 		fProject = project;
-		putString(GIT_PROJECT_NAME, project.getName());
+		putString(PROJECT_NAME, project.getName());
 	}
 
 	/**
@@ -165,7 +166,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 			throw new RuntimeException(Messages.GSP_ChangeConnectionError);
 		}
 		fConnection = conn;
-		putString(GIT_CONNECTION_NAME, conn.getName());
+		putString(CONNECTION_NAME, conn.getName());
 	}
 
 	/**
@@ -176,7 +177,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 * @throws RuntimeException if already set. Changing these local parameters is not currently supported but should be possible.
 	 */
 	public void setRemoteServices(IRemoteServices services) {
-		putString(GIT_SERVICES_ID, services.getId());
+		putString(SERVICES_ID, services.getId());
 	}
 
 	/*
@@ -186,8 +187,49 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 * synchronize(org.eclipse.core.resources.IResourceDelta, org.eclipse.core.runtime.IProgressMonitor, boolean)
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 100);
-		System.out.println("Synchronize function ran!");
+		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
+		
+		// Make a visitor that explores the delta. At the moment, this visitor is responsible for two tasks (the list may grow in the future):
+		// 1) Find out if there are any "relevant" resource changes (changes that need to be mirrored remotely)
+		// 2) Add an empty ".gitignore" file to new directories so that Git will sync them
+		class SyncResourceDeltaVisitor implements IResourceDeltaVisitor {
+			private boolean relevantChangeFound = false;
+
+			public boolean visit(IResourceDelta delta) throws CoreException {
+				if (irrelevantPath(delta)) {
+					return false;
+				} else {
+					if (delta.getAffectedChildren().length == 0) {
+						relevantChangeFound = true;
+					}
+				}
+
+				// Add .gitignore to empty directories
+				if (delta.getResource().getType() == IResource.FOLDER && (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
+					IFile emptyFile = getProject().getFile(delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore");  //$NON-NLS-1$
+					if (!(emptyFile.exists())) {
+						emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+					}
+				}
+				
+				return true;
+			}
+
+			public boolean isRelevant() {
+				return relevantChangeFound;
+			}
+		}
+
+		// Explore delta only if it is not null
+		boolean hasRelevantChangedResources = false;
+		if (fSyncConnection == null) {
+			hasRelevantChangedResources = true;
+		} else if (delta != null) {
+			SyncResourceDeltaVisitor visitor = new SyncResourceDeltaVisitor();
+			delta.accept(visitor);
+			hasRelevantChangedResources = visitor.isRelevant();
+		}
+
 		try {
 			/* A synchronize with SyncFlag.FORCE guarantees that both directories are in sync.
 			 * 
@@ -201,7 +243,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 			 *  In some cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
 			 */
 			// TODO: We are not using the individual "sync to local" and "sync to remote" flags yet.
-			if ((syncFlags == SyncFlag.NO_FORCE) && (!(hasRelevantChangedResources(delta)))) {
+			if ((syncFlags == SyncFlag.NO_FORCE) && (!(hasRelevantChangedResources))) {
 				return;
 			}
 			
@@ -221,11 +263,11 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 			try {
 				while (!syncLock.tryLock(50, TimeUnit.MILLISECONDS)) {
 					if (progress.isCanceled()) {
-						throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.GitServiceProvider_1));
+						throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.RSyncServiceProvider_1));
 					}
 				}
 			} catch (InterruptedException e1) {
-				throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.GitServiceProvider_2));
+				throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.RSyncServiceProvider_2));
 			}
 				
 				
@@ -239,12 +281,12 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 					// Open a remote sync connection
 					fSyncConnection = new RsyncRemoteSyncConnection(this.getRemoteConnection(),
 															this.getProject().getLocation().toString(),	this.getLocation(),
-															new FileFilter(),progress);
+															new PathFilter(), progress);
 				}
 	
 				// Open remote connection if necessary
 				if (this.getRemoteConnection().isOpen() == false) {
-					this.getRemoteConnection().open(null);
+					this.getRemoteConnection().open(progress.newChild(10));
 				}
 	
 				// This synchronization operation will include all tasks up to current syncTaskId
@@ -259,10 +301,13 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	
 				// Sync local and remote. For now, do both ways each time.
 				// TODO: Sync more efficiently and appropriately to the situation.
-				fSyncConnection.syncRemoteToLocal(progress.newChild(40));
 				fSyncConnection.syncLocalToRemote(progress.newChild(40));
+				fSyncConnection.syncRemoteToLocal(progress.newChild(40));
 	
 				finishedSyncTaskId = willFinishTaskId;
+			} catch (final RemoteSyncException e) {
+				this.handleRemoteSyncException(e);
+				return;
 			} catch (RemoteConnectionException e) {
 				this.handleRemoteSyncException(new RemoteSyncException(e));
 				return;
@@ -304,64 +349,32 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 		status = new Status(severity, Activator.PLUGIN_ID, message, e);
 		StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
 	}
-
-	// Are any of the changes in delta relevant for sync'ing?
-	private boolean hasRelevantChangedResources(IResourceDelta delta) {
-		if (delta == null) {
-			return false;
-		}
-		String[] relevantChangedResources = getRelevantChangedResources(delta);
-		if (relevantChangedResources.length == 0) {
-			return false;
-		}
-		return true;
-	}
 	
-	// This function and the next recursively compile a list of relevant resources that have changed.
-	private String[] getRelevantChangedResources(IResourceDelta delta) {
-		ArrayList<String> res = new ArrayList<String>();
-		getRelevantChangedResourcesRecursive(delta, res);
-		return res.toArray(new String[0]);
-	}
-	
-	private void getRelevantChangedResourcesRecursive(IResourceDelta delta, ArrayList<String> res) {
-		// Prune recursion if this is a directory or file of no interest (such as the ".git" directory)
-		if (irrelevantPath(delta)) {
-			return;
-		}
-		
-		// Recursion logic
-		IResourceDelta[] resChildren = delta.getAffectedChildren();
-		if (resChildren.length == 0) {
-			res.add(delta.getFullPath().toString());
-			return;
-		} else {
-			for (IResourceDelta resChild : resChildren) {
-				getRelevantChangedResourcesRecursive(resChild, res);
-			}
-		}
-	}
-	
-	// Paths that the Git sync provider can ignore. For now, only the ".git" directory is excluded. This function should expand
-	// later to include other paths, such as those in Git's ignore list.
+	// Check if delta refers to a path that should not be sync'ed.
+	// TODO: Make sure Delta refers to only one project
 	private boolean irrelevantPath(IResourceDelta delta) {
-		String path = delta.getFullPath().toString();
-		if (path.endsWith("/.git")) { //$NON-NLS-1$
+		PathFilter filter = new PathFilter();
+		String path = delta.getProjectRelativePath().toString();
+		if(filter.shouldIgnore(path) || fSyncConnection.pathFilter(path)) 
 			return true;
-		} else if (path.endsWith("/.git/")){ //$NON-NLS-1$
-			return true;
-		} else {
-			return false;
-		}
+		
+		return false;
 	}
 	
-	private class FileFilter implements SyncFileFilter {
-		public boolean shouldIgnore(String fileName) {
-			if (fileName.endsWith(".cproject") || fileName.endsWith(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
+	
+	private class PathFilter implements SyncFileFilter {
+		public boolean shouldIgnore(String path) {
+			if (path.length() == 0)
+				return false;
+			if (path.equals(".cproject") || path.equals(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
 				return true;
 			}
 
-			if (this.isBinaryFile(fileName)) {
+			if (path.startsWith(".settings")) { //$NON-NLS-1$
+				return true;
+			}
+
+			if (this.isBinaryFile(path)) {
 				return true;
 			}
 
@@ -370,19 +383,22 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 
 		private boolean isBinaryFile(String fileName) {
 			try {
-				int resType = CoreModel.getDefault().create(getProject().getFile(fileName)).getElementType();
+				ICElement fileElement = CoreModel.getDefault().create(getProject().getFile(fileName));
+				if (fileElement == null) {
+					return false;
+				}
+				int resType = fileElement.getElementType();
 				if (resType == ICElement.C_BINARY) {
 					return true;
 				} else {
 					return false;
 				}
 			} catch (NullPointerException e) {
-				System.err.println(fileName);
+				// CDT throws this exception for files not recognized. For now, be conservative and allow these files.
 				return false;
 			}
 		}
 	}
-	
 
 
 
@@ -413,7 +429,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 		syncLock.lock();
 		try {
 			fConnection = connection;
-			putString(GIT_CONNECTION_NAME, connection.getName());
+			putString(CONNECTION_NAME, connection.getName());
 			fSyncConnection = null;  //get reinitialized by next synchronize call
 		} finally {
 			syncLock.unlock();
@@ -429,12 +445,11 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 		syncLock.lock();
 		try {
 			fLocation = configLocation;
-			putString(GIT_LOCATION, configLocation);
+			putString(LOCATION, configLocation);
 			fSyncConnection = null;  //get reinitialized by next synchronize call
 		} finally {
 			syncLock.unlock();
 		}
 	}
-
-  }	
+}
 
