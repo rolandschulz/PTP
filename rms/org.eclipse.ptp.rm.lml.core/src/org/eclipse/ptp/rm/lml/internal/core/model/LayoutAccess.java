@@ -615,6 +615,7 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	public ColumnlayoutType[] getLayoutColumsToCids(BigInteger[] cids, String gid) {
+		final TablelayoutType table = getTableLayout(gid);
 		final ColumnlayoutType[] columns = new ColumnlayoutType[cids.length];
 		for (int i = 0; i < cids.length; i++) {
 			for (final ColumnlayoutType column : getTableLayout(gid).getColumn()) {
@@ -624,6 +625,7 @@ public class LayoutAccess extends LguiHandler {
 				}
 			}
 		}
+
 		return columns;
 	}
 

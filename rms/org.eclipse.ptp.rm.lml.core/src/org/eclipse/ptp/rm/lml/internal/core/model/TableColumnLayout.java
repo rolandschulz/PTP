@@ -9,7 +9,6 @@
  * 		Claudia Knobloch, FZ Juelich
  */
 
-
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
 import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
@@ -18,34 +17,56 @@ import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
  * Class of the interface ITableColumnLayout
  */
 public class TableColumnLayout implements ITableColumnLayout {
-	
+
 	/*
 	 * Title of the column
 	 */
-	private String title;
-	
+	private final String title;
+
 	/*
 	 * Width of the column
 	 */
-	private int width;
-	
+	private final int width;
+
 	/*
-	 * Style of the column 
+	 * Style of the column
 	 */
-	private String style;
-	
+	private final String style;
+
+	/*
+	 * Activity of the column.
+	 */
+	private final boolean active;
+
 	/**
 	 * Constructor
-	 * @param title title of the column
-	 * @param size width of the column
-	 * @param width style of the column
+	 * 
+	 * @param title
+	 *            title of the column
+	 * @param size
+	 *            width of the column
+	 * @param width
+	 *            style of the column
+	 * @param activity
+	 *            of the column
 	 */
-	public TableColumnLayout(String title, int size, String width) {
+	public TableColumnLayout(String title, int size, String width, boolean active) {
 		this.title = title;
 		this.width = size;
 		this.style = width;
+		this.active = active;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.lml.core.IJobTableColumnLayout#getStyle()
+	 */
+	public String getStyle() {
+		return style;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -55,7 +76,7 @@ public class TableColumnLayout implements ITableColumnLayout {
 	public String getTitle() {
 		return title;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -65,15 +86,9 @@ public class TableColumnLayout implements ITableColumnLayout {
 	public int getWidth() {
 		return width;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.IJobTableColumnLayout#getStyle()
-	 */
-	public String getStyle() {
-		return style;
+
+	public boolean isActive() {
+		return active;
 	}
 
 }

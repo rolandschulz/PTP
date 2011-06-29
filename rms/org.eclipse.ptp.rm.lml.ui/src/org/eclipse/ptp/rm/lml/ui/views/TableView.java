@@ -379,10 +379,11 @@ public class TableView extends ViewPart {
 			return;
 		}
 
-		final int numCols = fLguiItem.getTableHandler().getNumberOfTableColumns(gid);
-		treeColumns = new TreeColumn[numCols];
-		savedColumnWidths = new int[numCols];
+		// final int numCols = fLguiItem.getTableHandler().getNumberOfTableColumns(gid);
+		treeColumns = new TreeColumn[tableColumnLayouts.length];
+		savedColumnWidths = new int[tableColumnLayouts.length];
 
+		// first column with color rectangle
 		TreeViewerColumn treeViewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
 		treeViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -418,6 +419,7 @@ public class TableView extends ViewPart {
 		createMenuItem(headerMenu, treeColumn, 0);
 		treeColumnLayout.setColumnData(treeColumn, new ColumnPixelData(40, true));
 
+		// the remaining columns
 		for (int i = 0; i < tableColumnLayouts.length; i++) {
 			treeViewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
 			final int cellNumber = i;
@@ -432,21 +434,35 @@ public class TableView extends ViewPart {
 			treeColumn.setText(tableColumnLayouts[i].getTitle());
 			treeColumn.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
 
-			boolean resizable = true;
-			if (tableColumnLayouts[i].getWidth() == 0) {
-				resizable = false;
+			if (tableColumnLayouts[i].isActive()) {
+				final boolean resizable = true;
+				treeColumn.setResizable(resizable);
+
+				/*
+				 * Create the header menu for this column
+				 */
+				createMenuItem(headerMenu, treeColumn, i + 1);
+
+				/*
+				 * Set the column width
+				 */
+				savedColumnWidths[i] = 0;
+				treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(tableColumnLayouts[i].getWidth(), 0, resizable));
+			} else {
+				final boolean resizable = false;
+				treeColumn.setResizable(resizable);
+
+				/*
+				 * Create the header menu for this column
+				 */
+				createMenuItem(headerMenu, treeColumn, i + 1);
+
+				/*
+				 * Set the column width
+				 */
+				savedColumnWidths[i] = tableColumnLayouts[i].getWidth();
+				treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(0, 0, resizable));
 			}
-			treeColumn.setResizable(resizable);
-
-			/*
-			 * Create the header menu for this column
-			 */
-			createMenuItem(headerMenu, treeColumn, i + 1);
-
-			/*
-			 * Set the column width
-			 */
-			treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(tableColumnLayouts[i].getWidth(), 0, resizable));
 			treeColumns[i] = treeColumn;
 		}
 
@@ -532,11 +548,13 @@ public class TableView extends ViewPart {
 	}
 
 	private void createMenuItem(Menu parent, final TreeColumn column, final int index) {
+
 		final MenuItem itemName = new MenuItem(parent, SWT.CHECK);
 		itemName.setText(column.getText());
 		itemName.setSelection(column.getResizable());
 		itemName.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
+				boolean active = true;
 				if (itemName.getSelection()) {
 					if (savedColumnWidths[index] == 0) {
 						savedColumnWidths[index] = 50;
@@ -547,9 +565,10 @@ public class TableView extends ViewPart {
 					savedColumnWidths[index] = column.getWidth();
 					column.setWidth(0);
 					column.setResizable(false);
+					active = false;
 				}
 				if (fLguiItem != null) {
-					fLguiItem.getTableHandler().changeTableColumnsWidth(gid, getWidths());
+					fLguiItem.getTableHandler().setTableColumnActive(gid, column.getText(), active);
 				}
 			}
 		});

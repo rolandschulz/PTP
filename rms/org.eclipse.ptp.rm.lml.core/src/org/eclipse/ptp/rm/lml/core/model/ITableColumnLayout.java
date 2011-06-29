@@ -12,9 +12,7 @@
 package org.eclipse.ptp.rm.lml.core.model;
 
 /**
- * This interface presents the layout of one column of a table,
- * 
- * @author Claudia Knobloch
+ * This interface presents the layout of one column of a table.
  */
 public interface ITableColumnLayout {
 
@@ -38,4 +36,11 @@ public interface ITableColumnLayout {
 	 * @return width of the table
 	 */
 	public int getWidth();
+
+	// TODO maybe also position???
+
+	/**
+	 * @return if table column is active or not
+	 */
+	public boolean isActive();
 }
