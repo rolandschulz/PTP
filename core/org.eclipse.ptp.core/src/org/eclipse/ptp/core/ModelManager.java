@@ -33,7 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
@@ -132,28 +132,32 @@ public class ModelManager implements IModelManager {
 	}
 
 	private class RMStartupJob extends Job {
-		private final IResourceManager resourceManager;
+		private final IResourceManager[] resourceManagers;
 
-		public RMStartupJob(IResourceManager rm) {
-			super(Messages.ModelManager_0 + rm.getName());
-			resourceManager = rm;
+		public RMStartupJob(IResourceManager[] rms) {
+			super(Messages.ModelManager_0);
+			resourceManagers = rms;
 		}
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
+			SubMonitor subMon = SubMonitor.convert(monitor, resourceManagers.length);
 			try {
 				try {
-					monitor.beginTask(Messages.ModelManager_1, 100);
-					resourceManager.start(new SubProgressMonitor(monitor, 100));
+					for (IResourceManager rm : resourceManagers) {
+						rm.start(subMon.newChild(1));
+						if (subMon.isCanceled()) {
+							return Status.CANCEL_STATUS;
+						}
+					}
 				} catch (CoreException e) {
 					return e.getStatus();
 				}
-				if (monitor.isCanceled()) {
-					return Status.CANCEL_STATUS;
-				}
 				return Status.OK_STATUS;
 			} finally {
-				monitor.done();
+				if (monitor != null) {
+					monitor.done();
+				}
 			}
 		}
 
@@ -698,10 +702,8 @@ public class ModelManager implements IModelManager {
 	 * @throws CoreException
 	 */
 	private void startResourceManagers(IResourceManager[] rmsNeedStarting) throws CoreException {
-		for (final IResourceManager rm : rmsNeedStarting) {
-			Job job = new RMStartupJob(rm);
-			job.schedule();
-		}
+		Job job = new RMStartupJob(rmsNeedStarting);
+		job.schedule();
 	}
 
 	public static ModelManager getInstance() {

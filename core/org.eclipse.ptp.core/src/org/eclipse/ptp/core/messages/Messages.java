@@ -118,7 +118,6 @@ public class Messages extends NLS {
 	public static String MessageAttributes_1;
 	public static String MessageAttributes_2;
 	public static String ModelManager_0;
-	public static String ModelManager_1;
 	public static String NodeAttributes_0;
 	public static String NodeAttributes_1;
 	public static String NodeAttributes_2;
