@@ -381,7 +381,7 @@ public class TableView extends ViewPart {
 
 		// final int numCols = fLguiItem.getTableHandler().getNumberOfTableColumns(gid);
 		treeColumns = new TreeColumn[tableColumnLayouts.length];
-		savedColumnWidths = new int[tableColumnLayouts.length];
+		savedColumnWidths = new int[tableColumnLayouts.length + 1];
 
 		// first column with color rectangle
 		TreeViewerColumn treeViewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
@@ -446,7 +446,6 @@ public class TableView extends ViewPart {
 				/*
 				 * Set the column width
 				 */
-				savedColumnWidths[i] = 0;
 				treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(tableColumnLayouts[i].getWidth(), 0, resizable));
 			} else {
 				final boolean resizable = false;
@@ -460,11 +459,25 @@ public class TableView extends ViewPart {
 				/*
 				 * Set the column width
 				 */
-				savedColumnWidths[i] = tableColumnLayouts[i].getWidth();
+				savedColumnWidths[i + 1] = tableColumnLayouts[i].getWidth();
 				treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(0, 0, resizable));
 			}
 			treeColumns[i] = treeColumn;
 		}
+
+		// just a default column
+		treeViewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
+		treeViewerColumn.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+			}
+		});
+		treeColumn = treeViewerColumn.getColumn();
+		treeColumn.setMoveable(true);
+		treeColumn.setText("");
+		treeColumn.setAlignment(SWT.TRAIL);
+		treeColumn.setResizable(false);
+		treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(0, 0, false));
 
 		/*
 		 * Sorting is done in the model as the table is virtual and has a lazy
@@ -646,9 +659,9 @@ public class TableView extends ViewPart {
 	 * @return new column order array with first column removed
 	 */
 	private int[] removeFirstColumn(int[] order) {
-		final int[] orderNew = new int[order.length - 1];
+		final int[] orderNew = new int[order.length - 2];
 		int dif = 0;
-		for (int i = 0; i < order.length; i++) {
+		for (int i = 0; i < order.length - 1; i++) {
 			if (order[i] != 0) {
 				orderNew[i - dif] = order[i] - 1;
 			} else {
