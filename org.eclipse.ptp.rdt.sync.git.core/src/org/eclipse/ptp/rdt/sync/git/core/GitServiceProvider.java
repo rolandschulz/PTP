@@ -345,7 +345,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	// Paths that the Git sync provider can ignore.
 	private boolean irrelevantPath(IResourceDelta delta) {
 		String path = delta.getFullPath().toString();
-		if (path.endsWith("/.git")) { //$NON-NLS-1$
+		if (path.endsWith("/" + GitRemoteSyncConnection.gitDir)) { //$NON-NLS-1$
+			return true;
+		} else if (path.endsWith("/.git")) { //$NON-NLS-1$
 			return true;
 		} else if (path.endsWith("/.settings")) { //$NON-NLS-1$
 			return true;
@@ -361,6 +363,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			}
 
 			if (fileName.startsWith(".settings")) { //$NON-NLS-1$
+				return true;
+			}
+			
+			if (fileName.startsWith(GitRemoteSyncConnection.gitDir)) {
 				return true;
 			}
 
