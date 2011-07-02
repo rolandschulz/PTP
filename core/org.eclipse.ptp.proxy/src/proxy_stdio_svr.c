@@ -162,6 +162,7 @@ proxy_stdio_svr_finish(proxy_svr *svr)
 	}
 
 	proxy_stdio_destroy_conn(conn);
+	proxy_end();
 }
 
 /**
