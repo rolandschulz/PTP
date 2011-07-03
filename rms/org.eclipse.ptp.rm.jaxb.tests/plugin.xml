@@ -4,24 +4,40 @@
    <extension
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
-            configurationFile="data/demo-example.xml"
-            name="Demo Example">
+            configurationFile="data/browse-example.xml"
+            name="Browse Example">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
-            configurationFile="data/namelist-example.xml"
-            name="Namelist Example">
+            configurationFile="data/button-group-example.xml"
+            name="Button Group Example">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/control-state-example.xml"
+            name="Control State Example">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/demo-example.xml"
+            name="Demo Example">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/demo-example-with-action.xml"
             name="Demo Full (with Action) Example">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
-            configurationFile="data/miscellaneous-example.xml"
-            name="Miscellaneous Example">
+            configurationFile="data/discovered-properties-example.xml"
+            name="Discovered Properties Example">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
-            configurationFile="data/Open MPI (JAXB).xml"
-            name="Open MPI (JAXB)">
+            configurationFile="data/namelist-example.xml"
+            name="Namelist (Input) File Example">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/sharedvar-example.xml"
+            name="Shared Variable Example">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/viewer-example.xml"
+            name="Viewers Example">
       </JAXBResourceManagerConfiguration>
    </extension>
 

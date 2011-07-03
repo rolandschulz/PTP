@@ -16,6 +16,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -97,7 +98,7 @@ public class WidgetActionUtils {
 
 	/**
 	 * Get Combo items from a reference to another Attribute or Property with a
-	 * List as its value.
+	 * Collection as its value.
 	 * 
 	 * @param map
 	 *            resource manager environment
@@ -113,23 +114,27 @@ public class WidgetActionUtils {
 		if (data == null) {
 			return new String[0];
 		}
-		List<String> valueList = null;
+		Collection<String> values = null;
 		if (data instanceof AttributeType) {
 			AttributeType a = (AttributeType) data;
 			Object value = a.getValue();
-			if (value instanceof List<?>) {
-				valueList = (List<String>) value;
+			if (value instanceof Collection<?>) {
+				values = (Collection<String>) value;
 			}
-		} else {
+		} else if (data instanceof PropertyType) {
 			PropertyType p = (PropertyType) data;
 			Object value = p.getValue();
-			if (value instanceof List<?>) {
-				valueList = (List<String>) value;
+			if (value instanceof Collection<?>) {
+				values = (Collection<String>) value;
 			}
+		} else if (data instanceof Collection<?>) {
+			values = (Collection<String>) data;
 		}
-		if (valueList != null) {
-			return valueList.toArray(new String[0]);
+
+		if (values != null) {
+			return values.toArray(new String[0]);
 		}
+
 		return new String[0];
 	}
 

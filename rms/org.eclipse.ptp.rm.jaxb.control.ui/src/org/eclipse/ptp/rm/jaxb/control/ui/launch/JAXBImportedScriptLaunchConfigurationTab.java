@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -20,77 +21,74 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
-import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.control.ui.utils.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
+import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
-import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
+import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
  * Specialized Launch Tab for displaying (read only) custom batch scripts. To
  * edit scripts, they should be imported into the workspace. The selection of a
  * pre-existent file sets the SCRIPT_PATH variable in the environment which
- * overrides any SCRIPT content that may have been previously set.
+ * overrides any SCRIPT content that may have been previously set.<br>
+ * <br>
+ * The configuration provides for the exporting of the environment for the
+ * purpose of overriding settings.
  * 
  * @author arossi
  * 
  */
-public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements SelectionListener,
-		ModifyListener {
+public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchConfigurationTab {
+
+	private final String rmPrefix;
+	private final StringBuffer contents;
+	private final AttributeViewerType viewerType;
 
 	private Text choice;
 	private Text editor;
-	private Text stdoutText;
-	private Text stderrText;
 	private Button browseWorkspace;
 	private Button clear;
-	private Button enableFetchStdout;
-	private Button enableFetchStderr;
-
 	private String selected;
-	private String stdoutPath;
-	private String stderrPath;
-	private final StringBuffer contents;
 
 	/**
 	 * @param rm
 	 *            the resource manager
 	 * @param dialog
 	 *            the ancestor main launch dialog
-	 * @param title
-	 *            to display in the parent TabFolder tab
+	 * @param importTab
+	 *            describing configurable parts
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	public JAXBImportedScriptLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog, String title,
-			JAXBControllerLaunchConfigurationTab parentTab) {
-		super(parentTab, dialog);
-		if (title != null) {
-			this.title = title;
-		}
-		stdoutPath = JAXBControlUIConstants.ZEROSTR;
-		stderrPath = JAXBControlUIConstants.ZEROSTR;
+	public JAXBImportedScriptLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog,
+			LaunchTabType.Import importTab, JAXBControllerLaunchConfigurationTab parentTab) {
+		super(rm, dialog, parentTab);
+		this.title = importTab.getTitle();
+		this.viewerType = importTab.getExportForOverride();
+		shared = new String[0];
+		rmPrefix = rm.getConfiguration().getUniqueName() + JAXBUIConstants.DOT;
 		contents = new StringBuffer();
 	}
 
@@ -103,14 +101,15 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 * org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
+	@Override
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
-		return new RMLaunchValidation(true, null);
+		return super.canSave(control, rm, queue);
 	}
 
 	/*
 	 * Fixed construction of read-only text field and browse button for the
 	 * selection, a clear button to clear the choice, and a large text area for
-	 * displaying the script. (non-Javadoc)
+	 * displaying the script. Attribute viewer is configurable. (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
@@ -118,41 +117,65 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 * org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
+	@Override
 	public void createControl(final Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
-		control = WidgetBuilderUtils.createComposite(parent, 1);
-
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(6, false);
-		GridData gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, false, false, 600,
-				JAXBControlUIConstants.DEFAULT, 6, JAXBControlUIConstants.DEFAULT);
-		Group comp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
-
-		/*
-		 * path buttons/text
-		 */
-		maybeAddPathControls(control, ((IJAXBResourceManager) rm).getControl().getEnvironment());
+		control = new Composite(parent, SWT.NONE);
+		control.setLayout(WidgetBuilderUtils.createGridLayout(1, false));
 
 		/*
 		 * script upload controls
 		 */
-		WidgetBuilderUtils.createLabel(comp, Messages.BatchScriptPath, SWT.LEFT, 1);
-		WidgetBuilderUtils.createLabel(comp, JAXBControlUIConstants.ZEROSTR, SWT.LEFT, 1);
-		GridData gdsub = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 310,
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(6, false);
+		GridData gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, false, false, 600,
+				JAXBControlUIConstants.DEFAULT, 6, JAXBControlUIConstants.DEFAULT);
+		gd.verticalAlignment = SWT.CENTER;
+		Group group = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
+
+		WidgetBuilderUtils.createLabel(group, Messages.BatchScriptPath, SWT.LEFT, 1);
+		WidgetBuilderUtils.createLabel(group, JAXBControlUIConstants.ZEROSTR, SWT.LEFT, 1);
+		gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, JAXBControlUIConstants.DEFAULT,
 				JAXBControlUIConstants.DEFAULT, 2, JAXBControlUIConstants.DEFAULT);
+		gd.verticalAlignment = SWT.CENTER;
 		String s = selected == null ? JAXBControlUIConstants.ZEROSTR : selected.toString();
-		choice = WidgetBuilderUtils.createText(comp, SWT.BORDER, gdsub, true, s);
-		browseWorkspace = WidgetBuilderUtils.createPushButton(comp, Messages.JAXBRMConfigurationSelectionWizardPage_1, this);
+		choice = WidgetBuilderUtils.createText(group, SWT.BORDER, gd, true, s);
+		browseWorkspace = WidgetBuilderUtils.createPushButton(group, Messages.JAXBRMConfigurationSelectionWizardPage_1, this);
 		SWTUtil.setButtonDimensionHint(browseWorkspace);
-		clear = WidgetBuilderUtils.createPushButton(comp, Messages.ClearScript, this);
+		clear = WidgetBuilderUtils.createPushButton(group, Messages.ClearScript, this);
 		SWTUtil.setButtonDimensionHint(clear);
+
+		/*
+		 * attribute viewer
+		 */
+		if (viewerType != null) {
+			try {
+				LaunchTabBuilder builder = new LaunchTabBuilder(this);
+				if (listeners != null) {
+					listeners.clear();
+				}
+				localWidgets.clear();
+				layout = WidgetBuilderUtils.createGridLayout(1, true);
+				gd = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, JAXBControlUIConstants.DEFAULT,
+						JAXBControlUIConstants.DEFAULT, 2, JAXBControlUIConstants.DEFAULT);
+				gd.verticalAlignment = SWT.CENTER;
+				group = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
+				group.setText(Messages.OverrideEnvironment);
+				group.setToolTipText(Messages.OverrideEnvironmentTooltip);
+				builder.addAttributeViewer(viewerType, group);
+			} catch (Throwable t) {
+				t.printStackTrace();
+				throw CoreExceptionUtils.newException(Messages.CreateControlConfigurableError + JAXBUIConstants.SP + title, t);
+			}
+		}
 
 		/*
 		 * text editor
 		 */
 		layout = WidgetBuilderUtils.createGridLayout(1, true);
-		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, null);
+		gd = WidgetBuilderUtils.createGridData(GridData.FILL_BOTH, true, true, JAXBControlUIConstants.DEFAULT,
+				JAXBControlUIConstants.DEFAULT, 1, JAXBControlUIConstants.DEFAULT);
+		group = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
 		int style = SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL;
-		gdsub = WidgetBuilderUtils.createGridDataFill(600, 400, 1);
-		editor = WidgetBuilderUtils.createText(grp, style, gdsub, true, JAXBControlUIConstants.ZEROSTR, null, null);
+		editor = WidgetBuilderUtils.createText(group, style, gd, true, JAXBControlUIConstants.ZEROSTR, null, null);
 		WidgetBuilderUtils.applyMonospace(editor);
 		editor.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {
@@ -165,30 +188,15 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 				MessageDialog.openWarning(parent.getShell(), Messages.ReadOnlyWarning_title, Messages.ReadOnlyWarning);
 			}
 		});
+
+		/*
+		 * view buttons
+		 */
+		createViewScriptGroup(control);
+
 		control.layout(true, true);
-		size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		selected = null;
 		updateControls();
-	}
-
-	/**
-	 * The top-level control.
-	 */
-	public Control getControl() {
-		return control;
-	}
-
-	@Override
-	public Image getImage() {
-		return null;
-	}
-
-	/**
-	 * @return title of tab.
-	 */
-	@Override
-	public String getText() {
-		return title;
 	}
 
 	/*
@@ -202,16 +210,20 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 * org.eclipse.ptp.core.elements.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
+	@Override
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		try {
-			String uriStr = configuration.getAttribute(JAXBControlUIConstants.SCRIPT_PATH, JAXBControlUIConstants.ZEROSTR);
-			if (!JAXBControlUIConstants.ZEROSTR.equals(uriStr)) {
-				selected = uriStr;
+			RMLaunchValidation validation = super.initializeFrom(control, rm, queue, configuration);
+			if (!validation.isSuccess()) {
+				return validation;
+			}
+			String value = getAttribute(JAXBControlUIConstants.SCRIPT_PATH, configuration);
+			if (!JAXBControlUIConstants.ZEROSTR.equals(value)) {
+				selected = value;
 			} else {
 				selected = null;
 			}
 			uploadScript();
-			maybeInitializePaths(configuration);
 		} catch (Throwable t) {
 			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ErrorOnLoadFromStore, Messages.ErrorOnLoadTitle, false);
 		}
@@ -227,28 +239,9 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 * org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
+	@Override
 	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
-		return new RMLaunchValidation(true, null);
-	}
-
-	/*
-	 * Tab acts as listener for path text boxes. (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events
-	 * .ModifyEvent)
-	 */
-	public void modifyText(ModifyEvent e) {
-		try {
-			if (stdoutText == e.getSource()) {
-				stdoutPath = stdoutText.getText().trim();
-			} else if (stderrText == e.getSource()) {
-				stderrPath = stderrText.getText().trim();
-			}
-			fireContentsChanged();
-		} catch (Throwable t) {
-			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.ModifyError, Messages.ModifyErrorTitle, false);
-		}
+		return super.isValid(launchConfig, rm, queue);
 	}
 
 	/*
@@ -260,19 +253,9 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 * org.eclipse.ptp.rmsystem.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
+	@Override
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		return new RMLaunchValidation(true, null);
-	}
-
-	/*
-	 * Tab acts as listener for browse, clear and path buttons (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
-	 * .swt.events.SelectionEvent)
-	 */
-	public void widgetDefaultSelected(SelectionEvent e) {
-		widgetSelected(e);
+		return super.setDefaults(configuration, rm, queue);
 	}
 
 	/*
@@ -282,6 +265,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
 	 * .events.SelectionEvent)
 	 */
+	@Override
 	public void widgetSelected(SelectionEvent e) {
 		Object source = e.getSource();
 		try {
@@ -291,26 +275,8 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 			} else if (source == clear) {
 				selected = null;
 				updateContents();
-			} else if (source == enableFetchStdout) {
-				boolean enabled = enableFetchStdout.getSelection();
-				if (enabled) {
-					stdoutText.setText(stdoutPath);
-					stdoutText.setEnabled(true);
-				} else {
-					stdoutText.setText(JAXBControlUIConstants.ZEROSTR);
-					stdoutText.setEnabled(false);
-				}
-				fireContentsChanged();
-			} else if (source == enableFetchStderr) {
-				boolean enabled = enableFetchStderr.getSelection();
-				if (enabled) {
-					stderrText.setText(stderrPath);
-					stderrText.setEnabled(true);
-				} else {
-					stderrText.setText(JAXBControlUIConstants.ZEROSTR);
-					stderrText.setEnabled(false);
-				}
-				fireContentsChanged();
+			} else {
+				super.widgetSelected(e);
 			}
 		} catch (Throwable t) {
 			WidgetActionUtils.errorMessage(control.getShell(), t, Messages.WidgetSelectedError, Messages.WidgetSelectedErrorTitle,
@@ -319,8 +285,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	}
 
 	/*
-	 * If there is a path selected, store it in the local map as the
-	 * SCRIPT_PATH. Also store or remove remote paths. (non-Javadoc)
+	 * Store SCRIPT_PATH. (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab#
@@ -328,107 +293,79 @@ public class JAXBImportedScriptLaunchConfigurationTab extends AbstractJAXBLaunch
 	 */
 	@Override
 	protected void doRefreshLocal() {
-		if (selected != null) {
-			localMap.put(JAXBControlUIConstants.SCRIPT_PATH, selected);
-		}
-		maybeRefreshPaths();
+		super.doRefreshLocal();
+		LCVariableMap lcMap = parentTab.getLCMap();
+		lcMap.put(JAXBControlUIConstants.SCRIPT_PATH, selected);
 	}
 
-	/**
-	 * If the variables for remote path are defined in the configuration, add
-	 * the buttons and text for retrieving them.
+	/*
+	 * Let the writeLocalProperties determine validity of script, excluded by
+	 * all other controllers. (non-Javadoc)
 	 * 
-	 * @param parent
-	 * @throws CoreException
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab
+	 * #getLocalInvalid()
 	 */
-	private void maybeAddPathControls(final Composite parent, IVariableMap env) throws CoreException {
-		if (env == null) {
-			/*
-			 * This means the tab has been opened without having started the RM.
-			 * When the RM is started, this tab will be rebuilt.
-			 */
-			return;
-		}
-
-		Object stdout = env.get(JAXBControlUIConstants.STDOUT_REMOTE_FILE);
-		Object stderr = env.get(JAXBControlUIConstants.STDERR_REMOTE_FILE);
-		if (stdout == null && stderr == null) {
-			return;
-		}
-
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(4, false);
-		GridData data = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, false, false, 400,
-				JAXBControlUIConstants.DEFAULT, 4, JAXBControlUIConstants.DEFAULT);
-		Group group = WidgetBuilderUtils.createGroup(parent, SWT.NONE, layout, data);
-		if (stdout != null) {
-			Label l = WidgetBuilderUtils.createLabel(group, Messages.RemoteScriptPath, SWT.LEFT, 1);
-			l.setToolTipText(Messages.RemotePathTooltip);
-			data = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 175, JAXBControlUIConstants.DEFAULT, 2,
-					JAXBControlUIConstants.DEFAULT);
-			stdoutText = WidgetBuilderUtils.createText(group, SWT.BORDER, data, false, JAXBControlUIConstants.ZEROSTR);
-			stdoutText.addModifyListener(this);
-			enableFetchStdout = WidgetBuilderUtils.createCheckButton(group, Messages.EnableStdoutFetch, this);
-		}
-		if (stderr != null) {
-			WidgetBuilderUtils.createLabel(group, Messages.RemoteScriptPath, SWT.LEFT, 1);
-			data = WidgetBuilderUtils.createGridData(GridData.FILL_HORIZONTAL, true, false, 175, JAXBControlUIConstants.DEFAULT, 2,
-					JAXBControlUIConstants.DEFAULT);
-			stderrText = WidgetBuilderUtils.createText(group, SWT.BORDER, data, false, JAXBControlUIConstants.ZEROSTR);
-			stderrText.addModifyListener(this);
-			enableFetchStderr = WidgetBuilderUtils.createCheckButton(group, Messages.EnableStderrFetch, this);
-		}
+	@Override
+	protected Set<String> getLocalInvalid() {
+		Set<String> localInvalid = super.getLocalInvalid();
+		localInvalid.remove(JAXBControlUIConstants.SCRIPT_PATH);
+		return localInvalid;
 	}
 
-	/**
-	 * Upload the saved values, or disable if none.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param configuration
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
+	 * #writeLocalProperties()
 	 */
-	private void maybeInitializePaths(ILaunchConfiguration configuration) {
-		try {
-			if (stdoutText != null) {
-				stdoutPath = configuration.getAttribute(JAXBControlUIConstants.STDOUT_REMOTE_FILE, JAXBControlUIConstants.ZEROSTR);
-				if (JAXBControlUIConstants.ZEROSTR.equals(stdoutPath)) {
-					stdoutText.setText(JAXBControlUIConstants.ZEROSTR);
-					stdoutText.setEnabled(false);
-					enableFetchStdout.setSelection(false);
-				} else {
-					stdoutText.setText(stdoutPath);
-					stdoutText.setEnabled(true);
-					enableFetchStdout.setSelection(true);
-				}
-			}
-			if (stderrText != null) {
-				stderrPath = configuration.getAttribute(JAXBControlUIConstants.STDERR_REMOTE_FILE, JAXBControlUIConstants.ZEROSTR);
-				if (JAXBControlUIConstants.ZEROSTR.equals(stderrPath)) {
-					stderrText.setText(JAXBControlUIConstants.ZEROSTR);
-					stderrText.setEnabled(false);
-					enableFetchStderr.setSelection(false);
-				} else {
-					stderrText.setText(stderrPath);
-					stderrText.setEnabled(true);
-					enableFetchStderr.setSelection(true);
-				}
-			}
-		} catch (CoreException t) {
-			JAXBControlUIPlugin.log(t);
+	@Override
+	protected void writeLocalProperties() {
+		if (selected != null && !JAXBUIConstants.ZEROSTR.equals(selected)) {
+			validSet.add(JAXBControlUIConstants.SCRIPT_PATH);
 		}
+		super.writeLocalProperties();
 	}
 
 	/**
-	 * If the values are non-empty, add to map; else remove.
+	 * Adds the View Script and Restore Defaults buttons to the bottom of the
+	 * control pane.
+	 * 
+	 * @param control
 	 */
-	private void maybeRefreshPaths() {
-		if (JAXBControlUIConstants.ZEROSTR.equals(stdoutPath)) {
-			localMap.remove(JAXBControlUIConstants.STDOUT_REMOTE_FILE);
-		} else {
-			localMap.put(JAXBControlUIConstants.STDOUT_REMOTE_FILE, stdoutPath);
-		}
-		if (JAXBControlUIConstants.ZEROSTR.equals(stderrPath)) {
-			localMap.remove(JAXBControlUIConstants.STDERR_REMOTE_FILE);
-		} else {
-			localMap.put(JAXBControlUIConstants.STDERR_REMOTE_FILE, stderrPath);
-		}
+	private void createViewScriptGroup(final Composite control) {
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(4, true, 5, 5, 2, 2);
+		GridData gd = WidgetBuilderUtils.createGridData(SWT.NONE, 4);
+		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
+
+		Button b = WidgetBuilderUtils.createPushButton(grp, Messages.ViewConfig, this);
+		SWTUtil.setButtonDimensionHint(b);
+		b.setToolTipText(Messages.ViewConfigTooltip);
+
+		b = WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				resetDefaults();
+			}
+		});
+		SWTUtil.setButtonDimensionHint(b);
+	}
+
+	/**
+	 * Provides the LCVariableMap prefixing function
+	 * 
+	 * @param name
+	 *            of attribute
+	 * @param config
+	 *            Launch Configuration
+	 * @return variable value
+	 */
+	private String getAttribute(String name, ILaunchConfiguration config) throws CoreException {
+		return config.getAttribute(rmPrefix + name, JAXBUIConstants.ZEROSTR);
 	}
 
 	/*

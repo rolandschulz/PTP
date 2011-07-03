@@ -81,8 +81,6 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							<entry value="SUBMITTED"/>
 						</set>
 					</match>
-				</target>
-				<target ref="@jobId">
 					<match>
 						<expression>qsub:[\s]+job[\s]+([\d]+[.].+)[\s]ready[\s]*</expression>
 						<set field="name">
@@ -92,8 +90,6 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							<entry value="RUNNING"/>
 						</set>
 					</match>
-				</target>
-				<target ref="@jobId">
 					<match>
 						<expression>.*Job not submitted[\s]*</expression>
 						<set field="value">
@@ -183,7 +179,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				</target>
 			</stderr-parser>
 		</get-job-status>
-		<terminate-job name="cancel" ignoreExitStatus="true">
+		<terminate-job name="cancel">
 			<arg>qdel</arg>
 			<arg>${ptp_rm:@jobId#name}</arg>
 		</terminate-job>

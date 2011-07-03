@@ -163,9 +163,10 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#runActionCommand
-	 * (java.lang.String)
+	 * (java.lang.String, java.lang.String,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public Object runActionCommand(String action, String resetValue) throws CoreException {
+	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException {
 		return null;
 	}
 

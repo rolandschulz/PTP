@@ -11,12 +11,13 @@ package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckable;
@@ -27,10 +28,13 @@ import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.TemplateType;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Control;
 
 /**
  * Update model for the entire viewer (CheckboxTable or CheckboxTree). <br>
@@ -48,7 +52,6 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	private final String separator;
 	private final ICheckable viewer;
 	private final ColumnViewer columnViewer;
-	private final Map<String, Object> deselected;
 	private final boolean initialAllChecked;
 	private Button showOnlySelected;
 
@@ -92,23 +95,23 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		this.viewer = viewer;
 		this.columnViewer = (ColumnViewer) viewer;
 		this.initialAllChecked = initialAllChecked;
-		pattern = template.getPattern();
-		String s = template.getSeparator();
+		String s = null;
+		if (template == null) {
+			pattern = null;
+		} else {
+			pattern = template.getPattern();
+			s = template.getSeparator();
+		}
 		separator = s == null ? JAXBControlUIConstants.ZEROSTR : s;
 		checked = new StringBuffer();
 		templatedValue = new StringBuffer();
 		viewer.addCheckStateListener(this);
-		deselected = new HashMap<String, Object>();
 	}
 
 	/*
-	 * Model serves as CheckStateListener for the viewer. When check state
-	 * changes to checked, the checked values are stored, and the update handler
-	 * notified. Unchecked values get removed from the current environment and
-	 * placed in a temporary map; when rechecked, the current value in the
-	 * deselected map is removed and replaced into the environment. Multiple
-	 * rows can be selected, in which case they will all receive the value of
-	 * the clicked row. (non-Javadoc)
+	 * Model serves as CheckStateListener for the viewer. Multiple rows can be
+	 * selected, in which case they will all receive the value of the clicked
+	 * row. (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse
@@ -133,13 +136,6 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 						ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
 						model.setChecked(checked);
 						viewer.setChecked(model, checked);
-						String name = model.getName();
-						if (!checked) {
-							deselected.put(name, lcMap.remove(name));
-						} else if (lcMap.get(name) == null) {
-							lcMap.put(name, deselected.remove(name));
-							model.refreshValueFromMap();
-						}
 					} else {
 						viewer.setChecked(o, false);
 					}
@@ -148,7 +144,6 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		} catch (Throwable t) {
 			JAXBControlUIPlugin.log(t);
 		}
-		storeValue();
 		handleUpdate(null);
 	}
 
@@ -160,6 +155,19 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	@Override
 	public Object getControl() {
 		return viewer;
+	}
+
+	/**
+	 * @return the actual SWT control.
+	 */
+	public Control getSWTControl() {
+		if (columnViewer instanceof CheckboxTableViewer) {
+			return ((CheckboxTableViewer) columnViewer).getTable();
+		}
+		if (columnViewer instanceof CheckboxTreeViewer) {
+			return ((CheckboxTreeViewer) columnViewer).getTree();
+		}
+		return null;
 	}
 
 	/*
@@ -181,7 +189,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 */
 	@SuppressWarnings("unchecked")
 	public void initializeChecked() throws CoreException {
-		Map<String, String> allChecked = lcMap.getChecked(name);
+		Set<String> allChecked = lcMap.getChecked(name);
 		Collection<Object> input = (Collection<Object>) ((Viewer) viewer).getInput();
 		for (Object o : input) {
 			boolean checked = false;
@@ -190,7 +198,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 				if (allChecked.isEmpty()) {
 					checked = initialAllChecked;
 				} else {
-					checked = allChecked.containsKey(model.getName());
+					checked = allChecked.contains(model.getName());
 				}
 				model.setChecked(checked);
 				viewer.setChecked(model, checked);
@@ -207,7 +215,6 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		if (b) {
 			columnViewer.addFilter(filter);
 		}
-		storeValue();
 		handleUpdate(null);
 	}
 
@@ -217,19 +224,22 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	 * @see org.eclipse.ptp.rm.jaxb.ui.model.AbstractUpdateModel#storeValue()
 	 */
 	@SuppressWarnings("unchecked")
-	public void putCheckedSettings(Map<String, Object> localMap) {
+	public void putCheckedSettings(LCVariableMap lcMap) {
 		checked.setLength(0);
 		Collection<Object> input = (Collection<Object>) ((Viewer) viewer).getInput();
 		for (Object o : input) {
 			if (o instanceof ICellEditorUpdateModel) {
 				ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
 				if (model.isChecked()) {
-					checked.append(model.getName()).append(JAXBControlUIConstants.SP);
+					String name = model.getName();
+					if (name != null && !JAXBUIConstants.ZEROSTR.equals(name)) {
+						checked.append(model.getName()).append(JAXBControlUIConstants.SP);
+					}
 				}
 			}
 		}
-		localMap.put(JAXBControlUIConstants.CHECKED_ATTRIBUTES + name, checked.toString().trim());
-		localMap.put(JAXBControlUIConstants.SHOW_ONLY_CHECKED + name, showOnlySelected.getSelection());
+		lcMap.put(JAXBControlUIConstants.CHECKED_ATTRIBUTES + name, checked.toString().trim());
+		lcMap.put(JAXBControlUIConstants.SHOW_ONLY_CHECKED + name, showOnlySelected.getSelection());
 	}
 
 	/*
@@ -259,27 +269,27 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	@Override
 	public Object storeValue() {
 		templatedValue.setLength(0);
-		Collection<Object> input = (Collection<Object>) ((Viewer) viewer).getInput();
-		for (Object o : input) {
-			if (o instanceof ICellEditorUpdateModel) {
-				ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
-				/*
-				 * model will return ZEROSTR if the entry is not selected
-				 */
-				String replaced = model.getReplacedValue(pattern);
-				if (!JAXBControlUIConstants.ZEROSTR.equals(replaced)) {
-					templatedValue.append(separator).append(replaced);
+		if (pattern != null) {
+			Collection<Object> input = (Collection<Object>) ((Viewer) viewer).getInput();
+			for (Object o : input) {
+				if (o instanceof ICellEditorUpdateModel) {
+					ICellEditorUpdateModel model = (ICellEditorUpdateModel) o;
+					/*
+					 * model will return ZEROSTR if the entry is not selected
+					 */
+					String replaced = model.getReplacedValue(pattern);
+					if (!JAXBControlUIConstants.ZEROSTR.equals(replaced)) {
+						templatedValue.append(separator).append(replaced);
+					}
 				}
 			}
+			templatedValue.delete(0, separator.length());
 		}
-		templatedValue.delete(0, separator.length());
 		String t = templatedValue.toString().trim();
 		if (!JAXBControlUIConstants.ZEROSTR.equals(t)) {
 			t = lcMap.getString(t);
-			lcMap.put(name, t);
-		} else {
-			lcMap.remove(name);
 		}
+		lcMap.put(name, t);
 		mapValue = t;
 		return t;
 	}
@@ -310,7 +320,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		} else {
 			columnViewer.removeFilter(filter);
 		}
-		storeValue();
 		handleUpdate(null);
 	}
+
 }

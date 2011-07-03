@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011 University of Illinois All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- * Contributors: -->
+<!-- * Albert L. Rossi - design and implementation -->
+<!-- ****************************************************************************** -->
+<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="resource_manager_type.xsd" name="browse-example">
+   <control-data>
+      <property name="path1" visible="true"/>
+      <property name="path2" visible="true"/>
+      <property name="path3" visible="true"/>
+      <property name="path4" visible="true"/>
+      <submit-interactive name="submit-interactive">
+         <arg>echo</arg>
+         <arg>$VAR_1</arg>
+         <arg>$VAR_2</arg>
+         <arg>$VAR_3</arg>
+         <arg>$VAR_4</arg>
+         <environment name="VAR_1" value="${ptp_rm:path1#value}"/>
+         <environment name="VAR_2" value="${ptp_rm:path2#value}"/>
+         <environment name="VAR_3" value="${ptp_rm:path3#value}"/>
+         <environment name="VAR_4" value="${ptp_rm:path4#value}"/>
+      </submit-interactive>
+      <launch-tab>
+         <dynamic includeWidgetValuesFrom="Cores">
+            <title>Paths</title>
+            <layout>
+               <grid-layout/>
+            </layout>
+            <composite>
+               <layout>
+                  <grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+               </layout>
+               <layout-data>
+                  <grid-data horizontalSpan="4" widthHint="700"/>
+               </layout-data>
+               <!-- row 1 -->
+               <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <tooltip>Browse for a file or directory, return the URI</tooltip>
+                  <fixed-text>Browse URI: </fixed-text>
+               </widget>
+               <browse uri="true" textStyle="SWT.BORDER" readOnly="false" title="Browse" saveValueTo="path1">
+                  <text-layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
+                  </text-layout-data>
+                  <button-layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+                  </button-layout-data>
+               </browse>
+               <!-- row 2 -->
+               <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <tooltip>Browse for only a directory, return the path</tooltip>
+                  <fixed-text>Browse Dir Path: </fixed-text>
+               </widget>
+               <browse uri="false" directory="true" textStyle="SWT.BORDER" readOnly="true" title="Browse" saveValueTo="path2">
+                  <text-layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
+                  </text-layout-data>
+                  <button-layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+                  </button-layout-data>
+               </browse>
+               <!-- row 3 -->
+               <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <tooltip>Browse for only local files or directories</tooltip>
+                  <fixed-text>Browse Local File: </fixed-text>
+               </widget>
+               <browse textStyle="SWT.BORDER | SWT.H_SCROLL" readOnly="true" localOnly="true" title="Browse" saveValueTo="path3">
+                  <text-layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
+                  </text-layout-data>
+                  <button-layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+                  </button-layout-data>
+               </browse>
+               <!-- row 4 -->
+               <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                   <tooltip>Browse for only local directories, return URI</tooltip>
+                  <fixed-text>Browse Local Dir URI: </fixed-text>
+               </widget>
+               <browse directory="true" uri="true" textStyle="SWT.BORDER" readOnly="true" localOnly="true" title="Browse" saveValueTo="path4">
+                  <text-layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
+                  </text-layout-data>
+                  <button-layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" widthHint="100" horizontalSpan="1" grabExcessHorizontal="false"/>
+                  </button-layout-data>
+               </browse>
+            </composite>
+         </dynamic>
+      </launch-tab>
+   </control-data>
+   <monitor-data schedulerType="PBS"/>
+</resource-manager-builder>

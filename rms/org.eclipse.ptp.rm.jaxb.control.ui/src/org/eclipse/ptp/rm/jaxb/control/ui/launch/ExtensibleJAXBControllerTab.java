@@ -54,7 +54,6 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 */
 	protected boolean voidRMConfig;
 	protected TabFolder tabFolder;
-	protected String lastVisited;
 	protected int lastIndex;
 
 	private final LinkedList<AbstractJAXBLaunchConfigurationTab> tabControllers = new LinkedList<AbstractJAXBLaunchConfigurationTab>();
@@ -68,7 +67,6 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 		super(dialog);
 		voidRMConfig = false;
 		lastIndex = 0;
-		lastVisited = null;
 	}
 
 	/*
@@ -131,10 +129,10 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * @return the FQN of the tab which was last visible
+	 * @return index of the selected controller
 	 */
-	public String getLastVisited() {
-		return lastVisited;
+	public int getSelectedController() {
+		return tabFolder.getSelectionIndex();
 	}
 
 	/*
@@ -173,7 +171,20 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 			}
 		}
 		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
-			tabControl.setUpSharedEnvironment(controllerIndex);
+			try {
+				tabControl.setUpSharedEnvironment(controllerIndex);
+			} catch (CoreException t) {
+				return new RMLaunchValidation(false, t.getLocalizedMessage());
+			}
+		}
+		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
+			try {
+				tabControl.getControl().setVisible(true);
+				tabControl.refreshLocal(configuration.getWorkingCopy());
+				tabControl.getControl().setVisible(false);
+			} catch (CoreException t) {
+				return new RMLaunchValidation(false, t.getLocalizedMessage());
+			}
 		}
 		return resultValidation;
 	}
@@ -235,14 +246,6 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 			}
 		}
 		return resultValidation;
-	}
-
-	/**
-	 * @param lastVisited
-	 *            the FQN of the currently visible tab
-	 */
-	public void setLastVisited(String lastVisited) {
-		this.lastVisited = lastVisited;
 	}
 
 	/**

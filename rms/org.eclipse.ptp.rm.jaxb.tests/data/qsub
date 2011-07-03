@@ -1,7 +1,0 @@
-#!/bin/bash
-
-echo EMULATING QSUB LOCALLY > qsub.txt
-echo $1 >> qsub.txt
-cat $1 >> qsub.txt
-echo >> qsub.txt
-echo 44104.localhost

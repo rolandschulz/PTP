@@ -13,6 +13,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
@@ -20,6 +21,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.cell.SpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -190,6 +192,16 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel#getParent()
+	 */
+	public Viewer getParent() {
+		return (Viewer) viewer.getControl();
+	}
+
+	/*
 	 * For generating a templated string using all the names and values in the
 	 * viewer rows. Skips non-checked items. (non-Javadoc)
 	 * 
@@ -275,6 +287,9 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 		if (editor instanceof ComboBoxCellEditor) {
 			if (itemsFrom != null) {
 				items = WidgetActionUtils.getItemsFrom(rmMap, itemsFrom);
+				if (items.length == 0) {
+					items = WidgetActionUtils.getItemsFrom(lcMap, itemsFrom);
+				}
 				items = WidgetBuilderUtils.normalizeComboItems(items);
 				((ComboBoxCellEditor) editor).setItems(items);
 			}
@@ -308,6 +323,9 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 			}
 		} else if (editor instanceof CheckboxCellEditor) {
 			booleanValue = false;
+			if (JAXBUIConstants.ZEROSTR.equals(mapValue)) {
+				mapValue = null;
+			}
 			if (mapValue != null) {
 				if (mapValue instanceof String) {
 					booleanValue = Boolean.parseBoolean((String) mapValue);
@@ -318,6 +336,9 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 		} else if (editor instanceof SpinnerCellEditor) {
 			SpinnerCellEditor e = (SpinnerCellEditor) editor;
 			integerValue = e.getMin();
+			if (JAXBUIConstants.ZEROSTR.equals(mapValue)) {
+				mapValue = null;
+			}
 			if (mapValue != null) {
 				if (mapValue instanceof String) {
 					integerValue = Integer.parseInt((String) mapValue);

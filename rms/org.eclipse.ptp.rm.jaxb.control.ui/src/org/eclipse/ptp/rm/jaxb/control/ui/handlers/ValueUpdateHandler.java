@@ -13,8 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.control.ui.IFireContentsChangedEnabled;
+import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
+import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled;
+import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
 
 /**
  * When a widget or cell editor commits a change, this handler is called to
@@ -27,20 +29,24 @@ import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 public class ValueUpdateHandler {
 
 	private final Map<Object, IUpdateModel> controlToModelMap;
-	private final IFireContentsChangedEnabled tab;
+	private final Map<Object, ICellEditorUpdateModel> cellEditorToModelMap;
+	private final Map<Viewer, ViewerUpdateModel> viewerModelMap;
+	private final IUpdateModelEnabled tab;
 
 	/**
 	 * @param tab
 	 *            the parent controller tab
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab
 	 */
-	public ValueUpdateHandler(IFireContentsChangedEnabled tab) {
+	public ValueUpdateHandler(IUpdateModelEnabled tab) {
 		controlToModelMap = new HashMap<Object, IUpdateModel>();
+		cellEditorToModelMap = new HashMap<Object, ICellEditorUpdateModel>();
+		viewerModelMap = new HashMap<Viewer, ViewerUpdateModel>();
 		this.tab = tab;
 	}
 
 	/**
-	 * Adds a widget-to-model mapping to the registered controls map.
+	 * Adds a widget-to-model mapping to the appropriate map.
 	 * 
 	 * @param control
 	 *            widget or cell editor
@@ -48,26 +54,37 @@ public class ValueUpdateHandler {
 	 *            associate data model
 	 */
 	public void addUpdateModelEntry(Object control, IUpdateModel model) {
-		controlToModelMap.put(control, model);
+		if (model instanceof ViewerUpdateModel) {
+			ViewerUpdateModel vum = (ViewerUpdateModel) model;
+			viewerModelMap.put((Viewer) control, vum);
+		} else if (model instanceof ICellEditorUpdateModel) {
+			cellEditorToModelMap.put(control, (ICellEditorUpdateModel) model);
+		} else {
+			controlToModelMap.put(control, model);
+		}
 	}
 
 	/**
-	 * Empties the registered controls map.
+	 * Empties the maps.
 	 */
 	public void clear() {
+		cellEditorToModelMap.clear();
 		controlToModelMap.clear();
-	}
-
-	/**
-	 * @return the registered controls map.
-	 */
-	public Map<Object, IUpdateModel> getControlToModelMap() {
-		return controlToModelMap;
+		viewerModelMap.clear();
 	}
 
 	/**
 	 * Broadcasts update request to all other controls by invoking refresh on
-	 * their model objects.
+	 * their model objects.<br>
+	 * <br>
+	 * 
+	 * The order follows this logic: update all cell editors first, then have
+	 * the viewers write their template strings, then refresh the rest of the
+	 * widgets.<br>
+	 * <br>
+	 * 
+	 * In order to catch any references in table or tree cells to the template
+	 * output of other viewers, the first two update sets are iterated once.
 	 * 
 	 * The value can largely be ignored.
 	 * 
@@ -77,22 +94,34 @@ public class ValueUpdateHandler {
 	 *            the new value (if any) produced (unused here)
 	 */
 	public void handleUpdate(Object source, Object value) {
+		tab.relink();
+
+		for (int i = 0; i < 2; i++) {
+			for (Object control : cellEditorToModelMap.keySet()) {
+				if (control == source) {
+					continue;
+				}
+				ICellEditorUpdateModel m = cellEditorToModelMap.get(control);
+				m.refreshValueFromMap();
+			}
+
+			for (ViewerUpdateModel vum : viewerModelMap.values()) {
+				vum.storeValue();
+			}
+		}
+
 		for (Object control : controlToModelMap.keySet()) {
 			if (control == source) {
 				continue;
 			}
-			controlToModelMap.get(control).refreshValueFromMap();
+			IUpdateModel m = controlToModelMap.get(control);
+			m.refreshValueFromMap();
 		}
 
-		for (Object control : controlToModelMap.keySet()) {
-			if (control instanceof Viewer) {
-				((Viewer) control).refresh();
-			}
+		for (Viewer viewer : viewerModelMap.keySet()) {
+			viewer.refresh();
 		}
 
-		/*
-		 * notify the parent tab about the update
-		 */
 		tab.fireContentsChanged();
 	}
 }

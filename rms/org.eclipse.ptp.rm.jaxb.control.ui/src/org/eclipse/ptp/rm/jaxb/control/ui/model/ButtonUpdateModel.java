@@ -84,6 +84,9 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 		refreshing = true;
 		mapValue = lcMap.get(name);
 		boolean b = false;
+		if (JAXBUIConstants.ZEROSTR.equals(mapValue)) {
+			mapValue = null;
+		}
 		if (mapValue != null) {
 			if (mapValue instanceof String) {
 				if (valueMapping != null) {

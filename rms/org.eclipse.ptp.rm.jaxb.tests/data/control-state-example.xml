@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011 University of Illinois All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- * Contributors: -->
+<!-- * Albert L. Rossi - design and implementation -->
+<!-- ****************************************************************************** -->
+<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="resource_manager_type.xsd" name="control-state-example">
+	<control-data>
+		<property name="checked00" visible="false"/>
+		<property name="checked01" visible="false"/>
+		<property name="checked10" visible="false"/>
+		<property name="checked11" visible="false"/>
+		<property name="saved" visible="true"/>
+		<launch-tab>
+			<dynamic>
+				<title>Basic 0</title>
+				<layout>
+					<grid-layout numColumns="3"/>
+				</layout>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3"/>
+					</layout>
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="true"
+							horizontalSpan="2"/>
+					</layout-data>
+					<title>Hosts</title>
+					<widget type="checkbox" buttonId="001" title="Host file:" saveValueTo="checked00"/>
+					<browse textStyle="SWT.BORDER" title="Browse">
+						<text-layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data horizontalAlign="SWT.RIGHT" verticalAlign="SWT.CENTER"/>
+						</button-layout-data>
+						<text-control-state>
+							<enable-if button="001" selected="true"/>
+						</text-control-state>
+						<button-control-state>
+							<enable-if button="001" selected="true"/>
+						</button-control-state>
+					</browse>
+					<!-- <widget type="checkbox" buttonId="002" title="Host list:" saveValueTo="w01"> -->
+					<widget type="checkbox" buttonId="002" title="Host list:" saveValueTo="checked01">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.TOP"/>
+						</layout-data>
+						<control-state>
+							<show-if button="001" selected="true"/>
+						</control-state>
+					</widget>
+					<widget type="text" style="SWT.V_SCROLL | SWT.BORDER" saveValueTo="saved">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"
+								grabExcessVertical="true"/>
+						</layout-data>
+						<control-state>
+							<show-if button="001" selected="true"/>
+							<enable-if>
+								<and>
+									<rule button="001" selected="true"/>
+									<rule button="002" selected="true"/>
+								</and>
+							</enable-if>
+						</control-state>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic>
+				<title>Basic 1</title>
+				<layout>
+					<grid-layout numColumns="3"/>
+				</layout>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3"/>
+					</layout>
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="true"
+							horizontalSpan="2"/>
+					</layout-data>
+					<title>Hosts</title>
+					<widget type="checkbox" buttonId="011" title="Host file:" saveValueTo="checked10"/>
+					<browse textStyle="SWT.BORDER" title="Browse">
+						<text-layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data horizontalAlign="SWT.RIGHT" verticalAlign="SWT.CENTER"/>
+						</button-layout-data>
+						<text-control-state>
+							<enable-if button="011" selected="true"/>
+						</text-control-state>
+						<button-control-state>
+							<enable-if button="011" selected="true"/>
+						</button-control-state>
+					</browse>
+					<widget type="checkbox" buttonId="012" title="Host list:" saveValueTo="checked11">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.TOP"/>
+						</layout-data>
+						<control-state>
+							<show-if button="011" selected="true"/>
+						</control-state>
+					</widget>
+					<widget type="text" style="SWT.V_SCROLL | SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"
+								grabExcessVertical="true"/>
+						</layout-data>
+						<control-state>
+							<show-if button="011" selected="true"/>
+							<enable-if>
+								<and>
+									<rule button="011" selected="true"/>
+									<rule button="012" selected="true"/>
+								</and>
+							</enable-if>
+						</control-state>
+					</widget>
+				</composite>
+			</dynamic>
+		</launch-tab>
+	</control-data>
+</resource-manager-builder>

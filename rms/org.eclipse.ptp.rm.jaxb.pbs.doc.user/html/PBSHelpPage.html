@@ -138,10 +138,10 @@
 		configuration). The text box above the table/tree containing the
 		attribute list also displays a string of name=value defintions from
 		the table (here for viewing convenience only). The table has typed
-		values; it provides an appropriate editor (drop-down list,
-		numerical spinner, checkbox, etc.) to fill in the value according to
-		the value's type; doing "tab" after filling in the value effects the change.
-		The check box at the top left "Show Only Checked Items" allows you to
+		values; it provides an appropriate editor (drop-down list, numerical
+		spinner, checkbox, etc.) to fill in the value according to the value's
+		type; doing "tab" after filling in the value effects the change. The
+		check box at the top left "Show Only Checked Items" allows you to
 		filter out unchecked items from the table list.</p>
 	<br>
 	<br>
@@ -166,6 +166,26 @@
 		to edit, you will need to import it like any other file into your
 		workspace. The selection can be cleared or cancelled using the "Clear
 		Script" button.</p>
+	<p>The PBS import tab is preconfigured with an optional table
+		viewer for selecting the variables from the environment which you wish
+		to pass to the launch command along with the script.</p>
+	<p>
+		<b>NOTE:</b>
+	<ol>
+		<li><b>The values should correspond to whatever the script is
+				giving to PBS; if the current values in the environment do not
+				match, they can be changed here. However, these are set <i>for
+					the benefit of the internal consistency of the PTP client, and do
+					not override those hard-coded in script.</i> </b></li>
+		<li>Unselecting the variable means that its value will not be
+			passed to the resource manager.</li>
+		<li>If the error and output paths are not selected or blank, the
+			default locations will be accessed by the monitor; these, however,
+			require the Job_Name property to be set (and be correct; see further
+			the following paragraph).</li>
+		<li>Setting the destination is for the benefit of monitoring
+			consistency.</li>
+	</ol>
 	<br>
 	<br>
 	<div style="margin-left: 40px;">
@@ -179,26 +199,26 @@
 
 	<p>The JAXB/PBS manager has the capability of allowing you to
 		stream in to the console the output and error files associated with a
-		batch job when the job has completed. This is done in the XML definition
-		file for the Basic and Advanced tabs by creating a link from the PBS
-		batch attributes defining Output Path and Error Path to special (hidden)
-		variables understood by the resource manager. If you set the
-		PBS attributes, the change will be conveyed through the linked variables.
-		If they are not set, the configuration provides a value corresponding
-		to the default location where PBS would put them.</p>
+		batch job when the job has completed. This is done in the XML
+		definition file for the Basic and Advanced tabs by creating a link
+		from the PBS batch attributes defining Output Path and Error Path to
+		special (hidden) variables understood by the resource manager. If you
+		set the PBS attributes, the change will be conveyed through the linked
+		variables. If they are not set, the configuration provides a value
+		corresponding to the default location where PBS would put them.</p>
 	<p>
 		<b>NOTE: </b>If you are using the Import Script tab, the two paths
 		must be manually adjusted to correspond to whatever you have done
 		inside the script; the default definitions are provided, but these can
-		be adjusted as necessary. You can also turn off this feature on this
-		tab by unchecking the "Enable remote output file read" to the left of
-		the text box.
+		be adjusted as necessary.
 	</p>
+
 	<p>If there are files associated with this job, and the job
 		completes, the "Get Job Error" and "Get Job Output" actions, activated
-		by clicking the row associated with the job in the monitor job table, can be used to
-		issue a streaming command which will write the file contents to the
-		console. If the files do not exist, these actions will be disabled.</p>
+		by clicking the row associated with the job in the monitor job table,
+		can be used to issue a streaming command which will write the file
+		contents to the console. If the files do not exist, these actions will
+		be disabled.</p>
 	<br>
 	<br>
 	<div style="margin-left: 40px;">
@@ -217,20 +237,19 @@
 		RUNNING (this can be seen both from the reported state in monitor job
 		table views, as well as by the disappearance of the progress bars for
 		the submission), the job will then be streamed to the qsub terminal's
-		standard input, just as it would when you submit from a shell command-line.
-		Subsequent submissions will also be streamed to the same interactive
-		terminal process, for as long as it is running. If the time limit
-		expires, the next submission will resubmit the terminal request (qsub
-		-I).</p>
-	<br>
-	<p>The Launch Tab for this kind of job closely resembles the Basic
-		batch tab.</p>
-	<br>
+		standard input, just as it would when you submit from a shell
+		command-line. Subsequent submissions will also be streamed to the same
+		interactive terminal process, for as long as it is running. If the
+		time limit expires, the next submission will resubmit the terminal
+		request (qsub -I).</p>
+	<p>
+		<b>The Launch Tab for this kind of job closely resembles the Basic
+			batch tab.</b>
+	</p>
 	<br>
 	<div style="margin-left: 40px;">
 		<img alt="Imported" src="images/07Interactive.png"><br>
 	</div>
-	<br>
 	<br>
 	<p>The job output will go to the console when the job starts to
 		run, as seen here.</p>
@@ -242,23 +261,23 @@
 	<br>
 	<br>
 	<h2 style="text-align: left;">
-			<a name="Preferences"></a>Preferences
+		<a name="Preferences"></a>Preferences
 	</h2>
-	<p>There is currently only one preference option. Since the PBS
-		Resource Manager is configured from an XML definition file, the file
-		can be cached the first time you add the resource manager (this is the
-		default behavior), or you can set it to reread the file every time you
-		start the Resource Manager. This is useful if you are doing
-		customization (see below) and are configuring from a special XML file
-		you have imported into your workspace. This way, if you make changes,
-		they will automatically be picked up without having to reboot the
-		application or recreate the Resource Manager.
+	<p>The preference options are mainly aids for the developer or user
+		who wishes to reconfigure or modify the resource manager
+		configuration. Since the PBS Resource Manager is configured from an
+		XML definition file, the file can be cached the first time you add the
+		resource manager (this is the default behavior), or you can set it to
+		reread the file every time you start the Resource Manager. This is
+		useful if you are doing customization (see below) and are configuring
+		from a special XML file you have imported into your workspace. This
+		way, if you make changes, they will automatically be picked up without
+		having to reboot the application or recreate the Resource Manager.
 	<p>
-		<br> <br>
+		<br>
 	<div style="margin-left: 40px;">
 		<img alt="Preferences" src="images/00Preferences.png"><br>
 	</div>
-	<br>
 	<br>
 	<ol>
 		<li>From the "Eclipse" menu, select "Preferences"</li>
@@ -267,20 +286,28 @@
 		<li>Select "Always reload XML from URL" and click "Apply", then
 			"OK".</li>
 	</ol>
+	<p>The other options are useful if you are writing a new stream
+		tokenizer for a command (which can be tricky); checking all four
+		options usually produces quite a bit of output, so in that case it may
+		be advisable to log the results to a file rather than stdout (at any
+		rate the latter would be available only if PTP were running as an
+		application within the Eclipse IDE platform, which is not the case for
+		those modifying the XML simply from within the PTP package
+		installation workspace).</p>
+
 	<h2 style="text-align: left;">
 		<a name="Customizing"></a>Customizing the Configuration
 	</h2>
-	<br>
-	<br>
-	<p>The Resource Manager configuration for PBS can of course be
-		customized to suit the needs of the systems you habitually work with.
-		Of course, an understanding of the basic structure and content of the
-		XML definition is necessary for this, but often it may simply be a
-		question of changing a few of the provided attribute defaults or
-		definitions or a special command definition.</p>
+	<p>The Resource Manager configuration for PBS can be customized to
+		suit the needs of the systems you habitually work with. Of course, an
+		understanding of the basic structure and content of the XML definition
+		is necessary for this, but often it may simply be a question of
+		changing a few of the provided attribute defaults or definitions or a
+		special command definition.</p>
 	<p>The way to provide a specialized XML configuration is by placing
 		it in a project named "resourceManagers" in your current workspace.
-		You can import a XML file into your workspace in three different ways:</p>
+		You can import an XML file into your workspace in three different
+		ways:</p>
 	<br>
 	<ul>
 		<li><b>Using Import :: General :: File System</b> for files on
@@ -334,8 +361,9 @@
 	</div>
 	<br>
 	<br>
-	<p>The XML file will now appear in an editor in your workspace. The
-		XML editor which has been included in the PTP all-in-one download
+	<p>The XML file will now appear in the "resourceManagers" directory;
+		double-clicking on it will open an editor in your workspace. The XML
+		editor which has been included in the PTP all-in-one download
 		("Eclipse IDE for Parallel Application Developers") does syntax
 		highlighting and also provides a design tree-view for examining its
 		structure.</p>

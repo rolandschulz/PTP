@@ -19,9 +19,14 @@ package org.eclipse.ptp.rm.jaxb.control.ui;
  * @author arossi
  * 
  */
-public interface IFireContentsChangedEnabled {
+public interface IUpdateModelEnabled {
 	/**
-	 * Used to delegate to the internal contents changed method of the tab
+	 * Used to delegate to the internal contents changed method of the tab.
 	 */
 	public void fireContentsChanged();
+
+	/**
+	 * Relinks hidden variables with link-to settings.
+	 */
+	public void relink();
 }

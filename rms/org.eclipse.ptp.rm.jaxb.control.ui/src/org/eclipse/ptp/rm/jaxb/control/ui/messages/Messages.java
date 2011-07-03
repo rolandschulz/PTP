@@ -21,7 +21,9 @@ public class Messages extends NLS {
 	public static String JAXBRMConfigurationSelectionWizardPage_1;
 	public static String ClearScript;
 	public static String BatchScriptPath;
-	public static String RemoteScriptPath;
+	public static String StdoutPath;
+	public static String StderrPath;
+	public static String QueueName;
 	public static String DefaultDynamicTab_title;
 	public static String ViewScript;
 	public static String ViewConfig;
@@ -44,9 +46,11 @@ public class Messages extends NLS {
 	public static String CreateControlConfigurableError;
 	public static String ReadOnlyWarning;
 	public static String ReadOnlyWarning_title;
-	public static String EnableStdoutFetch;
-	public static String EnableStderrFetch;
+	public static String EnableStdoutOverride;
+	public static String EnableStderrOverride;
+	public static String EnableQueue;
 	public static String RemotePathTooltip;
+	public static String QueueNameTooltip;
 	public static String VoidLaunchTabMessage;
 	public static String VoidLaunchTabTitle;
 	public static String IllegalVariableValueType;
@@ -55,6 +59,11 @@ public class Messages extends NLS {
 	public static String ControlStateListener_0;
 	public static String ControlStateListener_1;
 	public static String ControlStateRule_0;
+	public static String ViewExcluded;
+	public static String ViewConfigTooltip;
+	public static String ViewExcludedTooltip;
+	public static String OverrideEnvironment;
+	public static String OverrideEnvironmentTooltip;
 
 	static {
 		// initialize resource bundle

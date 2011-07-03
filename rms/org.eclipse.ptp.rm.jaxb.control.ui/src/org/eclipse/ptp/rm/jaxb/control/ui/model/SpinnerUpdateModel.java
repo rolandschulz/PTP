@@ -10,6 +10,7 @@
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Spinner;
@@ -81,6 +82,9 @@ public class SpinnerUpdateModel extends AbstractUpdateModel implements ModifyLis
 	public void refreshValueFromMap() {
 		refreshing = true;
 		mapValue = lcMap.get(name);
+		if (JAXBUIConstants.ZEROSTR.equals(mapValue)) {
+			mapValue = null;
+		}
 		int i = spinner.getMinimum();
 		if (mapValue != null) {
 			if (mapValue instanceof String) {

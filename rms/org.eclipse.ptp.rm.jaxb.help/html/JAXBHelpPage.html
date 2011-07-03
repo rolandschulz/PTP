@@ -8,6 +8,42 @@
 <body>
 	<br>
 	<h1>The JAXB Configurable Resource Manager</h1>
+
+	<h3>
+		<a name="PTP501">PTP 5.0.1 Changes</a>
+	</h3>
+
+	<p>Aside from some significant bug fixes, there are a number of new
+		features with the 5.0.1 release.</p>
+	<ol>
+		<li>The <code>widget</code> component has been split up into
+			three components: <a href="#Widget"><code>widget</code> </a>, <a
+			href="#ButtonGroup"><code>button-group</code> </a>, and <a
+			href="#Browse"><code>browse</code> </a>;</li>
+		<li><a href="#Action"><code>action</code> </a> push-button
+			functionality has been added;</li>
+		<li><a href="#ControlState"><code>control-state</code> </a>
+			elements have been added to all UI control descriptors;</li>
+		<li>The launch tab <a href="#LaunchTab"><code>import</code> </a>
+			controller type has been modified (largely for maintaining unformity
+			of implementation) to subclass the <code>dynamic</code> controller;</li>
+		<li>Ability to inspect invisible discovered (excluded) properties
+			and attributes via a "View" button (see <a href="#TabController">note</a>)
+			has been added;</li>
+		<li><a href="#Preferences">Preferences</a> have been added to
+			help with thue debugging of <a href="#StreamParsers">stream
+				tokenizers</a>;</li>
+		<li>Resource Manager "environment" handling has been totally
+			rewritten in order to support the exclusion of properties associated
+			with invisible or disabled widgets, and to allow for the restoration
+			of their values when re-enabled.</li>
+	</ol>
+
+	<p>In addition, some tweaking of the SWT "knobs" was necessary to
+		get the XML to reflect more closely the behavior of the Java classes
+		(especially in terms of defaults).</p>
+	<hr>
+
 	<h2>
 		<a name="Introduction">Introduction</a>
 	</h2>
@@ -76,9 +112,37 @@
 			the Resource Manager</a>
 	</h2>
 
-	<p>We provide here an introductory tutorial slide set demonstrating
-		some simple additions to a pre-existing resource manager definition
-		file.</p>
+	<p>
+		We provide here an introductory tutorial slide set demonstrating some
+		simple additions to a pre-existing resource manager definition file.
+		For some example XML illustrating various aspects of the schema
+		(particularly UI features), we also provide a <a
+			href="JAXBExamples_5.0.1.zip">.zip file (for PTP release 5.0.1)</a>.
+	</p>
+
+	<h3>
+		<a name="Preferences"></a>Preferences
+	</h3>
+
+	<p>The preference options are aids for debugging configuration
+		changes. The first has to do with altering the default behavior of the
+		resource manager, which is to cache its XML definition file; this can
+		be overridden to reread the file every time you start the Resource
+		Manager. This way, if you make changes, they will automatically be
+		picked up without having to reboot the application or recreate the
+		Resource Manager.</p>
+
+	<p>The other options are useful if you are writing a new stream
+		tokenizer for a command; checking all four options usually produces
+		quite a bit of output, so in that case it may be advisable to log the
+		results to a file rather than stdout (at any rate the latter would be
+		available only if PTP were running as an application within the
+		Eclipse IDE platform, which is not the case for those modifying the
+		XML simply from within the PTP package installation workspace).</p>
+	<br>
+	<div style="margin-left: 40px;">
+		<img alt="Preferences" src="images/00Preferences.png"><br>
+	</div>
 	<hr>
 
 	<h2>
@@ -264,13 +328,28 @@
 		the
 		<code>attribute viewer</code>
 		) check this to see if the property or attribute should be included
-		automatically in its list. <i>status</i> is an optional field for
-		capturing the validity of the attribute at runtime or for a particular
-		installation, if such information is made available by the system. The
-		<i>readOnly</i> property can be defined here, but more often will be
-		enforced directly on the widget which is connected to the property or
-		attribute. <i>min</i> and <i>max</i> give the boundaries for integer
-		values, usually represented by spinner widgets.
+		automatically in its list.
+	</p>
+
+	<hr>
+	<h5>BEST PRACTICE: VISIBLE vs INVISIBLE</h5>
+	<p>
+		Always mark properties or attributes which are the targets of <i>saveValueTo</i>
+		(see <a href="#Widget">below</a>) as <i>visible</i>="true"; if this
+		value is false, this variable will <i>always</i> be passed to the
+		configuration/environment of the resource manager; selection/exclusion
+		of sets of properties or attributes pertains only to those marked
+		visible.
+	</p>
+	<hr>
+	<p>
+		<i>status</i> is an optional field for capturing the validity of the
+		attribute at runtime or for a particular installation, if such
+		information is made available by the system. The <i>readOnly</i>
+		property can be defined here, but more often will be enforced directly
+		on the widget which is connected to the property or attribute. <i>min</i>
+		and <i>max</i> give the boundaries for integer values, usually
+		represented by spinner widgets.
 	</p>
 
 	<p>
@@ -680,6 +759,81 @@
 		mode to control job submission).
 	</p>
 
+	<hr>
+	<h5>BEST PRACTICE: WAIT-FOR-ID</h5>
+	<p>
+		As <a href="#CommandTypes">previously</a> described, there are two
+		basic types of commands, <b>(uu)id</b> commands which are related to a
+		specific job, and generic (non-uuid) commands.
+		<code>submit-</code>
+		and
+		<code>-job-</code>
+		commands fall into the former category; those in the latter category
+		are usually simple interactive commands, and their output is not
+		redirected to the console, but uuid-commands have several subclasses:
+	</p>
+	<br>
+	<table align="CENTER" rules="all">
+		<tr>
+			<th>COMMAND TYPE</th>
+			<th>WAIT FOR ID</th>
+			<th>TOKENIZER STATES</th>
+		</tr>
+		<tr>
+			<td>batch</td>
+			<td>yes</td>
+			<td>SUBMITTED</td>
+		</tr>
+		<tr>
+			<td>interactive</td>
+			<td>no</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>interactive</td>
+			<td>yes</td>
+			<td>RUNNING</td>
+		</tr>
+		<tr>
+			<td>interactive, open</td>
+			<td>no</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>interactive, open</td>
+			<td>yes</td>
+			<td>(SUBMITTED,) RUNNING</td>
+		</tr>
+		<tr>
+			<td>interactive, open, pseudo-terminal</td>
+			<td>no</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>interactive, open, pseudo-terminal</td>
+			<td>yes</td>
+			<td>(SUBMITTED,) RUNNING</td>
+		</tr>
+	</table>
+	<br>
+	<p>
+		This table shows the various combinations that are feasible between
+		command type and waiting states. Simple interactive commands, whether
+		held open for further input or not, can wait or not wait, but in the
+		case of waiting, they should be provided with a <a
+			href="#StreamParsers">stream tokenizer</a> which recognizes and sets
+		the RUNNING state. Batch jobs, on the other hand, will usually have a
+		tokenizer which recognizes and sets SUBMITTED. In the case of some
+		open-process jobs (e.g.,
+		<code>qsub -I</code>
+		for PBS, which also requires a pseudo-terminal to connect remotely),
+		there will usually be a pause before the terminal job is actually
+		scheduled; in order to allow the user to see that the job has been
+		accepted and is pending, the tokenizer needs to set both SUBMITTED and
+		RUNNING states, the latter when the job has actually started.
+	</p>
+	<hr>
+
 	<p>
 		We have discussed the
 		<code>arg</code>
@@ -845,8 +999,7 @@
 						<li>if the match is positive, process each of the actions,
 							and go to (1).</li>
 					</ul>
-			</ul>
-		</li>
+			</ul></li>
 	</ol>
 
 	<p>
@@ -894,30 +1047,25 @@
 
 	<table align="center" rules="all">
 		<tr>
-			<td><code>set</code>
-			</td>
+			<td><code>set</code></td>
 			<td>sets the value of that field</td>
 		</tr>
 		<tr>
-			<td><code>append</code>
-			</td>
+			<td><code>append</code></td>
 			<td>adds to a string buffer, whose string value will be set on
 				the field</td>
 		</tr>
 		<tr>
-			<td><code>add</code>
-			</td>
+			<td><code>add</code></td>
 			<td>adds to a list to which the value of that field will be set</td>
 		</tr>
 		<tr>
-			<td><code>put</code>
-			</td>
+			<td><code>put</code></td>
 			<td>places a key-value pair in a map to which the value of that
 				field will be set</td>
 		</tr>
 		<tr>
-			<td><code>throw</code>
-			</td>
+			<td><code>throw</code></td>
 			<td>throws an exception and (optionally) also sets the value of
 				the field</td>
 		</tr>
@@ -1145,17 +1293,32 @@
 		As seen from this top-level specification, the Launch Tab can have any
 		number of
 		<code>dynamic</code>
-		tab-controllers, "dynamic" meaning configurable from the XML. There is
-		also a fixed
+		tab-controllers, "dynamic" meaning configurable from the XML, which
+		will discuss in more detail in the following paragraphs.
+	</p>
+	<p>
+		There is also a fixed
 		<code>import</code>
-		controller type; the text of this element is the label/title that will
-		appear on the tab. This component allows you to browse the workspace
-		to set a custom script as the one to run. Its main text area widget is
-		read-only; any editing of the script must be done through the
-		workspace editor. The browse is local only, so remote scripts should
-		first be imported into a local project in the workspace (using the
-		remote systems import wizard), and then captured by this controller's
-		browse button.
+		controller type (implemented as an extension/subclass of the dynamic
+		controller, in order to provide uniform handling of the environment);
+		this component allows you to browse the workspace to set a custom
+		script as the one to run. Its main text area widget is read-only; any
+		editing of the script must be done through the workspace editor. The
+		browse is local only, so remote scripts should first be imported into
+		a local project in the workspace (using the remote systems import
+		wizard), and then captured by this controller's browse button.
+	</p>
+
+	<p>
+		The configurable part of the import tab an optional <a
+			href="#AttributeViewer">attribute viewer</a> for selecting the
+		variables from the environment which you wish to pass to the launch
+		command along with the script. <i>The values set here should
+			correspond to whatever the script contains; are set for the benefit
+			of the internal consistency of the PTP client, and do not override
+			those hard-coded in script.</i> For an example, see the <a
+			href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.pbs.doc.user/html/PBSHelpPage.html#ImportTab">Import
+			PBS Script</a> tab.
 	</p>
 
 	<h4 align="CENTER">
@@ -1187,7 +1350,6 @@
 	</p>
 
 	<img alt="TabController" src="images/14tab-controller.jpeg" />
-
 	<p>
 		The <i>includeWidgetValuesFrom</i> field is important. By default, it
 		is set to empty, meaning that the subset of the total resource manager
@@ -1198,25 +1360,55 @@
 		<code>title</code>
 		values for other controllers. In this case, the configuration for the
 		job, when the "Run" button is pressed with this controller being the
-		visible one, will also include the values of the widgets on the listed
-		but currently invisible controllers. <b>NOTE:</b> while this field
-		controls the inclusion or exclusion of attribute and property names in
-		the configuration, their values are always shared across the
-		controllers (there is only one environment); thus if a variable value
-		is changed on one controller, and this variable is also exposed on
-		another, the value for that variable will also change on the other
-		controller when it becomes visible; similarly, if the user switches
-		off a controller to another having only a subset of the first
-		controller's variables, the variables not represented on the second
-		controller will become undefined or return to their defaults.
+		visible one, will also include <i>all the properties or attributes
+			valid for the listed but currently invisible controllers</i>.
 	</p>
+	<hr>
+	<h5>PROPERTY/ATTRIBUTE NAMES vs VALUES</h5>
 
+	<p>While this field controls the inclusion or exclusion of
+		attribute and property names in the configuration, their values are
+		always shared across the controllers (there is only one environment);
+		thus if a variable value is changed on one controller, and this
+		variable is also exposed on another, the value for that variable will
+		also change on the other controller when it becomes visible;
+		similarly, if the user switches off a controller to another having
+		only a subset of the first controller's variables, the variables not
+		represented on the second controller will become undefined or return
+		to their defaults.</p>
+	<p>
+		<b>Note</b> that the union of valid names is transively closed; that
+		is, if Tab1 has <i>includeWidgetValuesFrom</i>="Tab2", and Tab2
+		similarly has <i>includeWidgetValuesFrom</i>="Tab3", Tab1 will get the
+		valid names from Tab2 and Tab3. <b>Note</b> also, however, that if
+		there are names which intersect with strictly local widget targets,
+		the local settings (visibility, selection, enablement) still determine
+		whether they belong in the set of valid property/attribute names.
+	</p>
+	<hr>
+	<p>
+		The <i>showViewConfig</i> and <i>showViewExcluded</i> fields allow
+		control over whether the "View Configuration" and "View Excluded"
+		buttons appear at the bottom of the tab (the "View Script" button
+		appears if the configuration contains a
+		<code>script</code>
+		element). <i>showViewConfig</i> is true by default; this button brings
+		up a scrolling dialog which allows you to inspect the current
+		configuration (that is, the one relevant to the visible controller). <i>showViewExcluded</i>
+		is by default false, and should only be set if the resource manager
+		processes attributes or properties discovered by a command at run
+		time; this dialog allows you to see which ones have been marked
+		invisible; <b>unlike invisible predefined properties or attributes</b>,
+		which are always <i>included</i>, invisible discovered properties or
+		attributes are always <i>excluded</i> from the configuration and thus
+		do not persist across resource manager sessions.
+	</p>
+	<br>
 	<h4 align="CENTER">
 		<a name="TabFolders">Tab Folders and Tab Items</a>
 	</h4>
 
 	<img alt="TabFolder" src="images/15tab-folder.jpeg" />
-
 	<p>
 		The
 		<code>tab-folder</code>
@@ -1338,7 +1530,7 @@
 		of both a text field and a related checkbox:</p>
 
 	<pre>
-               &lt;widget type="checkbox" buttonId="002" title="Host list:" saveValueTo="hostlistchecked"&gt;
+               &lt;widget type="checkbox" buttonId="002" title="Host list:" saveValueTo="checked002"&gt;
                   &lt;layout-data&gt;
                      &lt;grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.TOP"/&gt;
                   &lt;/layout-data&gt;
@@ -1367,6 +1559,16 @@
 		cycles; the building of the UI tab will be aborted if such a cycle is
 		discovered.</p>
 
+	<hr>
+	<h5>BEST PRACTICE: CONTROL STATE</h5>
+	<p>
+		An invisible property should be assigned to each checkbox which
+		controls the state of other widgets (e.g., <i>checked002</i> in the
+		example above); this will allow you to restore the state of the tab
+		correctly when it is rebuilt or re-initialized.
+	</p>
+	<br>
+	<hr>
 	<h4 align="CENTER">
 		<a name="Widget">Widget</a>
 	</h4>
@@ -1384,34 +1586,27 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><code>label</code>
-			</td>
+			<td><code>label</code></td>
 			<td>fixed text for display</td>
 		</tr>
 		<tr>
-			<td><code>text</code>
-			</td>
+			<td><code>text</code></td>
 			<td>area for entering/editing text</td>
 		</tr>
 		<tr>
-			<td><code>checkbox</code>
-			</td>
+			<td><code>checkbox</code></td>
 			<td>corresponds to a boolean choice</td>
 		</tr>
 		<tr>
-			<td><code>radiobutton</code>
-			</td>
-			<td>usually used in connection with <code>button-group</code>
-			</td>
+			<td><code>radiobutton</code></td>
+			<td>usually used in connection with <code>button-group</code></td>
 		</tr>
 		<tr>
-			<td><code>spinner</code>
-			</td>
+			<td><code>spinner</code></td>
 			<td>provides a continuous range of integer values</td>
 		</tr>
 		<tr>
-			<td><code>combo</code>
-			</td>
+			<td><code>combo</code></td>
 			<td>select from a list of items</td>
 		</tr>
 	</table>
@@ -1425,26 +1620,22 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><i>title</i>
-			</td>
+			<td><i>title</i></td>
 			<td>used with <code>checkbox</code> and <code>radiobutton</code>
 				widgets for the button label</td>
 		</tr>
 		<tr>
-			<td><i>style</i>
-			</td>
+			<td><i>style</i></td>
 			<td>carries the <code>SWT</code> style constants appropriate to
 				the widget type</td>
 		</tr>
 		<tr>
-			<td><i>readOnly</i>
-			</td>
-			<td>applies to <code>text</code>, <code>spinner</code> and <code>combo</code> widgets;
-				the text area in this case is not editable</td>
+			<td><i>readOnly</i></td>
+			<td>applies to <code>text</code>, <code>spinner</code> and <code>combo</code>
+				widgets; the text area in this case is not editable</td>
 		</tr>
 		<tr>
-			<td><i>saveValueTo</i>
-			</td>
+			<td><i>saveValueTo</i></td>
 			<td>applies to all widgets except <code>label</code>; the name
 				of the property or attribute whose value should be set on the basis
 				of the widget's "selected" value or text<br> <b>Note:</b> use
@@ -1452,8 +1643,7 @@
 				and <code>dynamic-text</code> elements.</td>
 		</tr>
 		<tr>
-			<td><i>translateBooleanAs</i>
-			</td>
+			<td><i>translateBooleanAs</i></td>
 			<td>applies to the <code>checkbox</code> widget; a
 				comma-delimited pair indicating a string equivalent for the boolean
 				to be used as the actual value for the property or attribute set by
@@ -1461,8 +1651,7 @@
 				the first string and false the second</td>
 		</tr>
 		<tr>
-			<td><code>items-from</code>
-			</td>
+			<td><code>items-from</code></td>
 			<td>applies to the <code>combo</code> widget; indicates a
 				property or attribute <i>value</i> (of type <code>java.util.Collection</code>)
 				to use to populate the items<br> <b>Note:</b> if a combo widget
@@ -1475,14 +1664,12 @@
 				choices)</td>
 		</tr>
 		<tr>
-			<td><code>fixed-text</code>
-			</td>
+			<td><code>fixed-text</code></td>
 			<td>applies to the <code>label</code> and (read-only) <code>text</code>
 				widgets; text is resolved once and remains constant thereafter</td>
 		</tr>
 		<tr>
-			<td><code>dynamic-text</code>
-			</td>
+			<td><code>dynamic-text</code></td>
 			<td>applies only to (read-only) <code>text</code> widgets; text
 				is resolved each time there is an update of a value from the Launch
 				Tab</td>
@@ -1493,6 +1680,7 @@
 	<p>Widget foreground, background (color) and font are in principle
 		configurable, though the font setting may not always work. The tooltip
 		will appear on the widget whereever it usually does.</p>
+	<br>
 
 	<h4 align="CENTER">
 		<a name="ButtonGroup">Button Group</a>
@@ -1527,14 +1715,13 @@
 	<br>
 	<img alt="ButtonGroupExample" src="images/ButtonGroup.jpeg" />
 	<br>
+	<br>
 
 	<h4 align="CENTER">
 		<a name="Browse">Browse</a>
 	</h4>
 
-	<br>
 	<img alt="BrowseType" src="images/190browse.jpeg" />
-	<br>
 
 	<p>
 		A special widget-pair -- a text widget followed by a push button --
@@ -1546,19 +1733,16 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><i>directory</i>
-			</td>
+			<td><i>directory</i></td>
 			<td>limit the <code>browse</code> widget to directories</td>
 		</tr>
 		<tr>
-			<td><i>uri</i>
-			</td>
+			<td><i>uri</i></td>
 			<td>have the <code>browse</code> widget set a URI as the text
 				(default is false, in which case the text is an absolute path)</td>
 		</tr>
 		<tr>
-			<td><i>localOnly</i>
-			</td>
+			<td><i>localOnly</i></td>
 			<td>limit the <code>browse</code> widget to the local file
 				system (otherwise, the choice of local or remote is enabled)</td>
 		</tr>
@@ -1572,6 +1756,7 @@
 		are specified as belonging to either the text or the button. Style
 		applies only to the text widget.
 	</p>
+	<br>
 
 	<h4 align="CENTER">
 		<a name="Action">Action Button</a>
@@ -1602,6 +1787,7 @@
 		cleared prior to the command execution, and whether the launch tab
 		should be refreshed (default is true) afterward.
 	</p>
+	<br>
 
 	<h4 align="CENTER">
 		<a name="AttributeViewer">Attribute Viewer</a>
@@ -1642,30 +1828,24 @@
 		attribute fields:
 	</p>
 
-	<table align="center">
+	<table align="center" rules="all">
 		<tr>
-			<td><b>Name</b>
-			</td>
+			<td><b>Name</b></td>
 		</tr>
 		<tr>
-			<td><b>Value</b>
-			</td>
+			<td><b>Value</b></td>
 		</tr>
 		<tr>
-			<td><b>Type</b>
-			</td>
+			<td><b>Type</b></td>
 		</tr>
 		<tr>
-			<td><b>Status</b>
-			</td>
+			<td><b>Status</b></td>
 		</tr>
 		<tr>
-			<td><b>Default</b>
-			</td>
+			<td><b>Default</b></td>
 		</tr>
 		<tr>
-			<td><b>Description</b>
-			</td>
+			<td><b>Description</b></td>
 		</tr>
 	</table>
 	<br>
@@ -1675,11 +1855,10 @@
 		is chosen as type. For <b>table</b> type, the value of the field
 		simply appears in the corresponding column:
 	</p>
-
 	<br>
 	<img alt="Table" src="images/Table.jpg" />
 	<br>
-
+	<br>
 	<p>
 		In the <b>tree</b> type, the
 		<code>name</code>
@@ -1696,6 +1875,7 @@
 	<br>
 	<img alt="Tree1" src="images/Tree1.jpg" />
 	<br>
+	<br>
 
 	<p>
 		Otherwise, the child fields display their value in the value column
@@ -1706,6 +1886,7 @@
 
 	<br>
 	<img alt="Tree2" src="images/Tree2.jpg" />
+	<br>
 	<br>
 
 	<p>
