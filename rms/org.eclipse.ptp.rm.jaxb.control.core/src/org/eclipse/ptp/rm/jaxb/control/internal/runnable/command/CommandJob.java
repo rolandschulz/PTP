@@ -623,8 +623,9 @@ public class CommandJob extends Job implements ICommandJob {
 				if (type != null) {
 					stdoutTokenizer = getTokenizer(type);
 				} else {
-					stdoutTokenizer = new ConfigurableRegexTokenizer(uuid, t, rmVarMap, monitor);
+					stdoutTokenizer = new ConfigurableRegexTokenizer(t);
 				}
+				stdoutTokenizer.initialize(uuid, rmVarMap, monitor);
 			} catch (Throwable e) {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
 			}
@@ -637,8 +638,9 @@ public class CommandJob extends Job implements ICommandJob {
 				if (type != null) {
 					stderrTokenizer = getTokenizer(type);
 				} else {
-					stderrTokenizer = new ConfigurableRegexTokenizer(uuid, t, rmVarMap, monitor);
+					stderrTokenizer = new ConfigurableRegexTokenizer(t);
 				}
+				stderrTokenizer.initialize(uuid, rmVarMap, monitor);
 			} catch (Throwable e) {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
 			}

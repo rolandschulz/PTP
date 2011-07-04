@@ -510,7 +510,8 @@ public class StreamParserTest extends TestCase {
 	}
 
 	private void runTokenizer(TokenizerType tokenizer, InputStream stream) {
-		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(uuid, tokenizer, rmVarMap, null);
+		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(tokenizer);
+		t.initialize(uuid, rmVarMap, null);
 		t.setInputStream(stream);
 		Thread thr = new Thread(t);
 		thr.start();

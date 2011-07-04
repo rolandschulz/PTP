@@ -90,15 +90,16 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 		return delim.charAt(0);
 	}
 
-	private char delim;
-	private final int maxLen;
-	private final Integer save;
-	private final boolean all;
-	private final boolean applyToAll;
-	private final List<IMatchable> toMatch;
-	private final IProgressMonitor commandMonitor;
-	private final StringBuffer segment;
+	private final TokenizerType tokenizer;
+	private int maxLen;
+	private Integer save;
+	private boolean all;
+	private boolean applyToAll;
+	private List<IMatchable> toMatch;
+	private IProgressMonitor commandMonitor;
+	private StringBuffer segment;
 
+	private char delim;
 	private RegexImpl exitOn;
 	private RegexImpl exitAfter;
 	private boolean includeDelim;
@@ -109,18 +110,29 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	private boolean endOfStream;
 
 	/**
-	 * @param uuid
-	 *            id associated with this resource manager operation (can be
-	 *            <code>null</code>).
 	 * @param tokenizer
 	 *            JAXB data element
-	 * @param rmVarMap
-	 *            resource manager environment
-	 * @param commandMonitor
-	 *            so that the operation can be canceled in the case of a thrown
-	 *            exception
 	 */
-	public ConfigurableRegexTokenizer(String uuid, TokenizerType tokenizer, IVariableMap rmVarMap, IProgressMonitor commandMonitor) {
+	public ConfigurableRegexTokenizer(TokenizerType tokenizer) {
+		this.tokenizer = tokenizer;
+	}
+
+	/**
+	 * @return error generated during thread execution
+	 */
+	public Throwable getInternalError() {
+		return error;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.control.internal.IStreamParserTokenizer#initialize
+	 * (java.lang.String, org.eclipse.ptp.rm.jaxb.core.IVariableMap,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public void initialize(String uuid, IVariableMap rmVarMap, IProgressMonitor commandMonitor) {
 		this.commandMonitor = commandMonitor;
 		String d = tokenizer.getDelim();
 		if (d != null) {
@@ -164,13 +176,6 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 		}
 
 		segment = new StringBuffer();
-	}
-
-	/**
-	 * @return error generated during thread execution
-	 */
-	public Throwable getInternalError() {
-		return error;
 	}
 
 	/**

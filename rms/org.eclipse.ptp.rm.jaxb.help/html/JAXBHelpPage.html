@@ -31,7 +31,7 @@
 			and attributes via a "View" button (see <a href="#TabController">note</a>)
 			has been added;</li>
 		<li><a href="#Preferences">Preferences</a> have been added to
-			help with thue debugging of <a href="#StreamParsers">stream
+			help with the debugging of <a href="#StreamParsers">stream
 				tokenizers</a>;</li>
 		<li>Resource Manager "environment" handling has been totally
 			rewritten in order to support the exclusion of properties associated
@@ -332,7 +332,9 @@
 	</p>
 
 	<hr>
-	<h5>BEST PRACTICE: VISIBLE vs INVISIBLE</h5>
+	<h5>
+		<a name="Note1">BEST PRACTICE: VISIBLE vs INVISIBLE</a>
+	</h5>
 	<p>
 		Always mark properties or attributes which are the targets of <i>saveValueTo</i>
 		(see <a href="#Widget">below</a>) as <i>visible</i>="true"; if this
@@ -760,7 +762,9 @@
 	</p>
 
 	<hr>
-	<h5>BEST PRACTICE: WAIT-FOR-ID</h5>
+	<h5>
+		<a name="Note2">BEST PRACTICE: WAIT-FOR-ID</a>
+	</h5>
 	<p>
 		As <a href="#CommandTypes">previously</a> described, there are two
 		basic types of commands, <b>(uu)id</b> commands which are related to a
@@ -886,8 +890,12 @@
 		a contribution to the
 		<code>org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer</code>
 		extension point, in which case this element should be set to its
-		extension id (note however that such a parser is not configurable from
-		the XML document).
+		extension id. Note that the extension requires the class to implement
+		<code>org.eclipse.ptp.rm.jaxb.control.internal.IStreamParserTokenizer</code>
+		, which is a Runnable interface with an initialize method which passes in
+		any job id plus the current environment map; the details of such a
+		parser's implementation are not, however, configured from the XML
+		document.
 	</p>
 
 	<p>
@@ -999,8 +1007,7 @@
 						<li>if the match is positive, process each of the actions,
 							and go to (1).</li>
 					</ul>
-			</ul>
-		</li>
+			</ul></li>
 	</ol>
 
 	<p>
@@ -1048,30 +1055,25 @@
 
 	<table align="center" rules="all">
 		<tr>
-			<td><code>set</code>
-			</td>
+			<td><code>set</code></td>
 			<td>sets the value of that field</td>
 		</tr>
 		<tr>
-			<td><code>append</code>
-			</td>
+			<td><code>append</code></td>
 			<td>adds to a string buffer, whose string value will be set on
 				the field</td>
 		</tr>
 		<tr>
-			<td><code>add</code>
-			</td>
+			<td><code>add</code></td>
 			<td>adds to a list to which the value of that field will be set</td>
 		</tr>
 		<tr>
-			<td><code>put</code>
-			</td>
+			<td><code>put</code></td>
 			<td>places a key-value pair in a map to which the value of that
 				field will be set</td>
 		</tr>
 		<tr>
-			<td><code>throw</code>
-			</td>
+			<td><code>throw</code></td>
 			<td>throws an exception and (optionally) also sets the value of
 				the field</td>
 		</tr>
@@ -1316,13 +1318,13 @@
 	</p>
 
 	<p>
-		The configurable part of the import tab an optional <a
+		The configurable part of the import tab is an optional <a
 			href="#AttributeViewer">attribute viewer</a> for selecting the
 		variables from the environment which you wish to pass to the launch
 		command along with the script. <i>The values set here should
-			correspond to whatever the script contains; are set for the benefit
-			of the internal consistency of the PTP client, and do not override
-			those hard-coded in script.</i> For an example, see the <a
+			correspond to whatever the script contains; they are set for the
+			benefit of the internal consistency of the PTP client, and do not
+			override those hard-coded in script.</i> For an example, see the <a
 			href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.pbs.doc.user/html/PBSHelpPage.html#ImportTab">Import
 			PBS Script</a> tab.
 	</p>
@@ -1370,7 +1372,9 @@
 			valid for the listed but currently invisible controllers</i>.
 	</p>
 	<hr>
-	<h5>PROPERTY/ATTRIBUTE NAMES vs VALUES</h5>
+	<h5>
+		<a name="Note3">PROPERTY/ATTRIBUTE NAMES vs VALUES</a>
+	</h5>
 
 	<p>While this field controls the inclusion or exclusion of
 		attribute and property names in the configuration, their values are
@@ -1382,15 +1386,15 @@
 		only a subset of the first controller's variables, the variables not
 		represented on the second controller will become undefined or return
 		to their defaults.</p>
-    <p>
-      <b>Note</b> that the union of valid names is not transitively closed;
-      that is, if Tab1 has <i>includeWidgetValuesFrom</i>="Tab2", and Tab2
-      similarly has <i>includeWidgetValuesFrom</i>="Tab3", Tab1 will get
-      only the valid values local to Tab2. <b>Note</b> also, that if there are
-      names which intersect with strictly local widget targets, the local
-      settings (visibility, selection, enablement) still determine whether
-      they belong in the set of valid property/attribute names.
-   </p>
+	<p>
+		<b>Note</b> that the union of valid names is not transitively closed;
+		that is, if Tab1 has <i>includeWidgetValuesFrom</i>="Tab2", and Tab2
+		similarly has <i>includeWidgetValuesFrom</i>="Tab3", Tab1 will get
+		only the valid values local to Tab2. <b>Note</b> also, that if there
+		are names which intersect with strictly local widget targets, the
+		local settings (visibility, selection, enablement) still determine
+		whether they belong in the set of valid property/attribute names.
+	</p>
 	<hr>
 	<p>
 		The <i>showViewConfig</i> and <i>showViewExcluded</i> fields allow
@@ -1507,7 +1511,7 @@
 
 	<ol>
 		<li>the id of the button control to check;</li>
-		<li>whether its selected state should be true or false</li>
+		<li>whether its selected state should be true or false.</li>
 	</ol>
 
 	<p>Rules can be nested to an arbitrary depth to form clauses
@@ -1566,7 +1570,9 @@
 		discovered.</p>
 
 	<hr>
-	<h5>BEST PRACTICE: CONTROL STATE</h5>
+	<h5>
+		<a name="Note4">BEST PRACTICE: CONTROL STATE</a>
+	</h5>
 	<p>
 		An invisible property should be assigned to each checkbox which
 		controls the state of other widgets (e.g., <i>checked002</i> in the
@@ -1592,34 +1598,27 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><code>label</code>
-			</td>
+			<td><code>label</code></td>
 			<td>fixed text for display</td>
 		</tr>
 		<tr>
-			<td><code>text</code>
-			</td>
+			<td><code>text</code></td>
 			<td>area for entering/editing text</td>
 		</tr>
 		<tr>
-			<td><code>checkbox</code>
-			</td>
+			<td><code>checkbox</code></td>
 			<td>corresponds to a boolean choice</td>
 		</tr>
 		<tr>
-			<td><code>radiobutton</code>
-			</td>
-			<td>usually used in connection with <code>button-group</code>
-			</td>
+			<td><code>radiobutton</code></td>
+			<td>usually used in connection with <code>button-group</code></td>
 		</tr>
 		<tr>
-			<td><code>spinner</code>
-			</td>
+			<td><code>spinner</code></td>
 			<td>provides a continuous range of integer values</td>
 		</tr>
 		<tr>
-			<td><code>combo</code>
-			</td>
+			<td><code>combo</code></td>
 			<td>select from a list of items</td>
 		</tr>
 	</table>
@@ -1633,67 +1632,59 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><i>title</i>
-			</td>
+			<td><i>title</i></td>
 			<td>used with <code>checkbox</code> and <code>radiobutton</code>
-				widgets for the button label</td>
+				widgets for the button label.</td>
 		</tr>
 		<tr>
-			<td><i>style</i>
-			</td>
+			<td><i>style</i></td>
 			<td>carries the <code>SWT</code> style constants appropriate to
-				the widget type</td>
+				the widget type.</td>
 		</tr>
 		<tr>
-			<td><i>readOnly</i>
-			</td>
+			<td><i>readOnly</i></td>
 			<td>applies to <code>text</code>, <code>spinner</code> and <code>combo</code>
-				widgets; the text area in this case is not editable</td>
+				widgets; the text area in this case is not editable.</td>
 		</tr>
 		<tr>
-			<td><i>saveValueTo</i>
-			</td>
+			<td><i>saveValueTo</i></td>
 			<td>applies to all widgets except <code>label</code>; the name
 				of the property or attribute whose value should be set on the basis
-				of the widget's "selected" value or text<br> <b>Note:</b> use
+				of the widget's "selected" value or text.<br> <b>Note:</b> use
 				of this attribute is mutually exclusive with the <code>fixed-</code>
 				and <code>dynamic-text</code> elements.</td>
 		</tr>
 		<tr>
-			<td><i>translateBooleanAs</i>
-			</td>
+			<td><i>translateBooleanAs</i></td>
 			<td>applies to the <code>checkbox</code> widget; a
 				comma-delimited pair indicating a string equivalent for the boolean
 				to be used as the actual value for the property or attribute set by
 				the widget<br> <i>Example</i>: "YES,NO" would mean true yields
-				the first string and false the second</td>
+				the first string and false the second.</td>
 		</tr>
 		<tr>
-			<td><code>items-from</code>
-			</td>
+			<td><code>items-from</code></td>
 			<td>applies to the <code>combo</code> widget; indicates a
 				property or attribute <i>value</i> (of type <code>java.util.Collection</code>)
-				to use to populate the items<br> <b>Note:</b> if a combo widget
-				saves its value to an attribute and the present element on the
-				widget descriptor is not set, the attribute will be checked for
+				to use to populate the items.<br> <b>Note:</b> if a combo
+				widget saves its value to an attribute and the present element on
+				the widget descriptor is not set, the attribute will be checked for
 				non-empty <code>choice</code> or <code>items-from</code> values,
 				which then will be used to populate the combo items; the <code>items-from</code>
 				field on the widget is for added flexibility (for instance, linking
 				up a target property with another property providing the list of
-				choices)</td>
+				choices).</td>
 		</tr>
 		<tr>
-			<td><code>fixed-text</code>
-			</td>
+			<td><code>fixed-text</code></td>
 			<td>applies to the <code>label</code> and (read-only) <code>text</code>
-				widgets; text is resolved once and remains constant thereafter</td>
+				widgets; text is resolved once and remains constant thereafter.</td>
 		</tr>
 		<tr>
-			<td><code>dynamic-text</code>
-			</td>
+			<td><code>dynamic-text</code></td>
 			<td>applies only to (read-only) <code>text</code> widgets; text
 				is resolved each time there is an update of a value from the Launch
-				Tab</td>
+				Tab.</td>
 		</tr>
 	</table>
 	<br>
@@ -1754,21 +1745,18 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><i>directory</i>
-			</td>
-			<td>limit the <code>browse</code> widget to directories</td>
+			<td><i>directory</i></td>
+			<td>limit the <code>browse</code> widget to directories.</td>
 		</tr>
 		<tr>
-			<td><i>uri</i>
-			</td>
+			<td><i>uri</i></td>
 			<td>have the <code>browse</code> widget set a URI as the text
-				(default is false, in which case the text is an absolute path)</td>
+				(default is false, in which case the text is an absolute path).</td>
 		</tr>
 		<tr>
-			<td><i>localOnly</i>
-			</td>
+			<td><i>localOnly</i></td>
 			<td>limit the <code>browse</code> widget to the local file
-				system (otherwise, the choice of local or remote is enabled)</td>
+				system (otherwise, the choice of local or remote is enabled).</td>
 		</tr>
 	</table>
 	<br>
@@ -1803,9 +1791,8 @@
 		<code>shut-down</code>
 		commands, or a special
 		<code>button-action</code>
-		command (<b>note </b>that it cannot, however, be a
-		<code>-job</code>
-		command, as the Launch Tab is not coupled to any submitted jobs); the
+		command (<b>note </b>that it cannot, however, be a <a href="#Note2"><b>(uu)id</b>
+		</a> command, as the Launch Tab is not coupled to any submitted jobs); the
 		<code>button-action-type</code>
 		also indicates whether the variable affected by the command should be
 		cleared prior to the command execution, and whether the launch tab
@@ -1836,12 +1823,12 @@
 	</p>
 
 	<p>Each entry in the viewer is provided with a checkbox to indicate
-		which attributes have been chosen. A checkbox is also placed above the
-		viewer to allow for filtering the unchecked items. The viewer outputs
-		its checked values to the environment (and on update removes
-		unselected ones). The name of the viewer is also stored against a
-		string of all selected values, constructed from a template (further
-		discussion at the end of this section).</p>
+		which attributes have been chosen (and thus marked valid). A checkbox
+		is also placed above the viewer to allow for filtering the unchecked
+		items. The viewer outputs its values to the environment. The name of
+		the viewer is also stored against a string of all selected values,
+		constructed from a template (further discussion at the end of this
+		section).</p>
 
 	<p>
 		The viewer <i>type</i> can be either "table" or "tree"; in the case of
@@ -1854,28 +1841,22 @@
 
 	<table align="center" rules="all">
 		<tr>
-			<td><b>Name</b>
-			</td>
+			<td><b>Name</b></td>
 		</tr>
 		<tr>
-			<td><b>Value</b>
-			</td>
+			<td><b>Value</b></td>
 		</tr>
 		<tr>
-			<td><b>Type</b>
-			</td>
+			<td><b>Type</b></td>
 		</tr>
 		<tr>
-			<td><b>Status</b>
-			</td>
+			<td><b>Status</b></td>
 		</tr>
 		<tr>
-			<td><b>Default</b>
-			</td>
+			<td><b>Default</b></td>
 		</tr>
 		<tr>
-			<td><b>Description</b>
-			</td>
+			<td><b>Description</b></td>
 		</tr>
 	</table>
 	<br>
