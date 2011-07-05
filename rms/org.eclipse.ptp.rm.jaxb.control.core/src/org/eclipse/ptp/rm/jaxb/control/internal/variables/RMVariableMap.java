@@ -10,15 +10,21 @@
 package org.eclipse.ptp.rm.jaxb.control.internal.variables;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 
 /**
@@ -40,8 +46,86 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 public class RMVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
 
+	/**
+	 * Checks for current valid attributes by examining the valid list for the
+	 * current controller, excluding <code>null</code> or 0-length string
+	 * values. Removes the rm unique id prefix.
+	 * 
+	 * @param config
+	 * @return currently valid variables
+	 */
+	@SuppressWarnings("unchecked")
+	public static Map<Object, Object> getValidAttributes(ILaunchConfiguration config) throws CoreException {
+		String rmId = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+				JAXBControlConstants.TEMP);
+		rmId += JAXBControlConstants.DOT;
+		int len = rmId.length();
+
+		Map<String, Object> attr = config.getAttributes();
+		Map<Object, Object> current = new TreeMap<Object, Object>();
+		Map<String, Object> rmAttr = new HashMap<String, Object>();
+		Set<String> include = new HashSet<String>();
+
+		for (String name : attr.keySet()) {
+			Object value = attr.get(name);
+			if (value == null || JAXBControlConstants.ZEROSTR.equals(value)) {
+				continue;
+			}
+			if (name.startsWith(rmId)) {
+				name = name.substring(len);
+				if (isFixedValid(name)) {
+					current.put(name, value);
+				} else {
+					rmAttr.put(name, value);
+				}
+			} else if (isExternal(name)) {
+				current.put(name, value);
+			}
+		}
+
+		String id = (String) rmAttr.get(JAXBCoreConstants.CURRENT_CONTROLLER);
+		String valid = (String) rmAttr.get(JAXBCoreConstants.VALID + id);
+		if (valid != null) {
+			String[] split = valid.split(JAXBCoreConstants.SP);
+			for (String s : split) {
+				include.add(s);
+			}
+		}
+
+		for (Object var : rmAttr.keySet()) {
+			Object value = rmAttr.get(var);
+			if (include.contains(var)) {
+				current.put(var, value);
+			}
+		}
+		return current;
+	}
+
+	/**
+	 * @param name
+	 *            or property or attribute
+	 * @return whether it is a ptp or debug
+	 */
+	public static boolean isExternal(String name) {
+		return name.startsWith(JAXBControlConstants.DEBUG_PACKAGE) || name.startsWith(JAXBControlConstants.PTP_PACKAGE);
+	}
+
+	/**
+	 * Standard properties needed by control.
+	 * 
+	 * @param name
+	 *            or property or attribute
+	 * @return if it belongs to this group
+	 */
+	public static boolean isFixedValid(String name) {
+		return name.startsWith(JAXBControlConstants.CONTROL_DOT) || name.equals(JAXBControlConstants.DIRECTORY)
+				|| name.equals(JAXBControlConstants.EXEC_PATH) || name.equals(JAXBControlConstants.PROG_ARGS)
+				|| name.equals(JAXBControlConstants.STDOUT_REMOTE_FILE) || name.equals(JAXBControlConstants.STDERR_REMOTE_FILE);
+	}
+
 	private final Map<String, Object> variables;
 	private final Map<String, Object> discovered;
+
 	private boolean initialized;
 
 	public RMVariableMap() {
@@ -143,14 +227,39 @@ public class RMVariableMap implements IVariableMap {
 	 *            interface (Launch Tab)
 	 */
 	public void maybeAddProperty(String name, Object value, boolean visible) {
-		if (name == null || value == null) {
+		if (name == null) {
 			return;
 		}
-		PropertyType p = new PropertyType();
-		p.setName(name);
-		p.setValue(value);
-		p.setVisible(visible);
-		variables.put(name, p);
+
+		Object o = get(name);
+		PropertyType p = null;
+		AttributeType a = null;
+		if (o == null && value != null) {
+			p = new PropertyType();
+			variables.put(name, p);
+		} else if (o instanceof PropertyType) {
+			if (value != null) {
+				p = (PropertyType) o;
+			} else {
+				remove(name);
+			}
+		} else if (o instanceof AttributeType) {
+			if (value != null) {
+				a = (AttributeType) o;
+			} else {
+				remove(name);
+			}
+		}
+
+		if (p != null) {
+			p.setName(name);
+			p.setValue(value);
+			p.setVisible(visible);
+		} else if (a != null) {
+			a.setName(name);
+			a.setValue(value);
+			a.setVisible(visible);
+		}
 	}
 
 	/**
@@ -165,21 +274,28 @@ public class RMVariableMap implements IVariableMap {
 	 *            to map the property to in the environemnt
 	 * @param key2
 	 *            to search for the property in the configuration
-	 * @param configuration
+	 * @param map
 	 *            to search
+	 * @param defaultOverride
+	 *            if the value of key2 is null, restore the default value
 	 * @throws CoreException
 	 */
-	public void maybeOverwrite(String key1, String key2, ILaunchConfiguration configuration) throws CoreException {
+	public void maybeOverwrite(String key1, String key2, Map<String, Object> map, boolean defaultOverride) throws CoreException {
 		Object value1 = null;
 		Object value2 = null;
+		String dValue = null;
 		PropertyType p = (PropertyType) get(key1);
 		if (p != null) {
 			value1 = p.getValue();
+			dValue = p.getDefault();
 		}
-		value2 = configuration.getAttributes().get(key2);
-
-		if (value2 == null) {
-			maybeAddProperty(key1, value1, false);
+		value2 = map.get(key2);
+		if (value2 == null || JAXBControlConstants.ZEROSTR.equals(value2)) {
+			if (defaultOverride) {
+				maybeAddProperty(key1, dValue, false);
+			} else {
+				maybeAddProperty(key1, value1, false);
+			}
 		} else {
 			maybeAddProperty(key1, value2, false);
 		}

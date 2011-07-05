@@ -193,7 +193,6 @@ public class CommandJob extends Job implements ICommandJob {
 	private final boolean waitForId;
 	private final JobMode mode;
 	private final boolean keepOpen;
-	private boolean ignoreExitStatus;
 
 	private final StringBuffer error;
 	private Thread jobThread;
@@ -231,7 +230,6 @@ public class CommandJob extends Job implements ICommandJob {
 		this.uuid = jobUUID;
 		this.proxy = new CommandJobStreamsProxy();
 		this.waitForId = command.isWaitForId();
-		this.ignoreExitStatus = command.isIgnoreExitStatus();
 		this.error = new StringBuffer();
 		this.keepOpen = command.isKeepOpen();
 		String flags = command.getFlags();
@@ -414,6 +412,13 @@ public class CommandJob extends Job implements ICommandJob {
 
 			status = execute(progress.newChild(50));
 
+			if (uuid == null) {
+				/*
+				 * these jobs will have waited for the exit of the process.
+				 */
+				return status;
+			}
+
 			/*
 			 * When there is a UUID defined for this command, set the status for
 			 * it. If the submit job lacks a jobId on the standard streams, then
@@ -426,58 +431,56 @@ public class CommandJob extends Job implements ICommandJob {
 			jobStatus = null;
 			String waitUntil = keepOpen ? IJobStatus.RUNNING : IJobStatus.SUBMITTED;
 			ICommandJob parent = keepOpen ? this : null;
-			if (uuid != null) {
-				if (waitForId) {
-					jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
-					jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
-					jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
-					try {
-						jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap(), progress.newChild(20));
-					} catch (CoreException failed) {
-						status = CoreExceptionUtils.getErrorStatus(
-								failed.getMessage() + JAXBCoreConstants.LINE_SEP + error.toString(), null);
-						ignoreExitStatus = true;
-						error.setLength(0);
-						return status;
-					}
-				} else {
-					if (mode == JobMode.STATUS) {
-						CoreException e = joinConsumers();
-						if (e != null) {
-							return CoreExceptionUtils.getErrorStatus(e.getMessage(), e);
-						}
-					}
-					PropertyType p = (PropertyType) rmVarMap.get(uuid);
-					String state = (String) p.getValue();
-					if (state == null) {
-						state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
-						p.setValue(state);
-					}
-					p.setName(uuid);
-					jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
-					jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
-					jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
-				}
 
-				if (monitor.isCanceled()) {
+			if (waitForId) {
+				jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
+				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
+				try {
+					jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap(), progress.newChild(20));
+				} catch (CoreException failed) {
+					status = CoreExceptionUtils.getErrorStatus(failed.getMessage() + JAXBCoreConstants.LINE_SEP + error.toString(),
+							null);
+					error.setLength(0);
 					return status;
 				}
-
-				if (!isBatch()) {
-					jobStatus.setProcess(process);
-				}
-
-				jobStatus.setProxy(getProxy());
-
-				if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
-					if (input) {
-						if (process != null && !process.isCompleted()) {
-							status = writeInputToProcess(process);
-						}
+			} else {
+				if (!keepOpen) {
+					CoreException e = joinConsumers();
+					if (e != null) {
+						return CoreExceptionUtils.getErrorStatus(e.getMessage(), e);
 					}
-				} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
-					terminate();
 				}
+				PropertyType p = (PropertyType) rmVarMap.get(uuid);
+				String state = (String) p.getValue();
+				if (state == null) {
+					state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
+					p.setValue(state);
+				}
+				p.setName(uuid);
+				jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
+				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
+			}
+
+			if (monitor.isCanceled()) {
+				return status;
+			}
+
+			if (!isBatch()) {
+				jobStatus.setProcess(process);
+			}
+
+			jobStatus.setProxy(getProxy());
+
+			if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
+				if (input) {
+					if (process != null && !process.isCompleted()) {
+						status = writeInputToProcess(process);
+					}
+				}
+			} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
+				terminate();
 			}
 		} finally {
 			if (monitor != null) {
@@ -521,18 +524,27 @@ public class CommandJob extends Job implements ICommandJob {
 			}
 			progress.worked(20);
 
-			if (!waitForId) {
-				progress.done();
-				return Status.OK_STATUS;
-			}
-
-			if (keepOpen) {
-				control.setInteractiveJob(this);
-				progress.done();
-				return Status.OK_STATUS;
-			}
-
 			int exit = 0;
+			if (uuid != null) {
+				if (!waitForId) {
+					try {
+						exit = process.exitValue();
+					} catch (Throwable t) {
+					}
+					if ((exit != 0 || error.length() > 0)) {
+						processError(builder.command().get(0), exit, null);
+					}
+					progress.done();
+					return Status.OK_STATUS;
+				}
+
+				if (keepOpen) {
+					control.setInteractiveJob(this);
+					progress.done();
+					return Status.OK_STATUS;
+				}
+			}
+
 			try {
 				exit = process.waitFor();
 			} catch (InterruptedException ignored) {
@@ -542,15 +554,8 @@ public class CommandJob extends Job implements ICommandJob {
 
 			CoreException e = joinConsumers();
 
-			if (exit != 0 && !ignoreExitStatus) {
-				if (e != null) {
-					error.append(e.getMessage()).append(JAXBControlConstants.LINE_SEP);
-				}
-				String message = error.toString();
-				error.setLength(0);
-				throw CoreExceptionUtils.newException(builder.command().get(0) + JAXBControlConstants.SP
-						+ Messages.ProcessExitValueError + (JAXBControlConstants.ZEROSTR + exit) + JAXBControlConstants.LINE_SEP
-						+ message, null);
+			if (exit != 0) {
+				processError(builder.command().get(0), exit, e);
 			}
 		} catch (CoreException ce) {
 			return ce.getStatus();
@@ -618,8 +623,9 @@ public class CommandJob extends Job implements ICommandJob {
 				if (type != null) {
 					stdoutTokenizer = getTokenizer(type);
 				} else {
-					stdoutTokenizer = new ConfigurableRegexTokenizer(uuid, t, rmVarMap, monitor);
+					stdoutTokenizer = new ConfigurableRegexTokenizer(t);
 				}
+				stdoutTokenizer.initialize(uuid, rmVarMap, monitor);
 			} catch (Throwable e) {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
 			}
@@ -632,8 +638,9 @@ public class CommandJob extends Job implements ICommandJob {
 				if (type != null) {
 					stderrTokenizer = getTokenizer(type);
 				} else {
-					stderrTokenizer = new ConfigurableRegexTokenizer(uuid, t, rmVarMap, monitor);
+					stderrTokenizer = new ConfigurableRegexTokenizer(t);
 				}
+				stderrTokenizer.initialize(uuid, rmVarMap, monitor);
 			} catch (Throwable e) {
 				throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
 			}
@@ -722,6 +729,27 @@ public class CommandJob extends Job implements ICommandJob {
 	private String prepareInput() throws CoreException {
 		List<ArgType> args = command.getInput();
 		return ArgImpl.toString(uuid, args, control.getEnvironment());
+	}
+
+	/**
+	 * Auxiliary for processing error based on exit value.
+	 * 
+	 * @param arg
+	 *            first arg of command
+	 * @param exit
+	 *            of process
+	 * @param e
+	 *            additional exception info
+	 * @throws CoreException
+	 */
+	private void processError(String arg, int exit, CoreException e) throws CoreException {
+		if (e != null) {
+			error.append(e.getMessage()).append(JAXBControlConstants.LINE_SEP);
+		}
+		String message = error.toString();
+		error.setLength(0);
+		throw CoreExceptionUtils.newException(arg + JAXBControlConstants.SP + Messages.ProcessExitValueError
+				+ (JAXBControlConstants.ZEROSTR + exit) + JAXBControlConstants.LINE_SEP + message, null);
 	}
 
 	/**

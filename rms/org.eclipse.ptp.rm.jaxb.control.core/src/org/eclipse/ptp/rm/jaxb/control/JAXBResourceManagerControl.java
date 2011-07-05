@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
@@ -136,7 +135,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 *             if the job execution raised and exception
 	 */
 	private static void checkJobForError(ICommandJob job) throws CoreException {
-		job.joinConsumers();
 		IStatus status = job.getRunStatus();
 		if (status != null && status.getSeverity() == IStatus.ERROR) {
 			Throwable t = status.getException();
@@ -158,6 +156,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private RMVariableMap rmVarMap;
 	private ControlType controlData;
 	private String servicesId;
+
 	private String connectionName;
 
 	private RemoteServicesDelegate remoteServicesDelegate;
@@ -266,10 +265,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#runActionCommand(java.lang.String)
 	 */
-	public Object runActionCommand(String action, String resetValue) throws CoreException {
+	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException {
 		if (!IResourceManager.STARTED_STATE.equals(getResourceManager().getState())) {
 			return null;
 		}
+
+		updatePropertyValuesFromTab(configuration, null);
 
 		Object changedValue = null;
 
@@ -413,7 +414,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					 * a COMPLETED, CANCELED, FAILED or JOB_OUTERR_READY detail
 					 */
 					status = jobStatusMap.terminated(jobId, progress.newChild(50));
-					if (status.stateChanged()) {
+					if (status != null && status.stateChanged()) {
 						jobStateChanged(jobId, status);
 					}
 					return status;
@@ -436,7 +437,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 				CommandType job = controlData.getGetJobStatus();
 				if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
-
 					pinTable.pin(jobId);
 					p = new PropertyType();
 					p.setVisible(false);
@@ -444,7 +444,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					rmVarMap.put(jobId, p);
 					runCommand(jobId, job, CommandJob.JobMode.STATUS, true);
 					p = (PropertyType) rmVarMap.remove(jobId);
-
 				}
 
 				if (p != null) {
@@ -594,7 +593,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * content (${ptp_rm:script#value}), or to its path (SCRIPT_PATH) must
 		 * exist.
 		 */
-		maybeAddManagedFileForScript(files, script.getFileStagingLocation(), delScript);
+		if (script != null) {
+			maybeAddManagedFileForScript(files, script.getFileStagingLocation(), delScript);
+		}
 		worked(progress, 5);
 
 		if (!maybeTransferManagedFiles(uuid, files)) {
@@ -1029,6 +1030,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				job.join();
 			} catch (InterruptedException ignored) {
 			}
+		}
+		if (!command.isIgnoreExitStatus()) {
 			checkJobForError(job);
 		}
 		return job;
@@ -1062,7 +1065,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
 			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
-			rmVarMap.maybeAddProperty(JAXBControlConstants.DIRECTORY, rc.getWorkingDirectory(), false);
 		}
 	}
 
@@ -1079,7 +1081,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		setFixedConfigurationProperties(progress.newChild(10));
 
-		Map lcattr = configuration.getAttributes();
+		Map lcattr = RMVariableMap.getValidAttributes(configuration);
 		for (Object key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
 			Object target = rmVarMap.get(key.toString());
@@ -1095,10 +1097,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		progress.worked(10);
 
 		/*
-		 * The non-selected variables have been excluded from the launch
-		 * configuration; but we need to null out the superset values here that
-		 * are undefined. We also need to take care of the variables which are
-		 * not visible but are set in the launch tab.
+		 * The non-selected variables have been excluded from the valid
+		 * attributes of the configuration; but we need to null out the superset
+		 * values here that are undefined.
 		 */
 		for (String key : rmVarMap.getVariables().keySet()) {
 			if (!lcattr.containsKey(key)) {
@@ -1120,13 +1121,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		progress.worked(10);
 
 		/*
-		 * pull these out of the configuration; they are needed for the script
+		 * make sure these fixed properties are included
 		 */
-		rmVarMap.maybeOverwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, configuration);
-		rmVarMap.maybeOverwrite(JAXBControlConstants.DIRECTORY, IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, configuration);
-		rmVarMap.maybeOverwrite(JAXBControlConstants.EXEC_PATH, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
-				configuration);
-		rmVarMap.maybeOverwrite(JAXBControlConstants.PROG_ARGS, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, configuration);
+		rmVarMap.maybeOverwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, lcattr, false);
+		rmVarMap.maybeOverwrite(JAXBControlConstants.DIRECTORY, JAXBControlConstants.DIRECTORY, lcattr, false);
+		rmVarMap.maybeOverwrite(JAXBControlConstants.EXEC_PATH, JAXBControlConstants.EXEC_PATH, lcattr, false);
+		rmVarMap.maybeOverwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr, false);
 
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));

@@ -12,8 +12,11 @@ package org.eclipse.ptp.rm.jaxb.control.ui.launch;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -29,6 +32,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
@@ -71,35 +75,28 @@ import org.eclipse.swt.widgets.Shell;
  * <br>
  * Aside from being registered with the update handler, the widgets specific to
  * this tab are also maintained in a local map so that their values (and only
- * theirs) will appear in the environment when performApply() is called. A list
- * of viewers is also kept so that refresh can be called on them when the tab is
- * (re-)initialized or the defaults are reset. <br>
+ * theirs) will appear in the environment when performApply() is called. <br>
  * <br>
  * If different widgets on different tabs reference the same Property or
  * Attribute, its value will change everywhere. However, if the
- * <code>shared</code> property is set to true, then the local map is populated
- * by values produced from all tabs and defaults are likewise reset on all
- * widgets in the update handler. This shared option is motivated by a scenario
- * in which the attributes are partitioned (empty intersection) between the
- * various tabs, but all of them are necessary to the definition of the job
- * submission. The default (not shared) implies that the tabs have intersecting
- * subsets of the whole attribute set, any one of which is sufficient to
- * configure a launch.
+ * <code>shared</code> property is given a list of other controllors, their
+ * values are included in the local environment.
  * 
  * @author arossi
  * 
  */
 public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements SelectionListener {
 
-	private final IJAXBResourceManager rm;
-	private final TabControllerType controller;
-	private final ValueUpdateHandler updateHandler;
-	private final List<Viewer> viewers;
-	private final Map<Object, IUpdateModel> localWidgets;
-	private final String[] shared;
-	private final Collection<IUpdateModel> sharedModels;
-	private Collection<ControlStateListener> listeners;
-	private ILaunchConfiguration listenerConfiguration;
+	protected final IJAXBResourceManager rm;
+	protected final ValueUpdateHandler updateHandler;
+	protected final List<Viewer> viewers;
+	protected final Map<Object, IUpdateModel> localWidgets;
+	protected Collection<ControlStateListener> listeners;
+	protected ILaunchConfiguration listenerConfiguration;
+
+	protected TabControllerType controller;
+	protected String[] shared;
+	protected Collection<IUpdateModel> sharedModels;
 
 	/**
 	 * @param rm
@@ -114,8 +111,11 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 */
 	public JAXBDynamicLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog,
 			TabControllerType controller, JAXBControllerLaunchConfigurationTab parentTab) {
-		super(parentTab, dialog);
-		this.rm = rm;
+		this(rm, dialog, parentTab);
+		String title = controller.getTitle();
+		if (title != null) {
+			this.title = title;
+		}
 		this.controller = controller;
 		String s = controller.getIncludeWidgetValuesFrom();
 		if (s == null) {
@@ -123,14 +123,26 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		} else {
 			shared = s.split(JAXBUIConstants.CM);
 		}
+	}
+
+	/**
+	 * 
+	 * @param rm
+	 *            the resource manager
+	 * @param dialog
+	 *            the ancestor main launch dialog
+	 * @param parentTab
+	 *            the parent controller tab
+	 */
+	protected JAXBDynamicLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog,
+			JAXBControllerLaunchConfigurationTab parentTab) {
+		super(parentTab, dialog);
+		this.rm = rm;
 		sharedModels = new ArrayList<IUpdateModel>();
-		String title = controller.getTitle();
-		if (title != null) {
-			this.title = title;
-		}
 		updateHandler = parentTab.getUpdateHandler();
 		localWidgets = new HashMap<Object, IUpdateModel>();
 		viewers = new ArrayList<Viewer>();
+		sharedModels = new ArrayList<IUpdateModel>();
 	}
 
 	/*
@@ -164,12 +176,10 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			}
 			control = builder.build(parent);
 		} catch (Throwable t) {
-			Throwable t1 = new Throwable(t.getLocalizedMessage());
-			throw CoreExceptionUtils.newException(Messages.CreateControlConfigurableError, t1);
+			t.printStackTrace();
+			throw CoreExceptionUtils.newException(Messages.CreateControlConfigurableError + JAXBUIConstants.SP + title, t);
 		}
 		createViewScriptGroup(control);
-		control.layout(true, true);
-		size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 	}
 
 	/**
@@ -222,9 +232,10 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/*
 	 * Resets the configuation then re-initializes all widgets: 1. clears
 	 * viewers and repopulate that list. 2. repopulates the handler with local
-	 * widgets. 3. initializes the (new) widgets from the original global map.
-	 * 4. initializes the checked state on any checkbox viewers and then
-	 * refreshes them.(non-Javadoc)
+	 * widgets. 3. initializes the (new) widgets from the map. 4. initializes
+	 * the checked state on any checkbox viewers and then refreshes them; sets
+	 * enabled and visible on non-viewer widgets, and then sets state only the
+	 * control state listeners.(non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
@@ -249,7 +260,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			}
 
 			LCVariableMap lcMap = parentTab.getLCMap();
-			lcMap.updateGlobal(listenerConfiguration);
 			RMVariableMap rmMap = (RMVariableMap) this.rm.getJAXBConfiguration().getRMVariableMap();
 
 			for (IUpdateModel m : localWidgets.values()) {
@@ -257,8 +267,16 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			}
 
 			for (IUpdateModel m : localWidgets.values()) {
+				Control mControl = null;
 				if (m instanceof ViewerUpdateModel) {
-					((ViewerUpdateModel) m).initializeChecked();
+					ViewerUpdateModel vmodel = (ViewerUpdateModel) m;
+					vmodel.initializeChecked();
+					mControl = vmodel.getSWTControl();
+				} else if (!(m instanceof ICellEditorUpdateModel)) {
+					mControl = (Control) m.getControl();
+				}
+				if (mControl != null) {
+					mControl.setVisible(true);
 				}
 			}
 
@@ -267,7 +285,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 					l.setState();
 				}
 			}
-			
+
 			for (Viewer v : viewers) {
 				v.refresh();
 			}
@@ -314,7 +332,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * 
 	 */
 	public void run(ButtonActionType action) throws CoreException {
-		rm.getControl().runActionCommand(action.getAction(), action.getClearValue());
+		rm.getControl().runActionCommand(action.getAction(), action.getClearValue(), listenerConfiguration);
 		if (action.isRefresh()) {
 			try {
 				parentTab.initializeFrom(null, rm, null, listenerConfiguration);
@@ -345,7 +363,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	public void setListeners(Collection<ControlStateListener> listeners) {
 		this.listeners = listeners;
 	}
-	
+
 	/*
 	 * Pull out the local maps from each and set them into the shared array.
 	 * (non-Javadoc)
@@ -355,7 +373,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * #setUpSharedEnvironment(java.util.List)
 	 */
 	@Override
-	public void setUpSharedEnvironment(Map<String, AbstractJAXBLaunchConfigurationTab> controllers) {
+	public void setUpSharedEnvironment(Map<String, AbstractJAXBLaunchConfigurationTab> controllers) throws CoreException {
 		sharedModels.clear();
 		for (String title : shared) {
 			AbstractJAXBLaunchConfigurationTab tab = controllers.get(title);
@@ -366,9 +384,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/*
-	 * If this is not the last selected tab, sets a property in the
-	 * configuration marking this tab as visible. This is mainly in order to
-	 * trigger activation of the Apply button. (non-Javadoc)
+	 * Reactivates the tab; if this was not the last tab, the Apply button
+	 * should become active.
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
@@ -377,12 +394,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	@Override
 	public void setVisible() {
 		try {
-			String lastVisited = parentTab.getLastVisited();
-			if (title.equals(lastVisited)) {
-				return;
-			}
-			parentTab.setLastVisited(title);
-			listenerConfiguration.getWorkingCopy().setAttribute(JAXBUIConstants.VISIBLE, this.toString());
+			refreshLocal(listenerConfiguration.getWorkingCopy());
 			fireContentsChanged();
 		} catch (CoreException t) {
 			JAXBUIPlugin.log(t);
@@ -419,6 +431,9 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			if (Messages.ViewConfig.equals(b.getText())) {
 				text = displayConfigurationContents(listenerConfiguration);
 				title = Messages.DisplayConfig;
+			} else if (Messages.ViewExcluded.equals(b.getText())) {
+				text = displayExcluded();
+				title = Messages.ViewExcluded;
 			} else if (!parentTab.hasScript()) {
 				MessageDialog.openWarning(shell, Messages.ScriptNotSupportedWarning_title, Messages.ScriptNotSupportedWarning
 						+ JAXBControlUIConstants.LINE_SEP);
@@ -433,48 +448,108 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		}
 	}
 
-	/*
-	 * Writes values of local widgets or cell editors (if the viewer row is
-	 * selected) to the local map. We enforce the same exclusion of
-	 * <code>null</code> as we do on the LCVariableMap#put method (non-Javadoc)
+	/**
+	 * Calls {@link #refresh(IUpdateModel, LCVariableMap)} for each entry in the
+	 * local widgets map.
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab#
-	 * doRefreshLocal()
+	 * @see org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab#
+	 *      doRefreshLocal()
 	 */
 	@Override
 	protected void doRefreshLocal() {
-		Object value = null;
-		List<ViewerUpdateModel> viewerModels = new ArrayList<ViewerUpdateModel>();
-		for (IUpdateModel m : getModels()) {
-			if (!m.isWritable()) {
+		LCVariableMap lcMap = parentTab.getLCMap();
+		for (IUpdateModel m : localWidgets.values()) {
+			refresh(m, lcMap);
+		}
+	}
+
+	/**
+	 * The complement of validSet.
+	 * 
+	 * @return all locally invalid variables
+	 */
+	protected Set<String> getLocalInvalid() {
+		Set<String> locaInvalid = new TreeSet<String>();
+		for (IUpdateModel m : localWidgets.values()) {
+			String name = m.getName();
+			if (name == null) {
 				continue;
 			}
+			if (!validSet.contains(name)) {
+				locaInvalid.add(name);
+			}
+		}
+		locaInvalid.add(JAXBControlConstants.SCRIPT_PATH);
+		return locaInvalid;
+	}
+
+	/**
+	 * Runs only on local widgets. First resets default values from the
+	 * LCVariableMap on widgets and rows in the viewers, then has the viewers
+	 * rewrite their templated strings. The update handler is called to refresh
+	 * all the widgets from the map, and then the viewers are refreshed.
+	 */
+	protected synchronized void resetDefaults() {
+		Collection<IUpdateModel> models = localWidgets.values();
+		for (IUpdateModel m : models) {
+			m.restoreDefault();
+		}
+		for (IUpdateModel m : models) {
 			if (m instanceof ViewerUpdateModel) {
-				viewerModels.add((ViewerUpdateModel) m);
-				continue;
-			}
-			if (m instanceof ICellEditorUpdateModel) {
-				if (((ICellEditorUpdateModel) m).isChecked()) {
-					value = m.getValueFromControl();
-					if (value != null) {
-						localMap.put(m.getName(), value);
-					}
-				}
-			} else {
-				value = m.getValueFromControl();
-				if (value != null) {
-					localMap.put(m.getName(), value);
-				}
+				((ViewerUpdateModel) m).storeValue();
 			}
 		}
-		for (ViewerUpdateModel m : viewerModels) {
-			value = m.getValueFromControl();
-			if (value != null) {
-				localMap.put(m.getName(), value);
-			}
-			m.putCheckedSettings(localMap);
+		updateHandler.handleUpdate(null, null);
+		for (Viewer v : viewers) {
+			v.refresh();
 		}
+	}
+
+	/**
+	 * VISIBLE, ENABLED, (LOCALLY) INVALID and VALID.
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
+	 *      #writeLocalProperties()
+	 */
+	@Override
+	protected void writeLocalProperties() {
+		LCVariableMap lcMap = parentTab.getLCMap();
+		String id = getControllerTag();
+		lcMap.put(JAXBUIConstants.CURRENT_CONTROLLER, id);
+
+		StringBuffer list = new StringBuffer();
+		for (String var : visibleList) {
+			list.append(var).append(JAXBUIConstants.SP);
+		}
+		lcMap.put(JAXBUIConstants.VISIBLE + id, list.toString().trim());
+
+		list.setLength(0);
+		for (String var : enabledList) {
+			list.append(var).append(JAXBUIConstants.SP);
+		}
+		lcMap.put(JAXBUIConstants.ENABLED + id, list.toString().trim());
+
+		Set<String> set = getLocalInvalid();
+		list.setLength(0);
+		for (String var : set) {
+			list.append(var).append(JAXBUIConstants.SP);
+		}
+		lcMap.put(JAXBUIConstants.INVALID + id, list.toString().trim());
+
+		set = getSharedValid(set);
+		set.addAll(validSet);
+		set.addAll(lcMap.getHidden());
+		set.add(JAXBUIConstants.CURRENT_CONTROLLER);
+		set.add(JAXBUIConstants.VISIBLE + id);
+		set.add(JAXBUIConstants.ENABLED + id);
+		set.add(JAXBUIConstants.INVALID + id);
+		set.add(JAXBUIConstants.VALID + id);
+
+		list.setLength(0);
+		for (String var : set) {
+			list.append(var).append(JAXBUIConstants.SP);
+		}
+		lcMap.put(JAXBUIConstants.VALID + id, list.toString().trim());
 	}
 
 	/**
@@ -484,8 +559,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * @param control
 	 */
 	private void createViewScriptGroup(final Composite control) {
-		GridLayout layout = WidgetBuilderUtils.createGridLayout(3, true, 5, 5, 2, 2);
-		GridData gd = WidgetBuilderUtils.createGridData(SWT.NONE, 3);
+		GridLayout layout = WidgetBuilderUtils.createGridLayout(4, true, 5, 5, 2, 2);
+		GridData gd = WidgetBuilderUtils.createGridData(SWT.NONE, 4);
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
 
 		if (parentTab.hasScript()) {
@@ -493,10 +568,19 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			SWTUtil.setButtonDimensionHint(b);
 		}
 
-		Button b = WidgetBuilderUtils.createPushButton(grp, Messages.ViewConfig, this);
-		SWTUtil.setButtonDimensionHint(b);
+		if (controller.isShowViewConfig()) {
+			Button b = WidgetBuilderUtils.createPushButton(grp, Messages.ViewConfig, this);
+			SWTUtil.setButtonDimensionHint(b);
+			b.setToolTipText(Messages.ViewConfigTooltip);
+		}
 
-		b = WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, new SelectionListener() {
+		if (controller.isShowViewExcluded()) {
+			Button b = WidgetBuilderUtils.createPushButton(grp, Messages.ViewExcluded, this);
+			SWTUtil.setButtonDimensionHint(b);
+			b.setToolTipText(Messages.ViewExcludedTooltip);
+		}
+
+		Button b = WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
 			}
@@ -518,26 +602,21 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 */
 	private synchronized String displayConfigurationContents(final ILaunchConfiguration config) throws Throwable {
 		final StringBuffer buffer = new StringBuffer();
-		refreshLocal(config);
 		Job job = new Job(JAXBControlUIConstants.ZEROSTR) {
-			@SuppressWarnings({ "rawtypes", "unchecked" })
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
-					Map<Object, Object> attr = config.getAttributes();
-					for (Map.Entry e : attr.entrySet()) {
+					Map<Object, Object> validCurrent = RMVariableMap.getValidAttributes(config);
+					for (Map.Entry<Object, Object> e : validCurrent.entrySet()) {
 						Object v = e.getValue();
-						if (v != null && !JAXBControlUIConstants.ZEROSTR.equals(v)) {
-							buffer.append(e.getKey()).append(JAXBControlUIConstants.EQ).append(v)
-									.append(JAXBControlUIConstants.LINE_SEP);
-						}
+						buffer.append(e.getKey()).append(JAXBControlUIConstants.EQ).append(v)
+								.append(JAXBControlUIConstants.LINE_SEP);
 					}
 				} catch (CoreException t) {
 					return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
 				}
 				return Status.OK_STATUS;
 			}
-
 		};
 		job.schedule();
 		try {
@@ -548,15 +627,60 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/**
-	 * Gathers widgets to include in the local mapping.
+	 * Creates a contents string from the excluded properties.
 	 * 
-	 * @return the set of widgets to be accessed for values.
+	 * @return string representing contents
+	 * @throws Throwable
 	 */
-	private Collection<IUpdateModel> getModels() {
-		Collection<IUpdateModel> models = new ArrayList<IUpdateModel>();
-		models.addAll(sharedModels);
-		models.addAll(localWidgets.values());
-		return models;
+	private String displayExcluded() throws Throwable {
+		final StringBuffer buffer = new StringBuffer();
+		Job job = new Job(JAXBControlUIConstants.ZEROSTR) {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				Map<String, Object> excluded = parentTab.getLCMap().getExcluded();
+				for (Map.Entry<String, Object> e : excluded.entrySet()) {
+					Object v = e.getValue();
+					buffer.append(e.getKey()).append(JAXBControlUIConstants.EQ).append(v).append(JAXBControlUIConstants.LINE_SEP);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
+		try {
+			job.join();
+		} catch (InterruptedException ignored) {
+		}
+		return buffer.toString();
+	}
+
+	/**
+	 * Creates the set of all widget variables on shared tabs that are valid.
+	 * 
+	 * @param localInvalid
+	 *            locally excluded override external if there is an intersection
+	 * @return set of shared variables that are valid
+	 */
+	private Set<String> getSharedValid(Set<String> localInvalid) {
+		Set<String> sharedInvalid = new HashSet<String>();
+		LCVariableMap lcMap = parentTab.getLCMap();
+		for (String title : shared) {
+			String invalid = (String) lcMap.get(JAXBUIConstants.INVALID + title);
+			if (invalid != null) {
+				String[] names = invalid.split(JAXBUIConstants.SP);
+				for (String name : names) {
+					sharedInvalid.add(name.trim());
+				}
+			}
+		}
+
+		Set<String> sharedValid = new TreeSet<String>();
+		for (IUpdateModel m : sharedModels) {
+			String name = m.getName();
+			if (!sharedInvalid.contains(name) && !localInvalid.contains(name)) {
+				sharedValid.add(name);
+			}
+		}
+		return sharedValid;
 	}
 
 	/**
@@ -572,9 +696,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private synchronized String realizeLocalScript(ILaunchConfiguration config) throws Throwable {
 		String value = JAXBControlUIConstants.ZEROSTR;
-		refreshLocal(config);
 		LCVariableMap lcMap = parentTab.getLCMap();
-		Map<String, Object> current = lcMap.swapVariables(localMap);
+		lcMap.shiftToCurrent(getControllerTag());
 		Map env = config.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
 		ScriptHandler job = new ScriptHandler(null, parentTab.getScript(), lcMap, env, true);
 		job.schedule();
@@ -583,35 +706,58 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		} catch (InterruptedException ignored) {
 		}
 		value = job.getScriptValue();
-		lcMap.swapVariables(current);
+		lcMap.restoreGlobal();
 		return value;
 	}
 
 	/**
-	 * Runs only on local widgets. First resets default values from the
-	 * LCVariableMap on widgets and selected rows in the viewers, then has the
-	 * viewers rewrite their templated strings. The update handler is called to
-	 * refresh all the widgets from the map, and then the viewers are refreshed.
+	 * Auxiliary for updating configuration/map values. Writes value of local
+	 * widget or cell editor (if the viewer row is selected) to the map. Also
+	 * writes to the lists pertaining to current state of the environment.
+	 * 
+	 * @param model
+	 *            of widget
+	 * @param lcMap
+	 *            configuration wrapper
 	 */
-	private synchronized void resetDefaults() {
-		Collection<IUpdateModel> models = localWidgets.values();
-		for (IUpdateModel m : models) {
-			if (m instanceof ICellEditorUpdateModel) {
-				if (((ICellEditorUpdateModel) m).isChecked()) {
-					m.restoreDefault();
+	private void refresh(IUpdateModel model, LCVariableMap lcMap) {
+		String name = model.getName();
+		if (name == null || JAXBUIConstants.ZEROSTR.equals(name)) {
+			return;
+		}
+		Object value = null;
+		boolean selected = true;
+
+		Control c = null;
+		if (model instanceof ViewerUpdateModel) {
+			ViewerUpdateModel vmodel = (ViewerUpdateModel) model;
+			vmodel.putCheckedSettings(lcMap);
+			c = vmodel.getSWTControl();
+		} else if (model instanceof ICellEditorUpdateModel) {
+			ICellEditorUpdateModel cellModel = (ICellEditorUpdateModel) model;
+			selected = cellModel.isChecked();
+			c = cellModel.getParent().getControl();
+		} else {
+			c = (Control) model.getControl();
+		}
+
+		if (model.isWritable() && selected) {
+			value = model.getValueFromControl();
+			lcMap.put(name, value);
+		}
+
+		boolean visible = c == null ? false : c.isVisible();
+		boolean enabled = c == null ? false : c.isEnabled();
+		if (visible) {
+			visibleList.add(name);
+			if (enabled) {
+				enabledList.add(name);
+				if (model.isWritable() && selected) {
+					validSet.add(name);
 				}
-			} else {
-				m.restoreDefault();
 			}
-		}
-		for (IUpdateModel m : models) {
-			if (m instanceof ViewerUpdateModel) {
-				((ViewerUpdateModel) m).storeValue();
-			}
-		}
-		updateHandler.handleUpdate(null, null);
-		for (Viewer v : viewers) {
-			v.refresh();
+		} else if (enabled) {
+			enabledList.add(name);
 		}
 	}
 

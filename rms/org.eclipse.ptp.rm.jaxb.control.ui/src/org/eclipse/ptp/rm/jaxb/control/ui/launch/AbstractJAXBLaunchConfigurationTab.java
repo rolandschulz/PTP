@@ -10,10 +10,10 @@
 package org.eclipse.ptp.rm.jaxb.control.ui.launch;
 
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -22,9 +22,9 @@ import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -32,10 +32,6 @@ import org.eclipse.swt.widgets.Composite;
  * editable widgets. Up to three such tabs can be configured as children of the
  * controller tab.<br>
  * <br>
- * 
- * Each tab maintains its own local map of values which are set from its
- * widgets, and this swapped into the environment active map when configuration
- * changes are needed.
  * 
  * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab
  * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBImportedScriptLaunchConfigurationTab
@@ -46,10 +42,11 @@ import org.eclipse.swt.widgets.Composite;
 public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunchConfigurationDynamicTab {
 
 	protected final JAXBControllerLaunchConfigurationTab parentTab;
-	protected final Map<String, Object> localMap;
+	protected final Set<String> visibleList;
+	protected final Set<String> enabledList;
+	protected final Set<String> validSet;
 	protected String title;
 	protected Composite control;
-	protected Point size;
 
 	/**
 	 * @param parentTab
@@ -63,21 +60,15 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 		super(dialog);
 		this.parentTab = parentTab;
 		this.title = Messages.DefaultDynamicTab_title;
-		localMap = new TreeMap<String, Object>();
+		visibleList = new TreeSet<String>();
+		enabledList = new TreeSet<String>();
+		validSet = new TreeSet<String>();
 	}
 
 	/**
 	 * @return image to display in the folder tab for this LaunchTab
 	 */
 	public abstract Image getImage();
-
-	/**
-	 * @return size of control as originally computed.
-	 * 
-	 */
-	public Point getSize() {
-		return size;
-	}
 
 	/**
 	 * @return text to display in the folder tab for this LaunchTab
@@ -90,33 +81,21 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	 * configuration unless this tab is the origin of the change; hence we check
 	 * to see if the tab is visible.<br>
 	 * <br>
-	 * If write to configuration is indicated, then the local map is refreshed,
-	 * swapped in to the active map, and then flushed to the configuration.
 	 * 
 	 * @param configuration
 	 *            working copy of current launch configuration
-	 * @param current
+	 * @param rm
 	 *            resource manager
 	 * @param queue
 	 *            (unused)
 	 */
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		if (control.isVisible()) {
-			Map<String, Object> current = null;
-			LCVariableMap lcMap = parentTab.getLCMap();
 			try {
 				refreshLocal(configuration);
-				current = lcMap.swapVariables(localMap);
-				lcMap.writeToConfiguration(configuration);
 			} catch (CoreException t) {
 				JAXBControlUIPlugin.log(t);
 				return new RMLaunchValidation(false, t.getMessage());
-			} finally {
-				try {
-					lcMap.swapVariables(current);
-				} catch (CoreException t) {
-					JAXBControlUIPlugin.log(t);
-				}
 			}
 		}
 		return new RMLaunchValidation(true, null);
@@ -127,17 +106,16 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	 * 
 	 * @param controllers
 	 *            from the parent tab, mapped to their titles
+	 * @throws CoreException
 	 */
-	public void setUpSharedEnvironment(Map<String, AbstractJAXBLaunchConfigurationTab> controllers) {
+	public void setUpSharedEnvironment(Map<String, AbstractJAXBLaunchConfigurationTab> controllers) throws CoreException {
 		// does nothing
 	}
 
 	/**
 	 * In case button activations need to take place when the tab changes
 	 */
-	public void setVisible() {
-		// does nothing
-	}
+	public abstract void setVisible();
 
 	/**
 	 * Tab-specific handling of local variable map.
@@ -145,20 +123,35 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	protected abstract void doRefreshLocal();
 
 	/**
+	 * Eliminate whitespace.
+	 * 
+	 * @return title
+	 */
+	protected String getControllerTag() {
+		return title.replaceAll(JAXBUIConstants.SP, JAXBUIConstants.DOT);
+	}
+
+	/**
 	 * Subclasses should call this method, but implement doRefreshLocal().
 	 * 
 	 * @param current
 	 *            configuration
 	 */
-	protected void refreshLocal(ILaunchConfiguration config) throws CoreException {
-
-		Map<String, Object> saved = new TreeMap<String, Object>();
-		LCVariableMap lcMap = parentTab.getLCMap();
-		lcMap.saveHiddenNonLinked(localMap, saved);
-		lcMap.saveStandardConfigurationProperties(config, localMap, saved);
-		localMap.clear();
-		localMap.putAll(saved);
+	protected void refreshLocal(ILaunchConfigurationWorkingCopy config) throws CoreException {
+		visibleList.clear();
+		enabledList.clear();
+		validSet.clear();
 		doRefreshLocal();
-		lcMap.relinkHidden(localMap);
+		LCVariableMap lcMap = parentTab.getLCMap();
+		lcMap.relinkConfigurationProperties(config);
+		parentTab.getLCMap().relinkHidden(getControllerTag());
+		writeLocalProperties();
+		parentTab.getLCMap().flush(config);
 	}
+
+	/**
+	 * Sets the current environment of the configuration implicitly by defining
+	 * which variables are valid.
+	 */
+	protected abstract void writeLocalProperties();
 }

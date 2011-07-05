@@ -615,6 +615,16 @@ public class CommandJobStatus implements ICommandJobStatus {
 				}
 			}
 
+			if (isInteractive()) {
+				try {
+					int exit = process.exitValue();
+					if (exit != 0) {
+						throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
+					}
+				} catch (Throwable t) {
+				}
+			}
+
 			PropertyType p = (PropertyType) env.get(uuid);
 			if (p == null) {
 				continue;

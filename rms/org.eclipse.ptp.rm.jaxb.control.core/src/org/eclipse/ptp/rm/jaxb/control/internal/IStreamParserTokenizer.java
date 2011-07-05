@@ -11,6 +11,9 @@ package org.eclipse.ptp.rm.jaxb.control.internal;
 
 import java.io.InputStream;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+
 /**
  * Interface for tokenizer (parser) attached to process streams. These can be
  * custom implementations of the extension point. The reference implementation
@@ -30,6 +33,18 @@ public interface IStreamParserTokenizer extends Runnable {
 	 * @return any fatal exception raised during parsing
 	 */
 	public Throwable getInternalError();
+
+	/**
+	 * @param uuid
+	 *            id associated with this resource manager operation (can be
+	 *            <code>null</code>).
+	 * @param rmVarMap
+	 *            resource manager environment
+	 * @param commandMonitor
+	 *            so that the operation can be canceled in the case of a thrown
+	 *            exception
+	 */
+	public void initialize(String uuid, IVariableMap rmVarMap, IProgressMonitor commandMonitor);
 
 	/**
 	 * @param stream

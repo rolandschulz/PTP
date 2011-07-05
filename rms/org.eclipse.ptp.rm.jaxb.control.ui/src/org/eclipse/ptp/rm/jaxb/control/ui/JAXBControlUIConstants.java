@@ -25,7 +25,7 @@ public class JAXBControlUIConstants extends JAXBUIConstants {
 	public static final String NAME_TAG = AT + NAME;
 	public static final String VALUE_TAG = AT + VALUE;
 
-	public static final String CHECKED_ATTRIBUTES = "checked_attributes";//$NON-NLS-1$
+	public static final String CHECKED_ATTRIBUTES = "checked_attributes_";//$NON-NLS-1$
 	public static final String SHOW_ONLY_CHECKED = "show_only_checked";//$NON-NLS-1$
 	public static final String IS_PRESET = "is_preset";//$NON-NLS-1$
 

@@ -75,7 +75,14 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	 */
 	@Override
 	public void initialize(RMVariableMap rmMap, LCVariableMap lcMap) {
-		refreshItemsFrom(rmMap);
+		if (itemsFrom != null) {
+			String[] items = WidgetActionUtils.getItemsFrom(rmMap, itemsFrom);
+			if (items.length == 0) {
+				items = WidgetActionUtils.getItemsFrom(lcMap, itemsFrom);
+			}
+			items = WidgetBuilderUtils.normalizeComboItems(items);
+			combo.setItems(items);
+		}
 		super.initialize(rmMap, lcMap);
 	}
 
@@ -141,19 +148,5 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 		}
 		Object value = storeValue();
 		handleUpdate(value);
-	}
-
-	/**
-	 * Calls
-	 * {@link WidgetActionUtils#getItemsFrom(org.eclipse.ptp.rm.jaxb.core.IVariableMap, String)}
-	 * 
-	 * @param rmMap
-	 */
-	private void refreshItemsFrom(RMVariableMap rmMap) {
-		if (itemsFrom != null) {
-			String[] items = WidgetActionUtils.getItemsFrom(rmMap, itemsFrom);
-			items = WidgetBuilderUtils.normalizeComboItems(items);
-			combo.setItems(items);
-		}
 	}
 }

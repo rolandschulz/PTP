@@ -27,9 +27,9 @@
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
 			<link-value-to>Error_Path</link-value-to>
 		</property>
-		<property name="local.input.file" visible="false"/>
+		<property name="local.input.file" visible="true"/>
 		<property name="remote.input.files" visible="false"/>
-		<attribute name="remote.input.file" type="choice">
+		<attribute name="remote.input.file" visible="true" type="choice">
 			<items-from>remote.input.files</items-from>
 		</attribute>
 		<attribute name="mpiCommand" type="string">
@@ -297,7 +297,7 @@
 			<stdout-parser delim="\n">
 				<target ref="remote.input.files">
 					<match>
-						<expression>[-rwx+@]+[\s]+[\d]+[\s]+[\w]+[\s]+[\w]+[\s]+[\d]+[\s]+[\w]+[\s]+[\d]+[\s]+[\d:]+[\s]+(.+)</expression>
+						<expression>[-drwx+@]+.+[\d:]+[\s]+(.+)</expression>
 						<add field="value">
 							<entry valueGroup="1"/>
 						</add>

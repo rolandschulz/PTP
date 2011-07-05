@@ -27,7 +27,6 @@
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
 			<link-value-to>Error_Path</link-value-to>
 		</property>
-
 		<attribute name="mpiCommand" type="string">
 			<description>Which mpi command to use.</description>
 		</attribute>

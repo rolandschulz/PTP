@@ -10,6 +10,7 @@
 package org.eclipse.ptp.rm.jaxb.control.ui;
 
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -34,6 +35,11 @@ public interface ICellEditorUpdateModel extends IUpdateModel, IColumnViewerLabel
 	 * @return the cell editor for this model
 	 */
 	public CellEditor getCellEditor();
+
+	/**
+	 * @return viewer to which it belongs
+	 */
+	public Viewer getParent();
 
 	/**
 	 * Insert name and value into template as indicated by the pattern

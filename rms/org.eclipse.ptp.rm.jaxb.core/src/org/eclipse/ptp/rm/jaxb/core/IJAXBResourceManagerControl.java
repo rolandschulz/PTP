@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
@@ -67,8 +68,10 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	 *            name of action or command
 	 * @param resetValue
 	 *            name of property or attribute
+	 * @param configuration
+	 *            current values
 	 * @return result of the action on resetValue, if any
 	 * 
 	 */
-	public Object runActionCommand(String action, String resetValue) throws CoreException;
+	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException;
 }

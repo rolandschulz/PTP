@@ -50,6 +50,7 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 	public static final String EXPORT = "export";//$NON-NLS-1$
 
 	public static final String CUSTOM = "custom";//$NON-NLS-1$
+	public static final String CONTROL_DOT = "control.";//$NON-NLS-1$
 	public static final String CONTROL_USER_VAR = "control.user.name";//$NON-NLS-1$
 	public static final String CONTROL_USER_NAME = "${ptp_rm:control.user.name#value}";//$NON-NLS-1$
 	public static final String CONTROL_QUEUE_VAR = "control.queue.name";//$NON-NLS-1$

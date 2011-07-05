@@ -124,7 +124,14 @@
 	<xs:complexType name="launch-tab-type">
 		<xs:sequence>
 			<xs:element name="dynamic" minOccurs="0" maxOccurs="unbounded" type="rm:tab-controller-type"/>
-			<xs:element name="import" minOccurs="0" type="xs:string"/>
+			<xs:element name="import" minOccurs="0">
+				<xs:complexType>
+				   <xs:sequence>
+				     <xs:element name="export-for-override" minOccurs="0"  type="rm:attribute-viewer-type"/>
+				   </xs:sequence>
+					<xs:attribute name="title" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="validator-type">
@@ -183,6 +190,8 @@
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 		<xs:attribute name="includeWidgetValuesFrom" type="xs:string"/>
+		<xs:attribute name="showViewConfig" type="xs:boolean" default="true"/>
+		<xs:attribute name="showViewExcluded" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="regex-type" mixed="true">
 		<xs:attribute name="flags" type="xs:string"/>
@@ -231,8 +240,8 @@
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="composite" type="rm:composite-type"/>
 				<xs:element name="widget" type="rm:widget-type"/>
-            <xs:element name="browse" type="rm:browse-type"/>
-            <xs:element name="action" type="rm:push-button-type"/>
+				<xs:element name="browse" type="rm:browse-type"/>
+				<xs:element name="action" type="rm:push-button-type"/>
 				<xs:element name="button-group" type="rm:button-group-type"/>
 				<xs:element name="viewer" type="rm:attribute-viewer-type"/>
 			</xs:choice>
@@ -253,8 +262,8 @@
 				<xs:element name="composite" type="rm:composite-type"/>
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
 				<xs:element name="widget" type="rm:widget-type"/>
-            <xs:element name="browse" type="rm:browse-type"/>
-            <xs:element name="action" type="rm:push-button-type"/>
+				<xs:element name="browse" type="rm:browse-type"/>
+				<xs:element name="action" type="rm:push-button-type"/>
 				<xs:element name="button-group" type="rm:button-group-type"/>
 				<xs:element name="viewer" type="rm:attribute-viewer-type"/>
 			</xs:choice>

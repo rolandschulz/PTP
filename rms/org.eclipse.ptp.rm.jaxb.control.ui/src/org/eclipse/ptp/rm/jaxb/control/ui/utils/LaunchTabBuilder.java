@@ -170,6 +170,54 @@ public class LaunchTabBuilder {
 	}
 
 	/**
+	 * Constructs the viewer, its row items and their update models, and adds it
+	 * to the tree.
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.utils.UpdateModelFactory#createModel(ColumnViewer,
+	 *      AttributeViewer, JAXBDynamicLaunchConfigurationTab)
+	 * 
+	 * @param descriptor
+	 *            JAXB data element describing CheckboxTableViewer or
+	 *            CheckboxTreeViewer for displaying a subset of the resource
+	 *            manager properties and attributes
+	 * @param parent
+	 *            control to which to add the viewer
+	 * @return the control
+	 */
+	public ColumnViewer addAttributeViewer(AttributeViewerType descriptor, Composite parent) {
+		Layout layout = createLayout(descriptor.getLayout());
+		Object data = createLayoutData(descriptor.getLayoutData());
+		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
+		Button showHide = WidgetBuilderUtils.createCheckButton(parent, Messages.ToggleShowHideSelectedAttributes, null);
+		ColumnViewer viewer = null;
+		if (JAXBControlUIConstants.TABLE.equals(descriptor.getType())) {
+			viewer = addCheckboxTableViewer(parent, data, layout, style, descriptor);
+		} else if (JAXBControlUIConstants.TREE.equals(descriptor.getType())) {
+			viewer = addCheckboxTreeViewer(parent, data, layout, style, descriptor);
+		}
+		if (viewer != null) {
+			Collection<ICellEditorUpdateModel> rows = addRows(viewer, descriptor);
+			ViewerUpdateModel model = UpdateModelFactory.createModel(viewer, descriptor, tab);
+			for (ICellEditorUpdateModel row : rows) {
+				row.setViewer(model);
+			}
+			viewer.setInput(rows);
+			showHide.addSelectionListener(model);
+			model.setShowAll(showHide);
+			localWidgets.put(viewer, model);
+
+			ControlStateType cst = descriptor.getControlState();
+			if (cst != null) {
+				targets.put(cst, viewer.getControl());
+			}
+		}
+		return viewer;
+	}
+
+	/**
 	 * Root call to build the SWT widget tree.<br>
 	 * <br>
 	 * Clears the widgets map, in the case or reinitializaton. <br>
@@ -206,52 +254,6 @@ public class LaunchTabBuilder {
 
 		maybeWireWidgets();
 		return composite;
-	}
-
-	/**
-	 * Constructs the viewer, its row items and their update models, and adds it
-	 * to the tree.
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.utils.UpdateModelFactory#createModel(ColumnViewer,
-	 *      AttributeViewer, JAXBDynamicLaunchConfigurationTab)
-	 * 
-	 * @param descriptor
-	 *            JAXB data element describing CheckboxTableViewer or
-	 *            CheckboxTreeViewer for displaying a subset of the resource
-	 *            manager properties and attributes
-	 * @param parent
-	 *            control to which to add the viewer
-	 */
-	private void addAttributeViewer(AttributeViewerType descriptor, Composite parent) {
-		Layout layout = createLayout(descriptor.getLayout());
-		Object data = createLayoutData(descriptor.getLayoutData());
-		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
-		Button showHide = WidgetBuilderUtils.createCheckButton(parent, Messages.ToggleShowHideSelectedAttributes, null);
-		ColumnViewer viewer = null;
-		if (JAXBControlUIConstants.TABLE.equals(descriptor.getType())) {
-			viewer = addCheckboxTableViewer(parent, data, layout, style, descriptor);
-		} else if (JAXBControlUIConstants.TREE.equals(descriptor.getType())) {
-			viewer = addCheckboxTreeViewer(parent, data, layout, style, descriptor);
-		}
-		if (viewer != null) {
-			Collection<ICellEditorUpdateModel> rows = addRows(viewer, descriptor);
-			ViewerUpdateModel model = UpdateModelFactory.createModel(viewer, descriptor, tab);
-			for (ICellEditorUpdateModel row : rows) {
-				row.setViewer(model);
-			}
-			viewer.setInput(rows);
-			showHide.addSelectionListener(model);
-			model.setShowAll(showHide);
-			localWidgets.put(viewer, model);
-
-			ControlStateType cst = descriptor.getControlState();
-			if (cst != null) {
-				targets.put(cst, viewer.getControl());
-			}
-		}
 	}
 
 	/**
@@ -683,7 +685,7 @@ public class LaunchTabBuilder {
 
 	/**
 	 * Constructs a listener for each defined category of action on the target
-	 * and add it to the sources referenced in the rule.
+	 * and adds it to the sources referenced in the rule.
 	 */
 	private void maybeWireWidgets() throws Throwable {
 		Collection<ControlStateListener> listeners = new HashSet<ControlStateListener>();

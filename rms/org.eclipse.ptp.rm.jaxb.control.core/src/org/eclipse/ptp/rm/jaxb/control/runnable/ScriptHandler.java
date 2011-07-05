@@ -111,7 +111,7 @@ public class ScriptHandler extends Job {
 			return JAXBControlConstants.ZEROSTR;
 		}
 		int envAfter = script.getInsertEnvironmentAfter();
-		if (envAfter == JAXBControlConstants.UNDEFINED) {
+		if (envAfter == JAXBControlConstants.UNDEFINED || envAfter < 0 || envAfter >= len) {
 			envAfter = 1;
 		}
 		SubMonitor progress = SubMonitor.convert(monitor, len);

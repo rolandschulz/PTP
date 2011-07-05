@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011 University of Illinois All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- * Contributors: -->
+<!-- * Albert L. Rossi - design and implementation -->
+<!-- ****************************************************************************** -->
+<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="resource_manager_type.xsd" name="discovered-properties-example">
+   <control-data>
+      <start-up-command name="ompi_info">
+         <arg>ompi_info</arg>
+         <arg>-a</arg>
+         <arg>--parseable</arg>
+         <stdout-parser delim="\n">
+            <target type="attribute" allowOverwrites="true">
+               <match>
+                  <expression>mca:.*:param:([^:]*):value:(.*)</expression>
+                  <set field="name">
+                     <entry valueGroup="1"/>
+                  </set>
+                  <set field="visible">
+                     <entry value="true"/>
+                  </set>
+                  <set field="value">
+                     <entry valueGroup="2"/>
+                  </set>
+               </match>
+               <match>
+                  <expression>mca:.*:param:([^:]*):status:(.*)</expression>
+                  <set field="name">
+                     <entry valueGroup="1"/>
+                  </set>
+                  <set field="status">
+                     <entry valueGroup="2"/>
+                  </set>
+               </match>
+               <match>
+                  <expression>mca:.*:param:([^:]*):help:(.*)</expression>
+                  <set field="name">
+                     <entry valueGroup="1"/>
+                  </set>
+                  <set field="tooltip">
+                     <entry valueGroup="2"/>
+                  </set>
+               </match>
+               <test op="EQ">
+                  <value>#status</value>
+                  <value>read-only</value>
+                  <set field="readOnly">
+                     <entry value="true"/>
+                  </set>
+                  <else>
+                     <set field="readOnly">
+                        <entry value="false"/>
+                     </set>
+                  </else>
+               </test>
+            </target>
+            <target type="attribute">
+               <match>
+                  <expression>ompi:version:full:([^:]*)</expression>
+                  <set field="name">
+                     <entry value="ompi_version"/>
+                  </set>
+                  <set field="value">
+                     <entry valueGroup="1"/>
+                  </set>
+                  <set field="visible">
+                     <entry value="false"/>
+                  </set>
+                  <set field="readOnly">
+                     <entry value="true"/>
+                  </set>
+               </match>
+            </target>
+         </stdout-parser>
+      </start-up-command>
+      <launch-tab>
+         <dynamic showViewExcluded="true">
+            <title>Discovered Properties</title>
+            <layout>
+               <grid-layout/>
+            </layout>
+            <composite group="true">
+               <layout>
+                  <grid-layout numColumns="2"/>
+               </layout>
+               <layout-data>
+                  <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+               </layout-data>
+               <widget type="label">
+                  <layout-data>
+                     <grid-data/>
+                  </layout-data>
+                  <fixed-text>Arguments:</fixed-text>
+               </widget>
+               <widget type="text" readOnly="true" style="SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL">
+                  <layout-data>
+                     <grid-data heightHint="100" horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+                  </layout-data>
+                  <dynamic-text>
+                     <arg>${ptp_rm:allAttributes#value}</arg>
+                  </dynamic-text>
+               </widget>
+            </composite>
+            <composite group="true">
+               <layout>
+                  <grid-layout/>
+               </layout>
+               <layout-data>
+                  <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="true"/>
+               </layout-data>
+               <viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" sort="true" type="table" initialAllChecked="false">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
+                  </layout-data>
+                  <column-data name="Name" width="175">
+                     <tooltip>Multi-select and click checkbox to apply change to all rows.</tooltip>
+                  </column-data>
+                  <column-data name="Value" width="200">
+                     <tooltip>Click to activate value widget.</tooltip>
+                  </column-data>
+                  <items allDiscovered="true">
+                  </items>
+                  <value pattern="-mca @name &quot;@value&quot;"/>
+               </viewer>
+            </composite>
+         </dynamic>
+      </launch-tab>
+   </control-data>
+   <monitor-data schedulerType="PBS">
+   </monitor-data>
+</resource-manager-builder>

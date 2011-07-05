@@ -124,7 +124,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	 * Sets the actual value in the current environment to the default value.
 	 */
 	public void restoreDefault() {
-		lcMap.put(name, defaultValue);
+		lcMap.setDefault(name, defaultValue);
 	}
 
 	/**

@@ -107,14 +107,16 @@ public class JAXBCoreConstants {
 	public static final String VALUE = "value";//$NON-NLS-1$
 	public static final String sDEFAULT = "default";//$NON-NLS-1$
 	public static final String LOCAL = "local";//$NON-NLS-1$
-	public static final String VISIBLE = "visible";//$NON-NLS-1$
+	public static final String VISIBLE = "visible_";//$NON-NLS-1$
+	public static final String ENABLED = "enabled_";//$NON-NLS-1$
+	public static final String VALID = "valid_";//$NON-NLS-1$
+	public static final String INVALID = "invalid_";//$NON-NLS-1$
+	public static final String TEMP = "temp";//$NON-NLS-1$
+	public static final String ACTIVE = "active";//$NON-NLS-1$
 
 	/* TYPE MATCHING */
 	public static final String NT = "nt";//$NON-NLS-1$
 	public static final String BOOL = "bool";//$NON-NLS-1$
-	public static final String ET = "et";//$NON-NLS-1$
-	public static final String IST = "ist";//$NON-NLS-1$
-	public static final String ECTOR = "ector";//$NON-NLS-1$
 
 	/* STANDARD PROPERTIES */
 	public static final String JAVA_USER_HOME = "user.home";//$NON-NLS-1$
@@ -125,6 +127,7 @@ public class JAXBCoreConstants {
 	public static final String SCRIPT_PATH = "script_path";//$NON-NLS-1$
 	public static final String SCRIPT = "script";//$NON-NLS-1$
 	public static final String SCRIPT_FILE = "managed_file_for_script";//$NON-NLS-1$
+	public static final String CURRENT_CONTROLLER = "current_controller";//$NON-NLS-1$
 
 	/*
 	 * EFS Attributes
