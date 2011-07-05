@@ -63,6 +63,7 @@
 		<xs:attribute name="type" type="xs:string" default="java.lang.String"/>
 		<xs:attribute name="visible" type="xs:boolean" default="true"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
+		<xs:attribute name="translateBooleanAs" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="attribute-type">
 		<xs:sequence>
@@ -80,6 +81,7 @@
 		<xs:attribute name="visible" type="xs:boolean" default="true"/>
 		<xs:attribute name="status" type="xs:string"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
+		<xs:attribute name="translateBooleanAs" type="xs:string"/>
 		<xs:attribute name="min" type="xs:int"/>
 		<xs:attribute name="max" type="xs:int"/>
 	</xs:complexType>
@@ -398,7 +400,6 @@
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
 		<xs:attribute name="saveValueTo" type="xs:string"/>
-		<xs:attribute name="translateBooleanAs" type="xs:string"/>
 		<xs:attribute name="foreground" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
 	</xs:complexType>

@@ -91,6 +91,7 @@ public class UpdateModelFactory {
 		private String description;
 		private String choice;
 		private String itemsFrom;
+		private String translateBooleanAs;
 		private Integer min;
 		private Integer max;
 		private boolean readOnly;
@@ -113,6 +114,7 @@ public class UpdateModelFactory {
 				name = a.getName();
 				choice = a.getChoice();
 				itemsFrom = a.getItemsFrom();
+				translateBooleanAs = a.getTranslateBooleanAs();
 				min = a.getMin();
 				max = a.getMax();
 				readOnly = a.isReadOnly();
@@ -126,6 +128,7 @@ public class UpdateModelFactory {
 			} else if (data instanceof PropertyType) {
 				PropertyType p = (PropertyType) data;
 				name = p.getName();
+				translateBooleanAs = p.getTranslateBooleanAs();
 				readOnly = p.isReadOnly();
 			}
 			if (description == null) {
@@ -248,6 +251,7 @@ public class UpdateModelFactory {
 		private String fixedText;
 		private ButtonActionType action;
 		private String itemsFrom;
+		private String translateBooleanAs;
 
 		private ControlDescriptor(BrowseType browse, IVariableMap rmMap) {
 			setControlData(browse);
@@ -358,6 +362,9 @@ public class UpdateModelFactory {
 				itemsFrom = a.getItemsFrom();
 				min = a.getMin();
 				max = a.getMax();
+				translateBooleanAs = a.getTranslateBooleanAs();
+			} else if (data instanceof PropertyType) {
+				translateBooleanAs = ((PropertyType) data).getTranslateBooleanAs();
 			}
 		}
 
@@ -559,7 +566,7 @@ public class UpdateModelFactory {
 		} else if (control instanceof Spinner) {
 			model = new SpinnerUpdateModel(name, handler, (Spinner) control);
 		} else if (control instanceof Button) {
-			model = new ButtonUpdateModel(name, handler, (Button) control, widget.getTranslateBooleanAs());
+			model = new ButtonUpdateModel(name, handler, (Button) control, cd.translateBooleanAs);
 		}
 
 		if (name != null && !JAXBUIConstants.ZEROSTR.equals(name)) {
@@ -893,9 +900,10 @@ public class UpdateModelFactory {
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		ICellEditorUpdateModel model = null;
 		if (data instanceof AttributeType) {
-			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.readOnly, (AttributeType) data);
+			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.translateBooleanAs, cd.readOnly,
+					(AttributeType) data);
 		} else if (data instanceof PropertyType) {
-			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.readOnly);
+			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.translateBooleanAs, cd.readOnly);
 		}
 		if (model != null) {
 			model.setBackground(cd.background);
@@ -931,10 +939,11 @@ public class UpdateModelFactory {
 		Object[] properties = viewer.getColumnProperties();
 		boolean inValueCol = properties.length == 2;
 		if (data instanceof AttributeType) {
-			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.readOnly, inValueCol,
-					(AttributeType) data);
+			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.translateBooleanAs,
+					cd.readOnly, inValueCol, (AttributeType) data);
 		} else if (data instanceof PropertyType) {
-			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.readOnly, inValueCol);
+			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.translateBooleanAs,
+					cd.readOnly, inValueCol);
 		}
 		if (model != null) {
 			model.setBackground(cd.background);

@@ -11,7 +11,7 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="button-group-example">
 	<control-data>
-		<attribute name="logResults" type="integer">
+		<attribute name="logResults" type="boolean" translateBooleanAs="1,0">
 			<description>Does nothing; for testing boolean value translation.</description>
 		</attribute>
 		<attribute name="numCores" min="1" type="integer">
@@ -54,7 +54,7 @@
 						</layout-data>
 						<fixed-text>Log results: </fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="logResults" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="logResults" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>

@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Button;
 public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionListener {
 
 	private final Button button;
-	private final String[] valueMapping;
 
 	/**
 	 * @param name
@@ -43,16 +42,7 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 		super(name, handler);
 		this.button = button;
 		button.addSelectionListener(this);
-		if (translateBooleanAs == null) {
-			valueMapping = null;
-		} else {
-			String[] pair = translateBooleanAs.split(JAXBUIConstants.CM);
-			if (pair.length == 2) {
-				valueMapping = pair;
-			} else {
-				valueMapping = null;
-			}
-		}
+		setBooleanToString(translateBooleanAs);
 	}
 
 	@Override
@@ -66,11 +56,7 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#getValueFromControl()
 	 */
 	public Object getValueFromControl() {
-		Boolean b = button.getSelection();
-		if (valueMapping != null) {
-			return b ? valueMapping[0] : valueMapping[1];
-		}
-		return b;
+		return getBooleanValue(button.getSelection());
 	}
 
 	/*
@@ -87,17 +73,7 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 		if (JAXBUIConstants.ZEROSTR.equals(mapValue)) {
 			mapValue = null;
 		}
-		if (mapValue != null) {
-			if (mapValue instanceof String) {
-				if (valueMapping != null) {
-					b = mapValue.equals(valueMapping[0]);
-				} else {
-					b = Boolean.parseBoolean((String) mapValue);
-				}
-			} else {
-				b = (Boolean) mapValue;
-			}
-		}
+		b = maybeGetBooleanFromString(mapValue);
 		button.setSelection(b);
 		refreshing = false;
 	}
@@ -129,4 +105,5 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 		Object value = storeValue();
 		handleUpdate(value);
 	}
+
 }
