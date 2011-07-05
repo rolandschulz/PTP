@@ -23,6 +23,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurati
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ui.progress.UIJob;
 
 /**
@@ -62,6 +63,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	protected ValidatorType validator;
 	protected JAXBControllerLaunchConfigurationTab tab;
 	protected String defaultValue;
+	protected String[] booleanToString;
 	protected Object mapValue;
 
 	/**
@@ -158,6 +160,20 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	}
 
 	/**
+	 * Used for boolean widgets. Checks for string translation
+	 * 
+	 * @param b
+	 *            the boolean that may need to be translated
+	 * @return either the boolean value or its translation
+	 */
+	protected Object getBooleanValue(Boolean b) {
+		if (booleanToString != null) {
+			return b ? booleanToString[0] : booleanToString[1];
+		}
+		return b;
+	}
+
+	/**
 	 * Delegates to the handler update method.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler#handleUpdate(Object,
@@ -168,6 +184,49 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	 */
 	protected void handleUpdate(Object value) {
 		handler.handleUpdate(getControl(), value);
+	}
+
+	/**
+	 * Used by boolean widgets. Checks for string translation.
+	 * 
+	 * @param mapValue
+	 *            either the boolean value or its translation
+	 * @return the actual boolean value
+	 */
+	protected boolean maybeGetBooleanFromString(Object mapValue) {
+		boolean b = false;
+		if (mapValue != null) {
+			if (mapValue instanceof String) {
+				if (booleanToString != null) {
+					b = mapValue.equals(booleanToString[0]);
+				} else {
+					b = Boolean.parseBoolean((String) mapValue);
+				}
+			} else {
+				b = (Boolean) mapValue;
+			}
+		}
+		return b;
+	}
+
+	/**
+	 * If this value type is boolean and it is mapped to a string pairing, set
+	 * the mapping.
+	 * 
+	 * @param translateBooleanAs
+	 *            comma-separated pair of values corresponding to T,F
+	 */
+	protected void setBooleanToString(String translateBooleanAs) {
+		if (translateBooleanAs == null) {
+			booleanToString = null;
+		} else {
+			String[] pair = translateBooleanAs.split(JAXBUIConstants.CM);
+			if (pair.length == 2) {
+				booleanToString = pair;
+			} else {
+				booleanToString = null;
+			}
+		}
 	}
 
 	/**

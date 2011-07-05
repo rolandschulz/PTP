@@ -76,9 +76,9 @@ the name of the job, see -N option, and Seq_num
 is the job number assigned when the job is submitted; 
 default value: (job_name).e(job_number).]]></tooltip>
 		</attribute>
-		<attribute name="export_all" type="boolean">
-			<description><![CDATA[Declares that all environment variables in the qsub command's environment are to be exported to the batch job.]]></description>
-			<default>true</default>
+		<attribute name="export_all" type="boolean" translateBooleanAs="-V, ">
+			<description><![CDATA[All variables in the qsub command's environment are to be exported to the batch job.]]></description>
+			<default>-V</default>
 		</attribute>
 		<attribute name="group_list" type="string">
 			<description><![CDATA[A list of hosts under which the job is run on a given host.]]></description>
@@ -285,9 +285,6 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<arg isUndefinedIfMatches="#PBS -e">#PBS -e ${ptp_rm:Error_Path#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#PBS -V">#PBS -V ${ptp_rm:export_all#value}</arg>
-			</line>
-			<line>
 				<arg isUndefinedIfMatches="#PBS -W group_list=">#PBS -W group_list=${ptp_rm:group_list#value}</arg>
 			</line>
 			<line>
@@ -370,6 +367,9 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#PBS -v">#PBS -v ${ptp_rm:Variable_List#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#PBS">#PBS ${ptp_rm:export_all#value}</arg>
 			</line>
 			<line>
 				<arg>MPI_ARGS="-np ${ptp_rm:mpiCores#value}"</arg>
@@ -706,6 +706,25 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>${ptp_rm:mpiCores#description}</fixed-text>
 					</widget>
+					<!-- 8 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:export_all#tooltip}</tooltip>
+						<fixed-text>Export Environment: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.BORDER" saveValueTo="export_all">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
+                  </layout-data>
+               </widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:export_all#description}</fixed-text>
+					</widget>
 				</composite>
 			</dynamic>
 			<dynamic>
@@ -776,10 +795,10 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>Click to activate value widget.</tooltip>
 					</column-data>
 					<items>
-					 <include>destination</include>
-					 <include>Job_Name</include>
-					 <include>Output_Path</include>
-					 <include>Error_Path</include>
+						<include>destination</include>
+						<include>Job_Name</include>
+						<include>Output_Path</include>
+						<include>Error_Path</include>
 					</items>
 				</export-for-override>
 			</import>

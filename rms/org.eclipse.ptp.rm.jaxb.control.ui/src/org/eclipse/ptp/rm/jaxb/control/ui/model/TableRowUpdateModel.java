@@ -38,13 +38,15 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 * @param itemsFrom
 	 *            if this is a combo editor, the property or attribute value to
 	 *            get the items from
+	 * @param translateBooleanAs
+	 *            if this is a checkbox, use these string values for T/F
 	 * @param readOnly
-	 *            if this is a text box, whether it is editable
+	 *            whether it is editable
 	 */
 	public TableRowUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, String itemsFrom,
-			boolean readOnly) {
-		super(name, handler, editor, items, readOnly, JAXBControlUIConstants.ZEROSTR, JAXBControlUIConstants.ZEROSTR,
-				JAXBControlUIConstants.ZEROSTR, itemsFrom);
+			String translateBooleanAs, boolean readOnly) {
+		super(name, handler, editor, items, translateBooleanAs, readOnly, JAXBControlUIConstants.ZEROSTR,
+				JAXBControlUIConstants.ZEROSTR, JAXBControlUIConstants.ZEROSTR, itemsFrom);
 	}
 
 	/**
@@ -63,14 +65,17 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 * @param itemsFrom
 	 *            if this is a combo editor, the property or attribute value to
 	 *            get the items from
+	 * @param translateBooleanAs
+	 *            if this is a checkbox, use these string values for T/F
 	 * @param readOnly
-	 *            if this is a text box, whether it is editable
+	 *            whether it is editable
 	 * @param data
 	 *            the Attribute object
 	 */
 	public TableRowUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, String itemsFrom,
-			boolean readOnly, AttributeType data) {
-		super(name, handler, editor, items, readOnly, data.getTooltip(), data.getDescription(), data.getStatus(), itemsFrom);
+			String translateBooleanAs, boolean readOnly, AttributeType data) {
+		super(name, handler, editor, items, translateBooleanAs, readOnly, data.getTooltip(), data.getDescription(), data
+				.getStatus(), itemsFrom);
 	}
 
 	/*

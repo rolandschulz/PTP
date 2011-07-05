@@ -11,30 +11,30 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="miscellaneous-example">
 	<control-data>
-		<property name="a1" visible="true"/>
-		<property name="a2" visible="true"/>
-		<property name="a3" visible="true"/>
-		<property name="a4" visible="true"/>
-		<property name="b1" visible="true"/>
-		<property name="b2" visible="true"/>
-		<property name="b3" visible="true"/>
-		<property name="b4" visible="true"/>
-		<property name="c1" visible="true"/>
-		<property name="c2" visible="true"/>
-		<property name="c3" visible="true"/>
-		<property name="c4" visible="true"/>
-		<property name="d1" visible="true"/>
-		<property name="d2" visible="true"/>
-		<property name="d3" visible="true"/>
-		<property name="d4" visible="true"/>
-		<property name="e1" visible="true"/>
-		<property name="e2" visible="true"/>
-		<property name="e3" visible="true"/>
-		<property name="e4" visible="true"/>
-		<property name="f1" visible="true"/>
-		<property name="f2" visible="true"/>
-		<property name="f3" visible="true"/>
-		<property name="f4" visible="true"/>
+		<property name="a1" visible="true" translateBooleanAs="1,0"/>
+		<property name="a2" visible="true" translateBooleanAs="1,0"/>
+		<property name="a3" visible="true" translateBooleanAs="1,0"/>
+		<property name="a4" visible="true" translateBooleanAs="1,0"/>
+		<property name="b1" visible="true" translateBooleanAs="1,0"/>
+		<property name="b2" visible="true" translateBooleanAs="1,0"/>
+		<property name="b3" visible="true" translateBooleanAs="1,0"/>
+		<property name="b4" visible="true" translateBooleanAs="1,0"/>
+		<property name="c1" visible="true" translateBooleanAs="1,0"/>
+		<property name="c2" visible="true" translateBooleanAs="1,0"/>
+		<property name="c3" visible="true" translateBooleanAs="1,0"/>
+		<property name="c4" visible="true" translateBooleanAs="1,0"/>
+		<property name="d1" visible="true" translateBooleanAs="1,0"/>
+		<property name="d2" visible="true" translateBooleanAs="1,0"/>
+		<property name="d3" visible="true" translateBooleanAs="1,0"/>
+		<property name="d4" visible="true" translateBooleanAs="1,0"/>
+		<property name="e1" visible="true" translateBooleanAs="1,0"/>
+		<property name="e2" visible="true" translateBooleanAs="1,0"/>
+		<property name="e3" visible="true" translateBooleanAs="1,0"/>
+		<property name="e4" visible="true" translateBooleanAs="1,0"/>
+		<property name="f1" visible="true" translateBooleanAs="1,0"/>
+		<property name="f2" visible="true" translateBooleanAs="1,0"/>
+		<property name="f3" visible="true" translateBooleanAs="1,0"/>
+		<property name="f4" visible="true" translateBooleanAs="1,0"/>
 		<script>
 			<line>
 				<arg isUndefinedIfMatches="a1=">a1=${ptp_rm:a1#value}</arg>
@@ -188,7 +188,7 @@
 						</layout-data>
 						<fixed-text>a1:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="a1" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="a1" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -199,7 +199,7 @@
 						</layout-data>
 						<fixed-text>a2:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="a2" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="a2" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -210,7 +210,7 @@
 						</layout-data>
 						<fixed-text>a3:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="a3" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="a3" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -221,7 +221,7 @@
 						</layout-data>
 						<fixed-text>a4:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="a4" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="a4" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -255,7 +255,7 @@
 						</layout-data>
 						<fixed-text>b1:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="b1" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="b1" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -266,7 +266,7 @@
 						</layout-data>
 						<fixed-text>b2:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="b2" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="b2" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -277,7 +277,7 @@
 						</layout-data>
 						<fixed-text>b3:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="b3" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="b3" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -288,7 +288,7 @@
 						</layout-data>
 						<fixed-text>b4:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="b4" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="b4" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -322,7 +322,7 @@
 						</layout-data>
 						<fixed-text>c1:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="c1" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="c1" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -333,7 +333,7 @@
 						</layout-data>
 						<fixed-text>c2:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="c2" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="c2" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -344,7 +344,7 @@
 						</layout-data>
 						<fixed-text>c3:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="c3" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="c3" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -355,7 +355,7 @@
 						</layout-data>
 						<fixed-text>c4:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="c4" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="c4" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -389,7 +389,7 @@
 						</layout-data>
 						<fixed-text>d1:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="d1" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="d1" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -400,7 +400,7 @@
 						</layout-data>
 						<fixed-text>d2:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="d2" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="d2" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -411,7 +411,7 @@
 						</layout-data>
 						<fixed-text>d3:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="d3" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="d3" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -422,7 +422,7 @@
 						</layout-data>
 						<fixed-text>d4:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="d4" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="d4" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -456,7 +456,7 @@
 						</layout-data>
 						<fixed-text>e1:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="e1" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="e1" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -467,7 +467,7 @@
 						</layout-data>
 						<fixed-text>e2:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="e2" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="e2" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -478,7 +478,7 @@
 						</layout-data>
 						<fixed-text>e3:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="e3" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="e3" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -489,7 +489,7 @@
 						</layout-data>
 						<fixed-text>e4:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="e4" style="SWT.LEFT" translateBooleanAs="1,0">
+					<widget type="checkbox" saveValueTo="e4" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -502,37 +502,37 @@
 					<grid-layout/>
 				</layout>
 				<composite group="true">
-               <layout>
-                  <grid-layout/>
-               </layout>
-               <layout-data>
-                  <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
-               </layout-data>
-               <widget type="text" readOnly="true" style="SWT.BORDER | SWT.WRAP | SWT.V_SCROLL">
-                  <layout-data>
-                     <grid-data heightHint="75" horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
-                  </layout-data>
-                  <dynamic-text>
-                     <arg>${ptp_rm:allAttributes#value}</arg>
-                     <arg isUndefinedIfMatches=" destination=''"> destination='${ptp_rm:destination#value}'</arg>
-                  </dynamic-text>
-               </widget>
-               <viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" sort="true" type="tree" initialAllChecked="false">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
-                  </layout-data>
-                  <column-data name="Name" width="175" resizable="true">
-                     <tooltip>Multi-select and click checkbox to apply change to all rows.</tooltip>
-                  </column-data>
-                  <column-data name="Value" width="200" resizable="true">
-                     <tooltip>Click to activate value widget.</tooltip>
-                  </column-data>
-                  <items allPredefined="true">
-                     <exclude>destination</exclude>
-                  </items>
-                  <value pattern="@name='@value'"/>
-               </viewer>
-            </composite>
+					<layout>
+						<grid-layout/>
+					</layout>
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+					</layout-data>
+					<widget type="text" readOnly="true" style="SWT.BORDER | SWT.WRAP | SWT.V_SCROLL">
+						<layout-data>
+							<grid-data heightHint="75" horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+						</layout-data>
+						<dynamic-text>
+							<arg>${ptp_rm:allAttributes#value}</arg>
+							<arg isUndefinedIfMatches=" destination=''"> destination='${ptp_rm:destination#value}'</arg>
+						</dynamic-text>
+					</widget>
+					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" sort="true" type="tree" initialAllChecked="false">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+						</layout-data>
+						<column-data name="Name" width="175" resizable="true">
+							<tooltip>Multi-select and click checkbox to apply change to all rows.</tooltip>
+						</column-data>
+						<column-data name="Value" width="200" resizable="true">
+							<tooltip>Click to activate value widget.</tooltip>
+						</column-data>
+						<items allPredefined="true">
+							<exclude>destination</exclude>
+						</items>
+						<value pattern="@name='@value'"/>
+					</viewer>
+				</composite>
 			</dynamic>
 		</launch-tab>
 	</control-data>

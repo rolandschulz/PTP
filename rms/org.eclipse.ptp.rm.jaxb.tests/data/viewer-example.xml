@@ -26,7 +26,7 @@
 			<tooltip>use in conjunction with E3</tooltip>
 			<default>3</default>
 		</attribute>
-		<attribute name="e4" visible="true" status="unsupported" type="integer">
+		<attribute name="e4" visible="true" status="unsupported" translateBooleanAs="0,4">
 			<description>it's "e4"</description>
 			<tooltip>use in conjunction with E4</tooltip>
 			<default>4</default>

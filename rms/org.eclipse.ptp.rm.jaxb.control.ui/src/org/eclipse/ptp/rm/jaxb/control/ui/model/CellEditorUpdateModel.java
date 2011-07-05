@@ -82,6 +82,8 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 *            the cell editor for the value cell
 	 * @param items
 	 *            if this is a combo editor, the selection items
+	 * @param translateBooleanAs
+	 *            if this is a checkbox, use these string values for T/F
 	 * @param readOnly
 	 *            if this is a text box, whether it is editable
 	 * @param tooltip
@@ -93,8 +95,8 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 * @param itemsFrom
 	 *            for combo box
 	 */
-	protected CellEditorUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, boolean readOnly,
-			String tooltip, String description, String status, String itemsFrom) {
+	protected CellEditorUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items,
+			String translateBooleanAs, boolean readOnly, String tooltip, String description, String status, String itemsFrom) {
 		super(name, handler);
 		this.editor = editor;
 		this.readOnly = readOnly;
@@ -103,6 +105,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 		this.tooltip = tooltip;
 		this.description = description;
 		this.status = status;
+		setBooleanToString(translateBooleanAs);
 	}
 
 	/*
@@ -327,10 +330,10 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 				mapValue = null;
 			}
 			if (mapValue != null) {
-				if (mapValue instanceof String) {
-					booleanValue = Boolean.parseBoolean((String) mapValue);
-				} else {
-					booleanValue = (Boolean) mapValue;
+				booleanValue = maybeGetBooleanFromString(mapValue);
+				Object o = getBooleanValue(booleanValue);
+				if (o instanceof String) {
+					stringValue = (String) o;
 				}
 			}
 		} else if (editor instanceof SpinnerCellEditor) {
@@ -431,8 +434,14 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 				booleanValue = false;
 			} else {
 				booleanValue = (Boolean) value;
+				Object o = getBooleanValue((Boolean) value);
+				if (o instanceof String) {
+					stringValue = (String) o;
+					mapValue = stringValue;
+				} else {
+					mapValue = booleanValue;
+				}
 			}
-			mapValue = booleanValue;
 		} else if (editor instanceof SpinnerCellEditor) {
 			SpinnerCellEditor e = (SpinnerCellEditor) editor;
 			if (value == null) {
