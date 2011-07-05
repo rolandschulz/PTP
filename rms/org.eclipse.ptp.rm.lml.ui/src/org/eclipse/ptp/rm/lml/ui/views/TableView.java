@@ -518,6 +518,7 @@ public class TableView extends ViewPart {
 						isMouseDown = true;
 						final TreeItem item = tree.getItem(new Point(e.x, e.y));
 						if (item != null && !composite.isDisposed()) {
+							lmlManager.selectObject(item.getData().toString());
 							lmlManager.markObject(item.getData().toString());
 						}
 					}
@@ -529,6 +530,7 @@ public class TableView extends ViewPart {
 						final TreeItem item = tree.getItem(new Point(e.x, e.y));
 						if (item != null && !composite.isDisposed()) {
 							lmlManager.unmarkObject(item.getData().toString());
+							lmlManager.unselectObject(item.getData().toString());
 						}
 						isMouseDown = false;
 					}

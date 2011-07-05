@@ -141,7 +141,11 @@ public class NodesView extends ViewPart {
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		lmlManager.addListener(lguiListener, this.getClass().getName());
 
-		createNodedisplayView();
+		nodedisplayView = new NodedisplayView(null, null, composite);
+		if (fLguiItem != null) {
+			nodedisplayView.update(fLguiItem);
+		}
+		composite.layout();
 	}
 
 	@Override
@@ -156,18 +160,6 @@ public class NodesView extends ViewPart {
 	 */
 	@Override
 	public void setFocus() {
-	}
-
-	private void createNodedisplayView() {
-
-		if (!composite.isDisposed()) {
-			nodedisplayView = new NodedisplayView(null, null, composite);
-			if (fLguiItem != null) {
-				nodedisplayView.update(fLguiItem);
-			}
-			composite.layout();
-		}
-
 	}
 
 }
