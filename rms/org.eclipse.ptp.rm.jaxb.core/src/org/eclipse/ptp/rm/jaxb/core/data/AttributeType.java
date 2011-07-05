@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="readOnly" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="status" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="translateBooleanAs" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="type" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="type" type="{http://www.w3.org/2001/XMLSchema}string" default="java.lang.String" />
  *       &lt;attribute name="visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -78,7 +78,7 @@ public class AttributeType {
 	protected String status;
 	@XmlAttribute
 	protected String translateBooleanAs;
-	@XmlAttribute(required = true)
+	@XmlAttribute
 	protected String type;
 	@XmlAttribute
 	protected Boolean visible;
@@ -200,7 +200,11 @@ public class AttributeType {
 	 * 
 	 */
 	public String getType() {
-		return type;
+		if (type == null) {
+			return "java.lang.String"; //$NON-NLS-1$
+		} else {
+			return type;
+		}
 	}
 
 	/**

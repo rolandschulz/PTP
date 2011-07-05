@@ -77,7 +77,7 @@
 			<xs:element name="validator" minOccurs="0" type="rm:validator-type"/>
 		</xs:sequence>
 		<xs:attribute name="name" use="required" type="xs:string"/>
-		<xs:attribute name="type" use="required" type="xs:string"/>
+		<xs:attribute name="type" type="xs:string" default="java.lang.String"/>
 		<xs:attribute name="visible" type="xs:boolean" default="true"/>
 		<xs:attribute name="status" type="xs:string"/>
 		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
