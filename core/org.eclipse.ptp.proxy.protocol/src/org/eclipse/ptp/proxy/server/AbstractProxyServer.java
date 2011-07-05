@@ -25,14 +25,18 @@ import org.eclipse.ptp.proxy.command.IProxyCommandFactory;
 import org.eclipse.ptp.proxy.command.IProxyCommandListener;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
-import org.eclipse.ptp.proxy.util.compression.IEncoder;
 import org.eclipse.ptp.proxy.util.compression.IDecoder;
+import org.eclipse.ptp.proxy.util.compression.IEncoder;
 import org.eclipse.ptp.proxy.util.compression.huffmancoder.HuffmanByteCompress;
 import org.eclipse.ptp.proxy.util.compression.huffmancoder.HuffmanByteUncompress;
 
 public abstract class AbstractProxyServer implements IProxyServer {
 	protected enum ServerState {
-		INIT, DISCOVERY, NORMAL, SUSPENDED, SHUTDOWN
+		INIT,
+		DISCOVERY,
+		NORMAL,
+		SUSPENDED,
+		SHUTDOWN
 	}
 
 	public static final int MAX_ERRORS = 5;
@@ -45,8 +49,8 @@ public abstract class AbstractProxyServer implements IProxyServer {
 	private final String sessHost;
 	private final int sessPort;
 	private SocketChannel sessSocket;
-	private IEncoder compressor;
-	private IDecoder uncompressor;
+	private final IEncoder compressor;
+	private final IDecoder uncompressor;
 	private final IProxyCommandFactory proxyCommandFactory;
 	private Thread commandThread;
 	/**
@@ -130,7 +134,7 @@ public abstract class AbstractProxyServer implements IProxyServer {
 	 * @throws IOException
 	 */
 	private boolean sessionProgress() throws IOException {
-		ProxyPacket packet = new ProxyPacket(uncompressor);
+		ProxyPacket packet = new ProxyPacket();
 		System.out.print("sessionProgress: "); //$NON-NLS-1$
 		if (!packet.read(sessSocket)) {
 			System.out.println("false"); //$NON-NLS-1$

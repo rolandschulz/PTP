@@ -57,8 +57,8 @@ import org.eclipse.ptp.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 import org.eclipse.ptp.proxy.util.DebugOptions;
-import org.eclipse.ptp.proxy.util.compression.IEncoder;
 import org.eclipse.ptp.proxy.util.compression.IDecoder;
+import org.eclipse.ptp.proxy.util.compression.IEncoder;
 import org.eclipse.ptp.proxy.util.compression.huffmancoder.HuffmanByteCompress;
 import org.eclipse.ptp.proxy.util.compression.huffmancoder.HuffmanByteUncompress;
 
@@ -89,9 +89,9 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	private SocketChannel sessSock = null;
 	private IProxyEventFactory proxyEventFactory;
 	private FlowControlState flowState = FlowControlState.NORMAL_FLOW;
-	
-	private IEncoder compressor;
-	private IDecoder uncompressor;
+
+	private final IEncoder compressor;
+	private final IDecoder uncompressor;
 
 	private Thread eventThread;
 	private Thread acceptThread;
@@ -253,7 +253,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	}
 
 	private void processPacket() throws IOException {
-		ProxyPacket packet = new ProxyPacket(uncompressor);
+		ProxyPacket packet = new ProxyPacket();
 		if (getDebugOptions().PROTOCOL_TRACING) {
 			packet.setDebug(true);
 		}

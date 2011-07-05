@@ -44,7 +44,7 @@ extern int digittoint(int c);
 #define PACKET_SIZE_INCREMENT 1024
 
 /* packets above this size are considered for compression */
-#define COMPRESSION_SIZE_THRESHOLD   100
+#define COMPRESSION_SIZE_THRESHOLD   INT_MAX /* disable compression */
 /* Difference between original packet and compressed packet for 
 the packet to be sent as compressed packet */
 #define COMPRESSION_DIFF_THRESHOLD   100
@@ -479,6 +479,7 @@ proxy_msg_decode_string(unsigned char *packet, char **arg, unsigned char **end)
 		}
 		p[val_length] = '\0';
 		*end = packet;
+		break;
 	}
 	*arg = buf;
 	return 0;
