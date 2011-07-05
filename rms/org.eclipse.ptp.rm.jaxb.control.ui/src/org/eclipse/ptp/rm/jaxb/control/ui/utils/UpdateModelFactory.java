@@ -181,6 +181,9 @@ public class UpdateModelFactory {
 		public static CellEditorType getType(Object object) {
 			if (object instanceof PropertyType) {
 				PropertyType p = (PropertyType) object;
+				if (p.getTranslateBooleanAs() != null) {
+					return CHECK;
+				}
 				Object value = p.getValue();
 				String clzz = p.getType();
 				if (clzz != null) {
@@ -191,6 +194,9 @@ public class UpdateModelFactory {
 				}
 			} else if (object instanceof AttributeType) {
 				AttributeType a = (AttributeType) object;
+				if (a.getTranslateBooleanAs() != null) {
+					return CHECK;
+				}
 				if (a.getChoice() != null || a.getItemsFrom() != null) {
 					return COMBO;
 				}
