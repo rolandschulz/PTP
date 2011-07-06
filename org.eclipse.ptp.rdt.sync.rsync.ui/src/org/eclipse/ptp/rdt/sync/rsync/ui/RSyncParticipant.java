@@ -58,13 +58,11 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
@@ -87,9 +85,6 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
 	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
 
-	private Control fDialogControl;
-	private Point fDialogSize;
-	private Text fNameText;
 	private Button fBrowseButton;
 	private Button fNewConnectionButton;
 	private Combo fProviderCombo;
@@ -533,7 +528,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	 */
 	public boolean isConfigComplete() {
 		// TODO Auto-generated method stub
-		return true; //TODO check whether really complete
+		return false; //TODO check whether really complete
 	}
 
 	/**
@@ -556,7 +551,6 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	 * @return String
 	 */
 	private String getDefaultPathDisplayString() {
-		String projectName = ""; //$NON-NLS-1$
 		// IWizardPage page = getWizard().getStartingPage();
 		// if (page instanceof CDTMainWizardPage) {
 		// projectName = ((CDTMainWizardPage) page).getProjectName();
