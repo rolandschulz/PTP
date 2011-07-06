@@ -134,7 +134,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 */
 	public void setLocation(String location) {
 		if (fLocation != null) {
-			throw new RuntimeException(Messages.GSP_ChangeLocationError);
+			throw new RuntimeException(Messages.ChangeLocationError);
 		}
 		fLocation = location;
 		putString(LOCATION, location);
@@ -148,7 +148,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 */
 	public void setProject(IProject project) {
 		if (fProject != null) {
-			throw new RuntimeException(Messages.GSP_ChangeProjectError);
+			throw new RuntimeException(Messages.ChangeProjectError);
 		}
 		fProject = project;
 		putString(PROJECT_NAME, project.getName());
@@ -163,7 +163,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 */
 	public void setRemoteConnection(IRemoteConnection conn) {
 		if (fConnection != null) {
-			throw new RuntimeException(Messages.GSP_ChangeConnectionError);
+			throw new RuntimeException(Messages.ChangeConnectionError);
 		}
 		fConnection = conn;
 		putString(CONNECTION_NAME, conn.getName());
@@ -187,7 +187,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 * synchronize(org.eclipse.core.resources.IResourceDelta, org.eclipse.core.runtime.IProgressMonitor, boolean)
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
+		SubMonitor progress = SubMonitor.convert(monitor, Messages.SyncTaskName, 130);
 		
 		// Make a visitor that explores the delta. At the moment, this visitor is responsible for two tasks (the list may grow in the future):
 		// 1) Find out if there are any "relevant" resource changes (changes that need to be mirrored remotely)
@@ -345,7 +345,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 			message = e.getCause().getMessage();
 		}
 		e.printStackTrace();
-		message = Messages.GSP_SyncErrorMessage + this.getProject().getName() + message;
+		message = Messages.SyncErrorMessage + this.getProject().getName() + message;
 		status = new Status(severity, Activator.PLUGIN_ID, message, e);
 		StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
 	}

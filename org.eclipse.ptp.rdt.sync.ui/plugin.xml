@@ -19,6 +19,38 @@
          	</description>
       </wizard>
       
+      
+      <wizard
+            category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
+            class="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertFromCToSyncProjectWizard"
+            finalPerspective="org.eclipse.cdt.ui.CPerspective"
+            hasPages="true"
+            icon="icons/obj16/convert-normal.gif"
+            id="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertFromCToSyncProjectWizard"
+            name="%WizardConvertCProject.name"
+            >
+         <description>
+            %WizardConvertProject.description
+         </description>
+         <selection
+            class="org.eclipse.core.resources.IProject">
+         </selection>
+      </wizard>
+      <wizard
+            category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
+            class="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertFromRemoteCToSyncProjectWizard"
+            finalPerspective="org.eclipse.cdt.ui.CPerspective"
+            hasPages="true"
+            icon="icons/obj16/convert-normal.gif"
+            id="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertFromRemoteCToSyncProjectWizard"
+            name="%WizardConvertRemoteCProject.name">
+         <description>
+            %WizardConvertProject.description
+         </description>
+         <selection
+               class="org.eclipse.core.resources.IProject">
+         </selection>
+      </wizard>      
    </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">

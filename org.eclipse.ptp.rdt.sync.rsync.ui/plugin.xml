@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+<!-- the rsync provider is currently not functional - thus we don't register the participant
    <extension
          point="org.eclipse.ptp.rdt.sync.ui.synchronizeParticipants">
       <synchronizeParticipant
@@ -9,4 +10,5 @@
             name="Rsync">
       </synchronizeParticipant>
    </extension>
+-->
 </plugin>

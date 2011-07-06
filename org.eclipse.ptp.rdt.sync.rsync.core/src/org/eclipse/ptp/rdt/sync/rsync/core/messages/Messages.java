@@ -17,11 +17,11 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.sync.git.core.messages.messages"; //$NON-NLS-1$
 	public static String CommandRunner_0;
 	public static String CR_CreateInstanceError;
-	public static String GSP_ChangeConnectionError;
-	public static String GSP_ChangeLocationError;
-	public static String GSP_ChangeProjectError;
-	public static String GSP_SyncErrorMessage;
-	public static String GSP_SyncTaskName;
+	public static String ChangeConnectionError;
+	public static String ChangeLocationError;
+	public static String ChangeProjectError;
+	public static String SyncErrorMessage;
+	public static String SyncTaskName;
 	public static String RSyncServiceProvider_1;
 	public static String RSyncServiceProvider_2;
 
