@@ -1211,13 +1211,40 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
                     debugger_path = strdup(cp);
                 }
                 else if (strcmp(args[i], PTP_JOB_DEBUG_ARGS_ATTR) == 0) {
-                    debug_args[debug_arg_count] = strdup(cp);
-                    debug_arg_count = debug_arg_count + 1;
-                    if (debug_arg_count >= debug_arg_limit) {
-                        debug_arg_limit = debug_arg_limit + 10;
-                        debug_args = (char **) realloc(debug_args, debug_arg_limit * sizeof(char *));
-                        malloc_check(debug_args, __FUNCTION__, __LINE__);
-                    }
+                	
+                	if (!strncmp(cp, "PE_DEBUG_MODE=", strlen("PE_DEBUG_MODE=")))
+                	{
+                        char* dt = cp + strlen("PE_DEBUG_MODE=");
+                		if (strcasecmp(dt, "sdm") == 0)
+                            debug_sdm_mode = 1;
+                        else if (strcasecmp(dt, "sci") == 0) {
+                            debug_sci_mode++;
+                            if (!pmd_helper)
+                                pmd_helper = PMD_HELPER;
+                        }
+                        // temporarily leave check for "dual" for backwards
+                        // compatibility
+                        else if (strcasecmp(dt, "dual") == 0) {
+                            debug_sci_mode++;
+                            if (!pmd_helper)
+                                pmd_helper = PMD_HELPER;
+                        }
+                	}
+                	else if (!strncmp(cp, "PE_DEBUG_HELPER=", strlen("PE_DEBUG_HELPER=")))
+                	{
+                        pmd_helper = cp + strlen("PE_DEBUG_HELPER=");
+                	}
+                	else
+                	{
+						debug_args[debug_arg_count] = strdup(cp);
+						debug_arg_count = debug_arg_count + 1;
+						if (debug_arg_count >= debug_arg_limit) {
+							debug_arg_limit = debug_arg_limit + 10;
+							debug_args = (char **) realloc(debug_args, debug_arg_limit * sizeof(char *));
+							malloc_check(debug_args, __FUNCTION__, __LINE__);
+						}
+                	}
+                    
                 }
                 else if (strcmp(args[i], PTP_JOB_DEBUG_FLAG_ATTR) == 0) {
                     debug_sdm_mode = 1;
@@ -1317,19 +1344,21 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             int max_fd;
             int a = 0;
 
-            debug_arg_count++;
-            debugger_args = (char **) malloc((debug_arg_count + 3) * sizeof(char *));
+            debugger_args = (char **) malloc((debug_arg_count + 4) * sizeof(char *));
             debugger_args[a++] = debugger_full_path;
             /* Use --jobid to inform node elements of debugger what their poe pid is.
              * This 'jobid' will be used to set up a message queue to accept connections
              * from the application process when it launches on the node.
              */
             asprintf(&debugger_args[a++], "--jobid=%d", getpid());
-            for (i = 0; i < nargs; i++) {
-                if (strncmp(args[i], PTP_JOB_DEBUG_ARGS_ATTR, strlen(PTP_JOB_DEBUG_ARGS_ATTR)) == 0) {
-                    debugger_args[a++] = strchr(args[i], '=') + 1;
-                }
-            }
+            for (i = 0; i < debug_arg_count; i++)
+            	debugger_args[a++] = debug_args[i];
+            
+            //for (i = 0; i < nargs; i++) {
+            //    if (strncmp(args[i], PTP_JOB_DEBUG_ARGS_ATTR, strlen(PTP_JOB_DEBUG_ARGS_ATTR)) == 0) {
+            //        debugger_args[a++] = strchr(args[i], '=') + 1;
+            //    }
+            //}
             debugger_args[a] = NULL;
 
             snprintf(pe_debugger_id, sizeof pe_debugger_id, "PE_DEBUGGER_ID=%d", getpid());
