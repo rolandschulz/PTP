@@ -159,6 +159,16 @@
 			<environment name="VAR_f2" value="${ptp_rm:f2#value}"/>
 			<environment name="VAR_f3" value="${ptp_rm:f3#value}"/>
 			<environment name="VAR_f4" value="${ptp_rm:f4#value}"/>
+			<stdout-parser delim="\n">
+            <target type="property">
+               <match>
+                  <expression>(${ptp_rm:a1#value}).*</expression>
+                  <set field="name">
+                     <entry valueGroup="1"/>
+                  </set>
+               </match>
+            </target>
+         </stdout-parser>
 		</submit-interactive>
 		<launch-tab>
 			<dynamic includeWidgetValuesFrom="F">

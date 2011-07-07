@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 
 /**
@@ -34,10 +35,13 @@ public class RegexImpl {
 	 * @param regex
 	 *            JAXB data element
 	 */
-	public RegexImpl(RegexType regex) {
+	public RegexImpl(RegexType regex, String uuid, IVariableMap map) {
 		expression = regex.getExpression();
 		if (expression == null) {
 			expression = regex.getContent();
+		}
+		if (map != null) {
+			expression = map.getString(uuid, expression);
 		}
 		split = regex.isSplit();
 		flags = regex.getFlags();
