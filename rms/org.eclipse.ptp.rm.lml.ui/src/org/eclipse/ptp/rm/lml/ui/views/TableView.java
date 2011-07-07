@@ -129,8 +129,28 @@ public class TableView extends ViewPart {
 			selectedOid = event.getOid();
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					if (composite != null && !composite.isDisposed()) {
-						viewer.refresh();
+					// if (composite != null && !composite.isDisposed()) {
+					// viewer.refresh();
+					// }
+					if (composite != null && !composite.isDisposed() && viewer.getInput() != null) {
+						tree.deselectAll();
+
+						Row[] rows = null;
+						if (viewer.getInput() instanceof Row[]) {
+							rows = (Row[]) viewer.getInput();
+						}
+						int index = -1;
+						if (rows != null) {
+							for (int i = 0; i < rows.length; i++) {
+								if (rows[i].oid != null && rows[i].oid.equals(selectedOid)) {
+									index = i;
+									break;
+								}
+							}
+						}
+						if (index > -1) {
+							tree.select(tree.getItem(index));
+						}
 					}
 				}
 			});
@@ -182,8 +202,11 @@ public class TableView extends ViewPart {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					selectedOid = null;
+					// if (composite != null && !composite.isDisposed()) {
+					// viewer.refresh();
+					// }
 					if (composite != null && !composite.isDisposed()) {
-						viewer.refresh();
+						tree.deselectAll();
 					}
 				}
 			});
