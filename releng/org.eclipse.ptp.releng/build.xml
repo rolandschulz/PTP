@@ -299,6 +299,7 @@
 		<replace file="${buildsDir}/index.html">
 			<replacefilter token="@buildType@" value="${buildType}"/>
 			<replacefilter token="@buildId@" value="${buildId}"/>
+			<replacefilter token="@ptpBranchVersion@" value="${ptpBranchVersion}"/>
 		</replace>
 		<chmod file="${buildsDir}/index.html" perm="664"/>
 	</target>
