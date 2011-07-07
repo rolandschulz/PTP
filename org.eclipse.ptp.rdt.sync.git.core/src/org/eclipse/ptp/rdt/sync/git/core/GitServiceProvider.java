@@ -52,8 +52,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private GitRemoteSyncConnection fSyncConnection = null;
 
 	private final ReentrantLock syncLock = new ReentrantLock();
-	private Integer syncTaskId = -1;  //ID for most recent synchronization task, functions as a time-stamp 
-	private int finishedSyncTaskId = -1; //all synchronizations up to this ID (including it) have finished
+	private Integer syncTaskId = -1; // ID for most recent synchronization task, functions as a time-stamp
+	private int finishedSyncTaskId = -1; // all synchronizations up to this ID (including it) have finished
 
 	/**
 	 * Get the remote directory that will be used for synchronization
@@ -127,7 +127,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @param location
 	 *            directory path
-	 * @throws RuntimeException if already set. Changing these local parameters is not currently supported but should be possible.
+	 * @throws RuntimeException
+	 *             if already set. Changing these local parameters is not currently supported but should be possible.
 	 */
 	public void setLocation(String location) {
 		if (fLocation != null) {
@@ -156,7 +157,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @param conn
 	 *            remote connection
-	 * @throws RuntimeException if already set. Changing these local parameters is not currently supported but should be possible.
+	 * @throws RuntimeException
+	 *             if already set. Changing these local parameters is not currently supported but should be possible.
 	 */
 	public void setRemoteConnection(IRemoteConnection conn) {
 		if (fConnection != null) {
@@ -171,7 +173,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @param services
 	 *            remote services
-	 * @throws RuntimeException if already set. Changing these local parameters is not currently supported but should be possible.
+	 * @throws RuntimeException
+	 *             if already set. Changing these local parameters is not currently supported but should be possible.
 	 */
 	public void setRemoteServices(IRemoteServices services) {
 		putString(GIT_SERVICES_ID, services.getId());
@@ -185,8 +188,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
-		
-		// Make a visitor that explores the delta. At the moment, this visitor is responsible for two tasks (the list may grow in the future):
+
+		// Make a visitor that explores the delta. At the moment, this visitor is responsible for two tasks (the list may grow in
+		// the future):
 		// 1) Find out if there are any "relevant" resource changes (changes that need to be mirrored remotely)
 		// 2) Add an empty ".gitignore" file to new directories so that Git will sync them
 		class SyncResourceDeltaVisitor implements IResourceDeltaVisitor {
@@ -202,13 +206,15 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				}
 
 				// Add .gitignore to empty directories
-				if (delta.getResource().getType() == IResource.FOLDER && (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
-					IFile emptyFile = getProject().getFile(delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore");  //$NON-NLS-1$
+				if (delta.getResource().getType() == IResource.FOLDER
+						&& (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
+					IFile emptyFile = getProject().getFile(
+							delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore"); //$NON-NLS-1$
 					if (!(emptyFile.exists())) {
 						emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
 					}
 				}
-				
+
 				return true;
 			}
 
@@ -226,16 +232,17 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 
 		try {
-			/* A synchronize with SyncFlag.FORCE guarantees that both directories are in sync.
+			/*
+			 * A synchronize with SyncFlag.FORCE guarantees that both directories are in sync.
 			 * 
-			 * More precise: it guarantees that all changes written to disk at the moment of the call are guaranteed to be 
+			 * More precise: it guarantees that all changes written to disk at the moment of the call are guaranteed to be
 			 * synchronized between both directories. No guarantees are given for changes occurring during the synchronize call.
 			 * 
 			 * To satisfy this guarantee, this call needs to make sure that both the current delta and all outstanding sync requests
 			 * finish before this call returns.
 			 * 
-			 *  Example: Why sync if current delta is empty? The RemoteMakeBuilder forces a sync before and after building. 
-			 *  In some cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
+			 * Example: Why sync if current delta is empty? The RemoteMakeBuilder forces a sync before and after building.
+			 * In some cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
 			 */
 			// TODO: We are not using the individual "sync to local" and "sync to remote" flags yet.
 			if ((syncFlags == SyncFlag.NO_FORCE) && (!(hasRelevantChangedResources))) {
@@ -248,9 +255,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				mySyncTaskId = syncTaskId;
 				// suggestion for Deltas: add delta to list of deltas
 			}
-			
+
 			if (syncLock.hasQueuedThreads() && syncFlags == SyncFlag.NO_FORCE)
-				return;   //the queued Thread will do the work for us. And we don't have to wait because of NO_FORCE
+				return; // the queued Thread will do the work for us. And we don't have to wait because of NO_FORCE
 
 			// lock syncLock. interruptible by progress monitor
 			try {
@@ -264,7 +271,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			}
 
 			try {
-				if (mySyncTaskId<=finishedSyncTaskId) {  //some other thread has already done the work for us 
+				if (mySyncTaskId <= finishedSyncTaskId) { // some other thread has already done the work for us
 					return;
 				}
 
@@ -272,15 +279,15 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				if (fSyncConnection == null) {
 					// Open a remote sync connection
 					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(),
-															this.getProject().getLocation().toString(),	this.getLocation(),
-															new FileFilter(), progress);
+							this.getProject().getLocation().toString(), this.getLocation(),
+							new FileFilter(), progress);
 				}
 
 				// Open remote connection if necessary
 				if (this.getRemoteConnection().isOpen() == false) {
 					this.getRemoteConnection().open(progress.newChild(10));
 				}
-	
+
 				// This synchronization operation will include all tasks up to current syncTaskId
 				// syncTaskId can be larger than mySyncTaskId (than we do also the work for other threads)
 				// we might synchronize even more than that if a file is already saved but syncTaskId wasn't increased yet
@@ -320,9 +327,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	/**
 	 * Error handler. There are several reasons why a sync operation may fail. This function is responsible for handling each case
 	 * appropriately. For now we simply report any errors to the user.
-	 *
+	 * 
 	 * @param e
-	 * 			the remote sync exception
+	 *            the remote sync exception
 	 */
 	private void handleRemoteSyncException(RemoteSyncException e) {
 		IStatus status = null;
@@ -345,7 +352,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	// Paths that the Git sync provider can ignore.
 	private boolean irrelevantPath(IResourceDelta delta) {
 		String path = delta.getFullPath().toString();
-		if (path.endsWith("/.git")) { //$NON-NLS-1$
+		if (path.endsWith("/" + GitRemoteSyncConnection.gitDir)) { //$NON-NLS-1$
+			return true;
+		} else if (path.endsWith("/.git")) { //$NON-NLS-1$
 			return true;
 		} else if (path.endsWith("/.settings")) { //$NON-NLS-1$
 			return true;
@@ -361,6 +370,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			}
 
 			if (fileName.startsWith(".settings")) { //$NON-NLS-1$
+				return true;
+			}
+
+			if (fileName.startsWith(GitRemoteSyncConnection.gitDir)) {
 				return true;
 			}
 
@@ -418,7 +431,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		try {
 			fConnection = connection;
 			putString(GIT_CONNECTION_NAME, connection.getName());
-			fSyncConnection = null;  //get reinitialized by next synchronize call
+			fSyncConnection = null; // get reinitialized by next synchronize call
 		} finally {
 			syncLock.unlock();
 		}
@@ -434,7 +447,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		try {
 			fLocation = configLocation;
 			putString(GIT_LOCATION, configLocation);
-			fSyncConnection = null;  //get reinitialized by next synchronize call
+			fSyncConnection = null; // get reinitialized by next synchronize call
 		} finally {
 			syncLock.unlock();
 		}
