@@ -354,8 +354,8 @@
 		represented by spinner widgets. <i>translateBooleanAs</i> applies to
 		boolean values which should be represented as strings other than
 		"true" and "false"; use a comma-delimited pair to indicate the string
-      equivalent for the boolean; e.g., "YES,NO" would mean true yields the first
-      string and false the second.
+		equivalent for the boolean; e.g., "YES,NO" would mean true yields the
+		first string and false the second.
 	</p>
 
 	<p>
@@ -436,7 +436,12 @@
 		<li>UNIX_LINES</li>
 	</ul>
 
-	<p>These can be OR'd in the usual manner.</p>
+	<p>
+		These can be OR'd in the usual manner. <b>NOTE:</b> when using the
+		regex on the <a href="#MatchType"><code>match</code>
+		</a> type, the expression can contain variable references to be resolved
+		in the environment.
+	</p>
 
 	<p>
 		<code>file-match</code>
@@ -1011,8 +1016,7 @@
 						<li>if the match is positive, process each of the actions,
 							and go to (1).</li>
 					</ul>
-			</ul>
-		</li>
+			</ul></li>
 	</ol>
 
 	<p>
@@ -1060,30 +1064,25 @@
 
 	<table align="center" rules="all">
 		<tr>
-			<td><code>set</code>
-			</td>
+			<td><code>set</code></td>
 			<td>sets the value of that field</td>
 		</tr>
 		<tr>
-			<td><code>append</code>
-			</td>
+			<td><code>append</code></td>
 			<td>adds to a string buffer, whose string value will be set on
 				the field</td>
 		</tr>
 		<tr>
-			<td><code>add</code>
-			</td>
+			<td><code>add</code></td>
 			<td>adds to a list to which the value of that field will be set</td>
 		</tr>
 		<tr>
-			<td><code>put</code>
-			</td>
+			<td><code>put</code></td>
 			<td>places a key-value pair in a map to which the value of that
 				field will be set</td>
 		</tr>
 		<tr>
-			<td><code>throw</code>
-			</td>
+			<td><code>throw</code></td>
 			<td>throws an exception and (optionally) also sets the value of
 				the field</td>
 		</tr>
@@ -1608,34 +1607,27 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><code>label</code>
-			</td>
+			<td><code>label</code></td>
 			<td>fixed text for display</td>
 		</tr>
 		<tr>
-			<td><code>text</code>
-			</td>
+			<td><code>text</code></td>
 			<td>area for entering/editing text</td>
 		</tr>
 		<tr>
-			<td><code>checkbox</code>
-			</td>
+			<td><code>checkbox</code></td>
 			<td>corresponds to a boolean choice</td>
 		</tr>
 		<tr>
-			<td><code>radiobutton</code>
-			</td>
-			<td>usually used in connection with <code>button-group</code>
-			</td>
+			<td><code>radiobutton</code></td>
+			<td>usually used in connection with <code>button-group</code></td>
 		</tr>
 		<tr>
-			<td><code>spinner</code>
-			</td>
+			<td><code>spinner</code></td>
 			<td>provides a continuous range of integer values</td>
 		</tr>
 		<tr>
-			<td><code>combo</code>
-			</td>
+			<td><code>combo</code></td>
 			<td>select from a list of items</td>
 		</tr>
 	</table>
@@ -1649,26 +1641,22 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><i>title</i>
-			</td>
+			<td><i>title</i></td>
 			<td>used with <code>checkbox</code> and <code>radiobutton</code>
 				widgets for the button label.</td>
 		</tr>
 		<tr>
-			<td><i>style</i>
-			</td>
+			<td><i>style</i></td>
 			<td>carries the <code>SWT</code> style constants appropriate to
 				the widget type.</td>
 		</tr>
 		<tr>
-			<td><i>readOnly</i>
-			</td>
+			<td><i>readOnly</i></td>
 			<td>applies to <code>text</code>, <code>spinner</code> and <code>combo</code>
 				widgets; the text area in this case is not editable.</td>
 		</tr>
 		<tr>
-			<td><i>saveValueTo</i>
-			</td>
+			<td><i>saveValueTo</i></td>
 			<td>applies to all widgets except <code>label</code>; the name
 				of the property or attribute whose value should be set on the basis
 				of the widget's "selected" value or text.<br> <b>Note:</b> use
@@ -1676,8 +1664,7 @@
 				and <code>dynamic-text</code> elements.</td>
 		</tr>
 		<tr>
-			<td><code>items-from</code>
-			</td>
+			<td><code>items-from</code></td>
 			<td>applies to the <code>combo</code> widget; indicates a
 				property or attribute <i>value</i> (of type <code>java.util.Collection</code>)
 				to use to populate the items.<br> <b>Note:</b> if a combo
@@ -1690,14 +1677,12 @@
 				choices).</td>
 		</tr>
 		<tr>
-			<td><code>fixed-text</code>
-			</td>
+			<td><code>fixed-text</code></td>
 			<td>applies to the <code>label</code> and (read-only) <code>text</code>
 				widgets; text is resolved once and remains constant thereafter.</td>
 		</tr>
 		<tr>
-			<td><code>dynamic-text</code>
-			</td>
+			<td><code>dynamic-text</code></td>
 			<td>applies only to (read-only) <code>text</code> widgets; text
 				is resolved each time there is an update of a value from the Launch
 				Tab.</td>
@@ -1761,19 +1746,16 @@
 	<br>
 	<table align="center" rules="all">
 		<tr>
-			<td><i>directory</i>
-			</td>
+			<td><i>directory</i></td>
 			<td>limit the <code>browse</code> widget to directories.</td>
 		</tr>
 		<tr>
-			<td><i>uri</i>
-			</td>
+			<td><i>uri</i></td>
 			<td>have the <code>browse</code> widget set a URI as the text
 				(default is false, in which case the text is an absolute path).</td>
 		</tr>
 		<tr>
-			<td><i>localOnly</i>
-			</td>
+			<td><i>localOnly</i></td>
 			<td>limit the <code>browse</code> widget to the local file
 				system (otherwise, the choice of local or remote is enabled).</td>
 		</tr>
@@ -1860,28 +1842,22 @@
 
 	<table align="center" rules="all">
 		<tr>
-			<td><b>Name</b>
-			</td>
+			<td><b>Name</b></td>
 		</tr>
 		<tr>
-			<td><b>Value</b>
-			</td>
+			<td><b>Value</b></td>
 		</tr>
 		<tr>
-			<td><b>Type</b>
-			</td>
+			<td><b>Type</b></td>
 		</tr>
 		<tr>
-			<td><b>Status</b>
-			</td>
+			<td><b>Status</b></td>
 		</tr>
 		<tr>
-			<td><b>Default</b>
-			</td>
+			<td><b>Default</b></td>
 		</tr>
 		<tr>
-			<td><b>Description</b>
-			</td>
+			<td><b>Description</b></td>
 		</tr>
 	</table>
 	<br>
