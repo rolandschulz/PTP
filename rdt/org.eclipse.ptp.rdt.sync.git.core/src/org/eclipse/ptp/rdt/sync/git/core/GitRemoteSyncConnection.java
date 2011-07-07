@@ -67,6 +67,8 @@ public class GitRemoteSyncConnection {
 	private final int MAX_FILES = 100;
 	private final static String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
 	private final static String commitMessage = Messages.GRSC_CommitMessage;
+	public final static String gitDir = ".ptp-sync"; //$NON-NLS-1$
+	private final static String gitCommand = "git --git-dir " + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private final static String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 	private final IRemoteConnection connection;
 	private final SyncFileFilter fileFilter;
@@ -168,12 +170,12 @@ public class GitRemoteSyncConnection {
 		try {
 			final File localDir = new File(localDirectory);
 			final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
-			Repository repository = repoBuilder.setWorkTree(localDir).build();
+			File gitDirFile = new File(localDirectory + File.separator + gitDir);
+			Repository repository = repoBuilder.setWorkTree(localDir).setGitDir(gitDirFile).build();
 			git = new Git(repository);
 
-			// Create and configure local repository if it is not already
-			// present. Set the git instance.
-			if (repoReady() == false) {
+			// Create and configure local repository if it is not already present
+			if (!(gitDirFile.exists())) {
 				repository.create(false);
 
 				// An initial commit to create the master branch.
@@ -221,7 +223,7 @@ public class GitRemoteSyncConnection {
 	private boolean doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
-			String command = "git init"; //$NON-NLS-1$
+			String command = gitCommand + " init"; //$NON-NLS-1$
 			CommandResults commandResults = null;
 
 			try {
@@ -308,7 +310,7 @@ public class GitRemoteSyncConnection {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		subMon.subTask(Messages.GitRemoteSyncConnection_committing_remote);
 		try {
-			final String command = "git commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+			final String command = gitCommand + " commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = null;
 
 			try {
@@ -335,7 +337,7 @@ public class GitRemoteSyncConnection {
 			RemoteExecutionException, RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
-			List<String> command = stringToList("git rm"); //$NON-NLS-1$
+			List<String> command = stringToList(gitCommand + " rm"); //$NON-NLS-1$
 			for (String fileName : filesToDelete) {
 				command.add(fileName);
 			}
@@ -371,7 +373,7 @@ public class GitRemoteSyncConnection {
 		subMon.subTask(Messages.GitRemoteSyncConnection_adding_files);
 		try {
 			while (!filesToAdd.isEmpty()) {
-				List<String> commandList = stringToList("git add"); //$NON-NLS-1$
+				List<String> commandList = stringToList(gitCommand + " add"); //$NON-NLS-1$
 				int count = 1;
 				for (String fileName : filesToAdd.toArray(new String[0])) {
 					if (count++ % MAX_FILES == 0) {
@@ -413,9 +415,9 @@ public class GitRemoteSyncConnection {
 		try {
 			final String command;
 			if (includeUntrackedFiles) {
-				command = "git ls-files -t --modified --others --deleted"; //$NON-NLS-1$
+				command = gitCommand + " ls-files -t --modified --others --deleted"; //$NON-NLS-1$
 			} else {
-				command = "git ls-files -t --modified --deleted"; //$NON-NLS-1$
+				command = gitCommand + " ls-files -t --modified --deleted"; //$NON-NLS-1$
 			}
 			CommandResults commandResults = null;
 
@@ -559,11 +561,11 @@ public class GitRemoteSyncConnection {
 	 */
 	private URIish buildURI() {
 		return new URIish()
-		// .setUser(connection.getUsername())
+				// .setUser(connection.getUsername())
 				.setHost("none") //$NON-NLS-1$
 				// .setPass("")
 				.setScheme("ssh") //$NON-NLS-1$
-				.setPath(remoteDirectory);
+				.setPath(remoteDirectory + File.separator + gitDir);
 	}
 
 	public void close() {
@@ -634,20 +636,6 @@ public class GitRemoteSyncConnection {
 	}
 
 	/**
-	 * 
-	 * @param localDirectory
-	 * @return If the repo has actually been initialized TODO: Consider the ways
-	 *         this could go wrong. What if the directory name already ends in a
-	 *         slash? What if ".git" is a file or does not contain the
-	 *         appropriate files?
-	 */
-	private boolean repoReady() {
-		final String repoDirectory = localDirectory + "/.git"; //$NON-NLS-1$
-		final File repoDir = new File(repoDirectory);
-		return repoDir.exists();
-	}
-
-	/**
 	 * Many of the listed exceptions appear to be unrecoverable, caused by
 	 * errors in the initial setup. It is vital, though, that failed syncs are
 	 * reported and handled. So all exceptions are checked exceptions, embedded
@@ -672,7 +660,7 @@ public class GitRemoteSyncConnection {
 
 				// Now remotely merge changes with master branch
 				CommandResults mergeResults;
-				final String command = "git merge " + remotePushBranch; //$NON-NLS-1$
+				final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
 
 				mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
 
