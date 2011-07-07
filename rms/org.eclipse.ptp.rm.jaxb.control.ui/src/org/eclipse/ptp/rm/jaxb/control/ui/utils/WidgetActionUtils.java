@@ -247,7 +247,7 @@ public class WidgetActionUtils {
 			error = JAXBControlUIConstants.ZEROSTR;
 		}
 
-		if (reg != null && new RegexImpl(reg).getMatched(value) == null) {
+		if (reg != null && new RegexImpl(reg, null, null).getMatched(value) == null) {
 			throw new UnsatisfiedMatchException(error + JAXBControlUIConstants.CO + JAXBControlUIConstants.SP + reg.getExpression()
 					+ JAXBControlUIConstants.CM + JAXBControlUIConstants.SP + value);
 		} else {

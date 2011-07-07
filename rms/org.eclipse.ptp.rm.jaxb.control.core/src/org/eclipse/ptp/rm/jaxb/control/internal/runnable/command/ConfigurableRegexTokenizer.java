@@ -168,11 +168,11 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 
 		RegexType reg = tokenizer.getExitOn();
 		if (reg != null) {
-			exitOn = new RegexImpl(reg);
+			exitOn = new RegexImpl(reg, uuid, rmVarMap);
 		}
 		reg = tokenizer.getExitAfter();
 		if (reg != null) {
-			exitAfter = new RegexImpl(reg);
+			exitAfter = new RegexImpl(reg, uuid, rmVarMap);
 		}
 
 		segment = new StringBuffer();
