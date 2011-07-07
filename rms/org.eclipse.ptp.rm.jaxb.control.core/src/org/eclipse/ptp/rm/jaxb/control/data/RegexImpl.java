@@ -35,6 +35,20 @@ public class RegexImpl {
 	 * @param regex
 	 *            JAXB data element
 	 */
+	public RegexImpl(RegexType regex) {
+		this(regex, null, null);
+	}
+
+	/**
+	 * Wraps the Java implementation of regular expressions.
+	 * 
+	 * @param regex
+	 *            JAXB data element
+	 * @param uuid
+	 *            of job (can be <code>null</code>)
+	 * @param map
+	 *            of environment (can be <code>null</code>)
+	 */
 	public RegexImpl(RegexType regex, String uuid, IVariableMap map) {
 		expression = regex.getExpression();
 		if (expression == null) {
