@@ -36,6 +36,8 @@ PTP_FEATURES="\
 	org.eclipse.ptp.rdt-feature \
 	org.eclipse.ptp.rdt.remotejars-feature \
 	org.eclipse.ptp.rdt.remotetools-feature \
+	org.eclipse.ptp.rdt.sync-feature \
+	org.eclipse.ptp.rdt.sync.fortran-feature \
 	org.eclipse.ptp.rdt.xlc-feature \
 	org.eclipse.ptp.remote-feature \
 	org.eclipse.ptp.remote.remotetools-feature \
@@ -43,11 +45,15 @@ PTP_FEATURES="\
 	org.eclipse.ptp.remotetools-feature \
 	org.eclipse.ptp.rm.ibm.ll-feature \
 	org.eclipse.ptp.rm.ibm.pe-feature \
+	org.eclipse.ptp.rm.jaxb-feature \
+	org.eclipse.ptp.rm.jaxb.pbs-feature \
+	org.eclipse.ptp.rm.lml_jaxb-feature \
+	org.eclipse.ptp.rm.lml-feature \
 	org.eclipse.ptp.rm.mpich2-feature \
 	org.eclipse.ptp.rm.openmpi-feature \
-	org.eclipse.ptp.rm.pbs-feature \
 	org.eclipse.ptp.rm.slurm-feature \
 	org.eclipse.ptp.sci-feature \
+	org.eclipse.ptp.sdk-feature \
 	org.eclipse.ptp.sdm-feature \
 	org.eclipse.ptp.services-feature \
 	org.eclipse.ptp.utils-feature"
@@ -77,12 +83,12 @@ PTP_C_PROJECTS="\
 	org.eclipse.ptp.utils"
 	
 update_feature() {
-	sed -e "s/version=\"[0-9]\.[0-9]\.[0-9]\.qualifier\"/version=\"$2\.qualifier\"/" < $1/feature.xml > $TMP_DIR/${1}_feature.xml
+	sed -e "s/^\([ \t]*\)version=\"[0-9]\.[0-9]\.[0-9]\.qualifier\"/\1version=\"$2\.qualifier\"/" < $1/feature.xml > $TMP_DIR/${1}_feature.xml
 	mv $TMP_DIR/${1}_feature.xml $1/feature.xml
 }
 
 update_manifest() {
-	sed -e "s/Bundle-Version: *[0-9]\.[0-9]\.[0-9]\.qualifier/Bundle-Version: $2.qualifier/" < $1/META-INF/MANIFEST.MF > $TMP_DIR/${1}_MANIFEST.MF
+	sed -e "s/^\([ \t]*\)Bundle-Version: *[0-9]\.[0-9]\.[0-9]\.qualifier/\1Bundle-Version: $2.qualifier/" < $1/META-INF/MANIFEST.MF > $TMP_DIR/${1}_MANIFEST.MF
 	mv $TMP_DIR/${1}_MANIFEST.MF $1/META-INF/MANIFEST.MF
 }
 

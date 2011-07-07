@@ -25,7 +25,7 @@
 		<!-- Update for new RSE version -->
 		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/tm/downloads/drops/S-3.3RC3-201106011145/RSE-SDK-3.3RC3.zip"/>
 		<!-- Update for new Mylyn version -->
-		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/mylyn-3.4.3-e3.4.zip"/>
+		<!--property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/mylyn-3.4.3-e3.4.zip"/-->
 		<!-- Update for new jgit version -->
 		<property name="jgitDist" value="/home/data/httpd/download.eclipse.org/egit/staging/v1.0.0.201106090707-r/plugins/org.eclipse.jgit_1.0.0.201106090707-r.jar"/>
 		<!-- Properties below here shouldn't need to be changed -->
@@ -35,8 +35,8 @@
 		<property name="forceContextQualifier" value="${timestamp}"/>
 		<property name="buildingOSGi" value="true"/>
 		<property name="buildDirectory" value="${basedir}/results"/>
-		<property name="releaseDir" value="/home/data/httpd/download.eclipse.org/tools/ptp/builds/${eclipseRelease}"/>
-		<property name="copyToDir" value="${releaseDir}/${buildType}.${buildId}"/>
+		<property name="buildsDir" value="/home/data/httpd/download.eclipse.org/tools/ptp/builds/${ptpBranchVersion}"/>
+		<property name="copyToDir" value="${buildsDir}/${buildType}.${buildId}"/>
 		<property name="testDirectory" value="${buildDirectory}/test"/>
 		<property name="baseLocation" value="${buildDirectory}/eclipse"/>
 		<property name="pde.build.scripts" value="${eclipse.pdebuild.scripts}"/>
@@ -78,7 +78,7 @@
 		<untar src="${eclipseDist}" dest="${buildDirectory}" compression="gzip"/>
 		<unzip src="${rseDist}" dest="${buildDirectory}"/>
 		<unzip src="${cdtDist}" dest="${buildDirectory}/eclipse"/>
-		<unzip src="${mylynDist}" dest="${buildDirectory}/eclipse"/>
+		<!--unzip src="${mylynDist}" dest="${buildDirectory}/eclipse"/-->
 		<copy file="${jgitDist}" todir="${buildDirectory}/eclipse/plugins"/>
 	</target>
 	
@@ -210,24 +210,24 @@
 		<!-- symbolic links. The only option currenly is to exec the "rm" command. -->
 		<exec executable="rm">
 			<arg value="-f"/>
-			<arg value="${releaseDir}/latest"/>
+			<arg value="${buildsDir}/latest"/>
 		</exec>
-		<symlink link="${releaseDir}/latest" resource="${copyToDir}" overwrite="true" failonerror="false"/>
+		<symlink link="${buildsDir}/latest" resource="${copyToDir}" overwrite="true" failonerror="false"/>
 		<exec executable="rm">
 			<arg value="-f"/>
-			<arg value="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip"/>
+			<arg value="${buildsDir}/ptp-master-${ptpBranchVersion}-latest.zip"/>
 		</exec>
-		<symlink link="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${masterFile}" overwrite="true" failonerror="false"/>
+		<symlink link="${buildsDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${masterFile}" overwrite="true" failonerror="false"/>
 		<exec executable="rm">
 			<arg value="-f"/>
-			<arg value="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar"/>
+			<arg value="${buildsDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar"/>
 		</exec>
-		<symlink link="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true" failonerror="false"/>
+		<symlink link="${buildsDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true" failonerror="false"/>
 		<exec executable="rm">
 			<arg value="-f"/>
-			<arg value="${releaseDir}/rdt-server-aix-${ptpBranchVersion}-latest.tar"/>
+			<arg value="${buildsDir}/rdt-server-aix-${ptpBranchVersion}-latest.tar"/>
 		</exec>
-		<symlink link="${releaseDir}/rdt-server-aix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-aix-${ptpBranchVersion}.tar" overwrite="true" failonerror="false"/>
+		<symlink link="${buildsDir}/rdt-server-aix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-aix-${ptpBranchVersion}.tar" overwrite="true" failonerror="false"/>
 	</target>
 	
 	<target name="p2" depends="init" unless="hasErrors">
@@ -291,16 +291,17 @@
 	</target>
 	
 	<target name="update" depends="init" unless="hasErrors">
-		<replace file="${releaseDir}/index.html">
+		<replace file="${buildsDir}/index.html">
 			<replacetoken><![CDATA[  <!-- add here -->]]></replacetoken>
 			<replacevalue><![CDATA[  <!-- add here -->
 <li><a href="@buildType@.@buildId@/index.html">@buildId@</a></li>]]></replacevalue>
 		</replace>
-		<replace file="${releaseDir}/index.html">
+		<replace file="${buildsDir}/index.html">
 			<replacefilter token="@buildType@" value="${buildType}"/>
 			<replacefilter token="@buildId@" value="${buildId}"/>
+			<replacefilter token="@ptpBranchVersion@" value="${ptpBranchVersion}"/>
 		</replace>
-		<chmod file="${releaseDir}/index.html" perm="664"/>
+		<chmod file="${buildsDir}/index.html" perm="664"/>
 	</target>
 		
 	<target name="tagone">

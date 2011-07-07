@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <description url="http://download.eclipse.org/tools/ptp/updates/indigo">
+   <description url="http://download.eclipse.org/tools/ptp/updates/@eclipseRelease@">
       Parallel Tools Platform Indigo Update Site
    </description>
    <feature url="features/org.eclipse.ptp_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp" version="@ptpBranchVersion@.@timeStamp@">
