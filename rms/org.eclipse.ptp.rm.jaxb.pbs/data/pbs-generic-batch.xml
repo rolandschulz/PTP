@@ -458,7 +458,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				</target>
 				<target ref="@jobId">
 					<match>
-						<expression flags="DOTALL">.*Job not submitted.*</expression>
+						<expression flags="DOTALL|UNIX_LINES">.*Job not submitted.*</expression>
 						<set field="value">
 							<entry value="FAILED"/>
 						</set>
