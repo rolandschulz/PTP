@@ -200,7 +200,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				if (irrelevantPath(delta)) {
 					return false;
 				} else {
-					if (delta.getAffectedChildren().length == 0) {
+					if ((delta.getAffectedChildren().length == 0) && (delta.getFlags() != IResourceDelta.MARKERS)) {
 						relevantChangeFound = true;
 					}
 				}
