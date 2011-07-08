@@ -68,7 +68,7 @@ public class GitRemoteSyncConnection {
 	private final static String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
 	private final static String commitMessage = Messages.GRSC_CommitMessage;
 	public final static String gitDir = ".ptp-sync"; //$NON-NLS-1$
-	private final static String gitCommand = "git --git-dir " + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
+	private final static String gitCommand = "git --git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private final static String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 	private final IRemoteConnection connection;
 	private final SyncFileFilter fileFilter;
@@ -223,7 +223,7 @@ public class GitRemoteSyncConnection {
 	private boolean doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
-			String command = gitCommand + " init"; //$NON-NLS-1$
+			String command = "git --git-dir=" + gitDir + " init"; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = null;
 
 			try {
