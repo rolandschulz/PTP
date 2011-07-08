@@ -88,7 +88,7 @@ update_feature() {
 }
 
 update_manifest() {
-	sed -e "s/^\([ \t]*\)Bundle-Version: *[0-9]\.[0-9]\.[0-9]\.qualifier/\1Bundle-Version: $2.qualifier/" < $1/META-INF/MANIFEST.MF > $TMP_DIR/${1}_MANIFEST.MF
+	sed -e "s/^Bundle-Version: *[0-9]\.[0-9]\.[0-9]\.qualifier/Bundle-Version: $2.qualifier/" < $1/META-INF/MANIFEST.MF > $TMP_DIR/${1}_MANIFEST.MF
 	mv $TMP_DIR/${1}_MANIFEST.MF $1/META-INF/MANIFEST.MF
 }
 
