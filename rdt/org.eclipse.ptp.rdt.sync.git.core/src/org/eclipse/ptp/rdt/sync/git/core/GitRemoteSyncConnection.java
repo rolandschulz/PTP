@@ -565,7 +565,7 @@ public class GitRemoteSyncConnection {
 				.setHost("none") //$NON-NLS-1$
 				// .setPass("")
 				.setScheme("ssh") //$NON-NLS-1$
-				.setPath(remoteDirectory + File.separator + gitDir);
+				.setPath(remoteDirectory + "/" + gitDir); //$NON-NLS-1$  //Should use remote path seperator but first 315720 has to be fixed
 	}
 
 	public void close() {
