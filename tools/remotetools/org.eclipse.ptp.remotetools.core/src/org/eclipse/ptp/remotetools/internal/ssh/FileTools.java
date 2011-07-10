@@ -790,8 +790,9 @@ public class FileTools implements IRemoteFileTools {
 	public String parentOfRemotePath(String path) {
 		path = removeTrailingSlash(path);
 		int index = path.lastIndexOf('/');
-		if (index == -1)
+		if (index == -1) {
 			return null;
+		}
 		return removeTrailingSlash(path.substring(0, index));
 	}
 
@@ -895,8 +896,9 @@ public class FileTools implements IRemoteFileTools {
 	public String suffixOfRemotePath(String path) {
 		path = removeTrailingSlash(path);
 		int index = path.lastIndexOf('/');
-		if (index == -1)
+		if (index == -1) {
 			return null;
+		}
 		return removeTrailingSlash(path.substring(index + 1));
 	}
 
@@ -953,6 +955,7 @@ public class FileTools implements IRemoteFileTools {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private boolean checkOSName(String name) {
 		if (fOSName == null) {
 			try {

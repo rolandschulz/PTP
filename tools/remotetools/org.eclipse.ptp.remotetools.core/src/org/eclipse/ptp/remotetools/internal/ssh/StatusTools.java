@@ -153,7 +153,6 @@ public class StatusTools implements IRemoteStatusTools {
 	private static int PASSWD_USERNAME_FIELD = 0;
 	private static int PASSWD_USERID_FIELD = 2;
 	private static int PASSWD_GROUPID_FIELD = 3;
-	private static int PASSWD_HOMEDIR_FIELD = 5;
 
 	private static int GROUP_GROUPID_FIELD = 2;
 	private static int GROUP_USERLIST_FIELD = 3;
@@ -183,6 +182,7 @@ public class StatusTools implements IRemoteStatusTools {
 	 * @throws RemoteOperationException
 	 * @throws CancelException
 	 */
+	@SuppressWarnings("unused")
 	private Set<Integer> getGroupIDSet_CatBased() throws RemoteConnectionException, RemoteOperationException, CancelException {
 		String[] passwdFields = getPasswdFields();
 		String username = passwdFields[PASSWD_USERNAME_FIELD].trim();
