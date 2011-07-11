@@ -9,12 +9,12 @@
             class="org.eclipse.ptp.rdt.sync.ui.fortran.wizards.NewFortranSyncProjectWizard"
             finalPerspective="org.eclipse.photran.ui.FortranPerspective"
             hasPages="true"
-            icon="icons/etool16/newremote_c_proj.gif"
+            icon="icons/etool16/new_sync_f_proj.gif"
             id="org.eclipse.ptp.rdt.sync.ui.newFortranProjectWizard"
-            name="%wizard.name.1"
+            name="%wizard.name"
             project="true">
          <description>
-            %remoteCCPPproject.desc
+            %syncProject.desc
          </description>
       </wizard>
       
