@@ -168,7 +168,6 @@
          dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
          id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.linker.input"
          multipleOfType="true"
-         scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfile"
          sourceContentType="org.eclipse.cdt.managedbuilder.core.compiledObjectFile"
          sources="o">
       <additionalInput
@@ -377,7 +376,6 @@
           dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
           id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.linker.input"
           multipleOfType="true"
-          scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfile"
           sourceContentType="org.eclipse.cdt.managedbuilder.core.compiledObjectFile"
           sources="o">
        <additionalInput
@@ -526,7 +524,6 @@
     </option>
     <inputType
           id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.assembler.input"
-          scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfile"
           sourceContentType="org.eclipse.cdt.core.asmSource"
           sources="s,S">
     </inputType>
@@ -846,7 +843,7 @@
           dependencyExtensions="h"
           id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.input"
           languageId="org.eclipse.cdt.core.gcc"
-          scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfile"
+          scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerProjectProfile|org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfile"
           sourceContentType="org.eclipse.cdt.core.cSource"
           sources="c">
     </inputType>
@@ -1144,7 +1141,7 @@
           dependencyExtensions="h,H,hpp"
           id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.input"
           languageId="org.eclipse.cdt.core.g++"
-          scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfile"
+          scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerProjectProfileCpp|org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"
           sourceContentType="org.eclipse.cdt.core.cxxSource"
           sources="c,C,cc,cxx,cpp">
     </inputType>
@@ -1185,8 +1182,8 @@
        archList="all"
        id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base"
        name="%ToolChainName.Dbg"
-       osList="linux,hpux,aix,qnx"
-       scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfile"
+       osList="linux,qnx"
+       scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp | org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerProjectProfileCpp"
        targetTool="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.linker;org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.linker;org.eclipse.ptp.rdt.managedbuild.tool.gnu.archiver">
     <targetPlatform
           archList="all"
@@ -1648,11 +1645,11 @@
  
    </extension>
    <extension
-         id="RemoteGCCPerProjectProfile"
+         id="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerProjectProfile"
          name="%extension.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
      <scannerInfoCollector
-            class="org.eclipse.cdt.managedbuilder.internal.scannerconfig.DefaultGCCScannerInfoCollector"
+            class="org.eclipse.cdt.make.internal.core.scannerconfig2.PerProjectSICollector"
             scope="project"/>
      		<!-- The ScannerInfoProvider search for the information needed by the profile and send it to the ScannerInfoCollector -->
 		<scannerInfoProvider providerId="specsFile">
@@ -1660,7 +1657,7 @@
 			<!-- The compiler command used will be always a C compiler command -->
 			<!-- The output for C or C++ projects will be different as the ScannerInfoProvider substitute the ${specs_file} variable below with a dummy "c" file or "cpp" file -->
 			<run
-					arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
+					arguments="-E -P -v -dD ${specs_file_path}"
 					command="gcc"
 					class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCSpecsRunSIProvider">
 			</run>
@@ -1671,12 +1668,12 @@
 		</scannerInfoProvider>
   <buildOutputProvider>
      <scannerInfoConsoleParser
-           class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCPerFileBOPConsoleParser">
+           class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCScannerInfoConsoleParser">
      </scannerInfoConsoleParser>
   </buildOutputProvider>
    </extension>
    <extension
-         id="RemoteGCCPerFileProfile"
+         id="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfile"
          name="%scannerConfigProfile.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
@@ -1688,7 +1685,7 @@
 			<!-- The compiler command used will be always a C compiler command -->
 			<!-- The output for C or C++ projects will be different as the ScannerInfoProvider substitute the ${specs_file} variable below with a dummy "c" file or "cpp" file -->
 			<run
-					arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
+					arguments="-E -P -v -dD ${specs_file_path}"
 					command="gcc"
 					class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCSpecsRunSIProvider">
 			</run>
@@ -1699,16 +1696,16 @@
 		</scannerInfoProvider>
       <buildOutputProvider>
          <scannerInfoConsoleParser
-               class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCPerFileBOPConsoleParser">
+               class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCScannerInfoConsoleParser">
          </scannerInfoConsoleParser>
       </buildOutputProvider>
    </extension>
 <extension
-         id="RemoteGCCPerProjectProfileCpp"
+         id="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerProjectProfileCpp"
          name="%extensionCpp.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
      <scannerInfoCollector
-            class="org.eclipse.cdt.managedbuilder.internal.scannerconfig.DefaultGCCScannerInfoCollector"
+            class="org.eclipse.cdt.make.internal.core.scannerconfig2.PerProjectSICollector"
             scope="project"/>
      		<!-- The ScannerInfoProvider search for the information needed by the profile and send it to the ScannerInfoCollector -->
 		<scannerInfoProvider providerId="specsFile">
@@ -1716,7 +1713,7 @@
 			<!-- The compiler command used will be always a C compiler command -->
 			<!-- The output for C or C++ projects will be different as the ScannerInfoProvider substitute the ${specs_file} variable below with a dummy "c" file or "cpp" file -->
 			<run
-					arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
+					arguments="-E -P -v -dD ${specs_file_path}"
 					command="g++"
 					class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCSpecsRunSIProvider">
 			</run>
@@ -1727,12 +1724,12 @@
 		</scannerInfoProvider>
   <buildOutputProvider>
      <scannerInfoConsoleParser
-           class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCPerFileBOPConsoleParser">
+           class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCScannerInfoConsoleParser">
      </scannerInfoConsoleParser>
   </buildOutputProvider>
    </extension>
    <extension
-         id="RemoteGCCPerFileProfileCpp"
+         id="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"
          name="%scannerConfigProfileCpp.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
@@ -1744,7 +1741,7 @@
 			<!-- The compiler command used will be always a C compiler command -->
 			<!-- The output for C or C++ projects will be different as the ScannerInfoProvider substitute the ${specs_file} variable below with a dummy "c" file or "cpp" file -->
 			<run
-					arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
+					arguments="-E -P -v -dD ${specs_file_path}"
 					command="g++"
 					class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCSpecsRunSIProvider">
 			</run>
@@ -1755,10 +1752,10 @@
 		</scannerInfoProvider>
       <buildOutputProvider>
          <scannerInfoConsoleParser
-               class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCPerFileBOPConsoleParser">
+               class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCScannerInfoConsoleParser">
          </scannerInfoConsoleParser>
       </buildOutputProvider>
-   </extension>   
+   </extension> 
    <!-- activity to disable the local XL Compiler path properties page extension defined in org.eclipse.cdt.managedbuilder.xlc.ui-->
 
 </plugin>
