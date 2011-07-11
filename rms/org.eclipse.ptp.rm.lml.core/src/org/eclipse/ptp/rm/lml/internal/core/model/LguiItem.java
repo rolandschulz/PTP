@@ -450,13 +450,13 @@ public class LguiItem implements ILguiItem {
 				xmlStream.append(s);
 			}
 		} catch (final IOException e) {
-			e.printStackTrace();
+			xmlStream = new StringBuilder();
 		} finally {
 			if (reader != null) {
 				try {
 					reader.close();
 				} catch (final IOException e) {
-					e.printStackTrace();
+					xmlStream = new StringBuilder();
 				}
 			}
 		}

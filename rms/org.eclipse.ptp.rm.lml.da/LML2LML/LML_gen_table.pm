@@ -185,7 +185,8 @@ sub get_lml_table {
     my($ds,$rc,$id,$cid);
     my $layoutref  = $self->{LAYOUT};
     my $tableref   = $self->{TABLE};
-    my(@keylist,$key,$value,$ref, $objtype_pattern, $specref, $active);
+#    my(@keylist,$key,$value,$ref, $objtype_pattern, $specref, $active);
+	my(%keylist,$key,$value,$ref, $objtype_pattern, $specref, $active, $lastcid, $cid);
 
     $objtype_pattern=$self->{OBJTYPE_PATTERN};
 
@@ -223,18 +224,26 @@ sub get_lml_table {
 		}
 	    }
 	}
-	push(@keylist,$layoutref->{column}->{$cid}->{key});
+	$keylist{$cid} = $layoutref->{column}->{$cid}->{key};
+	#push(@keylist,$layoutref->{column}->{$cid}->{key});
     }
     
     # add data to table
     foreach $id (@{$self->{IDLISTREF}}) {
-	foreach $key (@keylist) {
+	$lastcid = 0;
+	foreach $cid (sort {$a <=> $b} (keys %keylist)) {
+		$key = $keylist{$cid};
 	    if(exists($self->{LMLFH}->{DATA}->{INFODATA}->{$id}->{$key})) {
 		$value=$self->{LMLFH}->{DATA}->{INFODATA}->{$id}->{$key};
 	    } else {
 		$value="?";
 	    }
-	    push(@{$ds->{row}->{$id}->{cell}},$value);
+	    
+	    $ds->{row}->{$id}->{cell}->{$cid}->{value} = $value;
+	    if (($cid - $lastcid) > 1) {
+	    	$ds->{row}->{$id}->{cell}->{$cid}->{cid} = $cid;
+	    }
+	    $lastcid = $cid;
 	}
     }
     
@@ -285,6 +294,7 @@ sub get_lml_tablelayout {
 	    next if($activekeys{$key});
 	    $lastcid++;$cid=$lastcid;
 	    $ds->{column}->{$cid}->{cid}=$cid;
+	    $ds->{column}->{$cid}->{pos}=$cid - 1;
 	    $ds->{column}->{$cid}->{key}=$key;
 	    $ds->{column}->{$cid}->{width}="1";
 	    $ds->{column}->{$cid}->{active}="false";

@@ -58,7 +58,8 @@ sub new {
 #                                                 ->{name}
 #                                                 ->{sort}
 #                                                 ->{pattern}=[[include|exclude, regexp], ...]
-#                               ->{row}->{$id}->{cell}->[value,value,...]
+#                               ->{row}->{$id}->{cell}->{$cid}->{value}
+#                                                             ->{cid}
 #
 #                 {NODEDISPLAYLAYOUT}->{$id}->{id}
 #                                           ->{gid}
@@ -598,8 +599,12 @@ sub write_lml {
 	    }
  	    foreach $k (sort keys %{$table->{row}}) {
 		printf(OUT "<row  %s=\"%s\">\n","oid",$k);
-		foreach $c (@{$table->{row}->{$k}->{cell}}) {
-		    printf(OUT "<cell %s=\"%s\"/>\n","value",$c);
+		foreach $c (sort {$a <=> $b} keys %{$table->{row}->{$k}->{cell}}) {
+			if (exists($table->{row}->{$k}->{cell}->{$c}->{cid})) {
+				printf(OUT "<cell %s=\"%s\" %s=\"%s\"/>\n","value",$table->{row}->{$k}->{cell}->{$c}->{value},"cid",$table->{row}->{$k}->{cell}->{$c}->{cid});
+			} else {
+				printf(OUT "<cell %s=\"%s\"/>\n","value",$table->{row}->{$k}->{cell}->{$c}->{value});
+			}
 		}
 		printf(OUT "</row>\n");
 	    }

@@ -439,6 +439,9 @@ public class NodedisplayAccess extends LguiHandler {
 
 	public String getTitle(String gid) {
 		final List<Nodedisplay> displays = getNodedisplays();
+		if (displays.size() == 0 || displays.get(0) == null) {
+			return "Nodedisplay";
+		}
 		return displays.get(0).getTitle();
 	}
 

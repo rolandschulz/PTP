@@ -129,8 +129,28 @@ public class TableView extends ViewPart {
 			selectedOid = event.getOid();
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
-					if (composite != null && !composite.isDisposed()) {
-						viewer.refresh();
+					// if (composite != null && !composite.isDisposed()) {
+					// viewer.refresh();
+					// }
+					if (composite != null && !composite.isDisposed() && viewer.getInput() != null) {
+						tree.deselectAll();
+
+						Row[] rows = null;
+						if (viewer.getInput() instanceof Row[]) {
+							rows = (Row[]) viewer.getInput();
+						}
+						int index = -1;
+						if (rows != null) {
+							for (int i = 0; i < rows.length; i++) {
+								if (rows[i].oid != null && rows[i].oid.equals(selectedOid)) {
+									index = i;
+									break;
+								}
+							}
+						}
+						if (index > -1) {
+							tree.select(tree.getItem(index));
+						}
 					}
 				}
 			});
@@ -182,8 +202,11 @@ public class TableView extends ViewPart {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					selectedOid = null;
+					// if (composite != null && !composite.isDisposed()) {
+					// viewer.refresh();
+					// }
 					if (composite != null && !composite.isDisposed()) {
-						viewer.refresh();
+						tree.deselectAll();
 					}
 				}
 			});
@@ -379,10 +402,11 @@ public class TableView extends ViewPart {
 			return;
 		}
 
-		final int numCols = fLguiItem.getTableHandler().getNumberOfTableColumns(gid);
-		treeColumns = new TreeColumn[numCols];
-		savedColumnWidths = new int[numCols];
+		// final int numCols = fLguiItem.getTableHandler().getNumberOfTableColumns(gid);
+		treeColumns = new TreeColumn[tableColumnLayouts.length];
+		savedColumnWidths = new int[tableColumnLayouts.length + 1];
 
+		// first column with color rectangle
 		TreeViewerColumn treeViewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
 		treeViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -418,6 +442,7 @@ public class TableView extends ViewPart {
 		createMenuItem(headerMenu, treeColumn, 0);
 		treeColumnLayout.setColumnData(treeColumn, new ColumnPixelData(40, true));
 
+		// the remaining columns
 		for (int i = 0; i < tableColumnLayouts.length; i++) {
 			treeViewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
 			final int cellNumber = i;
@@ -432,23 +457,50 @@ public class TableView extends ViewPart {
 			treeColumn.setText(tableColumnLayouts[i].getTitle());
 			treeColumn.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
 
-			boolean resizable = true;
-			if (tableColumnLayouts[i].getWidth() == 0) {
-				resizable = false;
+			if (tableColumnLayouts[i].isActive()) {
+				final boolean resizable = true;
+				treeColumn.setResizable(resizable);
+
+				/*
+				 * Create the header menu for this column
+				 */
+				createMenuItem(headerMenu, treeColumn, i + 1);
+
+				/*
+				 * Set the column width
+				 */
+				treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(tableColumnLayouts[i].getWidth(), 0, resizable));
+			} else {
+				final boolean resizable = false;
+				treeColumn.setResizable(resizable);
+
+				/*
+				 * Create the header menu for this column
+				 */
+				createMenuItem(headerMenu, treeColumn, i + 1);
+
+				/*
+				 * Set the column width
+				 */
+				savedColumnWidths[i + 1] = tableColumnLayouts[i].getWidth();
+				treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(0, 0, resizable));
 			}
-			treeColumn.setResizable(resizable);
-
-			/*
-			 * Create the header menu for this column
-			 */
-			createMenuItem(headerMenu, treeColumn, i + 1);
-
-			/*
-			 * Set the column width
-			 */
-			treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(tableColumnLayouts[i].getWidth(), 0, resizable));
 			treeColumns[i] = treeColumn;
 		}
+
+		// just a default column
+		treeViewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
+		treeViewerColumn.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+			}
+		});
+		treeColumn = treeViewerColumn.getColumn();
+		treeColumn.setMoveable(true);
+		treeColumn.setText("");
+		treeColumn.setAlignment(SWT.TRAIL);
+		treeColumn.setResizable(false);
+		treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(0, 0, false));
 
 		/*
 		 * Sorting is done in the model as the table is virtual and has a lazy
@@ -489,6 +541,7 @@ public class TableView extends ViewPart {
 						isMouseDown = true;
 						final TreeItem item = tree.getItem(new Point(e.x, e.y));
 						if (item != null && !composite.isDisposed()) {
+							lmlManager.selectObject(item.getData().toString());
 							lmlManager.markObject(item.getData().toString());
 						}
 					}
@@ -500,6 +553,7 @@ public class TableView extends ViewPart {
 						final TreeItem item = tree.getItem(new Point(e.x, e.y));
 						if (item != null && !composite.isDisposed()) {
 							lmlManager.unmarkObject(item.getData().toString());
+							lmlManager.unselectObject(item.getData().toString());
 						}
 						isMouseDown = false;
 					}
@@ -532,11 +586,13 @@ public class TableView extends ViewPart {
 	}
 
 	private void createMenuItem(Menu parent, final TreeColumn column, final int index) {
+
 		final MenuItem itemName = new MenuItem(parent, SWT.CHECK);
 		itemName.setText(column.getText());
 		itemName.setSelection(column.getResizable());
 		itemName.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
+				boolean active = true;
 				if (itemName.getSelection()) {
 					if (savedColumnWidths[index] == 0) {
 						savedColumnWidths[index] = 50;
@@ -547,9 +603,10 @@ public class TableView extends ViewPart {
 					savedColumnWidths[index] = column.getWidth();
 					column.setWidth(0);
 					column.setResizable(false);
+					active = false;
 				}
 				if (fLguiItem != null) {
-					fLguiItem.getTableHandler().changeTableColumnsWidth(gid, getWidths());
+					fLguiItem.getTableHandler().setTableColumnActive(gid, column.getText(), active);
 				}
 			}
 		});
@@ -627,9 +684,9 @@ public class TableView extends ViewPart {
 	 * @return new column order array with first column removed
 	 */
 	private int[] removeFirstColumn(int[] order) {
-		final int[] orderNew = new int[order.length - 1];
+		final int[] orderNew = new int[order.length - 2];
 		int dif = 0;
-		for (int i = 0; i < order.length; i++) {
+		for (int i = 0; i < order.length - 1; i++) {
 			if (order[i] != 0) {
 				orderNew[i - dif] = order[i] - 1;
 			} else {
