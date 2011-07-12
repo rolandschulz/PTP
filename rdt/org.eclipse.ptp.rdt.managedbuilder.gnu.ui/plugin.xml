@@ -1649,7 +1649,7 @@
          name="%extension.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
      <scannerInfoCollector
-            class="org.eclipse.cdt.make.internal.core.scannerconfig2.PerProjectSICollector"
+            class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.PerProjectSICollectorSkipCygTrans"
             scope="project"/>
      		<!-- The ScannerInfoProvider search for the information needed by the profile and send it to the ScannerInfoCollector -->
 		<scannerInfoProvider providerId="specsFile">
@@ -1705,7 +1705,7 @@
          name="%extensionCpp.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
      <scannerInfoCollector
-            class="org.eclipse.cdt.make.internal.core.scannerconfig2.PerProjectSICollector"
+            class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.PerProjectSICollectorSkipCygTrans"
             scope="project"/>
      		<!-- The ScannerInfoProvider search for the information needed by the profile and send it to the ScannerInfoCollector -->
 		<scannerInfoProvider providerId="specsFile">
