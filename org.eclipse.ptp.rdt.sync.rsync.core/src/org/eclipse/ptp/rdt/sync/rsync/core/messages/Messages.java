@@ -22,8 +22,8 @@ public class Messages extends NLS {
 	public static String ChangeProjectError;
 	public static String SyncErrorMessage;
 	public static String SyncTaskName;
-	public static String RSyncServiceProvider_1;
-	public static String RSyncServiceProvider_2;
+	public static String ServiceProvider_1;
+	public static String ServiceProvider_2;
 
 	static {
 		// initialize resource bundle

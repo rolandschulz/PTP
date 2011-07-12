@@ -1,5 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2011 Oak Ridge National Laboratory and others.
+/* Copyright (c) 2011 Oak Ridge National Laboratory and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,14 +9,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.rsync.core;
 
-import java.io.ByteArrayInputStream;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -42,7 +39,7 @@ import org.eclipse.ptp.services.core.ServiceProvider;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 public class RSyncServiceProvider extends ServiceProvider implements ISyncServiceProvider {
-	public static final String ID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
+	public static final String ID = "org.eclipse.ptp.rdt.sync.rsync.core.RSyncServiceProvider"; //$NON-NLS-1$
 
 	private static final String LOCATION = "location"; //$NON-NLS-1$
 
@@ -191,7 +188,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 		
 		// Make a visitor that explores the delta. At the moment, this visitor is responsible for two tasks (the list may grow in the future):
 		// 1) Find out if there are any "relevant" resource changes (changes that need to be mirrored remotely)
-		// 2) Add an empty ".gitignore" file to new directories so that Git will sync them
+		// 2) Notify connection of path change.
 		class SyncResourceDeltaVisitor implements IResourceDeltaVisitor {
 			private boolean relevantChangeFound = false;
 
@@ -204,14 +201,8 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 					}
 				}
 
-				// Add .gitignore to empty directories
-				if (delta.getResource().getType() == IResource.FOLDER && (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
-					IFile emptyFile = getProject().getFile(delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore");  //$NON-NLS-1$
-					if (!(emptyFile.exists())) {
-						emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
-					}
-				}
-				
+				fSyncConnection.pathChanged(delta);
+
 				return true;
 			}
 
@@ -263,11 +254,11 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 			try {
 				while (!syncLock.tryLock(50, TimeUnit.MILLISECONDS)) {
 					if (progress.isCanceled()) {
-						throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.RSyncServiceProvider_1));
+						throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.ServiceProvider_1));
 					}
 				}
 			} catch (InterruptedException e1) {
-				throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.RSyncServiceProvider_2));
+				throw new CoreException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.ServiceProvider_2));
 			}
 				
 				
@@ -451,5 +442,5 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 			syncLock.unlock();
 		}
 	}
-}
+	}
 
