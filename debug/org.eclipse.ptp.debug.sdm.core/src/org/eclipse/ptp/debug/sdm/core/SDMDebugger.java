@@ -227,13 +227,7 @@ public class SDMDebugger implements IPDebugger {
 				dbgArgs.add("--debug=" + Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_LEVEL)); //$NON-NLS-1$
 			}
 
-			String args = workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, (String) null);
-			if (args == null) {
-				args = stringify(dbgArgs);
-			} else {
-				args += " " + stringify(dbgArgs); //$NON-NLS-1$
-			}
-			workingCopy.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, args);
+			workingCopy.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, stringify(dbgArgs));
 
 			String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, ""); //$NON-NLS-1$
 			verifyResource(dbgExePath, configuration, progress.newChild(10));
