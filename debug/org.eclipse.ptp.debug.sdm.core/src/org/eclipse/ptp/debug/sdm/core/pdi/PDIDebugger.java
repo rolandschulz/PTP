@@ -67,6 +67,8 @@ import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
  */
 public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	private int bpid = 0;
+	private int fForwardedPort = -1;
+	private IRemoteConnection fRemoteConnection = null;
 
 	/*
 	 * (non-Javadoc)
@@ -284,8 +286,8 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 						if (remoteServices != null) {
 							IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
 							if (connMgr != null) {
-								IRemoteConnection conn = connMgr.getConnection(remConf.getConnectionName());
-								if (conn != null) {
+								fRemoteConnection = connMgr.getConnection(remConf.getConnectionName());
+								if (fRemoteConnection != null) {
 									try {
 										/*
 										 * Bind remote port to all interfaces.
@@ -298,7 +300,8 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 										 * head node (GatewayPorts), I'd like
 										 * this to go way.
 										 */
-										port = conn.forwardRemotePort("", getSessionPort(), progress.newChild(5)); //$NON-NLS-1$
+										port = fRemoteConnection.forwardRemotePort("", getSessionPort(), progress.newChild(5)); //$NON-NLS-1$
+										fForwardedPort = port;
 									} catch (RemoteConnectionException e) {
 										throw new PDIException(null, e.getMessage());
 									}
@@ -917,6 +920,19 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	public void stopDebugger() throws PDIException {
 		try {
 			doShutdown();
+
+			/*
+			 * Remove any port forwarding we set up
+			 */
+			if (fForwardedPort >= 0 && fRemoteConnection != null) {
+				try {
+					fRemoteConnection.removePortForwarding(fForwardedPort);
+				} catch (RemoteConnectionException e) {
+					PTPCorePlugin.log(e);
+				}
+				fForwardedPort = -1;
+			}
+
 		} catch (IOException e) {
 			throw new PDIException(null, Messages.PDIDebugger_43 + e.getMessage());
 		}

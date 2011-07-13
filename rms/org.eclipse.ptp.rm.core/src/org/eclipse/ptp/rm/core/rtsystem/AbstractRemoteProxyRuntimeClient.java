@@ -81,6 +81,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 
 	private IProgressMonitor fStartupMonitor = null;
 	private IRemoteConnection fRemoteConnection = null;
+	private int fRemotePort = -1;
 	private final IRemoteResourceManagerConfiguration fConfig;
 	private final ConnectionChangeHandler fConnectionChangeHandler = new ConnectionChangeHandler();
 
@@ -120,6 +121,18 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 			sessionFinish();
 		} catch (IOException e) {
 			PTPCorePlugin.log(e);
+		}
+
+		/*
+		 * Remove any port forwarding we set up
+		 */
+		if (fRemotePort >= 0 && fRemoteConnection != null) {
+			try {
+				fRemoteConnection.removePortForwarding(fRemotePort);
+			} catch (RemoteConnectionException e) {
+				PTPCorePlugin.log(e);
+			}
+			fRemotePort = -1;
 		}
 
 		synchronized (this) {
@@ -193,9 +206,8 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 					}
 
 					subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_5);
-					int remotePort;
 					try {
-						remotePort = fRemoteConnection.forwardRemotePort("localhost", getSessionPort(), subMon.newChild(1)); //$NON-NLS-1$
+						fRemotePort = fRemoteConnection.forwardRemotePort("localhost", getSessionPort(), subMon.newChild(1)); //$NON-NLS-1$
 					} catch (RemoteConnectionException e) {
 						throw new IOException(e.getMessage());
 					}
@@ -204,7 +216,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 						return;
 					}
 					args.add("--host=localhost"); //$NON-NLS-1$
-					args.add("--port=" + remotePort); //$NON-NLS-1$
+					args.add("--port=" + fRemotePort); //$NON-NLS-1$
 				} else {
 					args.add("--host=" + getConfiguration().getLocalAddress()); //$NON-NLS-1$
 					args.add("--port=" + getSessionPort()); //$NON-NLS-1$
@@ -272,9 +284,8 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 				args.add("--proxy=tcp"); //$NON-NLS-1$
 
 				if (getConfiguration().testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
-					int remotePort;
 					try {
-						remotePort = fRemoteConnection.forwardRemotePort("localhost", getSessionPort(), subMon.newChild(1)); //$NON-NLS-1$
+						fRemotePort = fRemoteConnection.forwardRemotePort("localhost", getSessionPort(), subMon.newChild(1)); //$NON-NLS-1$
 					} catch (RemoteConnectionException e) {
 						throw new IOException(e.getMessage());
 					}
@@ -283,7 +294,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 						return;
 					}
 					args.add("--host=localhost"); //$NON-NLS-1$
-					args.add("--port=" + remotePort); //$NON-NLS-1$
+					args.add("--port=" + fRemotePort); //$NON-NLS-1$
 				} else {
 					args.add("--host=" + getConfiguration().getLocalAddress()); //$NON-NLS-1$
 					args.add("--port=" + getSessionPort()); //$NON-NLS-1$
