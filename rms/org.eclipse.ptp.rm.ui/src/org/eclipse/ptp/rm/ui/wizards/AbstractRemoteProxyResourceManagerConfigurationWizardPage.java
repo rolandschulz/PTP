@@ -1002,7 +1002,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		defaultSetting();
 		initializeRemoteServicesCombo();
 		initializeLocalHostCombo();
-		updatePage();
+		setPageComplete(isValidSetting());
 		loading = false;
 	}
 

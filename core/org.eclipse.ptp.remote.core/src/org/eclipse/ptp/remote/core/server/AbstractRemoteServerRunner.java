@@ -618,8 +618,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	private boolean isValidCommand(String command, String verifyPattern, IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
-			StringBuilder sb = new StringBuilder();
-			String s;
+			// compile the pattern for search
+			Pattern pattern = Pattern.compile(verifyPattern);
 
 			// get the remote process that runs the verify command
 			IRemoteProcess p = runCommand(command, Messages.AbstractRemoteServerRunner_runningValidate, null, true,
@@ -629,8 +629,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 
 			// read the output from the command
 			try {
+				String s;
 				while ((s = stdInput.readLine()) != null) {
-					sb.append(s);
+					// get a matcher object
+					Matcher m = pattern.matcher(s);
+					if (m.matches()) {
+						return true;
+					}
 				}
 			} catch (IOException e) {
 				/*
@@ -640,17 +645,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				 * be ascertained.
 				 */
 				PTPRemoteCorePlugin.log(e);
-			}
-
-			// compile the pattern for search
-			Pattern pattern = Pattern.compile(verifyPattern);
-			// get a matcher object
-			Matcher m = pattern.matcher(sb.toString());
-
-			while (m.find()) {
-				// return true if we find the specified pattern matched
-				// with the output stream
-				return true;
 			}
 
 			return false;

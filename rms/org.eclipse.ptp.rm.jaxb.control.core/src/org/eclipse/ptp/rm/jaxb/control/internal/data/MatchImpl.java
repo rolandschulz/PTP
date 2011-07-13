@@ -59,7 +59,7 @@ public class MatchImpl {
 
 		RegexType r = match.getExpression();
 		if (r != null) {
-			regex = new RegexImpl(r);
+			regex = new RegexImpl(r, uuid, rmVarMap);
 		}
 
 		List<Object> assign = match.getAddOrAppendOrPut();
