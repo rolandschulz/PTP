@@ -630,7 +630,7 @@ public class TableView extends ViewPart {
 			public void handleEvent(Event event) {
 				boolean active = true;
 				if (itemName.getSelection()) {
-					if (savedColumnWidths[index] == 0) {
+					if (savedColumnWidths[index] <= 50) {
 						savedColumnWidths[index] = 50;
 					}
 					column.setWidth(savedColumnWidths[index]);
