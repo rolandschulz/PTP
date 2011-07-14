@@ -19,9 +19,9 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection{
 	private final String localDirectory;
 	private final String remoteDirectory;
 	private final SyncFileFilter fileFilter;
+	private final static String FakeSSHLocation = "/home/lnj/bin/";
 
-	
-/* Create a remote sync connection using Rsync. */
+	/* Create a remote sync connection using Rsync. */
 	public RsyncRemoteSyncConnection(IRemoteConnection conn, String localDir, String remoteDir, SyncFileFilter filter, IProgressMonitor monitor){
 		connection = conn;
 		localDirectory = localDir;
@@ -57,7 +57,7 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection{
 	
 	public void syncLocalToRemote(IProgressMonitor monitor) throws RemoteSyncException {
 		//command to be run excluding exclusions.
-		String[] commandLtoR = {"rsync", "-avze","ssh -p " + Integer.toString(connection.getPort()),localDirectory + "/",connection.getUsername() + "@" + connection.getAddress() + ":" + remoteDirectory/*, "--exclude"*/};
+		String[] commandLtoR = {"rsync", "-avze","java -cp " +FakeSSHLocation + " FakeSSH",localDirectory + "/", connection.getAddress() + ":" + remoteDirectory/*, "--exclude"*/};
 		ArrayList<String> cLR = new ArrayList<String>();
 		
 		//load arguments from original command into ArrayList
@@ -90,8 +90,8 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection{
 		}
 	}
 	public void syncRemoteToLocal(IProgressMonitor monitor) throws RemoteSyncException {
-		String[] commandRtoL = {"rsync", "--ignore-existing", "-avze" ,"ssh -p " + Integer.toString(connection.getPort()), connection.getUsername() + "@" + connection.getAddress() + ":" + remoteDirectory + "/", localDirectory};
-		
+		// String[] commandRtoL = {"rsync", "--ignore-existing", "-avze" ,"java -cp" + FakeSSHLocation + Integer.toString(connection.getPort()), connection.getUsername() + "@" + connection.getAddress() + ":" + remoteDirectory + "/", localDirectory};
+		String[] commandRtoL = {"rsync", "--ignore-existing", "-avze", "java -cp " + FakeSSHLocation + " FakeSSH.java", remoteDirectory + "/", connection.getAddress() + ":" + localDirectory/*, "--exclude"*/};
 		try {
 			Process p = Runtime.getRuntime().exec(commandRtoL);
 			p.waitFor();

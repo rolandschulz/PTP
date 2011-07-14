@@ -26,5 +26,4 @@ Import-Package: org.eclipse.ptp.internal.rdt.core.index,
  org.eclipse.ptp.internal.rdt.core.remotemake,
  org.eclipse.ptp.rdt.core.remotemake,
  org.eclipse.ptp.rdt.core.serviceproviders,
- org.eclipse.ptp.rdt.core.services,
- org.eclipse.ptp.rdt.sync.core
+ org.eclipse.ptp.rdt.core.services
