@@ -105,7 +105,8 @@ public class LMLManager {
 
 	public void addComponent(String gid) {
 		if (fLguiItem.getLayoutAccess() != null) {
-			final String type = fLguiItem.getLayoutAccess().setComponentActive(gid, true);
+			final String type = fLguiItem.getLayoutAccess().setComponentActive(
+					gid, true);
 			fireAddView(gid, type);
 		}
 	}
@@ -156,6 +157,7 @@ public class LMLManager {
 		synchronized (LGUIS) {
 			item = LGUIS.get(name);
 			if (item != null) {
+				item.saveCurrentLayout(memento);
 				LGUIS.remove(name);
 			}
 		}
@@ -238,6 +240,7 @@ public class LMLManager {
 			fLguiItem = item;
 		}
 
+		fLguiItem.reloadLastLayout(memento);
 		restoreJobStatusData(fLguiItem, memento);
 
 		if (!fLguiItem.isEmpty()) {
@@ -281,7 +284,8 @@ public class LMLManager {
 	}
 
 	public void selectLgui(String name) {
-		if (name != null && fLguiItem != null && fLguiItem.toString().equals(name)) {
+		if (name != null && fLguiItem != null
+				&& fLguiItem.toString().equals(name)) {
 			return;
 		}
 		fireRemovedLgui(null);
@@ -337,7 +341,8 @@ public class LMLManager {
 		fireUnselectObject(oid);
 	}
 
-	public void update(String name, InputStream input, OutputStream output) throws CoreException {
+	public void update(String name, InputStream input, OutputStream output)
+			throws CoreException {
 		ILguiItem lguiItem = null;
 		synchronized (LGUIS) {
 			lguiItem = LGUIS.get(name);
@@ -346,14 +351,16 @@ public class LMLManager {
 			try {
 				lguiItem.getCurrentLayout(output);
 			} catch (final JAXBException e) {
-				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
-						.getLocalizedMessage()));
+				throw new CoreException(new Status(IStatus.ERROR,
+						LMLCorePlugin.getUniqueIdentifier(), e.getCause()
+								.getLocalizedMessage()));
 			}
 			try {
 				lguiItem.update(input);
 			} catch (final JAXBException e) {
-				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
-						.getLocalizedMessage()));
+				throw new CoreException(new Status(IStatus.ERROR,
+						LMLCorePlugin.getUniqueIdentifier(), e.getCause()
+								.getLocalizedMessage()));
 			}
 
 			if (fLguiItem == lguiItem) {
@@ -366,7 +373,8 @@ public class LMLManager {
 		}
 	}
 
-	public void updateUserJob(String name, String jobId, String status, String detail) {
+	public void updateUserJob(String name, String jobId, String status,
+			String detail) {
 		final ILguiItem lguiItem = LGUIS.get(name);
 		if (lguiItem != null) {
 			lguiItem.updateUserJob(jobId, status, detail);
@@ -384,14 +392,16 @@ public class LMLManager {
 	}
 
 	private void fireChangeSelectedObject(String oid) {
-		final ISelectedObjectChangeEvent event = new SelectedObjectChangeEvent(oid);
+		final ISelectedObjectChangeEvent event = new SelectedObjectChangeEvent(
+				oid);
 		for (final Object listener : lmlListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
 	}
 
 	private void fireChangeTableColumn() {
-		final ITableColumnChangeEvent event = new TableColumnChangeEvent(this, fLguiItem);
+		final ITableColumnChangeEvent event = new TableColumnChangeEvent(this,
+				fLguiItem);
 		for (final Object listener : lmlListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
@@ -442,7 +452,8 @@ public class LMLManager {
 	 * Method is called when an ILguiItem was sorted.
 	 */
 	private void fireSortedLgui() {
-		final IJobListSortedEvent event = new JobListSortedEvent(this, fLguiItem);
+		final IJobListSortedEvent event = new JobListSortedEvent(this,
+				fLguiItem);
 		for (final Object listener : lmlListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}

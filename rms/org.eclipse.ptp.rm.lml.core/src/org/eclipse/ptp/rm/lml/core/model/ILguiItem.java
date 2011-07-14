@@ -25,6 +25,7 @@ import org.eclipse.ptp.rm.lml.internal.core.model.OIDToObject;
 import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus;
 import org.eclipse.ptp.rm.lml.internal.core.model.OverviewAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.TableHandler;
+import org.eclipse.ui.IMemento;
 
 /**
  * Interface to manage the handling of an LguiType. It helps to work with
@@ -68,6 +69,8 @@ public interface ILguiItem {
 	public void addUserJob(String jobId, JobStatusData status, boolean force);
 
 	/**
+	 * The meth
+	 * 
 	 * @param output
 	 */
 	public void getCurrentLayout(OutputStream output) throws JAXBException;
@@ -150,9 +153,24 @@ public interface ILguiItem {
 	public void notifyListeners();
 
 	/**
+	 * 
+	 * @param memento
+	 */
+	public void reloadLastLayout(IMemento memento);
+
+	/**
 	 * @param name
 	 */
 	public void removeUserJob(String name);
+
+	/**
+	 * The Resource Manager is being closed. The current layout of the different
+	 * monitoring parts should be saved during the closing.
+	 * 
+	 * @param memento
+	 *            Memento in which the current layout should be saved
+	 */
+	public void saveCurrentLayout(IMemento memento);
 
 	/**
 	 * Getting a string representing the ILguiItem.
@@ -162,6 +180,7 @@ public interface ILguiItem {
 	public String toString();
 
 	/**
+	 * 
 	 * @param stream
 	 * @throws JAXBException
 	 */
