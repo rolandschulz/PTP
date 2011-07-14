@@ -50,8 +50,10 @@ public class NodesView extends ViewPart {
 						nodedisplayView.update(fLguiItem);
 						nodedisplayView.setVisible(true);
 					}
-					if (fLguiItem != null && fLguiItem.getNodedisplayAccess() != null) {
-						setPartName(fLguiItem.getNodedisplayAccess().getTitle(gid));
+					if (fLguiItem != null
+							&& fLguiItem.getNodedisplayAccess() != null) {
+						setPartName(fLguiItem.getNodedisplayAccess().getTitle(
+								gid));
 					}
 				}
 			});
@@ -93,8 +95,10 @@ public class NodesView extends ViewPart {
 		}
 
 		public void handleEvent(IUnselectedObjectEvent event) {
-			if (fLguiItem != null && fLguiItem.getOIDToObject() != null && fLguiItem.getObjectStatus() != null) {
-				final ObjectType object = fLguiItem.getOIDToObject().getObjectById(event.getOid());
+			if (fLguiItem != null && fLguiItem.getOIDToObject() != null
+					&& fLguiItem.getObjectStatus() != null) {
+				final ObjectType object = fLguiItem.getOIDToObject()
+						.getObjectById(event.getOid());
 				fLguiItem.getObjectStatus().mouseexit(object);
 			}
 
@@ -108,8 +112,10 @@ public class NodesView extends ViewPart {
 						nodedisplayView.update(fLguiItem);
 						nodedisplayView.setVisible(true);
 					}
-					if (fLguiItem != null && fLguiItem.getNodedisplayAccess() != null) {
-						setPartName(fLguiItem.getNodedisplayAccess().getTitle(gid));
+					if (fLguiItem != null
+							&& fLguiItem.getNodedisplayAccess() != null) {
+						setPartName(fLguiItem.getNodedisplayAccess().getTitle(
+								gid));
 					}
 				}
 			});
@@ -136,7 +142,8 @@ public class NodesView extends ViewPart {
 		gid = getViewSite().getId();
 		composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new FillLayout());
-		composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		composite.setBackground(composite.getDisplay().getSystemColor(
+				SWT.COLOR_WHITE));
 
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		lmlManager.addListener(lguiListener, this.getClass().getName());

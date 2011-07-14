@@ -88,7 +88,8 @@ public class LayoutAccess extends LguiHandler {
 		final LguiItem lgui = new LguiItem(data);
 		final LayoutAccess la = new LayoutAccess(lgui, lgui.getLguiType());
 		// Replace component-layouts
-		for (final JAXBElement<?> el : layout.getObjectsAndRelationsAndInformation()) {
+		for (final JAXBElement<?> el : layout
+				.getObjectsAndRelationsAndInformation()) {
 			if (el.getValue() instanceof ComponentlayoutType) {
 				la.replaceComponentLayout((ComponentlayoutType) el.getValue());
 			}
@@ -116,7 +117,8 @@ public class LayoutAccess extends LguiHandler {
 		 **/
 
 		// Overwrite layouts with the same name
-		for (final JAXBElement<?> el : layout.getObjectsAndRelationsAndInformation()) {
+		for (final JAXBElement<?> el : layout
+				.getObjectsAndRelationsAndInformation()) {
 			if (el.getValue() instanceof LayoutType) {
 				if (!replaceGlobalLayout((LayoutType) el.getValue(), data)) {// If
 																				// not
@@ -140,9 +142,11 @@ public class LayoutAccess extends LguiHandler {
 	 *            lgui-instance, which is changed
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean replaceGlobalLayout(LayoutType newlayout, LguiType model) {
+	public static boolean replaceGlobalLayout(LayoutType newlayout,
+			LguiType model) {
 
-		final List<JAXBElement<?>> all = model.getObjectsAndRelationsAndInformation();
+		final List<JAXBElement<?>> all = model
+				.getObjectsAndRelationsAndInformation();
 
 		// Go through all objects, search for layouttypes with newlayout.getId
 		// as id and replace them with this layout
@@ -169,7 +173,8 @@ public class LayoutAccess extends LguiHandler {
 	 * @param neededComponents
 	 *            resulting Hashset
 	 */
-	private static void collectComponents(PaneType p, HashSet<String> neededComponents) {
+	private static void collectComponents(PaneType p,
+			HashSet<String> neededComponents) {
 
 		if (p.getGid() != null) {
 			neededComponents.add(p.getGid());
@@ -264,7 +269,8 @@ public class LayoutAccess extends LguiHandler {
 			final ChartgroupType orig = (ChartgroupType) gobj;
 			// Go through all charts minimize them and add them to ut
 			for (final ChartType chart : orig.getChart()) {
-				final ChartType min = (ChartType) (minimizeGobjectType(chart).getValue());
+				final ChartType min = (ChartType) (minimizeGobjectType(chart)
+						.getValue());
 				ut.getChart().add(min);
 			}
 
@@ -277,7 +283,8 @@ public class LayoutAccess extends LguiHandler {
 		value.setId(gobj.getId());
 		value.setTitle(gobj.getTitle());
 
-		final JAXBElement<GobjectType> res = new JAXBElement<GobjectType>(new QName(qname), c, value);
+		final JAXBElement<GobjectType> res = new JAXBElement<GobjectType>(
+				new QName(qname), c, value);
 
 		return res;
 	}
@@ -290,7 +297,8 @@ public class LayoutAccess extends LguiHandler {
 	 * @throws JAXBException
 	 */
 	@SuppressWarnings("unused")
-	private static void objToLML(LguiType obj, OutputStream output) throws JAXBException {
+	private static void objToLML(LguiType obj, OutputStream output)
+			throws JAXBException {
 
 		final JAXBContext jc = JAXBContext.newInstance("lml"); //$NON-NLS-1$
 
@@ -300,7 +308,8 @@ public class LayoutAccess extends LguiHandler {
 
 		final QName tagname = new QName("http://www.llview.de", "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		final JAXBElement<LguiType> rootel = new JAXBElement<LguiType>(tagname, LguiType.class, obj);
+		final JAXBElement<LguiType> rootel = new JAXBElement<LguiType>(tagname,
+				LguiType.class, obj);
 
 		mar.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
@@ -359,13 +368,15 @@ public class LayoutAccess extends LguiHandler {
 
 			final AbslayoutType abslayout = (AbslayoutType) layout;
 
-			jaxbel = new JAXBElement<AbslayoutType>(new QName("abslayout"), AbslayoutType.class, abslayout); //$NON-NLS-1$
+			jaxbel = new JAXBElement<AbslayoutType>(
+					new QName("abslayout"), AbslayoutType.class, abslayout); //$NON-NLS-1$
 
 		} else if (layout instanceof SplitlayoutType) {
 
 			final SplitlayoutType splitlayout = (SplitlayoutType) layout;
 
-			jaxbel = new JAXBElement<SplitlayoutType>(new QName("splitlayout"), SplitlayoutType.class, splitlayout); //$NON-NLS-1$
+			jaxbel = new JAXBElement<SplitlayoutType>(
+					new QName("splitlayout"), SplitlayoutType.class, splitlayout); //$NON-NLS-1$
 
 		} else {
 			return;
@@ -391,13 +402,15 @@ public class LayoutAccess extends LguiHandler {
 	public AbslayoutType generateDefaultAbsoluteLayout(int width, int height) {
 
 		// Collect active components
-		final List<GobjectType> gobjects = lguiItem.getOverviewAccess().getGraphicalObjects();
+		final List<GobjectType> gobjects = lguiItem.getOverviewAccess()
+				.getGraphicalObjects();
 
 		final ArrayList<GobjectType> activeobjects = new ArrayList<GobjectType>();
 		// Go through all graphical objects
 		for (final GobjectType gobj : gobjects) {
 			// Get layouts for this object, normally there is only one
-			final List<ComponentlayoutType> layouts = getComponentLayoutByGID(gobj.getId());
+			final List<ComponentlayoutType> layouts = getComponentLayoutByGID(gobj
+					.getId());
 
 			if (layouts.size() == 0) {// assume gobj to be active if there is no
 										// componentlayout
@@ -541,7 +554,8 @@ public class LayoutAccess extends LguiHandler {
 	 */
 	public List<ComponentlayoutType> getComponentLayouts() {
 		final List<ComponentlayoutType> layouts = new LinkedList<ComponentlayoutType>();
-		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+		for (final JAXBElement<?> tag : lgui
+				.getObjectsAndRelationsAndInformation()) {
 			if (tag.getValue() instanceof ComponentlayoutType) {
 				layouts.add((ComponentlayoutType) tag.getValue());
 			}
@@ -582,13 +596,16 @@ public class LayoutAccess extends LguiHandler {
 		for (final ComponentlayoutType object : objects) {
 			if (!object.isActive()) {
 				if (object.getClass().getSimpleName().equals("TablelayoutType")) { //$NON-NLS-1$
-					final TableType table = lguiItem.getTableHandler().getTable(object.getGid());
+					final TableType table = lguiItem.getTableHandler()
+							.getTable(object.getGid());
 					if (table != null) {
 						inactiveMap.put(table.getTitle(), object.getGid());
 					}
-				} else if (object.getClass().getSimpleName().equals("NodedisplaylayoutType")) { //$NON-NLS-1$
-					inactiveMap
-							.put(lguiItem.getNodedisplayAccess().getNodedisplayById(object.getGid()).getTitle(), object.getGid());
+				} else if (object.getClass().getSimpleName()
+						.equals("NodedisplaylayoutType")) { //$NON-NLS-1$
+					inactiveMap.put(lguiItem.getNodedisplayAccess()
+							.getNodedisplayById(object.getGid()).getTitle(),
+							object.getGid());
 				}
 				inactive.add(object.getGid());
 			}
@@ -614,11 +631,13 @@ public class LayoutAccess extends LguiHandler {
 		return defaultInfobox;
 	}
 
-	public ColumnlayoutType[] getLayoutColumsToCids(BigInteger[] cids, String gid) {
+	public ColumnlayoutType[] getLayoutColumsToCids(BigInteger[] cids,
+			String gid) {
 		final TablelayoutType table = getTableLayout(gid);
 		final ColumnlayoutType[] columns = new ColumnlayoutType[cids.length];
 		for (int i = 0; i < cids.length; i++) {
-			for (final ColumnlayoutType column : getTableLayout(gid).getColumn()) {
+			for (final ColumnlayoutType column : getTableLayout(gid)
+					.getColumn()) {
 				if (column.getCid().equals(cids[i])) {
 					columns[i] = column;
 					break;
@@ -630,25 +649,25 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	/**
-	 * Remove all real data from modell return only layout-information and data,
+	 * Remove all real data from model return only layout-information and data,
 	 * which is needed to make lml-model valid
 	 * 
-	 * @param modell
-	 *            lml-modell with data and layout-information
+	 * @param model
+	 *            lml-model with data and layout-information
 	 * @return
 	 */
 	public LguiType getLayoutFromModel() {
 
-		final String dummystring = "__dummy_nd__";// This is gid for all //$NON-NLS-1$
-													// nodedisplaylayouts in
-													// requests => id for all
-													// nodedisplays
+		// This is gid for all nodedisplaylayouts in requests => id for all
+		// nodedisplays
+		final String dummystring = "__dummy_nd__";//$NON-NLS-1$
 
 		final LguiType res = objectFactory.createLguiType();
 
 		final HashSet<String> neededComponents = new HashSet<String>();
 
-		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+		for (final JAXBElement<?> tag : lgui
+				.getObjectsAndRelationsAndInformation()) {
 
 			final Object value = tag.getValue();
 
@@ -660,8 +679,10 @@ public class LayoutAccess extends LguiHandler {
 					final SplitlayoutType splitlayout = (SplitlayoutType) value;
 					// Collect needed components from layout recursively
 					if (splitlayout.getLeft() != null) {
-						collectComponents(splitlayout.getLeft(), neededComponents);
-						collectComponents(splitlayout.getRight(), neededComponents);
+						collectComponents(splitlayout.getLeft(),
+								neededComponents);
+						collectComponents(splitlayout.getRight(),
+								neededComponents);
 					}
 				} else if (value instanceof AbslayoutType) {
 
@@ -694,7 +715,8 @@ public class LayoutAccess extends LguiHandler {
 		final HashMap<String, GobjectType> idtoGobject = new HashMap<String, GobjectType>();
 		// Search needed components in data-tag to discover, which type the
 		// needed components have
-		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
+		for (final JAXBElement<?> tag : lgui
+				.getObjectsAndRelationsAndInformation()) {
 
 			final Object value = tag.getValue();
 			// is it a graphical object?
@@ -829,7 +851,8 @@ public class LayoutAccess extends LguiHandler {
 		}
 		final String gid = newlayout.getGid();
 
-		final List<JAXBElement<?>> allobjects = lgui.getObjectsAndRelationsAndInformation();
+		final List<JAXBElement<?>> allobjects = lgui
+				.getObjectsAndRelationsAndInformation();
 
 		boolean replaced = false;
 
@@ -840,13 +863,15 @@ public class LayoutAccess extends LguiHandler {
 			// Over all Componentlayouts
 			if (aobj.getValue() instanceof ComponentlayoutType) {
 
-				final ComponentlayoutType alayout = (ComponentlayoutType) aobj.getValue();
+				final ComponentlayoutType alayout = (ComponentlayoutType) aobj
+						.getValue();
 
 				if (alayout.getGid() != null && alayout.getGid().equals(gid)) {
 
 					if (!replaced) {
 
-						((JAXBElement<ComponentlayoutType>) aobj).setValue(newlayout);
+						((JAXBElement<ComponentlayoutType>) aobj)
+								.setValue(newlayout);
 						lguiItem.notifyListeners();
 						replaced = true;
 					} else {// Delete this object
@@ -865,10 +890,12 @@ public class LayoutAccess extends LguiHandler {
 
 			// Differ between several layouts, create different JAXBElements
 			if (newlayout instanceof TablelayoutType) {
-				newel = new JAXBElement<TablelayoutType>(new QName("tablelayout"), TablelayoutType.class, //$NON-NLS-1$
+				newel = new JAXBElement<TablelayoutType>(new QName(
+						"tablelayout"), TablelayoutType.class, //$NON-NLS-1$
 						(TablelayoutType) newlayout);
 			} else if (newlayout instanceof NodedisplaylayoutType) {
-				newel = new JAXBElement<NodedisplaylayoutType>(new QName("nodedisplaylayout"), NodedisplaylayoutType.class, //$NON-NLS-1$
+				newel = new JAXBElement<NodedisplaylayoutType>(new QName(
+						"nodedisplaylayout"), NodedisplaylayoutType.class, //$NON-NLS-1$
 						(NodedisplaylayoutType) newlayout);
 			}
 

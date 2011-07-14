@@ -22,8 +22,6 @@ import org.eclipse.ui.IMemento;
  * 
  */
 
-// TODO Save and restore
-
 public class JobStatusData {
 	private static final String JOB_ID_ATTR = "job_id";//$NON-NLS-1$
 	private static final String RM_ID_ATTR = "rm_id";//$NON-NLS-1$
@@ -51,10 +49,10 @@ public class JobStatusData {
 	 * @return list of job status objects
 	 */
 	public static List<JobStatusData> reload(IMemento memento) {
-		List<JobStatusData> jobs = new ArrayList<JobStatusData>();
+		final List<JobStatusData> jobs = new ArrayList<JobStatusData>();
 		if (memento != null) {
-			IMemento[] children = memento.getChildren(JOB_ID_ATTR);
-			for (IMemento child : children) {
+			final IMemento[] children = memento.getChildren(JOB_ID_ATTR);
+			for (final IMemento child : children) {
 				jobs.add(new JobStatusData(child));
 			}
 		}
@@ -62,7 +60,8 @@ public class JobStatusData {
 	}
 
 	private static boolean detailIsFinal(String detail) {
-		return CANCELED.equals(detail) || FAILED.equals(detail) || JOB_OUTERR_READY.equals(detail);
+		return CANCELED.equals(detail) || FAILED.equals(detail)
+				|| JOB_OUTERR_READY.equals(detail);
 	}
 
 	private final String fRmId;
@@ -99,7 +98,8 @@ public class JobStatusData {
 		fQueueName = memento.getString(QUEUE_NAME_ATTR);
 		fOwner = memento.getString(OWNER_ATTR);
 		fOid = memento.getString(OID_ATTR);
-		fOutReady = fOutputPath != null && JOB_OUTERR_READY.equals(fStateDetail);
+		fOutReady = fOutputPath != null
+				&& JOB_OUTERR_READY.equals(fStateDetail);
 		fErrReady = fErrorPath != null && JOB_OUTERR_READY.equals(fStateDetail);
 	}
 
@@ -109,7 +109,8 @@ public class JobStatusData {
 	 * @param status
 	 *            to persist
 	 */
-	public JobStatusData(String rmId, String jobId, String queueName, String owner, String outputPath, String errorPath,
+	public JobStatusData(String rmId, String jobId, String queueName,
+			String owner, String outputPath, String errorPath,
 			boolean interactive) {
 		fRmId = rmId;
 		fJobId = jobId;
@@ -196,6 +197,13 @@ public class JobStatusData {
 	}
 
 	/**
+	 * @return job is completed
+	 */
+	public boolean isCompleted() {
+		return fState.equals(COMPLETED);
+	}
+
+	/**
 	 * @return job was submitted interactively
 	 */
 	public boolean isInteractive() {
@@ -210,13 +218,6 @@ public class JobStatusData {
 	}
 
 	/**
-	 * @return job is completed
-	 */
-	public boolean isCompleted() {
-		return fState.equals(COMPLETED);
-	}
-
-	/**
 	 * Save for restart.
 	 * 
 	 * @param memento
@@ -225,7 +226,7 @@ public class JobStatusData {
 		if (memento == null) {
 			return;
 		}
-		IMemento jobMemento = memento.createChild(JOB_ID_ATTR, fJobId);
+		final IMemento jobMemento = memento.createChild(JOB_ID_ATTR, fJobId);
 		jobMemento.putString(RM_ID_ATTR, fRmId);
 		jobMemento.putString(STATE_ATTR, fState);
 		jobMemento.putString(STATE_DETAIL_ATTR, fStateDetail);
