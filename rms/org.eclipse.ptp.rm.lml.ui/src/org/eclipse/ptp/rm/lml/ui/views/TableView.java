@@ -28,12 +28,12 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
-import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
+import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
@@ -72,21 +72,6 @@ import org.eclipse.ui.progress.UIJob;
 public class TableView extends ViewPart {
 
 	private final class LMLTableListListener implements ILMLListener {
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILguiListener# handleEvent
-		 * (org.eclipse.ptp.core.events.IJobListSortEvent)
-		 */
-		public void handleEvent(IJobListSortedEvent e) {
-			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
-				public void run() throws Exception {
-					setViewerInput();
-				}
-			});
-
-		}
 
 		public void handleEvent(ILguiAddedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
@@ -199,6 +184,21 @@ public class TableView extends ViewPart {
 						disposeTable();
 						createTable();
 					}
+				}
+			});
+
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILguiListener# handleEvent
+		 * (org.eclipse.ptp.core.events.IJobListSortEvent)
+		 */
+		public void handleEvent(ITableSortedEvent e) {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				public void run() throws Exception {
+					setViewerInput();
 				}
 			});
 
@@ -388,7 +388,7 @@ public class TableView extends ViewPart {
 	 * Refresh the viewer.
 	 */
 	public void refresh() {
-		new UIJob(Messages.JobListUpdate) {
+		new UIJob(Messages.TableUpdate) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (viewer != null) {

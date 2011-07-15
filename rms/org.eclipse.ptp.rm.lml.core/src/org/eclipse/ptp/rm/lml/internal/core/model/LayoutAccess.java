@@ -80,6 +80,7 @@ public class LayoutAccess extends LguiHandler {
 	 *            data-model, but add additional abs/-splitlayouts
 	 * @return merged lml-model
 	 */
+	@SuppressWarnings("unused")
 	public static LguiType mergeLayouts(LguiType data, LguiType layout) {
 
 		if (data == null || layout == null) {
@@ -120,11 +121,8 @@ public class LayoutAccess extends LguiHandler {
 		for (final JAXBElement<?> el : layout
 				.getObjectsAndRelationsAndInformation()) {
 			if (el.getValue() instanceof LayoutType) {
-				if (!replaceGlobalLayout((LayoutType) el.getValue(), data)) {// If
-																				// not
-																				// replaced,
-																				// insert
-																				// it
+				if (!replaceGlobalLayout((LayoutType) el.getValue(), data)) {
+					// If not replaced, insert it
 					data.getObjectsAndRelationsAndInformation().add(el);
 				}
 			}

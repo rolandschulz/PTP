@@ -11,7 +11,6 @@
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,8 +18,6 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,42 +61,6 @@ import org.eclipse.ui.IMemento;
 public class LguiItem implements ILguiItem {
 	private static final String LAYOUT = "layout";//$NON-NLS-1$
 
-	/**
-	 * Parsing an XML file. The method generates from an XML file an instance of
-	 * LguiType.
-	 * 
-	 * @param xml
-	 *            the URL source of the XML file
-	 * @return the generated LguiType
-	 * @throws MalformedURLException
-	 * @throws JAXBException
-	 */
-	@SuppressWarnings("unchecked")
-	private static LguiType parseLML(URI xml) throws MalformedURLException {
-		LguiType lml = null;
-		try {
-			final Unmarshaller unmarshaller = LMLCorePlugin.getDefault()
-					.getUnmarshaller();
-
-			/*
-			 * Synchronize to avoid the dreaded
-			 * "FWK005 parse may not be called while parsing" message
-			 */
-			final JAXBElement<LguiType> doc;
-			synchronized (LguiItem.class) {
-				doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(xml
-						.toURL());
-			}
-
-			lml = doc.getValue();
-		} catch (final JAXBException e) {
-			e.printStackTrace();
-		}
-
-		return lml;
-
-	}
-
 	/*
 	 * Source of the XML-file from which the LguiType was generated.
 	 */
@@ -141,28 +102,10 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/**
-	 * Empty Constructor.
+	 * 
 	 */
 	public LguiItem(String name) {
 		this.name = name;
-	}
-
-	/**
-	 * Constructor with one argument, an URI. Within the constructor the method
-	 * for parsing an XML-file into LguiItem is called.
-	 * 
-	 * @param xmlFile
-	 *            the source of the XML file.
-	 */
-	public LguiItem(URI xmlFile) {
-		name = xmlFile.getPath();
-		try {
-			lgui = parseLML(xmlFile);
-		} catch (final MalformedURLException e) {
-			e.printStackTrace();
-		}
-		createLguiHandlers();
-		setCid();
 	}
 
 	/**
@@ -314,42 +257,6 @@ public class LguiItem implements ILguiItem {
 		return (OverviewAccess) lguiHandlers.get(OverviewAccess.class);
 	}
 
-	public void getRequestXml(FileOutputStream output) {
-		LguiType layoutLgui = null;
-		if (lgui == null) {
-			layoutLgui = firstRequest();
-		} else {
-			layoutLgui = getLayoutAccess().getLayoutFromModel();
-		}
-		final Marshaller marshaller = LMLCorePlugin.getDefault()
-				.getMarshaller();
-		try {
-			marshaller.setProperty(
-					"jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$//$NON-NLS-2$
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-					Boolean.TRUE);
-			final QName tagname = new QName(lmlNamespace, "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$
-
-			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(
-					tagname, LguiType.class, layoutLgui);
-			/*
-			 * Synchronize to avoid the dreaded
-			 * "FWK005 parse may not be called while parsing" message
-			 */
-			synchronized (LguiItem.class) {
-				marshaller.marshal(rootElement, output);
-			}
-			output.close();
-		} catch (final PropertyException e) {
-			e.printStackTrace();
-		} catch (final JAXBException e) {
-			e.printStackTrace();
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
 	public TableHandler getTableHandler() {
 		if (lguiHandlers.get(TableHandler.class) == null) {
 			return null;
@@ -401,7 +308,7 @@ public class LguiItem implements ILguiItem {
 	 * @see org.eclipse.ptp.rm.lml.core.elemhents.ILguiItem#isLayout()
 	 */
 	public boolean isLayout() {
-		return !isEmpty() && lgui.isLayout();
+		return (lgui == null) && lgui.isLayout();
 	}
 
 	/*

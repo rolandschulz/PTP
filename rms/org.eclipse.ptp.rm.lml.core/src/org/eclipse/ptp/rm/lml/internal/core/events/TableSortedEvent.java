@@ -20,8 +20,55 @@
 
 package org.eclipse.ptp.rm.lml.internal.core.events;
 
-import org.eclipse.ptp.rm.lml.core.events.IViewDisposedEvent;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
+import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
+import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
-public class ViewDisposedEvent implements IViewDisposedEvent {
+/**
+ * Class of the interface IJobListSortedEvent.
+ */
+public class TableSortedEvent implements ITableSortedEvent {
+
+	/*
+	 * The associated LMLManager
+	 */
+	private final LMLManager lmlManager;
+
+	/*
+	 * The associated ILguiItem
+	 */
+	private final ILguiItem lguiItem;
+
+	/**
+	 * Constructor
+	 * 
+	 * @param lmlManager
+	 *            the associated LMLManager
+	 * @param lguiItem
+	 *            the associated ILguiItem
+	 */
+	public TableSortedEvent(LMLManager lmlManager, ILguiItem lguiItem) {
+		this.lmlManager = lmlManager;
+		this.lguiItem = lguiItem;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.elements.IJobListSortedEvent#getLgui()
+	 */
+	public ILguiItem getLguiItem() {
+		return lguiItem;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.lml.core.elements.IJobListSortedEvent#getLMLManager()
+	 */
+	public LMLManager getLMLManager() {
+		return lmlManager;
+	}
 
 }

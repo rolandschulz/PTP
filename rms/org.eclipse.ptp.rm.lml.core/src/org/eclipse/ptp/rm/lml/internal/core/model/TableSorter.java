@@ -38,7 +38,7 @@ public class TableSorter implements Comparator<RowType> {
 	private final int sortDirection;
 
 	/*
-	 * The type of the sorting (date, numerix or alpha)
+	 * The type of the sorting (date, numeric or alpha)
 	 */
 	private final String sortType;
 
@@ -73,17 +73,18 @@ public class TableSorter implements Comparator<RowType> {
 	 * @return integer which represents the result of the comparison
 	 */
 	public int compare(RowType a, RowType b) {
-		CellType aCell = a.getCell().get(sortIndex);
+		final CellType aCell = a.getCell().get(sortIndex);
 		String aValue = null;
 		if (aCell != null) {
 			aValue = aCell.getValue();
 		}
-		CellType bCell = b.getCell().get(sortIndex);
+		final CellType bCell = b.getCell().get(sortIndex);
 		String bValue = null;
 		if (bCell != null) {
 			bValue = bCell.getValue();
 		}
-		if ((aCell == null && bCell == null) || ((aValue != null && aValue.equals("?")) && (bValue != null && bValue.equals("?")))) { //$NON-NLS-1$ //$NON-NLS-2$
+		if ((aCell == null && bCell == null)
+				|| ((aValue != null && aValue.equals("?")) && (bValue != null && bValue.equals("?")))) { //$NON-NLS-1$ //$NON-NLS-2$
 			return 0;
 		}
 		if (aCell == null || aValue == null || aValue.equals("?")) { //$NON-NLS-1$
@@ -100,9 +101,11 @@ public class TableSorter implements Comparator<RowType> {
 		if (sortType.equals("numeric")) { //$NON-NLS-1$
 			// The sort type is a numeric one
 			if (sortDirection == up) {
-				return Integer.parseInt(aValue) < Integer.parseInt(bValue) ? -1 : 1;
+				return Integer.parseInt(aValue) < Integer.parseInt(bValue) ? -1
+						: 1;
 			} else {
-				return Integer.parseInt(aValue) < Integer.parseInt(bValue) ? 1 : -1;
+				return Integer.parseInt(aValue) < Integer.parseInt(bValue) ? 1
+						: -1;
 			}
 		} else {
 			// The (default) sort type is a alphabetic one

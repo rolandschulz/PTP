@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
+import org.eclipse.ptp.rm.lml.core.messages.Messages;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
@@ -34,8 +35,6 @@ import org.eclipse.ptp.rm.lml.internal.core.model.LMLCheck.SchemeAndData;
  * Moreover there are functions to handle mask-attributes.
  * 
  * You can convert implicit names into level-ids and vice versa.
- * 
- * @author karbach
  * 
  */
 public class NodedisplayAccess extends LguiHandler {
@@ -234,7 +233,8 @@ public class NodedisplayAccess extends LguiHandler {
 									// till now
 
 			nodedisplays = new ArrayList<Nodedisplay>();
-			for (final GobjectType tag : lguiItem.getOverviewAccess().getGraphicalObjects()) {
+			for (final GobjectType tag : lguiItem.getOverviewAccess()
+					.getGraphicalObjects()) {
 				if (tag instanceof Nodedisplay) {
 					nodedisplays.add((Nodedisplay) tag);
 				}
@@ -284,12 +284,14 @@ public class NodedisplayAccess extends LguiHandler {
 	 * }
 	 * </pre>
 	 * 
-	 * getSchemeAndDataByLevels("display1", (1,3) ) returns scheme: {@code <el1 tagname="row" min="0" max="8" mask="R%01d">} and
-	 * data: {@code <el1 min="0" max="3" oid="job1"/>} the function traverses as deep
+	 * getSchemeAndDataByLevels("display1", (1,3) ) returns scheme:
+	 * {@code <el1 tagname="row" min="0" max="8" mask="R%01d">} and data:
+	 * {@code <el1 min="0" max="3" oid="job1"/>} the function traverses as deep
 	 * as possible.
 	 * 
-	 * getSchemeAndDataByLevels("display1", (5,3) ) returns scheme: {@code <el2 tagname="rack" min="0" max="7" mask="%01d" />} and
-	 * data: {@code <el2 min="0" max="3" oid="job3"/>}
+	 * getSchemeAndDataByLevels("display1", (5,3) ) returns scheme:
+	 * {@code <el2 tagname="rack" min="0" max="7" mask="%01d" />} and data:
+	 * {@code <el2 min="0" max="3" oid="job3"/>}
 	 * 
 	 * 
 	 * @param nodedisplayId
@@ -300,14 +302,16 @@ public class NodedisplayAccess extends LguiHandler {
 	 *         scheme-tag, which defines this data-tag null if there is no
 	 *         nodedisplay with id nodedisplayId
 	 */
-	public SchemeAndData getSchemeAndDataByLevels(String nodedisplayId, ArrayList<Integer> ids) {
+	public SchemeAndData getSchemeAndDataByLevels(String nodedisplayId,
+			ArrayList<Integer> ids) {
 		final Nodedisplay nodedisplay = getNodedisplayById(nodedisplayId);
 
 		if (nodedisplay == null) {
 			return null;
 		}
 
-		return LMLCheck.getSchemeAndDataByLevels(ids, nodedisplay.getData(), nodedisplay.getScheme());
+		return LMLCheck.getSchemeAndDataByLevels(ids, nodedisplay.getData(),
+				nodedisplay.getScheme());
 	}
 
 	/**
@@ -340,7 +344,8 @@ public class NodedisplayAccess extends LguiHandler {
 	 * </pre>
 	 * 
 	 * getSchemeByLevels("display1", arraylistwithelements(1,2,1) ) will return
-	 * the JAXB-object-instance corresponding to the tag starting with {@code <el3 tagname="midplane" min="0" max="1" mask="-M%1d">}
+	 * the JAXB-object-instance corresponding to the tag starting with
+	 * {@code <el3 tagname="midplane" min="0" max="1" mask="-M%1d">}
 	 * 
 	 * @param nodedisplayId
 	 *            id of nodedisplay, which is traversed for scheme-elements
@@ -348,7 +353,8 @@ public class NodedisplayAccess extends LguiHandler {
 	 *            ids identifying a schemeelement within nodedisplay-scheme-tag
 	 * @return JAXB-instance corresponding to the searched scheme-tag
 	 */
-	public SchemeElement getSchemeByLevels(String nodedisplayId, ArrayList<Integer> ids) {
+	public SchemeElement getSchemeByLevels(String nodedisplayId,
+			ArrayList<Integer> ids) {
 		final Nodedisplay nodedisplay = getNodedisplayById(nodedisplayId);
 
 		if (nodedisplay == null) {
@@ -488,7 +494,8 @@ public class NodedisplayAccess extends LguiHandler {
 	 *         implicit name. null, if there is no nodedisplay with given id, or
 	 *         if there is no physical element with the passed implicit name
 	 */
-	public ArrayList<Integer> impnameToLevel(String nodedisplayId, String impname) {
+	public ArrayList<Integer> impnameToLevel(String nodedisplayId,
+			String impname) {
 
 		final Nodedisplay nodedisplay = getNodedisplayById(nodedisplayId);
 
@@ -496,7 +503,8 @@ public class NodedisplayAccess extends LguiHandler {
 			return null;
 		}
 
-		return FastImpCheck.impnameToOneLevel(impname, nodedisplay, new ArrayList<Integer>());
+		return FastImpCheck.impnameToOneLevel(impname, nodedisplay,
+				new ArrayList<Integer>());
 	}
 
 	@Override
@@ -536,7 +544,8 @@ public class NodedisplayAccess extends LguiHandler {
 			oidToTagNames.put(nodedisplay.getId(), atagnames);
 			oidToMasks.put(nodedisplay.getId(), amasks);
 		}
-		final List<NodedisplaylayoutType> nodedisplayLayouts = lguiItem.getLayoutAccess().getNodedisplayLayouts();
+		final List<NodedisplaylayoutType> nodedisplayLayouts = lguiItem
+				.getLayoutAccess().getNodedisplayLayouts();
 		for (final NodedisplaylayoutType nodedisplayLayout : nodedisplayLayouts) {
 			if (oidToLayouts.containsKey(nodedisplayLayout.getGid())) {// Already
 																		// layout
@@ -544,7 +553,8 @@ public class NodedisplayAccess extends LguiHandler {
 																		// for
 																		// referenced
 																		// nodedisplay
-				final ArrayList<NodedisplaylayoutType> old = oidToLayouts.get(nodedisplayLayout.getGid());
+				final ArrayList<NodedisplaylayoutType> old = oidToLayouts
+						.get(nodedisplayLayout.getGid());
 				old.add(nodedisplayLayout);
 			} else {// Create new layout-list
 				final ArrayList<NodedisplaylayoutType> layouts = new ArrayList<NodedisplaylayoutType>();
@@ -576,8 +586,8 @@ public class NodedisplayAccess extends LguiHandler {
 	 * @param masks
 	 *            hashmap for masks key=level of tree, value=mask-object
 	 */
-	private void findtagNamesAndMasks(Object schemeelement, int level, HashMap<Integer, String> tagnames,
-			HashMap<Integer, Mask> masks) {
+	private void findtagNamesAndMasks(Object schemeelement, int level,
+			HashMap<Integer, String> tagnames, HashMap<Integer, Mask> masks) {
 
 		final List els = LMLCheck.getLowerSchemeElements(schemeelement);
 

@@ -13,12 +13,10 @@ package org.eclipse.ptp.rm.lml.internal.core.model;
 
 import java.util.ArrayList;
 
+import org.eclipse.ptp.rm.lml.core.messages.Messages;
+
 /**
- * This class collects errors, which occur while parsing
- * and checking lml-files
- * 
- * @author karbach
- * 
+ * This class collects errors, which occur while parsing and checking lml-files
  * 
  */
 public class ErrorList {
@@ -60,8 +58,7 @@ public class ErrorList {
 
 		if (realerror) {
 			res = Messages.ErrorList_1;
-		}
-		else
+		} else
 			res = Messages.ErrorList_2;
 
 		for (int i = 0; i < errors.size(); i++) {

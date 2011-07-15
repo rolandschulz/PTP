@@ -18,6 +18,5 @@ Bundle-Vendor: %pluginProvider
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.rm.lml.ui.LMLUIPlugin
 Export-Package: org.eclipse.ptp.rm.lml.ui,
- org.eclipse.ptp.rm.lml.ui.actions,
  org.eclipse.ptp.rm.lml.ui.views
 Bundle-ClassPath: lmlui.jar
