@@ -19,10 +19,8 @@ import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 
 /**
  * Interface to manage the event that a joblist has been sorted.
- * 
- * @author Claudia Knobloch
  */
-public interface IJobListSortedEvent {
+public interface ITableSortedEvent {
 
 	/**
 	 * Getting the involved IlguiItem.

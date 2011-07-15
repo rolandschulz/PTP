@@ -10,7 +10,6 @@
  */
 package org.eclipse.ptp.rm.lml.core.model;
 
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -104,11 +103,6 @@ public interface ILguiItem {
 	 * @return
 	 */
 	public OverviewAccess getOverviewAccess();
-
-	/**
-	 * @param output
-	 */
-	public void getRequestXml(FileOutputStream output);
 
 	/**
 	 * @return

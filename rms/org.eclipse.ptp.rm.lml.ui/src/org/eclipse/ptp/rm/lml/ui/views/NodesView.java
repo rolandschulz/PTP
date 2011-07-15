@@ -14,12 +14,12 @@ package org.eclipse.ptp.rm.lml.ui.views;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
-import org.eclipse.ptp.rm.lml.core.events.IJobListSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
+import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
@@ -39,9 +39,6 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class NodesView extends ViewPart {
 	private final class LguiListener implements ILMLListener {
-		public void handleEvent(IJobListSortedEvent e) {
-		}
-
 		public void handleEvent(ILguiAddedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
@@ -86,6 +83,9 @@ public class NodesView extends ViewPart {
 
 		public void handleEvent(ITableColumnChangeEvent e) {
 
+		}
+
+		public void handleEvent(ITableSortedEvent e) {
 		}
 
 		public void handleEvent(IUnmarkObjectEvent event) {

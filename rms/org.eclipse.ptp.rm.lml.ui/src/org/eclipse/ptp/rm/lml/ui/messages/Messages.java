@@ -14,15 +14,12 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.lml.ui.messages.messages"; //$NON-NLS-1$
-	public static String RemoveLguiAction_0;
-	public static String RemoveLguiAction_1;
 	public static String UIUtils_1;
 	public static String UIUtils_2;
 	public static String UIUtils_3;
 	public static String UIUtils_4;
-	public static String UpdateLguiAction_0;
 
-	public static String JobListUpdate;
+	public static String TableUpdate;
 
 	static {
 		// initialize resource bundle
