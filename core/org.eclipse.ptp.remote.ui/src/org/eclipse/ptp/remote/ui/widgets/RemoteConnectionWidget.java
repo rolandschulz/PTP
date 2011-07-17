@@ -15,7 +15,6 @@ import java.util.Comparator;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.jface.util.Util;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -221,12 +220,8 @@ public class RemoteConnectionWidget extends Composite {
 		if (remoteCombo != null) {
 			initializeRemoteServicesCombo(null);
 		}
-		/*
-		 * XXX: Avoid extra event on Linux
-		 */
-		if (!Util.isLinux()) {
-			handleRemoteServiceSelected(null);
-		}
+
+		handleRemoteServiceSelected(null);
 	}
 
 	/**
