@@ -328,27 +328,28 @@ public class FileTools implements IRemoteFileTools {
 	 * org.eclipse.ptp.remotetools.core.IRemoteFileTools#createDirectory(java
 	 * .lang.String)
 	 */
-	public void createDirectory(String directory, IProgressMonitor monitor) throws RemoteOperationException,
+	public void createDirectory(final String directory, IProgressMonitor monitor) throws RemoteOperationException,
 			RemoteConnectionException, CancelException {
 		final SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
 			test();
 			validateRemotePath(directory);
-			IRemotePathTools pathTool = manager.getRemotePathTools();
+			final IRemotePathTools pathTool = manager.getRemotePathTools();
 
-			final String path = pathTool.quote(directory, true);
-			String parent = pathTool.parent(path);
-
-			RemoteFileAttributes attrs = fetchRemoteAttr(parent, subMon.newChild(5));
+			/*
+			 * Recursively create parent directory if necessary
+			 */
+			String parent = pathTool.parent(directory);
+			RemoteFileAttributes attrs = fetchRemoteAttr(parent, subMon.newChild(1));
 			if (attrs == null) {
-				createDirectory(parent, monitor);
+				createDirectory(parent, subMon.newChild(4));
 			}
 
 			try {
 				SftpCallable<Integer> c = new SftpCallable<Integer>() {
 					@Override
 					public Integer call() throws SftpException {
-						getChannel().mkdir(path);
+						getChannel().mkdir(directory);
 						return 0;
 					}
 				};
@@ -829,20 +830,18 @@ public class FileTools implements IRemoteFileTools {
 	 * org.eclipse.ptp.remotetools.core.IRemoteFileTools#removeFile(java.lang
 	 * .String)
 	 */
-	public void removeFile(String file, IProgressMonitor monitor) throws RemoteOperationException, RemoteConnectionException,
+	public void removeFile(final String file, IProgressMonitor monitor) throws RemoteOperationException, RemoteConnectionException,
 			CancelException {
 		final SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
 			test();
 			validateRemotePath(file);
-			IRemotePathTools pathTool = manager.getRemotePathTools();
-			final String path = pathTool.quote(file, true);
 
 			try {
 				SftpCallable<Integer> c = new SftpCallable<Integer>() {
 					@Override
 					public Integer call() throws SftpException {
-						getChannel().rm(path);
+						getChannel().rm(file);
 						return 0;
 					}
 				};
