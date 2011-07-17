@@ -41,11 +41,6 @@ void makeKey()
 
 void* init(void * pthis)
 {
-    sigset_t sigs_to_block;
-    sigset_t old_sigs;
-    sigfillset(&sigs_to_block);
-    pthread_sigmask(SIG_SETMASK, &sigs_to_block, &old_sigs);
-
     Thread *p = (Thread *) pthis;
     void *data = p->getSpecific();
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
@@ -56,7 +51,6 @@ void* init(void * pthis)
     }
     p->setState(true);
     p->run();
-    pthread_sigmask(SIG_SETMASK, &old_sigs, NULL);
 
     return 0;
 }
@@ -73,10 +67,15 @@ Thread::~Thread()
 void Thread::start()
 {
     if (!launched) {
-        if (pthread_create(&(thread), NULL, init, this) != 0) {
-            running = false;
-            throw ThreadException(ThreadException::ERR_CREATE);
-        }
+		sigset_t sigs_to_block;
+		sigset_t old_sigs;
+		sigfillset(&sigs_to_block);
+		pthread_sigmask(SIG_SETMASK, &sigs_to_block, &old_sigs);
+		if (pthread_create(&(thread), NULL, init, this) != 0) {
+			running = false;
+			throw ThreadException(ThreadException::ERR_CREATE);
+		}
+		pthread_sigmask(SIG_SETMASK, &old_sigs, NULL);
     } else {
         throw ThreadException(ThreadException::ERR_LAUNCH);
     }

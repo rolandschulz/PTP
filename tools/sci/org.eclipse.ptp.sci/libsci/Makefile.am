@@ -42,7 +42,7 @@ libsci_la_CPPFLAGS = -g -O0 -I../include -I../common -I../secmod
 if BIT64
 libsci_la_CPPFLAGS += -D__64BIT__
 endif
-libsci_la_LDFLAGS= -L../common -lcmn -lrt 
+libsci_la_LDFLAGS= -L../common -lcmn -lrt -ldl
 endif
 if SYSTEM_DARWIN
 lib_LTLIBRARIES=libsci.la
