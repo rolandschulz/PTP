@@ -12,6 +12,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.remote.remotetools.core.RemoteToolsServices;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionTools;
+import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
+import org.eclipse.ptp.remotetools.core.IRemoteItem;
 import org.eclipse.ptp.remotetools.core.IRemoteScript;
 import org.eclipse.ptp.remotetools.core.RemoteProcess;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
@@ -23,10 +25,11 @@ import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
+import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 
 public class RemoteToolsTests extends TestCase {
 	private static final String USERNAME = "greg"; //$NON-NLS-1$
-	private static final String HOST = "localhost"; //$NON-NLS-1$
+	private static final String HOST = "10.211.55.6"; //$NON-NLS-1$
 
 	private ITargetControl fTargetControl;
 	private IRemoteExecutionManager fExecutionManager;
@@ -181,6 +184,35 @@ public class RemoteToolsTests extends TestCase {
 		}
 	}
 
+	public void testBug300435() {
+		IRemoteFileTools fileTools;
+		String DIR_NAME = "/tmp/my path";
+		try {
+			fileTools = fExecutionManager.getRemoteFileTools();
+			fileTools.createDirectory(DIR_NAME, new NullProgressMonitor());
+			IRemoteItem[] items = fileTools.listItems("/tmp", new NullProgressMonitor());
+			boolean found = false;
+			for (IRemoteItem item : items) {
+				if (item.getPath().equals(DIR_NAME)) {
+					found = true;
+					break;
+				}
+			}
+			assertTrue(found);
+			fileTools.removeDirectory(DIR_NAME, new NullProgressMonitor());
+			fileTools.createFile(DIR_NAME, new NullProgressMonitor());
+			fileTools.removeFile(DIR_NAME, new NullProgressMonitor());
+		} catch (RemoteOperationException e) {
+			fail(e.getLocalizedMessage());
+		} catch (RemoteConnectionException e) {
+			fail(e.getLocalizedMessage());
+		} catch (CancelException e) {
+			fail(e.getLocalizedMessage());
+			// } catch (IOException e) {
+			// fail(e.getLocalizedMessage());
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -192,6 +224,7 @@ public class RemoteToolsTests extends TestCase {
 		ITargetConfig config = factory.createTargetConfig();
 		config.setConnectionAddress(HOST);
 		config.setLoginUsername(USERNAME);
+		config.setLoginPassword("jiagg!");
 		config.setPasswordAuth(true);
 
 		fTarget = RemoteToolsServices.getTargetTypeElement();
