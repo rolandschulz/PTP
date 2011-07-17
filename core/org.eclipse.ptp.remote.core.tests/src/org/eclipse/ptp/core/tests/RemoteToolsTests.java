@@ -224,7 +224,6 @@ public class RemoteToolsTests extends TestCase {
 		ITargetConfig config = factory.createTargetConfig();
 		config.setConnectionAddress(HOST);
 		config.setLoginUsername(USERNAME);
-		config.setLoginPassword("jiagg!");
 		config.setPasswordAuth(true);
 
 		fTarget = RemoteToolsServices.getTargetTypeElement();
