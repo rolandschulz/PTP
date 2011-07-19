@@ -57,7 +57,7 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection{
 	
 	public void syncLocalToRemote(IProgressMonitor monitor) throws RemoteSyncException {
 		//command to be run excluding exclusions.
-		String[] commandLtoR = {"rsync", "-avze","java -cp " +FakeSSHLocation + " FakeSSH",localDirectory + "/", connection.getAddress() + ":" + remoteDirectory/*, "--exclude"*/};
+		String[] commandLtoR = {"rsync", "-avze","java -cp " +FakeSSHLocation + " FakeSSH",localDirectory + "/", connection.getAddress() + ":" + remoteDirectory};
 		ArrayList<String> cLR = new ArrayList<String>();
 		
 		//load arguments from original command into ArrayList
@@ -91,7 +91,7 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection{
 	}
 	public void syncRemoteToLocal(IProgressMonitor monitor) throws RemoteSyncException {
 		// String[] commandRtoL = {"rsync", "--ignore-existing", "-avze" ,"java -cp" + FakeSSHLocation + Integer.toString(connection.getPort()), connection.getUsername() + "@" + connection.getAddress() + ":" + remoteDirectory + "/", localDirectory};
-		String[] commandRtoL = {"rsync", "--ignore-existing", "-avze", "java -cp " + FakeSSHLocation + " FakeSSH.java", remoteDirectory + "/", connection.getAddress() + ":" + localDirectory/*, "--exclude"*/};
+		String[] commandRtoL = {"rsync", "--ignore-existing", "-avze", "java -cp " + FakeSSHLocation + " FakeSSH", connection.getAddress() + ":" + remoteDirectory + "/", localDirectory};
 		try {
 			Process p = Runtime.getRuntime().exec(commandRtoL);
 			p.waitFor();
