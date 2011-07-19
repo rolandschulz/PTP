@@ -189,10 +189,11 @@ public class CommandRunner {
 			IProgressMonitor monitor) throws
 			IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
 	
-		return executeRemoteCommandAndRedirectStreams(conn, command, remoteDirectory, monitor, null, null, null);
+		return executeRemoteCommand(conn, command, remoteDirectory, monitor, null, null, null);
 	}
-
-	public static CommandResults executeRemoteCommandAndRedirectStreams(IRemoteConnection conn, String command,
+	
+	// Redirected string output not available in returned results.
+	public static CommandResults executeRemoteCommand(IRemoteConnection conn, String command,
 			String remoteDirectory, IProgressMonitor monitor, InputStream inputStream, OutputStream outputStream,
 			OutputStream errorStream) throws
 			IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
@@ -209,7 +210,9 @@ public class CommandRunner {
 
 		final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandList);
 		final IRemoteFileManager rfm = conn.getRemoteServices().getFileManager(conn);
-		rpb.directory(rfm.getResource(remoteDirectory));
+		if(remoteDirectory != null){
+			rpb.directory(rfm.getResource(remoteDirectory));
+		}
 
 		// Run process and stream readers
 		OutputStream output = new ByteArrayOutputStream();
@@ -217,21 +220,43 @@ public class CommandRunner {
 	
 
 		IRemoteProcess rp = rpb.start();
-		StreamCopyThread getOutput = new StreamCopyThread(rp.getInputStream(), output);
-		StreamCopyThread getError = new StreamCopyThread(rp.getErrorStream(), error);
+		
+		StreamCopyThread getOutput = null;
+		if(outputStream == null){
+			getOutput = new StreamCopyThread(rp.getInputStream(), output);
+		}else if (outputStream != null){
+			getOutput = new StreamCopyThread(rp.getInputStream(), outputStream);
+		}
+		
+		StreamCopyThread getError = null;
+		if(errorStream == null){
+			getError = new StreamCopyThread(rp.getErrorStream(), error);
+		}else if(errorStream != null){
+			getError = new StreamCopyThread(rp.getErrorStream(), errorStream);
+		}
+		
+		StreamCopyThread getInput = null;
+		if(inputStream != null){
+			getInput = new StreamCopyThread(inputStream, rp.getOutputStream());
+		}
+
 		getOutput.start();
 		getError.start();
-		//wait for EOF with the change for the ProcessMonitor to cancel
-		for (;;) {
-			getOutput.join(250);
-			if (!getOutput.isAlive()) break;
+		if(getInput != null){
+			getInput.start();
+		}
+//		//wait for EOF with the change for the ProcessMonitor to cancel
+//		for (;;) {
+//			getOutput.join(250);
+//			if (!getOutput.isAlive()) break;
 //			if (monitor.isCanceled()) {
 //				throw new RemoteSyncException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.CommandRunner_0));
 //			}
-		}
+//		}
 		//rp and getError should be finished as soon as getOutput is finished
 		int exitCode = rp.waitFor();
 		getError.halt();
+		getInput.halt();
 		
 		final CommandResults commandResults = new CommandResults();
 		commandResults.setExitCode(exitCode);
