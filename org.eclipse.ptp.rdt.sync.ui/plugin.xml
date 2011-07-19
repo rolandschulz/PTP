@@ -10,12 +10,12 @@
             class="org.eclipse.ptp.rdt.sync.ui.wizards.NewRemoteSyncProjectWizard"
             finalPerspective="org.eclipse.cdt.ui.CPerspective"
             hasPages="true"
-            icon="icons/etool16/newremote_c_proj.gif"
+            icon="icons/etool16/new_sync_c_proj.gif"
             id="org.eclipse.ptp.rdt.sync.ui.newRemoteProjectWizard"
             name="%wizard.name.0"
             project="true">
             <description>
-             	%remoteCCPPproject.desc
+             	%syncProject.desc
          	</description>
       </wizard>
       
