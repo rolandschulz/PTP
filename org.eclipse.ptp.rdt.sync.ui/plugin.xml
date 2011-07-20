@@ -140,4 +140,24 @@
 		</filter>
         </page>
      </extension>
+     <extension
+           point="org.eclipse.ui.menus">
+        <menuContribution
+              allPopups="true"
+              locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu">
+           <command
+                 commandId="org.eclipse.ptp.internal.rdt.sync.ui.SyncCommand"
+                 label="Sync Now"
+                 style="push">
+           </command>
+        </menuContribution>
+     </extension>
+     <extension
+           point="org.eclipse.ui.commands">
+        <command
+              defaultHandler="org.eclipse.ptp.internal.rdt.sync.ui.SyncCommand"
+              id="org.eclipse.ptp.internal.rdt.sync.ui.SyncCommand"
+              name="Sync Now">
+        </command>
+     </extension>
 </plugin>
