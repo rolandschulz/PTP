@@ -145,11 +145,14 @@
         <menuContribution
               allPopups="true"
               locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu">
-           <command
-                 commandId="org.eclipse.ptp.internal.rdt.sync.ui.SyncCommand"
-                 label="Sync Now"
-                 style="push">
-           </command>
+           <menu
+                 label="Synchronization">
+              <command
+                    commandId="org.eclipse.ptp.internal.rdt.sync.ui.SyncCommand"
+                    label="Sync Now"
+                    style="push">
+              </command>
+           </menu>
         </menuContribution>
      </extension>
      <extension
