@@ -1,11 +1,27 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Oak Ridge National Laboratory and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    John Eblen - initial implementation
+ *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.core;
 
+import java.util.Map;
+
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.commands.IElementUpdater;
+import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.menus.UIElement;
 
-public class SyncCommand implements IHandler {
+public class SyncCommand extends AbstractHandler implements IElementUpdater {
 	public static enum SYNC_MODE {
 		ACTIVE, ALL, NONE
 	};
@@ -36,6 +52,11 @@ public class SyncCommand implements IHandler {
 		} else if (command.equals("none")) { //$NON-NLS-1$
 			syncMode = SYNC_MODE.NONE;
 		}
+
+		ICommandService service = (ICommandService) HandlerUtil.getActiveWorkbenchWindowChecked(event).getService(
+				ICommandService.class);
+		service.refreshElements(event.getCommand().getId(), null);
+
 		return null;
 	}
 
@@ -44,11 +65,23 @@ public class SyncCommand implements IHandler {
 	}
 
 	public boolean isHandled() {
-		return false;
+		return true;
 	}
 
 	public void removeHandlerListener(IHandlerListener handlerListener) {
 		// Listeners not yet supported
 	}
 
+	public void updateElement(UIElement element, @SuppressWarnings("rawtypes") Map parameters) {
+		String parm = (String) parameters.get(SYNC_COMMAND_PARAMETER_ID);
+		if (parm != null) {
+			if ((parm.equals("active") && syncMode == SYNC_MODE.ACTIVE) || //$NON-NLS-1$
+					(parm.equals("all") && syncMode == SYNC_MODE.ALL) || //$NON-NLS-1$
+					(parm.equals("none") && syncMode == SYNC_MODE.NONE)) { //$NON-NLS-1$
+				element.setChecked(true);
+			} else {
+				element.setChecked(false);
+			}
+		}
+	}
 }
