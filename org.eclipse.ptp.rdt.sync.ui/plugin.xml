@@ -148,19 +148,58 @@
            <menu
                  label="Synchronization">
               <command
-                    commandId="org.eclipse.ptp.internal.rdt.sync.ui.SyncCommand"
+                    commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
                     label="Sync Now"
                     style="push">
+                 <parameter
+                       name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                       value="sync">
+                 </parameter>
               </command>
+              <menu
+                    label="Set Sync">
+                 <command
+                       commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                       label="Sync Active"
+                       style="radio">
+                    <parameter
+                          name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                          value="active">
+                    </parameter>
+                 </command>
+                 <command
+                       commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                       label="Sync All"
+                       style="radio">
+                    <parameter
+                          name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                          value="all">
+                    </parameter>
+                 </command>
+                 <command
+                       commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                       label="Sync None"
+                       style="radio">
+                    <parameter
+                          name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                          value="none">
+                    </parameter>  
+                 </command>
+              </menu>
            </menu>
         </menuContribution>
      </extension>
      <extension
            point="org.eclipse.ui.commands">
         <command
-              defaultHandler="org.eclipse.ptp.internal.rdt.sync.ui.SyncCommand"
-              id="org.eclipse.ptp.internal.rdt.sync.ui.SyncCommand"
-              name="Sync Now">
+              defaultHandler="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+              id="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+              name="Sync Operations">
+           <commandParameter
+                 id="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                 name="Sync Mode"
+                 optional="false">
+           </commandParameter>
         </command>
      </extension>
 </plugin>
