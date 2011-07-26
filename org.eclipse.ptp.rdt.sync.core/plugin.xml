@@ -109,11 +109,29 @@
             </menu>
             <command
                   commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
-                  label="Sync Now"
+                  label="Sync Active Now"
                   style="push">
                <parameter
                      name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
                      value="sync">
+               </parameter>
+            </command>
+            <command
+                  commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                  label="Sync All Now"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                     value="sync_all">
+               </parameter>
+            </command>
+            <command
+                  commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                  label="Sync Automatically"
+                  style="toggle">
+               <parameter
+                     name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                     value="toggle_auto_sync">
                </parameter>
             </command>
          </menu>
