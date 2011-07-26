@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
-import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
+import org.eclipse.ptp.rm.lml.core.events.ISelectObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
@@ -34,7 +34,7 @@ import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiAddedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.MarkObjectEvent;
-import org.eclipse.ptp.rm.lml.internal.core.events.SelectedObjectChangeEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.SelectObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.TableSortedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.UnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.UnselectObjectEvent;
@@ -244,7 +244,7 @@ public class LMLManager {
 	}
 
 	private void fireChangeSelectedObject(String oid) {
-		final ISelectedObjectChangeEvent event = new SelectedObjectChangeEvent(
+		final ISelectObjectEvent event = new SelectObjectEvent(
 				oid);
 		for (final Object listener : lmlListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);

@@ -20,51 +20,18 @@
 
 package org.eclipse.ptp.rm.lml.internal.core.events;
 
-import org.eclipse.ptp.rm.lml.core.LMLManager;
-import org.eclipse.ptp.rm.lml.core.events.ILguiSelectedEvent;
-import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.core.events.ISelectObjectEvent;
 
-public class LguiSelectedEvent implements ILguiSelectedEvent {
-	/*
-	 * The associated LMLManager
-	 */
-	private final LMLManager lmlManager;
+public class SelectObjectEvent implements ISelectObjectEvent {
 
-	/*
-	 * The associated ILguiItem
-	 */
-	private final ILguiItem lguiItem;
+	private final String oid;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param lmlManager
-	 *            the associated LMLManager
-	 * @param lguiItem
-	 *            the associated ILguiItem
-	 */
-	public LguiSelectedEvent(LMLManager lmlManager, ILguiItem lguiItem) {
-		this.lmlManager = lmlManager;
-		this.lguiItem = lguiItem;
+	public SelectObjectEvent(String oid) {
+		this.oid = oid;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.elements.ILguiRemovedEvent#getLgui()
-	 */
-	public ILguiItem getLguiItem() {
-		return lguiItem;
+	public String getOid() {
+		return oid;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.elements.ILguiRemovedEvent#getLMLManager()
-	 */
-	public LMLManager getLMLManager() {
-		return lmlManager;
-	}
 }

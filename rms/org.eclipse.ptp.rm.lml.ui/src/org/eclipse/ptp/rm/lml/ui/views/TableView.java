@@ -31,8 +31,7 @@ import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
-import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
-import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
+import org.eclipse.ptp.rm.lml.core.events.ISelectObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
@@ -145,7 +144,7 @@ public class TableView extends ViewPart {
 			});
 		}
 
-		public void handleEvent(ISelectedObjectChangeEvent event) {
+		public void handleEvent(ISelectObjectEvent event) {
 			final String oid = event.getOid();
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
@@ -172,18 +171,6 @@ public class TableView extends ViewPart {
 						}
 					}
 
-				}
-			});
-
-		}
-
-		public void handleEvent(ITableColumnChangeEvent e) {
-			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
-				public void run() throws Exception {
-					if (composite != null) {
-						disposeTable();
-						createTable();
-					}
 				}
 			});
 
