@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -88,13 +88,26 @@ public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 	//returns absolute url in the form of: schema://host/mypath...filename
 	public IIndexFileLocation getIncludedByLocation() throws CoreException
 	{
-		return this.includedByLocation;
+		IIndexFileLocation location = this.includedByLocation;
+		
+		if (location == null && converter == null) {		
+			if (this.getIncludedBy() != null && this.getIncludedBy().getLocation() != null)
+				location = this.getIncludedBy().getLocation();
+		}
+		
+		return location;
 	}
 
 	//returns absolute url in the form of: protocol://host/mypath...file.ext
 	public IIndexFileLocation getIncludesLocation() throws CoreException
 	{
-		return this.includesLocation;
+		IIndexFileLocation location = this.includesLocation;
+		
+		if (location == null && converter == null && this.include.getIncludesLocation() != null) {
+			location = this.include.getIncludesLocation();
+		}
+	
+		return location;
 	}
 
 	public String getName() throws CoreException
