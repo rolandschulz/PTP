@@ -12,10 +12,10 @@
 		<touch file="${user.home}/.cvspass" />
 		<tstamp/>
 		<!-- Update for new simultaneous release -->
-		<property name="eclipseRelease" value="indigo"/>
+		<property name="eclipseRelease" value="juno"/>
 		<!-- Update for new PTP branch -->
-		<property name="ptpBranchVersion" value="5.0.0"/>
-		<property name="photranBranchVersion" value="7.0.0"/>
+		<property name="ptpBranchVersion" value="6.0.0"/>
+		<property name="photranBranchVersion" value="8.0.0"/>
 		<!-- The following properties need to be updated to reflect the version we are building against. -->
 		<!-- NOTE: changing any of these will require corresponding changes in org.eclipse.ptp.rdt.core.remotejars/build.xml -->
 		<!-- Update for new Eclipse version -->
@@ -23,9 +23,7 @@
 		<!-- Update for new CDT version -->
 		<property name="cdtDist" value="/home/data/httpd/download.eclipse.org/tools/cdt/builds/8.0.0/I.I201106081058/cdt-master-8.0.0-I201106081058.zip"/>
 		<!-- Update for new RSE version -->
-		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/tm/downloads/drops/S-3.3RC3-201106011145/RSE-SDK-3.3RC3.zip"/>
-		<!-- Update for new Mylyn version -->
-		<!--property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/mylyn-3.4.3-e3.4.zip"/-->
+		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/tm/downloads/drops/R-3.3-201106080935/RSE-SDK-3.3.zip"/>
 		<!-- Update for new jgit version -->
 		<property name="jgitDist" value="/home/data/httpd/download.eclipse.org/egit/staging/v1.0.0.201106090707-r/plugins/org.eclipse.jgit_1.0.0.201106090707-r.jar"/>
 		<!-- Properties below here shouldn't need to be changed -->
