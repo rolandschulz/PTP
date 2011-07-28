@@ -1,15 +1,14 @@
-/****************************
- * IBM Confidential
- * Licensed Materials - Property of IBM
+/*******************************************************************************
+ * Copyright (c) 2011 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *
- * IBM Rational Developer for Power Systems Software
- * IBM Rational Team Concert for Power Systems Software
- *
- * (C) Copyright IBM Corporation 2011.
- *
- * The source code for this program is not published or otherwise divested of its trade secrets, 
- * irrespective of what has been deposited with the U.S. Copyright Office.
- */
+ * Contributors:
+ *    IBM Corporation - initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractLocalCIndexServiceProvider;
@@ -26,6 +25,7 @@ import org.eclipse.ptp.internal.rdt.ui.search.LocalSearchService;
  *
  */
 public class LocalCIndexServiceProvider extends AbstractLocalCIndexServiceProvider implements IIndexServiceProvider2 {
+	public static final String ID = "org.eclipse.ptp.rdt.ui.LocalCIndexServiceProvider"; //$NON-NLS-1$
 
 	private ISearchService fSearchService;
 	private IContentAssistService fContentAssistService;

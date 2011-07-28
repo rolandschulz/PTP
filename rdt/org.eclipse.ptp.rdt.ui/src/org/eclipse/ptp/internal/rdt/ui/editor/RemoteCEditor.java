@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.text.CTextTools;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.ui.CUIPlugin;
+import org.eclipse.cdt.ui.actions.CdtActionConstants;
 import org.eclipse.cdt.ui.text.ICPartitions;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -37,6 +38,7 @@ import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionGroup;
@@ -142,18 +144,13 @@ public class RemoteCEditor extends CEditor {
 	protected void setPreferenceStore(IPreferenceStore store) {
 		super.setPreferenceStore(store);
 
-		ICProject cproject = EditorUtility.getCProject(input);
-
-		if (cproject != null) {
-			IProject project = cproject.getProject();
-			if (RemoteNature.hasRemoteNature(project)) {
-				// use remote source viewer configuration
-				SourceViewerConfiguration sourceViewerConfiguration = getSourceViewerConfiguration();
-				if (!(sourceViewerConfiguration instanceof RemoteCSourceViewerConfiguration)) {
-					CTextTools textTools = CUIPlugin.getDefault().getTextTools();
-					setSourceViewerConfiguration(new RemoteCSourceViewerConfiguration(textTools.getColorManager(), store, this,
-							ICPartitions.C_PARTITIONING));
-				}
+		if (!isLocalServiceProvider()) {
+			// use remote source viewer configuration
+			SourceViewerConfiguration sourceViewerConfiguration = getSourceViewerConfiguration();
+			if (!(sourceViewerConfiguration instanceof RemoteCSourceViewerConfiguration)) {
+				CTextTools textTools = CUIPlugin.getDefault().getTextTools();
+				setSourceViewerConfiguration(new RemoteCSourceViewerConfiguration(textTools.getColorManager(), store, this,
+						ICPartitions.C_PARTITIONING));
 			}
 		}
 	}
@@ -181,6 +178,19 @@ public class RemoteCEditor extends CEditor {
 		// remove refactoring for now
 		menu.remove("org.eclipse.cdt.ui.refactoring.menu"); //$NON-NLS-1$
 	}
+	
+	@Override
+	public void fillActionBars(IActionBars actionBars) {
+		super.fillActionBars(actionBars);
+		if (isRemote()) {
+			// remove refactoring for now
+			actionBars.setGlobalActionHandler(CdtActionConstants.RENAME, null);
+			actionBars.setGlobalActionHandler(CdtActionConstants.EXTRACT_CONSTANT, null);
+			actionBars.setGlobalActionHandler(CdtActionConstants.EXTRACT_LOCAL_VARIABLE, null);
+			actionBars.setGlobalActionHandler(CdtActionConstants.EXTRACT_METHOD, null);
+			actionBars.setGlobalActionHandler(CdtActionConstants.HIDE_METHOD, null);
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -193,6 +203,10 @@ public class RemoteCEditor extends CEditor {
 	 */
 	@Override
 	public boolean shouldProcessLocalParsingCompletions() {
+		return isLocalServiceProvider();
+	}
+	
+	private boolean isLocalServiceProvider() {
 		ICProject cproject = EditorUtility.getCProject(input);
 		IServiceModelManager smm = ServiceModelManager.getInstance();
 		
@@ -213,4 +227,8 @@ public class RemoteCEditor extends CEditor {
 		return true;
 	}
 
+	@Override
+	protected boolean isSemanticHighlightingEnabled() {		
+		return isRemote() ? false : super.isSemanticHighlightingEnabled();
+	}
 }
