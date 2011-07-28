@@ -2,10 +2,6 @@ package org.eclipse.ptp.rdt.sync.rsync.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 
 
@@ -14,9 +10,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.sync.core.IRemoteSyncConnection;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
-import org.eclipse.ptp.rdt.sync.rsync.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public class RsyncRemoteSyncConnection implements IRemoteSyncConnection{
 //	private final static String remoteProjectName = "eclipse_auto";
@@ -63,7 +57,7 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection{
 	
 	public void syncLocalToRemote(IProgressMonitor monitor) throws RemoteSyncException {
 		//command to be run excluding exclusions.
-		String[] commandLtoR = {"rsync", "-avvvze","java -cp " +FakeSSHLocation + " FakeSSH",localDirectory + "/", connection.getAddress() + ":" + remoteDirectory};
+		String[] commandLtoR = {"rsync", "-avze","java -cp " +FakeSSHLocation + " FakeSSH",localDirectory + "/", connection.getAddress() + ":" + remoteDirectory};
 		ArrayList<String> cLR = new ArrayList<String>();
 		
 		//load arguments from original command into ArrayList
@@ -82,34 +76,31 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection{
 		}
 		
 		//execute the command
-		String[] command = new String[cLR.size()];
-		command = cLR.toArray(command);
-
-
+		String[] tempArray = new String[cLR.size()];
+		tempArray = cLR.toArray(tempArray);
 		try {
-			executeLocalCommandWithConnection(command);
-
+			Process p = Runtime.getRuntime().exec(tempArray);
+			p.waitFor();
 		} catch (IOException e) {
-			throw new RemoteSyncException(e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (InterruptedException e) {
-			throw new RemoteSyncException(e);
-		} catch (RemoteConnectionException e) {
-			throw new RemoteSyncException(e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	public void syncRemoteToLocal(IProgressMonitor monitor) throws RemoteSyncException {
 		// String[] commandRtoL = {"rsync", "--ignore-existing", "-avze" ,"java -cp" + FakeSSHLocation + Integer.toString(connection.getPort()), connection.getUsername() + "@" + connection.getAddress() + ":" + remoteDirectory + "/", localDirectory};
-		String[] commandRtoL = {"rsync", "--ignore-existing", "-avvvze", "java -cp " + FakeSSHLocation + " FakeSSH", connection.getAddress() + ":" + remoteDirectory + "/", localDirectory};
-		
+		String[] commandRtoL = {"rsync", "--ignore-existing", "-avze", "java -cp " + FakeSSHLocation + " FakeSSH", connection.getAddress() + ":" + remoteDirectory + "/", localDirectory};
 		try {
-			executeLocalCommandWithConnection(commandRtoL);
-
+			Process p = Runtime.getRuntime().exec(commandRtoL);
+			p.waitFor();
 		} catch (IOException e) {
-			throw new RemoteSyncException(e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (InterruptedException e) {
-			throw new RemoteSyncException(e);
-		} catch (RemoteConnectionException e) {
-			throw new RemoteSyncException(e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}	
 	}
 
@@ -135,30 +126,5 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection{
 	public void pathChanged(IResourceDelta delta) throws RemoteSyncException {
 		
 	}
-	public CommandResults executeLocalCommandWithConnection(String[] localCommand) throws RemoteSyncException, InterruptedException, IOException, RemoteConnectionException {
-
-		ServerSocket serverSocket = new ServerSocket(8888);  //Should be 0 (any free) and than communicated
-		Process p = Runtime.getRuntime().exec(localCommand);
-		Socket clientSocket = serverSocket.accept();
-
-		InputStream socketInput = clientSocket.getInputStream();
-		OutputStream socketOutput = clientSocket.getOutputStream();
-
-		int chr;
-		String remoteCommand="";
-		while ((chr=socketInput.read())!='\n') {  //using really slow unbuffered read - because it is only a single line and we need to make sure not to read too much
-			remoteCommand+=(char)chr;
-		}
-		System.out.println(remoteCommand);
-
-		CommandResults commandResults = CommandRunner.executeRemoteCommand(connection, remoteCommand, null, null, socketInput, socketOutput, null);
-
-		p.waitFor();
-		serverSocket.close();
-		clientSocket.close();
-		return commandResults;
-	}
 }
-
-	
 
