@@ -22,7 +22,7 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.rsync.core.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.rsync.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;

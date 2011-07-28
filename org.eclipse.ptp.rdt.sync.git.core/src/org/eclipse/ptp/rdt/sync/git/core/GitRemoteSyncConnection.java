@@ -54,9 +54,6 @@ import org.eclipse.jgit.transport.Transport;
 import org.eclipse.jgit.transport.TransportGitSsh;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.util.FS;
-import org.eclipse.ptp.rdt.sync.core.IRemoteSyncConnection;
-import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
@@ -83,7 +80,6 @@ public class GitRemoteSyncConnection implements IRemoteSyncConnection{
 	private final String remoteDirectory;
 	private Git git;
 	private TransportGitSsh transport;
-	
 
 	/**
 	 * Create a remote sync connection using git. Assumes that the local

@@ -1,8 +1,7 @@
-package org.eclipse.ptp.rdt.sync.core;
+package org.eclipse.ptp.rdt.sync.rsync.core;
 
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
 
 /**
  * @since 1.0

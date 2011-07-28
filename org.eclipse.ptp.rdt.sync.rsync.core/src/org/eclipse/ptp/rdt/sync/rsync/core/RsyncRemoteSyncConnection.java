@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rdt.sync.core.IRemoteSyncConnection;
-import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.rsync.core.IRemoteSyncConnection;
+import org.eclipse.ptp.rdt.sync.rsync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.rsync.core.SyncFileFilter;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 
 public class RsyncRemoteSyncConnection implements IRemoteSyncConnection{
