@@ -175,6 +175,13 @@
             priority="1"
             serviceId="org.eclipse.ptp.rdt.core.BuildService">
       </provider>
+      <provider
+            class="org.eclipse.ptp.rdt.ui.serviceproviders.LocalCIndexServiceProvider"
+            id="org.eclipse.ptp.rdt.ui.LocalCIndexServiceProvider"
+            name="%LocalCIndexServiceProvider.name"
+            priority="2"
+            serviceId="org.eclipse.ptp.rdt.core.CIndexingService">
+      </provider>
    </extension>
    <extension
          id="org.eclipse.ptp.rdt.core.remoteNature"

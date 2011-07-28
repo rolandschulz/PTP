@@ -90,8 +90,12 @@ public class OpenDeclarationHandler {
 		ITranslationUnit.AST_CONFIGURE_USING_SOURCE_CONTEXT;
 
 	
+	public interface INavigationErrorLogger { // because logging works different locally or remote
+		public void logDebugMessage(String message);
+		public void logError(String message, Throwable e);
+	}
 	
-	public static OpenDeclarationResult handleOpenDeclaration(String scopeName, String scheme, ITranslationUnit workingCopy, String path, String selectedText, int selectionStart, int selectionLength, DataStore _dataStore) {
+	public static OpenDeclarationResult handleOpenDeclarationRemotely(String scopeName, String scheme, ITranslationUnit workingCopy, String path, String selectedText, int selectionStart, int selectionLength, final DataStore _dataStore) {
 
 		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Getting declaration for selection in " + workingCopy.getElementName(), _dataStore); //$NON-NLS-1$
 		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "scope: " + scopeName, _dataStore); //$NON-NLS-1$
@@ -99,42 +103,6 @@ public class OpenDeclarationHandler {
 		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "offset: " + selectionStart, _dataStore); //$NON-NLS-1$
 		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "length: " + selectionLength, _dataStore); //$NON-NLS-1$
 
-		IIndex index = RemoteIndexManager.getInstance().getIndexForScope(Scope.WORKSPACE_ROOT_SCOPE_NAME, _dataStore);
-
-		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Acquiring read lock", _dataStore); //$NON-NLS-1$
-		
-		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Got Read lock", _dataStore); //$NON-NLS-1$
-		
-		
-		return doHandleOpenDeclaration(scopeName, scheme, workingCopy, path, selectedText, selectionStart, selectionLength, index, _dataStore);
-			
-		
-	}
-
-	
-	/**
-	 * PDOMNames and ASTNames are not serializable, need to convert them 
-	 * to a serializable form before returning them.
-	 */
-	private static IName[] convertNames(IName[] names) {
-		int n = names.length;
-		IName[] converted = new IName[n];
-		for(int i = 0; i < n; i++) {
-			converted[i] = new SimpleName(names[i]);
-		}
-		
-		return converted;
-	}
-	
-	/* -- ST-Origin --
-	 * Source folder: org.eclipse.cdt.ui/src
-	 * Class: org.eclipse.cdt.internal.ui.search.actions.OpenDeclarationsJob
-	 * Version: 1.22
-	 */	
-	
-	private static OpenDeclarationResult doHandleOpenDeclaration(String scopeName, String scheme, ITranslationUnit workingCopy, String path, String selectedText, 
-			                                                     int selectionStart, int selectionLength, IIndex index, DataStore _dataStore) {
-		
 		IIndex project_index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
 		IASTTranslationUnit ast = null;
 		try {
@@ -155,9 +123,35 @@ public class OpenDeclarationHandler {
 		if(ast == null){
 			return OpenDeclarationResult.failureUnexpectedError();
 		}
+			
+		INavigationErrorLogger logger = new INavigationErrorLogger() {
+			public void logDebugMessage(String message) {
+				UniversalServerUtilities.logDebugMessage(CLASS_NAME, message, _dataStore);
+			}
+			public void logError(String message, Throwable e) {
+				UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);	
+			}
+		};
+		
+		IIndex index = RemoteIndexManager.getInstance().getIndexForScope(Scope.WORKSPACE_ROOT_SCOPE_NAME, _dataStore);
+		return doHandleOpenDeclaration(ast, workingCopy, selectedText, selectionStart, selectionLength, index, logger);
+		
+	}
+
+	
+	
+	
+	/* -- ST-Origin --
+	 * Source folder: org.eclipse.cdt.ui/src
+	 * Class: org.eclipse.cdt.internal.ui.search.actions.OpenDeclarationsJob
+	 * Version: 1.22
+	 */	
+	
+	public static OpenDeclarationResult doHandleOpenDeclaration(IASTTranslationUnit ast, ITranslationUnit workingCopy, String selectedText, 
+			                                                     int selectionStart, int selectionLength, IIndex index, INavigationErrorLogger logger) {
 		
 		try{
-			UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Acquiring read lock for workspace_scope_index", _dataStore); //$NON-NLS-1$
+			logger.logDebugMessage("Acquiring read lock for workspace_scope_index"); //$NON-NLS-1$
 			index.acquireReadLock();
 			final IASTNodeSelector nodeSelector = ast.getNodeSelector(null);
 			
@@ -165,7 +159,7 @@ public class OpenDeclarationHandler {
 			IName[] implicitTargets = findImplicitTargets(index, ast, nodeSelector, selectionStart, selectionLength);
 			if (sourceName == null) {
 				if (implicitTargets.length > 0) {
-					ICElement[] elements = convertToCElements(workingCopy, index, implicitTargets, _dataStore);
+					ICElement[] elements = convertToCElements(workingCopy, index, implicitTargets, logger);
 					return OpenDeclarationResult.resultCElements(elements);				
 				}
 			} else {
@@ -219,13 +213,13 @@ public class OpenDeclarationHandler {
 						}
 					}
 					targets = ArrayUtil.trim(ArrayUtil.addAll(targets, implicitTargets));
-					ICElement[] elements = convertToCElements(workingCopy, index, targets, _dataStore);
+					ICElement[] elements = convertToCElements(workingCopy, index, targets, logger);
 					if(elements != null && elements.length > 0)
 						return OpenDeclarationResult.resultCElements(elements);					
 					else if(hasAtLeastOneLocation(targets))
 						return OpenDeclarationResult.resultNames(convertNames(targets));
 					
-					return navigationFallBack(ast, index, selectedText, _dataStore, workingCopy, sourceName, kind); 
+					return navigationFallBack(ast, index, selectedText, logger, workingCopy, sourceName, kind); 
 				}
 			
 			}
@@ -250,19 +244,35 @@ public class OpenDeclarationHandler {
 				}
 			}
 					
-			return navigationFallBack(ast, index, selectedText, _dataStore, workingCopy, sourceName, NameKind.REFERENCE); 
+			return navigationFallBack(ast, index, selectedText, logger, workingCopy, sourceName, NameKind.REFERENCE); 
 		}catch (InterruptedException e) {
-			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
+			logger.logError(e.toString(), e);
 			return OpenDeclarationResult.failureUnexpectedError();
 		}
 		catch (CoreException e) {
-			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
+			logger.logError(e.toString(), e);
 			return OpenDeclarationResult.failureUnexpectedError();
 		} finally {
-			UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Releasing read lock for workspace_scope_index", _dataStore); //$NON-NLS-1$
+			logger.logDebugMessage("Releasing read lock for workspace_scope_index"); //$NON-NLS-1$
 			index.releaseReadLock();
 		}
 	}
+	
+	
+	/**
+	 * PDOMNames and ASTNames are not serializable, need to convert them 
+	 * to a serializable form before returning them.
+	 */
+	private static IName[] convertNames(IName[] names) {
+		int n = names.length;
+		IName[] converted = new IName[n];
+		for(int i = 0; i < n; i++) {
+			converted[i] = new SimpleName(names[i]);
+		}
+		
+		return converted;
+	}
+	
 	
 	private static boolean areOverlappingNames(IName n1, IName n2) {
 		if (n1 == n2)
@@ -310,7 +320,7 @@ public class OpenDeclarationHandler {
 
 
 
-	private static ICElement[] convertToCElements(ITranslationUnit unit, IIndex index, IName[] names, DataStore _dataStore) {
+	private static ICElement[] convertToCElements(ITranslationUnit unit, IIndex index, IName[] names, INavigationErrorLogger logger) {
 		List<ICElement> elements = new ArrayList<ICElement>();
 		for(IName name : names) {
 			try {
@@ -318,9 +328,9 @@ public class OpenDeclarationHandler {
 				if(element instanceof ISourceReference)
 					elements.add(element);
 			} catch (CoreException e) {
-				UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
+				logger.logError(e.toString(), e);
 			} catch (DOMException e) {
-				UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore); 
+				logger.logError(e.toString(), e); 
 			}
 		}
 		return elements.toArray(new ICElement[elements.size()]);
@@ -508,7 +518,7 @@ public class OpenDeclarationHandler {
 	/**
 	 * If the names cannot be found using a binding then fall back to a text search.
 	 */
-	private static OpenDeclarationResult navigationFallBack(IASTTranslationUnit ast, IIndex index, String selectedText, DataStore _dataStore, ITranslationUnit tu, IASTName sourceName, NameKind kind) {
+	private static OpenDeclarationResult navigationFallBack(IASTTranslationUnit ast, IIndex index, String selectedText, INavigationErrorLogger logger, ITranslationUnit tu, IASTName sourceName, NameKind kind) {
 		if(selectedText == null || selectedText.length() == 0)
 			return null;
 		
@@ -547,7 +557,7 @@ public class OpenDeclarationHandler {
 				IName macroName = new SimpleName(macro.getFileLocation(), macro.getNameCharArray());
 				nameList.add(macroName);
 			}
-			ICElement[] elements = convertToCElements(tu, index, (nameList.toArray(new IName[nameList.size()])), _dataStore);
+			ICElement[] elements = convertToCElements(tu, index, (nameList.toArray(new IName[nameList.size()])), logger);
 			for (ICElement element : elements) {
 				elems.add(element);
 			}			
@@ -571,7 +581,7 @@ public class OpenDeclarationHandler {
 						}
 					}
 					names = (IName[]) ArrayUtil.removeNulls(IName.class, names);					
-					elements = convertToCElements(tu, index, names, _dataStore);
+					elements = convertToCElements(tu, index, names, logger);
 					for (ICElement element : elements) {
 						elems.add(element);
 					}			
@@ -589,7 +599,7 @@ public class OpenDeclarationHandler {
 			}
 			
 		} catch (CoreException e) {
-			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
+			logger.logError(e.toString(), e);
 		}
 		
 		return OpenDeclarationResult.failureSymbolLookup(selectedText);

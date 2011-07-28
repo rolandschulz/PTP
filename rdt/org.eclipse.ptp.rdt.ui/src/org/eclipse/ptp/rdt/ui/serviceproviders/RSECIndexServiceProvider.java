@@ -13,6 +13,8 @@ package org.eclipse.ptp.rdt.ui.serviceproviders;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteCIndexServiceProvider;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.RemoteContentAssistService;
+import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
+import org.eclipse.ptp.internal.rdt.ui.navigation.RemoteNavigationService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
 import org.eclipse.ptp.internal.rdt.ui.search.RemoteSearchService;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
@@ -39,7 +41,15 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 
 	private RemoteSearchService fSearchService;
 	private IContentAssistService fContentAssistService;
+	private INavigationService fNavigationService;
 
+	/**
+	 * @since 4.0
+	 */
+	public boolean isRemote() {
+		return true;
+	}
+	
 	public synchronized ISearchService getSearchService() {
 		if (!isConfigured())
 			return null;
@@ -60,6 +70,19 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 		return fContentAssistService;
 	}
 
+	/**
+	 * @since 4.0
+	 */
+	public synchronized INavigationService getNavigationService() {
+		if(!isConfigured())
+			return null;
+		
+		if(fNavigationService== null)
+			fNavigationService = new RemoteNavigationService(fConnectorService);
+		
+		return fNavigationService;
+	}
+	
 	@Override
 	public IHost getHost() {
 		initializeHost();

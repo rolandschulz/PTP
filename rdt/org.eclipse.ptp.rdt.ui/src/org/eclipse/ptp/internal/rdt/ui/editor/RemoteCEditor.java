@@ -29,6 +29,13 @@ import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
 import org.eclipse.ptp.internal.rdt.ui.actions.OpenViewActionGroup;
 import org.eclipse.ptp.internal.rdt.ui.search.actions.SelectionSearchGroup;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
+import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
+import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
+import org.eclipse.ptp.services.core.IService;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceModelManager;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PlatformUI;
@@ -186,8 +193,19 @@ public class RemoteCEditor extends CEditor {
 	 */
 	@Override
 	public boolean shouldProcessLocalParsingCompletions() {
-
 		ICProject cproject = EditorUtility.getCProject(input);
+		IServiceModelManager smm = ServiceModelManager.getInstance();
+		
+		if(smm.isConfigured(cproject.getProject())) {
+			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(cproject.getProject());
+			IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
+			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
+	
+			if (serviceProvider instanceof IIndexServiceProvider) {
+				return !((IIndexServiceProvider)serviceProvider).isRemote();
+			}
+		}
+		
 		if (RemoteNature.hasRemoteNature(cproject.getProject())) {
 			return false;
 		}

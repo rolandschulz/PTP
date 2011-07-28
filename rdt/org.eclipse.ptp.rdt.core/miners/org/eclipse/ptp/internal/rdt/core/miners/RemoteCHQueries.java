@@ -44,6 +44,7 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.index.DummyName;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 import org.eclipse.ptp.internal.rdt.core.model.ICProjectFactory;
+import org.eclipse.ptp.internal.rdt.core.model.IIndexLocationConverterFactory;
 import org.eclipse.ptp.internal.rdt.core.model.RemoteCProjectFactory;
 import org.eclipse.rse.dstore.universal.miners.UniversalServerUtilities;
 
@@ -56,7 +57,7 @@ public class RemoteCHQueries {
 	 * Version: 1.20
 	 */
 	//copied from private static void findCalledBy(ICElement callee, int linkageID, IIndex index, CalledByResult result) 
-	public static CalledByResult findCalledBy(ICElement callee, String path, IIndex project_index, IIndex serach_scope_index, String scheme, String hostName, CalledByResult result, DataStore _dataStore, IIndexLocationConverter converter) 
+	public static CalledByResult findCalledBy(ICElement callee, String path, IIndex project_index, IIndex serach_scope_index, String scheme, String hostName, CalledByResult result, DataStore _dataStore, IIndexLocationConverterFactory converter) 
 	throws CoreException, URISyntaxException, InterruptedException {
 		
 		final ICProject project = callee.getCProject();
@@ -93,7 +94,7 @@ public class RemoteCHQueries {
 	}
 	
 	private static void findCalledBy1(IIndex index, IBinding callee, boolean includeOrdinaryCalls,
-			ICProject project, String scheme, String hostName, CalledByResult result, DataStore _dataStore, IIndexLocationConverter converter) throws CoreException, URISyntaxException {
+			ICProject project, String scheme, String hostName, CalledByResult result, DataStore _dataStore, IIndexLocationConverterFactory converter) throws CoreException, URISyntaxException {
 		
 		findCalledBy2(index, callee, includeOrdinaryCalls, project, scheme, hostName, result, _dataStore, converter);
 		List<? extends IBinding> specializations = IndexQueries.findSpecializations(callee);
@@ -104,7 +105,7 @@ public class RemoteCHQueries {
 
 	
 	
-	private static void findCalledBy2(IIndex index, IBinding callee, boolean includeOrdinaryCalls, ICProject project, String scheme, String hostName, CalledByResult result,  DataStore _dataStore, IIndexLocationConverter converter) 
+	private static void findCalledBy2(IIndex index, IBinding callee, boolean includeOrdinaryCalls, ICProject project, String scheme, String hostName, CalledByResult result,  DataStore _dataStore, IIndexLocationConverterFactory converter) 
 		throws CoreException, URISyntaxException {
 		IIndexName[] names= index.findNames(callee, IIndex.FIND_REFERENCES | IIndex.SEARCH_ACROSS_LANGUAGE_BOUNDARIES);
 		for (IIndexName rname : names) {
@@ -127,7 +128,7 @@ public class RemoteCHQueries {
 	 * @throws InterruptedException 
 	 * @throws URISyntaxException 
 	 */
-	public static CallsToResult findCalls(ICElement caller, String path, IIndex project_index, IIndex workspace_scope_index, String scheme, String hostName, DataStore _dataStore, IIndexLocationConverter converter) 
+	public static CallsToResult findCalls(ICElement caller, String path, IIndex project_index, IIndex workspace_scope_index, String scheme, String hostName, DataStore _dataStore, IIndexLocationConverterFactory converter) 
 			throws CoreException, InterruptedException, URISyntaxException {
 		
 		CallsToResult result = new CallsToResult();
@@ -190,7 +191,7 @@ public class RemoteCHQueries {
 	/**
 	 * Searches for overriders of method and converts them to ICElement, returns null, if there are none.
 	 */
-	private static ICElement[] findOverriders(IIndex index, ICPPMethod binding, IIndexLocationConverter converter, ICProject project, ICProjectFactory projectFactory)	throws CoreException {
+	private static ICElement[] findOverriders(IIndex index, ICPPMethod binding, IIndexLocationConverterFactory converter, ICProject project, ICProjectFactory projectFactory)	throws CoreException {
 		IBinding[] virtualOverriders= ClassTypeHelper.findOverriders(index, binding);
 		if (virtualOverriders.length > 0) {
 			ArrayList<ICElement> list= new ArrayList<ICElement>();
@@ -239,7 +240,7 @@ public class RemoteCHQueries {
 	 * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHContentProvider
 	 * Version: 1.21
 	 */
-	public static Map<String, ICElement[]> handleGetOverriders(IIndex project_index, ICElement subject, String path, DataStore _dataStore, IIndexLocationConverter converter) throws InterruptedException, CoreException {
+	public static Map<String, ICElement[]> handleGetOverriders(IIndex project_index, ICElement subject, String path, DataStore _dataStore, IIndexLocationConverterFactory converter) throws InterruptedException, CoreException {
 		
 		
 		

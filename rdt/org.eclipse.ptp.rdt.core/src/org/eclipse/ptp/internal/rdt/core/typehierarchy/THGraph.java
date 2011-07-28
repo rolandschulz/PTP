@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 import org.eclipse.ptp.internal.rdt.core.model.ICProjectFactory;
+import org.eclipse.ptp.internal.rdt.core.model.IIndexLocationConverterFactory;
 import org.eclipse.ptp.rdt.core.RDTLog;
 
 public class THGraph implements Serializable {
@@ -54,7 +55,7 @@ public class THGraph implements Serializable {
 	private HashMap<ICElement, THGraphNode> fNodes= new HashMap<ICElement, THGraphNode>();
 	private boolean fFileIsIndexed;
 	
-	private transient IIndexLocationConverter fConverter;
+	private transient IIndexLocationConverterFactory fConverterFactory;
 	
 	public THGraph() {
 	}
@@ -67,8 +68,8 @@ public class THGraph implements Serializable {
 		return fNodes.get(elem);
 	}
 
-	public void setLocationConverter(IIndexLocationConverter converter) {
-		fConverter = converter;
+	public void setLocationConverterFactory(IIndexLocationConverterFactory converter) {
+		fConverterFactory = converter;
 	}
 	
 	private THGraphNode addNode(ICElement input, String path) {
@@ -142,7 +143,7 @@ public class THGraph implements Serializable {
 		if (input != null) {
 			try {
 				fFileIsIndexed= true;
-				input= IndexQueries.attemptConvertionToHandle(index, input, fConverter, projectFactory);
+				input= IndexQueries.attemptConvertionToHandle(index, input, fConverterFactory, projectFactory);
 				fInputNode= addNode(input, path);
 			} catch (CoreException e) {
 				RDTLog.logError(e);
@@ -211,8 +212,8 @@ public class THGraph implements Serializable {
 						}
 						IName name= base.getBaseClassSpecifierName();
 						IBinding basecl= name != null ? index.findBinding(name) : base.getBaseClass();
-						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter, null, projectFactory);
-						String[] paths = IndexQueries.findRepresentitivePaths(index, basecl, fConverter, null, projectFactory);
+						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverterFactory, null, projectFactory);
+						String[] paths = IndexQueries.findRepresentitivePaths(index, basecl, fConverterFactory, null, projectFactory);
 
 						for (int j = 0; j < baseElems.length; j++) {
 							ICElement baseElem = baseElems[j];
@@ -233,8 +234,8 @@ public class THGraph implements Serializable {
 					IType type= ct.getType();
 					if (type instanceof IBinding) {
 						IBinding basecl= (IBinding) type;
-						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter, null, projectFactory);
-						String[] paths = IndexQueries.findRepresentitivePaths(index, basecl, fConverter, null, projectFactory);
+						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverterFactory, null, projectFactory);
+						String[] paths = IndexQueries.findRepresentitivePaths(index, basecl, fConverterFactory, null, projectFactory);
 						if (baseElems.length > 0) {
 							ICElement baseElem= baseElems[0];
 							String path = paths[0];
@@ -285,8 +286,8 @@ public class THGraph implements Serializable {
 							IIndexName subClassDef= indexName.getEnclosingDefinition();
 							if (subClassDef != null) {
 								IBinding subClass= index.findBinding(subClassDef);
-								ICElement[] subClassElems= IndexQueries.findRepresentative(index, subClass, fConverter, null, projectFactory);
-								String[] paths = IndexQueries.findRepresentitivePaths(index, subClass, fConverter, null, projectFactory);
+								ICElement[] subClassElems= IndexQueries.findRepresentative(index, subClass, fConverterFactory, null, projectFactory);
+								String[] paths = IndexQueries.findRepresentitivePaths(index, subClass, fConverterFactory, null, projectFactory);
 								if (subClassElems.length > 0) {
 									ICElement subClassElem= subClassElems[0];
 									String path1 = paths[0];
@@ -346,7 +347,7 @@ public class THGraph implements Serializable {
 	private void addMemberElements(IIndex index, IBinding[] members, List<ICElement> memberList, ICProjectFactory projectFactory) 
 			throws CoreException {
 		for (IBinding binding : members) {
-			ICElement[] elems= IndexQueries.findRepresentative(index, binding, fConverter, null, projectFactory);
+			ICElement[] elems= IndexQueries.findRepresentative(index, binding, fConverterFactory, null, projectFactory);
 			if (elems.length > 0) {
 				memberList.add(elems[0]);
 			}

@@ -15,6 +15,7 @@ import java.util.Arrays;
 
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IFunction;
+import org.eclipse.cdt.core.dom.ast.IType;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.IFunctionDeclaration;
@@ -49,7 +50,8 @@ public class FunctionDeclaration extends SourceManipulation implements IFunction
 	public FunctionDeclaration(Parent parent, int type, IFunction function) throws DOMException {
 		super(parent, type, function.getName());
 		fParameterTypes = extractParameterTypes(function);
-		fReturnType = function.getType().getReturnType().toString();
+		IType rt = function.getType().getReturnType();
+		fReturnType = rt == null ? "" : rt.toString(); //$NON-NLS-1$
 		fIsStatic = function.isStatic();
 	}
 

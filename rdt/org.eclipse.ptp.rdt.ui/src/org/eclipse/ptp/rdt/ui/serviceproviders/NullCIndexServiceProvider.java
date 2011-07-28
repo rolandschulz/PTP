@@ -36,18 +36,19 @@ import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
-import org.eclipse.ptp.internal.rdt.core.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteCIndexServiceProvider;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
+import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.ISearchResult;
 import org.eclipse.search.ui.ISearchResultListener;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * A C/C++ indexing service provider that does nothing.
@@ -64,6 +65,14 @@ import org.eclipse.search.ui.ISearchResultListener;
 public class NullCIndexServiceProvider extends
 		AbstractRemoteCIndexServiceProvider implements IIndexServiceProvider2 {
 
+	
+	/**
+	 * @since 4.0
+	 */
+	public boolean isRemote() {
+		return false;
+	}
+	
 	private final class NullSearchQuery implements ISearchQuery {		
 		
 		private final class NullSearchResult implements ISearchResult {
@@ -210,12 +219,14 @@ public class NullCIndexServiceProvider extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteCIndexServiceProvider#getNavigationService()
 	 */
+	/**
+	 * @since 4.0
+	 */
 	@Override
 	public INavigationService getNavigationService() {
 		return new INavigationService() {
 
-			public OpenDeclarationResult openDeclaration(Scope scope,
-					ITranslationUnit workingCopy, String selectedText,
+			public OpenDeclarationResult openDeclaration(ITextEditor editor, String selectedText,
 					int selectionStart, int selectionLength,
 					IProgressMonitor monitor) {
 				

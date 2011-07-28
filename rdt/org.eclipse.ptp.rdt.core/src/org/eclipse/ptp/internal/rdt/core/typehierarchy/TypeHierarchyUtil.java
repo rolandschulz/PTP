@@ -33,6 +33,7 @@ import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 import org.eclipse.ptp.internal.rdt.core.model.ICProjectFactory;
+import org.eclipse.ptp.internal.rdt.core.model.IIndexLocationConverterFactory;
 
 public class TypeHierarchyUtil {
 
@@ -75,7 +76,7 @@ public class TypeHierarchyUtil {
 		return false;
 	}
 
-	public static ICElement findDeclaration(ICProject project, IIndex index, IASTName name, IBinding binding, IIndexLocationConverter converter, ICProjectFactory projectFactory) 
+	public static ICElement findDeclaration(ICProject project, IIndex index, IASTName name, IBinding binding, IIndexLocationConverterFactory converter, ICProjectFactory projectFactory) 
 			throws CoreException {
 		if (name != null && name.isDefinition()) {
 			return IndexQueries.getCElementForName(project, index, name, converter, projectFactory);
@@ -88,7 +89,7 @@ public class TypeHierarchyUtil {
 		return IndexQueries.findAnyDeclaration(index, project, binding, converter, projectFactory);
 	}
 
-	public static ICElement findDefinition(ICProject project, IIndex index, IASTName name, IBinding binding, IIndexLocationConverter converter, ICProjectFactory projectFactory) 
+	public static ICElement findDefinition(ICProject project, IIndex index, IASTName name, IBinding binding, IIndexLocationConverterFactory converter, ICProjectFactory projectFactory) 
 			throws CoreException {
 		if (name != null && name.isDefinition()) {
 			return IndexQueries.getCElementForName(project, index, name, converter, projectFactory);

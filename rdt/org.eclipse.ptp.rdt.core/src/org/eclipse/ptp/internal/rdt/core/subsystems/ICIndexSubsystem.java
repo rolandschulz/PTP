@@ -27,10 +27,10 @@ import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvoca
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
-import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
+import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 
 
 

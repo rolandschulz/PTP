@@ -20,12 +20,12 @@ import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.model.IModelBuilderService;
 import org.eclipse.ptp.internal.rdt.core.model.RemoteModelBuilderService;
-import org.eclipse.ptp.internal.rdt.core.navigation.INavigationService;
-import org.eclipse.ptp.internal.rdt.core.navigation.RemoteNavigationService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.RemoteTypeHierarchyService;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.RemoteContentAssistService;
+import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
+import org.eclipse.ptp.internal.rdt.ui.navigation.RemoteNavigationService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
 import org.eclipse.ptp.internal.rdt.ui.search.RemoteSearchService;
 import org.eclipse.ptp.rdt.server.dstore.messages.Messages;
@@ -81,6 +81,14 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 		setDescriptor(provider.getDescriptor());
 	}
 
+	
+	/**
+	 * @since 3.0
+	 */
+	public boolean isRemote() {
+		return true;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -196,6 +204,9 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	 * 
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider#
 	 * getNavigationService()
+	 */
+	/**
+	 * @since 3.0
 	 */
 	public synchronized INavigationService getNavigationService() {
 		if (!isConfigured())

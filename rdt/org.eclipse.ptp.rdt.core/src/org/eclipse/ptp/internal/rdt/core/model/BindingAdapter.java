@@ -136,9 +136,9 @@ public class BindingAdapter {
 			element.setIdPos(offset, length);
 			
 			ICProject project = unit.getCProject();
-			if (project instanceof CProject) {
+//			if (project instanceof CProject) {
 				element.setCProject(project);
-			}
+//			}
 		}
 		return element;
 	}

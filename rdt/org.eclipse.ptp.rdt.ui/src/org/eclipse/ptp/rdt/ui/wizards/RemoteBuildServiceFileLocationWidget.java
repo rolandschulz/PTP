@@ -142,14 +142,16 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 
 	public static String getDefaultPath(IRemoteServices remoteServices, IRemoteConnection connection) {
 		// get the user's home directory
-		String homeDir = connection.getProperty(IRemoteConnection.USER_HOME_PROPERTY);
-		if (homeDir != null) {
-			IFileStore homeStore = remoteServices.getFileManager(connection).getResource(homeDir);
-			URI uri = homeStore.toURI();
-			String pathString = EFSExtensionManager.getDefault().getPathFromURI(uri);
-			IPath path = new Path(pathString);
-			path = path.append(RSEUtils.DEFAULT_CONFIG_DIR_NAME);
-			return path.toString();
+		if(connection.isOpen()) {
+			String homeDir = connection.getProperty(IRemoteConnection.USER_HOME_PROPERTY);
+			if (homeDir != null) {
+				IFileStore homeStore = remoteServices.getFileManager(connection).getResource(homeDir);
+				URI uri = homeStore.toURI();
+				String pathString = EFSExtensionManager.getDefault().getPathFromURI(uri);
+				IPath path = new Path(pathString);
+				path = path.append(RSEUtils.DEFAULT_CONFIG_DIR_NAME);
+				return path.toString();
+			}
 		}
 		return null;
 	}

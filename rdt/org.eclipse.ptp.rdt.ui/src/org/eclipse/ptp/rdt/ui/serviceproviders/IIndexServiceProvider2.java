@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
+import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
 
@@ -26,4 +27,9 @@ public interface IIndexServiceProvider2 extends IIndexServiceProvider {
 	public ISearchService getSearchService();
 
 	public IContentAssistService getContentAssistService();
+	
+	/**
+	 * @since 4.0
+	 */
+	public INavigationService getNavigationService();
 }

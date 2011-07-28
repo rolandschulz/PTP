@@ -70,6 +70,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.rdt.core.index.DummyFile;
 import org.eclipse.ptp.internal.rdt.core.index.DummyName;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
+import org.eclipse.ptp.internal.rdt.core.model.IIndexLocationConverterFactory;
 import org.eclipse.ptp.internal.rdt.core.model.RemoteCProjectFactory;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteLineSearchElement.RemoteLineSearchElementMatch;
 
@@ -150,7 +151,7 @@ public abstract class RemoteSearchQuery implements Serializable {
 	throws CoreException {
 			IIndexName[] names= index.findNames(binding, IIndex.FIND_DECLARATIONS_DEFINITIONS);
 			if (names.length > 0) {
-				return IndexQueries.getCElementForName((ICProject) null, index, names[0], fConverter, new RemoteCProjectFactory());
+				return IndexQueries.getCElementForName((ICProject) null, index, names[0], wrapConverter(fConverter), new RemoteCProjectFactory());
 				
 			}
 			return null;
@@ -175,8 +176,14 @@ public abstract class RemoteSearchQuery implements Serializable {
 		
 	}
 	
-	
-	
+	// Don't know if this is the right thing to do
+	private static IIndexLocationConverterFactory wrapConverter(final IIndexLocationConverter converter) {
+		return new IIndexLocationConverterFactory() {
+			@Override public IIndexLocationConverter getConverter(ICProject project) {
+				return converter;
+			}
+		};
+	}
 	
 	
 	public ICElement getcElement() {
@@ -223,7 +230,7 @@ public abstract class RemoteSearchQuery implements Serializable {
 					ICElement enclosingElement = null;
 					IIndexName enclosingDefinition = name.getEnclosingDefinition();
 					if (enclosingDefinition != null) {
-						enclosingElement = IndexQueries.getCElementForName(preferred, index, enclosingDefinition, fConverter, new RemoteCProjectFactory());
+						enclosingElement = IndexQueries.getCElementForName(preferred, index, enclosingDefinition, wrapConverter(fConverter), new RemoteCProjectFactory());
 					}
 					boolean isWriteAccess = name.isWriteAccess();
 					matches.add(new RemoteLineSearchElementMatch(nodeOffset, nodeLength, isPolymorphicOnly, enclosingElement,
@@ -409,7 +416,7 @@ public abstract class RemoteSearchQuery implements Serializable {
 							if (node != null) {
 								IASTFunctionDefinition definition = (IASTFunctionDefinition) node;
 								element = IndexQueries.getCElementForName(getPreferredProject(),
-										ast.getIndex(), definition.getDeclarator().getName(), fConverter, new RemoteCProjectFactory());
+										ast.getIndex(), definition.getDeclarator().getName(), wrapConverter(fConverter), new RemoteCProjectFactory());
 							}
 							boolean isWrite = isWriteOccurrence(name, binding);
 							localMatches.add(new RemoteLineSearchElementMatch(ref.getOffset(), ref.getLength(), false,

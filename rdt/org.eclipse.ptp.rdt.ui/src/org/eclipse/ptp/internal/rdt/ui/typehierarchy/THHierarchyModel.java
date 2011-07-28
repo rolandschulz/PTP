@@ -44,6 +44,7 @@ import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraphEdge;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraphNode;
+import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.services.core.IService;
@@ -188,7 +189,10 @@ public class THHierarchyModel {
 			CUIPlugin.log(e);
 		} catch (InterruptedException e) {
 			return Status.CANCEL_STATUS;
+		} catch (Exception e) {
+			RDTLog.logError(e);
 		}
+		
 		finally {
 			onJobDone(graph, job);
 		}			

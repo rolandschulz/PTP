@@ -92,7 +92,7 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 		T value = map.get(project);
 		if (value == null) {
-			throw new ProjectNotConfiguredException();
+			throw new ProjectNotConfiguredException(project.getName());
 		}
 		return value;
 	}

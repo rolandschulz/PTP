@@ -36,6 +36,8 @@ public class LocalContentAssistService implements IContentAssistService {
 		
 		RemoteContentAssistInvocationContext remoteContext = ContentAssistUtil.adaptContext((CContentAssistInvocationContext) context);
 		IASTCompletionNode completionNode = ((CContentAssistInvocationContext) context).getCompletionNode();
+		if(completionNode == null)
+			return Collections.emptyList();
 		String prefix = completionNode.getPrefix();
 		if (prefix == null) {
 			prefix = remoteContext.computeIdentifierPrefix().toString();

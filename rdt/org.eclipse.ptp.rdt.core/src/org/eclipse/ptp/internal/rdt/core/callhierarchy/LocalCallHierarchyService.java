@@ -40,11 +40,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.CModelUtil;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 import org.eclipse.ptp.internal.rdt.core.model.ICProjectFactory;
+import org.eclipse.ptp.internal.rdt.core.model.IIndexLocationConverterFactory;
 import org.eclipse.ptp.internal.rdt.core.model.LocalCProjectFactory;
+import org.eclipse.ptp.internal.rdt.core.model.LocalIndexLocationConverterFactory;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 
 public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 
+	private static IIndexLocationConverterFactory converterFactory = new LocalIndexLocationConverterFactory();
 	
 	/* -- ST-Origin --
 	 * Source folder: org.eclipse.cdt.ui/src
@@ -106,7 +109,7 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 			if (includeOrdinaryCalls || rname.couldBePolymorphicMethodCall()) {
 				IIndexName caller= rname.getEnclosingDefinition();
 				if (caller != null) {
-					ICElement elem= IndexQueries.getCElementForName(project, index, caller, null, new LocalCProjectFactory());
+					ICElement elem= IndexQueries.getCElementForName(project, index, caller, converterFactory, new LocalCProjectFactory());
 					if (elem != null) {
 						result.add(elem, rname);
 					} 
@@ -147,7 +150,7 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 							defs = findOverriders(index, (ICPPMethod) binding, project, projectFactory);
 						}
 						if (defs == null) {
-							defs= IndexQueries.findRepresentative(index, binding, null, project, projectFactory);
+							defs= IndexQueries.findRepresentative(index, binding, converterFactory, project, projectFactory);
 						}
 						if (defs != null && defs.length > 0) {
 							result.add(defs, name);
@@ -174,9 +177,9 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 		IBinding[] virtualOverriders= ClassTypeHelper.findOverriders(index, binding);
 		if (virtualOverriders.length > 0) {
 			ArrayList<ICElement> list= new ArrayList<ICElement>();
-			list.addAll(Arrays.asList(IndexQueries.findRepresentative(index, binding, null, project, projectFactory)));
+			list.addAll(Arrays.asList(IndexQueries.findRepresentative(index, binding, converterFactory, project, projectFactory)));
 			for (IBinding overrider : virtualOverriders) {
-				list.addAll(Arrays.asList(IndexQueries.findRepresentative(index, overrider, null, project, projectFactory)));
+				list.addAll(Arrays.asList(IndexQueries.findRepresentative(index, overrider, converterFactory, project, projectFactory)));
 			}
 			return list.toArray(new ICElement[list.size()]);
 		}
@@ -205,30 +208,28 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 					if (isRelevantForCallHierarchy(binding)) {
 						final LocalCProjectFactory projectFactory = new LocalCProjectFactory();
 						if (name.isDefinition()) {
-							ICElement elem= IndexQueries.getCElementForName(project, index, name, null, projectFactory);
+							ICElement elem= IndexQueries.getCElementForName(project, index, name, converterFactory, projectFactory);
 							if (elem != null) {
 								return new ICElement[]{elem};
 							}
 							return NO_ELEMENTS;
-
 						}
-						
-						
 
-						ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, null, project, projectFactory);
+
+						ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, converterFactory, project, projectFactory);
 						if (elems.length != 0) 
 							return elems;
 							
 								
 						if (name.isDeclaration()) {
-							ICElement elem= IndexQueries.getCElementForName(project, index, name, null, projectFactory);
+							ICElement elem= IndexQueries.getCElementForName(project, index, name, converterFactory, projectFactory);
 							if (elem != null) {
 								return new ICElement[] {elem};
 							}
 							return NO_ELEMENTS;
 
 						}
-						ICElement elem= IndexQueries.findAnyDeclaration(index, project, binding, null, projectFactory);
+						ICElement elem= IndexQueries.findAnyDeclaration(index, project, binding, converterFactory, projectFactory);
 						
 						if (elem != null) {
 							return new ICElement[]{elem};
@@ -263,9 +264,9 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 			IIndex index, LocalCProjectFactory projectFactory) throws CoreException {
 		while (binding instanceof ICPPSpecialization) {
 			IBinding original= ((ICPPSpecialization) binding).getSpecializedBinding();
-			ICElement[] elems= IndexQueries.findAllDefinitions(index, original, null, project, projectFactory);
+			ICElement[] elems= IndexQueries.findAllDefinitions(index, original, converterFactory, project, projectFactory);
 			if (elems.length == 0) {
-				ICElement elem= IndexQueries.findAnyDeclaration(index, project, original, null, projectFactory);
+				ICElement elem= IndexQueries.findAnyDeclaration(index, project, original, converterFactory, projectFactory);
 				if (elem != null) {
 					elems= new ICElement[]{elem};
 				}
@@ -293,7 +294,7 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 						String path = EFSExtensionManager.getDefault().getPathFromURI(input.getLocationURI());
 						IBinding binding= IndexQueries.elementToBinding(index, input, path);
 						if (binding != null) {
-							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, null, project, projectFactory);
+							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, converterFactory, project, projectFactory);
 							if (result.length > 0) {
 								return result;
 							}

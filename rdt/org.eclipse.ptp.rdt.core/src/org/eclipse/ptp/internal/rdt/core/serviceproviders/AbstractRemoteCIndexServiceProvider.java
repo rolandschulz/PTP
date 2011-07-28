@@ -18,8 +18,6 @@ import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.model.IModelBuilderService;
 import org.eclipse.ptp.internal.rdt.core.model.RemoteModelBuilderService;
-import org.eclipse.ptp.internal.rdt.core.navigation.INavigationService;
-import org.eclipse.ptp.internal.rdt.core.navigation.RemoteNavigationService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.RemoteTypeHierarchyService;
 import org.eclipse.ptp.rdt.core.messages.Messages;
@@ -41,7 +39,6 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 	protected IHost fHost;
 	protected IConnectorService fConnectorService;
 	protected IIndexLifecycleService fIndexLifecycleService;
-	protected INavigationService fNavigationService;
 	protected ICallHierarchyService fCallHierarchyService;
 	protected ITypeHierarchyService fTypeHierarchyService;
 	protected IIncludeBrowserService fIncludeBrowserService;
@@ -102,15 +99,6 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 		return fModelBuilderService;
 	}
 	
-	public synchronized INavigationService getNavigationService() {
-		if(!isConfigured())
-			return null;
-		
-		if(fNavigationService== null)
-			fNavigationService = new RemoteNavigationService(fConnectorService);
-		
-		return fNavigationService;
-	}
 
 	public synchronized ITypeHierarchyService getTypeHierarchyService() {
 		if(!isConfigured())

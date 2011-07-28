@@ -183,38 +183,43 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 		
 		IProject project = callee.getCProject().getProject();
 		IServiceModelManager smm = ServiceModelManager.getInstance();
-		IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
-
-		IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
-
-		IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
-
-		if (serviceProvider instanceof IIndexServiceProvider) {
-			Scope scope = new Scope(project);
-			ICallHierarchyService chService = ((IIndexServiceProvider) serviceProvider).getCallHierarchyService();
-			result = chService.findCalledBy(scope, callee, NPM);
+		if(smm.isConfigured(project)) {
+			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
+			IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
+			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
+	
+			if (serviceProvider instanceof IIndexServiceProvider) {
+				Scope scope = new Scope(project);
+				ICallHierarchyService chService = ((IIndexServiceProvider) serviceProvider).getCallHierarchyService();
+				result = chService.findCalledBy(scope, callee, NPM);
+				return createNodes(parent, result);
+			}
 		}
-		return createNodes(parent, result);
+		
+		return new Object[0];
 	}
 
+	
 	private Object[] asyncronouslyComputeRefersTo(CHNode parent) throws CoreException, InterruptedException {
 		ICElement caller = parent.getRepresentedDeclaration();
 		CallsToResult result = null;
 		
 		IProject project = caller.getCProject().getProject();
 		IServiceModelManager smm = ServiceModelManager.getInstance();
-		IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
-
-		IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
-
-		IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
-
-		if (serviceProvider instanceof IIndexServiceProvider) {
-			Scope scope = new Scope(project);
-			ICallHierarchyService chService = ((IIndexServiceProvider) serviceProvider).getCallHierarchyService();
-			result = chService.findCalls(scope, caller, NPM);
+		if(smm.isConfigured(project)) {
+			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
+			IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
+			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
+	
+			if (serviceProvider instanceof IIndexServiceProvider) {
+				Scope scope = new Scope(project);
+				ICallHierarchyService chService = ((IIndexServiceProvider) serviceProvider).getCallHierarchyService();
+				result = chService.findCalls(scope, caller, NPM);
+				return createNodes(parent, result);
+			}
 		}
-		return createNodes(parent, result);
+		
+		return new Object[0];
 	}
 
 	public void setComputeReferencedBy(boolean value) {

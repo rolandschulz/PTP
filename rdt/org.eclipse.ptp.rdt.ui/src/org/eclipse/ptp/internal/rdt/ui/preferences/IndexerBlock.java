@@ -520,10 +520,11 @@ public class IndexerBlock extends AbstractCOptionPage {
             	final String id = info.getAttribute(ATTRIB_INDEXERID);
             	if (id != null) {
                 	IndexerConfig config= new IndexerConfig(info);
-                	if (config.getName() != null && !WorkbenchActivityHelper.filterItem(config)) {
+                	if (config.getName() != null) {// && !WorkbenchActivityHelper.filterItem(config)) {
                 		IProject proj = getProject();
                 		if (proj != null && RemoteNature.hasRemoteNature(proj)) {
-                			if (id.startsWith("org.eclipse.ptp.rdt.core.RemoteFastIndexer") || id.equalsIgnoreCase("org.eclipse.cdt.core.nullindexer")) { //$NON-NLS-1$ //$NON-NLS-2$
+                			if (id.equals("org.eclipse.cdt.core.fastIndexer") || id.equals("org.eclipse.cdt.core.fastIndexer2") || //$NON-NLS-1$ //$NON-NLS-2$
+                					id.startsWith("org.eclipse.ptp.rdt.core.RemoteFastIndexer") || id.equalsIgnoreCase("org.eclipse.cdt.core.nullindexer")) { //$NON-NLS-1$ //$NON-NLS-2$
                 				fIndexerConfigMap.put(id, config);
                 			}
                 		} else {

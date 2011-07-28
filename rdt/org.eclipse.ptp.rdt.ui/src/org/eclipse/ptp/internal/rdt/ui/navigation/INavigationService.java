@@ -9,14 +9,14 @@
  *    IBM Corporation - initial API and implementation
  *******************************************************************************/ 
 
-package org.eclipse.ptp.internal.rdt.core.navigation;
+package org.eclipse.ptp.internal.rdt.ui.navigation;
 
-import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.internal.rdt.core.model.Scope;
+import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 public interface INavigationService {
 
-	OpenDeclarationResult openDeclaration(Scope scope, ITranslationUnit workingCopy, String selectedText, int selectionStart, int selectionLength, IProgressMonitor monitor);
+	OpenDeclarationResult openDeclaration(ITextEditor editor, String selectedText, int selectionStart, int selectionLength, IProgressMonitor monitor);
 	
 }

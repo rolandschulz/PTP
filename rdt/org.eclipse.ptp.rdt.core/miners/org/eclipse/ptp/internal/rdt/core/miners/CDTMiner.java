@@ -66,7 +66,9 @@ import org.eclipse.ptp.internal.rdt.core.includebrowser.IndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 import org.eclipse.ptp.internal.rdt.core.model.CModelBuilder2;
 import org.eclipse.ptp.internal.rdt.core.model.CProject;
+import org.eclipse.ptp.internal.rdt.core.model.IIndexLocationConverterFactory;
 import org.eclipse.ptp.internal.rdt.core.model.RemoteCProjectFactory;
+import org.eclipse.ptp.internal.rdt.core.model.RemoteIndexLocationConverterFactory;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.model.WorkingCopy;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
@@ -584,7 +586,7 @@ public class CDTMiner extends Miner {
 				int selectionLength = getInteger(theCommand, 9);
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Open declaration...", _dataStore); //$NON-NLS-1$
 				
-				OpenDeclarationResult result = OpenDeclarationHandler.handleOpenDeclaration(scopeName, scheme, unit, path, selectedText, selectionStart, selectionLength, _dataStore);
+				OpenDeclarationResult result = OpenDeclarationHandler.handleOpenDeclarationRemotely(scopeName, scheme, unit, path, selectedText, selectionStart, selectionLength, _dataStore);
 				
 				String resultString = Serializer.serialize(result);
 				status.getDataStore().createObject(status, T_NAVIGATION_RESULT, resultString);
@@ -1119,7 +1121,7 @@ public class CDTMiner extends Miner {
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock for workspace_scope_index", _dataStore); //$NON-NLS-1$
 			index.acquireReadLock();	
 			try {
-				IIndexLocationConverter converter = getLocationConverter(scheme, hostName);
+				IIndexLocationConverterFactory converter = new RemoteIndexLocationConverterFactory(scheme, hostName, _dataStore);
 				ICElement[] result = null;
 				ICProject project = new CProject(projectName);
 				
@@ -1170,7 +1172,7 @@ public class CDTMiner extends Miner {
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Element: " + input.getElementName(), _dataStore); //$NON-NLS-1$
 			
 			
-			IIndexLocationConverter converter = getLocationConverter(scheme, hostName);
+			IIndexLocationConverterFactory converter = new RemoteIndexLocationConverterFactory(scheme, hostName, _dataStore);
 			
 			IIndex project_index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
 			IBinding binding = null;
@@ -1241,7 +1243,7 @@ public class CDTMiner extends Miner {
 			try {
 				IProgressMonitor monitor = new NullProgressMonitor();
 				THGraph graph = new THGraph();
-				graph.setLocationConverter(getLocationConverter(scheme, hostName));
+				graph.setLocationConverterFactory(new RemoteIndexLocationConverterFactory(scheme, hostName, _dataStore));
 				final RemoteCProjectFactory projectFactory = new RemoteCProjectFactory(input.getCProject());
 				graph.defineInputNode(index, input, projectFactory, path);
 				graph.addSuperClasses(index, monitor, projectFactory);
@@ -1511,7 +1513,8 @@ public class CDTMiner extends Miner {
 					if (needToFindDefinition(subject)) {
 						IBinding binding= IndexQueries.elementToBinding(index, subject, path);
 						if (binding != null) {
-							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, getLocationConverter(scheme, hostName), subject.getCProject(), new RemoteCProjectFactory());
+							RemoteIndexLocationConverterFactory converter = new RemoteIndexLocationConverterFactory(scheme, hostName, _dataStore);
+							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, converter, subject.getCProject(), new RemoteCProjectFactory());
 							if (result.length > 0) {
 								definitions = result;
 							}
@@ -1563,7 +1566,7 @@ public class CDTMiner extends Miner {
 			try {
 				ICElement[] definitions = null;
 				ICProject project = workingCopy.getCProject();
-				IIndexLocationConverter converter = getLocationConverter(scheme, hostName);
+				RemoteIndexLocationConverterFactory converter = new RemoteIndexLocationConverterFactory(scheme, hostName, _dataStore);
 				definitions = findDefinitions(index, workingCopy, selectionStart, selectionLength, converter);
 				// create the result object
 				String resultString = Serializer.serialize(definitions);
@@ -1587,7 +1590,7 @@ public class CDTMiner extends Miner {
 	 * Version: 1.25
 	 */
 	//CallHierarchyUI -> private static ICElement[] findDefinitions(ICProject project, IEditorInput editorInput, ITextSelection sel)
-	private static ICElement[] findDefinitions(IIndex index, ITranslationUnit workingCopy, int selectionStart, int selectionLength, IIndexLocationConverter converter) throws CoreException {
+	private static ICElement[] findDefinitions(IIndex index, ITranslationUnit workingCopy, int selectionStart, int selectionLength, IIndexLocationConverterFactory converter) throws CoreException {
 		
 			ICElement[] no_elements = {};
 			ICProject project = workingCopy.getCProject();
@@ -1635,7 +1638,7 @@ public class CDTMiner extends Miner {
 	}
 	
 	private static ICElement[] findSpecializationDeclaration(IBinding binding, ICProject project,
-			IIndex index, IIndexLocationConverter converter) throws CoreException {
+			IIndex index, IIndexLocationConverterFactory converter) throws CoreException {
 		while (binding instanceof ICPPSpecialization) {
 			IBinding original= ((ICPPSpecialization) binding).getSpecializedBinding();
 			ICElement[] elems= IndexQueries.findAllDefinitions(index, original, converter, project, new RemoteCProjectFactory());
@@ -1668,8 +1671,8 @@ public class CDTMiner extends Miner {
 
 			// search the index for the name
 			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
-			
-			Map<String, ICElement[]> result =  RemoteCHQueries.handleGetOverriders(index, subject, path, _dataStore, getLocationConverter(scheme, hostName));
+			IIndexLocationConverterFactory converter = new RemoteIndexLocationConverterFactory(scheme, hostName, _dataStore);
+			Map<String, ICElement[]> result =  RemoteCHQueries.handleGetOverriders(index, subject, path, _dataStore, converter);
 			
 			// create the result object
 			String resultString = Serializer.serialize(result);
@@ -1739,7 +1742,8 @@ public class CDTMiner extends Miner {
 
 			if (subject != null) {
 				
-				RemoteCHQueries.findCalledBy(subject, path, project_index, workspace_scope_index, scheme, hostName, result, _dataStore, getLocationConverter(scheme, hostName));
+				IIndexLocationConverterFactory converter = new RemoteIndexLocationConverterFactory(scheme, hostName, _dataStore);
+				RemoteCHQueries.findCalledBy(subject, path, project_index, workspace_scope_index, scheme, hostName, result, _dataStore, converter);
 				
 			}
 			
@@ -1773,12 +1777,11 @@ public class CDTMiner extends Miner {
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Getting index", _dataStore); //$NON-NLS-1$
 			
 
-			IIndexLocationConverter converter = getLocationConverter(scheme, hostName);
-			
 			// search the index for the name
 			IIndex project_index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
 			IIndex workspace_scope_index = RemoteIndexManager.getInstance().getIndexForScope(Scope.WORKSPACE_ROOT_SCOPE_NAME, _dataStore);
 			
+			IIndexLocationConverterFactory converter = new RemoteIndexLocationConverterFactory(scheme, hostName, _dataStore);
 			CallsToResult result = RemoteCHQueries.findCalls(subject, path, project_index, workspace_scope_index, scheme, hostName, _dataStore, converter);
 					
 			// create the result object
