@@ -38,6 +38,16 @@
       </UNCPathConverter>
    </extension>
    <extension
+         point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
+      <builder
+            commandLauncher="org.eclipse.ptp.rdt.sync.core.remotemake.SyncCommandLauncher"
+            id="org.eclipse.ptp.rdt.sync.core.SyncBuilder"
+            isAbstract="false"
+            isVariableCaseSensitive="false"
+            name="%Builder.name">
+      </builder>
+   </extension>
+   <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
             class="org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider"
@@ -48,13 +58,65 @@
       </provider>
    </extension>
    <extension
-         point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
-      <builder
-            commandLauncher="org.eclipse.ptp.rdt.sync.core.remotemake.SyncCommandLauncher"
-            id="org.eclipse.ptp.rdt.sync.core.SyncBuilder"
-            isAbstract="false"
-            isVariableCaseSensitive="false"
-            name="%Builder.name">
-      </builder>
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+            id="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+            name="Sync Operations">
+         <commandParameter
+               id="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+               name="Sync Mode"
+               optional="false">
+         </commandParameter>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="true"
+            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu">
+         <menu
+               label="Synchronization">
+            <menu
+                  label="Set Sync">
+               <command
+                     commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                     label="Sync Active"
+                     style="radio">
+                  <parameter
+                        name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                        value="active">
+                  </parameter>
+               </command>
+               <command
+                     commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                     label="Sync All"
+                     style="radio">
+                  <parameter
+                        name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                        value="all">
+                  </parameter>
+               </command>
+               <command
+                     commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                     label="Sync None"
+                     style="radio">
+                  <parameter
+                        name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                        value="none">
+                  </parameter>
+               </command>
+            </menu>
+            <command
+                  commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                  label="Sync Now"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                     value="sync">
+               </parameter>
+            </command>
+         </menu>
+      </menuContribution>
    </extension>
 </plugin>
