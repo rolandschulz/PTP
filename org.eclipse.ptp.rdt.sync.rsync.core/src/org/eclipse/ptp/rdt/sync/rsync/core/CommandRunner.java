@@ -13,7 +13,6 @@ package org.eclipse.ptp.rdt.sync.rsync.core;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -186,17 +185,8 @@ public class CommandRunner {
 	 * 			   if other error
 	 */
 	public static CommandResults executeRemoteCommand(IRemoteConnection conn, String command, String remoteDirectory,
-			IProgressMonitor monitor) throws
-			IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
-	
-		return executeRemoteCommandAndRedirectStreams(conn, command, remoteDirectory, monitor, null, null, null);
-	}
-
-	public static CommandResults executeRemoteCommandAndRedirectStreams(IRemoteConnection conn, String command,
-			String remoteDirectory, IProgressMonitor monitor, InputStream inputStream, OutputStream outputStream,
-			OutputStream errorStream) throws
-			IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
-
+														IProgressMonitor monitor) throws 
+																IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
 		if (!conn.isOpen()) {
 			conn.open(monitor);
 		}
@@ -240,11 +230,8 @@ public class CommandRunner {
 		return commandResults;
 	}
 
-	
-
 	// Enforce as static
 	private CommandRunner() {
 		throw new AssertionError(Messages.CR_CreateInstanceError);
-		
 	}
 }
