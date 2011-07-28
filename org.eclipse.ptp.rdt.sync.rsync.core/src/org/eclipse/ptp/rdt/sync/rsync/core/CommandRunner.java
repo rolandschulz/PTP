@@ -129,7 +129,7 @@ public class CommandRunner {
 	 * This function creates the local directory if it does not exist.
 	 * 
 	 * @return whether the directory was already PRESENT
-	 * TODO: Handle false return from mkdir
+	 *         TODO: Handle false return from mkdir
 	 */
 	public static DirectoryStatus createLocalDirectory(String localDirectory) {
 		final DirectoryStatus directoryStatus = checkLocalDirectory(localDirectory);
@@ -147,12 +147,13 @@ public class CommandRunner {
 	 * 
 	 * @param conn
 	 * @param remoteDir
-	 * @param monitor 
+	 * @param monitor
 	 * @throws CoreException
 	 *             on problem creating the remote directory.
 	 * @return whether the directory was already PRESENT
 	 */
-	public static DirectoryStatus createRemoteDirectory(IRemoteConnection conn, String remoteDir, IProgressMonitor monitor) throws CoreException {
+	public static DirectoryStatus createRemoteDirectory(IRemoteConnection conn, String remoteDir, IProgressMonitor monitor)
+			throws CoreException {
 		final IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
 		final IFileStore fileStore = fileManager.getResource(remoteDir);
 		final IFileInfo fileInfo = fileStore.fetchInfo();
@@ -181,17 +182,17 @@ public class CommandRunner {
 	 * @throws InterruptedException
 	 *             if execution of remote command is interrupted.
 	 * @throws RemoteConnectionException
-	 * 			   if connection closed and cannot be opened. 
-	 * @throws RemoteSyncException 
-	 * 			   if other error
+	 *             if connection closed and cannot be opened.
+	 * @throws RemoteSyncException
+	 *             if other error
 	 */
 	public static CommandResults executeRemoteCommand(IRemoteConnection conn, String command, String remoteDirectory,
 			IProgressMonitor monitor) throws
 			IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
-	
+
 		return executeRemoteCommand(conn, command, remoteDirectory, monitor, null, null, null);
 	}
-	
+
 	// Redirected string output not available in returned results.
 	public static CommandResults executeRemoteCommand(IRemoteConnection conn, String command,
 			String remoteDirectory, IProgressMonitor monitor, InputStream inputStream, OutputStream outputStream,
@@ -210,54 +211,53 @@ public class CommandRunner {
 
 		final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandList);
 		final IRemoteFileManager rfm = conn.getRemoteServices().getFileManager(conn);
-		if(remoteDirectory != null){
+		if (remoteDirectory != null) {
 			rpb.directory(rfm.getResource(remoteDirectory));
 		}
 
 		// Run process and stream readers
 		OutputStream output = new ByteArrayOutputStream();
 		OutputStream error = new ByteArrayOutputStream();
-	
 
 		IRemoteProcess rp = rpb.start();
-		
+
 		StreamCopyThread getOutput = null;
-		if(outputStream == null){
+		if (outputStream == null) {
 			getOutput = new StreamCopyThread(rp.getInputStream(), output);
-		}else if (outputStream != null){
+		} else if (outputStream != null) {
 			getOutput = new StreamCopyThread(rp.getInputStream(), outputStream);
 		}
-		
+
 		StreamCopyThread getError = null;
-		if(errorStream == null){
+		if (errorStream == null) {
 			getError = new StreamCopyThread(rp.getErrorStream(), error);
-		}else if(errorStream != null){
+		} else if (errorStream != null) {
 			getError = new StreamCopyThread(rp.getErrorStream(), errorStream);
 		}
-		
+
 		StreamCopyThread getInput = null;
-		if(inputStream != null){
+		if (inputStream != null) {
 			getInput = new StreamCopyThread(inputStream, rp.getOutputStream());
 		}
 
 		getOutput.start();
 		getError.start();
-		if(getInput != null){
+		if (getInput != null) {
 			getInput.start();
 		}
-//		//wait for EOF with the change for the ProcessMonitor to cancel
-//		for (;;) {
-//			getOutput.join(250);
-//			if (!getOutput.isAlive()) break;
-//			if (monitor.isCanceled()) {
-//				throw new RemoteSyncException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.CommandRunner_0));
-//			}
-//		}
-		//rp and getError should be finished as soon as getOutput is finished
+		// //wait for EOF with the change for the ProcessMonitor to cancel
+		// for (;;) {
+		// getOutput.join(250);
+		// if (!getOutput.isAlive()) break;
+		// if (monitor.isCanceled()) {
+		// throw new RemoteSyncException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.CommandRunner_0));
+		// }
+		// }
+		// rp and getError should be finished as soon as getOutput is finished
 		int exitCode = rp.waitFor();
 		getError.halt();
 		getInput.halt();
-		
+
 		final CommandResults commandResults = new CommandResults();
 		commandResults.setExitCode(exitCode);
 		commandResults.setStdout(output.toString());
@@ -265,11 +265,9 @@ public class CommandRunner {
 		return commandResults;
 	}
 
-	
-
 	// Enforce as static
 	private CommandRunner() {
 		throw new AssertionError(Messages.CR_CreateInstanceError);
-		
+
 	}
 }

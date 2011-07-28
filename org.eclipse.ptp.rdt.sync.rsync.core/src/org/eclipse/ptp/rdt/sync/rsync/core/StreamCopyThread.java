@@ -1,5 +1,4 @@
-/*
- * Copyright (C) 2009-2010, Google Inc.
+/* Copyright (C) 2009-2010, Google Inc.
  * and other copyright owners as documented in the project's IP log.
  *
  * This program and the accompanying materials are made available
@@ -43,6 +42,9 @@
 
 package org.eclipse.ptp.rdt.sync.rsync.core;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
@@ -61,7 +63,7 @@ public class StreamCopyThread extends Thread {
 
 	/**
 	 * Create a thread to copy data from an input stream to an output stream.
-	 *
+	 * 
 	 * @param i
 	 *            stream to copy from. The thread terminates when this stream
 	 *            reaches EOF. The thread closes this stream before it exits.
@@ -78,9 +80,8 @@ public class StreamCopyThread extends Thread {
 	/**
 	 * Request the thread to flush the output stream as soon as possible.
 	 * <p>
-	 * This is an asynchronous request to the thread. The actual flush will
-	 * happen at some future point in time, when the thread wakes up to process
-	 * the request.
+	 * This is an asynchronous request to the thread. The actual flush will happen at some future point in time, when the thread
+	 * wakes up to process the request.
 	 */
 	public void flush() {
 		interrupt();
@@ -89,9 +90,8 @@ public class StreamCopyThread extends Thread {
 	/**
 	 * Request that the thread terminate, and wait for it.
 	 * <p>
-	 * This method signals to the copy thread that it should stop as soon as
-	 * there is no more IO occurring.
-	 *
+	 * This method signals to the copy thread that it should stop as soon as there is no more IO occurring.
+	 * 
 	 * @throws InterruptedException
 	 *             the calling thread was interrupted.
 	 */
@@ -109,6 +109,11 @@ public class StreamCopyThread extends Thread {
 	@Override
 	public void run() {
 		try {
+			File fakesshfile = new File("/home/ejd/TestSSH/fakesshout");
+
+			fakesshfile.createNewFile();
+
+			BufferedWriter out = new BufferedWriter(new FileWriter("/home/ejd/TestSSH/fakesshout", true));
 			final byte[] buf = new byte[BUFFER_SIZE];
 			int interruptCounter = 0;
 			for (;;) {
@@ -124,6 +129,7 @@ public class StreamCopyThread extends Thread {
 					final int n;
 					try {
 						n = src.read(buf);
+						out.write("Read from stream: " + src.toString() + " buffer: " + buf.toString() + "\n");
 					} catch (InterruptedIOException wakey) {
 						interruptCounter++;
 						continue;
@@ -135,6 +141,7 @@ public class StreamCopyThread extends Thread {
 					for (;;) {
 						try {
 							dst.write(buf, 0, n);
+							out.write("Write to stream: " + dst.toString() + " buffer: " + buf.toString());
 						} catch (InterruptedIOException wakey) {
 							writeInterrupted = true;
 							continue;
@@ -146,10 +153,14 @@ public class StreamCopyThread extends Thread {
 							interrupt();
 						break;
 					}
-				} catch (IOException e) {
-					break;
+				} catch (Exception e) {
+
+					e.printStackTrace();
+
 				}
 			}
+		} catch (IOException e) {
+			// Do nothing
 		} finally {
 			try {
 				src.close();
@@ -160,7 +171,11 @@ public class StreamCopyThread extends Thread {
 				dst.close();
 			} catch (IOException e) {
 				// Ignore IO errors on close
+			} catch (Exception e) {
+				e.printStackTrace();
+
 			}
+
 		}
 	}
 }
