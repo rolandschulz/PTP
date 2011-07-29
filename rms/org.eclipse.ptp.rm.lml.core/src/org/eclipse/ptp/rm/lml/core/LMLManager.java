@@ -40,7 +40,6 @@ import org.eclipse.ptp.rm.lml.internal.core.events.UnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.UnselectObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.ViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
-import org.eclipse.ui.IMemento;
 
 /**
  * 
@@ -98,12 +97,12 @@ public class LMLManager {
 		}
 	}
 
-	public void closeLgui(String name, IMemento memento) {
+	public void closeLgui(String name) {
 		ILguiItem item = null;
 		synchronized (LGUIS) {
 			item = LGUIS.get(name);
 			if (item != null) {
-				item.saveCurrentLayout(memento);
+				// item.saveCurrentLayout(memento);
 				LGUIS.remove(name);
 			}
 		}
@@ -115,7 +114,40 @@ public class LMLManager {
 		/*
 		 * takes care of persisting user job state info
 		 */
-		saveJobStatusData(item, memento);
+		// saveJobStatusData(item, memento);
+	}
+
+	// public void closeLgui(String name, IMemento memento) {
+	// ILguiItem item = null;
+	// synchronized (LGUIS) {
+	// item = LGUIS.get(name);
+	// if (item != null) {
+	// item.saveCurrentLayout(memento);
+	// LGUIS.remove(name);
+	// }
+	// }
+	// if (fLguiItem != null && fLguiItem == item) {
+	// fireRemovedLgui(item);
+	// fLguiItem = null;
+	// }
+	//
+	// /*
+	// * takes care of persisting user job state info
+	// */
+	// saveJobStatusData(item, memento);
+	// }
+
+	public String getCurrentLayout(String name) {
+		ILguiItem item = null;
+		synchronized (LGUIS) {
+			item = LGUIS.get(name);
+			if (item != null) {
+				return item.saveCurrentLayout();
+				// item.getCurrentLayout(output)
+			}
+		}
+
+		return null;
 	}
 
 	public ILguiItem getSelectedLguiItem() {
@@ -130,11 +162,41 @@ public class LMLManager {
 		return null;
 	}
 
+	public JobStatusData[] getUserJobs(String name) {
+		ILguiItem item = null;
+		synchronized (LGUIS) {
+			item = LGUIS.get(name);
+			if (item != null) {
+				return item.getUserJobs();
+			}
+		}
+		return null;
+	}
+
 	public void markObject(String oid) {
 		fireMarkObject(oid);
 	}
 
-	public void openLgui(String name, IMemento memento) {
+	// public void openLgui(String name, IMemento memento) {
+	// synchronized (LGUIS) {
+	// ILguiItem item = LGUIS.get(name);
+	// if (item == null) {
+	// item = new LguiItem(name);
+	// LGUIS.put(name, item);
+	// }
+	// fLguiItem = item;
+	// }
+	//
+	// fLguiItem.reloadLastLayout(memento);
+	// restoreJobStatusData(fLguiItem, memento);
+	//
+	// if (!fLguiItem.isEmpty()) {
+	// fireNewLgui();
+	// }
+	// }
+
+	public void openLgui(String name, StringBuilder layout, JobStatusData[] jobs) {
+		// TODO Werte evtl leer
 		synchronized (LGUIS) {
 			ILguiItem item = LGUIS.get(name);
 			if (item == null) {
@@ -144,8 +206,8 @@ public class LMLManager {
 			fLguiItem = item;
 		}
 
-		fLguiItem.reloadLastLayout(memento);
-		restoreJobStatusData(fLguiItem, memento);
+		fLguiItem.reloadLastLayout(layout);
+		restoreJobStatusData(fLguiItem, jobs);
 
 		if (!fLguiItem.isEmpty()) {
 			fireNewLgui();
@@ -244,8 +306,7 @@ public class LMLManager {
 	}
 
 	private void fireChangeSelectedObject(String oid) {
-		final ISelectObjectEvent event = new SelectObjectEvent(
-				oid);
+		final ISelectObjectEvent event = new SelectObjectEvent(oid);
 		for (final Object listener : lmlListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
@@ -314,24 +375,24 @@ public class LMLManager {
 	 * @param memento
 	 *            may be <code>null</code>
 	 */
-	private void restoreJobStatusData(ILguiItem item, IMemento memento) {
-		if (memento != null) {
-			for (final JobStatusData status : JobStatusData.reload(memento)) {
+	private void restoreJobStatusData(ILguiItem item, JobStatusData[] jobs) {
+		if (jobs.length > 0) {
+			for (final JobStatusData status : jobs) {
 				item.addUserJob(status.getJobId(), status, false);
 			}
 		}
 	}
 
-	/**
-	 * @param map
-	 * @param memento
-	 *            guaranteed by caller to be non-<code>null</code>
-	 */
-	private void saveJobStatusData(ILguiItem item, IMemento memento) {
-		for (final JobStatusData status : item.getUserJobs()) {
-			if (!status.isRemoved()) {
-				status.save(memento);
-			}
-		}
-	}
+	// /**
+	// * @param map
+	// * @param memento
+	// * guaranteed by caller to be non-<code>null</code>
+	// */
+	// private void saveJobStatusData(ILguiItem item, IMemento memento) {
+	// for (final JobStatusData status : item.getUserJobs()) {
+	// if (!status.isRemoved()) {
+	// status.save(memento);
+	// }
+	// }
+	// }
 }
