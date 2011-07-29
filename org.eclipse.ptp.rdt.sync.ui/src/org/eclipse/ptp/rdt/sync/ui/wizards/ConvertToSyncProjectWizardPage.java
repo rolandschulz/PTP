@@ -1,13 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2011 Oak Ridge National Laboratory and others.
+ * Copyright (c) 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    John Eblen - initial implementation
+ * IBM Corporation - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ptp.rdt.sync.ui.wizards;
 
 import java.io.IOException;
@@ -27,7 +28,6 @@ import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
-import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
@@ -49,15 +48,12 @@ import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -66,17 +62,17 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * Converts existing CDT projects to sync projects.
- * @since 1.0
  */
-public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWizardPage {
+public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 
 	private Combo fProviderCombo;
-	private Text fLocationText;
+	private Composite fProviderArea;
+	private StackLayout fProviderStack;
+	private final List<Composite> fProviderControls = new ArrayList<Composite>();
 	private ISynchronizeParticipantDescriptor fSelectedProvider;
 	private final Map<Integer, ISynchronizeParticipantDescriptor> fComboIndexToDescriptorMap = new HashMap<Integer, ISynchronizeParticipantDescriptor>();
 
@@ -90,8 +86,20 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 	 * 
 	 * @param pageName
 	 */
-	public ConvertFromRemoteCToSyncProjectWizardPage(String pageName) {
+	public ConvertToSyncProjectWizardPage(String pageName) {
 		super(pageName);
+	}
+
+	private void addProviderControl(ISynchronizeParticipantDescriptor desc) {
+		Composite comp = null;
+		ISynchronizeParticipant part = desc.getParticipant();
+		if (part != null) {
+			comp = new Composite(fProviderArea, SWT.NONE);
+			comp.setLayout(new GridLayout(1, false));
+			comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			part.createConfigurationArea(comp, getWizard().getContainer());
+		}
+		fProviderControls.add(comp);
 	}
 
 	@Override
@@ -121,30 +129,21 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 			}
 		});
 
+		fProviderArea = new Group(comp, SWT.SHADOW_ETCHED_IN);
+		fProviderStack = new StackLayout();
+		fProviderArea.setLayout(fProviderStack);
+		GridData providerAreaData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		providerAreaData.horizontalSpan = 3;
+		fProviderArea.setLayoutData(providerAreaData);
+
 		// populate the combo with a list of providers
 		ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
 
 		for (int k = 0; k < providers.length; k++) {
 			fProviderCombo.add(providers[k].getName(), k);
 			fComboIndexToDescriptorMap.put(k, providers[k]);
+			addProviderControl(providers[k]);
 		}
-
-		// Label for location
-		Label locationLabel = new Label(comp, SWT.LEFT);
-		locationLabel.setText(Messages.ConvertFromRemoteCToSyncProjectWizardPage_0);
-
-		// Location text box
-		fLocationText = new Text(comp, SWT.SINGLE | SWT.BORDER);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 1;
-		gd.grabExcessHorizontalSpace = true;
-		gd.widthHint = 250;
-		fLocationText.setLayoutData(gd);
-		fLocationText.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				update();
-			}
-		});
 
 		fProviderCombo.select(0);
 		handleProviderSelected();
@@ -318,10 +317,8 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 			errMsg = super.getErrorMessage();
 		} else if (fSelectedProvider == null) {
 			errMsg = Messages.ConvertToSyncProjectWizardPage_0;
-		} else if (fLocationText.getText().length() == 0 ) {
-			errMsg = Messages.ConvertFromRemoteCToSyncProjectWizardPage_1;
-		} else if (URIUtil.toURI(fLocationText.getText()) == null) {
-			errMsg = Messages.ConvertFromRemoteCToSyncProjectWizardPage_2;
+		} else {
+			errMsg = fSelectedProvider.getParticipant().getErrorMessage();
 		}
 		setPageComplete(super.validatePage() && errMsg == null);
 		return errMsg;
@@ -350,34 +347,31 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 	 */
 	private void handleProviderSelected() {
 		int index = fProviderCombo.getSelectionIndex();
+		fProviderStack.topControl = fProviderControls.get(index);
 		fSelectedProvider = fComboIndexToDescriptorMap.get(index);
+		fProviderArea.layout();
 		update();
 	}
 
-
 	/**
-	 * Return true for projects that are:
-	 * 1) not hidden
-	 * 2) have C or CC nature
-	 * 3) are not already sync projects
-	 * 4) have remote nature
+	 * Returns true for: - non-hidden projects - non-RDT projects - projects
+	 * that does not have remote systems temporary nature - projects that are
+	 * located remotely
 	 */
 	@Override
 	public boolean isCandidate(IProject project) {
 		boolean a = false;
 		boolean b = false;
 		boolean c = false;
-		boolean d = false;
 		a = !project.isHidden();
 		try {
 			b = project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID);
 			c = !project.hasNature(RemoteSyncNature.NATURE_ID);
-			d = project.hasNature(RemoteNature.REMOTE_NATURE_ID);
 		} catch (CoreException e) {
 			RDTSyncUIPlugin.log(e);
 		}
 
-		return a && b && c && d;
+		return a && b && c;
 	}
 
 	/*

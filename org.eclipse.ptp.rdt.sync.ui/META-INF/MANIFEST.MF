@@ -25,4 +25,3 @@ Export-Package: org.eclipse.ptp.rdt.sync.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin
 Bundle-Vendor: %providerName
-Import-Package: org.eclipse.core.filesystem

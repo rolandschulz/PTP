@@ -19,11 +19,11 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
- * Wizard that enables the conversion of existing Remote C/C++ projects to synchronized projects
- * @since 1.0
+ * Wizard that enables the conversion of existing projects to synchronized
+ * projects
  * 
  */
-public class ConvertFromRemoteCToSyncProjectWizard extends ConversionWizard {
+public class ConvertToSyncProjectWizard extends ConversionWizard {
 
 	/*
 	 * (non-Javadoc)
@@ -44,7 +44,7 @@ public class ConvertFromRemoteCToSyncProjectWizard extends ConversionWizard {
 
 	@Override
 	public void addPages() {
-		addPage(mainPage = new ConvertFromRemoteCToSyncProjectWizardPage(getPrefix()));
+		addPage(mainPage = new ConvertToSyncProjectWizardPage(getPrefix()));
 	}
 
 	@Override
