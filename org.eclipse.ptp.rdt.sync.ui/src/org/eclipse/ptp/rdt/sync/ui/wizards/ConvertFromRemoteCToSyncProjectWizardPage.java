@@ -11,8 +11,10 @@
 package org.eclipse.ptp.rdt.sync.ui.wizards;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,7 +38,9 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
+import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
@@ -45,11 +49,13 @@ import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -58,6 +64,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -170,17 +177,25 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 			IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(SyncBuildServiceProvider.ID);
 			SyncBuildServiceProvider rbsp = (SyncBuildServiceProvider) smm.getServiceProvider(descriptor);
 			if (rbsp != null) {
-				SyncBuildServiceProvider currentBuildProvider = (SyncBuildServiceProvider) smm.getActiveConfiguration(project).
-																								getServiceProvider(buildService);
-				IRemoteConnection remoteConnection = null;
-				if (currentBuildProvider != null) {
-					remoteConnection = currentBuildProvider.getConnection();
-				}
+				IRemoteConnection remoteConnection = participant.getProvider(project).getRemoteConnection();
 				rbsp.setRemoteToolsConnection(remoteConnection);
 				serviceConfig.setServiceProvider(buildService, rbsp);
 			}
 
-			// For each build configuration, set builder to be the sync builder
+			smm.addConfiguration(project, serviceConfig);
+			try {
+				smm.saveModelConfiguration();
+			} catch (IOException e) {
+				RDTSyncUIPlugin.log(e.toString(), e);
+			}
+
+			// Create build scenario based on initial remote location
+			// information
+			ISyncServiceProvider provider = participant.getProvider(project);
+			BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(), provider.getLocation());
+
+			// For each build configuration, set the build directory
+			// appropriately.
 			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 			if (buildInfo == null) {
 				throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
@@ -198,9 +213,11 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 			}
 			ManagedBuildManager.saveBuildInfo(project, true);
 
-			// Initialize project for the BuildConfigurationManager
-			// Do this last (except for adding local configuration) so that project is not flagged as initialized prematurely.
-			BuildConfigurationManager.getInstance().initProject(project, serviceConfig, null);
+			// Add information about remote location to the initial build
+			// configurations.
+			// Do this last (except for adding local configuration) so that
+			// project is not flagged as initialized prematurely.
+			BuildConfigurationManager.getInstance().initProject(project, serviceConfig, buildScenario);
 			try {
 				BuildConfigurationManager.getInstance().saveConfigurationData();
 			} catch (IOException e) {
@@ -371,4 +388,5 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 	private void update() {
 		getWizard().getContainer().updateMessage();
 	}
+
 }
