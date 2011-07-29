@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.ptp.internal.rdt.sync.core.SyncManager.SYNC_MODE;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 
@@ -34,8 +35,19 @@ public class ResourceChangeListener {
 		public void resourceChanged(IResourceChangeEvent event) {
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
 				IProject project = delta.getResource().getProject();
-				if (project != null && RemoteSyncNature.hasNature(project)) {
-					SyncCommand.sync(delta, project, SyncFlag.NO_FORCE);
+				if (project == null) {
+					return;
+				}
+				if (RemoteSyncNature.hasNature(project)) {
+					SyncManager scm = SyncManager.getInstance();
+					SYNC_MODE syncMode = scm.getSyncMode(project);
+					// Note that sync'ing is necessary even if sync mode is NONE. The actual synchronization call does more than
+					// just sync files to remote.
+					if (syncMode == SYNC_MODE.ALL) {
+						scm.syncAll(delta, project, SyncFlag.NO_FORCE);
+					} else {
+						scm.sync(delta, project, SyncFlag.NO_FORCE);
+					}
 				}
 			}
 		}

@@ -17,9 +17,6 @@ public class Messages extends NLS {
 
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.sync.core.messages.messages"; //$NON-NLS-1$
 
-	public static String RCL_NoServiceConfigError;
-
-	public static String ResourceChangeListener_jobName;
 	public static String BCM_WorkspaceConfigDes;
 	public static String BCM_ScenarioToServiceConfigError;
 
@@ -47,6 +44,26 @@ public class Messages extends NLS {
 	public static String SyncBuildServiceProvider_configDir;
 
 	public static String SyncBuildServiceProvider_name;
+
+	/**
+	 * @since 1.0
+	 */
+	public static String SyncConfigurationManager_0;
+
+	/**
+	 * @since 1.0
+	 */
+	public static String SyncConfigurationManager_1;
+
+	/**
+	 * @since 1.0
+	 */
+	public static String SyncConfigurationManager_2;
+
+	/**
+	 * @since 1.0
+	 */
+	public static String SyncConfigurationManager_3;
 
 	static {
 		initializeMessages(BUNDLE_NAME, Messages.class);
