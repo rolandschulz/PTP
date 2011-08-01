@@ -144,7 +144,7 @@
             class="org.eclipse.ptp.launch.ui.ResourcesTab"
             group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.launch.applicationLaunch.resourcesTabDebug"
-            name="%ResourceLaunchTab.name">
+            name="%ResourcesLaunchTab.name">
       </tab>
       <tab
             class="org.eclipse.ptp.launch.ui.EnvironmentTab"
