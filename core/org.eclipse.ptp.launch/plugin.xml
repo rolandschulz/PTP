@@ -9,7 +9,7 @@
 			delegate="org.eclipse.ptp.launch.ParallelLaunchConfigurationDelegate"
 			sourceLocatorId="org.eclipse.ptp.debug.core.sourceLocator"
 			sourcePathComputerId="org.eclipse.ptp.debug.core.sourcePathComputer"
-			modes="run,debug"
+			modes="run,debug,profile"
 			public="true"
 			id="org.eclipse.ptp.launch.parallelLaunch">
 		</launchConfigurationType>
@@ -144,7 +144,7 @@
             class="org.eclipse.ptp.launch.ui.ResourcesTab"
             group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.launch.applicationLaunch.resourcesTabDebug"
-            name="%ResourceLaunchTab.name">
+            name="%ResourcesLaunchTab.name">
       </tab>
       <tab
             class="org.eclipse.ptp.launch.ui.EnvironmentTab"
