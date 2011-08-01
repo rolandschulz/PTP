@@ -245,6 +245,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			 * In some cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
 			 */
 			// TODO: We are not using the individual "sync to local" and "sync to remote" flags yet.
+			if (syncFlags.contains(SyncFlag.DISABLE_SYNC)) {
+				return;
+			}
 			if ((syncFlags == SyncFlag.NO_FORCE) && (!(hasRelevantChangedResources))) {
 				return;
 			}

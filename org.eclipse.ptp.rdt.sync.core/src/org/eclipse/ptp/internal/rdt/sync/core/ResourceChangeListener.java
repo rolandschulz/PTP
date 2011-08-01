@@ -39,14 +39,15 @@ public class ResourceChangeListener {
 					return;
 				}
 				if (RemoteSyncNature.hasNature(project)) {
-					SyncManager scm = SyncManager.getInstance();
-					SYNC_MODE syncMode = scm.getSyncMode(project);
-					// Note that sync'ing is necessary even if sync mode is NONE. The actual synchronization call does more than
-					// just sync files to remote.
-					if (syncMode == SYNC_MODE.ALL) {
-						scm.syncAll(delta, project, SyncFlag.NO_FORCE);
-					} else {
-						scm.sync(delta, project, SyncFlag.NO_FORCE);
+					SYNC_MODE syncMode = SyncManager.getSyncMode(project);
+					// Note that sync'ing is necessary even if user has turned sync'ing off. The actual synchronization call does
+					// more than just sync files to remote.
+					if (!(SyncManager.getSyncAuto()) || syncMode == SYNC_MODE.NONE) {
+						SyncManager.sync(delta, project, SyncFlag.NO_SYNC);
+					} else if (syncMode == SYNC_MODE.ALL) {
+						SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE);
+					} else if (syncMode == SYNC_MODE.ACTIVE) {
+						SyncManager.sync(delta, project, SyncFlag.NO_FORCE);
 					}
 				}
 			}
