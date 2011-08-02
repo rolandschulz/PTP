@@ -31,6 +31,18 @@ public interface IAssign {
 	public int getIndex();
 
 	/**
+	 * @param increment
+	 *            by which to increase index number
+	 */
+	public void incrementIndex(int increment);
+
+	/**
+	 * @return whether to force the creation of a new object
+	 * 
+	 */
+	public boolean isForceNew();
+
+	/**
 	 * @param target
 	 *            current target for the assign action
 	 */

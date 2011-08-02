@@ -128,9 +128,9 @@
 			<xs:element name="dynamic" minOccurs="0" maxOccurs="unbounded" type="rm:tab-controller-type"/>
 			<xs:element name="import" minOccurs="0">
 				<xs:complexType>
-				   <xs:sequence>
-				     <xs:element name="export-for-override" minOccurs="0"  type="rm:attribute-viewer-type"/>
-				   </xs:sequence>
+					<xs:sequence>
+						<xs:element name="export-for-override" minOccurs="0" type="rm:attribute-viewer-type"/>
+					</xs:sequence>
 					<xs:attribute name="title" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
@@ -138,10 +138,13 @@
 	</xs:complexType>
 	<xs:complexType name="validator-type">
 		<xs:sequence>
-			<xs:sequence>
-				<xs:element name="regex" minOccurs="0" type="rm:regex-type"/>
-				<xs:element name="file-info" minOccurs="0" type="rm:file-match-type"/>
-			</xs:sequence>
+			<xs:choice minOccurs="0">
+				<xs:element name="regex"  type="rm:regex-type"/>
+				<xs:element name="file-info" type="rm:file-match-type"/>
+				<xs:sequence>
+				  <xs:element name="range" maxOccurs="unbounded" type="rm:range-type"/>
+				</xs:sequence>
+			</xs:choice>
 			<xs:element name="error-message" minOccurs="0" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -166,6 +169,12 @@
 		<xs:attribute name="length" type="xs:long"/>
 		<xs:attribute name="isDirectory" type="xs:boolean" default="false"/>
 	</xs:complexType>
+	  <xs:complexType name="range-type">
+     <xs:attribute name="lessThan" type="xs:string"/>
+     <xs:attribute name="lessThanOrEqualTo" type="xs:string"/>
+     <xs:attribute name="greaterThan" type="xs:string"/>
+     <xs:attribute name="greaterThanOrEqualTo" type="xs:string"/>
+   </xs:complexType>
 	<xs:complexType name="name-value-pair-type">
 		<xs:sequence>
 			<xs:element name="arg" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type"/>
@@ -510,6 +519,17 @@
 		<xs:sequence>
 			<xs:element name="match" maxOccurs="unbounded" type="rm:match-type"/>
 			<xs:element name="test" minOccurs="0" maxOccurs="unbounded" type="rm:test-type"/>
+			<xs:element name="else" minOccurs="0">
+				<xs:complexType>
+					<xs:choice>
+						<xs:element name="add" type="rm:add-type"/>
+						<xs:element name="append" type="rm:append-type"/>
+						<xs:element name="put" type="rm:put-type"/>
+						<xs:element name="set" type="rm:set-type"/>
+						<xs:element name="throw" type="rm:throw-type"/>
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="ref" type="xs:string"/>
 		<xs:attribute name="type" default="property">
@@ -554,6 +574,7 @@
 			<xs:element name="entry" minOccurs="0" type="rm:entry-type"/>
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
+		<xs:attribute name="forceNewObject" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="throw-type">
 		<xs:sequence>
@@ -567,6 +588,7 @@
 			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded" type="rm:entry-type"/>
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
+		<xs:attribute name="forceNewObject" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="append-type">
 		<xs:sequence>
@@ -574,12 +596,14 @@
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
 		<xs:attribute name="separator" type="xs:string"/>
+		<xs:attribute name="forceNewObject" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="put-type">
 		<xs:sequence>
 			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded" type="rm:entry-type"/>
 		</xs:sequence>
 		<xs:attribute name="field" type="xs:string"/>
+		<xs:attribute name="forceNewObject" type="xs:boolean" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="entry-type">
 		<xs:attribute name="key" type="xs:string"/>

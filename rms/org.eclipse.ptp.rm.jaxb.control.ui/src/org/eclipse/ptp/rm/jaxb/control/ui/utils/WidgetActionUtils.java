@@ -42,6 +42,7 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.FileMatchType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.data.RangeType;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 import org.eclipse.swt.SWT;
@@ -241,6 +242,9 @@ public class WidgetActionUtils {
 	 */
 	public static void validate(String value, ValidatorType validator, IRemoteFileManager fileManager) throws Exception {
 		RegexType reg = validator.getRegex();
+		FileMatchType match = validator.getFileInfo();
+		List<RangeType> ranges = validator.getRange();
+
 		String error = validator.getErrorMessage();
 
 		if (error == null) {
@@ -250,8 +254,7 @@ public class WidgetActionUtils {
 		if (reg != null && new RegexImpl(reg, null, null).getMatched(value) == null) {
 			throw new UnsatisfiedMatchException(error + JAXBControlUIConstants.CO + JAXBControlUIConstants.SP + reg.getExpression()
 					+ JAXBControlUIConstants.CM + JAXBControlUIConstants.SP + value);
-		} else {
-			FileMatchType match = validator.getFileInfo();
+		} else if (match != null) {
 			try {
 				if (match != null && !validate(match, value, fileManager)) {
 					throw new UnsatisfiedMatchException(error + JAXBControlUIConstants.CO + JAXBControlUIConstants.SP + value);
@@ -259,6 +262,18 @@ public class WidgetActionUtils {
 			} catch (CoreException ce) {
 				throw new UnsatisfiedMatchException(ce);
 			}
+		} else if (!ranges.isEmpty()) {
+			try {
+				double dVal = Double.valueOf(value);
+				for (RangeType r : ranges) {
+					if (validate(dVal, r)) {
+						return;
+					}
+				}
+			} catch (NumberFormatException e) {
+				throw new UnsatisfiedMatchException(e);
+			}
+			throw new UnsatisfiedMatchException(error + JAXBControlUIConstants.CO + JAXBControlUIConstants.SP + value);
 		}
 	}
 
@@ -327,6 +342,42 @@ public class WidgetActionUtils {
 		} catch (ParseException pe) {
 			return null;
 		}
+	}
+
+	/**
+	 * Checks the range to see if the value falls within it.
+	 * 
+	 * @param value
+	 *            number value
+	 * @param range
+	 *            specifies valid range
+	 * @return true if number is in range
+	 */
+	private static boolean validate(double value, RangeType range) throws NumberFormatException {
+		String exp = range.getGreaterThan();
+		if (exp != null) {
+			if (value <= Double.valueOf(exp)) {
+				return false;
+			}
+		} else {
+			exp = range.getGreaterThanOrEqualTo();
+			if (value < Double.valueOf(exp)) {
+				return false;
+			}
+		}
+
+		exp = range.getLessThan();
+		if (exp != null) {
+			if (value >= Double.valueOf(exp)) {
+				return false;
+			}
+		} else {
+			exp = range.getLessThanOrEqualTo();
+			if (value > Double.valueOf(exp)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**

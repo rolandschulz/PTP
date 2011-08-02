@@ -43,6 +43,7 @@ public class PutImpl extends AbstractAssign {
 		this.uuid = uuid;
 		field = put.getField();
 		entries = put.getEntry();
+		forceNew = put.isForceNewObject();
 	}
 
 	@SuppressWarnings("unchecked")

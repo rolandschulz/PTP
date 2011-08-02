@@ -37,6 +37,7 @@ public class SetImpl extends AbstractAssign {
 		this.uuid = uuid;
 		field = set.getField();
 		entry = set.getEntry();
+		forceNew = set.isForceNewObject();
 	}
 
 	@Override

@@ -117,7 +117,7 @@
 		simple additions to a pre-existing resource manager definition file.
 		For some example XML illustrating various aspects of the schema
 		(particularly UI features), we also provide a <a
-			href="JAXBExamples_5.0.1.zip">.zip file (for PTP release 5.0.1)</a>.
+			href="JAXBExamples_5.0.1.1.zip">.zip file (for PTP release 5.0.1)</a>.
 	</p>
 
 	<h3>
@@ -398,8 +398,9 @@
 	</p>
 
 	<p>Attributes also carry optional validators which allow you to
-		enforce syntactic rules or file-system semantics on the value when the
-		user enters text.</p>
+		enforce syntactic rules, numerical ranges (each with one or both
+		boundaries; these are OR'd) or file-system semantics on the value when
+		the user enters text.</p>
 
 	<img alt="Validator" src="images/041validator.jpeg" />
 
@@ -438,9 +439,9 @@
 
 	<p>
 		These can be OR'd in the usual manner. <b>NOTE:</b> when using the
-		regex on the <a href="#MatchType"><code>match</code>
-		</a> type, the expression can contain variable references to be resolved
-		in the environment.
+		regex on the <a href="#MatchType"><code>match</code> </a> type, the
+		expression can contain variable references to be resolved in the
+		environment.
 	</p>
 
 	<p>
@@ -968,7 +969,11 @@
 		elements and
 		<code>test</code>
 		elements; the former are run as part of the stream processing; the
-		latter are run after the stream processing has been completed.
+		latter are run after the stream processing has been completed. The
+		optional
+		<code>else</code>
+		element is applied only if there are no other tests defined or if none
+		of the defined tests succeed).
 	</p>
 
 	<p>
@@ -1093,7 +1098,11 @@
 		<code>entry-type</code>
 		children, either single (
 		<code>set, throw</code>
-		) or potentially multiple.
+		) or potentially multiple. All of these except
+		<code>throw</code>
+		also allow you to force the creation of a new object (<i>forceNewObject</i>)
+		each time it is applied; the new object then replaces the current one
+		for successive actions in the match.
 	</p>
 
 	<h5 align="CENTER">

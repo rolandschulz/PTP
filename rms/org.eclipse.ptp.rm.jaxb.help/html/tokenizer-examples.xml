@@ -5,13 +5,11 @@
 		<!-- EXAMPLE 1: output is a list of line-separated queue names to be assigned
 			to the known property "available-queues" -->
 		<start-up-command name="test01ParseQstat">
-			<arg>qstat</arg>
-			<arg>-Q</arg>
-			<arg>-f</arg>
+			<arg/>
 			<stdout-parser delim="\n">
 				<target ref="queues">
 					<match>
-						<expression>Queue: ([\w\d]+)</expression>
+						<expression>([\w\d]+)</expression>
 						<add field="value">
 							<entry valueGroup="1"/>
 						</add>
@@ -112,6 +110,46 @@
 								<entry value="false"/>
 							</set>
 						</else>
+					</test>
+				</target>
+				<target type="attribute">
+					<match>
+						<expression>ompi:version:full:([\d]+)[.]([\d]+).*</expression>
+						<set field="name">
+							<entry value="ompi_major_version"/>
+						</set>
+						<set field="value">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="visible">
+							<entry value="true"/>
+						</set>
+						<set field="readOnly">
+							<entry value="true"/>
+						</set>
+						<set field="name" forceNewObject="true">
+							<entry value="ompi_minor_version"/>
+						</set>
+						<set field="value">
+							<entry valueGroup="2"/>
+						</set>
+						<set field="visible">
+							<entry value="true"/>
+						</set>
+						<set field="readOnly">
+							<entry value="true"/>
+						</set>
+					</match>
+					<test op="AND">
+						<test op="EQ">
+							<value>#name</value>
+							<value>ompi_minor_version</value>
+						</test>
+						<test op="LT">
+							<value>#value</value>
+							<value>7</value>
+						</test>
+						<throw message="Only supports Open MPI 1.7 and later"/>
 					</test>
 				</target>
 				<target type="attribute">
@@ -409,25 +447,16 @@
 					</test>
 					<test op="EQ">
 						<value>#value</value>
-						<value>C</value>
-						<set field="value">
-							<entry value="COMPLETED"/>
-						</set>
-					</test>
-					<test op="EQ">
-						<value>#value</value>
-						<value>E</value>
-						<set field="value">
-							<entry value="COMPLETED"/>
-						</set>
-					</test>
-					<test op="EQ">
-						<value>#value</value>
 						<value>H</value>
 						<set field="value">
 							<entry value="SYSTEM_ON_HOLD"/>
 						</set>
 					</test>
+					<else>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</else>
 				</target>
 			</stdout-parser>
 			<stderr-parser delim="\n">

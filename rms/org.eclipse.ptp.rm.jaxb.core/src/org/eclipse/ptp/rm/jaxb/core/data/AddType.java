@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="entry" type="{http://org.eclipse.ptp/rm}entry-type" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="field" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="forceNewObject" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -45,6 +46,8 @@ public class AddType {
 	protected List<EntryType> entry;
 	@XmlAttribute
 	protected String field;
+	@XmlAttribute
+	protected Boolean forceNewObject;
 
 	/**
 	 * Gets the value of the entry property.
@@ -87,6 +90,20 @@ public class AddType {
 	}
 
 	/**
+	 * Gets the value of the forceNewObject property.
+	 * 
+	 * @return possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isForceNewObject() {
+		if (forceNewObject == null) {
+			return false;
+		} else {
+			return forceNewObject;
+		}
+	}
+
+	/**
 	 * Sets the value of the field property.
 	 * 
 	 * @param value
@@ -95,6 +112,17 @@ public class AddType {
 	 */
 	public void setField(String value) {
 		this.field = value;
+	}
+
+	/**
+	 * Sets the value of the forceNewObject property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setForceNewObject(Boolean value) {
+		this.forceNewObject = value;
 	}
 
 }

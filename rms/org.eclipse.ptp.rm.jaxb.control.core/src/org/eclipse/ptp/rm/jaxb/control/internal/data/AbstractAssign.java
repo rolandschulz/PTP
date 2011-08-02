@@ -130,32 +130,21 @@ public abstract class AbstractAssign implements IAssign {
 	 */
 	static Object normalizedValue(Object target, String uuid, String expression, boolean convert, IVariableMap map)
 			throws Throwable {
+		Object value = expression;
 		if (expression.startsWith(JAXBControlConstants.PD)) {
 			if (target == null) {
 				return null;
 			}
 			String field = expression.substring(1);
-			return AbstractAssign.get(target, field);
+			value = AbstractAssign.get(target, field);
 		} else if (expression.indexOf(JAXBControlConstants.OPENV) >= 0) {
 			expression = map.getString(uuid, expression);
-			return map.getString(uuid, expression);
-		} else if (convert) {
-			if (JAXBControlConstants.TRUE.equalsIgnoreCase(expression)) {
-				return true;
-			}
-			if (JAXBControlConstants.FALSE.equalsIgnoreCase(expression)) {
-				return false;
-			}
-			try {
-				if (expression.indexOf(JAXBControlConstants.DOT) >= 0) {
-					return new Double(expression);
-				}
-				return new Integer(expression);
-			} catch (NumberFormatException nfe) {
-				return expression;
-			}
+			value = map.getString(uuid, expression);
 		}
-		return expression;
+		if (convert) {
+			return convert(value);
+		}
+		return value;
 	}
 
 	/**
@@ -214,10 +203,37 @@ public abstract class AbstractAssign implements IAssign {
 		setter.invoke(target, values);
 	}
 
+	/**
+	 * Converts string to int or boolean, if applicable,
+	 * 
+	 * @param value
+	 * @return converted value
+	 */
+	private static Object convert(Object value) {
+		if (value instanceof String) {
+			String string = (String) value;
+			if (JAXBControlConstants.TRUE.equalsIgnoreCase(string)) {
+				return true;
+			}
+			if (JAXBControlConstants.FALSE.equalsIgnoreCase(string)) {
+				return false;
+			}
+			try {
+				if (string.indexOf(JAXBControlConstants.DOT) >= 0) {
+					return new Double(string);
+				}
+				return new Integer(string);
+			} catch (NumberFormatException nfe) {
+			}
+		}
+		return value;
+	}
+
 	protected String uuid;
 	protected String field;
 	protected Object target;
 	protected int index;
+	protected boolean forceNew;
 	protected IVariableMap rmVarMap;
 
 	/**
@@ -229,6 +245,7 @@ public abstract class AbstractAssign implements IAssign {
 		field = null;
 		target = null;
 		index = 0;
+		forceNew = false;
 		this.rmVarMap = rmVarMap;
 	}
 
@@ -260,6 +277,24 @@ public abstract class AbstractAssign implements IAssign {
 	 */
 	public int getIndex() {
 		return index;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.IAssign#incrementIndex(int)
+	 */
+	public void incrementIndex(int increment) {
+		index += increment;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.IAssign#isForceNew()
+	 */
+	public boolean isForceNew() {
+		return forceNew;
 	}
 
 	/**

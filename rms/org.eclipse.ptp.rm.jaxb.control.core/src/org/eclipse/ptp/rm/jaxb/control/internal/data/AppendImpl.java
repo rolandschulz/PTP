@@ -41,6 +41,7 @@ public class AppendImpl extends AbstractAssign {
 		this.field = append.getField();
 		separator = append.getSeparator();
 		entries = append.getEntry();
+		forceNew = append.isForceNewObject();
 	}
 
 	@Override
