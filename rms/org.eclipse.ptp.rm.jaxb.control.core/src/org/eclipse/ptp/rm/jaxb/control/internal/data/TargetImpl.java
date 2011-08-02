@@ -26,11 +26,16 @@ import org.eclipse.ptp.rm.jaxb.control.internal.utils.TokenizerLogger;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
+import org.eclipse.ptp.rm.jaxb.core.data.AddType;
+import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.data.PutType;
+import org.eclipse.ptp.rm.jaxb.core.data.SetType;
 import org.eclipse.ptp.rm.jaxb.core.data.TargetType;
 import org.eclipse.ptp.rm.jaxb.core.data.TestType;
+import org.eclipse.ptp.rm.jaxb.core.data.ThrowType;
 
 /**
  * Wrapper implementation. A target contains any number of matches, with their
@@ -63,7 +68,7 @@ public class TargetImpl implements IMatchable {
 	private final List<Object> targets;
 	private final boolean matchAll;
 	private final boolean allowOverwrites;
-
+	private IAssign defaultAction;
 	private Object refTarget;
 	private boolean selected;
 
@@ -94,6 +99,26 @@ public class TargetImpl implements IMatchable {
 		List<TestType> tdata = target.getTest();
 		for (TestType t : tdata) {
 			tests.add(new TestImpl(uuid, t, rmVarMap));
+		}
+
+		TargetType.Else defAction = target.getElse();
+		if (defAction != null) {
+			AddType add = defAction.getAdd();
+			AppendType append = defAction.getAppend();
+			PutType put = defAction.getPut();
+			SetType set = defAction.getSet();
+			ThrowType toThrow = defAction.getThrow();
+			if (add != null) {
+				defaultAction = new AddImpl(uuid, add, rmVarMap);
+			} else if (append != null) {
+				defaultAction = new AppendImpl(uuid, append, rmVarMap);
+			} else if (put != null) {
+				defaultAction = new PutImpl(uuid, put, rmVarMap);
+			} else if (set != null) {
+				defaultAction = new SetImpl(uuid, set, rmVarMap);
+			} else if (toThrow != null) {
+				defaultAction = new ThrowImpl(uuid, toThrow, rmVarMap);
+			}
 		}
 		targets = new ArrayList<Object>();
 		selected = false;
@@ -219,10 +244,7 @@ public class TargetImpl implements IMatchable {
 			if (rmVarMap instanceof RMVariableMap) {
 				Map<String, Object> dmap = ((RMVariableMap) rmVarMap).getDiscovered();
 				for (Object t : targets) {
-					for (TestImpl test : tests) {
-						test.setTarget(t);
-						test.doTest();
-					}
+					runTests(t);
 					if (JAXBControlConstants.PROPERTY.equals(type)) {
 						PropertyType p = (PropertyType) t;
 						TokenizerLogger.getLogger().logPropertyInfo(
@@ -238,10 +260,7 @@ public class TargetImpl implements IMatchable {
 			}
 			targets.clear();
 		} else {
-			for (TestImpl test : tests) {
-				test.setTarget(refTarget);
-				test.doTest();
-			}
+			runTests(refTarget);
 			refTarget = null;
 		}
 	}
@@ -449,5 +468,30 @@ public class TargetImpl implements IMatchable {
 					+ JAXBControlConstants.SP + s1);
 		}
 		return s0;
+	}
+
+	/**
+	 * Runs all the tests on the given target. If none succeed, and the default
+	 * action is defined, the latter is applied.
+	 * 
+	 * @param target
+	 * @throws Throwable
+	 */
+	private void runTests(Object target) throws Throwable {
+		boolean any = false;
+		boolean testSuccess = false;
+		for (TestImpl test : tests) {
+			test.setTarget(target);
+			testSuccess = test.doTest();
+			any = any || testSuccess;
+		}
+		if (!any && defaultAction != null) {
+			defaultAction.setTarget(target);
+			/*
+			 * These will be using only preassigned values, so the tokens[]
+			 * param is null
+			 */
+			defaultAction.assign(null);
+		}
 	}
 }

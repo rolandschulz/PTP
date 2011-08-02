@@ -110,7 +110,13 @@ public class MatchImpl {
 			return end;
 		}
 
+		int incr = 0;
+
 		for (IAssign a : assign) {
+			if (a.isForceNew()) {
+				incr++;
+			}
+			a.incrementIndex(incr);
 			Object t = target.getTarget(a);
 			a.setTarget(t);
 			a.assign(tokens);

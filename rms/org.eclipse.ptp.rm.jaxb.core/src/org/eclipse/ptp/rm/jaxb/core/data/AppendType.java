@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;/sequence>
  *       &lt;attribute name="field" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="separator" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="forceNewObject" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -48,6 +49,8 @@ public class AppendType {
 	protected String field;
 	@XmlAttribute
 	protected String separator;
+	@XmlAttribute
+	protected Boolean forceNewObject;
 
 	/**
 	 * Gets the value of the entry property.
@@ -100,6 +103,20 @@ public class AppendType {
 	}
 
 	/**
+	 * Gets the value of the forceNewObject property.
+	 * 
+	 * @return possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isForceNewObject() {
+		if (forceNewObject == null) {
+			return false;
+		} else {
+			return forceNewObject;
+		}
+	}
+
+	/**
 	 * Sets the value of the field property.
 	 * 
 	 * @param value
@@ -108,6 +125,17 @@ public class AppendType {
 	 */
 	public void setField(String value) {
 		this.field = value;
+	}
+
+	/**
+	 * Sets the value of the forceNewObject property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setForceNewObject(Boolean value) {
+		this.forceNewObject = value;
 	}
 
 	/**

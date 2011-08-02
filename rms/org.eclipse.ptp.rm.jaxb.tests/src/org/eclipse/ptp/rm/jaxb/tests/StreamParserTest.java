@@ -19,11 +19,14 @@ import java.util.UUID;
 
 import junit.framework.TestCase;
 
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.IStreamParserTokenizer;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.ConfigurableRegexTokenizer;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
@@ -154,7 +157,9 @@ public class StreamParserTest extends TestCase {
 	}
 
 	private static InputStream getOpenMPIOut() {
-		String content = "mca:mca:base:param:mca_component_disable_dlopen:status:writable" //$NON-NLS-1$
+		String content = "ompi:version:full:1.8" //$NON-NLS-1$
+				+ JAXBControlConstants.LINE_SEP
+				+ "mca:mca:base:param:mca_component_disable_dlopen:status:writable" //$NON-NLS-1$
 				+ JAXBControlConstants.LINE_SEP
 				+ "mca:mca:base:param:mca_component_disable_dlopen:help:Whether to attempt to disable opening dynamic components or not" //$NON-NLS-1$
 				+ JAXBControlConstants.LINE_SEP
@@ -192,7 +197,7 @@ public class StreamParserTest extends TestCase {
 	}
 
 	private static InputStream getQstat() {
-		String content = "42226.ember       g_zn_ph2         enoey             665:51:4 R normal  \n";//$NON-NLS-1$ 
+		String content = "42226.ember       g_zn_ph2         enoey             665:51:4 E normal  \n";//$NON-NLS-1$ 
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
@@ -220,6 +225,7 @@ public class StreamParserTest extends TestCase {
 	private String[] values;
 
 	private final boolean verbose = true;
+	private final boolean logging = false;
 
 	private String target;
 
@@ -242,6 +248,10 @@ public class StreamParserTest extends TestCase {
 					false, false };
 			values = new String[oracle.length];
 		} else {
+			Preferences.setBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN, logging);
+			Preferences.setBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.MATCH_STATUS, logging);
+			Preferences.setBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS, logging);
+			Preferences.setBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES, logging);
 			try {
 				JAXBTestsPlugin.validate(tokxml);
 				ResourceManagerData rmdata = JAXBInitializationUtils.initializeRMData(JAXBTestsPlugin.getURL(tokxml));

@@ -40,6 +40,7 @@ public class AddImpl extends AbstractAssign {
 		this.uuid = uuid;
 		field = add.getField();
 		entries = add.getEntry();
+		forceNew = add.isForceNewObject();
 	}
 
 	@SuppressWarnings("unchecked")
