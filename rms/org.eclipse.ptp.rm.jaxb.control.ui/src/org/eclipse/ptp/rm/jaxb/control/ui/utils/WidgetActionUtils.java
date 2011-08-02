@@ -45,6 +45,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.RangeType;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.FileDialog;
@@ -401,6 +402,9 @@ public class WidgetActionUtils {
 	private static boolean validate(FileMatchType match, String value, IRemoteFileManager fileManager) throws CoreException {
 		if (fileManager == null) {
 			return false;
+		}
+		if (value == null || JAXBUIConstants.ZEROSTR.equals(value.trim())) {
+			return true;
 		}
 		final IFileStore rres = fileManager.getResource(value);
 		final IFileInfo[] info = new IFileInfo[1];
