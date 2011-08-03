@@ -9,7 +9,7 @@
 			delegate="org.eclipse.ptp.launch.ParallelLaunchConfigurationDelegate"
 			sourceLocatorId="org.eclipse.ptp.debug.core.sourceLocator"
 			sourcePathComputerId="org.eclipse.ptp.debug.core.sourcePathComputer"
-			modes="run,debug,profile"
+			modes="run,debug"
 			public="true"
 			id="org.eclipse.ptp.launch.parallelLaunch">
 		</launchConfigurationType>
