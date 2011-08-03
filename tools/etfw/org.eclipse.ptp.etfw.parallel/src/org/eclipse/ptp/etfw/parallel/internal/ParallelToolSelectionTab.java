@@ -15,21 +15,19 @@
  * Contributors:
  *    Wyatt Spear - initial API and implementation
  ****************************************************************************/
-package org.eclipse.ptp.etfw.parallel;
+package org.eclipse.ptp.etfw.parallel.internal;
 
-import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.ptp.etfw.ui.ExternalToolSelectionTab;
 
-/**
- * Defines the tab group in the performance analysis launch configuration system
- * using the PTP launcher
- */
-public class ParallelToolLaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
-	/**
-	 * Creates the tabs used by the performance launch configuration system
-	 */
-	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
-		setTabs(new ILaunchConfigurationTab[0]);
+public class ParallelToolSelectionTab extends ExternalToolSelectionTab {
+	private static final String TAB_ID = "org.eclipse.ptp.etfw.parallelToolSelectionTab"; //$NON-NLS-1$
+
+	public ParallelToolSelectionTab() {
+		super(true);
+	}
+
+	@Override
+	public String getId() {
+		return TAB_ID;
 	}
 }
