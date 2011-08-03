@@ -376,7 +376,7 @@ public class LMLManager {
 	 *            may be <code>null</code>
 	 */
 	private void restoreJobStatusData(ILguiItem item, JobStatusData[] jobs) {
-		if (jobs.length > 0) {
+		if (jobs != null && jobs.length > 0) {
 			for (final JobStatusData status : jobs) {
 				item.addUserJob(status.getJobId(), status, false);
 			}
