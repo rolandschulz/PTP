@@ -10,12 +10,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.core;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -28,6 +34,7 @@ import org.eclipse.core.resources.IResourceRuleFactory;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -38,6 +45,7 @@ import org.eclipse.core.runtime.jobs.MultiRule;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
@@ -47,9 +55,13 @@ import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.ptp.services.core.ServicesCorePlugin;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -63,6 +75,12 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	private static final IServiceModelManager serviceModel = ServiceModelManager.getInstance();
 	private static final IService syncService = serviceModel.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
 	private static final String SYNC_COMMAND_PARAMETER_ID = "org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"; //$NON-NLS-1$
+	private static final String DEFAULT_SAVE_FILE_NAME = "SyncManagerData.xml"; //$NON-NLS-1$
+	private static final String SYNC_MANAGER_ELEMENT_NAME = "sync-manager-data"; //$NON-NLS-1$
+	private static final String SYNC_MODE_ELEMENT_NAME = "project-to-sync-mode"; //$NON-NLS-1$
+	private static final String ATTR_PROJECT_NAME = "project"; //$NON-NLS-1$
+	private static final String ATTR_SYNC_MODE = "sync-mode"; //$NON-NLS-1$
+	private static final String ATTR_AUTO_SYNC = "auto-sync"; //$NON-NLS-1$
 
 	private static boolean fSyncAuto = true;
 	private static final Map<IProject, SYNC_MODE> fProjectToSyncModeMap = Collections
@@ -74,6 +92,20 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	private static final String setActiveCommand = "set_active"; //$NON-NLS-1$
 	private static final String setAllCommand = "set_all"; //$NON-NLS-1$
 	private static final String syncAutoCommand = "sync_auto"; //$NON-NLS-1$
+	
+	static {
+		try {
+			loadConfigurationData();
+		} catch (WorkbenchException e) {
+			handleInitError(e);
+		} catch (IOException e) {
+			handleInitError(e);
+		}
+	}
+	
+	private static void handleInitError(Throwable e) {
+		RDTSyncCorePlugin.log(Messages.SyncManager_1, e);
+	}
 
 	private static class SynchronizeJob extends Job {
 		private final ISyncServiceProvider fSyncProvider;
@@ -144,6 +176,11 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 		}
 		if (!(fProjectToSyncModeMap.containsKey(project))) {
 			fProjectToSyncModeMap.put(project, SYNC_MODE.ACTIVE);
+			try {
+				saveConfigurationData();
+			} catch (IOException e) {
+				RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+			}
 		}
 		return fProjectToSyncModeMap.get(project);
 	}
@@ -165,6 +202,11 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	 */
 	public static void setSyncMode(IProject project, SYNC_MODE mode) {
 		fProjectToSyncModeMap.put(project, mode);
+		try {
+			saveConfigurationData();
+		} catch (IOException e) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+		}
 	}
 
 	/**
@@ -174,6 +216,11 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	 */
 	public static void setSyncAuto(boolean isSyncAutomatic) {
 		fSyncAuto = isSyncAutomatic;
+		try {
+			saveConfigurationData();
+		} catch (IOException e) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+		}
 	}
 
 	public void addHandlerListener(IHandlerListener handlerListener) {
@@ -368,5 +415,70 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 		IResource resource = (IResource) o;
 
 		return resource.getProject();
+	}
+
+	/**
+	 * Save configuration data to plugin metadata area
+	 * 
+	 * @throws IOException
+	 *             on problems writing configuration data to file
+	 */
+	public static synchronized void saveConfigurationData() throws IOException {
+		XMLMemento rootMemento = XMLMemento.createWriteRoot(SYNC_MANAGER_ELEMENT_NAME);
+
+		// Save project to sync mode map
+		synchronized (fProjectToSyncModeMap) {
+			for (IProject project : fProjectToSyncModeMap.keySet()) {
+				IMemento modeMemento = rootMemento.createChild(SYNC_MODE_ELEMENT_NAME);
+				modeMemento.putString(ATTR_PROJECT_NAME, project.getName());
+				modeMemento.putString(ATTR_SYNC_MODE, fProjectToSyncModeMap.get(project).name());
+			}
+		}
+		
+		// Save auto-sync setting
+		rootMemento.putBoolean(ATTR_AUTO_SYNC, fSyncAuto);
+
+		IPath savePath = ServicesCorePlugin.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
+		File saveFile = savePath.toFile();
+		rootMemento.save(new FileWriter(saveFile));
+	}
+
+	/**
+	 * Load configuration data. All previously stored data is erased.
+	 * 
+	 * @throws IOException
+	 */
+	private static void loadConfigurationData() throws IOException, WorkbenchException {
+		// Setup root memento
+		IPath loadPath = ServicesCorePlugin.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
+		File loadFile = loadPath.toFile();
+		if (!(loadFile.exists())) {
+			return;
+		}
+
+		BufferedReader reader = new BufferedReader(new FileReader(loadFile));
+		XMLMemento rootMemento;
+		try {
+			rootMemento = XMLMemento.createReadRoot(reader);
+		} catch (WorkbenchException e) {
+			throw e;
+		}
+
+		// Load project sync modes
+		fProjectToSyncModeMap.clear();
+		for (IMemento modeMemento : rootMemento.getChildren(SYNC_MODE_ELEMENT_NAME)) {
+			String projectName = modeMemento.getString(ATTR_PROJECT_NAME);
+			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			if (project == null) {
+				throw new RuntimeException(Messages.SyncManager_0 + project);
+			}
+			String syncModeString = modeMemento.getString(ATTR_SYNC_MODE);
+			SYNC_MODE syncMode = SYNC_MODE.ACTIVE;
+			syncMode = SYNC_MODE.valueOf(syncModeString);
+			fProjectToSyncModeMap.put(project, syncMode);
+		}
+		
+		// Load auto-sync setting
+		fSyncAuto = rootMemento.getBoolean(ATTR_AUTO_SYNC);
 	}
 }
