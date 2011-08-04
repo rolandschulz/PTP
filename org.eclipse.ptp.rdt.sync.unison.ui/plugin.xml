@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.rdt.sync.ui.synchronizeParticipants">
+      <synchronizeParticipant
+            class="org.eclipse.ptp.rdt.sync.unison.ui.UnisonParticipant"
+            id="org.eclipse.ptp.rdt.sync.unison.ui.unisonParticipant"
+            name="Unison">
+      </synchronizeParticipant>
+   </extension>
+</plugin>
