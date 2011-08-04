@@ -1274,7 +1274,8 @@
        buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe"
        id="org.eclipse.ptp.rdt.managedbuild.target.gnu.exe"
        isAbstract="false"
-       isTest="false">
+       isTest="false"
+       name="%projectType.exe.name">
     <configuration
           buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
           cleanCommand="rm -rf"
@@ -1282,7 +1283,9 @@
           name="%ConfigName.Dbg"
           parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.base">
        <toolChain
+             archList="all"
              id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.exe.debug"
+             osList="all"
              superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base">
           <targetPlatform
                 id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.exe.debug"
@@ -1337,7 +1340,9 @@
           name="%ConfigName.Rel"
           parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.base">
        <toolChain
+             archList="all"
              id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.exe.release"
+             osList="all"
              superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base">
           <targetPlatform
                 id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.exe.release"
@@ -1390,7 +1395,8 @@
        buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib"
        id="org.eclipse.ptp.rdt.managedbuild.target.gnu.so"
        isAbstract="false"
-       isTest="false">
+       isTest="false"
+       name="%projectType.so.name">
     <configuration
           buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
           cleanCommand="rm -rf"
@@ -1398,7 +1404,9 @@
           name="%ConfigName.Dbg"
           parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.base">
        <toolChain
+             archList="all"
              id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.so.debug"
+             osList="all"
              superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base">
           <targetPlatform
                 id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.so.debug"
@@ -1469,7 +1477,9 @@
           name="%ConfigName.Rel"
           parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.base">
        <toolChain
+             archList="all"
              id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.so.release"
+             osList="all"
              superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base">
           <targetPlatform
                 id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.so.release"
@@ -1538,7 +1548,8 @@
        buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib"
        id="org.eclipse.ptp.rdt.managedbuild.target.gnu.lib"
        isAbstract="false"
-       isTest="false">
+       isTest="false"
+       name="%projectType.lib.name">
     <configuration
           buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
           cleanCommand="rm -rf"
@@ -1546,7 +1557,9 @@
           name="%ConfigName.Dbg"
           parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.base">
        <toolChain
+             archList="all"
              id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.lib.debug"
+             osList="all"
              superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base">
           <targetPlatform
                 id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.lib.debug"
@@ -1597,7 +1610,9 @@
           name="%ConfigName.Rel"
           parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.base">
        <toolChain
+             archList="all"
              id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.lib.release"
+             osList="all"
              superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base">
           <targetPlatform
                 id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.lib.release"
@@ -1649,7 +1664,7 @@
          name="%extension.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
      <scannerInfoCollector
-            class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.PerProjectSICollectorSkipCygTrans"
+            class="org.eclipse.cdt.make.internal.core.scannerconfig2.PerProjectSICollector"
             scope="project"/>
      		<!-- The ScannerInfoProvider search for the information needed by the profile and send it to the ScannerInfoCollector -->
 		<scannerInfoProvider providerId="specsFile">
@@ -1705,7 +1720,7 @@
          name="%extensionCpp.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
      <scannerInfoCollector
-            class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.PerProjectSICollectorSkipCygTrans"
+            class="org.eclipse.cdt.make.internal.core.scannerconfig2.PerProjectSICollector"
             scope="project"/>
      		<!-- The ScannerInfoProvider search for the information needed by the profile and send it to the ScannerInfoCollector -->
 		<scannerInfoProvider providerId="specsFile">
