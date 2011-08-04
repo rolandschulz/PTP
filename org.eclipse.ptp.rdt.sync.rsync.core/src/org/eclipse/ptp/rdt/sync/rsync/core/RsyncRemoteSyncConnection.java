@@ -4,11 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.sync.core.IRemoteSyncConnection;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
@@ -24,7 +27,6 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection {
 	private final String localDirectory;
 	private final String remoteDirectory;
 	private final SyncFileFilter fileFilter;
-	private final static String FakeSSHLocation = "/home/ejd/bin/";
 
 	/* Create a remote sync connection using Rsync. */
 	public RsyncRemoteSyncConnection(IRemoteConnection conn, String localDir, String remoteDir, SyncFileFilter filter,
@@ -63,7 +65,7 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection {
 
 	public void syncLocalToRemote(IProgressMonitor monitor) throws RemoteSyncException {
 		// command to be run excluding exclusions.
-		String[] commandLtoR = { "rsync", "-avvvze", "java -cp " + FakeSSHLocation + " FakeSSH", localDirectory + "/",
+		String[] commandLtoR = { "rsync", "-avvvze", "java -cp " + getFakeSSHLocation().getPath() + " org.eclipse.ptp.rdt.sync.rsync.core.FakeSSH", localDirectory + "/",
 				connection.getAddress() + ":" + remoteDirectory };
 		ArrayList<String> cLR = new ArrayList<String>();
 
@@ -97,11 +99,30 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection {
 		}
 	}
 
+	private URL getFakeSSHLocation() throws RemoteSyncException {
+		URL binFolder = null;
+		try {
+			binFolder = FileLocator.find(new URL("platform:/plugin/org.eclipse.ptp.rdt.sync.rsync.core/bin"));
+			if (binFolder != null) {
+				binFolder = FileLocator.toFileURL(binFolder);
+			}
+		} catch (MalformedURLException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		if (binFolder == null) {
+			throw new RemoteSyncException("binary not found");
+		}
+		return binFolder;
+	}
+
 	public void syncRemoteToLocal(IProgressMonitor monitor) throws RemoteSyncException {
 		// String[] commandRtoL = {"rsync", "--ignore-existing", "-avze" ,"java -cp" + FakeSSHLocation +
 		// Integer.toString(connection.getPort()), connection.getUsername() + "@" + connection.getAddress() + ":" + remoteDirectory
 		// + "/", localDirectory};
-		String[] commandRtoL = { "rsync", "--ignore-existing", "-avvvze", "java -cp " + FakeSSHLocation + " FakeSSH",
+		String[] commandRtoL = { "rsync", "--ignore-existing", "-avvvze", "java -cp " + getFakeSSHLocation().getPath() + " org.eclipse.ptp.rdt.sync.rsync.core.FakeSSH",
 				connection.getAddress() + ":" + remoteDirectory + "/", localDirectory };
 
 		try {

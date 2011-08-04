@@ -216,35 +216,18 @@ public class CommandRunner {
 		}
 
 		// Run process and stream readers
-		OutputStream output = new ByteArrayOutputStream();
-		OutputStream error = new ByteArrayOutputStream();
+		if (outputStream == null) outputStream = new ByteArrayOutputStream();
+		if (errorStream == null) errorStream = new ByteArrayOutputStream();
 
 		IRemoteProcess rp = rpb.start();
 
-		StreamCopyThread getOutput = null;
-		if (outputStream == null) {
-			getOutput = new StreamCopyThread(rp.getInputStream(), output);
-		} else if (outputStream != null) {
-			getOutput = new StreamCopyThread(rp.getInputStream(), outputStream);
-		}
+		new StreamCopyThread(rp.getInputStream(), outputStream).start();
+		new StreamCopyThread(rp.getErrorStream(), errorStream).start();
 
-		StreamCopyThread getError = null;
-		if (errorStream == null) {
-			getError = new StreamCopyThread(rp.getErrorStream(), error);
-		} else if (errorStream != null) {
-			getError = new StreamCopyThread(rp.getErrorStream(), errorStream);
-		}
-
-		StreamCopyThread getInput = null;
 		if (inputStream != null) {
-			getInput = new StreamCopyThread(inputStream, rp.getOutputStream());
+			new StreamCopyThread(inputStream, rp.getOutputStream(), true).start();
 		}
-
-		getOutput.start();
-		getError.start();
-		if (getInput != null) {
-			getInput.start();
-		}
+		
 		// //wait for EOF with the change for the ProcessMonitor to cancel
 		// for (;;) {
 		// getOutput.join(250);
@@ -255,13 +238,13 @@ public class CommandRunner {
 		// }
 		// rp and getError should be finished as soon as getOutput is finished
 		int exitCode = rp.waitFor();
-		getError.halt();
-		getInput.halt();
+//		getError.halt();
+//		getInput.halt();
 
 		final CommandResults commandResults = new CommandResults();
 		commandResults.setExitCode(exitCode);
-		commandResults.setStdout(output.toString());
-		commandResults.setStderr(error.toString());
+		if (outputStream instanceof ByteArrayOutputStream) commandResults.setStdout(outputStream.toString());
+		if (errorStream instanceof ByteArrayOutputStream) commandResults.setStderr(errorStream.toString());
 		return commandResults;
 	}
 
