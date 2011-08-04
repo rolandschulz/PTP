@@ -240,13 +240,13 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			while (!progress.isCanceled()) {
 				try {
 					forwardRemotePort(remotePort, fwdAddress, fwdPort);
+					return remotePort;
 				} catch (AddressInUseException e) {
 					if (++remotePort == fwdPort) {
 						throw new UnableToForwardPortException(Messages.RemoteToolsConnection_remotePort);
 					}
 					progress.worked(1);
 				}
-				return remotePort;
 			}
 			return -1;
 		} finally {
