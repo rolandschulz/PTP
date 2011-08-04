@@ -65,10 +65,19 @@ public class Messages extends NLS {
 	 */
 	public static String SyncConfigurationManager_3;
 
+	/**
+	 * @since 1.0
+	 */
 	public static String SyncManager_0;
 
+	/**
+	 * @since 1.0
+	 */
 	public static String SyncManager_1;
 
+	/**
+	 * @since 1.0
+	 */
 	public static String SyncManager_2;
 
 	static {

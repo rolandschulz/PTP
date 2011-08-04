@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.cdt.core,
  org.eclipse.cdt.managedbuilder.core,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.services.core,
- org.eclipse.ui
+ org.eclipse.ui,
+ org.eclipse.core.expressions
 Export-Package: org.eclipse.ptp.rdt.sync.core,
  org.eclipse.ptp.rdt.sync.core.messages,
  org.eclipse.ptp.rdt.sync.core.remotemake,
