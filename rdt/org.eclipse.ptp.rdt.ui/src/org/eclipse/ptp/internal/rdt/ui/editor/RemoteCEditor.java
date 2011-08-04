@@ -208,6 +208,9 @@ public class RemoteCEditor extends CEditor {
 	
 	private boolean isLocalServiceProvider() {
 		ICProject cproject = EditorUtility.getCProject(input);
+		if(cproject == null) { // external translation unit
+			return true;
+		}
 		IServiceModelManager smm = ServiceModelManager.getInstance();
 		
 		if(smm.isConfigured(cproject.getProject())) {
