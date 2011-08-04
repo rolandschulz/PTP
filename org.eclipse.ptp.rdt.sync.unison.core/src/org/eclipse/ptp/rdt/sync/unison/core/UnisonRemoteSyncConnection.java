@@ -3,6 +3,8 @@ package org.eclipse.ptp.rdt.sync.unison.core;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 
 
 import org.eclipse.core.resources.IResourceDelta;
@@ -57,73 +59,25 @@ public class UnisonRemoteSyncConnection implements IRemoteSyncConnection{
 	
 	public void syncLocalToRemote(IProgressMonitor monitor) throws RemoteSyncException {
 		synchronize(monitor);
-//		//command to be run excluding exclusions.
-//		String[] commandLtoR = {"rsync", "-avze","ssh -p " + Integer.toString(connection.getPort()),localDirectory + "/",connection.getUsername() + "@" + connection.getAddress() + ":" + remoteDirectory/*, "--exclude"*/};
-//		ArrayList<String> cLR = new ArrayList<String>();
-//		
-//		//load arguments from original command into ArrayList
-//		for(String arg : commandLtoR){
-//			cLR.add(arg);
-//		}
-//		
-//		
-//		String[] filesToExclude = new String[getFilesToBeExcluded().size()];
-//		filesToExclude = getFilesToBeExcluded().toArray(filesToExclude);
-//		
-//		//add exclusions from filesToExclude to cLR, which then contains all arguments.
-//		for(String argtoExclude : filesToExclude){
-//			cLR.add("--exclude");
-//			cLR.add(argtoExclude);
-//		}
-//		
-//		//execute the command
-//		String[] tempArray = new String[cLR.size()];
-//		tempArray = cLR.toArray(tempArray);
-//		try {
-//			Process p = Runtime.getRuntime().exec(tempArray);
-//			p.waitFor();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 	}
 	public void syncRemoteToLocal(IProgressMonitor monitor) throws RemoteSyncException {
-//		String[] commandRtoL = {"rsync", "--ignore-existing", "-avze" ,"ssh -p " + Integer.toString(connection.getPort()), connection.getUsername() + "@" + connection.getAddress() + ":" + remoteDirectory + "/", localDirectory};
-//		
-//		try {
-//			Process p = Runtime.getRuntime().exec(commandRtoL);
-//			p.waitFor();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}	
+		synchronize(monitor);	
 	}
-	private void synchronize(IProgressMonitor monitor){
-		ArrayList<String> argList = new ArrayList<String>();
-		
-		String[] filesToExclude = new String[getFilesToBeExcluded().size()];
-		filesToExclude = getFilesToBeExcluded().toArray(filesToExclude);
-		
-		//add exclusions from filesToExclude to cLR, which then contains all arguments.
-		for(String argtoExclude : filesToExclude){
-			argList.add(argtoExclude + ",");
-		}
-		
-		String tempString ="";
-		for(String string : argList){
-			 tempString = tempString.concat(string);
-		}
-		String[] command = {"unison", "-batch","-ignore", "Path {" + tempString + "}", localDirectory, "ssh://" + connection.getUsername() + "@" + connection.getAddress() + "/" + remoteDirectory};
-		
-		
+	private void synchronize(IProgressMonitor monitor){		
+		String[] command = {"unison", "-batch", localDirectory, "ssh://" + connection.getUsername() + "@" + connection.getAddress() + "/" + remoteDirectory};
+		ArrayList<String> tempArray = new ArrayList<String>(Arrays.asList(command));
+		//Add files to exclude to -ignore argument
+		LinkedList<String> filesToExclude = getFilesToBeExcluded();
+		if(!filesToExclude.isEmpty()){
+			String tempString = filesToExclude.removeFirst();			
+			for(String argtoExclude : filesToExclude){
+				tempString = tempString.concat("," + argtoExclude);
+			}			
+			tempArray.add("-ignore");
+			tempArray.add("Path {" + tempString + "}");
+		}	
 		try{
-			Process p = Runtime.getRuntime().exec(command);
+			Process p = Runtime.getRuntime().exec(tempArray.toArray(new String[0]));
 			p.waitFor();
 		} catch (IOException e){
 			e.printStackTrace();
@@ -133,9 +87,9 @@ public class UnisonRemoteSyncConnection implements IRemoteSyncConnection{
 	}
 	
 	/*  Returns an ArrayList of strings containing the file exclusion arguments */
-	private ArrayList<String> getFilesToBeExcluded(){
+	private LinkedList<String> getFilesToBeExcluded(){
 		File dir = new File(localDirectory);
-		ArrayList<String> filesToBeExcluded = new ArrayList<String>();
+		LinkedList<String> filesToBeExcluded = new LinkedList<String>();
 		String[] fileList = dir.list();
 		for(String file : fileList){
 			if(fileFilter.shouldIgnore(file)){
