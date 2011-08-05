@@ -30,6 +30,7 @@ import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 
 /**
  * Launches sequential C/C++ (or Fortran) applications after rebuilding them with performance tool instrumentation
+ * @since 4.1
  */
 @SuppressWarnings("restriction")
 public class ToolLaunchConfigurationDelegate extends LocalRunLaunchDelegate implements IToolLaunchConfigurationConstants{
