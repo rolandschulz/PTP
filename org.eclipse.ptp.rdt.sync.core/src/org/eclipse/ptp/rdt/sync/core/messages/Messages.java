@@ -80,6 +80,8 @@ public class Messages extends NLS {
 	 */
 	public static String SyncManager_2;
 
+	public static String SyncManager_3;
+
 	static {
 		initializeMessages(BUNDLE_NAME, Messages.class);
 	}

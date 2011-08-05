@@ -15,8 +15,11 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.internal.rdt.sync.core.SyncManager.SYNC_MODE;
+import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 
 public class ResourceChangeListener {
@@ -42,12 +45,17 @@ public class ResourceChangeListener {
 					SYNC_MODE syncMode = SyncManager.getSyncMode(project);
 					// Note that sync'ing is necessary even if user has turned sync'ing off. The actual synchronization call does
 					// more than just sync files to remote.
-					if (!(SyncManager.getSyncAuto()) || syncMode == SYNC_MODE.NONE) {
-						SyncManager.sync(delta, project, SyncFlag.NO_SYNC);
-					} else if (syncMode == SYNC_MODE.ALL) {
-						SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE);
-					} else if (syncMode == SYNC_MODE.ACTIVE) {
-						SyncManager.sync(delta, project, SyncFlag.NO_FORCE);
+					try {
+						if (!(SyncManager.getSyncAuto()) || syncMode == SYNC_MODE.NONE) {
+							SyncManager.sync(delta, project, SyncFlag.NO_SYNC);
+						} else if (syncMode == SYNC_MODE.ALL) {
+							SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE);
+						} else if (syncMode == SYNC_MODE.ACTIVE) {
+							SyncManager.sync(delta, project, SyncFlag.NO_FORCE);
+						}
+					} catch (CoreException e){
+						// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
+						RDTSyncCorePlugin.log(Messages.SyncManager_3);
 					}
 				}
 			}

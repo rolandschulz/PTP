@@ -238,30 +238,35 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 		}
 
 		// On sync request, sync regardless of the flags
-		if (command.equals(syncActiveCommand)) {
-			sync(null, project, SyncFlag.FORCE);
-		} else if (command.equals(syncAllCommand)) {
-			syncAll(null, project, SyncFlag.FORCE);
-			// If user switches to active or all, assume the user wants to sync right away
-		} else if (command.equals(setActiveCommand)) {
-			setSyncMode(project, SYNC_MODE.ACTIVE);
-			sync(null, project, SyncFlag.FORCE);
-		} else if (command.equals(setAllCommand)) {
-			setSyncMode(project, SYNC_MODE.ALL);
-			syncAll(null, project, SyncFlag.FORCE);
-		} else if (command.equals(setNoneCommand)) {
-			setSyncMode(project, SYNC_MODE.NONE);
-		} else if (command.equals(syncAutoCommand)) {
-			setSyncAuto(!(getSyncAuto()));
-			// If user switches to automatic sync'ing, go ahead and sync based on current setting for project
-			if (getSyncAuto()) {
-				SYNC_MODE syncMode = getSyncMode(project);
-				if (syncMode == SYNC_MODE.ACTIVE) {
-					sync(null, project, SyncFlag.FORCE);
-				} else if (syncMode == SYNC_MODE.ALL) {
-					syncAll(null, project, SyncFlag.FORCE);
+		try {
+			if (command.equals(syncActiveCommand)) {
+				sync(null, project, SyncFlag.FORCE);
+			} else if (command.equals(syncAllCommand)) {
+				syncAll(null, project, SyncFlag.FORCE);
+				// If user switches to active or all, assume the user wants to sync right away
+			} else if (command.equals(setActiveCommand)) {
+				setSyncMode(project, SYNC_MODE.ACTIVE);
+				sync(null, project, SyncFlag.FORCE);
+			} else if (command.equals(setAllCommand)) {
+				setSyncMode(project, SYNC_MODE.ALL);
+				syncAll(null, project, SyncFlag.FORCE);
+			} else if (command.equals(setNoneCommand)) {
+				setSyncMode(project, SYNC_MODE.NONE);
+			} else if (command.equals(syncAutoCommand)) {
+				setSyncAuto(!(getSyncAuto()));
+				// If user switches to automatic sync'ing, go ahead and sync based on current setting for project
+				if (getSyncAuto()) {
+					SYNC_MODE syncMode = getSyncMode(project);
+					if (syncMode == SYNC_MODE.ACTIVE) {
+						sync(null, project, SyncFlag.FORCE);
+					} else if (syncMode == SYNC_MODE.ALL) {
+						syncAll(null, project, SyncFlag.FORCE);
+					}
 				}
 			}
+		} catch (CoreException e) {
+			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
+			RDTSyncCorePlugin.log(Messages.SyncManager_3);
 		}
 
 		ICommandService service = (ICommandService) HandlerUtil.getActiveWorkbenchWindowChecked(event).getService(
@@ -317,8 +322,30 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	 * @param syncFlags
 	 *            sync flags
 	 * @return the scheduled sync job
+	 * @throws CoreException 
 	 */
-	public static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags) {
+	public static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags) throws CoreException {
+		return sync(delta, project, syncFlags, false);
+	}
+	
+	/**
+	 * Invoke sync and block until sync finishes. This does not spawn another thread and no locking of resources is done.
+	 * 
+	 * @param delta
+	 *            project delta
+	 * @param project
+	 *            project to sync
+	 * @param syncFlags
+	 *            sync flags
+	 * @return the scheduled sync job
+	 * @throws CoreException
+	 * 			  on problems sync'ing
+	 */
+	public static Job syncBlocking(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags) throws CoreException {
+		return sync(delta, project, syncFlags, true);
+	}
+	
+	private static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, boolean isBlocking) throws CoreException {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		if (!(bcm.isInitialized(project))) {
 			return null;
@@ -326,12 +353,13 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 
 		IConfiguration[] buildConfigurations = new IConfiguration[1];
 		buildConfigurations[0] = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
-		Job[] syncJobs = scheduleSyncJobs(delta, project, syncFlags, buildConfigurations);
+		Job[] syncJobs = scheduleSyncJobs(delta, project, syncFlags, buildConfigurations, isBlocking);
 		return syncJobs[0];
 	}
 
 	/**
-	 * Invoke sync for all configurations on a project
+	 * Invoke sync for all configurations on a project.
+	 * Note that there is no syncAllBlocking, because it was not needed but would be easy to add.
 	 * 
 	 * @param delta
 	 *            project delta
@@ -341,19 +369,21 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	 *            sync flags
 	 * 
 	 * @return array of sync jobs scheduled
+	 * @throws CoreException
+	 * 			  on problems sync'ing
 	 */
-	public static Job[] syncAll(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags) {
+	public static Job[] syncAll(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		if (!(bcm.isInitialized(project))) {
 			return new Job[0];
 		}
 
 		return scheduleSyncJobs(delta, project, syncFlags, ManagedBuildManager.getBuildInfo(project).getManagedProject()
-				.getConfigurations());
+				.getConfigurations(), false);
 	}
 
 	private static Job[] scheduleSyncJobs(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags,
-			IConfiguration[] buildConfigurations) {
+			IConfiguration[] buildConfigurations, boolean isBlocking) throws CoreException {
 		int jobNum = 0;
 		Job[] syncJobs = new Job[buildConfigurations.length];
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
@@ -364,9 +394,13 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 			if (serviceConfig != null) {
 				ISyncServiceProvider provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
 				if (provider != null) {
-					job = new SynchronizeJob(delta, provider, syncFlags);
-					job.setRule(syncRule);
-					job.schedule();
+					if (isBlocking) {
+						provider.synchronize(delta, null, syncFlags);
+					} else {
+						job = new SynchronizeJob(delta, provider, syncFlags);
+						job.setRule(syncRule);
+						job.schedule();
+					}
 				}
 			} else {
 				RDTSyncCorePlugin.log(Messages.SyncConfigurationManager_1 + buildConfig.getName());

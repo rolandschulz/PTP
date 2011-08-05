@@ -192,14 +192,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			processBuilder.redirectErrorStream(true);
 
 			// Synchronize before building
-			Job syncJob = SyncManager.sync(null, getProject(), SyncFlag.FORCE);
-			if (syncJob != null) {
-				try {
-					syncJob.join();
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-				}
-			}
+			SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE);
 
 			IRemoteProcess p = null;
 			try {
@@ -231,14 +224,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			}
 
 			// Synchronize after building
-			syncJob = SyncManager.sync(null, getProject(), SyncFlag.FORCE);
-			if (syncJob != null) {
-				try {
-					syncJob.join();
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-				}
-			}
+			SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE);
 
 			return fProcess;
 		}
