@@ -77,8 +77,17 @@
             locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu">
          <menu
                label="Synchronization">
+            <command
+                  commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                  label="Auto-Sync"
+                  style="toggle">
+               <parameter
+                     name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                     value="sync_auto">
+               </parameter>
+            </command>
             <menu
-                  label="Set Sync">
+                  label="Project Auto-Sync Settings">
                <command
                      commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
                      label="Sync Active"
@@ -123,15 +132,6 @@
                <parameter
                      name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
                      value="sync_all">
-               </parameter>
-            </command>
-            <command
-                  commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
-                  label="Sync Automatically"
-                  style="toggle">
-               <parameter
-                     name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
-                     value="sync_auto">
                </parameter>
             </command>
             <visibleWhen
