@@ -80,14 +80,12 @@ public class SyncBuildServiceProvider extends ServiceProvider implements IRemote
 	 * #getConfigLocation()
 	 */
 	/**
-	 * @since 2.0
 	 */
 	public String getConfigLocation() {
 		return getString(REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION, getDefaultPath(getRemoteServices(), getConnection()));
 	}
 
 	/**
-	 * @since 2.0
 	 */
 	public void setConfigLocation(String configLocation) {
 		putString(REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION, configLocation);

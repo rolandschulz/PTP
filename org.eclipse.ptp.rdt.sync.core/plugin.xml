@@ -60,7 +60,7 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="org.eclipse.ptp.internal.rdt.sync.core.SyncManager"
+            defaultHandler="org.eclipse.ptp.rdt.sync.internal.core.SyncManager"
             id="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
             name="Sync Operations">
          <commandParameter

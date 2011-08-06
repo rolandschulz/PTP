@@ -76,9 +76,6 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 	private ISynchronizeParticipantDescriptor fSelectedProvider;
 	private final Map<Integer, ISynchronizeParticipantDescriptor> fComboIndexToDescriptorMap = new HashMap<Integer, ISynchronizeParticipantDescriptor>();
 
-	/**
-	 * @since 2.0
-	 */
 	protected Map<IProject, IServiceConfiguration> projectConfigs = new HashMap<IProject, IServiceConfiguration>();
 
 	/**
@@ -149,9 +146,6 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 		handleProviderSelected();
 	}
 
-	/**
-	 * @since 2.0
-	 */
 	protected void convertProject(IProject project, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.ConvertToSyncProjectWizardPage_convertingToSyncProject, 3);
 		
@@ -270,9 +264,6 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 		}
 	}
 
-	/**
-	 * @since 2.0
-	 */
 	protected IServiceConfiguration getConfig(IProject project) {
 		IServiceConfiguration config = projectConfigs.get(project);
 		if (config == null) {

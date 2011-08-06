@@ -15,8 +15,5 @@ package org.eclipse.ptp.rdt.sync.ui.preferences;
 
 import org.eclipse.cdt.ui.newui.PrefPage_Abstract;
 
-/**
- * @since 2.0
- */
 public class RemotePrefPage_Env extends PrefPage_Abstract {
 }
