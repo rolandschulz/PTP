@@ -269,11 +269,6 @@ public class GitRemoteSyncConnection {
 	 * 
 	 * @return whether there are changes to be committed.
 	 */
-	private boolean prepareRemoteForCommit(IProgressMonitor monitor) throws	RemoteSyncException {
-		return prepareRemoteForCommit(monitor, false); // Default to not
-														// including untracked
-														// files
-	}
 
 	private boolean prepareRemoteForCommit(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
@@ -312,7 +307,7 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Do a "git commit" on the remote host
 	 */
-	private void commitRemoteFiles(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
+	private void commitRemoteFiles(IProgressMonitor monitor) throws RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		subMon.subTask(Messages.GitRemoteSyncConnection_committing_remote);
 		try {
@@ -322,12 +317,14 @@ public class GitRemoteSyncConnection {
 			try {
 				commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(10));
 			} catch (final InterruptedException e) {
-				throw new RemoteExecutionException(e);
+				throw new RemoteSyncException(e);
 			} catch (RemoteConnectionException e) {
-				throw new RemoteExecutionException(e);
+				throw new RemoteSyncException(e);
+			} catch (IOException e) {
+				throw new RemoteSyncException(e);
 			}
 			if (commandResults.getExitCode() != 0) {
-				throw new RemoteExecutionException(Messages.GRSC_GitCommitFailure + commandResults.getStderr());
+				throw new RemoteSyncException(Messages.GRSC_GitCommitFailure + commandResults.getStderr());
 			}
 		} finally {
 			if (monitor != null) {
@@ -711,7 +708,7 @@ public class GitRemoteSyncConnection {
 	 *             reported and handled. So all exceptions are checked
 	 *             exceptions, embedded in a RemoteSyncException.
 	 */
-	public void syncRemoteToLocal(IProgressMonitor monitor) throws RemoteSyncException {
+	public void syncRemoteToLocal(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
 
 		// TODO: Figure out why pull doesn't work and why we have to fetch and
 		// merge instead.
@@ -734,8 +731,9 @@ public class GitRemoteSyncConnection {
 		
 		try {
 			// First, commit in case any changes have occurred remotely.
-			if (prepareRemoteForCommit(subMon.newChild(5))) {
+			if (prepareRemoteForCommit(subMon.newChild(5),includeUntrackedFiles)) {
 				/*than transport if something is available to send*/
+				commitRemoteFiles(subMon.newChild(5));
 				transportRemoteToLocal(subMon.newChild(5));
 			}
 		} finally {
