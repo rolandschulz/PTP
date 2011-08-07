@@ -173,13 +173,14 @@ public class GitRemoteSyncConnection {
 			File gitDirFile = new File(localDirectory + File.separator + gitDir);
 			Repository repository = repoBuilder.setWorkTree(localDir).setGitDir(gitDirFile).build();
 			git = new Git(repository);
+			boolean hasLocalCommit = true;
 
 			// Create and configure local repository if it is not already present
 			if (!(gitDirFile.exists())) {
 				repository.create(false);
 
 				// An initial commit to create the master branch.
-				doCommit();
+				hasLocalCommit = doCommit();
 			}
 
 			// Create remote directory if necessary.
@@ -195,11 +196,14 @@ public class GitRemoteSyncConnection {
 			// Prepare remote site for committing (stage files using git) and
 			// then commit remote files if necessary
 			// Include untracked files for new git
-			boolean needToCommitRemote = prepareRemoteForCommit(subMon.newChild(90), !existingGitRepo);
+			boolean needToCommitRemote = prepareRemoteForCommit(subMon.newChild(50), !existingGitRepo);
 			// repos
 			if (needToCommitRemote) {
 				commitRemoteFiles(subMon.newChild(5));
 			}
+			
+			if (hasLocalCommit) transportLocalToRemote(subMon.newChild(25));
+			if (needToCommitRemote) transportRemoteToLocal(subMon.newChild(25));
 
 			return git;
 		} finally {
@@ -263,17 +267,15 @@ public class GitRemoteSyncConnection {
 	 * outstanding changes. Note that this can only occur by accessing the repo
 	 * outside of Eclipse.
 	 * 
-	 * @return whether or not there are changes to be committed.
+	 * @return whether there are changes to be committed.
 	 */
-	private boolean prepareRemoteForCommit(IProgressMonitor monitor) throws IOException, RemoteExecutionException,
-			RemoteSyncException {
+	private boolean prepareRemoteForCommit(IProgressMonitor monitor) throws	RemoteSyncException {
 		return prepareRemoteForCommit(monitor, false); // Default to not
 														// including untracked
 														// files
 	}
 
-	private boolean prepareRemoteForCommit(IProgressMonitor monitor, boolean includeUntrackedFiles) throws IOException,
-			RemoteExecutionException, RemoteSyncException {
+	private boolean prepareRemoteForCommit(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
 			Set<String> filesToAdd = new HashSet<String>();
@@ -296,6 +298,10 @@ public class GitRemoteSyncConnection {
 			}
 
 			return needToCommit;
+		} catch (IOException e) {
+			throw new RemoteSyncException(e);
+		} catch (RemoteExecutionException e) {
+			throw new RemoteSyncException(e);
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -581,14 +587,15 @@ public class GitRemoteSyncConnection {
 	 * 
 	 * @throws RemoteSyncException
 	 *             on problems committing.
+	 * @return whether any changes were committed
 	 */
-	private void doCommit() throws RemoteSyncException {
+	private boolean doCommit() throws RemoteSyncException {
 		Set<String> filesToAdd = new HashSet<String>();
 		Set<String> filesToRemove = new HashSet<String>();
 		this.getFileStatus(filesToAdd, filesToRemove, true);
 
 		try {
-			if (!(filesToAdd.isEmpty())) {
+			if (!filesToAdd.isEmpty()) {
 				final AddCommand addCommand = git.add();
 				for (String fileName : filesToAdd) {
 					addCommand.addFilepattern(fileName);
@@ -596,17 +603,21 @@ public class GitRemoteSyncConnection {
 				addCommand.call();
 			}
 
-			if (!(filesToRemove.isEmpty())) {
+			if (!filesToRemove.isEmpty()) {
 				final RmCommand rmCommand = git.rm();
 				for (String fileName : filesToRemove) {
 					rmCommand.addFilepattern(fileName);
 				}
 				rmCommand.call();
 			}
-
-			final CommitCommand commitCommand = git.commit();
-			commitCommand.setMessage(commitMessage);
-			commitCommand.call();
+			if (!filesToAdd.isEmpty() || !filesToRemove.isEmpty()) {
+				final CommitCommand commitCommand = git.commit();
+				commitCommand.setMessage(commitMessage);
+				commitCommand.call();
+				return true;
+			} else {
+				return false;
+			}
 		} catch (final GitAPIException e) {
 			throw new RemoteSyncException(e);
 		} catch (final UnmergedPathException e) {
@@ -652,33 +663,41 @@ public class GitRemoteSyncConnection {
 		subMon.subTask(Messages.GitRemoteSyncConnection_sync_local_to_remote);
 		try {
 			// First commit changes to the local repository.
-			doCommit();
-
-			// Then push them to the remote site.
-			try {
-				transport.push(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
-
-				// Now remotely merge changes with master branch
-				CommandResults mergeResults;
-				final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
-
-				mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
-
-				if (mergeResults.getExitCode() != 0) {
-					throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
-							+ mergeResults.getStdout()));
-				}
-			} catch (final IOException e) {
-				throw new RemoteSyncException(e);
-			} catch (final InterruptedException e) {
-				throw new RemoteSyncException(e);
-			} catch (RemoteConnectionException e) {
-				throw new RemoteSyncException(e);
+			if (doCommit()) {
+				// than transfer if anything todo
+				transportLocalToRemote(subMon.newChild(10));
 			}
 		} finally {
 			if (monitor != null) {
 				monitor.done();
 			}
+		}
+	}
+
+	private void transportLocalToRemote(IProgressMonitor monitor)
+			throws RemoteSyncException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		subMon.subTask(Messages.GitRemoteSyncConnection_transport_local_to_remote0); 
+		// Then push them to the remote site.
+		try {
+			transport.push(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
+
+			// Now remotely merge changes with master branch
+			CommandResults mergeResults;
+			final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
+
+			mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
+
+			if (mergeResults.getExitCode() != 0) {
+				throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
+						+ mergeResults.getStdout()));
+			}
+		} catch (final IOException e) {
+			throw new RemoteSyncException(e);
+		} catch (final InterruptedException e) {
+			throw new RemoteSyncException(e);
+		} catch (RemoteConnectionException e) {
+			throw new RemoteSyncException(e);
 		}
 	}
 
@@ -712,12 +731,25 @@ public class GitRemoteSyncConnection {
 		// }
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		subMon.subTask(Messages.GitRemoteSyncConnection_sync_remote_to_local);
+		
 		try {
 			// First, commit in case any changes have occurred remotely.
-			prepareRemoteForCommit(subMon.newChild(5));
+			if (prepareRemoteForCommit(subMon.newChild(5))) {
+				/*than transport if something is available to send*/
+				transportRemoteToLocal(subMon.newChild(5));
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
 
+	private void transportRemoteToLocal(IProgressMonitor monitor)
+			throws RemoteSyncException {
+		try {
 			// Next, fetch the remote repository
-			transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
+			transport.fetch(new EclipseGitProgressTransformer(monitor), null);
 
 			// Now merge. Before merging we set the head for merging to master.
 			Ref masterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -729,12 +761,6 @@ public class GitRemoteSyncConnection {
 			throw new RemoteSyncException(e);
 		} catch (GitAPIException e) {
 			throw new RemoteSyncException(e);
-		} catch (RemoteExecutionException e) {
-			throw new RemoteSyncException(e);
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
 		}
 	}
 }
