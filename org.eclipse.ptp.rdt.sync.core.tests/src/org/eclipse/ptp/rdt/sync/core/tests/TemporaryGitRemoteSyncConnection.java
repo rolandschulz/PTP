@@ -1,13 +1,20 @@
 package org.eclipse.ptp.rdt.sync.core.tests;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Random;
+
+import javax.security.auth.login.FailedLoginException;
 
 import org.eclipse.ptp.rdt.sync.git.core.GitRemoteSyncConnection;
 import org.eclipse.ptp.rdt.sync.git.core.SyncFileFilter;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
 
@@ -17,16 +24,14 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 	private GitRemoteSyncConnection fGITConn;
 	private IRemoteConnection fRemoteConnection;
 	private TemporaryFolder localFolder;
-	private String remoteFolder;
 	private static Random random = new Random();
 	private IRemoteFileManager fileManager;
+	private BasicGitSyncTests test;
+	private String remoteFolder;
+	private IRemoteConnectionManager connMgr;
 	
-	public TemporaryGitRemoteSyncConnection(IRemoteConnection remoteConnection, String remoteBaseDir) {
-		fRemoteConnection = remoteConnection;
-		fileManager = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection);
-		long n = random.nextInt(1000000);
-		remoteFolder = remoteBaseDir + "/junit" + n;
-
+	public TemporaryGitRemoteSyncConnection(BasicGitSyncTests basicGitSyncTests) {
+		test = basicGitSyncTests;
 	}
 
 	@Override
@@ -56,14 +61,43 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 	}
 
 	private void create() throws Exception {
-		localFolder = new TemporaryFolder();
-		localFolder.create();
+		long n = random.nextInt(1000000);
+		remoteFolder = test.remoteBaseDir + "/junit" + n;
 		
+		/* setup remote connection */
+		IRemoteServices fRemoteServices;
+		
+		fRemoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
+				"org.eclipse.ptp.remote.RemoteTools"); //$NON-NLS-1$
+		assertNotNull(fRemoteServices);
+
+		connMgr = fRemoteServices.getConnectionManager();
+		assertNotNull(connMgr);
+
+		fRemoteConnection = connMgr.newConnection("test_connection"); //$NON-NLS-1$
+
+		assertNotNull(fRemoteConnection);
+		fRemoteConnection.setAddress(test.host);
+		fRemoteConnection.setUsername(test.username);
+		if (test.privatekey == null) {
+			fRemoteConnection.setPassword(test.password);
+		} else {
+			fRemoteConnection.setAttribute(ConfigFactory.ATTR_KEY_PATH, test.privatekey);
+			fRemoteConnection.setAttribute(ConfigFactory.ATTR_KEY_PASSPHRASE, test.password);
+			fRemoteConnection.setAttribute(ConfigFactory.ATTR_IS_PASSWORD_AUTH, Boolean.toString(false));
+		}
 		
 		if (!fRemoteConnection.isOpen()) {
 			fRemoteConnection.open(null);
 		}
 		
+		fileManager = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection);
+		
+		/*local folder*/
+		localFolder = new TemporaryFolder();
+		localFolder.create();
+		
+		/*remote folder (just delete - is created by GitRemoteSyncConnection)*/
 		fileManager.getResource(remoteFolder).delete(EFS.NONE, null);
 		
 		fGITConn = new GitRemoteSyncConnection(fRemoteConnection,
@@ -79,21 +113,32 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 	}
 
 	private void delete()  {
-		fGITConn.close();
+		String failMessage="";
 		
-		/*Delete Remote folder*/
+		fGITConn.close();
+		localFolder.delete();
+		
 		try {
 			fileManager.getResource(remoteFolder).delete(EFS.NONE, null);
 		} catch (Exception e){
-			//TODO: What should we do here? Method "after" is not allowed to throw.    
 			e.printStackTrace();
-			assertTrue(false);
+			failMessage += e.getMessage(); //don't fail yet - try to clean up as much as possible
 		}
 		
-		localFolder.delete();
+		fRemoteConnection.close();
+		try {
+			connMgr.removeConnection(fRemoteConnection);
+		} catch (Exception e){
+			e.printStackTrace();
+			failMessage += e.getMessage(); //don't fail yet - try to clean up as much as possible
+		}
+		
+		if (!failMessage.equals("")) {
+			fail(failMessage);
+		}
 	}
 
-
-	
-	
+	public IRemoteConnection getRemoteConn() {
+		return fRemoteConnection;
+	}
 }
