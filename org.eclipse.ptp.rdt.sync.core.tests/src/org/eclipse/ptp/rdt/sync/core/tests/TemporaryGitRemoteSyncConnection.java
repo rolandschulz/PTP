@@ -43,6 +43,18 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 		return fGITConn;
 	}
 	
+	public TemporaryFolder getLocalFolder() {
+		return localFolder;
+	}
+	
+	public String getRemoteFolder() {
+		return remoteFolder;
+	}
+
+	public IRemoteFileManager getFileManager() {
+		return fileManager;
+	}
+
 	private void create() throws Exception {
 		localFolder = new TemporaryFolder();
 		localFolder.create();
