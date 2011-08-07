@@ -222,7 +222,7 @@ public class GitRemoteSyncConnection {
 	 * @throws IOException
 	 * @throws RemoteExecutionException
 	 * @throws RemoteSyncException
-	 * @return whether or not this repo already existed
+	 * @return whether this repo already existed
 	 */
 	private boolean doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
