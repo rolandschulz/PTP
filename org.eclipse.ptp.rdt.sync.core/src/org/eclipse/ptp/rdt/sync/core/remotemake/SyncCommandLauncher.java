@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
@@ -192,7 +192,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			processBuilder.redirectErrorStream(true);
 
 			// Synchronize before building
-			SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE);
+			SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10));
 
 			IRemoteProcess p = null;
 			try {
@@ -224,7 +224,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			}
 
 			// Synchronize after building
-			SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE);
+			SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10));
 
 			return fProcess;
 		}

@@ -325,7 +325,7 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	 * @throws CoreException 
 	 */
 	public static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		return sync(delta, project, syncFlags, false);
+		return sync(delta, project, syncFlags, false, null);
 	}
 	
 	/**
@@ -341,11 +341,13 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	 * @throws CoreException
 	 * 			  on problems sync'ing
 	 */
-	public static Job syncBlocking(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		return sync(delta, project, syncFlags, true);
+	public static Job syncBlocking(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, IProgressMonitor monitor)
+			throws CoreException {
+		return sync(delta, project, syncFlags, true, monitor);
 	}
 	
-	private static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, boolean isBlocking) throws CoreException {
+	private static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, boolean isBlocking,
+			IProgressMonitor monitor) throws CoreException {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		if (!(bcm.isInitialized(project))) {
 			return null;
@@ -353,7 +355,7 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 
 		IConfiguration[] buildConfigurations = new IConfiguration[1];
 		buildConfigurations[0] = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
-		Job[] syncJobs = scheduleSyncJobs(delta, project, syncFlags, buildConfigurations, isBlocking);
+		Job[] syncJobs = scheduleSyncJobs(delta, project, syncFlags, buildConfigurations, isBlocking, monitor);
 		return syncJobs[0];
 	}
 
@@ -379,11 +381,12 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 		}
 
 		return scheduleSyncJobs(delta, project, syncFlags, ManagedBuildManager.getBuildInfo(project).getManagedProject()
-				.getConfigurations(), false);
+				.getConfigurations(), false, null);
 	}
 
+	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor
 	private static Job[] scheduleSyncJobs(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags,
-			IConfiguration[] buildConfigurations, boolean isBlocking) throws CoreException {
+			IConfiguration[] buildConfigurations, boolean isBlocking, IProgressMonitor monitor) throws CoreException {
 		int jobNum = 0;
 		Job[] syncJobs = new Job[buildConfigurations.length];
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
@@ -395,7 +398,7 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 				ISyncServiceProvider provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
 				if (provider != null) {
 					if (isBlocking) {
-						provider.synchronize(delta, null, syncFlags);
+						provider.synchronize(delta, monitor, syncFlags);
 					} else {
 						job = new SynchronizeJob(delta, provider, syncFlags);
 						job.setRule(syncRule);
