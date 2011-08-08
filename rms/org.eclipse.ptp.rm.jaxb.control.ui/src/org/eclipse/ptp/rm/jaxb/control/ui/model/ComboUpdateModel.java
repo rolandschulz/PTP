@@ -146,7 +146,10 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 		if (refreshing) {
 			return;
 		}
-		Object value = storeValue();
-		handleUpdate(value);
+		try {
+			Object value = storeValue();
+			handleUpdate(value);
+		} catch (Exception ignored) {
+		}
 	}
 }

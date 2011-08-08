@@ -595,6 +595,25 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					</widget>
 					<!-- row 2 -->
 					<widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
+                  <fixed-text>Account: </fixed-text>
+               </widget>
+               <widget type="text" style="SWT.BORDER" saveValueTo="Account_Name">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+                  </layout-data>
+               </widget>
+               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>${ptp_rm:Account_Name#description}</fixed-text>
+               </widget>
+               <!-- row 3 -->
+					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
@@ -613,7 +632,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>${ptp_rm:destination#description}</fixed-text>
 					</widget>
-					<!-- row 3 -->
+					<!-- row 4 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -632,7 +651,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>${ptp_rm:Resource_List.nodes#description}</fixed-text>
 					</widget>
-					<!-- row 4 -->
+					<!-- row 5 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -651,7 +670,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>${ptp_rm:Resource_List.mem#description}</fixed-text>
 					</widget>
-					<!-- row 5 -->
+					<!-- row 6 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -670,7 +689,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>${ptp_rm:Resource_List.walltime#description}</fixed-text>
 					</widget>
-					<!-- row 6 -->
+					<!-- row 7 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -688,7 +707,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>${ptp_rm:mpiCommand#description}</fixed-text>
 					</widget>
-					<!-- row 7 -->
+					<!-- row 8 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -706,7 +725,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>${ptp_rm:mpiCores#description}</fixed-text>
 					</widget>
-					<!-- 8 -->
+					<!-- row 9 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>

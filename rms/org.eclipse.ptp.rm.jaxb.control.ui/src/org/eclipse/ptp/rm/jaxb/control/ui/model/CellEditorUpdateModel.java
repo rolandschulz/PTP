@@ -460,9 +460,12 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 			}
 			mapValue = stringValue;
 		}
-		Object v = storeValue();
-		viewer.storeValue();
-		handleUpdate(v);
+		try {
+			Object v = storeValue();
+			viewer.storeValue();
+			handleUpdate(v);
+		} catch (Exception ignored) {
+		}
 	}
 
 	/*

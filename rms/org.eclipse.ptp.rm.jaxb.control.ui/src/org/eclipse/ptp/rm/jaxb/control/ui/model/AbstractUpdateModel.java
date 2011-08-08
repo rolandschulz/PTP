@@ -47,8 +47,11 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
-			Object value = storeValue();
-			handleUpdate(value);
+			try {
+				Object value = storeValue();
+				handleUpdate(value);
+			} catch (Exception ignored) {
+			}
 			return Status.OK_STATUS;
 		}
 	}
@@ -96,7 +99,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	}
 
 	/**
-	 * If this widget saves its value to a Property of Attribute, then the
+	 * If this widget saves its value to a Property or Attribute, then the
 	 * default value here is retrieved. The widget value is then refreshed from
 	 * the map, and if the value is <code>null</code>, the default value is
 	 * restored to the map and another refresh is called on the actual value.
@@ -141,22 +144,6 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	public void setValidator(ValidatorType validator, JAXBControllerLaunchConfigurationTab tab) {
 		this.validator = validator;
 		this.tab = tab;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel#validate()
-	 */
-	public String validate() {
-		if (validator != null) {
-			try {
-				WidgetActionUtils.validate(String.valueOf(getValueFromControl()), validator, getRemoteFileManager());
-			} catch (Exception t) {
-				return validator.getErrorMessage();
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -234,8 +221,8 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	 * environment map and calls the update handler. <br>
 	 * <br>
 	 */
-	protected Object storeValue() {
-		Object value = getValueFromControl();
+	protected Object storeValue() throws Exception {
+		Object value = validate();
 		lcMap.put(name, value);
 		return value;
 	}
@@ -253,5 +240,32 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Gets value from control and runs validator on it, if there is one. If
+	 * there is an error, this is registered with the handler.
+	 * 
+	 * @return valid value
+	 * @throws Exception
+	 *             thrown if invalid
+	 */
+	private Object validate() throws Exception {
+		Object value = getValueFromControl();
+		String error = null;
+		if (validator != null) {
+			try {
+				WidgetActionUtils.validate(String.valueOf(getValueFromControl()), validator, getRemoteFileManager());
+			} catch (Exception t) {
+				error = validator.getErrorMessage();
+			}
+		}
+		if (error != null) {
+			handler.addError(name, error);
+			throw new Exception(error);
+		} else {
+			handler.removeError(name);
+		}
+		return value;
 	}
 }

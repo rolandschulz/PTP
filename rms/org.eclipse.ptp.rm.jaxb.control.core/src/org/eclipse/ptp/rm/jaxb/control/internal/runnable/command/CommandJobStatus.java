@@ -194,6 +194,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 				return false;
 			}
 
+			waitEnabled = false;
+
 			/*
 			 * If this process is persistent (open), call terminate on the job,
 			 * as it may still be running; the process will be killed and the
@@ -205,7 +207,6 @@ public class CommandJobStatus implements ICommandJobStatus {
 				return true;
 			}
 
-			waitEnabled = false;
 			notifyAll();
 
 			if (process != null && !process.isCompleted()) {
@@ -607,7 +608,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 			return;
 		}
 
-		while (!monitor.isCanceled() && waitEnabled && (jobId == null || !isReached(state, waitUntil))) {
+		while (!monitor.isCanceled() && isWaitEnabled() && (jobId == null || !isReached(state, waitUntil))) {
 			synchronized (this) {
 				try {
 					wait(1000);
@@ -616,12 +617,13 @@ public class CommandJobStatus implements ICommandJobStatus {
 			}
 
 			if (isInteractive()) {
+				int exit = 0;
 				try {
-					int exit = process.exitValue();
-					if (exit != 0) {
-						throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
-					}
+					exit = process.exitValue();
 				} catch (Throwable t) {
+				}
+				if (exit != 0 && !monitor.isCanceled() && isWaitEnabled()) {
+					throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
 				}
 			}
 
@@ -760,5 +762,16 @@ public class CommandJobStatus implements ICommandJobStatus {
 		int i = getStateRank(state);
 		int j = getStateRank(waitUntil);
 		return i >= j;
+	}
+
+	/**
+	 * @return under synchronization
+	 */
+	private boolean isWaitEnabled() {
+		boolean w = true;
+		synchronized (this) {
+			w = waitEnabled;
+		}
+		return w;
 	}
 }
