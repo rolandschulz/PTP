@@ -65,11 +65,11 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 public class GitRemoteSyncConnection {
 
 	private final int MAX_FILES = 100;
-	private final static String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
-	private final static String commitMessage = Messages.GRSC_CommitMessage;
-	public final static String gitDir = ".ptp-sync"; //$NON-NLS-1$
-	private final static String gitCommand = "git --git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
-	private final static String remotePushBranch = "ptp-push"; //$NON-NLS-1$
+	private static final String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
+	private static final String commitMessage = Messages.GRSC_CommitMessage;
+	public static final String gitDir = ".ptp-sync"; //$NON-NLS-1$
+	private static final String gitCommand = "git --git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 	private final IRemoteConnection connection;
 	private final SyncFileFilter fileFilter;
 	private final String localDirectory;
