@@ -126,6 +126,10 @@ public abstract class RemoteRunSIProvider implements IExternalScannerInfoProvide
 			return false;
 
 		IRemoteServices remoteServices = executionProvider.getRemoteServices();
+		
+		if (remoteServices == null)
+			return false;
+		
 		if(!remoteServices.isInitialized()) {
 			remoteServices.initialize();
 		}
