@@ -436,9 +436,16 @@ public class CommandJob extends Job implements ICommandJob {
 				jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
 				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
 				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
+				if (!isBatch()) {
+					jobStatus.setProcess(process);
+				}
+				jobStatus.setProxy(getProxy());
 				try {
 					jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap(), progress.newChild(20));
 				} catch (CoreException failed) {
+					error.append(jobStatus.getStreamsProxy().getOutputStreamMonitor().getContents()).append(
+							JAXBCoreConstants.LINE_SEP);
+
 					status = CoreExceptionUtils.getErrorStatus(failed.getMessage() + JAXBCoreConstants.LINE_SEP + error.toString(),
 							null);
 					error.setLength(0);
@@ -461,17 +468,15 @@ public class CommandJob extends Job implements ICommandJob {
 				jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
 				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
 				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
+				if (!isBatch()) {
+					jobStatus.setProcess(process);
+				}
+				jobStatus.setProxy(getProxy());
 			}
 
 			if (monitor.isCanceled()) {
 				return status;
 			}
-
-			if (!isBatch()) {
-				jobStatus.setProcess(process);
-			}
-
-			jobStatus.setProxy(getProxy());
 
 			if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
 				if (input) {

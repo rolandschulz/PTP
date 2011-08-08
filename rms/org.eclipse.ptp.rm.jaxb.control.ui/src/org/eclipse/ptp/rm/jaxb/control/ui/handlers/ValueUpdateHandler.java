@@ -11,12 +11,14 @@ package org.eclipse.ptp.rm.jaxb.control.ui.handlers;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 
 /**
  * When a widget or cell editor commits a change, this handler is called to
@@ -31,6 +33,7 @@ public class ValueUpdateHandler {
 	private final Map<Object, IUpdateModel> controlToModelMap;
 	private final Map<Object, ICellEditorUpdateModel> cellEditorToModelMap;
 	private final Map<Viewer, ViewerUpdateModel> viewerModelMap;
+	private final TreeMap<String, String> errors;
 	private final IUpdateModelEnabled tab;
 
 	/**
@@ -42,7 +45,19 @@ public class ValueUpdateHandler {
 		controlToModelMap = new HashMap<Object, IUpdateModel>();
 		cellEditorToModelMap = new HashMap<Object, ICellEditorUpdateModel>();
 		viewerModelMap = new HashMap<Viewer, ViewerUpdateModel>();
+		errors = new TreeMap<String, String>();
 		this.tab = tab;
+	}
+
+	/**
+	 * @param source
+	 *            the control which has been faulty value
+	 * @param error
+	 *            error message
+	 */
+	public void addError(String source, String error) {
+		errors.put(source, error);
+		tab.fireContentsChanged();
 	}
 
 	/**
@@ -74,6 +89,19 @@ public class ValueUpdateHandler {
 	}
 
 	/**
+	 * @return the first error in order
+	 */
+	public String getFirstError() {
+		if (!errors.isEmpty()) {
+			String name = errors.firstKey();
+			if (name != null) {
+				return name + JAXBUIConstants.CO + JAXBUIConstants.SP + errors.get(name);
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Broadcasts update request to all other controls by invoking refresh on
 	 * their model objects.<br>
 	 * <br>
@@ -94,6 +122,10 @@ public class ValueUpdateHandler {
 	 *            the new value (if any) produced (unused here)
 	 */
 	public void handleUpdate(Object source, Object value) {
+		if (!errors.isEmpty()) {
+			return;
+		}
+
 		tab.relink();
 
 		for (int i = 0; i < 2; i++) {
@@ -123,5 +155,16 @@ public class ValueUpdateHandler {
 		}
 
 		tab.fireContentsChanged();
+	}
+
+	/**
+	 * @param source
+	 *            the control which had faulty value
+	 */
+	public void removeError(String source) {
+		errors.remove(source);
+		if (!errors.isEmpty()) {
+			tab.fireContentsChanged();
+		}
 	}
 }

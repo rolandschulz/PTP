@@ -155,7 +155,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
-		return validateWidgets();
+		return checkForValidationError();
 	}
 
 	/*
@@ -306,16 +306,25 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
-		return validateWidgets();
+		return checkForValidationError();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
+	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
+	 * org.eclipse.ptp.rmsystem.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
 	@Override
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		if (control == null) {
 			return new RMLaunchValidation(false, null);
 		}
 		if (control.isVisible()) {
-			RMLaunchValidation v = validateWidgets();
+			RMLaunchValidation v = checkForValidationError();
 			if (!v.isSuccess()) {
 				return v;
 			}
@@ -553,6 +562,17 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	}
 
 	/**
+	 * @return the first error in the map
+	 */
+	private RMLaunchValidation checkForValidationError() {
+		String error = parentTab.getUpdateHandler().getFirstError();
+		if (error != null) {
+			return new RMLaunchValidation(false, error);
+		}
+		return new RMLaunchValidation(true, null);
+	}
+
+	/**
 	 * Adds the View Script and Restore Defaults buttons to the bottom of the
 	 * control pane.
 	 * 
@@ -759,20 +779,5 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		} else if (enabled) {
 			enabledList.add(name);
 		}
-	}
-
-	/**
-	 * Runs the validator on the widgets, if they have one.
-	 * 
-	 * @return invalid on first failure; else valid;
-	 */
-	private RMLaunchValidation validateWidgets() {
-		for (IUpdateModel m : localWidgets.values()) {
-			String error = m.validate();
-			if (error != null) {
-				return new RMLaunchValidation(false, error);
-			}
-		}
-		return new RMLaunchValidation(true, null);
 	}
 }
