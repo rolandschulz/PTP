@@ -233,8 +233,7 @@ public class NodedisplayAccess extends LguiHandler {
 									// till now
 
 			nodedisplays = new ArrayList<Nodedisplay>();
-			for (final GobjectType tag : lguiItem.getOverviewAccess()
-					.getGraphicalObjects()) {
+			for (final GobjectType tag : lguiItem.getOverviewAccess().getGraphicalObjects()) {
 				if (tag instanceof Nodedisplay) {
 					nodedisplays.add((Nodedisplay) tag);
 				}
@@ -302,16 +301,14 @@ public class NodedisplayAccess extends LguiHandler {
 	 *         scheme-tag, which defines this data-tag null if there is no
 	 *         nodedisplay with id nodedisplayId
 	 */
-	public SchemeAndData getSchemeAndDataByLevels(String nodedisplayId,
-			ArrayList<Integer> ids) {
+	public SchemeAndData getSchemeAndDataByLevels(String nodedisplayId, ArrayList<Integer> ids) {
 		final Nodedisplay nodedisplay = getNodedisplayById(nodedisplayId);
 
 		if (nodedisplay == null) {
 			return null;
 		}
 
-		return LMLCheck.getSchemeAndDataByLevels(ids, nodedisplay.getData(),
-				nodedisplay.getScheme());
+		return LMLCheck.getSchemeAndDataByLevels(ids, nodedisplay.getData(), nodedisplay.getScheme());
 	}
 
 	/**
@@ -353,8 +350,7 @@ public class NodedisplayAccess extends LguiHandler {
 	 *            ids identifying a schemeelement within nodedisplay-scheme-tag
 	 * @return JAXB-instance corresponding to the searched scheme-tag
 	 */
-	public SchemeElement getSchemeByLevels(String nodedisplayId,
-			ArrayList<Integer> ids) {
+	public SchemeElement getSchemeByLevels(String nodedisplayId, ArrayList<Integer> ids) {
 		final Nodedisplay nodedisplay = getNodedisplayById(nodedisplayId);
 
 		if (nodedisplay == null) {
@@ -446,7 +442,7 @@ public class NodedisplayAccess extends LguiHandler {
 	public String getTitle(String gid) {
 		final List<Nodedisplay> displays = getNodedisplays();
 		if (displays.size() == 0 || displays.get(0) == null) {
-			return "Nodedisplay";
+			return "Nodedisplay"; //$NON-NLS-1$
 		}
 		return displays.get(0).getTitle();
 	}
@@ -494,8 +490,7 @@ public class NodedisplayAccess extends LguiHandler {
 	 *         implicit name. null, if there is no nodedisplay with given id, or
 	 *         if there is no physical element with the passed implicit name
 	 */
-	public ArrayList<Integer> impnameToLevel(String nodedisplayId,
-			String impname) {
+	public ArrayList<Integer> impnameToLevel(String nodedisplayId, String impname) {
 
 		final Nodedisplay nodedisplay = getNodedisplayById(nodedisplayId);
 
@@ -503,8 +498,7 @@ public class NodedisplayAccess extends LguiHandler {
 			return null;
 		}
 
-		return FastImpCheck.impnameToOneLevel(impname, nodedisplay,
-				new ArrayList<Integer>());
+		return FastImpCheck.impnameToOneLevel(impname, nodedisplay, new ArrayList<Integer>());
 	}
 
 	@Override
@@ -544,8 +538,7 @@ public class NodedisplayAccess extends LguiHandler {
 			oidToTagNames.put(nodedisplay.getId(), atagnames);
 			oidToMasks.put(nodedisplay.getId(), amasks);
 		}
-		final List<NodedisplaylayoutType> nodedisplayLayouts = lguiItem
-				.getLayoutAccess().getNodedisplayLayouts();
+		final List<NodedisplaylayoutType> nodedisplayLayouts = lguiItem.getLayoutAccess().getNodedisplayLayouts();
 		for (final NodedisplaylayoutType nodedisplayLayout : nodedisplayLayouts) {
 			if (oidToLayouts.containsKey(nodedisplayLayout.getGid())) {// Already
 																		// layout
@@ -553,8 +546,7 @@ public class NodedisplayAccess extends LguiHandler {
 																		// for
 																		// referenced
 																		// nodedisplay
-				final ArrayList<NodedisplaylayoutType> old = oidToLayouts
-						.get(nodedisplayLayout.getGid());
+				final ArrayList<NodedisplaylayoutType> old = oidToLayouts.get(nodedisplayLayout.getGid());
 				old.add(nodedisplayLayout);
 			} else {// Create new layout-list
 				final ArrayList<NodedisplaylayoutType> layouts = new ArrayList<NodedisplaylayoutType>();
@@ -586,8 +578,8 @@ public class NodedisplayAccess extends LguiHandler {
 	 * @param masks
 	 *            hashmap for masks key=level of tree, value=mask-object
 	 */
-	private void findtagNamesAndMasks(Object schemeelement, int level,
-			HashMap<Integer, String> tagnames, HashMap<Integer, Mask> masks) {
+	private void findtagNamesAndMasks(Object schemeelement, int level, HashMap<Integer, String> tagnames,
+			HashMap<Integer, Mask> masks) {
 
 		final List els = LMLCheck.getLowerSchemeElements(schemeelement);
 
