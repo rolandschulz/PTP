@@ -16,7 +16,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem;bundle-version="1.3.100"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.ptp.rm.jaxb.control;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui",
+Export-Package: org.eclipse.ptp.rm.jaxb.control;
+  x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,
+   org.eclipse.ptp.rm.jaxb.tests,
+   org.eclipse.ptp.rm.lml.monitor.core,
+   org.eclipse.ptp.rm.lml_jaxb",
  org.eclipse.ptp.rm.jaxb.control.data;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.lml_jaxb,org.eclipse.ptp.rm.jaxb.tests",
  org.eclipse.ptp.rm.jaxb.control.exceptions;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.lml_jaxb,org.eclipse.ptp.rm.jaxb.tests",
  org.eclipse.ptp.rm.jaxb.control.internal;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
