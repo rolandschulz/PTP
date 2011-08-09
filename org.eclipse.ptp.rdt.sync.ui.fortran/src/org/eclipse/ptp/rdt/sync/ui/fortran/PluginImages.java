@@ -23,9 +23,9 @@ public class PluginImages {
 
 	static {
 		try {
-			fgIconBaseURL = new URL(RDTSyncUIPlugin.getDefault().getBundle().getEntry("/"), "icons/"); //$NON-NLS-1$ //$NON-NLS-2$
+			fgIconBaseURL = new URL(Activator.getDefault().getBundle().getEntry("/"), "icons/"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (MalformedURLException e) {
-			RDTSyncUIPlugin.log(e);
+			Activator.log(e);
 		}
 	}
 	private static final String T_WIZBAN = "wizban/"; //$NON-NLS-1$
@@ -45,7 +45,7 @@ public class PluginImages {
 		try {
 			return new URL(fgIconBaseURL, buffer.toString());
 		} catch (MalformedURLException e) {
-			RDTSyncUIPlugin.log(e);
+			Activator.log(e);
 			return null;
 		}
 	}
