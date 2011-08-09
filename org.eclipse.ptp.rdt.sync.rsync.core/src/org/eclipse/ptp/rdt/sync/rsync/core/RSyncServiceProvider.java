@@ -25,11 +25,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.ptp.rdt.sync.core.IRemoteSyncConnection;
-import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.rsync.core.IRemoteSyncConnection;
+import org.eclipse.ptp.rdt.sync.rsync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.rsync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.rsync.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -41,16 +41,17 @@ import org.eclipse.ui.statushandlers.StatusManager;
 public class RSyncServiceProvider extends ServiceProvider implements ISyncServiceProvider {
 	public static final String ID = "org.eclipse.ptp.rdt.sync.rsync.core.RSyncServiceProvider"; //$NON-NLS-1$
 
-	private static final String LOCATION = "location"; //$NON-NLS-1$
+	private static final String RSYNC_LOCATION = "location"; //$NON-NLS-1$
 
-	private static final String CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
-	private static final String SERVICES_ID = "servicesId"; //$NON-NLS-1$
-	private static final String PROJECT_NAME = "projectName"; //$NON-NLS-1$
+	private static final String RSYNC_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
+	private static final String RSYNC_SERVICES_ID = "servicesId"; //$NON-NLS-1$
+	private static final String RSYNC_PROJECT_NAME = "projectName"; //$NON-NLS-1$
 	private IProject fProject = null;
+
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
 	private IRemoteSyncConnection fSyncConnection = null;
-	
+
 	private final ReentrantLock syncLock = new ReentrantLock();
 	private Integer syncTaskId = -1;  //ID for most recent synchronization task, functions as a time-stamp 
 	private int finishedSyncTaskId = -1; //all synchronizations up to this ID (including it) have finished
@@ -62,7 +63,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 */
 	public String getLocation() {
 		if (fLocation == null) {
-			fLocation = getString(LOCATION, null);
+			fLocation = getString(RSYNC_LOCATION, null);
 		}
 		return fLocation;
 	}
@@ -74,7 +75,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 */
 	public IProject getProject() {
 		if (fProject == null) {
-			final String name = getString(PROJECT_NAME, null);
+			String name = getString(RSYNC_PROJECT_NAME, null);
 			if (name != null) {
 				fProject = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 			}
@@ -89,7 +90,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 */
 	public IRemoteConnection getRemoteConnection() {
 		if (fConnection == null) {
-			final String name = getString(CONNECTION_NAME, null);
+			String name = getString(RSYNC_CONNECTION_NAME, null);
 			if (name != null) {
 				final IRemoteServices services = getRemoteServices();
 				if (services != null) {
@@ -106,7 +107,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 * @return remote services
 	 */
 	public IRemoteServices getRemoteServices() {
-		final String id = getString(SERVICES_ID, null);
+		String id = getString(RSYNC_SERVICES_ID, null);
 		if (id != null) {
 			return PTPRemoteCorePlugin.getDefault().getRemoteServices(id);
 		}
@@ -134,7 +135,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 			throw new RuntimeException(Messages.ChangeLocationError);
 		}
 		fLocation = location;
-		putString(LOCATION, location);
+		putString(RSYNC_LOCATION, location);
 	}
 
 	/**
@@ -148,7 +149,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 			throw new RuntimeException(Messages.ChangeProjectError);
 		}
 		fProject = project;
-		putString(PROJECT_NAME, project.getName());
+		putString(RSYNC_PROJECT_NAME, project.getName());
 	}
 
 	/**
@@ -163,7 +164,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 			throw new RuntimeException(Messages.ChangeConnectionError);
 		}
 		fConnection = conn;
-		putString(CONNECTION_NAME, conn.getName());
+		putString(RSYNC_CONNECTION_NAME, conn.getName());
 	}
 
 	/**
@@ -174,7 +175,7 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	 * @throws RuntimeException if already set. Changing these local parameters is not currently supported but should be possible.
 	 */
 	public void setRemoteServices(IRemoteServices services) {
-		putString(SERVICES_ID, services.getId());
+		putString(RSYNC_SERVICES_ID, services.getId());
 	}
 
 	/*
@@ -419,8 +420,8 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		syncLock.lock();
 		try {
-			fConnection = connection;
-			putString(CONNECTION_NAME, connection.getName());
+		fConnection = connection;
+			putString(RSYNC_CONNECTION_NAME, connection.getName());
 			fSyncConnection = null;  //get reinitialized by next synchronize call
 		} finally {
 			syncLock.unlock();
@@ -435,12 +436,12 @@ public class RSyncServiceProvider extends ServiceProvider implements ISyncServic
 	public void setConfigLocation(String configLocation) {
 		syncLock.lock();
 		try {
-			fLocation = configLocation;
-			putString(LOCATION, configLocation);
+		fLocation = configLocation;
+			putString(RSYNC_LOCATION, configLocation);
 			fSyncConnection = null;  //get reinitialized by next synchronize call
 		} finally {
 			syncLock.unlock();
-		}
 	}
+}
 	}
 

@@ -8,7 +8,7 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.git.core;
+package org.eclipse.ptp.rdt.sync.unison.core;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -22,10 +22,8 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jgit.util.io.StreamCopyThread;
-import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
+import org.eclipse.ptp.rdt.sync.unison.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.unison.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -189,37 +187,16 @@ public class CommandRunner {
 	public static CommandResults executeRemoteCommand(IRemoteConnection conn, String command, String remoteDirectory,
 														IProgressMonitor monitor) throws 
 																IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
+		if (!conn.isOpen()) {
+			conn.open(monitor);
+		}
+
 		// Setup a new process
 		final List<String> commandList = new LinkedList<String>();
 		commandList.add("sh"); //$NON-NLS-1$
 		commandList.add("-c"); //$NON-NLS-1$
 		commandList.add(command);
-		return executeRemoteCommand(conn, commandList, remoteDirectory, monitor);
-	}
-		
-	/**
-	 * Execute command on a remote host and wait for the command to complete.
-	 * 
-	 * @param conn
-	 * @param command
-	 * @return CommandResults (contains stdout, stderr, and exit code)
-	 * @throws IOException
-	 *             in several cases if there is a problem communicating with the remote host.
-	 * @throws InterruptedException
-	 *             if execution of remote command is interrupted.
-	 * @throws RemoteConnectionException
-	 * 			   if connection closed and cannot be opened. 
-	 * @throws RemoteSyncException 
-	 * 			   if other error
-	 */
-	public static CommandResults executeRemoteCommand(IRemoteConnection conn, List<String> commandList, String remoteDirectory,
-															IProgressMonitor monitor) throws 
-																	IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
-	
-		
-		if (!conn.isOpen()) {
-			conn.open(monitor);
-		}
+
 		final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandList);
 		final IRemoteFileManager rfm = conn.getRemoteServices().getFileManager(conn);
 		rpb.directory(rfm.getResource(remoteDirectory));
@@ -238,9 +215,9 @@ public class CommandRunner {
 		for (;;) {
 			getOutput.join(250);
 			if (!getOutput.isAlive()) break;
-			if (monitor.isCanceled()) {
-				throw new RemoteSyncException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.CommandRunner_0));
-			}
+//			if (monitor.isCanceled()) {
+//				throw new RemoteSyncException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.CommandRunner_0));
+//			}
 		}
 		//rp and getError should be finished as soon as getOutput is finished
 		int exitCode = rp.waitFor();

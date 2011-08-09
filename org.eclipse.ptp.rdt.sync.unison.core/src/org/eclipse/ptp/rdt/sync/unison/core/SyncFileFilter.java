@@ -8,7 +8,7 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.core;
+package org.eclipse.ptp.rdt.sync.unison.core;
 
 /**
  * A simple filtering interface intended for sync providers to pass to the underlying sync tool to indicate files that should not
