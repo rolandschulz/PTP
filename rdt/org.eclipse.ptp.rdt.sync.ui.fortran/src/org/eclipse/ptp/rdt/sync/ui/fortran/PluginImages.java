@@ -14,7 +14,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 
 public class PluginImages {
 	// Subdirectory (under the package containing this class) where 16 color
