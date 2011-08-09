@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.remotetools"
       label="%featureName"
-      version="5.0.1.qualifier"
+      version="5.0.2.qualifier"
       plugin="org.eclipse.ptp.remotetools.core"
       provider-name="%providerName"
       license-feature="org.eclipse.ptp.license"
