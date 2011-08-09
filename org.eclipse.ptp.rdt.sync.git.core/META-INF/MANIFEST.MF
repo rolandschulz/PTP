@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %plugin.name
 Bundle-SymbolicName: org.eclipse.ptp.rdt.sync.git.core;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rdt.sync.git.core.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -13,7 +13,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.rdt.core;bundle-version="3.1.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.ptp.rdt.sync.git.core
 Bundle-Vendor: %plugin.provider
 Bundle-Localization: plugin
 Import-Package: org.eclipse.cdt.core.model,
@@ -26,3 +25,4 @@ Import-Package: org.eclipse.cdt.core.model,
  org.eclipse.jgit.transport,
  org.eclipse.jgit.util,
  org.eclipse.jgit.util.io
+Export-Package: org.eclipse.ptp.rdt.sync.git.core;x-friends:="org.eclipse.ptp.rdt.sync.git.ui"
