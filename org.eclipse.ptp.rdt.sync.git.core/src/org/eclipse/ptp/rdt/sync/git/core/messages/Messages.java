@@ -35,7 +35,6 @@ public class Messages extends NLS {
 	public static String GitRemoteSyncConnection_getting_remote_file_status;
 	public static String GitRemoteSyncConnection_sync_local_to_remote;
 	public static String GitRemoteSyncConnection_sync_remote_to_local;
-	public static String GitRemoteSyncConnection_transport_local_to_remote0;
 	public static String GitServiceProvider_1;
 	public static String GitServiceProvider_2;
 
