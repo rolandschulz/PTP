@@ -38,7 +38,7 @@ import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
-import org.eclipse.ptp.rdt.sync.internal.core.SyncManager;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
