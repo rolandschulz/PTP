@@ -90,17 +90,17 @@ GetSimpleType(char *type)
 		return T_CHAR_PTR;
 	}
 	if (strncmp(t, "char", 4) == 0 ||
-		strncmp(t, "unsigned char", 13) == 0) ||
-		strncmp(t, "integer*1", 9) == 0) ||
-		strncmp(t, "integer(kind=3)", 15) == 0) ||
-		strncmp(t, "integer(kind=1)", 15) == 0) ||
-		strncmp(t, "character(kind=1)", 15) == 0) ||
+		strncmp(t, "unsigned char", 13) == 0 ||
+		strncmp(t, "integer*1", 9) == 0 ||
+		strncmp(t, "integer(kind=3)", 15) == 0 ||
+		strncmp(t, "integer(kind=1)", 15) == 0 ||
+		strncmp(t, "character(kind=1)", 15) == 0 ||
 		strncmp(t, "character(kind=3)", 15) == 0) {
 		return T_CHAR;
 	}
 	if (strncmp(t, "short int", 9) == 0 ||
-		strncmp(t, "int2", 4) == 0) ||
-		strncmp(t, "integer*2", 9) == 0) ||
+		strncmp(t, "int2", 4) == 0 ||
+		strncmp(t, "integer*2", 9) == 0 ||
 		strncmp(t, "integer(kind=5)", 15) == 0) {
 		return T_SHORT;
 	}
@@ -113,8 +113,8 @@ GetSimpleType(char *type)
 	if (strncmp(t, "long int", 8) == 0 ||
 		strncmp(t, "long", 4) == 0 ||
 		strncmp(t, "real*4", 6) == 0 ||
-		strncmp(t, "int8", 4) == 0) ||
-		strncmp(t, "integer(kind=7)", 15) == 0) ||
+		strncmp(t, "int8", 4) == 0 ||
+		strncmp(t, "integer(kind=7)", 15) == 0 ||
 		strncmp(t, "integer(kind=2)", 15) == 0) {
 		return T_LONG;
 	}
@@ -130,12 +130,12 @@ GetSimpleType(char *type)
 	}
 #endif /* CC_HAS_LONG_LONG */
 	if (strncmp(t, "float", 5) == 0 ||
-		strncmp(t, "real*4", 6) == 0) ||
+		strncmp(t, "real*4", 6) == 0 ||
 		strncmp(t, "real(kind=1)", 12) == 0) {
 		return T_FLOAT;
 	}
-	if (strncmp(t, "double", 6) == 0) {
-		strncmp(t, "real*8", 6) == 0) ||
+	if (strncmp(t, "double", 6) == 0 ||
+		strncmp(t, "real*8", 6) == 0 ||
 		strncmp(t, "real(kind=2)", 12) == 0) {
 		return T_DOUBLE;
 	}
@@ -143,8 +143,8 @@ GetSimpleType(char *type)
 		return T_STRING;
 	}
 	if (strncmp(t, "bool", 4) == 0 ||
-		strncmp(t, "logical4", 8) == 0) ||
-		strncmp(t, "logical*", 8) == 0) ||
+		strncmp(t, "logical4", 8) == 0 ||
+		strncmp(t, "logical*", 8) == 0 ||
 		strncmp(t, "logical(kind=", 13) == 0) {
  		return T_BOOLEAN;
  	}
