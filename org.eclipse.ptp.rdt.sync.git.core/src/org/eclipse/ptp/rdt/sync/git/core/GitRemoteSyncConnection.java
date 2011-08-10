@@ -660,17 +660,22 @@ public class GitRemoteSyncConnection {
 
 			// Then push them to the remote site.
 			try {
-				transport.push(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
-
-				// Now remotely merge changes with master branch
-				CommandResults mergeResults;
-				final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
-
-				mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
-
-				if (mergeResults.getExitCode() != 0) {
-					throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
-							+ mergeResults.getStdout()));
+				//TODO: we currently need to do this always because we don't keep track of failed commits. We first need to decide whether we want to do commits based on delta or (as currently) based on git searching modified files
+				//Than we can either keep track of deltas not transported yet or we can compare SHA-numbers (HEAD to remote-ref from last pull) to see whether something needs to be transported
+				//Than we can also get rid of this hack to check for existence of master 
+				if (git.branchList().call().size()>0) { //check whether master was already created
+					transport.push(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
+	
+					// Now remotely merge changes with master branch
+					CommandResults mergeResults;
+					final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
+	
+					mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
+	
+					if (mergeResults.getExitCode() != 0) {
+						throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
+								+ mergeResults.getStdout()));
+					}
 				}
 			} catch (final IOException e) {
 				throw new RemoteSyncException(e);
@@ -732,6 +737,12 @@ public class GitRemoteSyncConnection {
 			final MergeCommand mergeCommand = git.merge().include(masterRef);
 
 			mergeCommand.call();
+		} catch (TransportException e) {
+			if (e.getMessage().startsWith("Remote does not have ")) { //$NON-NLS-1$
+				//just means that the remote branch isn't set up yet (and thus nothing too fetch). Can be ignored.
+			} else {
+				throw new RemoteSyncException(e);
+			}
 		} catch (IOException e) {
 			throw new RemoteSyncException(e);
 		} catch (GitAPIException e) {
