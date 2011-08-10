@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name.0
 Bundle-SymbolicName: org.eclipse.ptp.rdt.sync.core;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.cdt.core,
  org.eclipse.core.runtime,
@@ -11,14 +11,12 @@ Require-Bundle: org.eclipse.cdt.core,
  org.eclipse.cdt.managedbuilder.core,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.services.core,
- org.eclipse.ui,
- org.eclipse.core.expressions
-Export-Package: org.eclipse.ptp.rdt.sync.core,
- org.eclipse.ptp.rdt.sync.core.messages,
- org.eclipse.ptp.rdt.sync.core.remotemake,
- org.eclipse.ptp.rdt.sync.core.resources,
- org.eclipse.ptp.rdt.sync.core.serviceproviders,
- org.eclipse.ptp.rdt.sync.core.services
+ org.eclipse.ui
+Export-Package: org.eclipse.ptp.rdt.sync.core;x-friends:="org.eclipse.ptp.rdt.sync.ui,org.eclipse.ptp.rdt.sync.git.core",
+ org.eclipse.ptp.rdt.sync.core.remotemake;x-friends:="org.eclipse.ptp.rdt.sync.ui",
+ org.eclipse.ptp.rdt.sync.core.resources;x-friends:="org.eclipse.ptp.rdt.sync.ui",
+ org.eclipse.ptp.rdt.sync.core.serviceproviders;x-friends:="org.eclipse.ptp.rdt.sync.git.core,org.eclipse.ptp.rdt.sync.git.ui",
+ org.eclipse.ptp.rdt.sync.core.services;x-friends:="org.eclipse.ptp.rdt.sync.git.ui"
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin
