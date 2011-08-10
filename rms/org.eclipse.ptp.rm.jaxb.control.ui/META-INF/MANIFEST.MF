@@ -27,7 +27,17 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.utils.ui;bundle-version="3.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.ptp.rm.jaxb.control.ui.launch;x-friends:="org.eclipse.ptp.rm.lml_jaxb",
+Export-Package: org.eclipse.ptp.rm.jaxb.control.ui;x-internal:=true,
+ org.eclipse.ptp.rm.jaxb.control.ui.cell;x-internal:=true,
+ org.eclipse.ptp.rm.jaxb.control.ui.dialogs;x-internal:=true,
+ org.eclipse.ptp.rm.jaxb.control.ui.handlers;x-internal:=true,
+ org.eclipse.ptp.rm.jaxb.control.ui.launch;x-friends:="org.eclipse.ptp.rm.lml_jaxb",
+ org.eclipse.ptp.rm.jaxb.control.ui.messages;x-internal:=true,
+ org.eclipse.ptp.rm.jaxb.control.ui.model;x-internal:=true,
+ org.eclipse.ptp.rm.jaxb.control.ui.providers;x-internal:=true,
+ org.eclipse.ptp.rm.jaxb.control.ui.sorters;x-internal:=true,
+ org.eclipse.ptp.rm.jaxb.control.ui.utils;x-internal:=true,
+ org.eclipse.ptp.rm.jaxb.control.ui.variables;x-internal:=true,
  org.eclipse.ptp.rm.jaxb.control.ui.wizards;x-friends:="org.eclipse.ptp.rm.lml_jaxb"
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
