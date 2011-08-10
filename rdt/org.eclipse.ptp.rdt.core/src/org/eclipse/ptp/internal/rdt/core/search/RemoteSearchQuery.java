@@ -179,7 +179,7 @@ public abstract class RemoteSearchQuery implements Serializable {
 	// Don't know if this is the right thing to do
 	private static IIndexLocationConverterFactory wrapConverter(final IIndexLocationConverter converter) {
 		return new IIndexLocationConverterFactory() {
-			@Override public IIndexLocationConverter getConverter(ICProject project) {
+			public IIndexLocationConverter getConverter(ICProject project) {
 				return converter;
 			}
 		};

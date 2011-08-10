@@ -64,10 +64,10 @@ public class LocalNavigationService implements INavigationService {
 		}
 
 		final INavigationErrorLogger logger = new INavigationErrorLogger() {
-			@Override public void logDebugMessage(String message) {
+			public void logDebugMessage(String message) {
 				RDTLog.logInfo(message);
 			}
-			@Override public void logError(String message, Throwable e) {
+			public void logError(String message, Throwable e) {
 				RDTLog.logError(e, message);
 			}
 		};

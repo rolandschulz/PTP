@@ -229,9 +229,4 @@ public class RemoteCEditor extends CEditor {
 
 		return true;
 	}
-
-	@Override
-	protected boolean isSemanticHighlightingEnabled() {		
-		return isRemote() ? false : super.isSemanticHighlightingEnabled();
-	}
 }

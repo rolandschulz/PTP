@@ -41,14 +41,12 @@ public class LocalCIndexServiceProvider extends AbstractLocalCIndexServiceProvid
 		return fNavigationService;
 	}
 	
-	@Override
 	public synchronized ISearchService getSearchService() {
 		if(fSearchService == null)
 			fSearchService = new LocalSearchService();
 		return fSearchService;
 	}
 
-	@Override
 	public synchronized IContentAssistService getContentAssistService() {
 		if(fContentAssistService == null)
 			fContentAssistService = new LocalContentAssistService();

@@ -222,7 +222,6 @@ public class NullCIndexServiceProvider extends
 	/**
 	 * @since 4.0
 	 */
-	@Override
 	public INavigationService getNavigationService() {
 		return new INavigationService() {
 
