@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="WINDOWS-1252"?>
-<jardesc>
+<?xml version="1.0" encoding="WINDOWS-1252"?><jardesc>
     <jar path="C:/remote_deploy_rdt/spawner.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/org.eclipse.ptp.rdt.core.remotejars/spawner.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
@@ -13,6 +12,6 @@
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <javaElement handleIdentifier="=org.eclipse.cdt.core/utils&lt;org.eclipse.cdt.utils.spawner"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.remote.rse.core/miners"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core/utils&lt;org.eclipse.cdt.utils.pty"/>
     </selectedElements>
-    <fatjar builder="org.eclipse.jdt.ui.plain_jar_builder" launchConfig=""/>
 </jardesc>
