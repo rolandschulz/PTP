@@ -43,7 +43,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.MultiRule;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.rdt.sync.internal.core.messages.Messages;
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.services.core.IService;
@@ -108,7 +108,7 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 		private final EnumSet<SyncFlag> fSyncFlags;
 
 		public SynchronizeJob(IResourceDelta delta, ISyncServiceProvider provider, EnumSet<SyncFlag> syncFlags) {
-			super(Messages.SyncConfigurationManager_2);
+			super(Messages.SyncManager_4);
 			fDelta = delta;
 			fSyncProvider = provider;
 			fSyncFlags = syncFlags;
@@ -125,7 +125,7 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 			try {
 				fSyncProvider.synchronize(fDelta, progress.newChild(100), fSyncFlags);
 			} catch (CoreException e) {
-				System.out.println("sync failed: " + e.getLocalizedMessage()); //$NON-NLS-1$
+				System.out.println(Messages.SyncManager_8 + e.getLocalizedMessage());
 				e.printStackTrace();
 			} finally {
 				monitor.done();
@@ -230,7 +230,7 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 		String command = event.getParameter(SYNC_COMMAND_PARAMETER_ID);
 		IProject project = getProject();
 		if (project == null) {
-			RDTSyncCorePlugin.log(Messages.SyncConfigurationManager_3);
+			RDTSyncCorePlugin.log(Messages.SyncManager_5);
 			return null;
 		}
 
@@ -288,13 +288,13 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	public void updateElement(UIElement element, @SuppressWarnings("rawtypes") Map parameters) {
 		String command = (String) parameters.get(SYNC_COMMAND_PARAMETER_ID);
 		if (command == null) {
-			RDTSyncCorePlugin.log(Messages.SyncConfigurationManager_0);
+			RDTSyncCorePlugin.log(Messages.SyncManager_6);
 			return;
 		}
 
 		IProject project = this.getProject();
 		if (project == null) {
-			RDTSyncCorePlugin.log(Messages.SyncConfigurationManager_3);
+			RDTSyncCorePlugin.log(Messages.SyncManager_5);
 			return;
 		}
 
@@ -403,7 +403,7 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 					}
 				}
 			} else {
-				RDTSyncCorePlugin.log(Messages.SyncConfigurationManager_1 + buildConfig.getName());
+				RDTSyncCorePlugin.log(Messages.SyncManager_7 + buildConfig.getName());
 			}
 
 			// Each build configuration is matched with a job, which may be null if a job could not be created.

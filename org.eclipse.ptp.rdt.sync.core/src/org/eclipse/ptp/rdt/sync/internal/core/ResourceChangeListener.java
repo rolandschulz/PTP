@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
-import org.eclipse.ptp.rdt.sync.internal.core.messages.Messages;
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SYNC_MODE;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 

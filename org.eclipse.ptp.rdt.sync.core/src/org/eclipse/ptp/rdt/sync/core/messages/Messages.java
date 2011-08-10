@@ -12,8 +12,6 @@ package org.eclipse.ptp.rdt.sync.core.messages;
 
 import org.eclipse.osgi.util.NLS;
 
-/* all new String should be added to the internal package not here 
- * This class should be removed next time API changes are allowed (or made internal and merged with internal class) */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
 
@@ -46,12 +44,24 @@ public class Messages extends NLS {
 	public static String SyncBuildServiceProvider_configDir;
 
 	public static String SyncBuildServiceProvider_name;
+ 
+	public static String SyncManager_0;
+ 
+	public static String SyncManager_1;
+ 
+	public static String SyncManager_2;
+ 
+	public static String SyncManager_3;
 
-	
-	/* following are not needed anymore but cannot be removed for API reasons */
-	public static String RCL_NoServiceConfigError;
-	
-	public static String ResourceChangeListener_jobName;
+	public static String SyncManager_4;
+
+	public static String SyncManager_5;
+
+	public static String SyncManager_6;
+
+	public static String SyncManager_7;
+
+	public static String SyncManager_8;
 	
 	static {
 		initializeMessages(BUNDLE_NAME, Messages.class);
