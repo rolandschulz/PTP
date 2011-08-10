@@ -74,7 +74,9 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 		connMgr = fRemoteServices.getConnectionManager();
 		assertNotNull(connMgr);
 
-		fRemoteConnection = connMgr.newConnection("test_connection"); //$NON-NLS-1$
+		//TODO: understand why it is causes problem when all connections are called the same. Should be fine because 
+		// connections are deleted. There seems to be a problem in RemoteTools with creating a new connection with the same name
+		fRemoteConnection = connMgr.newConnection("test_connection"+n); //$NON-NLS-1$  
 
 		assertNotNull(fRemoteConnection);
 		fRemoteConnection.setAddress(test.host);
