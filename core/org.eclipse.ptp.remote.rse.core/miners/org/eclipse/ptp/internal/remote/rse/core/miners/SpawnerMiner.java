@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,29 +10,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote.rse.core.miners;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.cdt.utils.spawner.ProcessFactory;
-import org.eclipse.cdt.utils.spawner.Spawner;
 import org.eclipse.dstore.core.miners.Miner;
 import org.eclipse.dstore.core.model.DE;
 import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStoreResources;
 import org.eclipse.dstore.core.model.DataStoreSchema;
-import org.eclipse.rse.dstore.universal.miners.CommandMiner;
 import org.eclipse.rse.dstore.universal.miners.UniversalServerUtilities;
 import org.eclipse.rse.internal.dstore.universal.miners.command.patterns.Patterns;
 
@@ -40,7 +28,9 @@ import org.eclipse.rse.internal.dstore.universal.miners.command.patterns.Pattern
  * @author crecoskie
  *
  */
+@SuppressWarnings("restriction")
 public class SpawnerMiner extends Miner {
+	public static final String SPAWN_ERROR = "spawnError"; //$NON-NLS-1$
 	
     public class CommandMinerDescriptors
     {
@@ -103,45 +93,6 @@ public class SpawnerMiner extends Miner {
         }
     }
 
-	private final class WaitThread extends Thread {
-		private final Process process;
-
-		private boolean fIsDone = false;
-		
-		private WaitThread(Process process) {
-			this.process = process;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.lang.Thread#run()
-		 */
-		@Override
-		public void run() {
-			try {
-				while (!isDone()) {
-					try {
-						process.waitFor();
-						setDone(true);
-					} catch (InterruptedException e) {
-						// swallow
-					}
-
-				}
-			} finally {
-				setDone(true);
-			}
-
-		}
-		
-		private synchronized void setDone(boolean value) {
-			fIsDone = value;
-		}
-		
-		public synchronized boolean isDone() {
-			return fIsDone;
-		}
-	}
-
 	public static final String C_SPAWN_REDIRECTED = "C_SPAWN_REDIRECTED"; //$NON-NLS-1$
 	public static final String C_SPAWN_NOT_REDIRECTED = "C_SPAWN_NOT_REDIRECTED"; //$NON-NLS-1$
 	public static final String C_SPAWN_TTY = "C_SPAWN_TTY"; //$NON-NLS-1$
@@ -155,7 +106,6 @@ public class SpawnerMiner extends Miner {
 	private DataElement _status;
 	private Map<DataElement, Process> fProcessMap = new HashMap<DataElement, Process>();
 	public boolean _supportsCharConversion = true;
-	@SuppressWarnings("restriction")
 	private Patterns _patterns;
 	
 	
@@ -164,7 +114,7 @@ public class SpawnerMiner extends Miner {
 	 */
 	@Override
 	public String getVersion() {
-		return "0.0.1";  //$NON-NLS-1$
+		return "0.0.2";  //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -252,35 +202,19 @@ public class SpawnerMiner extends Miner {
 			synchronized(this) {
 				fProcessMap.put(status, process);
 			}
-
-			
-//			InputStream stdout = process.getInputStream();
-//			StringBuilder sb = new StringBuilder();
-//			String line;
-//
-//			BufferedReader reader = new BufferedReader(new InputStreamReader(stdout, "UTF-8")); //$NON-NLS-1$
-//			while ((line = reader.readLine()) != null) {
-//				sb.append(line).append("\n"); //$NON-NLS-1$
-//			}
-//
-//			System.out.print(sb.toString());
 			
 			CommandMinerThread newCommand = new CommandMinerThread(subject, process, cmd, dir.getAbsolutePath(), status, getPatterns(), fDescriptors);
 			newCommand.start();
-			
-//			boolean done = false;
-//			while(!done) {
-//				try {
-//					newCommand.join();
-//					done = true;
-//				} catch (InterruptedException e) {
-//					// swallow
-//				}
-//			}
-			
-					
+								
 		} catch (IOException e) {
+			// report the error to the client so that it should show up in their console
+			_dataStore.createObject(status, SPAWN_ERROR, cmd, ""); //$NON-NLS-1$
+			refreshStatus();
+									
+			// tell the client that the operation is done (even though unsuccessful)
 			statusDone(status);
+			
+			// log to the server log
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 		}
 		
@@ -351,7 +285,6 @@ public class SpawnerMiner extends Miner {
 		_dataStore.refresh(_status);
 	}
 	
-	@SuppressWarnings("restriction")
 	private Patterns getPatterns()
 	{
 		if (_patterns == null)
