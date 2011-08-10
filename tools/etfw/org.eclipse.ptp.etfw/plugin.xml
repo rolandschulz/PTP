@@ -5,23 +5,11 @@
    <extension-point id="workflows" name="Performance Workflow Definitions" schema="schema/workflows.exsd"/>
    <extension-point id="configurationTabs" name="Performance Configuration Tabs" schema="schema/configurationTabs.exsd"/>
    <extension
-         point="org.eclipse.debug.core.launchConfigurationTypes">
-         <launchConfigurationType
-			name="Performance Analysis"
-			delegate="org.eclipse.ptp.etfw.internal.ToolLaunchConfigurationDelegate"
-			sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
-			sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer"
-			modes="profile"
-			public="true"
-			id="org.eclipse.ptp.etfw.tau.performance.performancelaunch">
-		</launchConfigurationType>
-   </extension>
-   <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
             class="org.eclipse.ptp.etfw.ui.ToolLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.tau.performance.launchConfigurationTabGroup"
-            type="org.eclipse.ptp.etfw.tau.performance.performancelaunch">
+            type="org.eclipse.cdt.launch.applicationLaunchType">
          <launchMode
                description="Build C, C++ or Fortran applications with performance analysis tools.  Launch as sequential programs or use the command line for parallel execution."
                mode="profile"/>
@@ -61,4 +49,14 @@
        <actionSet id="org.eclipse.debug.ui.profileActionSet"/>
     </perspectiveExtension>
    </extension>
+ <extension
+       point="org.eclipse.debug.core.launchDelegates">
+    <launchDelegate
+          delegate="org.eclipse.ptp.etfw.internal.ToolLaunchConfigurationDelegate"
+          id="org.eclipse.ptp.etfw.tau.performance.performancelaunch"
+          modes="profile"
+          name="Performance Analysis"
+          type="org.eclipse.cdt.launch.applicationLaunchType">
+    </launchDelegate>
+ </extension>
 </plugin>

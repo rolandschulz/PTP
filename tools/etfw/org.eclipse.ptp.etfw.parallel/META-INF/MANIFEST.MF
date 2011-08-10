@@ -2,13 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %fragmentName.parallel
 Bundle-SymbolicName: org.eclipse.ptp.etfw.parallel;singleton:=true
-Bundle-Version: 1.0.1.qualifier
+Bundle-Version: 2.0.0.qualifier
 Fragment-Host: org.eclipse.ptp.etfw;bundle-version="1.0.0"
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ptp.core,
  org.eclipse.ptp.launch,
  org.eclipse.ptp.debug.core,
  org.eclipse.ptp.remote.core
-Export-Package: org.eclipse.ptp.etfw.parallel
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

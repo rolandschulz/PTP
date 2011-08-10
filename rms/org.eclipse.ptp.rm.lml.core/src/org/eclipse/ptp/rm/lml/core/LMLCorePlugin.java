@@ -21,7 +21,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.core;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.MissingResourceException;
@@ -35,18 +34,11 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.eclipse.core.resources.ISaveContext;
-import org.eclipse.core.resources.ISaveParticipant;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.lml.core.messages.Messages;
 import org.eclipse.ptp.rm.lml.core.util.DebugUtil;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.xml.sax.SAXException;
 
@@ -193,56 +185,6 @@ public class LMLCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Locate the fragment for our architecture. This should really be phased
-	 * out, since there is now no guarantee that there will be local executables
-	 * for the proxy server or debugger.
-	 * 
-	 * @param fragment
-	 * @param file
-	 * @return path to "bin" directory in fragment
-	 */
-	public String locateFragmentFile(String fragment, String file) {
-		final Bundle[] frags = Platform.getFragments(Platform.getBundle(LMLCorePlugin.PLUGIN_ID));
-
-		if (frags != null) {
-			final String os = Platform.getOS();
-			final String arch = Platform.getOSArch();
-			final String frag_os_arch = fragment + "." + os + "." + arch; //$NON-NLS-1$ //$NON-NLS-2$
-
-			for (final Bundle frag : frags) {
-				final URL path = frag.getEntry("/"); //$NON-NLS-1$
-				try {
-					final URL local_path = FileLocator.toFileURL(path);
-					final String str_path = local_path.getPath();
-
-					/*
-					 * Check each fragment that matches our os and arch for a
-					 * bin directory.
-					 */
-
-					final int idx = str_path.indexOf(frag_os_arch);
-					if (idx > 0) {
-						/*
-						 * found it! This is the right fragment for our OS &
-						 * arch
-						 */
-						final String file_path = str_path + "bin/" + file; //$NON-NLS-1$
-						final File f = new File(file_path);
-						if (f.exists()) {
-							return file_path;
-						}
-					}
-
-				} catch (final Exception e) {
-				}
-			}
-		}
-
-		/* guess we never found it.... */
-		return null;
-	}
-
-	/**
 	 * This method is called upon plug-in activation
 	 */
 	@Override
@@ -250,20 +192,6 @@ public class LMLCorePlugin extends Plugin {
 		super.start(context);
 		createUnmarshaller();
 		DebugUtil.configurePluginDebugOptions();
-		ResourcesPlugin.getWorkspace().addSaveParticipant(getUniqueIdentifier(), new ISaveParticipant() {
-			public void doneSaving(ISaveContext saveContext) {
-			}
-
-			public void prepareToSave(ISaveContext saveContext) throws CoreException {
-			}
-
-			public void rollback(ISaveContext saveContext) {
-			}
-
-			public void saving(ISaveContext saveContext) throws CoreException {
-				Preferences.savePreferences(getUniqueIdentifier());
-			}
-		});
 	}
 
 	/**
@@ -273,7 +201,6 @@ public class LMLCorePlugin extends Plugin {
 	public void stop(BundleContext context) throws Exception {
 		try {
 			Preferences.savePreferences(getUniqueIdentifier());
-			ResourcesPlugin.getWorkspace().removeSaveParticipant(getUniqueIdentifier());
 		} finally {
 			super.stop(context);
 			fPlugin = null;

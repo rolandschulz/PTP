@@ -17,8 +17,7 @@ import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
-import org.eclipse.ptp.rm.lml.core.events.ISelectedObjectChangeEvent;
-import org.eclipse.ptp.rm.lml.core.events.ITableColumnChangeEvent;
+import org.eclipse.ptp.rm.lml.core.events.ISelectObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
@@ -75,14 +74,10 @@ public class NodesView extends ViewPart {
 			}
 		}
 
-		public void handleEvent(ISelectedObjectChangeEvent event) {
+		public void handleEvent(ISelectObjectEvent event) {
 			if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
 				fLguiItem.getObjectStatus().mouseOver(event.getOid());
 			}
-		}
-
-		public void handleEvent(ITableColumnChangeEvent e) {
-
 		}
 
 		public void handleEvent(ITableSortedEvent e) {

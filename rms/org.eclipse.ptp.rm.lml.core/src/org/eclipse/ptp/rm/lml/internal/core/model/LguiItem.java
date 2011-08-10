@@ -53,13 +53,11 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiUpdatedEvent;
-import org.eclipse.ui.IMemento;
 
 /**
  * Class of the interface ILguiItem
  */
 public class LguiItem implements ILguiItem {
-	private static final String LAYOUT = "layout";//$NON-NLS-1$
 
 	/*
 	 * Source of the XML-file from which the LguiType was generated.
@@ -89,6 +87,8 @@ public class LguiItem implements ILguiItem {
 			.synchronizedMap(new TreeMap<String, JobStatusData>());
 
 	private static String lmlNamespace = "http://www.llview.de"; //$NON-NLS-1$
+
+	//	private static final String LAYOUT = "layout";//$NON-NLS-1$
 
 	/**
 	 * Constructor with LML-model as argument
@@ -299,7 +299,11 @@ public class LguiItem implements ILguiItem {
 	}
 
 	public boolean isEmpty() {
-		return getTableHandler().getTables().get(0).getRow().size() == 0;
+		final TableHandler handler = getTableHandler();
+		if (handler != null) {
+			return handler.getTables().get(0).getRow().size() == 0;
+		}
+		return true;
 	}
 
 	/*
@@ -323,14 +327,36 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	public void reloadLastLayout(IMemento memento) {
-		final StringBuilder layout = new StringBuilder();
-		LguiType lguiType = null;
-		if (memento != null) {
-			final IMemento child = memento.getChild(LAYOUT);
-			layout.append(child.getID());
-		}
+	// public void reloadLastLayout(IMemento memento) {
+	// final StringBuilder layout = new StringBuilder();
+	//
+	// if (memento != null) {
+	// final IMemento child = memento.getChild(LAYOUT);
+	// layout.append(child.getID());
+	// }
+	// LguiType lguiType = null;
+	// if (layout.length() > 0) {
+	// try {
+	// lguiType = parseLML(layout.toString());
+	// } catch (final JAXBException e) {
+	// LMLCorePlugin.log(e);
+	// }
+	// }
+	// if (lguiType != null) {
+	// for (final JAXBElement<?> tag : lguiType
+	// .getObjectsAndRelationsAndInformation()) {
+	// if (tag.getValue() instanceof ComponentlayoutType) {
+	// lgui = lguiType;
+	// if (listeners.isEmpty()) {
+	// createLguiHandlers();
+	// }
+	// }
+	// }
+	// }
+	// }
 
+	public void reloadLastLayout(StringBuilder layout) {
+		LguiType lguiType = null;
 		if (layout.length() > 0) {
 			try {
 				lguiType = parseLML(layout.toString());
@@ -392,10 +418,8 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	public void saveCurrentLayout(IMemento memento) {
-		if (memento == null) {
-			return;
-		}
+	public String saveCurrentLayout() {
+
 		final StringWriter writer = new StringWriter();
 		LguiType layoutLgui = null;
 		if (lgui == null) {
@@ -427,9 +451,47 @@ public class LguiItem implements ILguiItem {
 		} catch (final JAXBException e) {
 			LMLCorePlugin.log(e);
 		}
-		final IMemento layoutMemento = memento.createChild(LAYOUT, writer
-				.getBuffer().toString());
+		return writer.getBuffer().toString();
 	}
+
+	// public void saveCurrentLayout(IMemento memento) {
+	// if (memento == null) {
+	// return;
+	// }
+	// final StringWriter writer = new StringWriter();
+	// LguiType layoutLgui = null;
+	// if (lgui == null) {
+	// layoutLgui = firstRequest();
+	// } else {
+	// layoutLgui = getLayoutAccess().getLayoutFromModel();
+	// }
+	// final Marshaller marshaller = LMLCorePlugin.getDefault()
+	// .getMarshaller();
+	// try {
+	// marshaller.setProperty(
+	//					"jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
+	// marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+	// Boolean.TRUE);
+	//			final QName tagname = new QName(lmlNamespace, "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$
+	//
+	// final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(
+	// tagname, LguiType.class, layoutLgui);
+	// /*
+	// * Synchronize to avoid the dreaded
+	// * "FWK005 parse may not be called while parsing" message
+	// */
+	// synchronized (LguiItem.class) {
+	// marshaller.marshal(rootElement, writer);
+	//
+	// }
+	// } catch (final PropertyException e) {
+	// LMLCorePlugin.log(e);
+	// } catch (final JAXBException e) {
+	// LMLCorePlugin.log(e);
+	// }
+	// final IMemento layoutMemento = memento.createChild(LAYOUT, writer
+	// .getBuffer().toString());
+	// }
 
 	/*
 	 * (non-Javadoc)

@@ -30,9 +30,10 @@ import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 
 /**
  * Launches sequential C/C++ (or Fortran) applications after rebuilding them with performance tool instrumentation
+ * @since 4.1
  */
 @SuppressWarnings("restriction")
-class ToolLaunchConfigurationDelegate extends LocalRunLaunchDelegate implements IToolLaunchConfigurationConstants{
+public class ToolLaunchConfigurationDelegate extends LocalRunLaunchDelegate implements IToolLaunchConfigurationConstants{
 	
 	private boolean initialized=false;
 	
@@ -75,5 +76,9 @@ class ToolLaunchConfigurationDelegate extends LocalRunLaunchDelegate implements 
 		
 		}finally{initialized=false;}
 		
+	}
+	
+	public String getPluginID() {
+		return org.eclipse.ptp.etfw.Activator.PLUGIN_ID;
 	}
 }

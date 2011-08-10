@@ -28,5 +28,17 @@
             name="TAU Configuration">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabs">
+      <tab
+            class="org.eclipse.ptp.etfw.tau.TAUAnalysisTab"
+            group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
+            id="org.eclipse.ptp.etfw.tau.TAUANalysisTab"
+            name="TAU">
+         <placement
+               after="org.eclipse.ptp.etfw.parallelToolSelectionTab">
+         </placement>
+      </tab>
+   </extension>
 
 </plugin>

@@ -2,26 +2,87 @@
 <?eclipse version="3.2"?>
 <fragment>
    <extension
-         point="org.eclipse.debug.core.launchConfigurationTypes">
-         <launchConfigurationType
-			name="Parallel Performance Analysis"
-			delegate="org.eclipse.ptp.etfw.parallel.ParallelToolLaunchConfigurationDelegate"
-			sourceLocatorId="org.eclipse.ptp.debug.core.sourceLocator"
-			sourcePathComputerId="org.eclipse.ptp.debug.core.sourcePathComputer"
-			modes="profile"
-			public="true"
-			id="org.eclipse.ptp.etfw.performancelaunch.parallel">
-		</launchConfigurationType>
-   </extension>
-   <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
             class="org.eclipse.ptp.etfw.parallel.ParallelToolLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.etfw.launchConfigurationTabGroup.parallel"
-            type="org.eclipse.ptp.etfw.performancelaunch.parallel">
+            id="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
+            type="org.eclipse.ptp.launch.parallelLaunch">
          <launchMode
                description="Build C, C++ or Fortran applications with performance analysis tools.  Launch parallel programs from within Eclipse via the PTP."
                mode="profile"/>
       </launchConfigurationTabGroup>
    </extension>
+   <extension
+         point="org.eclipse.debug.core.launchDelegates">
+      <launchDelegate
+            delegate="org.eclipse.ptp.etfw.parallel.ParallelToolLaunchConfigurationDelegate"
+            id="org.eclipse.ptp.etfw.parallelLaunch"
+            modes="profile"
+            name="Profile Parallel Application"
+            type="org.eclipse.ptp.launch.parallelLaunch">
+      </launchDelegate>
+   </extension>
+      <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabs">
+      <tab
+            class="org.eclipse.ptp.launch.ui.ResourcesTab"
+            group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
+            id="org.eclipse.ptp.etfw.resourcesTab"
+            name="%ResourcesLaunchTab.name">
+      </tab>
+      <tab
+            class="org.eclipse.ptp.etfw.parallel.ParallelToolRecompMainTab"
+            group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
+            id="org.eclipse.ptp.etfw.applicationTab"
+            name="%ApplicationLaunchTab.name">
+         <placement
+               after="org.eclipse.ptp.launch.applicationLaunch.resourcesTab">
+         </placement>
+      </tab>
+      <tab
+            class="org.eclipse.ptp.launch.ui.ArgumentsTab"
+            group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
+            id="org.eclipse.ptp.etfw.argumentsTab"
+            name="%ArgumentsLaunchTab.name">
+         <placement
+               after="org.eclipse.ptp.launch.applicationLaunch.applicationTab">
+         </placement>
+      </tab>
+      <tab
+            class="org.eclipse.ptp.launch.ui.EnvironmentTab"
+            group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
+            id="org.eclipse.ptp.etfw.environmentTab"
+            name="%EnvironmentLaunchTab.name">
+         <placement
+               after="org.eclipse.ptp.launch.applicationLaunch.argumentsTab">
+         </placement>
+      </tab>
+      <tab
+            class="org.eclipse.ptp.etfw.parallel.internal.ParallelToolSelectionTab"
+            group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
+            id="org.eclipse.ptp.etfw.parallelToolSelectionTab"
+   			name="%ExternalLaunchTab.name">
+         <placement
+               after="org.eclipse.ptp.launch.applicationLaunch.environmentTab">
+         </placement>
+      </tab>
+      <tab
+    		class="org.eclipse.ptp.etfw.parallel.internal.ParallelParameterTab"
+            group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
+            id="org.eclipse.ptp.etfw.parametricParameterTab"
+          	name="%ParametricLaunchTab.name">
+         <placement
+               after="org.eclipse.ptp.etfw.parallelToolSelectionTab">
+         </placement>
+      </tab>
+      <tab
+            class="org.eclipse.debug.ui.CommonTab"
+            group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
+            id="org.eclipse.ptp.etfw.commonTab"
+            name="%CommonLaunchTab.name">
+         <placement
+               after="org.eclipse.ptp.etfw.parametricParameterTab">
+         </placement>
+      </tab>
+   </extension>	
 </fragment>

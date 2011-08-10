@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.eclipse.cdt.launch.ui.CArgumentsTab;
-import org.eclipse.cdt.launch.ui.CDebuggerTab;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.EnvironmentTab;
@@ -42,20 +41,21 @@ public class ToolLaunchConfigurationTabGroup extends
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		
 		ArrayList<AbstractToolConfigurationTab> perfTabs=Activator.getPerfTabs();
-		ILaunchConfigurationTab tabs[]=new ILaunchConfigurationTab[8+perfTabs.size()];
+		ILaunchConfigurationTab tabs[]=new ILaunchConfigurationTab[7+perfTabs.size()];
 		tabs[0]=new ToolRecompMainTab(true);
-		tabs[1]=new CDebuggerTab(false);
-		tabs[2]=new CArgumentsTab();
-		tabs[3]=new EnvironmentTab();
-		tabs[4]=new SourceLookupTab();
-		tabs[5]=new CommonTab();
-		tabs[6]=new ExternalToolSelectionTab(true);
-		tabs[7]=new ParametricParameterTab(false);
+		//tabs[1]=new CDebuggerTab(false);
+		tabs[1]=new CArgumentsTab();
+		tabs[2]=new EnvironmentTab();
+		tabs[3]=new SourceLookupTab();
+		tabs[4]=new CommonTab();
+		tabs[5]=new ExternalToolSelectionTab(true);
+		tabs[6]=new ParametricParameterTab(false);
 		Iterator<AbstractToolConfigurationTab> perfIt=perfTabs.iterator();
-		int tabDex=8;
+		int tabDex=7;
 		while(perfIt.hasNext())
 		{
 			tabs[tabDex]=perfIt.next();
+			tabDex++;
 		}
 		
 //		ILaunchConfigurationTab tabs[] = {
