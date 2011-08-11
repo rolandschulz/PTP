@@ -2,18 +2,18 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.pldt.openmp.analysis; singleton:=true
-Bundle-Version: 4.1.0.qualifier
+Bundle-Version: 6.0.0.qualifier
 Bundle-ClassPath: .
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.pldt.openmp.analysis,
- org.eclipse.ptp.pldt.openmp.analysis.PAST,
- org.eclipse.ptp.pldt.openmp.analysis.dictionary,
- org.eclipse.ptp.pldt.openmp.analysis.ompcfg,
- org.eclipse.ptp.pldt.openmp.analysis.ompcfg.factory,
- org.eclipse.ptp.pldt.openmp.analysis.parser,
- org.eclipse.ptp.pldt.openmp.analysis.textview,
- org.eclipse.ptp.pldt.openmp.analysis.internal.core;x-internal:=true
+Export-Package: org.eclipse.ptp.pldt.openmp.analysis;x-friends:="org.eclipse.ptp.pldt.wizards,org.eclipse.ptp.pldt.openmp.core",
+ org.eclipse.ptp.pldt.openmp.analysis.PAST;x-internal:=true,
+ org.eclipse.ptp.pldt.openmp.analysis.dictionary;x-internal:=true,
+ org.eclipse.ptp.pldt.openmp.analysis.internal.core;x-internal:=true,
+ org.eclipse.ptp.pldt.openmp.analysis.ompcfg;x-internal:=true,
+ org.eclipse.ptp.pldt.openmp.analysis.ompcfg.factory;x-internal:=true,
+ org.eclipse.ptp.pldt.openmp.analysis.parser;x-internal:=true,
+ org.eclipse.ptp.pldt.openmp.analysis.textview;x-internal:=true
 Require-Bundle: org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.cdt.core,

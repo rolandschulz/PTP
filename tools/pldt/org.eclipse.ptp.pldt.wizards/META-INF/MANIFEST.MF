@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.pldt.wizards;singleton:=true
-Bundle-Version: 5.0.0.qualifier
+Bundle-Version: 6.0.0.qualifier
 Bundle-ClassPath: .
 Bundle-Activator: org.eclipse.ptp.pldt.wizards.MpiWizardsPlugin
 Bundle-Vendor: %pluginProvider
@@ -20,6 +20,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.cdt.ui.wizards,
  org.eclipse.ui.wizards.newresource
-Export-Package: org.eclipse.ptp.pldt.wizards,
- org.eclipse.ptp.pldt.wizards.wizardPages
+Export-Package: org.eclipse.ptp.pldt.wizards;x-internal:=true,
+ org.eclipse.ptp.pldt.wizards.messages;x-internal:=true,
+ org.eclipse.ptp.pldt.wizards.wizardPages;x-internal:=true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
