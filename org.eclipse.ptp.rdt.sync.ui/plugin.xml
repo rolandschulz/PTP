@@ -99,8 +99,7 @@
               <contentExtension pattern="org.eclipse.ptp.rdt.sync.ui.navigator.content"/>
           </includes>
        </viewerContentBinding>
-   </extension>
-   
+   </extension> 
      <extension
            point="org.eclipse.cdt.managedbuilder.ui.newWizardPages">
         <wizardPage
@@ -125,4 +124,95 @@
 		</filter>
         </page>
      </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.ptp.rdt.sync.core.SyncManager"
+            id="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+            name="Sync Operations">
+         <commandParameter
+               id="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+               name="Sync Mode"
+               optional="false">
+         </commandParameter>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="true"
+            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu">
+         <menu
+               label="Synchronization">
+            <command
+                  commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                  label="Auto-Sync"
+                  style="toggle">
+               <parameter
+                     name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                     value="sync_auto">
+               </parameter>
+            </command>
+            <menu
+                  label="Project Auto-Sync Settings">
+               <command
+                     commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                     label="Sync Active"
+                     style="radio">
+                  <parameter
+                        name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                        value="set_active">
+                  </parameter>
+               </command>
+               <command
+                     commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                     label="Sync All"
+                     style="radio">
+                  <parameter
+                        name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                        value="set_all">
+                  </parameter>
+               </command>
+               <command
+                     commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                     label="Sync None"
+                     style="radio">
+                  <parameter
+                        name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                        value="set_none">
+                  </parameter>
+               </command>
+            </menu>
+            <command
+                  commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                  label="Sync Active Now"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                     value="sync_active">
+               </parameter>
+            </command>
+            <command
+                  commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                  label="Sync All Now"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                     value="sync_all">
+               </parameter>
+            </command>
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <test
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </menu>
+      </menuContribution>
+   </extension>
 </plugin>
