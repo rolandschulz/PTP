@@ -128,10 +128,10 @@
          point="org.eclipse.ui.commands">
       <command
             defaultHandler="org.eclipse.ptp.rdt.sync.core.SyncManager"
-            id="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+            id="org.eclipse.ptp.rdt.sync.core.SyncCommand"
             name="Sync Operations">
          <commandParameter
-               id="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+               id="org.eclipse.ptp.rdt.sync.core.syncCommand.syncModeParameter"
                name="Sync Mode"
                optional="false">
          </commandParameter>
@@ -145,59 +145,59 @@
          <menu
                label="Synchronization">
             <command
-                  commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                  commandId="org.eclipse.ptp.rdt.sync.core.SyncCommand"
                   label="Auto-Sync"
                   style="toggle">
                <parameter
-                     name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                     name="org.eclipse.ptp.rdt.sync.core.syncCommand.syncModeParameter"
                      value="sync_auto">
                </parameter>
             </command>
             <menu
                   label="Project Auto-Sync Settings">
                <command
-                     commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                     commandId="org.eclipse.ptp.rdt.sync.core.SyncCommand"
                      label="Sync Active"
                      style="radio">
                   <parameter
-                        name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                        name="org.eclipse.ptp.rdt.sync.core.syncCommand.syncModeParameter"
                         value="set_active">
                   </parameter>
                </command>
                <command
-                     commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                     commandId="org.eclipse.ptp.rdt.sync.core.SyncCommand"
                      label="Sync All"
                      style="radio">
                   <parameter
-                        name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                        name="org.eclipse.ptp.rdt.sync.core.syncCommand.syncModeParameter"
                         value="set_all">
                   </parameter>
                </command>
                <command
-                     commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                     commandId="org.eclipse.ptp.rdt.sync.core.SyncCommand"
                      label="Sync None"
                      style="radio">
                   <parameter
-                        name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                        name="org.eclipse.ptp.rdt.sync.core.syncCommand.syncModeParameter"
                         value="set_none">
                   </parameter>
                </command>
             </menu>
             <command
-                  commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                  commandId="org.eclipse.ptp.rdt.sync.core.SyncCommand"
                   label="Sync Active Now"
                   style="push">
                <parameter
-                     name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                     name="org.eclipse.ptp.rdt.sync.core.syncCommand.syncModeParameter"
                      value="sync_active">
                </parameter>
             </command>
             <command
-                  commandId="org.eclipse.ptp.internal.rdt.sync.core.SyncCommand"
+                  commandId="org.eclipse.ptp.rdt.sync.core.SyncCommand"
                   label="Sync All Now"
                   style="push">
                <parameter
-                     name="org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"
+                     name="org.eclipse.ptp.rdt.sync.core.syncCommand.syncModeParameter"
                      value="sync_all">
                </parameter>
             </command>
