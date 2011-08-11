@@ -2,17 +2,18 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.pldt.mpi.core; singleton:=true
-Bundle-Version: 5.0.0.qualifier
+Bundle-Version: 6.0.0.qualifier
 Bundle-ClassPath: .
 Bundle-Activator: org.eclipse.ptp.pldt.mpi.core.MpiPlugin
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.pldt.mpi.core,
- org.eclipse.ptp.pldt.mpi.core.actions,
- org.eclipse.ptp.pldt.mpi.core.analysis,
- org.eclipse.ptp.pldt.mpi.core.editorHelp,
- org.eclipse.ptp.pldt.mpi.core.prefs,
- org.eclipse.ptp.pldt.mpi.core.views,
+Export-Package: org.eclipse.ptp.pldt.mpi.core;x-friends:="org.eclipse.ptp.pldt.mpi.analysis,org.eclipse.ptp.pldt.mpi.analysis.cdt",
+ org.eclipse.ptp.pldt.mpi.core.actions;x-internal:=true,
+ org.eclipse.ptp.pldt.mpi.core.analysis;x-internal:=true,
+ org.eclipse.ptp.pldt.mpi.core.editorHelp;x-internal:=true,
+ org.eclipse.ptp.pldt.mpi.core.messages;x-internal:=true,
+ org.eclipse.ptp.pldt.mpi.core.prefs;x-internal:=true,
+ org.eclipse.ptp.pldt.mpi.core.views;x-internal:=true,
  org.eclipse.ptp.pldt.mpi.internal.core;x-friends:="org.eclipse.ptp.pldt.wizards,org.eclipse.ptp.pldt.tests"
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
