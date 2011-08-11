@@ -28,7 +28,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -36,7 +38,9 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.ServiceProvider;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 
 public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider {
 	public static final String ID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
@@ -46,6 +50,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private static final String GIT_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
 	private static final String GIT_SERVICES_ID = "servicesId"; //$NON-NLS-1$
 	private static final String GIT_PROJECT_NAME = "projectName"; //$NON-NLS-1$
+	private static final String ERROR_MESSAGE_TITLE = Messages.GitServiceProvider_0;
+	private static final String ERROR_MESSAGE_TOGGLE = Messages.GitServiceProvider_3;
 	private IProject fProject = null;
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
@@ -308,14 +314,17 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 				finishedSyncTaskId = willFinishTaskId;
 			} catch (final RemoteSyncException e) {
-				this.handleRemoteSyncException(e);
+				this.handleRemoteSyncException(e, syncFlags);
 				return;
 			} catch (RemoteConnectionException e) {
-				this.handleRemoteSyncException(new RemoteSyncException(e));
+				this.handleRemoteSyncException(new RemoteSyncException(e), syncFlags);
 				return;
 			} finally {
 				syncLock.unlock();
 			}
+			
+			// Sync successful - re-enable error messages
+			SyncManager.setShowErrors(getProject(), true);
 
 			IProject project = this.getProject();
 			if (project != null) {
@@ -333,23 +342,44 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @param e
 	 *            the remote sync exception
+	 * @param syncFlags 
 	 */
-	private void handleRemoteSyncException(RemoteSyncException e) {
-		IStatus status = null;
-		int severity = e.getStatus().getSeverity();
-		String message = null;
+	private void handleRemoteSyncException(RemoteSyncException e, EnumSet<SyncFlag> syncFlags) {
+		if (!SyncManager.getShowErrors(getProject()) && syncFlags == SyncFlag.NO_FORCE) {
+			return;
+		}
+		final String message;
+		final String endOfLineChar = System.getProperty("line.separator"); //$NON-NLS-1$
 
 		// RemoteSyncException is generally used by either creating a new exception with a message describing the problem or by
 		// embedding another type of error. So we need to decide which message to use.
-		if (e.getMessage() != null || e.getCause() == null) {
-			message = e.getMessage();
+		if ((e.getMessage() != null && e.getMessage().length() > 0) || e.getCause() == null) {
+			message = Messages.GSP_SyncErrorMessage + this.getProject().getName() + ":" + endOfLineChar + endOfLineChar + e.getMessage(); //$NON-NLS-1$
 		} else {
-			message = e.getCause().getMessage();
+			message = Messages.GSP_SyncErrorMessage + this.getProject().getName() +":" + endOfLineChar + endOfLineChar + e.getCause().getMessage(); //$NON-NLS-1$
 		}
 		e.printStackTrace();
-		message = Messages.GSP_SyncErrorMessage + this.getProject().getName() + message;
-		status = new Status(severity, Activator.PLUGIN_ID, message, e);
-		StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
+		
+		// For forced sync, use the status manager and just print an error dialog
+		if (syncFlags == SyncFlag.FORCE) {
+			IStatus status = null;
+			int severity = e.getStatus().getSeverity();
+            status = new Status(severity, Activator.PLUGIN_ID, message, e);
+            StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
+		} else { // For non-forced sync, display message with toggle
+			Display errorDisplay = RDTSyncUIPlugin.getStandardDisplay();
+			errorDisplay.syncExec(new Runnable () {
+				public void run() {
+					MessageDialogWithToggle dialog = MessageDialogWithToggle.openError(null, ERROR_MESSAGE_TITLE, message,
+							ERROR_MESSAGE_TOGGLE, !SyncManager.getShowErrors(getProject()), null, null);
+					if (dialog.getToggleState()) {
+						SyncManager.setShowErrors(getProject(), false);
+					} else {
+						SyncManager.setShowErrors(getProject(), true);
+					}
+				}
+			});
+		}
 	}
 
 	// Paths that the Git sync provider can ignore.

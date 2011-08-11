@@ -73,13 +73,17 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	private static final String DEFAULT_SAVE_FILE_NAME = "SyncManagerData.xml"; //$NON-NLS-1$
 	private static final String SYNC_MANAGER_ELEMENT_NAME = "sync-manager-data"; //$NON-NLS-1$
 	private static final String SYNC_MODE_ELEMENT_NAME = "project-to-sync-mode"; //$NON-NLS-1$
+	private static final String SHOW_ERROR_ELEMENT_NAME = "project-to-show-error"; //$NON-NLS-1$
 	private static final String ATTR_PROJECT_NAME = "project"; //$NON-NLS-1$
 	private static final String ATTR_SYNC_MODE = "sync-mode"; //$NON-NLS-1$
+	private static final String ATTR_SHOW_ERROR = "show-error"; //$NON-NLS-1$
 	private static final String ATTR_AUTO_SYNC = "auto-sync"; //$NON-NLS-1$
 
 	private static boolean fSyncAuto = true;
 	private static final Map<IProject, SYNC_MODE> fProjectToSyncModeMap = Collections
 			.synchronizedMap(new HashMap<IProject, SYNC_MODE>());
+	private static final Map<IProject, Boolean> fProjectToShowErrorMap = Collections
+			.synchronizedMap(new HashMap<IProject, Boolean>());
 
 	private static final String syncActiveCommand = "sync_active"; //$NON-NLS-1$
 	private static final String syncAllCommand = "sync_all"; //$NON-NLS-1$
@@ -188,6 +192,27 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	public static boolean getSyncAuto() {
 		return fSyncAuto;
 	}
+	
+	/**
+	 * Should error messages be displayed for the given project?
+	 * 
+	 * @param project
+	 * @return whether error messages should be displayed.
+	 */
+	public static boolean getShowErrors(IProject project) {
+		if (project == null) {
+			throw new NullPointerException();
+		}
+		if (!(fProjectToShowErrorMap.containsKey(project))) {
+			fProjectToShowErrorMap.put(project, true);
+			try {
+				saveConfigurationData();
+			} catch (IOException e) {
+				RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+			}
+		}
+		return fProjectToShowErrorMap.get(project);
+	}
 
 	/**
 	 * Set sync mode for project
@@ -211,6 +236,21 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	 */
 	public static void setSyncAuto(boolean isSyncAutomatic) {
 		fSyncAuto = isSyncAutomatic;
+		try {
+			saveConfigurationData();
+		} catch (IOException e) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+		}
+	}
+	
+	/**
+	 * Set whether error messages should be displayed
+	 *
+	 * @param project
+	 * @param shouldBeDisplayed
+	 */
+	public static void setShowErrors(IProject project, boolean shouldBeDisplayed) {
+		fProjectToShowErrorMap.put(project, shouldBeDisplayed);
 		try {
 			saveConfigurationData();
 		} catch (IOException e) {
@@ -467,6 +507,15 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 			}
 		}
 		
+		// Save project to "show error" map
+		synchronized (fProjectToShowErrorMap) {
+			for (IProject project : fProjectToShowErrorMap.keySet()) {
+				IMemento showErrorMemento = rootMemento.createChild(SHOW_ERROR_ELEMENT_NAME);
+				showErrorMemento.putString(ATTR_PROJECT_NAME, project.getName());
+				showErrorMemento.putBoolean(ATTR_SHOW_ERROR, fProjectToShowErrorMap.get(project));
+			}
+		}
+		
 		// Save auto-sync setting
 		rootMemento.putBoolean(ATTR_AUTO_SYNC, fSyncAuto);
 
@@ -505,9 +554,19 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 				throw new RuntimeException(Messages.SyncManager_0 + project);
 			}
 			String syncModeString = modeMemento.getString(ATTR_SYNC_MODE);
-			SYNC_MODE syncMode = SYNC_MODE.ACTIVE;
-			syncMode = SYNC_MODE.valueOf(syncModeString);
+			SYNC_MODE syncMode = SYNC_MODE.valueOf(syncModeString);
 			fProjectToSyncModeMap.put(project, syncMode);
+		}
+		
+		// Load project "show error" settings
+		fProjectToShowErrorMap.clear();
+		for (IMemento showErrorMemento : rootMemento.getChildren(SHOW_ERROR_ELEMENT_NAME)) {
+			String projectName = showErrorMemento.getString(ATTR_PROJECT_NAME);
+			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			if (project == null) {
+				throw new RuntimeException(Messages.SyncManager_0 + project);
+			}
+			fProjectToShowErrorMap.put(project, showErrorMemento.getBoolean(ATTR_SHOW_ERROR));
 		}
 		
 		// Load auto-sync setting
