@@ -213,6 +213,10 @@
                </iterate>
             </visibleWhen>
          </menu>
+         <dynamic
+               class="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu"
+               id="org.eclipse.ptp.rdt.sync.ui.initSyncMenu">
+         </dynamic>
       </menuContribution>
    </extension>
 </plugin>
