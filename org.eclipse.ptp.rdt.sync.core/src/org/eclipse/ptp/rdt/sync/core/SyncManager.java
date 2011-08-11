@@ -69,7 +69,7 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 
 	private static final IServiceModelManager serviceModel = ServiceModelManager.getInstance();
 	private static final IService syncService = serviceModel.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-	private static final String SYNC_COMMAND_PARAMETER_ID = "org.eclipse.ptp.internal.rdt.sync.core.syncCommand.syncModeParameter"; //$NON-NLS-1$
+	private static final String SYNC_COMMAND_PARAMETER_ID = "org.eclipse.ptp.rdt.sync.core.syncCommand.syncModeParameter"; //$NON-NLS-1$
 	private static final String DEFAULT_SAVE_FILE_NAME = "SyncManagerData.xml"; //$NON-NLS-1$
 	private static final String SYNC_MANAGER_ELEMENT_NAME = "sync-manager-data"; //$NON-NLS-1$
 	private static final String SYNC_MODE_ELEMENT_NAME = "project-to-sync-mode"; //$NON-NLS-1$
