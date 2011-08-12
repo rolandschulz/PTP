@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rdt.sync.core.IRemoteSyncConnection;
-import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.rsync.core.IRemoteSyncConnection;
+import org.eclipse.ptp.rdt.sync.rsync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.rsync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.rsync.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
@@ -65,31 +65,33 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection {
 
 	public void syncLocalToRemote(IProgressMonitor monitor) throws RemoteSyncException {
 		// command to be run excluding exclusions.
-		String[] commandLtoR = { "rsync", "-avvvze", "java -cp " + getFakeSSHLocation().getPath() + " org.eclipse.ptp.rdt.sync.rsync.core.FakeSSH", localDirectory + "/",
-				connection.getAddress() + ":" + remoteDirectory };
-		ArrayList<String> cLR = new ArrayList<String>();
-
-		// load arguments from original command into ArrayList
-		for (String arg : commandLtoR) {
-			cLR.add(arg);
-		}
-
-		String[] filesToExclude = new String[getFilesToBeExcluded().size()];
-		filesToExclude = getFilesToBeExcluded().toArray(filesToExclude);
-
-		// add exclusions from filesToExclude to cLR, which then contains all arguments.
-		for (String argtoExclude : filesToExclude) {
-			cLR.add("--exclude");
-			cLR.add(argtoExclude);
-		}
-
-		// execute the command
-		String[] command = new String[cLR.size()];
-		command = cLR.toArray(command);
 
 		try {
-			executeLocalCommandWithConnection(command);
+			ServerSocket serverSocket = new ServerSocket(0);
+			int portnum = serverSocket.getLocalPort();
+			String[] commandLtoR = { "rsync", "-avvvze", "java -cp " + getFakeSSHLocation().getPath() + " org.eclipse.ptp.rdt.sync.rsync.core.FakeSSH" + " -p " + portnum, localDirectory + "/",
+					connection.getAddress() + ":" + remoteDirectory };
+			ArrayList<String> cLR = new ArrayList<String>();
 
+			// load arguments from original command into ArrayList
+			for (String arg : commandLtoR) {
+				cLR.add(arg);
+			}
+
+			String[] filesToExclude = new String[getFilesToBeExcluded().size()];
+			filesToExclude = getFilesToBeExcluded().toArray(filesToExclude);
+
+			// add exclusions from filesToExclude to cLR, which then contains all arguments.
+			for (String argtoExclude : filesToExclude) {
+				cLR.add("--exclude");
+				cLR.add(argtoExclude);
+			}
+
+			// execute the command
+			String[] command = new String[cLR.size()];
+			command = cLR.toArray(command);
+			executeLocalCommandWithConnection(command, serverSocket);
+			serverSocket.close();
 		} catch (IOException e) {
 			throw new RemoteSyncException(e);
 		} catch (InterruptedException e) {
@@ -122,11 +124,13 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection {
 		// String[] commandRtoL = {"rsync", "--ignore-existing", "-avze" ,"java -cp" + FakeSSHLocation +
 		// Integer.toString(connection.getPort()), connection.getUsername() + "@" + connection.getAddress() + ":" + remoteDirectory
 		// + "/", localDirectory};
-		String[] commandRtoL = { "rsync", "--ignore-existing", "-avvvze", "java -cp " + getFakeSSHLocation().getPath() + " org.eclipse.ptp.rdt.sync.rsync.core.FakeSSH",
-				connection.getAddress() + ":" + remoteDirectory + "/", localDirectory };
-
-		try {
-			executeLocalCommandWithConnection(commandRtoL);
+		try{
+			ServerSocket serverSocket = new ServerSocket(0);
+			int portnum = serverSocket.getLocalPort();
+			String[] commandRtoL = { "rsync", "--ignore-existing", "-avvvze", "java -cp " + getFakeSSHLocation().getPath() + " org.eclipse.ptp.rdt.sync.rsync.core.FakeSSH" + " -p " + portnum,
+					connection.getAddress() + ":" + remoteDirectory + "/", localDirectory };
+			executeLocalCommandWithConnection(commandRtoL, serverSocket);
+			serverSocket.close();
 
 		} catch (IOException e) {
 			throw new RemoteSyncException(e);
@@ -159,10 +163,9 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection {
 
 	}
 
-	public CommandResults executeLocalCommandWithConnection(String[] localCommand) throws RemoteSyncException,
+	public CommandResults executeLocalCommandWithConnection(String[] localCommand, ServerSocket serverSocket) throws RemoteSyncException,
 			InterruptedException, IOException, RemoteConnectionException {
 
-		ServerSocket serverSocket = new ServerSocket(6565); // Should be 0 (any free) and than communicated
 		Process p = Runtime.getRuntime().exec(localCommand);
 		Socket clientSocket = serverSocket.accept();
 
@@ -181,7 +184,6 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection {
 				socketOutput, null);
 
 		p.waitFor();
-		serverSocket.close();
 		clientSocket.close();
 		return commandResults;
 	}

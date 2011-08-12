@@ -1,5 +1,9 @@
 package org.eclipse.ptp.rdt.sync.rsync.core;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -11,13 +15,30 @@ public class FakeSSH {
 	 */
 	public static void main(String[] args) {
 		String cmd = "";
-		for (int i = 1; i < args.length; i++) { // not adding the first argument
+		int portnum = Integer.parseInt(args[1]);
+		
+
+		for (int i = 3; i < args.length; i++){ // not adding the first argument
 												// because it is the host
+			
 			cmd += args[i] + " ";
+			
 		}
+
 		cmd += "\n";
+		File fakesshfile = new File("/home/lnj/TestSSH/fakesshout");
+        try {
+			fakesshfile.createNewFile();
+	        BufferedWriter out = new BufferedWriter(new FileWriter("/home/lnj/TestSSH/fakesshout", true));
+	        out.write(portnum + "\n");
+	        out.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		try {
-			Socket socket = new Socket("localhost", 6565);
+			Socket socket = new Socket("localhost", portnum);
 
 			OutputStream outputStream = socket.getOutputStream();
 			InputStream inputStream = socket.getInputStream();
