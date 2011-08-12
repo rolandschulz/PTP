@@ -164,6 +164,8 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	private static final String LAYOUT = "layout";//$NON-NLS-1$
 
+	private static final String LAYOUT_STRING = "layoutString";//$NON-NLS-1$
+
 	private static final String JOB_ID_ATTR = "job_id";//$NON-NLS-1$
 
 	private static final String RM_ID_ATTR = "rm_id";//$NON-NLS-1$
@@ -287,8 +289,8 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 					.getUserJobs(getResourceManager().getUniqueName());
 
 			if (layout != null) {
-				final IMemento layoutMemento = memento.createChild(LAYOUT,
-						layout);
+				final IMemento layoutMemento = memento.createChild(LAYOUT);
+				layoutMemento.putString(LAYOUT_STRING, layout);
 			}
 
 			if (jobs != null && jobs.length > 0) {
@@ -304,10 +306,12 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		fLMLManager.closeLgui(getResourceManager().getUniqueName());
 
 		final StringWriter writer = new StringWriter();
-		try {
-			memento.save(writer);
-		} catch (final IOException t) {
-			throw CoreExceptionUtils.newException(t.getMessage(), t);
+		if (memento != null) {
+			try {
+				memento.save(writer);
+			} catch (final IOException t) {
+				throw CoreExceptionUtils.newException(t.getMessage(), t);
+			}
 		}
 
 		/*
@@ -344,12 +348,10 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 		if (memento != null) {
 			final IMemento child = memento.getChild(LAYOUT);
-			layout.append(child.getID());
+			layout.append(child.getString(LAYOUT_STRING));
 
 			jobs = reload(memento);
 		}
-
-		// TODO jobs from memento
 
 		/*
 		 * Initialize LML classes
