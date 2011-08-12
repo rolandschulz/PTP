@@ -47,9 +47,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.net.SocketException;
 
 /** Thread to copy from an input stream to an output stream. */
-/** This code was copied from org.eclipse.jgit.util.io.StreamCopyThread */
 public class StreamCopyThread extends Thread {
 	private static final int BUFFER_SIZE = 1024;
 
@@ -59,9 +59,11 @@ public class StreamCopyThread extends Thread {
 
 	private volatile boolean done;
 
+	private final boolean flushAllWrites;
+
 	/**
 	 * Create a thread to copy data from an input stream to an output stream.
-	 *
+	 * 
 	 * @param i
 	 *            stream to copy from. The thread terminates when this stream
 	 *            reaches EOF. The thread closes this stream before it exits.
@@ -70,9 +72,18 @@ public class StreamCopyThread extends Thread {
 	 *            closed when the thread terminates.
 	 */
 	public StreamCopyThread(final InputStream i, final OutputStream o) {
-		setName(Thread.currentThread().getName() + "-StreamCopy"); //$NON-NLS-1$
+		setName(Thread.currentThread().getName() + "-StreamCopy");
 		src = i;
 		dst = o;
+		this.flushAllWrites = false;
+	}
+
+	public StreamCopyThread(final InputStream i, final OutputStream o,
+			boolean flushAllWrites) {
+		setName(Thread.currentThread().getName() + "-StreamCopy");
+		src = i;
+		dst = o;
+		this.flushAllWrites = flushAllWrites;
 	}
 
 	/**
@@ -91,7 +102,7 @@ public class StreamCopyThread extends Thread {
 	 * <p>
 	 * This method signals to the copy thread that it should stop as soon as
 	 * there is no more IO occurring.
-	 *
+	 * 
 	 * @throws InterruptedException
 	 *             the calling thread was interrupted.
 	 */
@@ -135,6 +146,8 @@ public class StreamCopyThread extends Thread {
 					for (;;) {
 						try {
 							dst.write(buf, 0, n);
+							if (flushAllWrites)
+								dst.flush();
 						} catch (InterruptedIOException wakey) {
 							writeInterrupted = true;
 							continue;
@@ -146,7 +159,11 @@ public class StreamCopyThread extends Thread {
 							interrupt();
 						break;
 					}
+				} catch (SocketException e) {
+					// assuming socket closed: nothing to do
+					break;
 				} catch (IOException e) {
+					e.printStackTrace();
 					break;
 				}
 			}
@@ -154,11 +171,13 @@ public class StreamCopyThread extends Thread {
 			try {
 				src.close();
 			} catch (IOException e) {
+				e.printStackTrace();
 				// Ignore IO errors on close
 			}
 			try {
 				dst.close();
 			} catch (IOException e) {
+				e.printStackTrace();
 				// Ignore IO errors on close
 			}
 		}
