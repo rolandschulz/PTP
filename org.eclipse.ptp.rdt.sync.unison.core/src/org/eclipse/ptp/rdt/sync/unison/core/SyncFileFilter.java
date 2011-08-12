@@ -8,12 +8,11 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.git.core;
+package org.eclipse.ptp.rdt.sync.unison.core;
 
 /**
  * A simple filtering interface intended for sync providers to pass to the underlying sync tool to indicate files that should not
  * by sync'ed. This may include Eclipse files, like .project, binary files, or files indicated by the user. 
- * @since 1.0
  */
 public interface SyncFileFilter {
 	public boolean shouldIgnore(String fileName);

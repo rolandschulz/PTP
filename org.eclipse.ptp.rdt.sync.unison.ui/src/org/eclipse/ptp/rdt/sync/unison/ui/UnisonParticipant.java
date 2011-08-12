@@ -8,7 +8,7 @@
  * Contributors:
  *    IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.rsync.ui;
+package org.eclipse.ptp.rdt.sync.unison.ui;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -37,9 +37,9 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
-import org.eclipse.ptp.rdt.sync.rsync.core.RSyncServiceProvider;
-import org.eclipse.ptp.rdt.sync.rsync.ui.messages.Messages;
+import org.eclipse.ptp.rdt.sync.unison.core.UnisonServiceProvider;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
+import org.eclipse.ptp.rdt.sync.unison.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -73,7 +73,7 @@ import org.eclipse.swt.widgets.TreeItem;
  * buttons. Also has a text field to allow the name of the configuration to be
  * changed.
  */
-public class RSyncParticipant implements ISynchronizeParticipant {
+public class UnisonParticipant implements ISynchronizeParticipant {
 	private static final String FILE_SCHEME = "file"; //$NON-NLS-1$
 
 	// private IServiceConfiguration fConfig;
@@ -109,7 +109,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 
 		// Label for "Provider:"
 		Label providerLabel = new Label(configArea, SWT.LEFT);
-		providerLabel.setText(Messages.RSyncParticipant_remoteProvider);
+		providerLabel.setText(Messages.UnisonParticipant_remoteProvider);
 
 		// combo for providers
 		fProviderCombo = new Combo(configArea, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -143,7 +143,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 		// connection combo
 		// Label for "Connection:"
 		Label connectionLabel = new Label(configArea, SWT.LEFT);
-		connectionLabel.setText(Messages.RSyncParticipant_connection);
+		connectionLabel.setText(Messages.UnisonParticipant_connection);
 
 		// combo for providers
 		fConnectionCombo = new Combo(configArea, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -161,7 +161,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 
 		// new connection button
 		fNewConnectionButton = new Button(configArea, SWT.PUSH);
-		fNewConnectionButton.setText(Messages.RSyncParticipant_new);
+		fNewConnectionButton.setText(Messages.UnisonParticipant_new);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		fNewConnectionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -176,7 +176,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 		});
 
 		Label locationLabel = new Label(configArea, SWT.LEFT);
-		locationLabel.setText(Messages.RSyncParticipant_location);
+		locationLabel.setText(Messages.UnisonParticipant_location);
 
 		fLocationText = new Text(configArea, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -193,7 +193,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 
 		// new connection button
 		fBrowseButton = new Button(configArea, SWT.PUSH);
-		fBrowseButton.setText(Messages.RSyncParticipant_browse);
+		fBrowseButton.setText(Messages.UnisonParticipant_browse);
 		fBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -511,8 +511,8 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	public ISyncServiceProvider getProvider(IProject project) {
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-		RSyncServiceProvider provider = (RSyncServiceProvider) smm.getServiceProvider(syncService
-				.getProviderDescriptor(RSyncServiceProvider.ID));
+		UnisonServiceProvider provider = (UnisonServiceProvider) smm.getServiceProvider(syncService
+				.getProviderDescriptor(UnisonServiceProvider.ID));
 		provider.setLocation(fLocationText.getText());
 		provider.setRemoteConnection(fSelectedConnection);
 		provider.setRemoteServices(fSelectedProvider);

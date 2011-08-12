@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rdt.sync.git.core;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -22,6 +23,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -62,8 +66,8 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
  * jgit library.
  * 
  */
-public class GitRemoteSyncConnection {
-
+public class GitRemoteSyncConnection implements IRemoteSyncConnection{
+	public final static String ID = "org.eclipse.ptp.rdt.sync.git.core.GitRemoteSyncConnection";  //$NON-NLS-1$
 	private final int MAX_FILES = 100;
 	private static final String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
 	private static final String commitMessage = Messages.GRSC_CommitMessage;
@@ -441,7 +445,7 @@ public class GitRemoteSyncConnection {
 				String fn = line.substring(2);
 				if (status == 'R') {
 					filesToDelete.add(fn);
-				} else if (!(fileFilter.shouldIgnore(fn))) {
+				} else if (!(fileFilter.shouldIgnore(fn) || pathFilter(fn))) {
 					filesToAdd.add(fn);
 				}
 			}
@@ -477,7 +481,7 @@ public class GitRemoteSyncConnection {
 
 		Set<String> filesToBeIgnored = new HashSet<String>();
 		for (String fileName : filesToAdd) {
-			if (fileFilter.shouldIgnore(fileName)) {
+			if (fileFilter.shouldIgnore(fileName) || pathFilter(fileName)) {
 				filesToBeIgnored.add(fileName);
 			}
 		}
@@ -752,5 +756,26 @@ public class GitRemoteSyncConnection {
 				monitor.done();
 			}
 		}
+	}
+
+	public boolean pathFilter(String path){
+		if(path.equals(".git")) //$NON-NLS-1$
+			return true;
+
+		return false;
+	}
+
+	public void pathChanged(IResourceDelta delta) throws RemoteSyncException{
+		// Add .gitignore to empty directories
+		if (delta.getResource().getType() == IResource.FOLDER && (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
+			IFile emptyFile = delta.getResource().getProject().getFile(delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore");  //$NON-NLS-1$
+			if (!(emptyFile.exists())) {
+				try {
+					emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+				} catch (CoreException e) {
+					throw new RemoteSyncException(e);
+				}
+			}
+		}		
 	}
 }

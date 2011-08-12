@@ -8,16 +8,13 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.git.core;
+package org.eclipse.ptp.rdt.sync.unison.core;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 // An exception to wrap exceptions for which the Remote Sync services cannot recover.
-/**
- * @since 1.0
- */
 public class RemoteSyncException extends CoreException {
 	private static final String pluginID = "org.eclipse.ptp.rdt.sync.git.core"; //$NON-NLS-1$
 	private static final long serialVersionUID = 1L;
@@ -32,7 +29,7 @@ public class RemoteSyncException extends CoreException {
 	}
 
 	public RemoteSyncException(Throwable arg0) {
-		super(new Status(IStatus.ERROR, pluginID, null, arg0));
+		super(new Status(IStatus.ERROR, pluginID, "", arg0)); //$NON-NLS-1$
 	}
 
 	public RemoteSyncException(Status status) {
