@@ -90,6 +90,13 @@ public class LguiItem implements ILguiItem {
 
 	//	private static final String LAYOUT = "layout";//$NON-NLS-1$
 
+	// TODO Rewrite - Java Applet
+	private final Marshaller marshaller = LMLCorePlugin.getDefault()
+			.getMarshaller();
+
+	private final Unmarshaller unmarshaller = LMLCorePlugin.getDefault()
+			.getUnmarshaller();
+
 	/**
 	 * Constructor with LML-model as argument
 	 * 
@@ -98,6 +105,7 @@ public class LguiItem implements ILguiItem {
 	 */
 	public LguiItem(LguiType lgui) {
 		this.lgui = lgui;
+		// TODO Give the LguiItem a name
 		createLguiHandlers();
 	}
 
@@ -165,11 +173,8 @@ public class LguiItem implements ILguiItem {
 		} else {
 			layoutLgui = getLayoutAccess().getLayoutFromModel();
 		}
-		final Marshaller marshaller = LMLCorePlugin.getDefault()
-				.getMarshaller();
 		try {
-			marshaller.setProperty(
-					"jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
+			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
 					Boolean.TRUE);
 			final QName tagname = new QName(lmlNamespace, "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -427,11 +432,8 @@ public class LguiItem implements ILguiItem {
 		} else {
 			layoutLgui = getLayoutAccess().getLayoutFromModel();
 		}
-		final Marshaller marshaller = LMLCorePlugin.getDefault()
-				.getMarshaller();
 		try {
-			marshaller.setProperty(
-					"jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
+			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
 					Boolean.TRUE);
 			final QName tagname = new QName(lmlNamespace, "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -444,7 +446,6 @@ public class LguiItem implements ILguiItem {
 			 */
 			synchronized (LguiItem.class) {
 				marshaller.marshal(rootElement, writer);
-
 			}
 		} catch (final PropertyException e) {
 			LMLCorePlugin.log(e);
@@ -465,8 +466,6 @@ public class LguiItem implements ILguiItem {
 	// } else {
 	// layoutLgui = getLayoutAccess().getLayoutFromModel();
 	// }
-	// final Marshaller marshaller = LMLCorePlugin.getDefault()
-	// .getMarshaller();
 	// try {
 	// marshaller.setProperty(
 	//					"jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -681,8 +680,6 @@ public class LguiItem implements ILguiItem {
 	 */
 	@SuppressWarnings("unchecked")
 	private LguiType parseLML(String string) throws JAXBException {
-		final Unmarshaller unmarshaller = LMLCorePlugin.getDefault()
-				.getUnmarshaller();
 		/*
 		 * Synchronize to avoid the dreaded
 		 * "FWK005 parse may not be called while parsing" message

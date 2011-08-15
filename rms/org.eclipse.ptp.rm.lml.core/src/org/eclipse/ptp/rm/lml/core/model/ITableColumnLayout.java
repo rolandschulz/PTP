@@ -35,9 +35,7 @@ public interface ITableColumnLayout {
 	 * 
 	 * @return width of the table
 	 */
-	public int getWidth();
-
-	// TODO maybe also position???
+	public Double getWidth();
 
 	/**
 	 * @return if table column is active or not

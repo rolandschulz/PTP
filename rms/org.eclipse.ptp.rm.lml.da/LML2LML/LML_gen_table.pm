@@ -285,6 +285,7 @@ sub get_lml_tablelayout {
 	    $ds->{column}->{$cid}->{pos}=$layoutref->{column}->{$cid}->{pos};
 	    $ds->{column}->{$cid}->{width}=$layoutref->{column}->{$cid}->{width};
 	    $ds->{column}->{$cid}->{active}=$layoutref->{column}->{$cid}->{active};
+	    $ds->{column}->{$cid}->{sorted}=$layoutref->{column}->{$cid}->{sorted} if (exists ($layoutref->{column}->{$cid}->{sorted}));
 	    $lastcid=$cid if($cid>$lastcid);
 	    $activekeys{$ds->{column}->{$cid}->{key}}++;
 	}

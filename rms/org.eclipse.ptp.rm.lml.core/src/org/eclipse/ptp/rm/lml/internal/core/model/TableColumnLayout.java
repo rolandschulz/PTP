@@ -26,7 +26,7 @@ public class TableColumnLayout implements ITableColumnLayout {
 	/*
 	 * Width of the column
 	 */
-	private final int width;
+	private final Double width;
 
 	/*
 	 * Style of the column
@@ -50,7 +50,8 @@ public class TableColumnLayout implements ITableColumnLayout {
 	 * @param activity
 	 *            of the column
 	 */
-	public TableColumnLayout(String title, int size, String width, boolean active) {
+	public TableColumnLayout(String title, Double size, String width,
+			boolean active) {
 		this.title = title;
 		this.width = size;
 		this.style = width;
@@ -60,8 +61,7 @@ public class TableColumnLayout implements ITableColumnLayout {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.IJobTableColumnLayout#getStyle()
+	 * @see org.eclipse.ptp.rm.lml.core.IJobTableColumnLayout#getStyle()
 	 */
 	public String getStyle() {
 		return style;
@@ -70,8 +70,7 @@ public class TableColumnLayout implements ITableColumnLayout {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.IJobTableColumnLayout#getTitle()
+	 * @see org.eclipse.ptp.rm.lml.core.IJobTableColumnLayout#getTitle()
 	 */
 	public String getTitle() {
 		return title;
@@ -80,10 +79,9 @@ public class TableColumnLayout implements ITableColumnLayout {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.IJobTableColumnLayout#getWidth()
+	 * @see org.eclipse.ptp.rm.lml.core.IJobTableColumnLayout#getWidth()
 	 */
-	public int getWidth() {
+	public Double getWidth() {
 		return width;
 	}
 

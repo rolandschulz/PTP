@@ -26,7 +26,7 @@ my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
 my $patbl ="\\s+";             # Pattern for blank space (variable length)
 
-my $version="1.10";
+my $version="1.11";
  
 my ($tstart,$tdiff,$rc);
 
@@ -65,7 +65,7 @@ my $hostname = `hostname`;chomp($hostname);
 my $ppid = $$;
 my $opt_tmpdir=sprintf("./tmp_%s_%d",$hostname,$ppid);
 my $opt_permdir=sprintf("./perm_%s",$hostname);
-my $opt_keeptmp=0;
+my $opt_keeptmp=1;
 my $opt_keepperm=1;
 my $opt_dump=0;
 my $opt_demo=0;
