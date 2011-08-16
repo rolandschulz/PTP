@@ -1,4 +1,4 @@
-package org.eclipse.ptp.rdt.sync.rsync.core;
+package org.eclipse.ptp.rdt.sync.unison.core;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,8 +11,8 @@ public class FakeSSH {
 	 */
 	public static void main(String[] args) {
 		String cmd = "";
-		int portnum = Integer.parseInt(args[1]);
-		for (int i = 3; i < args.length; i++){ // not adding the first argument
+		int portnum = Integer.parseInt(args[5]);
+		for (int i = 6; i < args.length; i++){ // not adding the first argument
 												// because it is the host
 			
 			cmd += args[i] + " ";		

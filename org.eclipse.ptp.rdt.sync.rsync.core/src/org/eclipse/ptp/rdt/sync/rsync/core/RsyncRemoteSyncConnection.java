@@ -121,9 +121,6 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection {
 	}
 
 	public void syncRemoteToLocal(IProgressMonitor monitor) throws RemoteSyncException {
-		// String[] commandRtoL = {"rsync", "--ignore-existing", "-avze" ,"java -cp" + FakeSSHLocation +
-		// Integer.toString(connection.getPort()), connection.getUsername() + "@" + connection.getAddress() + ":" + remoteDirectory
-		// + "/", localDirectory};
 		try{
 			ServerSocket serverSocket = new ServerSocket(0);
 			int portnum = serverSocket.getLocalPort();
@@ -178,7 +175,6 @@ public class RsyncRemoteSyncConnection implements IRemoteSyncConnection {
 														// need to make sure not to read too much
 			remoteCommand += (char) chr;
 		}
-		System.out.println(remoteCommand);
 
 		CommandResults commandResults = CommandRunner.executeRemoteCommand(connection, remoteCommand, null, null, socketInput,
 				socketOutput, null);
