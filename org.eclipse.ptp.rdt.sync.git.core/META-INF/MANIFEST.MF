@@ -24,6 +24,5 @@ Import-Package: org.eclipse.cdt.core.model,
  org.eclipse.jgit.storage.file,
  org.eclipse.jgit.transport,
  org.eclipse.jgit.util,
- org.eclipse.jgit.util.io,
- org.eclipse.ptp.rdt.sync.ui
+ org.eclipse.jgit.util.io
 Export-Package: org.eclipse.ptp.rdt.sync.git.core;x-friends:="org.eclipse.ptp.rdt.sync.git.ui"

@@ -38,16 +38,6 @@
       </UNCPathConverter>
    </extension>
    <extension
-         point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
-      <builder
-            commandLauncher="org.eclipse.ptp.rdt.sync.core.remotemake.SyncCommandLauncher"
-            id="org.eclipse.ptp.rdt.sync.core.SyncBuilder"
-            isAbstract="false"
-            isVariableCaseSensitive="false"
-            name="%Builder.name">
-      </builder>
-   </extension>
-   <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
             class="org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider"
@@ -56,5 +46,15 @@
             priority="1"
             serviceId="org.eclipse.ptp.rdt.core.BuildService">
       </provider>
+   </extension>
+   <extension
+         point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
+      <builder
+            commandLauncher="org.eclipse.ptp.rdt.sync.core.remotemake.SyncCommandLauncher"
+            id="org.eclipse.ptp.rdt.sync.core.SyncBuilder"
+            isAbstract="false"
+            isVariableCaseSensitive="false"
+            name="%Builder.name">
+      </builder>
    </extension>
 </plugin>

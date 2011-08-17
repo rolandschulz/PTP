@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
@@ -38,9 +37,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.ServiceProvider;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 
 public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider {
 	public static final String ID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
@@ -361,25 +358,25 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		e.printStackTrace();
 		
 		// For forced sync, use the status manager and just print an error dialog
-		if (syncFlags == SyncFlag.FORCE) {
+		// if (syncFlags == SyncFlag.FORCE) {
 			IStatus status = null;
 			int severity = e.getStatus().getSeverity();
             status = new Status(severity, Activator.PLUGIN_ID, message, e);
             StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
-		} else { // For non-forced sync, display message with toggle
-			Display errorDisplay = RDTSyncUIPlugin.getStandardDisplay();
-			errorDisplay.syncExec(new Runnable () {
-				public void run() {
-					MessageDialogWithToggle dialog = MessageDialogWithToggle.openError(null, ERROR_MESSAGE_TITLE, message,
-							ERROR_MESSAGE_TOGGLE, !SyncManager.getShowErrors(getProject()), null, null);
-					if (dialog.getToggleState()) {
-						SyncManager.setShowErrors(getProject(), false);
-					} else {
-						SyncManager.setShowErrors(getProject(), true);
-					}
-				}
-			});
-		}
+//		} else { // For non-forced sync, display message with toggle
+//			Display errorDisplay = RDTSyncUIPlugin.getStandardDisplay();
+//			errorDisplay.syncExec(new Runnable () {
+//				public void run() {
+//					MessageDialogWithToggle dialog = MessageDialogWithToggle.openError(null, ERROR_MESSAGE_TITLE, message,
+//							ERROR_MESSAGE_TOGGLE, !SyncManager.getShowErrors(getProject()), null, null);
+//					if (dialog.getToggleState()) {
+//						SyncManager.setShowErrors(getProject(), false);
+//					} else {
+//						SyncManager.setShowErrors(getProject(), true);
+//					}
+//				}
+//			});
+//		}
 	}
 
 	// Paths that the Git sync provider can ignore.
