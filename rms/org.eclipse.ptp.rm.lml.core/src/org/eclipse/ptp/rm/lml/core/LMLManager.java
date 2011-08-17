@@ -106,10 +106,10 @@ public class LMLManager {
 				LGUIS.remove(name);
 			}
 		}
-		if (fLguiItem != null && fLguiItem == item) {
-			fireRemovedLgui(item);
-			fLguiItem = null;
-		}
+		// if (fLguiItem != null && fLguiItem == item) {
+		// fireRemovedLgui(item);
+		// fLguiItem = null;
+		// }
 
 		/*
 		 * takes care of persisting user job state info
@@ -141,12 +141,15 @@ public class LMLManager {
 		ILguiItem item = null;
 		synchronized (LGUIS) {
 			item = LGUIS.get(name);
-			if (item != null) {
-				return item.saveCurrentLayout();
-				// item.getCurrentLayout(output)
-			}
 		}
-
+		if (item != null) {
+			if (fLguiItem != null && fLguiItem == item) {
+				fireRemovedLgui(item);
+				fLguiItem = null;
+			}
+			final String string = item.saveCurrentLayout();
+			return string;
+		}
 		return null;
 	}
 
@@ -177,6 +180,34 @@ public class LMLManager {
 		fireMarkObject(oid);
 	}
 
+	/**
+	 * This method is called by LMLResourceManagerMonitor. A ResourceManager was started.
+	 * 
+	 * @param name
+	 *            Name of the ResourceManager
+	 * @param layout
+	 *            Layout from an earlier Eclipse session
+	 * @param jobs
+	 *            Array of earlier started jobs
+	 */
+	public void openLgui(String name, StringBuilder layout, JobStatusData[] jobs) {
+		synchronized (LGUIS) {
+			ILguiItem item = LGUIS.get(name);
+			if (item == null) {
+				item = new LguiItem(name);
+				LGUIS.put(name, item);
+			}
+			fLguiItem = item;
+		}
+
+		fLguiItem.reloadLastLayout(layout);
+		restoreJobStatusData(fLguiItem, jobs);
+
+		if (!fLguiItem.isEmpty()) {
+			fireNewLgui();
+		}
+	}
+
 	// public void openLgui(String name, IMemento memento) {
 	// synchronized (LGUIS) {
 	// ILguiItem item = LGUIS.get(name);
@@ -194,25 +225,6 @@ public class LMLManager {
 	// fireNewLgui();
 	// }
 	// }
-
-	public void openLgui(String name, StringBuilder layout, JobStatusData[] jobs) {
-		// TODO Werte evtl leer
-		synchronized (LGUIS) {
-			ILguiItem item = LGUIS.get(name);
-			if (item == null) {
-				item = new LguiItem(name);
-				LGUIS.put(name, item);
-			}
-			fLguiItem = item;
-		}
-
-		fLguiItem.reloadLastLayout(layout);
-		restoreJobStatusData(fLguiItem, jobs);
-
-		if (!fLguiItem.isEmpty()) {
-			fireNewLgui();
-		}
-	}
 
 	public void removeListener(ILMLListener listener) {
 		lmlListeners.remove(listener);

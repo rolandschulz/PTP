@@ -623,7 +623,7 @@ sub write_lml {
 	    printf(OUT ">\n");
  	    foreach $k (sort {$a <=> $b} keys %{$tablelayout->{column}}) {
 		printf(OUT "<column");
-		for $key ("cid","pos","width","active","key") {
+		for $key ("cid","pos","sorted","width","active","key") {
 		    if(exists($tablelayout->{column}->{$k}->{$key})) {
 			printf(OUT " %s=\"%s\"",$key,  $tablelayout->{column}->{$k}->{$key});
 		    }
