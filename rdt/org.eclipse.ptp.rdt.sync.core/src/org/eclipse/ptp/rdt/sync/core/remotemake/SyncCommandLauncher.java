@@ -38,8 +38,7 @@ import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
-import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
-import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -59,11 +58,11 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  * with the RDT team.
  * 
  * @author crecoskie
- *
+ * 
  */
 public class SyncCommandLauncher implements ICommandLauncher {
 	protected IProject fProject;
-	
+
 	protected Process fProcess;
 	protected IRemoteProcess fRemoteProcess;
 	protected boolean fShowCommand;
@@ -72,90 +71,88 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	protected String fErrorMessage;
 
 	protected Map<String, String> remoteEnvMap;
-	
+
 	private boolean isCleanBuild;
-	
+
 	/**
 	 * The number of milliseconds to pause between polling.
 	 */
 	protected static final long DELAY = 50L;
-	
+
 	/**
 	 * 
 	 */
 	public SyncCommandLauncher() {
 	}
-	
-	private boolean isCleanBuild(String[] args){
-		for(int i=0; i< args.length; i++){
-			if(IBuilder.DEFAULT_TARGET_CLEAN.equals(args[i])){
+
+	private boolean isCleanBuild(String[] args) {
+		for (int i = 0; i < args.length; i++) {
+			if (IBuilder.DEFAULT_TARGET_CLEAN.equals(args[i])) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.core.ICommandLauncher#execute(org.eclipse.core.runtime.IPath, java.lang.String[], java.lang.String[], org.eclipse.core.runtime.IPath)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.cdt.core.ICommandLauncher#execute(org.eclipse.core.runtime.IPath, java.lang.String[], java.lang.String[],
+	 * org.eclipse.core.runtime.IPath)
 	 */
 	public Process execute(IPath commandPath, String[] args, String[] env,
 			IPath changeToDirectory, final IProgressMonitor monitor) throws CoreException {
-		isCleanBuild= isCleanBuild(args);
+		isCleanBuild = isCleanBuild(args);
 		IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
-		
-		if(projectStatus!=null){
-			projectStatus.setRuntimeBuildStatus(null);	
+
+		if (projectStatus != null) {
+			projectStatus.setRuntimeBuildStatus(null);
 		}
-		
+
 		// if there is no project associated to us then we cannot function... throw an exception
-		if(getProject() == null) {
-			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.core", "RemoteCommandLauncher has not been associated with a project.")); //$NON-NLS-1$ //$NON-NLS-2$
+		if (getProject() == null) {
+			throw new CoreException(new Status(IStatus.ERROR,
+					"org.eclipse.ptp.rdt.core", "RemoteCommandLauncher has not been associated with a project.")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Set correct directory
 		// For managed projects and configurations other than workspace, the directory is incorrect and needs to be fixed.
 		IConfiguration configuration = ManagedBuildManager.getBuildInfo(getProject()).getDefaultConfiguration();
-		String projectWorkspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString() + 
-																				getProject().getFullPath().toPortableString();
+		String projectWorkspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString() +
+				getProject().getFullPath().toPortableString();
 		String projectActualRoot = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration).
-																													getLocation();
+				getLocation();
 		changeToDirectory = new Path(changeToDirectory.toString().replaceFirst(projectWorkspaceRoot, projectActualRoot));
 		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
 
-		// Determine the service model for this configuration, and use the provider of the build
-		// service to execute the build command. Also get the sync provider to sync before and
-		// after building.
+		// Determine the service model for this configuration, and use the provider of the build service to execute the build
+		// command.
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 		IServiceConfiguration serviceConfig = BuildConfigurationManager.getInstance().
-																			getConfigurationForBuildConfiguration(configuration);
+				getConfigurationForBuildConfiguration(configuration);
 		if (serviceConfig == null) {
 			throw new RuntimeException("Cannot find service configuration for build configuration"); //$NON-NLS-1$
-		}
-		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-		ISyncServiceProvider syncProvider = null;
-		if (!(serviceConfig.isDisabled(syncService))) {
-			syncProvider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
 		}
 		IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
 		IServiceProvider provider = serviceConfig.getServiceProvider(buildService);
 		IRemoteExecutionServiceProvider executionProvider = null;
-		if(provider instanceof IRemoteExecutionServiceProvider) {
+		if (provider instanceof IRemoteExecutionServiceProvider) {
 			executionProvider = (IRemoteExecutionServiceProvider) provider;
 		}
-		
+
 		if (executionProvider != null) {
-			
+
 			IRemoteServices remoteServices = executionProvider.getRemoteServices();
-			if(!remoteServices.isInitialized()) {
+			if (!remoteServices.isInitialized()) {
 				remoteServices.initialize();
 			}
-			
+
 			if (remoteServices == null)
 				return null;
-			
+
 			IRemoteConnection connection = executionProvider.getConnection();
-			
-			if(!connection.isOpen()) {
+
+			if (!connection.isOpen()) {
 				try {
 					connection.open(monitor);
 				} catch (RemoteConnectionException e1) {
@@ -163,59 +160,58 @@ public class SyncCommandLauncher implements ICommandLauncher {
 					throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.core", "Error opening connection.", e1)); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
-			
+
 			List<String> command = new LinkedList<String>();
-			
+
 			command.add(commandPath.toString());
-			
-			for(int k = 0; k <  args.length; k++)
+
+			for (int k = 0; k < args.length; k++)
 				command.add(args[k]);
-						
+
 			IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
-			
+
 			remoteEnvMap = processBuilder.environment();
-			
-			for(String envVar : env) {
+
+			for (String envVar : env) {
 				String[] splitStr = envVar.split("="); //$NON-NLS-1$
 				if (splitStr.length > 1) {
 					remoteEnvMap.put(splitStr[0], splitStr[1]);
-				} else if (splitStr.length == 1){
-					// Empty environment variable 
+				} else if (splitStr.length == 1) {
+					// Empty environment variable
 					remoteEnvMap.put(splitStr[0], ""); //$NON-NLS-1$
 				}
 			}
-			
+
 			// set the directory in which to run the command
 			IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
-			if(changeToDirectory != null && fileManager != null) {
+			if (changeToDirectory != null && fileManager != null) {
 				processBuilder.directory(fileManager.getResource(changeToDirectory.toString()));
 			}
-			
+
 			// combine stdout and stderr
 			processBuilder.redirectErrorStream(true);
-			
+
 			// Synchronize before building
-			if (syncProvider != null) {
-				syncProvider.synchronize(null, new SubProgressMonitor(monitor, 10), SyncFlag.FORCE);
-			}
-			
+			SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10));
+
 			IRemoteProcess p = null;
 			try {
 				p = processBuilder.start();
 			} catch (IOException e) {
-				if(projectStatus!=null){
+				if (projectStatus != null) {
 					projectStatus.setRuntimeBuildStatus(IndexBuildSequenceController.STATUS_INCOMPLETE);
 				}
 				// rethrow as CoreException
-				throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.sync.core", "Error launching remote process.", e)); //$NON-NLS-1$ //$NON-NLS-2$
+				throw new CoreException(new Status(IStatus.ERROR,
+						"org.eclipse.ptp.rdt.sync.core", "Error launching remote process.", e)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			
-			if(projectStatus!=null){
-				if(!isCleanBuild){
+
+			if (projectStatus != null) {
+				if (!isCleanBuild) {
 					projectStatus.setBuildRunning();
 				}
 			}
-			
+
 			fRemoteProcess = p;
 			fProcess = new RemoteProcessAdapter(p);
 			// wait for the process to finish
@@ -226,23 +222,21 @@ public class SyncCommandLauncher implements ICommandLauncher {
 					// just keep waiting until the process is done
 				}
 			}
-			
+
 			// Synchronize after building
-			if (syncProvider != null) {
-				syncProvider.synchronize(null, new SubProgressMonitor(monitor, 10), SyncFlag.FORCE);
-			}		
-				
+			SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10));
+
 			return fProcess;
 		}
-			
-		return null;	
+
+		return null;
 	}
 
 	private String getCommandLine(String[] commandArgs) {
-		
-		if(fProject == null)
+
+		if (fProject == null)
 			return null;
-		
+
 		StringBuffer buf = new StringBuffer();
 		if (fCommandArgs != null) {
 			for (String commandArg : commandArgs) {
@@ -253,7 +247,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		}
 		return buf.toString();
 	}
-	
+
 	/**
 	 * Constructs a command array that will be passed to the process
 	 */
@@ -263,22 +257,28 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		System.arraycopy(commandArgs, 0, args, 1, commandArgs.length);
 		return args;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#getCommandLine()
 	 */
 	public String getCommandLine() {
 		return getCommandLine(getCommandArgs());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#getCommandArgs()
 	 */
 	public String[] getCommandArgs() {
 		return fCommandArgs;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#getEnvironment()
 	 */
 	public Properties getEnvironment() {
@@ -287,29 +287,35 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 	private Properties convertEnvMapToProperties() {
 		Properties properties = new Properties();
-		
-		for(String key : remoteEnvMap.keySet()) {
+
+		for (String key : remoteEnvMap.keySet()) {
 			properties.put(key, remoteEnvMap.get(key));
 		}
-		
+
 		return properties;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#getErrorMessage()
 	 */
 	public String getErrorMessage() {
 		return fErrorMessage;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#setErrorMessage(java.lang.String)
 	 */
 	public void setErrorMessage(String error) {
 		fErrorMessage = error;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#showCommand(boolean)
 	 */
 	public void showCommand(boolean show) {
@@ -328,8 +334,10 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			}
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#waitAndRead(java.io.OutputStream, java.io.OutputStream)
 	 */
 	public int waitAndRead(OutputStream out, OutputStream err) {
@@ -346,8 +354,11 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		return OK;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.core.ICommandLauncher#waitAndRead(java.io.OutputStream, java.io.OutputStream, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.cdt.core.ICommandLauncher#waitAndRead(java.io.OutputStream, java.io.OutputStream,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public int waitAndRead(OutputStream output, OutputStream err,
 			IProgressMonitor monitor) {
@@ -370,13 +381,14 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		}
 
 		int state = OK;
-		final IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
+		final IndexBuildSequenceController projectStatus = IndexBuildSequenceController
+				.getIndexBuildSequenceController(getProject());
 		// Operation canceled by the user, terminate abnormally.
 		if (monitor.isCanceled()) {
 			closure.terminate();
 			state = COMMAND_CANCELED;
 			setErrorMessage(CCorePlugin.getResourceString("CommandLauncher.error.commandCanceled")); //$NON-NLS-1$
-			if(projectStatus!=null){
+			if (projectStatus != null) {
 				projectStatus.setRuntimeBuildStatus(IndexBuildSequenceController.STATUS_INCOMPLETE);
 			}
 		}
@@ -386,8 +398,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		} catch (InterruptedException e) {
 			// ignore
 		}
-		
-	
+
 		try {
 			// Do not allow the cancel of the refresh, since the
 			// builder is external
@@ -399,26 +410,24 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			// this should never happen because we should never be building from a
 			// state where ressource changes are disallowed
 		}
-		
-		
-		if(projectStatus!=null){
-			if(isCleanBuild){
-			
-					projectStatus.setBuildInCompletedForCleanBuild();
-			
-				
-			}else{
-			
-					if(projectStatus.isIndexAfterBuildSet()){
-				
-						projectStatus.invokeIndex();
-					}else{
-						projectStatus.setFinalBuildStatus();
-					}
-				
+
+		if (projectStatus != null) {
+			if (isCleanBuild) {
+
+				projectStatus.setBuildInCompletedForCleanBuild();
+
+			} else {
+
+				if (projectStatus.isIndexAfterBuildSet()) {
+
+					projectStatus.invokeIndex();
+				} else {
+					projectStatus.setFinalBuildStatus();
+				}
+
 			}
 		}
-			
+
 		return state;
 	}
 

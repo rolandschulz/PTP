@@ -61,7 +61,6 @@ import org.eclipse.ui.XMLMemento;
  * to the user. The user only needs to specify the build scenario for the build configuration. On project initialization, though,
  * a default service configuration must be given.
  *
- * @since 3.1
  */
 public class BuildConfigurationManager {
 	private static final String DEFAULT_SAVE_FILE_NAME = "BuildConfigurationData.xml";  //$NON-NLS-1$
@@ -118,7 +117,6 @@ public class BuildConfigurationManager {
 	 * Add a new build scenario, creating a new service configuration for that scenario if necessary.
 	 *
 	 * @param buildScenario
-	 * @since 2.1
 	 */
 	private void addBuildScenario(IProject project, BuildScenario buildScenario) {
 		// Check if build scenario already known
@@ -154,7 +152,6 @@ public class BuildConfigurationManager {
 	 * @param bconf
 	 * 				The build configuration
 	 * @return build scenario
-	 * @since 2.1
 	 */
 	public BuildScenario getBuildScenarioForBuildConfiguration(IConfiguration bconf) {
 		if (bconf == null) {
@@ -182,7 +179,6 @@ public class BuildConfigurationManager {
 	 * @param buildScenario
 	 * @param bconf
 	 * 				the build configuration
-	 * @since 2.1
 	 */
 	public void setBuildScenarioForBuildConfiguration(BuildScenario bs, IConfiguration bconf) {
 		if (bs == null || bconf == null) {
@@ -216,7 +212,6 @@ public class BuildConfigurationManager {
 	 * 			The build configuration
 	 * @return service configuration for the build configuration
 	 * @throws RuntimeException if the build scenario cannot be mapped to a service configuration. This should never happen.
-	 * @since 2.1
 	 */
 	public IServiceConfiguration getConfigurationForBuildConfiguration(IConfiguration bconf) {
 		if (bconf == null) {

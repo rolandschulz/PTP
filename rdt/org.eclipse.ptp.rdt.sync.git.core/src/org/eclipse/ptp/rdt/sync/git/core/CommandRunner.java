@@ -238,7 +238,7 @@ public class CommandRunner {
 		for (;;) {
 			getOutput.join(250);
 			if (!getOutput.isAlive()) break;
-			if (monitor.isCanceled()) {
+			if (monitor!=null && monitor.isCanceled()) {
 				throw new RemoteSyncException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.CommandRunner_0));
 			}
 		}
