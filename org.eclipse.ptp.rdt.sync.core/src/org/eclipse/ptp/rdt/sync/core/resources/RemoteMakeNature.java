@@ -149,7 +149,6 @@ public class RemoteMakeNature implements IProjectNature {
 	 * @param builderID
 	 * @param mon
 	 * @throws CoreException
-	 * @since 2.0
 	 */
 	public static void updateProjectDescription(IProject project, String builderID, IProgressMonitor mon) throws CoreException {
 		// setup builder
@@ -294,7 +293,6 @@ public class RemoteMakeNature implements IProjectNature {
 	 * 
 	 * @throws NullPointerException
 	 *             if project is null
-	 * @since 2.0
 	 */
 	public static boolean hasNature(IProject project) {
 		try {
