@@ -50,6 +50,7 @@ import org.eclipse.jgit.transport.Transport;
 import org.eclipse.jgit.transport.TransportGitSsh;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.util.FS;
+import org.eclipse.jgit.util.QuotedString;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
@@ -64,7 +65,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
  */
 public class GitRemoteSyncConnection {
 
-	private final int MAX_FILES = 100;
+	private final int MAX_FILES = 2;
 	private static final String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
 	private static final String commitMessage = Messages.GRSC_CommitMessage;
 	public static final String gitDir = ".ptp-sync"; //$NON-NLS-1$
@@ -372,7 +373,7 @@ public class GitRemoteSyncConnection {
 		subMon.subTask(Messages.GitRemoteSyncConnection_adding_files);
 		try {
 			while (!filesToAdd.isEmpty()) {
-				List<String> commandList = stringToList(gitCommand + " add"); //$NON-NLS-1$
+				List<String> commandList = stringToList(gitCommand + " add --"); //$NON-NLS-1$
 				int count = 1;
 				for (String fileName : filesToAdd.toArray(new String[0])) {
 					if (count++ % MAX_FILES == 0) {
@@ -434,11 +435,12 @@ public class GitRemoteSyncConnection {
 			BufferedReader statusReader = new BufferedReader(new StringReader(commandResults.getStdout()));
 			String line = null;
 			while ((line = statusReader.readLine()) != null) {
-				if (line.charAt(0) == ' ' || line.charAt(1) != ' ' || line.charAt(2) == ' ') {
+				if (line.charAt(0) == ' ' || line.charAt(1) != ' ') {
 					continue;
 				}
 				char status = line.charAt(0);
 				String fn = line.substring(2);
+				fn = QuotedString.GIT_PATH.dequote(fn);
 				if (status == 'R') {
 					filesToDelete.add(fn);
 				} else if (!(fileFilter.shouldIgnore(fn))) {
