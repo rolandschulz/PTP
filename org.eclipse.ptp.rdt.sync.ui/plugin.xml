@@ -196,7 +196,7 @@
                </iterate>
             </visibleWhen>
             <dynamic
-                  class="org.eclipse.ptp.rdt.sync.ui.initSyncMenu"
+                  class="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu"
                   id="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu">
             </dynamic>
          </menu>
