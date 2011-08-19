@@ -22,17 +22,12 @@ import java.util.Map;
 
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceRuleFactory;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -41,8 +36,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.MultiRule;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
@@ -52,24 +45,16 @@ import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.core.ServicesCorePlugin;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
-import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.commands.IElementUpdater;
-import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.menus.UIElement;
 
-public class SyncManager extends AbstractHandler implements IElementUpdater {
+public class SyncManager  {
 	public static enum SYNC_MODE {
 		ACTIVE, ALL, NONE
 	};
 
 	private static final IServiceModelManager serviceModel = ServiceModelManager.getInstance();
 	private static final IService syncService = serviceModel.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-	private static final String SYNC_COMMAND_PARAMETER_ID = "org.eclipse.ptp.rdt.sync.core.syncCommand.syncModeParameter"; //$NON-NLS-1$
 	private static final String DEFAULT_SAVE_FILE_NAME = "SyncManagerData.xml"; //$NON-NLS-1$
 	private static final String SYNC_MANAGER_ELEMENT_NAME = "sync-manager-data"; //$NON-NLS-1$
 	private static final String SYNC_MODE_ELEMENT_NAME = "project-to-sync-mode"; //$NON-NLS-1$
@@ -85,13 +70,6 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 	private static final Map<IProject, Boolean> fProjectToShowErrorMap = Collections
 			.synchronizedMap(new HashMap<IProject, Boolean>());
 
-	private static final String syncActiveCommand = "sync_active"; //$NON-NLS-1$
-	private static final String syncAllCommand = "sync_all"; //$NON-NLS-1$
-	private static final String setNoneCommand = "set_none"; //$NON-NLS-1$
-	private static final String setActiveCommand = "set_active"; //$NON-NLS-1$
-	private static final String setAllCommand = "set_all"; //$NON-NLS-1$
-	private static final String syncAutoCommand = "sync_auto"; //$NON-NLS-1$
-	
 	static {
 		try {
 			loadConfigurationData();
@@ -266,53 +244,6 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 		// Nothing to do
 	}
 
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		String command = event.getParameter(SYNC_COMMAND_PARAMETER_ID);
-		IProject project = getProject();
-		if (project == null) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_5);
-			return null;
-		}
-
-		// On sync request, sync regardless of the flags
-		try {
-			if (command.equals(syncActiveCommand)) {
-				sync(null, project, SyncFlag.FORCE);
-			} else if (command.equals(syncAllCommand)) {
-				syncAll(null, project, SyncFlag.FORCE);
-				// If user switches to active or all, assume the user wants to sync right away
-			} else if (command.equals(setActiveCommand)) {
-				setSyncMode(project, SYNC_MODE.ACTIVE);
-				sync(null, project, SyncFlag.FORCE);
-			} else if (command.equals(setAllCommand)) {
-				setSyncMode(project, SYNC_MODE.ALL);
-				syncAll(null, project, SyncFlag.FORCE);
-			} else if (command.equals(setNoneCommand)) {
-				setSyncMode(project, SYNC_MODE.NONE);
-			} else if (command.equals(syncAutoCommand)) {
-				setSyncAuto(!(getSyncAuto()));
-				// If user switches to automatic sync'ing, go ahead and sync based on current setting for project
-				if (getSyncAuto()) {
-					SYNC_MODE syncMode = getSyncMode(project);
-					if (syncMode == SYNC_MODE.ACTIVE) {
-						sync(null, project, SyncFlag.FORCE);
-					} else if (syncMode == SYNC_MODE.ALL) {
-						syncAll(null, project, SyncFlag.FORCE);
-					}
-				}
-			}
-		} catch (CoreException e) {
-			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
-			RDTSyncCorePlugin.log(Messages.SyncManager_3);
-		}
-
-		ICommandService service = (ICommandService) HandlerUtil.getActiveWorkbenchWindowChecked(event).getService(
-				ICommandService.class);
-		service.refreshElements(event.getCommand().getId(), null);
-
-		return null;
-	}
-
 	public boolean isEnabled() {
 		return true;
 	}
@@ -323,30 +254,6 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 
 	public void removeHandlerListener(IHandlerListener handlerListener) {
 		// Listeners not yet supported
-	}
-
-	public void updateElement(UIElement element, @SuppressWarnings("rawtypes") Map parameters) {
-		String command = (String) parameters.get(SYNC_COMMAND_PARAMETER_ID);
-		if (command == null) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_6);
-			return;
-		}
-
-		IProject project = this.getProject();
-		if (project == null) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_5);
-			return;
-		}
-
-		SYNC_MODE syncMode = getSyncMode(project);
-		if ((command.equals(setActiveCommand) && syncMode == SYNC_MODE.ACTIVE) ||
-				(command.equals(setAllCommand) && syncMode == SYNC_MODE.ALL) ||
-				(command.equals(setNoneCommand) && syncMode == SYNC_MODE.NONE) ||
-				(command.equals(syncAutoCommand) && fSyncAuto)) {
-			element.setChecked(true);
-		} else {
-			element.setChecked(false);
-		}
 	}
 
 	/**
@@ -461,32 +368,6 @@ public class SyncManager extends AbstractHandler implements IElementUpdater {
 		IResourceRuleFactory ruleFactory = ResourcesPlugin.getWorkspace().getRuleFactory();
 		ISchedulingRule projectRule = ruleFactory.createRule(project);
 		return MultiRule.combine(SyncMutex.getInstance(), projectRule);
-	}
-
-	/*
-	 * Portions copied from org.eclipse.ptp.services.ui.wizards.setDefaultFromSelection
-	 */
-	private IProject getProject() {
-		IWorkbenchWindow wnd = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		IWorkbenchPage pg = wnd.getActivePage();
-		ISelection sel = pg.getSelection();
-
-		if (!(sel instanceof IStructuredSelection)) {
-			return null;
-		}
-		IStructuredSelection selection = (IStructuredSelection) sel;
-
-		Object firstElement = selection.getFirstElement();
-		if (!(firstElement instanceof IAdaptable)) {
-			return null;
-		}
-		Object o = ((IAdaptable) firstElement).getAdapter(IResource.class);
-		if (o == null) {
-			return null;
-		}
-		IResource resource = (IResource) o;
-
-		return resource.getProject();
 	}
 
 	/**

@@ -56,7 +56,7 @@ public class ResourceChangeListener {
 						}
 					} catch (CoreException e){
 						// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
-						RDTSyncCorePlugin.log(Messages.SyncManager_3);
+						RDTSyncCorePlugin.log(Messages.ResourceChangeListener_0);
 					}
 				}
 			}

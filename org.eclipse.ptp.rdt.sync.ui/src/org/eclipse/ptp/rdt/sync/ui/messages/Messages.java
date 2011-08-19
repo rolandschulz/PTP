@@ -25,6 +25,9 @@ public class Messages extends NLS {
 	public static String RemoteSyncWizardPage_0;
 	public static String RemoteSyncWizardPage_description;
 	public static String SynchronizeParticipantDescriptor_invalidClass;
+	public static String SyncMenuOperation_0;
+	public static String SyncMenuOperation_1;
+	public static String SyncMenuOperation_2;
 	public static String BRPPage_RemoteProviderLabel;
 	public static String BRPPage_ConnectionLabel;
 	public static String BRPPage_RootLocation;
