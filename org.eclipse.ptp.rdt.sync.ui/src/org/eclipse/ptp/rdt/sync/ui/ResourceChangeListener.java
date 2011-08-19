@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.internal.core;
+package org.eclipse.ptp.rdt.sync.ui;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
-import org.eclipse.ptp.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SYNC_MODE;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 
