@@ -88,12 +88,15 @@ public class SyncManager  {
 		private final ISyncServiceProvider fSyncProvider;
 		private final IResourceDelta fDelta;
 		private final EnumSet<SyncFlag> fSyncFlags;
+		private final SyncExceptionHandler fSyncExceptionHandler;
 
-		public SynchronizeJob(IResourceDelta delta, ISyncServiceProvider provider, EnumSet<SyncFlag> syncFlags) {
+		public SynchronizeJob(IResourceDelta delta, ISyncServiceProvider provider, EnumSet<SyncFlag> syncFlags,
+				SyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
 			fDelta = delta;
 			fSyncProvider = provider;
 			fSyncFlags = syncFlags;
+			fSyncExceptionHandler = seHandler;
 		}
 
 		/*
@@ -107,8 +110,11 @@ public class SyncManager  {
 			try {
 				fSyncProvider.synchronize(fDelta, progress.newChild(100), fSyncFlags);
 			} catch (CoreException e) {
-				System.out.println(Messages.SyncManager_8 + e.getLocalizedMessage());
-				e.printStackTrace();
+				if (fSyncExceptionHandler == null) {
+					System.out.println(Messages.SyncManager_8 + e.getLocalizedMessage());
+				} else {
+					fSyncExceptionHandler.handle(e);
+				}
 			} finally {
 				monitor.done();
 			}
@@ -268,8 +274,9 @@ public class SyncManager  {
 	 * @return the scheduled sync job
 	 * @throws CoreException 
 	 */
-	public static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		return sync(delta, project, syncFlags, false, null);
+	public static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, SyncExceptionHandler seHandler)
+			throws CoreException {
+		return sync(delta, project, syncFlags, false, seHandler, null);
 	}
 	
 	/**
@@ -287,11 +294,11 @@ public class SyncManager  {
 	 */
 	public static Job syncBlocking(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, IProgressMonitor monitor)
 			throws CoreException {
-		return sync(delta, project, syncFlags, true, monitor);
+		return sync(delta, project, syncFlags, true, null, monitor);
 	}
 	
 	private static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, boolean isBlocking,
-			IProgressMonitor monitor) throws CoreException {
+			SyncExceptionHandler seHandler, IProgressMonitor monitor) throws CoreException {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		if (!(bcm.isInitialized(project))) {
 			return null;
@@ -299,7 +306,7 @@ public class SyncManager  {
 
 		IConfiguration[] buildConfigurations = new IConfiguration[1];
 		buildConfigurations[0] = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
-		Job[] syncJobs = scheduleSyncJobs(delta, project, syncFlags, buildConfigurations, isBlocking, monitor);
+		Job[] syncJobs = scheduleSyncJobs(delta, project, syncFlags, buildConfigurations, isBlocking, seHandler, monitor);
 		return syncJobs[0];
 	}
 
@@ -318,19 +325,21 @@ public class SyncManager  {
 	 * @throws CoreException
 	 * 			  on problems sync'ing
 	 */
-	public static Job[] syncAll(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags) throws CoreException {
+	public static Job[] syncAll(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, SyncExceptionHandler seHandler)
+			throws CoreException {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		if (!(bcm.isInitialized(project))) {
 			return new Job[0];
 		}
 
 		return scheduleSyncJobs(delta, project, syncFlags, ManagedBuildManager.getBuildInfo(project).getManagedProject()
-				.getConfigurations(), false, null);
+				.getConfigurations(), false, seHandler, null);
 	}
 
 	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor
 	private static Job[] scheduleSyncJobs(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags,
-			IConfiguration[] buildConfigurations, boolean isBlocking, IProgressMonitor monitor) throws CoreException {
+			IConfiguration[] buildConfigurations, boolean isBlocking, SyncExceptionHandler seHandler, IProgressMonitor monitor)
+			throws CoreException {
 		int jobNum = 0;
 		Job[] syncJobs = new Job[buildConfigurations.length];
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
@@ -344,7 +353,7 @@ public class SyncManager  {
 					if (isBlocking) {
 						provider.synchronize(delta, monitor, syncFlags);
 					} else {
-						job = new SynchronizeJob(delta, provider, syncFlags);
+						job = new SynchronizeJob(delta, provider, syncFlags, seHandler);
 						job.setRule(syncRule);
 						job.schedule();
 					}

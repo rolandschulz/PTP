@@ -19,12 +19,15 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.rdt.sync.core.SyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SYNC_MODE;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -41,7 +44,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String setActiveCommand = "set_active"; //$NON-NLS-1$
 	private static final String setAllCommand = "set_all"; //$NON-NLS-1$
 	private static final String syncAutoCommand = "sync_auto"; //$NON-NLS-1$
-	
+
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		String command = event.getParameter(SYNC_COMMAND_PARAMETER_ID);
 		IProject project = getProject();
@@ -53,16 +56,16 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 		// On sync request, sync regardless of the flags
 		try {
 			if (command.equals(syncActiveCommand)) {
-				SyncManager.sync(null, project, SyncFlag.FORCE);
+				SyncManager.sync(null, project, SyncFlag.FORCE, null);
 			} else if (command.equals(syncAllCommand)) {
-				SyncManager.syncAll(null, project, SyncFlag.FORCE);
+				SyncManager.syncAll(null, project, SyncFlag.FORCE, null);
 				// If user switches to active or all, assume the user wants to sync right away
 			} else if (command.equals(setActiveCommand)) {
 				SyncManager.setSyncMode(project, SYNC_MODE.ACTIVE);
-				SyncManager.sync(null, project, SyncFlag.FORCE);
+				SyncManager.sync(null, project, SyncFlag.FORCE, null);
 			} else if (command.equals(setAllCommand)) {
 				SyncManager.setSyncMode(project, SYNC_MODE.ALL);
-				SyncManager.syncAll(null, project, SyncFlag.FORCE);
+				SyncManager.syncAll(null, project, SyncFlag.FORCE, null);
 			} else if (command.equals(setNoneCommand)) {
 				SyncManager.setSyncMode(project, SYNC_MODE.NONE);
 			} else if (command.equals(syncAutoCommand)) {
@@ -71,9 +74,9 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				if (SyncManager.getSyncAuto()) {
 					SYNC_MODE syncMode = SyncManager.getSyncMode(project);
 					if (syncMode == SYNC_MODE.ACTIVE) {
-						SyncManager.sync(null, project, SyncFlag.FORCE);
+						SyncManager.sync(null, project, SyncFlag.FORCE, null);
 					} else if (syncMode == SYNC_MODE.ALL) {
-						SyncManager.syncAll(null, project, SyncFlag.FORCE);
+						SyncManager.syncAll(null, project, SyncFlag.FORCE, null);
 					}
 				}
 			}
