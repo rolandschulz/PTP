@@ -18,7 +18,6 @@ import org.eclipse.ui.IMemento;
 /**
  * Class for build information that will be mapped to a specific service configuration. Utility methods for reading and writing
  * the information to a memento are provided.
- * @since 3.1
  */
 public class BuildScenario {
 	private static final String ATTR_SYNC_PROVIDER = "sync-provider"; //$NON-NLS-1$

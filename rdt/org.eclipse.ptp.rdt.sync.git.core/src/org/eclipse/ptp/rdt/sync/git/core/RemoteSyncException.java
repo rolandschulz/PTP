@@ -29,7 +29,7 @@ public class RemoteSyncException extends CoreException {
 	}
 
 	public RemoteSyncException(Throwable arg0) {
-		super(new Status(IStatus.ERROR, pluginID, "", arg0)); //$NON-NLS-1$
+		super(new Status(IStatus.ERROR, pluginID, null, arg0));
 	}
 
 	public RemoteSyncException(Status status) {

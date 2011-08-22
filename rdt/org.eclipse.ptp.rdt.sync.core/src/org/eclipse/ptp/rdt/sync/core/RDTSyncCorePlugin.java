@@ -13,7 +13,7 @@ package org.eclipse.ptp.rdt.sync.core;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.internal.rdt.sync.core.ResourceChangeListener;
+import org.eclipse.ptp.rdt.sync.internal.core.ResourceChangeListener;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -24,7 +24,6 @@ import org.osgi.framework.BundleContext;
  * the RDT team.
  * 
  * @author crecoskie
- * @since 2.0
  */
 public class RDTSyncCorePlugin extends Plugin {
 

@@ -30,7 +30,6 @@ import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
  * it will remain the same. Please do not use this API without consulting with
  * the RDT team.
  * 
- * @since 2.0
  * 
  */
 public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
