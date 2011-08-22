@@ -5,16 +5,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner.CommandResults;
@@ -26,6 +28,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+@SuppressWarnings("restriction")
 @RunWith(Parameterized.class)
 public class BasicGitSyncTests {
 	String host;
@@ -100,23 +103,52 @@ public class BasicGitSyncTests {
 		tempGitConn.getGITConn().syncRemoteToLocal(null, false);
 	}
 	
+	/* next two test sync empty file in one direction and than a change in the other
+	 * (doesn't follow simple test recommendation but 2nd step requires first so no use in breaking apart
+	 */
 	@Test 
-	public void testSyncLocalToRemoteRegularFile() throws IOException, CoreException {
+	public void testSyncLocalToRemoteToLocal() throws IOException, CoreException {
+		//sync empty file
 		tempGitConn.getLocalFolder().newFile("testFile");
 		tempGitConn.getGITConn().syncLocalToRemote(null);
-		//assertTrue(tempGitConn.getFileManager().getResource(tempGitConn.getRemoteFolder()+"/testFile").fetchInfo().exists());
+
+		//check file was synced
 		assertArrayEquals(tempGitConn.getFileManager().getResource(tempGitConn.getRemoteFolder()+"/testFile").childNames(EFS.NONE, null),
 				 new String[]{"testFile"});
+		
+		//TODO: change file and sync in other direction 
+		
 	}
 	
 	@Test 
-	public void testSyncRemoteToLocalRegularFile() throws CoreException, IOException {
-		tempGitConn.getFileManager().getResource(tempGitConn.getRemoteFolder()+"/testFile").openOutputStream(EFS.NONE, null).close();
+	public void testSyncRemoteToLocalToRemote() throws CoreException, IOException {
+		//sync empty file
+		IFileStore remoteTestFile = tempGitConn.getFileManager().getResource(tempGitConn.getRemoteFolder()+"/testFile");
+		remoteTestFile.openOutputStream(EFS.NONE, null).close();
 		tempGitConn.getGITConn().syncRemoteToLocal(null, true);
-		assertArrayEquals(tempGitConn.getLocalFolder().getRoot().list(new FilenameFilter() {
+		
+		//check file was synced
+		File localRoot = tempGitConn.getLocalFolder().getRoot();
+		assertArrayEquals(localRoot.list(new FilenameFilter() {
 			public boolean accept(File dir, String name) {
 				return !name.equals(".ptp-sync");
 			}
 		}), new String[]{"testFile"});
+		
+		//now sync change in other directions, first write data
+		OutputStream out = new FileOutputStream(new File(localRoot.getAbsoluteFile(),"testFile"));
+		byte data[] = "some data".getBytes();
+		out.write(data);
+		out.close();
+		
+		//sync
+		tempGitConn.getGITConn().syncLocalToRemote(null);
+		
+		//read data and compare
+		byte buf[] = new byte[data.length];
+		InputStream in = remoteTestFile.openInputStream(EFS.NONE, null);
+		in.read(buf);
+		in.close();
+		assertArrayEquals(data, buf);
 	}
 }

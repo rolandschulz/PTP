@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 
 import java.util.Random;
 
-import javax.security.auth.login.FailedLoginException;
-
 import org.eclipse.ptp.rdt.sync.git.core.GitRemoteSyncConnection;
 import org.eclipse.ptp.rdt.sync.git.core.SyncFileFilter;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -13,13 +11,13 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
 
 import org.eclipse.core.filesystem.EFS;
 
+@SuppressWarnings("restriction")
 public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 	private GitRemoteSyncConnection fGITConn;
 	private IRemoteConnection fRemoteConnection;
