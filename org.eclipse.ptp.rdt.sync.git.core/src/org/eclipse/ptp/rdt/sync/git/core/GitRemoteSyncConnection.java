@@ -337,7 +337,7 @@ public class GitRemoteSyncConnection {
 			RemoteExecutionException, RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
-			List<String> command = stringToList(gitCommand + " rm"); //$NON-NLS-1$
+			List<String> command = stringToList(gitCommand + " rm --"); //$NON-NLS-1$
 			for (String fileName : filesToDelete) {
 				command.add(fileName);
 			}
