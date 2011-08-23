@@ -65,7 +65,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
  */
 public class GitRemoteSyncConnection {
 
-	private final int MAX_FILES = 2;
+	private final int MAX_FILES = 100;
 	private static final String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
 	private static final String commitMessage = Messages.GRSC_CommitMessage;
 	public static final String gitDir = ".ptp-sync"; //$NON-NLS-1$
