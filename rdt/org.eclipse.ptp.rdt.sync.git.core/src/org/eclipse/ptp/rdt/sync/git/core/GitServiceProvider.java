@@ -47,8 +47,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private static final String GIT_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
 	private static final String GIT_SERVICES_ID = "servicesId"; //$NON-NLS-1$
 	private static final String GIT_PROJECT_NAME = "projectName"; //$NON-NLS-1$
-	private static final String ERROR_MESSAGE_TITLE = Messages.GitServiceProvider_0;
-	private static final String ERROR_MESSAGE_TOGGLE = Messages.GitServiceProvider_3;
 	private IProject fProject = null;
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
@@ -320,7 +318,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				syncLock.unlock();
 			}
 			
-			// Sync successful - re-enable error messages
+			// Sync successful - re-enable error messages. This is really UI code, but there is no way at the moment to notify UI
+			// of a successful sync.
 			SyncManager.setShowErrors(getProject(), true);
 
 			IProject project = this.getProject();
@@ -334,16 +333,18 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	}
 
 	/**
-	 * Error handler. There are several reasons why a sync operation may fail. This function is responsible for handling each case
-	 * appropriately. For now we simply report any errors to the user.
+	 * Handle sync errors appropriately. Currently, this function only handles forced sync errors by displaying them to the user.
+	 * Non-forced syncs are called by the UI, so errors are thrown for the UI to handle.
 	 * 
 	 * @param e
 	 *            the remote sync exception
 	 * @param syncFlags 
+	 * @throws RemoteSyncException
+	 * 			  for non-forced syncs
 	 */
-	private void handleRemoteSyncException(RemoteSyncException e, EnumSet<SyncFlag> syncFlags) {
-		if (!SyncManager.getShowErrors(getProject()) && syncFlags == SyncFlag.NO_FORCE) {
-			return;
+	private void handleRemoteSyncException(RemoteSyncException e, EnumSet<SyncFlag> syncFlags) throws RemoteSyncException {
+		if (syncFlags == SyncFlag.NO_FORCE) {
+			throw e;
 		}
 		final String message;
 		final String endOfLineChar = System.getProperty("line.separator"); //$NON-NLS-1$
@@ -355,28 +356,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		} else {
 			message = Messages.GSP_SyncErrorMessage + this.getProject().getName() +":" + endOfLineChar + endOfLineChar + e.getCause().getMessage(); //$NON-NLS-1$
 		}
-		e.printStackTrace();
 		
-		// For forced sync, use the status manager and just print an error dialog
-		// if (syncFlags == SyncFlag.FORCE) {
-			IStatus status = null;
-			int severity = e.getStatus().getSeverity();
-            status = new Status(severity, Activator.PLUGIN_ID, message, e);
-            StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
-//		} else { // For non-forced sync, display message with toggle
-//			Display errorDisplay = RDTSyncUIPlugin.getStandardDisplay();
-//			errorDisplay.syncExec(new Runnable () {
-//				public void run() {
-//					MessageDialogWithToggle dialog = MessageDialogWithToggle.openError(null, ERROR_MESSAGE_TITLE, message,
-//							ERROR_MESSAGE_TOGGLE, !SyncManager.getShowErrors(getProject()), null, null);
-//					if (dialog.getToggleState()) {
-//						SyncManager.setShowErrors(getProject(), false);
-//					} else {
-//						SyncManager.setShowErrors(getProject(), true);
-//					}
-//				}
-//			});
-//		}
+		IStatus status = null;
+		int severity = e.getStatus().getSeverity();
+		status = new Status(severity, Activator.PLUGIN_ID, message, e);
+		StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
 	}
 
 	// Paths that the Git sync provider can ignore.
