@@ -24,7 +24,14 @@ public class Messages extends NLS {
 	public static String ConvertToSyncProjectWizardPage_convertingToSyncProject;
 	public static String RemoteSyncWizardPage_0;
 	public static String RemoteSyncWizardPage_description;
+	public static String ResourceChangeListener_0;
 	public static String SynchronizeParticipantDescriptor_invalidClass;
+	public static String SyncMenuOperation_0;
+	public static String SyncMenuOperation_1;
+	public static String SyncMenuOperation_2;
+	public static String SyncMenuOperation_3;
+	public static String SyncMenuOperation_4;
+	public static String SyncMenuOperation_5;
 	public static String BRPPage_RemoteProviderLabel;
 	public static String BRPPage_ConnectionLabel;
 	public static String BRPPage_RootLocation;
@@ -34,6 +41,8 @@ public class Messages extends NLS {
 	public static String GitParticipant_1;
 	public static String GitParticipant_2;
 	public static String GitParticipant_3;
+	public static String GitServiceProvider_0;
+	public static String GitServiceProvider_3;
 	public static String WorkspaceConfigName;
 
 	static {

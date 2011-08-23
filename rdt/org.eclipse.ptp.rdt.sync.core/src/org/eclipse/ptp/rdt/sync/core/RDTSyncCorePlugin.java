@@ -13,7 +13,6 @@ package org.eclipse.ptp.rdt.sync.core;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.rdt.sync.internal.core.ResourceChangeListener;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -42,13 +41,11 @@ public class RDTSyncCorePlugin extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		ResourceChangeListener.startListening();
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		try {
-			ResourceChangeListener.stopListening();
 		} finally {
 			super.stop(context);
 		}

@@ -54,11 +54,13 @@ public class RDTSyncUIPlugin extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		ResourceChangeListener.startListening();
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		try {
+			ResourceChangeListener.stopListening();
 		} finally {
 			super.stop(context);
 		}
