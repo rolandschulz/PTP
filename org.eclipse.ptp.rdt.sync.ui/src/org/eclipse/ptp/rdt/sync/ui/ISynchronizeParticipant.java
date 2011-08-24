@@ -13,6 +13,8 @@ package org.eclipse.ptp.rdt.sync.ui;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -52,4 +54,49 @@ public interface ISynchronizeParticipant {
 	 * @return true if the configuration is complete
 	 */
 	public boolean isConfigComplete();
+	
+	// Setter methods to allow parent UI to set values programmatically and even disallow editing depending on the situation.
+	// (For example, if the project already exists and is being converted to a sync project, this information is already known.)
+	
+	/**
+	 * Set remote location
+	 *
+	 * @param location
+	 */
+	public void setRemoteLocation(String location);
+	
+	/**
+	 * Disable editing of remote location
+	 *
+	 * @param isEditable
+	 */
+	public void setRemoteLocationEditable(boolean isEditable);
+	
+	/**
+	 * Set remote connection
+	 *
+	 * @param connection
+	 */
+	public void setRemoteConnection(IRemoteConnection connection);
+	
+	/**
+	 * Disable editing of remote connection
+	 *
+	 * @param isEditable
+	 */
+	public void setRemoteConnectionEditable(boolean isEditable);
+
+	/**
+	 * Set remote services 
+	 *
+	 * @param services
+	 */
+	public void setRemoteServices(IRemoteServices services);
+	
+	/**
+	 * Disable editing of remote services
+	 *
+	 * @param isEditable
+	 */
+	public void setRemoteServicesEditable(boolean isEditable);
 }

@@ -184,13 +184,11 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 				RDTSyncUIPlugin.log(e.toString(), e);
 			}
 
-			// Create build scenario based on initial remote location
-			// information
+			// Create build scenario based on initial remote location information
 			ISyncServiceProvider provider = participant.getProvider(project);
 			BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(), provider.getLocation());
 
-			// For each build configuration, set the build directory
-			// appropriately.
+			// For each build configuration, set the build directory appropriately.
 			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 			if (buildInfo == null) {
 				throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
@@ -208,10 +206,8 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 			}
 			ManagedBuildManager.saveBuildInfo(project, true);
 
-			// Add information about remote location to the initial build
-			// configurations.
-			// Do this last (except for adding local configuration) so that
-			// project is not flagged as initialized prematurely.
+			// Add information about remote location to the initial build configurations. Do this last (except for adding local
+			// configuration) so that project is not flagged as initialized prematurely.
 			BuildConfigurationManager.getInstance().initProject(project, serviceConfig, buildScenario);
 			try {
 				BuildConfigurationManager.getInstance().saveConfigurationData();

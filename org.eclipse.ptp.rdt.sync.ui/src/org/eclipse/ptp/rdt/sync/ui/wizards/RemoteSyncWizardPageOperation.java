@@ -70,13 +70,13 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			return;
 		}
 
-//		try {
-//			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
-//		} catch (CoreException e1) {
-//			StatusManager.getManager().handle(e1, RDTSyncUIPlugin.PLUGIN_ID);
-//		}
+		// try {
+		// RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
+		// } catch (CoreException e1) {
+		// StatusManager.getManager().handle(e1, RDTSyncUIPlugin.PLUGIN_ID);
+		// }
 
-		// BUild the service configuration
+		// Build the service configuration
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 		IServiceConfiguration serviceConfig = smm.newServiceConfiguration(getConfigName(project.getName()));
 		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
@@ -111,19 +111,17 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		for (IConfiguration config : allConfigs) {
 			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
 			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
-			//turn off append contributed(local) environment variables for the build configuration of the remote project
+			// turn off append contributed(local) environment variables for the build configuration of the remote project
 			ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
-			if(c_mb_confgDes!=null){
+			if (c_mb_confgDes != null) {
 				EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
-				//EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_mb_confgDes);
+				// EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_mb_confgDes);
 			}
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
 
-		// Add information about remote location to the initial build
-		// configurations.
-		// Do this last (except for adding local configuration) so that project
-		// is not flagged as initialized prematurely.
+		// Add information about remote location to the initial build configurations. Do this last (except for adding local
+		// configuration) so that project is not flagged as initialized prematurely.
 		BuildConfigurationManager.getInstance().initProject(project, serviceConfig, buildScenario);
 		try {
 			BuildConfigurationManager.getInstance().saveConfigurationData();

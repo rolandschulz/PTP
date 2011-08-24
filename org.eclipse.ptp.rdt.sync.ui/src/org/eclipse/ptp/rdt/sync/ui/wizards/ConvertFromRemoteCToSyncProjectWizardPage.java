@@ -1,18 +1,21 @@
 /*******************************************************************************
- * Copyright (c) 2011 Oak Ridge National Laboratory and others.
+ * Copyright (c) 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    John Eblen - initial implementation
+ * IBM Corporation - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ptp.rdt.sync.ui.wizards;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,7 +39,9 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
+import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
@@ -49,15 +54,17 @@ import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -70,12 +77,12 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 
 	private Combo fProviderCombo;
 	private Text fLocationText;
+	private Composite fProviderArea;
+	private StackLayout fProviderStack;
+	private final List<Composite> fProviderControls = new ArrayList<Composite>();
 	private ISynchronizeParticipantDescriptor fSelectedProvider;
 	private final Map<Integer, ISynchronizeParticipantDescriptor> fComboIndexToDescriptorMap = new HashMap<Integer, ISynchronizeParticipantDescriptor>();
 
-	/**
-	 * @since 2.0
-	 */
 	protected Map<IProject, IServiceConfiguration> projectConfigs = new HashMap<IProject, IServiceConfiguration>();
 
 	/**
@@ -85,6 +92,23 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 	 */
 	public ConvertFromRemoteCToSyncProjectWizardPage(String pageName) {
 		super(pageName);
+	}
+
+	private void addProviderControl(ISynchronizeParticipantDescriptor desc) {
+		Composite comp = null;
+		ISynchronizeParticipant part = desc.getParticipant();
+		if (part != null) {
+			setParticipantData(part);
+			comp = new Composite(fProviderArea, SWT.NONE);
+			comp.setLayout(new GridLayout(1, false));
+			comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			part.createConfigurationArea(comp, getWizard().getContainer());
+		}
+		fProviderControls.add(comp);
+	}
+	
+	private void setParticipantData(ISynchronizeParticipant part) {
+		
 	}
 
 	@Override
@@ -114,12 +138,20 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 			}
 		});
 
+		fProviderArea = new Group(comp, SWT.SHADOW_ETCHED_IN);
+		fProviderStack = new StackLayout();
+		fProviderArea.setLayout(fProviderStack);
+		GridData providerAreaData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		providerAreaData.horizontalSpan = 3;
+		fProviderArea.setLayoutData(providerAreaData);
+
 		// populate the combo with a list of providers
 		ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
 
 		for (int k = 0; k < providers.length; k++) {
 			fProviderCombo.add(providers[k].getName(), k);
 			fComboIndexToDescriptorMap.put(k, providers[k]);
+			addProviderControl(providers[k]);
 		}
 
 		// Label for location
@@ -143,9 +175,6 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 		handleProviderSelected();
 	}
 
-	/**
-	 * @since 2.0
-	 */
 	protected void convertProject(IProject project, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.ConvertToSyncProjectWizardPage_convertingToSyncProject, 3);
 		
@@ -180,6 +209,17 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 				serviceConfig.setServiceProvider(buildService, rbsp);
 			}
 
+			smm.addConfiguration(project, serviceConfig);
+			try {
+				smm.saveModelConfiguration();
+			} catch (IOException e) {
+				RDTSyncUIPlugin.log(e.toString(), e);
+			}
+
+			// Create build scenario based on initial remote location information
+			ISyncServiceProvider provider = participant.getProvider(project);
+			BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(), provider.getLocation());
+
 			// For each build configuration, set builder to be the sync builder
 			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 			if (buildInfo == null) {
@@ -198,9 +238,9 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 			}
 			ManagedBuildManager.saveBuildInfo(project, true);
 
-			// Initialize project for the BuildConfigurationManager
-			// Do this last (except for adding local configuration) so that project is not flagged as initialized prematurely.
-			BuildConfigurationManager.getInstance().initProject(project, serviceConfig, null);
+			// Add information about remote location to the initial build configurations. Do this last (except for adding local
+			// configuration) so that project is not flagged as initialized prematurely.
+			BuildConfigurationManager.getInstance().initProject(project, serviceConfig, buildScenario);
 			try {
 				BuildConfigurationManager.getInstance().saveConfigurationData();
 			} catch (IOException e) {
@@ -254,9 +294,6 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 		}
 	}
 
-	/**
-	 * @since 2.0
-	 */
 	protected IServiceConfiguration getConfig(IProject project) {
 		IServiceConfiguration config = projectConfigs.get(project);
 		if (config == null) {
@@ -333,10 +370,11 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 	 */
 	private void handleProviderSelected() {
 		int index = fProviderCombo.getSelectionIndex();
+		fProviderStack.topControl = fProviderControls.get(index);
 		fSelectedProvider = fComboIndexToDescriptorMap.get(index);
+		fProviderArea.layout();
 		update();
 	}
-
 
 	/**
 	 * Return true for projects that are:
@@ -371,4 +409,5 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 	private void update() {
 		getWizard().getContainer().updateMessage();
 	}
+
 }
