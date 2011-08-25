@@ -35,6 +35,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
@@ -146,6 +148,17 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 
 		fProviderCombo.select(0);
 		handleProviderSelected();
+		
+		// Need to update whenever the project selection changes
+		this.tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				update();
+			}
+		});
+		
+		// These buttons are useless when only one project should be selected
+		this.selectAllButton.setVisible(false);
+		this.deselectAllButton.setVisible(false);
 	}
 
 	protected void convertProject(IProject project, IProgressMonitor monitor) throws CoreException {
@@ -188,7 +201,7 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 			ISyncServiceProvider provider = participant.getProvider(project);
 			BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(), provider.getLocation());
 
-			// For each build configuration, set the build directory appropriately.
+			// For each build configuration, set builder to be the sync builder
 			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 			if (buildInfo == null) {
 				throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
@@ -306,6 +319,8 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 			errMsg = super.getErrorMessage();
 		} else if (fSelectedProvider == null) {
 			errMsg = Messages.ConvertToSyncProjectWizardPage_0;
+		} else if (this.getCheckedElements().length != 1) {
+			errMsg = Messages.ConvertFromRemoteCToSyncProjectWizardPage_3;
 		} else {
 			errMsg = fSelectedProvider.getParticipant().getErrorMessage();
 		}
@@ -366,11 +381,6 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 
 		return a && b && c && d;
 	}
-
-	/*
-	 * @Override public boolean validatePage() { return super.validatePage();//
-	 * && getErrorMessage()==null; }
-	 */
 
 	private void update() {
 		getWizard().getContainer().updateMessage();

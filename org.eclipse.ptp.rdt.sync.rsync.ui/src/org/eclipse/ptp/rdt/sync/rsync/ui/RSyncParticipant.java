@@ -657,7 +657,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setRemoteLocationEditable(boolean)
 	 */
-	public void setRemoteLocationEditable(boolean isEditable) {
+	public void setRemoteLocationEnabled(boolean isEditable) {
 		fLocationText.setEditable(isEditable);
 	}
 
@@ -673,7 +673,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setRemoteConnectionEditable(boolean)
 	 */
-	public void setRemoteConnectionEditable(boolean isEditable) {
+	public void setRemoteConnectionEnabled(boolean isEditable) {
 		fConnectionCombo.setEnabled(isEditable);
 	}
 
@@ -689,7 +689,7 @@ public class RSyncParticipant implements ISynchronizeParticipant {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setRemoteServicesEditable(boolean)
 	 */
-	public void setRemoteServicesEditable(boolean isEditable) {
+	public void setRemoteServicesEnabled(boolean isEditable) {
 		fProviderCombo.setEnabled(isEditable);
 	}
 }

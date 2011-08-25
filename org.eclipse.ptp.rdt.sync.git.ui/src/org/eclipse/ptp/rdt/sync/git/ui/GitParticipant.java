@@ -379,8 +379,9 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setRemoteLocationEditable(boolean)
 	 */
-	public void setRemoteLocationEditable(boolean isEditable) {
-		fLocationText.setEditable(isEditable);
+	public void setRemoteLocationEnabled(boolean isEnabled) {
+		fLocationText.setEnabled(isEnabled);
+		fBrowseButton.setVisible(isEnabled);
 	}
 
 	/*
@@ -395,8 +396,9 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setRemoteConnectionEditable(boolean)
 	 */
-	public void setRemoteConnectionEditable(boolean isEditable) {
-		fConnectionCombo.setEnabled(isEditable);
+	public void setRemoteConnectionEnabled(boolean isEnabled) {
+		fConnectionCombo.setEnabled(isEnabled);
+		fNewConnectionButton.setVisible(isEnabled);
 	}
 
 	/*
@@ -411,7 +413,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setRemoteServicesEditable(boolean)
 	 */
-	public void setRemoteServicesEditable(boolean isEditable) {
-		fProviderCombo.setEnabled(isEditable);
+	public void setRemoteServicesEnabled(boolean isEnabled) {
+		fProviderCombo.setEnabled(isEnabled);
 	}
 }

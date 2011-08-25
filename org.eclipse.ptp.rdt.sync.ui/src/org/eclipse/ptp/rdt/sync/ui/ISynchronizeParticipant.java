@@ -70,7 +70,7 @@ public interface ISynchronizeParticipant {
 	 *
 	 * @param isEditable
 	 */
-	public void setRemoteLocationEditable(boolean isEditable);
+	public void setRemoteLocationEnabled(boolean isEditable);
 	
 	/**
 	 * Set remote connection
@@ -84,7 +84,7 @@ public interface ISynchronizeParticipant {
 	 *
 	 * @param isEditable
 	 */
-	public void setRemoteConnectionEditable(boolean isEditable);
+	public void setRemoteConnectionEnabled(boolean isEditable);
 
 	/**
 	 * Set remote services 
@@ -98,5 +98,5 @@ public interface ISynchronizeParticipant {
 	 *
 	 * @param isEditable
 	 */
-	public void setRemoteServicesEditable(boolean isEditable);
+	public void setRemoteServicesEnabled(boolean isEditable);
 }
