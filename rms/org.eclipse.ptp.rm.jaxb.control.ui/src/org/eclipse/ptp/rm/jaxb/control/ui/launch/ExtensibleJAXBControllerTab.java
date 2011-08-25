@@ -23,6 +23,8 @@ import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamic
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -163,12 +165,24 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+		String lastTab = null;
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
+		try {
+			String key = rm.getUniqueName() + JAXBUIConstants.DOT + JAXBUIConstants.CURRENT_CONTROLLER;
+			lastTab = configuration.getAttribute(key, JAXBUIConstants.ZEROSTR);
+		} catch (CoreException t1) {
+			JAXBUIPlugin.log(t1);
+		}
+		int i = 0;
 		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
+			if (tabControl.getControllerTag().equals(lastTab)) {
+				lastIndex = i;
+			}
 			RMLaunchValidation validation = tabControl.initializeFrom(control, rm, queue, configuration);
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
 			}
+			i++;
 		}
 		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
 			try {
