@@ -23,6 +23,8 @@ import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamic
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -53,10 +55,12 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 * reset to valid (false) at the next load of a resource manager.
 	 */
 	protected boolean voidRMConfig;
+	protected boolean initialized;
 	protected TabFolder tabFolder;
 	protected int lastIndex;
 
 	private final LinkedList<AbstractJAXBLaunchConfigurationTab> tabControllers = new LinkedList<AbstractJAXBLaunchConfigurationTab>();
+
 	private final Map<String, AbstractJAXBLaunchConfigurationTab> controllerIndex = new HashMap<String, AbstractJAXBLaunchConfigurationTab>();
 	private Composite control;
 
@@ -66,6 +70,7 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	protected ExtensibleJAXBControllerTab(ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		voidRMConfig = false;
+		initialized = false;
 		lastIndex = 0;
 	}
 
@@ -163,13 +168,30 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+		String lastTab = null;
+		String key = null;
+		try {
+			key = rm.getUniqueName() + JAXBUIConstants.DOT + JAXBUIConstants.INITIALIZED;
+			initialized = configuration.getAttribute(key, false);
+			key = rm.getUniqueName() + JAXBUIConstants.DOT + JAXBUIConstants.CURRENT_CONTROLLER;
+			lastTab = configuration.getAttribute(key, JAXBUIConstants.ZEROSTR);
+		} catch (CoreException t1) {
+			JAXBUIPlugin.log(t1);
+		}
+
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
+		int i = 0;
 		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
+			if (tabControl.getControllerTag().equals(lastTab)) {
+				lastIndex = i;
+			}
 			RMLaunchValidation validation = tabControl.initializeFrom(control, rm, queue, configuration);
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
 			}
+			i++;
 		}
+
 		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
 			try {
 				tabControl.setUpSharedEnvironment(controllerIndex);
@@ -177,16 +199,30 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 				return new RMLaunchValidation(false, t.getLocalizedMessage());
 			}
 		}
-		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
+
+		if (!initialized) {
+			for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
+				try {
+					tabControl.refreshLocal(configuration.getWorkingCopy());
+				} catch (CoreException t) {
+					return new RMLaunchValidation(false, t.getLocalizedMessage());
+				}
+			}
 			try {
-				tabControl.getControl().setVisible(true);
-				tabControl.refreshLocal(configuration.getWorkingCopy());
-				tabControl.getControl().setVisible(false);
+				configuration.getWorkingCopy().setAttribute(rm.getUniqueName() + JAXBUIConstants.DOT + JAXBUIConstants.INITIALIZED,
+						true);
 			} catch (CoreException t) {
-				return new RMLaunchValidation(false, t.getLocalizedMessage());
+				JAXBUIPlugin.log(t);
 			}
 		}
 		return resultValidation;
+	}
+
+	/**
+	 * @return whether the config has already been initialized for this rm
+	 */
+	public boolean isInitialized() {
+		return initialized;
 	}
 
 	/*

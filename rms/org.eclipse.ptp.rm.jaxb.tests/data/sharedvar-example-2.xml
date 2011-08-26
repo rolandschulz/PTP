@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011 University of Illinois All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- * Contributors: -->
+<!-- * Albert L. Rossi - design and implementation -->
+<!-- ****************************************************************************** -->
+<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="resource_manager_type.xsd" name="miscellaneous-example">
+	<control-data>
+		<property name="a1" visible="true" translateBooleanAs="1,0"/>
+		<property name="a2" visible="true" translateBooleanAs="1,0"/>
+		<property name="a3" visible="true" translateBooleanAs="1,0"/>
+		<property name="a4" visible="true" translateBooleanAs="1,0"/>
+		<property name="b1" visible="true" translateBooleanAs="1,0"/>
+		<property name="b2" visible="true" translateBooleanAs="1,0"/>
+		<property name="b3" visible="true" translateBooleanAs="1,0"/>
+		<property name="b4" visible="true" translateBooleanAs="1,0"/>
+		<property name="c1" visible="true" translateBooleanAs="1,0"/>
+		<property name="c2" visible="true" translateBooleanAs="1,0"/>
+		<property name="c3" visible="true" translateBooleanAs="1,0"/>
+		<property name="c4" visible="true" translateBooleanAs="1,0"/>
+		<property name="d1" visible="true" translateBooleanAs="1,0"/>
+		<property name="d2" visible="true" translateBooleanAs="1,0"/>
+		<property name="d3" visible="true" translateBooleanAs="1,0"/>
+		<property name="d4" visible="true" translateBooleanAs="1,0"/>
+		<property name="e1" visible="true" translateBooleanAs="1,0"/>
+		<property name="e2" visible="true" translateBooleanAs="1,0"/>
+		<property name="e3" visible="true" translateBooleanAs="1,0"/>
+		<property name="e4" visible="true" translateBooleanAs="1,0"/>
+		<property name="f1" visible="true" translateBooleanAs="1,0"/>
+		<property name="f2" visible="true" translateBooleanAs="1,0"/>
+		<property name="f3" visible="true" translateBooleanAs="1,0"/>
+		<property name="f4" visible="true" translateBooleanAs="1,0"/>
+		<script>
+			<line>
+				<arg isUndefinedIfMatches="a1=">a1=${ptp_rm:a1#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="a2=">a2=${ptp_rm:a2#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="a3=">a3=${ptp_rm:a3#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="a4=">a4=${ptp_rm:a4#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="b1=">b1=${ptp_rm:b1#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="b2=">b2=${ptp_rm:b2#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="b3=">b3=${ptp_rm:b3#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="b4=">b4=${ptp_rm:b4#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="c1=">c1=${ptp_rm:c1#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="c2=">c2=${ptp_rm:c2#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="c3=">c3=${ptp_rm:c3#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="c4=">c4=${ptp_rm:c4#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="d1=">d1=${ptp_rm:d1#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="d2=">d2=${ptp_rm:d2#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="d3=">d3=${ptp_rm:d3#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="d4=">d4=${ptp_rm:d4#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="e1=">e1=${ptp_rm:e1#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="e2=">e2=${ptp_rm:e2#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="e3=">e3=${ptp_rm:e3#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="e4=">e4=${ptp_rm:e4#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="f1=">f1=${ptp_rm:f1#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="f2=">f2=${ptp_rm:f2#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="f3=">f3=${ptp_rm:f3#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="f4=">f4=${ptp_rm:f4#value}</arg>
+			</line>
+		</script>
+		<submit-interactive name="submit-interactive">
+			<arg>echo</arg>
+			<arg>$VAR_a1</arg>
+			<arg>$VAR_a2</arg>
+			<arg>$VAR_a3</arg>
+			<arg>$VAR_a4</arg>
+			<arg>$VAR_b1</arg>
+			<arg>$VAR_b2</arg>
+			<arg>$VAR_b3</arg>
+			<arg>$VAR_b4</arg>
+			<arg>$VAR_c1</arg>
+			<arg>$VAR_c2</arg>
+			<arg>$VAR_c3</arg>
+			<arg>$VAR_c4</arg>
+			<arg>$VAR_d1</arg>
+			<arg>$VAR_d2</arg>
+			<arg>$VAR_d3</arg>
+			<arg>$VAR_d4</arg>
+			<arg>$VAR_e1</arg>
+			<arg>$VAR_e2</arg>
+			<arg>$VAR_e3</arg>
+			<arg>$VAR_e4</arg>
+			<arg>$VAR_f1</arg>
+			<arg>$VAR_f2</arg>
+			<arg>$VAR_f3</arg>
+			<arg>$VAR_f4</arg>
+			<environment name="VAR_a1" value="${ptp_rm:a1#value}"/>
+			<environment name="VAR_a2" value="${ptp_rm:a2#value}"/>
+			<environment name="VAR_a3" value="${ptp_rm:a3#value}"/>
+			<environment name="VAR_a4" value="${ptp_rm:a4#value}"/>
+			<environment name="VAR_b1" value="${ptp_rm:b1#value}"/>
+			<environment name="VAR_b2" value="${ptp_rm:b2#value}"/>
+			<environment name="VAR_b3" value="${ptp_rm:b3#value}"/>
+			<environment name="VAR_b4" value="${ptp_rm:b4#value}"/>
+			<environment name="VAR_c1" value="${ptp_rm:c1#value}"/>
+			<environment name="VAR_c2" value="${ptp_rm:c2#value}"/>
+			<environment name="VAR_c3" value="${ptp_rm:c3#value}"/>
+			<environment name="VAR_c4" value="${ptp_rm:c4#value}"/>
+			<environment name="VAR_d1" value="${ptp_rm:d1#value}"/>
+			<environment name="VAR_d2" value="${ptp_rm:d2#value}"/>
+			<environment name="VAR_d3" value="${ptp_rm:d3#value}"/>
+			<environment name="VAR_d4" value="${ptp_rm:d4#value}"/>
+			<environment name="VAR_e1" value="${ptp_rm:e1#value}"/>
+			<environment name="VAR_e2" value="${ptp_rm:e2#value}"/>
+			<environment name="VAR_e3" value="${ptp_rm:e3#value}"/>
+			<environment name="VAR_e4" value="${ptp_rm:e4#value}"/>
+			<environment name="VAR_f1" value="${ptp_rm:f1#value}"/>
+			<environment name="VAR_f2" value="${ptp_rm:f2#value}"/>
+			<environment name="VAR_f3" value="${ptp_rm:f3#value}"/>
+			<environment name="VAR_f4" value="${ptp_rm:f4#value}"/>
+			<stdout-parser delim="\n">
+            <target type="property">
+               <match>
+                  <expression>(${ptp_rm:a1#value}).*</expression>
+                  <set field="name">
+                     <entry valueGroup="1"/>
+                  </set>
+               </match>
+            </target>
+         </stdout-parser>
+		</submit-interactive>
+		<launch-tab>
+			<dynamic includeWidgetValuesFrom="B,C,D,E,F">
+				<title>A</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Name</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Value</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>a1:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="a1" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>a2:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="a2" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>a3:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="a3" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>a4:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="a4" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic includeWidgetValuesFrom="A,C,D,E,F">
+				<title>B</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Name</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Value</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>b1:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="b1" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>b2:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="b2" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>b3:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="b3" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>b4:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="b4" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic includeWidgetValuesFrom="A,B,D,E,F">
+				<title>C</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Name</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Value</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>c1:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="c1" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>c2:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="c2" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>c3:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="c3" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>c4:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="c4" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic includeWidgetValuesFrom="A,B,C,E,F">
+				<title>D</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Name</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Value</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>d1:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="d1" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>d2:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="d2" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>d3:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="d3" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>d4:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="d4" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic includeWidgetValuesFrom="A,B,C,D,F">
+				<title>E</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Name</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Value</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>e1:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="e1" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>e2:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="e2" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>e3:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="e3" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>e4:</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="e4" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic includeWidgetValuesFrom="A,B,C,D,E">
+            <title>F</title>
+            <layout>
+               <grid-layout/>
+            </layout>
+            <composite group="true">
+               <layout>
+                  <grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+               </layout>
+               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>Name</fixed-text>
+               </widget>
+               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>Value</fixed-text>
+               </widget>
+               <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>f1:</fixed-text>
+               </widget>
+               <widget type="checkbox" saveValueTo="f1" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+                  </layout-data>
+               </widget>
+               <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>f2:</fixed-text>
+               </widget>
+               <widget type="checkbox" saveValueTo="f2" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+                  </layout-data>
+               </widget>
+               <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>f3:</fixed-text>
+               </widget>
+               <widget type="checkbox" saveValueTo="f3" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+                  </layout-data>
+               </widget>
+               <widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>f4:</fixed-text>
+               </widget>
+               <widget type="checkbox" saveValueTo="f4" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
+                  </layout-data>
+               </widget>
+            </composite>
+         </dynamic>
+		</launch-tab>
+	</control-data>
+	<monitor-data schedulerType="Tabbed">
+		<driver>
+			<name></name>
+		</driver>
+	</monitor-data>
+</resource-manager-builder>

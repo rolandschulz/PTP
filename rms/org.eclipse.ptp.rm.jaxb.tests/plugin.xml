@@ -39,6 +39,10 @@
             configurationFile="data/viewer-example.xml"
             name="Viewers Example">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/sharedvar-example-2.xml"
+            name="Shared Variable Example 2">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>

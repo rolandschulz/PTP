@@ -1,2 +1,0 @@
-#!/bin/bash
-./qstat | grep $1
