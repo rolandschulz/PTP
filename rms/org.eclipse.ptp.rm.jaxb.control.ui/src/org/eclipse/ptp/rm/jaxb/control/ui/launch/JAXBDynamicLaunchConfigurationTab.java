@@ -766,7 +766,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			lcMap.put(name, value);
 		}
 
-		boolean visible = c == null ? false : c.isVisible();
+		boolean visible = c == null ? false : (!getParent().isInitialized() || c.isVisible());
 		boolean enabled = c == null ? false : c.isEnabled();
 		if (visible) {
 			visibleList.add(name);
