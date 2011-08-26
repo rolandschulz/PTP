@@ -251,16 +251,16 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 
 			IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
 			IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(SyncBuildServiceProvider.ID);
-			SyncBuildServiceProvider rbsp = (SyncBuildServiceProvider) smm.getServiceProvider(descriptor);
-			if (rbsp != null) {
-				SyncBuildServiceProvider currentBuildProvider = (SyncBuildServiceProvider) smm.getActiveConfiguration(project).
-																								getServiceProvider(buildService);
+			SyncBuildServiceProvider sbsp = (SyncBuildServiceProvider) smm.getServiceProvider(descriptor);
+			if (sbsp != null) {
+				IRemoteExecutionServiceProvider currentBuildProvider =
+						(IRemoteExecutionServiceProvider) smm.getActiveConfiguration(project).getServiceProvider(buildService);
 				IRemoteConnection remoteConnection = null;
 				if (currentBuildProvider != null) {
 					remoteConnection = currentBuildProvider.getConnection();
 				}
-				rbsp.setRemoteToolsConnection(remoteConnection);
-				serviceConfig.setServiceProvider(buildService, rbsp);
+				sbsp.setRemoteToolsConnection(remoteConnection);
+				serviceConfig.setServiceProvider(buildService, sbsp);
 			}
 
 			smm.addConfiguration(project, serviceConfig);
@@ -305,6 +305,8 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 		} finally {
 			monitor.done();
 		}
+
+		// Move project from remote directory to local directory
 
 		BuildConfigurationManager.getInstance().createLocalConfiguration(project);
 	}
