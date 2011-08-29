@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.rdt.services.services">
+      <service
+            id="TestService1"
+            name="Test Service 1">
+      </service>
+      <service
+            id="TestService2"
+            name="Test Service 2">
+      </service>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.rdt.services.providers">
+      <provider
+            class="org.eclipse.ptp.rdt.services.core.TestServiceProvider"
+            configurationUIClass="org.eclipse.ptp.rdt.services.core.TestServiceProvider"
+            id="TestProvider1"
+            name="Test Provider 1"
+            serviceId="TestService1">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.rdt.services.providers">
+      <provider
+            class="org.eclipse.ptp.rdt.services.core.TestServiceProvider2"
+            configurationUIClass="org.eclipse.ptp.rdt.services.core.TestServiceProvider2"
+            id="TestProvider2"
+            name="Test Provider 2"
+            serviceId="TestService1">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.rdt.services.providers">
+      <provider
+            class="org.eclipse.ptp.rdt.services.core.TestServiceProvider3"
+            configurationUIClass="org.eclipse.ptp.rdt.services.core.TestServiceProvider3"
+            id="TestProvider3"
+            name="Test Provider 3"
+            serviceId="TestService2">
+      </provider>
+   </extension>
+
+
+	<extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="RDT Services Test"
+            visible="true"
+            id="org.eclipse.ptp.rdt.services.test.actionSet">
+         <action
+               label="&amp;Print Service Model"
+               class="org.eclipse.ptp.rdt.services.core.actions.PrintServiceModelAction"
+               tooltip="Print Service Model"
+               toolbarPath="sampleGroup"
+               id="org.eclipse.ptp.rdt.services.test.actionSet.PrintServiceModelAction">
+         </action>
+      </actionSet>
+   </extension>
+</plugin>

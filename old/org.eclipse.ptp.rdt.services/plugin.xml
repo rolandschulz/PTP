@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point id="providers" name="Service Providers" schema="schema/providers.exsd"/>
+   <extension-point id="services" name="Services" schema="schema/services.exsd"/>
+   <extension
+         point="org.eclipse.ptp.rdt.services.services">
+      <service
+            id="test1"
+            name="Test1">
+         <nature
+               id="nature1"></nature>
+         <nature
+               id="nature2">
+         </nature>
+      </service>
+      <service
+            id="test2"
+            name="Test2">
+      </service>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.eclipse.ptp.rdt.services.Startup">
+      </startup>
+   </extension>
+
+</plugin>
