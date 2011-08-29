@@ -14,6 +14,7 @@ package org.eclipse.ptp.rdt.sync.ui.wizards;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
+import org.eclipse.ptp.rdt.sync.git.core.CommandRunner;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
@@ -56,6 +58,7 @@ import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -71,10 +74,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.statushandlers.StatusManager;
 
@@ -252,10 +253,10 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 			IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
 			IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(SyncBuildServiceProvider.ID);
 			SyncBuildServiceProvider sbsp = (SyncBuildServiceProvider) smm.getServiceProvider(descriptor);
+			IRemoteConnection remoteConnection = null;
 			if (sbsp != null) {
 				IRemoteExecutionServiceProvider currentBuildProvider =
 						(IRemoteExecutionServiceProvider) smm.getActiveConfiguration(project).getServiceProvider(buildService);
-				IRemoteConnection remoteConnection = null;
 				if (currentBuildProvider != null) {
 					remoteConnection = currentBuildProvider.getConnection();
 				}
@@ -301,12 +302,26 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 				StatusManager.getManager().handle(new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, e.getMessage(), e),
 						StatusManager.SHOW);
 			}
+			
+			// Move project from remote directory to local directory
+			project.delete(true, null);
+			project.create(null);
+			project.open(null);
+			List<String> configFiles = Arrays.asList(".cproject", ".project", ".settings"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			List<String> command = Arrays.asList("scp", project.getLocation().toOSString()); //$NON-NLS-1$
+			command.addAll(configFiles);
+			CommandRunner.executeRemoteCommand(provider.getRemoteConnection(), command, provider.getLocation(), null);
+
 			monitor.done();
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.rdt.sync.ui", "", e)); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (InterruptedException e) {
+			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.rdt.sync.ui", "", e)); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (RemoteConnectionException e) {
+			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.rdt.sync.ui", "", e)); //$NON-NLS-1$ //$NON-NLS-2$
 		} finally {
 			monitor.done();
 		}
-
-		// Move project from remote directory to local directory
 
 		BuildConfigurationManager.getInstance().createLocalConfiguration(project);
 	}
