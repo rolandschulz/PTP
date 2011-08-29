@@ -1,9 +1,354 @@
-<html><head><title>MPI_Type_get_contents</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:52 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Type_get_contents</title>
+
+</head>
 <body>
-<H3>MPI_Type_get_contents</H3>
-<PRE>
-int MPI_Type_get_contents(MPI_Datatype, int, int, int, int [], MPI_Aint [], MPI_Datatype []);
-</PRE>
-<DL><DD>
-Obtains the arguments used in the creation of the datatype.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Type_get_contents</h1>
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Type_get_contents</b>
+&minus; Returns information about arguments used in creation
+of a data type.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Type_get_contents(MPI_Datatype <i>datatype</i>, int
+<i>max_integers</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int <i>max_addresses</i>, int
+<i>max_datatypes</i>, int <i>array_of_integers</i>[],
+MPI_Aint <i>array_of_addresses</i>[], MPI_Datatype
+array_of_datatypes<i>[])</i></p> </td>
+</table>
+
+<a name="Fortran Syntax (see FORTRAN 77 NOTES)"></a>
+<h2>Fortran Syntax (see FORTRAN 77 NOTES)</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_TYPE_GET_CONTENTS(<i>DATATYPE, MAX_INTEGERS,
+MAX_ADDRESSES,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>MAX_DATATYPES, ARRAY_OF_INTEGERS,
+ARRAY_OF_ADDRESSES,</i></p> </td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>ARRAY_OF_DATATYPES, IERROR</i>)</p></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>DATATYPE, MAX_INTEGERS, MAX_ADDRESSES,
+MAX_DATATYPES</i></p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>ARRAY_OF_INTEGERS(*),
+ARRAY_OF_DATATYPES(*), IERROR</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">INTEGER(KIND=MPI_ADDRESS_KIND)
+<i>ARRAY_OF_ADDRESSES</i>(*)</p> </td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void MPI::Datatype::Get_contents(int <i>max_integers</i>,
+int <i>max_addresses</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int <i>max_datatypes</i>, int
+<i>array_of_integers</i>[],</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">MPI::Aint <i>array_of_addresses</i>[],</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">MPI::Datatype <i>array_of_datatypes</i>[])
+const</p> </td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">datatype</p></td>
+<td width="3%"></td>
+<td width="45%">
+
+
+<p style="margin-top: 1em" valign="top">Data type to access
+(handle).</p> </td>
+<td width="29%">
+</td>
+</table>
+
+<p style="margin-left:11%;">max_integers</p>
+
+<p style="margin-left:26%;">Number of elements in
+<i>array_of_integers</i> (nonnegative integer).</p>
+
+<p style="margin-left:11%;">max_addresses</p>
+
+<p style="margin-left:26%;">Number of elements in
+<i>array_of_addresses</i> (nonnegative integer).</p>
+
+<p style="margin-left:11%;">max_datatypes</p>
+
+<p style="margin-left:26%;">Number of elements in
+<i>array_of_datatypes</i> (nonnegative integer).</p>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">array_of_integers</p>
+
+<p style="margin-left:26%;">Contains integer arguments used
+in constructing <i>datatype</i> (array of integers).</p>
+
+<p style="margin-left:11%;">array_of_addresses</p>
+
+<p style="margin-left:26%;">Contains address arguments used
+in constructing <i>datatype</i> (array of integers).</p>
+
+<p style="margin-left:11%;">array_of_datatypes</p>
+
+<p style="margin-left:26%;">Contains data-type arguments
+used in constructing <i>datatype</i> (array of
+integers).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">For the given
+data type, MPI_Type_get_envelope returns information on the
+number and type of input arguments used in the call that
+created the data type. The number-of-arguments values
+returned can be used to provide sufficiently large arrays in
+the decoding routine MPI_Type_get_contents. This call and
+the meaning of the returned values is described below. The
+combiner reflects the MPI data type constructor call that
+was used in creating <i>datatype</i>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The parameter
+<i>datatype</i> must be a predefined unnamed or a derived
+data type. The call is erroneous if <i>datatype</i> is a
+predefined named data type.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The values
+given for <i>max_integers</i>, <i>max_addresses</i>, and
+<i>max_datatypes</i> must be at least as large as the value
+returned in <i>num_integers</i>, <i>num_addresses</i>, and
+<i>num_datatypes</i>, respectively, in the call
+MPI_Type_get_envelope for the same <i>datatype</i>
+argument.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The data types
+returned in <i>array_of_datatypes</i> are handles to
+data-type objects that are equivalent to the data types used
+in the original construction call. If these were derived
+data types, then the returned data types are new data-type
+objects, and the user is responsible for freeing these
+datatypes with MPI_Type_free. If these were predefined data
+types, then the returned data type is equal to that
+(constant) predefined data type and cannot be freed.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The committed
+state of returned derived data types is undefined, that is,
+the data types may or may not be committed. Furthermore, the
+content of attributes of returned data types is
+undefined.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Note that
+MPI_Type_get_contents can be invoked with a data-type
+argument that was constructed using
+MPI_Type_create_f90_real, MPI_Type_create_f90_integer, or
+MPI_Type_create_f90_complex (an unnamed predefined data
+type). In such a case, an empty <i>array_of_datatypes</i> is
+returned.</p>
+
+<p style="margin-left:11%; margin-top: 1em">In the MPI-1
+data-type constructor calls, the address arguments in
+Fortran are of type INTEGER. In the new MPI-2 calls, the
+address arguments are of type INTEGER(KIND=MPI ADDRESS
+KIND). The call MPI_Type_get_contents returns all addresses
+in an argument of type INTEGER(KIND=MPI ADDRESS KIND). This
+is true even if the old MPI-1 calls were used. Thus, the
+location of values returned can be thought of as being
+returned by the C bindings. It can also be determined by
+examining the new MPI-2 calls for data-type constructors for
+the deprecated MPI-1 calls that involve addresses.</p>
+
+<a name="FORTRAN 77 NOTES"></a>
+<h2>FORTRAN 77 NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The MPI
+standard prescribes portable Fortran syntax for the
+<i>ARRAY_OF_ADDRESSES</i> argument only for Fortran 90.
+FORTRAN 77 users may use the non-portable syntax</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">INTEGER*MPI_ADDRESS_KIND
+<i>ARRAY_OF_ADDRESSES</i>(*)</p>
+
+<p style="margin-left:11%; margin-top: 1em">where
+MPI_ADDRESS_KIND is a constant defined in mpif.h and gives
+the length of the declared integer in bytes.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Type_get_envelope.html">MPI_Type_get_envelope</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

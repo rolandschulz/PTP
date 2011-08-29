@@ -1,9 +1,444 @@
-<html><head><title>MPI_Grequest_start</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:35 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Grequest_start</title>
+
+</head>
 <body>
-<H3>MPI_Grequest_start</H3>
-<PRE>
-int MPI_Grequest_start(MPI_Grequest_query_function *, MPI_Grequest_free_function *,MPI_Grequest_cancel_function *, void *, MPI_Request *);
-</PRE>
-<DL><DD>
-Initializes a generalized request.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Grequest_start</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Grequest_start</b>
+&minus; Starts a generalized request and returns a handle to
+it in <i>request</i>.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Grequest_start(MPI_Grequest_query_function
+<i>*query_fn</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Grequest_free_function
+<i>*free_fn</i>,</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Grequest_cancel_function
+<i>*cancel_fn</i>, void <i>*extra_state</i>,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Request <i>*request</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax (see FORTRAN 77 NOTES)"></a>
+<h2>Fortran Syntax (see FORTRAN 77 NOTES)</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_GREQUEST_START(<i>QUERY_FN, FREE_FN, CANCEL_FN,
+EXTRA_STATE,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top"><i>REQUEST, IERROR</i>)</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>REQUEST, IERROR</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">EXTERNAL <i>QUERY_FN, FREE_FN,
+CANCEL_FN</i></p> </td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER (KIND=MPI_ADDRESS_KIND)
+<i>EXTRA_STATE</i></p> </td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+static MPI::Grequest <br>
+MPI::Grequest::Start(const MPI::Grequest::Query_function
+<i><br>
+query_fn</i>, const MPI::Grequest::Free_function
+<i>free_fn</i>, <br>
+const MPI::Grequest::Cancel_function <i>cancel_fn</i>, <br>
+void <i>*extra_state</i>)</p>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">query_fn</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Callback function
+invoked when request status is queried (function).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">free_fn</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Callback function
+invoked when request is freed (function).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">cancel_fn</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Callback function
+invoked when request is canceled (function).</p></td>
+</table>
+
+<p style="margin-left:11%;">extra_state</p>
+
+<p style="margin-left:26%;">Extra state.</p>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">request</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Generalized request
+(handle).</p> </td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Grequest_start
+starts a generalized request and returns a handle to it in
+<i>request</i>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The syntax and
+meaning of the callback functions are listed below. All
+callback functions are passed the <i>extra_state</i>
+argument that was associated with the request by the
+starting call MPI_Grequest_start. This can be used to
+maintain user-defined state for the request. In C, the query
+function is</p>
+
+<p style="margin-left:11%; margin-top: 1em">typedef int
+MPI_Grequest_query_function(void <i>*extra_state</i>, <br>
+MPI_Status <i>*status</i>);</p>
+
+<p style="margin-left:11%; margin-top: 1em">In Fortran, it
+is</p>
+
+<p style="margin-left:11%; margin-top: 1em">SUBROUTINE
+GREQUEST_QUERY_FUNCTION(<i>EXTRA_STATE, STATUS, IERROR</i>)
+<br>
+INTEGER STATUS(MPI_STATUS_SIZE), <i>IERROR</i> <br>
+INTEGER(KIND=MPI_ADDRESS_KIND) <i>EXTRA_STATE</i></p>
+
+<p style="margin-left:11%; margin-top: 1em">and in C++, it
+is</p>
+
+<p style="margin-left:11%; margin-top: 1em">typedef int
+MPI::Grequest::Query_function(void* <i>extra_state</i>, <br>
+MPI::Status&amp; <i>status</i>);</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+<i>query_fn</i> function computes the status that should be
+returned for the generalized request. The status also
+includes information about successful/unsuccessful
+cancellation of the request (result to be returned by
+MPI_Test_cancelled).</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+<i>query_fn</i> function is invoked by the
+MPI_{Wait|Test}{any|some|all} call that completed the
+generalized request associated with this callback. The
+callback function is also invoked by calls to
+MPI_Request_get_status if the request is complete when the
+call occurs. In both cases, the callback is passed a
+reference to the corresponding status variable passed by the
+user to the MPI call. If the user provided MPI_STATUS_IGNORE
+or MPI_STATUSES_IGNORE to the MPI function that causes
+<i>query_fn</i> to be called, then MPI will pass a valid
+status object to <i>query_fn</i>, and this status will be
+ignored upon return of the callback function. Note that
+<i>query_fn</i> is invoked only after MPI_Grequest_complete
+is called on the request; it may be invoked several times
+for the same generalized request. Note also that a call to
+MPI_{Wait|Test}{some|all} may cause multiple invocations of
+<i>query_fn</i> callback functions, one for each generalized
+request that is completed by the MPI call. The order of
+these invocations is not specified by MPI.</p>
+
+<p style="margin-left:11%; margin-top: 1em">In C, the free
+function is</p>
+
+<p style="margin-left:11%; margin-top: 1em">typedef int
+MPI_Grequest_free_function(void *<i>extra_state</i>);</p>
+
+<p style="margin-left:11%; margin-top: 1em">In Fortran, it
+is</p>
+
+<p style="margin-left:11%; margin-top: 1em">SUBROUTINE
+GREQUEST_FREE_FUNCTION(<i>EXTRA_STATE, IERROR</i>) <br>
+INTEGER <i>IERROR</i> <br>
+INTEGER(KIND=MPI_ADDRESS_KIND) <i>EXTRA_STATE</i></p>
+
+<p style="margin-left:11%; margin-top: 1em">And in C++, it
+is</p>
+
+<p style="margin-left:11%; margin-top: 1em">typedef int
+MPI::Grequest::Free_function(void* <i>extra_state</i>);</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+<i>free_fn</i> callback function is invoked to clean up
+user-allocated resources when the generalized request is
+freed.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+<i>free_fn</i> function is invoked by the
+MPI_{Wait|Test}{any|some|all} call that completed the
+generalized request associated with this callback.
+<i>free_fn</i> is invoked after the call to <i>query_fn</i>
+for the same request. However, if the MPI call completed
+multiple generalized requests, the order in which
+<i>free_fn</i> callback functions are invoked is not
+specified by MPI.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+<i>free_fn</i> callback is also invoked for generalized
+requests that are freed by a call to MPI_Request_free (no
+call to MPI_{Wait|Test}{any|some|all} will occur for such a
+request). In this case, the callback function will be called
+either in the MPI call MPI_Request_free(request) or in the
+MPI call MPI_Grequest_complete(request), whichever happens
+last. In other words, in this case the actual freeing code
+is executed as soon as both calls (MPI_Request_free and
+MPI_Grequest_complete) have occurred. The <i>request</i> is
+not deallocated until after <i>free_fn</i> completes. Note
+that <i>free_fn</i> will be invoked only once per request by
+a correct program.</p>
+
+<p style="margin-left:11%; margin-top: 1em">In C, the
+cancel function is</p>
+
+<p style="margin-left:11%; margin-top: 1em">typedef int
+MPI_Grequest_cancel_function(void *<i>extra_state</i>, int
+<i>complete</i>);</p>
+
+<p style="margin-left:11%; margin-top: 1em">In Fortran, the
+cancel function is</p>
+
+<p style="margin-left:11%; margin-top: 1em">SUBROUTINE
+GREQUEST_CANCEL_FUNCTION(<i>EXTRA_STATE, COMPLETE,
+IERROR</i>) <br>
+INTEGER <i>IERROR</i> <br>
+INTEGER(KIND=MPI_ADDRESS_KIND) <i>EXTRA_STATE</i> <br>
+LOGICAL <i>COMPLETE</i></p>
+
+<p style="margin-left:11%; margin-top: 1em">In C++, the
+cancel function is</p>
+
+<p style="margin-left:11%; margin-top: 1em">typedef in
+MPI::Grequest::Cancel_function(void* <i>extra_state</i>,
+<br>
+bool <i>complete</i>);</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+<i>cancel_fn</i> function is invoked to start the
+cancellation of a generalized request. It is called by
+MPI_Request_cancel(request). MPI passes to the callback
+function complete=true if MPI_Grequest_complete has already
+been called on the request, and complete=false
+otherwise.</p>
+
+<a name="FORTRAN 77 NOTES"></a>
+<h2>FORTRAN 77 NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The MPI
+standard prescribes portable Fortran syntax for the
+<i>EXTRA_STATE</i> argument only for Fortran 90. FORTRAN 77
+users may use the non-portable syntax</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">INTEGER*MPI_ADDRESS_KIND
+<i>EXTRA_STATE</i></p>
+
+<p style="margin-left:11%; margin-top: 1em">where
+MPI_ADDRESS_KIND is a constant defined in mpif.h and gives
+the length of the declared integer in bytes.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<p style="margin-left:11%; margin-top: 1em">All callback
+functions return an error code. The code is passed back and
+dealt with as appropriate for the error code by the MPI
+function that invoked the callback function. For example, if
+error codes are returned, then the error code returned by
+the callback function will be returned by the MPI function
+that invoked the callback function. In the case of a
+MPI_{Wait|Test}any call that invokes both <i>query_fn</i>
+and <i>free_fn</i>, the MPI call will return the error code
+returned by the last callback, namely <i>free_fn</i>. If one
+or more of the requests in a call to
+MPI_{Wait|Test}{some|all} has failed, then the MPI call will
+return MPI_ERR_IN_STATUS. In such a case, if the MPI call
+was passed an array of statuses, then MPI will return in
+each of the statuses that correspond to a completed
+generalized request the error code returned by the
+corresponding invocation of its <i>free_fn</i> callback
+function. However, if the MPI function was passed
+MPI_STATUSES_IGNORE, then the individual error codes
+returned by each callback function will be lost.</p>
+
+<p style="margin-left:11%; margin-top: 1em">See the MPI man
+page for a full list of MPI error codes.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

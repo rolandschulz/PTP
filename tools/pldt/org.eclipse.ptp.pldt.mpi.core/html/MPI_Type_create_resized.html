@@ -1,9 +1,299 @@
-<html><head><title>MPI_Type_create_resized</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:51 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Type_create_resized</title>
+
+</head>
 <body>
-<H3>MPI_Type_create_resized</H3>
-<PRE>
-int MPI_Type_create_resized(MPI_Datatype, MPI_Aint, MPI_Aint, MPI_Datatype *);
-</PRE>
-<DL><DD>
-Duplicates a datatype and changes the upper bound, lower bound, and extent.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Type_create_resized</h1>
+
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Type_create_resized</b>
+&minus; Returns a new data type with new extent and upper
+and lower bounds.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Type_create_resized(MPI_Datatype <i>oldtype</i>,
+MPI_Aint <i>lb</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Aint <i>extent</i>, MPI_Datatype
+*<i>newtype</i>)</p> </td>
+</table>
+
+<a name="Fortran Syntax (see FORTRAN 77 NOTES)"></a>
+<h2>Fortran Syntax (see FORTRAN 77 NOTES)</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_TYPE_CREATE_RESIZED(<i>OLDTYPE, LB, EXTENT, NEWTYPE,
+IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="31%"></td>
+<td width="7%"></td>
+<td width="31%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top"><i>OLDTYPE, NEWTYPE, IERROR</i></p></td>
+<td width="31%"></td>
+<td width="7%"></td>
+<td width="31%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="31%"></td>
+<td width="7%"></td>
+<td width="31%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER(KIND=MPI_ADDRESS_KIND)</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="31%"></td>
+<td width="7%"></td>
+<td width="31%">
+
+
+<p valign="top"><i>LB, EXTENT</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+MPI::Datatype MPI::Datatype::Create_resized(const MPI::Aint
+<i>lb</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const MPI::Aint <i>extent</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">oldtype</p></td>
+<td width="4%"></td>
+<td width="60%">
+
+
+<p style="margin-top: 1em" valign="top">Input data type
+(handle).</p> </td>
+<td width="14%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">lb</p></td>
+<td width="4%"></td>
+<td width="60%">
+
+
+<p style="margin-top: 1em" valign="top">New lower bound of
+data type (integer).</p></td>
+<td width="14%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">extent</p></td>
+<td width="4%"></td>
+<td width="60%">
+
+
+<p style="margin-top: 1em" valign="top">New extent of data
+type (integer).</p></td>
+<td width="14%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">newtype</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Output data type
+(handle).</p> </td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Type_create_resized
+returns in <i>newtype</i> a handle to a new data type that
+is identical to <i>oldtype</i>, except that the lower bound
+of this new data type is set to be <i>lb</i>, and its upper
+bound is set to be <i>lb</i> + <i>extent</i>. Any previous
+<i>lb</i> and <i>ub</i> markers are erased, and a new pair
+of lower bound and upper bound markers are put in the
+positions indicated by the <i>lb</i> and <i>extent</i>
+arguments. This affects the behavior of the data type when
+used in communication operations, with <i>count</i> &gt; 1,
+and when used in the construction of new derived data
+types.</p>
+
+<a name="FORTRAN 77 NOTES"></a>
+<h2>FORTRAN 77 NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The MPI
+standard prescribes portable Fortran syntax for the
+<i>LB</i> and <i>EXTENT</i> arguments only for Fortran 90.
+FORTRAN 77 users may use the non-portable syntax</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">INTEGER*MPI_ADDRESS_KIND
+<i>LB</i> <br>
+or <br>
+INTEGER*MPI_ADDRESS_KIND <i>EXTENT</i></p>
+
+<p style="margin-left:11%; margin-top: 1em">where
+MPI_ADDRESS_KIND is a constant defined in mpif.h and gives
+the length of the declared integer in bytes.</p>
+
+<a name="NOTE"></a>
+<h2>NOTE</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Use of
+MPI_Type_create_resized is strongly recommended over the old
+MPI-1 functions MPI_Type_extent and MPI_Type_lb.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Type_get_extent.html">MPI_Type_get_extent</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

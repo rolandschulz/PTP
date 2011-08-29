@@ -1,9 +1,247 @@
-<html><head><title>MPI_Comm_get_attr</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:19 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Comm_get_attr</title>
+
+</head>
 <body>
-<H3>MPI_Comm_get_attr</H3>
-<PRE>
-int MPI_Comm_get_attr(MPI_Comm, int, void *, int *);
-</PRE>
-<DL><DD>
-Retrieves the communicator attribute value identified by the key.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Comm_get_attr</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Comm_get_attr</b>
+&minus; Retrieves attribute value by key.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Comm_get_attr(MPI_Comm <i>comm</i>, int
+<i>comm_keyval</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">void *<i>attribute_val</i>, int
+*<i>flag</i>)</p> </td>
+</table>
+
+<a name="Fortran Syntax (see FORTRAN 77 NOTES)"></a>
+<h2>Fortran Syntax (see FORTRAN 77 NOTES)</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_COMM_GET_ATTR(<i>COMM, COMM_KEYVAL, ATTRIBUTE_VAL,
+IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COMM, COMM_KEYVAL, IERROR</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER(KIND=MPI_ADDRESS_KIND)
+<i>ATTRIBUTE_VAL</i></p> </td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">LOGICAL <i>FLAG</i></p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+bool MPI::Comm::Get_attr(int <i>comm_keyval</i>, void*
+<i>attribute_val</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em" valign="top">comm</p></td>
+<td width="9%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Communicator to
+which the attribute is attached (handle).</p></td>
+</table>
+
+<p style="margin-left:11%;">comm_keyval</p>
+
+<p style="margin-left:26%;">Key value (integer).</p>
+
+<a name="OUTPUT PARAMETER"></a>
+<h2>OUTPUT PARAMETER</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">attribute_val</p>
+
+<p style="margin-left:26%;">Attribute value, unless
+f<i>lag</i> = false.</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">flag</p></td>
+<td width="6%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">False if no
+attribute is associated with the key (logical).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Comm_get_attr
+retrieves an attribute value by key. The call is erroneous
+if there is no key with value <i>keyval</i>. On the other
+hand, the call is correct if the key value exists, but no
+attribute is attached on <i>comm</i> for that key; in that
+case, the call returns <i>flag</i> = false. In particular,
+MPI_KEYVAL_INVALID is an erroneous key value.</p>
+
+<p style="margin-left:11%; margin-top: 1em">This function
+replaces MPI_Attr_get, the use of which is deprecated. The C
+binding is identical. The Fortran binding differs in that
+<i>attribute_val</i> is an address-sized integer.</p>
+
+<a name="FORTRAN 77 NOTES"></a>
+<h2>FORTRAN 77 NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The MPI
+standard prescribes portable Fortran syntax for the
+<i>ATTRIBUTE_VAL</i> argument only for Fortran 90. Sun
+FORTRAN 77 users may use the non-portable syntax</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">INTEGER*MPI_ADDRESS_KIND
+<i>ATTRIBUTE_VAL</i></p>
+
+<p style="margin-left:11%; margin-top: 1em">where
+MPI_ADDRESS_KIND is a constant defined in mpif.h and gives
+the length of the declared integer in bytes.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

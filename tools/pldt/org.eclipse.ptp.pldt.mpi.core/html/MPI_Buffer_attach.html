@@ -1,9 +1,234 @@
-<html><head><title>MPI_Buffer_attach</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:15 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Buffer_attach</title>
+
+</head>
 <body>
-<H3>MPI_Buffer_attach</H3>
-<PRE>
-int MPI_Buffer_attach( void*, int);
-</PRE>
-<DL><DD>
-Provides MPI with a message buffer for sending.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Buffer_attach</h1>
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Buffer_attach</b>
+&minus; Attaches a user-defined buffer for sending.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Buffer_attach(void <i>*buf</i>, int <i>size</i>)</p>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_BUFFER_ATTACH(<i>BUF</i>, <i>SIZE</i>,
+<i>IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">&lt;type&gt;</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>BUF</i>(<i>*</i>)</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>SIZE</i>, <i>IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void Attach_buffer(void* <i>buffer</i>, int <i>size</i>)</p>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em" valign="top">buf</p></td>
+<td width="9%"></td>
+<td width="49%">
+
+
+<p style="margin-top: 1em" valign="top">Initial buffer
+address (choice).</p></td>
+<td width="25%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em" valign="top">size</p></td>
+<td width="9%"></td>
+<td width="49%">
+
+
+<p style="margin-top: 1em" valign="top">Buffer size, in
+bytes (integer).</p></td>
+<td width="25%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETER"></a>
+<h2>OUTPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Provides to MPI
+a buffer in the user&rsquo;s memory to be used for buffering
+outgoing messages. The buffer is used only by messages sent
+in buffered mode. Only one buffer can be attached to a
+process at a time.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The size given
+should be the sum of the sizes of all outstanding Bsends
+that you intend to have, plus MPI_BSEND_OVERHEAD bytes for
+each Bsend that you do. For the purposes of calculating
+size, you should use MPI_Pack_size. In other words, in the
+code</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Buffer_attach(
+buf, size ); <br>
+MPI_Bsend( ..., count=20, datatype=type1, ... ); <br>
+... <br>
+MPI_Bsend( ..., count=40, datatype=type2, ... );</p>
+
+<p style="margin-left:11%; margin-top: 1em">the value of
+size in the MPI_Buffer_attach call should be greater than
+the value computed by</p>
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Pack_size(
+20, type1, comm, &amp;s1 ); <br>
+MPI_Pack_size( 40, type2, comm, &amp;s2 ); <br>
+size = s1 + s2 + 2 * MPI_BSEND_OVERHEAD;</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_BSEND_OVERHEAD
+gives the maximum amount of buffer space that may be used by
+the Bsend routines. This value is in mpi.h for C and mpif.h
+for Fortran.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Buffer_detach.html">MPI_Buffer_detach</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

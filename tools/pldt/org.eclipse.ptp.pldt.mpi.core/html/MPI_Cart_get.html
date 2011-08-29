@@ -1,9 +1,260 @@
-<html><head><title>MPI_Cart_get</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:16 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Cart_get</title>
+
+</head>
 <body>
-<H3>MPI_Cart_get</H3>
-<PRE>
-int MPI_Cart_get(MPI_Comm, int, int *, int *, int *);
-</PRE>
-<DL><DD>
-Retrieves Cartesian topology information from a communicator.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Cart_get</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Cart_get</b>
+&minus; Retrieves Cartesian topology information associated
+with a communicator.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Cart_get(MPI_Comm <i>comm</i>, int <i>maxdims</i>,
+int <i>*dims</i>, int <i>*periods</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int <i>*coords</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_CART_GET(<i>COMM</i>, <i>MAXDIMS</i>, <i>DIMS</i>,
+<i>PERIODS</i>, <i>COORDS</i>, <i>IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COMM</i>, <i>MAXDIMS</i>,
+<i>DIMS</i>(*), <i>COORDS</i>(*), <i>IERROR</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">LOGICAL</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>PERIODS</i>(*)</p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void Cartcomm::Get_topo(int <i>maxdims</i>, int
+<i>dims</i>[],</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">bool <i>periods</i>[], int <i>coords</i>[])
+const</p> </td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">comm</p></td>
+<td width="4%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Communicator with
+Cartesian structure (handle).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">maxdims</p></td>
+<td width="4%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Length of vectors
+dims, periods, and coords in the calling program
+(integer).</p> </td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">dims</p></td>
+<td width="4%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Number of processes
+for each Cartesian dimension (array of integers).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">periods</p></td>
+<td width="4%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Periodicity
+(true/false) for each Cartesian dimension (array of
+logicals).</p> </td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">coords</p></td>
+<td width="4%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Coordinates of
+calling process in Cartesian structure (array of
+integers).</p> </td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The functions
+MPI_Cartdim_get and MPI_Cart_get return the Cartesian
+topology information that was associated with a communicator
+by MPI_Cart_create.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Cartdim_get.html">MPI_Cartdim_get</a>
+<br>
+ <a href="MPI_Cart_create.html">MPI_Cart_create</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

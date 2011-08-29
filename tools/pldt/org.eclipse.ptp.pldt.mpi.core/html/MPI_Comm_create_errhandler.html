@@ -1,9 +1,250 @@
-<html><head><title>MPI_Comm_create_errhandler</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:17 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Comm_create_errhandler</title>
+
+</head>
 <body>
-<H3>MPI_Comm_create_errhandler</H3>
-<PRE>
-int MPI_Comm_create_errhandler(MPI_Comm_errhandler_fn *, MPI_Errhandler *);
-</PRE>
-<DL><DD>
-Creates an error handler that can be attached to communicators.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Comm_create_errhandler</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Comm_create_errhandler</b>
+&minus; Creates an error handler that can be attached to
+communicators.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Comm_create_errhandler(MPI_Comm_errhandler_function
+<i>*function</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Errhandler *<i>errhandler</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_COMM_CREATE_ERRHANDLER(<i>FUNCTION, ERRHANDLER,
+IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">EXTERNAL</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>FUNCTION</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>ERRHANDLER, IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+static MPI::Errhandler</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+
+<p valign="top">MPI::Comm::Create_errhandler(MPI::Comm::Errhandler_function*</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><i>function</i>)</p></td>
+</table>
+
+<a name="DEPRECATED TYPE NAME NOTE"></a>
+<h2>DEPRECATED TYPE NAME NOTE</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI-2.2
+deprecated the MPI_Comm_errhandler_fn and
+MPI::Comm::Errhandler_fn types in favor of
+MPI_Comm_errhandler_function and
+MPI::Comm::Errhandler_function, respectively. Open MPI
+supports both names (indeed, the _fn names are typedefs to
+the _function names).</p>
+
+<a name="INPUT PARAMETER"></a>
+<h2>INPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">function</p></td>
+<td width="3%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">User-defined error
+handling procedure (function).</p></td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">errhandler</p>
+
+<p style="margin-left:26%;">MPI error handler (handle).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Comm_create_errhandler
+creates an error handler that can be attached to
+communicators. This function is identical to
+MPI_Errhandler_create, the use of which is deprecated.</p>
+
+<p style="margin-left:11%; margin-top: 1em">In C, the user
+routine should be a function of type
+MPI_Comm_errhandler_function, which is defined as</p>
+
+<p style="margin-left:11%; margin-top: 1em">typedef void
+MPI_Comm_errhandler_function(MPI_Comm *, int *, ...);</p>
+
+<p style="margin-left:11%; margin-top: 1em">The first
+argument is the communicator in use. The second is the error
+code to be returned by the MPI routine that raised the
+error. This typedef replaces MPI_Handler_function, the use
+of which is deprecated.</p>
+
+<p style="margin-left:11%; margin-top: 1em">In Fortran, the
+user routine should be of this form:</p>
+
+<p style="margin-left:11%; margin-top: 1em">SUBROUTINE
+COMM_ERRHANDLER_FUNCTION(COMM, ERROR_CODE, ...) <br>
+INTEGER COMM, ERROR_CODE</p>
+
+<p style="margin-left:11%; margin-top: 1em">In C++, the
+user routine should be of this form:</p>
+
+<p style="margin-left:11%; margin-top: 1em">typedef void
+MPI::Comm::Errhandler_function(MPI_Comm &amp;, int *,
+...);</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

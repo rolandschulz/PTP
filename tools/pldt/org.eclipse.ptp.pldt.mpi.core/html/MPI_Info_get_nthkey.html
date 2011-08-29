@@ -1,9 +1,225 @@
-<html><head><title>MPI_Info_get_nthkey</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:38 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Info_get_nthkey</title>
+
+</head>
 <body>
-<H3>MPI_Info_get_nthkey</H3>
-<PRE>
-int MPI_Info_get_nthkey(MPI_Info, int, char *);
-</PRE>
-<DL><DD>
-Retrieves the nth key defined in an Info object.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Info_get_nthkey</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Info_get_nthkey</b>
+&minus; Returns the <i>n</i>th defined key in
+<i>info</i>.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Info_get_nthkey(MPI_Info <i>info</i>, int <i>n</i>,
+char <i>*key</i>)</p>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_INFO_GET_NTHKEY(<i>INFO, N, KEY, IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="62%">
+
+
+<p valign="top"><i>INFO, N, IERROR</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">CHARACTER*(*)</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+
+
+<p valign="top"><i>KEY</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void MPI::Info::Get_nthkey(int <i>n</i>, char* <i>key</i>)
+const</p>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em" valign="top">info</p></td>
+<td width="9%"></td>
+<td width="32%">
+
+
+<p style="margin-top: 1em" valign="top">Info object
+(handle).</p> </td>
+<td width="42%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em" valign="top">n</p></td>
+<td width="9%"></td>
+<td width="32%">
+
+
+<p style="margin-top: 1em" valign="top">Key number
+(integer).</p> </td>
+<td width="42%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">key</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Key (string).</p></td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Info_get_nthkey
+returns the <i>n</i>th defined key in <i>info</i>. Keys are
+numbered 0...<i>N</i> - 1 where <i>N</i> is the value
+returned by MPI_Info_get_nkeys. All keys between 0 and
+<i>N</i> - 1 are guaranteed to be defined. The number of a
+given key does not change as long as <i>info</i> is not
+modified with MPI_Info_set or MPI_Info_delete.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Info_get.html">MPI_Info_get</a>
+<br>
+<a href="MPI_Info_get_nkeys.html">MPI_Info_get_nkeys</a> <br>
+ <a href="MPI_Info_get_valueln.html">MPI_Info_get_valueln</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

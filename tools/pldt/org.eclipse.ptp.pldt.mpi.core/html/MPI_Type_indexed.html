@@ -1,9 +1,335 @@
-<html><head><title>MPI_Type_indexed</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:53 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Type_indexed</title>
+
+</head>
 <body>
-<H3>MPI_Type_indexed</H3>
-<PRE>
-int MPI_Type_indexed(int, int *, int *, MPI_Datatype, MPI_Datatype *);
-</PRE>
-<DL><DD>
-Returns a new datatype that representscount blocks with stride in terms of defining type.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Type_indexed</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Type_indexed</b>
+&minus; Creates an indexed datatype.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Type_indexed(int <i>count</i>, int
+<i>*array_of_blocklengths</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int <i>*array_of_displacements</i>,
+MPI_Datatype <i>oldtype</i>,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Datatype <i>*newtype</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_TYPE_INDEXED(<i>COUNT, ARRAY_OF_BLOCKLENGTHS,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>ARRAY_OF_DISPLACEMENTS, OLDTYPE,
+NEWTYPE, IERROR</i>)</p></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COUNT, ARRAY_OF_BLOCKLENGTHS(*)</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>ARRAY_OF_DISPLACEMENTS(*), OLDTYPE,
+NEWTYPE</i></p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+Datatype Datatype::Create_indexed(int <i>count</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const int
+<i>array_of_blocklengths</i>[],</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const int <i>array_of_displacements</i>[])
+const</p> </td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="7%">
+
+
+<p style="margin-top: 1em" valign="top">count</p></td>
+<td width="8%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Number of blocks --
+also number of entries in array_of_displacements and
+array_of_blocklengths (nonnegative integer).</p></td>
+</table>
+
+<p style="margin-left:11%;">array_of_blocklengths</p>
+
+<p style="margin-left:26%;">Number of elements per block
+(array of nonnegative integers).</p>
+
+<p style="margin-left:11%;">array_of_displacements</p>
+
+<p style="margin-left:26%;">Displacement for each block, in
+multiples of oldtype extent (array of integer).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">oldtype</p></td>
+<td width="4%"></td>
+<td width="34%">
+
+
+<p style="margin-top: 1em" valign="top">Old datatype
+(handle).</p> </td>
+<td width="40%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">newtype</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">New datatype
+(handle).</p> </td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The function
+MPI_Type_indexed allows replication of an old datatype into
+a sequence of blocks (each block is a concatenation of the
+old datatype), where each block can contain a different
+number of copies and have a different displacement. All
+block displacements are multiples of the old data
+type&rsquo;s extent.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example:</b>
+Let oldtype have type map {(double, 0), (char, 8)}, with
+extent 16. Let B = (3, 1) and let D = (4, 0). A call to
+MPI_Type_indexed(2, B, D, oldtype, newtype) returns a
+datatype with type map</p>
+
+<p style="margin-left:11%; margin-top: 1em">{(double, 64),
+(char, 72), (double, 80), (char, 88), <br>
+(double, 96), (char, 104), <br>
+(double, 0), (char, 8)}</p>
+
+<p style="margin-left:11%; margin-top: 1em">That is, three
+copies of the old type starting at displacement 4 x 16 = 64,
+and one copy starting at displacement 0.</p>
+
+<p style="margin-left:11%; margin-top: 1em">In general,
+assume that oldtype has type map</p>
+
+<p style="margin-left:11%; margin-top: 1em">{(type(0),
+disp(0)), ..., (type(n-1), disp(n-1))},</p>
+
+<p style="margin-left:11%; margin-top: 1em">with extent ex.
+Let B be the array_of_blocklength argument and D be the
+array_of_displacements argument. The newly created datatype
+has <br>
+n x S ^count-1 <br>
+i = 0 B[i] entries:</p>
+
+<p style="margin-left:11%; margin-top: 1em">{(type(0),
+disp(0) + D[0]* ex), ..., <br>
+(type(n-1), disp(n-1) + D[0]* ex), ..., <br>
+(type(0), disp(0) + (D[0] + B[0]-1)* ex), ..., <br>
+(type(n-1), disp(n-1) + (D[0]+ B[0]-1)* ex), ..., <br>
+(type(0), disp(0) + D[count-1]* ex), ..., <br>
+(type(n-1), disp(n-1) + D[count-1]* ex), ..., <br>
+(type(0), disp(0) + (D[count-1] + B[count-1] -1)* ex), ...,
+<br>
+(type(n-1), disp(n-1) + (D[count-1] + B[count-1] -1)*
+ex)}</p>
+
+<p style="margin-left:11%; margin-top: 1em">A call to
+MPI_Type_vector(count, blocklength, stride, oldtype,
+newtype) is equivalent to a call to MPI_Type_indexed(count,
+B, D, oldtype, newtype) where</p>
+
+<p style="margin-left:11%; margin-top: 1em">D[j] = j *
+stride, j = 0,..., count-1</p>
+
+<p style="margin-left:11%; margin-top: 1em">and</p>
+
+<p style="margin-left:11%; margin-top: 1em">B[j] =
+blocklength, j = 0, .., count-1</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Type_create_hindexed.html">MPI_Type_create_hindexed</a>
+<br>
+ <a href="MPI_Type_hindexed.html">MPI_Type_hindexed</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

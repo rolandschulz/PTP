@@ -1,9 +1,279 @@
-<html><head><title>MPI_Test</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:48 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Test</title>
+
+</head>
 <body>
-<H3>MPI_Test</H3>
-<PRE>
-int MPI_Test(MPI_Request *, int *, MPI_Status *);
-</PRE>
-<DL><DD>
-Checks to see if a non-blocking operation has completed.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Test</h1>
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Test</b>
+&minus; Tests for the completion of a specific send or
+receive.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Test(MPI_Request *<i>request</i>, int <i>*flag</i>,
+MPI_Status <i>*status</i>)</p>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_TEST(<i>REQUEST, FLAG, STATUS, IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">LOGICAL</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>FLAG</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>REQUEST, STATUS(MPI_STATUS_SIZE),
+IERROR</i></p> </td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+bool Request::Test(Status&amp; <i>status</i>)</p>
+
+<p style="margin-left:11%; margin-top: 1em">bool
+Request::Test()</p>
+
+<a name="INPUT PARAMETER"></a>
+<h2>INPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">request</p></td>
+<td width="4%"></td>
+<td width="48%">
+
+
+<p style="margin-top: 1em" valign="top">Communication
+request (handle).</p></td>
+<td width="26%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">flag</p></td>
+<td width="6%"></td>
+<td width="59%">
+
+
+<p style="margin-top: 1em" valign="top">True if operation
+completed (logical).</p></td>
+<td width="15%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">status</p></td>
+<td width="6%"></td>
+<td width="59%">
+
+
+<p style="margin-top: 1em" valign="top">Status object
+(status).</p> </td>
+<td width="15%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="59%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="15%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">A call to
+MPI_Test returns flag = true if the operation identified by
+request is complete. In such a case, the status object is
+set to contain information on the completed operation; if
+the communication object was created by a nonblocking send
+or receive, then it is deallocated and the request handle is
+set to MPI_REQUEST_NULL. The call returns flag = false,
+otherwise. In this case, the value of the status object is
+undefined. MPI_Test is a local operation.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The return
+status object for a receive operation carries information
+that can be accessed as described in Section 3.2.5 of the
+MPI-1 Standard, &quot;Return Status.&quot; The status object
+for a send operation carries information that can be
+accessed by a call to MPI_Test_cancelled (see Section 3.8 of
+the MPI-1 Standard, &quot;Probe and Cancel&quot;).</p>
+
+<p style="margin-left:11%; margin-top: 1em">If your
+application does not need to examine the <i>status</i>
+field, you can save resources by using the predefined
+constant MPI_STATUS_IGNORE as a special value for the
+<i>status</i> argument.</p>
+
+<p style="margin-left:11%; margin-top: 1em">One is allowed
+to call MPI_Test with a null or inactive <i>request</i>
+argument. In such a case the operation returns with
+<i>flag</i> = true and empty <i>status</i>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The functions
+MPI_Wait and MPI_Test can be used to complete both sends and
+receives.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The use of the
+nonblocking MPI_Test call allows the user to schedule
+alternative activities within a single thread of execution.
+An event-driven thread scheduler can be emulated with
+periodic calls to MPI_Test.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI::Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler,
+MPI_File_set_errhandler, or MPI_Win_set_errhandler
+(depending on the type of MPI handle that generated the
+request); the predefined error handler MPI_ERRORS_RETURN may
+be used to cause error values to be returned. Note that MPI
+does not guarantee that an MPI program can continue past an
+error.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Note that per
+MPI-1 section 3.2.5, MPI exceptions on requests passed to
+MPI_TEST do not set the status.MPI_ERROR field in the
+returned status. The error code is passed to the back-end
+error handler and may be passed back to the caller through
+the return value of MPI_TEST if the back-end error handler
+returns it. The pre-defined MPI error handler
+MPI_ERRORS_RETURN exhibits this behavior, for example.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Comm_set_errhandler.html">MPI_Comm_set_errhandler</a>
+<br>
+<a href="MPI_File_set_errhandler.html">MPI_File_set_errhandler</a> <br>
+<a href="MPI_Testall.html">MPI_Testall</a> <br>
+<a href="MPI_Testany.html">MPI_Testany</a> <br>
+<a href="MPI_Testsome.html">MPI_Testsome</a> <br>
+<a href="MPI_Wait.html">MPI_Wait</a> <br>
+<a href="MPI_Waitall.html">MPI_Waitall</a> <br>
+<a href="MPI_Waitany.html">MPI_Waitany</a> <br>
+<a href="MPI_Waitsome.html">MPI_Waitsome</a> <br>
+ <a href="MPI_Win_set_errhandler.html">MPI_Win_set_errhandler</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

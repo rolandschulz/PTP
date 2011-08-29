@@ -1,9 +1,305 @@
-<html><head><title>MPI_Type_get_envelope</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:52 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Type_get_envelope</title>
+
+</head>
 <body>
-<H3>MPI_Type_get_envelope</H3>
-<PRE>
-int MPI_Type_get_envelope(MPI_Datatype, int *, int *, int *, int *);
-</PRE>
-<DL><DD>
-Determines the constructor that was used to create the datatype.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Type_get_envelope</h1>
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Type_get_envelope</b>
+&minus; Returns informaion about input arguments associated
+with a data type.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Type_get_envelope(MPI_Datatype <i>datatype</i>, int
+*<i>num_integers</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int *<i>num_addresses</i>, int
+*<i>num_datatypes</i>, int *<i>combiner</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_TYPE_GET_ENVELOPE(<i>DATATYPE, NUM_INTEGERS,
+NUM_ADDRESSES,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>NUM_DATATYPES, COMBINER, IERROR</i>)</p></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>DATATYPE, NUM_INTEGERS,
+NUM_ADDRESSES</i></p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>NUM_DATATYPES, COMBINER, IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void MPI::Datatype::Get_envelope(int&amp;
+<i>num_integers</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int&amp; <i>num_addresses</i>, int&amp;
+<i>num_datatypes</i>,</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int&amp; <i>combiner</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETER"></a>
+<h2>INPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">datatype</p></td>
+<td width="3%"></td>
+<td width="45%">
+
+
+<p style="margin-top: 1em" valign="top">Data type to access
+(handle).</p> </td>
+<td width="29%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">num_integers</p>
+
+<p style="margin-left:26%;">Number of input integers used
+in the call constructing <i>combiner</i> (nonnegative
+integer).</p>
+
+<p style="margin-left:11%;">num_addresses</p>
+
+<p style="margin-left:26%;">Number of input addresses used
+in the call constructing <i>combiner</i> (nonnegative
+integer).</p>
+
+<p style="margin-left:11%;">num_datatypes</p>
+
+<p style="margin-left:26%;">Number of input data types used
+in the call constructing <i>combiner</i> (nonnegative
+integer).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">combiner</p></td>
+<td width="3%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Combiner
+(state).</p> </td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="3%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">For the given
+data type, MPI_Type_get_envelope returns information on the
+number and type of input arguments used in teh call that
+created the data type. The number-of-arguments values
+returned can be used to provide sufficiently large arrays in
+the decoding routine MPI_Type_get_contents. This call and
+the meaning of the returned values is described below. The
+combiner reflects the MPI data type constructor call that
+was used in creating <i>datatype</i>.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">These are the
+values that can be returned in <i>combiner</i> and their
+associated calls:</p>
+
+<p style="margin-left:11%; margin-top: 1em">Values
+Associated Calls</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_COMBINER_NAMED
+a named predefined data type <br>
+MPI_COMBINER_DUP MPI_Type_dup <br>
+MPI_COMBINER_CONTIGUOUS MPI_Type_contiguous <br>
+MPI_COMBINER_VECTOR MPI_Type_vector <br>
+MPI_COMBINER_HVECTOR_INTEGER MPI_Type_hvector from Fortran
+<br>
+MPI_COMBINER_HVECTOR MPI_Type_hvector from C or C++ <br>
+and MPI_Type_create for <br>
+all languages <br>
+MPI_COMBINER_INDEXED MPI_Type_indexed <br>
+MPI_COMBINER_HINDEXED_INTEGER MPI_Type_hindexed from Fortran
+<br>
+MPI_COMBINER_HINDEXED MPI_Type_hindexed from C or C++ <br>
+and MPI_Type_create_hindexed <br>
+for all languages <br>
+MPI_COMBINER_INDEXED_BLOCK MPI_Type_create_indexed_block
+<br>
+MPI_COMBINER_STRUCT_INTEGER MPI_Type_struct from Fortran
+<br>
+MPI_COMBINER_STRUCT MPI_Type_struct from C or C++ <br>
+and MPI_Type_create_struct <br>
+for all languages <br>
+MPI_COMBINER_SUBARRAY MPI_Type_create_subarray <br>
+MPI_COMBINER_DARRAY MPI_Type_create_darray <br>
+MPI_COMBINER_F90_REAL MPI_Type_create_f90_real <br>
+MPI_COMBINER_F90_COMPLEX MPI_Type_create_f90_complex <br>
+MPI_COMBINER_F90_INTEGER MPI_Type_create_f90_integer <br>
+MPI_COMBINER_RESIZED MPI_Type_create_resized</p>
+
+<p style="margin-left:11%; margin-top: 1em">If
+<i>combiner</i> is MPI_COMBINER_NAMED, then <i>datatype</i>
+is a named predefined data type.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The actual
+arguments used in the creation call for a data type can be
+obtained from the call MPI_Type_get_contents.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Type_get_contents.html">MPI_Type_get_contents</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

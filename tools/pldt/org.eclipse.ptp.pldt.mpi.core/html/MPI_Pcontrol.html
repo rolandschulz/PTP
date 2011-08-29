@@ -1,9 +1,229 @@
-<html><head><title>MPI_Pcontrol</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:42 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Pcontrol</title>
+
+</head>
 <body>
-<H3>MPI_Pcontrol</H3>
-<PRE>
-int MPI_Pcontrol(const int, ...);
-</PRE>
-<DL><DD>
-Provides profile control.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Pcontrol</h1>
+
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Pcontrol</b>
+&minus; Controls profiling.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Pcontrol(const int <i>level</i>, ... )</p>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_PCONTROL(<i>LEVEL</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>LEVEL</i>, ...</p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void Pcontrol(const int <i>level</i>, ...)</p>
+
+<a name="INPUT PARAMETER"></a>
+<h2>INPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="7%">
+
+
+<p style="margin-top: 1em" valign="top">level</p></td>
+<td width="8%"></td>
+<td width="25%">
+
+
+<p style="margin-top: 1em" valign="top">Profiling
+level.</p> </td>
+<td width="49%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI libraries
+themselves make no use of this routine; they simply return
+immediately to the user code. However the presence of calls
+to this routine allows a profiling package to be explicitly
+called by the user.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Since MPI has
+no control of the implementation of the profiling code, we
+are unable to specify precisely the semantics that will be
+provided by calls to MPI_Pcontrol. This vagueness extends to
+the number of arguments to the function, and their
+datatypes.</p>
+
+<p style="margin-left:11%; margin-top: 1em">However to
+provide some level of portability of user codes to different
+profiling libraries, we request the following meanings for
+certain values of level:</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="14%"></td>
+<td width="1%">
+
+
+<p style="margin-top: 1em" valign="top">o</p></td>
+<td width="7%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">level==0</p></td>
+<td width="66%">
+</td>
+</table>
+
+<p style="margin-left:11%;">Profiling is disabled.</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="14%"></td>
+<td width="1%">
+
+
+<p style="margin-top: 1em" valign="top">o</p></td>
+<td width="7%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">level==1</p></td>
+<td width="66%">
+</td>
+</table>
+
+<p style="margin-left:11%;">Profiling is enabled at a
+normal default level of detail.</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="14%"></td>
+<td width="1%">
+
+
+<p style="margin-top: 1em" valign="top">o</p></td>
+<td width="7%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">level==2</p></td>
+<td width="66%">
+</td>
+</table>
+
+<p style="margin-left:11%;">Profile buffers are flushed.
+(This may be a no-op in some profilers).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="14%"></td>
+<td width="1%">
+
+
+<p style="margin-top: 1em" valign="top">o</p></td>
+<td width="7%"></td>
+<td width="78%">
+
+
+<p style="margin-top: 1em" valign="top">All other values of
+level have profile library-defined effects and additional
+arguments.</p> </td>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">We also request
+that the default state after MPI_Init has been called is for
+profiling to be enabled at the normal default level (i.e.,
+as if MPI_Pcontrol had just been called with the argument
+1). This allows users to link with a profiling library and
+obtain profile output without having to modify their source
+code at all.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The provision
+of MPI_Pcontrol as a no-op in the standard MPI library
+allows users to modify their source code to obtain more
+detailed profiling information, but still be able to link
+exactly the same code against the standard MPI library.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">This routine
+provides a common interface for profiling control. The
+interpretation of level and any other arguments is left to
+the profiling library.</p>
+
+<p style="margin-left:11%; margin-top: 1em">This function
+does not return an error value. Consequently, the result of
+calling it before MPI_Init or after MPI_Finalize is
+undefined.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

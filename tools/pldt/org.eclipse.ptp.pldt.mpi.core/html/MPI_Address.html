@@ -1,9 +1,278 @@
-<html><head><title>MPI_Address</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:12 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Address</title>
+
+</head>
 <body>
-<H3>MPI_Address</H3>
-<PRE>
-int MPI_Address(void*, MPI_Aint *);
-</PRE>
-<DL><DD>
-Returns the address of a location in memory.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Address</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Address</b>
+&minus; Gets the address of a location in memory -- use of
+this routine is deprecated.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Address(void *<i>location</i>, MPI_Aint
+<i>*address</i>)</p>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo;</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%"></td>
+<td width="7%">
+
+
+<p valign="top">MPI_ADDRESS(<i>LOCATION</i>,
+<i>ADDRESS</i>, <i>IERROR</i>)</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="15%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+</td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="15%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%"></td>
+<td width="7%">
+
+
+<p valign="top">&lt;type&gt;</p></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top"><i>LOCATION</i> (*)</p></td>
+<td width="15%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="15%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top"><i>ADDRESS</i>, <i>IERROR</i></p></td>
+<td width="15%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+</table>
+
+<a name="INPUT PARAMETER"></a>
+<h2>INPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">location</p></td>
+<td width="3%"></td>
+<td width="54%">
+
+
+<p style="margin-top: 1em" valign="top">Location in caller
+memory (choice).</p></td>
+<td width="20%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">address</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Address of location
+(integer).</p> </td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Note that use
+of this routine is <i>deprecated</i> as of MPI-2. Please use
+MPI_Get_address instead.</p>
+
+<p style="margin-left:11%; margin-top: 1em">This deprecated
+routine is not available in C++.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The address of
+a location in memory can be found by invoking this function.
+Returns the (byte) address of location.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Example: Using
+MPI_Address for an array.</p>
+
+<p style="margin-left:11%; margin-top: 1em">REAL A(100,100)
+<br>
+INTEGER I1, I2, DIFF <br>
+CALL MPI_ADDRESS(A(1,1), I1, IERROR) <br>
+CALL MPI_ADDRESS(A(10,10), I2, IERROR) <br>
+DIFF = I2 - I1 <br>
+! The value of DIFF is 909*sizeofreal; the values of I1 and
+I2 are <br>
+! implementation dependent.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">This routine is
+provided for both Fortran and C programmers and may be
+useful when writing portable code. In the current release,
+the address returned by this routine will be the same as
+that produced by the C &amp; operator.</p>
+
+<p style="margin-left:11%; margin-top: 1em">C users may be
+tempted to avoid using MPI_Address and rely on the
+availability of the address operator &amp;. Note, however,
+that &amp; cast-expression is a pointer, not an address.
+ANSI C does not require that the value of a pointer (or the
+pointer cast to int) be the absolute address of the object
+pointed at although this is commonly the case. Furthermore,
+referencing may not have a unique definition on machines
+with a segmented address space. The use of MPI_Address to
+&quot;reference&quot; C variables guarantees portability to
+such machines as well.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Get_address.html">MPI_Get_address</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

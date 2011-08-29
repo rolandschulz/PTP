@@ -1,9 +1,348 @@
-<html><head><title>MPI_Dims_create</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:21 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Dims_create</title>
+
+</head>
 <body>
-<H3>MPI_Dims_create</H3>
-<PRE>
-int MPI_Dims_create(int, int, int *);
-</PRE>
-<DL><DD>
-Defines a Cartesian grid to balance tasks.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Dims_create</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Dims_create</b>
+&minus; Creates a division of processors in a Cartesian
+grid.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Dims_create(int <i>nnodes</i>, int <i>ndims</i>, int
+<i>*dims</i>)</p>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_DIMS_CREATE(<i>NNODES, NDIMS, DIMS, IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>NNODES, NDIMS, DIMS(*), IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void Compute_dims(int <i>nnodes</i>, int <i>ndims</i>, int
+<i>dims</i>[])</p>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">nnodes</p></td>
+<td width="6%"></td>
+<td width="63%">
+
+
+<p style="margin-top: 1em" valign="top">Number of nodes in
+a grid (integer).</p></td>
+<td width="11%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">ndims</p></td>
+<td width="6%"></td>
+<td width="63%">
+
+
+<p style="margin-top: 1em" valign="top">Number of Cartesian
+dimensions (integer).</p></td>
+<td width="11%">
+</td>
+</table>
+
+<a name="IN/OUT PARAMETER"></a>
+<h2>IN/OUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em" valign="top">dims</p></td>
+<td width="9%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Integer array of
+size ndims specifying the number of nodes in each
+dimension.</p> </td>
+</table>
+
+<a name="OUTPUT PARAMETER"></a>
+<h2>OUTPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">For Cartesian
+topologies, the function MPI_Dims_create helps the user
+select a balanced distribution of processes per coordinate
+direction, depending on the number of processes in the group
+to be balanced and optional constraints that can be
+specified by the user. One use is to partition all the
+processes (the size of MPI_COMM_WORLD&rsquo;s group) into an
+n-dimensional topology.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The entries in
+the array <i>dims</i> are set to describe a Cartesian grid
+with <i>ndims</i> dimensions and a total of <i>nnodes</i>
+nodes. The dimensions are set to be as close to each other
+as possible, using an appropriate divisibility algorithm.
+The caller may further constrain the operation of this
+routine by specifying elements of array dims. If dims[i] is
+set to a positive number, the routine will not modify the
+number of nodes in dimension i; only those entries where
+dims[i] = 0 are modified by the call.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Negative input
+values of dims[i] are erroneous. An error will occur if
+nnodes is not a multiple of ((pi) over (i, dims[i] != 0))
+dims[i].</p>
+
+<p style="margin-left:11%; margin-top: 1em">For dims[i] set
+by the call, dims[i] will be ordered in nonincreasing order.
+Array dims is suitable for use as input to routine
+MPI_Cart_create. MPI_Dims_create is local.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example:</b></p>
+
+<p style="margin-left:11%; margin-top: 1em">dims</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%"></td>
+<td width="7%">
+
+
+<p valign="top">before</p></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+</td>
+<td width="46%">
+
+
+<p valign="top">dims</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%"></td>
+<td width="7%">
+
+
+<p valign="top">call</p></td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top">function call</p></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="46%">
+
+
+<p valign="top">on return</p></td>
+</table>
+
+
+<p style="margin-left:11%;">-----------------------------------------------------</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%">
+
+
+<p valign="top">(0,0)</p></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">MPI_Dims_create(6, 2, dims)</p></td>
+<td width="39%"></td>
+<td width="7%"></td>
+<td width="31%">
+
+
+<p valign="top">(3,2)</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%">
+
+
+<p valign="top">(0,0)</p></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">MPI_Dims_create(7, 2, dims)</p></td>
+<td width="39%"></td>
+<td width="7%"></td>
+<td width="31%">
+
+
+<p valign="top">(7,1)</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%">
+
+
+<p valign="top">(0,3,0)</p></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">MPI_Dims_create(6, 3, dims)</p></td>
+<td width="39%"></td>
+<td width="7%"></td>
+<td width="31%">
+
+
+<p valign="top">(2,3,1)</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%">
+
+
+<p valign="top">(0,3,0)</p></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">MPI_Dims_create(7, 3, dims)</p></td>
+<td width="39%"></td>
+<td width="7%"></td>
+<td width="31%">
+
+
+<p valign="top">erroneous call</p></td>
+</table>
+
+
+<p style="margin-left:11%;">------------------------------------------------------</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

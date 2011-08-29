@@ -1,9 +1,264 @@
-<html><head><title>MPI_Comm_test_inter</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:21 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Comm_test_inter</title>
+
+</head>
 <body>
-<H3>MPI_Comm_test_inter</H3>
-<PRE>
-int MPI_Comm_test_inter(MPI_Comm, int *);
-</PRE>
-<DL><DD>
-Returns the type of a communicator (intra-communicator or inter-communicator).
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Comm_test_inter</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Comm_test_inter</b>
+&minus; Tests to see if a comm is an intercommunicator.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Comm_test_inter(MPI_Comm <i>comm</i>, int
+<i>*flag</i>)</p>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_COMM_TEST_INTER(<i>COMM, FLAG, IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COMM, IERROR</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">LOGICAL</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>FLAG</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+bool Comm::Is_inter() const</p>
+
+<a name="INPUT PARAMETER"></a>
+<h2>INPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em" valign="top">comm</p></td>
+<td width="9%"></td>
+<td width="34%">
+
+
+<p style="margin-top: 1em" valign="top">Communicator
+(handle).</p> </td>
+<td width="40%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">flag
+(Logical.)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">This local
+routine allows the calling process to determine the type of
+a communicator. It returns true for an intercommunicator,
+false for an intracommunicator.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The type of
+communicator also affects the value returned by three other
+functions. When dealing with an intracommunicator (enables
+communication within a single group), the functions listed
+below return the expected values, group size, group, and
+rank. When dealing with an inter-communicator, however, they
+return the following values:</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%">
+
+
+<p valign="top">MPI_Comm_size</p></td>
+<td width="15%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top">Returns the size of the local group.</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%">
+
+
+<p valign="top">MPI_Comm_group</p></td>
+<td width="15%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top">Returns the local group.</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="-3%">
+
+
+<p valign="top">MPI_Comm_rank</p></td>
+<td width="15%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top">Returns the rank in the local group.</p></td>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">To return the
+remote group and remote group size of an inter-communicator,
+use the MPI_Comm_remote_group and MPI_Comm_remote_size
+functions.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The operation
+MPI_Comm_compare is valid for intercommunicators. Both
+communicators must be either intra- or intercommunicators,
+or else MPI_UNEQUAL results. Both corresponding local and
+remote groups must compare correctly to get the results
+MPI_CONGRUENT and MPI_SIMILAR. In particular, it is possible
+for MPI_SIMILAR to result because either the local or remote
+groups were similar but not identical.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The following
+accessors provide consistent access to the remote group of
+an intercommunicator: MPI_Comm_remote_size,
+MPI_Comm_remote_group.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+intercommunicator accessors (MPI_Comm_test_inter,
+MPI_Comm_remote_size, MPI_Comm_remote_group) are all local
+operations.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Comm_remote_group.html">MPI_Comm_remote_group</a>
+<br>
+<a href="MPI_Comm_remote_size.html">MPI_Comm_remote_size</a> <br>
+<a href="MPI_Intercomm_create.html">MPI_Intercomm_create</a> <br>
+ <a href="MPI_Intercomm_merge.html">MPI_Intercomm_merge</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>
