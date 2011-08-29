@@ -24,16 +24,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.UIJob;
 
 /**
- * Configuration object used for persisting values between sessions. Also
- * contains (in memory) the JAXB data object tree and the active instance of the
- * environment map.<br>
+ * Configuration object used for persisting values between sessions. Also contains (in memory) the JAXB data object tree and the
+ * active instance of the environment map.<br>
  * <br>
- * There are actually three such configurations associated with a JAXB resource
- * manager instance: the base configuration, and the control and monitor
- * configurations. The latter two contain references to their parent base
- * provider. <br>
- * This abstract class provides the access and construction functionality for
- * the data tree and the variable map.
+ * There are actually three such configurations associated with a JAXB resource manager instance: the base configuration, and the
+ * control and monitor configurations. The latter two contain references to their parent base provider. <br>
+ * This abstract class provides the access and construction functionality for the data tree and the variable map.
  * 
  * @author arossi
  * 
@@ -57,8 +53,7 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	/*
 	 * Clears in-memory objects (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration#
-	 * clearReferences()
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration# clearReferences()
 	 */
 	public void clearReferences(boolean all) {
 		if (all) {
@@ -76,8 +71,7 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration#
-	 * getResourceManagerData()
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration# getResourceManagerData()
 	 */
 	public ResourceManagerData getResourceManagerData() throws Throwable {
 		if (rmdata == null) {
@@ -92,8 +86,7 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration#
-	 * setRMConfigurationURL(java.net.URL)
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration# setRMConfigurationURL(java.net.URL)
 	 */
 	public void setRMConfigurationURL(URL url) {
 		if (url != null) {
@@ -130,9 +123,8 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	/**
 	 * Unmarshals the XML into the JAXB data tree.<br>
 	 * <br>
-	 * If the current xml is <code>null</code>, or if the "force reload"
-	 * preference is set, a fresh attempt is made to store the xml from the
-	 * location. Otherwise, the cached xml is used.
+	 * If the current xml is <code>null</code>, or if the "force reload" preference is set, a fresh attempt is made to store the xml
+	 * from the location. Otherwise, the cached xml is used.
 	 * 
 	 * @throws unmarshaling
 	 *             or URL exceptions
@@ -141,7 +133,7 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 		String xml = getRMConfigurationXML();
 		boolean force = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD);
 		if (xml == null || force) {
-			String location = getString(JAXBCoreConstants.RM_URL, JAXBCoreConstants.ZEROSTR);
+			String location = getString(JAXBCoreConstants.RM_URL, null);
 			if (location != null) {
 				try {
 					xml = JAXBInitializationUtils.getRMConfigurationXML(new URL(location));
@@ -168,8 +160,7 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration#
-	 * setRMConfigurationXML(java.lang.String)
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration# setRMConfigurationXML(java.lang.String)
 	 */
 	private void setRMConfigurationXML(String xml) {
 		if (xml != null) {
