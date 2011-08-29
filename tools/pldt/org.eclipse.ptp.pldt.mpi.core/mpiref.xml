@@ -403,6 +403,22 @@
 </prototype>
 </function>
 
+<!-- added 8/29/11, first of new APIs added with OpenMPI manpages. --> 
+
+<function>
+<cname>MPI_Close_port</cname>
+<cppname>MPI::Close_port</cppname>
+<fname>MPI_CLOSE_PORT</fname>
+<namespace></namespace>
+<description>Releases the specified network address.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Close_port</name>
+<arguments>char *</arguments>
+</prototype>
+</function>
+
+
 <function>
 <cname>MPI_Comm_c2f</cname>
 <cppname>(none)</cppname>
