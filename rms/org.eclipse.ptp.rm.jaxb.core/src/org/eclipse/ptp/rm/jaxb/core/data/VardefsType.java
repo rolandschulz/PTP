@@ -16,17 +16,17 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for line-type complex type.
+ * <p>Java class for vardefs-type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="line-type">
+ * &lt;complexType name="vardefs-type">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="arg" type="{http://org.eclipse.ptp/rm}arg-type" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
+ *       &lt;choice>
+ *         &lt;element name="var" type="{http://org.eclipse.ptp/rm}var-type" maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/choice>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -35,40 +35,40 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "line-type", propOrder = {
-    "arg"
+@XmlType(name = "vardefs-type", propOrder = {
+    "var"
 })
-public class LineType {
+public class VardefsType {
 
-    protected List<ArgType> arg;
+    protected List<VarType> var;
 
     /**
-     * Gets the value of the arg property.
+     * Gets the value of the var property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the arg property.
+     * This is why there is not a <CODE>set</CODE> method for the var property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getArg().add(newItem);
+     *    getVar().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link ArgType }
+     * {@link VarType }
      * 
      * 
      */
-    public List<ArgType> getArg() {
-        if (arg == null) {
-            arg = new ArrayList<ArgType>();
+    public List<VarType> getVar() {
+        if (var == null) {
+            var = new ArrayList<VarType>();
         }
-        return this.arg;
+        return this.var;
     }
 
 }

@@ -13,6 +13,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
@@ -21,7 +22,9 @@ import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -47,9 +50,6 @@ public class JAXBInitializationUtils {
 
 	private static Unmarshaller unmarshaller;
 	private static Validator validator;
-
-	private JAXBInitializationUtils() {
-	}
 
 	/**
 	 * Streams the content from the url.
@@ -81,8 +81,7 @@ public class JAXBInitializationUtils {
 	}
 
 	/**
-	 * Retrieves Property and Attribute definitions from the data tree and adds
-	 * them to the environment map.
+	 * Retrieves Property and Attribute definitions from the data tree and adds them to the environment map.
 	 * 
 	 * @param rmData
 	 *            the JAXB data tree
@@ -115,8 +114,7 @@ public class JAXBInitializationUtils {
 	}
 
 	/**
-	 * Delegates to {@link #getRMConfigurationXML(URL)},
-	 * {@link #initializeRMData(String)}
+	 * Delegates to {@link #getRMConfigurationXML(URL)}, {@link #initializeRMData(String)}
 	 * 
 	 * @param url
 	 *            of the XML for the configuration
@@ -128,6 +126,31 @@ public class JAXBInitializationUtils {
 	 */
 	public static ResourceManagerData initializeRMData(URL url) throws IOException, SAXException, URISyntaxException, JAXBException {
 		return initializeRMData(getRMConfigurationXML(url));
+	}
+
+	/**
+	 * Marshal a subtree into a string. This can be used to convert part of the XML tree into a string.
+	 * 
+	 * @param jaxbElement
+	 *            element to marshal
+	 * @param className
+	 *            class of the root element
+	 * @root root element tag
+	 * @return
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static String marshalData(Object jaxbElement, Class className, String root) {
+		StringWriter writer = new StringWriter();
+		try {
+			JAXBContext jc = JAXBContext
+					.newInstance(JAXBCoreConstants.JAXB_CONTEXT, JAXBInitializationUtils.class.getClassLoader());
+			Marshaller marshaller = jc.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+			marshaller.marshal(new JAXBElement(new QName("", root), className, jaxbElement), writer); //$NON-NLS-1$
+		} catch (JAXBException e) {
+			// return default
+		}
+		return writer.toString();
 	}
 
 	/**
@@ -145,8 +168,7 @@ public class JAXBInitializationUtils {
 	}
 
 	/**
-	 * Adds the attributes. If the attribute value is <code>null</code>,
-	 * overwrites it with the default.
+	 * Adds the attributes. If the attribute value is <code>null</code>, overwrites it with the default.
 	 * 
 	 * @param env
 	 *            the active instance of the resource manager environment map
@@ -167,8 +189,7 @@ public class JAXBInitializationUtils {
 	}
 
 	/**
-	 * Adds the properties. If the property value is <code>null</code>,
-	 * overwrites it with the default.
+	 * Adds the properties. If the property value is <code>null</code>, overwrites it with the default.
 	 * 
 	 * @param env
 	 *            the active instance of the resource manager environment map
@@ -238,8 +259,7 @@ public class JAXBInitializationUtils {
 	}
 
 	/**
-	 * First validates the xml, then gets the JAXB context and calls the JAXB
-	 * unmarshaller from it.
+	 * First validates the xml, then gets the JAXB context and calls the JAXB unmarshaller from it.
 	 * 
 	 * @param xml
 	 *            of the configuration file.
@@ -286,5 +306,8 @@ public class JAXBInitializationUtils {
 			JAXBCorePlugin.log(printInfo(sax));
 			throw sax;
 		}
+	}
+
+	private JAXBInitializationUtils() {
 	}
 }

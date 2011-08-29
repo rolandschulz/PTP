@@ -694,6 +694,7 @@
 		<xs:sequence>
 			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property-type"/>
 			<xs:element name="driver" minOccurs="0" type="rm:monitor-driver-type"/>
+			<xs:element name="workflow" minOccurs="0" type="rm:workflow-type"/>
 		</xs:sequence>
 		<xs:attribute name="schedulerType" type="xs:string"/>
 		<xs:attribute name="refreshFrequencyInSeconds" type="xs:int" default="60"/>
@@ -707,5 +708,36 @@
 				<xs:element name="args" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type"/>
 			</xs:sequence>
 		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="workflow-type">
+		<xs:sequence>
+			<xs:element name="vardefs" minOccurs="0" maxOccurs="unbounded" type="rm:vardefs-type"/>
+			<xs:element name="managed-files" minOccurs="0" maxOccurs="unbounded" type="rm:managed-files-type"/>
+			<xs:element name="step" minOccurs="0" maxOccurs="unbounded" type="rm:step-type"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="vardefs-type">
+		<xs:choice>
+			<xs:element name="var" minOccurs="0" maxOccurs="unbounded" type="rm:var-type"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="var-type">
+		<xs:attribute name="key" type="xs:string"/>
+		<xs:attribute name="value" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="step-type">
+		<xs:choice>
+			<xs:element name="cmd" minOccurs="0" maxOccurs="unbounded" type="rm:monitor-command-type"/>
+		</xs:choice>
+		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="active" type="xs:string"/>
+		<xs:attribute name="exec_after" type="xs:string"/>
+		<xs:attribute name="type" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="monitor-command-type">
+		<xs:attribute name="directory" type="xs:string"/>
+		<xs:attribute name="redirectStderr" type="xs:boolean" default="false"/>
+		<xs:attribute name="ignoreExitStatus" type="xs:boolean" default="false"/>
+		<xs:attribute name="exec" type="xs:string"/>
 	</xs:complexType>
 </xs:schema>
