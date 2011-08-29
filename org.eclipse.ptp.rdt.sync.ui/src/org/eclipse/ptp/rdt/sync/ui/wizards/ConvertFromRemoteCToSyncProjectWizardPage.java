@@ -13,6 +13,7 @@ package org.eclipse.ptp.rdt.sync.ui.wizards;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,12 +32,15 @@ import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
 import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -304,21 +308,24 @@ public class ConvertFromRemoteCToSyncProjectWizardPage extends ConvertProjectWiz
 			}
 			
 			// Move project from remote directory to local directory
-			project.delete(true, null);
-			project.create(null);
-			project.open(null);
-			List<String> configFiles = Arrays.asList(".cproject", ".project", ".settings"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			List<String> command = Arrays.asList("scp", project.getLocation().toOSString()); //$NON-NLS-1$
-			command.addAll(configFiles);
-			CommandRunner.executeRemoteCommand(provider.getRemoteConnection(), command, provider.getLocation(), null);
+			IFolder projectLocalFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(new Path(fLocationText.getText()));
+			projectLocalFolder.create(false, true, null);
+			project.move(projectLocalFolder.getFullPath(), false, null);
+//			project.delete(true, null);
+//			project.create(null);
+//			project.open(null);
+//			List<String> configFiles = Arrays.asList(".cproject", ".project", ".settings"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//			List<String> command = Arrays.asList("scp", project.getLocation().toOSString()); //$NON-NLS-1$
+//			command.addAll(configFiles);
+//			CommandRunner.executeRemoteCommand(provider.getRemoteConnection(), command, provider.getLocation(), null);
 
 			monitor.done();
-		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.rdt.sync.ui", "", e)); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (InterruptedException e) {
-			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.rdt.sync.ui", "", e)); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (RemoteConnectionException e) {
-			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.rdt.sync.ui", "", e)); //$NON-NLS-1$ //$NON-NLS-2$
+//		} catch (IOException e) {
+//			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.rdt.sync.ui", "", e)); //$NON-NLS-1$ //$NON-NLS-2$
+//		} catch (InterruptedException e) {
+//			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.rdt.sync.ui", "", e)); //$NON-NLS-1$ //$NON-NLS-2$
+//		} catch (RemoteConnectionException e) {
+//			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.rdt.sync.ui", "", e)); //$NON-NLS-1$ //$NON-NLS-2$
 		} finally {
 			monitor.done();
 		}
