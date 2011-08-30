@@ -454,6 +454,10 @@
 			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.sdk-feature"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.license-feature"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>		
 		
 		<!--Plugins-->
 		<antcall target="tagone">
