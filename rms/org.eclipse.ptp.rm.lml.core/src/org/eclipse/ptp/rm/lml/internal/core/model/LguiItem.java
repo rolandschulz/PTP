@@ -175,6 +175,7 @@ public class LguiItem implements ILguiItem {
 			layoutLgui = firstRequest();
 		} else {
 			layoutLgui = getLayoutAccess().getLayoutFromModel();
+			layoutLgui.setRequest(request);
 		}
 		try {
 			marshaller.setProperty(
@@ -547,9 +548,6 @@ public class LguiItem implements ILguiItem {
 		}
 		if (xmlStream.length() > 0) {
 			lgui = parseLML(xmlStream.toString());
-			if (lgui != null) {
-				lgui.setRequest(request);
-			}
 			if (listeners.isEmpty()) {
 				createLguiHandlers();
 			}
