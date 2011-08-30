@@ -693,8 +693,8 @@
 	<xs:complexType name="monitor-type">
 		<xs:sequence>
 			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property-type"/>
-			<xs:element name="driver" minOccurs="0" type="rm:monitor-driver-type"/>
-			<xs:element name="workflow" minOccurs="0" type="rm:workflow-type"/>
+			<xs:element name="driver" minOccurs="0" maxOccurs="unbounded" type="rm:monitor-driver-type"/>
+			<xs:element name="workflow" minOccurs="0" maxOccurs="unbounded" type="rm:workflow-type"/>
 		</xs:sequence>
 		<xs:attribute name="schedulerType" type="xs:string"/>
 		<xs:attribute name="refreshFrequencyInSeconds" type="xs:int" default="60"/>
@@ -703,9 +703,10 @@
 		<xs:choice>
 			<xs:element name="url" type="xs:string"/>
 			<xs:sequence>
-				<xs:element name="name" type="xs:string"/>
-				<xs:element name="path" minOccurs="0" type="xs:string"/>
+				<xs:element name="name" minOccurs="0" type="xs:string"/>
+				<xs:element name="path" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 				<xs:element name="args" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type"/>
+				<xs:element name="cmd" minOccurs="0" maxOccurs="unbounded" type="rm:monitor-command-type"/>
 			</xs:sequence>
 		</xs:choice>
 	</xs:complexType>
@@ -739,5 +740,6 @@
 		<xs:attribute name="redirectStderr" type="xs:boolean" default="false"/>
 		<xs:attribute name="ignoreExitStatus" type="xs:boolean" default="false"/>
 		<xs:attribute name="exec" type="xs:string"/>
+		<xs:attribute name="name" type="xs:string"/>
 	</xs:complexType>
 </xs:schema>
