@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.photran.internal.core.FProjectNature;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
@@ -370,16 +371,18 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 		boolean b = false;
 		boolean c = false;
 		boolean d = false;
+		boolean f = false;
 		a = !project.isHidden();
 		try {
 			b = project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID);
 			c = !project.hasNature(RemoteSyncNature.NATURE_ID);
 			d = !project.hasNature(RemoteNature.REMOTE_NATURE_ID);
+			f = !project.hasNature(FProjectNature.F_NATURE_ID);
 		} catch (CoreException e) {
 			RDTSyncUIPlugin.log(e);
 		}
 
-		return a && b && c && d;
+		return a && b && c && d && f;
 	}
 
 	private void update() {
