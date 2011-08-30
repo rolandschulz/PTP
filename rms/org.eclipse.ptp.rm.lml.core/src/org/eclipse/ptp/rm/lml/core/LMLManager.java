@@ -31,6 +31,7 @@ import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiAddedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.MarkObjectEvent;
@@ -56,8 +57,9 @@ public class LMLManager {
 	/*
 	 * Map of all ILguiItems
 	 * 
-	 * For every created Resource Manager instance there is an entry in this map; as long as the Resource Manager instance is not
-	 * removed an associates entry keeps in this map
+	 * For every created Resource Manager instance there is an entry in this
+	 * map; as long as the Resource Manager instance is not removed an
+	 * associates entry keeps in this map
 	 */
 	protected final Map<String, ILguiItem> LGUIS = new HashMap<String, ILguiItem>();
 
@@ -180,7 +182,8 @@ public class LMLManager {
 	}
 
 	/**
-	 * This method is called by LMLResourceManagerMonitor. A ResourceManager was started.
+	 * This method is called by LMLResourceManagerMonitor. A ResourceManager was
+	 * started.
 	 * 
 	 * @param name
 	 *            Name of the ResourceManager
@@ -191,7 +194,8 @@ public class LMLManager {
 	 * @param jobs
 	 *            Array of earlier started jobs
 	 */
-	public void openLgui(String name, String configuration, StringBuilder layout, JobStatusData[] jobs) {
+	public void openLgui(String name, RequestType request,
+			StringBuilder layout, JobStatusData[] jobs) {
 		synchronized (LGUIS) {
 			ILguiItem item = LGUIS.get(name);
 			if (item == null) {
@@ -202,6 +206,7 @@ public class LMLManager {
 		}
 
 		fLguiItem.reloadLastLayout(layout);
+		fLguiItem.setRequest(request);
 		restoreJobStatusData(fLguiItem, jobs);
 
 		if (!fLguiItem.isEmpty()) {
@@ -242,7 +247,8 @@ public class LMLManager {
 	}
 
 	public void selectLgui(String name) {
-		if (name != null && fLguiItem != null && fLguiItem.toString().equals(name)) {
+		if (name != null && fLguiItem != null
+				&& fLguiItem.toString().equals(name)) {
 			return;
 		}
 		fireRemovedLgui(null);
@@ -274,7 +280,8 @@ public class LMLManager {
 		fireUnselectObject(oid);
 	}
 
-	public void update(String name, InputStream input, OutputStream output) throws CoreException {
+	public void update(String name, InputStream input, OutputStream output)
+			throws CoreException {
 		ILguiItem lguiItem = null;
 		synchronized (LGUIS) {
 			lguiItem = LGUIS.get(name);
@@ -283,14 +290,16 @@ public class LMLManager {
 			try {
 				lguiItem.getCurrentLayout(output);
 			} catch (final JAXBException e) {
-				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
-						.getLocalizedMessage()));
+				throw new CoreException(new Status(IStatus.ERROR,
+						LMLCorePlugin.getUniqueIdentifier(), e.getCause()
+								.getLocalizedMessage()));
 			}
 			try {
 				lguiItem.update(input);
 			} catch (final JAXBException e) {
-				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
-						.getLocalizedMessage()));
+				throw new CoreException(new Status(IStatus.ERROR,
+						LMLCorePlugin.getUniqueIdentifier(), e.getCause()
+								.getLocalizedMessage()));
 			}
 
 			if (fLguiItem == lguiItem) {
@@ -303,7 +312,8 @@ public class LMLManager {
 		}
 	}
 
-	public void updateUserJob(String name, String jobId, String status, String detail) {
+	public void updateUserJob(String name, String jobId, String status,
+			String detail) {
 		final ILguiItem lguiItem = LGUIS.get(name);
 		if (lguiItem != null) {
 			lguiItem.updateUserJob(jobId, status, detail);

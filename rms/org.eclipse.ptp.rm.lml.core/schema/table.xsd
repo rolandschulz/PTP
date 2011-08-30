@@ -13,9 +13,9 @@ which accompanies this distribution and is available at
 
 http://www.eclipse.org/legal/epl-v10.html
 -->
-<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
 
-    <include schemaLocation="lgui.xsd"></include>
+    <include schemaLocation="lgui.xsd"/>
     <complexType name="column_type">
     	<annotation>
     		<documentation>
@@ -23,8 +23,7 @@ http://www.eclipse.org/legal/epl-v10.html
     		</documentation>
     	</annotation>
     	<sequence>
-    		<element name="pattern" type="lml:pattern_type"
-    			minOccurs="0" maxOccurs="1">
+    		<element maxOccurs="1" minOccurs="0" name="pattern" type="lml:pattern_type">
     			<annotation>
     				<documentation>
     					The pattern-tag defines regular expressions,
@@ -40,19 +39,19 @@ http://www.eclipse.org/legal/epl-v10.html
     			</annotation>
     		</element>
     	</sequence>
-    	<attribute name="name" type="NCName" use="required"></attribute>
-    	<attribute name="sort" type="lml:sorting_type"></attribute>
-    	<attribute name="description" type="string"></attribute>
-    	<attribute name="id" type="positiveInteger" use="required"></attribute>
-    	<attribute name="type" default="optional">
+    	<attribute name="name" type="NCName" use="required"/>
+    	<attribute name="sort" type="lml:sorting_type"/>
+    	<attribute name="description" type="string"/>
+    	<attribute name="id" type="positiveInteger" use="required"/>
+    	<attribute default="optional" name="type">
             <annotation>
             	<documentation>This attribute defines the use of this column. If optional (default) cells of this column can be left out in rows.
 If mandatory they have to be defined.</documentation>
             </annotation>
             <simpleType>
     			<restriction base="string">
-    				<enumeration value="mandatory"></enumeration>
-    				<enumeration value="optional"></enumeration>
+    				<enumeration value="mandatory"/>
+    				<enumeration value="optional"/>
     			</restriction>
     		</simpleType>
     	</attribute>
@@ -64,9 +63,9 @@ If mandatory they have to be defined.</documentation>
 A valid example is: "2011-04-13 09:56:44"</documentation>
         </annotation>
         <restriction base="string">
-    		<enumeration value="numeric"></enumeration>
-    		<enumeration value="alpha"></enumeration>
-    		<enumeration value="date"></enumeration>
+    		<enumeration value="numeric"/>
+    		<enumeration value="alpha"/>
+    		<enumeration value="date"/>
     	</restriction>
     </simpleType>
 
@@ -78,8 +77,9 @@ Otherwise order of cells define connections to columns.</documentation>
         <attribute name="cid" type="positiveInteger">
     		<annotation>
     			<documentation>Is cid not defined, order of columns and cells will define which cell is connected to which column.</documentation>
-    		</annotation></attribute>
-    	<attribute name="value" type="string"></attribute>
+    		</annotation>
+</attribute>
+    	<attribute name="value" type="string"/>
     </complexType>
 
 
@@ -88,12 +88,13 @@ Otherwise order of cells define connections to columns.</documentation>
         	<documentation>One row in final table.</documentation>
         </annotation>
         <sequence>
-    		<element name="cell" type="lml:cell_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element maxOccurs="unbounded" minOccurs="0" name="cell" type="lml:cell_type"/>
     	</sequence>
     	<attribute name="oid" type="NCName">
     		<annotation>
     			<documentation>Reference to object-tag</documentation>
-    		</annotation></attribute>
+    		</annotation>
+</attribute>
     </complexType>
 
 
@@ -108,11 +109,11 @@ Otherwise order of cells define connections to columns.</documentation>
     	<complexContent>
     		<extension base="lml:gobject_type">
     			<sequence>
-    				<element name="column" type="lml:column_type"
-    					minOccurs="0" maxOccurs="unbounded">
+    				<element maxOccurs="unbounded" minOccurs="0"
+    					name="column" type="lml:column_type">
     				</element>
-    				<element name="row" type="lml:row_type"
-    					minOccurs="0" maxOccurs="unbounded">
+    				<element maxOccurs="unbounded" minOccurs="0"
+    					name="row" type="lml:row_type">
 
     					<!-- for one column only one cell in a row -->
     					<unique name="cellCIDUnique">
@@ -122,19 +123,36 @@ Otherwise order of cells define connections to columns.</documentation>
 
     				</element>
     			</sequence>
-    			<attribute name="contenttype" default="other">
+    			<attribute default="other" name="contenttype">
+    				<annotation>
+    					<documentation>
+    						This attribute defines the table's content
+    						type. E.g. the value jobs defines this table
+    						to contain job-information.
+    					</documentation>
+    				</annotation>
+    				<simpleType>
+    					<restriction base="string">
+    						<enumeration value="jobs" />
+    						<enumeration value="nodes" />
+    						<enumeration value="users" />
+    						<enumeration value="groups" />
+    						<enumeration value="classes" />
+    						<enumeration value="queues" />
+    						<enumeration value="other" />
+    					</restriction>
+    				</simpleType>
+    			</attribute>
+    			<attribute name="form" default="sparse">
                     <annotation>
-                    	<documentation>This attribute defines the table's content type. E.g. the value jobs defines this table to contain job-information.</documentation>
+                    	<documentation>This attribute defines the used form of this table. The form can be regular or sparse in comparison with a matrix. A regular table is filled completely. Every row has the maximum amount of cells.
+A sparse table can leave cells out. One row could contain only one cell, which means that all other columns are empty for this row. Another row might contain 5 cells in the same table.
+This table form could reduce transmitted data. On the other hand regular tables can be processed faster, because a program does not have to check if every cell is available.</documentation>
                     </annotation>
                     <simpleType>
     					<restriction base="string">
-    						<enumeration value="jobs"></enumeration>
-    						<enumeration value="nodes"></enumeration>
-    						<enumeration value="users"></enumeration>
-    						<enumeration value="groups"></enumeration>
-    						<enumeration value="classes"></enumeration>
-    						<enumeration value="queues"></enumeration>
-    						<enumeration value="other"></enumeration>
+    						<enumeration value="regular"></enumeration>
+    						<enumeration value="sparse"></enumeration>
     					</restriction>
     				</simpleType>
     			</attribute>
@@ -143,8 +161,8 @@ Otherwise order of cells define connections to columns.</documentation>
     </complexType>
 
 
-    
-    
+
+
 
     <complexType name="pattern_type">
         <annotation>
@@ -155,9 +173,9 @@ include-regexps and must not match with the exclude-regexps. Therefore the order
 is important.
 </documentation>
         </annotation>
-        <sequence minOccurs="1" maxOccurs="unbounded">
-    		<element name="include" type="lml:pattern_match_type" minOccurs="0" maxOccurs="1"></element>
-    		<element name="exclude" type="lml:pattern_match_type" minOccurs="0" maxOccurs="1"></element>
+        <sequence maxOccurs="unbounded" minOccurs="1">
+    		<element maxOccurs="1" minOccurs="0" name="include" type="lml:pattern_match_type"/>
+    		<element maxOccurs="1" minOccurs="0" name="exclude" type="lml:pattern_match_type"/>
     	</sequence>
     </complexType>
     
@@ -165,6 +183,7 @@ is important.
     	<attribute name="regexp" type="string">
     		<annotation>
     			<documentation>This attribute takes regular expressions of any kind.</documentation>
-    		</annotation></attribute>
+    		</annotation>
+</attribute>
     </complexType>
 </schema>

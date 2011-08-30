@@ -47,6 +47,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfoType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InformationType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutRequestType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
@@ -96,6 +97,8 @@ public class LguiItem implements ILguiItem {
 
 	private final Unmarshaller unmarshaller = LMLCorePlugin.getDefault()
 			.getUnmarshaller();
+
+	private RequestType request;
 
 	/**
 	 * Constructor with LML-model as argument
@@ -494,6 +497,17 @@ public class LguiItem implements ILguiItem {
 	// .getBuffer().toString());
 	// }
 
+	public void setRequest(RequestType request) {
+		this.request = request;
+		if (lgui != null) {
+			final LayoutRequestType layoutReq = new LayoutRequestType();
+			layoutReq.setGetDefaultData(true);
+
+			this.request.setLayoutManagement(layoutReq);
+			lgui.setRequest(this.request);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -533,6 +547,9 @@ public class LguiItem implements ILguiItem {
 		}
 		if (xmlStream.length() > 0) {
 			lgui = parseLML(xmlStream.toString());
+			if (lgui != null) {
+				lgui.setRequest(request);
+			}
 			if (listeners.isEmpty()) {
 				createLguiHandlers();
 			}
@@ -696,8 +713,13 @@ public class LguiItem implements ILguiItem {
 		layoutLgui.setVersion("1"); //$NON-NLS-1$
 		layoutLgui.setLayout(true);
 
-		final RequestType request = objectFactory.createRequestType();
-		request.setGetDefaultData(true);
+		// final RequestType request = objectFactory.createRequestType();
+		final LayoutRequestType layoutReq = objectFactory
+				.createLayoutRequestType();
+		layoutReq.setGetDefaultData(true);
+
+		request.setLayoutManagement(layoutReq);
+
 		layoutLgui.setRequest(request);
 
 		return layoutLgui;
