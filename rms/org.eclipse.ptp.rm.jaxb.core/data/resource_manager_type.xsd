@@ -161,6 +161,8 @@
 		<xs:attribute name="resolveContents" type="xs:boolean" default="true"/>
 		<xs:attribute name="deleteSourceAfterUse" type="xs:boolean" default="false"/>
 		<xs:attribute name="deleteTargetAfterUse" type="xs:boolean" default="false"/>
+		<xs:attribute name="mode" type="xs:string"/>
+		<xs:attribute name="flags" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="file-match-type">
 		<xs:attribute name="efsAttributes" type="xs:string"/>
