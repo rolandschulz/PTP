@@ -84,19 +84,16 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * Map containing jobs under our control
 	 */
-	private final Map<String, JobStatusData> fJobMap = Collections
-			.synchronizedMap(new TreeMap<String, JobStatusData>());
+	private final Map<String, JobStatusData> fJobMap = Collections.synchronizedMap(new TreeMap<String, JobStatusData>());
 
 	private static String lmlNamespace = "http://www.llview.de"; //$NON-NLS-1$
 
 	//	private static final String LAYOUT = "layout";//$NON-NLS-1$
 
 	// TODO Rewrite - Java Applet
-	private final Marshaller marshaller = LMLCorePlugin.getDefault()
-			.getMarshaller();
+	private final Marshaller marshaller = LMLCorePlugin.getDefault().getMarshaller();
 
-	private final Unmarshaller unmarshaller = LMLCorePlugin.getDefault()
-			.getUnmarshaller();
+	private final Unmarshaller unmarshaller = LMLCorePlugin.getDefault().getUnmarshaller();
 
 	private RequestType request;
 
@@ -132,8 +129,7 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#addUserJob(java.lang.String,
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#addUserJob(java.lang.String,
 	 * org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData)
 	 */
 	public void addUserJob(String jobId, JobStatusData status, boolean force) {
@@ -148,8 +144,7 @@ public class LguiItem implements ILguiItem {
 				if (overview != null) {
 					String oid = overview.getOIDByJobId(jobId);
 					if (oid == null) {
-						final TableType table = getTableHandler().getTable(
-								getGidFromJobStatus(status.getState()));
+						final TableType table = getTableHandler().getTable(getGidFromJobStatus(status.getState()));
 						if (table != null) {
 							oid = generateOid();
 							status.setOid(oid);
@@ -165,9 +160,7 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#getCurrentLayout(java.io.
-	 * OutputStream)
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getCurrentLayout(java.io. OutputStream)
 	 */
 	public void getCurrentLayout(OutputStream output) throws JAXBException {
 		LguiType layoutLgui = null;
@@ -178,17 +171,13 @@ public class LguiItem implements ILguiItem {
 			layoutLgui.setRequest(request);
 		}
 		try {
-			marshaller.setProperty(
-					"jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-					Boolean.TRUE);
+			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			final QName tagname = new QName(lmlNamespace, "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$
 
-			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(
-					tagname, LguiType.class, layoutLgui);
+			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(tagname, LguiType.class, layoutLgui);
 			/*
-			 * Synchronize to avoid the dreaded
-			 * "FWK005 parse may not be called while parsing" message
+			 * Synchronize to avoid the dreaded "FWK005 parse may not be called while parsing" message
 			 */
 			synchronized (LguiItem.class) {
 				marshaller.marshal(rootElement, output);
@@ -226,9 +215,8 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/**
-	 * @return a object, which saves which object has to be highlighted. All
-	 *         user interactions are saved globally for all components in this
-	 *         object.
+	 * @return a object, which saves which object has to be highlighted. All user interactions are saved globally for all components
+	 *         in this object.
 	 */
 	public ObjectStatus getObjectStatus() {
 		if (lguiHandlers.get(ObjectStatus.class) == null) {
@@ -248,10 +236,8 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/**
-	 * @return a class, which provides an index for fast access to objects
-	 *         within the objects tag of LML. You can pass the id of the objects
-	 *         to the returned object. It then returns the corresponding
-	 *         objects.
+	 * @return a class, which provides an index for fast access to objects within the objects tag of LML. You can pass the id of the
+	 *         objects to the returned object. It then returns the corresponding objects.
 	 */
 	public OIDToObject getOIDToObject() {
 		if (lguiHandlers.get(OIDToObject.class) == null) {
@@ -277,8 +263,7 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#getUserJob(java.lang.String)
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getUserJob(java.lang.String)
 	 */
 	public JobStatusData getUserJob(String jobId) {
 		final JobStatusData status = fJobMap.get(jobId);
@@ -375,8 +360,7 @@ public class LguiItem implements ILguiItem {
 			}
 		}
 		if (lguiType != null) {
-			for (final JAXBElement<?> tag : lguiType
-					.getObjectsAndRelationsAndInformation()) {
+			for (final JAXBElement<?> tag : lguiType.getObjectsAndRelationsAndInformation()) {
 				if (tag.getValue() instanceof ComponentlayoutType) {
 					lgui = lguiType;
 					if (listeners.isEmpty()) {
@@ -400,21 +384,17 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#removeUserJob(java.lang.String
-	 * )
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#removeUserJob(java.lang.String )
 	 */
 	public void removeUserJob(String jobId) {
 		final JobStatusData status = fJobMap.get(jobId);
 		if (status != null) {
-			final TableType table = getTableHandler().getTable(
-					getGidFromJobStatus(status.getState()));
+			final TableType table = getTableHandler().getTable(getGidFromJobStatus(status.getState()));
 			if (table != null) {
 				int index = -1;
 				for (int i = 0; i < table.getRow().size(); i++) {
 					final RowType row = table.getRow().get(i);
-					final String rowJobId = getTableHandler().getCellValue(
-							table, row, JOB_ID);
+					final String rowJobId = getTableHandler().getCellValue(table, row, JOB_ID);
 					if (rowJobId.equals(jobId)) {
 						index = i;
 						break;
@@ -438,17 +418,13 @@ public class LguiItem implements ILguiItem {
 			layoutLgui = getLayoutAccess().getLayoutFromModel();
 		}
 		try {
-			marshaller.setProperty(
-					"jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-					Boolean.TRUE);
+			marshaller.setProperty("jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			final QName tagname = new QName(lmlNamespace, "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$
 
-			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(
-					tagname, LguiType.class, layoutLgui);
+			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(tagname, LguiType.class, layoutLgui);
 			/*
-			 * Synchronize to avoid the dreaded
-			 * "FWK005 parse may not be called while parsing" message
+			 * Synchronize to avoid the dreaded "FWK005 parse may not be called while parsing" message
 			 */
 			synchronized (LguiItem.class) {
 				marshaller.marshal(rootElement, writer);
@@ -522,13 +498,11 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#update(java.io.InputStream)
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#update(java.io.InputStream)
 	 */
 	public void update(InputStream stream) throws JAXBException {
 
-		final BufferedReader reader = new BufferedReader(new InputStreamReader(
-				stream));
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 		StringBuilder xmlStream = new StringBuilder();
 		String s;
 		try {
@@ -563,9 +537,7 @@ public class LguiItem implements ILguiItem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.core.model.ILguiItem#updateUserJob(java.lang.String
-	 * , java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#updateUserJob(java.lang.String , java.lang.String, java.lang.String)
 	 */
 	public void updateUserJob(String jobId, String status, String detail) {
 		final JobStatusData jobStatus = fJobMap.get(jobId);
@@ -578,37 +550,28 @@ public class LguiItem implements ILguiItem {
 				int index = -1;
 				for (int i = 0; i < tableOld.getRow().size(); i++) {
 					final RowType row = tableOld.getRow().get(i);
-					if (getTableHandler().getCellValue(tableOld, row, JOB_ID)
-							.equals(jobId)) {
-						getTableHandler().setCellValue(tableOld, row,
-								JOB_STATUS, status);
+					if (getTableHandler().getCellValue(tableOld, row, JOB_ID).equals(jobId)) {
+						getTableHandler().setCellValue(tableOld, row, JOB_STATUS, status);
 						rowOld = row;
 						index = i;
 						break;
 					}
 				}
 				if (!gidOld.equals(gidNew)) {
-					final TableType tableNew = getTableHandler().getTable(
-							gidNew);
+					final TableType tableNew = getTableHandler().getTable(gidNew);
 					if (tableNew != null) {
 						if (index >= 0 && rowOld != null) {
 							final RowType rowNew = new RowType();
 							rowNew.setOid(rowOld.getOid());
-							for (final ColumnType columnOld : tableOld
-									.getColumn()) {
+							for (final ColumnType columnOld : tableOld.getColumn()) {
 								final CellType cellNew = new CellType();
 								cellNew.setCid(columnOld.getId());
 								boolean filled = false;
-								for (final ColumnType columnNew : tableNew
-										.getColumn()) {
-									if (columnOld.getName().equals(
-											columnNew.getName())) {
-										for (final CellType cellOld : rowOld
-												.getCell()) {
-											if (cellOld.getCid().equals(
-													columnOld.getId())) {
-												cellNew.setValue(cellOld
-														.getValue());
+								for (final ColumnType columnNew : tableNew.getColumn()) {
+									if (columnOld.getName().equals(columnNew.getName())) {
+										for (final CellType cellOld : rowOld.getCell()) {
+											if (cellOld.getCid().equals(columnOld.getId())) {
+												cellNew.setValue(cellOld.getValue());
 												filled = true;
 												break;
 											}
@@ -616,7 +579,7 @@ public class LguiItem implements ILguiItem {
 									}
 								}
 								if (!filled) {
-									cellNew.setValue("?");
+									cellNew.setValue("?"); //$NON-NLS-1$
 								}
 								rowNew.getCell().add(cellNew);
 							}
@@ -681,20 +644,17 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/**
-	 * The instance lgui is filled with a new data-model. This method creates
-	 * all modules, which handle the data. These modules can then be accessed by
-	 * corresponding getter-functions.
+	 * The instance lgui is filled with a new data-model. This method creates all modules, which handle the data. These modules can
+	 * then be accessed by corresponding getter-functions.
 	 */
 	private void createLguiHandlers() {
 		lguiHandlers.put(OverviewAccess.class, new OverviewAccess(this, lgui));
 		lguiHandlers.put(LayoutAccess.class, new LayoutAccess(this, lgui));
 		lguiHandlers.put(OIDToObject.class, new OIDToObject(this, lgui));
 		lguiHandlers.put(ObjectStatus.class, new ObjectStatus(this, lgui));
-		lguiHandlers.put(OIDToInformation.class, new OIDToInformation(this,
-				lgui));
+		lguiHandlers.put(OIDToInformation.class, new OIDToInformation(this, lgui));
 		lguiHandlers.put(TableHandler.class, new TableHandler(this, lgui));
-		lguiHandlers.put(NodedisplayAccess.class, new NodedisplayAccess(this,
-				lgui));
+		lguiHandlers.put(NodedisplayAccess.class, new NodedisplayAccess(this, lgui));
 	}
 
 	private void fireUpdatedEvent() {
@@ -712,8 +672,7 @@ public class LguiItem implements ILguiItem {
 		layoutLgui.setLayout(true);
 
 		// final RequestType request = objectFactory.createRequestType();
-		final LayoutRequestType layoutReq = objectFactory
-				.createLayoutRequestType();
+		final LayoutRequestType layoutReq = objectFactory.createLayoutRequestType();
 		layoutReq.setGetDefaultData(true);
 
 		request.setLayoutManagement(layoutReq);
@@ -735,8 +694,7 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/**
-	 * Parsing an XML file. The method generates from an XML file an instance of
-	 * LguiType.
+	 * Parsing an XML file. The method generates from an XML file an instance of LguiType.
 	 * 
 	 * @param stream
 	 *            the input stream of the XML file
@@ -746,13 +704,11 @@ public class LguiItem implements ILguiItem {
 	@SuppressWarnings("unchecked")
 	private LguiType parseLML(String string) throws JAXBException {
 		/*
-		 * Synchronize to avoid the dreaded
-		 * "FWK005 parse may not be called while parsing" message
+		 * Synchronize to avoid the dreaded "FWK005 parse may not be called while parsing" message
 		 */
 		final JAXBElement<LguiType> doc;
 		synchronized (LguiItem.class) {
-			doc = (JAXBElement<LguiType>) unmarshaller
-					.unmarshal(new StringReader(string));
+			doc = (JAXBElement<LguiType>) unmarshaller.unmarshal(new StringReader(string));
 		}
 		return doc.getValue();
 	}
@@ -774,10 +730,9 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/**
-	 * Update the job map with the new job data. On this refresh, the new job
-	 * that was added to the table should have been "discovered" by the
-	 * scheduler, so it should appear in one of the job tables. We need to find
-	 * these jobs and update the OID and status information.
+	 * Update the job map with the new job data. On this refresh, the new job that was added to the table should have been
+	 * "discovered" by the scheduler, so it should appear in one of the job tables. We need to find these jobs and update the OID
+	 * and status information.
 	 */
 	private void updateJobData() {
 		final Set<JobStatusData> jobsInTable = new HashSet<JobStatusData>();
@@ -786,30 +741,25 @@ public class LguiItem implements ILguiItem {
 		/*
 		 * First check for jobs that are in the table and update them
 		 */
-		for (final InformationType information : getOverviewAccess()
-				.getInformations()) {
+		for (final InformationType information : getOverviewAccess().getInformations()) {
 			for (final InfoType info : information.getInfo()) {
-				final String jobId = getOverviewAccess().getInfodataValue(info,
-						JOB_ID);
+				final String jobId = getOverviewAccess().getInfodataValue(info, JOB_ID);
 				if (jobId != null) {
 					final JobStatusData status = fJobMap.get(jobId);
 					if (status != null) {
 						if (!status.isRemoved() && !status.isCompleted()) {
 							/*
-							 * job exists in both map and LML, so update the map
-							 * with the oid and latest status
+							 * job exists in both map and LML, so update the map with the oid and latest status
 							 */
 							status.setOid(info.getOid());
-							status.setState(getOverviewAccess()
-									.getInfodataValue(info, JOB_STATUS));
+							status.setState(getOverviewAccess().getInfodataValue(info, JOB_STATUS));
 							/*
 							 * Remember this job is in the table for later
 							 */
 							jobsInTable.add(status);
 						} else {
 							/*
-							 * job has been removed by the user. remove it from
-							 * the table
+							 * job has been removed by the user. remove it from the table
 							 */
 							oidsToRemove.add(info.getOid());
 						}
@@ -831,9 +781,8 @@ public class LguiItem implements ILguiItem {
 		checkTables();
 
 		/*
-		 * Next find any jobs that are no longer in any of the tables. We need
-		 * to create a "fake" entry in the jobslistwait table for these. Note
-		 * that these jobs are now considered "COMPLETED".
+		 * Next find any jobs that are no longer in any of the tables. We need to create a "fake" entry in the jobslistwait table
+		 * for these. Note that these jobs are now considered "COMPLETED".
 		 */
 		TableType table = getTableHandler().getTable(INACTIVE_JOB_TABLE);
 		if (table == null) {

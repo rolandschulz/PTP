@@ -27,8 +27,7 @@ import org.eclipse.ptp.rm.lml.internal.core.model.OverviewAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.TableHandler;
 
 /**
- * Interface to manage the handling of an LguiType. It helps to work with
- * LguiType without knowing the exact build of LguiType.
+ * Interface to manage the handling of an LguiType. It helps to work with LguiType without knowing the exact build of LguiType.
  */
 public interface ILguiItem {
 	/*
@@ -49,6 +48,17 @@ public interface ILguiItem {
 	 */
 	public static String ACTIVE_JOB_TABLE = "joblistrun"; //$NON-NLS-1$
 	public static String INACTIVE_JOB_TABLE = "joblistwait"; //$NON-NLS-1$
+
+	/*
+	 * Table content types
+	 */
+	public static String CONTENT_CLASSES = "classes"; //$NON-NLS-1$
+	public static String CONTENT_GROUPS = "groups"; //$NON-NLS-1$
+	public static String CONTENT_JOBS = "jobs"; //$NON-NLS-1$
+	public static String CONTENT_NODES = "nodes"; //$NON-NLS-1$
+	public static String CONTENT_OTHER = "other"; //$NON-NLS-1$
+	public static String CONTENT_QUEUES = "queues"; //$NON-NLS-1$
+	public static String CONTENT_USERS = "users"; //$NON-NLS-1$
 
 	/**
 	 * @param listener
@@ -140,9 +150,8 @@ public interface ILguiItem {
 	public boolean isLayout();
 
 	/**
-	 * Inform all listeners, that something changed in the data-model. Handlers
-	 * should use this event to update their model-references. Otherwise
-	 * inconsistent return-values will be the result.
+	 * Inform all listeners, that something changed in the data-model. Handlers should use this event to update their
+	 * model-references. Otherwise inconsistent return-values will be the result.
 	 */
 	public void notifyListeners();
 
@@ -164,8 +173,8 @@ public interface ILguiItem {
 	public void removeUserJob(String name);
 
 	/**
-	 * The Resource Manager is being closed. The current layout of the different
-	 * monitoring parts should be saved during the closing.
+	 * The Resource Manager is being closed. The current layout of the different monitoring parts should be saved during the
+	 * closing.
 	 * 
 	 */
 	public String saveCurrentLayout();
