@@ -64,18 +64,6 @@ public class RequestType implements Serializable {
 		return this.driver;
 	}
 
-	// /**
-	// * Sets the value of the driver property.
-	// *
-	// * @param value
-	// * allowed object is
-	// * {@link DriverType }
-	// *
-	// */
-	// public void setDriver(DriverType value) {
-	// this.driver = value;
-	// }
-
 	/**
 	 * Gets the value of the layoutManagement property.
 	 * 
