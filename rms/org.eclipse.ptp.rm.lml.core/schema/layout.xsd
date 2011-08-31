@@ -13,23 +13,23 @@ which accompanies this distribution and is available at
 
 http://www.eclipse.org/legal/epl-v10.html
 -->
-<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
 
-    <include schemaLocation="nodedisplay.xsd"></include>
+    <include schemaLocation="nodedisplay.xsd"/>
     <complexType name="splitlayout_type">
     	<complexContent>
     		<extension base="lml:layout_type">
     			<choice>
     				<sequence>
-    					<element name="left" type="lml:pane_type"></element>
-    					<element name="right" type="lml:pane_type"></element>
+    					<element name="left" type="lml:pane_type"/>
+    					<element name="right" type="lml:pane_type"/>
     				</sequence>
     				<sequence>
-    					<element name="top" type="lml:pane_type"></element>
-    					<element name="bottom" type="lml:pane_type"></element>
+    					<element name="top" type="lml:pane_type"/>
+    					<element name="bottom" type="lml:pane_type"/>
     				</sequence>
     			</choice>
-    			<attribute name="divpos" type="lml:divpos_type" default="0.5"></attribute>
+    			<attribute default="0.5" name="divpos" type="lml:divpos_type"/>
     		</extension>
     	</complexContent>
     </complexType>
@@ -50,23 +50,23 @@ http://www.eclipse.org/legal/epl-v10.html
     		</documentation>
     	</annotation>
    		<sequence>
-	   		<sequence minOccurs="0" maxOccurs="1">
-	    			<element name="left" type="lml:pane_type"></element>
-	    			<element name="right" type="lml:pane_type"></element>
+	   		<sequence maxOccurs="1" minOccurs="0">
+	    			<element name="left" type="lml:pane_type"/>
+	    			<element name="right" type="lml:pane_type"/>
 	   		</sequence>
-	   		<sequence minOccurs="0" maxOccurs="1">
-	    			<element name="top" type="lml:pane_type"></element>
-	    			<element name="bottom" type="lml:pane_type"></element>
+	   		<sequence maxOccurs="1" minOccurs="0">
+	    			<element name="top" type="lml:pane_type"/>
+	    			<element name="bottom" type="lml:pane_type"/>
 	   		</sequence>
    		</sequence>
-    	<attribute name="gid" type="string"></attribute>
-    	<attribute name="divpos" type="lml:divpos_type" default="0.5"></attribute>
+    	<attribute name="gid" type="string"/>
+    	<attribute default="0.5" name="divpos" type="lml:divpos_type"/>
     </complexType>
 
     <simpleType name="divpos_type">
     	<restriction base="double">
-    		<minInclusive value="0"></minInclusive>
-    		<maxInclusive value="1"></maxInclusive>
+    		<minInclusive value="0"/>
+    		<maxInclusive value="1"/>
     	</restriction>
     </simpleType>
 
@@ -74,7 +74,7 @@ http://www.eclipse.org/legal/epl-v10.html
         <annotation>
         	<documentation>All layout-types should extend this type</documentation>
         </annotation>
-        <attribute name="id" type="string" use="required"></attribute>
+        <attribute name="id" type="string" use="required"/>
     </complexType>
 
     <complexType name="abslayout_type">
@@ -87,7 +87,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:layout_type">
     			<sequence>
-    				<element name="comp" type="lml:component_type" minOccurs="1" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="1" name="comp" type="lml:component_type"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -100,23 +100,28 @@ http://www.eclipse.org/legal/epl-v10.html
         <attribute name="gid" type="string" use="required">
         	<annotation>
         		<documentation>connection to a graphical object</documentation>
-        	</annotation></attribute>
+        	</annotation>
+</attribute>
     	<attribute name="x" type="integer" use="required">
     		<annotation>
     			<documentation>left coordinate</documentation>
-    		</annotation></attribute>
+    		</annotation>
+</attribute>
     	<attribute name="y" type="integer" use="required">
     		<annotation>
     			<documentation>upper coordinate</documentation>
-    		</annotation></attribute>
-    	<attribute name="w" type="nonNegativeInteger" default="100">
+    		</annotation>
+</attribute>
+    	<attribute default="100" name="w" type="nonNegativeInteger">
     		<annotation>
     			<documentation>width</documentation>
-    		</annotation></attribute>
-    	<attribute name="h" type="nonNegativeInteger" default="100">
+    		</annotation>
+</attribute>
+    	<attribute default="100" name="h" type="nonNegativeInteger">
     		<annotation>
     			<documentation>height</documentation>
-    		</annotation></attribute>
+    		</annotation>
+</attribute>
     </complexType>
 
     <complexType name="nodedisplaylayout_type">
@@ -126,7 +131,7 @@ http://www.eclipse.org/legal/epl-v10.html
         <complexContent>
     		<extension base="lml:componentlayout_type">
     			<sequence>
-    				<element name="el0" type="lml:nodedisplayelement0"></element>
+    				<element name="el0" type="lml:nodedisplayelement0"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -148,10 +153,11 @@ http://www.eclipse.org/legal/epl-v10.html
     			</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="active" type="boolean" default="true">
+    	<attribute default="true" name="active" type="boolean">
     		<annotation>
     			<documentation>Defines if this component is active. If active is false, then no data for this graphical component has to be passed. This can be used for requesting information from server. Not active-components do not have to be filled with data from the server.</documentation>
-    		</annotation></attribute>
+    		</annotation>
+</attribute>
     </complexType>
 
     <complexType name="nodedisplayelement">
@@ -163,43 +169,38 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:element_type">
     			<sequence>
-    				<element name="img" type="lml:picture_type"
-    					minOccurs="0" maxOccurs="unbounded">
+    				<element maxOccurs="unbounded" minOccurs="0" name="img" type="lml:picture_type">
     				</element>
     			</sequence>
-    			<attribute name="rows" type="nonNegativeInteger"
-    				default="0">
+    			<attribute default="0" name="rows" type="nonNegativeInteger">
     				<annotation>
     					<documentation>
     						Amount of rows of lower elements
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="cols" type="nonNegativeInteger" default="8">
+    			<attribute default="8" name="cols" type="nonNegativeInteger">
     				<annotation>
     					<documentation>
     						Amount of columns of lower elements. This attribute must be defined. It has a higher priority than rows.
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="hgap" type="nonNegativeInteger"
-    				default="1">
+    			<attribute default="1" name="hgap" type="nonNegativeInteger">
     				<annotation>
     					<documentation>
     						horizontal space between two lower element
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="vgap" type="nonNegativeInteger"
-    				default="1">
+    			<attribute default="1" name="vgap" type="nonNegativeInteger">
     				<annotation>
     					<documentation>
     						vertical space between two lower elements
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="fontsize" type="nonNegativeInteger"
-    				default="10">
+    			<attribute default="10" name="fontsize" type="nonNegativeInteger">
     				<annotation>
     					<documentation>
     						size of fonts printed in this element (for
@@ -207,8 +208,7 @@ http://www.eclipse.org/legal/epl-v10.html
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="border" type="nonNegativeInteger"
-    				default="1">
+    			<attribute default="1" name="border" type="nonNegativeInteger">
     				<annotation>
     					<documentation>
     						pixels printed for a border around
@@ -216,33 +216,29 @@ http://www.eclipse.org/legal/epl-v10.html
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="fontfamily" type="string"
-    				default="Monospaced">
+    			<attribute default="Monospaced" name="fontfamily" type="string">
     				<annotation>
     					<documentation>
     						Font used for title
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="showtitle" type="boolean"
-    				default="false">
+    			<attribute default="false" name="showtitle" type="boolean">
     				<annotation>
     					<documentation>
-    						if true => title for elements of this level
+    						if true =&gt; title for elements of this level
     						are shown, otherwise title is hidden
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="titlebackground"
-    				type="lml:hexcolor_type" default="#EFEFEF">
+    			<attribute default="#EFEFEF" name="titlebackground" type="lml:hexcolor_type">
     				<annotation>
     					<documentation>
     						background-color for title-label
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="background" type="lml:hexcolor_type"
-    				default="#FFF">
+    			<attribute default="#FFF" name="background" type="lml:hexcolor_type">
     				<annotation>
     					<documentation>
     						background-color for this element
@@ -258,8 +254,7 @@ http://www.eclipse.org/legal/epl-v10.html
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="mouseborder" type="nonNegativeInteger"
-    				default="2">
+    			<attribute default="2" name="mouseborder" type="nonNegativeInteger">
     				<annotation>
     					<documentation>
     						border printed when mouse-over this
@@ -267,28 +262,25 @@ http://www.eclipse.org/legal/epl-v10.html
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="transparent" type="boolean"
-    				default="true">
+    			<attribute default="true" name="transparent" type="boolean">
     				<annotation>
     					<documentation>
     						Defines if this panel is drawn
     						transparently. Upper-level paintings can
-    						then be seen. If transparent == false => the
+    						then be seen. If transparent == false =&gt; the
     						whole rectangle is painted by the specific
     						panel on its own.
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="bordercolor" type="lml:hexcolor_type"
-    				default="#000">
+    			<attribute default="#000" name="bordercolor" type="lml:hexcolor_type">
     				<annotation>
     					<documentation>
     						Color of the border around inner panels.
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="showfulltitle" type="boolean"
-    				default="true">
+    			<attribute default="true" name="showfulltitle" type="boolean">
     				<annotation>
     					<documentation>
     						If true full implicit name over all levels
@@ -297,14 +289,16 @@ http://www.eclipse.org/legal/epl-v10.html
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="highestrowfirst" type="boolean" default="false">
+    			<attribute default="false" name="highestrowfirst" type="boolean">
     				<annotation>
     					<documentation>Defines the input order of rows within nodedisplaypanel. if true, the row with the highest id is inserted first</documentation>
-    				</annotation></attribute>
-    			<attribute name="highestcolfirst" type="boolean" default="false">
+    				</annotation>
+</attribute>
+    			<attribute default="false" name="highestcolfirst" type="boolean">
     				<annotation>
     					<documentation>Defines the input order of columns within nodedisplaypanel. if true, the column with the highest id is inserted first. Then the first cell within a panel has the highest id of the whole row.</documentation>
-    				</annotation></attribute>
+    				</annotation>
+</attribute>
     		</extension>
     	</complexContent>
     </complexType>
@@ -323,13 +317,12 @@ http://www.eclipse.org/legal/epl-v10.html
     			</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="align" default="CENTER"
-    		type="lml:align_type">
+    	<attribute default="CENTER" name="align" type="lml:align_type">
     		<annotation>
     			<documentation>Position of the picture</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="width" type="lml:percent_type" default="0.1">
+    	<attribute default="0.1" name="width" type="lml:percent_type">
     		<annotation>
     			<documentation>
     				width of the picture in percent corresponding to
@@ -337,8 +330,7 @@ http://www.eclipse.org/legal/epl-v10.html
     			</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="height" type="lml:percent_type"
-    		default="0.1">
+    	<attribute default="0.1" name="height" type="lml:percent_type">
     		<annotation>
     			<documentation>
     				height of the picture in percent corresponding to
@@ -346,17 +338,18 @@ http://www.eclipse.org/legal/epl-v10.html
     			</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="inneralign" type="lml:align_type" default="CENTER">
+    	<attribute default="CENTER" name="inneralign" type="lml:align_type">
     		<annotation>
     			<documentation>align is for positioning the image around the display-panel of one physical element. inner-align is for positioning the picture within its rectangle</documentation>
-    		</annotation></attribute>
+    		</annotation>
+</attribute>
     </complexType>
 
     <complexType name="nodedisplayelement0">
     	<complexContent>
     		<extension base="lml:nodedisplayelement">
     			<sequence>
-    				<element name="el1" type="lml:nodedisplayelement1" minOccurs="0" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el1" type="lml:nodedisplayelement1"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -366,7 +359,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:nodedisplayelement">
     			<sequence>
-    				<element name="el2" type="lml:nodedisplayelement2" minOccurs="0" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el2" type="lml:nodedisplayelement2"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -376,7 +369,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:nodedisplayelement">
     			<sequence>
-    				<element name="el3" type="lml:nodedisplayelement3" minOccurs="0" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el3" type="lml:nodedisplayelement3"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -386,7 +379,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:nodedisplayelement">
     			<sequence>
-    				<element name="el4" type="lml:nodedisplayelement4" minOccurs="0" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el4" type="lml:nodedisplayelement4"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -396,7 +389,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:nodedisplayelement">
     			<sequence>
-    				<element name="el5" type="lml:nodedisplayelement5" minOccurs="0" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el5" type="lml:nodedisplayelement5"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -406,7 +399,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:nodedisplayelement">
     			<sequence>
-    				<element name="el6" type="lml:nodedisplayelement6" minOccurs="0" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el6" type="lml:nodedisplayelement6"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -416,7 +409,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:nodedisplayelement">
     			<sequence>
-    				<element name="el7" type="lml:nodedisplayelement7" minOccurs="0" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el7" type="lml:nodedisplayelement7"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -426,7 +419,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:nodedisplayelement">
     			<sequence>
-    				<element name="el8" type="lml:nodedisplayelement8" minOccurs="0" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el8" type="lml:nodedisplayelement8"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -436,7 +429,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:nodedisplayelement">
     			<sequence>
-    				<element name="el9" type="lml:nodedisplayelement9" minOccurs="0" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el9" type="lml:nodedisplayelement9"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -446,7 +439,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:nodedisplayelement">
     			<sequence>
-    				<element name="el10" type="lml:nodedisplayelement" minOccurs="0" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el10" type="lml:nodedisplayelement"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -455,18 +448,18 @@ http://www.eclipse.org/legal/epl-v10.html
 
     <simpleType name="align_type">
     	<restriction base="string">
-    		<enumeration value="WEST"></enumeration>
-    		<enumeration value="EAST"></enumeration>
-    		<enumeration value="NORTH"></enumeration>
-    		<enumeration value="SOUTH"></enumeration>
-    		<enumeration value="CENTER"></enumeration>
+    		<enumeration value="WEST"/>
+    		<enumeration value="EAST"/>
+    		<enumeration value="NORTH"/>
+    		<enumeration value="SOUTH"/>
+    		<enumeration value="CENTER"/>
     	</restriction>
     </simpleType>
 
     <simpleType name="percent_type">
     	<restriction base="double">
-    		<minInclusive value="0"></minInclusive>
-    		<maxInclusive value="1"></maxInclusive>
+    		<minInclusive value="0"/>
+    		<maxInclusive value="1"/>
     	</restriction>
     </simpleType>
 
@@ -479,7 +472,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	</annotation>
     	<complexContent>
     		<extension base="lml:componentlayout_type">
-    			<attribute name="scale" default="nodes">
+    			<attribute default="nodes" name="scale">
     				<annotation>
     					<documentation>
     						defines which scale should be used. "nodes"
@@ -490,15 +483,16 @@ http://www.eclipse.org/legal/epl-v10.html
     				</annotation>
     				<simpleType>
     					<restriction base="string">
-    						<enumeration value="nodes"></enumeration>
-    						<enumeration value="cpus"></enumeration>
+    						<enumeration value="nodes"/>
+    						<enumeration value="cpus"/>
     					</restriction>
     				</simpleType>
     			</attribute>
-    			<attribute name="interval" type="positiveInteger" default="4">
+    			<attribute default="4" name="interval" type="positiveInteger">
     				<annotation>
     					<documentation>defines the distance between two scale-lines, in other words two tics on the axis</documentation>
-    				</annotation></attribute>
+    				</annotation>
+</attribute>
     		</extension>
     	</complexContent>
     </complexType>
@@ -511,8 +505,7 @@ http://www.eclipse.org/legal/epl-v10.html
     	</annotation>
     	<complexContent>
     		<extension base="lml:componentlayout_type">
-    			<attribute name="border" type="nonNegativeInteger"
-    				default="0">
+    			<attribute default="0" name="border" type="nonNegativeInteger">
     				<annotation>
     					<documentation>
     						border in pixels, which is painted around
@@ -520,8 +513,7 @@ http://www.eclipse.org/legal/epl-v10.html
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="showlegend" type="boolean"
-    				default="true">
+    			<attribute default="true" name="showlegend" type="boolean">
     				<annotation>
     					<documentation>
     						if true, legend is shown, otherwise no
@@ -529,16 +521,14 @@ http://www.eclipse.org/legal/epl-v10.html
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="backgroundcolor"
-    				type="lml:hexcolor_type" default="#FFF">
+    			<attribute default="#FFF" name="backgroundcolor" type="lml:hexcolor_type">
     				<annotation>
     					<documentation>
     						Background-color of the chart, usually white
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="innerbackgroundcolor"
-    				type="lml:hexcolor_type" default="#AAA">
+    			<attribute default="#AAA" name="innerbackgroundcolor" type="lml:hexcolor_type">
     				<annotation>
     					<documentation>
     						background-color of rectangle, in which the
@@ -546,14 +536,12 @@ http://www.eclipse.org/legal/epl-v10.html
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="axescolor" type="lml:hexcolor_type"
-    				default="#555">
+    			<attribute default="#555" name="axescolor" type="lml:hexcolor_type">
     				<annotation>
     					<documentation>Color of axes</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="bordercolor" type="lml:hexcolor_type"
-    				default="#000">
+    			<attribute default="#000" name="bordercolor" type="lml:hexcolor_type">
     				<annotation>
     					<documentation>
     						color of borders around rectangles painted
@@ -561,8 +549,7 @@ http://www.eclipse.org/legal/epl-v10.html
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="gridcolor" type="lml:hexcolor_type"
-    				default="#555">
+    			<attribute default="#555" name="gridcolor" type="lml:hexcolor_type">
     				<annotation>
     					<documentation>
     						Color of gridlines, which are painted at
@@ -570,10 +557,11 @@ http://www.eclipse.org/legal/epl-v10.html
     					</documentation>
     				</annotation>
     			</attribute>
-    			<attribute name="cutpaint" type="boolean" default="true">
+    			<attribute default="true" name="cutpaint" type="boolean">
     				<annotation>
     					<documentation>If true, rects and bars outside the diagrams view are not displayed, otherwise rects are painted outside the diagram area if needed</documentation>
-    				</annotation></attribute>
+    				</annotation>
+</attribute>
     		</extension>
     	</complexContent>
     </complexType>
@@ -585,7 +573,7 @@ http://www.eclipse.org/legal/epl-v10.html
         <complexContent>
     		<extension base="lml:componentlayout_type">
     			<sequence>
-    				<element name="column" type="lml:columnlayout_type" minOccurs="0" maxOccurs="unbounded"></element>
+    				<element maxOccurs="unbounded" minOccurs="0" name="column" type="lml:columnlayout_type"/>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -627,13 +615,12 @@ http://www.eclipse.org/legal/epl-v10.html
     		</annotation>
     		<simpleType>
     			<restriction base="double">
-    				<minInclusive value="0"></minInclusive>
-    				<maxInclusive value="1"></maxInclusive>
+    				<minInclusive value="0"/>
+    				<maxInclusive value="1"/>
     			</restriction>
     		</simpleType>
     	</attribute>
-    	<attribute name="sorted" type="lml:columnsortedtype"
-    		default="false">
+    	<attribute default="false" name="sorted" type="lml:columnsortedtype">
     		<annotation>
     			<documentation>
     				Defines if the table-content is sorted by this
@@ -641,7 +628,7 @@ http://www.eclipse.org/legal/epl-v10.html
     			</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="active" type="boolean" default="true">
+    	<attribute default="true" name="active" type="boolean">
     		<annotation>
     			<documentation>
     				This attribute defines if this column should be
@@ -653,15 +640,16 @@ http://www.eclipse.org/legal/epl-v10.html
     	<attribute name="key" type="string">
     		<annotation>
     			<documentation>Defines the name of an attribute, which is shown in the table in this column. This is comparable with the name-attribute within the table-tag. The values do not have to be equal. The key-attribute is needed</documentation>
-    		</annotation></attribute>
+    		</annotation>
+</attribute>
     </complexType>
 
 
     <simpleType name="columnsortedtype">
     	<restriction base="string">
-    		<enumeration value="asc"></enumeration>
-    		<enumeration value="desc"></enumeration>
-    		<enumeration value="false"></enumeration>
+    		<enumeration value="asc"/>
+    		<enumeration value="desc"/>
+    		<enumeration value="false"/>
     	</restriction>
     </simpleType>
 
@@ -669,16 +657,16 @@ http://www.eclipse.org/legal/epl-v10.html
     	<complexContent>
     		<extension base="lml:componentlayout_type">
     			<sequence>
-    				<element name="typecol"
-    					type="lml:infoboxlayout_coltype" minOccurs="0" maxOccurs="1">
+    				<element maxOccurs="1" minOccurs="0" name="typecol" type="lml:infoboxlayout_coltype">
                         <annotation>
                         	<documentation>this element defines properties for the column containing the keys of information</documentation>
                         </annotation>
     				</element>
-    				<element name="infocol" type="lml:infoboxlayout_coltype" minOccurs="0" maxOccurs="1">
+    				<element maxOccurs="1" minOccurs="0" name="infocol" type="lml:infoboxlayout_coltype">
     					<annotation>
     						<documentation>this element defines properties for the column containing the values of information</documentation>
-    					</annotation></element>
+    					</annotation>
+</element>
     			</sequence>
     		</extension>
     	</complexContent>
@@ -692,7 +680,7 @@ http://www.eclipse.org/legal/epl-v10.html
     			</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="width" default="0.5">
+    	<attribute default="0.5" name="width">
     		<annotation>
     			<documentation>
     				width of column in percent
@@ -700,15 +688,16 @@ http://www.eclipse.org/legal/epl-v10.html
     		</annotation>
     		<simpleType>
     			<restriction base="double">
-    				<minInclusive value="0"></minInclusive>
-    				<maxInclusive value="1"></maxInclusive>
+    				<minInclusive value="0"/>
+    				<maxInclusive value="1"/>
     			</restriction>
     		</simpleType>
     	</attribute>
-    	<attribute name="sorted" type="lml:columnsortedtype" default="false">
+    	<attribute default="false" name="sorted" type="lml:columnsortedtype">
     		<annotation>
     			<documentation>defines if infos are sorted by this column</documentation>
-    		</annotation></attribute>
+    		</annotation>
+</attribute>
     </complexType>
 
     <simpleType name="integer01type">
@@ -716,8 +705,8 @@ http://www.eclipse.org/legal/epl-v10.html
         	<documentation>integer values, where only e aus [0,1] is allowed ={0,1}, is used for infoboxlayout_coltype</documentation>
         </annotation>
         <restriction base="nonNegativeInteger">
-    		<minInclusive value="0"></minInclusive>
-    		<maxInclusive value="1"></maxInclusive>
+    		<minInclusive value="0"/>
+    		<maxInclusive value="1"/>
     	</restriction>
     </simpleType>
 </schema>

@@ -17,6 +17,7 @@ import javax.xml.bind.JAXBException;
 
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
+import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.internal.core.model.LayoutAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.NodedisplayAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.OIDToInformation;
@@ -178,6 +179,8 @@ public interface ILguiItem {
 	// * Memento in which the current layout should be saved
 	// */
 	// public void saveCurrentLayout(IMemento memento);
+
+	public void setRequest(RequestType request);
 
 	/**
 	 * Getting a string representing the ILguiItem.

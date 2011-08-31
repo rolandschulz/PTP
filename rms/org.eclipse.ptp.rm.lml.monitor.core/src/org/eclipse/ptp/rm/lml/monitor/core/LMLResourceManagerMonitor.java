@@ -34,9 +34,17 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.server.RemoteServerManager;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.data.MonitorCommandType;
+import org.eclipse.ptp.rm.jaxb.core.data.MonitorDriverType;
+import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
+import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
+import org.eclipse.ptp.rm.lml.internal.core.elements.CommandType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.DriverType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
 import org.eclipse.ptp.rm.lml.monitor.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
@@ -51,6 +59,7 @@ import org.eclipse.ui.XMLMemento;
 /**
  * LML JAXB resource manager monitor
  */
+@SuppressWarnings("restriction")
 public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	/**
 	 * Job for running the LML DA server. This job gets run periodically based
@@ -163,15 +172,10 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	private final LMLManager fLMLManager = LMLManager.getInstance();
 
 	private static final String LAYOUT = "layout";//$NON-NLS-1$
-
 	private static final String LAYOUT_STRING = "layoutString";//$NON-NLS-1$
-
 	private static final String JOB_ID_ATTR = "job_id";//$NON-NLS-1$
-
 	private static final String RM_ID_ATTR = "rm_id";//$NON-NLS-1$
-
 	private static final String STDOUT_REMOTE_FILE_ATTR = "stdout_remote_path";//$NON-NLS-1$
-
 	private static final String STDERR_REMOTE_FILE_ATTR = "stderr_remote_path";//$NON-NLS-1$
 	private static final String INTERACTIVE_ATTR = "interactive";//$NON-NLS-1$;
 	private static final String STATE_ATTR = "state";//$NON-NLS-1$;
@@ -183,6 +187,58 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	public LMLResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
 	}
+
+	private RequestType getMonitorConfigurationRequestType() {
+		final JAXBResourceManagerConfiguration config = (JAXBResourceManagerConfiguration) getResourceManager()
+				.getConfiguration();
+		ResourceManagerData data;
+		try {
+			data = config.getResourceManagerData();
+		} catch (final Throwable e) {
+			return null;
+		}
+
+		final MonitorType monitorType = data.getMonitorData();
+		RequestType request = null;
+		if (monitorType != null) {
+			request = new RequestType();
+			for (final MonitorDriverType monitorDriver : monitorType
+					.getDriver()) {
+				final DriverType driver = new DriverType();
+				driver.setName(monitorType.getSchedulerType());
+
+				for (final MonitorCommandType cmd : monitorDriver.getCmd()) {
+					final CommandType command = new CommandType();
+					command.setName(cmd.getName());
+					command.setExec(cmd.getExec());
+					driver.getCommand().add(command);
+				}
+				request.getDriver().add(driver);
+			}
+
+			if (monitorType.getDriver().size() == 0) {
+				final DriverType driver = new DriverType();
+				driver.setName(monitorType.getSchedulerType());
+				request.getDriver().add(driver);
+			}
+		}
+		return request;
+	}
+
+	// private String getMonitorConfigurationString() {
+	// final JAXBResourceManagerConfiguration config =
+	// (JAXBResourceManagerConfiguration) getResourceManager()
+	// .getConfiguration();
+	// ResourceManagerData data;
+	// try {
+	// data = config.getResourceManagerData();
+	// } catch (final Throwable e) {
+	//			return ""; //$NON-NLS-1$
+	// }
+	// final MonitorType monitorType = data.getMonitorData();
+	// return JAXBInitializationUtils.marshalData(monitorType,
+	//				MonitorType.class, "monitor-data"); //$NON-NLS-1$
+	// }
 
 	/**
 	 * Get the remote connection specified by the monitor configuration. This
@@ -348,18 +404,19 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 		if (memento != null) {
 			final IMemento child = memento.getChild(LAYOUT);
-			layout.append(child.getString(LAYOUT_STRING));
+			if (child != null) {
+				final String childString = child.getString(LAYOUT_STRING);
+				layout.append(childString);
+			}
 
 			jobs = reload(memento);
 		}
-
 		/*
 		 * Initialize LML classes
 		 */
 		// fLMLManager.openLgui(getResourceManager().getUniqueName(), memento);
-		fLMLManager
-				.openLgui(getResourceManager().getUniqueName(), layout, jobs);
-
+		fLMLManager.openLgui(getResourceManager().getUniqueName(),
+				getMonitorConfigurationRequestType(), layout, jobs);
 		/*
 		 * Open connection and launch periodic job
 		 */

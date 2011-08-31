@@ -13,7 +13,7 @@ which accompanies this distribution and is available at
 
 http://www.eclipse.org/legal/epl-v10.html
 -->
-<schema targetNamespace="http://www.llview.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
 
     
 
@@ -27,7 +27,19 @@ http://www.eclipse.org/legal/epl-v10.html
     			server returns the corresponding data.
     		</documentation>
     	</annotation>
-    	<attribute name="saveLayout" type="boolean" default="false">
+    	<sequence>
+            <element name="driver" type="lml:DriverType" minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="layoutManagement"
+    			type="lml:LayoutRequestType" minOccurs="0" maxOccurs="1">
+    		</element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="LayoutRequestType">
+        <annotation>
+        	<documentation>Contains information about handling layouts on the server side. For example an LML-client could wish to save the layout on the server-side. These parameters are listed within this tag.</documentation>
+        </annotation>
+        <attribute default="false" name="saveLayout" type="boolean">
     		<annotation>
     			<documentation>
     				If true, the server should save the currently send
@@ -35,9 +47,46 @@ http://www.eclipse.org/legal/epl-v10.html
     			</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="getDefaultData" type="boolean" default="false">
+    	<attribute default="false" name="getDefaultData"
+    		type="boolean">
     		<annotation>
-    			<documentation>If true the server should return default data with a default layout. This can be usefull when the client connects to the server for the first time.</documentation>
+    			<documentation>
+    				If true the server should return default data with a
+    				default layout. This can be usefull when the client
+    				connects to the server for the first time.
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    </complexType>
+
+    <complexType name="DriverType">
+    	<annotation>
+    		<documentation>
+    			Definition of driver-parameters for calling the lml-da
+    			with specific driver-information.
+    		</documentation>
+    	</annotation>
+    	<sequence>
+    		<element name="command" type="lml:CommandType" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    	<attribute name="name" type="string" use="required">
+    		<annotation>
+    			<documentation>Name of batch-system</documentation>
+    		</annotation>
+    	</attribute>
+    </complexType>
+    
+    <complexType name="CommandType">
+        <annotation>
+        	<documentation>Every command consists of a name and a path to this command.</documentation>
+        </annotation>
+        <attribute name="name" type="string" use="required">
+        	<annotation>
+        		<documentation>ID of the command</documentation>
+        	</annotation></attribute>
+    	<attribute name="exec" type="string" use="required">
+    		<annotation>
+    			<documentation>Path to the command on the server-side.</documentation>
     		</annotation></attribute>
     </complexType>
 </schema>

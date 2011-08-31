@@ -65,5 +65,35 @@ So one job can be divided into jobparts for a more detailled description.</docum
     		</extension>
     	</complexContent>
     </complexType>
+    
+    <complexType name="usage_type">
+        <annotation>
+        	<documentation>This type is used within nodedisplay to summarize job-infromation of sub-trees. 
+It is almost equivalent to a usagebar, 
+but it is not derived from a graphical object.
+Thus no id has to be defined and layouts cannot
+be associated with instances of this type.</documentation>
+        </annotation>
+        <sequence>
+			<element maxOccurs="unbounded" minOccurs="0" name="job"
+				type="lml:job_type">
+                <annotation>
+                	<documentation>Every job-element defines one job within this subtree.
+A job is simply described by the amount of cpus used by this job.</documentation>
+                </annotation>
+			</element>
+		</sequence>
+		<attribute name="cpucount" type="nonNegativeInteger" use="required">
+			<annotation>
+				<documentation>
+					defines how many cpus are in this sub-tree
+	    		</documentation>
+			</annotation>
+		</attribute>
+		<attribute default="1" name="cpupernode" type="positiveInteger" >
+			<annotation>
+				<documentation>Defines how many CPU build one node. This allows to combine both units: CPU and nodes.</documentation>
+			</annotation></attribute>
+	</complexType>
 
 </schema>

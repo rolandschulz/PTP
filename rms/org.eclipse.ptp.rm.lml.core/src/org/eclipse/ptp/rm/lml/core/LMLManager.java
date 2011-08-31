@@ -31,6 +31,7 @@ import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiAddedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.MarkObjectEvent;
@@ -181,16 +182,20 @@ public class LMLManager {
 	}
 
 	/**
-	 * This method is called by LMLResourceManagerMonitor. A ResourceManager was started.
+	 * This method is called by LMLResourceManagerMonitor. A ResourceManager was
+	 * started.
 	 * 
 	 * @param name
 	 *            Name of the ResourceManager
+	 * @param configuration
+	 *            Configuration information for session
 	 * @param layout
 	 *            Layout from an earlier Eclipse session
 	 * @param jobs
 	 *            Array of earlier started jobs
 	 */
-	public void openLgui(String name, StringBuilder layout, JobStatusData[] jobs) {
+	public void openLgui(String name, RequestType request,
+			StringBuilder layout, JobStatusData[] jobs) {
 		synchronized (LGUIS) {
 			ILguiItem item = LGUIS.get(name);
 			if (item == null) {
@@ -201,6 +206,7 @@ public class LMLManager {
 		}
 
 		fLguiItem.reloadLastLayout(layout);
+		fLguiItem.setRequest(request);
 		restoreJobStatusData(fLguiItem, jobs);
 
 		if (!fLguiItem.isEmpty()) {

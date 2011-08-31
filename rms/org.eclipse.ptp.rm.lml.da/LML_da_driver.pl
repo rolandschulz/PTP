@@ -26,7 +26,7 @@ my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
 my $patbl ="\\s+";             # Pattern for blank space (variable length)
 
-my $version="1.11";
+my $version="1.12";
  
 my ($tstart,$tdiff,$rc);
 
@@ -42,7 +42,7 @@ my ($tstart,$tdiff,$rc);
 #    - designed to run on remote system in user mode
 #    - determine system and select corrensponding query scripts
 #
-# 2. runnung from a LML raw file
+# 2. running on a LML raw file
 #    - designed to run on a web server as backend to 
 #      web server scripts 
 #    - raw file must be speciied by rawfile parameter
@@ -193,15 +193,25 @@ if($rawfile) {
     my $rms="undef";
     my %cmds=();
     print STDERR "$0: check_for rms ...\n"  if($opt_verbose);
-    if(exists($filehandler_request->{DATA}->{request})) {
-	if(exists($filehandler_request->{DATA}->{request}->[0]->{rms})) {
-	    $rms=lc($filehandler_request->{DATA}->{request}->[0]->{rms});
-	    print STDERR "$0: check_for rms, got hint from request ... ($rms)\n" if($opt_verbose);
-	    my($key);
-	    foreach $key (keys(%{$filehandler_request->{DATA}->{request}->[0]}) ) {
-		next if ($key !~/^cmd_/);
-		$cmds{$key}=$filehandler_request->{DATA}->{request}->[0]->{$key};
-		print STDERR "$0: check_for rms, got hint from for cmd $key ... ($cmds{$key})\n"  if($opt_verbose);
+    if(exists($filehandler_request->{DATA}->{REQUEST})) {
+	if(exists($filehandler_request->{DATA}->{REQUEST}->{driver})) {
+	    my $driver_ref=$filehandler_request->{DATA}->{REQUEST}->{driver};
+	    if(exists($driver_ref->{attr})) {
+		if(exists($driver_ref->{attr}->{name})) {
+		    $rms=lc($driver_ref->{attr}->{name});
+		    print STDERR "$0: check_for rms, got hint from request ... ($rms)\n" if($opt_verbose);
+		}
+	    }
+	    
+	    if(exists($driver_ref->{command})) {
+		my($key);
+		foreach $key ( keys(%{$driver_ref->{command}}) ) {
+		    if(exists($driver_ref->{command}->{$key}->{exec})) {
+			my $cmd_key="cmd_".$key;
+			$cmds{$cmd_key}=$driver_ref->{command}->{$key}->{exec};
+			print STDERR "$0: check_for rms, got hint from for cmd $cmd_key ... ($cmds{$cmd_key})\n"  if($opt_verbose);
+		    }
+		}
 	    }
 	}
     } 
@@ -695,7 +705,9 @@ sub check_rms_OpenMPI {
 
     # first:  check if ompi_info is given by request info
     if(exists($cmdsref->{"cmd_sysinfo"})) {
+	if(-f $cmdsref->{"cmd_sysinfo"}) {
 	    $infocmd=$cmdsref->{"cmd_sysinfo"}." --path bindir";
+	}
     } 
 
     # second: check if ompi_info is given in PATH

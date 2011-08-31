@@ -42,8 +42,12 @@ sub new {
 #                 {INFO}  ->{$oid}->{oid}  
 #                                 ->{type}
 #                 {INFODATA}->{$oid}->{$key}
-
-#                 {REQUEST}->{$key}
+#
+#                 {REQUEST}->{attr}->{$key}
+#                          ->{driver}->{attr}->{name}
+#                                    ->{command}->{$name}->{exec}
+#                                                        ->{input}
+#                          ->{layoutManagement}->{attr}->{$key}              
 #
 #                 {TABLELAYOUT}->{$id}->{id}
 #                                     ->{gid}
@@ -303,7 +307,28 @@ sub lml_start {
 ###########################################################################################
     if($name eq "request") {
 	foreach $k (sort keys %attr) {
-	    $o->{OBJECT}->{request}->{$k}=$attr{$k};
+	    $o->{REQUEST}->{attr}->{$k}=$attr{$k};
+	}
+	return(1);
+    }
+    if($name eq "layoutManagement") {
+	foreach $k (sort keys %attr) {
+	    $o->{REQUEST}->{layoutManagement}->{attr}->{$k}=$attr{$k};
+	}
+	return(1);
+    }
+    if($name eq "driver") {
+	foreach $k (sort keys %attr) {
+	    $o->{REQUEST}->{driver}->{attr}->{$k}=$attr{$k};
+	}
+	return(1);
+    }
+    if($name eq "command") {
+	if(exists($attr{name})) {
+	    my $cmdname=$attr{name};
+	    foreach $k (sort keys %attr) {
+		$o->{REQUEST}->{driver}->{command}->{$cmdname}->{$k}=$attr{$k};
+	    }
 	}
 	return(1);
     }

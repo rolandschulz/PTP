@@ -185,8 +185,7 @@ sub get_lml_table {
     my($ds,$rc,$id,$cid);
     my $layoutref  = $self->{LAYOUT};
     my $tableref   = $self->{TABLE};
-#    my(@keylist,$key,$value,$ref, $objtype_pattern, $specref, $active);
-	my(%keylist,$key,$value,$ref, $objtype_pattern, $specref, $active, $lastcid, $cid);
+    my(%keylist,$key,$value,$ref, $objtype_pattern, $specref, $active, $lastcid, $cid);
 
     $objtype_pattern=$self->{OBJTYPE_PATTERN};
 
