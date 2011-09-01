@@ -85,6 +85,7 @@ public class TableView extends ViewPart {
 					if (composite != null) {
 						fLguiItem = lmlManager.getSelectedLguiItem();
 						if (fLguiItem != null && !fLguiItem.isEmpty()) {
+							disposeTable();
 							createTable();
 							if (fLguiItem.getObjectStatus() != null) {
 								fLguiItem.getObjectStatus().addComponent(eventForwarder);
