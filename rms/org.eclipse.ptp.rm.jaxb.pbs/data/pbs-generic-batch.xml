@@ -823,6 +823,6 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			</import>
 		</launch-tab>
 	</control-data>
-	<monitor-data schedulerType="PBS">
+	<monitor-data schedulerType="TORQUE">
 	</monitor-data>
 </resource-manager-builder>
