@@ -10,7 +10,7 @@
       <wizard
             category="org.eclipse.ptp.rm.ResourceManagers"
             class="org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMConfigurationImportWizard"
-            icon="icons/sample.gif"
+            icon="icons/rm.gif"
             id="org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMConfigurationImportWizard"
             name="Resource Manager Definition from Plug-in">
          <description>
