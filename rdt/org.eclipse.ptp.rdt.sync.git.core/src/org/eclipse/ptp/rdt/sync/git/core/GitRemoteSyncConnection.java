@@ -373,7 +373,7 @@ public class GitRemoteSyncConnection {
 		subMon.subTask(Messages.GitRemoteSyncConnection_adding_files);
 		try {
 			while (!filesToAdd.isEmpty()) {
-				List<String> commandList = stringToList(gitCommand + " add --"); //$NON-NLS-1$
+				List<String> commandList = stringToList(gitCommand + " add -f --"); //$NON-NLS-1$
 				int count = 1;
 				for (String fileName : filesToAdd.toArray(new String[0])) {
 					if (count++ % MAX_FILES == 0) {
