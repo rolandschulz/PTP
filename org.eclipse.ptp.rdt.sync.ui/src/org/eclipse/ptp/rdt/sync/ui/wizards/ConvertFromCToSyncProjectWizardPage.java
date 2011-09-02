@@ -198,19 +198,12 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 				RDTSyncUIPlugin.log(e.toString(), e);
 			}
 
-			// Create build scenario based on initial remote location information
-			ISyncServiceProvider provider = participant.getProvider(project);
-			BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(), provider.getLocation());
-
-			// For each build configuration, set builder to be the sync builder
 			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 			if (buildInfo == null) {
 				throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 			}
 			IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 			for (IConfiguration config : allConfigs) {
-				IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
-				config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
 				//turn off append contributed(local) environment variables for the build configuration of the remote project
 				ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
 				if(c_mb_confgDes!=null){
@@ -220,21 +213,33 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 			}
 			ManagedBuildManager.saveBuildInfo(project, true);
 
-			// Add information about remote location to the initial build configurations. Do this last (except for adding local
-			// configuration) so that project is not flagged as initialized prematurely.
-			BuildConfigurationManager.getInstance().initProject(project, serviceConfig, buildScenario);
+			// Initialize all current configurations with a local build scenario. Do this last, except for making remote
+			// configuration, so project is not flagged as initialized prematurely.
+			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+			BuildScenario localBuildScenario = bcm.createLocalBuildScenario(project);
+			bcm.initProject(project, serviceConfig, localBuildScenario);
 			try {
 				BuildConfigurationManager.getInstance().saveConfigurationData();
 			} catch (IOException e) {
 				StatusManager.getManager().handle(new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, e.getMessage(), e),
 						StatusManager.SHOW);
 			}
+			
+			// Create a remote configuration
+			ISyncServiceProvider provider = participant.getProvider(project);
+			BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
+					provider.getLocation());
+			IConfiguration config = bcm.createRemoteConfiguration(project, remoteBuildScenario,
+					Messages.ConvertFromCToSyncProjectWizardPage_0, Messages.ConvertFromCToSyncProjectWizardPage_1);
+
+			// Change its builder to the sync builder
+			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
+			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
+			
 			monitor.done();
 		} finally {
 			monitor.done();
 		}
-
-		BuildConfigurationManager.getInstance().createLocalConfiguration(project);
 	}
 
 	/*
