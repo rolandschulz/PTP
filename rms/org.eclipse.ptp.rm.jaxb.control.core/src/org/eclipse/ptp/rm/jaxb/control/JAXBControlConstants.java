@@ -12,8 +12,7 @@ package org.eclipse.ptp.rm.jaxb.control;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 
 /**
- * Gathers all internal, unmodifiable string constants into a single place for
- * convenience and in the interest of uncluttered code.
+ * Gathers all internal, unmodifiable string constants into a single place for convenience and in the interest of uncluttered code.
  * 
  * @since 5.0
  */
@@ -77,6 +76,8 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 	public static final String DIRECTORY = "directory";//$NON-NLS-1$
 	public static final String MPI_CMD = "mpiCommand";//$NON-NLS-1$
 	public static final String MPI_ARGS = "mpiArgs";//$NON-NLS-1$
+	public static final String DEBUGGER_EXEC_PATH = "debuggerExecutablePath";//$NON-NLS-1$
+	public static final String DEBUGGER_ARGS = "debuggerArgs";//$NON-NLS-1$
 
 	public static final String CASE_INSENSITIVE = "CASE_INSENSITIVE";//$NON-NLS-1$
 	public static final String MULTILINE = "MULTILINE";//$NON-NLS-1$

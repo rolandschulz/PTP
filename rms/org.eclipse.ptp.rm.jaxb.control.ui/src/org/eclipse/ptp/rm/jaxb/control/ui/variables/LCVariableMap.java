@@ -34,24 +34,18 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 
 /**
- * A wrapper for the LaunchConfiguration accessed through the IVariableMap
- * interface.<br>
+ * A wrapper for the LaunchConfiguration accessed through the IVariableMap interface.<br>
  * <br>
  * <br>
- * Unlike the RMVariableMap, the internal map here is largely flat in the sense
- * that it holds only name-value pairs instead of the Property or Attribute
- * objects.<br>
+ * Unlike the RMVariableMap, the internal map here is largely flat in the sense that it holds only name-value pairs instead of the
+ * Property or Attribute objects.<br>
  * <br>
- * When this map is loaded from its parent (see
- * {@link #initialize(IVariableMap)}), the full set of Properties and Attributes
- * are maintained in a global map, which remains unaltered; a second, volatile
- * map can be swapped in and out by the caller to view the tab-specific
- * environment.<br>
+ * When this map is loaded from its parent (see {@link #initialize(IVariableMap)}), the full set of Properties and Attributes are
+ * maintained in a global map, which remains unaltered; a second, volatile map can be swapped in and out by the caller to view the
+ * tab-specific environment.<br>
  * <br>
- * This object also maintains the default values defined from the parent in a
- * separate map, and a map for invisible properties (i.e., those not exported to
- * widgets). Finally, it also holds aside linked properties for reevaluation at
- * update.
+ * This object also maintains the default values defined from the parent in a separate map, and a map for invisible properties
+ * (i.e., those not exported to widgets). Finally, it also holds aside linked properties for reevaluation at update.
  * 
  * @see org.eclipse.debug.core.ILaunchConfigurationWorkingCopy
  * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap
@@ -94,14 +88,11 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * Merge the attribute map on the configuration with the current (volatile)
-	 * map.<br>
+	 * Merge the attribute map on the configuration with the current (volatile) map.<br>
 	 * <br>
 	 * 
-	 * Note that if any
-	 * <code>null<code> values go into the working copy, they are not subsequently written to the original.  
-	 * Thus to maintain consistency, we do no allow <code>null</code> values in
-	 * the map.
+	 * Note that if any <code>null<code> values go into the working copy, they are not subsequently written to the original.  
+	 * Thus to maintain consistency, we do no allow <code>null</code> values in the map.
 	 * 
 	 * @param configuration
 	 *            working copy of Launch Tab's current configuration
@@ -129,8 +120,7 @@ public class LCVariableMap implements IVariableMap {
 
 	/**
 	 * @param name
-	 *            of tab or viewer for which to find qualifying widgets or
-	 *            checked rows
+	 *            of tab or viewer for which to find qualifying widgets or checked rows
 	 * @param statePrefix
 	 *            the tag for the control state
 	 * @return set of variable names in this control state
@@ -171,8 +161,7 @@ public class LCVariableMap implements IVariableMap {
 	/**
 	 * @param name
 	 *            of widget, bound to a Property or Attribute
-	 * @return default value of the Property or Attribute, or <code>null</code>
-	 *         if none
+	 * @return default value of the Property or Attribute, or <code>null</code> if none
 	 */
 	public String getDefault(String name) {
 		if (name == null) {
@@ -205,9 +194,8 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * The ${rm: prefix points to the RMVariableResolver, ${lc: to the
-	 * LCVariableResolver, so we substitute the latter and pass off the
-	 * substitution to the resolver for resolution.
+	 * The ${rm: prefix points to the RMVariableResolver, ${lc: to the LCVariableResolver, so we substitute the latter and pass off
+	 * the substitution to the resolver for resolution.
 	 * 
 	 * @param value
 	 *            expression to be resolved
@@ -251,8 +239,7 @@ public class LCVariableMap implements IVariableMap {
 	 * @param rmVars
 	 *            resource manager environment map
 	 * @param rmId
-	 *            IPTPLaunchConfigurationConstants.
-	 *            ATTR_RESOURCE_MANAGER_UNIQUENAME
+	 *            IPTPLaunchConfigurationConstants. ATTR_RESOURCE_MANAGER_UNIQUENAME
 	 * @throws Throwable
 	 */
 	public void initialize(IVariableMap rmVars, String rmId) throws Throwable {
@@ -282,8 +269,8 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * Relink ptp, debug, directory, executable and arguments variables. Note
-	 * that the externally defined variables do not get the rmId prefix.
+	 * Relink ptp, debug, directory, executable and arguments variables. Note that the externally defined variables do not get the
+	 * rmId prefix.
 	 * 
 	 * @param configuration
 	 *            current launch settings
@@ -315,12 +302,15 @@ public class LCVariableMap implements IVariableMap {
 				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
 		put(JAXBControlConstants.PROG_ARGS,
 				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR));
+		put(JAXBControlConstants.DEBUGGER_EXEC_PATH, configuration.getAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
+		put(JAXBControlConstants.DEBUGGER_ARGS,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, JAXBControlConstants.ZEROSTR));
 	}
 
 	/**
-	 * Relink the hidden variables in the current environment. (Note that the
-	 * presence of a symbolic link overrides the default value only if the
-	 * linked value is not <code>null</code>).
+	 * Relink the hidden variables in the current environment. (Note that the presence of a symbolic link overrides the default
+	 * value only if the linked value is not <code>null</code>).
 	 * 
 	 */
 	public void relinkHidden(String controller) {
@@ -431,9 +421,8 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * Calls the string substitution method on the variable manager. Under
-	 * synchronization, sets the variable resolver's map reference to this
-	 * instance.
+	 * Calls the string substitution method on the variable manager. Under synchronization, sets the variable resolver's map
+	 * reference to this instance.
 	 * 
 	 * @param expression
 	 *            to be resolved (recursively dereferenced from the map).
@@ -451,8 +440,7 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * If the value of the Property or Attribute is <code>null</code> and it has
-	 * a defined default, the value is set to the default.
+	 * If the value of the Property or Attribute is <code>null</code> and it has a defined default, the value is set to the default.
 	 * 
 	 * @param key
 	 *            from the original RMVariableMap

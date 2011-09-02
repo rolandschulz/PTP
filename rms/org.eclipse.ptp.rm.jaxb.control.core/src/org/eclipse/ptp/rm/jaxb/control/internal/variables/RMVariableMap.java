@@ -28,17 +28,13 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 
 /**
- * Abstraction representing all the Property and Attribute definitions
- * associated with a resource manager configuration. This provides an
- * "environment" for dereferencing the resource manager configuration, such that
- * the values of its Properties and Attributes can reference other Properties
- * and Attributes.<br>
+ * Abstraction representing all the Property and Attribute definitions associated with a resource manager configuration. This
+ * provides an "environment" for dereferencing the resource manager configuration, such that the values of its Properties and
+ * Attributes can reference other Properties and Attributes.<br>
  * <br>
  * 
- * There are two submaps: one contains all the Properties and Attributes defined
- * in the XML configuration; a separate map contains all the Properties and
- * Attributes which are "discovered" at runtime (through tokenization of command
- * output).
+ * There are two submaps: one contains all the Properties and Attributes defined in the XML configuration; a separate map contains
+ * all the Properties and Attributes which are "discovered" at runtime (through tokenization of command output).
  * 
  * @author arossi
  * 
@@ -47,9 +43,8 @@ public class RMVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
 
 	/**
-	 * Checks for current valid attributes by examining the valid list for the
-	 * current controller, excluding <code>null</code> or 0-length string
-	 * values. Removes the rm unique id prefix.
+	 * Checks for current valid attributes by examining the valid list for the current controller, excluding <code>null</code> or
+	 * 0-length string values. Removes the rm unique id prefix.
 	 * 
 	 * @param config
 	 * @return currently valid variables
@@ -120,6 +115,7 @@ public class RMVariableMap implements IVariableMap {
 	public static boolean isFixedValid(String name) {
 		return name.startsWith(JAXBControlConstants.CONTROL_DOT) || name.equals(JAXBControlConstants.DIRECTORY)
 				|| name.equals(JAXBControlConstants.EXEC_PATH) || name.equals(JAXBControlConstants.PROG_ARGS)
+				|| name.equals(JAXBControlConstants.DEBUGGER_EXEC_PATH) || name.equals(JAXBControlConstants.DEBUGGER_ARGS)
 				|| name.equals(JAXBControlConstants.STDOUT_REMOTE_FILE) || name.equals(JAXBControlConstants.STDERR_REMOTE_FILE);
 	}
 
@@ -144,8 +140,7 @@ public class RMVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * Search the two maps for this reference. The predefined variables are
-	 * searched first.
+	 * Search the two maps for this reference. The predefined variables are searched first.
 	 * 
 	 * @param name
 	 *            of Property or Attribute to find.
@@ -200,16 +195,14 @@ public class RMVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * @return map of Properties and Attributes defined in the XML
-	 *         configuration.
+	 * @return map of Properties and Attributes defined in the XML configuration.
 	 */
 	public Map<String, Object> getVariables() {
 		return variables;
 	}
 
 	/**
-	 * @return whether the map has been initialized from an XML resource manager
-	 *         configuration.
+	 * @return whether the map has been initialized from an XML resource manager configuration.
 	 */
 	public boolean isInitialized() {
 		return initialized;
@@ -223,8 +216,7 @@ public class RMVariableMap implements IVariableMap {
 	 * @param value
 	 *            of property to add
 	 * @param visible
-	 *            whether this property is to be made available through the user
-	 *            interface (Launch Tab)
+	 *            whether this property is to be made available through the user interface (Launch Tab)
 	 */
 	public void maybeAddProperty(String name, Object value, boolean visible) {
 		if (name == null) {
@@ -263,10 +255,9 @@ public class RMVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * Looks for property in the configuration and uses it to create a Property
-	 * in the current environment. If the property is undefined or has a
-	 * <code>null</code> value in the configuration, this will not overwrite a
-	 * currently defined property in the environment. <br>
+	 * Looks for property in the configuration and uses it to create a Property in the current environment. If the property is
+	 * undefined or has a <code>null</code> value in the configuration, this will not overwrite a currently defined property in the
+	 * environment. <br>
 	 * <br>
 	 * Delegates to {@link #maybeAddProperty(String, Object, boolean)}
 	 * 
@@ -317,8 +308,8 @@ public class RMVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * Removes a Property or Attribute. Checks first in the predefined values
-	 * map, and if it does not exist there, removes from the runtime values map.
+	 * Removes a Property or Attribute. Checks first in the predefined values map, and if it does not exist there, removes from the
+	 * runtime values map.
 	 * 
 	 * @param name
 	 *            of Property or Attribute to remove
@@ -337,17 +328,15 @@ public class RMVariableMap implements IVariableMap {
 
 	/**
 	 * @param initialized
-	 *            whether the map has been initialized from an XML resource
-	 *            manager configuration.
+	 *            whether the map has been initialized from an XML resource manager configuration.
 	 */
 	public void setInitialized(boolean initialized) {
 		this.initialized = initialized;
 	}
 
 	/**
-	 * Calls the string substitution method on the variable manager. Under
-	 * synchronization, sets the variable resolver's map reference to this
-	 * instance.
+	 * Calls the string substitution method on the variable manager. Under synchronization, sets the variable resolver's map
+	 * reference to this instance.
 	 * 
 	 * @param expression
 	 *            to be resolved (recursively dereferenced from the map).

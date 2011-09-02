@@ -58,19 +58,15 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
- * The part of the JAXB resource manager responsible for handling job
- * submission, termination, suspension and resumption. Also provides on-demand
- * job status checking. <br>
+ * The part of the JAXB resource manager responsible for handling job submission, termination, suspension and resumption. Also
+ * provides on-demand job status checking. <br>
  * <br>
- * The state maintained by the control is volatile (in-memory only). The control
- * is responsible for handing off to the caller status objects containing job
- * state, as well as means of acessing the process (if interactive) and the
- * standard out and error streams. When the job completes, these are eliminated
- * from its internal map.<br>
+ * The state maintained by the control is volatile (in-memory only). The control is responsible for handing off to the caller status
+ * objects containing job state, as well as means of acessing the process (if interactive) and the standard out and error streams.
+ * When the job completes, these are eliminated from its internal map.<br>
  * <br>
- * The logic of this manager is generic; the specific commands used, files
- * staged, and script constructed (if any) are all configured via the resource
- * manager XML. <br>
+ * The logic of this manager is generic; the specific commands used, files staged, and script constructed (if any) are all
+ * configured via the resource manager XML. <br>
  * <br>
  * Currently, it is the control which handles updating the monitor component.
  * 
@@ -80,8 +76,7 @@ import org.eclipse.ui.progress.IProgressConstants;
 public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl {
 
 	/*
-	 * copied from AbstractToolRuntimeSystem; the RM should shut down when the
-	 * remote connection is closed
+	 * copied from AbstractToolRuntimeSystem; the RM should shut down when the remote connection is closed
 	 */
 	private class ConnectionChangeListener implements IRemoteConnectionChangeListener {
 		public ConnectionChangeListener() {
@@ -91,8 +86,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener#
-		 * connectionChanged
+		 * @see org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener# connectionChanged
 		 * (org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent)
 		 */
 		public void connectionChanged(IRemoteConnectionChangeEvent event) {
@@ -174,8 +168,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * @return whether to append (true) the env passed in through the
-	 *         LaunchConfiguration, or replace the current env with it.
+	 * @return whether to append (true) the env passed in through the LaunchConfiguration, or replace the current env with it.
 	 */
 	public boolean getAppendEnv() {
 		return appendLaunchEnv;
@@ -184,8 +177,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getEnvironment()
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getEnvironment()
 	 */
 	public IVariableMap getEnvironment() {
 		return rmVarMap;
@@ -199,16 +191,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * @return any environment variables passed in through the
-	 *         LaunchConfiguration
+	 * @return any environment variables passed in through the LaunchConfiguration
 	 */
 	public Map<String, String> getLaunchEnv() {
 		return launchEnv;
 	}
 
 	/**
-	 * Reinitializes when the connection info has been changed on a cached
-	 * resource manager.
+	 * Reinitializes when the connection info has been changed on a cached resource manager.
 	 * 
 	 * @param monitor
 	 * @return wrapper object for remote services, connections and file managers
@@ -238,8 +228,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getStatusMap()
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getStatusMap()
 	 */
 	public ICommandJobStatusMap getStatusMap() {
 		return jobStatusMap;
@@ -248,9 +237,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged
-	 * (java.lang.String)
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged (java.lang.String)
 	 */
 	public void jobStateChanged(String jobId, IJobStatus status) {
 		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
@@ -258,8 +245,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * First clears the value, if indicated, then checks for the command
-	 * definition, and calls
+	 * First clears the value, if indicated, then checks for the command definition, and calls
 	 * {@link #runCommand(String, CommandType, org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJob.JobMode, boolean)}
 	 * .
 	 * 
@@ -326,13 +312,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
-	 * For termination, pause, hold, suspension and resume requests. Resets the
-	 * environment, generates a uuid property; if the control request is
-	 * termination, calls remove on the state map. (non-Javadoc)
+	 * For termination, pause, hold, suspension and resume requests. Resets the environment, generates a uuid property; if the
+	 * control request is termination, calls remove on the state map. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doControlJob(
-	 * java.lang.String, java.lang.String,
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doControlJob( java.lang.String, java.lang.String,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
@@ -384,14 +367,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
-	 * Used by the client to refresh status on demand. (non-Javadoc) Generates a
-	 * jobId property; if the returned state is RUNNING, starts the proxy (a
-	 * rentrant call to a started proxy does nothing); if COMPLETED, the status
-	 * is removed from the map.
+	 * Used by the client to refresh status on demand. (non-Javadoc) Generates a jobId property; if the returned state is RUNNING,
+	 * starts the proxy (a rentrant call to a started proxy does nothing); if COMPLETED, the status is removed from the map.
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doGetJobStatus
-	 * (java.lang.String)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doGetJobStatus (java.lang.String)
 	 */
 	@Override
 	protected IJobStatus doGetJobStatus(String jobId, boolean force, IProgressMonitor monitor) throws CoreException {
@@ -399,8 +378,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
 
 			/*
-			 * First check to see when the last call was made; throttle requests
-			 * coming in intervals less than
+			 * First check to see when the last call was made; throttle requests coming in intervals less than
 			 * ICommandJobStatus.UPDATE_REQUEST_INTERVAL
 			 */
 			SubMonitor progress = SubMonitor.convert(monitor, 100);
@@ -408,10 +386,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			if (status != null) {
 				if (IJobStatus.COMPLETED.equals(status.getState())) {
 					/*
-					 * leave the status in the map in case there are further
-					 * calls (regarding remote file state); it will be pruned by
-					 * the daemon; note that a COMPLETED state can correspond to
-					 * a COMPLETED, CANCELED, FAILED or JOB_OUTERR_READY detail
+					 * leave the status in the map in case there are further calls (regarding remote file state); it will be pruned
+					 * by the daemon; note that a COMPLETED state can correspond to a COMPLETED, CANCELED, FAILED or
+					 * JOB_OUTERR_READY detail
 					 */
 					status = jobStatusMap.terminated(jobId, progress.newChild(50));
 					if (status != null && status.stateChanged()) {
@@ -472,9 +449,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			if (IJobStatus.COMPLETED.equals(state)) {
 				/*
-				 * leave the status in the map in case there are further calls
-				 * (regarding remote file state); it will be pruned by the
-				 * daemon
+				 * leave the status in the map in case there are further calls (regarding remote file state); it will be pruned by
+				 * the daemon
 				 */
 				status = jobStatusMap.terminated(jobId, progress.newChild(50));
 			}
@@ -491,9 +467,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
-	 * Executes any shutdown commands, then calls halt on the status map thread.
-	 * NOTE: closing the RM does not terminate the remote connection it may be
-	 * using, but merely removes the listeners. (non-Javadoc)
+	 * Executes any shutdown commands, then calls halt on the status map thread. NOTE: closing the RM does not terminate the remote
+	 * connection it may be using, but merely removes the listeners. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doShutdown()
 	 */
@@ -512,9 +487,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/*
 	 * Connects and executes any startup commands. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doStartup(org
-	 * .eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doStartup(org .eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
@@ -540,22 +513,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/*
-	 * The main command for job submission. (non-Javadoc) A uuid tag is
-	 * generated for the submission until a resource-specific identifier is
-	 * returned (there should be a stream tokenizer associated with the job
-	 * command in this case which sets the uuid property).
+	 * The main command for job submission. (non-Javadoc) A uuid tag is generated for the submission until a resource-specific
+	 * identifier is returned (there should be a stream tokenizer associated with the job command in this case which sets the uuid
+	 * property).
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doSubmitJob(org
-	 * .eclipse.debug.core.ILaunchConfiguration, java.lang.String,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doSubmitJob(org .eclipse.debug.core.ILaunchConfiguration,
+	 * java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
 		/*
-		 * give submission a unique id which will in most cases be replaced by
-		 * the resource-generated id for the job/process
+		 * give submission a unique id which will in most cases be replaced by the resource-generated id for the job/process
 		 */
 		String uuid = UUID.randomUUID().toString();
 
@@ -589,9 +558,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		List<ManagedFilesType> files = controlData.getManagedFiles();
 
 		/*
-		 * if the script is to be staged, a managed file pointing to either its
-		 * content (${ptp_rm:script#value}), or to its path (SCRIPT_PATH) must
-		 * exist.
+		 * if the script is to be staged, a managed file pointing to either its content (${ptp_rm:script#value}), or to its path
+		 * (SCRIPT_PATH) must exist.
 		 */
 		if (script != null) {
 			maybeAddManagedFileForScript(files, script.getFileStagingLocation(), delScript);
@@ -624,9 +592,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		/*
-		 * property containing actual jobId as name was set in the wait call; we
-		 * may need the new jobId mapping momentarily to resolve proxy-specific
-		 * info
+		 * property containing actual jobId as name was set in the wait call; we may need the new jobId mapping momentarily to
+		 * resolve proxy-specific info
 		 */
 		rmVarMap.remove(uuid);
 		jobId = p.getName();
@@ -656,9 +623,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * If there are special server connections to open, those need to be taken
-	 * care of by a command to be run on start-up; here we just check for an
-	 * open connection and add a change listener to it.
+	 * If there are special server connections to open, those need to be taken care of by a command to be run on start-up; here we
+	 * just check for an open connection and add a change listener to it.
 	 * 
 	 * @param monitor
 	 * @throws RemoteConnectionException
@@ -718,11 +684,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * Run either interactive or batch job for run or debug modes.
-	 * ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE are the
-	 * corresponding LaunchConfiguration modes; batch/interactive are currently
-	 * determined by the configuration (the configuration cannot implement
-	 * both). This may need to be modified.
+	 * Run either interactive or batch job for run or debug modes. ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE are the
+	 * corresponding LaunchConfiguration modes; batch/interactive are currently determined by the configuration (the configuration
+	 * cannot implement both). This may need to be modified.
 	 * 
 	 * @param uuid
 	 *            temporary internal id for as yet unsubmitted job
@@ -757,15 +721,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		/*
-		 * NOTE: changed this to join, because the waitForId is now part of the
-		 * run() method of the command itself (05.01.2011)
+		 * NOTE: changed this to join, because the waitForId is now part of the run() method of the command itself (05.01.2011)
 		 */
 		return runCommand(uuid, command, jobMode, true);
 	}
 
 	/**
-	 * Run the shut down commands, if any. Cancel any running interactive
-	 * process.
+	 * Run the shut down commands, if any. Cancel any running interactive process.
 	 * 
 	 * @throws CoreException
 	 */
@@ -824,9 +786,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * Checks for existence of either internally generated script or custom
-	 * script path. In either case, either replaces contents of the
-	 * corresponding managed file object or creates one.
+	 * Checks for existence of either internally generated script or custom script path. In either case, either replaces contents of
+	 * the corresponding managed file object or creates one.
 	 * 
 	 * @param lists
 	 *            the lists of managed files for this submission
@@ -910,14 +871,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * Serialize script content if necessary. We first check to see if there is
-	 * a custom script (path).
+	 * Serialize script content if necessary. We first check to see if there is a custom script (path).
 	 * 
 	 * @param uuid
 	 *            temporary internal id for as yet unsubmitted job
 	 * @param script
-	 *            configuration object describing how to construct the script
-	 *            from the environment
+	 *            configuration object describing how to construct the script from the environment
 	 * @return whether the script target should be deleted
 	 */
 	private boolean maybeHandleScript(String uuid, ScriptType script) {
@@ -938,8 +897,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * If job is interactive, kill the process directly rather than issuing a
-	 * remote command.
+	 * If job is interactive, kill the process directly rather than issuing a remote command.
 	 * 
 	 * @param jobId
 	 *            either process id or internal identifier.
@@ -1002,14 +960,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * Create command job, and schedule. Used for job-specific commands
-	 * directly.
+	 * Create command job, and schedule. Used for job-specific commands directly.
 	 * 
 	 * @param uuid
 	 *            temporary internal id for as yet unsubmitted job
 	 * @param command
-	 *            configuration object containing the command arguments and
-	 *            tokenizers
+	 *            configuration object containing the command arguments and tokenizers
 	 * @param mode
 	 *            whether batch, interactive, or a status job
 	 * @param join
@@ -1038,13 +994,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * Run command sequence. Invoked by startup or shutdown commands. Delegates
-	 * to {@link #runCommand(String, CommandType, boolean, boolean)}. If a job
-	 * in the sequence fails, the subsequent commands will not run.
+	 * Run command sequence. Invoked by startup or shutdown commands. Delegates to
+	 * {@link #runCommand(String, CommandType, boolean, boolean)}. If a job in the sequence fails, the subsequent commands will not
+	 * run.
 	 * 
 	 * @param cmds
-	 *            configuration objects containing the command arguments and
-	 *            tokenizers
+	 *            configuration objects containing the command arguments and tokenizers
 	 * @throws CoreException
 	 */
 	private void runCommands(List<CommandType> cmds) throws CoreException {
@@ -1054,8 +1009,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * User name and service address. Set in case the script needs these
-	 * variables.
+	 * User name and service address. Set in case the script needs these variables.
 	 * 
 	 * @throws CoreException
 	 */
@@ -1097,9 +1051,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		progress.worked(10);
 
 		/*
-		 * The non-selected variables have been excluded from the valid
-		 * attributes of the configuration; but we need to null out the superset
-		 * values here that are undefined.
+		 * The non-selected variables have been excluded from the valid attributes of the configuration; but we need to null out the
+		 * superset values here that are undefined.
 		 */
 		for (String key : rmVarMap.getVariables().keySet()) {
 			if (!lcattr.containsKey(key)) {
@@ -1127,6 +1080,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.maybeOverwrite(JAXBControlConstants.DIRECTORY, JAXBControlConstants.DIRECTORY, lcattr, false);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.EXEC_PATH, JAXBControlConstants.EXEC_PATH, lcattr, false);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr, false);
+		rmVarMap.maybeOverwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr, false);
+		rmVarMap.maybeOverwrite(JAXBControlConstants.DEBUGGER_ARGS, JAXBControlConstants.DEBUGGER_ARGS, lcattr, false);
 
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));
