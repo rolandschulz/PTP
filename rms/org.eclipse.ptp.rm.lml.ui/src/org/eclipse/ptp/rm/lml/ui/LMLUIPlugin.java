@@ -21,8 +21,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.ui;
 
-import java.util.HashMap;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.lml.core.util.DebugUtil;
@@ -34,7 +32,6 @@ import org.osgi.framework.BundleContext;
 
 public class LMLUIPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.lml.ui"; //$NON-NLS-1$
-	public static final String RUNTIME_MODEL_PRESENTATION_EXTENSION_POINT_ID = "runtimeModelPresentations"; //$NON-NLS-1$
 
 	// The shared instance.
 	private static LMLUIPlugin plugin;
@@ -124,32 +121,16 @@ public class LMLUIPlugin extends AbstractUIPlugin {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), ILMLUIConstants.INTERNAL_ERROR, "Internal Error", e)); //$NON-NLS-1$
 	}
 
-	// Resource bundle.
-	private final HashMap<String, IRuntimeModelPresentation> runtimeModelPresentations = new HashMap<String, IRuntimeModelPresentation>();
-
 	public LMLUIPlugin() {
 		super();
 		plugin = this;
 
 	}
 
-	/**
-	 * Get the runtime model presentation for the given resource manager
-	 * 
-	 * @param id
-	 *            resource manager ID
-	 * @return runtime model presentation
-	 */
-	public IRuntimeModelPresentation getRuntimeModelPresentation(String id) {
-		return runtimeModelPresentations.get(id);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
@@ -160,9 +141,7 @@ public class LMLUIPlugin extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {

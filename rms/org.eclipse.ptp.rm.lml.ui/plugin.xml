@@ -7,7 +7,7 @@
             allowMultiple="true"
             category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.NodesView"
-            icon="icons/parallel_perspective.gif"
+            icon="icons/nodes_view.gif"
             id="__dummy_nd__1__"
             name="%NodediesplayView.name">
       </view>
@@ -15,7 +15,7 @@
             allowMultiple="true"
             category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.TableView"
-            icon="icons/parallel_perspective.gif"
+            icon="icons/active_jobs_view.gif"
             id="joblistrun"
             name="%TableView1.name">
       </view>
@@ -23,7 +23,7 @@
             allowMultiple="true"
             category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.TableView"
-            icon="icons/parallel_perspective.gif"
+            icon="icons/inactive_jobs_view.gif"
             id="joblistwait"
             name="%TableView2.name">
       </view>
@@ -32,7 +32,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.eclipse.ptp.rm.lml.internal.ui.LMLRuntimePerspectiveFactory"
-            icon="icons/parallel_perspective.gif"
+            icon="icons/system_monitoring_perspective.gif"
             id="org.eclipse.ptp.rm.lml.ui.LMLRunPerspective"
             name="%Perspective.name">
       </perspective>
