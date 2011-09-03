@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,11 +81,21 @@ public class RemoteCNavigatorOpenViewActionProvider extends CommonActionProvider
 	 */
 	@Override
 	public void fillActionBars(IActionBars actionBars) {
-		if (fOpenViewActionGroup != null) {
-			fOpenViewActionGroup.fillActionBars(actionBars);
-		}
-		if (fCDTOpenViewActionGroup != null) {
-			fCDTOpenViewActionGroup.fillActionBars(actionBars);
+		ISelection selection = getContext().getSelection();
+		if (selection != null && !selection.isEmpty() && selection instanceof StructuredSelection) {
+			Object sel = ((StructuredSelection) selection).getFirstElement();
+			if (sel instanceof ICElement) {
+				IProject project = ((ICElement) sel).getCProject().getProject();
+				if (!RemoteNature.hasRemoteNature(project)) {
+					if (fCDTOpenViewActionGroup != null) {
+						fCDTOpenViewActionGroup.fillActionBars(actionBars);
+					}
+				} else {
+					if (fOpenViewActionGroup != null) {
+						fOpenViewActionGroup.fillActionBars(actionBars);
+					}
+				}
+			}
 		}
 	}
 
@@ -96,20 +106,18 @@ public class RemoteCNavigatorOpenViewActionProvider extends CommonActionProvider
 	 */
 	@Override
 	public void fillContextMenu(IMenuManager menu) {
-		if (fOpenViewActionGroup != null && fCDTOpenViewActionGroup != null) {
-			ISelection selection = getContext().getSelection();
-			if (selection != null && !selection.isEmpty() && selection instanceof StructuredSelection) {
-				Object sel = ((StructuredSelection) selection).getFirstElement();
-				if (sel instanceof ICElement) {
-					IProject project = ((ICElement) sel).getCProject().getProject();
-					if (!RemoteNature.hasRemoteNature(project)) {
-						if (org.eclipse.cdt.ui.actions.OpenViewActionGroup.canActionBeAdded(selection)) {
-							fCDTOpenViewActionGroup.fillContextMenu(menu);
-						}
-					} else {
-						if (OpenViewActionGroup.canActionBeAdded(selection)) {
-							fOpenViewActionGroup.fillContextMenu(menu);
-						}
+		ISelection selection = getContext().getSelection();
+		if (selection != null && !selection.isEmpty() && selection instanceof StructuredSelection) {
+			Object sel = ((StructuredSelection) selection).getFirstElement();
+			if (sel instanceof ICElement) {
+				IProject project = ((ICElement) sel).getCProject().getProject();
+				if (!RemoteNature.hasRemoteNature(project)) {
+					if (org.eclipse.cdt.ui.actions.OpenViewActionGroup.canActionBeAdded(selection) && fCDTOpenViewActionGroup != null) {
+						fCDTOpenViewActionGroup.fillContextMenu(menu);
+					}
+				} else {
+					if (OpenViewActionGroup.canActionBeAdded(selection) && fOpenViewActionGroup != null) {
+						fOpenViewActionGroup.fillContextMenu(menu);
 					}
 				}
 			}
@@ -137,11 +145,21 @@ public class RemoteCNavigatorOpenViewActionProvider extends CommonActionProvider
 	 */
 	@Override
 	public void updateActionBars() {
-		if (fOpenViewActionGroup != null) {
-			fOpenViewActionGroup.updateActionBars();
-		}
-		if (fCDTOpenViewActionGroup != null) {
-			fCDTOpenViewActionGroup.updateActionBars();
+		ISelection selection = getContext().getSelection();
+		if (selection != null && !selection.isEmpty() && selection instanceof StructuredSelection) {
+			Object sel = ((StructuredSelection) selection).getFirstElement();
+			if (sel instanceof ICElement) {
+				IProject project = ((ICElement) sel).getCProject().getProject();
+				if (!RemoteNature.hasRemoteNature(project)) {
+					if (fCDTOpenViewActionGroup != null) {
+						fCDTOpenViewActionGroup.updateActionBars();
+					}
+				} else {
+					if (fOpenViewActionGroup != null) {
+						fOpenViewActionGroup.updateActionBars();
+					}
+				}
+			}
 		}
 	}
 }
