@@ -57,13 +57,14 @@ import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
- * Implementation of runnable Job for executing external processes. Uses the
- * IRemoteProcessBuilder with the IRemoteConnection for the resource manager's
- * target.
+ * Implementation of runnable Job for executing external processes. Uses the IRemoteProcessBuilder with the IRemoteConnection for
+ * the resource manager's target.
  * 
  * @author arossi
  * 
@@ -71,13 +72,14 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
 public class CommandJob extends Job implements ICommandJob {
 
 	public enum JobMode {
-		BATCH, STATUS, INTERACTIVE
+		BATCH,
+		STATUS,
+		INTERACTIVE
 	}
 
 	/**
-	 * Internal class used for multiplexing output streams between two different
-	 * endpoints, usually a tokenizer on the one hand and the stream proxy
-	 * passed back to the caller on the other.
+	 * Internal class used for multiplexing output streams between two different endpoints, usually a tokenizer on the one hand and
+	 * the stream proxy passed back to the caller on the other.
 	 * 
 	 * @author arossi
 	 */
@@ -124,8 +126,7 @@ public class CommandJob extends Job implements ICommandJob {
 							stream.flush();
 						} catch (IOException dead) {
 							/*
-							 * we need to check for this here because the
-							 * tokenizer can be set to exit early
+							 * we need to check for this here because the tokenizer can be set to exit early
 							 */
 							if (dead.getMessage().indexOf(JAXBControlConstants.DEAD) >= 0) {
 								b.remove();
@@ -287,8 +288,7 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * Wait for any special stream consumer threads to exit. We ignore the
-	 * stream monitors here.
+	 * Wait for any special stream consumer threads to exit. We ignore the stream monitors here.
 	 * 
 	 * @return CoreException
 	 */
@@ -337,9 +337,8 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/*
-	 * First unblock any wait; this will allow the run method to return. Destroy
-	 * the process and close streams, interrupt the thread and cancel with
-	 * manager. (non-Javadoc)
+	 * First unblock any wait; this will allow the run method to return. Destroy the process and close streams, interrupt the thread
+	 * and cancel with manager. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#terminate()
 	 */
@@ -369,8 +368,8 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * The resource manager should wait for the job id on the stream (parsed by
-	 * an apposite tokenizer) before returning the status object to the caller.
+	 * The resource manager should wait for the job id on the stream (parsed by an apposite tokenizer) before returning the status
+	 * object to the caller.
 	 * 
 	 * @return whether to wait
 	 */
@@ -379,10 +378,8 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * If this process has no input, execute it normally. Otherwise, if the
-	 * process is to be kept open, check for the pseudoTerminal job; if it is
-	 * there and still alive, send the input to it; if not, start the process,
-	 * and then send the input.
+	 * If this process has no input, execute it normally. Otherwise, if the process is to be kept open, check for the pseudoTerminal
+	 * job; if it is there and still alive, send the input to it; if not, start the process, and then send the input.
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
@@ -401,8 +398,7 @@ public class CommandJob extends Job implements ICommandJob {
 					} else {
 						job.terminate();
 						/*
-						 * since the process is dead, termination is just
-						 * clean-up, no need to force external termination
+						 * since the process is dead, termination is just clean-up, no need to force external termination
 						 */
 						control.setInteractiveJob(null);
 					}
@@ -420,13 +416,10 @@ public class CommandJob extends Job implements ICommandJob {
 			}
 
 			/*
-			 * When there is a UUID defined for this command, set the status for
-			 * it. If the submit job lacks a jobId on the standard streams, then
-			 * we assign it the UUID (it is most probably interactive); else we
-			 * wait for the id to be set by the tokenizer. NOTE that the caller
-			 * should now join on all commands with this property (05.01.2011).
-			 * Open connection jobs should have their jobId tokenizers set a
-			 * RUNNING state.
+			 * When there is a UUID defined for this command, set the status for it. If the submit job lacks a jobId on the standard
+			 * streams, then we assign it the UUID (it is most probably interactive); else we wait for the id to be set by the
+			 * tokenizer. NOTE that the caller should now join on all commands with this property (05.01.2011). Open connection jobs
+			 * should have their jobId tokenizers set a RUNNING state.
 			 */
 			jobStatus = null;
 			String waitUntil = keepOpen ? IJobStatus.RUNNING : IJobStatus.SUBMITTED;
@@ -487,6 +480,26 @@ public class CommandJob extends Job implements ICommandJob {
 			} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
 				terminate();
 			}
+
+			/*
+			 * Once job has started running, execute any nested commands
+			 */
+			for (SimpleCommandType cmd : command.getCmd()) {
+				Job job = new SimpleCommandJob(cmd, rm);
+				job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
+				job.schedule();
+				if (cmd.isWait()) {
+					try {
+						job.join();
+						if (!cmd.isIgnoreExitStatus()) {
+							if (!job.getResult().isOK()) {
+								return job.getResult();
+							}
+						}
+					} catch (InterruptedException ignored) {
+					}
+				}
+			}
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -496,10 +509,9 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * Uses the IRemoteProcessBuilder to set up the command and environment.
-	 * After start, the tokenizers (if any) are handled, and stream redirection
-	 * managed. Returns immediately if <code>keepOpen</code> is true; else waits
-	 * for the process, then joins on the consumers.x
+	 * Uses the IRemoteProcessBuilder to set up the command and environment. After start, the tokenizers (if any) are handled, and
+	 * stream redirection managed. Returns immediately if <code>keepOpen</code> is true; else waits for the process, then joins on
+	 * the consumers.x
 	 */
 	private IStatus execute(IProgressMonitor monitor) {
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
@@ -575,8 +587,7 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * Converts or'd string into bit-wise or of available flags for remote
-	 * process builder.
+	 * Converts or'd string into bit-wise or of available flags for remote process builder.
 	 * 
 	 * @param flags
 	 * @return bit-wise or
@@ -600,10 +611,8 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * Checks to see what tokenizers are configured for this resource manager.
-	 * If the two streams have been joined, it will prefer the redirect parser
-	 * if it exists; otherwise the joined streams will be parsed by the stdout
-	 * parser.<br>
+	 * Checks to see what tokenizers are configured for this resource manager. If the two streams have been joined, it will prefer
+	 * the redirect parser if it exists; otherwise the joined streams will be parsed by the stdout parser.<br>
 	 * <br>
 	 * If there is a custom extension tokenizer, it will be instantiated here.
 	 * 
@@ -653,9 +662,8 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * Resolves the command arguments against the current environment, then gets
-	 * the process builder from the remote connection. Also sets the directory
-	 * if it is defined (otherwise it defaults to the connection dir).
+	 * Resolves the command arguments against the current environment, then gets the process builder from the remote connection.
+	 * Also sets the directory if it is defined (otherwise it defaults to the connection dir).
 	 * 
 	 * @param monitor
 	 * @return the process builder
@@ -690,9 +698,8 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * Either appends to or replaces the process builder's environment with the
-	 * Launch Configuration environment variables. Also sets redirectErrorStream
-	 * on the builder.
+	 * Either appends to or replaces the process builder's environment with the Launch Configuration environment variables. Also
+	 * sets redirectErrorStream on the builder.
 	 * 
 	 * @param builder
 	 * @throws CoreException
@@ -758,9 +765,8 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * Configures handling of the error stream. If there is a tokenizer, the
-	 * stream is split between it and the proxy monitor. Otherwise, the proxy
-	 * just gets the stream.
+	 * Configures handling of the error stream. If there is a tokenizer, the stream is split between it and the proxy monitor.
+	 * Otherwise, the proxy just gets the stream.
 	 * 
 	 * @param process
 	 * @throws IOException
@@ -783,9 +789,8 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * Configures handling of the stdout stream. If there is a tokenizer, the
-	 * stream is split between it and the proxy monitor. Otherwise, the proxy
-	 * just gets the stream.
+	 * Configures handling of the stdout stream. If there is a tokenizer, the stream is split between it and the proxy monitor.
+	 * Otherwise, the proxy just gets the stream.
 	 * 
 	 * @param process
 	 * @throws IOException
@@ -821,8 +826,7 @@ public class CommandJob extends Job implements ICommandJob {
 
 		if (isBatch()) {
 			/*
-			 * hang on to the streams for the brief life of the job itself, only
-			 * for error tracking; do not send to console
+			 * hang on to the streams for the brief life of the job itself, only for error tracking; do not send to console
 			 */
 			batchMonitors = new IStreamMonitor[2];
 			batchMonitors[0] = proxy.getOutputStreamMonitor();
