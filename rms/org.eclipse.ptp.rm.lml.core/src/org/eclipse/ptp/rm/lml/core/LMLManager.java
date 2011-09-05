@@ -57,9 +57,8 @@ public class LMLManager {
 	/*
 	 * Map of all ILguiItems
 	 * 
-	 * For every created Resource Manager instance there is an entry in this
-	 * map; as long as the Resource Manager instance is not removed an
-	 * associates entry keeps in this map
+	 * For every created Resource Manager instance there is an entry in this map; as long as the Resource Manager instance is not
+	 * removed an associates entry keeps in this map
 	 */
 	protected final Map<String, ILguiItem> LGUIS = new HashMap<String, ILguiItem>();
 
@@ -103,40 +102,11 @@ public class LMLManager {
 		synchronized (LGUIS) {
 			item = LGUIS.get(name);
 			if (item != null) {
-				// item.saveCurrentLayout(memento);
 				LGUIS.remove(name);
 			}
 		}
-		// if (fLguiItem != null && fLguiItem == item) {
-		// fireRemovedLgui(item);
-		// fLguiItem = null;
-		// }
 
-		/*
-		 * takes care of persisting user job state info
-		 */
-		// saveJobStatusData(item, memento);
 	}
-
-	// public void closeLgui(String name, IMemento memento) {
-	// ILguiItem item = null;
-	// synchronized (LGUIS) {
-	// item = LGUIS.get(name);
-	// if (item != null) {
-	// item.saveCurrentLayout(memento);
-	// LGUIS.remove(name);
-	// }
-	// }
-	// if (fLguiItem != null && fLguiItem == item) {
-	// fireRemovedLgui(item);
-	// fLguiItem = null;
-	// }
-	//
-	// /*
-	// * takes care of persisting user job state info
-	// */
-	// saveJobStatusData(item, memento);
-	// }
 
 	public String getCurrentLayout(String name) {
 		ILguiItem item = null;
@@ -182,8 +152,7 @@ public class LMLManager {
 	}
 
 	/**
-	 * This method is called by LMLResourceManagerMonitor. A ResourceManager was
-	 * started.
+	 * This method is called by LMLResourceManagerMonitor. A ResourceManager was started.
 	 * 
 	 * @param name
 	 *            Name of the ResourceManager
@@ -194,8 +163,7 @@ public class LMLManager {
 	 * @param jobs
 	 *            Array of earlier started jobs
 	 */
-	public void openLgui(String name, RequestType request,
-			StringBuilder layout, JobStatusData[] jobs) {
+	public void openLgui(String name, RequestType request, StringBuilder layout, JobStatusData[] jobs) {
 		synchronized (LGUIS) {
 			ILguiItem item = LGUIS.get(name);
 			if (item == null) {
@@ -214,24 +182,6 @@ public class LMLManager {
 		}
 	}
 
-	// public void openLgui(String name, IMemento memento) {
-	// synchronized (LGUIS) {
-	// ILguiItem item = LGUIS.get(name);
-	// if (item == null) {
-	// item = new LguiItem(name);
-	// LGUIS.put(name, item);
-	// }
-	// fLguiItem = item;
-	// }
-	//
-	// fLguiItem.reloadLastLayout(memento);
-	// restoreJobStatusData(fLguiItem, memento);
-	//
-	// if (!fLguiItem.isEmpty()) {
-	// fireNewLgui();
-	// }
-	// }
-
 	public void removeListener(ILMLListener listener) {
 		lmlListeners.remove(listener);
 	}
@@ -247,11 +197,13 @@ public class LMLManager {
 	}
 
 	public void selectLgui(String name) {
-		if (name != null && fLguiItem != null
-				&& fLguiItem.toString().equals(name)) {
+		if (name != null && fLguiItem != null && fLguiItem.toString().equals(name)) {
 			return;
 		}
-		fireRemovedLgui(null);
+		if (fLguiItem != null) {
+			fLguiItem = null;
+			fireRemovedLgui(null);
+		}
 		if (name != null) {
 			final ILguiItem item = LGUIS.get(name);
 			if (item != null) {
@@ -261,7 +213,7 @@ public class LMLManager {
 			}
 
 		}
-		fLguiItem = null;
+
 	}
 
 	public void selectObject(String oid) {
@@ -280,8 +232,7 @@ public class LMLManager {
 		fireUnselectObject(oid);
 	}
 
-	public void update(String name, InputStream input, OutputStream output)
-			throws CoreException {
+	public void update(String name, InputStream input, OutputStream output) throws CoreException {
 		ILguiItem lguiItem = null;
 		synchronized (LGUIS) {
 			lguiItem = LGUIS.get(name);
@@ -290,16 +241,14 @@ public class LMLManager {
 			try {
 				lguiItem.getCurrentLayout(output);
 			} catch (final JAXBException e) {
-				throw new CoreException(new Status(IStatus.ERROR,
-						LMLCorePlugin.getUniqueIdentifier(), e.getCause()
-								.getLocalizedMessage()));
+				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
+						.getLocalizedMessage()));
 			}
 			try {
 				lguiItem.update(input);
 			} catch (final JAXBException e) {
-				throw new CoreException(new Status(IStatus.ERROR,
-						LMLCorePlugin.getUniqueIdentifier(), e.getCause()
-								.getLocalizedMessage()));
+				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
+						.getLocalizedMessage()));
 			}
 
 			if (fLguiItem == lguiItem) {
@@ -312,8 +261,7 @@ public class LMLManager {
 		}
 	}
 
-	public void updateUserJob(String name, String jobId, String status,
-			String detail) {
+	public void updateUserJob(String name, String jobId, String status, String detail) {
 		final ILguiItem lguiItem = LGUIS.get(name);
 		if (lguiItem != null) {
 			lguiItem.updateUserJob(jobId, status, detail);
