@@ -198,21 +198,6 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 				RDTSyncUIPlugin.log(e.toString(), e);
 			}
 
-			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-			if (buildInfo == null) {
-				throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
-			}
-			IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
-			for (IConfiguration config : allConfigs) {
-				//turn off append contributed(local) environment variables for the build configuration of the remote project
-				ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
-				if(c_mb_confgDes!=null){
-					EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
-					//EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_mb_confgDes);
-				}
-			}
-			ManagedBuildManager.saveBuildInfo(project, true);
-
 			// Initialize all current configurations with a local build scenario. Do this last, except for making remote
 			// configuration, so project is not flagged as initialized prematurely.
 			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
@@ -235,7 +220,8 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 			// Change its builder to the sync builder
 			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
 			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
-			
+			ManagedBuildManager.saveBuildInfo(project, true);
+
 			monitor.done();
 		} finally {
 			monitor.done();
