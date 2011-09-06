@@ -38,6 +38,7 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  * Supplies environment variables from the remote system.
  * 
  * @author crecoskie
+ * @since 2.0
  *
  */
 @SuppressWarnings("restriction")

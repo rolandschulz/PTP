@@ -25,6 +25,7 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: .,
  org.eclipse.ptp.rdt.managedbuilder.xlc.ui,
+ org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment,
  org.eclipse.ptp.rdt.managedbuilder.xlc.ui.messages,
  org.eclipse.ptp.rdt.managedbuilder.xlc.ui.properties,
  org.eclipse.ptp.rdt.managedbuilder.xlc.ui.scannerdiscovery
