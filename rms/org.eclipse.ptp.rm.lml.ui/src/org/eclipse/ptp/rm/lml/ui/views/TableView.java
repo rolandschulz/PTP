@@ -349,6 +349,10 @@ public class TableView extends ViewPart {
 			}
 		});
 		viewer.setUseHashlookup(true);
+		/*
+		 * Must expand first level of table, otherwise it may not be redrawn.
+		 */
+		viewer.setAutoExpandLevel(2);
 
 		tree = viewer.getTree();
 
@@ -826,12 +830,12 @@ public class TableView extends ViewPart {
 		 */
 		if (!isMouseDown) {
 			Row[] input = new Row[0];
-			if (fLguiItem != null && !fLguiItem.isEmpty() && fLguiItem.getTableHandler() != null) {
+			if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
 				input = fLguiItem.getTableHandler().getTableDataWithColor(gid, gid.equals(ILguiItem.ACTIVE_JOB_TABLE));
 			}
 			if (!composite.isDisposed()) {
 				viewer.setInput(input);
-				viewer.getTree().setItemCount(input.length);
+				viewer.setChildCount(input, input.length);
 			}
 		}
 	}
