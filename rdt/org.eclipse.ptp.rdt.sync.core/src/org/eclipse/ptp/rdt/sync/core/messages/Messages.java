@@ -20,7 +20,8 @@ public class Messages extends NLS {
 	public static String BCM_WorkspaceConfigDes;
 	public static String BCM_ScenarioToServiceConfigError;
 
-	public static String BCM_SetWorkspaceConfigDescriptionError;
+	public static String BCM_SetConfigDescriptionError;
+
 	public static String BCM_InitError;
 
 	public static String BCM_InitializationError;
@@ -30,9 +31,9 @@ public class Messages extends NLS {
 	public static String BCM_BuildInfoError;
 	public static String BCM_AncestorError;
 
-	public static String BCM_CreateWorkspaceConfigError;
+	public static String BCM_CreateConfigError;
 
-	public static String BCM_CreateWorkspaceConfigFailure;
+	public static String BCM_CreateConfigFailure;
 
 	public static String BCM_LocalConnectionError;
 

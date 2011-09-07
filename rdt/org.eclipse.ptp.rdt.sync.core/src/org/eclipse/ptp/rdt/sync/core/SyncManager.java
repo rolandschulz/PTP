@@ -271,6 +271,8 @@ public class SyncManager  {
 	 *            project to sync
 	 * @param syncFlags
 	 *            sync flags
+	 * @param seHandler
+	 * 			  logic to handle exceptions
 	 * @return the scheduled sync job
 	 * @throws CoreException 
 	 */
@@ -320,7 +322,8 @@ public class SyncManager  {
 	 *            project to sync
 	 * @param syncFlags
 	 *            sync flags
-	 * 
+	 * @param seHandler
+	 *			  logic to handle exceptions
 	 * @return array of sync jobs scheduled
 	 * @throws CoreException
 	 * 			  on problems sync'ing
