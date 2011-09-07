@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -51,6 +52,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
 	private GitRemoteSyncConnection fSyncConnection = null;
+	private boolean hasBeenSynced = false;
 
 	private final ReentrantLock syncLock = new ReentrantLock();
 	private Integer syncTaskId = -1; // ID for most recent synchronization task, functions as a time-stamp
@@ -189,6 +191,26 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
+		// On first sync, place .gitignore in directories. This is useful for folders that are already present and thus are never
+		// captured by a resource add or change event. (This can happen for projects converted to sync projects.)
+		if (!hasBeenSynced) {
+			final IProject project = getProject();
+			project.accept(new IResourceVisitor() {
+				public boolean visit(IResource resource) throws CoreException {
+					if (irrelevantPath(resource.getFullPath().toString())) {
+						return false;
+					}
+					if (resource.getType() == IResource.FOLDER) {
+						IFile emptyFile = project.getFile(resource.getProjectRelativePath().addTrailingSeparator() + ".gitignore"); //$NON-NLS-1$
+						if (!(emptyFile.exists())) {
+							emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+						}
+					}
+					return true;
+				}
+			});
+		}
+		hasBeenSynced = true;
 
 		// Make a visitor that explores the delta. At the moment, this visitor is responsible for two tasks (the list may grow in
 		// the future):
@@ -198,7 +220,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			private boolean relevantChangeFound = false;
 
 			public boolean visit(IResourceDelta delta) throws CoreException {
-				if (irrelevantPath(delta)) {
+				if (irrelevantPath(delta.getFullPath().toString())) {
 					return false;
 				} else {
 					if ((delta.getAffectedChildren().length == 0) && (delta.getFlags() != IResourceDelta.MARKERS)) {
@@ -364,8 +386,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	}
 
 	// Paths that the Git sync provider can ignore.
-	private boolean irrelevantPath(IResourceDelta delta) {
-		String path = delta.getFullPath().toString();
+	private boolean irrelevantPath(String path) {
 		if (path.endsWith("/" + GitRemoteSyncConnection.gitDir)) { //$NON-NLS-1$
 			return true;
 		} else if (path.endsWith("/.git")) { //$NON-NLS-1$

@@ -19,11 +19,11 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
- * Wizard that enables the conversion of existing C/C++ projects to synchronized projects
+ * Wizard that enables the conversion of existing C/C++ or Fortran projects to synchronized projects
  * @since 1.0
  * 
  */
-public class ConvertFromCToSyncProjectWizard extends ConversionWizard {
+public class ConvertLocalToSyncProjectWizard extends ConversionWizard {
 
 	/*
 	 * (non-Javadoc)
@@ -44,7 +44,7 @@ public class ConvertFromCToSyncProjectWizard extends ConversionWizard {
 
 	@Override
 	public void addPages() {
-		addPage(mainPage = new ConvertFromCToSyncProjectWizardPage(getPrefix()));
+		addPage(mainPage = new ConvertLocalToSyncProjectWizardPage(getPrefix()));
 	}
 
 	@Override

@@ -22,12 +22,11 @@
       
       <wizard
             category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
-            class="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertFromCToSyncProjectWizard"
-            finalPerspective="org.eclipse.cdt.ui.CPerspective"
+            class="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertLocalToSyncProjectWizard"
             hasPages="true"
             icon="icons/obj16/convert-normal.gif"
-            id="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertFromCToSyncProjectWizard"
-            name="%WizardConvertCProject.name"
+            id="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertLocalToSyncProjectWizard"
+            name="%WizardConvertLocalProject.name"
             >
          <description>
             %WizardConvertProject.description
@@ -141,7 +140,7 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="true"
-            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu">
+            locationURI="popup:org.eclipse.ui.popup.any?after=buildGroup">
          <menu
                label="Synchronization">
             <command

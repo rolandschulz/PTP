@@ -23,6 +23,4 @@ Bundle-Activator: org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin
 Bundle-Vendor: %providerName
 Export-Package: org.eclipse.ptp.rdt.sync.ui;x-friends:="org.eclipse.ptp.rdt.sync.git.ui",
  org.eclipse.ptp.rdt.sync.ui.wizards;x-friends:="org.eclipse.ptp.rdt.sync.ui.fortran"
-Import-Package: org.eclipse.core.filesystem,
- org.eclipse.photran.internal.core,
- org.eclipse.ptp.rdt.sync.git.core
+Import-Package: org.eclipse.core.filesystem

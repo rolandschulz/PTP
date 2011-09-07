@@ -7,6 +7,7 @@
  *
  * Contributors:
  * IBM Corporation - Initial API and implementation
+ * John Eblen - Do not change current configurations but add a new remote
  *******************************************************************************/
 
 package org.eclipse.ptp.rdt.sync.ui.wizards;
@@ -25,7 +26,6 @@ import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
-import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
 import org.eclipse.core.resources.IProject;
@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.photran.internal.core.FProjectNature;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
@@ -72,7 +71,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
  * Converts existing CDT projects to sync projects.
  * @since 1.0
  */
-public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPage {
+public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPage {
 
 	private Combo fProviderCombo;
 	private Composite fProviderArea;
@@ -88,7 +87,7 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 	 * 
 	 * @param pageName
 	 */
-	public ConvertFromCToSyncProjectWizardPage(String pageName) {
+	public ConvertLocalToSyncProjectWizardPage(String pageName) {
 		super(pageName);
 	}
 
@@ -162,7 +161,7 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 		this.deselectAllButton.setVisible(false);
 	}
 
-	protected void convertProject(IProject project, IProgressMonitor monitor) throws CoreException {
+	protected void convertProject(final IProject project, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.ConvertToSyncProjectWizardPage_convertingToSyncProject, 3);
 		
 		// Add project natures
@@ -221,6 +220,12 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
 			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
 			ManagedBuildManager.saveBuildInfo(project, true);
+
+			// Change environment variable handling
+			ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
+			if(c_mb_confgDes!=null){
+				EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+			}
 
 			monitor.done();
 		} finally {
@@ -362,18 +367,16 @@ public class ConvertFromCToSyncProjectWizardPage extends ConvertProjectWizardPag
 		boolean b = false;
 		boolean c = false;
 		boolean d = false;
-		boolean f = false;
 		a = !project.isHidden();
 		try {
 			b = project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID);
 			c = !project.hasNature(RemoteSyncNature.NATURE_ID);
 			d = !project.hasNature(RemoteNature.REMOTE_NATURE_ID);
-			f = !project.hasNature(FProjectNature.F_NATURE_ID);
 		} catch (CoreException e) {
 			RDTSyncUIPlugin.log(e);
 		}
 
-		return a && b && c && d && f;
+		return a && b && c && d;
 	}
 
 	private void update() {
