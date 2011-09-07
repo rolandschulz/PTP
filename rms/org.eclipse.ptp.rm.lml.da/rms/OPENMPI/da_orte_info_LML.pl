@@ -73,16 +73,24 @@ my %mapping_job = (
 my $cmd="orte-ps";
 $cmd=$ENV{"CMD_JOBINFO"} if($ENV{"CMD_JOBINFO"}); 
 
-if(open(IN,"$cmd -n |")) {
+if(open(IN,"$cmd -n -v 2>&1 |")) {
     my $firstrankpid=undef;
     $jobid="-";
     while($line=<IN>) {
 	chomp($line);
-	if($line=~/Information from $patwrd \[$patint,$patint\]$/) {
-	    my($call,$pid,$num)=($1,$2,$3);
-	    print "found job $pid\n";
-	    $jobid=$pid;
+	if ($line=~/Gathering Information for HNP: \[\[$patint,$patint\],$patint\]:$patint/) {
+		my($vpid,$pid)=($1,$4);
+		$jobid=$pid;
 	    $jobs{$jobid}{step}=$jobid;
+		print "found job $pid with vpid $vpid\n";
+#
+# Disable until ompi-ps is fixed
+#
+#    } elsif($line=~/Information from $patwrd \[$patint,$patint\]$/) {
+#	    my($call,$vpid,$num)=($1,$2,$3);
+#	    print "found vpid $vpid\n";
+#	    $jobid=$pid;
+#	    $jobs{$jobid}{step}=$jobid;
 	} elsif($line=~/^\s*Node Name \|/) {
 	    # scan node table
 	    print "line 1: $line\n";
@@ -113,7 +121,8 @@ if(open(IN,"$cmd -n |")) {
 	    if($line=~/^\s*\[$patint,$patint\]\s*\|\s*$patwrd\s*\|\s*$patwrd\s*\|\s*$patwrd\s*\|/) {
 		my($ppid,$num,$state,$slots,$numproc)=($1,$2,$3,$4,$5);
 		print "found joblist $ppid,$num,$state,$slots,$numproc\n";
-		$jobs{$jobid}{id}              = $ppid;
+#		$jobs{$jobid}{id}              = $ppid;
+		$jobs{$jobid}{id}              = $jobid;
 		$jobs{$jobid}{totaltasks}      = $numproc;
 		$jobs{$jobid}{job_state}       = $state;
 		$line=<IN>;
@@ -165,7 +174,9 @@ if(!keys(%nodes)) {
     $nodes{$nodeid}{id}       = $nodeid;
     $nodes{$nodeid}{arch}     = `uname -p`;
     $nodes{$nodeid}{state}    = "Up";
-    $nodes{$nodeid}{slots}    = `grep family /proc/cpuinfo | wc -l`;
+    if (-e '/proc/cpuinfo') {
+    	$nodes{$nodeid}{slots}    = `grep family /proc/cpuinfo | wc -l`;
+    }
     foreach $key (keys(%{$nodes{$nodeid}})) {
 	chomp($nodes{$nodeid}{$key});
     }
