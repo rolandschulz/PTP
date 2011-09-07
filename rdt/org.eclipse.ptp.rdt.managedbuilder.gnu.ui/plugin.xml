@@ -1187,7 +1187,6 @@
        targetTool="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.linker;org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.linker;org.eclipse.ptp.rdt.managedbuild.tool.gnu.archiver">
     <targetPlatform
           archList="all"
-          binaryParser="org.eclipse.cdt.core.ELF"
           id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.base"
           name="%PlatformName.Dbg"
           osList="linux,hpux,aix,qnx">
