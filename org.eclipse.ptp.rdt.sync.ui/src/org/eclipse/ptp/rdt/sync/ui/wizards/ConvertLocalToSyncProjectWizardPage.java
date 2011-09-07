@@ -7,6 +7,7 @@
  *
  * Contributors:
  * IBM Corporation - Initial API and implementation
+ * John Eblen - Do not change current configurations but add a new remote
  *******************************************************************************/
 
 package org.eclipse.ptp.rdt.sync.ui.wizards;
@@ -25,7 +26,6 @@ import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
-import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
 import org.eclipse.core.resources.IProject;
@@ -35,6 +35,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
@@ -66,8 +69,9 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * Converts existing CDT projects to sync projects.
+ * @since 1.0
  */
-public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
+public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPage {
 
 	private Combo fProviderCombo;
 	private Composite fProviderArea;
@@ -83,7 +87,7 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 	 * 
 	 * @param pageName
 	 */
-	public ConvertToSyncProjectWizardPage(String pageName) {
+	public ConvertLocalToSyncProjectWizardPage(String pageName) {
 		super(pageName);
 	}
 
@@ -144,9 +148,20 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 
 		fProviderCombo.select(0);
 		handleProviderSelected();
+		
+		// Need to update whenever the project selection changes
+		this.tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				update();
+			}
+		});
+		
+		// These buttons are useless when only one project should be selected
+		this.selectAllButton.setVisible(false);
+		this.deselectAllButton.setVisible(false);
 	}
 
-	protected void convertProject(IProject project, IProgressMonitor monitor) throws CoreException {
+	protected void convertProject(final IProject project, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.ConvertToSyncProjectWizardPage_convertingToSyncProject, 3);
 		
 		// Add project natures
@@ -182,47 +197,40 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 				RDTSyncUIPlugin.log(e.toString(), e);
 			}
 
-			// Create build scenario based on initial remote location
-			// information
-			ISyncServiceProvider provider = participant.getProvider(project);
-			BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(), provider.getLocation());
-
-			// For each build configuration, set the build directory
-			// appropriately.
-			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-			if (buildInfo == null) {
-				throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
-			}
-			IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
-			for (IConfiguration config : allConfigs) {
-				IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
-				config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
-				//turn off append contributed(local) environment variables for the build configuration of the remote project
-				ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
-				if(c_mb_confgDes!=null){
-					EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
-					//EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_mb_confgDes);
-				}
-			}
-			ManagedBuildManager.saveBuildInfo(project, true);
-
-			// Add information about remote location to the initial build
-			// configurations.
-			// Do this last (except for adding local configuration) so that
-			// project is not flagged as initialized prematurely.
-			BuildConfigurationManager.getInstance().initProject(project, serviceConfig, buildScenario);
+			// Initialize all current configurations with a local build scenario. Do this last, except for making remote
+			// configuration, so project is not flagged as initialized prematurely.
+			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+			BuildScenario localBuildScenario = bcm.createLocalBuildScenario(project);
+			bcm.initProject(project, serviceConfig, localBuildScenario);
 			try {
 				BuildConfigurationManager.getInstance().saveConfigurationData();
 			} catch (IOException e) {
 				StatusManager.getManager().handle(new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, e.getMessage(), e),
 						StatusManager.SHOW);
 			}
+			
+			// Create a remote configuration
+			ISyncServiceProvider provider = participant.getProvider(project);
+			BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
+					provider.getLocation());
+			IConfiguration config = bcm.createRemoteConfiguration(project, remoteBuildScenario,
+					Messages.ConvertFromCToSyncProjectWizardPage_0, Messages.ConvertFromCToSyncProjectWizardPage_1);
+
+			// Change its builder to the sync builder
+			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
+			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
+			ManagedBuildManager.saveBuildInfo(project, true);
+
+			// Change environment variable handling
+			ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
+			if(c_mb_confgDes!=null){
+				EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+			}
+
 			monitor.done();
 		} finally {
 			monitor.done();
 		}
-
-		BuildConfigurationManager.getInstance().createLocalConfiguration(project);
 	}
 
 	/*
@@ -308,6 +316,8 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 			errMsg = super.getErrorMessage();
 		} else if (fSelectedProvider == null) {
 			errMsg = Messages.ConvertToSyncProjectWizardPage_0;
+		} else if (this.getCheckedElements().length != 1) {
+			errMsg = Messages.ConvertFromRemoteCToSyncProjectWizardPage_3;
 		} else {
 			errMsg = fSelectedProvider.getParticipant().getErrorMessage();
 		}
@@ -345,30 +355,29 @@ public class ConvertToSyncProjectWizardPage extends ConvertProjectWizardPage {
 	}
 
 	/**
-	 * Returns true for: - non-hidden projects - non-RDT projects - projects
-	 * that does not have remote systems temporary nature - projects that are
-	 * located remotely
+	 * Return true for projects that are:
+	 * 1) not hidden
+	 * 2) have C or CC nature
+	 * 3) are not already sync projects
+	 * 4) do not have remote nature
 	 */
 	@Override
 	public boolean isCandidate(IProject project) {
 		boolean a = false;
 		boolean b = false;
 		boolean c = false;
+		boolean d = false;
 		a = !project.isHidden();
 		try {
 			b = project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID);
 			c = !project.hasNature(RemoteSyncNature.NATURE_ID);
+			d = !project.hasNature(RemoteNature.REMOTE_NATURE_ID);
 		} catch (CoreException e) {
 			RDTSyncUIPlugin.log(e);
 		}
 
-		return a && b && c;
+		return a && b && c && d;
 	}
-
-	/*
-	 * @Override public boolean validatePage() { return super.validatePage();//
-	 * && getErrorMessage()==null; }
-	 */
 
 	private void update() {
 		getWizard().getContainer().updateMessage();

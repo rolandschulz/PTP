@@ -19,6 +19,12 @@ public class Messages extends NLS {
 	public static String NewRemoteSyncProjectWizard_title;
 	public static String NewRemoteSyncProjectWizardPage_syncProvider;
 	public static String WizardProjectConversion_windowLabel;
+	public static String ConvertFromCToSyncProjectWizardPage_0;
+	public static String ConvertFromCToSyncProjectWizardPage_1;
+	public static String ConvertFromRemoteCToSyncProjectWizardPage_0;
+	public static String ConvertFromRemoteCToSyncProjectWizardPage_1;
+	public static String ConvertFromRemoteCToSyncProjectWizardPage_2;
+	public static String ConvertFromRemoteCToSyncProjectWizardPage_3;
 	public static String ConvertToRemoteWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_convertingToSyncProject;
