@@ -63,10 +63,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private final String fProjectName = ""; //$NON-NLS-1$
 
 	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
-	private final Map<String, Integer> fRemoteServicesProviderToComboIndexMap = new HashMap<String, Integer>();
-
 	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
-	private final Map<String, Integer> fRemoteConnectionToComboIndexMap = new HashMap<String, Integer>();
 
 //	private Control fDialogControl;
 //	private Point fDialogSize;
@@ -135,7 +132,6 @@ public class GitParticipant implements ISynchronizeParticipant {
 				toSelect = k;
 			}
 			fComboIndexToRemoteServicesProviderMap.put(k, providers[k]);
-			fRemoteServicesProviderToComboIndexMap.put(providers[k].getId(), k);
 		}
 
 		// set selected host to be the first one if we're not restoring from
@@ -347,7 +343,6 @@ public class GitParticipant implements ISynchronizeParticipant {
 		for (int k = 0; k < connections.length; k++) {
 			connectionCombo.add(connections[k].getName(), k);
 			fComboIndexToRemoteConnectionMap.put(k, connections[k]);
-			fRemoteConnectionToComboIndexMap.put(connections[k].getName(), k);
 		}
 
 		connectionCombo.select(0);
@@ -365,55 +360,5 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private void updateNewConnectionButtonEnabled(Button button) {
 		IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
 		button.setEnabled(connectionManager != null);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setRemoteLocation(java.lang.String)
-	 */
-	public void setRemoteLocation(String location) {
-		fLocationText.setText(location);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setRemoteLocationEditable(boolean)
-	 */
-	public void setRemoteLocationEnabled(boolean isEnabled) {
-		fLocationText.setEnabled(isEnabled);
-		fBrowseButton.setVisible(isEnabled);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setRemoteConnection(org.eclipse.ptp.remote.core.IRemoteConnection)
-	 */
-	public void setRemoteConnection(IRemoteConnection connection) {
-		fConnectionCombo.select(fRemoteConnectionToComboIndexMap.get(connection.getName()));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setRemoteConnectionEditable(boolean)
-	 */
-	public void setRemoteConnectionEnabled(boolean isEnabled) {
-		fConnectionCombo.setEnabled(isEnabled);
-		fNewConnectionButton.setVisible(isEnabled);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setRemoteServices(org.eclipse.ptp.remote.core.IRemoteServices)
-	 */
-	public void setRemoteServices(IRemoteServices services) {
-		fProviderCombo.select(fRemoteServicesProviderToComboIndexMap.get(services.getId()));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setRemoteServicesEditable(boolean)
-	 */
-	public void setRemoteServicesEnabled(boolean isEnabled) {
-		fProviderCombo.setEnabled(isEnabled);
 	}
 }
