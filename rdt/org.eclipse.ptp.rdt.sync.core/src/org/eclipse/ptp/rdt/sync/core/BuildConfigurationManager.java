@@ -36,6 +36,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
@@ -78,7 +80,6 @@ public class BuildConfigurationManager {
 	private static final String BUILD_SCENARIO_ELEMENT_NAME = "build-scenario"; //$NON-NLS-1$
 	private static final String CONFIG_ID_ELEMENT_NAME = "config-id-to-build-scenario"; //$NON-NLS-1$
 	private static final String TEMPLATE_SERVICE_CONFIGURATION_ELEMENT_NAME = "template-service-configuration-element-name"; //$NON-NLS-1$
-	private static final String LOCAL_CONFIGURATION_DES = Messages.BCM_WorkspaceConfigDes;
 
 	private final Map<IProject, IServiceConfiguration> fProjectToTemplateConfigurationMap =
 													Collections.synchronizedMap(new HashMap<IProject, IServiceConfiguration>());
@@ -590,7 +591,7 @@ public class BuildConfigurationManager {
 	 *
 	 * @param providerMemento
 	 * @param service
-	 * @return
+	 * @return the service provider
 	 */
 	private static IServiceProvider loadServiceProvider(IMemento providerMemento, IService service) {
 		if (service == null) {
@@ -619,20 +620,46 @@ public class BuildConfigurationManager {
 	}
 
 	/**
+	 * Create a remote build configuration.
+	 * 
+	 * @param project
+	 * 				The project needing a remote configuration
+	 * @param remoteBuildScenario
+	 * 				Configuration's build scenario
+	 * @param configName
+	 * 				Configuration's name
+	 * @param configDesc
+	 * 				Configuration's description
+	 */
+	public IConfiguration createRemoteConfiguration(IProject project, BuildScenario remoteBuildScenario, String configName, String configDesc) {
+		return this.createConfiguration(project, remoteBuildScenario, configName, configDesc);
+	}
+	
+	/**
 	 * Create a local build configuration. The corresponding build scenario has no sync provider and points to the project's
-	 * working directory.
-	 *
-	 * On project creation, CDT removes superfluous configurations. Thus, we place the functionality here, to be invoked at some
-	 * point after initial project creation.
+	 * working directory. It has a default name and description.
 	 * 
 	 * @param project
 	 * 				The project needing a local configuration
 	 */
+	public IConfiguration createLocalConfiguration(IProject project) {
+		try {
+			BuildScenario localBuildScenario = this.createLocalBuildScenario(project);
+			if (localBuildScenario != null) {
+				return this.createConfiguration(project, localBuildScenario, Messages.WorkspaceConfigName,
+						Messages.BCM_WorkspaceConfigDes);
+			}
+		} catch (CoreException e) {
+			RDTSyncCorePlugin.log(Messages.BCM_CreateConfigFailure + e.getMessage(), e);
+		}
+		
+		return null;
+	}
 
-	public void createLocalConfiguration(IProject project) {
+	private IConfiguration createConfiguration(IProject project, BuildScenario buildScenario, String configName, String configDesc) {
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
-			return;
+			return null;
 		}
 
 		// For recording of problems during attempt
@@ -641,67 +668,79 @@ public class BuildConfigurationManager {
 		boolean configAdded = false;
 
 		ManagedProject managedProject = (ManagedProject) buildInfo.getManagedProject();
-		Configuration localConfigParent = (Configuration) buildInfo.getDefaultConfiguration();
-		String localConfigId = ManagedBuildManager.calculateChildId(localConfigParent.getId(), null);
-		Configuration localConfig = new Configuration(managedProject, localConfigParent, localConfigId, true, false);
-		CConfigurationData localConfigData = localConfig.getConfigurationData();
+		Configuration configParent = (Configuration) buildInfo.getDefaultConfiguration();
+		String configId = ManagedBuildManager.calculateChildId(configParent.getId(), null);
+		Configuration config = new Configuration(managedProject, configParent, configId, true, false);
+		CConfigurationData configData = config.getConfigurationData();
 		ICProjectDescription projectDes = CoreModel.getDefault().getProjectDescription(project);
-		ICConfigurationDescription localConfigDes = null;
+		ICConfigurationDescription configDes = null;
 		try {
-			localConfigDes = projectDes.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, localConfigData);
+			configDes = projectDes.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, configData);
 		} catch (WriteAccessException e) {
 			creationException = e;
 		} catch (CoreException e) {
 			creationException = e;
 		}
 
-		if (localConfigDes != null) {
-			localConfig.setConfigurationDescription(localConfigDes);
-			localConfigDes.setName(Messages.WorkspaceConfigName);
-			localConfigDes.setDescription(LOCAL_CONFIGURATION_DES);
-			localConfig.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
-			IRemoteServices localService = PTPRemoteCorePlugin.getDefault().
-			getRemoteServices("org.eclipse.ptp.remote.LocalServices", null); //$NON-NLS-1$
-			if (localService != null) {
-				IRemoteConnection localConnection = localService.getConnectionManager().getConnection("Local"); //$NON-NLS-1$
-				if (localConnection != null) {
-					BuildScenario localBuildScenario = new BuildScenario(null, localConnection, project.getLocation().toString());
-					this.setBuildScenarioForBuildConfigurationInternal(localBuildScenario, localConfig);
-					configAdded = true;
-				} else {
-					creationError = Messages.BCM_LocalConnectionError;
-				}
-			} else {
-				creationError = Messages.BCM_LocalServiceError;
-			}
-			if (!configAdded) {
-				projectDes.removeConfiguration(localConfigDes);
-			} else {
-				try {
-					CoreModel.getDefault().setProjectDescription(project, projectDes, true, null);
-				} catch (CoreException e) {
-					projectDes.removeConfiguration(localConfigDes);
-					configAdded = false;
-					creationException = e;
-					creationError = Messages.BCM_SetWorkspaceConfigDescriptionError;
-				}
+		if (configDes != null) {
+			config.setConfigurationDescription(configDes);
+			configDes.setName(configName);
+			configDes.setDescription(configDesc);
+			config.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
+			this.setBuildScenarioForBuildConfigurationInternal(buildScenario, config);
+			configAdded = true;
+			try {
+				CoreModel.getDefault().setProjectDescription(project, projectDes, true, null);
+			} catch (CoreException e) {
+				projectDes.removeConfiguration(configDes);
+				configAdded = false;
+				creationException = e;
+				creationError = Messages.BCM_SetConfigDescriptionError;
 			}
 			if (configAdded) {
 				try {
 					this.saveConfigurationData();
 				} catch (IOException e) {
-					projectDes.removeConfiguration(localConfigDes);
+					projectDes.removeConfiguration(configDes);
 				}
 			}
 		} else {
-			creationError = Messages.BCM_CreateWorkspaceConfigError;
+			creationError = Messages.BCM_CreateConfigError;
 		}
 
 		if (!configAdded) {
 			if (creationError == null && creationException != null) {
 				creationError = creationException.getMessage();
 			}
-			RDTSyncCorePlugin.log(Messages.BCM_CreateWorkspaceConfigFailure + creationError, creationException);
+			RDTSyncCorePlugin.log(Messages.BCM_CreateConfigFailure + creationError, creationException);
+			return null;
+		}
+		
+		return config;
+	}
+	
+	/**
+	 * Create a build scenario for configurations that build in the local Eclipse workspace
+	 *
+	 * @param project
+	 * @return the build scenario
+	 * @throws CoreException
+	 * 				on problems getting local resources, either the local connection or local services
+	 */
+	public BuildScenario createLocalBuildScenario(IProject project) throws CoreException {
+		IRemoteServices localService = PTPRemoteCorePlugin.getDefault().
+				getRemoteServices("org.eclipse.ptp.remote.LocalServices", null); //$NON-NLS-1$
+
+		if (localService != null) {
+			IRemoteConnection localConnection = localService.getConnectionManager().getConnection("Local"); //$NON-NLS-1$
+			if (localConnection != null) {
+				return new BuildScenario(null, localConnection, project.getLocation().toString());
+			} else {
+				throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.sync.core", //$NON-NLS-1$
+						Messages.BCM_LocalConnectionError));
+			}
+		} else {
+			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.sync.core", Messages.BCM_LocalServiceError)); //$NON-NLS-1$
 		}
 	}
 }
