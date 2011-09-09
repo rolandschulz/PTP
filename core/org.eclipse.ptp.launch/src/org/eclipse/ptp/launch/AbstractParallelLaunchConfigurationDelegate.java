@@ -64,7 +64,6 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.launch.internal.LaunchAdapterFactory;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
@@ -390,12 +389,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	@Override
 	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
-		IPLaunch launch = LaunchAdapterFactory.getLaunch(configuration);
-		if (launch == null) {
-			launch = new PLaunch(configuration, mode, null);
-			LaunchAdapterFactory.addLaunch(configuration, launch);
-		}
-		return launch;
+		return new PLaunch(configuration, mode, null);
 	}
 
 	/*
