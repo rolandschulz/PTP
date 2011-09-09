@@ -7,7 +7,6 @@ import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
@@ -39,9 +38,7 @@ public class PLaunch extends Launch implements IPLaunch {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.launch.IPLaunch#getDebugTarget(org.eclipse
-	 * .ptp.debug.core.TaskSet)
+	 * @see org.eclipse.ptp.debug.core.launch.IPLaunch#getDebugTarget(org.eclipse .ptp.debug.core.TaskSet)
 	 */
 	/**
 	 * @since 4.0
@@ -83,22 +80,7 @@ public class PLaunch extends Launch implements IPLaunch {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.core.Launch#isTerminated()
-	 */
-	@Override
-	public boolean isTerminated() {
-		if (fResourceManager != null && fJobId != null) {
-			return fResourceManager.getJobStatus(fJobId, null).getState().equals(IJobStatus.COMPLETED);
-		}
-		return super.isTerminated();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.launch.IPLaunch#setPJob(org.eclipse.ptp.core
-	 * .elements.IPJob)
+	 * @see org.eclipse.ptp.debug.core.launch.IPLaunch#setPJob(org.eclipse.ptp.core .elements.IPJob)
 	 */
 	/**
 	 * @since 5.0
@@ -110,9 +92,7 @@ public class PLaunch extends Launch implements IPLaunch {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.launch.IPLaunch#setResourceManager(org.eclipse
-	 * .ptp.rmsystem.IResourceManager)
+	 * @see org.eclipse.ptp.debug.core.launch.IPLaunch#setResourceManager(org.eclipse .ptp.rmsystem.IResourceManager)
 	 */
 	/**
 	 * @since 5.0
