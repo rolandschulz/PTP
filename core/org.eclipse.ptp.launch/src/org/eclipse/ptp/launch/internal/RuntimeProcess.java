@@ -141,15 +141,15 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp
-	 * .core.events.IJobChangeEvent)
+	 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp .core.events.IJobChangeEvent)
 	 */
 	public void handleEvent(IJobChangedEvent e) {
-		IResourceManager rm = e.getSource();
-		IJobStatus status = rm.getJobStatus(e.getJobId(), null);
-		if (status.getState().equals(IJobStatus.COMPLETED)) {
-			terminated();
+		if (!isTerminated()) {
+			IResourceManager rm = e.getSource();
+			IJobStatus status = rm.getJobStatus(e.getJobId(), null);
+			if (status.getState().equals(IJobStatus.COMPLETED)) {
+				terminated();
+			}
 		}
 	}
 
