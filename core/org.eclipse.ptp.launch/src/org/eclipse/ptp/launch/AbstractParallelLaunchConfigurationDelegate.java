@@ -90,9 +90,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse
-		 * .ptp.core.events.IJobChangeEvent)
+		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse .ptp.core.events.IJobChangeEvent)
 		 */
 		public void handleEvent(IJobChangedEvent e) {
 			JobSubmission jobSub;
@@ -106,8 +104,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Wait for job to begin running, then perform post launch operations. The
-	 * job is guaranteed not to be in the UNDERTERMINED state.
+	 * Wait for job to begin running, then perform post launch operations. The job is guaranteed not to be in the UNDERTERMINED
+	 * state.
 	 * 
 	 * <pre>
 	 * Job state transition is:
@@ -117,10 +115,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 *             |- SUSPENDED <-|
 	 * </pre>
 	 * 
-	 * We must call completion method when job state is RUNNING, however it is
-	 * possible that the job may get to COMPLETED or SUSPENDED before we are
-	 * started. If either of these states is reached, assume that RUNNING has
-	 * also been reached.
+	 * We must call completion method when job state is RUNNING, however it is possible that the job may get to COMPLETED or
+	 * SUSPENDED before we are started. If either of these states is reached, assume that RUNNING has also been reached.
 	 */
 	private class JobSubmission extends Job {
 		private final IPLaunch fLaunch;
@@ -147,8 +143,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
-		 * IProgressMonitor)
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime. IProgressMonitor)
 		 */
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
@@ -190,8 +185,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 
 					if (!subMon.isCanceled()) {
 						/*
-						 * When the job terminates, do any post launch data
-						 * synchronization.
+						 * When the job terminates, do any post launch data synchronization.
 						 */
 						// If needed, copy data back.
 						try {
@@ -390,9 +384,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.core.model.LaunchConfigurationDelegate#getLaunch(org
-	 * .eclipse.debug.core.ILaunchConfiguration, java.lang.String)
+	 * @see org.eclipse.debug.core.model.LaunchConfigurationDelegate#getLaunch(org .eclipse.debug.core.ILaunchConfiguration,
+	 * java.lang.String)
 	 */
 	@Override
 	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
@@ -402,8 +395,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback#getLocalFileManager
+	 * @see org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback#getLocalFileManager
 	 * (org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public IRemoteFileManager getLocalFileManager(ILaunchConfiguration configuration) throws CoreException {
@@ -422,8 +414,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback#
-	 * getRemoteFileManager(org.eclipse.debug.core.ILaunchConfiguration,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * getRemoteFileManager(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	/**
 	 * @since 5.0
@@ -449,8 +440,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Check if the copy local file is enabled. If it is, copy the executable
-	 * file from the local host to the remote host.
+	 * Check if the copy local file is enabled. If it is, copy the executable file from the local host to the remote host.
 	 * 
 	 * @param configuration
 	 *            launch configuration
@@ -478,8 +468,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Copy a data from a path (can be a file or directory) from the remote host
-	 * to the local host.
+	 * Copy a data from a path (can be a file or directory) from the remote host to the local host.
 	 * 
 	 * @param remotePath
 	 * @param localPath
@@ -519,8 +508,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Copy a data from a path (can be a file or directory) from the local host
-	 * to the remote host.
+	 * Copy a data from a path (can be a file or directory) from the local host to the remote host.
 	 * 
 	 * @param localPath
 	 * @param remotePath
@@ -570,8 +558,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected abstract void doCleanupLaunch(IPLaunch launch);
 
 	/**
-	 * This method is called when the job state changes to RUNNING. This allows
-	 * the launcher to complete the job launch.
+	 * This method is called when the job state changes to RUNNING. This allows the launcher to complete the job launch.
 	 * 
 	 * @param launch
 	 * @param debugger
@@ -661,8 +648,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			verifyExecutablePath(configuration, progress.newChild(10));
 
 			/*
-			 * Verify working directory. Use the executable path if no working
-			 * directory has been set.
+			 * Verify working directory. Use the executable path if no working directory has been set.
 			 */
 			String workPath = getWorkingDirectory(configuration);
 			if (workPath != null) {
@@ -696,8 +682,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Get the absolute path of the executable to launch. If the executable is
-	 * on a remote machine, this is the path to the executable on that machine.
+	 * Get the absolute path of the executable to launch. If the executable is on a remote machine, this is the path to the
+	 * executable on that machine.
 	 * 
 	 * @param configuration
 	 * @return
@@ -786,8 +772,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Find the resource manager that corresponds to the unique name specified
-	 * in the configuration
+	 * Find the resource manager that corresponds to the unique name specified in the configuration
 	 * 
 	 * @param configuration
 	 *            launch configuration
@@ -804,8 +789,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Returns the (possible empty) list of synchronization rule objects
-	 * according to the rules described in the configuration.
+	 * Returns the (possible empty) list of synchronization rule objects according to the rules described in the configuration.
 	 * 
 	 * @since 5.0
 	 */
@@ -861,8 +845,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Create a source locator from the ID specified in the configuration, or
-	 * create a default one if it hasn't been specified.
+	 * Create a source locator from the ID specified in the configuration, or create a default one if it hasn't been specified.
 	 * 
 	 * @param launch
 	 * @param configuration
@@ -901,9 +884,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Submit a job to the resource manager. Keeps track of the submission so we
-	 * know when the job actually starts running. When this happens, the
-	 * abstract method doCompleteJobLaunch() is invoked.
+	 * Submit a job to the resource manager. Keeps track of the submission so we know when the job actually starts running. When
+	 * this happens, the abstract method doCompleteJobLaunch() is invoked.
 	 * 
 	 * @param configuration
 	 * @param mode
@@ -973,16 +955,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Verify the validity of executable path. If the executable is to be
-	 * copied, then no additional verification is required. Otherwise, the path
-	 * must point to an existing file.
+	 * Verify the validity of executable path. If the executable is to be copied, then no additional verification is required.
+	 * Otherwise, the path must point to an existing file.
 	 * 
 	 * @param configuration
 	 *            launch configuration
 	 * @param monitor
 	 *            progress monitor
-	 * @return IPath representing path to the executable (either local or
-	 *         remote)
+	 * @return IPath representing path to the executable (either local or remote)
 	 * @throws CoreException
 	 *             if the resource can't be found or the monitor was canceled.
 	 * @since 5.0
@@ -1042,8 +1022,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Verify the working directory. If no working directory is specified, the
-	 * default is the location of the executable.
+	 * Verify the working directory. If no working directory is specified, the default is the location of the executable.
 	 * 
 	 * @param configuration
 	 *            launch configuration
@@ -1051,8 +1030,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 *            progress monitor
 	 * @return path of working directory
 	 * @throws CoreException
-	 *             if the working directory is invalid or the monitor was
-	 *             canceled.
+	 *             if the working directory is invalid or the monitor was canceled.
 	 * @since 5.0
 	 */
 	protected String verifyWorkDirectory(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
