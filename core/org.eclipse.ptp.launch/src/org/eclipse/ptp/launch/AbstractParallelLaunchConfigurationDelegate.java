@@ -51,6 +51,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -649,6 +650,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
 			}
+			if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), NLS.bind(
+						Messages.AbstractParallelLaunchConfigurationDelegate_Manager_Not_Started, rm.getName())));
+			}
 
 			/*
 			 * Verify executable path
@@ -918,13 +923,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
 			}
 			rm.addJobListener(fJobListener);
+			launch.setResourceManager(rm);
 			String jobId = rm.submitJob(configuration, mode, progress.newChild(5));
 			if (rm.getJobStatus(jobId, progress.newChild(50)).equals(IJobStatus.UNDETERMINED)) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus));
 			}
 			launch.setJobId(jobId);
-			launch.setResourceManager(rm);
 			JobSubmission jobSub = new JobSubmission(launch, debugger);
 			synchronized (jobSubmissions) {
 				jobSubmissions.put(jobId, jobSub);
