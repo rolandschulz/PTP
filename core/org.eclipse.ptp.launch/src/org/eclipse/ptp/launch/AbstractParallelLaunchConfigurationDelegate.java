@@ -64,6 +64,7 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.launch.internal.LaunchAdapterFactory;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
@@ -173,7 +174,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						while (!rm.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
 								&& !subMon.isCanceled()) {
 							try {
-								fSubCondition.await(100, TimeUnit.MILLISECONDS);
+								fSubCondition.await(1000, TimeUnit.MILLISECONDS);
 							} catch (InterruptedException e) {
 								// Expect to be interrupted if monitor is
 								// canceled
@@ -389,7 +390,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	@Override
 	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
-		return new PLaunch(configuration, mode, null);
+		IPLaunch launch = new PLaunch(configuration, mode, null);
+		LaunchAdapterFactory.addLaunch(configuration, launch);
+		return launch;
 	}
 
 	/*
