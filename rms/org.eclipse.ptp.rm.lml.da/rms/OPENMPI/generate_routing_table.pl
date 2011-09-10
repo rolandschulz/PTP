@@ -30,6 +30,12 @@ my ($line,%job,$count);
 # task_number host_name port number
 # ...
 #
+#
+# where:
+# 	num_tasks is the total number of tasks in the MPI job
+#	task_number is the task number for a process (e.g. 0, 1, 2, etc.)
+#	host_name is the hostname of the node the process is running on
+#
 #####################################################################
 
 if ($#ARGV != 1) {
