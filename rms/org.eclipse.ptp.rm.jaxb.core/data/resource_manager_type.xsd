@@ -112,7 +112,8 @@
 			<xs:element name="stdout-parser" minOccurs="0" type="rm:tokenizer-type"/>
 			<xs:element name="stderr-parser" minOccurs="0" type="rm:tokenizer-type"/>
 			<xs:element name="redirect-parser" minOccurs="0" type="rm:tokenizer-type"/>
-			<xs:element name="cmd" minOccurs="0" maxOccurs="unbounded" type="rm:simple-command-type"/>
+			<xs:element name="pre-launch-cmd" minOccurs="0" maxOccurs="unbounded" type="rm:simple-command-type"/>
+			<xs:element name="post-launch-cmd" minOccurs="0" maxOccurs="unbounded" type="rm:simple-command-type"/>
 		</xs:sequence>
 		<xs:attribute name="name" use="required" type="xs:string"/>
 		<xs:attribute name="directory" type="xs:string"/>
