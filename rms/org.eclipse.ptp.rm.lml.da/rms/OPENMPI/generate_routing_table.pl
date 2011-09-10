@@ -27,14 +27,14 @@ my ($line,%job,$count);
 # Routing table format is:
 #
 # num_tasks
-# task_number host_name port number
+# task_num host_name port_num
 # ...
-#
 #
 # where:
 # 	num_tasks is the total number of tasks in the MPI job
-#	task_number is the task number for a process (e.g. 0, 1, 2, etc.)
+#	task_num is the task number for a process (e.g. 0, 1, 2, etc.)
 #	host_name is the hostname of the node the process is running on
+#	port_num is a semi-random port number that the debugger will listen on
 #
 #####################################################################
 
