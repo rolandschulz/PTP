@@ -19,6 +19,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -300,6 +301,9 @@ public class LCVariableMap implements IVariableMap {
 		put(JAXBControlConstants.DIRECTORY, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, dir));
 		put(JAXBControlConstants.EXEC_PATH,
 				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
+		String directory = new Path(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
+				JAXBControlConstants.ZEROSTR)).removeLastSegments(1).toString();
+		put(JAXBControlConstants.EXEC_DIR, directory);
 		put(JAXBControlConstants.PROG_ARGS,
 				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR));
 		put(JAXBControlConstants.DEBUGGER_EXEC_PATH, configuration.getAttribute(

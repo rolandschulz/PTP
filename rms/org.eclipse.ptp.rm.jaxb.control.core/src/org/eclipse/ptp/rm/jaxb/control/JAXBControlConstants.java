@@ -72,10 +72,12 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 	public static final String JOB_ID = "job_id";//$NON-NLS-1$
 	public static final String RM_ID = "rm_id";//$NON-NLS-1$
 	public static final String EXEC_PATH = "executablePath";//$NON-NLS-1$
+	public static final String EXEC_DIR = "executableDirectory";//$NON-NLS-1$
 	public static final String PROG_ARGS = "progArgs";//$NON-NLS-1$
 	public static final String DIRECTORY = "directory";//$NON-NLS-1$
 	public static final String MPI_CMD = "mpiCommand";//$NON-NLS-1$
 	public static final String MPI_ARGS = "mpiArgs";//$NON-NLS-1$
+	public static final String MPI_NUMPROCS = "numProcs";//$NON-NLS-1$
 	public static final String DEBUGGER_EXEC_PATH = "debuggerExecutablePath";//$NON-NLS-1$
 	public static final String DEBUGGER_ARGS = "debuggerArgs";//$NON-NLS-1$
 
