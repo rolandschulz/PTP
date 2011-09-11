@@ -15,12 +15,12 @@ import java.util.List;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
+import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
- * Wrapper implementation. An argument is a part of a string sequence which can
- * be resolved in an environment, and then tested to see if the result matches a
- * pattern indicating that the argument is equivalent to being undefined (and
- * thus should be eliminated).
+ * Wrapper implementation. An argument is a part of a string sequence which can be resolved in an environment, and then tested to
+ * see if the result matches a pattern indicating that the argument is equivalent to being undefined (and thus should be
+ * eliminated).
  * 
  * @author arossi
  * 
@@ -31,8 +31,7 @@ public class ArgImpl {
 	 * Auxiliary iterator.
 	 * 
 	 * @param uuid
-	 *            unique id associated with this resource manager operation (can
-	 *            be <code>null</code>).
+	 *            unique id associated with this resource manager operation (can be <code>null</code>).
 	 * @param args
 	 *            JAXB data elements.
 	 * @param map
@@ -42,7 +41,8 @@ public class ArgImpl {
 	public static String[] getArgs(String uuid, List<ArgType> args, IVariableMap map) {
 		List<String> resolved = new ArrayList<String>();
 		for (ArgType a : args) {
-			resolved.add(getResolved(uuid, a, map));
+			ArgumentParser arg = new ArgumentParser(getResolved(uuid, a, map));
+			resolved.addAll(arg.getTokenList());
 		}
 		return resolved.toArray(new String[0]);
 	}
@@ -51,8 +51,7 @@ public class ArgImpl {
 	 * Auxiliary iterator.
 	 * 
 	 * @param uuid
-	 *            unique id associated with this resource manager operation (can
-	 *            be <code>null</code>).
+	 *            unique id associated with this resource manager operation (can be <code>null</code>).
 	 * @param args
 	 *            JAXB data elements.
 	 * @param map
@@ -78,13 +77,11 @@ public class ArgImpl {
 	}
 
 	/**
-	 * Checks first to see if resolution is indicated for the argument. After
-	 * calling the resolver, checks to see if the resulting argument should be
-	 * considered equivalent to undefined.
+	 * Checks first to see if resolution is indicated for the argument. After calling the resolver, checks to see if the resulting
+	 * argument should be considered equivalent to undefined.
 	 * 
 	 * @param uuid
-	 *            unique id associated with this resource manager operation (can
-	 *            be <code>null</code>).
+	 *            unique id associated with this resource manager operation (can be <code>null</code>).
 	 * @param arg
 	 *            JAXB data element
 	 * @param map
@@ -119,8 +116,7 @@ public class ArgImpl {
 
 	/**
 	 * @param uuid
-	 *            unique id associated with this resource manager operation (can
-	 *            be <code>null</code>).
+	 *            unique id associated with this resource manager operation (can be <code>null</code>).
 	 * @param arg
 	 *            JAXB data element.
 	 * @param map
