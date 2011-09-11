@@ -36,6 +36,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob.Operation;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJobStatus;
+import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.DebugStarterJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.utils.JobIdPinTable;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
@@ -297,7 +298,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		if (command != null) {
-			runCommand(null, command, CommandJob.JobMode.INTERACTIVE, true);
+			runCommand(null, command, CommandJob.JobMode.INTERACTIVE, null, ILaunchManager.RUN_MODE, true);
 		}
 
 		return changedValue;
@@ -385,6 +386,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			if (status != null) {
 				if (IJobStatus.COMPLETED.equals(status.getState())) {
+
 					/*
 					 * leave the status in the map in case there are further calls (regarding remote file state); it will be pruned
 					 * by the daemon; note that a COMPLETED state can correspond to a COMPLETED, CANCELED, FAILED or
@@ -392,6 +394,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					 */
 					status = jobStatusMap.terminated(jobId, progress.newChild(50));
 					if (status != null && status.stateChanged()) {
+						/*
+						 * If this is a debug job, mark it as terminated
+						 */
+						DebugStarterJob.terminate(jobId);
+
 						jobStateChanged(jobId, status);
 					}
 					return status;
@@ -419,7 +426,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					p.setVisible(false);
 					p.setName(jobId);
 					rmVarMap.put(jobId, p);
-					runCommand(jobId, job, CommandJob.JobMode.STATUS, true);
+					runCommand(jobId, job, CommandJob.JobMode.STATUS, null, ILaunchManager.RUN_MODE, true);
 					p = (PropertyType) rmVarMap.remove(jobId);
 				}
 
@@ -574,7 +581,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		ICommandJob job = null;
 
 		try {
-			job = doJobSubmitCommand(uuid, mode);
+			job = doJobSubmitCommand(uuid, configuration, mode);
+			if (job.getRunStatus().getSeverity() == IStatus.CANCEL) {
+				throw CoreExceptionUtils.newException(Messages.OperationWasCancelled, null);
+			}
 			worked(progress, 40);
 		} finally {
 			/*
@@ -680,7 +690,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 		}
 
-		runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, true);
+		runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, null, ILaunchManager.RUN_MODE, true);
 	}
 
 	/**
@@ -695,7 +705,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @return job wrapper object
 	 * @throws CoreException
 	 */
-	private ICommandJob doJobSubmitCommand(String uuid, String mode) throws CoreException {
+	private ICommandJob doJobSubmitCommand(String uuid, ILaunchConfiguration configuration, String mode) throws CoreException {
 		CommandType command = null;
 		CommandJob.JobMode jobMode = CommandJob.JobMode.INTERACTIVE;
 
@@ -723,7 +733,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * NOTE: changed this to join, because the waitForId is now part of the run() method of the command itself (05.01.2011)
 		 */
-		return runCommand(uuid, command, jobMode, true);
+		return runCommand(uuid, command, jobMode, configuration, mode, true);
 	}
 
 	/**
@@ -973,12 +983,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @return the runnable job object
 	 * @throws CoreException
 	 */
-	private ICommandJob runCommand(String uuid, CommandType command, CommandJob.JobMode mode, boolean join) throws CoreException {
+	private ICommandJob runCommand(String uuid, CommandType command, CommandJob.JobMode jobMode,
+			ILaunchConfiguration configuration, String launchMode, boolean join) throws CoreException {
 		if (command == null) {
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
-		ICommandJob job = new CommandJob(uuid, command, mode, (IJAXBResourceManager) getResourceManager());
+		ICommandJob job = new CommandJob(uuid, command, jobMode, (IJAXBResourceManager) getResourceManager(), configuration,
+				launchMode);
 		((Job) job).setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 		job.schedule();
 		if (join) {
@@ -1004,7 +1016,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	private void runCommands(List<CommandType> cmds) throws CoreException {
 		for (CommandType cmd : cmds) {
-			runCommand(null, cmd, CommandJob.JobMode.INTERACTIVE, true);
+			runCommand(null, cmd, CommandJob.JobMode.INTERACTIVE, null, ILaunchManager.RUN_MODE, true);
 		}
 	}
 
@@ -1079,6 +1091,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.maybeOverwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, lcattr, false);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.DIRECTORY, JAXBControlConstants.DIRECTORY, lcattr, false);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.EXEC_PATH, JAXBControlConstants.EXEC_PATH, lcattr, false);
+		rmVarMap.maybeOverwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr, false);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr, false);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr, false);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.DEBUGGER_ARGS, JAXBControlConstants.DEBUGGER_ARGS, lcattr, false);

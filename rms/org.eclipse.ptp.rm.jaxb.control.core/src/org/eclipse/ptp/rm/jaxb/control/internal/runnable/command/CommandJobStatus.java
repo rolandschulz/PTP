@@ -37,8 +37,8 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 
 /**
- * Extension of the IJobStatus class to handle resource manager command jobs.
- * Also handles availability notification for remote stdout and stderr files.
+ * Extension of the IJobStatus class to handle resource manager command jobs. Also handles availability notification for remote
+ * stdout and stderr files.
  * 
  * @author arossi
  * 
@@ -46,11 +46,9 @@ import org.eclipse.ptp.rmsystem.IJobStatus;
 public class CommandJobStatus implements ICommandJobStatus {
 
 	/**
-	 * Checks for file existence, then waits 3 seconds to compare file length.
-	 * If block is false, the listeners may be notified that the file is still
-	 * not ready; else the listeners will receive a ready = true notification
-	 * when the file does finally stabilize, provided this occurs within the
-	 * block parameter (seconds).
+	 * Checks for file existence, then waits 3 seconds to compare file length. If block is false, the listeners may be notified that
+	 * the file is still not ready; else the listeners will receive a ready = true notification when the file does finally
+	 * stabilize, provided this occurs within the block parameter (seconds).
 	 * 
 	 * @author arossi
 	 */
@@ -70,8 +68,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
-		 * IProgressMonitor)
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime. IProgressMonitor)
 		 */
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
@@ -83,8 +80,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 				d = control.getRemoteServicesDelegate(progress.newChild(20));
 				if (d.getRemoteFileManager() == null) {
 					/*
-					 * could be a call initiated by closing of resource manager,
-					 * the connection may be closed; just ignore and move on
+					 * could be a call initiated by closing of resource manager, the connection may be closed; just ignore and move
+					 * on
 					 */
 					return Status.OK_STATUS;
 				}
@@ -183,8 +180,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
-	 * Closes the proxy and calls destroy on the process. Used for interactive
-	 * job cancellation.
+	 * Closes the proxy and calls destroy on the process. Used for interactive job cancellation.
 	 * 
 	 * @return true if canceled during this call.
 	 */
@@ -197,9 +193,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 			waitEnabled = false;
 
 			/*
-			 * If this process is persistent (open), call terminate on the job,
-			 * as it may still be running; the process will be killed and the
-			 * proxy closed inside the job
+			 * If this process is persistent (open), call terminate on the job, as it may still be running; the process will be
+			 * killed and the proxy closed inside the job
 			 */
 			if (open != null) {
 				open.terminate();
@@ -325,24 +320,19 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
-	 * Wrapper containing monitoring functionality for the associated output and
-	 * error streams.
+	 * Wrapper containing monitoring functionality for the associated output and error streams.
 	 */
 	public IStreamsProxy getStreamsProxy() {
 		return proxy;
 	}
 
 	/*
-	 * NOTE: Initialize must be called immediately after the return of the
-	 * submit.run() method while the property for the jobId is pinned and in the
-	 * environment. Note also that batch variable replacement will not work, as
-	 * that would not be interpretable for the RM. One actually needs to
-	 * configure two separate strings in this case, giving one to the script and
-	 * one to the resource manager.
+	 * NOTE: Initialize must be called immediately after the return of the submit.run() method while the property for the jobId is
+	 * pinned and in the environment. Note also that batch variable replacement will not work, as that would not be interpretable
+	 * for the RM. One actually needs to configure two separate strings in this case, giving one to the script and one to the
+	 * resource manager.
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#initialize(java.lang.String
-	 * )
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#initialize(java.lang.String )
 	 */
 	public void initialize(String jobId) {
 		if (initialized) {
@@ -379,9 +369,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
-	 * @return whether a process object has been attached to this status object
-	 *         (in which case the submission is not through an asynchronous job
-	 *         scheduler).
+	 * @return whether a process object has been attached to this status object (in which case the submission is not through an
+	 *         asynchronous job scheduler).
 	 */
 	public boolean isInteractive() {
 		return process != null;
@@ -390,9 +379,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#maybeWaitForHandlerFiles
-	 * (int)
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#maybeWaitForHandlerFiles (int)
 	 */
 	public void maybeWaitForHandlerFiles(int blockForSecs, IProgressMonitor monitor) {
 		if (fFilesChecked) {
@@ -449,9 +436,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#setOwner(java
-	 * .lang.String)
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#setOwner(java .lang.String)
 	 */
 	public void setOwner(String owner) {
 		this.owner = owner;
@@ -467,8 +452,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 
 	/**
 	 * @param proxy
-	 *            Wrapper containing monitoring functionality for the associated
-	 *            output and error streams.
+	 *            Wrapper containing monitoring functionality for the associated output and error streams.
 	 */
 	public void setProxy(ICommandJobStreamsProxy proxy) {
 		this.proxy = proxy;
@@ -477,9 +461,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#setQueueName
-	 * (java.lang.String)
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#setQueueName (java.lang.String)
 	 */
 	public void setQueueName(String name) {
 		this.queue = name;
@@ -550,8 +532,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 
 	/**
 	 * @param time
-	 *            in milliseconds of last update request issued to remote
-	 *            resource
+	 *            in milliseconds of last update request issued to remote resource
 	 */
 	public synchronized void setUpdateRequestTime(long update) {
 		lastRequestedUpdate = update;
@@ -585,20 +566,15 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/*
-	 * Wait until the jobId has been set on the job id property in the
-	 * environment.
+	 * Wait until the jobId has been set on the job id property in the environment.
 	 * 
-	 * The uuid key for the property containing as its name the
-	 * resource-specific jobId and as its value the state.
+	 * The uuid key for the property containing as its name the resource-specific jobId and as its value the state.
 	 * 
-	 * The waitUntil state will usually be either SUBMITTED or RUNNING (for
-	 * interactive)
+	 * The waitUntil state will usually be either SUBMITTED or RUNNING (for interactive)
 	 * 
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#waitForJobId(java.lang
-	 * .String, java.lang.String,
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#waitForJobId(java.lang .String, java.lang.String,
 	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl)
 	 */
 	public void waitForJobId(String uuid, String waitUntil, ICommandJobStatusMap map, IProgressMonitor monitor)
@@ -682,10 +658,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
-	 * Checks for file existence, then waits 3 seconds to compare file length.
-	 * If block is false, the listeners may be notified that the file is still
-	 * not ready; else the listeners will receive a ready = true notification
-	 * when the file does finally stabilize. (non-Javadoc)
+	 * Checks for file existence, then waits 3 seconds to compare file length. If block is false, the listeners may be notified that
+	 * the file is still not ready; else the listeners will receive a ready = true notification when the file does finally
+	 * stabilize. (non-Javadoc)
 	 * 
 	 * @param path
 	 * @param blockInSeconds

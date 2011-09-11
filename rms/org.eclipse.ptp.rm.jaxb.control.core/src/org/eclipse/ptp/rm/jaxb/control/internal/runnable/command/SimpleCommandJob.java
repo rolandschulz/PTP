@@ -1,12 +1,14 @@
-/*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
- * Contributors: 
- * 	Albert L. Rossi - design and implementation
- ******************************************************************************/
+/******************************************************************************
+ * Copyright (c) 2011 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     IBM Corporation - Initial Implementation
+ *
+ *****************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;
 
 import java.io.IOException;
@@ -31,6 +33,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
+import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
  * Implementation of runnable Job for the simple execution of external processes. Uses the IRemoteProcessBuilder with the
@@ -45,24 +48,28 @@ public class SimpleCommandJob extends Job {
 	private final JAXBResourceManagerControl fControl;
 	private final IVariableMap fRmVarMap;
 	private final int fFlags;
+	private final String fUuid;
+	private final String fDirectory;
 
-	private IRemoteProcess process;
-	private IStatus status;
-	private boolean active;
+	private IRemoteProcess fProcess;
+	private IStatus fStatus;
+	private boolean fActive;
 
 	/**
-	 * @param jobUUID
+	 * @param uuid
 	 *            either internal or resource specific identifier
 	 * @param command
 	 *            JAXB data element
-	 * @param mode
-	 *            whether submission is batch, interactive or status
+	 * @param directory
+	 *            directory of parent command, or null if none
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public SimpleCommandJob(SimpleCommandType command, IJAXBResourceManager rm) {
-		super(command.getName());
+	public SimpleCommandJob(String uuid, SimpleCommandType command, String directory, IJAXBResourceManager rm) {
+		super(command.getName() != null ? command.getName() : "simple"); //$NON-NLS-1$
+		fUuid = uuid;
 		fCommand = command;
+		fDirectory = command.getDirectory() != null ? command.getDirectory() : directory;
 		fControl = (JAXBResourceManagerControl) rm.getControl();
 		fRmVarMap = fControl.getEnvironment();
 		fFlags = getFlags(command.getFlags());
@@ -72,7 +79,7 @@ public class SimpleCommandJob extends Job {
 	 * @return the process wrapper
 	 */
 	public IRemoteProcess getProcess() {
-		return process;
+		return fProcess;
 	}
 
 	/*
@@ -81,7 +88,7 @@ public class SimpleCommandJob extends Job {
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#getRunStatus()
 	 */
 	public IStatus getRunStatus() {
-		return status;
+		return fStatus;
 	}
 
 	/**
@@ -90,7 +97,7 @@ public class SimpleCommandJob extends Job {
 	public boolean isActive() {
 		boolean b = false;
 		synchronized (this) {
-			b = active;
+			b = fActive;
 		}
 		return b;
 	}
@@ -102,10 +109,10 @@ public class SimpleCommandJob extends Job {
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#terminate()
 	 */
 	public synchronized void terminate() {
-		if (active) {
-			active = false;
-			if (process != null && !process.isCompleted()) {
-				process.destroy();
+		if (fActive) {
+			fActive = false;
+			if (fProcess != null && !fProcess.isCompleted()) {
+				fProcess.destroy();
 			}
 			cancel();
 		}
@@ -119,13 +126,13 @@ public class SimpleCommandJob extends Job {
 	protected IStatus run(IProgressMonitor monitor) {
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		try {
-			status = execute(progress.newChild(50));
+			fStatus = execute(progress.newChild(50));
 		} finally {
 			if (monitor != null) {
 				monitor.done();
 			}
 		}
-		return status;
+		return fStatus;
 	}
 
 	/**
@@ -137,30 +144,30 @@ public class SimpleCommandJob extends Job {
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		try {
 			synchronized (this) {
-				status = null;
-				active = false;
+				fStatus = null;
+				fActive = false;
 			}
 			IRemoteProcessBuilder builder = prepareCommand(progress.newChild(10));
 			prepareEnv(builder);
 			progress.worked(10);
 
-			process = null;
+			fProcess = null;
 			try {
-				process = builder.start(fFlags);
+				fProcess = builder.start(fFlags);
 			} catch (IOException t) {
 				throw CoreExceptionUtils.newException(Messages.CouldNotLaunch + builder.command(), t);
 			}
 			progress.worked(30);
 
 			synchronized (this) {
-				active = true;
+				fActive = true;
 			}
 			progress.worked(20);
 
 			int exit = 0;
 
 			try {
-				exit = process.waitFor();
+				exit = fProcess.waitFor();
 			} catch (InterruptedException ignored) {
 			}
 
@@ -178,7 +185,7 @@ public class SimpleCommandJob extends Job {
 		}
 
 		synchronized (this) {
-			active = false;
+			fActive = false;
 		}
 		return Status.OK_STATUS;
 	}
@@ -216,7 +223,7 @@ public class SimpleCommandJob extends Job {
 	 * @throws CoreException
 	 */
 	private IRemoteProcessBuilder prepareCommand(IProgressMonitor monitor) throws CoreException {
-		String commandToExec = fRmVarMap.getString(fCommand.getExec());
+		ArgumentParser args = new ArgumentParser(fRmVarMap.getString(fUuid, fCommand.getExec()));
 		RemoteServicesDelegate delegate = fControl.getRemoteServicesDelegate(monitor);
 		if (delegate.getRemoteConnection() == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, new Throwable(
@@ -229,10 +236,9 @@ public class SimpleCommandJob extends Job {
 		} catch (RemoteConnectionException rce) {
 			throw CoreExceptionUtils.newException(rce.getLocalizedMessage(), rce);
 		}
-		IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, commandToExec);
-		String directory = fCommand.getDirectory();
-		if (directory != null && !JAXBControlConstants.ZEROSTR.equals(directory)) {
-			directory = fRmVarMap.getString(directory);
+		IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, args.getTokenList());
+		if (fDirectory != null && !JAXBControlConstants.ZEROSTR.equals(fDirectory)) {
+			String directory = fRmVarMap.getString(fUuid, fDirectory);
 			IFileStore dir = delegate.getRemoteFileManager().getResource(directory);
 			builder.directory(dir);
 		}
