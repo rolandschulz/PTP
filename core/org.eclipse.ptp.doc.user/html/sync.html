@@ -11,6 +11,8 @@
 <li><a href="#prereq">Requirements for Synchronized Projects</a>
 <li><a href="#create">Creating a new Synchronized Project</a>
 <li><a href="#work">Working with a Synchronized Project</a>
+<li><a href="#context-menu">Changing sync behavior with the Sync Context Menu</a>
+<li><a href="#conversion-wizard">Converting a project to a Synchronized Project</a>
 <li><a href="#props">Project Properties specific to Synchronized Projects</a>
 </ul>
 <p>Synchronized projects consist of files that are mirrored on the local system as well as on one or more remote systems.
@@ -109,6 +111,22 @@ Synchronization is done between the local workspace and the active configuration
 properties page. If "Workspace" is the active configuration, no synchronization is done.
 </p>
 
+<h2 id="context-menu">Changing sync behavior with the Sync Context Menu</h2>
+<p>
+The sync context menu lets you alter the sync behavior and can be accessed with a right click on a sync project. From this menu, you can turn off automatic sync'ing (sync after saving files and other resource changes) so that syncs only occur on request. This setting is applied to all projects in the workspace. The "Project Auto-Sync Settings" submenu allows you to alter the behavior of automatic sync'ing per project. Finally, the last two selections allow you to force an immediate sync of the current project. A "sync all" syncs all configurations of a project. Note that this can be quite slow if your project has several configurations. When a build is requested, a sync of the active configuration, and only the active configuration, is forced regardless of any settings.
+</p>
+<p><img src="images/sync-contextMenu.png">
+
+<h2 id="conversion-wizard">Converting a project to a Synchronized Project</h2>
+<p>
+The conversion wizard allows you to convert current C/C++ or Fortran projects to synchronized projects. Currently only local projects can be converted. To convert a project right-click in the workspace and select <b>New > Other...</b> In the wizard selection dialog, select <b> Remote > Convert C/C++ or Fortran Project to a Synchronized Project > Next</b>. From this dialog, you can select a project to convert and configure a remote site. See <a href="#create">Creating a new Synchronized Project</a> for details on configuring a remote site. This wizard will add a single new remote build configuration. Its settings are copied from the current active configuration. You can change these settings and add new configurations as with any other synchronization project. See <a href="#work">Working with a Synchronized Project</a> for details.
+</p>
+<table cellpadding="5" cellspacing="5" border="0">
+<tr>
+<td><img src="images/sync-selectConversionWizard.png"></td>
+<td><img src="images/sync-conversionWizard.png"></td>
+</tr>
+</table>
 
 <h2 id="includes">Remote Include Paths</h2>
 <p>At the time of the PTP 5.0 release (June 2011),
