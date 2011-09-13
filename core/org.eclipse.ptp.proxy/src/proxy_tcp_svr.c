@@ -42,6 +42,8 @@
 #include "proxy_tcp.h"
 #include "handler.h"
 
+#define CONNECT_TRIES	5
+#define CONNECT_TIMEOUT	1
 static int	proxy_tcp_svr_init(proxy_svr *, void **);
 static int	proxy_tcp_svr_create(proxy_svr *, int);
 static int	proxy_tcp_svr_connect(proxy_svr *, char *, int);
@@ -181,6 +183,7 @@ proxy_tcp_svr_create(proxy_svr *svr, int port)
 static int
 proxy_tcp_svr_connect(proxy_svr *svr, char *host, int port)
 {
+	int						num_tries;
 	SOCKET					sd;
 	struct hostent *		hp;
 	struct sockaddr_in		scket;
@@ -209,11 +212,18 @@ proxy_tcp_svr_connect(proxy_svr *svr, char *host, int port)
 	scket.sin_port = htons((u_short) port);
 	memcpy(&(scket.sin_addr), *(hp->h_addr_list), sizeof(struct in_addr));
 
-	if ( connect(sd, (struct sockaddr *) &scket, sizeof(scket)) == SOCKET_ERROR )
-	{
-		proxy_set_error(PTP_PROXY_ERR_SYSTEM, strerror(errno));
-		CLOSE_SOCKET(sd);
-		return PTP_PROXY_RES_ERR;
+	for (num_tries = 0; num_tries < CONNECT_TRIES; num_tries++) {
+		if (connect(sd, (struct sockaddr *) &scket, sizeof(scket)) >= 0) {
+			break;
+		}
+
+		if (errno != ECONNREFUSED || num_tries == CONNECT_TRIES - 1) {
+			proxy_set_error(PTP_PROXY_ERR_SYSTEM, strerror(errno));
+			CLOSE_SOCKET(sd);
+			return PTP_PROXY_RES_ERR;
+		}
+
+		sleep(CONNECT_TIMEOUT);
 	}
 
 	conn->sess_sock = sd;
@@ -350,6 +360,7 @@ proxy_tcp_svr_progress(proxy_svr *svr)
 		default:
 			if (CallFileHandlers(&rfds, &wfds, &efds) < 0)
 				return PTP_PROXY_RES_ERR;
+			break;
 		}
 
 		break;
