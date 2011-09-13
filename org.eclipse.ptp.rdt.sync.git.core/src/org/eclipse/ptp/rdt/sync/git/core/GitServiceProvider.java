@@ -54,7 +54,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private GitRemoteSyncConnection fSyncConnection = null;
 	private boolean hasBeenSynced = false;
 
-	private final ReentrantLock syncLock = new ReentrantLock();
+	private static final ReentrantLock syncLock = new ReentrantLock();
+	private Integer fWaitingThreadsCount = 0;
 	private Integer syncTaskId = -1; // ID for most recent synchronization task, functions as a time-stamp
 	private int finishedSyncTaskId = -1; // all synchronizations up to this ID (including it) have finished
 
@@ -202,8 +203,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					}
 					if (resource.getType() == IResource.FOLDER) {
 						IFile emptyFile = project.getFile(resource.getProjectRelativePath().addTrailingSeparator() + ".gitignore"); //$NON-NLS-1$
-						if (!(emptyFile.exists())) {
-							emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+						try {
+							if (!(emptyFile.exists())) {
+								emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+							}
+						} catch (CoreException e){
+							// Nothing to do. Can happen if another thread creates the file between the check and creation.
 						}
 					}
 					return true;
@@ -233,8 +238,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 						&& (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
 					IFile emptyFile = getProject().getFile(
 							delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore"); //$NON-NLS-1$
-					if (!(emptyFile.exists())) {
-						emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+					try {
+						if (!(emptyFile.exists())) {
+							emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+						}
+					} catch (CoreException e) {
+						// Nothing to do. Can happen if another thread creates the file between the check and creation.
 					}
 				}
 
@@ -282,8 +291,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				// suggestion for Deltas: add delta to list of deltas
 			}
 
-			if (syncLock.hasQueuedThreads() && syncFlags == SyncFlag.NO_FORCE)
-				return; // the queued Thread will do the work for us. And we don't have to wait because of NO_FORCE
+			synchronized (fWaitingThreadsCount) {
+				if (fWaitingThreadsCount > 0 && syncFlags == SyncFlag.NO_FORCE) {
+					return; // the queued thread will do the work for us. And we don't have to wait because of NO_FORCE
+				} else {
+					fWaitingThreadsCount++;       
+				}
+			}
 
 			// lock syncLock. interruptible by progress monitor
 			try {
@@ -294,6 +308,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				}
 			} catch (InterruptedException e1) {
 				throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, Messages.GitServiceProvider_2));
+			} finally {
+				synchronized (fWaitingThreadsCount) {
+					fWaitingThreadsCount--;
+				}
 			}
 
 			try {
