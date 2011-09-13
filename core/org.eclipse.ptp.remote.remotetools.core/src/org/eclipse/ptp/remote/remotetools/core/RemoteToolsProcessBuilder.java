@@ -11,11 +11,15 @@
 package org.eclipse.ptp.remote.remotetools.core;
 
 import java.io.IOException;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
@@ -30,6 +34,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	private final RemoteToolsFileManager fFileMgr;
 	private final Map<String, String> fRemoteEnv;
 	private Map<String, String> fNewRemoteEnv = null;
+	private Set<Character> charSet = new HashSet<Character>();
 
 	/**
 	 * @since 4.0
@@ -39,6 +44,15 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 		fConnection = conn;
 		fFileMgr = fileMgr;
 		fRemoteEnv = new HashMap<String, String>(conn.getEnv());
+		
+		//Create set of characters not to escape
+		String trustedChars = null;
+		trustedChars = "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; //$NON-NLS-1$ //$NON-NLS-2$
+		trustedChars += "0123456789" + "/._-"; //$NON-NLS-1$ //$NON-NLS-2$
+		CharacterIterator it = new StringCharacterIterator(trustedChars);
+		for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
+			charSet.add(c);
+		}
 	}
 
 	/**
@@ -113,7 +127,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 			if (i > 0) {
 				remoteCmd += " "; //$NON-NLS-1$
 			}
-			remoteCmd += spaceEscapify(cmdArgs.get(i));
+			remoteCmd += charEscapify(cmdArgs.get(i), charSet);
 		}
 
 		try {
@@ -149,10 +163,23 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 		}
 	}
 
-	private String spaceEscapify(String inputString) {
+	private String charEscapify(String inputString, Set<Character> charSet) {
 		if (inputString == null) {
 			return null;
 		}
-		return inputString.replaceAll(" ", "\\\\ "); //$NON-NLS-1$ //$NON-NLS-2$
+		StringBuffer newString = new StringBuffer(""); //$NON-NLS-1$
+		CharacterIterator it = new StringCharacterIterator(inputString);
+
+		for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
+			if (c == '\'') {
+				newString.append("'\\\\\\''"); //$NON-NLS-1$
+			} else if (c > 127 || charSet.contains(c)) { // Do not escape non-ASCII characters (> 127)
+				newString.append(c);
+			} else {
+				newString.append("\\" + c); //$NON-NLS-1$
+			}
+		}
+		inputString = newString.toString();
+		return inputString;
 	}
 }
