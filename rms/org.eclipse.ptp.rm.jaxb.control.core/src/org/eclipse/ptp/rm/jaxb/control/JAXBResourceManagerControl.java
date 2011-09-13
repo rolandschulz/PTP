@@ -592,7 +592,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		try {
 			job = doJobSubmitCommand(uuid, configuration, mode);
-			if (job.getRunStatus().getSeverity() == IStatus.CANCEL) {
+
+			IStatus status = job.getRunStatus();
+			if (status != null && status.getSeverity() == IStatus.CANCEL) {
 				throw CoreExceptionUtils.newException(Messages.OperationWasCancelled, null);
 			}
 			worked(progress, 40);
