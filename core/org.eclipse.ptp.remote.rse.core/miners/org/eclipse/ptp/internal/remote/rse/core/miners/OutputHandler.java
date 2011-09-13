@@ -32,7 +32,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.CharBuffer;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.dstore.core.model.Handler;
 
@@ -62,20 +64,21 @@ public class OutputHandler extends Handler {
 
 	private List<String> _encodings;
 	
-	private String fCwd;
 	private BufferedReader fBufferedReader;
 	private boolean fIsFinished;
+	
+	char[] buf = new char[1024]; 
+	int readindex=0, writeindex=0;
 
 
 	public OutputHandler(DataInputStream reader, String qualifier,
 			boolean isTerminal, boolean isStdError, boolean isShell,
-			CommandMinerThread commandThread, String cwd) {
+			CommandMinerThread commandThread) {
 		_reader = reader;
 		_isStdError = isStdError;
 		_isTerminal = isTerminal;
 		fCommandThread = commandThread;
 		_isShell = isShell;
-		fCwd = cwd;
 
 		_encodings = new ArrayList<String>();
 		String system = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
@@ -113,33 +116,32 @@ public class OutputHandler extends Handler {
 	public synchronized void handle() {
 		String[] lines = readLines();
 		if (lines != null) {
-						
-			/*
-			 * if (lines.length == 0) { _reader. }
-			 *  // don't do anything unless we require output if (_newCommand &&
-			 * !_isTerminal) { doPrompt(); } } else
-			 */
-			for (int i = 0; i < lines.length; i++) {
-				// first make sure it's not a multiline line
-				String ln = lines[i];
-				if (ln.indexOf('\n') > 0){
-					String[] lns = ln.split("\n"); //$NON-NLS-1$
-					for (int j = 0; j < lns.length; j++){
-						String line = convertSpecialCharacters(lns[j]);
+			if (lines.length > 0) {
+				/*
+				 * if (lines.length == 0) { _reader. } // don't do anything unless we require output if (_newCommand &&
+				 * !_isTerminal) { doPrompt(); } } else
+				 */
+				for (int i = 0; i < lines.length; i++) {
+					// first make sure it's not a multiline line
+					String ln = lines[i];
+					if (ln.indexOf('\n') > 0) {
+						String[] lns = ln.split("\n"); //$NON-NLS-1$
+						for (int j = 0; j < lns.length; j++) {
+							String line = convertSpecialCharacters(lns[j]);
+							fCommandThread.interpretLine(line, _isStdError);
+						}
+					} else {
+						String line = convertSpecialCharacters(ln);
 						fCommandThread.interpretLine(line, _isStdError);
 					}
 				}
-				else {
-					String line = convertSpecialCharacters(ln);
-					fCommandThread.interpretLine(line, _isStdError);
+
+				if (!_isTerminal) {
+					doPrompt();
 				}
-			}
 
-			if (!_isTerminal){
-				doPrompt();
+				fCommandThread.refreshStatus();
 			}
-
-			fCommandThread.refreshStatus();
 		} else {
 			finish();
 		}
@@ -203,7 +205,7 @@ public class OutputHandler extends Handler {
 						Thread.sleep(200);
 						if (_reader.available() == 0) {
 							// create fake prompt
-							fCommandThread.createPrompt(fCwd + '>', fCwd);							
+							fCommandThread.createPrompt(fCommandThread.getCWD() + '>', fCommandThread.getCWD());							
 						}
 					} catch (Exception e) {
 					}
@@ -218,37 +220,71 @@ public class OutputHandler extends Handler {
 		if (_endOfStream || fBufferedReader == null) {
 			return null;
 		}
-		String[] output = new String[0];
 		
-		String line;
 		ArrayList<String> outputLines = new ArrayList<String>();
+		
+		StringBuilder sb = new StringBuilder();
 
 		try {
 			
-			line = fBufferedReader.readLine();
-			if(line != null) {
-				outputLines.add(line);
+			boolean lineFound = false;
+			do {
+				
+				int currVal = fBufferedReader.read();
+
+				switch (currVal) {
+				case -1:
+					_endOfStream = true;
+					// if we have a string in progress, return whatever we have left as a line
+					if(sb.length() > 0) {
+						outputLines.add(sb.toString());
+						sb = new StringBuilder();
+					}
+					break;
+
+				case '\r':	
+				case '\n':
+					// never append newlines, we'll return them as individual lines instead
+					// instead take what we have so far and create a new line out of it
+					if(sb.length() > 0) {
+						outputLines.add(sb.toString());
+						sb = new StringBuilder();
+						lineFound = true;
+					}
+					
+					// mark our position so that we can rewind to here
+					fBufferedReader.mark(65536); // means we can read up to 64 KB and still recover
+					break;
+
+			
+				default:
+					sb.append((char) currVal);
+					break;
+				}
+			} while(!_endOfStream && !lineFound);
+			
+			// we've now created as many lines as we can, but we may have partially read a line... rewind the stream if we have a partial line
+			if(sb.length() > 0) {
+				fBufferedReader.reset();
 			}
 			
-			else {
-				// end of stream
-				_endOfStream = true;
-				return null;
-			}
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fCommandThread._dataStore.trace(e);
 		} catch (IOException e) {
 			// end of file?
 			_endOfStream = true;
-			e.printStackTrace();
+			fCommandThread._dataStore.trace(e);
 		}
 		
-		return outputLines.toArray(output);
+		return outputLines.toArray(new String[0]);
 
 	}
 	
 	public synchronized void waitForInput() {
-		// do nothing, we'll block on read if necessary
+		try {
+			Thread.sleep(100);
+		} catch (Exception e) {
+
+		}
 	}
 }
