@@ -54,7 +54,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private GitRemoteSyncConnection fSyncConnection = null;
 	private boolean hasBeenSynced = false;
 
-	private final ReentrantLock syncLock = new ReentrantLock();
+	private static final ReentrantLock syncLock = new ReentrantLock();
+	private Integer fThreadCount = 0;
 	private Integer syncTaskId = -1; // ID for most recent synchronization task, functions as a time-stamp
 	private int finishedSyncTaskId = -1; // all synchronizations up to this ID (including it) have finished
 
@@ -282,8 +283,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				// suggestion for Deltas: add delta to list of deltas
 			}
 
-			if (syncLock.hasQueuedThreads() && syncFlags == SyncFlag.NO_FORCE)
-				return; // the queued Thread will do the work for us. And we don't have to wait because of NO_FORCE
+			synchronized (fThreadCount) {
+				if (fThreadCount > 0 && syncFlags == SyncFlag.NO_FORCE) {
+					return; // the queued thread will do the work for us. And we don't have to wait because of NO_FORCE
+				} else {
+					fThreadCount++;       
+				}
+			}
 
 			// lock syncLock. interruptible by progress monitor
 			try {
@@ -294,6 +300,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				}
 			} catch (InterruptedException e1) {
 				throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, Messages.GitServiceProvider_2));
+			} finally {
+				fThreadCount--;
 			}
 
 			try {
