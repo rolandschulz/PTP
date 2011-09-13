@@ -32,41 +32,50 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class TerminateJobAction extends ParallelAction {
 	public static final String name = Messages.TerminateJobAction_0;
-	
-	/** Constructor
+
+	/**
+	 * Constructor
+	 * 
 	 * @param view
 	 */
 	public TerminateJobAction(AbstractParallelElementView view) {
 		super(name, view);
-	    setImageDescriptor(ParallelImages.ID_ICON_TERMINATE_JOB_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_TERMINATE_JOB_DISABLE);
+		setImageDescriptor(ParallelImages.ID_ICON_TERMINATE_JOB_NORMAL);
+		setDisabledImageDescriptor(ParallelImages.ID_ICON_TERMINATE_JOB_DISABLE);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
-	 */
-	public void run(IElement[] elements) {}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.action.IAction#run()
 	 */
+	@Override
 	public void run() {
 		IElementManager manager = view.getUIManager();
 		if (manager instanceof IJobManager) {
-			boolean terminate = MessageDialog.openConfirm(getShell(),
-					Messages.TerminateJobAction_1,
-					NLS.bind(Messages.TerminateJobAction_2, ((IJobManager)manager).getJob().getName()));
+			boolean terminate = MessageDialog.openConfirm(getShell(), Messages.TerminateJobAction_1, NLS.bind(
+					Messages.TerminateJobAction_2, ((IJobManager) manager).getJob() != null ? ((IJobManager) manager).getJob()
+							.getName() : "<empty>")); //$NON-NLS-1$
 			if (terminate) {
 				try {
-					((IJobManager)manager).terminateJob();
+					((IJobManager) manager).terminateJob();
 				} catch (CoreException e) {
 					ErrorDialog.openError(getShell(), Messages.TerminateJobAction_3, Messages.TerminateJobAction_4, e.getStatus());
 				}
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
+	@Override
+	public void run(IElement[] elements) {
 	}
 }
