@@ -25,7 +25,6 @@ import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceRuleFactory;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -33,9 +32,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.MultiRule;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
@@ -121,30 +118,6 @@ public class SyncManager  {
 			return Status.OK_STATUS;
 		}
 	};
-
-	// Simple rule to prevent sync jobs from running concurrently
-	private static class SyncMutex implements ISchedulingRule {
-		// Enforce as a singleton
-		private static SyncMutex instance = null;
-
-		private SyncMutex() {
-		}
-
-		public static SyncMutex getInstance() {
-			if (instance == null) {
-				instance = new SyncMutex();
-			}
-			return instance;
-		}
-
-		public boolean isConflicting(ISchedulingRule rule) {
-			return rule == this;
-		}
-
-		public boolean contains(ISchedulingRule rule) {
-			return rule == this;
-		}
-	}
 
 	/**
 	 * Return project's current sync mode
@@ -346,7 +319,6 @@ public class SyncManager  {
 		int jobNum = 0;
 		Job[] syncJobs = new Job[buildConfigurations.length];
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-		ISchedulingRule syncRule = createSyncRule(project);
 		for (IConfiguration buildConfig : buildConfigurations) {
 			SynchronizeJob job = null;
 			IServiceConfiguration serviceConfig = bcm.getConfigurationForBuildConfiguration(buildConfig);
@@ -357,7 +329,6 @@ public class SyncManager  {
 						provider.synchronize(delta, monitor, syncFlags);
 					} else {
 						job = new SynchronizeJob(delta, provider, syncFlags, seHandler);
-						job.setRule(syncRule);
 						job.schedule();
 					}
 				}
@@ -371,15 +342,6 @@ public class SyncManager  {
 		}
 
 		return syncJobs;
-	}
-
-	// Create the scheduling rule for a sync job. This is a multirule that combines two other rules:
-	// 1) SyncMutex to ensure that two sync jobs do not run concurrently
-	// 2) The project itself since sync'ing can cause changes to any number of project files
-	private static ISchedulingRule createSyncRule(IProject project) {
-		IResourceRuleFactory ruleFactory = ResourcesPlugin.getWorkspace().getRuleFactory();
-		ISchedulingRule projectRule = ruleFactory.createRule(project);
-		return MultiRule.combine(SyncMutex.getInstance(), projectRule);
 	}
 
 	/**
