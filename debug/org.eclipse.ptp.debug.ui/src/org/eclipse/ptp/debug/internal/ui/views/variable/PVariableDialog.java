@@ -69,21 +69,48 @@ public class PVariableDialog extends Dialog {
 	public PVariableDialog(PVariableView view) {
 		this(view, NEW_MODE);
 	}
+
 	public PVariableDialog(PVariableView view, int mode) {
 		super(view.getSite().getShell());
 		this.view = view;
 		this.mode = mode;
 	}
+
+	@Override
 	public void configureShell(Shell newShell) {
 		newShell.setText(Messages.PVariableDialog_0);
 		super.configureShell(newShell);
 	}
-	/** Get OK Button
-     * @return
-     */
-    public Button getOkButton() {
-        return getButton(IDialogConstants.OK_ID);
-    }
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#createButtonBar(org.eclipse.swt.widgets.Composite)
+	 */
+	@Override
+	public Control createButtonBar(Composite parent) {
+		Control control = super.createButtonBar(parent);
+		switch (mode) {
+		case NEW_MODE:
+			getOkButton().setText(Messages.PVariableDialog_5);
+			break;
+		case EDIT_MODE:
+			getOkButton().setText(Messages.PVariableDialog_6);
+			break;
+		}
+		updateButtons();
+		return control;
+	}
+
+	/**
+	 * Get OK Button
+	 * 
+	 * @return
+	 */
+	public Button getOkButton() {
+		return getButton(IDialogConstants.OK_ID);
+	}
+
 	private void createOthersSection(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);
@@ -92,13 +119,15 @@ public class PVariableDialog extends Dialog {
 		layout.verticalSpacing = 25;
 		comp.setLayout(layout);
 		comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		
+
 		checkBtn = new Button(comp, SWT.CHECK);
 		checkBtn.setText(Messages.PVariableDialog_1);
 		checkBtn.setSelection(true);
 	}
 
-    /** Display the available variable in debugger
+	/**
+	 * Display the available variable in debugger
+	 * 
 	 * @param parent
 	 */
 	private void createVarSection(Composite parent) {
@@ -109,20 +138,21 @@ public class PVariableDialog extends Dialog {
 		layout.marginWidth = 5;
 		aGroup.setLayout(layout);
 		aGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-		
+
 		Label availLabel = new Label(aGroup, SWT.NONE);
 		availLabel.setText(Messages.PVariableDialog_3);
 		availLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false, 2, 1));
-		
+
 		varTable = new Table(aGroup, SWT.CHECK | SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        gd.widthHint = 300;
-        gd.heightHint = 150;
-		//gd.verticalSpan = 30;
+		gd.widthHint = 300;
+		gd.heightHint = 150;
+		// gd.verticalSpan = 30;
 		varTable.setLayoutData(gd);
 		varTable.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-				TableItem item = (TableItem)e.item;
+				TableItem item = (TableItem) e.item;
 				boolean checked = item.getChecked();
 				if (checked) {
 					varText.setText(""); //$NON-NLS-1$
@@ -138,10 +168,11 @@ public class PVariableDialog extends Dialog {
 		varText = new Text(aGroup, SWT.BORDER | SWT.NONE);
 		varText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		varText.addKeyListener(new KeyAdapter() {
+			@Override
 			public void keyReleased(KeyEvent e) {
 				if (varText.getText().length() > 0) {
 					TableItem[] items = varTable.getItems();
-					for (int i=0; i<items.length; i++) {
+					for (int i = 0; i < items.length; i++) {
 						items[i].setChecked(false);
 					}
 				}
@@ -150,14 +181,20 @@ public class PVariableDialog extends Dialog {
 		});
 		varText.setFocus();
 	}
-	private boolean anyTableItemChecked(Table table) {
-		TableItem[] items = table.getItems();
-		for (int i=0; i<items.length; i++) {
-			if (items[i].getChecked())
-				return true;
+
+	private String[] getVariables(IStackFrame frame) throws DebugException {
+		if (frame == null) {
+			return new String[0];
 		}
-		return false;
+
+		IVariable[] vars = frame.getVariables();
+		String[] varTexts = new String[vars.length];
+		for (int j = 0; j < vars.length; j++) {
+			varTexts[j] = vars[j].getName();
+		}
+		return varTexts;
 	}
+
 	private void updateButtons() {
 		boolean enabled = true;
 		if (getSelectedVariables().length == 0) {
@@ -165,30 +202,40 @@ public class PVariableDialog extends Dialog {
 		}
 		getOkButton().setEnabled(enabled);
 	}
-	/** Initialize the content in new section and variable section
-	 * 
-	 */
-	protected void initContent() {
-		PVariableInfo jVar = null;
-		if (mode == EDIT_MODE) {
-			ISelection selection = view.getSelection();
-			if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
-				jVar = (PVariableInfo)((IStructuredSelection)selection).getFirstElement();
-				varText.setText(jVar.getName());
-				checkBtn.setSelection(jVar.isEnabled());
-			}
-		}
 
-		TableItem item = null;		
-		for (String var : getAvailableVariables()) {
-			item = new TableItem(varTable, SWT.NONE);
-			item.setText(var);
-			if (jVar != null) {
-				item.setChecked(jVar.getName().equals(var));
-			}
-		}		
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
+	@Override
+	protected Control createDialogArea(Composite parent) {
+		Composite composite = (Composite) super.createDialogArea(parent);
+
+		createVarSection(composite);
+		createVerticalSpan(composite, 2);
+		createOthersSection(composite);
+
+		initContent();
+		return composite;
 	}
-	/** Get variables from Debug View
+
+	/**
+	 * Create vertical space
+	 * 
+	 * @param parent
+	 * @param space
+	 */
+	protected void createVerticalSpan(Composite parent, int space) {
+		Label label = new Label(parent, SWT.NONE);
+		GridData gd = new GridData(GridData.FILL_BOTH);
+		gd.verticalSpan = space;
+		label.setLayoutData(gd);
+	}
+
+	/**
+	 * Get variables from Debug View
+	 * 
 	 * @return variable names
 	 */
 	protected String[] getAvailableVariables() {
@@ -197,16 +244,14 @@ public class PVariableDialog extends Dialog {
 			return new String[0];
 		}
 		if (selection instanceof IStructuredSelection) {
-			Object target = ((IStructuredSelection)selection).getFirstElement();
+			Object target = ((IStructuredSelection) selection).getFirstElement();
 			try {
 				if (target instanceof IStackFrame) {
-					return getVariables((IStackFrame)target);
-				}
-				else if (target instanceof IThread) {
-					return getVariables(((IThread)target).getTopStackFrame());
-				}
-				else if (target instanceof IPDebugTarget) {
-					IThread[] threads = ((IPDebugTarget)target).getThreads();
+					return getVariables((IStackFrame) target);
+				} else if (target instanceof IThread) {
+					return getVariables(((IThread) target).getTopStackFrame());
+				} else if (target instanceof IPDebugTarget) {
+					IThread[] threads = ((IPDebugTarget) target).getThreads();
 					if (threads.length > 0) {
 						return getVariables(threads[0].getTopStackFrame());
 					}
@@ -217,63 +262,14 @@ public class PVariableDialog extends Dialog {
 		}
 		return new String[0];
 	}
-	private String[] getVariables(IStackFrame frame) throws DebugException {
-		if (frame == null) 
-			return new String[0];
-		
-		IVariable[] vars = frame.getVariables();
-		String[] varTexts = new String[vars.length];
-		for (int j=0; j<vars.length; j++) {
-			varTexts[j] = vars[j].getName();
-		}
-		return varTexts;
-	}
-	/** Create vertical space
-	 * @param parent
-	 * @param space
-	 */
-	protected void createVerticalSpan(Composite parent, int space) {
-		Label label = new Label(parent, SWT.NONE);
-		GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.verticalSpan = space;
-		label.setLayoutData(gd);
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.Dialog#createButtonBar(org.eclipse.swt.widgets.Composite)
-	 */
-	public Control createButtonBar(Composite parent) {
-		Control control = super.createButtonBar(parent);
-		switch(mode) {
-		case NEW_MODE:
-			getOkButton().setText(Messages.PVariableDialog_5);
-			break;
-		case EDIT_MODE:
-			getOkButton().setText(Messages.PVariableDialog_6);
-			break;
-		}
-		updateButtons();
-		return control;
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-	 */
-	protected Control createDialogArea(Composite parent) {
-		Composite composite = (Composite)super.createDialogArea(parent);
 
-		createVarSection(composite);
-		createVerticalSpan(composite, 2);
-		createOthersSection(composite);
-
-		initContent();
-		return composite;
-	}
 	protected String[] getSelectedVariables() {
 		List<String> vars = new ArrayList<String>();
 		TableItem[] items = varTable.getItems();
-		for (int i=0; i<items.length; i++) {
+		for (int i = 0; i < items.length; i++) {
 			if (items[i].getChecked()) {
 				vars.add(items[i].getText());
-				items[i].setChecked(mode==NEW_MODE);
+				items[i].setChecked(mode == NEW_MODE);
 			}
 		}
 		if (vars.size() == 0) {
@@ -281,43 +277,72 @@ public class PVariableDialog extends Dialog {
 				vars.add(varText.getText());
 			}
 		}
-		return (String[])vars.toArray(new String[0]);
+		return vars.toArray(new String[0]);
 	}
-	/* (non-Javadoc)
+
+	/**
+	 * Initialize the content in new section and variable section
+	 * 
+	 */
+	protected void initContent() {
+		PVariableInfo jVar = null;
+		if (mode == EDIT_MODE) {
+			ISelection selection = view.getSelection();
+			if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
+				jVar = (PVariableInfo) ((IStructuredSelection) selection).getFirstElement();
+				varText.setText(jVar.getName());
+				checkBtn.setSelection(jVar.isEnabled());
+			}
+		}
+
+		TableItem item = null;
+		for (String var : getAvailableVariables()) {
+			item = new TableItem(varTable, SWT.NONE);
+			item.setText(var);
+			if (jVar != null) {
+				item.setChecked(jVar.getName().equals(var));
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
+	@Override
 	protected void okPressed() {
 		PVariableManager jobMgr = view.getUIManager().getJobVariableManager();
 		IPJob job = view.getUIManager().getJob();
-		String[] vars = getSelectedVariables();
-		boolean checked = checkBtn.getSelection();
-		switch(mode) {
-		case NEW_MODE:
-			//check duplicate variable
-			for (int i=0; i<vars.length; i++) {
-				try {
-					jobMgr.addVariable(job, vars[i], checked);
-				}
-				catch (CoreException e) {
-					PTPDebugUIPlugin.errorDialog(Messages.PVariableDialog_7, e.getStatus());
-				}
-			}
-			break;
-		case EDIT_MODE:
-			ISelection selection = view.getSelection();
-			if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
-				PVariableInfo jVar = (PVariableInfo)((IStructuredSelection)selection).getFirstElement();
-				for (String var : vars) {
-					String newvar = jVar.getName().equals(var)?null:var;
+		if (job != null) {
+			String[] vars = getSelectedVariables();
+			boolean checked = checkBtn.getSelection();
+			switch (mode) {
+			case NEW_MODE:
+				// check duplicate variable
+				for (int i = 0; i < vars.length; i++) {
 					try {
-						jobMgr.updateVariable(job, jVar.getName(), newvar, checked);
-					}
-					catch (CoreException e) {
-						
+						jobMgr.addVariable(job, vars[i], checked);
+					} catch (CoreException e) {
+						PTPDebugUIPlugin.errorDialog(Messages.PVariableDialog_7, e.getStatus());
 					}
 				}
+				break;
+			case EDIT_MODE:
+				ISelection selection = view.getSelection();
+				if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
+					PVariableInfo jVar = (PVariableInfo) ((IStructuredSelection) selection).getFirstElement();
+					for (String var : vars) {
+						String newvar = jVar.getName().equals(var) ? null : var;
+						try {
+							jobMgr.updateVariable(job, jVar.getName(), newvar, checked);
+						} catch (CoreException e) {
+
+						}
+					}
+				}
+				break;
 			}
-			break;
 		}
 		super.okPressed();
 	}
