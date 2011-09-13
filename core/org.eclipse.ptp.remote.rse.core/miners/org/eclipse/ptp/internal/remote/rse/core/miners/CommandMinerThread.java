@@ -242,12 +242,12 @@ public class CommandMinerThread extends MinerThread
 		_dataStore.update(status);
 		_dataStore.disconnectObjects(status);
 
-		_stdOutputHandler = new OutputHandler(_stdInput, null, _isWindows || _isTTY, false, _isShell, this, _cwdStr);
+		_stdOutputHandler = new OutputHandler(_stdInput, null, _isWindows || _isTTY, false, _isShell, this);
 		_stdOutputHandler.setWaitTime(0);
 		_stdOutputHandler.setDataStore(_dataStore);
 		_stdOutputHandler.start();
 
-		_stdErrorHandler = new OutputHandler(_stdError, null, _isWindows || _isTTY, true, _isShell, this, _cwdStr);
+		_stdErrorHandler = new OutputHandler(_stdError, null, _isWindows || _isTTY, true, _isShell, this);
 		_stdErrorHandler.setWaitTime(0);
 		_stdOutputHandler.setDataStore(_dataStore);
 		_stdErrorHandler.start();
