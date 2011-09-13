@@ -183,14 +183,4 @@
          </placement>
       </tab>
    </extension>
-   <extension
-         point="org.eclipse.core.runtime.adapters">
-      <factory
-            adaptableType="org.eclipse.debug.core.ILaunchConfiguration"
-            class="org.eclipse.ptp.launch.internal.LaunchAdapterFactory">
-         <adapter
-               type="org.eclipse.ptp.debug.core.launch.IPLaunch">
-         </adapter>
-      </factory>
-   </extension>	
 </plugin>

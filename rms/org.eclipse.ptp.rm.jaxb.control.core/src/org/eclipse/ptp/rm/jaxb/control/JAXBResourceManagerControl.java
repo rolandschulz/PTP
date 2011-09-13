@@ -21,6 +21,10 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
@@ -36,7 +40,6 @@ import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob.Operation;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJobStatus;
-import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.DebugStarterJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.utils.JobIdPinTable;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
@@ -241,6 +244,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged (java.lang.String)
 	 */
 	public void jobStateChanged(String jobId, IJobStatus status) {
+		/*
+		 * Update any debug models associated with this job ID
+		 */
+		IPResourceManager prm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		if (prm != null) {
+			IPJob job = prm.getJobById(jobId);
+			if (job != null) {
+				if (status.getState().equals(IJobStatus.COMPLETED)) {
+					job.getAttribute(JobAttributes.getStateAttributeDefinition()).setValue(JobAttributes.State.COMPLETED);
+				}
+			}
+		}
 		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
 		getResourceManager().updateJob(jobId, status);
 	}
@@ -394,11 +409,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					 */
 					status = jobStatusMap.terminated(jobId, progress.newChild(50));
 					if (status != null && status.stateChanged()) {
-						/*
-						 * If this is a debug job, mark it as terminated
-						 */
-						DebugStarterJob.terminate(jobId);
-
 						jobStateChanged(jobId, status);
 					}
 					return status;
@@ -989,8 +999,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
-		ICommandJob job = new CommandJob(uuid, command, jobMode, (IJAXBResourceManager) getResourceManager(), configuration,
-				launchMode);
+		ICommandJob job = new CommandJob(uuid, command, jobMode, (IJAXBResourceManager) getResourceManager(), launchMode);
 		((Job) job).setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 		job.schedule();
 		if (join) {
@@ -1095,6 +1104,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.maybeOverwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr, false);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr, false);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.DEBUGGER_ARGS, JAXBControlConstants.DEBUGGER_ARGS, lcattr, false);
+
+		/*
+		 * XXX: required until I work out how to update from the launch configuration
+		 */
+		Object x = rmVarMap.get(JAXBControlConstants.DEBUGGER_ARGS);
+		if (x instanceof PropertyType) {
+			((PropertyType) x).setValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS,
+					(String) ((PropertyType) x).getValue()));
+		}
 
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));

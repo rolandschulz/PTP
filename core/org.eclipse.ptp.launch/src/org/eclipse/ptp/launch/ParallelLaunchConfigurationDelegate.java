@@ -40,7 +40,6 @@ import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
-import org.eclipse.ptp.launch.internal.LaunchAdapterFactory;
 import org.eclipse.ptp.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -55,8 +54,6 @@ import org.eclipse.ui.WorkbenchException;
  * A launch configuration delegate for launching jobs via the PTP resource manager mechanism.
  */
 public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchConfigurationDelegate {
-	private static String JAXB_RM = "org.eclipse.ptp.rm.lml_jaxb"; //$NON-NLS-1$
-
 	private class DebuggerSession implements IRunnableWithProgress {
 		private final String fJobId;
 		private final IPLaunch fLaunch;
@@ -136,29 +133,19 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					 * Show ptp debug view
 					 */
 					showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
-					/*
-					 * Is this really necessary?
-					 */
-					setDefaultSourceLocator(launch, configuration);
+					progress.subTask(Messages.ParallelLaunchConfigurationDelegate_6);
 
 					/*
-					 * FIXME: Specifically disable this for the JAXB RM. This needs to be fixed, but probably requires an API
-					 * change.
+					 * Create the debugger extension, then the connection point
+					 * for the debug server. The debug server is launched via
+					 * the submitJob() command.
 					 */
-					IResourceManager rm = getResourceManager(configuration);
-					if (!rm.getResourceManagerId().equals(JAXB_RM)) {
-						progress.subTask(Messages.ParallelLaunchConfigurationDelegate_6);
 
-						/*
-						 * Create the debugger extension, then the connection point for the debug server. The debug server is
-						 * launched via the submitJob() command.
-						 */
-						IPDebugConfiguration debugConfig = getDebugConfig(configuration);
-						debugger = debugConfig.getDebugger();
-						debugger.initialize(configuration, progress.newChild(10));
-						if (progress.isCanceled()) {
-							return;
-						}
+					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
+					debugger = debugConfig.getDebugger();
+					debugger.initialize(configuration, progress.newChild(10));
+					if (progress.isCanceled()) {
+						return;
 					}
 				}
 
@@ -211,7 +198,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				IPDebugConfiguration debugConfig = getDebugConfig(launch.getLaunchConfiguration());
 				IPDebugger debugger = debugConfig.getDebugger();
 				debugger.cleanup(launch);
-				LaunchAdapterFactory.removeLaunch(launch.getLaunchConfiguration());
 			} catch (CoreException e) {
 				PTPLaunchPlugin.log(e);
 			}
@@ -241,11 +227,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		 */
 		new RuntimeProcess(launch, rm, jobId, null);
 
-		/*
-		 * FIXME: Specifically disable this for the JAXB RM. This needs to be fixed, but probably requires an API change.
-		 */
-		if (!rm.getResourceManagerId().equals(JAXB_RM) && launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
+		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
 			try {
+				setDefaultSourceLocator(launch, configuration);
 				final IProject project = verifyProject(configuration);
 
 				final DebuggerSession session = new DebuggerSession(jobId, launch, project, debugger);
@@ -275,7 +259,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				});
 			}
 		}
-
 	}
 
 	/**

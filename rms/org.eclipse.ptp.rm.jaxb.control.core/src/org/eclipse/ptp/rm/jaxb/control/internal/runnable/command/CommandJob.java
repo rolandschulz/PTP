@@ -18,6 +18,8 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +34,15 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
-import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
@@ -58,12 +62,14 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
@@ -198,7 +204,6 @@ public class CommandJob extends Job implements ICommandJob {
 	private final boolean waitForId;
 	private final JobMode jobMode;
 	private final boolean keepOpen;
-	private final ILaunchConfiguration configuration;
 	private final String launchMode;
 
 	private final StringBuffer error;
@@ -227,13 +232,11 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public CommandJob(String jobUUID, CommandType command, JobMode jobMode, IJAXBResourceManager rm, ILaunchConfiguration config,
-			String launchMode) {
+	public CommandJob(String jobUUID, CommandType command, JobMode jobMode, IJAXBResourceManager rm, String launchMode) {
 		super(command.getName() + JAXBControlConstants.CO + JAXBControlConstants.SP + (jobUUID == null ? rm.getName() : jobUUID));
 		this.command = command;
 		this.jobMode = jobMode;
 		this.rm = rm;
-		this.configuration = config;
 		this.launchMode = launchMode;
 		this.control = (JAXBResourceManagerControl) rm.getControl();
 		this.rmVarMap = this.control.getEnvironment();
@@ -387,204 +390,41 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * If this process has no input, execute it normally. Otherwise, if the process is to be kept open, check for the pseudoTerminal
-	 * job; if it is there and still alive, send the input to it; if not, start the process, and then send the input.
+	 * Create a temporary debug model so that the debug view displays correctly
+	 * 
+	 * @param jobId
+	 *            job ID for this job
+	 * @param rm
+	 *            resource manager controlling the launch
+	 * @param vars
+	 *            variable map
 	 */
-	@Override
-	protected IStatus run(IProgressMonitor monitor) {
-		SubMonitor progress = SubMonitor.convert(monitor, 100);
-		try {
-			jobThread = Thread.currentThread();
-			boolean input = !command.getInput().isEmpty();
-			if (input) {
-				ICommandJob job = control.getInteractiveJob();
-				if (job != null && job.isActive()) {
-					IRemoteProcess process = job.getProcess();
-					if (process != null && !process.isCompleted()) {
-						jobStatus = job.getJobStatus();
-						return writeInputToProcess(process);
-					} else {
-						job.terminate();
-						/*
-						 * since the process is dead, termination is just clean-up, no need to force external termination
-						 */
-						control.setInteractiveJob(null);
-					}
-				}
-			}
-			progress.worked(25);
+	private void createDebugModel(String jobId, IResourceManager rm, IVariableMap vars) {
+		IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
+		AttributeManager attrMgr = new AttributeManager();
 
-			for (SimpleCommandType cmd : command.getPreLaunchCmd()) {
-				Job job = new SimpleCommandJob(null, cmd, command.getDirectory(), rm);
-				job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
-				job.schedule();
-				if (cmd.isWait()) {
-					try {
-						job.join();
-						if (!cmd.isIgnoreExitStatus()) {
-							if (!job.getResult().isOK()) {
-								return job.getResult();
-							}
-						}
-					} catch (InterruptedException ignored) {
-					}
-				}
-			}
+		attrMgr.addAttribute(JobAttributes.getJobIdAttributeDefinition().create(jobId));
+		attrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(JobAttributes.State.RUNNING));
+		attrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 
-			IPDebugger debugger = null;
-			if (launchMode.equals(ILaunchManager.DEBUG_MODE)) {
-				try {
-					debugger = DebugStarterJob.initialize(configuration, progress.newChild(10));
-				} catch (CoreException e) {
-					status = CoreExceptionUtils.getErrorStatus(e.getLocalizedMessage(), null);
-					return status;
-				}
+		IPJob job = prm.newJob(jobId, attrMgr);
 
-				if (progress.isCanceled()) {
-					return Status.CANCEL_STATUS;
-				}
+		attrMgr = new AttributeManager();
+		attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
 
-				/*
-				 * The debugger may update the arguments, so we need to update the variable map
-				 */
-				try {
-					PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.DEBUGGER_ARGS);
-					p.setValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS,
-							JAXBControlConstants.ZEROSTR));
-				} catch (CoreException e) {
-					// Ignore
-				}
-			}
+		AttributeType attr = (AttributeType) vars.get(JAXBControlConstants.MPI_NUMPROCS);
+		String numProcsStr = String.valueOf(attr.getValue());
+		int numProcs = Integer.parseInt(numProcsStr);
+		BitSet procRanks = new BitSet(numProcs);
+		procRanks.set(0, numProcs, true);
+		job.addProcessesByJobRanks(procRanks, attrMgr);
 
-			status = execute(progress.newChild(50));
+		prm.addJobs(null, Arrays.asList(job));
 
-			if (progress.isCanceled()) {
-				return Status.CANCEL_STATUS;
-			}
-
-			if (uuid == null) {
-				/*
-				 * these jobs will have waited for the exit of the process.
-				 */
-				return status;
-			}
-
-			/*
-			 * When there is a UUID defined for this command, set the status for it. If the submit job lacks a jobId on the standard
-			 * streams, then we assign it the UUID (it is most probably interactive); else we wait for the id to be set by the
-			 * tokenizer. NOTE that the caller should now join on all commands with this property (05.01.2011). Open connection jobs
-			 * should have their jobId tokenizers set a RUNNING state.
-			 */
-			jobStatus = null;
-			String waitUntil = keepOpen ? IJobStatus.RUNNING : IJobStatus.SUBMITTED;
-			ICommandJob parent = keepOpen ? this : null;
-
-			if (waitForId) {
-				jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
-				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
-				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
-				if (!isBatch()) {
-					jobStatus.setProcess(process);
-				}
-				jobStatus.setProxy(getProxy());
-				try {
-					jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap(), progress.newChild(20));
-				} catch (CoreException failed) {
-					error.append(jobStatus.getStreamsProxy().getOutputStreamMonitor().getContents()).append(
-							JAXBCoreConstants.LINE_SEP);
-
-					status = CoreExceptionUtils.getErrorStatus(failed.getMessage() + JAXBCoreConstants.LINE_SEP + error.toString(),
-							null);
-					error.setLength(0);
-					return status;
-				}
-			} else {
-				if (!keepOpen) {
-					CoreException e = joinConsumers();
-					if (e != null) {
-						return CoreExceptionUtils.getErrorStatus(e.getMessage(), e);
-					}
-				}
-				PropertyType p = (PropertyType) rmVarMap.get(uuid);
-				String state = (String) p.getValue();
-				if (state == null) {
-					state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
-					p.setValue(state);
-				}
-				p.setName(uuid);
-				jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
-				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
-				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
-				if (!isBatch()) {
-					jobStatus.setProcess(process);
-				}
-				jobStatus.setProxy(getProxy());
-			}
-
-			if (progress.isCanceled()) {
-				return status;
-			}
-
-			if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
-				if (input) {
-					if (process != null && !process.isCompleted()) {
-						status = writeInputToProcess(process);
-					}
-				}
-			} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
-				terminate();
-			}
-
-			/*
-			 * If this is a debug job, start a job to wait for the debugger front-end to connect
-			 */
-			DebugStarterJob debugJob = null;
-			if (debugger != null) {
-				debugJob = new DebugStarterJob(configuration, debugger, jobStatus.getJobId(), rmVarMap, rm);
-				debugJob.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
-				debugJob.schedule();
-			}
-
-			/*
-			 * Once job has started running, execute any nested commands
-			 */
-			for (SimpleCommandType cmd : command.getPostLaunchCmd()) {
-				Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), rm);
-				job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
-				job.schedule();
-				if (cmd.isWait()) {
-					try {
-						job.join();
-						if (!cmd.isIgnoreExitStatus()) {
-							if (!job.getResult().isOK()) {
-								return job.getResult();
-							}
-						}
-					} catch (InterruptedException ignored) {
-					}
-				}
-			}
-
-			/*
-			 * Check for any errors from the debug job
-			 */
-			if (debugJob != null) {
-				try {
-					debugJob.join();
-				} catch (InterruptedException e) {
-					// Ignore
-				}
-				if (!debugJob.getResult().isOK()) {
-					return debugJob.getResult();
-				}
-			}
-
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
-		return status;
+		/*
+		 * Listen for job change events to cleanup model
+		 */
+		// rm.addJobListener(jobListener);
 	}
 
 	/**
@@ -977,5 +817,189 @@ public class CommandJob extends Job implements ICommandJob {
 			return CoreExceptionUtils.getErrorStatus(Messages.ProcessRunError, t);
 		}
 		return Status.OK_STATUS;
+	}
+
+	/**
+	 * If this process has no input, execute it normally. Otherwise, if the process is to be kept open, check for the pseudoTerminal
+	 * job; if it is there and still alive, send the input to it; if not, start the process, and then send the input.
+	 */
+	@Override
+	protected IStatus run(IProgressMonitor monitor) {
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
+		try {
+			jobThread = Thread.currentThread();
+			boolean input = !command.getInput().isEmpty();
+			if (input) {
+				ICommandJob job = control.getInteractiveJob();
+				if (job != null && job.isActive()) {
+					IRemoteProcess process = job.getProcess();
+					if (process != null && !process.isCompleted()) {
+						jobStatus = job.getJobStatus();
+						return writeInputToProcess(process);
+					} else {
+						job.terminate();
+						/*
+						 * since the process is dead, termination is just clean-up, no need to force external termination
+						 */
+						control.setInteractiveJob(null);
+					}
+				}
+			}
+			progress.worked(25);
+
+			for (SimpleCommandType cmd : command.getPreLaunchCmd()) {
+				Job job = new SimpleCommandJob(null, cmd, command.getDirectory(), rm);
+				job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
+				job.schedule();
+				if (cmd.isWait()) {
+					try {
+						job.join();
+						if (!cmd.isIgnoreExitStatus()) {
+							if (!job.getResult().isOK()) {
+								return job.getResult();
+							}
+						}
+					} catch (InterruptedException ignored) {
+					}
+				}
+			}
+			/*
+			 * IPDebugger debugger = null; if (launchMode.equals(ILaunchManager.DEBUG_MODE)) { try { debugger =
+			 * DebugStarterJob.initialize(configuration, progress.newChild(10)); } catch (CoreException e) { status =
+			 * CoreExceptionUtils.getErrorStatus(e.getLocalizedMessage(), null); return status; }
+			 * 
+			 * if (progress.isCanceled()) { return Status.CANCEL_STATUS; }
+			 * 
+			 * /* The debugger may update the arguments, so we need to update the variable map
+			 * 
+			 * try { PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.DEBUGGER_ARGS);
+			 * p.setValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS,
+			 * JAXBControlConstants.ZEROSTR)); } catch (CoreException e) { // Ignore } }
+			 */
+
+			status = execute(progress.newChild(50));
+
+			if (progress.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
+
+			if (uuid == null) {
+				/*
+				 * these jobs will have waited for the exit of the process.
+				 */
+				return status;
+			}
+
+			/*
+			 * When there is a UUID defined for this command, set the status for it. If the submit job lacks a jobId on the standard
+			 * streams, then we assign it the UUID (it is most probably interactive); else we wait for the id to be set by the
+			 * tokenizer. NOTE that the caller should now join on all commands with this property (05.01.2011). Open connection jobs
+			 * should have their jobId tokenizers set a RUNNING state.
+			 */
+			jobStatus = null;
+			String waitUntil = keepOpen ? IJobStatus.RUNNING : IJobStatus.SUBMITTED;
+			ICommandJob parent = keepOpen ? this : null;
+
+			if (waitForId) {
+				jobStatus = new CommandJobStatus(rm.getUniqueName(), parent, control);
+				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
+				if (!isBatch()) {
+					jobStatus.setProcess(process);
+				}
+				jobStatus.setProxy(getProxy());
+				try {
+					jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap(), progress.newChild(20));
+				} catch (CoreException failed) {
+					error.append(jobStatus.getStreamsProxy().getOutputStreamMonitor().getContents()).append(
+							JAXBCoreConstants.LINE_SEP);
+
+					status = CoreExceptionUtils.getErrorStatus(failed.getMessage() + JAXBCoreConstants.LINE_SEP + error.toString(),
+							null);
+					error.setLength(0);
+					return status;
+				}
+			} else {
+				if (!keepOpen) {
+					CoreException e = joinConsumers();
+					if (e != null) {
+						return CoreExceptionUtils.getErrorStatus(e.getMessage(), e);
+					}
+				}
+				PropertyType p = (PropertyType) rmVarMap.get(uuid);
+				String state = (String) p.getValue();
+				if (state == null) {
+					state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
+					p.setValue(state);
+				}
+				p.setName(uuid);
+				jobStatus = new CommandJobStatus(rm.getUniqueName(), uuid, state, parent, control);
+				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
+				if (!isBatch()) {
+					jobStatus.setProcess(process);
+				}
+				jobStatus.setProxy(getProxy());
+			}
+
+			if (progress.isCanceled()) {
+				return status;
+			}
+
+			if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
+				if (input) {
+					if (process != null && !process.isCompleted()) {
+						status = writeInputToProcess(process);
+					}
+				}
+			} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
+				terminate();
+			}
+
+			if (launchMode.equals(ILaunchManager.DEBUG_MODE)) {
+				createDebugModel(jobStatus.getJobId(), rm, rmVarMap);
+				/*
+				 * If this is a debug job, start a job to wait for the debugger front-end to connect
+				 * 
+				 * DebugStarterJob debugJob = null; if (debugger != null) { debugJob = new DebugStarterJob(configuration, debugger,
+				 * jobStatus.getJobId(), rmVarMap, rm); debugJob.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY,
+				 * Boolean.TRUE); debugJob.schedule(); }
+				 */
+			}
+
+			/*
+			 * Once job has started running, execute any nested commands
+			 */
+			for (SimpleCommandType cmd : command.getPostLaunchCmd()) {
+				Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), rm);
+				job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
+				job.schedule();
+				if (cmd.isWait()) {
+					try {
+						job.join();
+						if (!cmd.isIgnoreExitStatus()) {
+							if (!job.getResult().isOK()) {
+								terminate();
+								// return job.getResult();
+							}
+						}
+					} catch (InterruptedException ignored) {
+					}
+				}
+			}
+
+			/*
+			 * Check for any errors from the debug job
+			 * 
+			 * if (debugJob != null) { try { debugJob.join(); } catch (InterruptedException e) { // Ignore } if
+			 * (!debugJob.getResult().isOK()) { return debugJob.getResult(); } }
+			 */
+
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+		return status;
 	}
 }
