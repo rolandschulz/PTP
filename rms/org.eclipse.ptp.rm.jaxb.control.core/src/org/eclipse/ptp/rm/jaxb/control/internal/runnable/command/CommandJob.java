@@ -863,19 +863,6 @@ public class CommandJob extends Job implements ICommandJob {
 					}
 				}
 			}
-			/*
-			 * IPDebugger debugger = null; if (launchMode.equals(ILaunchManager.DEBUG_MODE)) { try { debugger =
-			 * DebugStarterJob.initialize(configuration, progress.newChild(10)); } catch (CoreException e) { status =
-			 * CoreExceptionUtils.getErrorStatus(e.getLocalizedMessage(), null); return status; }
-			 * 
-			 * if (progress.isCanceled()) { return Status.CANCEL_STATUS; }
-			 * 
-			 * /* The debugger may update the arguments, so we need to update the variable map
-			 * 
-			 * try { PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.DEBUGGER_ARGS);
-			 * p.setValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS,
-			 * JAXBControlConstants.ZEROSTR)); } catch (CoreException e) { // Ignore } }
-			 */
 
 			status = execute(progress.newChild(50));
 
@@ -958,13 +945,6 @@ public class CommandJob extends Job implements ICommandJob {
 
 			if (launchMode.equals(ILaunchManager.DEBUG_MODE)) {
 				createDebugModel(jobStatus.getJobId(), rm, rmVarMap);
-				/*
-				 * If this is a debug job, start a job to wait for the debugger front-end to connect
-				 * 
-				 * DebugStarterJob debugJob = null; if (debugger != null) { debugJob = new DebugStarterJob(configuration, debugger,
-				 * jobStatus.getJobId(), rmVarMap, rm); debugJob.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY,
-				 * Boolean.TRUE); debugJob.schedule(); }
-				 */
 			}
 
 			/*
@@ -987,14 +967,6 @@ public class CommandJob extends Job implements ICommandJob {
 					}
 				}
 			}
-
-			/*
-			 * Check for any errors from the debug job
-			 * 
-			 * if (debugJob != null) { try { debugJob.join(); } catch (InterruptedException e) { // Ignore } if
-			 * (!debugJob.getResult().isOK()) { return debugJob.getResult(); } }
-			 */
-
 		} finally {
 			if (monitor != null) {
 				monitor.done();
