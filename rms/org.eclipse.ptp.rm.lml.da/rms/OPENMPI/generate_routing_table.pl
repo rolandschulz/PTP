@@ -17,6 +17,7 @@ my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
 my $patbl ="\\s+";             # Pattern for blank space (variable length)
 
 my $portbase=50000;
+my $portrange=10000;
 my $verbose=1;
 my ($line,%job,$count);
 
@@ -102,7 +103,7 @@ open(OUT,"> $filename") || die "cannot open file $filename";
 printf(OUT "%d\n", $totaltasks);
 # job objs
 for ($count=0; $count < $totaltasks; $count++) {
-    printf(OUT "%d %s %d\n",$count,$job{nodelist}{$count},$count+$portbase);
+    printf(OUT "%d %s %d\n",$count,$job{nodelist}{$count},$portbase+int(rand($portrange)));
 }
 close(OUT);
 
