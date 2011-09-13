@@ -43,13 +43,15 @@ public class ToolLaunchManager {
 	protected LaunchConfigurationDelegate paraDel;
 
 	private ILaunchFactory lf = null;
+	private IBuildLaunchUtils utilBlob=null;
 
-	public ToolLaunchManager(LaunchConfigurationDelegate delegate, ILaunchFactory lf) {// ,
+	public ToolLaunchManager(LaunchConfigurationDelegate delegate, ILaunchFactory lf,IBuildLaunchUtils utilBlob) {// ,
 																						// String
 																						// appNameAtt,String
 																						// projNameAtt){
 		paraDel = delegate;
 		this.lf = lf;
+		this.utilBlob=utilBlob;
 		// appNameAttribute=appNameAtt;
 		// projNameAttribute=projNameAtt;
 	}
@@ -92,7 +94,7 @@ public class ToolLaunchManager {
 		boolean useParam = configuration.getAttribute(org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants.PARA_USE_PARAMETRIC,
 				false) || (pproc.para != null && pproc.para.runParametric);
 		if (useParam) {
-			ParametricToolLaunchManager.launch(configuration, paraDel, lf, mode, launchIn, monitor);// tool,
+			ParametricToolLaunchManager.launch(configuration, paraDel, lf, mode, launchIn, monitor,utilBlob);// tool,
 			return;
 		}
 
@@ -117,7 +119,7 @@ public class ToolLaunchManager {
 
 		// If build only, just run the first build process and we're done
 		if (buildOnly) {
-			builder = new BuilderTool(configuration, bt);
+			builder = new BuilderTool(configuration, bt,utilBlob);
 			runStep(builder);
 			return;
 		}
@@ -130,7 +132,7 @@ public class ToolLaunchManager {
 		// //TODO: There may be cases where we have multiple analysis steps and
 		// nothing else!
 		if (analyzeOnly) {
-			PostlaunchTool analyzer = new PostlaunchTool(configuration, ppt, null);
+			PostlaunchTool analyzer = new PostlaunchTool(configuration, ppt, null,utilBlob);
 			runStep(analyzer);
 			return;
 		}
@@ -139,7 +141,7 @@ public class ToolLaunchManager {
 		if (!pproc.recompile) {
 			// Make and run a new null-builder to initialize the stuff we need
 			// from the build step anyway
-			builder = new BuilderTool(configuration, null);
+			builder = new BuilderTool(configuration, null,utilBlob);
 			if (!runStep(builder)) {
 				return;
 			}
@@ -150,7 +152,7 @@ public class ToolLaunchManager {
 			// indicated to ignore this
 			if (!pproc.prependExecution && !(pproc.externalTools.get(0) instanceof ExecTool) && !pproc.explicitExecution) {
 				// Run the newly built executable
-				launcher = new LauncherTool(configuration, null, bProgPath, paraDel, launch);
+				launcher = new LauncherTool(configuration, null, bProgPath, paraDel, launch,utilBlob);
 
 				if (!runStep(launcher)) {
 					return;
@@ -175,7 +177,7 @@ public class ToolLaunchManager {
 				 * for this project, producing a new build configuration and
 				 * instrumented binary file
 				 */
-				builder = new BuilderTool(configuration, (BuildTool) t);
+				builder = new BuilderTool(configuration, (BuildTool) t,utilBlob);
 				if (!runStep(builder)) {
 					return;
 				}
@@ -187,7 +189,7 @@ public class ToolLaunchManager {
 				// an exec step, we'd better perform the execution ourselves...
 				if (!pproc.prependExecution && !ran && i < pproc.externalTools.size() - 1
 						&& !(pproc.externalTools.get(i + 1) instanceof ExecTool) && !pproc.explicitExecution) {
-					launcher = new LauncherTool(configuration, null, bProgPath, paraDel, launch);
+					launcher = new LauncherTool(configuration, null, bProgPath, paraDel, launch,utilBlob);
 
 					if (!runStep(launcher)) {
 						return;
@@ -198,7 +200,7 @@ public class ToolLaunchManager {
 				/**
 				 * Execute the program specified in the build step
 				 */
-				launcher = new LauncherTool(configuration, (ExecTool) t, bProgPath, paraDel, launch);
+				launcher = new LauncherTool(configuration, (ExecTool) t, bProgPath, paraDel, launch,utilBlob);
 
 				if (!runStep(launcher)) {
 					return;
@@ -208,7 +210,7 @@ public class ToolLaunchManager {
 				 * Collect performance data from the execution handled in the
 				 * run step
 				 */
-				final PostlaunchTool analyzer = new PostlaunchTool(configuration, (PostProcTool) t, bOutLoc);
+				final PostlaunchTool analyzer = new PostlaunchTool(configuration, (PostProcTool) t, bOutLoc,utilBlob);
 
 				if (!runStep(analyzer)) {
 					return;

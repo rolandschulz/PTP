@@ -18,33 +18,39 @@
 package org.eclipse.ptp.etfw.tau;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
+import org.eclipse.ptp.etfw.internal.IBuildLaunchUtils;
+import org.eclipse.ptp.etfw.internal.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.tau.papiselect.PapiListSelectionDialog;
 import org.eclipse.ptp.etfw.tau.papiselect.papic.EventTreeDialog;
@@ -55,6 +61,7 @@ import org.eclipse.ptp.etfw.toolopts.ToolPane;
 import org.eclipse.ptp.etfw.toolopts.ToolPaneListener;
 import org.eclipse.ptp.etfw.toolopts.ToolsOptionsConstants;
 import org.eclipse.ptp.etfw.ui.AbstractToolConfigurationTab;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
@@ -267,7 +274,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	/**
 	 * The path to the TAU lib directory
 	 */
-	private String tlpath = null;
+	private IFileStore taulib = null;
 
 	protected Map<String, Object> archvarmap = null;
 
@@ -292,7 +299,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	//	e.printStackTrace();
 	//	} 
 	//	}
-
+private final static String UNIX_SLASH="/";
 	/**
 	 * Listen for activity in the TAU makefile combo-box, CheckItem widgets or other options
 	 * @author wspear
@@ -350,7 +357,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 				else if(source.equals(selectRadios[1])){
 					if(selectRadios[1].getSelection()){
 						selectOpt.setSelected(true);
-						selectOpt.setArg(ToolsOptionsConstants.PROJECT_ROOT+File.separator+"tau.selective"); //$NON-NLS-1$
+						selectOpt.setArg(ToolsOptionsConstants.PROJECT_ROOT+UNIX_SLASH+"tau.selective"); //$NON-NLS-1$
 						selectOpt.setEnabled(false);
 					}
 				}
@@ -405,11 +412,13 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	}
 
 	protected WidgetListener listener = new WidgetListener();
-
+private IBuildLaunchUtils blt;
 	/*
 	 * Plugins of this nature require a default constructor
 	 */
 	public TAUAnalysisTab(){
+		//getLaunchConfiguration();
+		//blt = new BuildLaunchUtils();
 	}
 
 	/**
@@ -488,9 +497,23 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	 */
 	private void initMakefiles() {
 		//IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
-		String archpath = BuildLaunchUtils.getToolPath("tau");//pstore.getString(ITAULaunchConfigurationConstants.TAU_ARCH_PATH); //$NON-NLS-1$
-
-		File[] mfiles = testTAUEnv(archpath);
+		
+		
+		String binpath = blt.getToolPath("tau");//pstore.getString(ITAULaunchConfigurationConstants.TAU_ARCH_PATH); //$NON-NLS-1$
+		IFileStore bindir =null;
+		if(binpath==null||binpath.length()==0){
+			binpath=blt.checkToolEnvPath("pprof");
+			if(binpath!=null&&binpath.length()>0){
+				bindir = blt.getFile(binpath);
+				//archpath=pprof.getParent().toURI().getPath();
+			}
+		}
+		else{
+			bindir = blt.getFile(binpath);
+		}
+		
+		
+		List<IFileStore> mfiles = testTAUEnv(bindir);
 
 		/*
 		if ((mfiles == null) || (mfiles.length == 0)) {
@@ -522,46 +545,63 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		allopts = new LinkedHashSet<String>();
 		String name = null;
 		if(mfiles==null)return;
-		for (int i = 0; i < mfiles.length; i++) {
-			name = mfiles[i].getName();
+		for (int i = 0; i < mfiles.size(); i++) {
+			name = mfiles.get(i).getName();
 			allmakefiles.add(name);
 			allopts.addAll(Arrays.asList(name.split("-"))); //$NON-NLS-1$
 		}
 		allopts.remove("Makefile.tau"); //$NON-NLS-1$
 	}
-
+private static final String TAU_MAKEFILE_PREFIX="Makefile.tau";
 	/**
 	 * Given a directory (presumably a tau arch directory) this looks in the lib
 	 * subdirectory and returns a list of all Makefile.tau... files with -pdt
 	 * */
-	private File[] testTAUEnv(String binpath) {
+	private List<IFileStore> testTAUEnv(IFileStore bindir) {
 
-		class makefilter implements FilenameFilter {
-			public boolean accept(File dir, String name) {
-				if ((name.indexOf("Makefile.tau") != 0)) { //$NON-NLS-1$
-					return false;
-				}
-
-				return true;
+//		class makefilter implements FilenameFilter {
+//			public boolean accept(File dir, String name) {
+//				if ((name.indexOf("Makefile.tau") != 0)) { //$NON-NLS-1$
+//					return false;
+//				}
+//
+//				return true;
+//			}
+//		}
+		
+		if(bindir==null||!bindir.fetchInfo().exists())
+			return null;
+		
+		//int lastSlash=binpath.lastIndexOf(File.separator);
+		//if(lastSlash<0)
+		//	return null;
+		//IFileStore taumain=blt.getFile(binpath);
+		//IFileStore taumain=bindir.getParent();
+		//tlpath = binpath.substring(0,lastSlash) + File.separator + "lib"; //$NON-NLS-1$
+		taulib =bindir.getParent().getChild("lib"); //blt.getFile(tlpath);// new File(tlpath);
+		//IFileStore[] mfiles = null;
+		IFileStore[] mfiles = null;
+		ArrayList<IFileStore> tmfiles=null;
+		//makefilter mfilter = new makefilter();
+		if (taulib.fetchInfo().exists()) {
+			try {
+				mfiles=taulib.childStores(EFS.NONE, null);
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		}
-		
-		if(binpath==null||binpath.length()==0)
-			return null;
-		
-		int lastSlash=binpath.lastIndexOf(File.separator);
-		if(lastSlash<0)
-			return null;
-		
-		tlpath = binpath.substring(0,lastSlash) + File.separator + "lib"; //$NON-NLS-1$
-		File taulib = new File(tlpath);
-		File[] mfiles = null;
-		makefilter mfilter = new makefilter();
-		if (taulib.exists()) {
-			mfiles = taulib.listFiles(mfilter);
+			tmfiles=new ArrayList<IFileStore>();
+			for(int i=0;i<mfiles.length;i++){
+				IFileInfo finf=mfiles[i].fetchInfo();
+				if(!finf.isDirectory() && finf.getName().startsWith(TAU_MAKEFILE_PREFIX)){
+					tmfiles.add(mfiles[i]);
+				}
+			}
+			
+			//mfiles = taulib.listFiles(mfilter);
 		}
 
-		return mfiles;
+		return tmfiles;
 	}
 
 	/**
@@ -1067,12 +1107,34 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	ToolOption compOpt = null;// tauOpts.getOption("-optCompInst");
 	ToolOption selectOpt = null;
 
+	
+	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) {
+		final String rmUniqueName;
+		try {
+			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+					EMPTY_STRING);
+		} catch (CoreException e) {
+			return null;
+		}
+		if(rmUniqueName.length()==0)return null;
+		return PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+	}
+	
+	private static final String EMPTY_STRING="";
 	/**
 	 * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
 	 */
 	@SuppressWarnings("unchecked")
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
+			
+			IResourceManager rm = getResourceManager(configuration);
+			if(rm!=null){
+				blt=new RemoteBuildLaunchUtils(rm);
+			}
+			else{
+				blt=new BuildLaunchUtils();
+			}
 
 			selopts = new LinkedHashSet<String>();
 
@@ -1356,7 +1418,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		if(seldex<0)return;
 		String tauMakeName=makecombo.getItem(seldex);
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKENAME, tauMakeName);
-		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE,"-tau_makefile="+tlpath+File.separator+makecombo.getItem(makecombo.getSelectionIndex())); //$NON-NLS-1$
+		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE,"-tau_makefile="+taulib.toURI().getPath()+UNIX_SLASH+makecombo.getItem(makecombo.getSelectionIndex())); //$NON-NLS-1$
 
 		configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB, dbCombo.getItem(dbCombo.getSelectionIndex()));
 		configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB_NAME, PerfDMFView.extractDatabaseName(dbCombo.getItem(dbCombo.getSelectionIndex())));
@@ -1400,11 +1462,11 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 
 		String correctPath = getFieldContent(tauSelectFile.getText());
 		if (correctPath != null) {
-			File path = new File(correctPath);
-			if (path.exists()) {
-				dialog.setFilterPath(path.isFile() ? correctPath : path
-						.getParent());
-			}
+//			IFileStore path = blt.getFile(correctPath);//new File(correctPath);
+//			if (path.fetchInfo().exists()) {
+//				dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path
+//						.getParent());
+//			}  //TODO: Support a starting path for selective instrumentation files on the remote and/or local machine.
 		}
 
 		String selectedPath = dialog.open();
@@ -1418,7 +1480,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	 * @return The string representation of the location of the PAPI utilities located in the selected makefile, or the empty string if they are not found
 	 * @throws FileNotFoundException if the location is in the makefile but not valid
 	 */
-	private String getPapiLoc() throws FileNotFoundException {
+	private IFileStore getPapiLoc() throws FileNotFoundException {
 
 		if(makecombo==null)
 			return null;
@@ -1434,22 +1496,23 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			return null;
 		}
 		
-		String papimake = tlpath + File.separator
-		+ selItem;
+		//String papimake = tlpath + File.separator+ selItem;
 
-		File papimakefile = new File(papimake);
-		if (!papimakefile.canRead()) {
+		IFileStore papimakefile = blt.getFile(taulib.toURI().getPath());//new File(papimake);
+		papimakefile=papimakefile.getChild(selItem);
+		
+		if (!papimakefile.fetchInfo().exists()) {
 			System.out.println(Messages.TAUAnalysisTab_InvalidPAPIMakefile);
 		}
 
 		String papiline = ""; //$NON-NLS-1$
 		boolean found = false;
 		try {
-			BufferedReader readmake = new BufferedReader(new FileReader(
-					papimakefile));
+			BufferedReader readmake = new BufferedReader(new InputStreamReader(
+					papimakefile.openInputStream(EFS.NONE, null)));
 			papiline = readmake.readLine();
 			while (papiline != null) {
-				if (papiline.indexOf("PAPIDIR=") == 0) { //$NON-NLS-1$
+				if (papiline.indexOf(PAPIDIR) == 0) { //$NON-NLS-1$
 					found = true;
 					break;
 				}
@@ -1460,31 +1523,40 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
+		IFileStore papibin=null;
 		if (found) {
-			papiline = papiline.substring(papiline.indexOf("=") + 1); //$NON-NLS-1$
-			File papibin = new File(papiline + File.separator + "bin" //$NON-NLS-1$
-					+ File.separator + "papi_event_chooser"); //$NON-NLS-1$
-			if (!papibin.canRead()) {
-				papibin = new File(papiline + File.separator + "share" //$NON-NLS-1$
-						+ File.separator + "papi" + File.separator + "utils" //$NON-NLS-1$ //$NON-NLS-2$
-						+ File.separator + "papi_event_chooser"); //$NON-NLS-1$
+			papiline = papiline.substring(papiline.indexOf(EQ) + 1); 
+			IFileStore papihome = blt.getFile(papiline); //new File(papiline + File.separator + BIN + File.separator + PAPI_EVENT_CHOOSER); 
+			papibin=papihome.getChild(BIN).getChild(PAPI_EVENT_CHOOSER);
+			if (!papibin.fetchInfo().exists()) {
+				papibin = papihome.getChild(SHARE).getChild(PAPI).getChild(UTILS).getChild(PAPI_EVENT_CHOOSER);//new File(papiline + File.separator + SHARE + File.separator + PAPI + File.separator + UTILS + File.separator + PAPI_EVENT_CHOOSER); 
 			}
 
-			if (!papibin.canRead()) {
+			if (!papibin.fetchInfo().exists()) {
 				throw new FileNotFoundException(
 				Messages.TAUAnalysisTab_CouldNotLocatePapiUtils);
 			}
 
-			papiline = papibin.getParentFile().toString();
+			//papiline = papibin.getParent().toURI().getPath();//.fetchInfo().getParentFile().toString();
 		} else {
 			System.out.println(Messages.TAUAnalysisTab_NoPapiDirInMakefile);
 		}
 
-		return papiline;
+		return papibin.getParent();
 	}
 
+	private static final String BIN ="bin";
+	private static final String EQ ="=";
+	private static final String PAPI ="papi";
+	private static final String PAPI_EVENT_CHOOSER ="papi_event_chooser";
+	private static final String PAPIDIR ="PAPIDIR=";
+	private static final String UTILS ="utils";
+	private static final String SHARE ="share";
+	private static final String PAPI_XML_BIN="papi_xml_event_info";
 	/**
 	 * Handles launching of the PAPI counter selection dialog.  Places values returned by the dialog in the launch environment variables list
 	 *
@@ -1493,38 +1565,36 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		Object[] selected=null;
 		try {
 
-			String papiBin=getPapiLoc();
+			IFileStore pdir=getPapiLoc();
 
-			if(papiBin==null)
-				return;
-			
-			File pdir=new File(papiBin);
-			if(!pdir.isDirectory()||!pdir.canRead()){
+
+
+			if(pdir==null||!pdir.fetchInfo().exists()||!pdir.fetchInfo().isDirectory()){
 				return;
 			}
-			File pcxi=new File(papiBin+File.separator+"papi_xml_event_info"); //$NON-NLS-1$
+			IFileStore pcxi=pdir.getChild(PAPI_XML_BIN);//new File(papiBin+File.separator+"papi_xml_event_info"); //$NON-NLS-1$
 
 
-			if(pcxi.exists())//papiCountRadios[2].getSelection())
+			if(pcxi.fetchInfo().exists())//papiCountRadios[2].getSelection())
 			{
 				//System.out.println(papiBin);
-				final String pTool="papi_xml_event_info"; //$NON-NLS-1$
-				File pDir=new File(papiBin);
-				String[]files=pDir.list(new FilenameFilter(){
+				//final String pTool="papi_xml_event_info"; //$NON-NLS-1$
+				//File pDir=new File(papiBin);
+//				String[]files=pDir.list(new FilenameFilter(){
+//
+//					public boolean accept(File fi, String name) {
+//						if(name.equals(pTool))
+//							return true;
+//						return false;
+//					}
+//				});
 
-					public boolean accept(File fi, String name) {
-						if(name.equals(pTool))
-							return true;
-						return false;
-					}
-				});
+//				if(files.length<1){
+//					MessageDialog.openWarning(getShell(),PAPI_XML_BIN+Messages.TAUAnalysisTab_NotFound,Messages.TAUAnalysisTab_PleaseSelectDiffCounterTool);
+//					return;
+//				}
 
-				if(files.length<1){
-					MessageDialog.openWarning(getShell(),pTool+Messages.TAUAnalysisTab_NotFound,Messages.TAUAnalysisTab_PleaseSelectDiffCounterTool);
-					return;
-				}
-
-				EventTreeDialog treeD=new EventTreeDialog(getShell(),papiBin);
+				EventTreeDialog treeD=new EventTreeDialog(getShell(),pdir.toURI().getPath());//TODO: This needs to use IFileStore
 				//				if ((varmap != null) && (varmap.size() > 0)) {
 				//				treeD.setInitialSelections(varmap.values().toArray());
 				//				}
@@ -1545,7 +1615,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 					papiCountType = PapiListSelectionDialog.NATIVE;
 				}
 				PapiListSelectionDialog papidialog = new PapiListSelectionDialog(
-						getShell(), papiBin, paprov, papilab,
+						getShell(), pdir.toURI().getPath(), paprov, papilab, //TODO: This needs to use IFileStore
 						Messages.TAUAnalysisTab_SelectPapiCountersForTau, papiCountType);
 				papidialog.setTitle(Messages.TAUAnalysisTab_PapiCounters);
 				papidialog.setHelpAvailable(false);

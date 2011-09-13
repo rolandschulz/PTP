@@ -17,11 +17,11 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw.tau;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -40,6 +40,8 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.window.Window;
@@ -80,9 +82,9 @@ public class TAUPortalUploadDialog extends Dialog {
 	  private String url=""; //$NON-NLS-1$
 	  private String uname=""; //$NON-NLS-1$
 	  private String pwd=""; //$NON-NLS-1$
-	  private File ppk=null;
+	  private IFileStore ppk=null;
 	  
-	  public TAUPortalUploadDialog(Shell parentShell, File ppk) {
+	  public TAUPortalUploadDialog(Shell parentShell, IFileStore ppk) {
 	    super(parentShell);
 	    this.ppk=ppk;
 	  }
@@ -354,7 +356,7 @@ public class TAUPortalUploadDialog extends Dialog {
      * @return
      * @throws Exception
      */
-	private static String uploadPPK(String url, String usr, String pwd, String workspace, File ppkFile) throws Exception {
+	private static String uploadPPK(String url, String usr, String pwd, String workspace, IFileStore ppkFile) throws Exception {
 		
 		String pwd2 = SHA1(pwd);
 		
@@ -362,9 +364,10 @@ public class TAUPortalUploadDialog extends Dialog {
 		String ppkName = ppkFile.getName();
 		ppkName=ppkName.substring(0, ppkName.lastIndexOf('.'));
 		
-		RandomAccessFile rfile = new RandomAccessFile(ppkFile, "r"); //$NON-NLS-1$
-		
-		byte barr[]=new byte[(int)rfile.length()];
+		//RandomAccessFile rfile = new RandomAccessFile(ppkFile.openOutputStream(EFS.NONE, null), "r"); //$NON-NLS-1$
+		InputStream rfile = (new BufferedInputStream(ppkFile.openInputStream(EFS.NONE, null)));
+		ppkFile.fetchInfo().getLength();
+		byte barr[]=new byte[(int)ppkFile.fetchInfo().getLength()];//TODO: This needs testing.
 		rfile.read(barr);
 		String ppkString=new String(barr,"ISO-8859-1"); //$NON-NLS-1$
 		ppkString=URLEncoder.encode(ppkString,"ISO-8859-1"); //$NON-NLS-1$

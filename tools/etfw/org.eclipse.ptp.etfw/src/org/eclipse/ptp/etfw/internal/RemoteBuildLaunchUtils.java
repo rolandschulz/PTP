@@ -18,14 +18,11 @@
 package org.eclipse.ptp.etfw.internal;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.URI;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
@@ -33,29 +30,84 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
-import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 
-public class BuildLaunchUtils implements IBuildLaunchUtils {
+
+public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 	
 	
-	public String getWorkingDirectory(){
-		return null;
+	
+	/**
+	 * Given a launch configuration, find the resource manager that was been
+	 * selected.
+	 * 
+	 * @param configuration
+	 * @return resource manager
+	 * @throws CoreException
+	 * @since 5.0
+	 */
+	public static IResourceManager getResourceManager(ILaunchConfiguration configuration) {
+		final String rmUniqueName;
+		try {
+			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+					"");
+		} catch (CoreException e) {
+			return null;
+		}
+		return PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
 	}
+	
 	
 	Shell selshell = null;
-	public BuildLaunchUtils(){
-		this.selshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
+	IResourceManager rm = null;
+	IRemoteConnection conn = null;
+	IResourceManagerComponentConfiguration conf = null;
+	IRemoteServices remoteServices = null;
+	IRemoteUIServices remoteUIServices = null;
+	IRemoteConnectionManager connMgr =null;
+	IRemoteUIFileManager fileManagerUI = null;
+	IRemoteFileManager fileManager= null;
+	public RemoteBuildLaunchUtils(IResourceManager rm){
+		this.rm=rm;
+		conf = rm.getControlConfiguration();
+		remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),null);//,getLaunchConfigurationDialog()
+		remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+		connMgr = remoteServices.getConnectionManager();
+		conn = connMgr.getConnection(conf.getConnectionName());
+		fileManagerUI = remoteUIServices.getUIFileManager();
+		fileManager = remoteServices.getFileManager(conn);
+
+		//this.selshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
 	}
+	
+	public String getWorkingDirectory(){
+		String jaxbtest=rm.getResourceManagerId();
+		if(!jaxbtest.equals("org.eclipse.ptp.rm.lml_jaxb"))
+			return null;
+		return conn.getWorkingDirectory();
+	}
+	
 
 	/**
 	 * Returns the directory containing the tool's executable file. Prompts the
@@ -76,7 +128,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	 * @return
 	 */
 	public String findToolBinPath(String toolfind, String suggPath, String queryText, String queryMessage) {
-		String vtbinpath = BuildLaunchUtils.checkLocalToolEnvPath(toolfind);
+		String vtbinpath = checkToolEnvPath(toolfind);
 		if (vtbinpath == null || vtbinpath.equals("")) //$NON-NLS-1$
 		{
 			vtbinpath = askToolPath(suggPath, queryText, queryMessage);
@@ -105,7 +157,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	 * @return
 	 */
 	public  String findToolBinPath(String toolfind, String suggPath, String toolName) {
-		String vtbinpath = BuildLaunchUtils.checkLocalToolEnvPath(toolfind);
+		String vtbinpath = checkToolEnvPath(toolfind);
 		if (vtbinpath == null || vtbinpath.equals("")) //$NON-NLS-1$
 		{
 			vtbinpath = askToolPath(suggPath, toolName);
@@ -125,7 +177,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	 */
 	public String getToolPath(String toolID) {
 		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
-		String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + toolID; //$NON-NLS-1$
+		String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + toolID+"."+rm.getUniqueName(); //$NON-NLS-1$
 		String path = pstore.getString(toolBinID);
 		if (path != null)
 			return path;
@@ -158,7 +210,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 				if (entry.equals("internal")) //$NON-NLS-1$
 					continue;
 
-				String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry; //$NON-NLS-1$
+				String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry+"."+rm.getUniqueName(); //$NON-NLS-1$
 				if (force || pstore.getString(toolBinID).equals("")) //$NON-NLS-1$
 				{
 					pstore.setValue(toolBinID, findToolBinPath(me.getValue(), null, entry));// findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
@@ -183,7 +235,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 			if (entry.equals("internal")) //$NON-NLS-1$
 				continue;
 
-			String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry; //$NON-NLS-1$
+			String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry+"."+rm.getUniqueName(); //$NON-NLS-1$
 			if (force || pstore.getString(toolBinID).equals("")) //$NON-NLS-1$
 			{
 				pstore.setValue(toolBinID, findToolBinPath(me.getValue(), null, entry));// findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
@@ -191,7 +243,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 		}
 	}
 
-	public static void verifyLocalEnvToolPath(ExternalToolProcess tool) {
+	public void verifyEnvToolPath(ExternalToolProcess tool) {
 		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
 
 		Iterator<Map.Entry<String, String>> eIt = null;
@@ -208,26 +260,22 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 			if (entry.equals("internal")) //$NON-NLS-1$
 				continue;
 
-			toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry; //$NON-NLS-1$
+			toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry+"."+rm.getUniqueName(); //$NON-NLS-1$
 			curTool = pstore.getString(toolBinID);
 
-			if (curTool == null || curTool.equals("") || !(new File(curTool).exists())) //$NON-NLS-1$
+			IFileStore ttool = fileManager.getResource(curTool);
+			
+			if (curTool == null || curTool.equals("") || !(ttool.fetchInfo().exists())) //$NON-NLS-1$
 			{
 				String gVal = me.getValue();
 				if (gVal != null && gVal.trim().length() > 0) {
-					curTool = BuildLaunchUtils.checkLocalToolEnvPath(gVal);
+					curTool = checkToolEnvPath(gVal);
 					if (curTool != null)
 						pstore.setValue(toolBinID, curTool);// findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
 				}
 			}
 		}
 	}
-	
-	
-	public String checkToolEnvPath(String toolname){
-		return checkLocalToolEnvPath(toolname);
-	}
-	
 
 	/**
 	 * This locates name of the parent of the directory containing the given
@@ -239,12 +287,16 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	 *         found or if the architecture is windows
 	 * 
 	 */
-	public static String checkLocalToolEnvPath(String toolname) {
+	public String checkToolEnvPath(String toolname) {
 		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0) //$NON-NLS-1$
 			return null;
 		String pPath = null;
 		try {
-			Process p = new ProcessBuilder("which", toolname).start();//Runtime.getRuntime().exec("which "+toolname); //$NON-NLS-1$
+			IRemoteProcessBuilder rpb = remoteServices.getProcessBuilder(conn);
+			rpb.command("which",toolname);
+			//rpb.
+			IRemoteProcess p = rpb.start();
+			//Process p = new ProcessBuilder("which", toolname).start();//Runtime.getRuntime().exec("which "+toolname); //$NON-NLS-1$
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			pPath = reader.readLine();
 			while (reader.readLine() != null) {
@@ -258,14 +310,17 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 		}
 		if (pPath == null)
 			return null;
-		File test = new File(pPath);
-		File toolin = new File(toolname);
-
-		if (test.getPath().equals(toolin.getPath()))
+		
+		IFileStore test = fileManager.getResource(pPath);
+		//File test = new File(pPath);
+		//IFileStore toolin = fileManager.getResource(toolname);
+		//File toolin = new File(toolname);
+		String name = test.fetchInfo().getName();
+		if (!name.equals(toolname))//test.getPath().equals(toolin.getPath()))
 			return null;// TODO: Make sure this is the right behavior when the
 						// full path is provided
-		if (test.exists()) {
-			return test.getParentFile().getPath();
+		if (test.fetchInfo().exists()) {
+			return test.getParent().toURI().getPath();//pPath;//test.getParent().fetchInfo().getName(); //.getParentFile().getPath();
 		} else
 			return null;
 	}
@@ -279,18 +334,20 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 		// ourshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
 		if (selshell == null)
 			return null;
-		DirectoryDialog dialog = new DirectoryDialog(selshell);
-		dialog.setText(toolText);
-		dialog.setMessage(toolMessage);
+		
+		//DirectoryDialog dialog = new DirectoryDialog(selshell);
+		//dialog.setText(toolText);
+		//dialog.setMessage(toolMessage);
+		
 		if (archpath != null) {
 			//File path = new File(archpath);
-			IFileStore path = EFS.getLocalFileSystem().getStore(new Path(archpath));
-			IFileInfo finf=path.fetchInfo();
-			if (finf.exists()) {
-				dialog.setFilterPath(!finf.isDirectory() ? archpath : path.getParent().toURI().getPath());
-			}
+//			IFileStore path = fileManager.getResource(archpath);////EFS.getLocalFileSystem().getStore(new Path(archpath));
+//			IFileInfo finf=path.fetchInfo();
+//			if (finf.exists()) {
+//				dialog.setFilterPath(!finf.isDirectory() ? archpath : path.getParent().toURI().getPath());
+//			}//TODO: We may actually want to use this initial directory checking
 		}
-		return dialog.open();
+		return fileManagerUI.browseDirectory(selshell, toolMessage, archpath, EFS.NONE);//dialog.open();
 	}
 
 	/**
@@ -307,7 +364,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	 * 
 	 * @return A formatted representation of the current time
 	 */
-	public static  String getNow() {
+	public static String getNow() {
 		Calendar cal = Calendar.getInstance(TimeZone.getDefault());
 		String DATE_FORMAT = "yyyy-MM-dd_HH:mm:ss"; //$NON-NLS-1$
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT);
@@ -329,27 +386,36 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 		return runTool(tool, env, directory, null);
 	}
 
-	public  boolean runTool(List<String> tool, Map<String, String> env, String directory, String output) {
+	
+	public IFileStore getFile(String path){
+		return fileManager.getResource(path);
+	}
+	
+	public boolean runTool(List<String> tool, Map<String, String> env, String directory, String output) {
 		int eval = -1;
 		try {
 
 			OutputStream fos = null;
 			if (output != null) {
-				File test = new File(output);
-				File parent = test.getParentFile();
-				if (parent == null || !parent.canRead()) {
-					output = directory + File.separator + output;
+				IFileStore test = fileManager.getResource(output);
+				//File test = new File(output);
+				IFileStore parent = test.getParent();//fileManager.getResource
+				//File parent = test.getParentFile();
+				if (parent == null || !parent.fetchInfo().exists()) {
+					parent = fileManager.getResource(directory);
+					test=parent.getChild(output);
+					//output = directory + File.separator + output;
 				}
-				fos = new FileOutputStream(output);
+				fos = test.openOutputStream(EFS.NONE, null);//test.openOutputStream(options, monitor)new FileOutputStream(test);
 			}
 
-			ProcessBuilder pb = new ProcessBuilder(tool);
-			pb.directory(new File(directory));
+			IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);//new IRemoteProcessBuilder(tool);
+			pb.directory(fileManager.getResource(directory));
 			if (env != null) {
 				pb.environment().putAll(env);
 			}
 
-			Process p = pb.start();// Runtime.getRuntime().exec(tool, env,
+			IRemoteProcess p = pb.start();// Runtime.getRuntime().exec(tool, env,
 									// directory);
 			StreamRunner outRun = new StreamRunner(p.getInputStream(), "out", fos); //$NON-NLS-1$
 			StreamRunner errRun = new StreamRunner(p.getErrorStream(), "err", null); //$NON-NLS-1$
@@ -373,8 +439,8 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 		int eval = -1;
 		try {
 
-			ProcessBuilder pb = new ProcessBuilder(tool);
-			pb.directory(new File(directory));
+			IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);//new IRemoteProcessBuilder(tool);
+			pb.directory(fileManager.getResource(directory));
 			if (env != null) {
 				pb.environment().putAll(env);
 			}
@@ -425,13 +491,6 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public IFileStore getFile(String path) {
-		// TODO Auto-generated method stub
-		
-		return EFS.getLocalFileSystem().getStore(URI.create(path));
-		///return null;
 	}
 
 }

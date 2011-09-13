@@ -26,10 +26,14 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.internal.ILaunchFactory;
+import org.eclipse.ptp.etfw.internal.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.etfw.internal.ToolLaunchManager;
 import org.eclipse.ptp.launch.ParallelLaunchConfigurationDelegate;
+import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * Launches parallel C/C++ (or Fortran) applications after rebuilding them with performance instrumentation
@@ -38,14 +42,19 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 	
 	private boolean initialized = false;
 	
+	
+
+	
 	/**
 	 * The primary launch command of this launch configuration delegate.  The operations in this function are divided into
 	 * three jobs:  Buildig, Running and Data collection
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launchIn, IProgressMonitor monitor) throws CoreException
 	{
-		if(initialized){
+		if(initialized){//TODO: This can break if the launch fails.  Fix it.
+			initialized=false;
 			super.launch(configuration, mode, launchIn, monitor);
+			
 			return;
 		}
 		
@@ -64,14 +73,30 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 		wc.setAttribute(EXTOOL_PROJECT_NAME_TAG, IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME);
 		wc.setAttribute(EXTOOL_EXECUTABLE_NAME_TAG, IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME);
 		wc.setAttribute(EXTOOL_EXECUTABLE_PATH_TAG, IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
+		String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+				EMPTY_STRING);
+		rmId += DOT;
+		wc.setAttribute(EXTOOL_JAXB_ATTR_ARGUMENTS_TAG, rmId+JAXBControlConstants.PROG_ARGS);
+		wc.setAttribute(EXTOOL_JAXB_EXECUTABLE_PATH_TAG, rmId+JAXBControlConstants.EXEC_PATH);
+		
+		//put(JAXBControlConstants.DIRECTORY, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, dir));
+		
+		//String testJaxb=configuration.getAttribute(JAXBControlConstants.EXEC_PATH, EMPTY_STRING);
+		//if(testJaxb!=null&&testJaxb.length()>0 &&test)
+		
 		wc.doSave();
 		
 		ILaunchFactory lf = new ParallelLaunchFactory();
 		
 		{
 			initialized=true;
-			ToolLaunchManager plaunch=new ToolLaunchManager(this, lf);//,IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME ,IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
+			
+			if(launchIn instanceof PLaunch){
+			IResourceManager rm = RemoteBuildLaunchUtils.getResourceManager(configuration);
+			//	IResourceManager rm = ((PLaunch) launchIn).getResourceManager();
+			ToolLaunchManager plaunch=new ToolLaunchManager(this, lf, new RemoteBuildLaunchUtils(rm));//,IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME ,IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH);
 			plaunch.launch(configuration,mode, launchIn, monitor);// tool, 
+			}
 		}
 		initialized=false;
 	}

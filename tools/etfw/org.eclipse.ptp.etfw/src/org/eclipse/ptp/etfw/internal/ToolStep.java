@@ -27,6 +27,8 @@ import java.util.Map.Entry;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.ICProject;
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -37,6 +39,7 @@ import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.ToolApp;
 import org.eclipse.ptp.etfw.toolopts.ToolIO;
 import org.eclipse.ptp.etfw.toolopts.ToolsOptionsConstants;
+import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 
 /**
  * Manages the process of building instrumented applications and collecting the
@@ -90,20 +93,32 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 	protected ILaunchConfiguration configuration = null;
 	// protected final ExternalToolProcess tool;
 	protected Map<String, String> IOMap = null;
+	protected boolean isSyncProject=false;
+	IBuildLaunchUtils utilBlob = null;
 
-	protected ToolStep(ILaunchConfiguration conf, String name) throws CoreException {
+	protected ToolStep(ILaunchConfiguration conf, String name, IBuildLaunchUtils utilBlob) throws CoreException {
 		super(name);
 		configuration = conf;
 
 		thisProject = getProject(configuration);
 		thisCProject = CCorePlugin.getDefault().getCoreModel().create(thisProject);
-		projectLocation = thisCProject.getResource().getLocationURI().getPath();
+		
+		isSyncProject=BuildConfigurationManager.getInstance().isInitialized(thisProject);
+		
+		if(isSyncProject){
+			IConfiguration configuration = ManagedBuildManager.getBuildInfo(thisProject).getDefaultConfiguration();
+			projectLocation = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration).getLocation();
+		}
+		else
+		{
+			projectLocation = thisCProject.getResource().getLocationURI().getPath();
+		}
 		
 		outputLocation = projectLocation;
 
 		projectBinary = Messages.ToolStep_Unknown;
 		projectName = Messages.ToolStep_Unknown;
-
+		this.utilBlob=utilBlob;
 		IOMap = new HashMap<String, String>();
 		// this.tool=Activator.getTool(configuration.getAttribute(SELECTED_TOOL,
 		// (String)null));
@@ -346,10 +361,12 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 	 * @param app
 	 * @return
 	 */
-	protected static String getToolExecutable(ToolApp app) {
+	protected String getToolExecutable(ToolApp app) {
 		String command = app.toolCommand;
 
-		String toolPath = BuildLaunchUtils.getToolPath(app.toolGroup); // checkToolEnvPath(app.toolCommand);
+		String toolPath = utilBlob.getToolPath(app.toolGroup); // checkToolEnvPath(app.toolCommand);
+		if(toolPath==null||toolPath.length()==0)
+			toolPath=utilBlob.checkToolEnvPath(command);
 		if (toolPath != null && toolPath.length() > 0) {
 			command = toolPath + File.separator + command;
 		}

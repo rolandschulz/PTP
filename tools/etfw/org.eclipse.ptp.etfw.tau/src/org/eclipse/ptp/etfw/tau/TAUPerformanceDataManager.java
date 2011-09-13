@@ -18,20 +18,25 @@
 package org.eclipse.ptp.etfw.tau;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.etfw.AbstractToolDataManager;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
+import org.eclipse.ptp.etfw.internal.IBuildLaunchUtils;
+import org.eclipse.ptp.etfw.internal.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.tau.perfdmf.PerfDMFUIPlugin;
 import org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -52,18 +57,6 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 		return configuration.getAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE, (String)null);
 	}
 	
-//	/**
-//	 * Gets the path to the TAU arch directory, as stored in the eclipse workspace
-//	 * @return the path to the TAU arch directory
-//	 */
-//	protected static String getTauArchPath(){
-//		File binPath=new File(pstore.getString(ITAULaunchConfigurationConstants.TAU_BIN_PATH));
-//		if(binPath.canRead())
-//			return binPath.getParent().toString();
-//		
-//		return "";
-//		//return pstore.getString(ITAULaunchConfigurationConstants.TAU_ARCH_PATH);
-//	}
 	
 	@Override
 	public void cleanup() {
@@ -74,19 +67,25 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 	public void setExternalTarget(boolean useExt){
 		this.useExt=useExt;
 	}
-
+	private IBuildLaunchUtils utilBlob=null;
 	public void process(String projname, ILaunchConfiguration configuration,String directory) throws CoreException {
-		tbpath=BuildLaunchUtils.getToolPath(Messages.TAUPerformanceDataManager_0);
+		IResourceManager rm = RemoteBuildLaunchUtils.getResourceManager(configuration);
+		if(rm!=null)
+			utilBlob=new RemoteBuildLaunchUtils(rm);
+		else
+			utilBlob = new BuildLaunchUtils();
+		tbpath=utilBlob.getToolPath(Messages.TAUPerformanceDataManager_0);
+		List<IFileStore> profs=null;
 		if(useExt||projname==null){
 			boolean usePortal=configuration.getAttribute(ITAULaunchConfigurationConstants.PORTAL, false);
-			String[] profIDs = getProfIDs();//manageProfiles(projectLocation,dbname,usePortal);
+			String[] profIDs = requestProfIDs();
 			
 			if(profIDs==null){
 				return;
 			}
 			
-			File[] profs = getProfiles(directory);
-			if(profs==null||profs.length==0)
+			profs = getProfiles(directory);
+			if(profs==null||profs.size()==0)
 			{
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
@@ -109,7 +108,7 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 			
 			String xmlMetaData=configuration.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_XML_METADATA, (String)null);
 			String database= PerfDMFView.extractDatabaseName(configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB,(String)null));
-			boolean hasdb=addToDatabase(directory,database,projname,projtype,projtrial,xmlMetaData);
+			boolean hasdb=addToDatabase(utilBlob.getFile(directory),database,projname,projtype,projtrial,xmlMetaData);
 			if (!hasdb) {
 				
 				Display.getDefault().syncExec(new Runnable() {
@@ -128,8 +127,8 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 			}
 			
 			if(usePortal){
-				File ppkfile=getPPKFile(directory,projname,projtype,projtrial);
-				if(ppkfile==null||!ppkfile.canRead())
+				IFileStore ppkfile=getPPKFile(directory,projname,projtype,projtrial);
+				if(ppkfile==null||!ppkfile.fetchInfo().exists())
 				{
 					Display.getDefault().syncExec(new Runnable() {
 						public void run() {
@@ -150,15 +149,11 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 					
 						
 				}
-				ppkfile.delete();
+				ppkfile.delete(EFS.NONE,null);
 			}
 			
 			return;
 		}
-		
-		//System.out.println("HEY!"+projectLocation+" vs "+thisCProject.getResource().getLocation().toOSString());
-		//String projname = thisCProject.getElementName();
-		
 		
 		
 		/*Contains all tau configuration options in the makefile name, except pdt*/
@@ -204,12 +199,13 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 				projtype+="_"+expAppend; //$NON-NLS-1$
 			}
 			
-			File xmlprof=null;
-			File[] profs = getProfiles(directory);
-			if(!useP&&profs==null||profs.length==0)
-			{
-				xmlprof = new File(directory+File.separatorChar+PROFXML);
-				if(!xmlprof.canRead()){
+			IFileStore xmlprof=null;
+			//TODO: Return support for regular profiles/ppk files
+			//profs = getProfiles(directory);
+			//if(!useP&&profs==null||profs.size()==0)
+			//{
+				xmlprof = utilBlob.getFile(directory).getChild(PROFXML);//new File(directory+File.separatorChar+PROFXML);
+				if(!xmlprof.fetchInfo().exists()){
 					Display.getDefault().syncExec(new Runnable() {
 						public void run() {
 							MessageDialog
@@ -222,7 +218,7 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 						}});
 					return;
 				}
-			}
+			//}
 			
 			boolean runtauinc = configuration.getAttribute(ITAULaunchConfigurationConstants.TAUINC, false);
 			if(runtauinc){
@@ -232,7 +228,7 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 			
 			String xmlMetaData=configuration.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_XML_METADATA, (String)null);
 			String database= PerfDMFView.extractDatabaseName(configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB,(String)null));
-			boolean hasdb=addToDatabase(directory,database,projname,projtype,projtrial,xmlMetaData);
+			boolean hasdb=addToDatabase(utilBlob.getFile(directory),database,projname,projtype,projtrial,xmlMetaData);
 			if (!hasdb&&!useP) {
 				
 				Display.getDefault().syncExec(new Runnable() {
@@ -253,8 +249,8 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 			boolean useportal=configuration.getAttribute(ITAULaunchConfigurationConstants.PORTAL, false);//TODO: Enable portal use via external data interface
 			
 			if(keepprofs||!hasdb||useportal){
-				File ppkfile=getPPKFile(directory,projname,projtype,projtrial);
-				if(ppkfile==null||!ppkfile.canRead())
+				IFileStore ppkfile=getPPKFile(directory,projname,projtype,projtrial);
+				if(ppkfile==null||!ppkfile.fetchInfo().exists())
 				{
 					
 					Display.getDefault().syncExec(new Runnable() {
@@ -275,17 +271,20 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 						runPortal(ppkfile);
 					}
 					if(keepprofs||!hasdb){
-						movePakFile(directory,projtype,projtrial,ppkfile);
+						if(ppkfile!=null)
+							movePakFile(directory,projtype,projtrial,ppkfile);
+						if(xmlprof!=null)
+							movePakFile(directory,projtype,projtrial,xmlprof);
 					}
 					else{
-						ppkfile.delete();
+						ppkfile.delete(EFS.NONE,null);
 					}
 				}
 			}
 			
 			removeProfiles(profs);//TODO: xml profiles don't make a mess, so save?
-			//if(xmlprof!=null)
-				//xmlprof.delete();
+			if(xmlprof!=null)
+				xmlprof.delete(EFS.NONE,null);
 			
 			boolean useperfex=configuration.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_LAUNCH_PERFEX, false);
 			if(useperfex){
@@ -309,34 +308,18 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 		
 	}
 	
-	
-	private static String[] getProfIDs(){// manageProfiles(final String directory,final String database, final boolean useportal) throws CoreException{
-		
-//		String pName="a";//null;
-//		String pType="b";//null;
-//		String pTrial="c";//null;
+	/**
+	 * Asks the user for the tags to use on the profile data when uploading to a database.
+	 * @return Array containing three Strings; User provided names for the application, experiment and trial.
+	 */
+	private static String[] requestProfIDs(){
 
 		final String queries[]=new String[3];
-		queries[0]=Messages.TAUPerformanceDataManager_AppName;//pName;
-		queries[1]=Messages.TAUPerformanceDataManager_ExpName;//pType;
-		queries[2]=Messages.TAUPerformanceDataManager_TrialName;//pTrial;
+		queries[0]=Messages.TAUPerformanceDataManager_AppName;
+		queries[1]=Messages.TAUPerformanceDataManager_ExpName;
+		queries[2]=Messages.TAUPerformanceDataManager_TrialName;
 		
 		final String values[] = new String[3];
-		
-//		class MFDRunner implements Runnable{
-//			MFDRunner(String[] queries){
-//				this.queries=queries;
-//			}
-//			public String[] values=null;
-//			public String[] queries=null;
-//			public void run() {
-//				Shell shell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
-//				MultiFieldDialog mfd = new MultiFieldDialog(shell,queries);
-//				values=mfd.open();
-//			}
-//		}
-//		
-//		final MFDRunner mfdr=new MFDRunner(ids);
 
 		Display.getDefault().syncExec(new Runnable(){
 
@@ -358,83 +341,82 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 	
 	private static final String PROFDOT="profile.";
 	private static final String PROFXML="tauprofile.xml";
+	private static final String MULTI="MULTI__";
 	
-	private static File[] getProfiles(String directory){
-		class Profilefilter implements FilenameFilter {
-			public boolean accept(File dir, String name) {
-				if (name.indexOf(PROFDOT) != 0) //$NON-NLS-1$
-					return false;
-				return true;
+	/**
+	 * Checks the directory for MULTI directories or profile. files.  Returns a list containing all of either type found, but not both. If a directory contains both only profile. files will be returned.
+	 * @param directory The main/output directory
+	 * @return List of file objects representing profiles or MULTI directories containing profiles
+	 */
+	private List<IFileStore> getProfiles(String directory){
+		IFileStore[] profiles = null;
+		IFileStore dir = utilBlob.getFile(directory);
+		try {
+			profiles = dir.childStores(EFS.NONE, null);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		ArrayList<IFileStore> profs=new ArrayList<IFileStore>();
+		ArrayList<IFileStore> dirs=new ArrayList<IFileStore>();
+		for(int i=0;i<profiles.length;i++){
+			IFileInfo proinfo=profiles[i].fetchInfo();
+			if(!proinfo.isDirectory()&&proinfo.getName().startsWith(PROFDOT)){
+				profs.add(profiles[i]);
+			}
+			else if(proinfo.isDirectory()&&proinfo.getName().startsWith(MULTI)){
+				dirs.add(profiles[i]);
 			}
 		}
-
-		class Counterfilter implements FileFilter {
-
-			public boolean accept(File pathname) {
-				if (pathname.isDirectory()) {
-					if (pathname.getName().indexOf("MULTI__") == 0) //$NON-NLS-1$
-						return true;
-				}
-				return false;
-			}
-
-		}
-
-		File[] profiles = null;
-		File dir = new File(directory);
-		Profilefilter profil = new Profilefilter();
-		profiles = dir.listFiles(profil);
+		
 		
 		if(profiles.length>0)
 		{
-			return profiles;
+			return profs;
 		}
 
-		//final boolean multipapi = (projtype.indexOf("multiplecounters") >= 0 && projtype.indexOf("papi") >= 0);// configuration.getAttribute(ITAULaunchConfigurationConstants.PAPI,false);
-		//File[] counterdirs = null;
-		Counterfilter countfil = new Counterfilter();
-		//if (multipapi) {
-			
-		profiles = dir.listFiles(countfil);
-		if(profiles.length>0)
+		if(dirs.size()>0)
 		{
-			return profiles;
+			return dirs;
 		}
 
 		return null;
 	}
+	private static final String UNIX_SLASH="/";
 	
-	private static File getPPKFile(final String directory, final String projname, final String projtype, final String projtrial){
+	
+	
+	private IFileStore getPPKFile(final String directory, final String projname, final String projtype, final String projtrial){
 		
 		class ppPaker implements Runnable {
 			public String ppk;
 			public void run() {
-				//String tbpath = BuildLaunchUtils.getToolPath("tau");
 
 				List<String> paraCommand = new ArrayList<String>();
 
 				String ppkname = projname + "_" + projtype + "_" + projtrial+ ".ppk"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				String paraprof = ""; //$NON-NLS-1$
-				if(tbpath!=null && tbpath.length()>0)
-					paraprof+= tbpath + File.separator;
+				
+				if(tbpath!=null && tbpath.length()>0){
+					paraprof+= tbpath + UNIX_SLASH;
+				}
 				paraprof+= "paraprof";  //$NON-NLS-1$
 				String pack = "--pack " + ppkname; //$NON-NLS-1$
 				System.out.println(paraprof+" "+pack); //$NON-NLS-1$
-				ppk = directory + File.separator + ppkname;
+				ppk = directory + UNIX_SLASH + ppkname;
 				
 				paraCommand.add(paraprof);
 				paraCommand.add(pack);
 
-				BuildLaunchUtils.runTool(paraCommand, null,new File(directory));
+				utilBlob.runTool(paraCommand, null,directory);
 			}}
 		
 		ppPaker ppp=new ppPaker();
 		Display.getDefault().syncExec(ppp);
 
-		return new File(ppp.ppk);
+		return utilBlob.getFile(ppp.ppk);
 	}
 	
-	private static boolean addToDatabase(final String directory, final String database, final String projname, final String projtype, final String projtrial, String xmlMetaData){
+	private static boolean addToDatabase(final IFileStore directory, final String database, final String projname, final String projtype, final String projtrial, String xmlMetaData){
 
 		boolean hasdb=false;
 		try {
@@ -499,11 +481,27 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 						//}
 					}});
 				*/
+				final IFileStore local;
+				IFileStore xml = directory.getChild("tauprofile.xml");
+				if(!xml.fetchInfo().exists()){
+					return false;
+				}
+				if(!xml.getFileSystem().equals(EFS.getLocalFileSystem())){
+					File f = xml.toLocalFile(EFS.CACHE,null);
+					if(!f.exists()){
+						return false;
+					}
+					String s = f.getCanonicalPath();
+					local =EFS.getLocalFileSystem().getStore(URI.create(s));
 				
+				}
+				else{
+				local =xml;
+				}
 				class DBView implements Runnable{
 					boolean hasdb=false;
 					public void run() {
-						hasdb = PerfDMFUIPlugin.addPerformanceData(projname,projtype, projtrial, directory, database);
+						hasdb = PerfDMFUIPlugin.addPerformanceData(projname,projtype, projtrial, local, database);
 						
 					}
 					
@@ -514,44 +512,61 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			hasdb=false;
 		}
 		return hasdb;
 	}
 
-	
-	private static void movePakFile(String directory, String projtype, String projtrial, File ppkFile){
-		File profdir = new File(directory + File.separator
-				+ "Profiles" + File.separator + projtype //$NON-NLS-1$
-				+ File.separator + projtrial);
-		profdir.mkdirs();
+	/**
+	 * Moves the ppk file to an approriately named subdirectory of a Profiles directory in the top-level output directory
+	 * @param directory The top level output directory, where the Profiles directory is created
+	 * @param projtype Created a subdirectory of Profiles
+	 * @param projtrial Created as a subdirectory of projtype
+	 * @param ppkFile This file is moved to the projtrial directory
+	 */
+	private void movePakFile(String directory, String projtype, String projtrial, IFileStore ppkFile){
+		IFileStore profdir = utilBlob.getFile(directory).getChild("Profiles").getChild(projtype).getChild(projtrial);
+				
+		try {
+			profdir.mkdir(EFS.NONE,null);
+			ppkFile.move(profdir.getChild(ppkFile.fetchInfo().getName()), EFS.NONE, null);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 
-		ppkFile.renameTo(new File(profdir + File.separator
-				+ ppkFile.getName()));
 	}
 	
-	private static void removeProfiles(File[] remprofs){
+	/**
+	 * Deletes either specified profiles or MULTI profile directories and the profiles they contain
+	 * @param remprofs List of either profile files or MULTI profile directories
+	 */
+	private static void removeProfiles(List<IFileStore> remprofs){
 		
-		if(remprofs==null||remprofs.length==0)
+		if(remprofs==null||remprofs.size()==0)
 			return;
 		
-		boolean multipapi=remprofs[0].isDirectory();
-		
-		for (int i = 0; i < remprofs.length; i++) {
+		boolean multipapi=remprofs.get(0).fetchInfo().isDirectory();
+		try {
+		for (int i = 0; i < remprofs.size(); i++) {
 			if (multipapi) {
-				File[] profs = remprofs[i].listFiles();
+				IFileStore[] profs;
+				
+					profs = remprofs.get(i).childStores(EFS.NONE, null);
+				
 				for (int j = 0; j < profs.length; j++)
-					profs[j].delete();
+					profs[j].delete(EFS.NONE,null);
 			}
-			remprofs[i].delete();
+			remprofs.get(i).delete(EFS.NONE,null);
+		
+		}
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
 	}
 	
-	private static void runTAUInc(final String directory, final String projname, final String projtype, final String projtrial){
+	private void runTAUInc(final String directory, final String projname, final String projtype, final String projtrial){
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
-					
-					//String tbpath = BuildLaunchUtils.getToolPath("tau");
-					
 					/*
 					* Produce MPI include list if specified.
 					* FIXME: Running getRuntime directly instead of through runTool to
@@ -562,19 +577,21 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 						String mpilistname = projname + "_" + projtype + "_" + projtrial+ ".includelist"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						String tauinc = "cd " + directory + " ; "; //$NON-NLS-1$ //$NON-NLS-2$
 						if(tbpath!=null && tbpath.length()>0)
-							tauinc+= tbpath + File.separator;
+							tauinc+= tbpath +UNIX_SLASH;
 						tauinc+= "tauinc.sh > " + mpilistname; //$NON-NLS-1$
 						System.out.println(tauinc);
 						try{
-							String[] cmd = {"sh", "-c", tauinc}; //$NON-NLS-1$ //$NON-NLS-2$
-							//Process p = 
-							Runtime.getRuntime().exec(cmd);
+							List<String> cmd = new ArrayList<String>();// {"sh", "-c", tauinc}; //$NON-NLS-1$ //$NON-NLS-2$
+							cmd.add("sh");
+							cmd.add("-c");
+							cmd.add(tauinc);
+							utilBlob.runTool(cmd, null, directory);//TODO: Test This!
 						}
 						catch (Exception e) {e.printStackTrace();}
 					}});
 	}
 	
-	private static void runPerfEx(String directory, String database, String projname, String projtype, String perfExScript){
+	private void runPerfEx(String directory, String database, String projname, String projtype, String perfExScript){
 		
 		
 		List<String> script = new ArrayList<String>();
@@ -586,10 +603,10 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 
 		
 		
-		BuildLaunchUtils.runTool(script, null,new File(directory));
+		utilBlob.runTool(script, null,directory);
 	}
 	
-	private static boolean runPortal(final File ppkFile){
+	private static boolean runPortal(final IFileStore ppkFile){
 		boolean hasdb = true;
 		
 		Display.getDefault().syncExec(new Runnable() {
@@ -633,40 +650,38 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	private static void managePerfFiles(String directory) throws CoreException
+	private void managePerfFiles(String directory) throws CoreException
 	{
-		class perffilter implements FilenameFilter{
-			public boolean accept(File dir, String name) {
-				if(name.indexOf("perf_data.")!=0) //$NON-NLS-1$
-					return false;
-				return true;
-			}
-		}
-		
-		//String tbpath = BuildLaunchUtils.getToolPath("tau");
-		
-		perffilter seekdir = new perffilter();
-		File dir = new File(directory);
-		File[] perfdir = dir.listFiles(seekdir);
+
+		IFileStore dir = utilBlob.getFile(directory);
+		IFileStore[] perfdir = dir.childStores(EFS.NONE, null);
 
 		if(perfdir==null||perfdir.length<1)
 		{
 			return;
 		}
+		
+		int count=0;
+		for(int i=0;i<perfdir.length;i++){
+			if(perfdir[i].fetchInfo().getName().startsWith("perf_data."))
+				count++;
+		}
 
+		if(count==0)
+			return;
+		
 		List<String> command = new ArrayList<String>();
 		String perf2tau=""; //$NON-NLS-1$
 		if(tbpath!=null && tbpath.length()>0)
-			perf2tau+=tbpath+File.separator;
+			perf2tau+=UNIX_SLASH;
 		perf2tau+="perf2tau"; //$NON-NLS-1$
 		command.add(perf2tau);
-		BuildLaunchUtils.runTool(command,null,dir);
+		utilBlob.runTool(command,null,directory);
 		
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "process-TAU-data"; //$NON-NLS-1$
 	}
 	

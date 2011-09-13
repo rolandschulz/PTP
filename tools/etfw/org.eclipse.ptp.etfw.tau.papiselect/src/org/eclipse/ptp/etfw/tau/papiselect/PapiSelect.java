@@ -42,7 +42,7 @@ public class PapiSelect {
 	private int countType=0;
 	
 	/**
-	 * Creates a PapiSelect object that will use the utilities at the given directory to determing
+	 * Creates a PapiSelect object that will use the utilities at the given directory to determine
 	 * PAPI counter availability
 	 * @param papiLocation Directory containing PAPI utilities
 	 * @param papiCountType Determines if counters requested are preset or native type

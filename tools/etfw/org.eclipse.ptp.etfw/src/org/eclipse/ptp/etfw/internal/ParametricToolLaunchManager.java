@@ -514,7 +514,7 @@ public class ParametricToolLaunchManager {
 	 */
 	@SuppressWarnings("unchecked")
 	public static void launch(ILaunchConfiguration configuration, LaunchConfigurationDelegate paraDel, ILaunchFactory lf,
-			String mode, ILaunch launchIn, IProgressMonitor monitor) throws CoreException // ,
+			String mode, ILaunch launchIn, IProgressMonitor monitor, IBuildLaunchUtils utilBlob) throws CoreException // ,
 																							// TAULaunch
 																							// bLTool
 	{
@@ -717,7 +717,7 @@ public class ParametricToolLaunchManager {
 		for (int bDex = 0; bDex < buildopts.size(); bDex++) {
 
 			Map<String, String> optM = buildopts.get(bDex);
-			BuilderTool builder = new BuilderTool(configuration, bTool, optM);
+			BuilderTool builder = new BuilderTool(configuration, bTool, optM, utilBlob);
 
 			// if(optM!=null)
 			// builder.setBuildMods(optM);
@@ -808,7 +808,7 @@ public class ParametricToolLaunchManager {
 
 				// ;
 
-				final LauncherTool launcher = new LauncherTool(tmpConfig, eTool, builder.getProgramPath(), paraDel, launch);
+				final LauncherTool launcher = new LauncherTool(tmpConfig, eTool, builder.getProgramPath(), paraDel, launch,utilBlob);
 				steps.add(launcher);
 				launcher.addJobChangeListener(tauChange);
 
@@ -818,7 +818,7 @@ public class ParametricToolLaunchManager {
 				 */
 
 				// if(pTool!=null){
-				PostlaunchTool analyzer = new PostlaunchTool(tmpConfig, pTool, builder.getOutputLocation());
+				PostlaunchTool analyzer = new PostlaunchTool(tmpConfig, pTool, builder.getOutputLocation(),utilBlob);
 				steps.add(analyzer);
 				analyzer.addJobChangeListener(tauChange);
 				// }

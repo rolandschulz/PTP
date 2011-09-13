@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -51,6 +52,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.perfdmf.PerfDMFUIPlugin;
 import org.eclipse.ptp.etfw.tau.perfdmf.messages.Messages;
 import org.eclipse.ptp.etfw.tau.perfdmf.views.ParaProfController.Level;
@@ -511,7 +513,7 @@ public class PerfDMFView extends ViewPart {
 	 * The constructor.
 	 */
 	public PerfDMFView() {
-		ppc = new ParaProfController();
+		ppc = new ParaProfController(new BuildLaunchUtils());
 
 		PerfDMFUIPlugin.registerPerfDMFView(this);
 
@@ -743,13 +745,18 @@ public class PerfDMFView extends ViewPart {
 		return true;
 	}
 
-	public boolean addProfile(String project, String projectType, String trialName, String directory, String dbname) {
+	public boolean addProfile(String project, String projectType, String trialName, IFileStore directory, String dbname) {
 		TreeTuple database = getDatabase(dbname);
 		if (database == null)
 			return false;
 
+		try{
 		ppc.uploadTrial(directory, database.id, project, projectType, trialName);
-
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
 		showProfile(project, projectType, trialName);
 
 		return true;
