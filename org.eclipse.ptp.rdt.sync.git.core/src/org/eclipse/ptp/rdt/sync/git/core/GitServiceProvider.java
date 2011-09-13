@@ -203,8 +203,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					}
 					if (resource.getType() == IResource.FOLDER) {
 						IFile emptyFile = project.getFile(resource.getProjectRelativePath().addTrailingSeparator() + ".gitignore"); //$NON-NLS-1$
-						if (!(emptyFile.exists())) {
-							emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+						try {
+							if (!(emptyFile.exists())) {
+								emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+							}
+						} catch (CoreException e){
+							// Nothing to do. Can happen if another thread creates the file between the check and creation.
 						}
 					}
 					return true;
@@ -234,8 +238,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 						&& (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
 					IFile emptyFile = getProject().getFile(
 							delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore"); //$NON-NLS-1$
-					if (!(emptyFile.exists())) {
-						emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+					try {
+						if (!(emptyFile.exists())) {
+							emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
+						}
+					} catch (CoreException e) {
+						// Nothing to do. Can happen if another thread creates the file between the check and creation.
 					}
 				}
 
