@@ -43,6 +43,7 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  * acts the same as the RemoteProjectEnvironmentSupplier at the moment.
  * 
  * @author crecoskie
+ * @since 2.0
  *
  */
 @SuppressWarnings("restriction")
