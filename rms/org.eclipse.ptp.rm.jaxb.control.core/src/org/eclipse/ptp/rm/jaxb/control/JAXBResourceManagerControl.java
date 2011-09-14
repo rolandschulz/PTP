@@ -1100,31 +1100,27 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * XXX: for some reason these are not getting updated correctly
 		 */
-		if (lcattr.get(JAXBControlConstants.DIRECTORY) == null) {
-			lcattr.put(JAXBControlConstants.DIRECTORY,
-					configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, JAXBControlConstants.ZEROSTR));
+		String defaultDir = JAXBControlConstants.ZEROSTR;
+		PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.DIRECTORY);
+		if (p == null || p.getValue() == null) {
+			p = (PropertyType) rmVarMap.get(JAXBControlConstants.CONTROL_WORKING_DIR_VAR);
 		}
-		if (lcattr.get(JAXBControlConstants.EXEC_PATH) == null) {
-			lcattr.put(JAXBControlConstants.EXEC_PATH,
-					configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
+		if (p != null && p.getValue() != null) {
+			defaultDir = (String) p.getValue();
 		}
-		if (lcattr.get(JAXBControlConstants.EXEC_DIR) == null) {
-			String directory = new Path(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
-					JAXBControlConstants.ZEROSTR)).removeLastSegments(1).toString();
-			lcattr.put(JAXBControlConstants.EXEC_DIR, directory);
-		}
-		if (lcattr.get(JAXBControlConstants.PROG_ARGS) == null) {
-			lcattr.put(JAXBControlConstants.PROG_ARGS,
-					configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR));
-		}
-		if (lcattr.get(JAXBControlConstants.DEBUGGER_EXEC_PATH) == null) {
-			lcattr.put(JAXBControlConstants.DEBUGGER_EXEC_PATH, configuration.getAttribute(
-					IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
-		}
-		if (lcattr.get(JAXBControlConstants.DEBUGGER_ARGS) == null) {
-			lcattr.put(JAXBControlConstants.DEBUGGER_ARGS,
-					configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, JAXBControlConstants.ZEROSTR));
-		}
+		lcattr.put(JAXBControlConstants.DIRECTORY,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, defaultDir));
+		lcattr.put(JAXBControlConstants.EXEC_PATH,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
+		String directory = new Path(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
+				JAXBControlConstants.ZEROSTR)).removeLastSegments(1).toString();
+		lcattr.put(JAXBControlConstants.EXEC_DIR, directory);
+		lcattr.put(JAXBControlConstants.PROG_ARGS,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR));
+		lcattr.put(JAXBControlConstants.DEBUGGER_EXEC_PATH, configuration.getAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
+		lcattr.put(JAXBControlConstants.DEBUGGER_ARGS,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, JAXBControlConstants.ZEROSTR));
 
 		/*
 		 * make sure these fixed properties are included
