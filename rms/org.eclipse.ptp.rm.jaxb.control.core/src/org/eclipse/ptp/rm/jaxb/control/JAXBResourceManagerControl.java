@@ -1063,7 +1063,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		for (Object key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
 			Object target = rmVarMap.get(key.toString());
-			System.out.println("updatePropertyValuesFromTab name=" + key + " value=" + value + " target=" + target);
 			if (target instanceof PropertyType) {
 				PropertyType p = (PropertyType) target;
 				p.setValue(value);
