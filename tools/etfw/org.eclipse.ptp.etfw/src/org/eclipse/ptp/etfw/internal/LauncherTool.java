@@ -131,7 +131,7 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 					String path=null;
 					if(isSyncProject)
 					{
-						path=outputLocation;
+						path=progStore.toURI().getPath();//outputLocation;
 					}
 					else
 					{

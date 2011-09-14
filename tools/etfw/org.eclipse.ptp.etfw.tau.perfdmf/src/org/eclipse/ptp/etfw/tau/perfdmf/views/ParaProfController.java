@@ -60,9 +60,13 @@ public class ParaProfController {
 		createProcess();
 
 	}
-
+	public boolean pullReady=false;
+public static final String RESTART="RESTART";
+public static final String DONE="DONE";
 	private void killProcess() {
 		pushQueue = null;
+		pullReady=false;
+		pullQueue.add(RESTART);
 		pullQueue = null;
 		pb = null;
 		errRun = null;
@@ -98,6 +102,7 @@ public class ParaProfController {
 		stdout = new PrintStream(new BufferedOutputStream(proc.getOutputStream()));
 		errRun.start();
 		inRun.start();
+		pullReady=true;
 	}
 
 	public List<TreeTuple> getDatabases() {
@@ -190,7 +195,7 @@ public class ParaProfController {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				if (s.equals("control endreturn") || s.equals("DONE")) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (s.equals("control endreturn") || s.equals(DONE)) { //$NON-NLS-1$ //$NON-NLS-2$
 					done = true;
 				} else {
 					l.add(s);
@@ -274,10 +279,13 @@ public class ParaProfController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			if (pullQueue != null)
-				pullQueue.add("DONE"); //$NON-NLS-1$
+//			if (pullQueue != null){
+//				if(!exception)
+//					pullQueue.add(DONE); //$NON-NLS-1$
+//			}
+				
 			if (pushQueue != null)
-				pushQueue.add("DONE"); //$NON-NLS-1$
+				pushQueue.add(DONE); //$NON-NLS-1$
 		}
 	}
 

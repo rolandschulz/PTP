@@ -423,8 +423,16 @@ public class PerfDMFView extends ViewPart {
 							String s = null;
 							try {
 								s = q.take();
-								if (s == null || s.equals("DONE")) //$NON-NLS-1$
+								if (s == null || s.equals(ParaProfController.DONE)) //$NON-NLS-1$
 									break;
+								if(s.equals(ParaProfController.RESTART)){
+									while(!ppc.pullReady){
+									}
+										
+										q=ppc.getPullQueue();
+										continue;
+									
+								}
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
@@ -440,7 +448,7 @@ public class PerfDMFView extends ViewPart {
 
 							});
 						}
-
+					System.out.println("Leaving Listener");
 				}
 			}
 
