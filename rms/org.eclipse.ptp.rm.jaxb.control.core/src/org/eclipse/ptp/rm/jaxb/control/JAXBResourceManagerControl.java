@@ -17,6 +17,7 @@ import java.util.UUID;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -1062,6 +1063,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		for (Object key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
 			Object target = rmVarMap.get(key.toString());
+			System.out.println("updatePropertyValuesFromTab name=" + key + " value=" + value + " target=" + target);
 			if (target instanceof PropertyType) {
 				PropertyType p = (PropertyType) target;
 				p.setValue(value);
@@ -1097,6 +1099,35 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		progress.worked(10);
 
 		/*
+		 * XXX: for some reason these are not getting updated correctly
+		 */
+		if (lcattr.get(JAXBControlConstants.DIRECTORY) == null) {
+			lcattr.put(JAXBControlConstants.DIRECTORY,
+					configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, JAXBControlConstants.ZEROSTR));
+		}
+		if (lcattr.get(JAXBControlConstants.EXEC_PATH) == null) {
+			lcattr.put(JAXBControlConstants.EXEC_PATH,
+					configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
+		}
+		if (lcattr.get(JAXBControlConstants.EXEC_DIR) == null) {
+			String directory = new Path(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
+					JAXBControlConstants.ZEROSTR)).removeLastSegments(1).toString();
+			lcattr.put(JAXBControlConstants.EXEC_DIR, directory);
+		}
+		if (lcattr.get(JAXBControlConstants.PROG_ARGS) == null) {
+			lcattr.put(JAXBControlConstants.PROG_ARGS,
+					configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR));
+		}
+		if (lcattr.get(JAXBControlConstants.DEBUGGER_EXEC_PATH) == null) {
+			lcattr.put(JAXBControlConstants.DEBUGGER_EXEC_PATH, configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
+		}
+		if (lcattr.get(JAXBControlConstants.DEBUGGER_ARGS) == null) {
+			lcattr.put(JAXBControlConstants.DEBUGGER_ARGS,
+					configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, JAXBControlConstants.ZEROSTR));
+		}
+
+		/*
 		 * make sure these fixed properties are included
 		 */
 		rmVarMap.maybeOverwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, lcattr, false);
@@ -1106,15 +1137,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.maybeOverwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr, false);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr, false);
 		rmVarMap.maybeOverwrite(JAXBControlConstants.DEBUGGER_ARGS, JAXBControlConstants.DEBUGGER_ARGS, lcattr, false);
-
-		/*
-		 * XXX: required until I work out how to update from the launch configuration
-		 */
-		Object x = rmVarMap.get(JAXBControlConstants.DEBUGGER_ARGS);
-		if (x instanceof PropertyType) {
-			((PropertyType) x).setValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS,
-					(String) ((PropertyType) x).getValue()));
-		}
 
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));
