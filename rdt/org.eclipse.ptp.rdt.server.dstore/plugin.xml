@@ -7,7 +7,7 @@
               class="org.eclipse.ptp.rdt.server.dstore.core.DStoreServer"
               continuous="true"
               id="org.eclipse.ptp.rdt.server.dstore.RemoteToolsDStoreServer"
-              launchCommand="java -Xms64m -Xmx128m -Xss2m -DA_PLUGIN_PATH=. -DDSTORE_TRACING_ON=false -Dclient.username=$USER -DDSTORE_SPIRIT_ON=true -jar ${payload} 0 60000"
+              launchCommand="java -Xms64m -Xmx1024m -Xss2m -DA_PLUGIN_PATH=. -DDSTORE_TRACING_ON=false -Dclient.username=$USER -DDSTORE_SPIRIT_ON=true -jar ${payload} 0 60000"
               name="%RemoteToolsDStoreServer.name"
               payload="rdt-server.jar"
               verifyLaunchCommand="java -version"
