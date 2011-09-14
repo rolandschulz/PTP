@@ -17,10 +17,15 @@ import java.util.UUID;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
@@ -36,7 +41,6 @@ import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob.Operation;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJobStatus;
-import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.DebugStarterJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.utils.JobIdPinTable;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
@@ -241,6 +245,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged (java.lang.String)
 	 */
 	public void jobStateChanged(String jobId, IJobStatus status) {
+		/*
+		 * Update any debug models associated with this job ID
+		 */
+		IPResourceManager prm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		if (prm != null) {
+			IPJob job = prm.getJobById(jobId);
+			if (job != null) {
+				if (status.getState().equals(IJobStatus.COMPLETED)) {
+					job.getAttribute(JobAttributes.getStateAttributeDefinition()).setValue(JobAttributes.State.COMPLETED);
+				}
+			}
+		}
 		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
 		getResourceManager().updateJob(jobId, status);
 	}
@@ -394,11 +410,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 					 */
 					status = jobStatusMap.terminated(jobId, progress.newChild(50));
 					if (status != null && status.stateChanged()) {
-						/*
-						 * If this is a debug job, mark it as terminated
-						 */
-						DebugStarterJob.terminate(jobId);
-
 						jobStateChanged(jobId, status);
 					}
 					return status;
@@ -582,7 +593,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		try {
 			job = doJobSubmitCommand(uuid, configuration, mode);
-			if (job.getRunStatus().getSeverity() == IStatus.CANCEL) {
+
+			IStatus status = job.getRunStatus();
+			if (status != null && status.getSeverity() == IStatus.CANCEL) {
 				throw CoreExceptionUtils.newException(Messages.OperationWasCancelled, null);
 			}
 			worked(progress, 40);
@@ -989,8 +1002,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
-		ICommandJob job = new CommandJob(uuid, command, jobMode, (IJAXBResourceManager) getResourceManager(), configuration,
-				launchMode);
+		ICommandJob job = new CommandJob(uuid, command, jobMode, (IJAXBResourceManager) getResourceManager(), launchMode);
 		((Job) job).setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 		job.schedule();
 		if (join) {
@@ -1084,6 +1096,31 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		progress.worked(10);
+
+		/*
+		 * XXX: for some reason these are not getting updated correctly
+		 */
+		String defaultDir = JAXBControlConstants.ZEROSTR;
+		PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.DIRECTORY);
+		if (p == null || p.getValue() == null) {
+			p = (PropertyType) rmVarMap.get(JAXBControlConstants.CONTROL_WORKING_DIR_VAR);
+		}
+		if (p != null && p.getValue() != null) {
+			defaultDir = (String) p.getValue();
+		}
+		lcattr.put(JAXBControlConstants.DIRECTORY,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, defaultDir));
+		lcattr.put(JAXBControlConstants.EXEC_PATH,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
+		String directory = new Path(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
+				JAXBControlConstants.ZEROSTR)).removeLastSegments(1).toString();
+		lcattr.put(JAXBControlConstants.EXEC_DIR, directory);
+		lcattr.put(JAXBControlConstants.PROG_ARGS,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR));
+		lcattr.put(JAXBControlConstants.DEBUGGER_EXEC_PATH, configuration.getAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
+		lcattr.put(JAXBControlConstants.DEBUGGER_ARGS,
+				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, JAXBControlConstants.ZEROSTR));
 
 		/*
 		 * make sure these fixed properties are included

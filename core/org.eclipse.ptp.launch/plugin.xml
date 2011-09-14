@@ -182,5 +182,5 @@
                after="org.eclipse.debug.ui.sourceLookupTab">
          </placement>
       </tab>
-   </extension>	
+   </extension>
 </plugin>

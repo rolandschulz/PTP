@@ -51,8 +51,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.WorkbenchException;
 
 /**
- * A launch configuration delegate for launching jobs via the PTP resource
- * manager mechanism.
+ * A launch configuration delegate for launching jobs via the PTP resource manager mechanism.
  */
 public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchConfigurationDelegate {
 	private class DebuggerSession implements IRunnableWithProgress {
@@ -76,8 +75,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 						subMon.newChild(2));
 
 				/*
-				 * NOTE: we assume these have already been verified prior to
-				 * launch
+				 * NOTE: we assume these have already been verified prior to launch
 				 */
 				String app = getProgramName(fLaunch.getLaunchConfiguration());
 				String path = getProgramPath(fLaunch.getLaunchConfiguration());
@@ -97,11 +95,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.
-	 * eclipse.debug.core.ILaunchConfiguration, java.lang.String,
-	 * org.eclipse.debug.core.ILaunch,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org. eclipse.debug.core.ILaunchConfiguration,
+	 * java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
 			throws CoreException {
@@ -134,7 +129,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 
 			try {
 				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-					// show ptp debug view
+					/*
+					 * Show ptp debug view
+					 */
 					showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 					progress.subTask(Messages.ParallelLaunchConfigurationDelegate_6);
 
@@ -211,8 +208,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
-	 * doCompleteJobLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch,
-	 * org.eclipse.ptp.debug.core.IPDebugger)
+	 * doCompleteJobLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.ptp.debug.core.IPDebugger)
 	 */
 	@Override
 	protected void doCompleteJobLaunch(final IPLaunch launch, final IPDebugger debugger) {
@@ -226,9 +222,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), jobId);
 
 		/*
-		 * Create process that is used by the DebugPlugin for handling console
-		 * output. This process gets added to the debug session so that it is
-		 * also displayed in the Debug View as the system process.
+		 * Create process that is used by the DebugPlugin for handling console output. This process gets added to the debug session
+		 * so that it is also displayed in the Debug View as the system process.
 		 */
 		new RuntimeProcess(launch, rm, jobId, null);
 
@@ -253,8 +248,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				});
 			} catch (final CoreException e) {
 				/*
-				 * Completion of launch fails, then terminate the job and
-				 * display error message.
+				 * Completion of launch fails, then terminate the job and display error message.
 				 */
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
