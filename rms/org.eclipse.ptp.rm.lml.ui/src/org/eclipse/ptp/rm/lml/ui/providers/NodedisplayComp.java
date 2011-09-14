@@ -67,13 +67,10 @@ import org.eclipse.swt.widgets.Listener;
  * 
  * Inner composites are NodedisplayComp again (recursive)
  * 
- * A NodedisplayComp represents one physical element within the nodedisplay-tag.
- * This might be a row, midplane, node or cpu. Through NodedisplayComp the
- * reduced collapsed tree of lml is fully expanded to maxlevel. Every visible
- * component in the nodedisplay is shown by a NodedisplayComp. There is one
- * exception: For performance reasons the lowest-level rectangles are painted
- * directly. So for the rectangles (physical elements) in the lowest level no
- * composites are created.
+ * A NodedisplayComp represents one physical element within the nodedisplay-tag. This might be a row, midplane, node or cpu. Through
+ * NodedisplayComp the reduced collapsed tree of lml is fully expanded to maxlevel. Every visible component in the nodedisplay is
+ * shown by a NodedisplayComp. There is one exception: For performance reasons the lowest-level rectangles are painted directly. So
+ * for the rectangles (physical elements) in the lowest level no composites are created.
  * 
  * The look of the nodedisplay is defined by the lml-Nodedisplay-Layout.
  * 
@@ -103,8 +100,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Parses through scheme and generates suitable preferences for every level
-	 * of the nodedisplay-tree
+	 * Parses through scheme and generates suitable preferences for every level of the nodedisplay-tree
 	 * 
 	 * @param scheme
 	 *            scheme of nodedisplay
@@ -154,8 +150,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * @return default GridData instance, which simulates Swing-behaviour of
-	 *         gridlayout
+	 * @return default GridData instance, which simulates Swing-behaviour of gridlayout
 	 */
 	public static GridData getDefaultGridData() {
 		final GridData griddata = new GridData();
@@ -281,15 +276,13 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * Call this constructor for start, maxlevel is chosen from lml-file
 	 * 
 	 * @param lgui
-	 *            wrapper instance around LguiType-instance -- provides easy
-	 *            access to lml-information
+	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
 	 * @param pmodel
 	 *            lml-model, which has data for this Nodedisplay
 	 * @param pnodeview
 	 *            root-nodedisplay is needed for zooming
 	 * @param pnode
-	 *            current node, which is root-data-element of this
-	 *            NodedisplayComp
+	 *            current node, which is root-data-element of this NodedisplayComp
 	 * @param style
 	 *            SWT Style
 	 */
@@ -321,11 +314,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * easy constructor for a nodedisplay as root-node
 	 * 
 	 * @param lgui
-	 *            wrapper instance around LguiType-instance -- provides easy
-	 *            access to lml-information
+	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
 	 * @param pmodel
-	 *            lml-model for the nodedisplay, which should be shown in this
-	 *            panel
+	 *            lml-model for the nodedisplay, which should be shown in this panel
 	 * @param lgui
 	 *            complete lml-model containing this nodedisplay
 	 * @param parent
@@ -340,17 +331,14 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Call this constructor for inner or lower elements, rellevel is counted to
-	 * zero with every level
+	 * Call this constructor for inner or lower elements, rellevel is counted to zero with every level
 	 * 
 	 * @param lgui
-	 *            wrapper instance around LguiType-instance -- provides easy
-	 *            access to lml-information
+	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
 	 * @param pmodel
 	 *            lml-model, which has data for this Nodedisplay
 	 * @param pnode
-	 *            current node, which is root-data-element of this
-	 *            NodedisplayComp
+	 *            current node, which is root-data-element of this NodedisplayComp
 	 * @param pnodeview
 	 *            root-nodedisplay is needed for zooming
 	 * @param pparentNodedisplay
@@ -390,8 +378,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	/**
 	 * Search for a layout-section for this nodedisplay-panel
 	 * 
-	 * @return lml-Nodedisplay-layout-section for this displaynode, or
-	 *         default-layout if no layout is defined
+	 * @return lml-Nodedisplay-layout-section for this displaynode, or default-layout if no layout is defined
 	 */
 	public Nodedisplayelement findLayout() {
 
@@ -468,21 +455,18 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Generates DisplayNodes for every visible component, which is a child of
-	 * the element identified by the level-ids.
+	 * Generates DisplayNodes for every visible component, which is a child of the element identified by the level-ids.
 	 * 
 	 * @param aScheme
 	 *            current lml-scheme describing a node
 	 * @param aData
 	 *            current lml-data for this node
 	 * @param levels
-	 *            ids for every level to identify a node in the lml-tree (1,1,1)
-	 *            means first cpu in first nodecard in first row
+	 *            ids for every level to identify a node in the lml-tree (1,1,1) means first cpu in first nodecard in first row
 	 * @param nodedisplay
 	 *            full LML-Model for a nodedisplay
 	 * @param highestRowfirst
-	 *            defines how the result will be sorted, true=> descending,
-	 *            false ascending
+	 *            defines how the result will be sorted, true=> descending, false ascending
 	 * @return list of DisplayNodes
 	 */
 	public ArrayList<DisplayNode> getLowerDisplayNodes(Object aScheme, Object aData, ArrayList<Integer> levels,
@@ -509,14 +493,14 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 					schemesForIds.put(aNumber, laScheme);
 				}
 
-			} else {// min- max-attributes
+			} else if (laScheme.getMin() != null) {// min- max-attributes
 				final int min = laScheme.getMin().intValue();
 				int max = min;
 				if (laScheme.getMax() != null) {
 					max = laScheme.getMax().intValue();
 				}
 
-				final int step = laScheme.getStep().intValue();
+				final int step = laScheme.getStep() != null ? laScheme.getStep().intValue() : 1;
 				for (int j = min; j <= max; j += step) {
 					numbers.add(j);
 					schemesForIds.put(j, laScheme);
@@ -559,8 +543,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * @return implicit name of node within nodedisplay, which is shown by this
-	 *         NodedisplayPanel
+	 * @return implicit name of node within nodedisplay, which is shown by this NodedisplayPanel
 	 */
 	public String getShownImpname() {
 		if (fDisplayNode == null) {
@@ -613,8 +596,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Calculate minimum size of this nodedisplay, which is needed to show all
-	 * painted rectangles in defined minimum size.
+	 * Calculate minimum size of this nodedisplay, which is needed to show all painted rectangles in defined minimum size.
 	 * 
 	 */
 	public void showMinRectangleSizes() {
@@ -665,8 +647,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Adds a dispose-listener, which removes this nodedisplay and its children
-	 * from Objectstatus.
+	 * Adds a dispose-listener, which removes this nodedisplay and its children from Objectstatus.
 	 */
 	private void addDisposeAction() {
 		this.addDisposeListener(new DisposeListener() {
@@ -683,8 +664,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Adds listeners to innerPanel, which react to user interaction on lowest
-	 * level rectangles.
+	 * Adds listeners to innerPanel, which react to user interaction on lowest level rectangles.
 	 */
 	private void addMouseListenerToInnerPanel() {
 
@@ -747,9 +727,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Adds a listener, which calls showMinRectangleSize everytime this
-	 * component is painted. This is needed to change minimum size in
-	 * surrounding ScrollPane.
+	 * Adds a listener, which calls showMinRectangleSize everytime this component is painted. This is needed to change minimum size
+	 * in surrounding ScrollPane.
 	 */
 	private void addPaintListener() {
 
@@ -826,9 +805,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Forward call to calculate desired minimum size to all inner components.
-	 * If this nodedisplay paints rectangles itself, this method calls the
-	 * calculateResize-function of the rectangle-painting-listener.
+	 * Forward call to calculate desired minimum size to all inner components. If this nodedisplay paints rectangles itself, this
+	 * method calls the calculateResize-function of the rectangle-painting-listener.
 	 */
 	private void callMinSizeCalculation() {
 
@@ -848,9 +826,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Check if maxlevel is bigger than deepest possible level within this
-	 * scheme-part. Change this fault by setting maxLevel to maximum possible
-	 * value.
+	 * Check if maxlevel is bigger than deepest possible level within this scheme-part. Change this fault by setting maxLevel to
+	 * maximum possible value.
 	 */
 	private void checkMaxLevel() {
 
@@ -898,8 +875,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Initializes the surrounding pictureFrame and inserts pictures for this
-	 * nodedisplay-level.
+	 * Initializes the surrounding pictureFrame and inserts pictures for this nodedisplay-level.
 	 */
 	private void createPictureFrame() {
 
@@ -920,8 +896,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * @return 1 if layout defines 0 for cols, otherwise the value set by the
-	 *         layout
+	 * @return 1 if layout defines 0 for cols, otherwise the value set by the layout
 	 */
 	@SuppressWarnings("unused")
 	private int getCols() {
@@ -933,8 +908,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Converts a URL given as String into a https-URL. The standard httpsport
-	 * is set in the result-URL.
+	 * Converts a URL given as String into a https-URL. The standard httpsport is set in the result-URL.
 	 * 
 	 * @param lmlurl
 	 *            normal URL as String
@@ -960,8 +934,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Generate the text shown for a displaynode, which is covered by
-	 * mouse-cursor.
+	 * Generate the text shown for a displaynode, which is covered by mouse-cursor.
 	 * 
 	 * @param focussed
 	 *            the displaynode which is covered
@@ -981,8 +954,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Part of constructor, which is equal in two constructors therefore
-	 * outsourced
+	 * Part of constructor, which is equal in two constructors therefore outsourced
 	 * 
 	 * @param nodedisplay
 	 */
@@ -1065,8 +1037,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * If inner panels exist and maxlevel is greater than alevel, then insert
-	 * lower level-panels
+	 * If inner panels exist and maxlevel is greater than alevel, then insert lower level-panels
 	 */
 	private void insertInnerPanel(int aLevel, Object aScheme, Object aData, ArrayList<Integer> levels) {
 
@@ -1196,8 +1167,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * 
 	 * @param displayNode
 	 *            the displaynode, which is checked
-	 * @return true, if anything in request-chain is null or if object-id is
-	 *         "empty"
+	 * @return true, if anything in request-chain is null or if object-id is "empty"
 	 */
 	private boolean isDisplayNodeEmpty(DisplayNode displayNode) {
 		if (displayNode == null) {
@@ -1217,8 +1187,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Remove recursively this component and all inner NodedisplayComp-instances
-	 * from ObjectStatus. Call this function before this Composite is disposed
+	 * Remove recursively this component and all inner NodedisplayComp-instances from ObjectStatus. Call this function before this
+	 * Composite is disposed
 	 */
 	private void removeUpdatable() {
 
@@ -1232,8 +1202,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Set minimum height for this nodedisplay. At least this height should be
-	 * used to display it. No forwarding to parent components.
+	 * Set minimum height for this nodedisplay. At least this height should be used to display it. No forwarding to parent
+	 * components.
 	 * 
 	 * @param height
 	 *            minimum height
@@ -1243,9 +1213,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Set minimum size for this nodedisplay. At least this size should be used
-	 * to display it. Use this function to initialize minWidth and minHeight. No
-	 * forwarding to parent components.
+	 * Set minimum size for this nodedisplay. At least this size should be used to display it. Use this function to initialize
+	 * minWidth and minHeight. No forwarding to parent components.
 	 * 
 	 * @param width
 	 *            minimum width
@@ -1258,8 +1227,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Set minimum width for this nodedisplay. At least this width should be
-	 * used to display it. No forwarding to parent components.
+	 * Set minimum width for this nodedisplay. At least this width should be used to display it. No forwarding to parent components.
 	 * 
 	 * @param width
 	 *            minimum width
@@ -1269,8 +1237,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Set default preferences for scrollpane. This function is only used for
-	 * root-NodedisplayComposites.
+	 * Set default preferences for scrollpane. This function is only used for root-NodedisplayComposites.
 	 */
 	private void setScrollBarPreferences() {
 		final ScrolledComposite scrolledComposite = fNodedisplayView.getScrollPane();
