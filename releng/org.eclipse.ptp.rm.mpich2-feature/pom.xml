@@ -13,4 +13,5 @@
   <artifactId>org.eclipse.ptp.rm.mpich2</artifactId>
   <version>5.0.0-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
+  <groupId>org.eclipse.ptp.features</groupId>
 </project>
