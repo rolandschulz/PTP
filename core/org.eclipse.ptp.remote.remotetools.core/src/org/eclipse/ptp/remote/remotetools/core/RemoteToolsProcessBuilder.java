@@ -34,7 +34,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	private final RemoteToolsFileManager fFileMgr;
 	private final Map<String, String> fRemoteEnv;
 	private Map<String, String> fNewRemoteEnv = null;
-	private final Set<Character> charSet = new HashSet<Character>();
+	private Set<Character> charSet = new HashSet<Character>();
 
 	/**
 	 * @since 4.0
@@ -44,11 +44,11 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 		fConnection = conn;
 		fFileMgr = fileMgr;
 		fRemoteEnv = new HashMap<String, String>(conn.getEnv());
-
-		// Create set of characters not to escape
+		
+		//Create set of characters not to escape
 		String trustedChars = null;
 		trustedChars = "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; //$NON-NLS-1$ //$NON-NLS-2$
-		trustedChars += "0123456789" + "/._-;=@"; //$NON-NLS-1$ //$NON-NLS-2$
+		trustedChars += "0123456789" + "/._-"; //$NON-NLS-1$ //$NON-NLS-2$
 		CharacterIterator it = new StringCharacterIterator(trustedChars);
 		for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
 			charSet.add(c);
@@ -80,7 +80,8 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#environment()
+	 * @see
+	 * org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#environment()
 	 */
 	@Override
 	public Map<String, String> environment() {
@@ -94,7 +95,9 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getSupportedFlags ()
+	 * @see
+	 * org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getSupportedFlags
+	 * ()
 	 */
 	@Override
 	public int getSupportedFlags() {
