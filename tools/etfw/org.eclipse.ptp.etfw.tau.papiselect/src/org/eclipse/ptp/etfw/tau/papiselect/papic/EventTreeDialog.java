@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -12,6 +13,7 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.papiselect.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -25,14 +27,15 @@ public class EventTreeDialog extends Dialog {
 
 	CheckboxTreeViewer treeV;
 	EventTree et;
-	private final String toolPath;
+	private final IFileStore toolPath;
 	// private Tree tree;
 	PapiCSelect cSelect;
-
+	private final IBuildLaunchUtils utilBlob;
 	// private final String treeTop="treeTop";
 
-	public EventTreeDialog(Shell parentShell, String tp) {
+	public EventTreeDialog(Shell parentShell, IFileStore tp, IBuildLaunchUtils utilBlob) {
 		super(parentShell);
+		this.utilBlob=utilBlob;
 		this.setShellStyle(this.getShellStyle() | SWT.RESIZE);
 		toolPath = tp;
 	}
@@ -54,7 +57,7 @@ public class EventTreeDialog extends Dialog {
 
 		// et=new EventTree();
 
-		cSelect = new PapiCSelect(toolPath);// "E:\\PAPIProject\\ptest2.xml");//
+		cSelect = new PapiCSelect(toolPath,utilBlob);// "E:\\PAPIProject\\ptest2.xml");//
 		et = cSelect.getEventTree();
 
 		treeV.setContentProvider(et);

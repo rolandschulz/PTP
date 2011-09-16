@@ -47,9 +47,9 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
-import org.eclipse.ptp.etfw.internal.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.internal.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.tau.papiselect.PapiListSelectionDialog;
@@ -1524,7 +1524,6 @@ private static final String TAU_MAKEFILE_PREFIX="Makefile.tau";
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		IFileStore papibin=null;
@@ -1594,7 +1593,7 @@ private static final String TAU_MAKEFILE_PREFIX="Makefile.tau";
 //					return;
 //				}
 
-				EventTreeDialog treeD=new EventTreeDialog(getShell(),pdir.toURI().getPath());//TODO: This needs to use IFileStore
+				EventTreeDialog treeD=new EventTreeDialog(getShell(),pdir,blt);
 				//				if ((varmap != null) && (varmap.size() > 0)) {
 				//				treeD.setInitialSelections(varmap.values().toArray());
 				//				}
@@ -1615,7 +1614,7 @@ private static final String TAU_MAKEFILE_PREFIX="Makefile.tau";
 					papiCountType = PapiListSelectionDialog.NATIVE;
 				}
 				PapiListSelectionDialog papidialog = new PapiListSelectionDialog(
-						getShell(), pdir.toURI().getPath(), paprov, papilab, //TODO: This needs to use IFileStore
+						getShell(), pdir,blt, paprov, papilab,
 						Messages.TAUAnalysisTab_SelectPapiCountersForTau, papiCountType);
 				papidialog.setTitle(Messages.TAUAnalysisTab_PapiCounters);
 				papidialog.setHelpAvailable(false);

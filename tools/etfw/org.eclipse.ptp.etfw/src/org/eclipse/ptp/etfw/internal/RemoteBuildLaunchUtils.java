@@ -18,6 +18,7 @@
 package org.eclipse.ptp.etfw.internal;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,6 +38,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
@@ -409,13 +411,13 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 				fos = test.openOutputStream(EFS.NONE, null);//test.openOutputStream(options, monitor)new FileOutputStream(test);
 			}
 
-			IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);//new IRemoteProcessBuilder(tool);
-			pb.directory(fileManager.getResource(directory));
-			if (env != null) {
-				pb.environment().putAll(env);
-			}
+//			IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);//new IRemoteProcessBuilder(tool);
+//			pb.directory(fileManager.getResource(directory));
+//			if (env != null) {
+//				pb.environment().putAll(env);
+//			}
 
-			IRemoteProcess p = pb.start();// Runtime.getRuntime().exec(tool, env,
+			IRemoteProcess p = getProcess(tool,env,directory);//pb.start();// Runtime.getRuntime().exec(tool, env,
 									// directory);
 			StreamRunner outRun = new StreamRunner(p.getInputStream(), "out", fos); //$NON-NLS-1$
 			StreamRunner errRun = new StreamRunner(p.getErrorStream(), "err", null); //$NON-NLS-1$
@@ -434,25 +436,85 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 		}
 		return (eval == 0);// true;
 	}
-
-	public  boolean runVis(List<String> tool, Map<String, String> env, String directory) {
+	
+	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory){
 		int eval = -1;
+		byte[] out = null;
 		try {
 
+			ByteArrayOutputStream fos = new ByteArrayOutputStream();//null;
+//			if (output != null) {
+//				IFileStore test = fileManager.getResource(output);
+//				//File test = new File(output);
+//				IFileStore parent = test.getParent();//fileManager.getResource
+//				//File parent = test.getParentFile();
+//				if (parent == null || !parent.fetchInfo().exists()) {
+//					parent = fileManager.getResource(directory);
+//					test=parent.getChild(output);
+//					//output = directory + File.separator + output;
+//				}
+//				fos = test.openOutputStream(EFS.NONE, null);//test.openOutputStream(options, monitor)new FileOutputStream(test);
+//			}
+
+
+			IRemoteProcess p = getProcess(tool,env,directory);//pb.start();// Runtime.getRuntime().exec(tool, env,
+									// directory);
+			StreamRunner outRun = new StreamRunner(p.getInputStream(), "out", fos); //$NON-NLS-1$
+			StreamRunner errRun = new StreamRunner(p.getErrorStream(), "err", null); //$NON-NLS-1$
+			outRun.start();
+			errRun.start();
+			outRun.join();
+			eval = p.waitFor();
+			if (fos != null) {
+				fos.flush();
+				out=fos.toByteArray();
+			}
+
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		if (eval != 0)
+			return null;
+		
+		return out;
+	}
+	
+	
+	private IRemoteProcess getProcess(List<String> tool, Map<String, String> env, String directory) throws IOException{
+
+
 			IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);//new IRemoteProcessBuilder(tool);
-			pb.directory(fileManager.getResource(directory));
+			if(directory!=null)
+				pb.directory(fileManager.getResource(directory));
 			if (env != null) {
 				pb.environment().putAll(env);
 			}
 
-			//Process p = 
-				pb.start();
+			return pb.start();
+	}
+
+	public  void runVis(List<String> tool, Map<String, String> env, String directory) {
+		//int eval = -1;
+		try {
+//
+//			IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);//new IRemoteProcessBuilder(tool);
+//			pb.directory(fileManager.getResource(directory));
+//			if (env != null) {
+//				pb.environment().putAll(env);
+//			}
+//
+//			//Process p = 
+//				pb.start();
+			
+			getProcess(tool,env,directory);
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			//return false;
 		}
-		return (eval == 0);// true;
+		//return (eval == 0);// true;
 	}
 
 	static class StreamRunner extends Thread {

@@ -1,4 +1,4 @@
-package org.eclipse.ptp.etfw.internal;
+package org.eclipse.ptp.etfw;
 
 //import java.io.File;
 import java.util.List;
@@ -104,9 +104,19 @@ public interface IBuildLaunchUtils {
 	 */
 	public boolean runTool(List<String> tool, Map<String, String> env, String directory) ;
 
+	/**
+	 * 
+	 * @param tool The command to be run 
+	 * @param env A list of environment variables to associate with the tool
+	 * @param directory The directory where the tool is invoked
+	 * @param output The path to the file where the output should be written
+	 * @return
+	 */
 	public boolean runTool(List<String> tool, Map<String, String> env, String directory, String output) ;
 
-	public boolean runVis(List<String> tool, Map<String, String> env, String directory);
+	public void runVis(List<String> tool, Map<String, String> env, String directory);
+	
+	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory);
 	
 	
 }

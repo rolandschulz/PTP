@@ -17,14 +17,16 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw.tau.papitest;
 
-import java.io.File;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.etfw.IBuildLaunchUtils;
+import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.Activator;
 import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.tau.papiselect.PapiListSelectionDialog;
@@ -73,16 +75,16 @@ public class TestPAPI {
 		String papiLoc = Activator.getDefault().getPreferenceStore().getString(papiLocationSelectionVar);
 
 		// System.out.println(papiLoc+" "+papiCountType);
-
-		File pdir = new File(papiLoc);
-		if (!pdir.isDirectory() || !pdir.canRead()) {
+		IBuildLaunchUtils blt = new BuildLaunchUtils();
+		IFileStore pdir = blt.getFile(papiLoc);//new File(papiLoc);
+		if (!pdir.fetchInfo().exists() || !pdir.fetchInfo().isDirectory()){// || !pdir..canRead()) {
 			return;
 		}
-		File pcxi = new File(papiLoc + File.separator + "papi_xml_event_info"); //$NON-NLS-1$
+		IFileStore pcxi = pdir.getChild("papi_xml_event_info");// new File(papiLoc + File.separator + "papi_xml_event_info"); //$NON-NLS-1$
 
-		if (pcxi.canRead() && pcxi.exists())// papiCountType==2)
+		if (pcxi.fetchInfo().exists())// papiCountType==2)
 		{
-			EventTreeDialog treeD = new EventTreeDialog(window.getShell(), papiLoc);
+			EventTreeDialog treeD = new EventTreeDialog(window.getShell(), pdir,blt);
 
 			if (treeD.open() == Window.OK) {
 				showCounters(treeD.getCommands().toArray());
@@ -90,7 +92,7 @@ public class TestPAPI {
 			return;
 		}
 
-		PapiListSelectionDialog papidialog = new PapiListSelectionDialog(window.getShell(), papiLoc, paprov, papilab,
+		PapiListSelectionDialog papidialog = new PapiListSelectionDialog(window.getShell(), pdir,blt, paprov, papilab,
 				Messages.TestPAPI_SelectPapiCounters, papiCountType);
 		papidialog.setTitle(Messages.TestPAPI_PapiCounters);
 		papidialog.setHelpAvailable(false);

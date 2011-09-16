@@ -18,6 +18,7 @@
 package org.eclipse.ptp.etfw.internal;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,6 +39,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
@@ -344,7 +346,8 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 			}
 
 			ProcessBuilder pb = new ProcessBuilder(tool);
-			pb.directory(new File(directory));
+			if(directory!=null)
+				pb.directory(new File(directory));
 			if (env != null) {
 				pb.environment().putAll(env);
 			}
@@ -369,8 +372,8 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 		return (eval == 0);// true;
 	}
 
-	public  boolean runVis(List<String> tool, Map<String, String> env, String directory) {
-		int eval = -1;
+	public  void runVis(List<String> tool, Map<String, String> env, String directory) {
+		//int eval = -1;
 		try {
 
 			ProcessBuilder pb = new ProcessBuilder(tool);
@@ -384,9 +387,9 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			//return false;
 		}
-		return (eval == 0);// true;
+		//return (eval == 0);// true;
 	}
 
 	static class StreamRunner extends Thread {
@@ -428,10 +431,45 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	}
 
 	public IFileStore getFile(String path) {
-		// TODO Auto-generated method stub
 		
 		return EFS.getLocalFileSystem().getStore(URI.create(path));
-		///return null;
+	}
+
+	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env,
+			String directory) {
+		int eval = -1;
+		byte[] out = null;
+		try {
+
+			ByteArrayOutputStream fos = new ByteArrayOutputStream();
+			
+			ProcessBuilder pb = new ProcessBuilder(tool);
+			if(directory!=null)
+				pb.directory(new File(directory));
+			if (env != null) {
+				pb.environment().putAll(env);
+			}
+
+			Process p = pb.start();// Runtime.getRuntime().exec(tool, env,
+									// directory);
+			StreamRunner outRun = new StreamRunner(p.getInputStream(), "out", fos); //$NON-NLS-1$
+			StreamRunner errRun = new StreamRunner(p.getErrorStream(), "err", null); //$NON-NLS-1$
+			outRun.start();
+			errRun.start();
+			outRun.join();
+			eval = p.waitFor();
+			if (fos != null) {
+				fos.flush();
+				out=fos.toByteArray();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		if(eval!=0)
+			return null;
+		return out;// true;
 	}
 
 }

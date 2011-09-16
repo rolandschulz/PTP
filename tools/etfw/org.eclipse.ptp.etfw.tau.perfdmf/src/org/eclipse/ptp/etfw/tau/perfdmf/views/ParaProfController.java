@@ -12,7 +12,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.ptp.etfw.internal.IBuildLaunchUtils;
+import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 
 /**
  * @since 2.0
