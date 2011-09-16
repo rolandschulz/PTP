@@ -25,6 +25,7 @@ public class Messages extends NLS {
 	public static String ConvertFromRemoteCToSyncProjectWizardPage_1;
 	public static String ConvertFromRemoteCToSyncProjectWizardPage_2;
 	public static String ConvertFromRemoteCToSyncProjectWizardPage_3;
+	public static String ConvertLocalToSyncProjectWizardPage_0;
 	public static String ConvertToRemoteWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_convertingToSyncProject;
