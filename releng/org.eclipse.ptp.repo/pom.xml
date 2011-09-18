@@ -19,7 +19,7 @@
 		<profile>
 			<id>production</id>
 			<properties>
-				<cdt-install>/Users/greg</cdt-install>
+				<ptp-install>/Users/greg/ptp-install</ptp-install>
 			</properties>
 			<build>
 				<plugins>

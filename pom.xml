@@ -63,6 +63,7 @@
 		<module>debug/org.eclipse.ptp.debug.sdm.ui</module>
 		<module>debug/org.eclipse.ptp.debug.ui</module>
 		<module>doc/org.eclipse.ptp.doc.user</module>
+		<module>doc/org.eclipse.ptp.doc.isv</module>
 		<module>photran/org.eclipse.photran.cdtinterface</module>
 		<module>photran/org.eclipse.photran.cdtinterface.vpg</module>
 		<module>photran/org.eclipse.photran.core</module>
@@ -79,7 +80,6 @@
 		<module>photran/org.eclipse.photran.managedbuilder.xlf.ui</module>
 		<module>photran/org.eclipse.photran.ui</module>
 		<module>photran/org.eclipse.photran.ui.vpg</module>
-		<module>photran/org.eclipse.photran.vpg-feature</module>
 		<module>photran/org.eclipse.photran.xlf-feature</module>
 		<module>photran/org.eclipse.rephraserengine.core</module>
 		<module>photran/org.eclipse.rephraserengine.core.refactoring</module>
@@ -89,6 +89,8 @@
 		<module>photran/org.eclipse.rephraserengine.ui.refactoring</module>
 		<module>photran/org.eclipse.rephraserengine.ui.vpg</module>
 		<module>rdt/org.eclipse.ptp.rdt.core</module>
+		<module>rdt/org.eclipse.ptp.rdt.core.remotejars</module>
+		<module>rdt/org.eclipse.ptp.rdt.core.stubs</module>
 		<module>rdt/org.eclipse.ptp.rdt.doc.user</module>
 		<module>rdt/org.eclipse.ptp.rdt.make.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.managedbuilder.gnu.ui</module>
@@ -124,11 +126,9 @@
 		<module>releng/org.eclipse.ptp.rdt-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.remotejars-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.remotetools-feature</module>
-		<module>releng/org.eclipse.ptp.rdt.sdk-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.sync-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.sync.fortran-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.xlc-feature</module>
-		<module>releng/org.eclipse.ptp.rdt.xlc.sdk-feature</module>
 		<module>releng/org.eclipse.ptp.remote-feature</module>
 		<module>releng/org.eclipse.ptp.remote.remotetools-feature</module>
 		<module>releng/org.eclipse.ptp.remote.rse-feature</module>
@@ -162,7 +162,6 @@
 		<module>rms/org.eclipse.ptp.rm.jaxb.control.ui</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.core</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.help</module>
-		<module>rms/org.eclipse.ptp.rm.jaxb.openmpi</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.pbs</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.pbs.doc.user</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.ui</module>
@@ -186,7 +185,6 @@
 		<module>tools/etfw/org.eclipse.ptp.etfw</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.doc.user</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.feedback</module>
-		<module>tools/etfw/org.eclipse.ptp.etfw.feedback.sample</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.parallel</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.tau</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.tau.papiselect</module>
@@ -218,6 +216,7 @@
 		<module>tools/remotetools/org.eclipse.ptp.remotetools.preferences</module>
 		<module>tools/remotetools/org.eclipse.ptp.remotetools.utils</module>
 		<module>tools/sci/org.eclipse.ptp.sci</module>
+		<module>releng/org.eclipse.ptp.repo</module>
 	</modules>
 
 	<repositories>
@@ -234,6 +233,11 @@
 		<repository>
 			<id>tm-${tm-version}</id>
 			<url>${tm-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>indigo</id>
+			<url>http://download.eclipse.org/releases/indigo</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>

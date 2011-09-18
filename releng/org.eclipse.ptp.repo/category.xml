@@ -30,11 +30,11 @@
    <feature url="features/org.eclipse.ptp.etfw.ppw_0.0.0.jar" id="org.eclipse.ptp.etfw.ppw" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.sci_0.0.0.jar" id="org.eclipse.ptp.sci" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.sdk_0.0.0.jar" id="org.eclipse.ptp.sdk" version="0.0.0"/>
-   <!--feature url="features/org.eclipse.ptp.rdt_0.0.0.jar" id="org.eclipse.ptp.rdt" version="0.0.0"/-->
-   <!--feature url="features/org.eclipse.ptp.rdt.xlc_0.0.0.jar" id="org.eclipse.ptp.rdt.xlc" version="0.0.0"/-->
-   <!--feature url="features/org.eclipse.ptp.rdt.sync_0.0.0.jar" id="org.eclipse.ptp.rdt.sync" version="0.0.0"/-->
-   <!--feature url="features/org.eclipse.ptp.rdt.sync.fortran_0.0.0.jar" id="org.eclipse.ptp.rdt.sync.fortran" version="0.0.0"/-->
-   <!--feature url="features/org.eclipse.ptp.rdt.remotetools_0.0.0.jar" id="org.eclipse.ptp.rdt.remotetools" version="0.0.0"/-->
+   <feature url="features/org.eclipse.ptp.rdt_0.0.0.jar" id="org.eclipse.ptp.rdt" version="0.0.0"/>
+   <feature url="features/org.eclipse.ptp.rdt.xlc_0.0.0.jar" id="org.eclipse.ptp.rdt.xlc" version="0.0.0"/>
+   <feature url="features/org.eclipse.ptp.rdt.sync_0.0.0.jar" id="org.eclipse.ptp.rdt.sync" version="0.0.0"/>
+   <feature url="features/org.eclipse.ptp.rdt.sync.fortran_0.0.0.jar" id="org.eclipse.ptp.rdt.sync.fortran" version="0.0.0"/>
+   <feature url="features/org.eclipse.ptp.rdt.remotetools_0.0.0.jar" id="org.eclipse.ptp.rdt.remotetools" version="0.0.0"/>
    <feature url="features/org.eclipse.photran_0.0.0.jar" id="org.eclipse.photran" version="0.0.0"/>
    <feature url="features/org.eclipse.photran.intel_0.0.0.jar" id="org.eclipse.photran.intel" version="0.0.0" os="linux"/>
    <feature url="features/org.eclipse.photran.xlf_0.0.0.jar" id="org.eclipse.photran.xlf" version="0.0.0"/>
