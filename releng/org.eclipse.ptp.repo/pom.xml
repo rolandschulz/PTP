@@ -19,7 +19,7 @@
 		<profile>
 			<id>production</id>
 			<properties>
-				<ptp-install>/Users/greg/ptp-install</ptp-install>
+				<ptp-install>/home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/cdt-nightly</ptp-install>
 			</properties>
 			<build>
 				<plugins>
