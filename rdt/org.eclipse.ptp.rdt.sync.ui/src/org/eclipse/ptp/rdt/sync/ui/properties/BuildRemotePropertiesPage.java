@@ -21,6 +21,7 @@ import org.eclipse.cdt.managedbuilder.core.IMultiConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.internal.core.MultiConfiguration;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractSingleBuildPage;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
@@ -321,12 +322,13 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 */
 	private void saveConfig(IConfiguration config, PageSettings settings) {
 		// Set build path in build configuration to appropriate directory
-		ManagedBuildManager.saveBuildInfo(config.getOwner().getProject(), true);
+		IProject project = config.getOwner().getProject();
+		ManagedBuildManager.saveBuildInfo(project, true);
 
         // Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
         // the BuildConfigurationManager relies on the data being up-to-date.
         BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-        String syncProvider = bcm.getBuildScenarioForBuildConfiguration(config).getSyncProvider();
+        String syncProvider = bcm.getProjectSyncProvider(project);
         BuildScenario buildScenario = new BuildScenario(syncProvider, settings.connection, settings.rootLocation);
         bcm.setBuildScenarioForBuildConfiguration(buildScenario, config);
         try {
