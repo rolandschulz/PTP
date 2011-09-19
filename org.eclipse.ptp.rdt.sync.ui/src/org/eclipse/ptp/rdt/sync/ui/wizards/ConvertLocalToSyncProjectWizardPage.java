@@ -26,6 +26,7 @@ import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
 import org.eclipse.core.resources.IProject;
@@ -213,19 +214,26 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			ISyncServiceProvider provider = participant.getProvider(project);
 			BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
 					provider.getLocation());
-			IConfiguration config = bcm.createRemoteConfiguration(project, remoteBuildScenario,
+			IConfiguration remoteConfig = bcm.createRemoteConfiguration(project, remoteBuildScenario,
 					Messages.ConvertFromCToSyncProjectWizardPage_0, Messages.ConvertFromCToSyncProjectWizardPage_1);
 
-			// Change its builder to the sync builder
-			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
-			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
-			ManagedBuildManager.saveBuildInfo(project, true);
-
 			// Change environment variable handling
-			ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
-			if(c_mb_confgDes!=null){
-				EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+			ICConfigurationDescription remoteConfigDesc = ManagedBuildManager.getDescriptionForConfiguration(remoteConfig);
+			if(remoteConfigDesc!=null){
+				EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, remoteConfigDesc);
 			}
+			
+			// Set all configurations to use the sync builder
+			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+			if (buildInfo == null) {
+				throw new RuntimeException(Messages.ConvertLocalToSyncProjectWizardPage_0 + project.getName());
+			}
+			IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
+			for (IConfiguration config : allConfigs) {
+				IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
+				config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			ManagedBuildManager.saveBuildInfo(project, true);
 
 			monitor.done();
 		} finally {

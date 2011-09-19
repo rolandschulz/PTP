@@ -41,6 +41,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
@@ -354,6 +355,22 @@ public class BuildConfigurationManager {
 			return parentConfigId;
 		} else {
 			return null;
+		}
+	}
+	
+	/**
+	 * Return the name of the sync provider for this project, as stored in the project's template service configuration.
+	 *
+	 * @param project
+	 * @return sync provider name
+	 */
+	public String getProjectSyncProvider(IProject project) {
+		IServiceConfiguration serviceConfig = fProjectToTemplateConfigurationMap.get(project);
+		if (serviceConfig == null) {
+			return null;
+		} else {
+			IService syncService = ServiceModelManager.getInstance().getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
+			return serviceConfig.getServiceProvider(syncService).getName();
 		}
 	}
 
