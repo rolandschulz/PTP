@@ -14,7 +14,7 @@
 	<version>6.0.0-SNAPSHOT</version>
 	<artifactId>org.eclipse.ptp.repo</artifactId>
 	<packaging>eclipse-repository</packaging>
-	
+
 	<profiles>
 		<profile>
 			<id>production</id>
@@ -34,18 +34,48 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<mkdir dir="${ptp-install}"/>
+										<mkdir dir="${ptp-install}" />
 										<delete>
 											<fileset dir="${ptp-install}">
 												<include name="**" />
 											</fileset>
 										</delete>
-										<copy
-											file="target/org.eclipse.ptp.repo.zip"
-											tofile="${ptp-install}/org.eclipse.ptp.repo.${unqualifiedVersion}.${buildQualifier}.zip"/>
-										<unzip
-											src="target/org.eclipse.ptp.repo.zip"
-											dest="${ptp-install}"/>
+										<copy file="target/org.eclipse.ptp.repo.zip"
+											tofile="${ptp-install}/org.eclipse.ptp.repo.${unqualifiedVersion}.${buildQualifier}.zip" />
+										<unzip src="target/org.eclipse.ptp.repo.zip" dest="${ptp-install}" />
+										<copy todir="${ptp-install}">
+											<fileset
+												dir="${basedir}/../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-aix-${unqualifiedVersion}.tar" />
+											<fileset
+												dir="${basedir}/../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-linux-${unqualifiedVersion}.tar" />
+											<fileset
+												dir="${basedir}/../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-linux.ppc-${unqualifiedVersion}.tar" />
+											<fileset
+												dir="${basedir}/../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-linux.x86-${unqualifiedVersion}.tar" />
+											<fileset
+												dir="${basedir}/../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-macosx-${unqualifiedVersion}.tar" />
+											<fileset
+												dir="${basedir}/../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-unix-${unqualifiedVersion}.tar" />
+											<fileset
+												dir="${basedir}/../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-windows-${unqualifiedVersion}.zip" />
+										</copy>
+										<unzip src="${basedir}/../releng/org.eclipse.ptp.aix.ppc/target/org.eclipse.ptp.aix.ppc-${version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.aix.ppc_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../releng/org.eclipse.ptp.linux.ppc/target/org.eclipse.ptp.linux.ppc-${version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.linux.ppc_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../releng/org.eclipse.ptp.linux.x86/target/org.eclipse.ptp.linux.x86-${version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.linux.x86_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../releng/org.eclipse.ptp.linux.x86_64/target/org.eclipse.ptp.linux.x86_64-${version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.linux.x86_64_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../releng/org.eclipse.ptp.macosx.ppc/target/org.eclipse.ptp.macosx.ppc-${version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.macosx.ppc_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../releng/org.eclipse.ptp.macosx.x86/target/org.eclipse.ptp.macosx.x86-${version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.macosx.x86_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../debug/org.eclipse.ptp.debug.sdm/target/org.eclipse.ptp.debug.sdm-${version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.debug.sdm_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../core/org.eclipse.ptp.proxy/target/org.eclipse.ptp.proxy-${version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.proxy_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../core/org.eclipse.ptp.utils/target/org.eclipse.ptp.utils-${version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.utils_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../rms/org.eclipse.ptp.rm.ibm.ll.proxy/target/org.eclipse.ptp.rm.ibm.ll.proxy-${version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.rm.ibm.ll.proxy_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../rms/org.eclipse.ptp.rm.ibm.pe.proxy/target/org.eclipse.ptp.rm.ibm.pe.proxy-${version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.rm.ibm.pe.proxy_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../rms/org.eclipse.ptp.rm.slurm.proxy/target/org.eclipse.ptp.rm.slurm.proxy-${version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.rm.slurm.proxy_${unqualifiedVersion}.${buildQualifier}"/>
+										<zip destfile="${ptp-install}/ptp-proxy-${unqualifiedVersion}-${buildQualifier}.zip">
+											<fileset dir="${ptp-install}">
+												<include name="proxy/**/*" />
+											</fileset>
+										</zip>
 									</tasks>
 								</configuration>
 							</execution>

@@ -44,10 +44,6 @@
 		</profile>
 	</profiles>
 
-	<properties>
-		<ptp-install>/home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-nightly</ptp-install>
-	</properties>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -73,15 +69,6 @@
 								<ant target="server.all">
 									<property name="serverVersion" value="${unqualifiedVersion}"/>
 								</ant>
-								<copy todir="${ptp-install}">
-						    		<fileset dir="${basedir}/rdt-server-aix-${unqualifiedVersion}.tar"/>
-						    		<fileset dir="${basedir}/rdt-server-linux-${unqualifiedVersion}.tar"/>
-						    		<fileset dir="${basedir}/rdt-server-linux.ppc-${unqualifiedVersion}.tar"/>
-						    		<fileset dir="${basedir}/rdt-server-linux.x86-${unqualifiedVersion}.tar"/>
-						    		<fileset dir="${basedir}/rdt-server-macosx-${unqualifiedVersion}.tar"/>
-						    		<fileset dir="${basedir}/rdt-server-unix-${unqualifiedVersion}.tar"/>
-						    		<fileset dir="${basedir}/rdt-server-windows-${unqualifiedVersion}.zip"/>
-						  		</copy>											
 							</tasks>
 						</configuration>
 					</execution>
