@@ -104,7 +104,7 @@
 	
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
 	
-	<target name="fetch" depends="fetch.rse, fetch.icu" unless="nofetch"/>
+	<target name="fetch" depends="fetch.rse, fetch.icu, fetch.cdt.versions" unless="nofetch"/>
 	<target name="server.all" depends="jar, fetch, unpack.platform, all.remote"/>
 	
 	<target name="build.jars" depends="server.all"/>
@@ -194,7 +194,7 @@
 	  	/>
 	</target>
 	
-	<target name="get.cdt.versions">
+	<target name="fetch.cdt.versions">
 		<mkdir dir="${downloads}"/>
 		<get src="${cdtBaseUrl}/artifacts.jar" dest="${downloads}/artifacts.jar"/>
 		<unzip src="${downloads}/artifacts.jar" dest="${downloads}" />
@@ -209,7 +209,7 @@
 		<echo>cdtCoreUPCParserVersion=${cdtCoreUPCParserVersion}</echo>
 	</target>
 		
-	<target name="get.cdt" depends="get.cdt.versions">
+	<target name="get.cdt">
         <!--Clone cdt Git repo-->
 		<mkdir dir="${basedir}/gitrepo"/>
 		<exec dir="${basedir}/gitrepo" executable="git">
@@ -228,7 +228,6 @@
 		
 		<!--Get cdt.core bin from CDT build-->
 		<get src="${cdtBaseUrl}/plugins/${cdtCoreJar}" dest="${downloads}/${cdtCoreJar}"/>
-			<globmapper />
 		<unzip dest="${basedir}/../org.eclipse.cdt.core/target/classes">
 			<fileset dir="${downloads}" includes="${cdtCoreJar}"/>
 		</unzip>
@@ -241,7 +240,6 @@
   		</copy>
 		
 		<!--Get cdt.core.lrparser bin from CDT build-->
-		<mkdir dir="${downloads}"/>
 		<get src="${cdtBaseUrl}/plugins/${cdtLRParserJar}" dest="${downloads}/${cdtLRParserJar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.lrparser/target/classes">
 			<fileset dir="${downloads}" includes="${cdtLRParserJar}"/>
@@ -255,7 +253,6 @@
   		</copy>
 		
 		<!--Get cdt.core.parser.upc bin from CDT build-->
-		<mkdir dir="${downloads}"/>
 		<get src="${cdtBaseUrl}/plugins/${cdtUPCParserJar}" dest="${downloads}/${cdtUPCParserJar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.parser.upc/target/classes">
 			<fileset dir="${downloads}" includes="${cdtUPCParserJar}"/>
@@ -269,7 +266,6 @@
   		</copy>
 		
 		<!--Get cdt.core.lrparser.xlc bin from CDT build-->
-		<mkdir dir="${downloads}"/>
 		<get src="${cdtBaseUrl}/plugins/${cdtLRParserXLCJar}" dest="${downloads}/${cdtLRParserXLCJar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.lrparser.xlc/target/classes">
 			<fileset dir="${downloads}" includes="${cdtLRParserXLCJar}"/>
