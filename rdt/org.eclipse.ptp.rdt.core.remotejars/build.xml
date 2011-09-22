@@ -209,7 +209,7 @@
 		<echo>cdtCoreUPCParserVersion=${cdtCoreUPCParserVersion}</echo>
 	</target>
 		
-	<target name="get.cdt">
+	<target name="get.cdt" depends="fetch.cdt.versions">
         <!--Clone cdt Git repo-->
 		<mkdir dir="${basedir}/gitrepo"/>
 		<exec dir="${basedir}/gitrepo" executable="git">
@@ -233,7 +233,7 @@
 		</unzip>
 	</target>
 	
-	<target name="get.cdt.core.lrparser">
+	<target name="get.cdt.core.lrparser" depends="get.cdt">
 		<!--Get cdt.core.lrparser source from Git -->
 		<copy todir="${basedir}/../org.eclipse.cdt.core.lrparser">
 			<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/lrparser/org.eclipse.cdt.core.lrparser"/>
@@ -246,7 +246,7 @@
 		</unzip>
 	</target>
 	
-	<target name="get.cdt.core.parser.upc">
+	<target name="get.cdt.core.parser.upc" depends="get.cdt.core.lrparser">
         <!--Get cdt.core.parser.upc source from Git-->
 		<copy todir="${basedir}/../org.eclipse.cdt.core.parser.upc">
 			<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/upc/org.eclipse.cdt.core.parser.upc"/>
@@ -259,7 +259,7 @@
 		</unzip>
 	</target>
 	
-	<target name="get.cdt.core.lrparser.xlc">
+	<target name="get.cdt.core.lrparser.xlc" depends="get.cdt.core.parser.upc">
 		<!--Get cdt.core.lrparser.xlc source from Git-->
 		<copy todir="${basedir}/../org.eclipse.cdt.core.lrparser.xlc">
 			<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/xlc/org.eclipse.cdt.core.lrparser.xlc"/>
@@ -272,7 +272,7 @@
 		</unzip>
 	</target>
 	
-	<target name="generate.file.lists" depends="compile.all, get.cdt, get.cdt.core.lrparser, get.cdt.core.parser.upc, get.cdt.core.lrparser.xlc">
+	<target name="generate.file.lists" depends="compile.all, get.cdt.core.lrparser.xlc">
 		<java
 			fork="true"
 			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"
