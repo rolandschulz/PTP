@@ -46,20 +46,15 @@
 											tofile="${ptp-install}/org.eclipse.ptp.repo.${unqualifiedVersion}.${buildQualifier}.zip" />
 										<unzip src="target/org.eclipse.ptp.repo.zip" dest="${ptp-install}" />
 										<copy todir="${ptp-install}">
-											<fileset
-												file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-aix-${unqualifiedVersion}.tar" />
-											<fileset
-												file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-linux-${unqualifiedVersion}.tar" />
-											<fileset
-												file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-linux.ppc-${unqualifiedVersion}.tar" />
-											<fileset
-												file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-linux.x86-${unqualifiedVersion}.tar" />
-											<fileset
-												file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-macosx-${unqualifiedVersion}.tar" />
-											<fileset
-												file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-unix-${unqualifiedVersion}.tar" />
-											<fileset
-												file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-windows-${unqualifiedVersion}.zip" />
+											<fileset dir="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars">
+												<filename name="rdt-server-aix-${unqualifiedVersion}.tar" />
+												<filename name="rdt-server-linux-${unqualifiedVersion}.tar" />
+												<filename name="rdt-server-linux.ppc-${unqualifiedVersion}.tar" />
+												<filename name="rdt-server-linux.x86-${unqualifiedVersion}.tar" />
+												<filename name="rdt-server-macosx-${unqualifiedVersion}.tar" />
+												<filename name="rdt-server-unix-${unqualifiedVersion}.tar" />
+												<filename name="rdt-server-windows-${unqualifiedVersion}.zip" />
+											</fileset>
 										</copy>
 										<unzip src="${basedir}/../../releng/org.eclipse.ptp.aix.ppc/target/org.eclipse.ptp.aix.ppc-${project.version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.aix.ppc_${unqualifiedVersion}.${buildQualifier}"/>
 										<unzip src="${basedir}/../../releng/org.eclipse.ptp.linux.ppc/target/org.eclipse.ptp.linux.ppc-${project.version}.jar" dest="${ptp-install}/proxy/org.eclipse.ptp.linux.ppc_${unqualifiedVersion}.${buildQualifier}"/>
