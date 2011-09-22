@@ -67,26 +67,33 @@
 
 	<!-- CDT VERSIONS MUST BE UPDATED FOR NEW CDT VERSION -->
 	<property name="cdtBaseUrl" value="http://download.eclipse.org/tools/cdt/builds/juno/nightly"/>
-	<property name="cdtVersion" value="201109211007"/>   
+	<!--property name="cdtVersion" value="201109211007"/-->   
 	
 	<!-- CDT branch need to be added for PTP maintenance builds -->
 	<property name="cdtBranch" value="master"/>
 	
-	<property name="cdtCoreVersion" value="5.4.0.${cdtVersion}"/>
-	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
+	<!--property name="cdtCoreVersion" value="5.4.0.${cdtVersion}"/-->
+	<!--property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/-->
+	<property name="cdtCoreJarPattern" value="org.eclipse.cdt.core_*.jar"/>
 	
-	<property name="cdtCoreAIXVersion" value="aix_5.1.0.${cdtVersion}"/>
-	<property name="cdtCoreLinuxPPCVersion" value="linux.ppc64_5.1.0.${cdtVersion}"/>
-	<property name="cdtCoreLinuxx86Version" value="linux.x86_5.2.0.${cdtVersion}"/>
+	<!--property name="cdtCoreAIXVersion" value="aix_5.1.0.${cdtVersion}"/-->
+	<!--property name="cdtCoreLinuxPPCVersion" value="linux.ppc64_5.1.0.${cdtVersion}"/-->
+	<!--property name="cdtCoreLinuxx86Version" value="linux.x86_5.2.0.${cdtVersion}"/-->
+	<property name="cdtCoreAIXVersionPattern" value="org.eclipse.cdt.core.aix_*.jar"/>
+	<property name="cdtCoreLinuxPPCVersionPattern" value="org.eclipse.cdt.core.linux.ppc64_*.jar"/>
+	<property name="cdtCoreLinuxx86VersionPattern" value="org.eclipse.cdt.core.linux.x86_*.jar"/>
 	
-	<property name="cdtLRParserVersion" value="5.2.0.${cdtVersion}"/>
-	<property name="cdtLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/>
+	<!--property name="cdtLRParserVersion" value="5.2.0.${cdtVersion}"/-->
+	<!--property name="cdtLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/-->
+	<property name="cdtLRParserJarPattern" value="org.eclipse.cdt.core.lrparser_*.jar"/>
 	
-	<property name="cdtUPCParserVersion" value="5.1.0.${cdtVersion}"/>
-	<property name="cdtUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtUPCParserVersion}.jar"/>
+	<!--property name="cdtUPCParserVersion" value="5.1.0.${cdtVersion}"/-->
+	<!--property name="cdtUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtUPCParserVersion}.jar"/-->
+	<property name="cdtUPCParserJarPattern" value="org.eclipse.cdt.core.parser.upc_*.jar"/>
 	
-	<property name="cdtLRParserXLCVersion" value="5.1.0.${cdtVersion}"/>
-	<property name="cdtLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/>
+	<!--property name="cdtLRParserXLCVersion" value="5.1.0.${cdtVersion}"/-->
+	<!--property name="cdtLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/-->
+	<property name="cdtLRParserXLCJarPattern" value="org.eclipse.cdt.core.lrparser.xlc_*.jar"/>
 	
 	<property name="rdtXLCPropertiesPath" value="${basedir}/../org.eclipse.ptp.rdt.xlc/properties"/>
 	<property name="rdtXLCProperties" value="languages.properties"/>
@@ -210,10 +217,10 @@
 		
 		<!--Get cdt.core bin from CDT build-->
 		<mkdir dir="${downloads}"/>
-		<get src="${cdtBaseUrl}/plugins/${cdtCoreJar}" dest="${downloads}/${cdtCoreJar}"/>
-		<unzip src="${downloads}/${cdtCoreJar}"
-			dest="${basedir}/../org.eclipse.cdt.core/target/classes"
-		/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreJarPattern}" dest="${downloads}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core/target/classes">
+			<fileset dir="${downloads}" includes="${cdtCoreJarPattern}"/>
+		</unzip>
 	</target>
 	
 	<target name="get.cdt.core.lrparser">
@@ -224,10 +231,10 @@
 		
 		<!--Get cdt.core.lrparser bin from CDT build-->
 		<mkdir dir="${downloads}"/>
-		<get src="${cdtBaseUrl}/plugins/${cdtLRParserJar}" dest="${downloads}/${cdtLRParserJar}"/>
-		<unzip src="${downloads}/${cdtLRParserJar}"
-			dest="${basedir}/../org.eclipse.cdt.core.lrparser/target/classes"
-		/>
+		<get src="${cdtBaseUrl}/plugins/${cdtLRParserJarPattern}" dest="${downloads}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.lrparser/target/classes">
+			<fileset dir="${downloads}" includes="${cdtLRParserJarPattern}"/>
+		</unzip>
 	</target>
 	
 	<target name="get.cdt.core.parser.upc">
@@ -238,10 +245,10 @@
 		
 		<!--Get cdt.core.parser.upc bin from CDT build-->
 		<mkdir dir="${downloads}"/>
-		<get src="${cdtBaseUrl}/plugins/${cdtUPCParserJar}" dest="${downloads}/${cdtUPCParserJar}"/>
-		<unzip src="${downloads}/${cdtUPCParserJar}"
-			dest="${basedir}/../org.eclipse.cdt.core.parser.upc/target/classes"
-		/>
+		<get src="${cdtBaseUrl}/plugins/${cdtUPCParserJarPattern}" dest="${downloads}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.parser.upc/target/classes">
+			<fileset dir="${downloads}" includes="${cdtUPCParserJarPattern}"/>
+		</unzip>
 	</target>
 	
 	<target name="get.cdt.core.lrparser.xlc">
@@ -252,10 +259,10 @@
 		
 		<!--Get cdt.core.lrparser.xlc bin from CDT build-->
 		<mkdir dir="${downloads}"/>
-		<get src="${cdtBaseUrl}/plugins/${cdtLRParserXLCJar}" dest="${downloads}/${cdtLRParserXLCJar}"/>
-		<unzip src="${downloads}/${cdtLRParserXLCJar}"
-			dest="${basedir}/../org.eclipse.cdt.core.lrparser.xlc/target/classes"
-		/>
+		<get src="${cdtBaseUrl}/plugins/${cdtLRParserXLCJarPattern}" dest="${downloads}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.lrparser.xlc/target/classes">
+			<fileset dir="${downloads}" includes="${cdtLRParserXLCJarPattern}"/>
+		</unzip>
 	</target>
 	
 	<target name="generate.file.lists" depends="compile.all, get.cdt, get.cdt.core.lrparser, get.cdt.core.parser.upc, get.cdt.core.lrparser.xlc">
@@ -401,7 +408,7 @@
 	</target>
 
 	<target name="fetch.lpg">
-		<get src="${cdtBaseUrl}/plugins/${lpgRuntimeJar}" dest="${remoteServerTempDir}/${icuBaseJar}"/>
+		<get src="${cdtBaseUrl}/plugins/${lpgRuntimeJar}" dest="${remoteServerTempDir}"/>
 	</target>
 
 	<target name="fetch.jdt">
@@ -602,26 +609,26 @@ export serverpath CLASSPATH LIBPATH
 	</target>
 	
 	<target name="add.so.aix">
-		<get src="${cdtBaseUrl}/plugins/org.eclipse.cdt.core.${cdtCoreAIXVersion}.jar" dest="${downloads}/org.eclipse.cdt.core.${cdtCoreAIXVersion}.jar"/>
-		<unzip src="${downloads}/org.eclipse.cdt.core.${cdtCoreAIXVersion}.jar"
-				dest="${basedir}/../org.eclipse.cdt.core.aix"
-			/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreAIXVersionPattern}" dest="${downloads}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.aix">
+			<fileset dir="${downloads}" includes="${cdtCoreAIXVersionPattern}"/>
+		</unzip>
 		<copy file="${basedir}/../org.eclipse.cdt.core.aix/os/aix/ppc/libspawner.so" todir="${remoteServerTempDir}"/>
 	</target>
 	
 	<target name="add.so.linux.ppc">
-		<get src="${cdtBaseUrl}/plugins/org.eclipse.cdt.core.${cdtCoreLinuxPPCVersion}.jar" dest="${downloads}/org.eclipse.cdt.core.${cdtCoreLinuxPPCVersion}.jar"/>
-		<unzip src="${downloads}/org.eclipse.cdt.core.${cdtCoreLinuxPPCVersion}.jar"
-				dest="${basedir}/../org.eclipse.cdt.core.linux.ppc64"
-			/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreLinuxPPCVersionPattern}" dest="${downloads}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.linux.ppc64">
+			<fileset dir="${downloads}" includes="${cdtCoreLinuxPPCVersionPattern}"/>
+		</unzip>
 		<copy file="${basedir}/../org.eclipse.cdt.core.linux.ppc64/os/linux/ppc64/libspawner.so" todir="${remoteServerTempDir}"/>
 	</target>
 	
 	<target name="add.so.linux.x86">
-		<get src="${cdtBaseUrl}/plugins/org.eclipse.cdt.core.${cdtCoreLinuxx86Version}.jar" dest="${downloads}/org.eclipse.cdt.core.${cdtCoreLinuxx86Version}.jar"/>
-		<unzip src="${downloads}/org.eclipse.cdt.core.${cdtCoreLinuxx86Version}.jar"
-				dest="${basedir}/../org.eclipse.cdt.core.linux.x86"
-			/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreLinuxx86VersionPattern}" dest="${downloads}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.linux.x86">
+			<fileset dir="${downloads}" includes="${cdtCoreLinuxx86VersionPattern}"/>
+		</unzip>
 		<copy file="${basedir}/../org.eclipse.cdt.core.linux.x86/os/linux/x86/libspawner.so" todir="${remoteServerTempDir}"/>
 	</target>	
 	
