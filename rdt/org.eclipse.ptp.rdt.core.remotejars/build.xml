@@ -200,6 +200,7 @@
 		<unzip src="${downloads}/artifacts.jar" dest="${downloads}" />
 		<xslt style="${basedir}/cdt.xsl" in="${downloads}/artifacts.xml" out="${downloads}/cdt.properties"/>
 		<property file="${downloads}/cdt.properties"/>
+		<echoproperties/>
 	</target>
 		
 	<target name="get.cdt" depends="get.cdt.versions">
