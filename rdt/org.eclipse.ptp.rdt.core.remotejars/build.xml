@@ -16,6 +16,27 @@
 -->
 
 <project name="RDT Remote JARs" default="server.all" basedir=".">
+	<!-- = = = = = = = = = = = = = = = = =
+          macrodef: glob
+          usage: <glob path="path-with-shell-expansion" property="result-property" pattern="restrict-result"/>          
+         = = = = = = = = = = = = = = = = = -->
+    <macrodef name="glob">
+        <attribute name="path" default="" />
+        <attribute name="property" default="" />
+        <attribute name="pattern" default="" />
+        <sequential>
+        	<exec executable="sh" outputproperty="resolved" >
+        		<arg value="-c"/>
+        		<arg value="echo @{path}"/>
+        	</exec>
+        	<exec executable="expr" outputproperty="@{property}">
+        		<arg value="${resolved}"/>
+        		<arg value=":"/>
+        		<arg value="@{pattern}"/>
+        	</exec>
+        </sequential>
+    </macrodef>
+
 	<tstamp/>
 	<property name="serverBaseName" value="rdt-server"/>
 	<property name="serverJar" value="${basedir}/${serverBaseName}"/>
@@ -46,7 +67,7 @@
 
 	<!-- CDT VERSIONS MUST BE UPDATED FOR NEW CDT VERSION -->
 	<property name="cdtBaseUrl" value="http://download.eclipse.org/tools/cdt/builds/juno/nightly"/>
-	<property name="cdtVersion" value="201109201006"/>   
+	<property name="cdtVersion" value="201109211007"/>   
 	
 	<!-- CDT branch need to be added for PTP maintenance builds -->
 	<property name="cdtBranch" value="master"/>
@@ -184,7 +205,7 @@
 		
 		<!--Get cdt.core source from Git-->
 		<copy todir="${basedir}/../org.eclipse.cdt.core">
-    			<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/core/org.eclipse.cdt.core"/>
+    		<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/core/org.eclipse.cdt.core"/>
   		</copy>		
 		
 		<!--Get cdt.core bin from CDT build-->
