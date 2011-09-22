@@ -104,8 +104,8 @@
 	
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
 	
-	<target name="fetch" depends="fetch.rse, fetch.icu, fetch.cdt.versions" unless="nofetch"/>
-	<target name="server.all" depends="jar, fetch, unpack.platform, all.remote"/>
+	<target name="fetch" depends="fetch.rse, fetch.icu" unless="nofetch"/>
+	<target name="server.all" depends="fetch.cdt.versions, jar, fetch, unpack.platform, all.remote"/>
 	
 	<target name="build.jars" depends="server.all"/>
     <target name="gather.bin.parts" depends="server.all"/>
