@@ -200,7 +200,13 @@
 		<unzip src="${downloads}/artifacts.jar" dest="${downloads}" />
 		<xslt style="${basedir}/cdt.xsl" in="${downloads}/artifacts.xml" out="${downloads}/cdt.properties"/>
 		<property file="${downloads}/cdt.properties"/>
-		<echoproperties/>
+		<echo>cdtCoreLinuxPPCVersion=${cdtCoreLinuxPPCVersion}</echo>
+		<echo>cdtCoreVersion=${cdtCoreVersion}</echo>
+		<echo>cdtCoreLRParserVersion=${cdtCoreLRParserVersion}</echo>
+		<echo>cdtCoreAIXVersion=${cdtCoreAIXVersion}</echo>
+		<echo>cdtCoreLinuxx86Version=${cdtCoreLinuxx86Version}</echo>
+		<echo>cdtCoreLRParserXLCVersion=${cdtCoreLRParserXLCVersion}</echo>
+		<echo>cdtCoreUPCParserVersion=${cdtCoreUPCParserVersion}</echo>
 	</target>
 		
 	<target name="get.cdt" depends="get.cdt.versions">
