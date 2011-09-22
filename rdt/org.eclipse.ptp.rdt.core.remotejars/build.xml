@@ -196,7 +196,7 @@
 	
 	<target name="get.cdt.versions">
 		<mkdir dir="${downloads}"/>
-		<get src="${cdtBaseUrl}/artifacts.jar" dest="${downloads}"/>
+		<get src="${cdtBaseUrl}/artifacts.jar" dest="${downloads}/artifacts.jar"/>
 		<unzip src="${downloads}/artifacts.jar" dest="${downloads}" />
 		<xslt style="${basedir}/cdt.xsl" in="${downloads}/artifacts.xml" out="${downloads}/cdt.properties"/>
 		<property file="${downloads}/cdt.properties"/>
@@ -220,7 +220,7 @@
   		</copy>		
 		
 		<!--Get cdt.core bin from CDT build-->
-		<get src="${cdtBaseUrl}/plugins/${cdtCoreJar}" dest="${downloads}"/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreJar}" dest="${downloads}/${cdtCoreJar}"/>
 			<globmapper />
 		<unzip dest="${basedir}/../org.eclipse.cdt.core/target/classes">
 			<fileset dir="${downloads}" includes="${cdtCoreJar}"/>
@@ -235,7 +235,7 @@
 		
 		<!--Get cdt.core.lrparser bin from CDT build-->
 		<mkdir dir="${downloads}"/>
-		<get src="${cdtBaseUrl}/plugins/${cdtLRParserJar}" dest="${downloads}"/>
+		<get src="${cdtBaseUrl}/plugins/${cdtLRParserJar}" dest="${downloads}/${cdtLRParserJar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.lrparser/target/classes">
 			<fileset dir="${downloads}" includes="${cdtLRParserJar}"/>
 		</unzip>
@@ -249,7 +249,7 @@
 		
 		<!--Get cdt.core.parser.upc bin from CDT build-->
 		<mkdir dir="${downloads}"/>
-		<get src="${cdtBaseUrl}/plugins/${cdtUPCParserJar}" dest="${downloads}"/>
+		<get src="${cdtBaseUrl}/plugins/${cdtUPCParserJar}" dest="${downloads}/${cdtUPCParserJar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.parser.upc/target/classes">
 			<fileset dir="${downloads}" includes="${cdtUPCParserJar}"/>
 		</unzip>
@@ -263,7 +263,7 @@
 		
 		<!--Get cdt.core.lrparser.xlc bin from CDT build-->
 		<mkdir dir="${downloads}"/>
-		<get src="${cdtBaseUrl}/plugins/${cdtLRParserXLCJar}" dest="${downloads}"/>
+		<get src="${cdtBaseUrl}/plugins/${cdtLRParserXLCJar}" dest="${downloads}/${cdtLRParserXLCJar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.lrparser.xlc/target/classes">
 			<fileset dir="${downloads}" includes="${cdtLRParserXLCJar}"/>
 		</unzip>
