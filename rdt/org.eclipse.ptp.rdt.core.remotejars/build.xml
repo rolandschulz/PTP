@@ -196,7 +196,7 @@
 	
 	<target name="get.cdt.versions">
 		<mkdir dir="${downloads}"/>
-		<get src="${cdtArtifacts}" dest="${downloads}"/>
+		<get src="${cdtBaseUrl}/artifacts.jar" dest="${downloads}"/>
 		<unzip src="${downloads}/artifacts.jar" dest="${downloads}" />
 		<xslt style="${basedir}/cdt.xsl" in="${downloads}/artifacts.xml" out="${downloads}/cdt.properties"/>
 		<property file="${downloads}/cdt.properties"/>
