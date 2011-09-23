@@ -34,8 +34,6 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo>BASEDIR IS ${basedir}</echo>
-										<echo>PATH IS ${basedir}/../../releng/org.eclipse.ptp.aix.ppc/target/org.eclipse.ptp.aix.ppc-${project.version}.jar</echo>
 										<mkdir dir="${ptp-install}" />
 										<delete>
 											<fileset dir="${ptp-install}">
