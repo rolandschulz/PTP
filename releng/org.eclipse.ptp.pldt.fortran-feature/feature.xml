@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.pldt.fortran"
       label="%featureName"
-      version="5.0.0.qualifier"
+      version="6.0.0.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.ptp.pldt.common"
       license-feature="org.eclipse.ptp.license"

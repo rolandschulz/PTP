@@ -33,6 +33,7 @@ PTP_FEATURES="\
 	org.eclipse.ptp.pldt-feature \
 	org.eclipse.ptp.pldt.lapi-feature \
 	org.eclipse.ptp.pldt.upc-feature \
+	org.eclipse.ptp.pldt.fortran-feature \
 	org.eclipse.ptp.rdt-feature \
 	org.eclipse.ptp.rdt.remotejars-feature \
 	org.eclipse.ptp.rdt.remotetools-feature \
