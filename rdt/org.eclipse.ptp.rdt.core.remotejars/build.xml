@@ -205,9 +205,9 @@
 		<property name="cdtCoreAIXJar" value="org.eclipse.cdt.core.aix_${cdtCoreAIXVersion}.jar"/>
 		<property name="cdtCoreLinuxPPCJar" value="org.eclipse.cdt.core.linux.ppc64_${cdtCoreLinuxPPCVersion}.jar"/>
 		<property name="cdtCoreLinuxx86Jar" value="org.eclipse.cdt.core.linux.x86_${cdtCoreLinuxx86Version}.jar"/>
-		<property name="cdtLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/>
-		<property name="cdtUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtUPCParserVersion}.jar"/>
-		<property name="cdtLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/>
+		<property name="cdtCoreLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/>
+		<property name="cdtCoreUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtUPCParserVersion}.jar"/>
+		<property name="cdtCoreLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/>
 	</target>
 		
 	<target name="get.cdt">
@@ -241,9 +241,9 @@
   		</copy>
 		
 		<!--Get cdt.core.lrparser bin from CDT build-->
-		<get src="${cdtBaseUrl}/plugins/${cdtLRParserJar}" dest="${downloads}/${cdtLRParserJar}"/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreLRParserJar}" dest="${downloads}/${cdtCoreLRParserJar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.lrparser/target/classes">
-			<fileset dir="${downloads}" includes="${cdtLRParserJar}"/>
+			<fileset dir="${downloads}" includes="${cdtCoreLRParserJar}"/>
 		</unzip>
 	</target>
 	
@@ -254,9 +254,9 @@
   		</copy>
 		
 		<!--Get cdt.core.parser.upc bin from CDT build-->
-		<get src="${cdtBaseUrl}/plugins/${cdtUPCParserJar}" dest="${downloads}/${cdtUPCParserJar}"/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreUPCParserJar}" dest="${downloads}/${cdtCoreUPCParserJar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.parser.upc/target/classes">
-			<fileset dir="${downloads}" includes="${cdtUPCParserJar}"/>
+			<fileset dir="${downloads}" includes="${cdtCoreUPCParserJar}"/>
 		</unzip>
 	</target>
 	
@@ -267,9 +267,9 @@
   		</copy>
 		
 		<!--Get cdt.core.lrparser.xlc bin from CDT build-->
-		<get src="${cdtBaseUrl}/plugins/${cdtLRParserXLCJar}" dest="${downloads}/${cdtLRParserXLCJar}"/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreLRParserXLCJar}" dest="${downloads}/${cdtCoreLRParserXLCJar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.lrparser.xlc/target/classes">
-			<fileset dir="${downloads}" includes="${cdtLRParserXLCJar}"/>
+			<fileset dir="${downloads}" includes="${cdtCoreLRParserXLCJar}"/>
 		</unzip>
 	</target>
 	
