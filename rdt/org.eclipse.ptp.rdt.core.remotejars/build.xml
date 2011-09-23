@@ -617,7 +617,7 @@ export serverpath CLASSPATH LIBPATH
 	</target>
 	
 	<target name="add.so.aix">
-		<get src="${cdtBaseUrl}/plugins/${cdtCoreAIXJar}" dest="${downloads}"/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreAIXJar}" dest="${downloads}/${cdtCoreAIXJar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.aix">
 			<fileset dir="${downloads}" includes="${cdtCoreAIXJar}"/>
 		</unzip>
@@ -625,7 +625,7 @@ export serverpath CLASSPATH LIBPATH
 	</target>
 	
 	<target name="add.so.linux.ppc">
-		<get src="${cdtBaseUrl}/plugins/${cdtCoreLinuxPPCJar}" dest="${downloads}"/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreLinuxPPCJar}" dest="${downloads}/${cdtCoreLinuxPPCJar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.linux.ppc64">
 			<fileset dir="${downloads}" includes="${cdtCoreLinuxPPCJar}"/>
 		</unzip>
@@ -633,7 +633,7 @@ export serverpath CLASSPATH LIBPATH
 	</target>
 	
 	<target name="add.so.linux.x86">
-		<get src="${cdtBaseUrl}/plugins/${cdtCoreLinuxx86Jar}" dest="${downloads}"/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreLinuxx86Jar}" dest="${downloads}/${cdtCoreLinuxx86Jar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.linux.x86">
 			<fileset dir="${downloads}" includes="${cdtCoreLinuxx86Jar}"/>
 		</unzip>
