@@ -73,23 +73,23 @@
 	<property name="cdtBranch" value="master"/>
 	
 	<!--property name="cdtCoreVersion" value="5.4.0.${cdtVersion}"/-->
-	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
+	<!--property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/-->
 	
 	<!--property name="cdtCoreAIXVersion" value="aix_5.1.0.${cdtVersion}"/-->
 	<!--property name="cdtCoreLinuxPPCVersion" value="linux.ppc64_5.1.0.${cdtVersion}"/-->
 	<!--property name="cdtCoreLinuxx86Version" value="linux.x86_5.2.0.${cdtVersion}"/-->
-	<property name="cdtCoreAIXJar" value="org.eclipse.cdt.core.aix_${cdtCoreAIXVersion}.jar"/>
-	<property name="cdtCoreLinuxPPCJar" value="org.eclipse.cdt.core.linux.ppc64_${cdtCoreLinuxPPCVersion}.jar"/>
-	<property name="cdtCoreLinuxx86Jar" value="org.eclipse.cdt.core.linux.x86_${cdtCoreLinuxx86Version}.jar"/>
+	<!--property name="cdtCoreAIXJar" value="org.eclipse.cdt.core.aix_${cdtCoreAIXVersion}.jar"/-->
+	<!--property name="cdtCoreLinuxPPCJar" value="org.eclipse.cdt.core.linux.ppc64_${cdtCoreLinuxPPCVersion}.jar"/-->
+	<!--property name="cdtCoreLinuxx86Jar" value="org.eclipse.cdt.core.linux.x86_${cdtCoreLinuxx86Version}.jar"/-->
 	
 	<!--property name="cdtLRParserVersion" value="5.2.0.${cdtVersion}"/-->
-	<property name="cdtLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/>
+	<!--property name="cdtLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/-->
 	
 	<!--property name="cdtUPCParserVersion" value="5.1.0.${cdtVersion}"/-->
-	<property name="cdtUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtUPCParserVersion}.jar"/>
+	<!--property name="cdtUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtUPCParserVersion}.jar"/-->
 	
 	<!--property name="cdtLRParserXLCVersion" value="5.1.0.${cdtVersion}"/-->
-	<property name="cdtLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/>
+	<!--property name="cdtLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/-->
 	
 	<property name="rdtXLCPropertiesPath" value="${basedir}/../org.eclipse.ptp.rdt.xlc/properties"/>
 	<property name="rdtXLCProperties" value="languages.properties"/>
@@ -200,16 +200,17 @@
 		<unzip src="${downloads}/artifacts.jar" dest="${downloads}" />
 		<xslt style="${basedir}/cdt.xsl" in="${downloads}/artifacts.xml" out="${downloads}/cdt.properties"/>
 		<property file="${downloads}/cdt.properties"/>
-		<echo>cdtCoreLinuxPPCVersion=${cdtCoreLinuxPPCVersion}</echo>
-		<echo>cdtCoreVersion=${cdtCoreVersion}</echo>
-		<echo>cdtCoreLRParserVersion=${cdtCoreLRParserVersion}</echo>
-		<echo>cdtCoreAIXVersion=${cdtCoreAIXVersion}</echo>
-		<echo>cdtCoreLinuxx86Version=${cdtCoreLinuxx86Version}</echo>
-		<echo>cdtCoreLRParserXLCVersion=${cdtCoreLRParserXLCVersion}</echo>
-		<echo>cdtCoreUPCParserVersion=${cdtCoreUPCParserVersion}</echo>
+		
+		<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
+		<property name="cdtCoreAIXJar" value="org.eclipse.cdt.core.aix_${cdtCoreAIXVersion}.jar"/>
+		<property name="cdtCoreLinuxPPCJar" value="org.eclipse.cdt.core.linux.ppc64_${cdtCoreLinuxPPCVersion}.jar"/>
+		<property name="cdtCoreLinuxx86Jar" value="org.eclipse.cdt.core.linux.x86_${cdtCoreLinuxx86Version}.jar"/>
+		<property name="cdtLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/>
+		<property name="cdtUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtUPCParserVersion}.jar"/>
+		<property name="cdtLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/>
 	</target>
 		
-	<target name="get.cdt" depends="fetch.cdt.versions">
+	<target name="get.cdt">
         <!--Clone cdt Git repo-->
 		<mkdir dir="${basedir}/gitrepo"/>
 		<exec dir="${basedir}/gitrepo" executable="git">
@@ -233,7 +234,7 @@
 		</unzip>
 	</target>
 	
-	<target name="get.cdt.core.lrparser" depends="get.cdt">
+	<target name="get.cdt.core.lrparser">
 		<!--Get cdt.core.lrparser source from Git -->
 		<copy todir="${basedir}/../org.eclipse.cdt.core.lrparser">
 			<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/lrparser/org.eclipse.cdt.core.lrparser"/>
@@ -246,7 +247,7 @@
 		</unzip>
 	</target>
 	
-	<target name="get.cdt.core.parser.upc" depends="get.cdt.core.lrparser">
+	<target name="get.cdt.core.parser.upc">
         <!--Get cdt.core.parser.upc source from Git-->
 		<copy todir="${basedir}/../org.eclipse.cdt.core.parser.upc">
 			<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/upc/org.eclipse.cdt.core.parser.upc"/>
@@ -259,7 +260,7 @@
 		</unzip>
 	</target>
 	
-	<target name="get.cdt.core.lrparser.xlc" depends="get.cdt.core.parser.upc">
+	<target name="get.cdt.core.lrparser.xlc">
 		<!--Get cdt.core.lrparser.xlc source from Git-->
 		<copy todir="${basedir}/../org.eclipse.cdt.core.lrparser.xlc">
 			<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/xlc/org.eclipse.cdt.core.lrparser.xlc"/>
@@ -272,7 +273,7 @@
 		</unzip>
 	</target>
 	
-	<target name="generate.file.lists" depends="compile.all, get.cdt.core.lrparser.xlc">
+	<target name="generate.file.lists" depends="compile.all, get.cdt, get.cdt.core.lrparser, get.cdt.core.parser.upc, get.cdt.core.lrparser.xlc">
 		<java
 			fork="true"
 			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"
