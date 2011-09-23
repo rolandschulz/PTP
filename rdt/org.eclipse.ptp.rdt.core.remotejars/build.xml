@@ -416,7 +416,7 @@
 	</target>
 
 	<target name="fetch.lpg">
-		<get src="${cdtBaseUrl}/plugins/${lpgRuntimeJar}" dest="${remoteServerTempDir}"/>
+		<get src="${cdtBaseUrl}/plugins/${lpgRuntimeJar}" dest="${remoteServerTempDir}/${lpgRuntimeJar}"/>
 	</target>
 
 	<target name="fetch.jdt">
