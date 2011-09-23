@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.rm.ibm.ll"
       label="%featureName"
-      version="5.0.0.qualifier"
+      version="6.0.0.qualifier"
       plugin="org.eclipse.ptp.rm.ibm.ll.core"
       provider-name="%providerName"
       license-feature="org.eclipse.ptp.license"
