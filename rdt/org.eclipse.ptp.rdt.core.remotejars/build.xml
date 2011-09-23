@@ -16,31 +16,10 @@
 -->
 
 <project name="RDT Remote JARs" default="server.all" basedir=".">
-	<!-- = = = = = = = = = = = = = = = = =
-          macrodef: glob
-          usage: <glob path="path-with-shell-expansion" property="result-property" pattern="restrict-result"/>          
-         = = = = = = = = = = = = = = = = = -->
-    <macrodef name="glob">
-        <attribute name="path" default="" />
-        <attribute name="property" default="" />
-        <attribute name="pattern" default="" />
-        <sequential>
-        	<exec executable="sh" outputproperty="resolved" >
-        		<arg value="-c"/>
-        		<arg value="echo @{path}"/>
-        	</exec>
-        	<exec executable="expr" outputproperty="@{property}">
-        		<arg value="${resolved}"/>
-        		<arg value=":"/>
-        		<arg value="@{pattern}"/>
-        	</exec>
-        </sequential>
-    </macrodef>
-
 	<tstamp/>
 	<property name="serverBaseName" value="rdt-server"/>
 	<property name="serverJar" value="${basedir}/${serverBaseName}"/>
-	<property name="serverVersion" value="5.0.2"/>
+	<property name="serverVersion" value="6.0.0"/>
 	
 	<property name="stylesheet" value="${basedir}/jardesc.xsl"/>
 	<property name="downloads" value="${basedir}/downloads"/>
@@ -65,31 +44,16 @@
 	<property name="jdtUIVersion" value="3.7.0.v20110531-1200"/>
 	<property name="jdtUIJar" value="org.eclipse.jdt.ui_${jdtUIVersion}.jar"/>
 
-	<!-- CDT VERSIONS MUST BE UPDATED FOR NEW CDT VERSION -->
+	<!-- RSE VERSIONS MUST BE UPDATED FOR NEW TM VERSION -->
+	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
+	<property name="rseVersion" value="R-3.3-201106080935"/>
+	<property name="dStoreBaseName" value="rseserver-3.3"/>
+
+	<!-- CDT PROPERTIES -->
 	<property name="cdtBaseUrl" value="http://download.eclipse.org/tools/cdt/builds/juno/nightly"/>
-	<!--property name="cdtVersion" value="201109211007"/-->   
 	
 	<!-- CDT branch need to be added for PTP maintenance builds -->
 	<property name="cdtBranch" value="master"/>
-	
-	<!--property name="cdtCoreVersion" value="5.4.0.${cdtVersion}"/-->
-	<!--property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/-->
-	
-	<!--property name="cdtCoreAIXVersion" value="aix_5.1.0.${cdtVersion}"/-->
-	<!--property name="cdtCoreLinuxPPCVersion" value="linux.ppc64_5.1.0.${cdtVersion}"/-->
-	<!--property name="cdtCoreLinuxx86Version" value="linux.x86_5.2.0.${cdtVersion}"/-->
-	<!--property name="cdtCoreAIXJar" value="org.eclipse.cdt.core.aix_${cdtCoreAIXVersion}.jar"/-->
-	<!--property name="cdtCoreLinuxPPCJar" value="org.eclipse.cdt.core.linux.ppc64_${cdtCoreLinuxPPCVersion}.jar"/-->
-	<!--property name="cdtCoreLinuxx86Jar" value="org.eclipse.cdt.core.linux.x86_${cdtCoreLinuxx86Version}.jar"/-->
-	
-	<!--property name="cdtLRParserVersion" value="5.2.0.${cdtVersion}"/-->
-	<!--property name="cdtLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/-->
-	
-	<!--property name="cdtUPCParserVersion" value="5.1.0.${cdtVersion}"/-->
-	<!--property name="cdtUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtUPCParserVersion}.jar"/-->
-	
-	<!--property name="cdtLRParserXLCVersion" value="5.1.0.${cdtVersion}"/-->
-	<!--property name="cdtLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/-->
 	
 	<property name="rdtXLCPropertiesPath" value="${basedir}/../org.eclipse.ptp.rdt.xlc/properties"/>
 	<property name="rdtXLCProperties" value="languages.properties"/>
@@ -97,10 +61,6 @@
 	<property name="lpgRuntimeVersion" value="1.1.0.v201004271650"/>
 	<property name="lpgRuntimeJar" value="net.sourceforge.lpg.lpgjavaruntime_${lpgRuntimeVersion}.jar"/>
 	
-	<!-- RSE VERSIONS MUST BE UPDATED FOR NEW TM VERSION -->
-	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
-	<property name="rseVersion" value="R-3.3-201106080935"/>
-	<property name="dStoreBaseName" value="rseserver-3.3"/>
 	
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
 	
