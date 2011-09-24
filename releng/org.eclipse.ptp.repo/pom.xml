@@ -100,8 +100,12 @@
 												<include name="**" />
 											</fileset>
 										</delete>
-										<copy file="${project.build.directory}/fixed/site_assembly.zip" tofile="${ptp-install}/org.eclipse.ptp.repo.${unqualifiedVersion}.${buildQualifier}.zip" />
-										<unzip src="${project.build.directory}/fixed/site_assembly.zip" dest="${ptp-install}" />
+										<copy includeemptydirs="false" todir="${ptp-install}">
+											<fileset dir="${project.build.directory}/target/checksumFix">
+												<include name="**" />
+											</fileset>
+										</copy>
+										<zip basedir="${project.build.directory}/target/checksumFix" destfile="${ptp-install}/org.eclipse.ptp.repo.${unqualifiedVersion}.${buildQualifier}.zip" />
 										<copy todir="${ptp-install}">
 											<fileset dir="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars">
 												<filename name="rdt-server-aix-${unqualifiedVersion}.tar" />
