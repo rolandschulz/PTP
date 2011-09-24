@@ -44,7 +44,6 @@
 								<id>pack</id>
 								<configuration>
 									<inputFile>${project.build.directory}/org.eclipse.ptp.repo.zip</inputFile>
-									<outputFile>${project.build.directory}/org.eclipse.ptp.repo-packed.zip</outputFile>
 								</configuration>
 								<phase>package</phase>
 								<goals>
@@ -54,8 +53,7 @@
 							<execution>
 								<id>sign</id>
 								<configuration>
-									<inputFile>${project.build.directory}/org.eclipse.ptp.repo-packed.zip</inputFile>
-									<outputFile>${project.build.directory}/org.eclipse.ptp.repo-signed.zip</outputFile>
+									<inputFile>${project.build.directory}/packed/site_assembly.zip</inputFile>
 									<signerInputDirectory>/home/data/httpd/download-staging.priv/tools/ptp</signerInputDirectory>
 								</configuration>
 								<phase>package</phase>
@@ -66,8 +64,7 @@
 							<execution>
 								<id>repack</id>
 								<configuration>
-									<inputFile>${project.build.directory}/org.eclipse.ptp.repo-signed.zip</inputFile>
-									<outputFile>${project.build.directory}/org.eclipse.ptp.repo-packed.zip</outputFile>
+									<inputFile>${project.build.directory}/signed/site_assembly.zip</inputFile>
 								</configuration>
 								<phase>package</phase>
 								<goals>
@@ -77,8 +74,7 @@
 							<execution>
 								<id>fixCheckSums</id>
 								<configuration>
-									<inputFile>${project.build.directory}/org.eclipse.ptp.repo-packed.zip</inputFile>
-									<outputFile>${project.build.directory}/org.eclipse.ptp.repo-final.zip</outputFile>
+									<inputFile>${project.build.directory}/packed/site_assembly.zip</inputFile>
 								</configuration>
 								<phase>package</phase>
 								<goals>
@@ -104,8 +100,8 @@
 												<include name="**" />
 											</fileset>
 										</delete>
-										<copy file="${project.build.directory}/org.eclipse.ptp.repo-final.zip" tofile="${ptp-install}/org.eclipse.ptp.repo.${unqualifiedVersion}.${buildQualifier}.zip" />
-										<unzip src="${project.build.directory}/org.eclipse.ptp.repo-final.zip" dest="${ptp-install}" />
+										<copy file="${project.build.directory}/fixed/site_assembly.zip" tofile="${ptp-install}/org.eclipse.ptp.repo.${unqualifiedVersion}.${buildQualifier}.zip" />
+										<unzip src="${project.build.directory}/fixed/site_assembly.zip" dest="${ptp-install}" />
 										<copy todir="${ptp-install}">
 											<fileset dir="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars">
 												<filename name="rdt-server-aix-${unqualifiedVersion}.tar" />
