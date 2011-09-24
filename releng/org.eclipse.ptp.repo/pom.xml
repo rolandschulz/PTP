@@ -53,7 +53,7 @@
 							<execution>
 								<id>sign</id>
 								<configuration>
-									<inputFile>${project.build.directory}/packed/site_assembly.zip</inputFile>
+									<inputFile>${project.build.directory}/packed/org.eclipse.ptp.repo.zip</inputFile>
 									<signerInputDirectory>/home/data/httpd/download-staging.priv/tools/ptp</signerInputDirectory>
 								</configuration>
 								<phase>package</phase>
