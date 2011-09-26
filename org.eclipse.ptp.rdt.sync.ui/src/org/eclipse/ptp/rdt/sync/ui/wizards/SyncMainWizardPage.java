@@ -95,7 +95,6 @@ import org.eclipse.cdt.internal.ui.newui.Messages;
 	    private Button show_sup;
 	    private Label right_label;
    
-	    public CWizardHandler h_selected = null;
 		private Label categorySelectedLabel;
 
 	    /**
@@ -214,7 +213,10 @@ import org.eclipse.cdt.internal.ui.newui.Messages;
 	    	return useDefaults() ? null : getLocationURI();
 	    }
 
-		private boolean validateProject() {
+		protected boolean validatePage() {
+			if (!validateProject()) {
+				return false;
+			}
     		setMessage(null);
 
 	        if (getProjectName().indexOf('#') >= 0) {
@@ -712,11 +714,7 @@ import org.eclipse.cdt.internal.ui.newui.Messages;
 	     * @return <code>true</code> if all controls are valid, and
 	     *   <code>false</code> if at least one is invalid
 	     */
-	    protected boolean validatePage() {
-	    	if (!validateProject()) {
-	    		return false;
-	    	}
-
+	    private boolean validateProject() {
 	        IWorkspace workspace = IDEWorkbenchPlugin.getPluginWorkspace();
 
 	        String projectFieldContents = getProjectNameFieldValue();
