@@ -14,6 +14,7 @@ package org.eclipse.ptp.rdt.sync.ui.wizards;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
@@ -71,6 +72,7 @@ import org.eclipse.cdt.ui.wizards.IWizardWithMemory;
 import org.eclipse.cdt.internal.ui.newui.Messages;
 
 	public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItemsListListener {
+		private static String RDT_PROJECT_TYPE = "org.eclipse.ptp.rdt"; //$NON-NLS-1$
 		private static final Image IMG_CATEGORY = CDTSharedImages.getImage(CDTSharedImages.IMG_OBJS_SEARCHFOLDER);
 		private static final Image IMG_ITEM = CDTSharedImages.getImage(CDTSharedImages.IMG_OBJS_VARIABLE);
 
@@ -511,9 +513,25 @@ import org.eclipse.cdt.internal.ui.newui.Messages;
 			return IMG_ITEM;
 		}
 
+		@Override
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public List filterItems(List items) {
-			return items;
+            /*
+             * Remove RDT project types as these will not work with synchronized
+             * projects
+             */
+            Iterator iterator = items.iterator();
+
+            List<EntryDescriptor> filteredList = new LinkedList<EntryDescriptor>();
+
+            while (iterator.hasNext()) {
+                    EntryDescriptor ed = (EntryDescriptor) iterator.next();
+                    if (!ed.getId().startsWith(RDT_PROJECT_TYPE)) {
+                            filteredList.add(ed);
+                    }
+            }
+
+            return filteredList;
 		}
 		
 		
