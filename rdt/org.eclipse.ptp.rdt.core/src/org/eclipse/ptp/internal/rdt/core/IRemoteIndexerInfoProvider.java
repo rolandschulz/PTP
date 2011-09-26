@@ -42,7 +42,7 @@ public interface IRemoteIndexerInfoProvider extends IStandaloneScannerInfoProvid
 			KEY_SKIP_ALL_REFERENCES = "skipReferences", //$NON-NLS-1$
 			//KEY_SKIP_IMPLICIT_REFERENCES = "skipImplicitReferences", //$NON-NLS-1$
 			KEY_SKIP_TYPE_REFERENCES = "skipTypeReferences", //$NON-NLS-1$
-			KEY_SKIP_MACRO_REFERENCES = "updatePolicy"; //$NON-NLS-1$
+			KEY_SKIP_MACRO_REFERENCES = "skipMacroReferences"; //$NON-NLS-1$
 
 	/**
 	 * Returns true if the given indexer preference is enabled.
