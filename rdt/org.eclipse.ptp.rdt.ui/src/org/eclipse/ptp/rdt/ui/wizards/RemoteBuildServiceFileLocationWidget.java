@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -148,9 +148,11 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 				IFileStore homeStore = remoteServices.getFileManager(connection).getResource(homeDir);
 				URI uri = homeStore.toURI();
 				String pathString = EFSExtensionManager.getDefault().getPathFromURI(uri);
-				IPath path = new Path(pathString);
-				path = path.append(RSEUtils.DEFAULT_CONFIG_DIR_NAME);
-				return path.toString();
+				if(pathString!=null){
+					IPath path = new Path(pathString);
+					path = path.append(RSEUtils.DEFAULT_CONFIG_DIR_NAME);
+					return path.toString();
+				}
 			}
 		}
 		return null;
