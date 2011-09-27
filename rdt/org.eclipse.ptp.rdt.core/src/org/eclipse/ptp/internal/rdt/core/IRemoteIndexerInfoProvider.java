@@ -53,16 +53,6 @@ public interface IRemoteIndexerInfoProvider extends IStandaloneScannerInfoProvid
 	public static final String ASM_LANGUAGEID_key="asm" + LANGUAGE_ID_SUFFIX; //$NON-NLS-1$
 	public static final String UPC_LANGUAGEID_key="upc" + LANGUAGE_ID_SUFFIX; //$NON-NLS-1$
 	
-		public static final List<String> EXCLUDED_DIRECTORIES= new ArrayList<String>() {{
-		add(".standalone_index");  //$NON-NLS-1$
-		add(".settings"); //$NON-NLS-1$
-		add(".par"); //$NON-NLS-1$
-	}};
-	public static final List<String> EXCLUDED_FILES= new ArrayList<String>(){{
-		add(".project");  //$NON-NLS-1$
-		add(".cproject"); //$NON-NLS-1$
-	}};
-
 	/**
 	 * Returns true if the given indexer preference is enabled.
 	 */

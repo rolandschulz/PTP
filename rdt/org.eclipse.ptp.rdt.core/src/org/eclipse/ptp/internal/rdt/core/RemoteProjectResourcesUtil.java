@@ -40,12 +40,9 @@ public class RemoteProjectResourcesUtil {
 			public boolean visit(IResource resource) throws CoreException {
 				if (!(resource instanceof IFile)){
 					
-				    if(IRemoteIndexerInfoProvider.EXCLUDED_DIRECTORIES.contains(resource.getName())){
+				    if(resource.getName().startsWith(".")){ //$NON-NLS-1$
 				    	return false;
 				    }else{
-				    	if(resource.getName().startsWith(".")){ //$NON-NLS-1$
-				    		return false;
-				    	}
 				    	return true;
 				    }
 				}else{
