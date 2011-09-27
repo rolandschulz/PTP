@@ -52,10 +52,10 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 	private Set<String> fValidSourceUnitNames;
 
 	//
-	RemoteIndexerInfoProvider() {
+	public RemoteIndexerInfoProvider() {
 	}
 
-	RemoteIndexerInfoProvider(Map<String, RemoteScannerInfo> pathMap, Map<Integer, RemoteScannerInfo> linkageMap,
+	public RemoteIndexerInfoProvider(Map<String, RemoteScannerInfo> pathMap, Map<Integer, RemoteScannerInfo> linkageMap,
 			Map<String, String> languageMap, Map<String, Map<String, String>> languagePropertyMap, Set<String> headerSet,
 			Set<String> indexerPreferences, List<String> filesToParseUpFront, FileEncodingRegistry fileEncodingRegistry, Set<String> fValidSourceUnitNames) {
 

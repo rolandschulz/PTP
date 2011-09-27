@@ -26,6 +26,7 @@ import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask;
+import org.eclipse.ptp.internal.rdt.core.index.IRemoteFastIndexerUpdateEvent.EventType;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
@@ -286,5 +287,10 @@ public interface ICIndexSubsystem {
 	public ITranslationUnit getModel(ITranslationUnit unit, IProgressMonitor monitor);
 
 	public String moveIndexFile(String scopeName, String newIndexLocation, IProgressMonitor monitor);
+	/**
+	 * 
+	 * @return the reindex event type
+	 */
+	public EventType getReIndexEventType();
 
 }

@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.core;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +44,24 @@ public interface IRemoteIndexerInfoProvider extends IStandaloneScannerInfoProvid
 			//KEY_SKIP_IMPLICIT_REFERENCES = "skipImplicitReferences", //$NON-NLS-1$
 			KEY_SKIP_TYPE_REFERENCES = "skipTypeReferences", //$NON-NLS-1$
 			KEY_SKIP_MACRO_REFERENCES = "skipMacroReferences"; //$NON-NLS-1$
+	
+	public static final String LANGUAGE_ID_SUFFIX="_languageID"; //$NON-NLS-1$
+	public static final String CXXSOURCE_LANGUAGEID_key="cxxSource" + LANGUAGE_ID_SUFFIX; //$NON-NLS-1$
+	public static final String CXXHEADER_LANGUAGEID_key="cxxHeader" + LANGUAGE_ID_SUFFIX; //$NON-NLS-1$
+	public static final String CSOURCE_LANGUAGEID_key="cSource" + LANGUAGE_ID_SUFFIX; //$NON-NLS-1$
+	public static final String CHEADER_LANGUAGEID_key="cHeader" + LANGUAGE_ID_SUFFIX; //$NON-NLS-1$
+	public static final String ASM_LANGUAGEID_key="asm" + LANGUAGE_ID_SUFFIX; //$NON-NLS-1$
+	public static final String UPC_LANGUAGEID_key="upc" + LANGUAGE_ID_SUFFIX; //$NON-NLS-1$
+	
+		public static final List<String> EXCLUDED_DIRECTORIES= new ArrayList<String>() {{
+		add(".standalone_index");  //$NON-NLS-1$
+		add(".settings"); //$NON-NLS-1$
+		add(".par"); //$NON-NLS-1$
+	}};
+	public static final List<String> EXCLUDED_FILES= new ArrayList<String>(){{
+		add(".project");  //$NON-NLS-1$
+		add(".cproject"); //$NON-NLS-1$
+	}};
 
 	/**
 	 * Returns true if the given indexer preference is enabled.

@@ -35,6 +35,7 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.ICallHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask;
+import org.eclipse.ptp.internal.rdt.core.index.IRemoteFastIndexerUpdateEvent.EventType;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteCIndexServiceProvider;
@@ -211,6 +212,11 @@ public class NullCIndexServiceProvider extends
 
 			public String moveIndexFile(String scopeName, String newIndexLocation, IProgressMonitor monitor) {
 				return null; // vacuously true
+			}
+
+			public EventType getReIndexEventType() {
+				// TODO Auto-generated method stub
+				return null;
 			}
 			
 		};

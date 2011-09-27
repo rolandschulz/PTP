@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.eclipse.cdt.core.dom.ILinkage;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexLocationConverter;
@@ -39,9 +38,9 @@ import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.rse.dstore.universal.miners.UniversalServerUtilities;
 
-
 public class RemoteIndexManager {
 	
+
 	public static final String PDOM_EXTENSION = ".pdom"; //$NON-NLS-1$
 	private static final String CLASS_NAME = "CDTMiner-RemoteIndexManager"; //$NON-NLS-1$
 	
@@ -50,7 +49,7 @@ public class RemoteIndexManager {
 //	private static final IParserLogService LOG = new DefaultLogService();
 	private static final PDOMCLinkageFactory cLinkageFactory = new PDOMCLinkageFactory();
 	private static final PDOMCPPLinkageFactory cppLinkageFactory = new PDOMCPPLinkageFactory();
-	private static final IIndexLocationConverter locationConverter = new RemoteLocationConverter();;
+	private static final IIndexLocationConverter locationConverter = new RemoteLocationConverter();
 	
 	private static final Map<String, IPDOMLinkageFactory> linkageFactoryMap = new HashMap<String, IPDOMLinkageFactory>();
 	static {
@@ -86,7 +85,11 @@ public class RemoteIndexManager {
 			}
 			
 			if(fragments.isEmpty())
-				UniversalServerUtilities.logWarning(CLASS_NAME, "Index contains 0 fragments", dataStore); //$NON-NLS-1$
+				if(dataStore !=null){
+					UniversalServerUtilities.logWarning(CLASS_NAME, "Index contains 0 fragments", dataStore); //$NON-NLS-1$
+				}else{
+					StandaloneLogService.getInstance().errorLog(CLASS_NAME +":" + "Index contains 0 fragments"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 			
 			return new CIndex(fragments.toArray(new IIndexFragment[fragments.size()]), fragments.size()); 
 		}
@@ -97,7 +100,6 @@ public class RemoteIndexManager {
 			return new CIndex(new IIndexFragment[]{indexer.getIndex().getWritableFragment()}, 1);
 		}
 	}
-	
 	
 	/**
 	 * Gets the indexer and also sets up indexer preferences.
@@ -154,20 +156,25 @@ public class RemoteIndexManager {
 
 	
 	public StandaloneFastIndexer getIndexerForScope(String scope, DataStore dataStore, DataElement status) {
-		
+				
 		if(scope.equals(Scope.WORKSPACE_ROOT_SCOPE_NAME)) {
 			throw new IllegalArgumentException("Attempted to get indexer for root scope."); //$NON-NLS-1$
 		}
 		
 		StandaloneFastIndexer indexer = (StandaloneFastIndexer) scopeToIndexerMap.get(scope);
 		if (indexer != null) {
-			if (status != null) {
-				IParserLogService LOG = new RemoteLogService(dataStore, status);
-				indexer.setParserLog(LOG);
+			IParserLogService LOG = null;
+			if (dataStore!=null) {
+				LOG = new RemoteLogService(dataStore, status);
+				
+			}else{
+				LOG = StandaloneLogService.getInstance();
+				
 			}
+			indexer.setParserLog(LOG);
 			return indexer;
 		}
-
+		
 		String path = scopeToIndexLocationMap.get(scope);
 		File indexFile = null;
 		
@@ -184,18 +191,35 @@ public class RemoteIndexManager {
 		
 		if(indexFile == null) {
 			indexFile = new File(scope + PDOM_EXTENSION); // creates a file object located in the server working directory
-			UniversalServerUtilities.logWarning(CLASS_NAME, "Can't create index file at " + path + " attempting to use " + indexFile.getParent() + " instead", dataStore); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if(dataStore!=null){
+				UniversalServerUtilities.logWarning(CLASS_NAME, "Can't create index file at " + path + " attempting to use " + indexFile.getParent() + " instead", dataStore); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}else{
+				StandaloneLogService.getInstance().traceLog(CLASS_NAME + "Can't create index file at " + path + " attempting to use " + indexFile.getParent() + " instead");   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+			}
 			scopeToIndexLocationMap.put(scope, indexFile.getParent());
 		}
-		UniversalServerUtilities.logInfo(CLASS_NAME, "Index at location:" + indexFile.getAbsolutePath(), dataStore);  //$NON-NLS-1$
+		if(dataStore!=null){
+			UniversalServerUtilities.logInfo(CLASS_NAME, "Index at location:" + indexFile.getAbsolutePath(), dataStore);  //$NON-NLS-1$
+		}else{
+			StandaloneLogService.getInstance().traceLog(CLASS_NAME + ":" + "Index at location:" + indexFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 
 		try {
-			IParserLogService LOG = new RemoteLogService(dataStore, status);
+			IParserLogService LOG = null;
+			if (dataStore!=null) {
+				LOG = new RemoteLogService(dataStore, status);
+			}else{
+				LOG = StandaloneLogService.getInstance();
+			}
 			indexer = new StandaloneFastIndexer(indexFile, locationConverter, linkageFactoryMap, null, null, LOG);
 
 			scopeToIndexerMap.put(scope, indexer);
 		} catch (CoreException e) {
-			UniversalServerUtilities.logError(CLASS_NAME, "Core Exception while getting indexer for scope", e, dataStore);  //$NON-NLS-1$
+			if(dataStore!=null){
+				UniversalServerUtilities.logError(CLASS_NAME, "Core Exception while getting indexer for scope", e, dataStore);  //$NON-NLS-1$
+			}else{
+				StandaloneLogService.getInstance().errorLog(CLASS_NAME +":" + "Core Exception while getting indexer for scope", e);  //$NON-NLS-1$//$NON-NLS-2$
+			}
 		}
 
 		return indexer;
@@ -222,8 +246,11 @@ public class RemoteIndexManager {
 			indexFile = new File(scope + PDOM_EXTENSION);
 		else
 			indexFile = new File(loc, scope + PDOM_EXTENSION);
-		
-		UniversalServerUtilities.logInfo(CLASS_NAME, "Remove index at location: " + indexFile.getAbsolutePath(), dataStore);  //$NON-NLS-1$
+		if(dataStore!=null){
+			UniversalServerUtilities.logInfo(CLASS_NAME, "Remove index at location: " + indexFile.getAbsolutePath(), dataStore);  //$NON-NLS-1$
+		}else{
+			StandaloneLogService.getInstance().traceLog(CLASS_NAME + ":"+ "Remove index at location: " + indexFile.getAbsolutePath());  //$NON-NLS-1$//$NON-NLS-2$
+		}
 		
 		return indexFile.delete();
 	}
@@ -337,4 +364,15 @@ public class RemoteIndexManager {
 			return oldLocation;
 		}
 	}
+	
+	//clear cached index
+	public void clearIndex(String scope) throws InterruptedException, CoreException{
+		scopeToIndexerMap.put(scope, null);
+		
+	}
+	
+	
+	
+	
+	
 }

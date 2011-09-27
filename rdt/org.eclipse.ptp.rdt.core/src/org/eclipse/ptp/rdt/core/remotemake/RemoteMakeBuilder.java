@@ -25,14 +25,11 @@ import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ErrorParserManager;
 import org.eclipse.cdt.core.envvar.IEnvironmentVariable;
 import org.eclipse.cdt.core.model.ICModelMarker;
-import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.resources.IConsole;
 import org.eclipse.cdt.internal.core.ConsoleOutputSniffer;
-import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.make.core.IMakeBuilderInfo;
 import org.eclipse.cdt.make.core.MakeBuilder;
 import org.eclipse.cdt.make.core.MakeCorePlugin;
-import org.eclipse.cdt.make.core.scannerconfig.IScannerConfigBuilderInfo2;
 import org.eclipse.cdt.make.core.scannerconfig.IScannerInfoCollector;
 import org.eclipse.cdt.make.core.scannerconfig.IScannerInfoCollector2;
 import org.eclipse.cdt.make.internal.core.MakeMessages;
@@ -490,14 +487,10 @@ public class RemoteMakeBuilder extends MakeBuilder {
 			monitor.done();
 		}
 		if(kind != CLEAN_BUILD){
-			if(projectStatus!=null){
-				if(projectStatus.isIndexAfterBuildSet()){
 			
-					projectStatus.invokeIndex();
-				}else{
-					projectStatus.setFinalBuildStatus();
-				}
-			}
+			
+			projectStatus.invokeIndex();
+			
 		}
 		return (isClean);
 	}
@@ -511,41 +504,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 			workspace.deleteMarkers(markers);
 		}
 	}
-	/*
-	private void invokeIndex(){
-		final IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getProjectStatus(getProject());
-		if(projectStatus!=null){
-			
-				Job job = new Job("Indexing Job"){ //$NON-NLS-1$
-					protected IStatus run(IProgressMonitor monitor) {
-						
-						if(projectStatus.isIndexAfterBuildSet() && projectStatus.shouldRunIndexFollowingBuild()){
-							projectStatus.setFinalBuildStatus();
-							if(projectStatus.isBuildCompleted()){
-								//for indexing following first time build, only run it after a completed build.
-								ICProject cProject = CModelManager.getDefault().getCModel().getCProject(getProject());
-								CCorePlugin.getIndexManager().reindex(cProject);
-								System.out.println("running invoke indexing job. "); //$NON-NLS-1$
-							}
-							
-						}else{
-							System.out.println("not running index job, just update build status. "); //$NON-NLS-1$
-							projectStatus.setFinalBuildStatus();
-						}
-				        return Status.OK_STATUS;
-				    }
-
-				};
-				ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
-	        	job.setRule(rule);
-	        	job.schedule();
-	        	
-	        	System.out.println("schedule invoke indexing job. "); //$NON-NLS-1$
-			
-		}
-	}
-	*/
-
+	
 	// Turn the string into an array.
 	private String[] makeArray(String string) {
 		string.trim();

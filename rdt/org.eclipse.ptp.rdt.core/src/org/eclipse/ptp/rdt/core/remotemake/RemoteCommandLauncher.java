@@ -383,13 +383,8 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 				
 			}else{
 			
-					if(projectStatus.isIndexAfterBuildSet()){
-				
-						projectStatus.invokeIndex();
-					}else{
-						projectStatus.setFinalBuildStatus();
-					}
-				
+				projectStatus.invokeIndex();
+						
 			}
 		}
 			

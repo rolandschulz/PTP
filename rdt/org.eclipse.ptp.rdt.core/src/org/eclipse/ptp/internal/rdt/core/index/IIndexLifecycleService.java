@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.internal.rdt.core.index.IRemoteFastIndexerUpdateEvent.EventType;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 
 /**
@@ -81,4 +82,11 @@ public interface IIndexLifecycleService {
 	 * @return The actual location of where the index file was moved.
 	 */
 	String moveIndexFile(String scopeName, String newIndexLocation, IProgressMonitor monitor);
+	
+	/**
+	 * 
+	 * @return the reindex event type
+	 */
+	public EventType getReIndexEventType();
+	
 }

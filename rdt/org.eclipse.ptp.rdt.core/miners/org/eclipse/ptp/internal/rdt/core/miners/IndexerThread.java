@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,10 +31,10 @@ public abstract class IndexerThread extends Thread {
 	private IProgressMonitor progressMonitor;
 	
 	
-	protected abstract void runIndexer(StandaloneFastIndexer indexer, IProgressMonitor progressMonitor) throws IOException;
+	protected abstract void runIndexer(StandaloneFastIndexer indexer, IProgressMonitor progressMonitor) throws Exception;
 	
 	
-	private IndexerThread(StandaloneFastIndexer indexer, DataElement status, CDTMiner miner) {
+	protected IndexerThread(StandaloneFastIndexer indexer, DataElement status, CDTMiner miner) {
 		super("Remote Indexer"); //$NON-NLS-1$
 		this.indexer = indexer;
 		this.status = status;

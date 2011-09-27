@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,12 +24,8 @@ import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInfoProviderFactory;
-import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
-import org.eclipse.ptp.internal.rdt.core.includebrowser.IncludeBrowserServiceFactory;
-import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.internal.rdt.core.model.ModelAdapter;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
@@ -52,7 +48,7 @@ public class AbstractRemoteService {
 		fConnectorService = connectorService;
 	}
 
-	protected ICIndexSubsystem getSubSystem() {
+	public ICIndexSubsystem getSubSystem() {
 		if (fIndexSubsystem == null) {
 
 			if (fConnectorService != null) {

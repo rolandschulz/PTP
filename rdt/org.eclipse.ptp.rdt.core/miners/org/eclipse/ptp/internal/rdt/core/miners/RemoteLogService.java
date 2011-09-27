@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -75,18 +75,26 @@ public class RemoteLogService extends AbstractParserLogService {
 	 */
 	@Override
 	public void errorLog(String message) {
+		UniversalServerUtilities.logError(LOG_TAG, getErrorMessage(message), null, fDataStore);
+	}
+	
+	protected String getErrorMessage(String message){
+		String returnMsg=message;
+	
 		if (message.indexOf("Indexer:") < 0) { //$NON-NLS-1$
-			message = "Parser Error Trace: " + message; //$NON-NLS-1$
+			returnMsg = "Parser Error Trace: " + message; //$NON-NLS-1$
 		} else {
-			for (int i = 0; i < fErrorMessages.size(); i++) {
-    			if (message.indexOf(fErrorMessages.get(i)) > 0) {
-    				fStatus.setAttribute(DE.A_NAME, message);
-    				fStatus.getDataStore().createObject(fStatus, CDTMiner.T_INDEXING_ERROR, message);
-    				fStatus.getDataStore().refresh(fStatus);
-    			}
-    		}
+			if(fStatus!=null){
+				for (int i = 0; i < fErrorMessages.size(); i++) {
+	    			if (message.indexOf(fErrorMessages.get(i)) > 0) {
+	    				fStatus.setAttribute(DE.A_NAME, message);
+	    				fStatus.getDataStore().createObject(fStatus, CDTMiner.T_INDEXING_ERROR, message);
+	    				fStatus.getDataStore().refresh(fStatus);
+	    			}
+	    		}
+			}
 		}
-		UniversalServerUtilities.logError(LOG_TAG, message, null, fDataStore);
+		return returnMsg;
 	}
 
 	/* (non-Javadoc)
@@ -111,15 +119,23 @@ public class RemoteLogService extends AbstractParserLogService {
 	 */
 	@Override
 	public void traceLog(String message) {		
-		if (message.indexOf("Indexer:") < 0) { //$NON-NLS-1$
-			message = "Parser Trace: " + message; //$NON-NLS-1$
+		String logMessage = getTraceMessage(message);
+		if(logMessage!=null){
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, message, fDataStore);
-		} else {
-			if (message.indexOf("Indexer: unresolved name") >= 0 && fStatus != null ) { //$NON-NLS-1$
+		}
+		
+	}
+	
+	protected String getTraceMessage(String message){
+		String returnMsg=message;
+		if (message.indexOf("Indexer:") < 0) { //$NON-NLS-1$
+			returnMsg = "Parser Trace: " + message; //$NON-NLS-1$
+		}else {
+			if (message.indexOf("Indexer: unresolved name") >= 0 ) { //$NON-NLS-1$
 				//see PDOMWriter.reportProblem(IProblemBinding problem)
 				errorLog(message);
-			}
-			else {
+				return null;
+			}else {
 				//determine if it is an indexer error
 				//see PDOMWriter.reportProblem(IASTProblem problem)
 				boolean found = false;				
@@ -130,12 +146,12 @@ public class RemoteLogService extends AbstractParserLogService {
 					}
 				}
 				
-				if (found && fStatus != null) {
+				if (found) {
 					errorLog(message);
-				} else {
-					UniversalServerUtilities.logDebugMessage(LOG_TAG, message, fDataStore);
-				}
+					return null;
+				} 
 			}
 		}
+		return returnMsg;
 	}
 }

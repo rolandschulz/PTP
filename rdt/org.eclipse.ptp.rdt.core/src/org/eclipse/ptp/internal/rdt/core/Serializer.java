@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -43,6 +44,39 @@ public class Serializer {
 		out.writeObject(o);
 		out.close();
 		return encodeBase64(buffer.toByteArray(), 0, buffer.size());
+	}
+	/**
+	 * To deserialize an object from other osgi bundle class loader, i.e. class from other plugin
+	 * @param data
+	 * @param cl
+	 * @return
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	public static Object deserialize(String data, final ClassLoader cl) throws IOException, ClassNotFoundException{
+		if(cl!=null){
+			
+			byte[] buffer = decodeBase64(data);
+			ByteArrayInputStream stream = new ByteArrayInputStream(buffer);
+			GZIPInputStream zipStream = new GZIPInputStream(stream);
+			ObjectInputStream in = new ObjectInputStream(zipStream){
+				public Class<?> resolveClass(ObjectStreamClass desc) throws IOException,
+						ClassNotFoundException {
+				
+					try{
+						return cl.loadClass(desc.getName());
+					}catch(Exception e){
+						
+					}
+					return super.resolveClass(desc);
+				}
+			};
+			
+			return in.readObject();
+			
+		}else{
+			return deserialize(data);
+		}
 	}
 	
 	public static Object deserialize(String data) throws IOException, ClassNotFoundException {

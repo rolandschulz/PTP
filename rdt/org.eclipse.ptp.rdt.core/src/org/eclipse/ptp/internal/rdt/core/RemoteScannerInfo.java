@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,8 +36,8 @@ public class RemoteScannerInfo implements IScannerInfo, Serializable {
 	 * Creates an empty RemoteScannerInfo object.
 	 */
 	public RemoteScannerInfo() {
-		symbols = Collections.emptyMap();
-		includePaths = Collections.emptyList();
+		symbols = new HashMap<String, String>();
+		includePaths = new ArrayList<String>();
 	}
 	
 	/**
@@ -97,4 +97,6 @@ public class RemoteScannerInfo implements IScannerInfo, Serializable {
 	public String toString() {
 		return includePaths + " " + symbols; //$NON-NLS-1$
 	}
+	
+	
 }

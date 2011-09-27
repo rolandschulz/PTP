@@ -23,7 +23,8 @@ import java.util.Set;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.dom.ILinkage;
-import org.eclipse.cdt.core.model.CoreModelUtil;
+import org.eclipse.cdt.core.dom.upc.UPCLanguage;
+import org.eclipse.cdt.core.language.ProjectLanguageConfiguration;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
@@ -36,7 +37,6 @@ import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -151,7 +151,9 @@ public class RemoteIndexerInfoProviderFactory {
 		if(project == null)
 			return new RemoteIndexerInfoProvider();
 		
-		final List<ICElement> elements = new ArrayList<ICElement>();
+		final List<ICElement> elements = RemoteProjectResourcesUtil.getCElements(project);
+		/*	
+			new ArrayList<ICElement>();
 		
 		// TODO replace with ICElementVisitor
 		IResourceVisitor resourceVisitor = new IResourceVisitor() {
@@ -171,6 +173,7 @@ public class RemoteIndexerInfoProviderFactory {
 		} catch (CoreException e) {
 			RDTLog.logError(e);
 		}
+		*/
 		
 		return getProvider(elements);
 	}
@@ -275,6 +278,8 @@ public class RemoteIndexerInfoProviderFactory {
 					ILanguage language = tu.getLanguage();
 					String id = language.getId();
 					languageMap.put(path, id);
+					IContentType ct= CCorePlugin.getContentType(project, path);
+					addLanguageIDByContenttype(project, languageMap, ct);
 					
 					if(!languagePropertyMap.containsKey(id))
 						languagePropertyMap.put(id, getLanguageProperties(id, project));
@@ -310,15 +315,72 @@ public class RemoteIndexerInfoProviderFactory {
 		// 1) The file may need to be parsed as more than one language, see PDOMIndexerTask.getLanguages()
 		// 2) If there is a file in the project with the same name as a file to parse up front it may get the wrong scanner info
 		for(String filename : filesToParseUpFront) {
+			if(filename!=null && filename.length()>0){
 			IContentType ct= CCorePlugin.getContentType(project, filename);
 			if (ct != null) {
 				ILanguage language = LanguageManager.getInstance().getLanguage(ct);
 				languageMap.put(filename, language.getId());
+				}
+				addLanguageIDByContenttype(project, languageMap, ct);
 			}
 		}
 
 		return new RemoteIndexerInfoProvider(scannerInfoMap, linkageMap, languageMap, languagePropertyMap, 
 				                             headerSet, preferences, filesToParseUpFront, fileEncodingRegistry, new HashSet<String>());
+	}
+	/**
+	 * add the given contentTypeID's language to the language map.
+	 * @param project
+	 * @param linkageID
+	 * @return
+	 */
+	private static void addLanguageIDByContenttype(IProject project, Map<String,String> languageMap, IContentType ct){
+		if(ct==null){
+			return;
+		}
+		String languageID= null;
+		LanguageManager langManager = LanguageManager.getInstance();
+		ProjectLanguageConfiguration projLangConfig=null;
+		try {
+			projLangConfig = langManager.getLanguageConfiguration(project);
+		} catch (CoreException e) {
+			
+		}
+		if(projLangConfig==null){
+			languageID = langManager.getLanguage(ct).getId();
+		}else{
+			languageID = projLangConfig.getLanguageForContentType(null, ct.getId());
+			if(languageID==null){
+				ILanguage lang= langManager.getLanguage(ct);
+				if(lang!=null){
+					languageID = lang.getId();
+				}
+			}
+		}
+		
+		
+		if(languageID!=null){
+		
+			if(CCorePlugin.CONTENT_TYPE_ASMSOURCE.equals(ct.getId())){
+				languageMap.put(IRemoteIndexerInfoProvider.ASM_LANGUAGEID_key, languageID);
+			}
+			if(UPCLanguage.UPC_CONTENT_TYPE_ID.equals(ct.getId())){
+				languageMap.put(IRemoteIndexerInfoProvider.UPC_LANGUAGEID_key, languageID);
+			}
+			
+			if(CCorePlugin.CONTENT_TYPE_CHEADER.equals(ct.getId())){
+				languageMap.put(IRemoteIndexerInfoProvider.CHEADER_LANGUAGEID_key, languageID);
+			}
+			if(CCorePlugin.CONTENT_TYPE_CSOURCE.equals(ct.getId())){
+				languageMap.put(IRemoteIndexerInfoProvider.CSOURCE_LANGUAGEID_key, languageID);
+			}
+			if(CCorePlugin.CONTENT_TYPE_CXXHEADER.equals(ct.getId())){
+				languageMap.put(IRemoteIndexerInfoProvider.CXXHEADER_LANGUAGEID_key, languageID);
+			}
+			if(CCorePlugin.CONTENT_TYPE_CXXSOURCE.equals(ct.getId())){
+				languageMap.put(IRemoteIndexerInfoProvider.CXXSOURCE_LANGUAGEID_key, languageID);
+			}
+		}
 	}
 
 	

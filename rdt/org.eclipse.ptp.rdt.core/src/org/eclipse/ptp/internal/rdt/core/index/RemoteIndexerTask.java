@@ -19,7 +19,9 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.pdom.IndexerProgress;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.internal.rdt.core.index.IRemoteFastIndexerUpdateEvent.EventType;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
+import org.eclipse.ptp.rdt.core.messages.Messages;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
 
 /**
@@ -82,6 +84,7 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 					.getIndexBuildSequenceController(fIndexer.getProject().getProject());
 
 			if (fUpdate) {
+				monitor.subTask(Messages.RemoteIndexTask_updateIndex_JobName);
 				// notify listeners
 				for (IRemoteFastIndexerListener listener : RemoteFastIndexer.getRemoteFastIndexerListeners()) {
 					listener.indexerUpdating(new RemoteFastIndexerUpdateEvent(
@@ -92,17 +95,19 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 				service.update(scope, Arrays.<ICElement> asList(fAdded), Arrays.<ICElement> asList(fChanged),
 						Arrays.<ICElement> asList(fRemoved), monitor, this);
 			} else {
-				// notify listeners
+				// perform the re-index
+				EventType eventType = service.getReIndexEventType();
+				if (eventType != null) {
 				for (IRemoteFastIndexerListener listener : RemoteFastIndexer.getRemoteFastIndexerListeners()) {
-					listener.indexerUpdating(new RemoteFastIndexerUpdateEvent(
-							IRemoteFastIndexerUpdateEvent.EventType.EVENT_REINDEX, this, scope));
+						listener.indexerUpdating(new RemoteFastIndexerUpdateEvent(eventType, this, scope));
+					}
 				}
-
 				// perform the re-index
 				service.reindex(scope, fIndexServiceProvider.getIndexLocation(), Arrays.<ICElement> asList(fAdded),
 						monitor, this);
+
+				projectStatus.setIndexCompleted();
 			}
-			projectStatus.setIndexCompleted();
 		}
 	}
 

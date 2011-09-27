@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInfoProviderFactory;
+import org.eclipse.ptp.internal.rdt.core.RemoteProjectResourcesUtil;
+import org.eclipse.ptp.internal.rdt.core.index.IRemoteFastIndexerUpdateEvent.EventType;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteService;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
@@ -38,7 +40,7 @@ import org.eclipse.rse.core.subsystems.IConnectorService;
 public class RemoteIndexLifecycleService extends AbstractRemoteService implements IIndexLifecycleService {
 	
 	private Map<String, Scope> fStringToScopeMap = new TreeMap<String, Scope>();
-	
+
 	public RemoteIndexLifecycleService(IConnectorService connectorService) {
 		super(connectorService);
 	}
@@ -79,12 +81,17 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 	public void update(Scope scope, List<ICElement> newElements,
 			List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor, RemoteIndexerTask task) {
 		
-		List<ICElement> elements = new ArrayList<ICElement>(newElements);
-		elements.addAll(changedElements);
+		List<ICElement> filertedNewElements = RemoteProjectResourcesUtil.filterElements(newElements);
+		List<ICElement> filteredChangedElements = RemoteProjectResourcesUtil.filterElements(changedElements);
+		if(filertedNewElements.isEmpty() && filteredChangedElements.isEmpty() && deletedElements.isEmpty()){
+			return;
+		}
+		List<ICElement> elements = new ArrayList<ICElement>(filertedNewElements);
+		elements.addAll(filteredChangedElements);
 		
 		IRemoteIndexerInfoProvider provider = RemoteIndexerInfoProviderFactory.getProvider(elements);
 		ICIndexSubsystem indexSubsystem = getSubSystem();
-		indexSubsystem.indexDelta(scope, provider, newElements, changedElements, deletedElements, monitor, task);
+		indexSubsystem.indexDelta(scope, provider, filertedNewElements, filteredChangedElements, deletedElements, monitor, task);
 	}
 	
 
@@ -98,8 +105,9 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 		if (project != null && project.isOpen()){
 			indexSubsystem.checkProject(project, new NullProgressMonitor());
 		}
-		
+			
 		indexSubsystem.reindexScope(scope, provider, indexLocation, monitor, task);
+			
 	}
 
 	
@@ -107,5 +115,12 @@ public class RemoteIndexLifecycleService extends AbstractRemoteService implement
 		ICIndexSubsystem indexSubsystem = getSubSystem();
 		return indexSubsystem.moveIndexFile(scopeName, newIndexLocation, monitor);
 	}
+		
 
+
+	public EventType getReIndexEventType() {
+		
+		return getSubSystem().getReIndexEventType();
+	}
+	
 }

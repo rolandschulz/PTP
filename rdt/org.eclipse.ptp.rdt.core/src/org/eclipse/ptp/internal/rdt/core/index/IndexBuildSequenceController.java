@@ -36,6 +36,7 @@ import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
+
 public class IndexBuildSequenceController implements IResourceChangeListener {
 
 	public static String INDEX_AFTER_BUILD_OPTION_KEY = "INDEX_AFTER_BUILD"; //$NON-NLS-1$
@@ -47,14 +48,16 @@ public class IndexBuildSequenceController implements IResourceChangeListener {
 	public static final String FALSE = String.valueOf(false);
 	
 	public static String STATUS_NEVERRUN = "never_run"; //$NON-NLS-1$
-	public static String STATUS_RUNNING = "running"; //$NON-NLS-1$
+	public static String STATUS_RUNNING ="running"; //$NON-NLS-1$
 	public static String STATUS_INCOMPLETE = "incomplete"; //$NON-NLS-1$
 	public static String STATUS_COMPLETE = "complete"; //$NON-NLS-1$
+	
+	//index special status
+	public static String STATUS_STARTING_BY_BUILD = "startingByBuild"; //$NON-NLS-1$
+	public static String STATUS_STARTING_BY_IMPORT = "startingByImport"; //$NON-NLS-1$
+	public static String STATUS_STARTING_BY_REINDEX = "startingByReindex"; //$NON-NLS-1$
+	public static String STATUS_COMPLETE_BY_BUILD="completeByBuild"; //$NON-NLS-1$
 
-	// To make a build complete, must follow this build sequence, build_finish,
-	// buildOutput_scanned -> build_complete
-	public static String BUILD_SEQUENCE_STATUS_FINISH = "build_finish"; //$NON-NLS-1$
-	public static String BUILD_SEQUENCE_STATUS_SCANNED = "build_sanned"; //$NON-NLS-1$
 
 	private static Map<String, IndexBuildSequenceController> projectStatusMap = new HashMap<String, IndexBuildSequenceController>();
 
@@ -104,7 +107,7 @@ public class IndexBuildSequenceController implements IResourceChangeListener {
 		}
 	}
 
-	public static IndexBuildSequenceController getIndexBuildSequenceController(IProject p) {
+	public static synchronized IndexBuildSequenceController getIndexBuildSequenceController(IProject p) {
 		String projectName = p.getName();
 		IndexBuildSequenceController ps = projectStatusMap.get(projectName);
 		if (ps == null) {
@@ -179,19 +182,25 @@ public class IndexBuildSequenceController implements IResourceChangeListener {
 	}
 	public boolean isIndexAfterBuildSet(){
 		
-		//if(isBuildServiceEnabled()){
-		      return checkStatus(INDEX_AFTER_BUILD_OPTION_KEY, TRUE);
-		//}else{
-			//return false;
-		//}
+		
+		return checkStatus(INDEX_AFTER_BUILD_OPTION_KEY, TRUE);
+		
 	}
 
 	public boolean isIndexNeverRun() {
 		return checkStatus(INDEX_STATUS_KEY, STATUS_NEVERRUN);
 	}
+	
+	public boolean isIndexStartingByBuild(){
+		return checkStatus(INDEX_STATUS_KEY, STATUS_STARTING_BY_BUILD);
+	}
+	
+	public boolean isIndexStartingByImport(){
+		return checkStatus(INDEX_STATUS_KEY, STATUS_STARTING_BY_IMPORT);
+	}
 
-	public boolean isIndexRunning() {
-		return checkStatus(INDEX_STATUS_KEY, STATUS_RUNNING);
+	public boolean isIndexStartingByReindex() {
+		return checkStatus(INDEX_STATUS_KEY, STATUS_STARTING_BY_REINDEX);
 	}
 
 	public boolean isIndexInCompleted() {
@@ -201,6 +210,13 @@ public class IndexBuildSequenceController implements IResourceChangeListener {
 	public boolean isIndexCompleted() {
 		return checkStatus(INDEX_STATUS_KEY, STATUS_COMPLETE);
 	}
+	
+	public boolean isIndexCompletedByBuild() {
+		return checkStatus(INDEX_STATUS_KEY, STATUS_COMPLETE_BY_BUILD);
+	}
+	
+	
+	
 
 	public boolean isBuildNeverRun() {
 		return checkStatus(BUILD_STATUS_KEY, STATUS_NEVERRUN);
@@ -218,17 +234,48 @@ public class IndexBuildSequenceController implements IResourceChangeListener {
 		return checkStatus(BUILD_STATUS_KEY, STATUS_COMPLETE);
 	}
 
-	public void setIndexCompleted() {
+	public void setIndexCompletedByBuild() {
+		setStatus(INDEX_STATUS_KEY, STATUS_COMPLETE_BY_BUILD);
+	}
+	
+	
+	private void setIndexCompletedTemorory() {
 		setStatus(INDEX_STATUS_KEY, STATUS_COMPLETE);
+		
+	}
+	
+	
+	public void setIndexCompleted() {
+		Job updateIndexJob = new Job("set index completed"){  //$NON-NLS-1$
+			protected IStatus run(IProgressMonitor monitor) {
+									
+				setIndexCompletedTemorory();
+				
+				return Status.OK_STATUS;
+			}
+		};
+		
+		ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
+		updateIndexJob.setRule(rule);
+		updateIndexJob.schedule();
+		
+		
 	}
 
-	public void setIndexInCompleted() {
-		setStatus(INDEX_STATUS_KEY, STATUS_INCOMPLETE);
-	}
 
-	public void setIndexRunning() {
-		setStatus(INDEX_STATUS_KEY, STATUS_RUNNING);
+	public void setIndexStartingByBuild() {
+		setStatus(INDEX_STATUS_KEY, STATUS_STARTING_BY_BUILD);
 	}
+	
+	public void setIndexStartingByImport() {
+		setStatus(INDEX_STATUS_KEY, STATUS_STARTING_BY_IMPORT);
+	}
+	
+	public void setIndexStartingByReindex() {
+		setStatus(INDEX_STATUS_KEY, STATUS_STARTING_BY_REINDEX);
+	}
+	
+	
 
 	public void setBuildCompleted() {
 		setStatus(BUILD_STATUS_KEY, STATUS_COMPLETE);
@@ -258,76 +305,16 @@ public class IndexBuildSequenceController implements IResourceChangeListener {
 	 */
 	public void setStatus(String status_property_key, String status_to_set) {
 		try {
-			project.setPersistentProperty(new QualifiedName("", //$NON-NLS-1$
-					status_property_key), status_to_set);
+			if(project.exists()){
+				project.setPersistentProperty(new QualifiedName("", //$NON-NLS-1$
+						status_property_key), status_to_set);
+			}
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
-	/*
-	 * public void setBuildStatus(String status){
-	 * if(status.equals(BUILD_SEQUENCE_STATUS_FINISH)){ build_sequence_status =
-	 * BUILD_SEQUENCE_STATUS_FINISH; }
-	 * if(status.equals(BUILD_SEQUENCE_STATUS_SCANNED)){
-	 * if(build_sequence_status.equals(BUILD_SEQUENCE_STATUS_FINISH)){
-	 * build_sequence_status = BUILD_SEQUENCE_STATUS_SCANNED;
-	 * setStatus(BUILD_STATUS_KEY, STATUS_COMPLETE);
-	 * if(start_index_after_build_complete){ startIndex(); } } } }
-	 */
-	/***
-	 * 
-	 * 
-	 * 
-	 * 
-	 * ri=reindex, iu=index update, optional ri = prompt user that build is incompleted, provide option if they want to preceed build.
-	 * IF=index following build
-	 * 
-	 * 
-	 * 							index neverRun		index running			index incompleted		index completed
-	 * build disabled             as usual				as usual				as usual				as usual
-	 * consider as never build    iu -> ri
-	 * 
-	 * build never run           skip iu, no ri case
-	 *
-	 * build running           must be 1st build		
-	 * no need this state	   run IF, skip iu          skip IF,                skip IF                 skip IF
-	 *                         provide user a           iu, ri as usual         iu, ri as usual         iu, ri as usual
-	 *                         warning message 
-	 *                         if build is 
-	 *                         incomplete 
-	 *  
-	 * build incomplete ->     optional ri,				optional ri, 			optional ri, 		    optional ri
-	 *                         skip iu                  iu as usual				iu as usual				iu as usual
-	 * 
-	 * build complete          should never be  		ri, iu as usual         as usual				as usual
-	 *                         this case             
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 */
-
-	/**
-	 * since we run index after first time build, so the first time building
-	 * must be at status of build-running and index-never-run. we want to skip
-	 * index update (check when do index update) and run index after build
-	 * (check in builder) in this case
-	 */
-	/*
-	public boolean isBeforeOrUnderFirstTimeBuilding() {
-		if (isBuildNeverRun()) {
-			return true;
-		}
-		if (isBuildRunning() && isIndexNeverRun()) {
-			return true;
-		}
-		return false;
-	}
-	*/
+	
 	/**
 	 * we call invoke index before update build status, so if the build status is never run at that time,
 	 * it must a first build attempt.
@@ -345,30 +332,19 @@ public class IndexBuildSequenceController implements IResourceChangeListener {
 	public boolean shouldTurnIndexUpdateToReindex(){
 		return isIndexNeverRun()&&isBuildCompleted();
 	}
-	/**
-	 * if index is not done yet, we will skip index update. The only exception is if build is completed, but this case should
-	 * never happen since we run index for first completed build.
-	 * @return
-	 */
-	public boolean shouldSkipIndexUpdate(){
 		
-		if(isBuildRunning()){
-			return true;
+	public boolean shouldSkipIndexUpdate (){
+				
+		if(isIndexCompleted()){
+			
+			return false;
 		}
-		if (isIndexNeverRun()){
 			
-			if(isBuildCompleted()){
-				return false;
-			}
-			return true;
-			
-			
-		}
-		return false;
+		return true;
 	}
 	
 	/**
-	 * this is called from reindex autio after user choose to continue index after an optional index prompt.
+	 * this is called from reindex action after user choose to continue index after an optional index prompt.
 	 * the build must be failed at the time.
 	 */
 	public void setBuildIncompleteIfItIsRunning(){
@@ -377,21 +353,42 @@ public class IndexBuildSequenceController implements IResourceChangeListener {
 			setBuildInCompleted();
 		}
 	}
-	/**
-	 * skip reindex during the first time build, when build is never run and index is never run.
-	 * 
-	 * this case would alos match if user run an optional reindex(build is never run and index is never run) and select to 
-	 * continue do index, to solve this conflicts, we will turn index status to running after user selects continue to do index.
-	 * @return
-	 */
-	public boolean shouldSkipReindex()
-	{
-		if(isBuildRunning()){
-			return true;
+	
+	public boolean shouldSkipReindex(){
+		
+		if(isIndexAfterBuildSet()){
+			
+			if(isIndexNeverRun()){
+				return true;
+			}else{
+				//from reindex action,
+				if(this.isIndexStartingByReindex()){
+					return false;
+				}
+				//during indexing triggered by build
+				if(this.isIndexStartingByBuild()){
+					return false;
+				}
+				//from index import action
+				if(this.isIndexStartingByImport()){
+					return false;
+				}
+											
+				return true;
+			}
+			
+		}else{
+			
+				
+			return false;
+			
+			
 		}
-		//the case of build is disable during project creation.
-		return isBuildNeverRun()&&isIndexNeverRun();
+		
+		
 	}
+	
+	
 	/*
 	 * should be called from reindex action
 	 * return true if build is never run or incomplete
@@ -402,39 +399,36 @@ public class IndexBuildSequenceController implements IResourceChangeListener {
 	}
 	
 	
-	/**
-	 * precondition to call this function, 
-	 * isIndexAfterBuildSet() ==true
-	 */
+	
 	public void invokeIndex(){
 		
+		if(isIndexAfterBuildSet()){
 		
-		
-		Job job = new Job("Indexing Job"){ //$NON-NLS-1$
-			protected IStatus run(IProgressMonitor monitor) {
-				
-				if(shouldRunIndexFollowingBuild()){
+			Job job = new Job("Indexing Job"){ //$NON-NLS-1$
+				protected IStatus run(IProgressMonitor monitor) {
 					setFinalBuildStatus();
-					if(isBuildCompleted()){
-						//for indexing following first time build, only run it after a completed build.
-						ICProject cProject = CModelManager.getDefault().getCModel().getCProject(project);
-						CCorePlugin.getIndexManager().reindex(cProject);
-						//System.out.println("running invoke indexing job. "); //$NON-NLS-1$
-					}
 					
-				}else{
-					//System.out.println("not running index job, just update build status. "); //$NON-NLS-1$
-					setFinalBuildStatus();
-				}
-		        return Status.OK_STATUS;
-		    }
-
-		};
-		ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
-    	job.setRule(rule);
-    	job.schedule();
+						
+						if(isBuildCompleted()){
+							//for indexing following first time build, only run it after a completed build.
+							ICProject cProject = CModelManager.getDefault().getCModel().getCProject(project);
+							setIndexStartingByBuild();
+							CCorePlugin.getIndexManager().reindex(cProject);
+							
+						}
+						
+					
+			        return Status.OK_STATUS;
+			    }
+	
+			};
+			ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
+	    	job.setRule(rule);
+	    	job.schedule();
+		}else{
+			setFinalBuildStatus();
+		}
     	
-    	//System.out.println("schedule invoke indexing job. "); //$NON-NLS-1$
 	
 		
 	}

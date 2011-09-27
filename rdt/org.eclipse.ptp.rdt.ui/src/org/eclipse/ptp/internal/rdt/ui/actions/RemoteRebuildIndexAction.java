@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,6 @@ import java.util.Iterator;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.ICProject;
-import org.eclipse.cdt.internal.ui.actions.RebuildIndexAction;
 import org.eclipse.cdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -51,10 +50,12 @@ public class RemoteRebuildIndexAction implements IObjectActionDelegate {
 				        if(continueIndex){
 				        	//in case build is not completed normally
 				        	indexBuildSequenceController.setBuildIncompleteIfItIsRunning();
-				        	indexBuildSequenceController.setIndexRunning();
+				        	//index could be never run as the build is not completed.
+				        	indexBuildSequenceController.setIndexStartingByReindex();
 				        	CCorePlugin.getIndexManager().reindex((ICProject) elem);
 				        }
 					}else{
+						indexBuildSequenceController.setIndexStartingByReindex();
 						CCorePlugin.getIndexManager().reindex((ICProject) elem);
 					}
 				}else{

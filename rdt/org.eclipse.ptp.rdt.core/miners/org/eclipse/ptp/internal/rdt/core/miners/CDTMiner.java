@@ -84,6 +84,7 @@ import org.eclipse.rse.dstore.universal.miners.UniversalServerUtilities;
  */
 public class CDTMiner extends Miner {
 	
+	public static final String CLASSNAME="org.eclipse.ptp.internal.rdt.core.miners.CDTMiner"; //$NON-NLS-1$
 	// index management
 	public static final String C_INDEX_REINDEX = "C_INDEX_REINDEX"; //$NON-NLS-1$
 	public static final String C_INDEX_DELTA = "C_INDEX_DELTA"; //$NON-NLS-1$
@@ -159,7 +160,7 @@ public class CDTMiner extends Miner {
 	
 	public static final boolean DEBUG = true; // must be true for debug messages to be logged 
 	
-	private IndexerThread indexerThread = null;
+	protected IndexerThread indexerThread = null;
 	
 
 	/* (non-Javadoc)
@@ -182,7 +183,7 @@ public class CDTMiner extends Miner {
 		}
 	}
 	
-	private DataElement doHandleCommand(DataElement theCommand) {
+	protected DataElement doHandleCommand(DataElement theCommand) {
 		String name = getCommandName(theCommand);
 		DataElement status = getCommandStatus(theCommand);
 		//DataElement subject = getCommandArgument(theCommand, 0);
@@ -1415,7 +1416,7 @@ public class CDTMiner extends Miner {
 		return Boolean.parseBoolean(element.getName());
 	}
 
-	private String getString(DataElement command, int index) {
+	protected String getString(DataElement command, int index) {
 		DataElement element = getCommandArgument(command, index);
 		return element.getName();
 	}

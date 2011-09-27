@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,18 +45,13 @@ public class RemoteFastIndexer extends AbstractPDOMIndexer {
 		if(serviceProvider instanceof IIndexServiceProvider) {
 			boolean update = !isReindex();
 			IndexBuildSequenceController indexBuildSequenceController = IndexBuildSequenceController.getIndexBuildSequenceController(getProject().getProject());
-			if(indexBuildSequenceController.isIndexAfterBuildSet()){
+			//if(indexBuildSequenceController.isIndexAfterBuildSet()){
 				
 				if(update){
 					
 					if(indexBuildSequenceController.shouldSkipIndexUpdate()){
 						return null;
 					}
-					/* we don't turn index update to reindex.
-					if(indexBuildSequenceController.shouldTurnIndexUpdateToReindex()){
-						update = false;
-					}
-					*/
 					
 					
 				}else{
@@ -64,9 +59,8 @@ public class RemoteFastIndexer extends AbstractPDOMIndexer {
 						return null;
 					}
 				}
-			}
+		//	}
 			
-			indexBuildSequenceController.setIndexRunning();	
 			return new RemoteIndexerTask(this, (IIndexServiceProvider) serviceProvider, added, changed, removed, update);
 			
 		}
