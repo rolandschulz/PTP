@@ -43,6 +43,9 @@ public class RemoteProjectResourcesUtil {
 				    if(IRemoteIndexerInfoProvider.EXCLUDED_DIRECTORIES.contains(resource.getName())){
 				    	return false;
 				    }else{
+				    	if(resource.getName().startsWith(".")){ //$NON-NLS-1$
+				    		return false;
+				    	}
 				    	return true;
 				    }
 				}else{
