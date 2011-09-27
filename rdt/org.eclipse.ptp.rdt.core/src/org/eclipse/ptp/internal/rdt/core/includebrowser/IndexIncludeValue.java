@@ -103,7 +103,7 @@ public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 	{
 		IIndexFileLocation location = this.includesLocation;
 		
-		if (location == null && converter == null && this.include.getIncludesLocation() != null) {
+		if (location == null && converter == null && this.include!=null &&  this.include.getIncludesLocation() != null) {
 			location = this.include.getIncludesLocation();
 		}
 	
