@@ -60,7 +60,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private IRemoteConnection fSelectedConnection;
 	private IRemoteServices fSelectedProvider;
 	// private final IRunnableContext fContext;
-	private final String fProjectName = ""; //$NON-NLS-1$
+	private String fProjectName = ""; //$NON-NLS-1$
 
 	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
 	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
@@ -360,5 +360,16 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private void updateNewConnectionButtonEnabled(Button button) {
 		IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
 		button.setEnabled(connectionManager != null);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setProjectName(String projectName)
+	 */
+	public void setProjectName(String projectName) {
+		fProjectName = projectName;
+		fLocationText.setText(getDefaultPathDisplayString());
 	}
 }
