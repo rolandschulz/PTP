@@ -14,8 +14,8 @@
 		<!-- Update for new simultaneous release -->
 		<property name="eclipseRelease" value="indigo"/>
 		<!-- Update for new PTP branch -->
-		<property name="ptpBranchVersion" value="5.0.2"/>
-		<property name="photranBranchVersion" value="7.0.2"/>
+		<property name="ptpBranchVersion" value="5.0.3"/>
+		<property name="photranBranchVersion" value="7.0.3"/>
 		<!-- The following properties need to be updated to reflect the version we are building against. -->
 		<!-- NOTE: changing any of these will require corresponding changes in org.eclipse.ptp.rdt.core.remotejars/build.xml -->
 		<!-- Update for new Eclipse version -->
