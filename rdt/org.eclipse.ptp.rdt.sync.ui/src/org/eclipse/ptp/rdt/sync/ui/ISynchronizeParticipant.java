@@ -52,4 +52,11 @@ public interface ISynchronizeParticipant {
 	 * @return true if the configuration is complete
 	 */
 	public boolean isConfigComplete();
+	
+	/**
+	 * Set project name so that the participant can use it in the UI
+	 * 
+	 * @param projectName
+	 */
+	public void setProjectName(String projectName);
 }
