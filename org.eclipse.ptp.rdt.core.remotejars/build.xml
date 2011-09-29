@@ -19,7 +19,7 @@
 	<tstamp/>
 	<property name="serverBaseName" value="rdt-server"/>
 	<property name="serverJar" value="${basedir}/${serverBaseName}"/>
-	<property name="serverVersion" value="5.0.2"/>
+	<property name="serverVersion" value="5.0.3"/>
 	
 	<property name="stylesheet" value="${basedir}/jardesc.xsl"/>
 	<property name="downloads" value="${basedir}/downloads"/>
@@ -28,9 +28,9 @@
 	
 	<!-- PLATFORM VERSIONS MUST BE UPDATED FOR NEW PLATFORM VERSION -->
 	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
-	<property name="platformVersion" value="S-3.7RC4-201106030909"/>
-	<property name="platformBaseName" value="eclipse-platform-3.7RC4"/>
-	<property name="icuBaseZip" value="com.ibm.icu.base-3.7RC4.zip"/>
+	<property name="platformVersion" value="R-3.7.1-201109091335"/>
+	<property name="platformBaseName" value="eclipse-platform-3.7.1"/>
+	<property name="icuBaseZip" value="com.ibm.icu.base-3.7.1.zip"/>
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.4.2.v20110208.jar"/>
 	
 	<property name="coreRuntimeVersion" value="3.7.0.v20110110"/>
