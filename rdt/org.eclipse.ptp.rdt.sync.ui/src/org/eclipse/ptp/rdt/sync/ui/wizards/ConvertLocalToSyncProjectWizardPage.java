@@ -389,6 +389,10 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 
 	private void update() {
 		getWizard().getContainer().updateMessage();
+		if (this.getCheckedElements().length == 1 && fSelectedProvider != null) {
+			String projectName = ((IProject) this.getCheckedElements()[0]).getName();
+			fSelectedProvider.getParticipant().setProjectName(projectName);
+		}
 	}
 
 }
