@@ -207,7 +207,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 							if (!(emptyFile.exists())) {
 								emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
 							}
-						} catch (CoreException e){
+						} catch (CoreException e) {
 							// Nothing to do. Can happen if another thread creates the file between the check and creation.
 						}
 					}
@@ -273,8 +273,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			 * To satisfy this guarantee, this call needs to make sure that both the current delta and all outstanding sync requests
 			 * finish before this call returns.
 			 * 
-			 * Example: Why sync if current delta is empty? The RemoteMakeBuilder forces a sync before and after building.
-			 * In some cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
+			 * Example: Why sync if current delta is empty? The RemoteMakeBuilder forces a sync before and after building. In some
+			 * cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
 			 */
 			// TODO: We are not using the individual "sync to local" and "sync to remote" flags yet.
 			if (syncFlags.contains(SyncFlag.DISABLE_SYNC)) {
@@ -295,7 +295,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				if (fWaitingThreadsCount > 0 && syncFlags == SyncFlag.NO_FORCE) {
 					return; // the queued thread will do the work for us. And we don't have to wait because of NO_FORCE
 				} else {
-					fWaitingThreadsCount++;       
+					fWaitingThreadsCount++;
 				}
 			}
 
@@ -322,9 +322,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				// TODO: Review exception handling
 				if (fSyncConnection == null) {
 					// Open a remote sync connection
-					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(),
-							this.getProject().getLocation().toString(), this.getLocation(),
-							new FileFilter(), progress);
+					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation()
+							.toString(), this.getLocation(), new FileFilter(), progress);
 				}
 
 				// Open remote connection if necessary
@@ -345,7 +344,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				// Sync local and remote. For now, do both ways each time.
 				// TODO: Sync more efficiently and appropriately to the situation.
 				fSyncConnection.syncLocalToRemote(progress.newChild(40));
-				fSyncConnection.syncRemoteToLocal(progress.newChild(40), false);
+				fSyncConnection.syncRemoteToLocal(progress.newChild(40), true); // Temporarily enable syncing new remote files
 
 				finishedSyncTaskId = willFinishTaskId;
 			} catch (final RemoteSyncException e) {
@@ -357,7 +356,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			} finally {
 				syncLock.unlock();
 			}
-			
+
 			// Sync successful - re-enable error messages. This is really UI code, but there is no way at the moment to notify UI
 			// of a successful sync.
 			SyncManager.setShowErrors(getProject(), true);
@@ -367,8 +366,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(20));
 			}
 		} finally {
-			if (monitor != null)
+			if (monitor != null) {
 				monitor.done();
+			}
 		}
 	}
 
@@ -378,9 +378,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @param e
 	 *            the remote sync exception
-	 * @param syncFlags 
+	 * @param syncFlags
 	 * @throws RemoteSyncException
-	 * 			  for non-forced syncs
+	 *             for non-forced syncs
 	 */
 	private void handleRemoteSyncException(RemoteSyncException e, EnumSet<SyncFlag> syncFlags) throws RemoteSyncException {
 		if (syncFlags == SyncFlag.NO_FORCE) {
@@ -392,11 +392,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		// RemoteSyncException is generally used by either creating a new exception with a message describing the problem or by
 		// embedding another type of error. So we need to decide which message to use.
 		if ((e.getMessage() != null && e.getMessage().length() > 0) || e.getCause() == null) {
-			message = Messages.GSP_SyncErrorMessage + this.getProject().getName() + ":" + endOfLineChar + endOfLineChar + e.getMessage(); //$NON-NLS-1$
+			message = Messages.GSP_SyncErrorMessage + this.getProject().getName()
+					+ ":" + endOfLineChar + endOfLineChar + e.getMessage(); //$NON-NLS-1$
 		} else {
-			message = Messages.GSP_SyncErrorMessage + this.getProject().getName() +":" + endOfLineChar + endOfLineChar + e.getCause().getMessage(); //$NON-NLS-1$
+			message = Messages.GSP_SyncErrorMessage + this.getProject().getName()
+					+ ":" + endOfLineChar + endOfLineChar + e.getCause().getMessage(); //$NON-NLS-1$
 		}
-		
+
 		IStatus status = null;
 		int severity = e.getStatus().getSeverity();
 		status = new Status(severity, Activator.PLUGIN_ID, message, e);
