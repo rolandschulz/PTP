@@ -89,7 +89,7 @@ import org.eclipse.cdt.internal.ui.newui.Messages;
 	    // widgets
 	    private Text projectNameField;
 	    private Text projectLocationField;
-	    private Tree tree;
+	    private Tree localTree;
 	    private Composite localToolChain;
 	    private Composite remoteToolChain;
 	    private Button show_sup;
@@ -126,8 +126,7 @@ import org.eclipse.cdt.internal.ui.newui.Messages;
 	        setControl(composite);
 	    	
 	    	createProjectDetailedInfoGroup((Composite)getControl()); 
-	    	updateData(tree, localToolChain, show_sup, SyncMainWizardPage.this, getWizard());
-			switchTo(updateData(tree, remoteToolChain, show_sup, SyncMainWizardPage.this, getWizard()), getDescriptor(tree));
+			switchTo(updateData(localTree, localToolChain, show_sup, SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
 
 			setPageComplete(false);
 	        setErrorMessage(null);
@@ -149,22 +148,22 @@ import org.eclipse.cdt.internal.ui.newui.Messages;
 	        projectLocalOptionsLabel.setFont(parent.getFont());
 	        projectLocalOptionsLabel.setLayoutData(new GridData(GridData.BEGINNING));
 	    	
-	        tree = new Tree(c, SWT.SINGLE | SWT.BORDER);
-	        tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
-	        tree.addSelectionListener(new SelectionAdapter() {
+	        localTree = new Tree(c, SWT.SINGLE | SWT.BORDER);
+	        localTree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
+	        localTree.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					TreeItem[] tis = tree.getSelection();
+					TreeItem[] tis = localTree.getSelection();
 					if (tis == null || tis.length == 0) return;
 					switchTo((CWizardHandler)tis[0].getData(), (EntryDescriptor)tis[0].getData(DESC));
 					setPageComplete(validatePage());
 				}});
-	        tree.getAccessible().addAccessibleListener(
+	        localTree.getAccessible().addAccessibleListener(
 					 new AccessibleAdapter() {                       
 		                 @Override
 						public void getName(AccessibleEvent e) {
-		                	 for (int i = 0; i < tree.getItemCount(); i++) {
-		                		 if (tree.getItem(i).getText().equals(e.result))
+		                	 for (int i = 0; i < localTree.getItemCount(); i++) {
+		                		 if (localTree.getItem(i).getText().equals(e.result))
 		                			 return;
 		                	 }
 	                         e.result = Messages.CMainWizardPage_0; 
@@ -194,8 +193,7 @@ import org.eclipse.cdt.internal.ui.newui.Messages;
 				public void widgetSelected(SelectionEvent e) {
 					if (h_selected != null)
 						h_selected.setSupportedOnly(show_sup.getSelection());
-					updateData(tree, localToolChain, show_sup, SyncMainWizardPage.this, getWizard());
-					switchTo(updateData(tree, remoteToolChain, show_sup, SyncMainWizardPage.this, getWizard()), getDescriptor(tree));
+					switchTo(updateData(localTree, localToolChain, show_sup, SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
 				}} );
 
 	        // restore settings from preferences
@@ -292,7 +290,7 @@ import org.eclipse.cdt.internal.ui.newui.Messages;
 	            }
 	        }
 
-	        if (tree.getItemCount() == 0) {
+	        if (localTree.getItemCount() == 0) {
 	        	setErrorMessage(Messages.CMainWizardPage_3); 
 	        	return false;
 	        }
