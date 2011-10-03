@@ -44,6 +44,7 @@ import org.eclipse.ptp.services.core.ServicesCorePlugin;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 public class SyncManager  {
 	public static enum SYNC_MODE {
@@ -52,6 +53,7 @@ public class SyncManager  {
 
 	private static final IServiceModelManager serviceModel = ServiceModelManager.getInstance();
 	private static final IService syncService = serviceModel.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
+	private static final String PLUGIN_ID = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String DEFAULT_SAVE_FILE_NAME = "SyncManagerData.xml"; //$NON-NLS-1$
 	private static final String SYNC_MANAGER_ELEMENT_NAME = "sync-manager-data"; //$NON-NLS-1$
 	private static final String SYNC_MODE_ELEMENT_NAME = "project-to-sync-mode"; //$NON-NLS-1$
@@ -80,6 +82,31 @@ public class SyncManager  {
 	private static void handleInitError(Throwable e) {
 		RDTSyncCorePlugin.log(Messages.SyncManager_1, e);
 	}
+	
+	private static class DefaultSyncExceptionHandler implements SyncExceptionHandler {
+		IProject project;
+		public DefaultSyncExceptionHandler(IProject p) {
+			project = p;
+		}
+
+		public void handle(CoreException e) {
+			final String message;
+			final String endOfLineChar = System.getProperty("line.separator"); //$NON-NLS-1$
+
+			// A RemoteSyncException is generally constructed by either creating a new exception with a message describing the
+			// problem or by embedding another type of error.
+			if ((e.getMessage() != null && e.getMessage().length() > 0) || e.getCause() == null) {
+				message = Messages.SyncManager_3 + project.getName() + ":" + endOfLineChar + endOfLineChar + e.getMessage(); //$NON-NLS-1$
+			} else {
+				message = Messages.SyncManager_3 + project.getName() + ":" + endOfLineChar + endOfLineChar + e.getCause().getMessage(); //$NON-NLS-1$
+			}
+
+			IStatus status = null;
+			int severity = e.getStatus().getSeverity();
+			status = new Status(severity, PLUGIN_ID, message, e);
+			StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
+		}
+	}
 
 	private static class SynchronizeJob extends Job {
 		private final ISyncServiceProvider fSyncProvider;
@@ -93,7 +120,11 @@ public class SyncManager  {
 			fDelta = delta;
 			fSyncProvider = provider;
 			fSyncFlags = syncFlags;
-			fSyncExceptionHandler = seHandler;
+			if (seHandler == null) {
+				fSyncExceptionHandler = new DefaultSyncExceptionHandler(delta.getResource().getProject());
+			} else {
+				fSyncExceptionHandler = seHandler;
+			}
 		}
 
 		/*
@@ -107,11 +138,7 @@ public class SyncManager  {
 			try {
 				fSyncProvider.synchronize(fDelta, progress.newChild(100), fSyncFlags);
 			} catch (CoreException e) {
-				if (fSyncExceptionHandler == null) {
-					System.out.println(Messages.SyncManager_8 + e.getLocalizedMessage());
-				} else {
 					fSyncExceptionHandler.handle(e);
-				}
 			} finally {
 				monitor.done();
 			}

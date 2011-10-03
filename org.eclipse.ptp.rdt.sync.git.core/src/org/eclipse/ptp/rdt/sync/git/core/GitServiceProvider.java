@@ -38,7 +38,6 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.ServiceProvider;
-import org.eclipse.ui.statushandlers.StatusManager;
 
 public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider {
 	public static final String ID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
@@ -348,11 +347,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 				finishedSyncTaskId = willFinishTaskId;
 			} catch (final RemoteSyncException e) {
-				this.handleRemoteSyncException(e, syncFlags);
-				return;
+				throw e;
 			} catch (RemoteConnectionException e) {
-				this.handleRemoteSyncException(new RemoteSyncException(e), syncFlags);
-				return;
+				throw new RemoteSyncException(e);
 			} finally {
 				syncLock.unlock();
 			}
@@ -370,39 +367,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				monitor.done();
 			}
 		}
-	}
-
-	/**
-	 * Handle sync errors appropriately. Currently, this function only handles forced sync errors by displaying them to the user.
-	 * Non-forced syncs are called by the UI, so errors are thrown for the UI to handle.
-	 * 
-	 * @param e
-	 *            the remote sync exception
-	 * @param syncFlags
-	 * @throws RemoteSyncException
-	 *             for non-forced syncs
-	 */
-	private void handleRemoteSyncException(RemoteSyncException e, EnumSet<SyncFlag> syncFlags) throws RemoteSyncException {
-		if (syncFlags == SyncFlag.NO_FORCE) {
-			throw e;
-		}
-		final String message;
-		final String endOfLineChar = System.getProperty("line.separator"); //$NON-NLS-1$
-
-		// RemoteSyncException is generally used by either creating a new exception with a message describing the problem or by
-		// embedding another type of error. So we need to decide which message to use.
-		if ((e.getMessage() != null && e.getMessage().length() > 0) || e.getCause() == null) {
-			message = Messages.GSP_SyncErrorMessage + this.getProject().getName()
-					+ ":" + endOfLineChar + endOfLineChar + e.getMessage(); //$NON-NLS-1$
-		} else {
-			message = Messages.GSP_SyncErrorMessage + this.getProject().getName()
-					+ ":" + endOfLineChar + endOfLineChar + e.getCause().getMessage(); //$NON-NLS-1$
-		}
-
-		IStatus status = null;
-		int severity = e.getStatus().getSeverity();
-		status = new Status(severity, Activator.PLUGIN_ID, message, e);
-		StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
 	}
 
 	// Paths that the Git sync provider can ignore.
