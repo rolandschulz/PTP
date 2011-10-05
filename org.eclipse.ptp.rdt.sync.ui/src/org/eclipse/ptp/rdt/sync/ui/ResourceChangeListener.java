@@ -20,6 +20,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.IconAndMessageDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
@@ -60,68 +62,6 @@ public class ResourceChangeListener {
 		public SyncRCLExceptionHandler(IProject p) {
 			project = p;
 		}
-		
-		// Class for a message dialog that also allows the user to launch the merge resolution tool.
-		private class MessageDialogWithToggleAndMergeButton extends MessageDialogWithToggle {
-			public MessageDialogWithToggleAndMergeButton(Shell parentShell, String dialogTitle, Image image, String message,
-					int dialogImageType, String[] dialogButtonLabels, int defaultIndex, String toggleMessage, boolean toggleState) {
-				super(parentShell, dialogTitle, image, message, dialogImageType, dialogButtonLabels, defaultIndex, toggleMessage,
-						toggleState);
-			}
-			
-		    /**
-		     * @see Dialog#createDialogArea(Composite)
-		     */
-			@Override
-			protected Control createDialogArea(Composite parent) {
-		        Composite dialogAreaComposite = (Composite) super.createDialogArea(parent);
-		        setMergeButton(createMergeButton(dialogAreaComposite));
-		        return dialogAreaComposite;
-			}
-			
-		    /**
-		     * Creates a merge button without any text or state.  The text and state
-		     * will be created by <code>createDialogArea</code>. 
-		     * 
-		     * @param parent
-		     *            The composite in which the merge button should be placed;
-		     *            must not be <code>null</code>.
-		     * @return The added merge button; never <code>null</code>.
-		     */
-		    protected Button createMergeButton(Composite parent) {
-		        final Button button = new Button(parent, SWT.CHECK | SWT.LEFT);
-
-		        GridData data = new GridData(SWT.NONE);
-		        data.horizontalSpan = 2;
-		        button.setLayoutData(data);
-		        button.setFont(parent.getFont());
-
-		        button.addSelectionListener(new SelectionAdapter() {
-		            public void widgetSelected(SelectionEvent e) {
-		                // Nothing yet
-		            }
-
-		        });
-
-		        return button;
-		    }
-		    
-		    /**
-		     * A mutator for the button to launch merge resolution
-		     * 
-		     * @param button
-		     *            The button to use; must not be <code>null</code>.
-		     */
-		    protected void setMergeButton(Button button) {
-		        if (button == null) {
-		            throw new NullPointerException(
-		                    "A message dialog with merge may not have a null merge button.");} //$NON-NLS-1$
-
-		        if (!button.isDisposed()) {
-		            button.setText(Messages.ResourceChangeListener_1);
-		        }
-		    }
-		}
 
 		public void handle(CoreException e) {
 			if (!SyncManager.getShowErrors(project)) {
@@ -131,36 +71,39 @@ public class ResourceChangeListener {
 			String message;
 			String endOfLineChar = System.getProperty("line.separator"); //$NON-NLS-1$
 			Display errorDisplay = RDTSyncUIPlugin.getStandardDisplay();
-			
+
 			message = Messages.SyncMenuOperation_5 + project.getName() + ":" + endOfLineChar + endOfLineChar; //$NON-NLS-1$
 			if ((e.getMessage() != null && e.getMessage().length() > 0) || e.getCause() == null) {
 				message = message + e.getMessage();
 			} else {
 				message = message + e.getCause().getMessage();
 			}
-			
+
 			final String finalMessage = message;
 			errorDisplay.syncExec(new Runnable () {
 				public void run() {
+					String[] buttonLabels;
 					if (false) {
-						MessageDialogWithToggle dialog = MessageDialogWithToggle.openError(null, Messages.SyncMenuOperation_3,
-								finalMessage, Messages.SyncMenuOperation_4, !SyncManager.getShowErrors(project), null, null);
-						if (dialog.getToggleState()) {
-							SyncManager.setShowErrors(project, false);
-						} else {
-							SyncManager.setShowErrors(project, true);
-						}
+						buttonLabels = new String[1];
+						buttonLabels[0] = "Ok"; //$NON-NLS-1$
 					} else {
-						MessageDialogWithToggle dialog = MessageDialogWithToggleAndMergeButton.openError(null,
-								Messages.SyncMenuOperation_3, finalMessage, Messages.SyncMenuOperation_4,
-								!SyncManager.getShowErrors(project), null, null);
-						if (dialog.getToggleState()) {
-							SyncManager.setShowErrors(project, false);
-						} else {
-							SyncManager.setShowErrors(project, true);
-						}
+						buttonLabels = new String[2];
+						buttonLabels[0] = "Ok"; //$NON-NLS-1$
+						buttonLabels[1] = "Resolve merge conflict"; //$NON-NLS-1$
 					}
-				}
+					MessageDialogWithToggle dialog = new MessageDialogWithToggle(null, Messages.SyncMenuOperation_3, null,
+							finalMessage, MessageDialog.ERROR, buttonLabels, 0, Messages.SyncMenuOperation_4,
+							!SyncManager.getShowErrors(project));
+					int buttonPressed = dialog.open();
+					if (dialog.getToggleState()) {
+						SyncManager.setShowErrors(project, false);
+					} else {
+						SyncManager.setShowErrors(project, true);
+					}
+					if (buttonPressed == 1) {
+						// Merge button pressed!
+					}
+				};
 			});
 		}
 	}
