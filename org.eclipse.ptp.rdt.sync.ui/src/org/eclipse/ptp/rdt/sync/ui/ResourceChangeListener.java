@@ -24,6 +24,7 @@ import org.eclipse.jface.dialogs.IconAndMessageDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.ptp.rdt.sync.core.MergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
@@ -63,7 +64,7 @@ public class ResourceChangeListener {
 			project = p;
 		}
 
-		public void handle(CoreException e) {
+		public void handle(final CoreException e) {
 			if (!SyncManager.getShowErrors(project)) {
 				return;
 			}
@@ -83,13 +84,13 @@ public class ResourceChangeListener {
 			errorDisplay.syncExec(new Runnable () {
 				public void run() {
 					String[] buttonLabels;
-					if (false) {
+					if (e.getCause().getClass() != MergeConflictException.class) {
 						buttonLabels = new String[1];
-						buttonLabels[0] = "Ok"; //$NON-NLS-1$
+						buttonLabels[0] = Messages.ResourceChangeListener_2;
 					} else {
 						buttonLabels = new String[2];
-						buttonLabels[0] = "Ok"; //$NON-NLS-1$
-						buttonLabels[1] = "Resolve merge conflict"; //$NON-NLS-1$
+						buttonLabels[0] = Messages.ResourceChangeListener_2;
+						buttonLabels[1] = Messages.ResourceChangeListener_3;
 					}
 					MessageDialogWithToggle dialog = new MessageDialogWithToggle(null, Messages.SyncMenuOperation_3, null,
 							finalMessage, MessageDialog.ERROR, buttonLabels, 0, Messages.SyncMenuOperation_4,

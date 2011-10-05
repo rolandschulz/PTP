@@ -51,6 +51,7 @@ import org.eclipse.jgit.transport.TransportGitSsh;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.QuotedString;
+import org.eclipse.ptp.rdt.sync.core.MergeConflictException;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
@@ -675,8 +676,9 @@ public class GitRemoteSyncConnection {
 					mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
 	
 					if (mergeResults.getExitCode() != 0) {
-						throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
-								+ mergeResults.getStdout()));
+						MergeConflictException mce = new MergeConflictException(Messages.GRSC_GitMergeFailure +
+								mergeResults.getStdout(), new RemoteExecutionException());
+						throw new RemoteSyncException(mce);
 					}
 				}
 			} catch (final IOException e) {
