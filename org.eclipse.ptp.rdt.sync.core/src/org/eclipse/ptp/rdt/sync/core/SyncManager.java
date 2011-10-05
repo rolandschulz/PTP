@@ -83,6 +83,7 @@ public class SyncManager  {
 		RDTSyncCorePlugin.log(Messages.SyncManager_1, e);
 	}
 	
+	// Default handler just prints a dialog or logs depending on the error severity.
 	private static class DefaultSyncExceptionHandler implements SyncExceptionHandler {
 		IProject project;
 		public DefaultSyncExceptionHandler(IProject p) {

@@ -32,6 +32,7 @@ public class Messages extends NLS {
 	public static String RemoteSyncWizardPage_0;
 	public static String RemoteSyncWizardPage_description;
 	public static String ResourceChangeListener_0;
+	public static String ResourceChangeListener_1;
 	public static String SynchronizeParticipantDescriptor_invalidClass;
 	public static String SyncMenuOperation_0;
 	public static String SyncMenuOperation_1;
