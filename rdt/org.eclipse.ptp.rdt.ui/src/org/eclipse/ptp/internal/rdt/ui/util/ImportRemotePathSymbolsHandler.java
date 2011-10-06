@@ -40,7 +40,7 @@ import org.xml.sax.SAXParseException;
 
 
 /**
- * @since 4.0
+ * @since 4.1
  */
 public class ImportRemotePathSymbolsHandler {
 	

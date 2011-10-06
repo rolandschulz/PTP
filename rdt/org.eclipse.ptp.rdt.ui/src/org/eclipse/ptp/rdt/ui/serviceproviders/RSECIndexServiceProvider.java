@@ -44,7 +44,7 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 	private INavigationService fNavigationService;
 
 	/**
-	 * @since 4.0
+	 * @since 4.1
 	 */
 	public boolean isRemote() {
 		return true;
@@ -71,7 +71,7 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 	}
 
 	/**
-	 * @since 4.0
+	 * @since 4.1
 	 */
 	public synchronized INavigationService getNavigationService() {
 		if(!isConfigured())

@@ -522,7 +522,7 @@
          name="%scannerConfigProfile.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="org.eclipse.cdt.make.xlc.core.scannerconfig.PerFileXLCScannerInfoCollector"
+            class="org.eclipse.internal.ptp.rdt.managedbuilder.xlc.ui.scannerdiscovery.RemotePerFileXLCScannerInfoCollector"
             scope="file">
       </scannerInfoCollector>
       <scannerInfoProvider providerId="specsFile">

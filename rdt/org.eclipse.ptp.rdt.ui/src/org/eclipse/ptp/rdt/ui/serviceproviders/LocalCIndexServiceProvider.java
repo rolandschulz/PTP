@@ -21,7 +21,7 @@ import org.eclipse.ptp.internal.rdt.ui.search.LocalSearchService;
 
 /**
  * @author mikek
- * @since 4.0
+ * @since 4.1
  *
  */
 public class LocalCIndexServiceProvider extends AbstractLocalCIndexServiceProvider implements IIndexServiceProvider2 {

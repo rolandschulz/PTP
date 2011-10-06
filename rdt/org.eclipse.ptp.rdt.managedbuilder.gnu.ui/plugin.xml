@@ -843,7 +843,7 @@
           dependencyExtensions="h"
           id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.input"
           languageId="org.eclipse.cdt.core.gcc"
-          scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerProjectProfile|org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfile"
+          scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfile"
           sourceContentType="org.eclipse.cdt.core.cSource"
           sources="c">
     </inputType>
@@ -1141,7 +1141,7 @@
           dependencyExtensions="h,H,hpp"
           id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.input"
           languageId="org.eclipse.cdt.core.g++"
-          scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerProjectProfileCpp|org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"
+          scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"
           sourceContentType="org.eclipse.cdt.core.cxxSource"
           sources="c,C,cc,cxx,cpp">
     </inputType>
@@ -1180,10 +1180,11 @@
  </builder>
  <toolChain
        archList="all"
+       configurationEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteConfigurationEnvironmentSupplier"
        id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base"
        name="%ToolChainName.Dbg"
        osList="linux,qnx"
-       scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp | org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerProjectProfileCpp"
+       scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"
        targetTool="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.linker;org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.linker;org.eclipse.ptp.rdt.managedbuild.tool.gnu.archiver">
     <targetPlatform
           archList="all"
@@ -1274,18 +1275,21 @@
        id="org.eclipse.ptp.rdt.managedbuild.target.gnu.exe"
        isAbstract="false"
        isTest="false"
-       name="%projectType.exe.name">
+       name="org.eclipse.ptp.rdt.managedbuild.target.gnu.exe"
+       projectEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteProjectEnvironmentSupplier">
     <configuration
+          buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe"
           buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
           cleanCommand="rm -rf"
           id="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.debug"
           name="%ConfigName.Dbg"
           parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.base">
        <toolChain
-             archList="all"
+             configurationEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteConfigurationEnvironmentSupplier"
              id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.exe.debug"
-             osList="all"
-             superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base">
+             scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"
+             superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base"
+             supportsManagedBuild="true">
           <targetPlatform
                 id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.exe.debug"
                 superClass="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.base">
@@ -1333,6 +1337,7 @@
        </toolChain>
     </configuration>
     <configuration
+          buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe"
           buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release"
           cleanCommand="rm -rf"
           id="org.eclipse.ptp.rdt.managedbuild.config.gnu.exe.release"
@@ -1340,9 +1345,12 @@
           parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.base">
        <toolChain
              archList="all"
+             configurationEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteConfigurationEnvironmentSupplier"
              id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.exe.release"
              osList="all"
-             superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base">
+             scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"
+             superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base"
+             supportsManagedBuild="true">
           <targetPlatform
                 id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.exe.release"
                 superClass="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.base">
@@ -1395,7 +1403,8 @@
        id="org.eclipse.ptp.rdt.managedbuild.target.gnu.so"
        isAbstract="false"
        isTest="false"
-       name="%projectType.so.name">
+       name="org.eclipse.ptp.rdt.managedbuild.target.gnu.so"
+       projectEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteProjectEnvironmentSupplier">
     <configuration
           buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
           cleanCommand="rm -rf"
@@ -1403,10 +1412,11 @@
           name="%ConfigName.Dbg"
           parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.base">
        <toolChain
-             archList="all"
+             configurationEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteConfigurationEnvironmentSupplier"
              id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.so.debug"
-             osList="all"
-             superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base">
+             scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"
+             superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base"
+             supportsManagedBuild="true">
           <targetPlatform
                 id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.so.debug"
                 superClass="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.base">
@@ -1476,10 +1486,11 @@
           name="%ConfigName.Rel"
           parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.base">
        <toolChain
-             archList="all"
+             configurationEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteConfigurationEnvironmentSupplier"
              id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.so.release"
-             osList="all"
-             superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base">
+             scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"
+             superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base"
+             supportsManagedBuild="true">
           <targetPlatform
                 id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.so.release"
                 superClass="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.base">
@@ -1548,7 +1559,8 @@
        id="org.eclipse.ptp.rdt.managedbuild.target.gnu.lib"
        isAbstract="false"
        isTest="false"
-       name="%projectType.lib.name">
+       name="org.eclipse.ptp.rdt.managedbuild.target.gnu.lib"
+       projectEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteProjectEnvironmentSupplier">
     <configuration
           buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
           cleanCommand="rm -rf"
@@ -1556,10 +1568,11 @@
           name="%ConfigName.Dbg"
           parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.base">
        <toolChain
-             archList="all"
+             configurationEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteConfigurationEnvironmentSupplier"
              id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.lib.debug"
-             osList="all"
-             superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base">
+             scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"
+             superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base"
+             supportsManagedBuild="true">
           <targetPlatform
                 id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.lib.debug"
                 superClass="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.base">
@@ -1609,10 +1622,11 @@
           name="%ConfigName.Rel"
           parent="org.eclipse.ptp.rdt.managedbuild.config.gnu.base">
        <toolChain
-             archList="all"
+             configurationEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteConfigurationEnvironmentSupplier"
              id="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.lib.release"
-             osList="all"
-             superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base">
+             scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.RemoteGCCPerFileProfileCpp"
+             superClass="org.eclipse.ptp.rdt.managedbuild.toolchain.gnu.base"
+             supportsManagedBuild="true">
           <targetPlatform
                 id="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.lib.release"
                 superClass="org.eclipse.ptp.rdt.managedbuild.target.gnu.platform.base">
@@ -1663,7 +1677,7 @@
          name="%extension.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
      <scannerInfoCollector
-            class="org.eclipse.cdt.make.internal.core.scannerconfig2.PerProjectSICollector"
+            class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.PerProjectSICollectorSkipCygTrans"
             scope="project"/>
      		<!-- The ScannerInfoProvider search for the information needed by the profile and send it to the ScannerInfoCollector -->
 		<scannerInfoProvider providerId="specsFile">
@@ -1677,7 +1691,7 @@
 			</run>
 			<!-- Specifies the parser for the output generated by the compiler with the above command line -->
 			<scannerInfoConsoleParser
-					class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser">
+					class="org.eclipse.internal.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCSpecsConsoleParser">
 			</scannerInfoConsoleParser>
 		</scannerInfoProvider>
   <buildOutputProvider>
@@ -1691,7 +1705,7 @@
          name="%scannerConfigProfile.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="org.eclipse.cdt.make.internal.core.scannerconfig2.PerFileSICollector"
+            class="org.eclipse.internal.ptp.rdt.managedbuilder.xlc.ui.scannerdiscovery.RemotePerFileXLCScannerInfoCollector"
             scope="file">
       </scannerInfoCollector>
       <scannerInfoProvider providerId="specsFile">
@@ -1705,12 +1719,12 @@
 			</run>
 			<!-- Specifies the parser for the output generated by the compiler with the above command line -->
 			<scannerInfoConsoleParser
-					class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser">
+					class="org.eclipse.internal.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCSpecsConsoleParser">
 			</scannerInfoConsoleParser>
 		</scannerInfoProvider>
       <buildOutputProvider>
          <scannerInfoConsoleParser
-               class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCScannerInfoConsoleParser">
+               class="org.eclipse.internal.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCPerFileBOPConsoleParser">
          </scannerInfoConsoleParser>
       </buildOutputProvider>
    </extension>
@@ -1719,7 +1733,7 @@
          name="%extensionCpp.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
      <scannerInfoCollector
-            class="org.eclipse.cdt.make.internal.core.scannerconfig2.PerProjectSICollector"
+            class="org.eclipse.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.PerProjectSICollectorSkipCygTrans"
             scope="project"/>
      		<!-- The ScannerInfoProvider search for the information needed by the profile and send it to the ScannerInfoCollector -->
 		<scannerInfoProvider providerId="specsFile">
@@ -1733,7 +1747,7 @@
 			</run>
 			<!-- Specifies the parser for the output generated by the compiler with the above command line -->
 			<scannerInfoConsoleParser
-					class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser">
+					class="org.eclipse.internal.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCSpecsConsoleParser">
 			</scannerInfoConsoleParser>
 		</scannerInfoProvider>
   <buildOutputProvider>
@@ -1747,7 +1761,7 @@
          name="%scannerConfigProfileCpp.name"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="org.eclipse.cdt.make.internal.core.scannerconfig2.PerFileSICollector"
+            class="org.eclipse.internal.ptp.rdt.managedbuilder.xlc.ui.scannerdiscovery.RemotePerFileXLCScannerInfoCollector"
             scope="file">
       </scannerInfoCollector>
       <scannerInfoProvider providerId="specsFile">
@@ -1761,12 +1775,12 @@
 			</run>
 			<!-- Specifies the parser for the output generated by the compiler with the above command line -->
 			<scannerInfoConsoleParser
-					class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser">
+					class="org.eclipse.internal.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCSpecsConsoleParser">
 			</scannerInfoConsoleParser>
 		</scannerInfoProvider>
       <buildOutputProvider>
          <scannerInfoConsoleParser
-               class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCScannerInfoConsoleParser">
+               class="org.eclipse.internal.ptp.rdt.managedbuilder.gnu.ui.scannerdiscovery.RemoteGCCPerFileBOPConsoleParser">
          </scannerInfoConsoleParser>
       </buildOutputProvider>
    </extension> 

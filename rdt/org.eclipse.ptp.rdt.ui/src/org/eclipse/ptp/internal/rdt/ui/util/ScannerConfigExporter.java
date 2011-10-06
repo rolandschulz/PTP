@@ -37,7 +37,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 
 /**
- * @since 4.0
+ * @since 4.1
  */
 public class ScannerConfigExporter {
 	

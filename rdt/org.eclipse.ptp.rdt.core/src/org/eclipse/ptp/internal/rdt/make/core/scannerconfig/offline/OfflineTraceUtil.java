@@ -23,7 +23,7 @@ import org.eclipse.ptp.internal.rdt.core.miners.StandaloneLogService;
  * Tracebility related utility functions
  *
  * @author vhirsl
- * @since 4.0
+ * @since 4.1
  */
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.make.core/src

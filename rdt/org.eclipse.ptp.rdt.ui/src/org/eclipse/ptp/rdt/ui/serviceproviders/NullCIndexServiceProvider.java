@@ -68,7 +68,7 @@ public class NullCIndexServiceProvider extends
 
 	
 	/**
-	 * @since 4.0
+	 * @since 4.1
 	 */
 	public boolean isRemote() {
 		return false;
@@ -226,7 +226,7 @@ public class NullCIndexServiceProvider extends
 	 * @see org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteCIndexServiceProvider#getNavigationService()
 	 */
 	/**
-	 * @since 4.0
+	 * @since 4.1
 	 */
 	public INavigationService getNavigationService() {
 		return new INavigationService() {

@@ -31,7 +31,7 @@ import org.eclipse.ptp.services.core.IServiceProvider;
 public interface IIndexServiceProvider extends IServiceProvider {
 	
 	/**
-	 * @since 4.0
+	 * @since 4.1
 	 */
 	public boolean isRemote();
 	

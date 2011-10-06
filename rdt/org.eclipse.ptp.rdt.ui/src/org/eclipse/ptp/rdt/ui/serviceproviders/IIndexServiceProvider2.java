@@ -29,7 +29,7 @@ public interface IIndexServiceProvider2 extends IIndexServiceProvider {
 	public IContentAssistService getContentAssistService();
 	
 	/**
-	 * @since 4.0
+	 * @since 4.1
 	 */
 	public INavigationService getNavigationService();
 }

@@ -39,7 +39,7 @@ import org.eclipse.core.runtime.Path;
 
 
 /**
- * @since 4.0
+ * @since 4.1
  */
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.make.xlc.core/src
