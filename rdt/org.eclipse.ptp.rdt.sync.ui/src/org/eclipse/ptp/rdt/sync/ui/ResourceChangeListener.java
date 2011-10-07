@@ -33,7 +33,8 @@ public class ResourceChangeListener {
 	}
 
 	public static void startListening() {
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE |
+				IResourceChangeEvent.PRE_DELETE);
 	}
 
 	public static void stopListening() {
@@ -82,6 +83,12 @@ public class ResourceChangeListener {
 
 	private static IResourceChangeListener resourceListener = new IResourceChangeListener() {
 		public void resourceChanged(IResourceChangeEvent event) {
+			// Turn off sync'ing for a project before deleting it - see bug 360170
+			if (event.getType() == IResourceChangeEvent.PRE_DELETE) {
+				IProject project = (IProject) event.getResource();
+				SyncManager.setSyncMode(project, SYNC_MODE.NONE);
+				return;
+			}
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
 				IProject project = delta.getResource().getProject();
 				if (project == null) {
