@@ -421,6 +421,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			}
 		}
 	}
+	
+	public IFile[] getMergeConflictedFiles() {
+	}
 
 	/*
 	 * (non-Javadoc)

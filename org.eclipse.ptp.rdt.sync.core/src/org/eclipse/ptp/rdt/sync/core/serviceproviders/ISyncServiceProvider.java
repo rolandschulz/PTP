@@ -12,6 +12,7 @@ package org.eclipse.ptp.rdt.sync.core.serviceproviders;
 
 import java.util.EnumSet;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -54,4 +55,23 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 *             if synchronization fails
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
+	
+	/**
+	 * Return all files where there is a merge conflict
+	 * @return list of files
+	 */
+	public IFile[] getMergeConflictedFiles();
+	
+	
+	/**
+	 * For the given files, resolve merge by setting both local and remote to the local copy
+	 * @param fileList
+	 */
+	public void resolveMergeConflictUseLocal(IFile[] fileList);
+	
+	/**
+	 * For the given files, resolve merge by setting both local and remote to the remote copy
+	 * @param fileList
+	 */
+	public void resolveMergeConflictUseRemote(IFile[] fileList);
 }

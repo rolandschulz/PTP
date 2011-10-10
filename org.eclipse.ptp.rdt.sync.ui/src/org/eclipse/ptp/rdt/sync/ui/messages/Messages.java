@@ -53,6 +53,9 @@ public class Messages extends NLS {
 	public static String GitParticipant_3;
 	public static String GitServiceProvider_0;
 	public static String GitServiceProvider_3;
+	public static String MergeConflictResolver_0;
+	public static String MergeConflictResolver_1;
+	public static String MergeConflictResolver_2;
 	public static String WorkspaceConfigName;
 
 	static {
