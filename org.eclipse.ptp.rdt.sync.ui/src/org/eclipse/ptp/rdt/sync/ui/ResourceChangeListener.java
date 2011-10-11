@@ -18,12 +18,9 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.IconAndMessageDialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.ptp.rdt.sync.core.MergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncExceptionHandler;
@@ -32,16 +29,7 @@ import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SYNC_MODE;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 public class ResourceChangeListener {
 	private ResourceChangeListener() {
@@ -86,11 +74,11 @@ public class ResourceChangeListener {
 					String[] buttonLabels;
 					if (e.getCause().getClass() != MergeConflictException.class) {
 						buttonLabels = new String[1];
-						buttonLabels[0] = Messages.ResourceChangeListener_2;
+						buttonLabels[0] = IDialogConstants.OK_LABEL;
 					} else {
 						buttonLabels = new String[2];
-						buttonLabels[0] = Messages.ResourceChangeListener_2;
-						buttonLabels[1] = Messages.ResourceChangeListener_3;
+						buttonLabels[0] = IDialogConstants.OK_LABEL;
+						buttonLabels[1] = Messages.ResourceChangeListener_3; // Custom button
 					}
 					MessageDialogWithToggle dialog = new MessageDialogWithToggle(null, Messages.SyncMenuOperation_3, null,
 							finalMessage, MessageDialog.ERROR, buttonLabels, 0, Messages.SyncMenuOperation_4,
@@ -101,8 +89,9 @@ public class ResourceChangeListener {
 					} else {
 						SyncManager.setShowErrors(project, true);
 					}
-					if (buttonPressed == 1) {
-						// Merge button pressed!
+					// See bug #236617 concerning custom button ids
+					if (IDialogConstants.INTERNAL_ID - buttonPressed == 0) {
+						// Merge button pressed
 					}
 				};
 			});
