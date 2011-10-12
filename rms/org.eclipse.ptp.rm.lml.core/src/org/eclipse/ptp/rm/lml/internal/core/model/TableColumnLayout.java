@@ -21,17 +21,17 @@ public class TableColumnLayout implements ITableColumnLayout {
 	/*
 	 * Title of the column
 	 */
-	private String title;
+	private final String title;
 
 	/*
 	 * Width of the column
 	 */
-	private Double width;
+	private final Double width;
 
 	/*
 	 * Style of the column
 	 */
-	private String style;
+	private final String style;
 
 	/*
 	 * Activity of the column.
@@ -43,29 +43,19 @@ public class TableColumnLayout implements ITableColumnLayout {
 	 * 
 	 * @param title
 	 *            title of the column
-	 * @param width
+	 * @param size
 	 *            width of the column
-	 * @param style
+	 * @param width
 	 *            style of the column
 	 * @param activity
 	 *            of the column
 	 */
-	public TableColumnLayout(String title, Double width, String style,
+	public TableColumnLayout(String title, Double size, String width,
 			boolean active) {
 		this.title = title;
-		this.width = width;
-		this.style = style;
+		this.width = size;
+		this.style = width;
 		this.active = active;
-
-		if (title == null) {
-			this.title = new String();
-		}
-		if (width == null) {
-			this.width = new Double(0);
-		}
-		if (style == null) {
-			this.style = ITableColumnLayout.COLUMN_STYLE_LEFT;
-		}
 	}
 
 	/*
