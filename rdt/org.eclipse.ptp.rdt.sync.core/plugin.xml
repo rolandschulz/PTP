@@ -58,10 +58,10 @@
       </builder>
    </extension>
    <extension
-         point="org.eclipse.ptp.remote.core.remoteProjects">
-      <remoteProject
-            class="org.eclipse.ptp.rdt.sync.core.SynchronizedProject"
+         point="org.eclipse.ptp.remote.core.remoteResources">
+      <remoteResource
+            class="org.eclipse.ptp.rdt.sync.core.SynchronizedResource"
             nature="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
-      </remoteProject>
+      </remoteResource>
    </extension>
 </plugin>

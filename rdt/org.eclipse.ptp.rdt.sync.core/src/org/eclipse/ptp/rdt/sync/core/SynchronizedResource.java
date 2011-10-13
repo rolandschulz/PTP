@@ -12,22 +12,21 @@ package org.eclipse.ptp.rdt.sync.core;
 
 import java.net.URI;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.remote.core.IRemoteProject;
+import org.eclipse.ptp.remote.core.IRemoteResource;
 
-public class SynchronizedProject implements IRemoteProject {
-	private IProject fProject;
+public class SynchronizedResource implements IRemoteResource {
+	private IResource fResource;
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteProject#getDefaultLocationURI(org.eclipse.core.resources.IResource)
+	 * @see org.eclipse.ptp.remote.core.IRemoteResource#getDefaultLocationURI(org.eclipse.core.resources.IResource)
 	 */
-	public URI getActiveLocationURI(IResource resource) {
+	public URI getActiveLocationURI() {
 		try {
-			return BuildConfigurationManager.getInstance().getActiveSyncLocationURI(resource);
+			return BuildConfigurationManager.getInstance().getActiveSyncLocationURI(fResource);
 		} catch (CoreException e) {
 			return null;
 		}
@@ -36,18 +35,18 @@ public class SynchronizedProject implements IRemoteProject {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteProject#getProject()
+	 * @see org.eclipse.ptp.remote.core.IRemoteResource#getResource()
 	 */
-	public IProject getProject() {
-		return fProject;
+	public IResource getResource() {
+		return fResource;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteProject#setProject(org.eclipse.core.resources.IProject)
+	 * @see org.eclipse.ptp.remote.core.IRemoteResource#setResource(org.eclipse.core.resources.IResource)
 	 */
-	public void setProject(IProject project) {
-		fProject = project;
+	public void setResource(IResource resource) {
+		fResource = resource;
 	}
 }

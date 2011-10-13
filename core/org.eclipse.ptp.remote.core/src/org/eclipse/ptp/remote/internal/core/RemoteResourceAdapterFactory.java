@@ -13,7 +13,7 @@ package org.eclipse.ptp.remote.internal.core;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -21,36 +21,36 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.ptp.remote.core.IRemoteProject;
+import org.eclipse.ptp.remote.core.IRemoteResource;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
-public class RemoteProjectAdapterFactory implements IAdapterFactory {
-	public static final String EXTENSION_POINT_ID = "remoteProjects"; //$NON-NLS-1$
+public class RemoteResourceAdapterFactory implements IAdapterFactory {
+	public static final String EXTENSION_POINT_ID = "remoteResources"; //$NON-NLS-1$
 
 	public static final String ATTR_NATURE = "nature"; //$NON-NLS-1$
 	public static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 
-	private Map<String, RemoteProjectFactory> fProjectFactory;
+	private Map<String, RemoteResourceFactory> fResourceFactory;
 
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		if (adapterType == IRemoteProject.class) {
-			if (adaptableObject instanceof IProject) {
+		if (adapterType == IRemoteResource.class) {
+			if (adaptableObject instanceof IResource) {
 				loadExtensions();
-				IProject project = (IProject) adaptableObject;
-				for (String nature : fProjectFactory.keySet()) {
+				IResource resource = (IResource) adaptableObject;
+				for (String nature : fResourceFactory.keySet()) {
 					try {
-						if (project.hasNature(nature)) {
-							RemoteProjectFactory factory = fProjectFactory.get(nature);
+						if (resource.getProject().hasNature(nature)) {
+							RemoteResourceFactory factory = fResourceFactory.get(nature);
 							if (factory != null) {
-								return factory.getRemoteProject(project);
+								return factory.getRemoteResource(resource);
 							}
 						}
 					} catch (CoreException e) {
 						// Treat as failure
 					}
 				}
-				return new LocalProject(project);
+				return new LocalResource(resource);
 			}
 		}
 		return null;
@@ -58,12 +58,12 @@ public class RemoteProjectAdapterFactory implements IAdapterFactory {
 
 	@SuppressWarnings("rawtypes")
 	public Class[] getAdapterList() {
-		return new Class[] { IRemoteProject.class };
+		return new Class[] { IRemoteResource.class };
 	}
 
 	private synchronized void loadExtensions() {
-		if (fProjectFactory == null) {
-			fProjectFactory = new HashMap<String, RemoteProjectFactory>();
+		if (fResourceFactory == null) {
+			fResourceFactory = new HashMap<String, RemoteResourceFactory>();
 
 			IExtensionRegistry registry = Platform.getExtensionRegistry();
 			IExtensionPoint extensionPoint = registry.getExtensionPoint(PTPRemoteCorePlugin.getUniqueIdentifier(),
@@ -74,8 +74,8 @@ public class RemoteProjectAdapterFactory implements IAdapterFactory {
 
 				for (IConfigurationElement ce : elements) {
 					String nature = ce.getAttribute(ATTR_NATURE);
-					RemoteProjectFactory factory = new RemoteProjectFactory(ce);
-					fProjectFactory.put(nature, factory);
+					RemoteResourceFactory factory = new RemoteResourceFactory(ce);
+					fResourceFactory.put(nature, factory);
 				}
 			}
 		}

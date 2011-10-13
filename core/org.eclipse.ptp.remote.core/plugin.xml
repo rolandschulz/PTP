@@ -3,7 +3,7 @@
 <plugin>
    <extension-point id="remoteServices" name="Remote Services" schema="schema/remoteServices.exsd"/>
    <extension-point id="remoteServer" name="Remote Server" schema="schema/remoteServer.exsd"/>
-   <extension-point id="remoteProjects" name="Remote Projets" schema="schema/remoteProjects.exsd"/>
+   <extension-point id="remoteResources" name="Remote Resources" schema="schema/remoteResources.exsd"/>
    <extension
          point="org.eclipse.ptp.remote.core.remoteServices">
       <remoteServices
@@ -33,9 +33,9 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.core.resources.IProject"
-            class="org.eclipse.ptp.remote.internal.core.RemoteProjectAdapterFactory">
+            class="org.eclipse.ptp.remote.internal.core.RemoteResourceAdapterFactory">
          <adapter
-               type="org.eclipse.ptp.remote.core.IRemoteProject">
+               type="org.eclipse.ptp.remote.core.IRemoteResource">
          </adapter>
       </factory>
    </extension>

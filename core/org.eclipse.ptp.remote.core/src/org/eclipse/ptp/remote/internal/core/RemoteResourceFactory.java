@@ -10,36 +10,36 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.internal.core;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.ptp.remote.core.IRemoteProject;
+import org.eclipse.ptp.remote.core.IRemoteResource;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
 /**
- * Factory to create an IRemoteProject
+ * Factory to create an IRemoteResource
  * 
  * @author greg
  * 
  */
-public class RemoteProjectFactory {
+public class RemoteResourceFactory {
 	private final IConfigurationElement fConfigElement;
 
-	public RemoteProjectFactory(IConfigurationElement ce) {
+	public RemoteResourceFactory(IConfigurationElement ce) {
 		fConfigElement = ce;
 	}
 
 	/**
-	 * Get the remote project associated with the project.
+	 * Get the remote resource associated with the platform resource.
 	 * 
-	 * @return IRemoteProject
+	 * @return IRemoteResource
 	 */
-	public IRemoteProject getRemoteProject(IProject project) {
+	public IRemoteResource getRemoteResource(IResource resource) {
 		try {
-			IRemoteProject remoteProj = (IRemoteProject) fConfigElement
-					.createExecutableExtension(RemoteProjectAdapterFactory.ATTR_CLASS);
-			remoteProj.setProject(project);
-			return remoteProj;
+			IRemoteResource remoteRes = (IRemoteResource) fConfigElement
+					.createExecutableExtension(RemoteResourceAdapterFactory.ATTR_CLASS);
+			remoteRes.setResource(resource);
+			return remoteRes;
 		} catch (CoreException e) {
 			PTPRemoteCorePlugin.log(e);
 			return null;

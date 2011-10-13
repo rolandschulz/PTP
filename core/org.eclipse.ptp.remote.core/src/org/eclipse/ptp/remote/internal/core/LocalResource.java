@@ -12,41 +12,40 @@ package org.eclipse.ptp.remote.internal.core;
 
 import java.net.URI;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.ptp.remote.core.IRemoteProject;
+import org.eclipse.ptp.remote.core.IRemoteResource;
 
-public class LocalProject implements IRemoteProject {
-	private IProject fProject;
+public class LocalResource implements IRemoteResource {
+	private IResource fResource;
 
-	public LocalProject(IProject project) {
-		fProject = project;
+	public LocalResource(IResource resource) {
+		fResource = resource;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteProject#getDefaultLocationURI(org.eclipse.core.resources.IResource)
+	 * @see org.eclipse.ptp.remote.core.IRemoteResource#getDefaultLocationURI(org.eclipse.core.resources.IResource)
 	 */
-	public URI getActiveLocationURI(IResource resource) {
-		return resource.getLocationURI();
+	public URI getActiveLocationURI() {
+		return fResource.getLocationURI();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteProject#getProject()
+	 * @see org.eclipse.ptp.remote.core.IRemoteResource#getResource()
 	 */
-	public IProject getProject() {
-		return fProject;
+	public IResource getResource() {
+		return fResource;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteProject#setProject(org.eclipse.core.resources.IProject)
+	 * @see org.eclipse.ptp.remote.core.IRemoteResource#setResource(org.eclipse.core.resources.IResource)
 	 */
-	public void setProject(IProject project) {
-		fProject = project;
+	public void setResource(IResource resource) {
+		fResource = resource;
 	}
 }
