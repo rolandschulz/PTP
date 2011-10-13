@@ -19,6 +19,7 @@
 package org.eclipse.ptp.launch.ui;
 
 import java.io.File;
+import java.net.URI;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -43,6 +44,7 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteResource;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
@@ -72,9 +74,8 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
- * The Main tab is used to specify the resource manager for the launch, select
- * the project and executable to launch, and specify the location of the
- * executable if it is a remote launch.
+ * The Main tab is used to specify the resource manager for the launch, select the project and executable to launch, and specify the
+ * location of the executable if it is a remote launch.
  */
 public class ApplicationTab extends LaunchConfigurationTab {
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener {
@@ -120,9 +121,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse
-	 * .swt.widgets.Composite)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse .swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
@@ -214,9 +213,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse
-	 * .debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse .debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
@@ -239,9 +236,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse
-	 * .debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse .debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration config) {
@@ -294,9 +289,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse
-	 * .debug.core.ILaunchConfigurationWorkingCopy)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse .debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, getFieldContent(projText.getText()));
@@ -310,9 +303,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.
-	 * debug.core.ILaunchConfigurationWorkingCopy)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse. debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		IProject project = getDefaultProject(configuration);
@@ -332,8 +323,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seeorg.eclipse.debug.ui.AbstractLaunchConfigurationTab#
-	 * setLaunchConfigurationDialog
+	 * @seeorg.eclipse.debug.ui.AbstractLaunchConfigurationTab# setLaunchConfigurationDialog
 	 * (org.eclipse.debug.ui.ILaunchConfigurationDialog)
 	 */
 	@Override
@@ -342,8 +332,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * Create a dialog that allows the user to select a file in the current
-	 * project.
+	 * Create a dialog that allows the user to select a file in the current project.
 	 * 
 	 * @return selected file
 	 */
@@ -414,9 +403,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * Get a default project. This is either the project name that has been
-	 * previously selected, or the project that is currently selected in the
-	 * workspace.
+	 * Get a default project. This is either the project name that has been previously selected, or the project that is currently
+	 * selected in the workspace.
 	 * 
 	 * @param configuration
 	 * @return default project
@@ -464,8 +452,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * Get the IProject the corresponds to the project name that is displayed in
-	 * the projText control
+	 * Get the IProject the corresponds to the project name that is displayed in the projText control
 	 * 
 	 * @return project
 	 */
@@ -486,12 +473,18 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		String initPath = appText.getText();
 		if (initPath.equals(EMPTY_STRING)) {
 			final IProject project = getProject();
-			if (project == null || project.getLocationURI() == null) {
+			if (project == null) {
 				MessageDialog.openInformation(getShell(), Messages.ApplicationTab_Project_required,
 						Messages.ApplicationTab_Enter_project_before_browsing_for_program);
 				return;
 			}
-			initPath = project.getLocationURI().getPath();
+			IRemoteResource remoteProject = (IRemoteResource) project.getAdapter(IRemoteResource.class);
+			if (remoteProject != null) {
+				URI location = remoteProject.getActiveLocationURI();
+				if (location != null) {
+					initPath = location.getPath();
+				}
+			}
 		}
 
 		IResourceManager rm = getResourceManager(getLaunchConfiguration());
@@ -583,8 +576,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seeorg.eclipse.debug.ui.AbstractLaunchConfigurationTab#
-	 * updateLaunchConfigurationDialog()
+	 * @seeorg.eclipse.debug.ui.AbstractLaunchConfigurationTab# updateLaunchConfigurationDialog()
 	 */
 	@Override
 	protected void updateLaunchConfigurationDialog() {
