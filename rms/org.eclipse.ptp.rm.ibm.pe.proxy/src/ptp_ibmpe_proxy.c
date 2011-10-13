@@ -3521,6 +3521,8 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
      */
     int i;
     int has_mp_procs = 0;
+    int has_mp_hostfile = 0;
+    pid_t debugger_pid = 0;
 
     TRACE_ENTRY;
     env_array_size = 100;
@@ -3541,6 +3543,8 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
                 /* Strip this out and replace with PE_DEBUG_MSG_API (see below) */;
             }
             else {
+            	if (strncmp(args[i], "MP_HOSTFILE=", 12) == 0)
+            		has_mp_hostfile = 1;
                 add_environment_variable(args[i]);
             }
 #else
@@ -3555,7 +3559,7 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
     }
 #ifdef PE_SCI_DEBUG
     if (is_debugger && !has_mp_procs)
-        add_environment_variable("MP_PROCS=1");
+    	add_environment_variable("MP_PROCS=1");
 #endif
 
     if (split_io == 1) {
@@ -3570,6 +3574,14 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
 #ifdef PE_SCI_DEBUG
     if (debugger_id && debugger_id[0] != '\0') {
         add_environment_variable(debugger_id);
+        if (!has_mp_hostfile) {
+            char hostfile[128];
+            char* id = strchr(debugger_id, '=') + 1;
+            debugger_pid = atoi(id);
+
+            snprintf(hostfile, sizeof(hostfile), "MP_SAVEHOSTFILE=/tmp/.ppe.savehostfile.%d", debugger_pid);
+            add_environment_variable(hostfile);
+        }
     }
 #endif
     if (use_load_leveler) {
