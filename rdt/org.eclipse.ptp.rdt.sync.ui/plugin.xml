@@ -218,4 +218,26 @@
          </menu>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            icon="icons/ovr16/sync_ovr.gif"
+            id="org.eclipse.ptp.rdt.sync.ui.decorator"
+            label="syncProjectDecorator"
+            lightweight="true"
+            location="BOTTOM_RIGHT"
+            state="true">
+         <enablement>
+            <and>
+               <objectClass
+                     name="org.eclipse.core.resources.IProject">
+               </objectClass>
+               <objectState
+                     name="projectNature"
+                     value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+               </objectState>
+            </and>
+         </enablement>
+      </decorator>
+   </extension>
 </plugin>
