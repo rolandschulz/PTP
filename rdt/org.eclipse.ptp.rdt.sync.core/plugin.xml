@@ -57,4 +57,11 @@
             name="%Builder.name">
       </builder>
    </extension>
+   <extension
+         point="org.eclipse.ptp.remote.core.remoteProjects">
+      <remoteProject
+            class="org.eclipse.ptp.rdt.sync.core.SynchronizedProject"
+            nature="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+      </remoteProject>
+   </extension>
 </plugin>
