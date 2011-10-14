@@ -223,7 +223,7 @@
       <decorator
             icon="icons/ovr16/sync_ovr.gif"
             id="org.eclipse.ptp.rdt.sync.ui.decorator"
-            label="syncProjectDecorator"
+            label="%SyncProjectDecorator.name"
             lightweight="true"
             location="BOTTOM_RIGHT"
             state="true">
