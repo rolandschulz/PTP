@@ -65,7 +65,7 @@
 				<error-message>format must be hh:mm:ss</error-message>
 			</validator>
 		</attribute>
-		<script>
+		<script deleteAfterSubmit="false">
 			<line>
 				<arg>#!/bin/bash</arg>
 			</line>

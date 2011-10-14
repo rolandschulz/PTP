@@ -56,11 +56,60 @@ import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 public class LCVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
 
+	/**
+	 * Assures that properties set by the other tabs get included in this RM's property set.
+	 * 
+	 * @param rmPrefix
+	 * @param configuration
+	 * @throws CoreException
+	 */
+	public static void normalizeStandardProperties(String rmPrefix, ILaunchConfigurationWorkingCopy configuration)
+			throws CoreException {
+		String cdir = configuration.getAttribute(rmPrefix + JAXBControlConstants.CONTROL_WORKING_DIR_VAR,
+				JAXBControlConstants.ZEROSTR);
+		String dir = configuration.getAttribute(rmPrefix + JAXBControlConstants.DIRECTORY, JAXBControlConstants.ZEROSTR);
+		if (dir == null || JAXBControlConstants.ZEROSTR.equals(dir)) {
+			dir = (cdir == null ? JAXBControlConstants.ZEROSTR : cdir);
+		}
+
+		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DIRECTORY);
+		configuration.removeAttribute(rmPrefix + JAXBControlConstants.EXEC_PATH);
+		configuration.removeAttribute(rmPrefix + JAXBControlConstants.EXEC_DIR);
+		configuration.removeAttribute(rmPrefix + JAXBControlConstants.PROG_ARGS);
+		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_EXEC_PATH);
+		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_ARGS);
+
+		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, dir);
+		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
+			configuration.setAttribute(rmPrefix + JAXBControlConstants.DIRECTORY, attr);
+		}
+		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR);
+		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
+			configuration.setAttribute(rmPrefix + JAXBControlConstants.EXEC_PATH, attr);
+			attr = new Path(attr).removeLastSegments(1).toString();
+			configuration.setAttribute(rmPrefix + JAXBControlConstants.EXEC_DIR, attr);
+		}
+		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR);
+		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
+			configuration.setAttribute(rmPrefix + JAXBControlConstants.PROG_ARGS, attr);
+		}
+		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
+				JAXBControlConstants.ZEROSTR);
+		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
+			configuration.setAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_EXEC_PATH, attr);
+		}
+		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, JAXBControlConstants.ZEROSTR);
+		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
+			configuration.setAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_ARGS, attr);
+		}
+	}
+
 	private final Map<String, Object> linkedTo;
 	private final Map<String, Object> excluded;
 	private final Map<String, Object> values;
 	private final Map<String, String> defaultValues;
 	private final Map<String, Object> temp;
+
 	private final Set<String> hidden;
 
 	private String rmPrefix;
@@ -292,24 +341,6 @@ public class LCVariableMap implements IVariableMap {
 				values.put(key, attributes.get(key));
 			}
 		}
-
-		String cdir = (String) get(JAXBControlConstants.CONTROL_WORKING_DIR_VAR);
-		String dir = (String) get(JAXBControlConstants.DIRECTORY);
-		if (dir == null || JAXBControlConstants.ZEROSTR.equals(dir)) {
-			dir = (cdir == null ? JAXBControlConstants.ZEROSTR : cdir);
-		}
-		put(JAXBControlConstants.DIRECTORY, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, dir));
-		put(JAXBControlConstants.EXEC_PATH,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
-		String directory = new Path(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
-				JAXBControlConstants.ZEROSTR)).removeLastSegments(1).toString();
-		put(JAXBControlConstants.EXEC_DIR, directory);
-		put(JAXBControlConstants.PROG_ARGS,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR));
-		put(JAXBControlConstants.DEBUGGER_EXEC_PATH, configuration.getAttribute(
-				IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
-		put(JAXBControlConstants.DEBUGGER_ARGS,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, JAXBControlConstants.ZEROSTR));
 	}
 
 	/**

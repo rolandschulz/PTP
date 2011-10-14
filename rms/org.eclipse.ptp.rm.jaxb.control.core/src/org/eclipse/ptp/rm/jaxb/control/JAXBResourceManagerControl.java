@@ -17,12 +17,10 @@ import java.util.UUID;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -1098,40 +1096,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		progress.worked(10);
 
 		/*
-		 * XXX: for some reason these are not getting updated correctly
-		 */
-		String defaultDir = JAXBControlConstants.ZEROSTR;
-		PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.DIRECTORY);
-		if (p == null || p.getValue() == null) {
-			p = (PropertyType) rmVarMap.get(JAXBControlConstants.CONTROL_WORKING_DIR_VAR);
-		}
-		if (p != null && p.getValue() != null) {
-			defaultDir = (String) p.getValue();
-		}
-		lcattr.put(JAXBControlConstants.DIRECTORY,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, defaultDir));
-		lcattr.put(JAXBControlConstants.EXEC_PATH,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
-		String directory = new Path(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
-				JAXBControlConstants.ZEROSTR)).removeLastSegments(1).toString();
-		lcattr.put(JAXBControlConstants.EXEC_DIR, directory);
-		lcattr.put(JAXBControlConstants.PROG_ARGS,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR));
-		lcattr.put(JAXBControlConstants.DEBUGGER_EXEC_PATH, configuration.getAttribute(
-				IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR));
-		lcattr.put(JAXBControlConstants.DEBUGGER_ARGS,
-				configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, JAXBControlConstants.ZEROSTR));
-
-		/*
 		 * make sure these fixed properties are included
 		 */
-		rmVarMap.maybeOverwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, lcattr, false);
-		rmVarMap.maybeOverwrite(JAXBControlConstants.DIRECTORY, JAXBControlConstants.DIRECTORY, lcattr, false);
-		rmVarMap.maybeOverwrite(JAXBControlConstants.EXEC_PATH, JAXBControlConstants.EXEC_PATH, lcattr, false);
-		rmVarMap.maybeOverwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr, false);
-		rmVarMap.maybeOverwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr, false);
-		rmVarMap.maybeOverwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr, false);
-		rmVarMap.maybeOverwrite(JAXBControlConstants.DEBUGGER_ARGS, JAXBControlConstants.DEBUGGER_ARGS, lcattr, false);
+		rmVarMap.overwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, lcattr);
+		rmVarMap.overwrite(JAXBControlConstants.DIRECTORY, JAXBControlConstants.DIRECTORY, lcattr);
+		rmVarMap.overwrite(JAXBControlConstants.EXEC_PATH, JAXBControlConstants.EXEC_PATH, lcattr);
+		rmVarMap.overwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr);
+		rmVarMap.overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
+		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
+		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_ARGS, JAXBControlConstants.DEBUGGER_ARGS, lcattr);
 
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));
