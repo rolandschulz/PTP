@@ -384,13 +384,11 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	 * @return selected project
 	 */
 	protected IProject chooseProject() {
-		IProject[] projects = getWorkspaceRoot().getProjects();
-
-		WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
-		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), labelProvider);
+		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(),
+				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
 		dialog.setTitle(Messages.ApplicationTab_Project_Selection_Title);
 		dialog.setMessage(Messages.ApplicationTab_Project_Selection_Message);
-		dialog.setElements(projects);
+		dialog.setElements(getWorkspaceRoot().getProjects());
 
 		IProject project = getProject();
 		if (project != null) {
