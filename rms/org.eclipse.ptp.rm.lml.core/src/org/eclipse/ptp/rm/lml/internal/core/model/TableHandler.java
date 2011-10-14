@@ -416,7 +416,7 @@ public class TableHandler extends LguiHandler {
 	 */
 	public void sort(String gid, int sortDirectionComparator, int sortIndex, int sortDirection) {
 		final TableType table = getTable(gid);
-		if (table != null) {
+		if (table != null && sortIndex != -1) {
 			final BigInteger[] cids = getCids(gid);
 			if (cids.length > sortIndex) {
 				final RowType[] jobTableData = getTableData(table, cids);
