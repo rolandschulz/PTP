@@ -23,6 +23,7 @@ import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamic
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -254,6 +255,11 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+		try {
+			LCVariableMap.normalizeStandardProperties(rm.getUniqueName() + JAXBUIConstants.DOT, configuration);
+		} catch (CoreException ce) {
+			return new RMLaunchValidation(false, ce.getLocalizedMessage());
+		}
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.performApply(configuration, rm, queue);

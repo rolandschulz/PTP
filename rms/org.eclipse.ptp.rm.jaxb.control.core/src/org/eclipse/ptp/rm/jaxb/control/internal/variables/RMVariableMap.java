@@ -268,29 +268,10 @@ public class RMVariableMap implements IVariableMap {
 	 *            to search for the property in the configuration
 	 * @param map
 	 *            to search
-	 * @param defaultOverride
-	 *            if the value of key2 is null, restore the default value
 	 * @throws CoreException
 	 */
-	public void maybeOverwrite(String key1, String key2, Map<String, Object> map, boolean defaultOverride) throws CoreException {
-		Object value1 = null;
-		Object value2 = null;
-		String dValue = null;
-		PropertyType p = (PropertyType) get(key1);
-		if (p != null) {
-			value1 = p.getValue();
-			dValue = p.getDefault();
-		}
-		value2 = map.get(key2);
-		if (value2 == null || JAXBControlConstants.ZEROSTR.equals(value2)) {
-			if (defaultOverride) {
-				maybeAddProperty(key1, dValue, false);
-			} else {
-				maybeAddProperty(key1, value1, false);
-			}
-		} else {
-			maybeAddProperty(key1, value2, false);
-		}
+	public void overwrite(String key1, String key2, Map<String, Object> map) throws CoreException {
+		maybeAddProperty(key1, map.get(key2), false);
 	}
 
 	/**
