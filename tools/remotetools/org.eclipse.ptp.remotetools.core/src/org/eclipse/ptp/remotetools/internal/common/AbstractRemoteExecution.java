@@ -23,7 +23,7 @@ public abstract class AbstractRemoteExecution implements IRemoteOperation {
 	/**
 	 * The execution manager that created the execution.
 	 */
-	private ExecutionManager executionManager;
+	private final ExecutionManager executionManager;
 	/**
 	 * The execution was canceled by the manager.
 	 */
@@ -36,14 +36,13 @@ public abstract class AbstractRemoteExecution implements IRemoteOperation {
 	/**
 	 * Default constructor.
 	 * <p>
-	 * It is protected because only the RemoteExecutionManager can instantiate
-	 * it and pass itself as the parameters to the constructor.
+	 * It is protected because only the RemoteExecutionManager can instantiate it and pass itself as the parameters to the
+	 * constructor.
 	 * 
 	 * @param remExecManager
 	 * @throws RemoteConnectionException
 	 */
-	public AbstractRemoteExecution(ExecutionManager executionManager)
-			throws RemoteConnectionException {
+	public AbstractRemoteExecution(ExecutionManager executionManager) throws RemoteConnectionException {
 		this.executionManager = executionManager;
 		this.cancelled = false;
 		this.finished = false;
@@ -62,9 +61,8 @@ public abstract class AbstractRemoteExecution implements IRemoteOperation {
 
 	protected synchronized void notifyCancel() {
 		/*
-		 * By default, no logic is implemented to cancel the execution. Only
-		 * sets the cancel flag. Notifies all waiting thread that the execution
-		 * was canceled.
+		 * By default, no logic is implemented to cancel the execution. Only sets the cancel flag. Notifies all waiting thread that
+		 * the execution was canceled.
 		 */
 		cancelled = true;
 		this.notifyAll();
@@ -72,15 +70,14 @@ public abstract class AbstractRemoteExecution implements IRemoteOperation {
 
 	protected synchronized void notifyFinish() {
 		/*
-		 * By default, no logic is implemented to finish the execution. Notifies
-		 * all waiting thread that the execution finished by itself.
+		 * By default, no logic is implemented to finish the execution. Notifies all waiting thread that the execution finished by
+		 * itself.
 		 */
 		finished = true;
 		this.notifyAll();
 	}
 
-	public synchronized void waitForEndOfExecution()
-			throws RemoteConnectionException, CancelException {
+	public synchronized void waitForEndOfExecution() throws RemoteConnectionException, CancelException {
 		/*
 		 * Block until the execution finishes or is canceled.
 		 */

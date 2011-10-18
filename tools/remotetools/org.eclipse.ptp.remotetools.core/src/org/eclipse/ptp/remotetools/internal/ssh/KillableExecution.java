@@ -45,7 +45,9 @@ public abstract class KillableExecution extends AbstractRemoteExecution {
 		try {
 			getExecutionManager().registerOperation(this);
 			getExecutionManager().getConnection().registerObservedExecution(this);
-			channel.connect();
+			synchronized (getExecutionManager().getConnection()) {
+				channel.connect();
+			}
 		} catch (JSchException e) {
 			throw new RemoteConnectionException(e.getLocalizedMessage());
 		}
@@ -59,9 +61,8 @@ public abstract class KillableExecution extends AbstractRemoteExecution {
 		getExecutionManager().unregisterOperation(this);
 		getExecutionManager().getConnection().unregisterObservedExecution(this);
 		/*
-		 * Force the end of the execution by closing the channel and killing
-		 * (SIGHUP or something similar) on the remote host. Remove the channel
-		 * from the connection pool.
+		 * Force the end of the execution by closing the channel and killing (SIGHUP or something similar) on the remote host.
+		 * Remove the channel from the connection pool.
 		 */
 		getExecutionManager().getConnection().killExecution(this);
 		getExecutionManager().getConnection().releaseChannel(channel);
@@ -71,8 +72,7 @@ public abstract class KillableExecution extends AbstractRemoteExecution {
 	@Override
 	protected void notifyFinish() {
 		/*
-		 * Stop observing this channel. Remote the channel from the connection
-		 * pool
+		 * Stop observing this channel. Remote the channel from the connection pool
 		 */
 		getExecutionManager().unregisterOperation(this);
 		getExecutionManager().getConnection().unregisterObservedExecution(this);
@@ -83,8 +83,7 @@ public abstract class KillableExecution extends AbstractRemoteExecution {
 	@Override
 	public void close() {
 		/*
-		 * Cancel execution, if still not finished. Then, make sure the channel
-		 * is closed and released from the execution manager.
+		 * Cancel execution, if still not finished. Then, make sure the channel is closed and released from the execution manager.
 		 */
 		if (isRunning()) {
 			cancel();
@@ -94,8 +93,7 @@ public abstract class KillableExecution extends AbstractRemoteExecution {
 
 	protected ChannelExec createChannel(boolean hasPTY) throws RemoteConnectionException {
 		/*
-		 * Get a channel from the connection pool. Channels with PTY must be
-		 * managed by the pool.
+		 * Get a channel from the connection pool. Channels with PTY must be managed by the pool.
 		 */
 		channel = getExecutionManager().getConnection().createExecChannel(hasPTY);
 		channel.setPty(hasPTY);
@@ -105,13 +103,11 @@ public abstract class KillableExecution extends AbstractRemoteExecution {
 	/**
 	 * Create a killable command line that will run on any system.
 	 * 
-	 * 1. The whole command is run using /bin/sh to ensure that it will work on
-	 * any system. 2. The killable prefix echos the PID of the shell to the
-	 * control terminal. This is read by the connection manager and can be used
-	 * to send a kill signal in order to terminate the process.
+	 * 1. The whole command is run using /bin/sh to ensure that it will work on any system. 2. The killable prefix echos the PID of
+	 * the shell to the control terminal. This is read by the connection manager and can be used to send a kill signal in order to
+	 * terminate the process.
 	 * 
-	 * NOTE: there is a maximum line length on most systems. If this is exceeded
-	 * the command will fail.
+	 * NOTE: there is a maximum line length on most systems. If this is exceeded the command will fail.
 	 * 
 	 * @param commandLine
 	 *            command line to run
