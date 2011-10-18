@@ -16,42 +16,65 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public class RemoteProcessTests extends TestCase {
-	private static final String USERNAME = "user"; //$NON-NLS-1$
-	private static final String PASSWORD = "password"; //$NON-NLS-1$
-	private static final String HOST = "host"; //$NON-NLS-1$
+	private static final String USERNAME = "username"; //$NON-NLS-1$
+	private static final String PASSWORD = ""; //$NON-NLS-1$
+	private static final String HOST = "localhost"; //$NON-NLS-1$
+	private static int NUM_THREADS = 15;
 
 	private IRemoteServices fRemoteServices;
 	private IRemoteConnection fRemoteConnection;
 
 	public void testProcess() {
-		for (int t = 0; t < 10; t++) {
-			new Thread() {
+		Thread[] threads = new Thread[NUM_THREADS];
+
+		for (int t = 0; t < NUM_THREADS; t++) {
+			System.out.println("creating thread...");
+			Thread thread = new Thread("test thread " + t) {
 				@Override
 				public void run() {
+					System.out.println("Thread " + getId() + " starting...");
+
 					IRemoteProcessBuilder builder = fRemoteServices.getProcessBuilder(fRemoteConnection, "perl", "-V:version"); //$NON-NLS-1$
 					builder.redirectErrorStream(true);
 					for (int i = 0; i < 100; i++) {
-						System.out.println("Testing process " + i + " (of 100)...");
+						System.out.println("Testing process " + i + " (of 10)..." + getId());
 						try {
 							IRemoteProcess proc = builder.start();
+							System.out.println("start proc (" + getId() + ")");
 							BufferedReader stdout = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 							String line;
 							while ((line = stdout.readLine()) != null) {
-								System.out.println("read " + line);
+								System.out.println("read (" + getId() + ") " + line);
+							}
+							try {
+								System.out.println("about to wait (" + getId() + ")");
+								proc.waitFor();
+							} catch (InterruptedException e) {
+								e.printStackTrace();
 							}
 						} catch (IOException e) {
+							e.printStackTrace();
 							fail(e.getLocalizedMessage());
 						}
-						try {
-							Thread.sleep(500);
-						} catch (InterruptedException e) {
-							fail(e.getLocalizedMessage());
-						}
+						// try {
+						// Thread.sleep(500);
+						// } catch (InterruptedException e) {
+						// e.printStackTrace();
+						// }
 					}
 				}
 
-			}.start();
+			};
+			thread.start();
+			threads[t] = thread;
 		}
+		for (Thread t : threads) {
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+			}
+		}
+
 	}
 
 	/*
