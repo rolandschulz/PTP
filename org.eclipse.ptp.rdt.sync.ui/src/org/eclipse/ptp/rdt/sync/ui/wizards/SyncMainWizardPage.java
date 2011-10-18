@@ -49,6 +49,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
@@ -68,6 +70,7 @@ import org.eclipse.cdt.ui.wizards.EntryDescriptor;
 import org.eclipse.cdt.ui.wizards.IWizardItemsListListener;
 import org.eclipse.cdt.ui.wizards.IWizardWithMemory;
 import org.eclipse.cdt.internal.ui.newui.Messages;
+import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 
 	public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItemsListListener {
 		private static String RDT_PROJECT_TYPE = "org.eclipse.ptp.rdt"; //$NON-NLS-1$
@@ -92,6 +95,7 @@ import org.eclipse.cdt.internal.ui.newui.Messages;
 	    private Tree localTree;
 	    private Composite localToolChain;
 	    private Composite remoteToolChain;
+	    private Table remoteToolChainTable;
 	    private Button show_sup;
 	    private Label projectLocalOptionsLabel;
 	    private Label projectRemoteOptionsLabel;
@@ -182,6 +186,9 @@ import org.eclipse.cdt.internal.ui.newui.Messages;
 	        remoteToolChain = new Composite(c, SWT.NONE);
 	        remoteToolChain.setLayoutData(new GridData(GridData.FILL_BOTH));
 	        remoteToolChain.setLayout(new PageLayout());
+	        remoteToolChainTable = new Table(remoteToolChain, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
+	        remoteToolChainTable.setVisible(true);
+
 
 	        show_sup = new Button(c, SWT.CHECK);
 	        show_sup.setText(Messages.CMainWizardPage_1); 
@@ -524,6 +531,13 @@ import org.eclipse.cdt.internal.ui.newui.Messages;
 				categorySelectedForRemoteLabel.setVisible(false);
 			h_selected.handleSelection();
 			h_selected.setSupportedOnly(show_sup.getSelection());
+			
+			List<String> tcNames = ((MBSWizardHandler) h_selected).getPreferredTCNames();
+			remoteToolChainTable.clearAll();
+			for (String tcName : tcNames) {
+				TableItem ti = new TableItem(remoteToolChainTable, SWT.NONE);
+				ti.setText(tcName);
+			}
 		}
 		
 		public static EntryDescriptor getDescriptor(Tree _tree) {
