@@ -103,7 +103,8 @@ public class RemoteScript implements IRemoteScript {
 		}
 
 		for (int i = 0; i < script.length; i++) {
-			sb.append(script[i] + "; "); //$NON-NLS-1$
+			sb.append(script[i]);
+			if (i < script.length-1) sb.append("&& ");//$NON-NLS-1$
 		}
 		return sb.toString();
 	}
