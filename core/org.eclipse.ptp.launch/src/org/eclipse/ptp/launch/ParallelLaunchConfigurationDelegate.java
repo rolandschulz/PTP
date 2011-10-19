@@ -53,6 +53,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 /**
@@ -135,13 +136,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 									Messages.ParallelLaunchConfigurationDelegate_RM_currently_stopped, configuration.getName()),
 									Messages.ParallelLaunchConfigurationDelegate_Always_start, false, null, null);
 							if (dialog.getReturnCode() == IDialogConstants.OK_ID) {
-								try {
-									rm.start(monitor);
-								} catch (CoreException e) {
-									ErrorDialog.openError(Display.getDefault().getActiveShell(),
-											Messages.ParallelLaunchConfigurationDelegate_Start_rm,
-											Messages.ParallelLaunchConfigurationDelegate_Failed_to_start, e.getStatus());
-								}
+								startRM(rm);
 							}
 							if (dialog.getToggleState()) {
 								Preferences.setBoolean(PTPLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START,
@@ -150,15 +145,11 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 						}
 
 					});
-					if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
-						return;
-					}
 				} else {
-					try {
-						rm.start(monitor);
-					} catch (CoreException e) {
-						throw new CoreException(e.getStatus());
-					}
+					startRM(rm);
+				}
+				if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
+					return;
 				}
 			}
 
@@ -368,6 +359,34 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					}
 				});
 			}
+		}
+	}
+
+	private void startRM(final IResourceManager rm) {
+		IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				try {
+					rm.start(monitor);
+				} catch (CoreException e) {
+					throw new InvocationTargetException(e);
+				}
+				if (monitor.isCanceled()) {
+					throw new InterruptedException();
+				}
+			}
+		};
+		try {
+			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
+		} catch (InvocationTargetException e) {
+			Throwable t = e.getCause();
+			IStatus status = null;
+			if (t != null && t instanceof CoreException) {
+				status = ((CoreException) t).getStatus();
+			}
+			ErrorDialog.openError(Display.getDefault().getActiveShell(), Messages.ParallelLaunchConfigurationDelegate_Start_rm,
+					Messages.ParallelLaunchConfigurationDelegate_Failed_to_start, status);
+		} catch (InterruptedException e) {
+			// Do nothing. Operation has been canceled.
 		}
 	}
 }
