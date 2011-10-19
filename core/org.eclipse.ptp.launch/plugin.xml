@@ -183,4 +183,19 @@
          </placement>
       </tab>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.launch.internal.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            class="org.eclipse.ptp.launch.internal.ui.LaunchPreferencesPage"
+            id="org.eclipse.ptp.launch.launchPage"
+            name="%LaunchPage.name">
+      </page>
+   </extension>
 </plugin>

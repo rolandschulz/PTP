@@ -30,9 +30,13 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
@@ -40,6 +44,7 @@ import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import org.eclipse.ptp.launch.internal.PreferenceConstants;
 import org.eclipse.ptp.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -48,6 +53,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 /**
@@ -98,7 +104,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org. eclipse.debug.core.ILaunchConfiguration,
 	 * java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
+	public void launch(final ILaunchConfiguration configuration, String mode, ILaunch launch, final IProgressMonitor monitor)
 			throws CoreException {
 		try {
 			if (!(launch instanceof IPLaunch)) {
@@ -111,6 +117,40 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			progress.setWorkRemaining(90);
 			if (progress.isCanceled()) {
 				return;
+			}
+
+			/*
+			 * Allow user to start resource manager if not running.
+			 */
+			final IResourceManager rm = getResourceManager(configuration);
+			if (rm == null) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
+			}
+			if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
+				if (!Preferences.getBoolean(PTPLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START)) {
+					Display.getDefault().syncExec(new Runnable() {
+						public void run() {
+							MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(Display.getDefault()
+									.getActiveShell(), Messages.ParallelLaunchConfigurationDelegate_Confirm_start, NLS.bind(
+									Messages.ParallelLaunchConfigurationDelegate_RM_currently_stopped, configuration.getName()),
+									Messages.ParallelLaunchConfigurationDelegate_Always_start, false, null, null);
+							if (dialog.getReturnCode() == IDialogConstants.OK_ID) {
+								startRM(rm);
+							}
+							if (dialog.getToggleState()) {
+								Preferences.setBoolean(PTPLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START,
+										dialog.getReturnCode() == IDialogConstants.OK_ID);
+							}
+						}
+
+					});
+				} else {
+					startRM(rm);
+				}
+				if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
+					return;
+				}
 			}
 
 			progress.worked(10);
@@ -136,9 +176,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					progress.subTask(Messages.ParallelLaunchConfigurationDelegate_6);
 
 					/*
-					 * Create the debugger extension, then the connection point
-					 * for the debug server. The debug server is launched via
-					 * the submitJob() command.
+					 * Create the debugger extension, then the connection point for the debug server. The debug server is launched
+					 * via the submitJob() command.
 					 */
 
 					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
@@ -320,6 +359,34 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					}
 				});
 			}
+		}
+	}
+
+	private void startRM(final IResourceManager rm) {
+		IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				try {
+					rm.start(monitor);
+				} catch (CoreException e) {
+					throw new InvocationTargetException(e);
+				}
+				if (monitor.isCanceled()) {
+					throw new InterruptedException();
+				}
+			}
+		};
+		try {
+			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
+		} catch (InvocationTargetException e) {
+			Throwable t = e.getCause();
+			IStatus status = null;
+			if (t != null && t instanceof CoreException) {
+				status = ((CoreException) t).getStatus();
+			}
+			ErrorDialog.openError(Display.getDefault().getActiveShell(), Messages.ParallelLaunchConfigurationDelegate_Start_rm,
+					Messages.ParallelLaunchConfigurationDelegate_Failed_to_start, status);
+		} catch (InterruptedException e) {
+			// Do nothing. Operation has been canceled.
 		}
 	}
 }
