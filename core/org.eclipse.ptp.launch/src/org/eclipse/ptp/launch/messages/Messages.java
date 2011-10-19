@@ -22,6 +22,8 @@ public class Messages extends NLS {
 	public static String Launch_common_DebuggerColon;
 	public static String Launch_common_Error;
 
+	public static String LaunchPreferencesPage_Auto_start_RM;
+
 	public static String ApplicationTab_0;
 	public static String ApplicationTab_1;
 	public static String ApplicationTab_2;
@@ -98,8 +100,12 @@ public class Messages extends NLS {
 	public static String ParallelLaunchConfigurationDelegate_5;
 	public static String ParallelLaunchConfigurationDelegate_6;
 	public static String ParallelLaunchConfigurationDelegate_7;
-
+	public static String ParallelLaunchConfigurationDelegate_Always_start;
+	public static String ParallelLaunchConfigurationDelegate_Confirm_start;
+	public static String ParallelLaunchConfigurationDelegate_Failed_to_start;
 	public static String ParallelLaunchConfigurationDelegate_Invalid_launch_object;
+	public static String ParallelLaunchConfigurationDelegate_RM_currently_stopped;
+	public static String ParallelLaunchConfigurationDelegate_Start_rm;
 
 	public static String PTPLaunchShortcut_0;
 	public static String PTPLaunchShortcut_1;

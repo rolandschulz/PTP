@@ -51,7 +51,6 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -627,21 +626,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	/**
 	 * @since 5.0
 	 */
-	protected void verifyLaunchAttributes(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
+	protected void verifyLaunchAttributes(final ILaunchConfiguration configuration, String mode, final IProgressMonitor monitor)
 			throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 30);
 
 		try {
-			IResourceManager rm = getResourceManager(configuration);
-			if (rm == null) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
-			}
-			if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), NLS.bind(
-						Messages.AbstractParallelLaunchConfigurationDelegate_Manager_Not_Started, rm.getName())));
-			}
-
 			/*
 			 * Verify executable path
 			 */
