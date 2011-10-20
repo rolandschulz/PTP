@@ -46,6 +46,7 @@ PTP_FEATURES="\
 	org.eclipse.ptp.rm.ibm.ll-feature \
 	org.eclipse.ptp.rm.ibm.pe-feature \
 	org.eclipse.ptp.rm.jaxb-feature \
+	org.eclipse.ptp.rm.jaxb.contrib-feature \
 	org.eclipse.ptp.rm.jaxb.pbs-feature \
 	org.eclipse.ptp.rm.lml_jaxb-feature \
 	org.eclipse.ptp.rm.lml-feature \

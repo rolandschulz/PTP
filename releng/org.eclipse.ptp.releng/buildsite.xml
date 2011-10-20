@@ -48,6 +48,9 @@
    <feature url="features/org.eclipse.ptp.rm.jaxb_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.jaxb" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
+   <feature url="features/org.eclipse.ptp.rm.jaxb.pbs_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.jaxb.contrib" version="@ptpBranchVersion@.@timeStamp@">
+      <category name="Parallel Tools Platform"/>
+   </feature>
    <feature url="features/org.eclipse.ptp.rm.jaxb.pbs_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.jaxb.pbs" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
