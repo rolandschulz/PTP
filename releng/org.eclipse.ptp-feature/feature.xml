@@ -100,6 +100,10 @@
          version="0.0.0"/>
 
    <includes
+         id="org.eclipse.ptp.rm.jaxb.openmpi"
+         version="0.0.0"/>
+
+   <includes
          id="org.eclipse.ptp.rm.jaxb.pbs"
          version="0.0.0"/>
 
