@@ -22,9 +22,7 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui
-	 * .IPageLayout)
+	 * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui .IPageLayout)
 	 */
 	public void createInitialLayout(IPageLayout layout) {
 		final String editorArea = layout.getEditorArea();
@@ -35,11 +33,9 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 		final IFolderLayout miscFolder = layout.createFolder("miscFolder", IPageLayout.BOTTOM, (float) 0.7, "jobsFolder"); //$NON-NLS-1$//$NON-NLS-2$
 		final IFolderLayout machinesFolder = layout.createFolder("machinesFolder", IPageLayout.BOTTOM, 0, editorArea); //$NON-NLS-1$
 
-		// lguiFolder.addView(ILMLUIConstants.VIEW_LML);
 		mainFolder.addView("org.eclipse.ptp.ui.views.resourceManagerView"); //$NON-NLS-1$
-		tableFolder.addView(ILMLUIConstants.VIEW_TABLE_1 + ":*"); //$NON-NLS-1$
-		tableFolder.addView(ILMLUIConstants.VIEW_TABLE_2 + ":*"); //$NON-NLS-1$
-		// tableFolder.addView(ILMLUIConstants.VIEW_TABLE_3);
+		tableFolder.addView(ILMLUIConstants.VIEW_TABLE_1);
+		tableFolder.addView(ILMLUIConstants.VIEW_TABLE_2);
 		machinesFolder.addView(ILMLUIConstants.VIEW_PARALLELNODES);
 		miscFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 		miscFolder.addView(IPageLayout.ID_PROP_SHEET);
