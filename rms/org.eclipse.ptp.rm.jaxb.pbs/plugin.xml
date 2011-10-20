@@ -11,6 +11,10 @@
             configurationFile="data/pbs-generic-interactive.xml"
             name="PBS-Generic-Interactive">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/openmpi-generic-interactive.xml"
+            name="Open MPI-Generic-Interactive">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>
