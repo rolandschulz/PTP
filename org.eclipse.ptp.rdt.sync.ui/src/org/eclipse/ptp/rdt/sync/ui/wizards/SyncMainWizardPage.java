@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedMap;
+
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -70,6 +72,7 @@ import org.eclipse.cdt.ui.wizards.EntryDescriptor;
 import org.eclipse.cdt.ui.wizards.IWizardItemsListListener;
 import org.eclipse.cdt.ui.wizards.IWizardWithMemory;
 import org.eclipse.cdt.internal.ui.newui.Messages;
+import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 
 	public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItemsListListener {
@@ -102,6 +105,8 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
    
 		private Label categorySelectedForLocalLabel;
 		private Label categorySelectedForRemoteLabel;
+
+		private SortedMap<String, IToolChain> toolChainMap;
 
 	    /**
 	     * Creates a new project creation wizard page.
@@ -532,12 +537,13 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 			h_selected.handleSelection();
 			h_selected.setSupportedOnly(show_sup.getSelection());
 			
-			List<String> tcNames = ((MBSWizardHandler) h_selected).getPreferredTCNames();
-			remoteToolChainTable.clearAll();
-			for (String tcName : tcNames) {
+			toolChainMap = ((MBSWizardHandler) h_selected).getToolChains();
+			remoteToolChainTable.removeAll();
+			for (String toolChainName : toolChainMap.keySet()) {
 				TableItem ti = new TableItem(remoteToolChainTable, SWT.NONE);
-				ti.setText(tcName);
+				ti.setText(toolChainName);
 			}
+			remoteToolChainTable.redraw();
 		}
 		
 		public static EntryDescriptor getDescriptor(Tree _tree) {
