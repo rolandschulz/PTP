@@ -23,8 +23,11 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
  * @since 5.0
  */
 public class RemoteServerManager {
-	private final static String REMOTE_SERVER_EXTENSION_POINT_ID = "remoteServer"; //$NON-NLS-1$
-	private final static Map<String, AbstractRemoteServerRunner> fServerMap = new HashMap<String, AbstractRemoteServerRunner>();
+	private static final String REMOTE_SERVER_EXTENSION_POINT_ID = "remoteServer"; //$NON-NLS-1$
+	private static final String REMOTE_SERVER_OVERRIDE_EXTENSION_POINT_ID = "remoteServerOverride"; //$NON-NLS-1$
+
+	private static final Map<String, AbstractRemoteServerRunner> fServerMap = new HashMap<String, AbstractRemoteServerRunner>();
+
 	private static final String ATTR_ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_LAUNCH_COMMAND = "launchCommand"; //$NON-NLS-1$
 	private static final String ATTR_UNPACK_COMMAND = "unpackCommand"; //$NON-NLS-1$
@@ -43,45 +46,101 @@ public class RemoteServerManager {
 	 * 
 	 * @param id
 	 *            id of the remote server
-	 * @return new instance of the remote server or null if no extension can be
-	 *         found
+	 * @return new instance of the remote server or null if no extension can be found
 	 */
 	private static AbstractRemoteServerRunner createServer(String id) {
 		AbstractRemoteServerRunner server = null;
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint(PTPRemoteCorePlugin.getUniqueIdentifier(),
 				REMOTE_SERVER_EXTENSION_POINT_ID);
-		final IExtension[] extensions = extensionPoint.getExtensions();
+		if (extensionPoint != null) {
+			final IExtension[] extensions = extensionPoint.getExtensions();
 
-		for (IExtension ext : extensions) {
-			final IConfigurationElement[] elements = ext.getConfigurationElements();
+			for (IExtension ext : extensions) {
+				final IConfigurationElement[] elements = ext.getConfigurationElements();
 
-			for (IConfigurationElement ce : elements) {
-				if (ce.getAttribute(ATTR_ID).equals(id)) {
-					try {
-						Object exec = ce.createExecutableExtension(ATTR_CLASS);
-						if (exec instanceof AbstractRemoteServerRunner) {
-							server = (AbstractRemoteServerRunner) exec;
-							server.setBundleId(ce.getContributor().getName());
-							server.setLaunchCommand(ce.getAttribute(ATTR_LAUNCH_COMMAND));
-							server.setUnpackCommand(ce.getAttribute(ATTR_UNPACK_COMMAND));
-							server.setPayload(ce.getAttribute(ATTR_PAYLOAD));
-							server.setContinuous(Boolean.parseBoolean(ce.getAttribute(ATTR_CONTINUOUS)));
-							server.setVerifyLaunchCommand(ce.getAttribute(ATTR_VERIFY_LAUNCH_COMMAND));
-							server.setVerifyLaunchPattern(ce.getAttribute(ATTR_VERIFY_LAUNCH_PATTERN));
-							server.setVerifyLaunchFailMessage(ce.getAttribute(ATTR_VERIFY_LAUNCH_FAILMESSAGE));
-							server.setVerifyUnpackCommand(ce.getAttribute(ATTR_VERIFY_UNPACK_COMMAND));
-							server.setVerifyUnpackPattern(ce.getAttribute(ATTR_VERIFY_UNPACK_PATTERN));
-							server.setVerifyUnpackFailMessage(ce.getAttribute(ATTR_VERIFY_UNPACK_FAILMESSAGE));
-							return server;
+				for (IConfigurationElement ce : elements) {
+					if (ce.getAttribute(ATTR_ID).equals(id)) {
+						try {
+							Object exec = ce.createExecutableExtension(ATTR_CLASS);
+							if (exec instanceof AbstractRemoteServerRunner) {
+								server = (AbstractRemoteServerRunner) exec;
+								server.setBundleId(ce.getContributor().getName());
+								server.setLaunchCommand(ce.getAttribute(ATTR_LAUNCH_COMMAND));
+								server.setUnpackCommand(ce.getAttribute(ATTR_UNPACK_COMMAND));
+								server.setPayload(ce.getAttribute(ATTR_PAYLOAD));
+								server.setContinuous(Boolean.parseBoolean(ce.getAttribute(ATTR_CONTINUOUS)));
+								server.setVerifyLaunchCommand(ce.getAttribute(ATTR_VERIFY_LAUNCH_COMMAND));
+								server.setVerifyLaunchPattern(ce.getAttribute(ATTR_VERIFY_LAUNCH_PATTERN));
+								server.setVerifyLaunchFailMessage(ce.getAttribute(ATTR_VERIFY_LAUNCH_FAILMESSAGE));
+								server.setVerifyUnpackCommand(ce.getAttribute(ATTR_VERIFY_UNPACK_COMMAND));
+								server.setVerifyUnpackPattern(ce.getAttribute(ATTR_VERIFY_UNPACK_PATTERN));
+								server.setVerifyUnpackFailMessage(ce.getAttribute(ATTR_VERIFY_UNPACK_FAILMESSAGE));
+								checkForOverrides(id, server);
+								return server;
+							}
+						} catch (CoreException e) {
+							PTPRemoteCorePlugin.log(e);
 						}
-					} catch (CoreException e) {
-						PTPRemoteCorePlugin.log(e);
 					}
 				}
 			}
 		}
 		return null;
+	}
+
+	private static void checkForOverrides(String id, AbstractRemoteServerRunner server) {
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(PTPRemoteCorePlugin.getUniqueIdentifier(),
+				REMOTE_SERVER_OVERRIDE_EXTENSION_POINT_ID);
+		if (extensionPoint != null) {
+			final IExtension[] extensions = extensionPoint.getExtensions();
+
+			for (IExtension ext : extensions) {
+				final IConfigurationElement[] elements = ext.getConfigurationElements();
+
+				for (IConfigurationElement ce : elements) {
+					if (ce.getAttribute(ATTR_ID).equals(id)) {
+						String attr = ce.getAttribute(ATTR_LAUNCH_COMMAND);
+						if (attr != null) {
+							server.setLaunchCommand(attr);
+						}
+						attr = ce.getAttribute(ATTR_UNPACK_COMMAND);
+						if (attr != null) {
+							server.setUnpackCommand(attr);
+						}
+						attr = ce.getAttribute(ATTR_PAYLOAD);
+						if (attr != null) {
+							server.setPayload(attr);
+						}
+						attr = ce.getAttribute(ATTR_VERIFY_LAUNCH_COMMAND);
+						if (attr != null) {
+							server.setVerifyLaunchCommand(attr);
+						}
+						attr = ce.getAttribute(ATTR_VERIFY_LAUNCH_PATTERN);
+						if (attr != null) {
+							server.setVerifyLaunchPattern(attr);
+						}
+						attr = ce.getAttribute(ATTR_VERIFY_LAUNCH_FAILMESSAGE);
+						if (attr != null) {
+							server.setVerifyLaunchFailMessage(attr);
+						}
+						attr = ce.getAttribute(ATTR_VERIFY_UNPACK_COMMAND);
+						if (attr != null) {
+							server.setVerifyUnpackCommand(attr);
+						}
+						attr = ce.getAttribute(ATTR_VERIFY_UNPACK_PATTERN);
+						if (attr != null) {
+							server.setVerifyUnpackPattern(attr);
+						}
+						attr = ce.getAttribute(ATTR_VERIFY_UNPACK_FAILMESSAGE);
+						if (attr != null) {
+							server.setVerifyUnpackFailMessage(attr);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -104,8 +163,7 @@ public class RemoteServerManager {
 	 *            id of the remote server
 	 * @param connection
 	 *            connection used to launch server
-	 * @return instance of the remote server, or null if no extension can be
-	 *         found
+	 * @return instance of the remote server, or null if no extension can be found
 	 */
 	public static AbstractRemoteServerRunner getServer(String id, IRemoteConnection connection) {
 		AbstractRemoteServerRunner server = fServerMap.get(getKey(id, connection));

@@ -6,7 +6,8 @@
          <meta.schema plugin="org.eclipse.ptp.remote.core" id="remoteServer" name="Remote Server"/>
       </appInfo>
       <documentation>
-         [Enter description of this extension point.]
+         This extension point allows a plugin to register remote servers that will be launched from the client and run on a remote target system. In addition to the payload to run, the extension point specifies the launch command that will be used, and optional command to unpack the payload on the target systems, and a verification command to check that the environment on the target system is valid for execution of the server.
+
       </documentation>
    </annotation>
 
@@ -17,9 +18,10 @@
          </appInfo>
       </annotation>
       <complexType>
-         <sequence>
+         <choice>
             <element ref="remoteServer"/>
-         </sequence>
+            <element ref="remoteServerOverride"/>
+         </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
@@ -146,41 +148,126 @@
       </complexType>
    </element>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="since"/>
-      </appInfo>
-      <documentation>
-         [Enter the first release in which this extension point appears.]
-      </documentation>
-   </annotation>
+   <element name="remoteServerOverride">
+      <annotation>
+         <documentation>
+            Used to override the settings of an existing extension. For example, this could be used to change the launch command to specify a different path.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The ID of the server that this extension overrides.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="payload" type="string">
+            <annotation>
+               <documentation>
+                  Server payload. This will be copied from the plugin to the working directory on the remote machine prior to launch. The payload is cached on the remote machine and only copied if it is necessary.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="launchCommand" type="string">
+            <annotation>
+               <documentation>
+                  The command used to launch the payload on the remote machine. The variable &quot;${payload}&quot; can be used to include the name of the payload (as specified in the &quot;payload&quot; attribute) in the launch command.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="unpackCommand" type="string">
+            <annotation>
+               <documentation>
+                  Optional command to unpack the payload prior to execution. The unpack command is only run when the payload is first copied to the server (and if re-copied subsequently). If the unpack fails, payload launch is aborted.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="verifyLaunchCommand" type="string">
+            <annotation>
+               <documentation>
+                  This will be used to specify a command to check the desired launch command is available on remote server
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="verifyLaunchFailMessage" type="string">
+            <annotation>
+               <documentation>
+                  This attribute is used to specify a message which will be shown to the user if the launch command verification fails.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="verifyLaunchPattern" type="string">
+            <annotation>
+               <documentation>
+                  This will be used to specify the search pattern in the form of regular expression which will be used to verify the output of the command specified in the verifyLaunchCommand attribute.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="verifyUnpackCommand" type="string">
+            <annotation>
+               <documentation>
+                  This will be used to specify a command to check the unpack command is available on remote server
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="verifyUnpackFailMessage" type="string">
+            <annotation>
+               <documentation>
+                  This attribute is used to specify message which will be shown to the user if the unpack command verification fails.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="verifyUnpackPattern" type="string">
+            <annotation>
+               <documentation>
+                  This will be used to specify the search pattern in the form of regular expression which will be used to verify the output of the command specified in the verifyUnpackCommand attribute.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
 
    <annotation>
       <appInfo>
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
+         The following is an example of a remote server extension point: 
+&lt;p&gt;
+&lt;pre&gt;
+   &lt;extension point=&quot;org.eclipse.ptp.remote.core.remoteServer&quot;&gt;
+      &lt;remoteServer
+           class=&quot;org.eclipse.ptp.rdt.server.dstore.core.DStoreServer&quot;
+           continuous=&quot;true&quot;
+           id=&quot;org.eclipse.ptp.rdt.server.dstore.RemoteToolsDStoreServer&quot;
+           launchCommand=&quot;java -Xms64m -Xmx128m -Xss2m -jar ${payload} 0 60000&quot;
+           name=&quot;%RemoteToolsDStoreServer.name&quot;
+           payload=&quot;rdt-server.jar&quot;
+           verifyLaunchCommand=&quot;java -version&quot;
+           verifyLaunchFailMessage=&quot;{0}: Invalid java version or java not installed on &amp;quot;{1}&amp;quot;&quot;
+           verifyLaunchPattern=&quot;^(java version )(.)(1\.[5-9]|[2-9]\.).*$&quot;&gt;
+      &lt;/remoteServer&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+
+The following is an example of a remote server override extension point: 
+&lt;p&gt;
+&lt;pre&gt;
+   &lt;extension point=&quot;org.eclipse.ptp.remote.core.remoteServerOverride&quot;&gt;
+      &lt;remoteServer
+           id=&quot;org.eclipse.ptp.rdt.server.dstore.RemoteToolsDStoreServer&quot;
+           launchCommand=&quot;/other/path/java -Xms64m -Xmx128m -Xss2m -jar ${payload} 0 60000&quot;
+      &lt;/remoteServer&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="apiinfo"/>
-      </appInfo>
-      <documentation>
-         [Enter API information here.]
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="implementation"/>
-      </appInfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
 
 
 </schema>
