@@ -135,6 +135,8 @@
 		<module>releng/org.eclipse.ptp.rm.ibm.ll-feature</module>
 		<module>releng/org.eclipse.ptp.rm.ibm.pe-feature</module>
 		<module>releng/org.eclipse.ptp.rm.jaxb-feature</module>
+		<module>releng/org.eclipse.ptp.rm.jaxb.contrib-feature</module>
+		<module>releng/org.eclipse.ptp.rm.jaxb.openmpi-feature</module>
 		<module>releng/org.eclipse.ptp.rm.jaxb.pbs-feature</module>
 		<module>releng/org.eclipse.ptp.rm.lml-feature</module>
 		<module>releng/org.eclipse.ptp.rm.lml_jaxb-feature</module>
@@ -157,10 +159,12 @@
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.help</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.proxy</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.ui</module>
+		<module>rms/org.eclipse.ptp.rm.jaxb.contrib</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.control.core</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.control.ui</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.core</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.help</module>
+		<module>rms/org.eclipse.ptp.rm.jaxb.openmpi</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.pbs</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.pbs.doc.user</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.ui</module>
