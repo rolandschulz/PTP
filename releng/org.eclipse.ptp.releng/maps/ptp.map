@@ -114,8 +114,8 @@ plugin@org.eclipse.ptp.debug.sdm=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cv
 plugin@org.eclipse.ptp.proxy=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.proxy
 plugin@org.eclipse.ptp.utils=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.utils
 plugin@org.eclipse.ptp.launch=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.launch
-plugin@org.eclipse.ptp.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/doc/org.eclipse.ptp.doc.user
-plugin@org.eclipse.ptp.doc.isv=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/doc/org.eclipse.ptp.doc.isv
+plugin@org.eclipse.ptp.doc.user=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.doc.user
+plugin@org.eclipse.ptp.doc.isv=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.doc.isv
 
 ! Services Plugins
 plugin@org.eclipse.ptp.services.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.services.core

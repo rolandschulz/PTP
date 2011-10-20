@@ -1,3 +1,6 @@
+<!--*******************************************************-->
+<!--* PDE BUILD IS ONLY SUPPORTED FOR PTP 5.0 AND EARLIER *-->
+<!--*******************************************************-->
 <project name="PTP" default="nightly">
 	<target name="hi">
 		<echo message="${eclipse.home}"/>
@@ -737,11 +740,11 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/doc/org.eclipse.ptp.doc.user"/>
+			<param name="tagmodule" value="org.eclipse.ptp/core/org.eclipse.ptp.doc.user"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/doc/org.eclipse.ptp.doc.isv"/>
+			<param name="tagmodule" value="org.eclipse.ptp/core/org.eclipse.ptp.doc.isv"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
