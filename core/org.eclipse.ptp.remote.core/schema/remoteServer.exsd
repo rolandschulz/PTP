@@ -18,7 +18,7 @@
          </appInfo>
       </annotation>
       <complexType>
-         <choice>
+         <choice minOccurs="1" maxOccurs="unbounded">
             <element ref="remoteServer"/>
             <element ref="remoteServerOverride"/>
          </choice>
