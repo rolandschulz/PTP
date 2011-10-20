@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.utk.nics.kraken.pbs.batch.xml"
+            name="edu.utk.nics.kraken.pbs.batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.utk.nics.keeneland.pbs.batch.xml"
+            name="edu.utk.nics.keeneland.pbs.batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.illinois.ncsa.forge.pbs.batch.mvapich2.xml"
+            name="edu.illinois.ncsa.forge.pbs.batch.mvapich2">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.illinois.ncsa.forge.pbs.batch.openmpi.xml"
+            name="edu.illinois.ncsa.forge.pbs.batch.openmpi">
+      </JAXBResourceManagerConfiguration>
+   </extension>
+
+</plugin>
