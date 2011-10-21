@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.lml.core;singleton:=true
 Bundle-Version: 2.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.eclipse.ptp.rm.lml.core;x-friends:="org.eclipse.ptp.rm.lml_jaxb,org.eclipse.ptp.rm.lml.ui,org.eclipse.ptp.rm.lml.monitor.core",
  org.eclipse.ptp.rm.lml.core.events;x-friends:="org.eclipse.ptp.rm.lml.ui",
  org.eclipse.ptp.rm.lml.core.listeners;x-friends:="org.eclipse.ptp.rm.lml.ui",
@@ -14,9 +14,6 @@ Export-Package: org.eclipse.ptp.rm.lml.core;x-friends:="org.eclipse.ptp.rm.lml_j
 Bundle-Activator: org.eclipse.ptp.rm.lml.core.LMLCorePlugin
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
-Require-Bundle: org.eclipse.core.runtime,
- javax.xml;bundle-version="1.3.4",
- javax.xml.stream;bundle-version="1.0.1",
- javax.xml.bind;bundle-version="2.1.9",
- com.sun.xml.bind;bundle-version="2.1.9"
+Require-Bundle: javax.xml.bind,
+ org.eclipse.core.runtime
 Bundle-Localization: plugin
