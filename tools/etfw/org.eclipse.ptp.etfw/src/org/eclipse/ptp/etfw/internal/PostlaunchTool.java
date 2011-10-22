@@ -42,11 +42,15 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 	boolean externalTarget = false;
 	String projName = null;
 	private IBuildLaunchUtils utilBLob;
+	private String syncProjectLocation=null;
 
 	public PostlaunchTool(ILaunchConfiguration conf, PostProcTool ppTool, String outLoc, IBuildLaunchUtils utilBlob) throws CoreException {
 		super(conf, Messages.PostlaunchTool_Analysis, utilBlob);
 		tool = ppTool;
 		this.utilBLob=utilBlob;
+		if(outLoc.equals(EMPTY_STRING)){
+			syncProjectLocation=projectLocation;
+		}
 		projectLocation = outputLocation = outLoc;
 		
 		String wdir = utilBlob.getWorkingDirectory();
@@ -114,7 +118,14 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 							} else {
 								projName = thisCProject.getElementName();
 							}
-							manager.process(projName, configuration, outputLocation);
+					
+							
+							//TODO: This is sort of ok, but we should probably change the API to accept both the output dir and the project dir.
+							String outdir=outputLocation;
+							if(this.syncProjectLocation!=null)
+								outdir=syncProjectLocation;
+								
+							manager.process(projName, configuration, outdir);
 							manager.cleanup();
 						}
 					}

@@ -36,6 +36,7 @@ import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.BuildTool;
 import org.eclipse.ptp.rdt.core.remotemake.RemoteMakeBuilder;
+import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 
 @SuppressWarnings("restriction")
 public class BuilderTool extends ToolStep implements IToolLaunchConfigurationConstants {
@@ -164,11 +165,11 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 
 		IFileStore projectFileStore=utilBlob.getFile(projectLocation);
 		IFileStore compilerInclude = projectFileStore.getChild("eclipse.inc");//new File(projectLocation + File.separator + "eclipse.inc"); //$NON-NLS-1$
-		IFileStore compilerDef = projectFileStore.getChild("eclipse.inc.default");// new File(projectLocation + File.separator + "eclipse.inc.default"); //$NON-NLS-1$
+		//IFileStore compilerDef = projectFileStore.getChild("eclipse.inc.default");// new File(projectLocation + File.separator + "eclipse.inc.default"); //$NON-NLS-1$
 		try {
-			if (compilerInclude.fetchInfo().exists()) {
+			//if (compilerInclude.fetchInfo().exists()) {
 				
-				compilerInclude.copy(compilerDef, EFS.OVERWRITE, null);
+			//	compilerInclude.copy(compilerDef, EFS.OVERWRITE, null);
 				
 //				InputStream in = compilerInclude.openInputStream(EFS.NONE, null);// new FileInputStream(compilerInclude);
 //				OutputStream out = compilerDef.openOutputStream(EFS.NONE, null);//new FileOutputStream(compilerDef);
@@ -180,7 +181,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 //				}
 //				in.close();
 //				out.close();
-			}
+		//	}
 			BufferedOutputStream makeOut = new BufferedOutputStream(compilerInclude.openOutputStream(EFS.NONE, null));
 			String allargs = getToolArguments(tool.getGlobalCompiler(), configuration);
 			String ops = getStandardMakeBuildOps(tool,configuration,allargs);
@@ -208,18 +209,28 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		if (select == null) {
 			
 			
-			final IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(thisProject, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID);
-			
-			
-			
-			if(info==null||!info.isFullBuildEnabled()){
-			System.out.println(Messages.BuilderTool_NoMakeTargetAll);
-			runbuilt = false;
-			return;
+			if(isSyncProject){
+				if(!BuildConfigurationManager.getInstance().isInitialized(thisProject))
+				{
+					System.out.println("Sync project not initialized");
+					return;
+				}
 			}
 			else{
-				thisProject.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+				final IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(thisProject, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID);
+			
+			
+			
+				if(info==null||!info.isFullBuildEnabled()){
+					System.out.println(Messages.BuilderTool_NoMakeTargetAll);
+					runbuilt = false;
+					return;
+				}
 			}
+			
+			
+				thisProject.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+			
 		}
 		else{
 			// System.out.println(select.getBuildLocation());
@@ -231,27 +242,27 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 
 		targetMan.shutdown();
 
-		if (compilerDef.fetchInfo().exists()) {
-			InputStream in;
+		//if (compilerDef.fetchInfo().exists()) {
+			//InputStream in;
 			try {
-				in = compilerDef.openInputStream(EFS.NONE, null);//new FileInputStream(compilerDef);
+				//in = compilerDef.openInputStream(EFS.NONE, null);//new FileInputStream(compilerDef);
 
 				OutputStream out = new BufferedOutputStream(compilerInclude.openOutputStream(EFS.NONE, null));// new FileOutputStream(compilerInclude);
 
 				// Transfer bytes from in to out
 				byte[] buf = new byte[1024];
-				int len;
-				while ((len = in.read(buf)) > 0) {
-					out.write(buf, 0, len);
-				}
-				in.close();
+//				int len;
+//				while ((len = in.read(buf)) > 0) {
+					out.write(buf, 0, 0);
+//				}
+//				in.close();
 				out.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+		//}
 		runbuilt = true;
 		return;
 	}

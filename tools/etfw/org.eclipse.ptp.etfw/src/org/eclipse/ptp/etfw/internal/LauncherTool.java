@@ -107,11 +107,16 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 			 * If progPath is a regular file then it is the actual executable from a managed build and we need to swap it out with our rebuilt version
 			 * If it is a directory then it is the location of the binary provided by a makefile build and we can ignore it.
 			 */
-			if (progPath != null&&!utilBlob.getFile(progPath).fetchInfo().isDirectory()) {
+			IFileStore testStore=null;
+			if(progPath!=null){
+				testStore=utilBlob.getFile(progPath);
+			}
+			
+			if (testStore != null&&testStore.fetchInfo().exists()&&!testStore.fetchInfo().isDirectory()) {
 				
 				savePath = confWC.getAttribute(apppathattrib, (String) null);
 				
-				IFileStore testStore=utilBlob.getFile(progPath);
+				//IFileStore testStore=utilBlob.getFile(progPath);
 				IFileStore progStore=utilBlob.getFile(projectLocation);
 				if(progStore.fetchInfo().exists()){
 					progStore=progStore.getChild(progPath);

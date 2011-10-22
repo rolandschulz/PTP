@@ -373,6 +373,7 @@ public class PerfDMFView extends ViewPart {
 		public void refresh(Viewer v) {
 			invisibleRoot = null;
 			v.refresh();
+			//initialized=false;
 		}
 
 		public Object getRoot() {
@@ -409,11 +410,17 @@ public class PerfDMFView extends ViewPart {
 			return ((TreeNode) parent).hasChildren();
 		}
 
+		
+		private boolean initialized=false;
+		
 		/*
 		 * We will set up a dummy model to initialize tree heararchy. In a real
 		 * code, you will connect to a real model and expose its hierarchy.
 		 */
 		private boolean initialize() {
+			
+//			if(initialized)
+//				return true;
 
 			class SourceWatcher implements Runnable {
 				public void run() {
@@ -490,6 +497,7 @@ public class PerfDMFView extends ViewPart {
 				invisibleRoot.addChild(root);
 
 			}
+			//initialized=true;
 			return true;
 		}
 	}

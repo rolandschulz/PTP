@@ -235,6 +235,8 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	protected Button nocleanCheck;
 
 	protected Button keepprofsCheck;
+	
+	protected Button profSummaryCheck;
 
 	protected Button portalCheck;
 
@@ -1043,6 +1045,9 @@ private static final String TAU_MAKEFILE_PREFIX="Makefile.tau";
 
 		keepprofsCheck = createCheckButton(dataComp, Messages.TAUAnalysisTab_KeepProfiles);
 		keepprofsCheck.addSelectionListener(listener);
+		
+		profSummaryCheck = createCheckButton(dataComp, Messages.TAUAnalysisTab_ProfileSummary);
+		profSummaryCheck.addSelectionListener(listener);
 
 		portalCheck = createCheckButton(dataComp,
 		Messages.TAUAnalysisTab_UploadDataToTauPortal);
@@ -1239,6 +1244,8 @@ private static final String TAU_MAKEFILE_PREFIX="Makefile.tau";
 
 			keepprofsCheck.setSelection(configuration.getAttribute(
 					ITAULaunchConfigurationConstants.KEEPPROFS, false));
+			
+			profSummaryCheck.setSelection(configuration.getAttribute(ITAULaunchConfigurationConstants.PROFSUMMARY, false));
 
 			portalCheck.setSelection(configuration.getAttribute(
 					ITAULaunchConfigurationConstants.PORTAL, false));
@@ -1315,6 +1322,10 @@ private static final String TAU_MAKEFILE_PREFIX="Makefile.tau";
 		//		nocleanCheck.getSelection());
 		configuration.setAttribute(ITAULaunchConfigurationConstants.KEEPPROFS,
 				keepprofsCheck.getSelection());
+		
+		configuration.setAttribute(ITAULaunchConfigurationConstants.PROFSUMMARY,
+				profSummaryCheck.getSelection());
+		
 		configuration.setAttribute(ITAULaunchConfigurationConstants.PORTAL,
 				portalCheck.getSelection());
 

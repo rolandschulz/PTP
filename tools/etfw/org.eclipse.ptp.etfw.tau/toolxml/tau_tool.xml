@@ -121,7 +121,7 @@
 			</togoption>
 			<togoption label="NoMpi" optname="-optNoMpi" tooltip="Removes -l*mpi* libraries during linking (default)"/>
 			<togoption label="Mpi" optname="-optMpi" tooltip="Does not remove -l*mpi* libraries during linking"/>
-			<togoption label="NoRevert" optname="-optNoRevert" tooltip="Exit on error. Does not revert to the original compilation rule on error."/>
+			<togoption label="NoRevert" defstate="true" optname="-optNoRevert" tooltip="Exit on error. Does not revert to the original compilation rule on error."/>
 			<togoption label="Revert" optname="-optRevert" tooltip="Revert to the original compilation rule on error (default)."/>
 			
 			<togoption label="AppCC" optname="-optAppCC" tooltip="pecifies the fallback C compiler.">
@@ -187,8 +187,8 @@
                       <optvalue type="dir" default="."/>
                 </togoption>
                 
-                <togoption label="Profile Format" optname="TAU_PROFILE_FORMAT" envvar="true" defstate="true" tooltip="Format of profile output. Note that merged output may prevent automatic database uploads.">
-                      <optvalue type="combo" defaultnum="1" items="profile:::merged:::snapshot:::none"/>
+                <togoption label="Profile Format" optname="TAU_PROFILE_FORMAT" envvar="true" defstate="false" tooltip="Format of profile output. Note that merged output may prevent automatic database uploads.">
+                      <optvalue type="combo" defaultnum="0" items="profile:::merged:::snapshot:::none"/>
                 </togoption>
                 
                <togoption label="Callpath Profiling" optname="TAU_CALLPATH" envvar="true" defstate="false" tooltip="Generate TAU callpath profiles">

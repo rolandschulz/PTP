@@ -56,7 +56,12 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	
 	Shell selshell = null;
 	public BuildLaunchUtils(){
+		try{
 		this.selshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
+		}
+		catch(Exception e){
+			selshell=null;
+		}
 	}
 
 	/**
@@ -311,7 +316,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	 */
 	public static  String getNow() {
 		Calendar cal = Calendar.getInstance(TimeZone.getDefault());
-		String DATE_FORMAT = "yyyy-MM-dd_HH:mm:ss"; //$NON-NLS-1$
+		String DATE_FORMAT = "yyyy-MM-dd_HH-mm-ss"; //$NON-NLS-1$
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT);
 		sdf.setTimeZone(TimeZone.getDefault());
 		return sdf.format(cal.getTime());

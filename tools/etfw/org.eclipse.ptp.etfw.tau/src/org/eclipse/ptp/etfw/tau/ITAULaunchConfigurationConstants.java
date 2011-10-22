@@ -44,6 +44,8 @@ public interface ITAULaunchConfigurationConstants {
 	public static final String NOPARRUN = "auto_select_BUILDONLY_for_MPI_makefiles"; //$NON-NLS-1$
 	public static final String KEEPPROFS = "keep_profile_files"; //$NON-NLS-1$
 	
+	public static final String PROFSUMMARY = "print_profile_summary_only"; //$NON-NLS-1$
+	
 	public static final String PORTAL = "upload_profiles_to_portal"; //$NON-NLS-1$
 	
 	public static final String ENVVARS = "environment_variable_map"; //$NON-NLS-1$
