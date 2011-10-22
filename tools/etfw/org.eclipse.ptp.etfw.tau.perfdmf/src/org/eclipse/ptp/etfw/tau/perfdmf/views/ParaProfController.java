@@ -2,7 +2,6 @@ package org.eclipse.ptp.etfw.tau.perfdmf.views;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,7 +11,8 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 
 /**
  * @since 2.0
@@ -54,14 +54,19 @@ public class ParaProfController {
 	private boolean canRun = true;
 
 	public static TreeTuple EMPTY;
-
-	public ParaProfController() {
+	private IBuildLaunchUtils utilBlob=null;
+	public ParaProfController(IBuildLaunchUtils utilBlob) {
+		this.utilBlob=utilBlob;
 		createProcess();
 
 	}
-
+	public boolean pullReady=false;
+public static final String RESTART="RESTART";
+public static final String DONE="DONE";
 	private void killProcess() {
 		pushQueue = null;
+		pullReady=false;
+		pullQueue.add(RESTART);
 		pullQueue = null;
 		pb = null;
 		errRun = null;
@@ -69,10 +74,12 @@ public class ParaProfController {
 	}
 
 	private void createProcess() {
-		String paraprof = BuildLaunchUtils.getToolPath("tau") + File.separator + "paraprof"; //$NON-NLS-1$ //$NON-NLS-2$
+		String taubin=utilBlob.getToolPath("tau");
+		IFileStore paraprof = utilBlob.getFile(taubin);// + File.separator + "paraprof"; //$NON-NLS-1$ //$NON-NLS-2$
+		paraprof=paraprof.getChild("paraprof");
 		EMPTY = new TreeTuple("None", -1, -1, Level.DATABASE); //$NON-NLS-1$
-		File checkp = new File(paraprof);
-		if (!checkp.exists()) {
+		//File checkp = new File(paraprof);
+		if (!paraprof.fetchInfo().exists()) {
 			canRun = false;
 			return;
 		}
@@ -80,7 +87,7 @@ public class ParaProfController {
 		pushQueue = new LinkedBlockingQueue<String>();
 		pullQueue = new LinkedBlockingQueue<String>();
 		List<String> command = new ArrayList<String>();
-		command.add(paraprof);
+		command.add(paraprof.toURI().getPath());
 		command.add("--control"); //$NON-NLS-1$
 		pb = new ProcessBuilder(command);
 
@@ -95,6 +102,7 @@ public class ParaProfController {
 		stdout = new PrintStream(new BufferedOutputStream(proc.getOutputStream()));
 		errRun.start();
 		inRun.start();
+		pullReady=true;
 	}
 
 	public List<TreeTuple> getDatabases() {
@@ -156,9 +164,9 @@ public class ParaProfController {
 		}
 		return out;
 	}
-
-	public TreeTuple uploadTrial(String profile, int dbid, String app, String exp, String tri) {
-		String comBuf = "control upload " + profile + "/tauprofile.xml " + dbid + " " + app + " " + exp + " " + tri; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+	private static final String SPACE=" ";
+	public TreeTuple uploadTrial(IFileStore profile, int dbid, String app, String exp, String tri) {
+		String comBuf = "control upload " + profile.toURI().getPath() + SPACE + dbid + SPACE + app + SPACE + exp + SPACE + tri; //$NON-NLS-1$ //$NON-NLS-2$ 
 		int res = issueCommand(comBuf);
 		if (res != 0)
 			return null;
@@ -187,7 +195,7 @@ public class ParaProfController {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				if (s.equals("control endreturn") || s.equals("DONE")) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (s.equals("control endreturn") || s.equals(DONE)) { //$NON-NLS-1$ //$NON-NLS-2$
 					done = true;
 				} else {
 					l.add(s);
@@ -271,10 +279,13 @@ public class ParaProfController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			if (pullQueue != null)
-				pullQueue.add("DONE"); //$NON-NLS-1$
+//			if (pullQueue != null){
+//				if(!exception)
+//					pullQueue.add(DONE); //$NON-NLS-1$
+//			}
+				
 			if (pushQueue != null)
-				pushQueue.add("DONE"); //$NON-NLS-1$
+				pushQueue.add(DONE); //$NON-NLS-1$
 		}
 	}
 

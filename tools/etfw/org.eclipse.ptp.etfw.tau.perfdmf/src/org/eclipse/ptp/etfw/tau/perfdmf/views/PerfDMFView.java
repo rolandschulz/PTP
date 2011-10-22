@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -51,6 +52,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.perfdmf.PerfDMFUIPlugin;
 import org.eclipse.ptp.etfw.tau.perfdmf.messages.Messages;
 import org.eclipse.ptp.etfw.tau.perfdmf.views.ParaProfController.Level;
@@ -371,6 +373,7 @@ public class PerfDMFView extends ViewPart {
 		public void refresh(Viewer v) {
 			invisibleRoot = null;
 			v.refresh();
+			//initialized=false;
 		}
 
 		public Object getRoot() {
@@ -407,11 +410,17 @@ public class PerfDMFView extends ViewPart {
 			return ((TreeNode) parent).hasChildren();
 		}
 
+		
+		private boolean initialized=false;
+		
 		/*
 		 * We will set up a dummy model to initialize tree heararchy. In a real
 		 * code, you will connect to a real model and expose its hierarchy.
 		 */
 		private boolean initialize() {
+			
+//			if(initialized)
+//				return true;
 
 			class SourceWatcher implements Runnable {
 				public void run() {
@@ -421,8 +430,16 @@ public class PerfDMFView extends ViewPart {
 							String s = null;
 							try {
 								s = q.take();
-								if (s == null || s.equals("DONE")) //$NON-NLS-1$
+								if (s == null || s.equals(ParaProfController.DONE)) //$NON-NLS-1$
 									break;
+								if(s.equals(ParaProfController.RESTART)){
+									while(!ppc.pullReady){
+									}
+										
+										q=ppc.getPullQueue();
+										continue;
+									
+								}
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
@@ -438,7 +455,7 @@ public class PerfDMFView extends ViewPart {
 
 							});
 						}
-
+					System.out.println("Leaving Listener");
 				}
 			}
 
@@ -480,6 +497,7 @@ public class PerfDMFView extends ViewPart {
 				invisibleRoot.addChild(root);
 
 			}
+			//initialized=true;
 			return true;
 		}
 	}
@@ -511,7 +529,7 @@ public class PerfDMFView extends ViewPart {
 	 * The constructor.
 	 */
 	public PerfDMFView() {
-		ppc = new ParaProfController();
+		ppc = new ParaProfController(new BuildLaunchUtils());
 
 		PerfDMFUIPlugin.registerPerfDMFView(this);
 
@@ -743,13 +761,18 @@ public class PerfDMFView extends ViewPart {
 		return true;
 	}
 
-	public boolean addProfile(String project, String projectType, String trialName, String directory, String dbname) {
+	public boolean addProfile(String project, String projectType, String trialName, IFileStore directory, String dbname) {
 		TreeTuple database = getDatabase(dbname);
 		if (database == null)
 			return false;
 
+		try{
 		ppc.uploadTrial(directory, database.id, project, projectType, trialName);
-
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
 		showProfile(project, projectType, trialName);
 
 		return true;

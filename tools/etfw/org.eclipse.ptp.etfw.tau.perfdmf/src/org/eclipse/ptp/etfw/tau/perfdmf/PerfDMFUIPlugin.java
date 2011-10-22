@@ -18,6 +18,7 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw.tau.perfdmf;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView;
 import org.eclipse.ui.IViewReference;
@@ -147,7 +148,7 @@ public class PerfDMFUIPlugin extends AbstractUIPlugin {
 	 * @return True on success, false on failure to upload
 	 * @since 2.0
 	 */
-	public static boolean addPerformanceData(String projectName, String projectType, String trialName, String location,
+	public static boolean addPerformanceData(String projectName, String projectType, String trialName, IFileStore location,
 			String dbname) {
 		try {
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(VIEW_ID);

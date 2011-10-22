@@ -306,7 +306,7 @@ public class Activator extends AbstractUIPlugin {
 		if(files.size()==0)
 		{
 			//File toolxml= new File();
-			String epath=BuildLaunchUtils.checkToolEnvPath("eclipse"); //$NON-NLS-1$
+			String epath=BuildLaunchUtils.checkLocalToolEnvPath("eclipse"); //$NON-NLS-1$
 			if(epath!=null)
 			{
 				IFileStore toolxml=loc.getStore(new Path(epath));
@@ -372,7 +372,7 @@ public class Activator extends AbstractUIPlugin {
 		
 		for(int i=0;i<tools.length;i++)
 		{
-			BuildLaunchUtils.verifyEnvToolPath(tools[i]);
+			BuildLaunchUtils.verifyLocalEnvToolPath(tools[i]);
 		}
 		
 	}

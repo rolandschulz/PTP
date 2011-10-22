@@ -1,10 +1,9 @@
 package org.eclipse.ptp.etfw.internal;
 
-import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -16,13 +15,13 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.ExecTool;
 
 public class LauncherTool extends ToolStep implements IToolLaunchConfigurationConstants {
 
-	private static final boolean traceOn = false;
 
 	/**
 	 * The location of the binary rebuilt with performance instrumentation
@@ -37,19 +36,14 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 	private String saveApp = null;
 	private String saveArgs = null;
 	private String savePath = null;
+	
+			
+	
 	private boolean swappedArgs = false;
 
 	private Map<String, String> saveEnv = null;
 	private boolean swappedEnv = false;
 
-	/**
-	 * False implies that no execution is to take place (either because of an
-	 * error, or user request)
-	 * */
-	// private boolean runbuilt=false;
-
-	// private final ExternalToolProcess tool;//=null;//Activator.getTool();//
-	// .tools[0].toolPanes[0];;
 
 	/** Executable (application) attribute name */
 	private String appnameattrib = null;
@@ -60,14 +54,14 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 	private ILaunch launch = null;
 	private LaunchConfigurationDelegate paraDel = null;
 	private ExecTool tool = null;
-
-	public LauncherTool(ILaunchConfiguration conf, ExecTool etool, String progPath, LaunchConfigurationDelegate pd, ILaunch launcher)
+	private IBuildLaunchUtils utilBlob = null;
+	public LauncherTool(ILaunchConfiguration conf, ExecTool etool, String progPath, LaunchConfigurationDelegate pd, ILaunch launcher, IBuildLaunchUtils utilBlob)
 			throws CoreException {
-		super(conf, Messages.LauncherTool_RunningApplication);
+		super(conf, Messages.LauncherTool_RunningApplication,utilBlob);
+		this.utilBlob=utilBlob;
 		launch = launcher;
 		tool = etool;
 		paraDel = pd;
-		// String ana,String projnameatt,String apa,
 		appnameattrib = conf.getAttribute(EXTOOL_EXECUTABLE_NAME_TAG, (String) null);
 		apppathattrib = conf.getAttribute(EXTOOL_EXECUTABLE_PATH_TAG, (String) null);
 		appargattrib = conf.getAttribute(EXTOOL_ATTR_ARGUMENTS_TAG, (String) null);
@@ -78,17 +72,7 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 
-		// try {
-		// System.out.println("The job that is actually running thinks it has mpi procs of: "+this.configuration.getAttribute("org.eclipse.ptp.rm.orte.ui.launchAttributes.numProcs",
-		// -1));
-		// } catch (CoreException e2) {
-		// // TODO Auto-generated catch block
-		// e2.printStackTrace();
-		// }
-
 		try {
-			// System.out.println("In tauManger "+tauManager.getConfiguration().getAttribute(tmp,
-			// -1)+" vs launch "+tmpConfig.getAttribute(tmp, -1));
 			if (!performLaunch(paraDel, launch, monitor))
 				return new Status(IStatus.WARNING,
 						"com.ibm.jdg2e.concurrency", IStatus.WARNING, Messages.LauncherTool_NothingToRun, null); //$NON-NLS-1$
@@ -115,63 +99,103 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 	@SuppressWarnings("unchecked")
 	public boolean performLaunch(LaunchConfigurationDelegate paraDel, ILaunch launch, IProgressMonitor monitor) throws Exception {
 		try {
-			// if(tool==null)
-			// throw new Exception("No valid tool configuration found");
-
-			// if(!runbuilt)
-			// return false;
 
 			ILaunchConfigurationWorkingCopy confWC = configuration.getWorkingCopy();
 			application = confWC.getAttribute(appnameattrib, (String) null);
 
-			if (progPath != null) {
+			/*
+			 * If progPath is a regular file then it is the actual executable from a managed build and we need to swap it out with our rebuilt version
+			 * If it is a directory then it is the location of the binary provided by a makefile build and we can ignore it.
+			 */
+			IFileStore testStore=null;
+			if(progPath!=null){
+				testStore=utilBlob.getFile(progPath);
+			}
+			
+			if (testStore != null&&testStore.fetchInfo().exists()&&!testStore.fetchInfo().isDirectory()) {
+				
+				savePath = confWC.getAttribute(apppathattrib, (String) null);
+				
+				//IFileStore testStore=utilBlob.getFile(progPath);
+				IFileStore progStore=utilBlob.getFile(projectLocation);
+				if(progStore.fetchInfo().exists()){
+					progStore=progStore.getChild(progPath);
+					
+					String jaxbAtt=confWC.getAttribute(EXTOOL_JAXB_EXECUTABLE_PATH_TAG, EMPTY_STRING);
+					if(jaxbAtt.length()>0)
+					confWC.setAttribute(jaxbAtt, progStore.toURI().getPath());
+				}
+				
+				
+				if(testStore.fetchInfo().exists()&&!testStore.fetchInfo().isDirectory()){
+					confWC.setAttribute(apppathattrib,testStore.toURI().getPath());
+					confWC.setAttribute(appnameattrib, testStore.getName());
+				}
+				else{
 				confWC.setAttribute(appnameattrib, progPath);
 				if (apppathattrib != null) {
-					IFile path = thisProject.getFile(progPath);
-					// System.out.println(path.exists());
-					// System.out.println(path.getLocation().toString());
-					savePath = confWC.getAttribute(apppathattrib, (String) null);
-					confWC.setAttribute(apppathattrib, path.getLocationURI().getPath());
+					String path=null;
+					if(isSyncProject)
+					{
+						path=progStore.toURI().getPath();//outputLocation;
+					}
+					else
+					{
+						path = thisProject.getFile(progPath).getLocationURI().getPath();
+					}
+					//savePath = confWC.getAttribute(apppathattrib, (String) null);
+					confWC.setAttribute(apppathattrib, path);
+				}
 				}
 			}
 
-			if (tool != null)// .prependExecution)
+			if (tool != null)
 			{
 				String prog = confWC.getAttribute(appnameattrib, EMPTY_STRING);
+				boolean usepathforapp=false;
+				if(prog==null||prog.equals(EMPTY_STRING)){
+					prog = confWC.getAttribute(apppathattrib, EMPTY_STRING);
+					if(prog!=null&&!prog.equals(EMPTY_STRING)){
+						savePath = confWC.getAttribute(apppathattrib, (String) null);
+						usepathforapp=true;
+					}
+				}
 				// TODO: This needs to work for PTP too eventually
 				String arg = confWC.getAttribute(appargattrib, EMPTY_STRING);
 				saveApp = prog;
 				saveArgs = arg;
 
-				// List utilList=tool.execUtils;
 				Map<String, String> envMap = new LinkedHashMap<String, String>();
 				if (tool.execUtils != null && tool.execUtils.length > 0) {
-					// Iterator utilIt=utilList.iterator();
 
-					String firstExecUtil = getToolExecutable(tool.execUtils[0]);// tool.execUtils[0].toolCommand;//
-																				// (String)utilIt.next();//confWC.getAttribute(EXEC_UTIL_LIST,
-																				// (String)null);
-					if (traceOn)
-						System.out.println("PerfLaunchSteps, firstExecUtil=" + firstExecUtil); //$NON-NLS-1$
+					String firstExecUtil = getToolExecutable(tool.execUtils[0]);
 
-					// String
-					// util1Path=BuildLaunchUtils.checkToolEnvPath(firstExecUtil);
-					File f = new File(firstExecUtil);
-					if (firstExecUtil == null || !f.exists())
+					if (firstExecUtil == null)
 						throw new Exception(Messages.LauncherTool_Tool + firstExecUtil + Messages.LauncherTool_NotFound);
 
-					confWC.setAttribute(appnameattrib, firstExecUtil);
+					if(!usepathforapp){
+						confWC.setAttribute(appnameattrib, firstExecUtil);
+					}
+					else{
+						confWC.setAttribute(apppathattrib, firstExecUtil);
+					}
 
-					String otherUtils = getToolArguments(tool.execUtils[0], configuration);// tool.execUtils[0].getArgs()+" "+tool.execUtils[0].getPaneArgs(configuration);
+					String otherUtils = getToolArguments(tool.execUtils[0], configuration);
 
 					for (int i = 1; i < tool.execUtils.length; i++) {
 						// TODO: Check paths of other tools
-						otherUtils += " " + getToolCommand(tool.execUtils[i], configuration);//tool.execUtils[i].getCommand(configuration); //$NON-NLS-1$
+						otherUtils += SPACE + getToolCommand(tool.execUtils[i], configuration);
 					}
 					swappedArgs = true;
-					String toArgs = otherUtils + " " + prog + " " + arg; //$NON-NLS-1$ //$NON-NLS-2$
-					System.out.println("PerfLaunchSteps.performLaunch() on: " + firstExecUtil + "|" + toArgs); //$NON-NLS-1$ //$NON-NLS-2$
+					String toArgs = otherUtils + SPACE + prog + SPACE + arg; 
 					confWC.setAttribute(appargattrib, toArgs);
+					
+					String jaxbAtt=confWC.getAttribute(EXTOOL_JAXB_ATTR_ARGUMENTS_TAG, EMPTY_STRING);
+					if(jaxbAtt!=null&&jaxbAtt.length()>0)
+						confWC.setAttribute(jaxbAtt, toArgs);
+					jaxbAtt=confWC.getAttribute(EXTOOL_JAXB_EXECUTABLE_PATH_TAG, EMPTY_STRING);
+					if(jaxbAtt!=null&&jaxbAtt.length()>0)
+						confWC.setAttribute(jaxbAtt, firstExecUtil);
 
 					for (int i = 0; i < tool.execUtils.length; i++) {
 						envMap.putAll(tool.execUtils[i].getEnvVars(configuration));
@@ -180,7 +204,7 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 				if (tool.global != null) {
 					envMap.putAll(tool.global.getEnvVars(configuration));
 				}
-				// System.out.println(envMap);
+
 				if (envMap.size() > 0) {
 					saveEnv = confWC.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map<String, String>) null);
 					Map<String, String> newvars = null;
@@ -206,15 +230,7 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 
 			paraDel.launch(configuration, ILaunchManager.RUN_MODE, launch, monitor);
 
-			// IProcess[] ips=launch.getProcesses();
-
-			// if(!launch.canTerminate())
-			// {
-			// System.out.println("Launch can not terminate!  Possible infinite loop!");
-			// cleanup();
-			// throw new OperationCanceledException();
-			// }
-			while (!launch.isTerminated())// &&!ips[0].isTerminated())
+			while (!launch.isTerminated())
 			{
 				if (monitor.isCanceled()) {
 					launch.terminate();
@@ -223,13 +239,6 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 				}
 				Thread.sleep(1000);
 			}
-
-			// while(!ips[0].isTerminated())//&&!ips[0].isTerminated())
-			// {
-			// Thread.sleep(1000);
-			// }
-
-			// System.out.println("Launch supposedly complete");
 			return true;
 		} finally {
 			cleanup();
@@ -250,7 +259,7 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 			confWC.setAttribute(apppathattrib, savePath);
 		}
 
-		if (tool != null && swappedArgs)// tool.prependExecution&&
+		if (tool != null && swappedArgs)
 		{
 			confWC.setAttribute(appnameattrib, saveApp);
 			confWC.setAttribute(appargattrib, saveArgs);

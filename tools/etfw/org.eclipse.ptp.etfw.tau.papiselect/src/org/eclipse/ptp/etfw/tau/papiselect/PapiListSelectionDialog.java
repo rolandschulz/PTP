@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Vector;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -37,6 +38,7 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.papiselect.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -112,11 +114,11 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	 *            the message to be displayed at the top of this dialog, or
 	 *            <code>null</code> to display a default message
 	 */
-	public PapiListSelectionDialog(Shell parentShell, String papiloc, IStructuredContentProvider contentProvider,
+	public PapiListSelectionDialog(Shell parentShell, IFileStore papiloc, IBuildLaunchUtils blt, IStructuredContentProvider contentProvider,
 			ILabelProvider labelProvider, String message, int papiCountType) {
 		super(parentShell);
 		setTitle(Messages.PapiListSelectionDialog_PapiCounters);// WorkbenchMessages.ListSelection_title);
-		papiCon = new PapiSelect(papiloc, papiCountType);
+		papiCon = new PapiSelect(papiloc, blt,papiCountType);
 		inputElement = papiCon.getAvail().toArray();
 		this.contentProvider = contentProvider;
 		this.labelProvider = labelProvider;

@@ -34,7 +34,8 @@ public class PPWController {
 	public PPWController(PPWDataManager ppwDataManager, String[] args) {
 		this.ppwDataManager = ppwDataManager;
 
-		String ppwToolPath = BuildLaunchUtils.getToolPath("ppw"); //$NON-NLS-1$
+		BuildLaunchUtils blt = new BuildLaunchUtils();
+		String ppwToolPath = blt.getToolPath("ppw"); //$NON-NLS-1$
 		String ppw = ppwToolPath + File.separator + "ppw"; //$NON-NLS-1$
 		String ppwConfig = ppwToolPath + File.separator + "ppw-config"; //$NON-NLS-1$
 

@@ -234,15 +234,20 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 			return;
 
 		IFileStore test=null;;
-		try {
-			test = EFS.getStore(new URI(out));
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//try {
+			try {
+				test = EFS.getLocalFileSystem().getStore(new URI(out));
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//		} catch (CoreException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (URISyntaxException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		//File test = new File(out);
 		if (test==null || !test.fetchInfo().exists() || test.fetchInfo().isDirectory()) {
 			return;

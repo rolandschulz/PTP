@@ -71,7 +71,7 @@ public class ToolLaunchConfigurationDelegate extends LocalRunLaunchDelegate impl
 		
 		try{
 		
-		ToolLaunchManager plaunch=new ToolLaunchManager(this,lf);//,ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME);
+		ToolLaunchManager plaunch=new ToolLaunchManager(this,lf,new BuildLaunchUtils());//,ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME);
 		plaunch.launch(configuration, mode, launchIn, monitor);//,tool
 		
 		}finally{initialized=false;}

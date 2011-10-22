@@ -30,6 +30,7 @@ public class Messages extends NLS {
 	public static String TAUAnalysisTab_Internal;
 	public static String TAUAnalysisTab_InvalidPAPIMakefile;
 	public static String TAUAnalysisTab_KeepProfiles;
+	public static String TAUAnalysisTab_ProfileSummary;
 	public static String TAUAnalysisTab_NativeCounters;
 	public static String TAUAnalysisTab_None;
 	public static String TAUAnalysisTab_NoPapiDirInMakefile;
