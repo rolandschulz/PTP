@@ -13,8 +13,9 @@
 		<link toc="reference.xml" />
 		<anchor id="reference_additions"/>
 	</topic>
-	<topic href="../org.eclipse.ptp.rm.jaxb.help/html/toc.html" label="Configuring the JAXB Resource Manager">
-            <anchor id="ptpJAXB"/>
-   </topic>       
+	<topic label="Configuring the JAXB Resource Manager">
+       		<anchor id="ptpJAXB"/>
+     </topic>
+      
 	<topic label="Legal" href="notices.html"/>
 </toc>
