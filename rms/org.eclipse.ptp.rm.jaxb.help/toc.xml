@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+<!-- ============================================================================= -->
+<!-- Define the top level topics                                                   -->
+<!-- ============================================================================= -->
+
+<toc label="Configuring the JAXB Resource Manager" link_to="../org.eclipse.ptp.doc.isv/toc.xml#ptpJAXB" topic="html/toc.html">
+	 <topic href="html/toc.html" label="Contents"/>
+</toc>
