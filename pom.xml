@@ -163,7 +163,7 @@
 		<module>rms/org.eclipse.ptp.rm.jaxb.control.core</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.control.ui</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.core</module>
-		<module>rms/org.eclipse.ptp.rm.jaxb.help</module>
+		<module>rms/org.eclipse.ptp.rm.jaxb.doc.isv</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.openmpi</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.pbs</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.pbs.doc.user</module>
