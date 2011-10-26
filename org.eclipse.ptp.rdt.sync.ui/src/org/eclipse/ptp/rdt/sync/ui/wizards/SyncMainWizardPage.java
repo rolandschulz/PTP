@@ -11,11 +11,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui.wizards;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 import org.eclipse.core.filesystem.EFS;
@@ -38,17 +41,28 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.TextProcessor;
+import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
+import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
+import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
+import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -73,9 +87,12 @@ import org.eclipse.cdt.ui.wizards.IWizardItemsListListener;
 import org.eclipse.cdt.ui.wizards.IWizardWithMemory;
 import org.eclipse.cdt.internal.ui.newui.Messages;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
+import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 
 	public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItemsListListener {
+		public static final String REMOTE_SYNC_WIZARD_PAGE_ID = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage"; //$NON-NLS-1$
+		public static final String SERVICE_PROVIDER_PROPERTY = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage.serviceProvider"; //$NON-NLS-1$
 		private static String RDT_PROJECT_TYPE = "org.eclipse.ptp.rdt"; //$NON-NLS-1$
 		private static final Image IMG_CATEGORY = CDTSharedImages.getImage(CDTSharedImages.IMG_OBJS_SEARCHFOLDER);
 		private static final Image IMG_ITEM = CDTSharedImages.getImage(CDTSharedImages.IMG_OBJS_VARIABLE);
@@ -88,13 +105,13 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 		public static final String DESC = "EntryDescriptor"; //$NON-NLS-1$
 	    private static final int SIZING_TEXT_FIELD_WIDTH = 250;
 
-		
-	    private String initialProjectNameFieldValue = ""; //$NON-NLS-1$
-	    private String initialProjectLocationFieldValue = ""; //$NON-NLS-1$
-
 	    // widgets
 	    private Text projectNameField;
 	    private Text projectLocationField;
+	    private Button browseButton;
+		private Combo fProviderCombo;
+		private Composite fProviderArea;
+		private StackLayout fProviderStack;
 	    private Tree localTree;
 	    private Composite localToolChain;
 	    private Composite remoteToolChain;
@@ -107,6 +124,9 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 		private Label categorySelectedForRemoteLabel;
 
 		private SortedMap<String, IToolChain> toolChainMap;
+		
+		private boolean useDefaultLocalDirectory = true;
+		private final List<Composite> fProviderControls = new ArrayList<Composite>();
 
 	    /**
 	     * Creates a new project creation wizard page.
@@ -133,9 +153,11 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 
 	        createProjectBasicInfoGroup(composite);
 	        setControl(composite);
-	    	
+	        
+	        createProjectRemoteInfoGroup(composite);
+
 	    	createProjectDetailedInfoGroup((Composite)getControl()); 
-			switchTo(updateData(localTree, localToolChain, show_sup, SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
+			this.switchTo(this.updateData(localTree, localToolChain, show_sup.getSelection(), SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
 
 			setPageComplete(false);
 	        setErrorMessage(null);
@@ -149,13 +171,14 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 	    	c.setLayout(new GridLayout(2, true));
 	    	
 	        Label left_label = new Label(c, SWT.NONE);
-	        left_label.setText(Messages.CMainWizardPage_0);
+	        left_label.setText("Project Type"); //$NON-NLS-1$
 	        left_label.setFont(parent.getFont());
 	        left_label.setLayoutData(new GridData(GridData.BEGINNING));
 	        
 	        projectLocalOptionsLabel = new Label(c, SWT.NONE);
 	        projectLocalOptionsLabel.setFont(parent.getFont());
 	        projectLocalOptionsLabel.setLayoutData(new GridData(GridData.BEGINNING));
+	        projectLocalOptionsLabel.setText("Local Toolchain"); //$NON-NLS-1$
 	    	
 	        localTree = new Tree(c, SWT.SINGLE | SWT.BORDER);
 	        localTree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
@@ -187,6 +210,7 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 	        projectRemoteOptionsLabel = new Label(c, SWT.NONE);
 	        projectRemoteOptionsLabel.setFont(parent.getFont());
 	        projectRemoteOptionsLabel.setLayoutData(new GridData(GridData.BEGINNING));
+	        projectRemoteOptionsLabel.setText("Remote Toolchain"); //$NON-NLS-1$
 
 	        remoteToolChain = new Composite(c, SWT.NONE);
 	        remoteToolChain.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -205,7 +229,7 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 				public void widgetSelected(SelectionEvent e) {
 					if (h_selected != null)
 						h_selected.setSupportedOnly(show_sup.getSelection());
-					switchTo(updateData(localTree, localToolChain, show_sup, SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
+					switchTo(updateData(localTree, localToolChain, show_sup.getSelection(), SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
 				}} );
 
 	        // restore settings from preferences
@@ -332,7 +356,7 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 	     * @param wizard
 	     * @return : selected Wizard Handler.
 	     */
-		public static CWizardHandler updateData(Tree tree, Composite right, Button show_sup, IWizardItemsListListener ls, IWizard wizard) {
+		public CWizardHandler updateData(Tree tree, Composite right, boolean show_sup, IWizardItemsListListener ls, IWizard wizard) {
 			// remember selected item
 			TreeItem[] selection = tree.getSelection();
 			TreeItem selectedItem = selection.length>0 ? selection[0] : null; 
@@ -359,7 +383,7 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 						}
 						if (w == null) return null;
 						w.setDependentControl(right, ls);
-						for (EntryDescriptor ed : w.createItems(show_sup.getSelection(), wizard)) {
+						for (EntryDescriptor ed : w.createItems(show_sup, wizard)) {
 							items.add(ed);
 						}
 					}
@@ -528,10 +552,8 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 				}
 				return;
 			}
-			projectLocalOptionsLabel.setText(h_selected.getHeader());
 			if (categorySelectedForLocalLabel != null)
 				categorySelectedForLocalLabel.setVisible(false);
-			projectRemoteOptionsLabel.setText(h_selected.getHeader());
 			if (categorySelectedForRemoteLabel != null)
 				categorySelectedForRemoteLabel.setVisible(false);
 			h_selected.handleSelection();
@@ -585,14 +607,6 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 		
 		// Functions copied from WizardNewProjectCreationPage
 
-	    private Listener modifyListener = new Listener() {
-	        public void handleEvent(Event e) {
-	            boolean valid = validatePage();
-	            setPageComplete(valid);
-	                
-	        }
-	    };
-	    
 	    /**
 		 * Get an error reporter for the receiver.
 		 * TODO: Use this - put an error reporter on the page!
@@ -625,54 +639,107 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 	     *
 	     * @param parent the parent composite
 	     */
-	    private final void createProjectBasicInfoGroup(Composite parent) {
-	        // project specification group
-	        Composite projectGroup = new Composite(parent, SWT.NONE);
-	        GridLayout layout = new GridLayout();
-	        layout.numColumns = 2;
-	        projectGroup.setLayout(layout);
-	        projectGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		private final void createProjectBasicInfoGroup(Composite parent) {
+			Composite projectGroup = new Composite(parent, SWT.NONE);
+			GridLayout layout = new GridLayout();
+			layout.numColumns = 3;
+			projectGroup.setLayout(layout);
+			projectGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-	        // new project name label
-	        Label projectNameLabel = new Label(projectGroup, SWT.NONE);
-	        projectNameLabel.setText("Project name:"); //$NON-NLS-1$
-	        projectNameLabel.setFont(parent.getFont());
+			// new project name label
+			Label projectNameLabel = new Label(projectGroup, SWT.NONE);
+			projectNameLabel.setText("Project name:"); //$NON-NLS-1$
+			projectNameLabel.setFont(parent.getFont());
 
-	        // new project name entry field
-	        projectNameField = new Text(projectGroup, SWT.BORDER);
-	        GridData nameData = new GridData(GridData.FILL_HORIZONTAL);
-	        nameData.widthHint = SIZING_TEXT_FIELD_WIDTH;
-	        projectNameField.setLayoutData(nameData);
-	        projectNameField.setFont(parent.getFont());
+			// new project name entry field
+			projectNameField = new Text(projectGroup, SWT.BORDER);
+			GridData nameData = new GridData(GridData.FILL_HORIZONTAL);
+			nameData.horizontalSpan = 2;
+			nameData.widthHint = SIZING_TEXT_FIELD_WIDTH;
+			projectNameField.setLayoutData(nameData);
+			projectNameField.setFont(parent.getFont());
 
-	        // Set the initial value first before listener
-	        // to avoid handling an event during the creation.
-	        if (initialProjectNameFieldValue != null) {
-				projectNameField.setText(initialProjectNameFieldValue);
+			projectNameField.addListener(SWT.Modify, new Listener() {
+				public void handleEvent(Event e) {
+					// Do not disable default location because of this event!
+					boolean udld_value = useDefaultLocalDirectory;
+					setProjectLocationString();
+					useDefaultLocalDirectory = udld_value;
+					setPageComplete(validatePage());         
+				}
+			});
+
+			// new project location label
+			Label projectLocationLabel = new Label(projectGroup, SWT.NONE);
+			projectLocationLabel.setText("Local directory:"); //$NON-NLS-1$
+			projectLocationLabel.setFont(parent.getFont());
+
+			// new project location entry field
+			projectLocationField = new Text(projectGroup, SWT.BORDER);
+			GridData locationData = new GridData(GridData.FILL_HORIZONTAL);
+			locationData.widthHint = SIZING_TEXT_FIELD_WIDTH;
+			projectLocationField.setLayoutData(locationData);
+			projectLocationField.setFont(parent.getFont());
+			this.setProjectLocationString();
+			projectLocationField.addListener(SWT.Modify, new Listener() {
+				public void handleEvent(Event e) {
+					useDefaultLocalDirectory = false;
+					setPageComplete(validatePage());        
+				}
+			});
+
+			// Browse button
+			browseButton = new Button(projectGroup, SWT.PUSH);
+			browseButton.setText("Browse"); //$NON-NLS-1$
+			browseButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					DirectoryDialog dirDialog = new DirectoryDialog(projectLocationField.getShell());
+					dirDialog.setText("Select project local directory"); //$NON-NLS-1$
+					String selectedDir = dirDialog.open();
+					projectLocationField.setText(selectedDir);
+				}
+			});
+		}
+
+		private final void createProjectRemoteInfoGroup(Composite parent) {
+			Composite projectGroup = new Composite(parent, SWT.NONE);
+			GridLayout layout = new GridLayout();
+			layout.numColumns = 3;
+			projectGroup.setLayout(layout);
+			GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+			projectGroup.setLayoutData(gd);
+
+			// Label for "Provider:"
+			Label remoteLocationLabel = new Label(projectGroup, SWT.LEFT);
+			remoteLocationLabel.setText("Remote Location"); //$NON-NLS-1$
+
+			fProviderArea = new Group(projectGroup, SWT.SHADOW_ETCHED_IN);
+			fProviderStack = new StackLayout();
+			fProviderArea.setLayout(fProviderStack);
+			GridData providerAreaData = new GridData(SWT.FILL, SWT.FILL, true, true);
+			providerAreaData.horizontalSpan = 3;
+			fProviderArea.setLayoutData(providerAreaData);
+
+			// For now, assume only one provider, to reduce the number of GUI elements.
+			// TODO: Add error handling if there are no providers
+			ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
+			ISynchronizeParticipant part = providers[0].getParticipant();
+			
+			Composite comp = new Composite(fProviderArea, SWT.NONE);
+			comp.setLayout(new GridLayout(1, false));
+			comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			part.createConfigurationArea(comp, getWizard().getContainer());
+			fProviderStack.topControl = comp;
+		}
+
+		private void setProjectLocationString() {
+			if (useDefaultLocalDirectory) {
+				projectLocationField.setText(Platform.getLocation().toOSString() + File.separator + projectNameField.getText());
 			}
-	        projectNameField.addListener(SWT.Modify, modifyListener);
-	        
-	        // new project location label
-	        Label projectLocationLabel = new Label(projectGroup, SWT.NONE);
-	        projectLocationLabel.setText("Project location:"); //$NON-NLS-1$
-	        projectLocationLabel.setFont(parent.getFont());
+		}
 
-	        // new project location entry field
-	        projectLocationField = new Text(projectGroup, SWT.BORDER);
-	        GridData locationData = new GridData(GridData.FILL_HORIZONTAL);
-	        locationData.widthHint = SIZING_TEXT_FIELD_WIDTH;
-	        projectLocationField.setLayoutData(locationData);
-	        projectLocationField.setFont(parent.getFont());
-
-	        // Set the initial value first before listener
-	        // to avoid handling an event during the creation.
-	        if (initialProjectLocationFieldValue != null) {
-				projectLocationField.setText(initialProjectNameFieldValue);
-			}
-	        projectLocationField.addListener(SWT.Modify, modifyListener);
-	    }
-
-	    /**
+		/**
 		 * Creates a project resource handle for the current project name field
 		 * value. The project handle is created relative to the workspace root.
 		 * <p>
@@ -683,402 +750,371 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 		 * 
 		 * @return the new project resource handle
 		 */
-	    @Override
-	    public IProject getProjectHandle() {
-	        return ResourcesPlugin.getWorkspace().getRoot().getProject(
-	                getProjectName());
-	    }
+		@Override
+		public IProject getProjectHandle() {
+			return ResourcesPlugin.getWorkspace().getRoot().getProject(
+					getProjectName());
+		}
 
-	    /**
-	     * Returns the current project name as entered by the user, or its anticipated
-	     * initial value.
-	     *
-	     * @return the project name, its anticipated initial value, or <code>null</code>
-	     *   if no project name is known
-	     */
-	    @Override
-	    public String getProjectName() {
-	        if (projectNameField == null) {
-				return initialProjectNameFieldValue;
-			}
+		/**
+		 * Returns the current project name as entered by the user, or its anticipated
+		 * initial value.
+		 *
+		 * @return the project name, its anticipated initial value, or <code>null</code>
+		 *   if no project name is known
+		 */
+		@Override
+		public String getProjectName() {
+			return getProjectNameFieldValue();
+		}
 
-	        return getProjectNameFieldValue();
-	    }
-
-	    /**
-	     * Returns the value of the project name field
-	     * with leading and trailing spaces removed.
-	     * 
-	     * @return the project name in the field
-	     */
-	    private String getProjectNameFieldValue() {
-	        if (projectNameField == null) {
+		/**
+		 * Returns the value of the project name field
+		 * with leading and trailing spaces removed.
+		 * 
+		 * @return the project name in the field
+		 */
+		private String getProjectNameFieldValue() {
+			if (projectNameField == null) {
 				return ""; //$NON-NLS-1$
 			}
 
-	        return projectNameField.getText().trim();
-	    }
+			return projectNameField.getText().trim();
+		}
 
-	    /**
-	     * Returns whether this page's controls currently all contain valid 
-	     * values.
-	     *
-	     * @return <code>true</code> if all controls are valid, and
-	     *   <code>false</code> if at least one is invalid
-	     */
-	    private boolean validateProject() {
-	        IWorkspace workspace = IDEWorkbenchPlugin.getPluginWorkspace();
+		/**
+		 * Returns whether this page's controls currently all contain valid 
+		 * values.
+		 *
+		 * @return <code>true</code> if all controls are valid, and
+		 *   <code>false</code> if at least one is invalid
+		 */
+		private boolean validateProject() {
+			IWorkspace workspace = IDEWorkbenchPlugin.getPluginWorkspace();
 
-	        String projectFieldContents = getProjectNameFieldValue();
-	        if (projectFieldContents.equals("")) { //$NON-NLS-1$
-	            setErrorMessage(null);
-	            setMessage(IDEWorkbenchMessages.WizardNewProjectCreationPage_projectNameEmpty);
-	            return false;
-	        }
+			String projectFieldContents = getProjectNameFieldValue();
+			if (projectFieldContents.equals("")) { //$NON-NLS-1$
+				setErrorMessage(null);
+				setMessage(IDEWorkbenchMessages.WizardNewProjectCreationPage_projectNameEmpty);
+				return false;
+			}
 
-	        IStatus nameStatus = workspace.validateName(projectFieldContents,
-	                IResource.PROJECT);
-	        if (!nameStatus.isOK()) {
-	            setErrorMessage(nameStatus.getMessage());
-	            return false;
-	        }
+			IStatus nameStatus = workspace.validateName(projectFieldContents,
+					IResource.PROJECT);
+			if (!nameStatus.isOK()) {
+				setErrorMessage(nameStatus.getMessage());
+				return false;
+			}
 
-	        IProject handle = getProjectHandle();
-	        if (handle.exists()) {
-	            setErrorMessage(IDEWorkbenchMessages.WizardNewProjectCreationPage_projectExistsMessage);
-	            return false;
-	        }
+			IProject handle = getProjectHandle();
+			if (handle.exists()) {
+				setErrorMessage(IDEWorkbenchMessages.WizardNewProjectCreationPage_projectExistsMessage);
+				return false;
+			}
 
-	        setErrorMessage(null);
-	        setMessage(null);
-	        return true;
-	    }
+			setErrorMessage(null);
+			setMessage(null);
+			return true;
+		}
 
-	    /**
-	     * Sets the initial project name that this page will use when
-	     * created. The name is ignored if the createControl(Composite)
-	     * method has already been called. Leading and trailing spaces
-	     * in the name are ignored.
-	     * Providing the name of an existing project will not necessarily 
-	     * cause the wizard to warn the user.  Callers of this method 
-	     * should first check if the project name passed already exists 
-	     * in the workspace.
-	     * 
-	     * TODO: Implement this method
-	     * @param name initial project name for this page
-	     * 
-	     * @see IWorkspace#validateName(String, int)
-	     * 
-	     */
-	    @Override
-	    public void setInitialProjectName(String name) {
-	    	// Empty for now
-	    }
+		/**
+		 * Sets the initial project name that this page will use when
+		 * created. The name is ignored if the createControl(Composite)
+		 * method has already been called. Leading and trailing spaces
+		 * in the name are ignored.
+		 * Providing the name of an existing project will not necessarily 
+		 * cause the wizard to warn the user.  Callers of this method 
+		 * should first check if the project name passed already exists 
+		 * in the workspace.
+		 * 
+		 * TODO: Implement this method
+		 * @param name initial project name for this page
+		 * 
+		 * @see IWorkspace#validateName(String, int)
+		 * 
+		 */
+		@Override
+		public void setInitialProjectName(String name) {
+			// Empty for now
+		}
 
-	    /*
-	     * see @DialogPage.setVisible(boolean)
-	     */
-	    @Override
-	    public void setVisible(boolean visible) {
-	    	this.getControl().setVisible(visible);
-	        if (visible) {
+		/*
+		 * see @DialogPage.setVisible(boolean)
+		 */
+		@Override
+		public void setVisible(boolean visible) {
+			this.getControl().setVisible(visible);
+			if (visible) {
 				projectNameField.setFocus();
 			}
-	    }
-	    
-	    // No defaults yet
-	    @Override
-	    public boolean useDefaults() {
-	    	return false;
-	    }
-	    
-	    // Functions copied from NewRemoteSyncProjectWizardPage - to be imported as needed.
-//		public static final String REMOTE_SYNC_WIZARD_PAGE_ID = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage"; //$NON-NLS-1$
-//		public static final String SERVICE_PROVIDER_PROPERTY = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage.serviceProvider"; //$NON-NLS-1$
-//
-//		private boolean fbVisited;
-//		private String fTitle;
-//		private String fDescription;
-//		private ImageDescriptor fImageDescriptor;
-//		private Image fImage;
-//		private ISynchronizeParticipantDescriptor fSelectedProvider;
-//
-//		private Control pageControl;
-//		private Combo fProviderCombo;
-//		private Composite fProviderArea;
-//		private StackLayout fProviderStack;
-//		private final List<Composite> fProviderControls = new ArrayList<Composite>();
-//		private final Map<Integer, ISynchronizeParticipantDescriptor> fComboIndexToDescriptorMap = new HashMap<Integer, ISynchronizeParticipantDescriptor>();
-//
-//		/**
-//		 * 
-//		 */
-//		public NewRemoteSyncProjectWizardPage() {
-//			this(REMOTE_SYNC_WIZARD_PAGE_ID);
-//		}
-//
-//		public NewRemoteSyncProjectWizardPage(String pageID) {
-//			super(pageID);
-//		}
-//
-//		private void addProviderControl(ISynchronizeParticipantDescriptor desc) {
-//			Composite comp = null;
-//			ISynchronizeParticipant part = desc.getParticipant();
-//			if (part != null) {
-//				comp = new Composite(fProviderArea, SWT.NONE);
-//				comp.setLayout(new GridLayout(1, false));
-//				comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-//				part.createConfigurationArea(comp, getWizard().getContainer());
-//			}
-//			fProviderControls.add(comp);
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see
-//		 * org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets
-//		 * .Composite)
-//		 */
-//		public void createControl(final Composite parent) {
-//			Composite comp = new Composite(parent, SWT.NONE);
-//			pageControl = comp;
-//			GridLayout layout = new GridLayout();
-//			layout.numColumns = 3;
-//			comp.setLayout(layout);
-//			GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-//			comp.setLayoutData(gd);
-//
-//			// Label for "Provider:"
-//			Label providerLabel = new Label(comp, SWT.LEFT);
-//			providerLabel.setText(Messages.NewRemoteSyncProjectWizardPage_syncProvider);
-//
-//			// combo for providers
-//			fProviderCombo = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY);
-//			// set layout to grab horizontal space
-//			fProviderCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-//			gd = new GridData();
-//			gd.horizontalSpan = 2;
-//			fProviderCombo.setLayoutData(gd);
-//			fProviderCombo.addSelectionListener(new SelectionAdapter() {
-//				@Override
-//				public void widgetSelected(SelectionEvent e) {
-//					handleProviderSelected();
-//				}
-//			});
-//
-//			fProviderArea = new Group(comp, SWT.SHADOW_ETCHED_IN);
-//			fProviderStack = new StackLayout();
-//			fProviderArea.setLayout(fProviderStack);
-//			GridData providerAreaData = new GridData(SWT.FILL, SWT.FILL, true, true);
-//			providerAreaData.horizontalSpan = 3;
-//			fProviderArea.setLayoutData(providerAreaData);
-//
-//			// populate the combo with a list of providers
-//			ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
-//
-//			for (int k = 0; k < providers.length; k++) {
-//				fProviderCombo.add(providers[k].getName(), k);
-//				fComboIndexToDescriptorMap.put(k, providers[k]);
-//				addProviderControl(providers[k]);
-//			}
-//
-//			fProviderCombo.select(0);
-//			handleProviderSelected();
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
-//		 */
-//		public void dispose() {
-//			// TODO Auto-generated method stub
-//		}
-//
-//		/**
-//		 * Find available remote services and service providers for a given project
-//		 * 
-//		 * If project is null, the C and C++ natures are used to determine which
-//		 * services are available
-//		 */
-//		protected Set<IService> getContributedServices() {
-//			ServiceModelManager smm = ServiceModelManager.getInstance();
-//			Set<IService> cppServices = smm.getServices(CCProjectNature.CC_NATURE_ID);
-//			Set<IService> cServices = smm.getServices(CProjectNature.C_NATURE_ID);
-//
-//			Set<IService> allApplicableServices = new LinkedHashSet<IService>();
-//			allApplicableServices.addAll(cppServices);
-//			allApplicableServices.addAll(cServices);
-//
-//			return allApplicableServices;
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see org.eclipse.jface.dialogs.IDialogPage#getControl()
-//		 */
-//		public Control getControl() {
-//			return pageControl;
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see org.eclipse.jface.dialogs.IDialogPage#getDescription()
-//		 */
-//		public String getDescription() {
-//			if (fDescription == null) {
-//				fDescription = Messages.RemoteSyncWizardPage_description;
-//			}
-//			return fDescription;
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see org.eclipse.jface.dialogs.IDialogPage#getErrorMessage()
-//		 */
-//		public String getErrorMessage() {
-//			if (fSelectedProvider==null)
-//				return Messages.ConvertToSyncProjectWizardPage_0; 
-//			else 
-//				return fSelectedProvider.getParticipant().getErrorMessage();
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see org.eclipse.jface.dialogs.IDialogPage#getImage()
-//		 */
-//		public Image getImage() {
-//			if (fImage == null && fImageDescriptor != null) {
-//				fImage = fImageDescriptor.createImage();
-//			}
-//
-//			if (fImage == null && wizard != null) {
-//				fImage = wizard.getDefaultPageImage();
-//			}
-//
-//			return fImage;
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see org.eclipse.jface.dialogs.IDialogPage#getMessage()
-//		 */
-//		public String getMessage() {
-//			// TODO Auto-generated method stub
-//			return null;
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see org.eclipse.jface.wizard.IWizardPage#getName()
-//		 */
-//		public String getName() {
-//			return Messages.RemoteSyncWizardPage_0;
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see org.eclipse.jface.dialogs.IDialogPage#getTitle()
-//		 */
-//		public String getTitle() {
-//			if (fTitle == null) {
-//				fTitle = Messages.RemoteSyncWizardPage_0;
-//			}
-//			return fTitle;
-//		}
-//
-//		/**
-//		 * Handle synchronize provider selected.
-//		 */
-//		private void handleProviderSelected() {
-//			int index = fProviderCombo.getSelectionIndex();
-//			fProviderStack.topControl = fProviderControls.get(index);
-//			fSelectedProvider = fComboIndexToDescriptorMap.get(index);
-//			fProviderArea.layout();
-//			update();
-//			if (fSelectedProvider != null) {
-//				MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY,
-//						fSelectedProvider.getParticipant());
-//			} else {
-//				MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY, null);
-//			}
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see
-//		 * org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage#isCustomPageComplete
-//		 * ()
-//		 */
-//		@Override
-//		protected boolean isCustomPageComplete() {
-//			return fbVisited  && getErrorMessage()==null && fSelectedProvider.getParticipant().isConfigComplete();
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see org.eclipse.jface.dialogs.IDialogPage#performHelp()
-//		 */
-//		public void performHelp() {
-//			// TODO Auto-generated method stub
-//
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see
-//		 * org.eclipse.jface.dialogs.IDialogPage#setDescription(java.lang.String)
-//		 */
-//		public void setDescription(String description) {
-//			fDescription = description;
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see
-//		 * org.eclipse.jface.dialogs.IDialogPage#setImageDescriptor(org.eclipse.
-//		 * jface.resource.ImageDescriptor)
-//		 */
-//		public void setImageDescriptor(ImageDescriptor image) {
-//			fImageDescriptor = image;
-//
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see org.eclipse.jface.dialogs.IDialogPage#setTitle(java.lang.String)
-//		 */
-//		public void setTitle(String title) {
-//			fTitle = title;
-//
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see org.eclipse.jface.dialogs.IDialogPage#setVisible(boolean)
-//		 */
-//		public void setVisible(boolean visible) {
-//			if (visible) {
-//				fbVisited = true;
-//			}
-//		}
-//
-//		private void update() {
-//			getWizard().getContainer().updateMessage();
-//			getWizard().getContainer().updateButtons();
-//		}
+		}
+
+		// No defaults yet
+		@Override
+		public boolean useDefaults() {
+			return false;
+		}
+
+		// Functions copied from NewRemoteSyncProjectWizardPage - to be imported as needed.
+		//
+		//		private void addProviderControl(ISynchronizeParticipantDescriptor desc) {
+		//			Composite comp = null;
+		//			ISynchronizeParticipant part = desc.getParticipant();
+		//			if (part != null) {
+		//				comp = new Composite(fProviderArea, SWT.NONE);
+		//				comp.setLayout(new GridLayout(1, false));
+		//				comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		//				part.createConfigurationArea(comp, getWizard().getContainer());
+		//			}
+		//			fProviderControls.add(comp);
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see
+		//		 * org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets
+		//		 * .Composite)
+		//		 */
+		//		public void createControl(final Composite parent) {
+		//			Composite comp = new Composite(parent, SWT.NONE);
+		//			pageControl = comp;
+		//			GridLayout layout = new GridLayout();
+		//			layout.numColumns = 3;
+		//			comp.setLayout(layout);
+		//			GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		//			comp.setLayoutData(gd);
+		//
+		//			// Label for "Provider:"
+		//			Label providerLabel = new Label(comp, SWT.LEFT);
+		//			providerLabel.setText(Messages.NewRemoteSyncProjectWizardPage_syncProvider);
+		//
+		//			// combo for providers
+		//			fProviderCombo = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		//			// set layout to grab horizontal space
+		//			fProviderCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+		//			gd = new GridData();
+		//			gd.horizontalSpan = 2;
+		//			fProviderCombo.setLayoutData(gd);
+		//			fProviderCombo.addSelectionListener(new SelectionAdapter() {
+		//				@Override
+		//				public void widgetSelected(SelectionEvent e) {
+		//					handleProviderSelected();
+		//				}
+		//			});
+		//
+		//			fProviderArea = new Group(comp, SWT.SHADOW_ETCHED_IN);
+		//			fProviderStack = new StackLayout();
+		//			fProviderArea.setLayout(fProviderStack);
+		//			GridData providerAreaData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		//			providerAreaData.horizontalSpan = 3;
+		//			fProviderArea.setLayoutData(providerAreaData);
+		//
+		//			// populate the combo with a list of providers
+		//			ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
+		//
+		//			for (int k = 0; k < providers.length; k++) {
+		//				fProviderCombo.add(providers[k].getName(), k);
+		//				fComboIndexToDescriptorMap.put(k, providers[k]);
+		//				addProviderControl(providers[k]);
+		//			}
+		//
+		//			fProviderCombo.select(0);
+		//			handleProviderSelected();
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
+		//		 */
+		//		public void dispose() {
+		//			// TODO Auto-generated method stub
+		//		}
+		//
+		//		/**
+		//		 * Find available remote services and service providers for a given project
+		//		 * 
+		//		 * If project is null, the C and C++ natures are used to determine which
+		//		 * services are available
+		//		 */
+		//		protected Set<IService> getContributedServices() {
+		//			ServiceModelManager smm = ServiceModelManager.getInstance();
+		//			Set<IService> cppServices = smm.getServices(CCProjectNature.CC_NATURE_ID);
+		//			Set<IService> cServices = smm.getServices(CProjectNature.C_NATURE_ID);
+		//
+		//			Set<IService> allApplicableServices = new LinkedHashSet<IService>();
+		//			allApplicableServices.addAll(cppServices);
+		//			allApplicableServices.addAll(cServices);
+		//
+		//			return allApplicableServices;
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see org.eclipse.jface.dialogs.IDialogPage#getControl()
+		//		 */
+		//		public Control getControl() {
+		//			return pageControl;
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see org.eclipse.jface.dialogs.IDialogPage#getDescription()
+		//		 */
+		//		public String getDescription() {
+		//			if (fDescription == null) {
+		//				fDescription = Messages.RemoteSyncWizardPage_description;
+		//			}
+		//			return fDescription;
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see org.eclipse.jface.dialogs.IDialogPage#getErrorMessage()
+		//		 */
+		//		public String getErrorMessage() {
+		//			if (fSelectedProvider==null)
+		//				return Messages.ConvertToSyncProjectWizardPage_0; 
+		//			else 
+		//				return fSelectedProvider.getParticipant().getErrorMessage();
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see org.eclipse.jface.dialogs.IDialogPage#getImage()
+		//		 */
+		//		public Image getImage() {
+		//			if (fImage == null && fImageDescriptor != null) {
+		//				fImage = fImageDescriptor.createImage();
+		//			}
+		//
+		//			if (fImage == null && wizard != null) {
+		//				fImage = wizard.getDefaultPageImage();
+		//			}
+		//
+		//			return fImage;
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see org.eclipse.jface.dialogs.IDialogPage#getMessage()
+		//		 */
+		//		public String getMessage() {
+		//			// TODO Auto-generated method stub
+		//			return null;
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see org.eclipse.jface.wizard.IWizardPage#getName()
+		//		 */
+		//		public String getName() {
+		//			return Messages.RemoteSyncWizardPage_0;
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see org.eclipse.jface.dialogs.IDialogPage#getTitle()
+		//		 */
+		//		public String getTitle() {
+		//			if (fTitle == null) {
+		//				fTitle = Messages.RemoteSyncWizardPage_0;
+		//			}
+		//			return fTitle;
+		//		}
+		//
+		//		/**
+		//		 * Handle synchronize provider selected.
+		//		 */
+		//		private void handleProviderSelected() {
+		//			int index = fProviderCombo.getSelectionIndex();
+		//			fProviderStack.topControl = fProviderControls.get(index);
+		//			fSelectedProvider = fComboIndexToDescriptorMap.get(index);
+		//			fProviderArea.layout();
+		//			update();
+		//			if (fSelectedProvider != null) {
+		//				MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY,
+		//						fSelectedProvider.getParticipant());
+		//			} else {
+		//				MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY, null);
+		//			}
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see
+		//		 * org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage#isCustomPageComplete
+		//		 * ()
+		//		 */
+		//		@Override
+		//		protected boolean isCustomPageComplete() {
+		//			return fbVisited  && getErrorMessage()==null && fSelectedProvider.getParticipant().isConfigComplete();
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see org.eclipse.jface.dialogs.IDialogPage#performHelp()
+		//		 */
+		//		public void performHelp() {
+		//			// TODO Auto-generated method stub
+		//
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see
+		//		 * org.eclipse.jface.dialogs.IDialogPage#setDescription(java.lang.String)
+		//		 */
+		//		public void setDescription(String description) {
+		//			fDescription = description;
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see
+		//		 * org.eclipse.jface.dialogs.IDialogPage#setImageDescriptor(org.eclipse.
+		//		 * jface.resource.ImageDescriptor)
+		//		 */
+		//		public void setImageDescriptor(ImageDescriptor image) {
+		//			fImageDescriptor = image;
+		//
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see org.eclipse.jface.dialogs.IDialogPage#setTitle(java.lang.String)
+		//		 */
+		//		public void setTitle(String title) {
+		//			fTitle = title;
+		//
+		//		}
+		//
+		//		/*
+		//		 * (non-Javadoc)
+		//		 * 
+		//		 * @see org.eclipse.jface.dialogs.IDialogPage#setVisible(boolean)
+		//		 */
+		//		public void setVisible(boolean visible) {
+		//			if (visible) {
+		//				fbVisited = true;
+		//			}
+		//		}
+		//
+		//		private void update() {
+		//			getWizard().getContainer().updateMessage();
+		//			getWizard().getContainer().updateButtons();
+		//		}
 }
