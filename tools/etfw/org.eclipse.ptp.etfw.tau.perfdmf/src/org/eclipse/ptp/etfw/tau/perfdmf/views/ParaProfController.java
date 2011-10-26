@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
@@ -191,10 +192,14 @@ public static final String DONE="DONE";
 			while (!done) {// for(int i=0;i<dex;i++){
 				String s = ""; //$NON-NLS-1$
 				try {
-					s = pushQueue.take();
+					s = pushQueue.poll(5, TimeUnit.SECONDS);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+				
+				if(s==null)
+					continue;
+				
 				if (s.equals("control endreturn") || s.equals(DONE)) { //$NON-NLS-1$ //$NON-NLS-2$
 					done = true;
 				} else {

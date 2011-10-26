@@ -228,7 +228,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 				}
 			}
 			
-			
+				thisProject.build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
 				thisProject.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
 			
 		}
