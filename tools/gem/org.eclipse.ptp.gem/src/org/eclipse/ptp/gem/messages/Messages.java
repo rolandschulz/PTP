@@ -191,6 +191,8 @@ public class Messages extends NLS {
 	public static String ProcessLogFilePopUpAction_1;
 	public static String VerificationPopUpAction_0;
 
+	public static String VerificationPopUpAction_1;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -682,6 +683,7 @@ public class GemAnalyzer extends ViewPart {
 			}
 		});
 
+		// TODO fix this for remote projects
 		// To conveniently run GEM from this view
 		this.runGemButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1164,12 +1166,13 @@ public class GemAnalyzer extends ViewPart {
 	 * Initializing everything and creates threads to be used by the main UI
 	 * thread to do updates.
 	 * 
-	 * @param sourceFile
-	 *            The file resource to initialize this view with.
+	 * @param resource
+	 *            The resource to initialize this view with.
 	 * @return void
 	 */
-	public void init(IFile sourceFile) {
-		this.activeFile = sourceFile;
+	public void init(IResource resource) {
+		// TODO this is redundant already checked in utils.initgemviews
+		this.activeFile = GemUtilities.adaptResource(resource);
 
 		this.analyzerUpdateThread = new Thread() {
 			@Override

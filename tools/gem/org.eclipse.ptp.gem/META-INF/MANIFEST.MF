@@ -13,5 +13,9 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
-Import-Package: org.eclipse.jface.text,
+Import-Package: org.eclipse.cdt.core.model,
+ org.eclipse.cdt.managedbuilder.core,
+ org.eclipse.jface.text,
+ org.eclipse.ptp.rdt.sync.core,
+ org.eclipse.ptp.rdt.sync.core.resources,
  org.eclipse.ptp.remote.core

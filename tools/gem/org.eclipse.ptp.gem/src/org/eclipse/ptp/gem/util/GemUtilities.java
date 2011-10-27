@@ -35,6 +35,8 @@ import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -54,6 +56,8 @@ import org.eclipse.ptp.gem.preferences.PreferenceConstants;
 import org.eclipse.ptp.gem.views.GemAnalyzer;
 import org.eclipse.ptp.gem.views.GemBrowser;
 import org.eclipse.ptp.gem.views.GemConsole;
+import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -69,6 +73,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
+@SuppressWarnings("restriction")
 public class GemUtilities {
 
 	public static enum TaskStatus {
@@ -89,7 +94,7 @@ public class GemUtilities {
 	private static String consoleStdErrMessage;
 	private static String outputSameMessage;
 	private static String outputSameDetails;
-	private static IFile gemInputFile;
+	private static IFile gemInputResource;
 	private static IFile gemLogFile;
 
 	// This thread exists to update SWT components belonging to the UI thread.
@@ -113,6 +118,20 @@ public class GemUtilities {
 			}
 		}
 	};
+
+	/**
+	 * Casts or adapts the specified IResource to IFile.
+	 * 
+	 * @param resource
+	 *            The resource to cast or adapt to IFile
+	 * @return IFile The cast or adapted IResource
+	 */
+	public static IFile adaptResource(IResource resource) {
+		if (resource instanceof IFile) {
+			return (IFile) resource;
+		}
+		return (IFile) resource.getAdapter(IFile.class);
+	}
 
 	/*
 	 * Used to cancel the current GEM analysis without killing any processes.
@@ -213,20 +232,20 @@ public class GemUtilities {
 	/**
 	 * Runs ISP on the specified, profiled executable.
 	 * 
-	 * @param inputFile
-	 *            The resource handle representing the profiled executable.
+	 * @param resource
+	 *            The resource representing the profiled executable.
 	 * @return void
 	 */
-	public static void doIsp(IFile inputFile) {
+	public static void doIsp(IResource resource) {
 
 		// Get all the current preferences
 		final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
 
 		// Create GEM directory to hold the generated log file and executable
-		final IProject currentProject = inputFile.getProject();
-		gemLogFile = currentProject.getFile(getLogfilePath(inputFile));
+		final IProject currentProject = resource.getProject();
+		gemLogFile = currentProject.getFile(getLogfilePath(resource));
 		final IFolder gemFolder = currentProject.getFolder(new Path("gem")); //$NON-NLS-1$
-
+		// TODO this is already done in getLogFilePath
 		if (!gemFolder.exists()) {
 			try {
 				gemFolder.create(true, true, null);
@@ -237,16 +256,30 @@ public class GemUtilities {
 		}
 
 		// Build up the command line String
+		// Also generate the path for the log file to be created by ISP
 		IPath executablePath = null;
-		if (inputFile.getFileExtension().equals("gem")) { //$NON-NLS-1$
-			executablePath = new Path(inputFile.getLocationURI().getPath());
+		String resourceLocation = null;
+		String logFileLocation = null;
+		if (resource.getFileExtension().equals("gem")) { //$NON-NLS-1$
+			if (isSynchronizedProject()) {
+				try {
+					resourceLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(resource).getPath();
+					logFileLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(gemFolder).getPath();
+				} catch (final CoreException e) {
+					logExceptionDetail(e);
+				}
+				executablePath = new Path(resourceLocation);
+			} else {
+				resourceLocation = resource.getLocationURI().getPath();
+				executablePath = new Path(resourceLocation);
+				logFileLocation = gemFolder.getLocationURI().getPath();
+			}
 		} else {
 			executablePath = new Path(gemFolder.getLocationURI().getPath());
 			executablePath = executablePath.append(currentProject.getName()).removeFileExtension().addFileExtension("gem"); //$NON-NLS-1$
 		}
 
-		// generate the path for the log file to be created by ISP
-		IPath logFilePath = new Path(gemFolder.getLocationURI().getPath());
+		IPath logFilePath = new Path(logFileLocation);
 		logFilePath = logFilePath.append(currentProject.getName()).removeFileExtension().addFileExtension("gem.log"); //$NON-NLS-1$
 
 		final int numprocs = pstore.getInt(PreferenceConstants.GEM_PREF_NUMPROCS);
@@ -261,8 +294,11 @@ public class GemUtilities {
 		final boolean unixSocketsPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_UNIXSOCKETS);
 		final boolean verbosePreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_VERBOSE);
 		final String hostName = pstore.getString(PreferenceConstants.GEM_PREF_HOSTNAME);
-		String ispExePath = pstore.getString((isRemoteProject() ? PreferenceConstants.GEM_PREF_REMOTE_ISPEXE_PATH
-				: PreferenceConstants.GEM_PREF_ISPEXE_PATH));
+
+		// Check for sync project
+		final boolean useRemoteISP = (isRemoteProject() || (isSynchronizedProject() && isRemoteBuildConfiguration()));
+		String ispExePath = pstore.getString(useRemoteISP ? PreferenceConstants.GEM_PREF_REMOTE_ISPEXE_PATH
+				: PreferenceConstants.GEM_PREF_ISPEXE_PATH);
 		ispExePath += (ispExePath == "") ? "" : "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		final String cmdArgs = pstore.getString(PreferenceConstants.GEM_PREF_ARGS);
 
@@ -324,17 +360,15 @@ public class GemUtilities {
 	 * Compiles the specified file with ispcc (mpicc wrapper), which links
 	 * against the profiler (interposition layer) library.
 	 * 
-	 * @param inputFile
-	 *            The resource handle representing the source code file to
-	 *            compile.
+	 * @param resource
+	 *            The resource to compile.
 	 * @return int Returns 1 if everything went smoothly, -1 otherwise.
 	 */
-	public static int doIspcc(IFile inputFile) {
+	public static int doIspcc(IResource resource) {
 
 		// Create GEM folder to hold the generated log file and executable
 		final IPath gemFolderPath = new Path("gem"); //$NON-NLS-1$
-		final String projectName = inputFile.getProject().getName();
-		final IProject currentProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		final IProject currentProject = getCurrentProject();
 		final IFolder gemFolder = currentProject.getFolder(gemFolderPath);
 
 		if (!gemFolder.exists()) {
@@ -351,7 +385,7 @@ public class GemUtilities {
 		executablePath = executablePath.append(currentProject.getName()).addFileExtension("gem"); //$NON-NLS-1$
 
 		// Determine if we need C or C++ ISP compile
-		final String fileExtension = inputFile.getFileExtension();
+		final String fileExtension = resource.getFileExtension();
 		int exitValue = 0;
 		final StringBuffer stringBuffer = new StringBuffer();
 
@@ -368,7 +402,7 @@ public class GemUtilities {
 			stringBuffer.append("ispcc -o "); //$NON-NLS-1$
 			stringBuffer.append(executablePath);
 			stringBuffer.append(" "); //$NON-NLS-1$
-			stringBuffer.append(inputFile.getLocationURI().getPath());
+			stringBuffer.append(resource.getLocationURI().getPath());
 			final String ispccStr = stringBuffer.toString();
 			exitValue = runCommand(ispccStr, true);
 		} else { // Deal with C++ compile
@@ -381,7 +415,7 @@ public class GemUtilities {
 			stringBuffer.append("ispCC -o "); //$NON-NLS-1$
 			stringBuffer.append(executablePath);
 			stringBuffer.append(" "); //$NON-NLS-1$
-			stringBuffer.append(inputFile.getLocationURI().getPath());
+			stringBuffer.append(resource.getLocationURI().getPath());
 			final String ispCppStr = stringBuffer.toString();
 			exitValue = runCommand(ispCppStr, true);
 		}
@@ -390,29 +424,39 @@ public class GemUtilities {
 	}
 
 	/**
-	 * Creates a log file from the specified source file by running ISP.
+	 * Creates a log file from the specified resource.
 	 * 
-	 * @param inputFile
-	 *            The resource handle representing the file for GEM to process.
+	 * @param resource
+	 *            The resource to process.
 	 * @param compile
 	 *            Whether or not to run ispcc script.
 	 * @param verify
 	 *            Whether or not to run ISP on the profiled executable.
 	 * @return void
 	 */
-	public static int generateLogFile(IFile inputFile, boolean compile, boolean verify) {
+	public static int generateLogFile(IResource resource, boolean compile, boolean verify) {
 
 		int exitStatus = 0;
 		if (compile && taskStatus != TaskStatus.ABORTED) {
-			exitStatus = doIspcc(inputFile);
+			exitStatus = doIspcc(resource);
 			if (exitStatus != -1 && taskStatus != TaskStatus.ABORTED) {
-				doIsp(inputFile);
+				doIsp(resource);
 			}
 		} else if (verify && taskStatus != TaskStatus.ABORTED) {
-			doIsp(inputFile);
+			doIsp(resource);
 		}
 
 		return exitStatus;
+	}
+
+	/**
+	 * Returns the current project being verified.
+	 * 
+	 * @param none
+	 * @return The current project being verified,
+	 */
+	public static IProject getCurrentProject() {
+		return gemInputResource.getProject();
 	}
 
 	/**
@@ -424,16 +468,19 @@ public class GemUtilities {
 	 */
 	public static String getIspVersion() {
 		// Get the location of ISP
-		String exePath = GemPlugin.getDefault().getPreferenceStore()
-				.getString((isRemoteProject() ? PreferenceConstants.GEM_PREF_REMOTE_ISPEXE_PATH
-						: PreferenceConstants.GEM_PREF_ISPEXE_PATH));
+		final boolean useRemoteISP = (isRemoteProject() || (isSynchronizedProject() && isRemoteBuildConfiguration()));
+		String ispExePath = GemPlugin
+				.getDefault()
+				.getPreferenceStore()
+				.getString(
+						useRemoteISP ? PreferenceConstants.GEM_PREF_REMOTE_ISPEXE_PATH : PreferenceConstants.GEM_PREF_ISPEXE_PATH);
 
 		// Run isp -v to get version number
-		exePath += (exePath == "") ? "" : "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		exePath += "isp -v"; //$NON-NLS-1$
+		ispExePath += (ispExePath == "") ? "" : "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		ispExePath += "isp -v"; //$NON-NLS-1$
 
 		// Abort if ISP is not installed
-		if (runCommand(exePath, false) == -1) {
+		if (runCommand(ispExePath, false) == -1) {
 			return null;
 		}
 
@@ -460,9 +507,9 @@ public class GemUtilities {
 	 *            The resource handle to get the project location from.
 	 * @return String The relative path of the log file to be generated.
 	 */
-	public static String getLogfilePath(IFile inputFile) {
+	public static String getLogfilePath(IResource resource) {
 		// Create GEM folder to hold the generated log file and executable
-		final String projectName = inputFile.getProject().getName();
+		final String projectName = resource.getProject().getName();
 		final IProject currentProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		final IPath gemFolderPath = new Path("gem"); //$NON-NLS-1$
 		final IFolder gemFolder = currentProject.getFolder(gemFolderPath);
@@ -528,7 +575,7 @@ public class GemUtilities {
 	 * Returns the generated log file for the current project being verified.
 	 * 
 	 * @param none
-	 * @return IFile the log file for the current project being verified.
+	 * @return IFile The log file for the current project being verified.
 	 */
 	public static IFile getProjectLogFile() {
 		return gemLogFile;
@@ -595,8 +642,22 @@ public class GemUtilities {
 	 *         with the connection used by the specified remote project.
 	 */
 	public static IRemoteProcessBuilder getRemoteProcessBuilder(IProject currentProject, String[] args) {
-		final URI projectURI = currentProject.getLocationURI();
-		final String scheme = projectURI.getScheme();
+		URI projectURI = null;
+		if (isSynchronizedProject()) {
+			try {
+				projectURI = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(currentProject);
+			} catch (final CoreException e) {
+				logExceptionDetail(e);
+			}
+		} else {
+			projectURI = currentProject.getLocationURI();
+		}
+		
+		String scheme = null;
+		if (projectURI != null) {
+			scheme = projectURI.getScheme();
+		}
+		
 		final IRemoteServices currentService = getRemoteService(scheme);
 		final IRemoteConnection currentConnection = getRemoteConnection(currentService);
 		final IRemoteProcessBuilder rpb = currentService.getProcessBuilder(currentConnection, args);
@@ -625,7 +686,7 @@ public class GemUtilities {
 	}
 
 	/**
-	 * Returns an IFile resource with path relative to the current project.
+	 * Returns a handle to the file with the specified name in the current project.
 	 * 
 	 * @param fullPath
 	 *            The string representation of the full path to a file contained
@@ -633,17 +694,15 @@ public class GemUtilities {
 	 * @param resource
 	 *            A resource within the current project (can be the current
 	 *            project itself).
-	 * @return IFile The resource handle to the requested source file.
+	 * @return IFile The handle to the member file in the current project.
 	 */
 	public static IFile getSourceFile(String fullPath, IResource resource) {
-		final String projectName = resource.getProject().getName();
-		final IProject currentProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		final String currentProjectPath = currentProject.getLocationURI().getPath();
-		IPath sourceFilePath = new Path(fullPath);
-		sourceFilePath = sourceFilePath.makeRelativeTo(new Path(currentProjectPath));
-		final IFile sourceFile = currentProject.getFile(sourceFilePath);
 
-		return sourceFile;
+		final IProject currentProject = resource.getProject();
+		final String[] args = fullPath.split("/", -1); //$NON-NLS-1$
+		final String name = args[args.length - 1];
+
+		return currentProject.getFile(name);
 	}
 
 	/**
@@ -685,7 +744,7 @@ public class GemUtilities {
 		// Skip the line holding the number of processes
 		scanner.nextLine();
 
-		// If ISP exited out without running any MPI Calls
+		// If ISP exited out without processing any MPI Calls
 		if (!scanner.hasNextLine()) {
 			GemUtilities.showErrorDialog(Messages.GemUtilities_5);
 			return null;
@@ -693,10 +752,11 @@ public class GemUtilities {
 
 		// Grab the path string for the source file form the log file line
 		sourceFilePathInfo = scanner.nextLine();
-		sourceFilePathInfo = sourceFilePathInfo.substring(sourceFilePathInfo.indexOf("/"), sourceFilePathInfo.lastIndexOf(" ")); //$NON-NLS-1$ //$NON-NLS-2$
+		final String[] elements = sourceFilePathInfo.split(" ", -1); //$NON-NLS-1$
+		sourceFilePathInfo = elements[elements.length - 2];
 		final IFile sourceFile = getSourceFile(sourceFilePathInfo, logFile);
 
-		// Close the open InputStream
+		// Close the InputStream
 		try {
 			if (logFileStream != null) {
 				logFileStream.close();
@@ -737,7 +797,7 @@ public class GemUtilities {
 	/**
 	 * Activates appropriate GEM views and launches necessary operations.
 	 * 
-	 * @param inputFile
+	 * @param resource
 	 *            The resource obtained from the project to be processed.
 	 * @param compile
 	 *            Performs necessary compilation if true. If false, the compile
@@ -747,9 +807,9 @@ public class GemUtilities {
 	 *            verification step is skipped.
 	 * @return void
 	 */
-	public static void initGemViews(IFile inputFile, boolean compile, boolean verify) {
+	public static void initGemViews(IResource resource, boolean compile, boolean verify) {
 
-		gemInputFile = inputFile;
+		gemInputResource = adaptResource(resource);
 		doCompile = compile;
 		doVerify = verify;
 
@@ -765,7 +825,7 @@ public class GemUtilities {
 		analyzer = (GemAnalyzer) gemViewPart;
 		// Clear the Analyzer view in case we're doing a repeated run
 		analyzer.clear();
-		analyzer.init(inputFile);
+		analyzer.init(gemInputResource);
 
 		// Tell the Browser where to find the source and log files
 		final IViewPart browserPart = window.getActivePage().findView(GemBrowser.ID);
@@ -799,7 +859,7 @@ public class GemUtilities {
 				}
 
 				// Run ispcc and/or isp and check for creation of the log file
-				if (generateLogFile(gemInputFile, doCompile, doVerify) == -1) {
+				if (generateLogFile(gemInputResource, doCompile, doVerify) == -1) {
 					cancelAnalysis();
 					showErrorDialog(Messages.GemUtilities_3);
 					return;
@@ -810,12 +870,11 @@ public class GemUtilities {
 					IFile sourceFile = null;
 
 					// If it's a log file, that's all we're interested in
-					if (gemInputFile.getFileExtension().equals("log")) { //$NON-NLS-1$
-						logFile = gemInputFile;
+					if (gemInputResource.getFileExtension().equals("log")) { //$NON-NLS-1$
+						logFile = gemInputResource;
 					} else {
 						logFile = gemLogFile;
 					}
-
 					if (logFile == null) {
 						cancelAnalysis();
 						showErrorDialog(Messages.GemUtilities_14);
@@ -827,7 +886,7 @@ public class GemUtilities {
 					sourceFile = getSourceFilePathFromLog(logFile);
 
 					if (transitions == null || sourceFile == null) {
-						// Error message issued in getSourceFilePath()
+						// Note: Error message issued in getSourceFilePathFromLog()
 						cancelAnalysis();
 						return;
 					}
@@ -897,18 +956,54 @@ public class GemUtilities {
 		}
 	}
 
+	//
+	private static boolean isRemoteBuildConfiguration() {
+
+		final IProject project = getCurrentProject();
+		final IConfiguration configuration = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
+		String buildLocation = null;
+		buildLocation = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration).getLocation();
+		// BuildConfigurationManager.getInstance().getActiveSyncLocationURI(gemInputResource).getPath();
+		final String projectLocation = gemInputResource.getProject().getLocationURI().getPath();
+
+		return !buildLocation.equals(projectLocation);
+	}
+
 	/**
 	 * Returns whether or not the current project being verified by GEM is
-	 * remote or not. The IResource method, <code>getLocation()</code> returns
-	 * the absolute path in the local file system to this resource, or null if
-	 * no path can be determined.
+	 * remote.
 	 * 
 	 * @param none
 	 * @return boolean True if the current project being verified by GEM is
 	 *         remote, false otherwise.
 	 */
 	public static boolean isRemoteProject() {
-		return gemInputFile.getLocation() == null;
+		// boolean isRemote = false;
+		// try {
+		// isRemote = getCurrentProject().hasNature(RemoteMakeNature.NATURE_ID);
+		// } catch (CoreException e) {
+		// GemUtilities.logExceptionDetail(e);
+		// }
+		// return isRemote;
+		return gemInputResource.getLocation() == null;
+	}
+
+	/**
+	 * Returns whether or not the current project being verified by GEM is
+	 * synchronized.
+	 * 
+	 * @param none
+	 * @return boolean True if the current project being verified by GEM is
+	 *         synchronized, false otherwise.
+	 */
+	public static boolean isSynchronizedProject() {
+		boolean isSync = false;
+		try {
+			isSync = getCurrentProject().hasNature(RemoteSyncNature.NATURE_ID);
+		} catch (final CoreException e) {
+			GemUtilities.logExceptionDetail(e);
+		}
+		return isSync;
 	}
 
 	/*
@@ -920,9 +1015,9 @@ public class GemUtilities {
 		final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
 		final String processName = pstore.getString(PreferenceConstants.GEM_PREF_PROCESS_NAME);
 		final String command = "pkill " + processName; //$NON-NLS-1$
-		final String projectName = gemInputFile.getProject().getName();
-		final IProject currentProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		final boolean isRemoteProject = (currentProject.getLocation() == null);
+		final IProject currentProject = getCurrentProject();
+		final boolean isRemoteProject = isRemoteProject();
+		;
 
 		if (isRemoteProject) {
 			final String[] args = command.split(" ", -1); //$NON-NLS-1$
@@ -1048,9 +1143,8 @@ public class GemUtilities {
 	public static int runCommand(String command, boolean verbose) {
 
 		// Find out if the current project is local or remote
-		final String projectName = gemInputFile.getProject().getName();
-		final IProject currentProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		final boolean isRemoteProject = currentProject.getLocation() == null;
+		final IProject currentProject = getCurrentProject();
+		final boolean isRemote = isRemoteProject() || (isSynchronizedProject() && isRemoteBuildConfiguration());
 
 		try {
 			final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
@@ -1061,7 +1155,7 @@ public class GemUtilities {
 			String stdErrResult = ""; //$NON-NLS-1$
 
 			// Check if the current project is remote
-			if (isRemoteProject) {
+			if (isRemote) {
 				final String[] args = command.split(" ", -1); //$NON-NLS-1$
 				final IRemoteProcessBuilder rpb = getRemoteProcessBuilder(currentProject, args);
 				remoteProcess = rpb.start();
@@ -1070,9 +1164,9 @@ public class GemUtilities {
 			}
 
 			final BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(
-					isRemoteProject ? remoteProcess.getInputStream() : process.getInputStream()));
+					isRemote ? remoteProcess.getInputStream() : process.getInputStream()));
 			final BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(
-					isRemoteProject ? remoteProcess.getErrorStream() : process.getErrorStream()));
+					isRemote ? remoteProcess.getErrorStream() : process.getErrorStream()));
 			consoleStdOutMessage = ""; //$NON-NLS-1$
 			consoleStdErrMessage = ""; //$NON-NLS-1$
 
@@ -1085,7 +1179,7 @@ public class GemUtilities {
 			// Try breaks when the process is terminated prematurely
 			try {
 				// read the process input stream
-				while ((isRemoteProject ? remoteProcess != null : process != null) && (stdOut = stdOutReader.readLine()) != null
+				while ((isRemote ? remoteProcess != null : process != null) && (stdOut = stdOutReader.readLine()) != null
 						&& taskStatus == TaskStatus.ACTIVE) {
 					stringBuffer.append(stdOut);
 					stringBuffer.append("\n"); //$NON-NLS-1$
@@ -1103,7 +1197,7 @@ public class GemUtilities {
 
 				// read the process error stream
 				stringBuffer.setLength(0);
-				while ((isRemoteProject ? remoteProcess != null : process != null) && (stdErr = stdErrReader.readLine()) != null
+				while ((isRemote ? remoteProcess != null : process != null) && (stdErr = stdErrReader.readLine()) != null
 						&& taskStatus == TaskStatus.ACTIVE) {
 					stringBuffer.append(stdErr);
 					stringBuffer.append("\n"); //$NON-NLS-1$
@@ -1134,7 +1228,7 @@ public class GemUtilities {
 				compareOutput(consoleStdOutMessage);
 			}
 
-			if (isRemoteProject ? remoteProcess == null : process == null) {
+			if (isRemote ? remoteProcess == null : process == null) {
 				return -1;
 			}
 
