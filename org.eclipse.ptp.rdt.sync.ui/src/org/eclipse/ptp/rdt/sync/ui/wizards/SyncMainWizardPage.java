@@ -14,11 +14,9 @@ package org.eclipse.ptp.rdt.sync.ui.wizards;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 
 import org.eclipse.core.filesystem.EFS;
@@ -44,10 +42,6 @@ import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
-import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
@@ -58,7 +52,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
@@ -87,7 +80,7 @@ import org.eclipse.cdt.ui.wizards.IWizardItemsListListener;
 import org.eclipse.cdt.ui.wizards.IWizardWithMemory;
 import org.eclipse.cdt.internal.ui.newui.Messages;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
-import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 
 	public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItemsListListener {
@@ -109,7 +102,6 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 	    private Text projectNameField;
 	    private Text projectLocationField;
 	    private Button browseButton;
-		private Combo fProviderCombo;
 		private Composite fProviderArea;
 		private StackLayout fProviderStack;
 	    private Tree localTree;
@@ -126,7 +118,7 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 		private SortedMap<String, IToolChain> toolChainMap;
 		
 		private boolean useDefaultLocalDirectory = true;
-		private final List<Composite> fProviderControls = new ArrayList<Composite>();
+		private ISynchronizeParticipant fSelectedParticipant = null;
 
 	    /**
 	     * Creates a new project creation wizard page.
@@ -724,12 +716,12 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 			// For now, assume only one provider, to reduce the number of GUI elements.
 			// TODO: Add error handling if there are no providers
 			ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
-			ISynchronizeParticipant part = providers[0].getParticipant();
+			fSelectedParticipant = providers[0].getParticipant();
 			
 			Composite comp = new Composite(fProviderArea, SWT.NONE);
 			comp.setLayout(new GridLayout(1, false));
 			comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			part.createConfigurationArea(comp, getWizard().getContainer());
+			fSelectedParticipant.createConfigurationArea(comp, getWizard().getContainer());
 			fProviderStack.topControl = comp;
 		}
 
@@ -854,123 +846,29 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 		public boolean useDefaults() {
 			return false;
 		}
+		
+		/**
+		 * Get the synchronize participant, which contains remote information
+		 * @return participant
+		 */
+		public ISynchronizeParticipant getSynchronizeParticipant() {
+			return fSelectedParticipant;
+		}
+		
+		/**
+		 * Get the selected remote tool chain
+		 * @return tool chain or null if either none selected or name does not map to a value (such as "Other Toolchain")
+		 */
+		public IToolChain getRemoteToolChain() {
+			 TableItem[] selectedToolChains  = remoteToolChainTable.getSelection();
+			 if (selectedToolChains.length < 1) {
+				 return null;
+			 } else {
+				 String toolChainName = selectedToolChains[0].getText();
+				 return toolChainMap.get(toolChainName);
+			 }
+		}
 
-		// Functions copied from NewRemoteSyncProjectWizardPage - to be imported as needed.
-		//
-		//		private void addProviderControl(ISynchronizeParticipantDescriptor desc) {
-		//			Composite comp = null;
-		//			ISynchronizeParticipant part = desc.getParticipant();
-		//			if (part != null) {
-		//				comp = new Composite(fProviderArea, SWT.NONE);
-		//				comp.setLayout(new GridLayout(1, false));
-		//				comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		//				part.createConfigurationArea(comp, getWizard().getContainer());
-		//			}
-		//			fProviderControls.add(comp);
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
-		//		 * @see
-		//		 * org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets
-		//		 * .Composite)
-		//		 */
-		//		public void createControl(final Composite parent) {
-		//			Composite comp = new Composite(parent, SWT.NONE);
-		//			pageControl = comp;
-		//			GridLayout layout = new GridLayout();
-		//			layout.numColumns = 3;
-		//			comp.setLayout(layout);
-		//			GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		//			comp.setLayoutData(gd);
-		//
-		//			// Label for "Provider:"
-		//			Label providerLabel = new Label(comp, SWT.LEFT);
-		//			providerLabel.setText(Messages.NewRemoteSyncProjectWizardPage_syncProvider);
-		//
-		//			// combo for providers
-		//			fProviderCombo = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY);
-		//			// set layout to grab horizontal space
-		//			fProviderCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-		//			gd = new GridData();
-		//			gd.horizontalSpan = 2;
-		//			fProviderCombo.setLayoutData(gd);
-		//			fProviderCombo.addSelectionListener(new SelectionAdapter() {
-		//				@Override
-		//				public void widgetSelected(SelectionEvent e) {
-		//					handleProviderSelected();
-		//				}
-		//			});
-		//
-		//			fProviderArea = new Group(comp, SWT.SHADOW_ETCHED_IN);
-		//			fProviderStack = new StackLayout();
-		//			fProviderArea.setLayout(fProviderStack);
-		//			GridData providerAreaData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		//			providerAreaData.horizontalSpan = 3;
-		//			fProviderArea.setLayoutData(providerAreaData);
-		//
-		//			// populate the combo with a list of providers
-		//			ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
-		//
-		//			for (int k = 0; k < providers.length; k++) {
-		//				fProviderCombo.add(providers[k].getName(), k);
-		//				fComboIndexToDescriptorMap.put(k, providers[k]);
-		//				addProviderControl(providers[k]);
-		//			}
-		//
-		//			fProviderCombo.select(0);
-		//			handleProviderSelected();
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
-		//		 * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
-		//		 */
-		//		public void dispose() {
-		//			// TODO Auto-generated method stub
-		//		}
-		//
-		//		/**
-		//		 * Find available remote services and service providers for a given project
-		//		 * 
-		//		 * If project is null, the C and C++ natures are used to determine which
-		//		 * services are available
-		//		 */
-		//		protected Set<IService> getContributedServices() {
-		//			ServiceModelManager smm = ServiceModelManager.getInstance();
-		//			Set<IService> cppServices = smm.getServices(CCProjectNature.CC_NATURE_ID);
-		//			Set<IService> cServices = smm.getServices(CProjectNature.C_NATURE_ID);
-		//
-		//			Set<IService> allApplicableServices = new LinkedHashSet<IService>();
-		//			allApplicableServices.addAll(cppServices);
-		//			allApplicableServices.addAll(cServices);
-		//
-		//			return allApplicableServices;
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
-		//		 * @see org.eclipse.jface.dialogs.IDialogPage#getControl()
-		//		 */
-		//		public Control getControl() {
-		//			return pageControl;
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
-		//		 * @see org.eclipse.jface.dialogs.IDialogPage#getDescription()
-		//		 */
-		//		public String getDescription() {
-		//			if (fDescription == null) {
-		//				fDescription = Messages.RemoteSyncWizardPage_description;
-		//			}
-		//			return fDescription;
-		//		}
-		//
 		//		/*
 		//		 * (non-Javadoc)
 		//		 * 
@@ -986,71 +884,6 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 		//		/*
 		//		 * (non-Javadoc)
 		//		 * 
-		//		 * @see org.eclipse.jface.dialogs.IDialogPage#getImage()
-		//		 */
-		//		public Image getImage() {
-		//			if (fImage == null && fImageDescriptor != null) {
-		//				fImage = fImageDescriptor.createImage();
-		//			}
-		//
-		//			if (fImage == null && wizard != null) {
-		//				fImage = wizard.getDefaultPageImage();
-		//			}
-		//
-		//			return fImage;
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
-		//		 * @see org.eclipse.jface.dialogs.IDialogPage#getMessage()
-		//		 */
-		//		public String getMessage() {
-		//			// TODO Auto-generated method stub
-		//			return null;
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
-		//		 * @see org.eclipse.jface.wizard.IWizardPage#getName()
-		//		 */
-		//		public String getName() {
-		//			return Messages.RemoteSyncWizardPage_0;
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
-		//		 * @see org.eclipse.jface.dialogs.IDialogPage#getTitle()
-		//		 */
-		//		public String getTitle() {
-		//			if (fTitle == null) {
-		//				fTitle = Messages.RemoteSyncWizardPage_0;
-		//			}
-		//			return fTitle;
-		//		}
-		//
-		//		/**
-		//		 * Handle synchronize provider selected.
-		//		 */
-		//		private void handleProviderSelected() {
-		//			int index = fProviderCombo.getSelectionIndex();
-		//			fProviderStack.topControl = fProviderControls.get(index);
-		//			fSelectedProvider = fComboIndexToDescriptorMap.get(index);
-		//			fProviderArea.layout();
-		//			update();
-		//			if (fSelectedProvider != null) {
-		//				MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY,
-		//						fSelectedProvider.getParticipant());
-		//			} else {
-		//				MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY, null);
-		//			}
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
 		//		 * @see
 		//		 * org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage#isCustomPageComplete
 		//		 * ()
@@ -1058,59 +891,6 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 		//		@Override
 		//		protected boolean isCustomPageComplete() {
 		//			return fbVisited  && getErrorMessage()==null && fSelectedProvider.getParticipant().isConfigComplete();
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
-		//		 * @see org.eclipse.jface.dialogs.IDialogPage#performHelp()
-		//		 */
-		//		public void performHelp() {
-		//			// TODO Auto-generated method stub
-		//
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
-		//		 * @see
-		//		 * org.eclipse.jface.dialogs.IDialogPage#setDescription(java.lang.String)
-		//		 */
-		//		public void setDescription(String description) {
-		//			fDescription = description;
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
-		//		 * @see
-		//		 * org.eclipse.jface.dialogs.IDialogPage#setImageDescriptor(org.eclipse.
-		//		 * jface.resource.ImageDescriptor)
-		//		 */
-		//		public void setImageDescriptor(ImageDescriptor image) {
-		//			fImageDescriptor = image;
-		//
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
-		//		 * @see org.eclipse.jface.dialogs.IDialogPage#setTitle(java.lang.String)
-		//		 */
-		//		public void setTitle(String title) {
-		//			fTitle = title;
-		//
-		//		}
-		//
-		//		/*
-		//		 * (non-Javadoc)
-		//		 * 
-		//		 * @see org.eclipse.jface.dialogs.IDialogPage#setVisible(boolean)
-		//		 */
-		//		public void setVisible(boolean visible) {
-		//			if (visible) {
-		//				fbVisited = true;
-		//			}
 		//		}
 		//
 		//		private void update() {

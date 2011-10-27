@@ -24,6 +24,7 @@ import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.cdt.ui.CUIPlugin;
@@ -160,21 +161,16 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 		setDefaultPageImageDescriptor(SyncPluginImages.DESC_WIZBAN_NEW_REMOTE_C_PROJ);
 	}
 	
-	// Functions copied from RemoteSyncWizardPageOperation
 	public void run(IProject project, IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		// monitor.beginTask("configure model services", 100); //$NON-NLS-1$
 
-		ISynchronizeParticipant participant = (ISynchronizeParticipant) getMBSProperty(NewRemoteSyncProjectWizardPage.SERVICE_PROVIDER_PROPERTY);
+		ISynchronizeParticipant participant = ((SyncMainWizardPage) fMainPage).getSynchronizeParticipant();
 		if (participant == null) {
 			// monitor.done();
 			return;
 		}
-
-		// try {
-		// RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
-		// } catch (CoreException e1) {
-		// StatusManager.getManager().handle(e1, RDTSyncUIPlugin.PLUGIN_ID);
-		// }
+		
+		IToolChain remoteToolChain = ((SyncMainWizardPage) fMainPage).getRemoteToolChain();
 
 		// Build the service configuration
 		ServiceModelManager smm = ServiceModelManager.getInstance();
@@ -202,13 +198,17 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 		ISyncServiceProvider provider = participant.getProvider(project);
 		BuildScenario buildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(), provider.getLocation());
 
-		// For each build configuration, set the build directory appropriately.
+		// Set each build configuration to use the sync builder and to use the selected remote toolchain.
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
 			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 		}
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allConfigs) {
+			if (remoteToolChain != null) {
+				config.createToolChain(remoteToolChain, ManagedBuildManager.calculateChildId(remoteToolChain.getId(), null),
+						remoteToolChain.getId(), false);
+			}
 			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
 			config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
 			// turn off append contributed(local) environment variables for the build configuration of the remote project
@@ -230,10 +230,6 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 					StatusManager.SHOW);
 		}
 		// monitor.done();
-	}
-
-	private static Object getMBSProperty(String propertyId) {
-		return MBSCustomPageManager.getPageProperty(NewRemoteSyncProjectWizardPage.REMOTE_SYNC_WIZARD_PAGE_ID, propertyId);
 	}
 
 	/**
