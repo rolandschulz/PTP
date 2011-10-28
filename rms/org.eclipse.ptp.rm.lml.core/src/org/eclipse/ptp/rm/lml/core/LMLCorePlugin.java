@@ -66,8 +66,7 @@ public class LMLCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Returns the string from the plugin's resource bundle, or 'key' if not
-	 * found.
+	 * Returns the string from the plugin's resource bundle, or 'key' if not found.
 	 */
 	public static String getResourceString(String key) {
 		final ResourceBundle bundle = LMLCorePlugin.getDefault().getResourceBundle();
@@ -208,15 +207,15 @@ public class LMLCorePlugin extends Plugin {
 	}
 
 	private void createMarshaller() throws JAXBException {
+		ClassLoader loader = LMLCorePlugin.class.getClassLoader();
 		final JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements", //$NON-NLS-1$
-				LMLCorePlugin.class.getClassLoader());
+				loader);
 		marshaller = jc.createMarshaller();
 	}
 
 	/**
-	 * For the generation of instances from classes by JAXB a unmarshaller is
-	 * needed. In the method the needed unmarshaller is created. It is said
-	 * where the classes for the instantiation are.
+	 * For the generation of instances from classes by JAXB a unmarshaller is needed. In the method the needed unmarshaller is
+	 * created. It is said where the classes for the instantiation are.
 	 * 
 	 * @throws MalformedURLException
 	 * @throws JAXBException
@@ -224,8 +223,8 @@ public class LMLCorePlugin extends Plugin {
 	private void createUnmarshaller() throws MalformedURLException, JAXBException {
 		final URL xsd = getBundle().getEntry("/schema/lgui.xsd"); //$NON-NLS-1$
 
-		final JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements", //$NON-NLS-1$
-				LMLCorePlugin.class.getClassLoader());
+		ClassLoader loader = LMLCorePlugin.class.getClassLoader();
+		final JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements", loader); //$NON-NLS-1$
 
 		unmarshaller = jc.createUnmarshaller();
 

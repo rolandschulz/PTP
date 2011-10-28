@@ -14,6 +14,6 @@ Export-Package: org.eclipse.ptp.rm.lml.core;x-friends:="org.eclipse.ptp.rm.lml_j
 Bundle-Activator: org.eclipse.ptp.rm.lml.core.LMLCorePlugin
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
-Require-Bundle: javax.xml.bind,
- org.eclipse.core.runtime
+Require-Bundle: org.eclipse.core.runtime
 Bundle-Localization: plugin
+Import-Package: javax.xml.bind
