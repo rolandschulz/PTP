@@ -88,10 +88,9 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
 /**
  * @author crecoskie
  * 
- *         <strong>EXPERIMENTAL</strong>. This class or interface has been added
- *         as part of a work in progress. There is no guarantee that this API
- *         will work or that it will remain the same. Please do not use this API
- *         without consulting with the RDT team.
+ *         <strong>EXPERIMENTAL</strong>. This class or interface has been added as part of a work in progress. There is no
+ *         guarantee that this API will work or that it will remain the same. Please do not use this API without consulting with the
+ *         RDT team.
  * 
  *         A builder for remote "standard make" projects.
  * 
@@ -101,9 +100,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.cdt.make.core.MakeBuilder#clean(org.eclipse.core.runtime.
-	 * IProgressMonitor)
+	 * @see org.eclipse.cdt.make.core.MakeBuilder#clean(org.eclipse.core.runtime. IProgressMonitor)
 	 */
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
@@ -118,15 +115,14 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				/*
 				 * (non-Javadoc)
 				 * 
-				 * @see
-				 * org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime
-				 * .IProgressMonitor)
+				 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime .IProgressMonitor)
 				 */
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
 						ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
 
+							@Override
 							public void run(IProgressMonitor monitor) {
 								invokeMake(CLEAN_BUILD, info, monitor);
 							}
@@ -150,8 +146,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.cdt.make.core.MakeBuilder#invokeMake(int,
-	 * org.eclipse.cdt.make.core.IMakeBuilderInfo,
+	 * @see org.eclipse.cdt.make.core.MakeBuilder#invokeMake(int, org.eclipse.cdt.make.core.IMakeBuilderInfo,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@SuppressWarnings("unchecked")
@@ -352,12 +347,11 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					}
 
 					IRemoteServices remoteServices = executionProvider.getRemoteServices();
-					if (!remoteServices.isInitialized()) {
-						remoteServices.initialize();
-					}
-
 					if (remoteServices == null) {
 						return false;
+					}
+					if (!remoteServices.isInitialized()) {
+						remoteServices.initialize();
 					}
 
 					IRemoteConnection connection = executionProvider.getConnection();
@@ -390,9 +384,9 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					// modified by the user, so we'll respect the user's edits
 					// and replace the environment entirely.
 
-					 remoteEnvMap.clear();
-					
-					 remoteEnvMap.putAll(envMap);
+					remoteEnvMap.clear();
+
+					remoteEnvMap.putAll(envMap);
 
 					// set the directory in which to run the command
 					IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
@@ -428,6 +422,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 
 					Thread monitorThread = new Thread(new Runnable() {
 
+						@Override
 						public void run() {
 							while (!monitor.isCanceled() && !p.isCompleted()) {
 								try {
@@ -560,30 +555,20 @@ public class RemoteMakeBuilder extends MakeBuilder {
 	}
 
 	/*
-	 * private void invokeIndex(){ final IndexBuildSequenceController
-	 * projectStatus =
-	 * IndexBuildSequenceController.getProjectStatus(getProject());
-	 * if(projectStatus!=null){
+	 * private void invokeIndex(){ final IndexBuildSequenceController projectStatus =
+	 * IndexBuildSequenceController.getProjectStatus(getProject()); if(projectStatus!=null){
 	 * 
-	 * Job job = new Job("Indexing Job"){ //$NON-NLS-1$ protected IStatus
-	 * run(IProgressMonitor monitor) {
+	 * Job job = new Job("Indexing Job"){ //$NON-NLS-1$ protected IStatus run(IProgressMonitor monitor) {
 	 * 
-	 * if(projectStatus.isIndexAfterBuildSet() &&
-	 * projectStatus.shouldRunIndexFollowingBuild()){
-	 * projectStatus.setFinalBuildStatus();
-	 * if(projectStatus.isBuildCompleted()){ //for indexing following first time
-	 * build, only run it after a completed build. ICProject cProject =
-	 * CModelManager.getDefault().getCModel().getCProject(getProject());
-	 * CCorePlugin.getIndexManager().reindex(cProject);
-	 * System.out.println("running invoke indexing job. "); //$NON-NLS-1$ }
+	 * if(projectStatus.isIndexAfterBuildSet() && projectStatus.shouldRunIndexFollowingBuild()){
+	 * projectStatus.setFinalBuildStatus(); if(projectStatus.isBuildCompleted()){ //for indexing following first time build, only
+	 * run it after a completed build. ICProject cProject = CModelManager.getDefault().getCModel().getCProject(getProject());
+	 * CCorePlugin.getIndexManager().reindex(cProject); System.out.println("running invoke indexing job. "); //$NON-NLS-1$ }
 	 * 
-	 * }else{
-	 * System.out.println("not running index job, just update build status. ");
-	 * //$NON-NLS-1$ projectStatus.setFinalBuildStatus(); } return
-	 * Status.OK_STATUS; }
+	 * }else{ System.out.println("not running index job, just update build status. "); //$NON-NLS-1$
+	 * projectStatus.setFinalBuildStatus(); } return Status.OK_STATUS; }
 	 * 
-	 * }; ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
-	 * job.setRule(rule); job.schedule();
+	 * }; ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot(); job.setRule(rule); job.schedule();
 	 * 
 	 * System.out.println("schedule invoke indexing job. "); //$NON-NLS-1$
 	 * 
@@ -645,8 +630,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.cdt.make.core.MakeBuilder#shouldBuild(int,
-	 * org.eclipse.cdt.make.core.IMakeBuilderInfo)
+	 * @see org.eclipse.cdt.make.core.MakeBuilder#shouldBuild(int, org.eclipse.cdt.make.core.IMakeBuilderInfo)
 	 */
 	@Override
 	protected boolean shouldBuild(int kind, IMakeBuilderInfo info) {

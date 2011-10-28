@@ -52,10 +52,8 @@ import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 /**
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
- * part of a work in progress. There is no guarantee that this API will work or
- * that it will remain the same. Please do not use this API without consulting
- * with the RDT team.
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part of a work in progress. There is no guarantee that
+ * this API will work or that it will remain the same. Please do not use this API without consulting with the RDT team.
  * 
  * @author crecoskie
  * 
@@ -100,8 +98,9 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	 * @see org.eclipse.cdt.core.ICommandLauncher#execute(org.eclipse.core.runtime.IPath, java.lang.String[], java.lang.String[],
 	 * org.eclipse.core.runtime.IPath)
 	 */
-	public Process execute(IPath commandPath, String[] args, String[] env,
-			IPath changeToDirectory, final IProgressMonitor monitor) throws CoreException {
+	@Override
+	public Process execute(IPath commandPath, String[] args, String[] env, IPath changeToDirectory, final IProgressMonitor monitor)
+			throws CoreException {
 		isCleanBuild = isCleanBuild(args);
 		IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
 
@@ -118,18 +117,18 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		// Set correct directory
 		// For managed projects and configurations other than workspace, the directory is incorrect and needs to be fixed.
 		IConfiguration configuration = ManagedBuildManager.getBuildInfo(getProject()).getDefaultConfiguration();
-		String projectWorkspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString() +
-				getProject().getFullPath().toPortableString();
-		String projectActualRoot = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration).
-				getLocation();
+		String projectWorkspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString()
+				+ getProject().getFullPath().toPortableString();
+		String projectActualRoot = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration)
+				.getLocation();
 		changeToDirectory = new Path(changeToDirectory.toString().replaceFirst(projectWorkspaceRoot, projectActualRoot));
 		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
 
 		// Determine the service model for this configuration, and use the provider of the build service to execute the build
 		// command.
 		ServiceModelManager smm = ServiceModelManager.getInstance();
-		IServiceConfiguration serviceConfig = BuildConfigurationManager.getInstance().
-				getConfigurationForBuildConfiguration(configuration);
+		IServiceConfiguration serviceConfig = BuildConfigurationManager.getInstance().getConfigurationForBuildConfiguration(
+				configuration);
 		if (serviceConfig == null) {
 			throw new RuntimeException("Cannot find service configuration for build configuration"); //$NON-NLS-1$
 		}
@@ -143,12 +142,12 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		if (executionProvider != null) {
 
 			IRemoteServices remoteServices = executionProvider.getRemoteServices();
+			if (remoteServices == null) {
+				return null;
+			}
 			if (!remoteServices.isInitialized()) {
 				remoteServices.initialize();
 			}
-
-			if (remoteServices == null)
-				return null;
 
 			IRemoteConnection connection = executionProvider.getConnection();
 
@@ -165,8 +164,9 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 			command.add(commandPath.toString());
 
-			for (int k = 0; k < args.length; k++)
+			for (int k = 0; k < args.length; k++) {
 				command.add(args[k]);
+			}
 
 			IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
 
@@ -234,8 +234,9 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 	private String getCommandLine(String[] commandArgs) {
 
-		if (fProject == null)
+		if (fProject == null) {
 			return null;
+		}
 
 		StringBuffer buf = new StringBuffer();
 		if (fCommandArgs != null) {
@@ -263,6 +264,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#getCommandLine()
 	 */
+	@Override
 	public String getCommandLine() {
 		return getCommandLine(getCommandArgs());
 	}
@@ -272,6 +274,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#getCommandArgs()
 	 */
+	@Override
 	public String[] getCommandArgs() {
 		return fCommandArgs;
 	}
@@ -281,6 +284,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#getEnvironment()
 	 */
+	@Override
 	public Properties getEnvironment() {
 		return convertEnvMapToProperties();
 	}
@@ -300,6 +304,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#getErrorMessage()
 	 */
+	@Override
 	public String getErrorMessage() {
 		return fErrorMessage;
 	}
@@ -309,6 +314,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#setErrorMessage(java.lang.String)
 	 */
+	@Override
 	public void setErrorMessage(String error) {
 		fErrorMessage = error;
 	}
@@ -318,6 +324,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#showCommand(boolean)
 	 */
+	@Override
 	public void showCommand(boolean show) {
 		fShowCommand = show;
 
@@ -340,6 +347,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	 * 
 	 * @see org.eclipse.cdt.core.ICommandLauncher#waitAndRead(java.io.OutputStream, java.io.OutputStream)
 	 */
+	@Override
 	public int waitAndRead(OutputStream out, OutputStream err) {
 		if (fShowCommand) {
 			printCommandLine(out);
@@ -360,8 +368,8 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	 * @see org.eclipse.cdt.core.ICommandLauncher#waitAndRead(java.io.OutputStream, java.io.OutputStream,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public int waitAndRead(OutputStream output, OutputStream err,
-			IProgressMonitor monitor) {
+	@Override
+	public int waitAndRead(OutputStream output, OutputStream err, IProgressMonitor monitor) {
 		if (fShowCommand) {
 			printCommandLine(output);
 		}
@@ -431,10 +439,12 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		return state;
 	}
 
+	@Override
 	public IProject getProject() {
 		return fProject;
 	}
 
+	@Override
 	public void setProject(IProject project) {
 		fProject = project;
 	}
