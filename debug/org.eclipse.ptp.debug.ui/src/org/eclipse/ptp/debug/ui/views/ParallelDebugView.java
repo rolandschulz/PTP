@@ -118,12 +118,9 @@ public class ParallelDebugView extends ParallelJobsView {
 	};
 
 	/*
-	 * private MouseAdapter debugViewMouseAdapter = new MouseAdapter() { public
-	 * void mouseUp(MouseEvent event) { Object test = event.getSource(); if
-	 * (test instanceof Tree) { TreeItem[] items = ((Tree)test).getSelection();
-	 * Object[] targets = new Object[items.length]; for (int i=0;
-	 * i<items.length; i++) { targets[i] = items[i].getData(); }
-	 * selectElements(targets); } } };
+	 * private MouseAdapter debugViewMouseAdapter = new MouseAdapter() { public void mouseUp(MouseEvent event) { Object test =
+	 * event.getSource(); if (test instanceof Tree) { TreeItem[] items = ((Tree)test).getSelection(); Object[] targets = new
+	 * Object[items.length]; for (int i=0; i<items.length; i++) { targets[i] = items[i].getData(); } selectElements(targets); } } };
 	 */
 	public ParallelDebugView(IElementManager manager) {
 		super(manager);
@@ -141,10 +138,12 @@ public class ParallelDebugView extends ParallelJobsView {
 	@Override
 	public void dispose() {
 		Viewer viewer = getDebugViewer();
-		if (viewer != null)
+		if (viewer != null) {
 			viewer.removeSelectionChangedListener(debugViewSelectChangedListener);
-		if (getEventHandler() != null)
+		}
+		if (getEventHandler() != null) {
 			getEventHandler().dispose();
+		}
 		super.dispose();
 	}
 
@@ -154,12 +153,11 @@ public class ParallelDebugView extends ParallelJobsView {
 	protected Viewer getDebugViewer() {
 		if (launchViewer == null) {
 			IWorkbenchPage page = getViewSite().getPage();
-			if (page == null)
+			if (page == null) {
 				return null;
+			}
 			IViewPart part = page.findView(IDebugUIConstants.ID_DEBUG_VIEW);
 			if (part == null) {
-				if (page == null)
-					return null;
 				try {
 					part = page.showView(IDebugUIConstants.ID_DEBUG_VIEW);
 				} catch (PartInitException e) {
@@ -168,23 +166,20 @@ public class ParallelDebugView extends ParallelJobsView {
 			}
 			if (part != null && part instanceof AbstractDebugView) {
 				launchViewer = ((AbstractDebugView) part).getViewer();
-				if (launchViewer != null)
+				if (launchViewer != null) {
 					launchViewer.addSelectionChangedListener(debugViewSelectChangedListener);
+				}
 			}
 		}
 		return launchViewer;
 	}
 
 	/*
-	 * FIXME does not work if create a new set. Currently we can task id to
-	 * identify icon, but viewer is using order private void
-	 * selectElements(final Object[] objects) { SafeRunnable.run(new
-	 * SafeRunnable() { public void run() { if (!canvas.isDisposed()) {
-	 * canvas.unselectAllElements(); for (int i=0; i<objects.length; i++) {
-	 * Object obj = objects[i]; int id = ((UIDebugManager)
-	 * manager).getSelectedRegisteredTasks(obj); if (id > -1) { if
-	 * (!canvas.isSelected(id)) canvas.selectElement(id); } } canvas.redraw();
-	 * canvas.setCurrentSelection(false); } } }); }
+	 * FIXME does not work if create a new set. Currently we can task id to identify icon, but viewer is using order private void
+	 * selectElements(final Object[] objects) { SafeRunnable.run(new SafeRunnable() { public void run() { if (!canvas.isDisposed())
+	 * { canvas.unselectAllElements(); for (int i=0; i<objects.length; i++) { Object obj = objects[i]; int id = ((UIDebugManager)
+	 * manager).getSelectedRegisteredTasks(obj); if (id > -1) { if (!canvas.isSelected(id)) canvas.selectElement(id); } }
+	 * canvas.redraw(); canvas.setCurrentSelection(false); } } }); }
 	 */
 
 	/**
@@ -209,9 +204,7 @@ public class ParallelDebugView extends ParallelJobsView {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.ParallelJobView#createView(org.eclipse.swt.widgets
-	 * .Composite)
+	 * @see org.eclipse.ptp.ui.views.ParallelJobView#createView(org.eclipse.swt.widgets .Composite)
 	 */
 	@Override
 	public void createView(Composite parent) {
@@ -222,9 +215,7 @@ public class ParallelDebugView extends ParallelJobsView {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelSetView#fillContextMenu(org.
-	 * eclipse.jface.action.IMenuManager)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#fillContextMenu(org. eclipse.jface.action.IMenuManager)
 	 */
 	@Override
 	protected void fillContextMenu(IMenuManager manager) {
@@ -248,9 +239,7 @@ public class ParallelDebugView extends ParallelJobsView {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActionGroup
-	 * (org.eclipse.jface.action.IToolBarManager)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActionGroup (org.eclipse.jface.action.IToolBarManager)
 	 */
 	@Override
 	protected void createToolBarActionGroup(IToolBarManager toolBarMgr) {
@@ -267,9 +256,7 @@ public class ParallelDebugView extends ParallelJobsView {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions
-	 * (org.eclipse.jface.action.IToolBarManager)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions (org.eclipse.jface.action.IToolBarManager)
 	 */
 	@Override
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
@@ -311,8 +298,7 @@ public class ParallelDebugView extends ParallelJobsView {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int,
-	 * int)
+	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int, int)
 	 */
 	@Override
 	public void handleAction(int type, int index) {
@@ -325,9 +311,7 @@ public class ParallelDebugView extends ParallelJobsView {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.
-	 * eclipse.ptp.ui.model.IElement)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org. eclipse.ptp.ui.model.IElement)
 	 */
 	@Override
 	public void doubleClick(IElement element) {
@@ -341,14 +325,13 @@ public class ParallelDebugView extends ParallelJobsView {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java
-	 * .lang.Object)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java .lang.Object)
 	 */
 	@Override
 	public String[] getToolTipText(Object obj) {
-		if (obj == null)
+		if (obj == null) {
 			return new String[] { "", "" }; //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		String[] header = super.getToolTipText(obj);
 		// FIXME PProcessUI goes away when we address UI scalability. See Bug
 		// 311057
@@ -367,10 +350,11 @@ public class ParallelDebugView extends ParallelJobsView {
 	 * @throws CoreException
 	 */
 	public void registerElement(IElement element) throws CoreException {
-		if (element.isRegistered())
+		if (element.isRegistered()) {
 			((UIDebugManager) manager).unregisterElements(new IElement[] { element });
-		else
+		} else {
 			((UIDebugManager) manager).registerElements(new IElement[] { element });
+		}
 	}
 
 	/**
@@ -432,17 +416,20 @@ public class ParallelDebugView extends ParallelJobsView {
 	 */
 	private void updateDebugButtons(String jobId) {
 		IPSession session = ((UIDebugManager) manager).getDebugSession(jobId);
-		if (session == null)
+		if (session == null) {
 			return;
+		}
 		IElementSet set = getCurrentSet();
-		if (set == null)
+		if (set == null) {
 			return;
+		}
 
 		TaskSet terminatedTasks = session.getPDISession().getTaskManager().getTerminatedTasks();
 		TaskSet suspendedTasks = session.getPDISession().getTaskManager().getSuspendedTasks();
 		TaskSet stepReturnTasks = session.getPDISession().getTaskManager().getCanStepReturnTasks();
-		if (terminatedTasks == null || suspendedTasks == null || stepReturnTasks == null)
+		if (terminatedTasks == null || suspendedTasks == null || stepReturnTasks == null) {
 			return;
+		}
 
 		int setSize = set.size();
 		int totalTerminatedSize = 0;
@@ -455,8 +442,9 @@ public class ParallelDebugView extends ParallelJobsView {
 		} else {
 			try {
 				TaskSet setTasks = ((UIDebugManager) manager).getTasks(set.getID());
-				if (setTasks == null)
+				if (setTasks == null) {
 					return;
+				}
 				setSize = setTasks.cardinality();
 				TaskSet setTerminatedTasks = session.getPDISession().getTaskManager().getTerminatedTasks(setTasks.copy());
 				totalTerminatedSize = setTerminatedTasks.cardinality();
@@ -495,9 +483,7 @@ public class ParallelDebugView extends ParallelJobsView {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#selectionChanged
-	 * (org.eclipse.jface.viewers.SelectionChangedEvent)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#selectionChanged (org.eclipse.jface.viewers.SelectionChangedEvent)
 	 */
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
@@ -519,14 +505,11 @@ public class ParallelDebugView extends ParallelJobsView {
 	}
 
 	/*
-	 * public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int
-	 * width, int height) { super.drawSpecial(obj, gc, x_loc, y_loc, width,
-	 * height); if (cur_element_set != null && obj instanceof DebugElement) {
-	 * DebugElement element = (DebugElement)obj; switch(element.getType()) {
-	 * case DebugElement.VALUE_DIFF:
-	 * gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLUE));
-	 * gc.drawLine(x_loc, y_loc, x_loc+width, y_loc+height); gc.drawLine(x_loc,
-	 * y_loc+height, x_loc+width, y_loc); break; } } }
+	 * public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) { super.drawSpecial(obj, gc, x_loc,
+	 * y_loc, width, height); if (cur_element_set != null && obj instanceof DebugElement) { DebugElement element =
+	 * (DebugElement)obj; switch(element.getType()) { case DebugElement.VALUE_DIFF:
+	 * gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLUE)); gc.drawLine(x_loc, y_loc, x_loc+width, y_loc+height);
+	 * gc.drawLine(x_loc, y_loc+height, x_loc+width, y_loc); break; } } }
 	 */
 
 	/******************************************************
@@ -638,10 +621,8 @@ public class ParallelDebugView extends ParallelJobsView {
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					/*
-					 * FIXME In Debug View, there is a Selection Policy. If
-					 * current selected element is stack frame and its status is
-					 * suspended, then it cannot allow to change selection to
-					 * others. Now I used internal class to avoid policy
+					 * FIXME In Debug View, there is a Selection Policy. If current selected element is stack frame and its status
+					 * is suspended, then it cannot allow to change selection to others. Now I used internal class to avoid policy
 					 * checking
 					 */
 					if (viewer instanceof InternalTreeModelViewer) {
@@ -661,9 +642,7 @@ public class ParallelDebugView extends ParallelJobsView {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.ParallelJobsView#changeJobRefresh(org.eclipse
-	 * .ptp.core.elements.IPJob, boolean)
+	 * @see org.eclipse.ptp.ui.views.ParallelJobsView#changeJobRefresh(org.eclipse .ptp.core.elements.IPJob, boolean)
 	 */
 	@Override
 	public void changeJobRefresh(IPJob job, boolean force) {
