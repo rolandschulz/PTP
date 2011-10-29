@@ -683,7 +683,6 @@ public class GemAnalyzer extends ViewPart {
 			}
 		});
 
-		// TODO fix this for remote projects
 		// To conveniently run GEM from this view
 		this.runGemButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1171,7 +1170,7 @@ public class GemAnalyzer extends ViewPart {
 	 * @return void
 	 */
 	public void init(IResource resource) {
-		// TODO this is redundant already checked in utils.initgemviews
+
 		this.activeFile = GemUtilities.adaptResource(resource);
 
 		this.analyzerUpdateThread = new Thread() {

@@ -44,7 +44,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -57,6 +59,8 @@ import org.eclipse.ptp.gem.views.GemAnalyzer;
 import org.eclipse.ptp.gem.views.GemBrowser;
 import org.eclipse.ptp.gem.views.GemConsole;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.SyncFlag;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -94,7 +98,7 @@ public class GemUtilities {
 	private static String consoleStdErrMessage;
 	private static String outputSameMessage;
 	private static String outputSameDetails;
-	private static IFile gemInputResource;
+	private static IFile gemActiveResource;
 	private static IFile gemLogFile;
 
 	// This thread exists to update SWT components belonging to the UI thread.
@@ -188,6 +192,18 @@ public class GemUtilities {
 		return;
 	}
 
+	//
+	private static void createGemFolder(final boolean remote, final IFolder gemFolder) {
+		try {
+			gemFolder.create(IResource.FORCE, true, null);
+		} catch (final CoreException e) {
+			logExceptionDetail(e);
+		}
+		if (remote) {
+			sync();
+		}
+	}
+
 	/**
 	 * Runs the Happens Before Viewer on the log file associated with the
 	 * specified input source file.
@@ -240,20 +256,12 @@ public class GemUtilities {
 
 		// Get all the current preferences
 		final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+		final boolean isRemote = (isRemoteProject() || (isSynchronizedProject() && isRemoteBuildConfiguration()));
 
 		// Create GEM directory to hold the generated log file and executable
 		final IProject currentProject = resource.getProject();
 		gemLogFile = currentProject.getFile(getLogfilePath(resource));
 		final IFolder gemFolder = currentProject.getFolder(new Path("gem")); //$NON-NLS-1$
-		// TODO this is already done in getLogFilePath
-		if (!gemFolder.exists()) {
-			try {
-				gemFolder.create(true, true, null);
-				refreshProject(currentProject);
-			} catch (final CoreException e) {
-				logExceptionDetail(e);
-			}
-		}
 
 		// Build up the command line String
 		// Also generate the path for the log file to be created by ISP
@@ -296,8 +304,7 @@ public class GemUtilities {
 		final String hostName = pstore.getString(PreferenceConstants.GEM_PREF_HOSTNAME);
 
 		// Check for sync project
-		final boolean useRemoteISP = (isRemoteProject() || (isSynchronizedProject() && isRemoteBuildConfiguration()));
-		String ispExePath = pstore.getString(useRemoteISP ? PreferenceConstants.GEM_PREF_REMOTE_ISPEXE_PATH
+		String ispExePath = pstore.getString(isRemote ? PreferenceConstants.GEM_PREF_REMOTE_ISPEXE_PATH
 				: PreferenceConstants.GEM_PREF_ISPEXE_PATH);
 		ispExePath += (ispExePath == "") ? "" : "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		final String cmdArgs = pstore.getString(PreferenceConstants.GEM_PREF_ARGS);
@@ -352,6 +359,11 @@ public class GemUtilities {
 		// Now run ISP
 		runCommand(ispCmd, true);
 
+		// Trigger a sync if the project is synchronized with remote build configuration
+		if (isRemote) {
+			sync();
+		}
+
 		// Sync the project with the underlying file system
 		refreshProject(currentProject);
 	}
@@ -365,19 +377,15 @@ public class GemUtilities {
 	 * @return int Returns 1 if everything went smoothly, -1 otherwise.
 	 */
 	public static int doIspcc(IResource resource) {
-
+		// TODO Do we need create gem folder here?
 		// Create GEM folder to hold the generated log file and executable
 		final IPath gemFolderPath = new Path("gem"); //$NON-NLS-1$
 		final IProject currentProject = getCurrentProject();
 		final IFolder gemFolder = currentProject.getFolder(gemFolderPath);
-
+		final boolean isRemote = (isRemoteProject() || (isSynchronizedProject() && isRemoteBuildConfiguration()));
 		if (!gemFolder.exists()) {
-			try {
-				gemFolder.create(IResource.FORCE, true, null);
-				refreshProject(currentProject);
-			} catch (final CoreException e) {
-				logExceptionDetail(e);
-			}
+			createGemFolder(isRemote, gemFolder);
+			refreshProject(currentProject);
 		}
 
 		// Build up command line String
@@ -456,7 +464,7 @@ public class GemUtilities {
 	 * @return The current project being verified,
 	 */
 	public static IProject getCurrentProject() {
-		return gemInputResource.getProject();
+		return gemActiveResource.getProject();
 	}
 
 	/**
@@ -514,12 +522,10 @@ public class GemUtilities {
 		final IPath gemFolderPath = new Path("gem"); //$NON-NLS-1$
 		final IFolder gemFolder = currentProject.getFolder(gemFolderPath);
 
+		final boolean isRemote = (isRemoteProject() || (isSynchronizedProject() && isRemoteBuildConfiguration()));
 		if (!gemFolder.exists()) {
-			try {
-				gemFolder.create(IResource.FORCE, true, null);
-			} catch (final CoreException e) {
-				logExceptionDetail(e);
-			}
+			createGemFolder(isRemote, gemFolder);
+			refreshProject(currentProject);
 		}
 
 		// Build up the correct project relative path for the log file
@@ -540,14 +546,13 @@ public class GemUtilities {
 	 */
 	public static URI getMostRecentURI() {
 		final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
-		final String mostRecentURIStr = pstore.getString(PreferenceConstants.GEM_PREF_MOST_RECENT_FILE);
-		URI mostRecentURI = null;
+		URI location = null;
 		try {
-			mostRecentURI = new URI(mostRecentURIStr);
+			location = new URI(pstore.getString(PreferenceConstants.GEM_PREF_MOST_RECENT_FILE));
 		} catch (final URISyntaxException e) {
 			logExceptionDetail(e);
 		}
-		return mostRecentURI;
+		return location;
 	}
 
 	/**
@@ -582,7 +587,7 @@ public class GemUtilities {
 	}
 
 	/**
-	 * Returns the IRemoteCOnnection associated with the specified
+	 * Returns the IRemoteConnection associated with the specified
 	 * IRemoteServices.
 	 * 
 	 * @param service
@@ -652,12 +657,12 @@ public class GemUtilities {
 		} else {
 			projectURI = currentProject.getLocationURI();
 		}
-		
+
 		String scheme = null;
 		if (projectURI != null) {
 			scheme = projectURI.getScheme();
 		}
-		
+
 		final IRemoteServices currentService = getRemoteService(scheme);
 		final IRemoteConnection currentConnection = getRemoteConnection(currentService);
 		final IRemoteProcessBuilder rpb = currentService.getProcessBuilder(currentConnection, args);
@@ -809,7 +814,7 @@ public class GemUtilities {
 	 */
 	public static void initGemViews(IResource resource, boolean compile, boolean verify) {
 
-		gemInputResource = adaptResource(resource);
+		gemActiveResource = adaptResource(resource);
 		doCompile = compile;
 		doVerify = verify;
 
@@ -825,7 +830,7 @@ public class GemUtilities {
 		analyzer = (GemAnalyzer) gemViewPart;
 		// Clear the Analyzer view in case we're doing a repeated run
 		analyzer.clear();
-		analyzer.init(gemInputResource);
+		analyzer.init(gemActiveResource);
 
 		// Tell the Browser where to find the source and log files
 		final IViewPart browserPart = window.getActivePage().findView(GemBrowser.ID);
@@ -845,24 +850,27 @@ public class GemUtilities {
 			public void run() {
 				taskStatus = TaskStatus.ACTIVE;
 
-				// Check that ISP itself is installed on the target machine
-				if (getIspVersion() == null) {
-					cancelAnalysis();
-					return;
-				}
+				final boolean isLogFile = gemActiveResource.getFileExtension().equals("log");
+				// If not a log file, check for ISP installation and version
+				if (!isLogFile) {
+					if (getIspVersion() == null) {
+						cancelAnalysis();
+						return;
+					}
 
-				// Check for correct version of ISP on the target machine
-				if (!hasCorrectIspVersion() && taskStatus == TaskStatus.ACTIVE) {
-					cancelAnalysis();
-					showErrorDialog(Messages.GemUtilities_7);
-					return;
-				}
+					// Check for correct version of ISP on the target machine
+					if (!hasCorrectIspVersion() && taskStatus == TaskStatus.ACTIVE) {
+						cancelAnalysis();
+						showErrorDialog(Messages.GemUtilities_7);
+						return;
+					}
 
-				// Run ispcc and/or isp and check for creation of the log file
-				if (generateLogFile(gemInputResource, doCompile, doVerify) == -1) {
-					cancelAnalysis();
-					showErrorDialog(Messages.GemUtilities_3);
-					return;
+					// Run ispcc and/or isp and check for creation of the log file
+					if (generateLogFile(gemActiveResource, doCompile, doVerify) == -1) {
+						cancelAnalysis();
+						showErrorDialog(Messages.GemUtilities_3);
+						return;
+					}
 				}
 
 				if (taskStatus == TaskStatus.ACTIVE) {
@@ -870,8 +878,9 @@ public class GemUtilities {
 					IFile sourceFile = null;
 
 					// If it's a log file, that's all we're interested in
-					if (gemInputResource.getFileExtension().equals("log")) { //$NON-NLS-1$
-						logFile = gemInputResource;
+					if (isLogFile) {
+						gemLogFile = gemActiveResource;
+						logFile = gemLogFile;
 					} else {
 						logFile = gemLogFile;
 					}
@@ -964,7 +973,7 @@ public class GemUtilities {
 		String buildLocation = null;
 		buildLocation = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration).getLocation();
 		// BuildConfigurationManager.getInstance().getActiveSyncLocationURI(gemInputResource).getPath();
-		final String projectLocation = gemInputResource.getProject().getLocationURI().getPath();
+		final String projectLocation = gemActiveResource.getProject().getLocationURI().getPath();
 
 		return !buildLocation.equals(projectLocation);
 	}
@@ -985,7 +994,7 @@ public class GemUtilities {
 		// GemUtilities.logExceptionDetail(e);
 		// }
 		// return isRemote;
-		return gemInputResource.getLocation() == null;
+		return gemActiveResource.getLocation() == null;
 	}
 
 	/**
@@ -1407,6 +1416,17 @@ public class GemUtilities {
 	public static void showInformationDialog(String message) {
 		final String title = Messages.GemUtilities_12;
 		JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	//
+	private static void sync() {
+		final IProgressMonitor monitor = new NullProgressMonitor();
+		final IProject project = getCurrentProject();
+		try {
+			SyncManager.syncBlocking(null, project, SyncFlag.FORCE, monitor);
+		} catch (final CoreException e) {
+			logExceptionDetail(e);
+		}
 	}
 
 	/**
