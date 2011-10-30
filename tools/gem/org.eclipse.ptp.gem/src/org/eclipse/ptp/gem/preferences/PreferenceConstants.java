@@ -61,7 +61,6 @@ public class PreferenceConstants {
 
 	// Hidden preference for name of child processes
 	public static final String GEM_PREF_PROCESS_NAME = "processName"; //$NON-NLS-1$
-	public static final String GEM_PREF_COMPARE_OUTPUT = "compareOutput"; //$NON-NLS-1$
 
 	// Hidden preference holding the previously used cmd line arguments
 	public static final String GEM_PREF_ARGS = "cmdArgs"; //$NON-NLS-1$

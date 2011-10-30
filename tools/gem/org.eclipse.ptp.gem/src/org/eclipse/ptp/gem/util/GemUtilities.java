@@ -27,7 +27,6 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -96,8 +95,6 @@ public class GemUtilities {
 	private static boolean doVerify;
 	private static String consoleStdOutMessage;
 	private static String consoleStdErrMessage;
-	private static String outputSameMessage;
-	private static String outputSameDetails;
 	private static IFile gemActiveResource;
 	private static IFile gemLogFile;
 
@@ -145,51 +142,6 @@ public class GemUtilities {
 		browser.clear();
 		console.cancel();
 		taskStatus = TaskStatus.IDLE;
-	}
-
-	private static void compareOutput(String consoleStdIn) {
-
-		// Create an array that holds the output of each interleaving
-		final ArrayList<String> outputs = new ArrayList<String>();
-		final Scanner scanner = new Scanner(consoleStdIn);
-		int interIndex = -1;
-
-		while (scanner.hasNextLine()) {
-			final String line = scanner.nextLine();
-			if (line.contains("INTERLEAVING :")) {//$NON-NLS-1$
-				outputs.add("");//$NON-NLS-1$
-				interIndex++;
-				continue;
-			}
-			outputs.set(interIndex, outputs.get(interIndex).concat("\n" + line));//$NON-NLS-1$
-		}
-
-		// Compare each output against first interleaving, report discrepancy
-		for (interIndex = 1; interIndex < outputs.size(); interIndex++) {
-			if (!outputs.get(0).equals(outputs.get(interIndex))) {
-				final StringBuffer stringBuffer = new StringBuffer();
-				stringBuffer.append(Messages.GemUtilities_19);
-				stringBuffer.append(outputs.get(0));
-				stringBuffer.append("\n"); //$NON-NLS-1$
-				stringBuffer.append("\n"); //$NON-NLS-1$
-				stringBuffer.append(Messages.GemUtilities_22);
-				stringBuffer.append(outputs.get(interIndex));
-				outputSameDetails = stringBuffer.toString();
-
-				stringBuffer.setLength(0);
-				stringBuffer.append(Messages.GemUtilities_23);
-				stringBuffer.append(" "); //$NON-NLS-1$
-				stringBuffer.append((interIndex - 1));
-				stringBuffer.append(" "); //$NON-NLS-1$
-				stringBuffer.append(Messages.GemUtilities_26);
-				outputSameMessage = stringBuffer.toString();
-
-				return;
-			}
-		}
-
-		outputSameMessage = Messages.GemUtilities_27;
-		return;
 	}
 
 	//
@@ -283,6 +235,7 @@ public class GemUtilities {
 				logFileLocation = gemFolder.getLocationURI().getPath();
 			}
 		} else {
+			logFileLocation = gemFolder.getLocationURI().getPath();
 			executablePath = new Path(gemFolder.getLocationURI().getPath());
 			executablePath = executablePath.append(currentProject.getName()).removeFileExtension().addFileExtension("gem"); //$NON-NLS-1$
 		}
@@ -297,7 +250,6 @@ public class GemUtilities {
 		final boolean mpiCallsPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_MPICALLS);
 		final boolean openmpPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_OPENMP);
 		final boolean blockingSendsPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_BLOCK);
-		final boolean compareOutputPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_COMPARE_OUTPUT);
 		final boolean reportPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_REPORT);
 		final boolean unixSocketsPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_UNIXSOCKETS);
 		final boolean verbosePreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_VERBOSE);
@@ -333,7 +285,6 @@ public class GemUtilities {
 		stringBuffer.append(portnum);
 		stringBuffer.append(" "); //$NON-NLS-1$
 		stringBuffer.append((blockingSendsPreference) ? "-b " : ""); //$NON-NLS-1$ //$NON-NLS-2$
-		stringBuffer.append((compareOutputPreference) ? "-P " : ""); //$NON-NLS-1$ //$NON-NLS-2$
 		stringBuffer.append((mpiCallsPreference) ? "-m " : ""); //$NON-NLS-1$ //$NON-NLS-2$
 		stringBuffer.append((unixSocketsPreference) ? "-x " : ""); //$NON-NLS-1$ //$NON-NLS-2$
 		stringBuffer.append((!hostName.trim().equals("")) ? "-h " : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -556,27 +507,6 @@ public class GemUtilities {
 	}
 
 	/**
-	 * Returns the value of 'outputSameDetails'
-	 * 
-	 * @param none
-	 * @return String The string representation of details of the output
-	 *         comparison.
-	 */
-	public static String getOutputSameDetails() {
-		return outputSameDetails;
-	}
-
-	/**
-	 * Returns the value of 'outputSameMessage'
-	 * 
-	 * @param none
-	 * @return String The output string to compare against.
-	 */
-	public static String getOutputSameMessage() {
-		return outputSameMessage;
-	}
-
-	/**
 	 * Returns the generated log file for the current project being verified.
 	 * 
 	 * @param none
@@ -591,7 +521,7 @@ public class GemUtilities {
 	 * IRemoteServices.
 	 * 
 	 * @param service
-	 *            The IRemotesServices object for which the IRemoteCOnnections
+	 *            The IRemotesServices object for which the IRemoteCOnnection
 	 *            object belongs.
 	 * @return IRemoteConnection The IRemoteConnection associated with the
 	 *         specified IRemoteServices.
@@ -600,6 +530,9 @@ public class GemUtilities {
 		IRemoteConnection currentConnection = null;
 		IRemoteConnectionManager connectionManager = null;
 		IRemoteConnection[] connections = null;
+
+		IProject project = getCurrentProject();
+
 		if (service != null) {
 			connectionManager = service.getConnectionManager();
 		}
@@ -608,7 +541,15 @@ public class GemUtilities {
 		}
 		if (connections != null) {
 			for (final IRemoteConnection connection : connections) {
-				if (connection.isOpen()) {
+				URI projectURI = null;
+				try {
+					projectURI = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(project);
+				} catch (CoreException e) {
+					e.printStackTrace();
+				}
+				String addr = connection.getAddress();
+				String host = projectURI.getHost();
+				if (host.equals(addr.substring(0, addr.indexOf(".")))) { //$NON-NLS-1$
 					currentConnection = connection;
 					break;
 				}
@@ -635,7 +576,7 @@ public class GemUtilities {
 	}
 
 	/**
-	 * Returns the RemoteProcessBuilder object associated with the connection
+	 * Returns the RemoteProcessBuilder associated with the connection
 	 * used by the specified remote project.
 	 * 
 	 * @param currentProject
@@ -704,9 +645,17 @@ public class GemUtilities {
 	public static IFile getSourceFile(String fullPath, IResource resource) {
 
 		final IProject currentProject = resource.getProject();
+
+		if (BuildConfigurationManager.getInstance().getProjectSyncProvider(currentProject) == null && !isRemoteProject()) {
+			final String currentProjectPath = currentProject.getLocationURI().getPath();
+			IPath sourceFilePath = new Path(fullPath);
+			sourceFilePath = sourceFilePath.makeRelativeTo(new Path(currentProjectPath));
+			final IFile sourceFile = currentProject.getFile(sourceFilePath);
+			return sourceFile;
+		}
+
 		final String[] args = fullPath.split("/", -1); //$NON-NLS-1$
 		final String name = args[args.length - 1];
-
 		return currentProject.getFile(name);
 	}
 
@@ -1229,13 +1178,6 @@ public class GemUtilities {
 
 			consoleStdOutMessage = stdOutResult;
 			consoleStdErrMessage = stdErrResult;
-
-			// means that the output was not compared
-			outputSameMessage = ""; //$NON-NLS-1$
-			outputSameDetails = ""; //$NON-NLS-1$
-			if (verbose && pstore.getBoolean(PreferenceConstants.GEM_PREF_COMPARE_OUTPUT)) {
-				compareOutput(consoleStdOutMessage);
-			}
 
 			if (isRemote ? remoteProcess == null : process == null) {
 				return -1;
