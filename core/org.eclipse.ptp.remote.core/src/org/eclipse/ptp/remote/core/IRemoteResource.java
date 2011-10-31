@@ -13,6 +13,8 @@ package org.eclipse.ptp.remote.core;
 import java.net.URI;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * Interface to a remote resource. There are currently two types of remote resources: fully remote and synchronized. This interface
@@ -49,6 +51,18 @@ public interface IRemoteResource {
 	 * @return IResource
 	 */
 	public IResource getResource();
+
+	/**
+	 * Synchronize the resource with the underlying filesystem. Performs a refresh for local and remote projects, but causes
+	 * synchronized projects to attempt to synchronize with their remote files. May synchronize more than just the single resource.
+	 * Blocks until the refresh has completed, so callers should use a job if necessary.
+	 * 
+	 * @param monitor
+	 *            progress monitor to cancel refresh
+	 * @throws CoreException
+	 *             if the underlying synchronization fails
+	 */
+	public void refresh(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Set the platform resource

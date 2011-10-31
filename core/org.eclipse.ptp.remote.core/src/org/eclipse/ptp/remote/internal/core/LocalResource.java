@@ -13,6 +13,8 @@ package org.eclipse.ptp.remote.internal.core;
 import java.net.URI;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.IRemoteResource;
 
 public class LocalResource implements IRemoteResource {
@@ -27,6 +29,7 @@ public class LocalResource implements IRemoteResource {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteResource#getDefaultLocationURI(org.eclipse.core.resources.IResource)
 	 */
+	@Override
 	public URI getActiveLocationURI() {
 		return fResource.getLocationURI();
 	}
@@ -36,6 +39,7 @@ public class LocalResource implements IRemoteResource {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteResource#getResource()
 	 */
+	@Override
 	public IResource getResource() {
 		return fResource;
 	}
@@ -43,8 +47,19 @@ public class LocalResource implements IRemoteResource {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteResource#refresh(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public void refresh(IProgressMonitor monitor) throws CoreException {
+		fResource.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteResource#setResource(org.eclipse.core.resources.IResource)
 	 */
+	@Override
 	public void setResource(IResource resource) {
 		fResource = resource;
 	}
