@@ -14,6 +14,7 @@ import java.net.URI;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.IRemoteResource;
 
 public class SynchronizedResource implements IRemoteResource {
@@ -24,6 +25,7 @@ public class SynchronizedResource implements IRemoteResource {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteResource#getDefaultLocationURI(org.eclipse.core.resources.IResource)
 	 */
+	@Override
 	public URI getActiveLocationURI() {
 		try {
 			return BuildConfigurationManager.getInstance().getActiveSyncLocationURI(fResource);
@@ -35,8 +37,19 @@ public class SynchronizedResource implements IRemoteResource {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteResource#refresh(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public void refresh(IProgressMonitor monitor) throws CoreException {
+		SyncManager.syncBlocking(null, fResource.getProject(), SyncFlag.FORCE, monitor);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteResource#getResource()
 	 */
+	@Override
 	public IResource getResource() {
 		return fResource;
 	}
@@ -46,6 +59,7 @@ public class SynchronizedResource implements IRemoteResource {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteResource#setResource(org.eclipse.core.resources.IResource)
 	 */
+	@Override
 	public void setResource(IResource resource) {
 		fResource = resource;
 	}
