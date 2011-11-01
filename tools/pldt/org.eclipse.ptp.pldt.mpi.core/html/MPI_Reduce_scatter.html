@@ -1,9 +1,331 @@
-<html><head><title>MPI_Reduce_scatter</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:44 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Reduce_scatter</title>
+
+</head>
 <body>
-<H3>MPI_Reduce_scatter</H3>
-<PRE>
-int MPI_Reduce_scatter(void* , void*, int *, MPI_Datatype, MPI_Op, MPI_Comm);
-</PRE>
-<DL><DD>
-Applies a reduction operation to the vectorsendbuf over the set of tasks specified bycomm and scatters the result according to the values in recvcounts.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Reduce_scatter</h1>
+
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Reduce_scatter</b>
+&minus; Combines values and scatters the results.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Reduce_scatter(void *<i>sendbuf</i>, void
+<i>*recvbuf</i>, int <i>*recvcounts</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Datatype <i>datatype</i>, MPI_Op
+<i>op</i>, MPI_Comm <i>comm</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_REDUCE_SCATTER(<i>SENDBUF, RECVBUF, RECVCOUNTS,
+DATATYPE, OP,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>COMM, IERROR</i>)</p></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">&lt;type&gt;</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>SENDBUF(*), RECVBUF(*)</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>RECVCOUNTS(*), DATATYPE, OP, COMM,
+IERROR</i></p> </td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void MPI::Comm::Reduce_scatter(const void* <i>sendbuf</i>,
+void* <i>recvbuf</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int <i>recvcounts</i>[], const
+MPI::Datatype&amp; <i>datatype</i>,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const MPI::Op&amp; <i>op</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">sendbuf</p></td>
+<td width="4%"></td>
+<td width="63%">
+
+
+<p style="margin-top: 1em" valign="top">Starting address of
+send buffer (choice).</p></td>
+<td width="11%">
+</td>
+</table>
+
+<p style="margin-left:11%;">recvcounts</p>
+
+<p style="margin-left:26%;">Integer array specifying the
+number of elements in result distributed to each process.
+Array must be identical on all calling processes.</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">datatype</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Datatype of
+elements of input buffer (handle).</p></td>
+<td width="3%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">op</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Operation
+(handle).</p> </td>
+<td width="3%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">comm</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Communicator
+(handle).</p> </td>
+<td width="3%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">recvbuf</p></td>
+<td width="4%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em" valign="top">Starting address of
+receive buffer (choice).</p></td>
+<td width="6%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="6%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Reduce_scatter
+first does an element-wise reduction on vector of
+<i>count</i> =&nbsp;S(i)<i>revcounts</i>[i] elements in the
+send buffer defined by <i>sendbuf</i>, <i>count</i>, and
+<i>datatype</i>. Next, the resulting vector of results is
+split into n disjoint segments, where n is the number of
+processes in the group. Segment i contains
+<i>recvcounts</i>[i] elements. The ith segment is sent to
+process i and stored in the receive buffer defined by
+<i>recvbuf</i>, <i>recvcounts</i>[i], and
+<i>datatype</i>.</p>
+
+<a name="USE OF IN-PLACE OPTION"></a>
+<h2>USE OF IN-PLACE OPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">When the
+communicator is an intracommunicator, you can perform a
+reduce-scatter operation in-place (the output buffer is used
+as the input buffer). Use the variable MPI_IN_PLACE as the
+value of the <i>sendbuf</i>. In this case, the input data is
+taken from the top of the receive buffer. The area occupied
+by the input data may be either longer or shorter than the
+data filled by the output data.</p>
+
+<a name="WHEN COMMUNICATOR IS AN INTER-COMMUNICATOR"></a>
+<h2>WHEN COMMUNICATOR IS AN INTER-COMMUNICATOR</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">When the
+communicator is an inter-communicator, the reduce-scatter
+operation occurs in two phases. First, the result of the
+reduction performed on the data provided by the processes in
+the first group is scattered among the processes in the
+second group. Then the reverse occurs: the reduction
+performed on the data provided by the processes in the
+second group is scattered among the processes in the first
+group. For each group, all processes provide the same
+<i>recvcounts</i> argument, and the sum of the
+<i>recvcounts</i> values should be the same for both
+groups.</p>
+
+<a name="NOTES ON COLLECTIVE OPERATIONS"></a>
+<h2>NOTES ON COLLECTIVE OPERATIONS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The reduction
+functions ( <i>MPI_Op</i> ) do not return an error value. As
+a result, if the functions detect an error, all they can do
+is either call <i>MPI_Abort</i> or silently skip the
+problem. Thus, if you change the error handler from
+<i>MPI_ERRORS_ARE_FATAL</i> to something else, for example,
+<i>MPI_ERRORS_RETURN</i> , then no error may be
+indicated.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The reason for
+this is the performance problems in ensuring that all
+collective routines return the same error value.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

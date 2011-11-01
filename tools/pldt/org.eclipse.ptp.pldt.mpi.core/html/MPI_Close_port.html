@@ -1,5 +1,5 @@
 <!-- Creator     : groff version 1.19.2 -->
-<!-- CreationDate: Fri Aug 26 10:45:57 2011 -->
+<!-- CreationDate: Fri Aug 26 10:45:16 2011 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -12,20 +12,19 @@
        pre   { margin-top: 0; margin-bottom: 0; }
        table { margin-top: 0; margin-bottom: 0; }
 </style>
-<title>MPI_Win_get_attr</title>
+<title>MPI_Close_port</title>
 
 </head>
 <body>
 
-<h1 align=center>MPI_Win_get_attr</h1>
+<h1 align=center>MPI_Close_port</h1>
 
-<a name="NAME"></a>
 <h2>NAME</h2>
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><b>MPI_Win_get_attr</b>
-&minus; Obtains the value of a window attribute.</p>
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Close_port</b>
+&minus; Releases the specified network address.</p>
 
 <a name="SYNTAX"></a>
 <h2>SYNTAX</h2>
@@ -37,51 +36,63 @@
 
 <p style="margin-left:11%; margin-top: 1em">#include
 &lt;mpi.h&gt; <br>
-int MPI_Win_get_attr(MPI_Win <i>win</i>, int
-<i>win_keyval</i>,</p>
+int MPI_Close_port(char *<i>port_name</i>)</p>
 
-<table width="100%" border=0 rules="none" frame="void"
-       cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="8%"></td>
-<td width="7%"></td>
-<td width="85%">
-
-
-<p valign="top">void *<i>attribute_val</i>, int
-*<i>flag</i>)</p> </td>
-</table>
-
-<a name="Fortran Syntax (see FORTRAN 77 NOTES)"></a>
-<h2>Fortran Syntax (see FORTRAN 77 NOTES)</h2>
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
 
 
 <p style="margin-left:11%; margin-top: 1em">INCLUDE
 &rsquo;mpif.h&rsquo; <br>
-MPI_WIN_GET_ATTR(<i>WIN, WIN_KEYVAL, ATTRIBUTE_VAL, FLAG,
-IERROR</i>)</p>
+MPI_CLOSE_PORT(<i>PORT_NAME, IERROR</i>)</p>
 
 <table width="100%" border=0 rules="none" frame="void"
        cellspacing="0" cellpadding="0">
 <tr valign="top" align="left">
 <td width="8%"></td>
-<td width="92%">
-
-
-<p valign="top">INTEGER <i>WIN, WIN_KEYVAL, IERROR</i></p></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
 <tr valign="top" align="left">
 <td width="8%"></td>
-<td width="92%">
+<td width="7%">
 
 
-<p valign="top">INTEGER(KIND=MPI_ADDRESS_KIND)
-<i>ATTRIBUTE_VAL</i></p> </td>
+<p valign="top">CHARACTER*(*)</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+
+
+<p valign="top"><i>PORT_NAME</i></p></td>
 <tr valign="top" align="left">
 <td width="8%"></td>
-<td width="92%">
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
 
 
-<p valign="top">LOGICAL <i>FLAG</i></p></td>
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="62%">
+
+
+<p valign="top"><i>IERROR</i></p></td>
 </table>
 
 <a name="C++ Syntax"></a>
@@ -90,57 +101,36 @@ IERROR</i>)</p>
 
 <p style="margin-left:11%; margin-top: 1em">#include
 &lt;mpi.h&gt; <br>
-bool MPI::Win::Get_attr(int win_keyval, void* attribute_val)
-const</p>
+void MPI::Close_port(const char* <i>port_name</i>)</p>
 
-<a name="INPUT PARAMETERS"></a>
-<h2>INPUT PARAMETERS</h2>
+<a name="INPUT PARAMETER"></a>
+<h2>INPUT PARAMETER</h2>
 
 
 <table width="100%" border=0 rules="none" frame="void"
        cellspacing="0" cellpadding="0">
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="4%">
+<td width="14%">
 
 
-<p style="margin-top: 1em" valign="top">win</p></td>
-<td width="11%"></td>
-<td width="74%">
+<p style="margin-top: 1em" valign="top">port_name</p></td>
+<td width="1%"></td>
+<td width="25%">
 
 
-<p style="margin-top: 1em" valign="top">Window to which the
-attribute is attached (handle).</p></td>
+<p style="margin-top: 1em" valign="top">A port
+(string).</p> </td>
+<td width="49%">
+</td>
 </table>
 
-<p style="margin-left:11%;">win_keyval</p>
+<a name="OUTPUT PARAMETER"></a>
+<h2>OUTPUT PARAMETER</h2>
 
-<p style="margin-left:26%;">Key value (integer).</p>
-
-<a name="OUTPUT PARAMETERS"></a>
-<h2>OUTPUT PARAMETERS</h2>
-
-
-
-<p style="margin-left:11%; margin-top: 1em">attribute_val</p>
-
-<p style="margin-left:26%;">Attribute value, unless
-<i>ag</i> = false</p>
 
 <table width="100%" border=0 rules="none" frame="void"
        cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="11%"></td>
-<td width="9%">
-
-
-<p style="margin-top: 1em" valign="top">flag</p></td>
-<td width="6%"></td>
-<td width="74%">
-
-
-<p style="margin-top: 1em" valign="top">False if no
-attribute is associated with the key (logical).</p></td>
 <tr valign="top" align="left">
 <td width="11%"></td>
 <td width="9%">
@@ -148,36 +138,22 @@ attribute is associated with the key (logical).</p></td>
 
 <p style="margin-top: 1em" valign="top">IERROR</p></td>
 <td width="6%"></td>
-<td width="74%">
+<td width="57%">
 
 
 <p style="margin-top: 1em" valign="top">Fortran only: Error
 status (integer).</p></td>
+<td width="17%">
+</td>
 </table>
 
 <a name="DESCRIPTION"></a>
 <h2>DESCRIPTION</h2>
 
 
-<p style="margin-left:11%; margin-top: 1em">Obtains the
-value of a window attribute.</p>
-
-<a name="FORTRAN 77 NOTES"></a>
-<h2>FORTRAN 77 NOTES</h2>
-
-
-<p style="margin-left:11%; margin-top: 1em">The MPI
-standard prescribes portable Fortran syntax for the
-<i>ATTRIBUTE_VAL</i> argument only for Fortran 90. FORTRAN
-77 users may use the non-portable syntax</p>
-
-
-<p style="margin-left:11%; margin-top: 1em">INTEGER*MPI_ADDRESS_KIND
-<i>ATTRIBUTE_VAL</i></p>
-
-<p style="margin-left:11%; margin-top: 1em">where
-MPI_ADDRESS_KIND is a constant defined in mpif.h and gives
-the length of the declared integer in bytes.</p>
+<p style="margin-left:11%; margin-top: 1em">MPI_Close_port
+releases the network address represented by
+<i>port_name</i>.</p>
 
 <a name="ERRORS"></a>
 <h2>ERRORS</h2>

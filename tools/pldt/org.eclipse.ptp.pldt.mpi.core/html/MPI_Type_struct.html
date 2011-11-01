@@ -1,9 +1,321 @@
-<html><head><title>MPI_Type_struct</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:54 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Type_struct</title>
+
+</head>
 <body>
-<H3>MPI_Type_struct</H3>
-<PRE>
-int MPI_Type_struct(int, int *, MPI_Aint *, MPI_Datatype *, MPI_Datatype *);
-</PRE>
-<DL><DD>
-Returns a new datatype that representscount blocks, each with a distinct format and offset.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Type_struct</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Type_struct</b>
+&minus; Creates a <i>struct</i> data type -- use of this
+routine is deprecated.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Type_struct(int <i>count</i>, int
+<i>*array_of_blocklengths</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Aint <i>*array_of_displacements</i>,
+MPI_Datatype <i>*array_of_types</i>,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Datatype <i>*newtype</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_TYPE_STRUCT(<i>COUNT, ARRAY_OF_BLOCKLENGTHS,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>ARRAY_OF_DISPLACEMENTS,
+ARRAY_OF_TYPES,</i></p> </td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>NEWTYPE, IERROR</i>)</p></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COUNT, ARRAY_OF_BLOCKLENGTHS(*)</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>ARRAY_OF_DISPLACEMENTS(*)</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>ARRAY_OF_TYPES(*), NEWTYPE,
+IERROR</i></p> </td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="7%">
+
+
+<p style="margin-top: 1em" valign="top">count</p></td>
+<td width="8%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Number of blocks
+(integer) also number of entries in arrays array_of_types,
+array_of_displacements, and array_of_blocklengths.</p></td>
+</table>
+
+<p style="margin-left:11%;">array_of_blocklengths</p>
+
+<p style="margin-left:26%;">Number of elements in each
+block (array).</p>
+
+<p style="margin-left:11%;">array_of_displacements</p>
+
+<p style="margin-left:26%;">Byte displacement of each block
+(array).</p>
+
+<p style="margin-left:11%;">array_of_types</p>
+
+<p style="margin-left:26%;">Type of elements in each block
+(array of handles to datatype objects).</p>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">newtype</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">New datatype
+(handle).</p> </td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Note that use
+of this routine is <i>deprecated</i> as of MPI-2. Use
+MPI_Type_create_struct instead.</p>
+
+<p style="margin-left:11%; margin-top: 1em">This deprecated
+routine is not available in C++.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Type_struct
+is the most general type constructor. It further generalizes
+MPI_Type_hindexed in that it allows each block to consist of
+replications of different datatypes.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example:</b>
+Let type1 have type map</p>
+
+<p style="margin-left:11%; margin-top: 1em">{(double, 0),
+(char, 8)}</p>
+
+<p style="margin-left:11%; margin-top: 1em">with extent 16.
+Let B = (2, 1, 3), D = (0, 16, 26), and T = (MPI_FLOAT,
+type1, MPI_CHAR). Then a call to MPI_Type_struct(3, B, D, T,
+newtype) returns a datatype with type map</p>
+
+<p style="margin-left:11%; margin-top: 1em">{(float, 0),
+(float,4), (double, 16), (char, 24), <br>
+(char, 26), (char, 27), (char, 28)}</p>
+
+<p style="margin-left:11%; margin-top: 1em">That is, two
+copies of MPI_FLOAT starting at 0, followed by one copy of
+type1 starting at 16, followed by three copies of MPI_CHAR,
+starting at 26. (We assume that a float occupies 4
+bytes.)</p>
+
+<p style="margin-left:11%; margin-top: 1em">For more
+information, see section 3.12.1 of the MPI-1.1 Standard.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">If an
+upperbound is set explicitly by using the MPI datatype
+MPI_UB, the corresponding index must be positive.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The MPI-1
+Standard originally made vague statements about padding and
+alignment; this was intended to allow the simple definition
+of structures that could be sent with a count greater than
+one. For example, <br>
+struct {int a; char b;} foo; <br>
+may have <br>
+sizeof(foo) = sizeof(int) + sizeof(char); <br>
+defining the extent of a datatype as including an epsilon,
+which would have allowed an implementation to make the
+extent an MPI datatype for this structure equal to
+2*sizeof(int). However, since different systems might define
+different paddings, a clarification to the standard made
+epsilon zero. Thus, if you define a structure datatype and
+wish to send or receive multiple items, you should
+explicitly include an MPI_UB entry as the last member of the
+structure. For example, the following code can be used for
+the structure foo:</p>
+
+<p style="margin-left:11%; margin-top: 1em">blen[0] = 1;
+indices[0] = 0; oldtypes[0] = MPI_INT; <br>
+blen[1] = 1; indices[1] = &amp;foo.b - &amp;foo; oldtypes[1]
+= MPI_CHAR; <br>
+blen[2] = 1; indices[2] = sizeof(foo); oldtypes[2] = MPI_UB;
+<br>
+MPI_Type_struct( 3, blen, indices, oldtypes, &amp;newtype
+);</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Type_create_struct.html">MPI_Type_create_struct</a>
+<br>
+ <a href="MPI_Type_create_hindexed.html">MPI_Type_create_hindexed</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

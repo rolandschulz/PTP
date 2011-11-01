@@ -1,9 +1,313 @@
-<html><head><title>MPI_Isend</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:40 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Isend</title>
+
+</head>
 <body>
-<H3>MPI_Isend</H3>
-<PRE>
-int MPI_Isend(void*, int, MPI_Datatype, int, int, MPI_Comm, MPI_Request *);
-</PRE>
-<DL><DD>
-Performs a non-blocking standard mode send operation.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Isend</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Isend</b>
+&minus; Starts a standard-mode, nonblocking send.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Isend(void *<i>buf</i>, int <i>count</i>,
+MPI_Datatype <i>datatype</i>, int <i>dest</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int <i>tag</i>, MPI_Comm <i>comm</i>,
+MPI_Request <i>*request</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_ISEND(<i>BUF, COUNT, DATATYPE, DEST, TAG, COMM, REQUEST,
+IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">&lt;type&gt;</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>BUF</i>(*)</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COUNT, DATATYPE, DEST, TAG, COMM,
+REQUEST, IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+Request Comm::Isend(const void* <i>buf</i>, int
+<i>count</i>, const</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">Datatype&amp; <i>datatype</i>, int
+<i>dest</i>, int <i>tag</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">buf</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Initial address of
+send buffer (choice).</p></td>
+<td width="3%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">count</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Number of elements
+in send buffer (integer).</p></td>
+<td width="3%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">datatype</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Datatype of each
+send buffer element (handle).</p></td>
+<td width="3%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">dest</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Rank of destination
+(integer).</p> </td>
+<td width="3%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">tag</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Message tag
+(integer).</p> </td>
+<td width="3%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">comm</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Communicator
+(handle).</p> </td>
+<td width="3%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">request</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Communication
+request (handle).</p></td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Isend
+starts a standard-mode, nonblocking send. Nonblocking calls
+allocate a communication request object and associate it
+with the request handle (the argument request). The request
+can be used later to query the status of the communication
+or wait for its completion.</p>
+
+<p style="margin-left:11%; margin-top: 1em">A nonblocking
+send call indicates that the system may start copying data
+out of the send buffer. The sender should not access any
+part of the send buffer after a nonblocking send operation
+is called, until the send completes.</p>
+
+<p style="margin-left:11%; margin-top: 1em">A send request
+can be determined being completed by calling the MPI_Wait,
+MPI_Waitany, MPI_Test, or MPI_Testany with request returned
+by this function.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">
+<a href="MPI_Send.html">MPI_Send</a> <br>
+<a href="MPI_Wait.html">MPI_Wait</a>  <br>
+<a href="MPI_Waitany.html">MPI_Waitany</a>  <br>
+<a href="MPI_Test.html">MPI_Test</a>  <br>
+<a href="MPI_Testany.html">MPI_Testany</a> <br>
+</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

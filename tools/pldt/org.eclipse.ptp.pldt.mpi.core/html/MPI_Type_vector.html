@@ -1,9 +1,314 @@
-<html><head><title>MPI_Type_vector</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:54 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Type_vector</title>
+
+</head>
 <body>
-<H3>MPI_Type_vector</H3>
-<PRE>
-int MPI_Type_vector(int, int, int, MPI_Datatype, MPI_Datatype *);
-</PRE>
-<DL><DD>
-Returns a new datatype that represents equally-spaced blocks of replicated data.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Type_vector</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Type_vector</b>
+&minus; Creates a vector (strided) datatype.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Type_vector(int <i>count</i>, int
+<i>blocklength</i>, int <i>stride</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Datatype <i>oldtype</i>, MPI_Datatype
+<i>*newtype</i>)</p> </td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_TYPE_VECTOR(<i>COUNT, BLOCKLENGTH, STRIDE, OLDTYPE,
+NEWTYPE,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>IERROR</i>)</p></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COUNT, BLOCKLENGTH, STRIDE,
+OLDTYPE</i></p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>NEWTYPE, IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+Datatype Datatype::Create_vector(int <i>count</i>, int
+<i>blocklength</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int <i>stride</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="7%">
+
+
+<p style="margin-top: 1em" valign="top">count</p></td>
+<td width="8%"></td>
+<td width="60%">
+
+
+<p style="margin-top: 1em" valign="top">Number of blocks
+(nonnegative integer).</p></td>
+<td width="14%">
+</td>
+</table>
+
+<p style="margin-left:11%;">blocklength</p>
+
+<p style="margin-left:26%;">Number of elements in each
+block (nonnegative integer).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">stride</p></td>
+<td width="4%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Number of elements
+between start of each block (integer).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">oldtype</p></td>
+<td width="4%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Old datatype
+(handle).</p> </td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">newtype</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">New datatype
+(handle).</p> </td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p>IERROR</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p>Fortran only: Error status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The function
+MPI_Type_vector is a general constructor that allows
+replication of a datatype into locations that consist of
+equally spaced blocks. Each block is obtained by
+concatenating the same number of copies of the old datatype.
+The spacing between blocks is a multiple of the extent of
+the old datatype.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example
+1:</b> Assume, again, that oldtype has type map {(double,
+0), (char, 8)}, with extent 16. A call to MPI_Type_vector(2,
+3, 4, oldtype, newtype) will create the datatype with type
+map <br>
+{(double, 0), (char, 8), (double, 16), (char, 24), <br>
+(double, 32), (char, 40), <br>
+(double, 64), (char, 72), <br>
+(double, 80), (char, 88), (double, 96), (char, 104)}</p>
+
+<p style="margin-left:11%; margin-top: 1em">That is, two
+blocks with three copies each of the old type, with a stride
+of 4 elements (4 x 6 bytes) between the blocks.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example
+2:</b> A call to MPI_Type_vector(3, 1, -2, oldtype, newtype)
+will create the datatype</p>
+
+<p style="margin-left:11%; margin-top: 1em">{(double, 0),
+(char, 8), (double, -32), (char, -24), <br>
+(double, -64), (char, -56)}</p>
+
+<p style="margin-left:11%; margin-top: 1em">In general,
+assume that oldtype has type map</p>
+
+<p style="margin-left:11%; margin-top: 1em">{(type(0),
+disp(0)), ..., (type(n-1), disp(n-1))},</p>
+
+<p style="margin-left:11%; margin-top: 1em">with extent ex.
+Let bl be the blocklength. The newly created datatype has a
+type map with count x bl x n entries:</p>
+
+<p style="margin-left:11%; margin-top: 1em">{(type(0),
+disp(0)), ..., (type(n-1), disp(n-1)), <br>
+(type(0), disp(0) + ex), ..., (type(n-1), disp(n-1) + ex),
+..., <br>
+(type(0), disp(0) + (bl -1) * ex),..., <br>
+(type(n-1), disp(n-1) + (bl -1)* ex), <br>
+(type(0), disp(0) + stride * ex),..., (type(n-1), <br>
+disp(n-1) + stride * ex), ..., <br>
+(type(0), disp(0) + (stride + bl - 1) * ex), ..., <br>
+(type(n-1), disp(n-1) + (stride + bl -1) * ex), ..., <br>
+(type(0), disp(0) + stride * (count -1) * ex), ..., <br>
+(type(n-1), disp(n-1) + stride * (count -1) * ex), ..., <br>
+(type(0), disp(0) + (stride * (count -1) + bl -1) * ex),
+..., <br>
+(type(n-1), disp(n-1) + (stride * (count -1) + bl -1) *
+ex)}</p>
+
+<p style="margin-left:11%; margin-top: 1em">A call to
+MPI_Type_contiguous(count, oldtype, newtype) is equivalent
+to a call to MPI_Type_vector(count, 1, 1, oldtype, newtype),
+or to a call to MPI_Type_vector(1, count, n, oldtype,
+newtype), n arbitrary.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Type_create_hvector.html">MPI_Type_create_hvector</a>
+<br>
+ <a href="MPI_Type_hvector.html">MPI_Type_hvector</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

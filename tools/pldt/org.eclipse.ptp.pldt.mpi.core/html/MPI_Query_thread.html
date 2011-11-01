@@ -1,9 +1,227 @@
-<html><head><title>MPI_Query_thread</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:43 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Query_thread</title>
+
+</head>
 <body>
-<H3>MPI_Query_thread</H3>
-<PRE>
-int MPI_Query_thread(int *);
-</PRE>
-<DL><DD>
-Returns the current level of threads support.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Query_thread</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Query_thread</b>
+&minus; Returns the current level of thread support</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Query_thread(int *<i>provided</i>)</p>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_QUERY_THREAD(<i>PROVIDED, IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>PROVIDED, IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI::Query_thread()</p>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">provided</p></td>
+<td width="3%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">C/Fortran only:
+Level of thread support (integer).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="3%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">This routine
+returns in <i>provided</i> the current level of thread
+support. If MPI was initialized by a call to
+MPI_Init_thread, <i>provided</i> will have the same value as
+was returned by that function.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The possible
+values of <i>provided</i> are as follows:</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="32%">
+
+
+
+<p style="margin-top: 1em" valign="top">MPI_THREAD_SINGLE</p> </td>
+<td width="5%"></td>
+<td width="52%">
+
+
+<p style="margin-top: 1em" valign="top">Only one thread may
+execute.</p> </td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="32%">
+
+
+
+<p style="margin-top: 1em" valign="top">MPI_THREAD_FUNNELED</p> </td>
+<td width="5%"></td>
+<td width="52%">
+
+
+<p style="margin-top: 1em" valign="top">If the process is
+multithreaded, only the thread that called MPI_Init[_thread]
+may make MPI calls.</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="32%">
+
+
+
+<p style="margin-top: 1em" valign="top">MPI_THREAD_SERIALIZED</p> </td>
+<td width="5%"></td>
+<td width="52%">
+
+
+<p style="margin-top: 1em" valign="top">If the process is
+multithreaded, only one thread may make MPI library calls at
+one time.</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="32%">
+
+
+
+<p style="margin-top: 1em" valign="top">MPI_THREAD_MULTIPLE</p> </td>
+<td width="5%"></td>
+<td width="52%">
+
+
+<p style="margin-top: 1em" valign="top">If the process is
+multithreaded, multiple threads may call MPI at once with no
+restrictions.</p> </td>
+</table>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">In Open MPI,
+<i>provided</i> is always MPI_THREAD_SINGLE, unless the
+program has been linked with the multithreaded library, in
+which case <i>provided</i> is MPI_THREAD_MULTIPLE.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<p style="margin-left:11%; margin-top: 1em">See the MPI man
+page for a full list of MPI error codes.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Init.html">MPI_Init</a> <br>
+ <a href="MPI_Init_thread.html">MPI_Init_thread</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

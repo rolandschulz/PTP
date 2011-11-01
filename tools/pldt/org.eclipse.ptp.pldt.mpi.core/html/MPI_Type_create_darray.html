@@ -1,9 +1,444 @@
-<html><head><title>MPI_Type_create_darray</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:49 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Type_create_darray</title>
+
+</head>
 <body>
-<H3>MPI_Type_create_darray</H3>
-<PRE>
-int MPI_Type_create_darray(int, int, int, int [], int [], int [], int [], int,MPI_Datatype, MPI_Datatype *);
-</PRE>
-<DL><DD>
-Generates the datatypes corresponding to an HPF-like distribution of an ndims-dimensional array of oldtype elements onto anndims-dimensional grid of logical tasks.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Type_create_darray</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Type_create_darray</b>
+&minus; Creates a distributed array datatype;</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Type_create_darray(int <i>size</i>, int <i>rank</i>,
+int <i>ndims</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int <i>array_of_gsizes</i>[], int
+<i>array_of_distribs</i>[],</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int <i>array_of_dargs</i>[], int
+<i>array_of_psizes</i>[],</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int <i>order</i>, MPI_Datatype
+<i>oldtype</i>, MPI_Datatype <i>*newtype</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_TYPE_CREATE_DARRAY(<i>SIZE, RANK, NDIMS,
+ARRAY_OF_GSIZES,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top"><i>ARRAY_OF_DISTRIBS, ARRAY_OF_DARGS,
+ARRAY_OF_PSIZES, ORDER,</i></p></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top"><i>OLDTYPE, NEWTYPE, IERROR</i>)</p></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>SIZE, RANK, NDIMS, ARRAY_OF_GSIZES(*),
+ARRAY_OF_DISTRIBS(*),</i></p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>ARRAY_OF_DARGS(*), ARRAY_OF_PSIZES(*),
+ORDER, OLDTYPE,</i></p></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>NEWTYPE, IERROR</i></p></td>
+<td width="69%">
+</td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+MPI::Datatype MPI::Datatype::Create_darray(int <i>size</i>,
+int <i>rank</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int <i>ndims</i>, const int
+<i>array_of_gsizes</i>[],</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const int <i>array_of_distribs</i>[], const
+int <i>array_of_dargs</i>[],</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const int <i>array_of_psizes</i>[], int
+<i>order</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="7%">
+
+
+<p style="margin-top: 1em" valign="top">size</p></td>
+<td width="8%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Size of process
+group (positive integer).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="7%">
+
+
+<p style="margin-top: 1em" valign="top">rank</p></td>
+<td width="8%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Rank in process
+group (nonnegative integer).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="7%">
+
+
+<p style="margin-top: 1em" valign="top">ndims</p></td>
+<td width="8%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Number of array
+dimensions as well as process grid dimensions (positive
+integer).</p> </td>
+</table>
+
+<p style="margin-left:11%;">array_of_gsizes</p>
+
+<p style="margin-left:26%;">Number of elements of type
+<i>oldtype</i> in each dimension of global array (array of
+positive integers).</p>
+
+<p style="margin-left:11%;">array_of_distribs</p>
+
+<p style="margin-left:26%;">Distribution of array in each
+dimension (array of state).</p>
+
+<p style="margin-left:11%;">array_of_dargs</p>
+
+<p style="margin-left:26%;">Distribution argument in each
+dimension (array of positive integers).</p>
+
+<p style="margin-left:11%;">array_of_psizes</p>
+
+<p style="margin-left:26%;">Size of process grid in each
+dimension (array of positive integers).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">order</p></td>
+<td width="4%"></td>
+<td width="51%">
+
+
+<p style="margin-top: 1em" valign="top">Array storage order
+flag (state).</p></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">oldtype</p></td>
+<td width="4%"></td>
+<td width="51%">
+
+
+<p style="margin-top: 1em" valign="top">Old data type
+(handle).</p> </td>
+<td width="23%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">newtype</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">New data type
+(handle).</p> </td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Type_create_darray
+can be used to generate the data types corresponding to the
+distribution of an ndims-dimensional array of <i>oldtype</i>
+elements onto an <i>ndims</i>-dimensional grid of logical
+processes. Unused dimensions of <i>array_of_psizes</i>
+should be set to 1. For a call to MPI_Type_create_darray to
+be correct, the equation</p>
+
+<p style="margin-left:11%; margin-top: 1em"><i>ndims</i>-1
+<br>
+pi <i>array_of_psizes[i]</i> = <i>size <br>
+i</i>=0</p>
+
+<p style="margin-left:11%; margin-top: 1em">must be
+satisfied. The ordering of processes in the process grid is
+assumed to be row-major, as in the case of virtual Cartesian
+process topologies in MPI-1.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Each dimension
+of the array can be distributed in one of three ways:</p>
+
+<p style="margin-left:11%; margin-top: 1em">-
+MPI_DISTRIBUTE_BLOCK - Block distribution <br>
+- MPI_DISTRIBUTE_CYCLIC - Cyclic distribution <br>
+- MPI_DISTRIBUTE_NONE - Dimension not distributed.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The constant
+MPI_DISTRIBUTE_DFLT_DARG specifies a default distribution
+argument. The distribution argument for a dimension that is
+not distributed is ignored. For any dimension <i>i</i> in
+which the distribution is MPI_DISTRIBUTE_BLOCK, it erroneous
+to specify <i>array_of_dargs[i] * array_of_psizes[i]</i>
+&lt; <i>array_of_gsizes[i]</i>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">For example,
+the HPF layout ARRAY(CYCLIC(15)) corresponds to
+MPI_DISTRIBUTE_CYCLIC with a distribution argument of 15,
+and the HPF layout ARRAY(BLOCK) corresponds to
+MPI_DISTRIBUTE_BLOCK with a distribution argument of
+MPI_DISTRIBUTE_DFLT_DARG.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+<i>order</i> argument is used as in MPI_TYPE_CREATE_SUBARRAY
+to specify the storage order. Therefore, arrays described by
+this type constructor may be stored in Fortran
+(column-major) or C (row-major) order. Valid values for
+order are MPI_ORDER_FORTRAN and MPI_ORDER_C.</p>
+
+<p style="margin-left:11%; margin-top: 1em">This routine
+creates a new MPI data type with a typemap defined in terms
+of a function called &quot;cyclic()&quot; (see below).</p>
+
+<p style="margin-left:11%; margin-top: 1em">Without loss of
+generality, it suffices to define the typemap for the
+MPI_DISTRIBUTE_CYCLIC case where MPI_DISTRIBUTE_DFLT_DARG is
+not used.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_DISTRIBUTE_BLOCK
+and MPI_DISTRIBUTE_NONE can be reduced to the
+MPI_DISTRIBUTE_CYCLIC case for dimension <i>i</i> as
+follows.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_DISTRIBUTE_BLOCK
+with <i>array_of_dargs[i]</i> equal to
+MPI_DISTRIBUTE_DFLT_DARG is equivalent to
+MPI_DISTRIBUTE_CYCLIC with <i>array_of_dargs[i]</i> set
+to</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">(<i>array_of_gsizes[i]</i>
++ <i>array_of_psizes[i]</i> -
+1)/<i>array_of_psizes[i]</i></p>
+
+<p style="margin-left:11%; margin-top: 1em">If
+<i>array_of_dargs[i]</i> is not MPI_DISTRIBUTE_DFLT_DARG,
+then MPI_DISTRIBUTE_BLOCK and DISTRIBUTE_CYCLIC are
+equivalent.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_DISTRIBUTE_NONE
+is equivalent to MPI_DISTRIBUTE_CYCLIC with
+<i>array_of_dargs[i]</i> set to
+<i>array_of_gsizes[i]</i>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Finally,
+MPI_DISTRIBUTE_CYCLIC with <i>array_of_dargs[i]</i> equal to
+MPI_DISTRIBUTE_DFLT_DARG is equivalent to
+MPI_DISTRIBUTE_CYCLIC with <i>array_of_dargs[i]</i> set to
+1.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">For both
+Fortran and C arrays, the ordering of processes in the
+process grid is assumed to be row-major. This is consistent
+with the ordering used in virtual Cartesian process
+topologies in MPI-1. To create such virtual process
+topologies, or to find the coordinates of a process in the
+process grid, etc., users may use the corresponding
+functions provided in MPI-1.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

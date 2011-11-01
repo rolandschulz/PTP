@@ -1,9 +1,310 @@
-<html><head><title>MPI_Bcast</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:14 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Bcast</title>
+
+</head>
 <body>
-<H3>MPI_Bcast</H3>
-<PRE>
-int MPI_Bcast(void*, int, MPI_Datatype, int, MPI_Comm );
-</PRE>
-<DL><DD>
-Broadcasts a message from root to all tasks in the group.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Bcast</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Bcast</b>
+&minus; Broadcasts a message from the process with rank
+<i>root</i> to all other processes of the group.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Bcast(void <i>*buffer</i>, int <i>count</i>,
+MPI_Datatype <i>datatype</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int <i>root</i>, MPI_Comm <i>comm</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_BCAST(<i>BUFFER</i>, <i>COUNT</i>, <i>DATATYPE</i>,
+<i>ROOT</i>, <i>COMM</i>, <i>IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">&lt;type&gt;</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>BUFFER</i>(*)</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COUNT</i>, <i>DATATYPE</i>, <i>ROOT</i>,
+<i>COMM</i>, <i>IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void MPI::Comm::Bcast(void* <i>buffer</i>, int
+<i>count</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const MPI::Datatype&amp; <i>datatype</i>,
+int <i>root</i>) const = 0</p></td>
+</table>
+
+<a name="INPUT/OUTPUT PARAMETERS"></a>
+<h2>INPUT/OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">buffer</p></td>
+<td width="3%"></td>
+<td width="59%">
+
+
+<p style="margin-top: 1em" valign="top">Starting address of
+buffer (choice).</p></td>
+<td width="15%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">count</p></td>
+<td width="3%"></td>
+<td width="59%">
+
+
+<p style="margin-top: 1em" valign="top">Number of entries
+in buffer (integer).</p></td>
+<td width="15%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">datatype</p></td>
+<td width="3%"></td>
+<td width="59%">
+
+
+<p style="margin-top: 1em" valign="top">Data type of buffer
+(handle).</p> </td>
+<td width="15%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">root</p></td>
+<td width="3%"></td>
+<td width="59%">
+
+
+<p style="margin-top: 1em" valign="top">Rank of broadcast
+root (integer).</p></td>
+<td width="15%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">comm</p></td>
+<td width="3%"></td>
+<td width="59%">
+
+
+<p style="margin-top: 1em" valign="top">Communicator
+(handle).</p> </td>
+<td width="15%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETER"></a>
+<h2>OUTPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Bcast
+broadcasts a message from the process with rank root to all
+processes of the group, itself included. It is called by all
+members of group using the same arguments for comm, root. On
+return, the contents of root&rsquo;s communication buffer
+has been copied to all processes.</p>
+
+<p style="margin-left:11%; margin-top: 1em">General,
+derived datatypes are allowed for datatype. The type
+signature of count, datatype on any process must be equal to
+the type signature of count, datatype at the root. This
+implies that the amount of data sent must be equal to the
+amount received, pairwise between each process and the root.
+MPI_Bcast and all other data-movement collective routines
+make this restriction. Distinct type maps between sender and
+receiver are still allowed.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example:</b>
+Broadcast 100 ints from process 0 to every process in the
+group. <br>
+MPI_Comm comm; <br>
+int array[100]; <br>
+int root=0; <br>
+... <br>
+MPI_Bcast( array, 100, MPI_INT, root, comm);</p>
+
+<p style="margin-left:11%; margin-top: 1em">As in many of
+our sample code fragments, we assume that some of the
+variables (such as comm in the example above) have been
+assigned appropriate values.</p>
+
+<p style="margin-left:11%; margin-top: 1em">WHEN
+COMMUNICATOR IS AN INTER-COMMUNICATOR</p>
+
+<p style="margin-left:11%; margin-top: 1em">When the
+communicator is an inter-communicator, the root process in
+the first group broadcasts data to all the processes in the
+second group. The first group defines the root process. That
+process uses MPI_ROOT as the value of its <i>root</i>
+argument. The remaining processes use MPI_PROC_NULL as the
+value of their <i>root</i> argument. All processes in the
+second group use the rank of that root process in the first
+group as the value of their <i>root</i> argument. The
+receive buffer arguments of the processes in the second
+group must be consistent with the send buffer argument of
+the root process in the first group.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">This function
+does not support the in-place option.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

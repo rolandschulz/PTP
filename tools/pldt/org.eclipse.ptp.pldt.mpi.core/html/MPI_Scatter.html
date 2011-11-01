@@ -1,9 +1,438 @@
-<html><head><title>MPI_Scatter</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:46 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Scatter</title>
+
+</head>
 <body>
-<H3>MPI_Scatter</H3>
-<PRE>
-int MPI_Scatter(void* , int, MPI_Datatype, void*, int, MPI_Datatype, int, MPI_Comm);
-</PRE>
-<DL><DD>
-Distributes individual messages fromroot to each task in comm.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Scatter</h1>
+
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Scatter</b>
+&minus; Sends data from one task to all tasks in a
+group.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Scatter(void *<i>sendbuf</i>, int <i>sendcount</i>,
+MPI_Datatype <i>sendtype</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">void <i>*recvbuf</i>, int <i>recvcount</i>,
+MPI_Datatype <i>recvtype</i>, int <i>root</i>,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Comm <i>comm</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_SCATTER(<i>SENDBUF, SENDCOUNT, SENDTYPE, RECVBUF,
+RECVCOUNT,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>RECVTYPE, ROOT, COMM, IERROR</i>)</p></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">&lt;type&gt;</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>SENDBUF(*), RECVBUF(*)</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>SENDCOUNT, SENDTYPE, RECVCOUNT,
+RECVTYPE, ROOT</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COMM, IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void MPI::Comm::Scatter(const void* <i>sendbuf</i>, int
+<i>sendcount</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const MPI::Datatype&amp; <i>sendtype</i>,
+void* <i>recvbuf</i>,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int <i>recvcount</i>, const
+MPI::Datatype&amp; <i>recvtype</i>,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int <i>root</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">sendbuf</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Address of send
+buffer (choice, significant only at root).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">sendcount</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Number of elements
+sent to each process (integer, significant only at
+root).</p> </td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">sendtype</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Datatype of send
+buffer elements (handle, significant only at root).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">recvcount</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Number of elements
+in receive buffer (integer).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">recvtype</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Datatype of receive
+buffer elements (handle).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">root</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Rank of sending
+process (integer).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">comm</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Communicator
+(handle).</p> </td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">recvbuf</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Address of receive
+buffer (choice).</p></td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Scatter is
+the inverse operation to MPI_Gather.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The outcome is
+as if the root executed n send operations,</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Send(sendbuf
++ i * sendcount * extent(sendtype), sendcount, <br>
+sendtype, i, ...)</p>
+
+<p style="margin-left:11%; margin-top: 1em">and each
+process executed a receive,</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Recv(recvbuf,
+recvcount, recvtype, i, ...).</p>
+
+<p style="margin-left:11%; margin-top: 1em">An alternative
+description is that the root sends a message with
+MPI_Send(<i>sendbuf</i>, <i>sendcount</i> *
+<i>n</i>,&nbsp;<i>sendtype</i>, ...). This message is split
+into <i>n</i> equal segments, the ith segment is sent to the
+ith process in the group, and each process receives this
+message as above.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The send buffer
+is ignored for all nonroot processes.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The type
+signature associated with <i>sendcount</i>, <i>sendtype</i>
+at the root must be equal to the type signature associated
+with <i>recvcount</i>, <i>recvtype</i> at all processes
+(however, the type maps may be different). This implies that
+the amount of data sent must be equal to the amount of data
+received, pairwise between each process and the root.
+Distinct type maps between sender and receiver are still
+allowed.</p>
+
+<p style="margin-left:11%; margin-top: 1em">All arguments
+to the function are significant on process <i>root</i>,
+while on other processes, only arguments <i>recvbuf</i>,
+<i>recvcount</i>, <i>recvtype</i>, <i>root</i>, <i>comm</i>
+are significant. The arguments <i>root</i> and <i>comm</i>
+must have identical values on all processes.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+specification of counts and types should not cause any
+location on the root to be read more than once.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>Rationale:</b>
+Though not needed, the last restriction is imposed so as to
+achieve symmetry with MPI_Gather, where the corresponding
+restriction (a multiple-write restriction) is necessary.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example:</b>
+The reverse of Example 1 in the MPI_Gather manpage. Scatter
+sets of 100 ints from the root to each process in the
+group.</p>
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Comm comm;
+<br>
+int gsize,*sendbuf; <br>
+int root, rbuf[100]; <br>
+... <br>
+MPI_Comm_size(comm, &amp;gsize); <br>
+sendbuf = (int *)malloc(gsize*100*sizeof(int)); <br>
+... <br>
+MPI_Scatter(sendbuf, 100, MPI_INT, rbuf, 100, <br>
+MPI_INT, root, comm);</p>
+
+<a name="USE OF IN-PLACE OPTION"></a>
+<h2>USE OF IN-PLACE OPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">When the
+communicator is an intracommunicator, you can perform a
+gather operation in-place (the output buffer is used as the
+input buffer). Use the variable MPI_IN_PLACE as the value of
+the root process <i>recvbuf</i>. In this case,
+<i>recvcount</i> and <i>recvtype</i> are ignored, and the
+root process sends no data to itself.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Note that
+MPI_IN_PLACE is a special kind of value; it has the same
+restrictions on its use as MPI_BOTTOM.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Because the
+in-place option converts the receive buffer into a
+send-and-receive buffer, a Fortran binding that includes
+INTENT must mark these as INOUT, not OUT.</p>
+
+<a name="WHEN COMMUNICATOR IS AN INTER-COMMUNICATOR"></a>
+<h2>WHEN COMMUNICATOR IS AN INTER-COMMUNICATOR</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">When the
+communicator is an inter-communicator, the root process in
+the first group sends data to all processes in the second
+group. The first group defines the root process. That
+process uses MPI_ROOT as the value of its <i>root</i>
+argument. The remaining processes use MPI_PROC_NULL as the
+value of their <i>root</i> argument. All processes in the
+second group use the rank of that root process in the first
+group as the value of their <i>root</i> argument. The
+receive buffer argument of the root process in the first
+group must be consistent with the receive buffer argument of
+the processes in the second group.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Scatterv.html">MPI_Scatterv</a>
+<br>
+<a href="MPI_Gather.html">MPI_Gather</a> <br>
+ <a href="MPI_Gatherv.html">MPI_Gatherv</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

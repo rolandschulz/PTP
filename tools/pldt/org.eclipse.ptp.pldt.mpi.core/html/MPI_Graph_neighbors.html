@@ -1,9 +1,658 @@
-<html><head><title>MPI_Graph_neighbors</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:34 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Graph_neighbors</title>
+
+</head>
 <body>
-<H3>MPI_Graph_neighbors</H3>
-<PRE>
-int MPI_Graph_neighbors(MPI_Comm, int, int, int *);
-</PRE>
-<DL><DD>
-Returns the neighbors of the given task.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Graph_neighbors</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Graph_neighbors</b>
+&minus; Returns the neighbors of a node associated with a
+graph topology.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Graph_neighbors(MPI_Comm <i>comm</i>, int
+<i>rank</i>, int <i>maxneighbors</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int <i>*neighbors</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_GRAPH_NEIGHBORS(<i>COMM, RANK, MAXNEIGHBORS, NEIGHBORS,
+IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COMM, RANK, MAXNEIGHBORS, NEIGHBORS(*),
+IERROR</i></p> </td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void Graphcomm::Get_neighbors(int <i>rank</i>, int
+<i>maxneighbors</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int <i>neighbors</i>[]) const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em" valign="top">comm</p></td>
+<td width="9%"></td>
+<td width="66%">
+
+
+<p style="margin-top: 1em" valign="top">Communicator with
+graph topology (handle).</p></td>
+<td width="8%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em" valign="top">rank</p></td>
+<td width="9%"></td>
+<td width="66%">
+
+
+<p style="margin-top: 1em" valign="top">Rank of process in
+group of comm (integer).</p></td>
+<td width="8%">
+</td>
+</table>
+
+<p style="margin-left:11%;">maxneighbors</p>
+
+<p style="margin-left:26%;">Size of array neighbors
+(integer).</p>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">neighbors</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Ranks of processes
+that are neighbors to specified process (array of
+integers).</p> </td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example:</b>
+Suppose that comm is a communicator with a shuffle-exchange
+topology. The group has 2n members. Each process is labeled
+by a(1),&nbsp;..., a(n) with a(i) E{0,1}, and has three
+neighbors: exchange (a(1),&nbsp;..., a(n) = a(1),&nbsp;...,
+a(n-1), a(n) (a = 1 - a), shuffle (a(1),&nbsp;..., a(n)) =
+a(2),&nbsp;..., a(n), a(1), and unshuffle (a(1),&nbsp;...,
+a(n)) = a(n), a(1),&nbsp;..., a(n-1). The graph adjacency
+list is illustrated below for n=3.</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">exchange</p></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">shuffle</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+</td>
+<td width="23%">
+
+
+<p valign="top">unshuffle <br>
+node</p></td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">neighbors(1)</p></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">neighbors(2)</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+
+
+<p valign="top">neighbors(3) <br>
+0(000)</p></td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">1</p></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">0</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+</td>
+<td width="23%">
+
+
+<p valign="top">0 <br>
+1(001)</p></td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">0</p></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">2</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+</td>
+<td width="23%">
+
+
+<p valign="top">4 <br>
+2(010)</p></td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">3</p></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">4</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+</td>
+<td width="23%">
+
+
+<p valign="top">1 <br>
+3(011)</p></td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">2</p></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">6</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+</td>
+<td width="23%">
+
+
+<p valign="top">5 <br>
+4(100)</p></td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">5</p></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">1</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+</td>
+<td width="23%">
+
+
+<p valign="top">2 <br>
+5(101)</p></td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">4</p></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">3</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+</td>
+<td width="23%">
+
+
+<p valign="top">6 <br>
+6(110)</p></td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">7</p></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">5</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+</td>
+<td width="23%">
+
+
+<p valign="top">3 <br>
+7(111)</p></td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">6</p></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="-9%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+
+
+<p valign="top">7</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+</td>
+<td width="23%">
+
+
+<p valign="top">7</p></td>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">Suppose that
+the communicator comm has this topology associated with it.
+The following code fragment cycles through the three types
+of neighbors and performs an appropriate permutation for
+each.</p>
+
+<p style="margin-left:11%; margin-top: 1em">C assume: each
+process has stored a real number A. <br>
+C extract neighborhood information <br>
+CALL MPI_COMM_RANK(comm, myrank, ierr) <br>
+CALL MPI_GRAPH_NEIGHBORS(comm, myrank, 3, neighbors, ierr)
+<br>
+C perform exchange permutation <br>
+CALL MPI_SENDRECV_REPLACE(A, 1, MPI_REAL, neighbors(1), 0,
+<br>
++ neighbors(1), 0, comm, status, ierr) <br>
+C perform shuffle permutation <br>
+CALL MPI_SENDRECV_REPLACE(A, 1, MPI_REAL, neighbors(2), 0,
+<br>
++ neighbors(3), 0, comm, status, ierr) <br>
+C perform unshuffle permutation <br>
+CALL MPI_SENDRECV_REPLACE(A, 1, MPI_REAL, neighbors(3), 0,
+<br>
++ neighbors(2), 0, comm, status, ierr)</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Graph_neighbors_count.html">MPI_Graph_neighbors_count</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

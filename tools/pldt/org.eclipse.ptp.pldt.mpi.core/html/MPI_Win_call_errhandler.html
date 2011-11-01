@@ -1,9 +1,190 @@
-<html><head><title>MPI_Win_call_errhandler</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:56 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Win_call_errhandler</title>
+
+</head>
 <body>
-<H3>MPI_Win_call_errhandler</H3>
-<PRE>
-int MPI_Win_call_errhandler(MPI_Win, int);
-</PRE>
-<DL><DD>
-Calls the error handler assigned to the window with the error code supplied.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Win_call_errhandler</h1>
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Win_call_errhandler</b>
+&minus; Passes the supplied error code to the error handler
+assigned to a window</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Win_call_errhandler(MPI_Win <i>win</i>, int
+<i>errorcode</i>)</p>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_WIN_CALL_ERRHANDLER(<i>WIN, ERRORCODE, IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>WIN, ERRORCODE, IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void MPI::Win::Call_errhandler(int <i>errorcode</i>)
+const</p>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">win</p></td>
+<td width="7%"></td>
+<td width="54%">
+
+
+<p style="margin-top: 1em" valign="top">Window with error
+handler (handle).</p></td>
+<td width="14%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">errorcode</p></td>
+<td width="7%"></td>
+<td width="54%">
+
+
+<p style="margin-top: 1em" valign="top">MPI error code
+(integer).</p> </td>
+<td width="14%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETER"></a>
+<h2>OUTPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="12%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="11%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">This function
+invokes the error handler assigned to the window <i>win</i>
+with the supplied error code <i>errorcode</i>. If the error
+handler was successfully called, the process is not aborted,
+and the error handler returns, this function returns
+MPI_SUCCESS.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Users should
+note that the default error handler is MPI_ERRORS_ARE_FATAL.
+Thus, calling this function will abort the window processes
+if the default error handler has not been changed for this
+window.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">See the MPI man
+page for a full list of MPI error codes.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Win_create_errhandler.html">MPI_Win_create_errhandler</a>
+<br>
+ <a href="MPI_Win_set_errhandler.html">MPI_Win_set_errhandler</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

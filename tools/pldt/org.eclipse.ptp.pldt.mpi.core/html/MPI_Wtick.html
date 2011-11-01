@@ -1,9 +1,97 @@
-<html><head><title>MPI_Wtick</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:59 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Wtick</title>
+
+</head>
 <body>
-<H3>MPI_Wtick</H3>
-<PRE>
-double MPI_Wtick(void);
-</PRE>
-<DL><DD>
-Returns the resolution of MPI_WTIME in seconds.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Wtick</h1>
+
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Wtick</b>
+&minus; Returns the resolution of MPI_Wtime.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+double MPI_Wtick()</p>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+DOUBLE PRECISION MPI_WTICK()</p>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+double MPI::Wtick()</p>
+
+<a name="RETURN VALUE"></a>
+<h2>RETURN VALUE</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Time in seconds
+of resolution of MPI_Wtime.</p>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Wtick
+returns the resolution of MPI_Wtime in seconds. That is, it
+returns, as a double-precision value, the number of seconds
+between successive clock ticks. For example, if the clock is
+implemented by the hardware as a counter that is incremented
+every millisecond, the value returned by MPI_Wtick should be
+10^-3.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Note that on
+POSIX platforms, Open MPI should always return 10^-6 for
+MPI_Wtick. The returned value may be different on Windows
+platforms.</p>
+
+<a name="NOTE"></a>
+<h2>NOTE</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">This function
+does not return an error value. Consequently, the result of
+calling it before MPI_Init or after MPI_Finalize is
+undefined.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+ 
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Wtime.html">MPI_Wtime</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

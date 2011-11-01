@@ -1,9 +1,444 @@
-<html><head><title>MPI_Init_thread</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:39 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Init_thread</title>
+
+</head>
 <body>
-<H3>MPI_Init_thread</H3>
-<PRE>
-int MPI_Init_thread(int *, char ***, int, int *);
-</PRE>
-<DL><DD>
-Initializes MPI and the MPI threads environment.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Init_thread</h1>
+
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Init_thread</b>
+&minus; Initializes the MPI execution environment</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Init_thread(int *<i>argc</i>, char
+***<i>argv</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int <i>required</i>, int
+*<i>provided</i>)</p> </td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_INIT(<i>REQUIRED, PROVIDED, IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>REQUIRED, PROVIDED, IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI::Init_thread(int&amp; <i>argc</i>, char**&amp;
+<i>argv</i>, int <i>required</i>) <br>
+int MPI::Init_thread(int <i>required</i>)</p>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">argc</p></td>
+<td width="3%"></td>
+<td width="72%">
+
+
+<p style="margin-top: 1em" valign="top">C/C++ only: Pointer
+to the number of arguments.</p></td>
+<td width="2%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">argv</p></td>
+<td width="3%"></td>
+<td width="72%">
+
+
+<p style="margin-top: 1em" valign="top">C/C++ only:
+Argument vector.</p></td>
+<td width="2%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">required</p></td>
+<td width="3%"></td>
+<td width="72%">
+
+
+<p style="margin-top: 1em" valign="top">Desired level of
+thread support (integer).</p></td>
+<td width="2%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">provided</p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em" valign="top">Available level of
+thread support (integer).</p></td>
+<td width="6%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="6%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">This routine,
+or MPI_Init, must be called before any other MPI routine
+(apart from MPI_Initialized) is called. MPI can be
+initialized at most once; subsequent calls to MPI_Init or
+MPI_Init_thread are erroneous.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Init_thread,
+as compared to MPI_Init, has a provision to request a
+certain level of thread support in <i>required</i>:</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="32%">
+
+
+
+<p style="margin-top: 1em" valign="top">MPI_THREAD_SINGLE</p> </td>
+<td width="5%"></td>
+<td width="52%">
+
+
+<p style="margin-top: 1em" valign="top">Only one thread
+will execute.</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="32%">
+
+
+
+<p style="margin-top: 1em" valign="top">MPI_THREAD_FUNNELED</p> </td>
+<td width="5%"></td>
+<td width="52%">
+
+
+<p style="margin-top: 1em" valign="top">If the process is
+multithreaded, only the thread that called MPI_Init_thread
+will make MPI calls.</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="32%">
+
+
+
+<p style="margin-top: 1em" valign="top">MPI_THREAD_SERIALIZED</p> </td>
+<td width="5%"></td>
+<td width="52%">
+
+
+<p style="margin-top: 1em" valign="top">If the process is
+multithreaded, only one thread will make MPI library calls
+at one time.</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="32%">
+
+
+
+<p style="margin-top: 1em" valign="top">MPI_THREAD_MULTIPLE</p> </td>
+<td width="5%"></td>
+<td width="52%">
+
+
+<p style="margin-top: 1em" valign="top">If the process is
+multithreaded, multiple threads may call MPI at once with no
+restrictions.</p> </td>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">The level of
+thread support available to the program is set in
+<i>provided</i>, except in C++, where it is the return value
+of the function. In Open MPI, the value is dependent on how
+the library was configured and built. Note that there is no
+guarantee that <i>provided</i> will be greater than or equal
+to <i>required</i>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Also note that
+calling MPI_Init_thread with a <i>required</i> value of
+<i>MPI_THREAD_SINGLE</i> is equivalent to calling
+MPI_Init.</p>
+
+<p style="margin-left:11%; margin-top: 1em">All MPI
+programs must contain a call to MPI_Init or MPI_Init_thread.
+Open MPI accepts the C/C++ <i>argc</i> and <i>argv</i>
+arguments to main, but neither modifies, interprets, nor
+distributes them:</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="18%"></td>
+<td width="8%">
+
+
+<p valign="top">{</p></td>
+<td width="8%"></td>
+<td width="66%">
+</td>
+<tr valign="top" align="left">
+<td width="18%"></td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top">/* declare variables */</p></td>
+<td width="66%">
+</td>
+<tr valign="top" align="left">
+<td width="18%"></td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top">MPI_Init_thread(&amp;argc, &amp;argv, req,
+&amp;prov);</p> </td>
+<td width="66%">
+</td>
+<tr valign="top" align="left">
+<td width="18%"></td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top">/* parse arguments */</p></td>
+<td width="66%">
+</td>
+<tr valign="top" align="left">
+<td width="18%"></td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top">/* main program */</p></td>
+<td width="66%">
+</td>
+<tr valign="top" align="left">
+<td width="18%"></td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top">MPI_Finalize();</p></td>
+<td width="66%">
+</td>
+<tr valign="top" align="left">
+<td width="18%"></td>
+<td width="8%">
+
+
+<p valign="top">}</p></td>
+<td width="8%"></td>
+<td width="66%">
+</td>
+</table>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The Fortran
+version does not have provisions for <i>argc</i> and
+<i>argv</i> and takes only IERROR.</p>
+
+<p style="margin-left:11%; margin-top: 1em">It is the
+caller&rsquo;s responsibility to check the value of
+<i>provided</i>, as it may be less than what was requested
+in <i>required</i>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The MPI
+Standard does not say what a program can do before an
+MPI_Init_thread or after an MPI_Finalize. In the Open MPI
+implementation, it should do as little as possible. In
+particular, avoid anything that changes the external state
+of the program, such as opening files, reading standard
+input, or writing to standard output.</p>
+
+<a name="MPI_THREAD_MULTIPLE Support"></a>
+<h2>MPI_THREAD_MULTIPLE Support</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_THREAD_MULTIPLE
+support is included if Open MPI was configured with the
+--enable-thread-multiple configure switch. You can check the
+output of <b>ompi_info</b>(1) to see if Open MPI has
+MPI_THREAD_MULTIPLE support:</p>
+
+<p style="margin-left:11%; margin-top: 1em">shell$
+ompi_info | grep -i thread <br>
+Thread support: posix (mpi: yes, progress: no) <br>
+shell$</p>
+
+<p style="margin-left:11%; margin-top: 1em">The &quot;mpi:
+yes&quot; portion of the above output indicates that Open
+MPI was compiled with MPI_THREAD_MULTIPLE support.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Note that
+MPI_THREAD_MULTIPLE support is only lightly tested. It
+likely does not work for thread-intensive applications. Also
+note that <i>only</i> the MPI point-to-point communication
+functions for the BTL&rsquo;s listed below are considered
+thread safe. Other support functions (e.g., MPI attributes)
+have not been certified as safe when simultaneously used by
+multiple threads.</p>
+
+<p style="margin-left:11%; margin-top: 1em">tcp <br>
+sm <br>
+mx <br>
+elan <br>
+self</p>
+
+<p style="margin-left:11%; margin-top: 1em">Note that Open
+MPI&rsquo;s thread support is in a fairly early stage; the
+above devices are likely to <i>work</i>, but the latency is
+likely to be fairly high. Specifically, efforts so far have
+concentrated on <i>correctness</i>, not <i>performance</i>
+(yet).</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Init.html">MPI_Init</a> <br>
+<a href="MPI_Initialized.html">MPI_Initialized</a> <br>
+ <a href="MPI_Finalize.html">MPI_Finalize</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

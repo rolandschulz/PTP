@@ -1,9 +1,349 @@
-<html><head><title>MPI_Pack</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:42 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Pack</title>
+
+</head>
 <body>
-<H3>MPI_Pack</H3>
-<PRE>
-int MPI_Pack(void*, int, MPI_Datatype, void *, int, int *,  MPI_Comm);
-</PRE>
-<DL><DD>
-Packs the message in the specified send buffer into the specified buffer space.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Pack</h1>
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Pack</b>
+&minus; Packs data of a given datatype into contiguous
+memory.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Pack(void *<i>inbuf</i>, int <i>incount</i>,
+MPI_Datatype <i>datatype</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">void <i>*outbuf</i>, int <i>outsize</i>,
+int <i>*position</i>, MPI_Comm <i>comm</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_PACK(<i>INBUF, INCOUNT, DATATYPE, OUTBUF,OUTSIZE,
+POSITION,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>COMM, IERROR</i>)</p></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">&lt;type&gt;</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>INBUF(*), OUTBUF(*)</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>INCOUNT, DATATYPE, OUTSIZE, POSITION,
+COMM, IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void Datatype::Pack(const void* <i>inbuf</i>, int
+<i>incount</i>, void *<i>outbuf</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int <i>outsize</i>, int&amp;
+<i>position</i>, const Comm &amp;<i>comm</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">inbuf</p></td>
+<td width="3%"></td>
+<td width="65%">
+
+
+<p style="margin-top: 1em" valign="top">Input buffer start
+(choice).</p> </td>
+<td width="9%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">incount</p></td>
+<td width="3%"></td>
+<td width="65%">
+
+
+<p style="margin-top: 1em" valign="top">Number of input
+data items (integer).</p></td>
+<td width="9%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">datatype</p></td>
+<td width="3%"></td>
+<td width="65%">
+
+
+<p style="margin-top: 1em" valign="top">Datatype of each
+input data item (handle).</p></td>
+<td width="9%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">outsize</p></td>
+<td width="3%"></td>
+<td width="65%">
+
+
+<p style="margin-top: 1em" valign="top">Output buffer size,
+in bytes (integer).</p></td>
+<td width="9%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">comm</p></td>
+<td width="3%"></td>
+<td width="65%">
+
+
+<p style="margin-top: 1em" valign="top">Communicator for
+packed message (handle).</p></td>
+<td width="9%">
+</td>
+</table>
+
+<a name="INPUT/OUTPUT PARAMETER"></a>
+<h2>INPUT/OUTPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">position</p></td>
+<td width="3%"></td>
+<td width="72%">
+
+
+<p style="margin-top: 1em" valign="top">Current position in
+buffer, in bytes (integer).</p></td>
+<td width="2%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">outbuf</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Output buffer start
+(choice).</p> </td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Packs the
+message in the send buffer specified by <i>inbuf</i>,
+<i>incount</i>, <i>datatype</i> into the buffer space
+specified by <i>outbuf</i> and <i>outsize</i>. The input
+buffer can be any communication buffer allowed in MPI_Send.
+The output buffer is a contiguous storage area containing
+<i>outsize</i> bytes, starting at the address <i>outbuf</i>
+(length is counted in bytes, not elements, as if it were a
+communication buffer for a message of type MPI_Packed).</p>
+
+<p style="margin-left:11%; margin-top: 1em">The input value
+of <i>position</i> is the first location in the output
+buffer to be used for packing. <i>position</i> is
+incremented by the size of the packed message, and the
+output value of <i>position</i> is the first location in the
+output buffer following the locations occupied by the packed
+message. The <i>comm</i> argument is the communicator that
+will be subsequently used for sending the packed
+message.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example:</b>
+An example using MPI_Pack:</p>
+
+<p style="margin-left:11%; margin-top: 1em">int position,
+i, j, a[2]; <br>
+char buff[1000];</p>
+
+<p style="margin-left:11%; margin-top: 1em">....</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Comm_rank(MPI_COMM_WORLD,
+&amp;myrank); <br>
+if (myrank == 0) <br>
+{ <br>
+/ * SENDER CODE */</p>
+
+<p style="margin-left:11%; margin-top: 1em">position = 0;
+<br>
+MPI_Pack(&amp;i, 1, MPI_INT, buff, 1000, &amp;position,
+MPI_COMM_WORLD); <br>
+MPI_Pack(&amp;j, 1, MPI_INT, buff, 1000, &amp;position,
+MPI_COMM_WORLD); <br>
+MPI_Send( buff, position, MPI_PACKED, 1, 0, MPI_COMM_WORLD);
+<br>
+} <br>
+else /* RECEIVER CODE */ <br>
+MPI_Recv( a, 2, MPI_INT, 0, 0, MPI_COMM_WORLD)</p>
+
+<p style="margin-left:11%; margin-top: 1em">}</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Unpack.html">MPI_Unpack</a> <br>
+ <a href="MPI_Pack_size.html">MPI_Pack_size</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

@@ -1,9 +1,105 @@
-<html><head><title>MPI_Comm_f2c</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:18 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Comm_f2c</title>
+
+</head>
 <body>
-<H3>MPI_Comm_f2c</H3>
-<PRE>
-MPI_Comm MPI_Comm_f2c(MPI_Fint);
-</PRE>
-<DL><DD>
-Returns a C handle to a communicator.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Comm_f2c</h1>
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Comm_f2c,
+MPI_Comm_c2f, MPI_File_f2c, MPI_File_c2f, MPI_Info_f2c,
+MPI_Info_c2f, MPI_Op_f2c, MPI_Op_c2f, MPI_Request_f2c,
+MPI_Request_c2f, MPI_Type_f2c, MPI_Type_c2f, MPI_Win_f2c,
+MPI_Win_c2f</b> &minus; Translates a C handle into a Fortran
+handle, or vice versa.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+MPI_Comm MPI_Comm_f2c(MPI_Fint <i>comm</i>) <br>
+MPI_Fint MPI_Comm_c2f(MPI_Comm <i>comm</i>)</p>
+
+<p style="margin-left:11%; margin-top: 1em">MPI_File
+MPI_File_f2c(MPI_Fint <i>file</i>) <br>
+MPI_Fint MPI_File_c2f(MPI_File <i>file</i>)</p>
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Group
+MPI_Group_f2c(MPI Fint <i>group</i>) <br>
+MPI_Fint MPI_Group_c2f(MPI Group <i>group</i>)</p>
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Info
+MPI_Info_f2c(MPI_Fint <i>info</i>) <br>
+MPI_Fint MPI_Info_c2f(MPI_Info <i>info</i>)</p>
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Op
+MPI_Op_f2c(MPI_Fint <i>op</i>) <br>
+MPI_Fint MPI_Op_c2f(MPI_Op <i>op</i>)</p>
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Request
+MPI_Request_f2c(MPI_Fint <i>request</i>) <br>
+MPI_Fint MPI_Request_c2f(MPI_Request <i>request</i>)</p>
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Datatype
+MPI_Type_f2c(MPI_Fint <i>datatype</i>) <br>
+MPI_Fint MPI_Type_c2f(MPI_Datatype <i>datatype</i>)</p>
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Win
+MPI_Win_f2c(MPI_Fint <i>win</i>) <br>
+MPI_Fint MPI_Win_c2f(MPI_Win <i>win</i>)</p>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Handles are
+passed between Fortran and C or C++ by using an explicit C
+wrapper to convert Fortran handles to C handles. There is no
+direct access to C or C++ handles in Fortran. Handles are
+passed between C and C++ using overloaded C++ operators
+called from C++ code. There is no direct access to C++
+objects from C. The type definition <i>MPI_Fint</i> is
+provided in C/C++ for an integer of the size that matches a
+Fortran <i>INTEGER</i>; usually, <i>MPI_Fint</i> will be
+equivalent to <i>int</i>. The handle translation functions
+are provided in C to convert from a Fortran handle (which is
+an integer) to a C handle, and vice versa.</p>
+
+<p style="margin-left:11%; margin-top: 1em">For example, if
+<i>comm</i> is a valid Fortran handle to a communicator,
+then MPI_Comm_f2c returns a valid C handle to that same
+communicator; if <i>comm</i> = MPI_COMM_NULL (Fortran
+value), then MPI_Comm_f2c returns a null C handle; if
+<i>comm</i> is an invalid Fortran handle, then MPI_Comm_f2c
+returns an invalid C handle.</p>
+
+<a name="NOTE"></a>
+<h2>NOTE</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">This function
+does not return an error value. Consequently, the result of
+calling it before MPI_Init or after MPI_Finalize is
+undefined.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

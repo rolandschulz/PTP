@@ -1,9 +1,179 @@
-<html><head><title>MPI_Add_error_code</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:12 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Add_error_code</title>
+
+</head>
 <body>
-<H3>MPI_Add_error_code</H3>
-<PRE>
-int MPI_Add_error_code(int, int *);
-</PRE>
-<DL><DD>
-Creates a new error code and returns the value for it.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Add_error_code</h1>
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Add_error_code</b>
+&minus; Creates a new error code associated with
+<i>errorclass</i></p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Add_error_code(int <i>errorclass</i>, int
+*<i>errorcode</i>)</p>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_ADD_ERROR_CODE(<i>ERRORCLASS, ERRORCODE, IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">INTEGER <i>ERRORCLASS, ERRORCODE,
+IERROR</i></p> </td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI::Add_error_code(int <i>errorclass</i>, int*
+<i>errorcode</i>)</p>
+
+<a name="INPUT PARAMETER"></a>
+<h2>INPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="15%">
+
+
+<p style="margin-top: 1em" valign="top">errorclass</p></td>
+<td width="6%"></td>
+<td width="40%">
+
+
+<p style="margin-top: 1em" valign="top">MPI error class
+(integer).</p> </td>
+<td width="28%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">errorcode</p></td>
+<td width="7%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em" valign="top">Error code returned
+by an MPI routine or an MPI error class (integer).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="7%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Creates a new
+error code associated with <i>errorclass</i> and returns its
+value in <i>errorcode</i>.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">No function is
+provided to free error codes, as it is not expected that an
+application will create them in significant numbers.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The value
+returned is always greater than or equal to
+MPI_ERR_LASTCODE.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Add_error_class.html">MPI_Add_error_class</a>
+<br>
+ <a href="MPI_Error_class.html">MPI_Error_class</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

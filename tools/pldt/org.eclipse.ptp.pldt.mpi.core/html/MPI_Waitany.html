@@ -1,9 +1,311 @@
-<html><head><title>MPI_Waitany</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:55 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Waitany</title>
+
+</head>
 <body>
-<H3>MPI_Waitany</H3>
-<PRE>
-int MPI_Waitany(int, MPI_Request *, int *, MPI_Status *);
-</PRE>
-<DL><DD>
-Waits for any specified non-blocking operation to complete.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Waitany</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Waitany</b>
+&minus; Waits for any specified send or receive to
+complete.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Waitany(int <i>count</i>, MPI_Request
+<i>*array_of_requests</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int <i>*index</i>, MPI_Status
+<i>*status</i>)</p> </td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_WAITANY(<i>COUNT, ARRAY_OF_REQUESTS, INDEX, STATUS,
+IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COUNT, ARRAY_OF_REQUESTS(*),
+INDEX</i></p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>STATUS(MPI_STATUS_SIZE), IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+static int Request::Waitany(int <i>count</i>, Request</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><i>array_of_requests</i>[], Status&amp;
+<i>status</i>)</p> </td>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">static int
+Request::Waitany(int <i>count</i>, Request
+<i>array_of_requests</i>[])</p>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="7%">
+
+
+<p style="margin-top: 1em" valign="top">count</p></td>
+<td width="8%"></td>
+<td width="34%">
+
+
+<p style="margin-top: 1em" valign="top">List length
+(integer).</p> </td>
+<td width="40%">
+</td>
+</table>
+
+<p style="margin-left:11%;">array_of_requests</p>
+
+<p style="margin-left:26%;">Array of requests (array of
+handles).</p>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">index</p></td>
+<td width="6%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Index of handle for
+operation that completed (integer). In the range 0 to
+count-1. In Fortran, the range is 1 to count.</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">status</p></td>
+<td width="6%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Status object
+(status).</p> </td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p>IERROR</p></td>
+<td width="6%"></td>
+<td width="74%">
+
+
+<p>Fortran only: Error status (integer).</p></td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">A call to
+MPI_Waitany can be used to wait for the completion of one
+out of several requests.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+array_of_requests list may contain null or inactive handles.
+If the list contains no active handles (list has length zero
+or all entries are null or inactive), then the call returns
+immediately with index = MPI_UNDEFINED, and an empty
+status.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The execution
+of MPI_Waitany(count, array_of_requests, index, status) has
+the same effect as the execution of
+MPI_Wait(&amp;array_of_requests[i], status), where i is the
+value returned by index (unless the value of index is
+MPI_UNDEFINED). MPI_Waitany with an array containing one
+active entry is equivalent to MPI_Wait.</p>
+
+<p style="margin-left:11%; margin-top: 1em">If your
+application does not need to examine the <i>status</i>
+field, you can save resources by using the predefined
+constant MPI_STATUS_IGNORE as a special value for the
+<i>status</i> argument.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example:</b>
+Client-server code (starvation can occur).</p>
+
+<p style="margin-left:11%; margin-top: 1em">CALL
+MPI_COMM_SIZE(comm, size, ierr) <br>
+CALL MPI_COMM_RANK(comm, rank, ierr) <br>
+IF(rank .GT 0) THEN ! client code <br>
+DO WHILE(.TRUE.) <br>
+CALL MPI_ISEND(a, n, MPI_REAL, 0, tag, comm, request, ierr)
+<br>
+CALL MPI_WAIT(request, status, ierr) <br>
+END DO <br>
+ELSE ! rank=0 -- server code <br>
+DO i=1, size-1 <br>
+CALL MPI_IRECV(a(1,i), n, MPI_REAL, i tag, <br>
+comm, request_list(i), ierr) <br>
+END DO <br>
+DO WHILE(.TRUE.) <br>
+CALL MPI_WAITANY(size-1, request_list, index, status, ierr)
+<br>
+CALL DO_SERVICE(a(1,index)) ! handle one message <br>
+CALL MPI_IRECV(a(1, index), n, MPI_REAL, index, tag, <br>
+comm, request_list(index), ierr) <br>
+END DO <br>
+END IF</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI::Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler,
+MPI_File_set_errhandler, or MPI_Win_set_errhandler
+(depending on the type of MPI handle that generated the
+request); the predefined error handler MPI_ERRORS_RETURN may
+be used to cause error values to be returned. Note that MPI
+does not guarantee that an MPI program can continue past an
+error.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Note that per
+MPI-1 section 3.2.5, MPI exceptions on requests passed to
+MPI_WAITANY do not set the status.MPI_ERROR field in the
+returned status. The error code is passed to the back-end
+error handler and may be passed back to the caller through
+the return value of MPI_WAITANY if the back-end error
+handler returns it. The pre-defined MPI error handler
+MPI_ERRORS_RETURN exhibits this behavior, for example.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Comm_set_errhandler.html">MPI_Comm_set_errhandler</a>
+<br>
+<a href="MPI_File_set_errhandler.html">MPI_File_set_errhandler</a> <br>
+<a href="MPI_Test.html">MPI_Test</a> <br>
+<a href="MPI_Testall.html">MPI_Testall</a> <br>
+<a href="MPI_Testany.html">MPI_Testany</a> <br>
+<a href="MPI_Testsome.html">MPI_Testsome</a> <br>
+<a href="MPI_Wait.html">MPI_Wait</a> <br>
+<a href="MPI_Waitall.html">MPI_Waitall</a> <br>
+<a href="MPI_Waitsome.html">MPI_Waitsome</a> <br>
+ <a href="MPI_Win_set_errhandler.html">MPI_Win_set_errhandler</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

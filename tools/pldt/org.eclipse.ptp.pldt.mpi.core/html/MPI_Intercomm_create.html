@@ -1,9 +1,289 @@
-<html><head><title>MPI_Intercomm_create</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:39 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Intercomm_create</title>
+
+</head>
 <body>
-<H3>MPI_Intercomm_create</H3>
-<PRE>
-int MPI_Intercomm_create(MPI_Comm, int, MPI_Comm, int, int, MPI_Comm * );
-</PRE>
-<DL><DD>
-Creates an inter-communicator from two intra-communicators.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Intercomm_create</h1>
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Intercomm_create</b>
+&minus; Creates an intercommuncator from two
+intracommunicators.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Intercomm_create(MPI_Comm <i>local_comm</i>, int
+<i>local_leader</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Comm <i>peer_comm</i>, int
+<i>remote_leader</i>, int <i>tag</i>, MPI_Comm
+<i>*newintercomm</i>)</p> </td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_INTERCOMM_CREATE(<i>LOCAL_COMM, LOCAL_LEADER,
+PEER_COMM,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>REMOTE_LEADER, TAG, NEWINTERCOMM,
+IERROR</i>)</p> </td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>LOCAL_COMM, LOCAL_LEADER, PEER_COMM,
+REMOTE_LEADER</i></p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>TAG, NEWINTERCOMM, IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+Intercomm Intracomm::Create_intercomm(int
+<i>local_leader</i>, const</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">Comm&amp; <i>peer_comm</i>, int
+<i>remote_leader</i>, int <i>tag</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">local_comm</p>
+
+<p style="margin-left:26%;">The communicator containing the
+process that initiates the inter-communication (handle).</p>
+
+<p style="margin-left:11%;">local_leader</p>
+
+<p style="margin-left:26%;">Rank of local group leader in
+local_comm (integer).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">peer_comm</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">&quot;Peer&quot;
+communicator; significant only at the local_leader
+(handle).</p> </td>
+</table>
+
+<p style="margin-left:11%;">remote_leader</p>
+
+<p style="margin-left:26%;">Rank of remote group leader in
+peer_comm; significant only at the local_leader
+(integer).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="4%">
+
+
+<p style="margin-top: 1em" valign="top">tag</p></td>
+<td width="11%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Message tag used to
+identify new intercommunicator (integer).</p></td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">newintercomm</p>
+
+<p style="margin-left:26%;">Created intercommunicator
+(handle).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">This call
+creates an intercommunicator. It is collective over the
+union of the local and remote groups. Processes should
+provide identical local_comm and local_leader arguments
+within each group. Wildcards are not permitted for
+remote_leader, local_leader, and tag.</p>
+
+<p style="margin-left:11%; margin-top: 1em">This call uses
+point-to-point communication with communicator peer_comm,
+and with tag tag between the leaders. Thus, care must be
+taken that there be no pending communication on peer_comm
+that could interfere with this communication.</p>
+
+<p style="margin-left:11%; margin-top: 1em">If multiple
+MPI_Intercomm_creates are being made, they should use
+different tags (more precisely, they should ensure that the
+local and remote leaders are using different tags for each
+MPI_intercomm_create).</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">We recommend
+using a dedicated peer communicator, such as a duplicate of
+MPI_COMM_WORLD, to avoid trouble with peer
+communicators.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The MPI 1.1
+Standard contains two mutually exclusive comments on the
+input intracommunicators. One says that their repective
+groups must be disjoint; the other that the leaders can be
+the same process. After some discussion by the MPI Forum, it
+has been decided that the groups must be disjoint. Note that
+the <b>reason</b> given for this in the standard is
+<b>not</b> the reason for this choice; rather, the
+<b>other</b> operations on intercommunicators (like
+<i>MPI_Intercomm_merge</i> ) do not make sense if the groups
+are not disjoint.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Intercomm_merge.html">MPI_Intercomm_merge</a>
+<br>
+<a href="MPI_Comm_free.html">MPI_Comm_free</a> <br>
+<a href="MPI_Comm_remote_group.html">MPI_Comm_remote_group</a> <br>
+ <a href="MPI_Comm_remote_size.html">MPI_Comm_remote_size</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

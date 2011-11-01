@@ -1,9 +1,238 @@
-<html><head><title>MPI_Type_contiguous</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:49 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Type_contiguous</title>
+
+</head>
 <body>
-<H3>MPI_Type_contiguous</H3>
-<PRE>
-int MPI_Type_contiguous(int, MPI_Datatype, MPI_Datatype *);
-</PRE>
-<DL><DD>
-Returns a new datatype that represents the concatenation of count instances ofoldtype.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Type_contiguous</h1>
+
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Type_contiguous</b>
+&minus; Creates a contiguous datatype.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Type_contiguous(int <i>count</i>, MPI_Datatype
+<i>oldtype</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Datatype <i>*newtype</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_TYPE_CONTIGUOUS(<i>COUNT, OLDTYPE, NEWTYPE,
+IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COUNT, OLDTYPE, NEWTYPE, IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+Datatype Datatype::Create_contiguous(int <i>count</i>)
+const</p>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">count</p></td>
+<td width="4%"></td>
+<td width="62%">
+
+
+<p style="margin-top: 1em" valign="top">Replication count
+(nonnegative integer).</p></td>
+<td width="12%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">oldtype</p></td>
+<td width="4%"></td>
+<td width="62%">
+
+
+<p style="margin-top: 1em" valign="top">Old datatype
+(handle).</p> </td>
+<td width="12%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">newtype</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">New datatype
+(handle).</p> </td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The simplest
+datatype constructor is MPI_Type_contiguous, which allows
+replication of a datatype into contiguous locations.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><i>newtype</i>
+is the datatype obtained by concatenating <i>count</i>
+copies of <i>oldtype</i>. Concatenation is defined using the
+extent of <i>oldtype</i> as the size of the concatenated
+copies.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example:</b>
+Let oldtype have type map {(double, 0), (char, 8)}, with
+extent 16, and let count = 3. The type map of the datatype
+returned by newtype is</p>
+
+<p style="margin-left:11%; margin-top: 1em">{(double, 0),
+(char, 8), (double, 16), (char, 24), <br>
+(double, 32), (char, 40)];</p>
+
+<p style="margin-left:11%; margin-top: 1em">i.e.,
+alternating double and char elements, with displacements 0,
+8, 16, 24, 32, 40.</p>
+
+<p style="margin-left:11%; margin-top: 1em">In general,
+assume that the type map of oldtype is</p>
+
+<p style="margin-left:11%; margin-top: 1em">{(type(0),
+disp(0)),...,(type(n-1), disp(n-1))},</p>
+
+<p style="margin-left:11%; margin-top: 1em">with extent ex.
+Then newtype has a type map with count times n entries
+defined by:</p>
+
+<p style="margin-left:11%; margin-top: 1em">{(type(0),
+disp(0)), ...,(type(n-1), disp(n-1)), <br>
+(type(0), disp(0) + ex), ...,(type(n-1), <br>
+disp(n-1) + ex), ...,(type(0), disp(0) + ex * (count - 1)),
+<br>
+...,(type(n-1), disp(n-1) + ex * (count - 1))}.</p>
+
+<p style="margin-left:11%; margin-top: 1em">For more
+information about derived datatypes, see Section 3.12 of the
+MPI-1 Standard.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

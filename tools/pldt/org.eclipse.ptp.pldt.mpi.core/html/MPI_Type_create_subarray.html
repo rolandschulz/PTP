@@ -1,9 +1,369 @@
-<html><head><title>MPI_Type_create_subarray</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:51 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Type_create_subarray</title>
+
+</head>
 <body>
-<H3>MPI_Type_create_subarray</H3>
-<PRE>
-int MPI_Type_create_subarray(int, int [], int [], int [], int, MPI_Datatype, MPI_Datatype *);
-</PRE>
-<DL><DD>
-Returns a new datatype that represents anndims-dimensional subarray of anndims-dimensional array.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Type_create_subarray</h1>
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Type_create_subarray</b>
+&minus; Creates a data type describing an
+<i>n</i>-dimensional subarray of an <i>n</i>-dimensional
+array.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Type_create_subarray(int <i>ndims</i>, int
+<i>array_of_sizes[]</i>, int <i>array_of_subsizes[]</i>, int
+<i>array_of_starts[]</i>, int <i>order</i>, MPI_Datatype
+<i>oldtype, MPI_Datatype *newtype)</i></p>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_TYPE_CREATE_SUBARRAY(<i>NDIMS, ARRAY_OF_SIZES,
+ARRAY_OF_SUBSIZES,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top"><i>ARRAY_OF_STARTS, ORDER, OLDTYPE,
+NEWTYPE, IERROR</i>)</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>NDIMS, ARRAY_OF_SIZES(*),
+ARRAY_OF_SUBSIZES(*),</i></p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top"><i>ARRAY_OF_STARTS(*), ORDER, OLDTYPE,
+NEWTYPE, IERROR</i></p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+MPI::Datatype MPI::Datatype::Create_subarray(int
+<i>ndims</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const int <i>array_of_sizes</i>[], const
+int <i>array_of_subsizes[]</i>,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const int <i>array_of_starts[]</i>, int
+<i>order</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="7%">
+
+
+<p style="margin-top: 1em" valign="top">ndims</p></td>
+<td width="8%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Number of array
+dimensions (positive integer).</p></td>
+<td width="3%">
+</td>
+</table>
+
+<p style="margin-left:11%;">array_of_sizes</p>
+
+<p style="margin-left:26%;">Number of elements of type
+<i>oldtype</i> in each dimension of the full array (array of
+positive integers).</p>
+
+<p style="margin-left:11%;">array_of_subsizes</p>
+
+<p style="margin-left:26%;">Number of elements of type
+<i>oldtype</i> in each dimension of the subarray (array of
+positive integers).</p>
+
+<p style="margin-left:11%;">array_of_starts</p>
+
+<p style="margin-left:26%;">Starting coordinates of the
+subarray in each dimension (array of nonnegative
+integers).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">order</p></td>
+<td width="4%"></td>
+<td width="51%">
+
+
+<p style="margin-top: 1em" valign="top">Array storage order
+flag (state).</p></td>
+<td width="23%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">oldtype</p></td>
+<td width="4%"></td>
+<td width="51%">
+
+
+<p style="margin-top: 1em" valign="top">Array element data
+type (handle).</p></td>
+<td width="23%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">newtype</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">New data type
+(handle).</p> </td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The subarray
+type constructor creates an MPI data type describing an
+<i>n</i>-dimensional subarray of an <i>n</i>-dimensional
+array. The subarray may be situated anywhere within the full
+array, and may be of any nonzero size up to the size of the
+larger array as long as it is confined within this array.
+This type constructor facilitates creating file types to
+access arrays distributed in blocks among processes to a
+single file that contains the global array.</p>
+
+<p style="margin-left:11%; margin-top: 1em">This type
+constructor can handle arrays with an arbitrary number of
+dimensions and works for both C- and Fortran-ordered
+matrices (that is, row-major or column-major). Note that a C
+program may use Fortran order and a Fortran program may use
+C order.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+<i>ndims</i> parameter specifies the number of dimensions in
+the full data array and gives the number of elements in
+<i>array_of_sizes</i>, <i>array_of_subsizes</i>, and
+<i>array_of_starts</i>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The number of
+elements of type <i>oldtype</i> in each dimension of the
+<i>n</i>-dimensional array and the requested subarray are
+specified by <i>array_of_sizes</i> and
+<i>array_of_subsizes</i>, respectively. For any dimension
+<i>i</i>, it is erroneous to specify
+<i>array_of_subsizes[i]</i> &lt; 1 or
+<i>array_of_subsizes[i]</i> &gt; <i>array of
+sizes[i]</i>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+<i>array_of_starts</i> contains the starting coordinates of
+each dimension of the subarray. Arrays are assumed to be
+indexed starting from zero. For any dimension <i>i</i>, it
+is erroneous to specify</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><i>array_of_starts[i]</i>
+&lt; 0</p>
+
+<p style="margin-left:11%; margin-top: 1em">or</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><i>array_of_starts[i]</i>
+&gt; (<i>array_of_sizes[i]</i> -
+<i>array_of_subsizes[i]</i>).</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+<i>order</i> argument specifies the storage order for the
+subarray as well as the full array. It must be set to one of
+the following:</p>
+
+<p style="margin-left:11%; margin-top: 1em">- MPI_ORDER_C:
+The ordering used by C arrays, (that is, row-major
+order)</p>
+
+<p style="margin-left:11%; margin-top: 1em">-
+MPI_ORDER_FORTRAN: The ordering used by Fortran arrays,
+(that is, column-major order)</p>
+
+<p style="margin-left:11%; margin-top: 1em">A
+<i>ndims</i>-dimensional subarray (<i>newtype</i>) with no
+extra padding can be defined by the function Subarray() as
+follows:</p>
+
+<p style="margin-left:11%; margin-top: 1em">newtype =
+Subarray(ndims, {size , size ,..., size }, <br>
+0 1 ndims-1 <br>
+{subsize , subsize , ..., subsize }, <br>
+0 1 ndims-1 <br>
+{start , start , ..., start }, <i>oldtype</i>) <br>
+0 1 bduns-1</p>
+
+<p style="margin-left:11%; margin-top: 1em">Let the typemap
+of <i>oldtype</i> have the form:</p>
+
+<p style="margin-left:11%; margin-top: 1em">{(type , disp
+), (type , disp ), ..., (type , disp )} <br>
+0 0 1 1 n-1 n-1</p>
+
+<p style="margin-left:11%; margin-top: 1em">where
+type<i>i</i> is a predefined MPI data type, and let
+<i>ex</i> be the extent of <i>oldtype</i>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The Subarray()
+function is defined recursively in three equations on page
+72 of the MPI-2 standard.</p>
+
+<p style="margin-left:11%; margin-top: 1em">For an example
+use of MPI_Type_create_subarray in the context of I/O, see
+Section 9.9.2 of the MPI-2 standard.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">In a Fortran
+program with arrays indexed starting from 1, if the starting
+coordinate of a particular dimension of the subarray is
+<i>n</i>, then the entry in array of starts for that
+dimension is <i>n</i>-1.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

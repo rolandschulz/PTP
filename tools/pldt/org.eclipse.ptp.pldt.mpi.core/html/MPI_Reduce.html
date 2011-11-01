@@ -1,9 +1,1068 @@
-<html><head><title>MPI_Reduce</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:44 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Reduce</title>
+
+</head>
 <body>
-<H3>MPI_Reduce</H3>
-<PRE>
-int MPI_Reduce(void* , void*, int, MPI_Datatype, MPI_Op, int, MPI_Comm);
-</PRE>
-<DL><DD>
-Applies a reduction operation to the vectorsendbuf over the set of tasks specified bycomm and places the result in recvbuf on root.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Reduce</h1>
+
+<hr>
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b><a href="MPI_Reduce.html">MPI_Reduce</a></b>
+&minus; Reduces values on all processes within a group.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int <a href="MPI_Reduce.html">MPI_Reduce</a>(void *<i>sendbuf</i>, void *<i>recvbuf</i>,
+int <i>count</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top"><a href="MPI_Datatype.html">MPI_Datatype</a> <i>datatype</i>, <a href="MPI_Op.html">MPI_Op</a>
+<i>op</i>, int <i>root</i>, <a href="MPI_Comm.html">MPI_Comm</a> <i>comm</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+<a href="MPI_REDUCE.html">MPI_REDUCE</a>(<i>SENDBUF, RECVBUF, COUNT, DATATYPE, OP, ROOT,
+COMM,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>IERROR</i>)</p></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">&lt;type&gt;</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>SENDBUF(*), RECVBUF(*)</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COUNT, DATATYPE, OP, ROOT, COMM,
+IERROR</i></p> </td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void MPI::Intracomm::Reduce(const void* <i>sendbuf</i>,
+void* <i>recvbuf</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int <i>count</i>, const MPI::Datatype&amp;
+<i>datatype</i>, const MPI::Op&amp; <i>op</i>,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int <i>root</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">sendbuf</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Address of send
+buffer (choice).</p></td>
+<td width="3%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">count</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Number of elements
+in send buffer (integer).</p></td>
+<td width="3%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">datatype</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Data type of
+elements of send buffer (handle).</p></td>
+<td width="3%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">op</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Reduce operation
+(handle).</p> </td>
+<td width="3%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">root</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Rank of root
+process (integer).</p></td>
+<td width="3%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">comm</p></td>
+<td width="3%"></td>
+<td width="71%">
+
+
+<p style="margin-top: 1em" valign="top">Communicator
+(handle).</p> </td>
+<td width="3%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">recvbuf</p></td>
+<td width="4%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Address of receive
+buffer (choice, significant only at root).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The global
+reduce functions (<a href="MPI_Reduce.html">MPI_Reduce</a>, <a href="MPI_Op_create.html">MPI_Op_create</a>, <a href="MPI_Op_free.html">MPI_Op_free</a>,
+<a href="MPI_Allreduce.html">MPI_Allreduce</a>, <a href="MPI_Reduce_scatter.html">MPI_Reduce_scatter</a>, <a href="MPI_Scan.html">MPI_Scan</a>) perform a
+global reduce operation (such as sum, max, logical AND,
+etc.) across all the members of a group. The reduction
+operation can be either one of a predefined list of
+operations, or a user-defined operation. The global
+reduction functions come in several flavors: a reduce that
+returns the result of the reduction at one node, an
+all-reduce that returns this result at all nodes, and a scan
+(parallel prefix) operation. In addition, a reduce-scatter
+operation combines the functionality of a reduce and a
+scatter operation.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Reduce.html">MPI_Reduce</a>
+combines the elements provided in the input buffer of each
+process in the group, using the operation op, and returns
+the combined value in the output buffer of the process with
+rank root. The input buffer is defined by the arguments
+sendbuf, count, and datatype; the output buffer is defined
+by the arguments recvbuf, count, and datatype; both have the
+same number of elements, with the same type. The routine is
+called by all group members using the same arguments for
+count, datatype, op, root, and comm. Thus, all processes
+provide input buffers and output buffers of the same length,
+with elements of the same type. Each process can provide one
+element, or a sequence of elements, in which case the
+combine operation is executed element-wise on each entry of
+the sequence. For example, if the operation is <a href="MPI_MAX.html">MPI_MAX</a> and
+the send buffer contains two elements that are
+floating-point numbers (count = 2 and datatype = <a href="MPI_FLOAT.html">MPI_FLOAT</a>),
+then recvbuf(1) = global max (sendbuf(1)) and recvbuf(2) =
+global max(sendbuf(2)).</p>
+
+<a name="USE OF IN-PLACE OPTION"></a>
+<h2>USE OF IN-PLACE OPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">When the
+communicator is an intracommunicator, you can perform a
+reduce operation in-place (the output buffer is used as the
+input buffer). Use the variable <a href="MPI_IN_PLACE.html">MPI_IN_PLACE</a> as the value of
+the root process <i>sendbuf</i>. In this case, the input
+data is taken at the root from the receive buffer, where it
+will be replaced by the output data.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Note that
+<a href="MPI_IN_PLACE.html">MPI_IN_PLACE</a> is a special kind of value; it has the same
+restrictions on its use as <a href="MPI_BOTTOM.html">MPI_BOTTOM</a>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Because the
+in-place option converts the receive buffer into a
+send-and-receive buffer, a Fortran binding that includes
+INTENT must mark these as INOUT, not OUT.</p>
+
+<a name="WHEN COMMUNICATOR IS AN INTER-COMMUNICATOR"></a>
+<h2>WHEN COMMUNICATOR IS AN INTER-COMMUNICATOR</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">When the
+communicator is an inter-communicator, the root process in
+the first group combines data from all the processes in the
+second group and then performs the <i>op</i> operation. The
+first group defines the root process. That process uses
+<a href="MPI_ROOT.html">MPI_ROOT</a> as the value of its <i>root</i> argument. The
+remaining processes use <a href="MPI_PROC_NULL.html">MPI_PROC_NULL</a> as the value of their
+<i>root</i> argument. All processes in the second group use
+the rank of that root process in the first group as the
+value of their <i>root</i> argument. Only the send buffer
+arguments are significant in the second group, and only the
+receive buffer arguments are significant in the root process
+of the first group.</p>
+
+<a name="PREDEFINED REDUCE OPERATIONS"></a>
+<h2>PREDEFINED REDUCE OPERATIONS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The set of
+predefined operations provided by MPI is listed below
+(Predefined Reduce Operations). That section also enumerates
+the datatypes each operation can be applied to. In addition,
+users may define their own operations that can be overloaded
+to operate on several datatypes, either basic or derived.
+This is further explained in the description of the
+user-defined operations (see the man pages for <a href="MPI_Op_create.html">MPI_Op_create</a>
+and <a href="MPI_Op_free.html">MPI_Op_free</a>).</p>
+
+<p style="margin-left:11%; margin-top: 1em">The operation
+op is always assumed to be associative. All predefined
+operations are also assumed to be commutative. Users may
+define operations that are assumed to be associative, but
+not commutative. The &lsquo;&lsquo;canonical&rsquo;&rsquo;
+evaluation order of a reduction is determined by the ranks
+of the processes in the group. However, the implementation
+can take advantage of associativity, or associativity and
+commutativity, in order to change the order of evaluation.
+This may change the result of the reduction for operations
+that are not strictly associative and commutative, such as
+floating point addition.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Predefined
+operators work only with the MPI types listed below
+(Predefined Reduce Operations, and the section MINLOC and
+MAXLOC, below). User-defined operators may operate on
+general, derived datatypes. In this case, each argument that
+the reduce operation is applied to is one element described
+by such a datatype, which may contain several basic values.
+This is further explained in Section 4.9.4 of the MPI
+Standard, &quot;User-Defined Operations.&quot;</p>
+
+<p style="margin-left:11%; margin-top: 1em">The following
+predefined operations are supplied for <a href="MPI_Reduce.html">MPI_Reduce</a> and
+related functions <a href="MPI_Allreduce.html">MPI_Allreduce</a>, <a href="MPI_Reduce_scatter.html">MPI_Reduce_scatter</a>, and
+<a href="MPI_Scan.html">MPI_Scan</a>. These operations are invoked by placing the
+following in op:</p>
+
+
+
+<p>&nbsp;</p>
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+   
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+<p valign="top">Name    Meaning</p></td>    
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+<p valign="top">--------- -----------</p></td>
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+<p valign="top"><a href="MPI_MAX.html">MPI_MAX</a> maximum</p></td>
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+<p valign="top"><a href="MPI_MIN.html">MPI_MIN</a> minimum</p></td>
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_SUM.html">MPI_SUM</a> sum</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_PROD.html">MPI_PROD</a> product</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_LAND.html">MPI_LAND</a> logical and</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_BAND.html">MPI_BAND</a> bit-wise and</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_LOR.html">MPI_LOR</a> logical or</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_BOR.html">MPI_BOR</a> bit-wise or</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_LXOR.html">MPI_LXOR</a> logical xor</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_BXOR.html">MPI_BXOR</a> bit-wise xor</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_MAXLOC.html">MPI_MAXLOC</a> max value and location</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_MINLOC.html">MPI_MINLOC</a> min value and location</p></td>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">The two
+operations <a href="MPI_MINLOC.html">MPI_MINLOC</a> and <a href="MPI_MAXLOC.html">MPI_MAXLOC</a> are discussed
+separately below (MINLOC and MAXLOC). For the other
+predefined operations, we enumerate below the allowed
+combinations of op and datatype arguments. First, define
+groups of MPI basic datatypes in the following way:</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">C integer: <a href="MPI_INT.html">MPI_INT</a>, <a href="MPI_LONG.html">MPI_LONG</a>,
+<a href="MPI_SHORT.html">MPI_SHORT</a>,</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_UNSIGNED_SHORT.html">MPI_UNSIGNED_SHORT</a>, <a href="MPI_UNSIGNED.html">MPI_UNSIGNED</a>,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_UNSIGNED_LONG.html">MPI_UNSIGNED_LONG</a></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">Fortran integer: <a href="MPI_INTEGER.html">MPI_INTEGER</a></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">Floating-point: <a href="MPI_FLOAT.html">MPI_FLOAT</a>, <a href="MPI_DOUBLE.html">MPI_DOUBLE</a>,
+<a href="MPI_REAL.html">MPI_REAL</a>,</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><a href="MPI_DOUBLE_PRECISION.html">MPI_DOUBLE_PRECISION</a>, <a href="MPI_LONG_DOUBLE.html">MPI_LONG_DOUBLE</a></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">Logical: <a href="MPI_LOGICAL.html">MPI_LOGICAL</a></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">Complex: <a href="MPI_COMPLEX.html">MPI_COMPLEX</a></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">Byte: <a href="MPI_BYTE.html">MPI_BYTE</a></p></td>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">Now, the valid
+datatypes for each option is specified below.</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="31%"></td>
+<td width="8%"></td>
+<td width="46%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">Op</p></td>
+<td width="31%"></td>
+<td width="8%"></td>
+<td width="46%">
+
+
+<p valign="top">Allowed Types</p></td>
+</table>
+
+<p style="margin-left:11%;">----------------
+---------------------------</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><a href="MPI_MAX.html">MPI_MAX</a>, <a href="MPI_MIN.html">MPI_MIN</a></p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="46%">
+
+
+<p valign="top">C integer, Fortran integer,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+</td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+</td>
+<td width="46%">
+
+
+<p valign="top">floating-point</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><a href="MPI_SUM.html">MPI_SUM</a>, <a href="MPI_PROD.html">MPI_PROD</a></p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="46%">
+
+
+<p valign="top">C integer, Fortran integer,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+</td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+</td>
+<td width="46%">
+
+
+<p valign="top">floating-point, complex</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><a href="MPI_LAND.html">MPI_LAND</a>, <a href="MPI_LOR.html">MPI_LOR</a>,</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="46%">
+
+
+<p valign="top">C integer, logical</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top"><a href="MPI_LXOR.html">MPI_LXOR</a></p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="46%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><a href="MPI_BAND.html">MPI_BAND</a>, <a href="MPI_BOR.html">MPI_BOR</a>,</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%">
+</td>
+<td width="46%">
+
+
+<p valign="top">C integer, Fortran integer, byte</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top"><a href="MPI_BXOR.html">MPI_BXOR</a></p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="46%">
+</td>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example
+1:</b> A routine that computes the dot product of two
+vectors that are distributed across a group of processes and
+returns the answer at process zero.</p>
+
+<p style="margin-left:11%; margin-top: 1em">SUBROUTINE
+PAR_BLAS1(m, a, b, c, comm) <br>
+REAL a(m), b(m) ! local slice of array <br>
+REAL c ! result (at process zero) <br>
+REAL sum <br>
+INTEGER m, comm, i, ierr</p>
+
+<p style="margin-left:11%; margin-top: 1em">! local sum
+<br>
+sum = 0.0 <br>
+DO i = 1, m <br>
+sum = sum + a(i)*b(i) <br>
+END DO</p>
+
+<p style="margin-left:11%; margin-top: 1em">! global sum
+<br>
+CALL <a href="MPI_REDUCE.html">MPI_REDUCE</a>(sum, c, 1, <a href="MPI_REAL.html">MPI_REAL</a>, <a href="MPI_SUM.html">MPI_SUM</a>, 0, comm, ierr)
+<br>
+RETURN</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example
+2:</b> A routine that computes the product of a vector and
+an array that are distributed across a group of processes
+and returns the answer at process zero.</p>
+
+<p style="margin-left:11%; margin-top: 1em">SUBROUTINE
+PAR_BLAS2(m, n, a, b, c, comm) <br>
+REAL a(m), b(m,n) ! local slice of array <br>
+REAL c(n) ! result <br>
+REAL sum(n) <br>
+INTEGER n, comm, i, j, ierr</p>
+
+<p style="margin-left:11%; margin-top: 1em">! local sum
+<br>
+DO j= 1, n <br>
+sum(j) = 0.0 <br>
+DO i = 1, m <br>
+sum(j) = sum(j) + a(i)*b(i,j) <br>
+END DO <br>
+END DO</p>
+
+<p style="margin-left:11%; margin-top: 1em">! global sum
+<br>
+CALL <a href="MPI_REDUCE.html">MPI_REDUCE</a>(sum, c, n, <a href="MPI_REAL.html">MPI_REAL</a>, <a href="MPI_SUM.html">MPI_SUM</a>, 0, comm,
+ierr)</p>
+
+<p style="margin-left:11%; margin-top: 1em">! return result
+at process zero (and garbage at the other nodes) <br>
+RETURN</p>
+
+<a name="MINLOC AND MAXLOC"></a>
+<h2>MINLOC AND MAXLOC</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The operator
+<a href="MPI_MINLOC.html">MPI_MINLOC</a> is used to compute a global minimum and also an
+index attached to the minimum value. <a href="MPI_MAXLOC.html">MPI_MAXLOC</a> similarly
+computes a global maximum and index. One application of
+these is to compute a global minimum (maximum) and the rank
+of the process containing this value.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The operation
+that defines <a href="MPI_MAXLOC.html">MPI_MAXLOC</a> is</p>
+
+<p style="margin-left:11%; margin-top: 1em">( u ) ( v ) ( w
+) <br>
+( ) o ( ) = ( ) <br>
+( i ) ( j ) ( k )</p>
+
+<p style="margin-left:11%; margin-top: 1em">where</p>
+
+<p style="margin-left:11%; margin-top: 1em">w = max(u,
+v)</p>
+
+<p style="margin-left:11%; margin-top: 1em">and</p>
+
+<p style="margin-left:11%; margin-top: 1em">( i if u &gt; v
+<br>
+( <br>
+k = ( min(i, j) if u = v <br>
+( <br>
+( j if u &lt; v)</p>
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_MINLOC.html">MPI_MINLOC</a> is
+defined similarly:</p>
+
+<p style="margin-left:11%; margin-top: 1em">( u ) ( v ) ( w
+) <br>
+( ) o ( ) = ( ) <br>
+( i ) ( j ) ( k )</p>
+
+<p style="margin-left:11%; margin-top: 1em">where</p>
+
+<p style="margin-left:11%; margin-top: 1em">w = max(u,
+v)</p>
+
+<p style="margin-left:11%; margin-top: 1em">and</p>
+
+<p style="margin-left:11%; margin-top: 1em">( i if u &lt; v
+<br>
+( <br>
+k = ( min(i, j) if u = v <br>
+( <br>
+( j if u &gt; v)</p>
+
+<p style="margin-left:11%; margin-top: 1em">Both operations
+are associative and commutative. Note that if <a href="MPI_MAXLOC.html">MPI_MAXLOC</a> is
+applied to reduce a sequence of pairs (u(0), 0), (u(1),
+1),&nbsp;..., (u(n-1), n-1), then the value returned is (u ,
+r), where u= max(i) u(i) and r is the index of the first
+global maximum in the sequence. Thus, if each process
+supplies a value and its rank within the group, then a
+reduce operation with op = <a href="MPI_MAXLOC.html">MPI_MAXLOC</a> will return the
+maximum value and the rank of the first process with that
+value. Similarly, <a href="MPI_MINLOC.html">MPI_MINLOC</a> can be used to return a minimum
+and its index. More generally, <a href="MPI_MINLOC.html">MPI_MINLOC</a> computes a
+lexicographic minimum, where elements are ordered according
+to the first component of each pair, and ties are resolved
+according to the second component.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The reduce
+operation is defined to operate on arguments that consist of
+a pair: value and index. For both Fortran and C, types are
+provided to describe the pair. The potentially mixed-type
+nature of such arguments is a problem in Fortran. The
+problem is circumvented, for Fortran, by having the
+MPI-provided type consist of a pair of the same type as
+value, and coercing the index to this type also. In C, the
+MPI-provided pair type has distinct types and the index is
+an int.</p>
+
+<p style="margin-left:11%; margin-top: 1em">In order to use
+<a href="MPI_MINLOC.html">MPI_MINLOC</a> and <a href="MPI_MAXLOC.html">MPI_MAXLOC</a> in a reduce operation, one must
+provide a datatype argument that represents a pair (value
+and index). MPI provides nine such predefined datatypes. The
+operations <a href="MPI_MAXLOC.html">MPI_MAXLOC</a> and <a href="MPI_MINLOC.html">MPI_MINLOC</a> can be used with each
+of the following datatypes:</p>
+
+<p style="margin-left:11%; margin-top: 1em">Fortran: <br>
+Name Description <br>
+<a href="MPI_2REAL.html">MPI_2REAL</a> pair of REALs <br>
+<a href="MPI_2DOUBLE_PRECISION.html">MPI_2DOUBLE_PRECISION</a> pair of DOUBLE-PRECISION variables
+<br>
+<a href="MPI_2INTEGER.html">MPI_2INTEGER</a> pair of INTEGERs</p>
+
+<p style="margin-left:11%; margin-top: 1em">C:</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+
+
+<p valign="top">Name</p><td width="17%"></td>
+<td width="-9%"></td>
+<td width="23%"></td>
+<td width="7%"></td>
+<td width="8%">
+</td>
+<td width="54%">
+
+
+<p valign="top">Description</p></td>
+</table>
+
+<p style="margin-left:11%;"><a href="MPI_FLOAT_INT.html">MPI_FLOAT_INT</a> float and int
+<br>
+<a href="MPI_DOUBLE_INT.html">MPI_DOUBLE_INT</a> double and int <br>
+<a href="MPI_LONG_INT.html">MPI_LONG_INT</a> long and int <br>
+<a href="MPI_2INT.html">MPI_2INT</a> pair of ints <br>
+<a href="MPI_SHORT_INT.html">MPI_SHORT_INT</a> short and int <br>
+<a href="MPI_LONG_DOUBLE_INT.html">MPI_LONG_DOUBLE_INT</a> long double and int</p>
+
+<p style="margin-left:11%; margin-top: 1em">The data type
+<a href="MPI_2REAL.html">MPI_2REAL</a> is equivalent to: <br>
+<a href="MPI_TYPE_CONTIGUOUS.html">MPI_TYPE_CONTIGUOUS</a>(2, <a href="MPI_REAL.html">MPI_REAL</a>, <a href="MPI_2REAL.html">MPI_2REAL</a>)</p>
+
+<p style="margin-left:11%; margin-top: 1em">Similar
+statements apply for <a href="MPI_2INTEGER.html">MPI_2INTEGER</a>, <a href="MPI_2DOUBLE_PRECISION.html">MPI_2DOUBLE_PRECISION</a>,
+and <a href="MPI_2INT.html">MPI_2INT</a>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The datatype
+<a href="MPI_FLOAT_INT.html">MPI_FLOAT_INT</a> is as if defined by the following sequence of
+instructions.</p>
+
+<p style="margin-left:11%; margin-top: 1em">type[0] =
+<a href="MPI_FLOAT.html">MPI_FLOAT</a> <br>
+type[1] = <a href="MPI_INT.html">MPI_INT</a> <br>
+disp[0] = 0 <br>
+disp[1] = sizeof(float) <br>
+block[0] = 1 <br>
+block[1] = 1 <br>
+<a href="MPI_TYPE_STRUCT.html">MPI_TYPE_STRUCT</a>(2, block, disp, type, <a href="MPI_FLOAT_INT.html">MPI_FLOAT_INT</a>)</p>
+
+<p style="margin-left:11%; margin-top: 1em">Similar
+statements apply for <a href="MPI_LONG_INT.html">MPI_LONG_INT</a> and <a href="MPI_DOUBLE_INT.html">MPI_DOUBLE_INT</a>.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example
+3:</b> Each process has an array of 30 doubles, in C. For
+each of the 30 locations, compute the value and rank of the
+process containing the largest value.</p>
+
+<p style="margin-left:11%; margin-top: 1em">... <br>
+/* each process has an array of 30 double: ain[30] <br>
+*/ <br>
+double ain[30], aout[30]; <br>
+int ind[30]; <br>
+struct { <br>
+double val; <br>
+int rank; <br>
+} in[30], out[30]; <br>
+int i, myrank, root;</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Comm_rank.html">MPI_Comm_rank</a>(<a href="MPI_COMM_WORLD.html">MPI_COMM_WORLD</a>,
+&amp;myrank); <br>
+for (i=0; i&lt;30; ++i) { <br>
+in[i].val = ain[i]; <br>
+in[i].rank = myrank; <br>
+} <br>
+<a href="MPI_Reduce.html">MPI_Reduce</a>( in, out, 30, <a href="MPI_DOUBLE_INT.html">MPI_DOUBLE_INT</a>, <a href="MPI_MAXLOC.html">MPI_MAXLOC</a>, root,
+comm ); <br>
+/* At this point, the answer resides on process root <br>
+*/ <br>
+if (myrank == root) { <br>
+/* read ranks out <br>
+*/ <br>
+for (i=0; i&lt;30; ++i) { <br>
+aout[i] = out[i].val; <br>
+ind[i] = out[i].rank; <br>
+} <br>
+}</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example
+4:</b> Same example, in Fortran.</p>
+
+<p style="margin-left:11%; margin-top: 1em">... <br>
+! each process has an array of 30 double: ain(30)</p>
+
+<p style="margin-left:11%; margin-top: 1em">DOUBLE
+PRECISION ain(30), aout(30) <br>
+INTEGER ind(30); <br>
+DOUBLE PRECISION in(2,30), out(2,30) <br>
+INTEGER i, myrank, root, ierr;</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_COMM_RANK.html">MPI_COMM_RANK</a>(<a href="MPI_COMM_WORLD.html">MPI_COMM_WORLD</a>,
+myrank); <br>
+DO I=1, 30 <br>
+in(1,i) = ain(i) <br>
+in(2,i) = myrank ! myrank is coerced to a double <br>
+END DO</p>
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_REDUCE.html">MPI_REDUCE</a>( in,
+out, 30, <a href="MPI_2DOUBLE_PRECISION.html">MPI_2DOUBLE_PRECISION</a>, <a href="MPI_MAXLOC.html">MPI_MAXLOC</a>, root, <br>
+comm, ierr ); <br>
+! At this point, the answer resides on process root</p>
+
+<p style="margin-left:11%; margin-top: 1em">IF (myrank .EQ.
+root) THEN <br>
+! read ranks out <br>
+DO I= 1, 30 <br>
+aout(i) = out(1,i) <br>
+ind(i) = out(2,i) ! rank is coerced back to an integer <br>
+END DO <br>
+END IF</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Example
+5:</b> Each process has a nonempty array of values. Find the
+minimum global value, the rank of the process that holds it,
+and its index on this process.</p>
+
+<p style="margin-left:11%; margin-top: 1em">#define LEN
+1000</p>
+
+<p style="margin-left:11%; margin-top: 1em">float val[LEN];
+/* local array of values */ <br>
+int count; /* local number of values */ <br>
+int myrank, minrank, minindex; <br>
+float minval;</p>
+
+<p style="margin-left:11%; margin-top: 1em">struct { <br>
+float value; <br>
+int index; <br>
+} in, out;</p>
+
+<p style="margin-left:11%; margin-top: 1em">/* local minloc
+*/ <br>
+in.value = val[0]; <br>
+in.index = 0; <br>
+for (i=1; i &lt; count; i++) <br>
+if (in.value &gt; val[i]) { <br>
+in.value = val[i]; <br>
+in.index = i; <br>
+}</p>
+
+<p style="margin-left:11%; margin-top: 1em">/* global
+minloc */ <br>
+<a href="MPI_Comm_rank.html">MPI_Comm_rank</a>(<a href="MPI_COMM_WORLD.html">MPI_COMM_WORLD</a>, &amp;myrank); <br>
+in.index = myrank*LEN + in.index; <br>
+<a href="MPI_Reduce.html">MPI_Reduce</a>( in, out, 1, <a href="MPI_FLOAT_INT.html">MPI_FLOAT_INT</a>, <a href="MPI_MINLOC.html">MPI_MINLOC</a>, root,
+comm ); <br>
+/* At this point, the answer resides on process root <br>
+*/ <br>
+if (myrank == root) { <br>
+/* read answer out <br>
+*/ <br>
+minval = out.value; <br>
+minrank = out.index / LEN; <br>
+minindex = out.index % LEN;</p>
+
+<p style="margin-left:11%; margin-top: 1em">All MPI objects
+(e.g., <a href="MPI_Datatype.html">MPI_Datatype</a>, <a href="MPI_Comm.html">MPI_Comm</a>) are of type INTEGER in
+Fortran.</p>
+
+<a name="NOTES ON COLLECTIVE OPERATIONS"></a>
+<h2>NOTES ON COLLECTIVE OPERATIONS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The reduction
+functions ( <i><a href="MPI_Op.html">MPI_Op</a></i> ) do not return an error value. As
+a result, if the functions detect an error, all they can do
+is either call <i><a href="MPI_Abort.html">MPI_Abort</a></i> or silently skip the
+problem. Thus, if you change the error handler from
+<i><a href="MPI_ERRORS_ARE_FATAL.html">MPI_ERRORS_ARE_FATAL</a></i> to something else, for example,
+<i><a href="MPI_ERRORS_RETURN.html">MPI_ERRORS_RETURN</a></i> , then no error may be
+indicated.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The reason for
+this is the performance problems in ensuring that all
+collective routines return the same error value.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with <a href="MPI_Comm_set_errhandler.html">MPI_Comm_set_errhandler</a>; the predefined error
+handler <a href="MPI_ERRORS_RETURN.html">MPI_ERRORS_RETURN</a> may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Allreduce.html">MPI_Allreduce</a>
+<br>
+<a href="MPI_Reduce_scatter.html">MPI_Reduce_scatter</a> <br>
+<a href="MPI_Scan.html">MPI_Scan</a> <br>
+<a href="MPI_Op_create.html">MPI_Op_create</a> <br>
+ <a href="MPI_Op_free.html">MPI_Op_free</a></p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

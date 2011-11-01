@@ -1,9 +1,354 @@
-<html><head><title>MPI_Type_create_f90_complex</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:49 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Type_create_f90_complex</title>
+
+</head>
 <body>
-<H3>MPI_Type_create_f90_complex</H3>
-<PRE>
-int MPI_Type_create_f90_complex( int, int, MPI_Datatype * );
-</PRE>
-<DL><DD>
-Returns a predefined MPI datatype that matches a COMPLEX variable of KIND selected_real_kind(p, r).
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Type_create_f90_complex</h1>
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Type_create_f90_complex</b>
+&minus; Returns a bounded MPI complex datatype</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Type_create_f90_complex(int <i>p</i>, int
+<i>r</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Datatype *<i>newtype</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_TYPE_CREATE_F90_COMPLEX (<i>P, R, NEWTYPE,
+IERROR</i>)</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>P, R, NEWTYPE, IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+static MPI::Datatype MPI::Datatype::Create_f90_complex(int
+<i>p</i>, int <i>r</i>)</p>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p style="margin-top: 1em" valign="top">p</p></td>
+<td width="14%"></td>
+<td width="60%">
+
+
+<p style="margin-top: 1em" valign="top">Precision, in
+decimal digits (integer).</p></td>
+<td width="14%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p style="margin-top: 1em" valign="top">r</p></td>
+<td width="14%"></td>
+<td width="60%">
+
+
+<p style="margin-top: 1em" valign="top">Decimal exponent
+range (integer).</p></td>
+<td width="14%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">newtype</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">New data type
+(handle).</p> </td>
+<td width="17%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="4%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">This function
+provides a way to declare KIND-parameterized COMPLEX MPI
+datatypes. The arguments are interpreted in a similar
+fashion to the F90 function SELECTED_REAL_KIND. The
+parameters <i>p</i> and <i>r</i> must be scalar integers.
+The argument <i>p</i> represents the required level of
+numerical precision, in decimal digits. The <i>r</i>
+parameter indicates the range of exponents desired: the
+returned datatype will have at least one exponent between
++<i>r</i> and &minus;<i>r</i> (inclusive).</p>
+
+<p style="margin-left:11%; margin-top: 1em">Either <i>p</i>
+or <i>r</i>, but not both, may be omitted from calls to
+SELECTED_REAL_KIND. Similarly, either argument to
+MPI_Type_create_f90_complex may be set to MPI_UNDEFINED.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">It is erroneous
+to supply values for <i>p</i> and <i>r</i> not supported by
+the compiler.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The Fortran
+function SELECTED_REAL_KIND maps a large number of
+(<i>p,r</i>) pairs to a much smaller number of KIND
+parameters supported by the compiler. KIND parameters are
+not specified by the language and are not portable. From the
+point of view of the language, variables of the same base
+type and KIND parameter are equivalent, even if their KIND
+parameters were generated by different (<i>p,r</i>)
+arguments to SELECTED_REAL_KIND. However, to help facilitate
+interoperability in a heterogeneous environment, equivalency
+is more strictly defined for datatypes returned by
+MPI_Type_create_f90_complex. Two MPI datatypes, each
+generated by this function, will match if and only if they
+have identical values for both <i>p</i> and <i>r</i>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The interaction
+between the datatypes returned by this function and the
+external32 data representation &minus; used by
+MPI_Pack_external, MPI_Unpack_external, and many MPI_File
+functions &minus; is subtle. The external32 representation
+of returned datatypes is as follows.</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">if (<i>p</i> &gt; 33) and/or (<i>r</i> &gt;
+4931):</p> </td>
+<td width="77%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="77%">
+
+
+<p valign="top">external32 size = n/a (undefined)</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">else if (<i>p</i> &gt; 15) and/or (<i>r</i>
+&gt; 307):</p></td>
+<td width="77%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="77%">
+
+
+<p valign="top">external32 size = 32</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">else if (<i>p</i> &gt; 6) and/or (<i>r</i>
+&gt; 37):</p></td>
+<td width="77%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="77%">
+
+
+<p valign="top">external32 size = 16</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">else:</p></td>
+<td width="77%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="77%">
+
+
+<p valign="top">external32 size = 8</p></td>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">If the
+external32 representation of a datatype is undefined, so are
+the results of using that datatype in operations that
+require the external32 format. Care should be taken not to
+use incompatible datatypes indirectly, e.g., as part of
+another datatype or through a duplicated datatype, in these
+functions.</p>
+
+<p style="margin-left:11%; margin-top: 1em">If a variable
+is declared specifying a nondefault KIND value that was not
+obtained with SELECTED_REAL_KIND (i.e., <i>p</i> and/or
+<i>r</i> are unknown), the only way to obtain a matching MPI
+datatype is to use the functions MPI_Sizeof and
+MPI_Type_match_size.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<p style="margin-left:11%; margin-top: 1em">See the MPI man
+page for a full list of MPI error codes.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Pack_external.html">MPI_Pack_external</a>
+<br>
+<a href="MPI_Sizeof.html">MPI_Sizeof</a> <br>
+<a href="MPI_Type_match_size.html">MPI_Type_match_size</a> <br>
+<a href="MPI_Unpack_external.html">MPI_Unpack_external</a> <br>
+ SELECTED_REAL_KIND</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

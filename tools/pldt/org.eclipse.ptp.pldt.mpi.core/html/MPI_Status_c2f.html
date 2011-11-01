@@ -1,9 +1,76 @@
-<html><head><title>MPI_Status_c2f</title>
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:47 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Status_f2c</title>
+
+</head>
 <body>
-<H3>MPI_Status_c2f</H3>
-<PRE>
-int MPI_Status_c2f(MPI_Status *, MPI_Fint *);
-</PRE>
-<DL><DD>
-Translates a C status object into a FORTRAN status object.
-<P></DL></font></body></html>
+
+<h1 align=center>MPI_Status_f2c</h1>
+
+MPI_Status_c2f</b> &minus; Translates a C status into a
+Fortran status, or vice versa.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Status_f2c(MPI_Fint <i>*f_status</i>, MPI_Status
+<i>*c_status</i>) <br>
+int MPI_Status_c2f(MPI_Status <i>*c_status</i>, MPI_Fint
+<i>*f_status</i>)</p>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">These two
+procedures are provided in C to convert from a Fortran
+status (which is an array of integers) to a C status (which
+is a structure), and vice versa. The conversion occurs on
+all the information in <i>status</i>, including that which
+is hidden. That is, no status information is lost in the
+conversion.</p>
+
+<p style="margin-left:11%; margin-top: 1em">When using
+MPI_Status_f2c, if <i>f_status</i> is a valid Fortran
+status, but not the Fortran value of MPI_STATUS_IGNORE or
+MPI_STATUSES_IGNORE, then MPI_Status_f2c returns in
+<i>c_status</i> a valid C status with the same content. If
+<i>f_status</i> is the Fortran value of MPI_STATUS_IGNORE or
+MPI_STATUSES_IGNORE, or if <i>f_status</i> is not a valid
+Fortran status, then the call is erroneous.</p>
+
+<p style="margin-left:11%; margin-top: 1em">When using
+MPI_Status_c2f, the opposite conversion is applied. If
+<i>c_status</i> is MPI_STATUS_IGNORE or MPI_STATUSES_IGNORE,
+or if <i>c_status</i> is not a valid C status, then the call
+is erroneous.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The C status
+has the same source, tag and error code values as the
+Fortran status, and returns the same answers when queried
+for count, elements, and cancellation. The conversion
+function may be called with a Fortran status argument that
+has an undefined error field, in which case the value of the
+error field in the C status argument is undefined.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>
