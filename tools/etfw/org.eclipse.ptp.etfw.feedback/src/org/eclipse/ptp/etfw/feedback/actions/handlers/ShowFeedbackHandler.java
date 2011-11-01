@@ -277,16 +277,18 @@ public class ShowFeedbackHandler extends AbstractHandler {
 		}
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		// 3/24/11 BRT
-		// Rui Liu (NCS) suggests the following to turn off DTD validation, for
-		// the case where
-		// DTD file is note locally available.
+		// Rui Liu (NCSA) suggests the following to turn off DTD validation, for
+		// the case where DTD file is not locally available.
 		// See http://xerces.apache.org/xerces2-j/features.html.
-		/*
-		 * try { factory.setFeature
-		 * ("http://apache.org/xml/features/nonvalidating/load-external-dtd",
-		 * false); } catch (ParserConfigurationException e1) {
-		 * e1.printStackTrace(); }
-		 */
+		try {
+			factory.setFeature
+					("http://apache.org/xml/features/nonvalidating/load-external-dtd",
+							false);
+		} catch (ParserConfigurationException e1) {
+			System.out.println("Failed to set parser feature to enable remote DTD files"); //$NON-NLS-1$
+			e1.printStackTrace();
+		}
+		 
 		Document document = null;
 		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
