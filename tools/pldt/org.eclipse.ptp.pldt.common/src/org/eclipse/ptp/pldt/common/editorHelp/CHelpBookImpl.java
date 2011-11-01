@@ -25,6 +25,10 @@ import org.eclipse.ptp.pldt.common.messages.Messages;
 
 /**
  * C Help Book implementation for hover help, etc. etc.
+ * Note: this is (one of?) only package that is fully exported.  For PTP 6.0, consider package
+ * re-arrangement such that only the parts that need to be accessible to downstream plug-ins (esp. outside
+ * of PTP proper and thus x-friend-able) are in the exported package.
+ * perhaps a pldt.common.internal.editorHelp package?
  * 
  * @author Beth Tibbitts
  * 
