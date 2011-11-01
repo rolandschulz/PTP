@@ -12,6 +12,7 @@
 package org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.impl;
 
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -139,6 +140,10 @@ public class CallGraph implements ICallGraph {
 		otherOP();
 	}
 
+	/**
+	 * Call Graph Builder
+	 *
+	 */
 	class CGBuilder extends ASTVisitor {
 		ICallGraphNode currentNode_;
 
@@ -222,6 +227,9 @@ public class CallGraph implements ICallGraph {
 		}
 	}
 
+	/**
+	 * Depth-First Search (?)
+	 */
 	protected void DFS() {
 		for (Iterator<ICallGraphNode> i = nodes_.iterator(); i.hasNext();) {
 			ICallGraphNode node = i.next();
@@ -249,6 +257,9 @@ public class CallGraph implements ICallGraph {
 		order.push(node);
 	}
 
+	/** 
+	 * Reverse Depth-First Search (?)
+	 */
 	protected void RV_DFS() {
 		for (Iterator<ICallGraphNode> i = nodes_.iterator(); i.hasNext();) {
 			ICallGraphNode node = i.next();
@@ -258,7 +269,13 @@ public class CallGraph implements ICallGraph {
 
 		ICallGraphNode n = null;
 		ICallGraphNode m = null;
-		topEntry_ = order.peek();
+		try{
+			topEntry_ = order.peek();
+		}catch (EmptyStackException e) {
+			System.out.println("EmptyStackException in CallGraph.RV_DFS but continuing.  Probably due to non-.c file, which is not supported for MPI barrier analysis.");
+			//topEntry_=null; // is this valid??
+			return;
+		}
 		while (!order.empty()) {
 			n = order.pop();
 			n.setBotNext(m);
