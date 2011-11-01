@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.pldt.mpi.analysis.cdt
-Bundle-Version: 5.0.0.qualifier
+Bundle-Version: 6.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.pldt.mpi.analysis.cdt.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.core,
  org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs,
- org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.impl
+Export-Package: org.eclipse.ptp.pldt.mpi.analysis.cdt;x-friends:="org.eclipse.ptp.pldt.mpi.analysis",
+ org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs;x-friends:="org.eclipse.ptp.pldt.mpi.analysis",
+ org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.impl;x-friends:="org.eclipse.ptp.pldt.mpi.analysis"
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
