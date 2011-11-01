@@ -34,6 +34,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * @author pazel
  * 
  */
+@SuppressWarnings("restriction")
 public class Utility
 {
 
