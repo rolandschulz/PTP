@@ -271,7 +271,7 @@ public class CallGraph implements ICallGraph {
 		ICallGraphNode m = null;
 		try{
 			topEntry_ = order.peek();
-		}catch (EmptyStackException e) {
+		}catch (EmptyStackException e) { // Bug 356745 fix (NOT 346745)
 			System.out.println("EmptyStackException in CallGraph.RV_DFS but continuing.  Probably due to non-.c file, which is not supported for MPI barrier analysis.");
 			//topEntry_=null; // is this valid??
 			return;
