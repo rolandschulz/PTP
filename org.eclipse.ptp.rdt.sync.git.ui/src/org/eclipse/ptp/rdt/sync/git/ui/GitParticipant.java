@@ -351,6 +351,10 @@ public class GitParticipant implements ISynchronizeParticipant {
 
 	private void update() {
 		container.updateMessage();
+		// updateButtons() fails if current page is null. This can happen if update() is called during wizard/page creation. 
+		if (container.getCurrentPage() == null) {
+			return;
+		}
 		container.updateButtons();
 	}
 
