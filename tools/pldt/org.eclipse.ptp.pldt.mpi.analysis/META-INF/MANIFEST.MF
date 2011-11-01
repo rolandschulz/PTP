@@ -2,15 +2,16 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.pldt.mpi.analysis; singleton:=true
-Bundle-Version: 5.0.0.qualifier
+Bundle-Version: 6.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.pldt.mpi.analysis.Activator
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.pldt.mpi.analysis,
- org.eclipse.ptp.pldt.mpi.analysis.actions,
- org.eclipse.ptp.pldt.mpi.analysis.analysis,
+Export-Package: org.eclipse.ptp.pldt.mpi.analysis;x-friends:="org.eclipse.ptp.pldt.mpi.analysis.cdt",
+ org.eclipse.ptp.pldt.mpi.analysis.actions;x-friends:="org.eclipse.ptp.pldt.mpi.analysis.cdt,org.eclipse.cdt.core.tests",
+ org.eclipse.ptp.pldt.mpi.analysis.analysis;x-friends:="org.eclipse.ptp.pldt.mpi.analysis.cdt",
  org.eclipse.ptp.pldt.mpi.analysis.internal;x-friends:="org.eclipse.ptp.pldt.tests",
- org.eclipse.ptp.pldt.mpi.analysis.view
+ org.eclipse.ptp.pldt.mpi.analysis.popup.actions;x-internal:=true,
+ org.eclipse.ptp.pldt.mpi.analysis.view;x-friends:="org.eclipse.ptp.pldt.mpi.analysis.cdt"
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
