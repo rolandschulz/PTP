@@ -141,14 +141,12 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 	        PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, IIDEHelpContextIds.NEW_PROJECT_WIZARD_PAGE);
 
 	        composite.setLayout(new GridLayout());
-	        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+	        composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+	        setControl(composite);
 
 	        createProjectBasicInfoGroup(composite);
-	        setControl(composite);
-	        
 	        createProjectRemoteInfoGroup(composite);
-
-	    	createProjectDetailedInfoGroup((Composite)getControl()); 
+	        createProjectDetailedInfoGroup(composite); 
 			this.switchTo(this.updateData(localTree, localToolChain, show_sup.getSelection(), SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
 
 			setPageComplete(false);
@@ -159,7 +157,7 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 	    
 	    private void createProjectDetailedInfoGroup(Composite parent) {
 	        Composite c = new Composite(parent, SWT.NONE);
-	        c.setLayoutData(new GridData(GridData.FILL_BOTH));
+	        c.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 	    	c.setLayout(new GridLayout(2, true));
 	    	
 	        Label left_label = new Label(c, SWT.NONE);
@@ -196,7 +194,7 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 				 );
 
 	        localToolChain = new Composite(c, SWT.NONE);
-	        localToolChain.setLayoutData(new GridData(GridData.FILL_BOTH));
+	        localToolChain.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 	        localToolChain.setLayout(new PageLayout());
 	        
 	        projectRemoteOptionsLabel = new Label(c, SWT.NONE);
@@ -205,7 +203,7 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 	        projectRemoteOptionsLabel.setText("Remote Toolchain"); //$NON-NLS-1$
 
 	        remoteToolChain = new Composite(c, SWT.NONE);
-	        remoteToolChain.setLayoutData(new GridData(GridData.FILL_BOTH));
+	        remoteToolChain.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 	        remoteToolChain.setLayout(new PageLayout());
 	        remoteToolChainTable = new Table(remoteToolChain, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
 	        remoteToolChainTable.setVisible(true);
@@ -695,34 +693,48 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 		}
 
 		private final void createProjectRemoteInfoGroup(Composite parent) {
-			Composite projectGroup = new Composite(parent, SWT.NONE);
-			GridLayout layout = new GridLayout();
-			layout.numColumns = 3;
-			projectGroup.setLayout(layout);
-			GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-			projectGroup.setLayoutData(gd);
+//			Composite comp = new Composite(parent, SWT.NONE);
+//			comp.setLayout(new GridLayout(1, false));
+//			comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 			// Label for "Provider:"
-			Label remoteLocationLabel = new Label(projectGroup, SWT.LEFT);
-			remoteLocationLabel.setText("Remote Location"); //$NON-NLS-1$
-
-			fProviderArea = new Group(projectGroup, SWT.SHADOW_ETCHED_IN);
-			fProviderStack = new StackLayout();
-			fProviderArea.setLayout(fProviderStack);
-			GridData providerAreaData = new GridData(SWT.FILL, SWT.FILL, true, true);
-			providerAreaData.horizontalSpan = 3;
-			fProviderArea.setLayoutData(providerAreaData);
+//			Label remoteLocationLabel = new Label(comp, SWT.LEFT);
+//			remoteLocationLabel.setText("Remote Location"); //$NON-NLS-1$
 
 			// For now, assume only one provider, to reduce the number of GUI elements.
 			// TODO: Add error handling if there are no providers
 			ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
 			fSelectedParticipant = providers[0].getParticipant();
+			fSelectedParticipant.createConfigurationArea(parent, getWizard().getContainer());
 			
-			Composite comp = new Composite(fProviderArea, SWT.NONE);
-			comp.setLayout(new GridLayout(1, false));
-			comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			fSelectedParticipant.createConfigurationArea(comp, getWizard().getContainer());
-			fProviderStack.topControl = comp;
+//			Composite projectGroup = new Composite(parent, SWT.NONE);
+//			GridLayout layout = new GridLayout();
+//			layout.numColumns = 3;
+//			projectGroup.setLayout(layout);
+//			GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+//			projectGroup.setLayoutData(gd);
+//
+//			// Label for "Provider:"
+//			Label remoteLocationLabel = new Label(projectGroup, SWT.LEFT);
+//			remoteLocationLabel.setText("Remote Location"); //$NON-NLS-1$
+//
+//			fProviderArea = new Group(projectGroup, SWT.SHADOW_ETCHED_IN);
+//			fProviderStack = new StackLayout();
+//			fProviderArea.setLayout(fProviderStack);
+//			GridData providerAreaData = new GridData(SWT.FILL, SWT.FILL, true, true);
+//			providerAreaData.horizontalSpan = 3;
+//			fProviderArea.setLayoutData(providerAreaData);
+//
+//			// For now, assume only one provider, to reduce the number of GUI elements.
+//			// TODO: Add error handling if there are no providers
+//			ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
+//			fSelectedParticipant = providers[0].getParticipant();
+//			
+//			Composite comp = new Composite(fProviderArea, SWT.NONE);
+//			comp.setLayout(new GridLayout(1, false));
+//			comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+//			fSelectedParticipant.createConfigurationArea(comp, getWizard().getContainer());
+//			fProviderStack.topControl = comp;
 		}
 
 		private void setProjectLocationString() {
