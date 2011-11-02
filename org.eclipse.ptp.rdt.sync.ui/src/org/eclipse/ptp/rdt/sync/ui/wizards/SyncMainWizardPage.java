@@ -77,6 +77,7 @@ import org.eclipse.cdt.ui.wizards.IWizardItemsListListener;
 import org.eclipse.cdt.ui.wizards.IWizardWithMemory;
 import org.eclipse.cdt.internal.ui.newui.Messages;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 
 	public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItemsListListener {
@@ -103,7 +104,7 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 	    private Composite localToolChain;
 	    private Composite remoteToolChain;
 	    private Table remoteToolChainTable;
-	    private Button show_sup;
+	    private Button showSupportedOnlyButton;
 	    private Label projectLocalOptionsLabel;
 	    private Label projectRemoteOptionsLabel;
    
@@ -141,7 +142,7 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 	        createProjectBasicInfoGroup(composite);
 	        createProjectRemoteInfoGroup(composite);
 	        createProjectDetailedInfoGroup(composite); 
-			this.switchTo(this.updateData(localTree, localToolChain, show_sup.getSelection(), SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
+			this.switchTo(this.updateData(localTree, localToolChain, false, SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
 
 			setPageComplete(false);
 	        setErrorMessage(null);
@@ -203,21 +204,17 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 	        remoteToolChainTable.setVisible(true);
 
 
-	        show_sup = new Button(c, SWT.CHECK);
-	        show_sup.setText(Messages.CMainWizardPage_1); 
+	        showSupportedOnlyButton = new Button(c, SWT.CHECK);
+	        showSupportedOnlyButton.setText(Messages.CMainWizardPage_1); 
 	        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 	        gd.horizontalSpan = 2;
-	        show_sup.setLayoutData(gd);
-	        show_sup.addSelectionListener(new SelectionAdapter() {
+	        showSupportedOnlyButton.setLayoutData(gd);
+	        showSupportedOnlyButton.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					if (h_selected != null)
-						h_selected.setSupportedOnly(show_sup.getSelection());
-					switchTo(updateData(localTree, localToolChain, show_sup.getSelection(), SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
+					switchTo(updateData(localTree, localToolChain, false, SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
 				}} );
-
-	        // restore settings from preferences
-			show_sup.setSelection(!CDTPrefUtil.getBool(CDTPrefUtil.KEY_NOSUPP));
+			showSupportedOnlyButton.setSelection(false);
 	    }
 	    
 	    @Override
@@ -541,8 +538,27 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 			if (categorySelectedForRemoteLabel != null)
 				categorySelectedForRemoteLabel.setVisible(false);
 			h_selected.handleSelection();
-			h_selected.setSupportedOnly(show_sup.getSelection());
-			
+			h_selected.setSupportedOnly(false);
+
+			// Delete unsupported toolchains from local view if requested.
+			// Java makes this harder than it should be...
+			if (showSupportedOnlyButton.getSelection()) {
+				Table localToolChainTable = ((MBSWizardHandler) h_selected).getToolChainsTable();
+				ArrayList<Integer> unSupportedToolChains = new ArrayList<Integer>();
+				for (int i=0; i<localToolChainTable.getItemCount(); i++) {
+					IToolChain tc = (IToolChain) localToolChainTable.getItem(i).getData();
+					if (tc != null && (!tc.isSupported() || !ManagedBuildManager.isPlatformOk(tc))) {
+						unSupportedToolChains.add(i);
+					}
+				}
+					
+				int[] toolChainsToDelete = new int[unSupportedToolChains.size()];
+				for (int j=0; j<unSupportedToolChains.size(); j++) {
+					toolChainsToDelete[j] = unSupportedToolChains.get(j).intValue();
+				}
+				localToolChainTable.remove(toolChainsToDelete);
+			}
+
 			toolChainMap = ((MBSWizardHandler) h_selected).getToolChains();
 			remoteToolChainTable.removeAll();
 			for (String toolChainName : toolChainMap.keySet()) {
