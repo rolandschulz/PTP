@@ -328,11 +328,9 @@ public class GemUtilities {
 	 * @return int Returns 1 if everything went smoothly, -1 otherwise.
 	 */
 	public static int doIspcc(IResource resource) {
-		// TODO Do we need create gem folder here?
 		// Create GEM folder to hold the generated log file and executable
-		final IPath gemFolderPath = new Path("gem"); //$NON-NLS-1$
-		final IProject currentProject = getCurrentProject();
-		final IFolder gemFolder = currentProject.getFolder(gemFolderPath);
+		final IProject currentProject = resource.getProject();
+		final IFolder gemFolder = currentProject.getFolder(new Path("gem")); //$NON-NLS-1$
 		final boolean isRemote = (isRemoteProject() || (isSynchronizedProject() && isRemoteBuildConfiguration()));
 		if (!gemFolder.exists()) {
 			createGemFolder(isRemote, gemFolder);
@@ -531,7 +529,7 @@ public class GemUtilities {
 		IRemoteConnectionManager connectionManager = null;
 		IRemoteConnection[] connections = null;
 
-		IProject project = getCurrentProject();
+		final IProject project = getCurrentProject();
 
 		if (service != null) {
 			connectionManager = service.getConnectionManager();
@@ -540,15 +538,15 @@ public class GemUtilities {
 			connections = connectionManager.getConnections();
 		}
 		if (connections != null) {
+			URI projectURI = null;
 			for (final IRemoteConnection connection : connections) {
-				URI projectURI = null;
 				try {
 					projectURI = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(project);
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					e.printStackTrace();
 				}
-				String addr = connection.getAddress();
-				String host = projectURI.getHost();
+				final String addr = connection.getAddress();
+				final String host = projectURI.getHost();
 				if (host.equals(addr.substring(0, addr.indexOf(".")))) { //$NON-NLS-1$
 					currentConnection = connection;
 					break;
@@ -799,7 +797,7 @@ public class GemUtilities {
 			public void run() {
 				taskStatus = TaskStatus.ACTIVE;
 
-				final boolean isLogFile = gemActiveResource.getFileExtension().equals("log");
+				final boolean isLogFile = gemActiveResource.getFileExtension().equals("log"); //$NON-NLS-1$
 				// If not a log file, check for ISP installation and version
 				if (!isLogFile) {
 					if (getIspVersion() == null) {
@@ -1141,10 +1139,10 @@ public class GemUtilities {
 						&& taskStatus == TaskStatus.ACTIVE) {
 					stringBuffer.append(stdOut);
 					stringBuffer.append("\n"); //$NON-NLS-1$
-					consoleStdOutMessage += stdOut + "\n";//$NON-NLS-1$
+					consoleStdOutMessage += stdOut + "\n"; //$NON-NLS-1$
 					if (!stdOutReader.ready()) {
 						updateConsole(verbose, true);
-						consoleStdOutMessage = "";//$NON-NLS-1$
+						consoleStdOutMessage = ""; //$NON-NLS-1$
 					}
 				}
 
@@ -1159,11 +1157,11 @@ public class GemUtilities {
 						&& taskStatus == TaskStatus.ACTIVE) {
 					stringBuffer.append(stdErr);
 					stringBuffer.append("\n"); //$NON-NLS-1$
-					consoleStdErrMessage += stdErr + "\n";//$NON-NLS-1$
+					consoleStdErrMessage += ""; //stdErr + "\n"; //$NON-NLS-1$
 
 					if (!stdErrReader.ready()) {
 						updateConsole(verbose, true);
-						consoleStdErrMessage = "";//$NON-NLS-1$
+						consoleStdErrMessage = ""; //$NON-NLS-1$
 					}
 				}
 

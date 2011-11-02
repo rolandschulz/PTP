@@ -115,15 +115,15 @@ public class VerificationPopUpAction implements IObjectActionDelegate {
 							|| id.equals("org.eclipse.ptp.gem.verificationPopupCc"); //$NON-NLS-1$
 
 					// Save the URI of the most recent project resource
-					if (isValidSourceFile) {
-						URI resourceLocation = null;
-						try {
-							resourceLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(resource);
-						} catch (final CoreException e) {
-							GemUtilities.logExceptionDetail(e);
-						}
-						GemUtilities.saveMostRecentURI(resourceLocation);
+					// if (isValidSourceFile) {
+					URI resourceLocation = null;
+					try {
+						resourceLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(resource);
+					} catch (final CoreException e) {
+						GemUtilities.logExceptionDetail(e);
 					}
+					GemUtilities.saveMostRecentURI(resourceLocation);
+					// }
 
 					GemUtilities.initGemViews(resource, isValidSourceFile, true);
 
