@@ -2228,7 +2228,7 @@ VERSION="_$PACKAGE_VERSION"
 if test `expr "$VERSION" : "_@^@*@"` -gt 0; then
 	VERSION=
 fi
-UTILS="../org.eclipse.ptp.utils"
+UTILS="../../core/org.eclipse.ptp.utils"
 if test ! -d $UTILS; then
 	UTILS="`echo ${UTILS}${VERSION}`"
 	if test ! -d $UTILS; then

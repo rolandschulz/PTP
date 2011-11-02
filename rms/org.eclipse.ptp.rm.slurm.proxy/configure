@@ -2276,7 +2276,7 @@ if  `expr "$VERSION" : "_@[^@]*@"` -gt 0 ; then
 	VERSION=
 fi
 
-UTILS="../org.eclipse.ptp.utils"
+UTILS="../../core/org.eclipse.ptp.utils"
 if test ! -d $UTILS; then
 	UTILS="`echo ${UTILS}${VERSION}`"
 	if test ! -d $UTILS; then
@@ -2286,7 +2286,7 @@ echo "$as_me: error: utils directory not found" >&2;}
 	fi
 fi
 
-PROXY="../org.eclipse.ptp.proxy"
+PROXY="../../core/org.eclipse.ptp.proxy"
 if test ! -d $PROXY; then
 	PROXY="`echo ${PROXY}${VERSION}`"
 	if test ! -d $PROXY; then
