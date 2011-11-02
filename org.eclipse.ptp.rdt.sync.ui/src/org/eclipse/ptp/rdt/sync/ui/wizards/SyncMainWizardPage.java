@@ -45,7 +45,6 @@ import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
-import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -55,7 +54,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -70,7 +68,6 @@ import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 import org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea.IErrorMessageReporter;
 import org.eclipse.cdt.ui.CDTSharedImages;
 import org.eclipse.cdt.ui.CUIPlugin;
-import org.eclipse.cdt.ui.newui.CDTPrefUtil;
 import org.eclipse.cdt.ui.newui.PageLayout;
 import org.eclipse.cdt.ui.wizards.CDTMainWizardPage;
 import org.eclipse.cdt.ui.wizards.CNewWizard;
@@ -80,7 +77,6 @@ import org.eclipse.cdt.ui.wizards.IWizardItemsListListener;
 import org.eclipse.cdt.ui.wizards.IWizardWithMemory;
 import org.eclipse.cdt.internal.ui.newui.Messages;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
-import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 
 	public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItemsListListener {
@@ -100,10 +96,9 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 
 	    // widgets
 	    private Text projectNameField;
+	    private Button defaultLocationButton;
 	    private Text projectLocationField;
 	    private Button browseButton;
-		private Composite fProviderArea;
-		private StackLayout fProviderStack;
 	    private Tree localTree;
 	    private Composite localToolChain;
 	    private Composite remoteToolChain;
@@ -117,7 +112,6 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 
 		private SortedMap<String, IToolChain> toolChainMap;
 		
-		private boolean useDefaultLocalDirectory = true;
 		private ISynchronizeParticipant fSelectedParticipant = null;
 
 	    /**
@@ -651,13 +645,23 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 
 			projectNameField.addListener(SWT.Modify, new Listener() {
 				public void handleEvent(Event e) {
-					// Do not disable default location because of this event!
-					boolean udld_value = useDefaultLocalDirectory;
-					setProjectLocationString();
-					useDefaultLocalDirectory = udld_value;
+					setProjectLocation();
 					setPageComplete(validatePage());         
 				}
 			});
+			
+			// Use default location button
+			defaultLocationButton = new Button(projectGroup, SWT.CHECK);
+			defaultLocationButton.setText("Use default location"); //$NON-NLS-1$
+			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+			gd.horizontalSpan = 3;
+			defaultLocationButton.setLayoutData(gd);
+			defaultLocationButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					setProjectLocation();
+				}});
+			defaultLocationButton.setSelection(true);
 
 			// new project location label
 			Label projectLocationLabel = new Label(projectGroup, SWT.NONE);
@@ -670,13 +674,13 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 			locationData.widthHint = SIZING_TEXT_FIELD_WIDTH;
 			projectLocationField.setLayoutData(locationData);
 			projectLocationField.setFont(parent.getFont());
-			this.setProjectLocationString();
 			projectLocationField.addListener(SWT.Modify, new Listener() {
 				public void handleEvent(Event e) {
-					useDefaultLocalDirectory = false;
 					setPageComplete(validatePage());        
 				}
 			});
+			projectLocationField.setEnabled(false);
+			this.setProjectLocation();
 
 			// Browse button
 			browseButton = new Button(projectGroup, SWT.PUSH);
@@ -728,11 +732,19 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 //			fSelectedParticipant.createConfigurationArea(comp, getWizard().getContainer());
 //			fProviderStack.topControl = comp;
 		}
-
-		private void setProjectLocationString() {
-			if (useDefaultLocalDirectory) {
+		
+		// Decides what should appear in project location field and whether or not it should be enabled
+		private void setProjectLocation() {
+			// Build string if default location is indicated.
+			if (defaultLocationButton.getSelection()) {
 				projectLocationField.setText(Platform.getLocation().toOSString() + File.separator + projectNameField.getText());
+			// If user just unchecked default location, erase field contents.
+			} else if (!projectLocationField.isEnabled()) {
+				projectLocationField.setText(""); //$NON-NLS-1$
 			}
+			
+			// These two values should never match.
+			projectLocationField.setEnabled(!defaultLocationButton.getSelection());
 		}
 
 		/**
