@@ -17,13 +17,12 @@ if [ $# -gt 0 ]; then
 fi
 
 KNOWN_PLUGINS="\
-	org.eclipse.ptp.utils$VERSION\
-	org.eclipse.ptp.proxy$VERSION\
-	org.eclipse.ptp.debug.sdm$VERSION\
-	org.eclipse.ptp.rm.ibm.ll.proxy$VERSION\
-	org.eclipse.ptp.rm.ibm.pe.proxy$VERSION\
-	org.eclipse.ptp.rm.pbs.proxy$VERSION\
-	org.eclipse.ptp.rm.slurm.proxy$VERSION"
+	core/org.eclipse.ptp.utils$VERSION\
+	core/org.eclipse.ptp.proxy$VERSION\
+	debug/org.eclipse.ptp.debug.sdm$VERSION\
+	rms/org.eclipse.ptp.rm.ibm.ll.proxy$VERSION\
+	rms/org.eclipse.ptp.rm.ibm.pe.proxy$VERSION\
+	rms/org.eclipse.ptp.rm.slurm.proxy$VERSION"
 	
 if [ "$CMD" = "configure" ]; then
 	UTILS_CONFIGURE_OPTIONS=""
@@ -43,9 +42,8 @@ if [ "$CMD" = "configure" ]; then
 	    "$SLURM_CONFIGURE_OPTIONS"
 fi
 		
-PARENT=`dirname $PWD`
-PLUGIN=`basename $PWD`
-PREFIX=$PARENT/$PLUGIN
+PARENT=$(dirname `dirname $PWD`)
+PREFIX=$PWD
 
 if [ ! -d bin ]; then
 	mkdir bin
