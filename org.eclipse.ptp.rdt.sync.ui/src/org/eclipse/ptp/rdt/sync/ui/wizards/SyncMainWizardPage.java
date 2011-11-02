@@ -693,14 +693,6 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 		}
 
 		private final void createProjectRemoteInfoGroup(Composite parent) {
-//			Composite comp = new Composite(parent, SWT.NONE);
-//			comp.setLayout(new GridLayout(1, false));
-//			comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-			// Label for "Provider:"
-//			Label remoteLocationLabel = new Label(comp, SWT.LEFT);
-//			remoteLocationLabel.setText("Remote Location"); //$NON-NLS-1$
-
 			// For now, assume only one provider, to reduce the number of GUI elements.
 			// TODO: Add error handling if there are no providers
 			ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
