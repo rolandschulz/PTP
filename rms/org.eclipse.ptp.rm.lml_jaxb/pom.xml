@@ -10,8 +10,7 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.ptp.rm.jaxb.contrib</artifactId>
-  <version>5.0.4-SHAPSHOT</version>
-  <packaging>eclipse-feature</packaging>
-  <groupId>org.eclipse.ptp.features</groupId>
+  <artifactId>org.eclipse.ptp.rm.lml_jaxb</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>eclipse-plugin</packaging>
 </project>
