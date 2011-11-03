@@ -100,17 +100,6 @@
        </viewerContentBinding>
    </extension> 
      <extension
-           point="org.eclipse.cdt.managedbuilder.ui.newWizardPages">
-        <wizardPage
-              ID="org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage"
-              operationClass="org.eclipse.ptp.rdt.sync.ui.wizards.RemoteSyncWizardPageOperation"
-              pageClass="org.eclipse.ptp.rdt.sync.ui.wizards.NewRemoteSyncProjectWizardPage">
-           <nature
-                 natureID="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
-           </nature>
-        </wizardPage>
-     </extension>
-     <extension
            point="org.eclipse.ui.propertyPages">
         <page
               category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
