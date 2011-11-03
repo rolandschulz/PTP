@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description url="http://download.eclipse.org/tools/ptp/updates/@eclipseRelease@">
+      Parallel Tools Platform Update Site
+   </description>
+   <feature url="features/org.eclipse.ptp_0.0.0.jar" id="org.eclipse.ptp" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.core_0.0.0.jar" id="org.eclipse.ptp.core" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.debug.sdm_0.0.0.jar" id="org.eclipse.ptp.debug.sdm" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.etfw_0.0.0.jar" id="org.eclipse.ptp.etfw" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.external_0.0.0.jar" id="org.eclipse.ptp.external" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.pldt_0.0.0.jar" id="org.eclipse.ptp.pldt" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.remote_0.0.0.jar" id="org.eclipse.ptp.remote" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.remote.remotetools_0.0.0.jar" id="org.eclipse.ptp.remote.remotetools" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.remotetools_0.0.0.jar" id="org.eclipse.ptp.remotetools" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.ibm.ll_0.0.0.jar" id="org.eclipse.ptp.rm.ibm.ll" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.ibm.pe_0.0.0.jar" id="org.eclipse.ptp.rm.ibm.pe" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.mpich2_0.0.0.jar" id="org.eclipse.ptp.rm.mpich2" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.openmpi_0.0.0.jar" id="org.eclipse.ptp.rm.openmpi" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.jaxb_0.0.0.jar" id="org.eclipse.ptp.rm.jaxb" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.lml_jaxb_0.0.0.jar" id="org.eclipse.ptp.rm.lml_jaxb" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.lml_0.0.0.jar" id="org.eclipse.ptp.rm.lml" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.slurm_0.0.0.jar" id="org.eclipse.ptp.rm.slurm" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.services_0.0.0.jar" id="org.eclipse.ptp.services" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.utils_0.0.0.jar" id="org.eclipse.ptp.utils" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.pldt.lapi_0.0.0.jar" id="org.eclipse.ptp.pldt.lapi" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.gem_0.0.0.jar" id="org.eclipse.ptp.gem" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.remote.rse_0.0.0.jar" id="org.eclipse.ptp.remote.rse" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.pldt.upc_0.0.0.jar" id="org.eclipse.ptp.pldt.upc" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.pldt.fortran_0.0.0.jar" id="org.eclipse.ptp.pldt.fortran" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.etfw.tau_0.0.0.jar" id="org.eclipse.ptp.etfw.tau" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.etfw.tau.fortran_0.0.0.jar" id="org.eclipse.ptp.etfw.tau.fortran" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.etfw.ppw_0.0.0.jar" id="org.eclipse.ptp.etfw.ppw" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.sci_0.0.0.jar" id="org.eclipse.ptp.sci" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.sdk_0.0.0.jar" id="org.eclipse.ptp.sdk" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rdt_0.0.0.jar" id="org.eclipse.ptp.rdt" version="0.0.0">
+      <category name="Remote Development Tools"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rdt.xlc_0.0.0.jar" id="org.eclipse.ptp.rdt.xlc" version="0.0.0">
+      <category name="Remote Development Tools"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rdt.sync_0.0.0.jar" id="org.eclipse.ptp.rdt.sync" version="0.0.0">
+      <category name="Remote Development Tools"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rdt.sync.fortran_0.0.0.jar" id="org.eclipse.ptp.rdt.sync.fortran" version="0.0.0">
+      <category name="Remote Development Tools"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rdt.remotetools_0.0.0.jar" id="org.eclipse.ptp.rdt.remotetools" version="0.0.0">
+      <category name="Remote Development Tools"/>
+   </feature>
+   <feature url="features/org.eclipse.photran_0.0.0.jar" id="org.eclipse.photran" version="0.0.0">
+      <category name="Fortran Development Tools (Photran)"/>
+   </feature>
+   <feature url="features/org.eclipse.photran.intel_0.0.0.jar" id="org.eclipse.photran.intel" version="0.0.0" os="linux">
+      <category name="Fortran Development Tools (Photran)"/>
+   </feature>
+   <feature url="features/org.eclipse.photran.xlf_0.0.0.jar" id="org.eclipse.photran.xlf" version="0.0.0">
+      <category name="Fortran Development Tools (Photran)"/>
+   </feature>
+   <feature url="features/org.eclipse.rephraserengine_0.0.0.jar" id="org.eclipse.rephraserengine" version="0.0.0">
+      <category name="Fortran Development Tools (Photran)"/>
+   </feature>
+   <feature url="features/org.eclipse.ptp.rm.jaxb.rms_6.0.0.qualifier.jar" id="org.eclipse.ptp.rm.jaxb.openmpi" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
+   <category-def name="Parallel Tools Platform" label="Parallel Tools Platform"/>
+   <category-def name="Remote Development Tools" label="Remote Development Tools"/>
+   <category-def name="Fortran Development Tools (Photran)" label="Fortran Development Tools (Photran)"/>
+</site>
