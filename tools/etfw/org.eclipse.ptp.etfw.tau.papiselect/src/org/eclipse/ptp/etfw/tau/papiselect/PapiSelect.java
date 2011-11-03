@@ -52,6 +52,7 @@ public class PapiSelect {
 	 * PAPI counter availability
 	 * @param papiLocation Directory containing PAPI utilities
 	 * @param papiCountType Determines if counters requested are preset or native type
+	 * @since 4.0
 	 */
 	public PapiSelect(IFileStore papiLocation, IBuildLaunchUtils blt, int papiCountType){
 		location=papiLocation;

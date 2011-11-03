@@ -56,13 +56,25 @@ public class ParaProfController {
 
 	public static TreeTuple EMPTY;
 	private IBuildLaunchUtils utilBlob=null;
+	/**
+	 * @since 3.0
+	 */
 	public ParaProfController(IBuildLaunchUtils utilBlob) {
 		this.utilBlob=utilBlob;
 		createProcess();
 
 	}
+	/**
+	 * @since 3.0
+	 */
 	public boolean pullReady=false;
+/**
+ * @since 3.0
+ */
 public static final String RESTART="RESTART";
+/**
+ * @since 3.0
+ */
 public static final String DONE="DONE";
 	private void killProcess() {
 		pushQueue = null;
@@ -166,6 +178,9 @@ public static final String DONE="DONE";
 		return out;
 	}
 	private static final String SPACE=" ";
+	/**
+	 * @since 3.0
+	 */
 	public TreeTuple uploadTrial(IFileStore profile, int dbid, String app, String exp, String tri) {
 		String comBuf = "control upload " + profile.toURI().getPath() + SPACE + dbid + SPACE + app + SPACE + exp + SPACE + tri; //$NON-NLS-1$ //$NON-NLS-2$ 
 		int res = issueCommand(comBuf);
