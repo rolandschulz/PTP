@@ -135,6 +135,9 @@ public class PapiCSelect {
 ////		}
 //	}
 	
+	/**
+	 * @since 4.0
+	 */
 	public EventTree findET(List<String> commands){
 		EventTree et =null;
 //		try {

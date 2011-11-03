@@ -33,6 +33,9 @@ public class EventTreeDialog extends Dialog {
 	private final IBuildLaunchUtils utilBlob;
 	// private final String treeTop="treeTop";
 
+	/**
+	 * @since 4.0
+	 */
 	public EventTreeDialog(Shell parentShell, IFileStore tp, IBuildLaunchUtils utilBlob) {
 		super(parentShell);
 		this.utilBlob=utilBlob;

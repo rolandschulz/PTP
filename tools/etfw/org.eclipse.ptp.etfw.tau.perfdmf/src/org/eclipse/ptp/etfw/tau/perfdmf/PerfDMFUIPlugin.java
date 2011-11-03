@@ -146,7 +146,7 @@ public class PerfDMFUIPlugin extends AbstractUIPlugin {
 	 * @param location
 	 *            The location of the profile data
 	 * @return True on success, false on failure to upload
-	 * @since 2.0
+	 * @since 3.0
 	 */
 	public static boolean addPerformanceData(String projectName, String projectType, String trialName, IFileStore location,
 			String dbname) {

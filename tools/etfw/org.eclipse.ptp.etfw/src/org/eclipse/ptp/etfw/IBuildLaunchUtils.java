@@ -8,6 +8,9 @@ import java.util.Map;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 
+/**
+ * @since 5.0
+ */
 public interface IBuildLaunchUtils {
 
 	/**
