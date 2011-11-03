@@ -56,13 +56,13 @@
 		<module>core/org.eclipse.ptp.utils.extensionpoints.core</module>
 		<module>core/org.eclipse.ptp.utils.file.core</module>
 		<module>core/org.eclipse.ptp.utils.ui</module>
+		<module>core/org.eclipse.ptp.doc.user</module>
+		<module>core/org.eclipse.ptp.doc.isv</module>
 		<module>debug/org.eclipse.ptp.debug.core</module>
 		<module>debug/org.eclipse.ptp.debug.sdm</module>
 		<module>debug/org.eclipse.ptp.debug.sdm.core</module>
 		<module>debug/org.eclipse.ptp.debug.sdm.ui</module>
 		<module>debug/org.eclipse.ptp.debug.ui</module>
-		<module>doc/org.eclipse.ptp.doc.user</module>
-		<module>doc/org.eclipse.ptp.doc.isv</module>
 		<module>photran/org.eclipse.photran.cdtinterface</module>
 		<module>photran/org.eclipse.photran.cdtinterface.vpg</module>
 		<module>photran/org.eclipse.photran.core</module>
