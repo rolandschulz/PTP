@@ -27,4 +27,5 @@ Export-Package: org.eclipse.ptp.rdt.sync.ui;x-friends:="org.eclipse.ptp.rdt.sync
  org.eclipse.ptp.rdt.sync.ui.wizards;x-friends:="org.eclipse.ptp.rdt.sync.ui.fortran"
 Import-Package: org.eclipse.compare,
  org.eclipse.compare.structuremergeviewer,
+ org.eclipse.core.filesystem,
  org.eclipse.team.ui.synchronize
