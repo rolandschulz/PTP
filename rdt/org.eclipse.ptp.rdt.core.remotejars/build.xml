@@ -44,6 +44,7 @@
 	<property name="jdtUIVersion" value="3.7.1.r371_v20110824-0800"/>
 	<property name="jdtUIJar" value="org.eclipse.jdt.ui_${jdtUIVersion}.jar"/>
 
+	
 	<!-- RSE VERSIONS MUST BE UPDATED FOR NEW TM VERSION -->
 	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
 	<property name="rseVersion" value="R-3.3-201106080935"/>
