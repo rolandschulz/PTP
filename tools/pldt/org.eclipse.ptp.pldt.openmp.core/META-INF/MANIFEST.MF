@@ -17,9 +17,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.ptp.pldt.openmp.analysis,
  org.eclipse.ptp.pldt.openmp.ui.pv,
- org.eclipse.photran.cdtinterface;resolution:=optional,
- org.eclipse.photran.core;resolution:=optional,
- org.eclipse.photran.core.vpg;resolution:=optional
+ org.eclipse.photran.cdtinterface,
+ org.eclipse.photran.core,
+ org.eclipse.photran.core.vpg
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Export-Package: org.eclipse.ptp.pldt.openmp.core;x-friends:="org.eclipse.ptp.pldt.openmp.analysis,org.eclipse.ptp.pldt.openmp.ui.pv,org.eclipse.ptp.pldt.wizards",
