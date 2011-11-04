@@ -11,8 +11,8 @@
 -->
 
 <!--
- Script for generating the RDT remote server packages.  To be run with
- PTP master build and not standalone.
+ Script for generating the RDT remote server packages.  
+ NOTE: This script will no longer work with PDE build
 -->
 
 <project name="RDT Remote JARs" default="server.all" basedir=".">
@@ -29,8 +29,7 @@
 	<!-- PLATFORM VERSIONS MUST BE UPDATED FOR NEW PLATFORM VERSION -->
 	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
 	<property name="platformVersion" value="R-3.7.1-201109091335"/>
-	<property name="platformBaseName" value="eclipse-platform-3.7.1"/>
-	<property name="icuBaseZip" value="com.ibm.icu.base-3.7.1.zip"/>
+	
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.4.2.v20110208.jar"/>
 	
 	<property name="coreRuntimeVersion" value="3.7.0.v20110110"/>
@@ -42,27 +41,19 @@
 	<property name="filesystemVersion" value="1.3.100.v20110423-0524"/>
 	<property name="filesystemJar" value="org.eclipse.core.filesystem_${filesystemVersion}.jar"/>
 	
-	<!-- CDT VERSIONS MUST BE UPDATED FOR NEW CDT VERSION -->
-	<property name="cdtVersion" value="201106151055"/>   
+	<property name="jdtUIVersion" value="3.7.0.v20110531-1200"/>
+	<property name="jdtUIJar" value="org.eclipse.jdt.ui_${jdtUIVersion}.jar"/>
+
+	<!-- RSE VERSIONS MUST BE UPDATED FOR NEW TM VERSION -->
+	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
+	<property name="rseVersion" value="R-3.3-201106080935"/>
+	<property name="dStoreBaseName" value="rseserver-3.3"/>
+
+	<!-- CDT PROPERTIES -->
+	<property name="cdtBaseUrl" value="http://download.eclipse.org/tools/cdt/builds/juno/nightly"/>
 	
 	<!-- CDT branch need to be added for PTP maintenance builds -->
-	<property name="cdtBranch" value=""/>
-	
-	<property name="cdtCoreVersion" value="5.3.0.${cdtVersion}"/>
-	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
-	
-	<property name="cdtCoreAIXVersion" value="aix_5.1.0.${cdtVersion}"/>
-	<property name="cdtCoreLinuxPPCVersion" value="linux.ppc_5.1.0.${cdtVersion}"/>
-	<property name="cdtCoreLinuxx86Version" value="linux.x86_5.2.0.${cdtVersion}"/>
-	
-	<property name="cdtLRParserVersion" value="5.2.0.${cdtVersion}"/>
-	<property name="cdtLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/>
-	
-	<property name="cdtUPCParserVersion" value="5.1.0.${cdtVersion}"/>
-	<property name="cdtUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtUPCParserVersion}.jar"/>
-	
-	<property name="cdtLRParserXLCVersion" value="5.1.0.${cdtVersion}"/>
-	<property name="cdtLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/>
+	<property name="cdtBranch" value="cdt_8_0"/>
 	
 	<property name="rdtXLCPropertiesPath" value="${basedir}/../org.eclipse.ptp.rdt.xlc/properties"/>
 	<property name="rdtXLCProperties" value="languages.properties"/>
@@ -70,16 +61,11 @@
 	<property name="lpgRuntimeVersion" value="1.1.0.v200803061910"/>
 	<property name="lpgRuntimeJar" value="net.sourceforge.lpg.lpgjavaruntime_${lpgRuntimeVersion}.jar"/>
 	
-	<!-- RSE VERSIONS MUST BE UPDATED FOR NEW TM VERSION -->
-	<!--property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/-->
-	<property name="rseBaseUrl" value="/home/data/httpd/download.eclipse.org/tm/downloads/drops"/>
-	<property name="rseVersion" value="R-3.3-201106080935"/>
-	<property name="dStoreBaseName" value="rseserver-3.3"/>
 	
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
 	
 	<target name="fetch" depends="fetch.rse, fetch.icu" unless="nofetch"/>
-	<target name="server.all" depends="jar, fetch, unpack.platform, all.remote"/>
+	<target name="server.all" depends="fetch.cdt.versions, jar, fetch, unpack.platform, all.remote"/>
 	
 	<target name="build.jars" depends="server.all"/>
     <target name="gather.bin.parts" depends="server.all"/>
@@ -125,31 +111,31 @@
 	
 	<target name="generate.build.scripts" depends="generate.file.lists">
 		<xslt style="${stylesheet}" in="${basedir}/cdtminer.files.xml" out="${basedir}/build.cdtminer.xml">
-			<param name="bindir" expression="@dot"/>
+			<param name="bindir" expression="target/classes"/>
 		</xslt>
 		<xslt style="${stylesheet}" in="${basedir}/cdtmodel.files.xml" out="${basedir}/build.cdtmodel.xml">
-			<param name="bindir" expression="@dot"/>
+			<param name="bindir" expression="target/classes"/>
 		</xslt>
 		<xslt style="${stylesheet}" in="${basedir}/cdtparser.files.xml" out="${basedir}/build.cdtparser.xml">
-			<param name="bindir" expression="@dot"/>
+			<param name="bindir" expression="target/classes"/>
 		</xslt>
 		<xslt style="${stylesheet}" in="${basedir}/stubs.files.xml" out="${basedir}/build.stubs.xml">
-			<param name="bindir" expression="@dot"/>
+			<param name="bindir" expression="target/classes"/>
 		</xslt>
 		<xslt style="${stylesheet}" in="${basedir}/lrparser.files.xml" out="${basedir}/build.lrparser.xml">
-			<param name="bindir" expression="@dot"/>
+			<param name="bindir" expression="target/classes"/>
 		</xslt>
 		<xslt style="${stylesheet}" in="${basedir}/upcparser.files.xml" out="${basedir}/build.upcparser.xml">
-			<param name="bindir" expression="@dot"/>
+			<param name="bindir" expression="target/classes"/>
 		</xslt>
 		<xslt style="${stylesheet}" in="${basedir}/xlcparser.files.xml" out="${basedir}/build.xlcparser.xml">
-			<param name="bindir" expression="@dot"/>
+			<param name="bindir" expression="target/classes"/>
 		</xslt>
 		<xslt style="${stylesheet}" in="${basedir}/spawner.files.xml" out="${basedir}/build.spawner.xml">
-			<param name="bindir" expression="@dot"/>
+			<param name="bindir" expression="target/classes"/>
 		</xslt>
 	</target>
-	
+		
 	<target name="compile.all">
 		<!--Compile rdt.core.remotejars and rdt.core.stubs-->
 		<mkdir dir="${basedir}/build"/>
@@ -159,103 +145,92 @@
 				target="1.5"
 	  	/>		
 		<antcall target="unpack.platform"></antcall>
-		<mkdir dir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/@dot"/>
+		<mkdir dir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/target/classes"/>
 		<javac srcdir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/src"
-				destdir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/@dot"
+				destdir="${basedir}/../org.eclipse.ptp.rdt.core.stubs/target/classes"
 				classpath="${platformTempDir}/eclipse/plugins/${coreRuntimeJar}:${platformTempDir}/eclipse/plugins/${equinoxJar}:${platformTempDir}/eclipse/plugins/${filesystemJar}"
 				source="1.5"
 				target="1.5"
 	  	/>
 	</target>
 	
+	<target name="fetch.cdt.versions">
+		<mkdir dir="${downloads}"/>
+		<get src="${cdtBaseUrl}/artifacts.jar" dest="${downloads}/artifacts.jar"/>
+		<unzip src="${downloads}/artifacts.jar" dest="${downloads}" />
+		<xslt style="${basedir}/cdt.xsl" in="${downloads}/artifacts.xml" out="${downloads}/cdt.properties"/>
+		<property file="${downloads}/cdt.properties"/>
+		
+		<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
+		<property name="cdtCoreAIXJar" value="org.eclipse.cdt.core.aix_${cdtCoreAIXVersion}.jar"/>
+		<property name="cdtCoreLinuxPPCJar" value="org.eclipse.cdt.core.linux.ppc64_${cdtCoreLinuxPPCVersion}.jar"/>
+		<property name="cdtCoreLinuxx86Jar" value="org.eclipse.cdt.core.linux.x86_${cdtCoreLinuxx86Version}.jar"/>
+		<property name="cdtCoreLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtCoreLRParserVersion}.jar"/>
+		<property name="cdtCoreUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtCoreUPCParserVersion}.jar"/>
+		<property name="cdtCoreLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtCoreLRParserXLCVersion}.jar"/>
+	</target>
+		
 	<target name="get.cdt">
-		<!--Get cdt.core source from CVS-->
-		<!--
-        <cvs cvsroot=":pserver:anonymous@dev.eclipse.org:/cvsroot/tools"
-                package="org.eclipse.cdt/all/org.eclipse.cdt.core"
-                command="checkout -d org.eclipse.cdt.core${cdtBranch}"
-                dest="${basedir}/.."
-        />
-        -->
         <!--Clone cdt Git repo-->
 		<mkdir dir="${basedir}/gitrepo"/>
-		<exec dir="${basedir}/gitrepo" executable="/usr/local/bin/git">
+		<exec dir="${basedir}/gitrepo" executable="git">
 		    <arg value="clone"/>
 			<arg value="git://git.eclipse.org/gitroot/cdt/org.eclipse.cdt.git"/>
 		</exec>
 
-		<exec dir="${basedir}/gitrepo/org.eclipse.cdt" executable="/usr/local/bin/git">
+		<exec dir="${basedir}/gitrepo/org.eclipse.cdt" executable="git">
 		    <arg line="checkout -b ${cdtBranch} origin/${cdtBranch}"/>
 		</exec>
 		
 		<!--Get cdt.core source from Git-->
 		<copy todir="${basedir}/../org.eclipse.cdt.core">
-    			<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/core/org.eclipse.cdt.core"/>
+    		<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/core/org.eclipse.cdt.core"/>
   		</copy>		
 		
-		<!--Get cdt.core bin from PTP build-->
-		<unzip src="${basedir}/../../eclipse/plugins/${cdtCoreJar}"
-			dest="${basedir}/../org.eclipse.cdt.core/@dot"
-		/>
+		<!--Get cdt.core bin from CDT build-->
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreJar}" dest="${downloads}/${cdtCoreJar}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core/target/classes">
+			<fileset dir="${downloads}" includes="${cdtCoreJar}"/>
+		</unzip>
 	</target>
 	
-	<target name="get.cdt.core.lrparser" depends="get.cdt">
-		<!--Get cdt.core.lrparser source from CVS-->
-		<!--
-        <cvs cvsroot=":pserver:anonymous@dev.eclipse.org:/cvsroot/tools"
-                package="org.eclipse.cdt/lrparser/org.eclipse.cdt.core.lrparser"
-                command="checkout -d org.eclipse.cdt.core.lrparser"
-                dest="${basedir}/.."
-        />-->
+	<target name="get.cdt.core.lrparser">
 		<!--Get cdt.core.lrparser source from Git -->
 		<copy todir="${basedir}/../org.eclipse.cdt.core.lrparser">
 			<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/lrparser/org.eclipse.cdt.core.lrparser"/>
   		</copy>
 		
-		<!--Get cdt.core.lrparser bin from PTP build-->
-		<unzip src="${basedir}/../../eclipse/plugins/${cdtLRParserJar}"
-			dest="${basedir}/../org.eclipse.cdt.core.lrparser/@dot"
-		/>
+		<!--Get cdt.core.lrparser bin from CDT build-->
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreLRParserJar}" dest="${downloads}/${cdtCoreLRParserJar}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.lrparser/target/classes">
+			<fileset dir="${downloads}" includes="${cdtCoreLRParserJar}"/>
+		</unzip>
 	</target>
 	
-	<target name="get.cdt.core.parser.upc" depends="get.cdt">
-		<!--Get cdt.core.parser.upc source from CVS-->
-        <!--
-        <cvs cvsroot=":pserver:anonymous@dev.eclipse.org:/cvsroot/tools"
-                package="org.eclipse.cdt/upc/org.eclipse.cdt.core.parser.upc"
-                command="checkout -d org.eclipse.cdt.core.parser.upc"
-                dest="${basedir}/.."
-        />-->
-        
+	<target name="get.cdt.core.parser.upc">
         <!--Get cdt.core.parser.upc source from Git-->
 		<copy todir="${basedir}/../org.eclipse.cdt.core.parser.upc">
 			<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/upc/org.eclipse.cdt.core.parser.upc"/>
   		</copy>
 		
-		<!--Get cdt.core.parser.upc bin from PTP build-->
-		<unzip src="${basedir}/../../eclipse/plugins/${cdtUPCParserJar}"
-			dest="${basedir}/../org.eclipse.cdt.core.parser.upc/@dot"
-		/>
+		<!--Get cdt.core.parser.upc bin from CDT build-->
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreUPCParserJar}" dest="${downloads}/${cdtCoreUPCParserJar}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.parser.upc/target/classes">
+			<fileset dir="${downloads}" includes="${cdtCoreUPCParserJar}"/>
+		</unzip>
 	</target>
 	
-	<target name="get.cdt.core.lrparser.xlc" depends="get.cdt">
-		<!--Get cdt.core.lrparser.xlc source from CVS-->
-        <!--
-		<cvs cvsroot=":pserver:anonymous@dev.eclipse.org:/cvsroot/tools"
-                package="org.eclipse.cdt/xlc/org.eclipse.cdt.core.lrparser.xlc"
-                command="checkout -d org.eclipse.cdt.core.lrparser.xlc"
-                dest="${basedir}/.."
-        />-->
-		
+	<target name="get.cdt.core.lrparser.xlc">
 		<!--Get cdt.core.lrparser.xlc source from Git-->
 		<copy todir="${basedir}/../org.eclipse.cdt.core.lrparser.xlc">
 			<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/xlc/org.eclipse.cdt.core.lrparser.xlc"/>
   		</copy>
 		
-		<!--Get cdt.core.lrparser.xlc bin from PTP build-->
-		<unzip src="${basedir}/../../eclipse/plugins/${cdtLRParserXLCJar}"
-			dest="${basedir}/../org.eclipse.cdt.core.lrparser.xlc/@dot"
-		/>
+		<!--Get cdt.core.lrparser.xlc bin from CDT build-->
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreLRParserXLCJar}" dest="${downloads}/${cdtCoreLRParserXLCJar}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.lrparser.xlc/target/classes">
+			<fileset dir="${downloads}" includes="${cdtCoreLRParserXLCJar}"/>
+		</unzip>
 	</target>
 	
 	<target name="generate.file.lists" depends="compile.all, get.cdt, get.cdt.core.lrparser, get.cdt.core.parser.upc, get.cdt.core.lrparser.xlc">
@@ -315,6 +290,15 @@
 			<arg value="xlcparser.files.xml"/>
 			<arg value=".."/>
 		</java>
+		<exec executable="rm">
+			<arg value="-f"/>
+			<arg value="${basedir}/../org.eclipse.ptp.remote.rse.core"/>
+		</exec>
+		<exec executable="ln">
+			<arg value="-s"/>
+			<arg value="${basedir}/../../core/org.eclipse.ptp.remote.rse.core"/>
+			<arg value="${basedir}/../org.eclipse.ptp.remote.rse.core"/>
+		</exec>
 		<java
 			fork="true"
 			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"
@@ -340,7 +324,22 @@
 			<include name="${serverBaseName}-unix-*.tar"/>
 			<include name="${serverBaseName}-windows-*.zip"/>
 		</delete>
+		<exec executable="rm">
+			<arg value="-f"/>
+			<arg value="${basedir}/../org.eclipse.ptp.remote.rse.core"/>
+		</exec>
+		<delete dir="${remoteServerTempDir}"/>
+		<delete dir="${platformTempDir}"/>
+		<delete dir="${downloads}"/>
+		<delete dir="${basedir}/../org.eclipse.ptp.core"/>
+		<delete dir="${basedir}/../org.eclipse.ptp.core.aix"/>
+		<delete dir="${basedir}/../org.eclipse.ptp.core.linux.ppc64"/>
+		<delete dir="${basedir}/../org.eclipse.ptp.core.linux.x86"/>
+		<delete dir="${basedir}/../org.eclipse.ptp.core.lrparser"/>
+		<delete dir="${basedir}/../org.eclipse.ptp.core.lrparser.xlc"/>
+		<delete dir="${basedir}/../org.eclipse.ptp.core.parser.upc"/>
 		<delete dir="${basedir}/gitrepo"/>
+		<delete dir="${basedir}/build"/>
 	</target>
 	
 	<target name="clean.except.jars">
@@ -362,40 +361,33 @@
 			<include name="xlcparser.files.xml"/>
 			<include name="spawner.files.xml"/>
 		</delete>
-		
-		<delete dir="${remoteServerTempDir}"/>
-		<delete dir="${platformTempDir}"/>
 	</target>
 	
-	<target name="fetch.platform">
-		<mkdir dir="${downloads}"/>
-		<get src="${platformBaseUrl}/${platformVersion}/${platformBaseName}-win32.zip" dest="${downloads}/${platformBaseName}-win32.zip"/>
-	</target>
-		
 	<target name="fetch.rse">
 		<mkdir dir="${downloads}"/>
-		<!--get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-windows.zip" dest="${downloads}/${dStoreBaseName}-windows.zip"/-->
-		<!--get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-linux.tar" dest="${downloads}/${dStoreBaseName}-linux.tar"/-->
-		<!--get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-unix.tar" dest="${downloads}/${dStoreBaseName}-unix.tar"/-->
-		<!--get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-macosx.tar" dest="${downloads}/${dStoreBaseName}-macosx.tar"/-->
-		<copy file="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-windows.zip" tofile="${downloads}/${dStoreBaseName}-windows.zip"/>
-		<copy file="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-linux.tar" tofile="${downloads}/${dStoreBaseName}-linux.tar"/>
-		<copy file="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-unix.tar" tofile="${downloads}/${dStoreBaseName}-unix.tar"/>
-		<copy file="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-macosx.tar" tofile="${downloads}/${dStoreBaseName}-macosx.tar"/>
+		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-windows.zip" dest="${downloads}/${dStoreBaseName}-windows.zip"/>
+		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-linux.tar" dest="${downloads}/${dStoreBaseName}-linux.tar"/>
+		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-unix.tar" dest="${downloads}/${dStoreBaseName}-unix.tar"/>
+		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-macosx.tar" dest="${downloads}/${dStoreBaseName}-macosx.tar"/>
 	</target>
 	
 	<target name="fetch.icu">
-		<mkdir dir="${downloads}"/>
-		<get src="${platformBaseUrl}/${platformVersion}/${icuBaseZip}" dest="${downloads}/${icuBaseZip}"/>
-		<unzip src="${downloads}/${icuBaseZip}" dest="${downloads}"/>
-		<copy file="${downloads}/plugins/${icuBaseJar}" todir="${platformTempDir}/eclipse/plugins"/>
+		<get src="${platformBaseUrl}/${platformVersion}/plugins/${icuBaseJar}" dest="${platformTempDir}/eclipse/plugins/${icuBaseJar}"/>
 	</target>
-	
+
+	<target name="fetch.lpg">
+		<get src="${cdtBaseUrl}/plugins/${lpgRuntimeJar}" dest="${remoteServerTempDir}/${lpgRuntimeJar}"/>
+	</target>
+
+	<target name="fetch.jdt">
+		<get src="${platformBaseUrl}/${platformVersion}/plugins/${jdtUIJar}" dest="${platformTempDir}/eclipse/plugins/${jdtUIJar}"/>
+	</target>
+
 	<target name="unpack.platform">
-		<!--Get platform jars from PTP build-->
-		<copy file="${basedir}/../../eclipse/plugins/${coreRuntimeJar}" todir="${platformTempDir}/eclipse/plugins"/>
-		<copy file="${basedir}/../../eclipse/plugins/${equinoxJar}" todir="${platformTempDir}/eclipse/plugins"/>
-		<copy file="${basedir}/../../eclipse/plugins/${filesystemJar}" todir="${platformTempDir}/eclipse/plugins"/>
+		<mkdir dir="${platformTempDir}/eclipse/plugins"/>
+		<get src="${platformBaseUrl}/${platformVersion}/plugins/${coreRuntimeJar}" dest="${platformTempDir}/eclipse/plugins/${coreRuntimeJar}"/>
+		<get src="${platformBaseUrl}/${platformVersion}/plugins/${equinoxJar}" dest="${platformTempDir}/eclipse/plugins/${equinoxJar}"/>
+		<get src="${platformBaseUrl}/${platformVersion}/plugins/${filesystemJar}" dest="${platformTempDir}/eclipse/plugins/${filesystemJar}"/>
 	</target>
 			
 	<target name="prepare.remote.tar">
@@ -523,7 +515,7 @@ export serverpath CLASSPATH LIBPATH
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.bat"/>
 	</target>
 	
-	<target name="prepare.remote.jar">
+	<target name="prepare.remote.jar" depends="fetch.jdt">
 		<property name="platform" value="linux"/>
 		<property name="jarplatform" value="linux"/>
 			
@@ -537,8 +529,8 @@ export serverpath CLASSPATH LIBPATH
 
 		<!-- Add the Jar-in-jar loader to the server -->
 		<unzip dest="${downloads}">
-			<fileset dir="${basedir}/../../eclipse/plugins">
-				<include name="org.eclipse.jdt.ui_*.jar"/>
+			<fileset dir="${platformTempDir}/eclipse/plugins">
+				<include name="${jdtUIJar}"/>
 			</fileset>
 			<patternset>
 				<include name="jar-in-jar-loader.zip"/>	
@@ -547,7 +539,7 @@ export serverpath CLASSPATH LIBPATH
 		<unzip src="${downloads}/jar-in-jar-loader.zip" dest="${remoteServerTempDir}"/>
 	</target>
 		
-	<target name="assemble.remote">
+	<target name="assemble.remote" depends="fetch.lpg">
 		<property name="platform" value="linux"/>
 		<!-- Copy over the RDT JARs and their dependencies -->
 		<copy todir="${remoteServerTempDir}" >
@@ -564,7 +556,6 @@ export serverpath CLASSPATH LIBPATH
 		</copy>
 		
 		<copy file="${rdtXLCPropertiesPath}/${rdtXLCProperties}" todir="${remoteServerTempDir}"/>
-		<copy file="${basedir}/../../eclipse/plugins/${lpgRuntimeJar}" todir="${remoteServerTempDir}"/>
 
 		<copy todir="${remoteServerTempDir}">
 			<fileset dir="${platformTempDir}/eclipse/plugins">
@@ -586,23 +577,26 @@ export serverpath CLASSPATH LIBPATH
 	</target>
 	
 	<target name="add.so.aix">
-		<unzip src="${basedir}/../../eclipse/plugins/org.eclipse.cdt.core.${cdtCoreAIXVersion}.jar"
-				dest="${basedir}/../org.eclipse.cdt.core.aix"
-			/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreAIXJar}" dest="${downloads}/${cdtCoreAIXJar}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.aix">
+			<fileset dir="${downloads}" includes="${cdtCoreAIXJar}"/>
+		</unzip>
 		<copy file="${basedir}/../org.eclipse.cdt.core.aix/os/aix/ppc/libspawner.so" todir="${remoteServerTempDir}"/>
 	</target>
 	
 	<target name="add.so.linux.ppc">
-		<unzip src="${basedir}/../../eclipse/plugins/org.eclipse.cdt.core.${cdtCoreLinuxPPCVersion}.jar"
-				dest="${basedir}/../org.eclipse.cdt.core.linux.ppc"
-			/>
-		<copy file="${basedir}/../org.eclipse.cdt.core.linux.ppc/os/linux/ppc/libspawner.so" todir="${remoteServerTempDir}"/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreLinuxPPCJar}" dest="${downloads}/${cdtCoreLinuxPPCJar}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.linux.ppc64">
+			<fileset dir="${downloads}" includes="${cdtCoreLinuxPPCJar}"/>
+		</unzip>
+		<copy file="${basedir}/../org.eclipse.cdt.core.linux.ppc64/os/linux/ppc64/libspawner.so" todir="${remoteServerTempDir}"/>
 	</target>
 	
 	<target name="add.so.linux.x86">
-		<unzip src="${basedir}/../../eclipse/plugins/org.eclipse.cdt.core.${cdtCoreLinuxx86Version}.jar"
-				dest="${basedir}/../org.eclipse.cdt.core.linux.x86"
-			/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreLinuxx86Jar}" dest="${downloads}/${cdtCoreLinuxx86Jar}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.linux.x86">
+			<fileset dir="${downloads}" includes="${cdtCoreLinuxx86Jar}"/>
+		</unzip>
 		<copy file="${basedir}/../org.eclipse.cdt.core.linux.x86/os/linux/x86/libspawner.so" todir="${remoteServerTempDir}"/>
 	</target>	
 	
@@ -623,13 +617,13 @@ export serverpath CLASSPATH LIBPATH
 		<property name="jarplatform" value="linux"/>
 			
 		<tar destfile="${serverJar}-${platform}-${serverVersion}.tar">
-			<fileset dir="${basedir}">
+			<tarfileset dir="${basedir}">
 				<include name="rdt-server/**/*"/>
-			</fileset>
+			</tarfileset>
 		</tar>
 		
-		<copy file="${serverJar}-${platform}-${serverVersion}.tar" 
-			todir="${copyToDir}"/>
+		<!--copy file="${serverJar}-${platform}-${serverVersion}.tar" 
+			todir="${copyToDir}"/-->
 				
 		<delete dir="${remoteServerTempDir}"/>
 	</target>
@@ -644,8 +638,8 @@ export serverpath CLASSPATH LIBPATH
 			</fileset>
 		</zip>
 		
-		<copy file="${serverJar}-${platform}-${serverVersion}.zip" 
-			todir="${copyToDir}"/>
+		<!--copy file="${serverJar}-${platform}-${serverVersion}.zip" 
+			todir="${copyToDir}"/-->
 		
 		<delete dir="${remoteServerTempDir}"/>
 	</target>
