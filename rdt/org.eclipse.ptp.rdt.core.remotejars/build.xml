@@ -61,6 +61,7 @@
 	<property name="lpgRuntimeVersion" value="1.1.0.v201004271650"/>
 	<property name="lpgRuntimeJar" value="net.sourceforge.lpg.lpgjavaruntime_${lpgRuntimeVersion}.jar"/>
 	
+	
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
 	
 	<target name="fetch" depends="fetch.rse, fetch.icu" unless="nofetch"/>
