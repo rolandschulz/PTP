@@ -114,9 +114,6 @@
    <feature url="features/org.eclipse.rephraserengine_0.0.0.jar" id="org.eclipse.rephraserengine" version="0.0.0">
       <category name="Fortran Development Tools (Photran)"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rm.jaxb.rms_6.0.0.qualifier.jar" id="org.eclipse.ptp.rm.jaxb.openmpi" version="0.0.0">
-      <category name="Parallel Tools Platform"/>
-   </feature>
    <category-def name="Parallel Tools Platform" label="Parallel Tools Platform"/>
    <category-def name="Remote Development Tools" label="Remote Development Tools"/>
    <category-def name="Fortran Development Tools (Photran)" label="Fortran Development Tools (Photran)"/>
