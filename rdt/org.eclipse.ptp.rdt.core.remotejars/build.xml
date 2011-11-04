@@ -27,7 +27,7 @@
 	<property name="platformTempDir" value="${basedir}/platform.temp"/>
 	
 	<!-- PLATFORM VERSIONS MUST BE UPDATED FOR NEW PLATFORM VERSION -->
-	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
+	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/updates/3.7"/>
 	<property name="platformVersion" value="R-3.7.1-201109091335"/>
 	
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.4.2.v20110208.jar"/>
