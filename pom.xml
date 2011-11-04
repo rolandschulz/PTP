@@ -119,7 +119,6 @@
 		<module>releng/org.eclipse.ptp.macosx.ppc</module>
 		<module>releng/org.eclipse.ptp.macosx.x86</module>
 		<module>releng/org.eclipse.ptp.pldt-feature</module>
-		<module>releng/org.eclipse.ptp.pldt.fortran-feature</module>
 		<module>releng/org.eclipse.ptp.pldt.lapi-feature</module>
 		<module>releng/org.eclipse.ptp.pldt.upc-feature</module>
 		<module>releng/org.eclipse.ptp.rdt-feature</module>
