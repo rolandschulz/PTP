@@ -12,8 +12,9 @@
 package org.eclipse.ptp.proxy.util.compression.huffmancoder;
 
 import java.nio.ByteBuffer;
+
 import org.eclipse.ptp.proxy.util.compression.IDecoder;
-import org.eclipse.ptp.utils.core.messages.Messages;
+import org.eclipse.ptp.proxy.util.messages.Messages;
 
 public class HuffmanByteUncompress implements IDecoder {
 	private static final int NSYMBOLS = 256;
@@ -43,7 +44,7 @@ public class HuffmanByteUncompress implements IDecoder {
 	 *            The input buffer to be compressed.
 	 * @return The uncompressed buffer using Huffman encoding.
 	 */
-	
+
 	public ByteBuffer apply(ByteBuffer in) {
 		if (in == null) {
 			throw new IllegalArgumentException(Messages.getString("HuffmanByteUncompress.0")); //$NON-NLS-1$
@@ -79,9 +80,8 @@ public class HuffmanByteUncompress implements IDecoder {
 	/**
 	 * Notifies Huffman frequency table is updated in the incoming stream
 	 * 
-	 * When this method is called, the next call to apply expects a frequency
-	 * table in the header information of the input compressed stream.
-	 * Subsequent calls to apply assume no frequency table.
+	 * When this method is called, the next call to apply expects a frequency table in the header information of the input
+	 * compressed stream. Subsequent calls to apply assume no frequency table.
 	 */
 	public void notifyFrequencyUpdate() {
 		freqUpdated = true;
