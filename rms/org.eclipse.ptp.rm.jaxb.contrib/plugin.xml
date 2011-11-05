@@ -19,6 +19,14 @@
             configurationFile="data/edu.illinois.ncsa.forge.pbs.batch.openmpi.xml"
             name="edu.illinois.ncsa.forge.pbs.batch.openmpi">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.illinois.ncsa.forge.pbs.interactive.openmpi.xml"
+            name="edu.illinois.ncsa.forge.pbs.interactive.openmpi">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.sdsc.trestles.pbs.batch.xml"
+            name="edu.sdsc.trestles.pbs.batch">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>
