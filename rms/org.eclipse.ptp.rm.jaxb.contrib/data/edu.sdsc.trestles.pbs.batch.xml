@@ -6,11 +6,10 @@
 <!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
 <!-- * -->
 <!-- * Contributors: -->
-<!-- * Al Rossi - design and implementation -->
-<!-- * Galen Arnold - adapt to mvapich2 -->
+<!-- * Albert L. Rossi - design and implementation -->
+<!-- * Galen Arnold - adapt to kraken -->
 <!-- ****************************************************************************** -->
-<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="edu.illinois.ncsa.forge.pbs.batch.mvapich2">
+<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="resource_manager_type.xsd" name="edu.sdsc.trestles.pbs.batch">
 	<control-data>
 		<!-- Set the default value of this property if PBS is installed in a non-standard location -->
 		<property name="bindir" visible="false"/>
@@ -32,7 +31,7 @@
 		</property>
 		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
-			<choice>,mpirun_rsh,mpiexec,mpirun</choice>
+			<choice>,mpirun_rsh,mpirun</choice>
 		</attribute>
 		<attribute name="mpiCores" min="1" type="integer">
 			<description>the '-np' value [usually equals Nodes*ppn]</description>
@@ -387,7 +386,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<line>
 				<arg resolve="false">fi</arg>
 			</line>
-			<line><arg resolve="false">cd $SCR</arg></line>
+			<line><arg resolve="false">cd /phase1/${USER}</arg></line>
 			<line><arg>cp ${ptp_rm:executablePath#value} .</arg></line>
 			<line><arg>MYSCREXE=`basename ${ptp_rm:executablePath#value}`</arg></line>
 			<line>
@@ -397,7 +396,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<arg resolve="false">if [ -n "${COMMAND}" ] ; then</arg>
 			</line>
 			<line>
-				<arg resolve="false"> COMMAND="${COMMAND} -ssh ${MPI_ARGS} -hostfile ${PBS_NODEFILE}</arg>
+				<arg resolve="false"> COMMAND="${COMMAND} ${MPI_ARGS} -hostfile ${PBS_NODEFILE} </arg>
 				<arg resolve="false"> ${MYSCREXE} </arg>
 				<arg>${ptp_rm:progArgs#value}"</arg>
 			</line>
@@ -808,8 +807,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				</composite>
 			</dynamic>
 			<import title="Import PBS Script">
-				<export-for-override name="exportedEnv" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table"
-					initialAllChecked="true" tooltipEnabled="true">
+				<export-for-override name="exportedEnv" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table" initialAllChecked="true" tooltipEnabled="true">
 					<layout-data>
 						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true" heightHint="80"/>
 					</layout-data>

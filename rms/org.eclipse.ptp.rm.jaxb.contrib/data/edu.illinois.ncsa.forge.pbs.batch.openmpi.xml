@@ -35,7 +35,7 @@
 			<choice>,mpiexec,mpirun</choice>
 		</attribute>
 		<attribute name="mpiCores" min="1" type="integer">
-			<description>the '-np' value</description>
+			<description>the '-np' value [usually equals Nodes*ppn]</description>
 		</attribute>
 		<attribute name="Account_Name" type="string">
 			<description>Account to which to charge this job.</description>
@@ -188,7 +188,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<default>0</default>
 		</attribute>
 		<attribute name="Resource_List.nodes" type="string">
-			<description>Number and/or type of nodes to be reserved for exclusive use by the job.</description>
+			<description>Number and/or type of nodes to be reserved for exclusive use by the job. 
+[usage hint] number_nodes:ppn=N</description>
 			<tooltip><![CDATA[The value is one or more node_specs joined with 
 the '+' character, "node_spec[+node_spec...]. Each node_spec is
 a number of nodes required of the type declared in the node_spec
@@ -389,6 +390,9 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<line>
 				<arg resolve="false">fi</arg>
 			</line>
+			<line><arg resolve="false">cd $SCR</arg></line>
+			<line><arg>cp ${ptp_rm:executablePath#value} .</arg></line>
+			<line><arg>MYSCREXE=`basename ${ptp_rm:executablePath#value}`</arg></line>
 			<line>
 				<arg>COMMAND=${ptp_rm:mpiCommand#value}</arg>
 			</line>
@@ -397,19 +401,18 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			</line>
 			<line>
 				<arg resolve="false"> COMMAND="${COMMAND} ${MPI_ARGS} -hostfile ${PBS_NODEFILE}</arg>
-				<arg>${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}"</arg>
+				<arg resolve="false"> ${MYSCREXE} </arg>
+				<arg>${ptp_rm:progArgs#value}"</arg>
 			</line>
 			<line>
 				<arg resolve="false">else</arg>
 			</line>
 			<line>
-				<arg> COMMAND="${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}"</arg>
+				<arg resolve="false"> COMMAND="${MYSCREXE}</arg>
+				<arg>${ptp_rm:progArgs#value}"</arg>
 			</line>
 			<line>
 				<arg resolve="false">fi</arg>
-			</line>
-			<line>
-				<arg isUndefinedIfMatches="cd">cd ${ptp_rm:directory#value}</arg>
 			</line>
 			<line>
 				<arg resolve="false">${COMMAND}</arg>
