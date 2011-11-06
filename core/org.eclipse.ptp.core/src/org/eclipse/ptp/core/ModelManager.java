@@ -176,8 +176,7 @@ public class ModelManager implements IModelManager {
 			switch (event.getType()) {
 			case IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED: {
 				/*
-				 * The service configuration has been removed, so remove the
-				 * resource manager associated with it (if any).
+				 * The service configuration has been removed, so remove the resource manager associated with it (if any).
 				 */
 				IServiceProvider provider = ((IServiceConfiguration) event.getSource()).getServiceProvider(fLaunchService);
 				if (provider != null && provider instanceof ResourceManagerServiceProvider) {
@@ -192,17 +191,15 @@ public class ModelManager implements IModelManager {
 
 			case IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED: {
 				/*
-				 * The service configuration has changed. Check if the old
-				 * provider is null, in which case this is likely to be a new
-				 * provider being added to a new configuration.
+				 * The service configuration has changed. Check if the old provider is null, in which case this is likely to be a
+				 * new provider being added to a new configuration.
 				 */
 				IServiceConfiguration config = (IServiceConfiguration) event.getSource();
 				if (event.getOldProvider() == null) {
 					IServiceProvider newProvider = config.getServiceProvider(fLaunchService);
 					if (newProvider != null && newProvider instanceof ResourceManagerServiceProvider) {
 						/*
-						 * Check if the rm already exists. Only add a new one if
-						 * it doesn't.
+						 * Check if the rm already exists. Only add a new one if it doesn't.
 						 */
 						IResourceManager rm = getResourceManagerFromUniqueName(((ResourceManagerServiceProvider) newProvider)
 								.getUniqueName());
@@ -219,8 +216,7 @@ public class ModelManager implements IModelManager {
 
 			case IServiceModelEvent.SERVICE_PROVIDER_CHANGED: {
 				/*
-				 * The service provider has been modified, so let the UI know
-				 * that something has changed and it should update.
+				 * The service provider has been modified, so let the UI know that something has changed and it should update.
 				 */
 				IServiceProvider provider = (IServiceProvider) event.getSource();
 				if (provider != null && provider instanceof ResourceManagerServiceProvider) {
@@ -259,9 +255,7 @@ public class ModelManager implements IModelManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.IModelManager#addListener(org.eclipse.ptp.core.listeners
-	 * .IResourceManagerListener)
+	 * @see org.eclipse.ptp.core.IModelManager#addListener(org.eclipse.ptp.core.listeners .IResourceManagerListener)
 	 */
 	public void addListener(IResourceManagerListener listener) {
 		fResourceManagerListeners.add(listener);
@@ -270,9 +264,7 @@ public class ModelManager implements IModelManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.IModelManager#addResourceManager(org.eclipse.ptp
-	 * .rmsystem.IResourceManager)
+	 * @see org.eclipse.ptp.core.IModelManager#addResourceManager(org.eclipse.ptp .rmsystem.IResourceManager)
 	 */
 	public void addResourceManager(IResourceManager rm) {
 		synchronized (fResourceManagers) {
@@ -284,9 +276,7 @@ public class ModelManager implements IModelManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.IModelManager#addResourceManagers(org.eclipse.ptp
-	 * .rmsystem.IResourceManager[])
+	 * @see org.eclipse.ptp.core.IModelManager#addResourceManagers(org.eclipse.ptp .rmsystem.IResourceManager[])
 	 */
 	public void addResourceManagers(IResourceManager[] rms) {
 		for (IResourceManager rm : rms) {
@@ -395,9 +385,7 @@ public class ModelManager implements IModelManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.IModelManager#getResourceManagerFromUniqueName(java
-	 * .lang.String)
+	 * @see org.eclipse.ptp.core.IModelManager#getResourceManagerFromUniqueName(java .lang.String)
 	 */
 	public IResourceManager getResourceManagerFromUniqueName(String rmUniqueName) {
 		synchronized (fResourceManagers) {
@@ -428,8 +416,7 @@ public class ModelManager implements IModelManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent
+	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent
 	 * (org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent)
 	 */
 	public void handleEvent(IResourceManagerErrorEvent e) {
@@ -445,8 +432,7 @@ public class ModelManager implements IModelManager {
 		Set<IResourceManager> rmsNeedStarting = new HashSet<IResourceManager>();
 
 		/*
-		 * Need to force service model to load so that the resource managers are
-		 * created.
+		 * Need to force service model to load so that the resource managers are created.
 		 */
 		fServiceManager.getActiveConfiguration();
 
@@ -466,9 +452,7 @@ public class ModelManager implements IModelManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.IModelManager#removeListener(org.eclipse.ptp.core
-	 * .listeners.IResourceManagerListener)
+	 * @see org.eclipse.ptp.core.IModelManager#removeListener(org.eclipse.ptp.core .listeners.IResourceManagerListener)
 	 */
 	public void removeListener(IResourceManagerListener listener) {
 		fResourceManagerListeners.remove(listener);
@@ -477,9 +461,7 @@ public class ModelManager implements IModelManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.IModelManager#removeResourceManager(org.eclipse.
-	 * ptp.rmsystem.IResourceManager)
+	 * @see org.eclipse.ptp.core.IModelManager#removeResourceManager(org.eclipse. ptp.rmsystem.IResourceManager)
 	 */
 	public void removeResourceManager(IResourceManager rm) {
 		IServiceProvider provider = (IServiceProvider) rm.getConfiguration().getAdapter(IServiceProvider.class);
@@ -492,9 +474,7 @@ public class ModelManager implements IModelManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.IModelManager#removeResourceManagers(org.eclipse
-	 * .ptp.rmsystem.IResourceManager[])
+	 * @see org.eclipse.ptp.core.IModelManager#removeResourceManagers(org.eclipse .ptp.rmsystem.IResourceManager[])
 	 */
 	public void removeResourceManagers(IResourceManager[] rms) {
 		for (IResourceManager rm : rms) {
@@ -677,9 +657,8 @@ public class ModelManager implements IModelManager {
 	}
 
 	/**
-	 * Remove provider from a service configurations, or if the configuration
-	 * has the same name as the resource manager, remove it from service
-	 * manager.
+	 * Remove provider from a service configurations, or if the configuration has the same name as the resource manager, remove it
+	 * from service manager.
 	 * 
 	 * @param provider
 	 *            provider to remove
@@ -688,7 +667,7 @@ public class ModelManager implements IModelManager {
 		Set<IServiceConfiguration> configs = fServiceManager.getConfigurations();
 
 		for (IServiceConfiguration config : configs) {
-			if (provider.equals(config.getServiceProvider(fLaunchService))) {
+			if (config.getServiceProvider(fLaunchService) == provider) {
 				config.setServiceProvider(fLaunchService, null);
 				break;
 			}
