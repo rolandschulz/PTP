@@ -13,6 +13,11 @@
 <!--
  Script for generating the RDT remote server packages.  
  NOTE: This script will no longer work with PDE build
+ 
+ serverVersion and buildQualifier must be passed via maven-antrun-plugin
+ 
+ These properties are derived from the plugin manifest version in the pom.xml, 
+ so the plugin version must be the same as the server version.
 -->
 
 <project name="RDT Remote JARs" default="server.all" basedir=".">
@@ -566,7 +571,7 @@ export serverpath CLASSPATH LIBPATH
 		</copy>
 		
 		<touch file="${remoteServerTempDir}/rdtserver_version.dat"/>
-		<concat destfile="${remoteServerTempDir}/rdtserver_version.dat">${unqualifiedVersion}-${buildQualifier}</concat>
+		<concat destfile="${remoteServerTempDir}/rdtserver_version.dat">${serverVersion}-${buildQualifier}</concat>
 		
 		<!--Create empty URICreator.dat file-->
 		<touch file="${remoteServerTempDir}/URICreator.dat"/>
@@ -615,7 +620,7 @@ export serverpath CLASSPATH LIBPATH
 		<property name="platform" value="linux"/>
 		<property name="jarplatform" value="linux"/>
 			
-		<tar destfile="${serverJar}-${platform}-${unqualifiedVersion}.tar">
+		<tar destfile="${serverJar}-${platform}-${serverVersion}.tar">
 			<tarfileset dir="${basedir}">
 				<include name="rdt-server/**/*"/>
 			</tarfileset>
@@ -628,7 +633,7 @@ export serverpath CLASSPATH LIBPATH
 		<property name="platform" value="windows"/>
 		<property name="jarplatform" value="windows"/>
 			
-		<zip destfile="${serverJar}-${platform}-${unqualifiedVersion}.zip">
+		<zip destfile="${serverJar}-${platform}-${serverVersion}.zip">
 			<fileset dir="${basedir}">
 				<include name="rdt-server/**/*"/>
 			</fileset>
