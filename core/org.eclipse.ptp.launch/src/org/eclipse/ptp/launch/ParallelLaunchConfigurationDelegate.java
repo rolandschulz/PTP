@@ -88,6 +88,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				String cwd = getWorkingDirectory(fLaunch.getLaunchConfiguration());
 				String[] args = getProgramArguments(fLaunch.getLaunchConfiguration());
 
+				switchPerspective(DebugUITools.getLaunchPerspective(fLaunch.getLaunchConfiguration().getType(),
+						fLaunch.getLaunchMode()));
+
 				session.connectToDebugger(subMon.newChild(8), app, path, cwd, args);
 			} catch (CoreException e) {
 				PTPDebugCorePlugin.getDebugModel().shutdownSession(fJobId);
@@ -162,9 +165,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			copyExecutable(configuration, progress.newChild(10));
 			doPreLaunchSynchronization(configuration, progress.newChild(10));
 
-			// switch perspective
-			switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
-
 			IPDebugger debugger = null;
 
 			try {
@@ -186,6 +186,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					if (progress.isCanceled()) {
 						return;
 					}
+				} else {
+					// switch perspective
+					switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
 				}
 
 				progress.worked(10);
