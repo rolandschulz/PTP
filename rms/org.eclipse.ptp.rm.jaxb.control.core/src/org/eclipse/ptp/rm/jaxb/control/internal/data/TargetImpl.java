@@ -22,7 +22,7 @@ import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.IAssign;
 import org.eclipse.ptp.rm.jaxb.control.internal.IMatchable;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.control.internal.utils.TokenizerLogger;
+import org.eclipse.ptp.rm.jaxb.control.internal.utils.DebuggingLogger;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
@@ -235,10 +235,10 @@ public class TargetImpl implements IMatchable {
 	public synchronized void postProcess() throws Throwable {
 		if (refTarget == null) {
 			if (JAXBControlConstants.PROPERTY.equals(type)) {
-				TokenizerLogger.getLogger().logPropertyInfo(Messages.TargetImpl_0 + targets.size() + Messages.TargetImpl_1);
+				DebuggingLogger.getLogger().logPropertyInfo(Messages.TargetImpl_0 + targets.size() + Messages.TargetImpl_1);
 				mergeProperties(targets);
 			} else if (JAXBControlConstants.ATTRIBUTE.equals(type)) {
-				TokenizerLogger.getLogger().logPropertyInfo(Messages.TargetImpl_2 + targets.size() + Messages.TargetImpl_3);
+				DebuggingLogger.getLogger().logPropertyInfo(Messages.TargetImpl_2 + targets.size() + Messages.TargetImpl_3);
 				mergeAttributes(targets);
 			}
 			if (rmVarMap instanceof RMVariableMap) {
@@ -247,12 +247,12 @@ public class TargetImpl implements IMatchable {
 					runTests(t);
 					if (JAXBControlConstants.PROPERTY.equals(type)) {
 						PropertyType p = (PropertyType) t;
-						TokenizerLogger.getLogger().logPropertyInfo(
+						DebuggingLogger.getLogger().logPropertyInfo(
 								Messages.TargetImpl_4 + p.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP + p.getValue());
 						dmap.put(p.getName(), p);
 					} else if (JAXBControlConstants.ATTRIBUTE.equals(type)) {
 						AttributeType a = (AttributeType) t;
-						TokenizerLogger.getLogger().logPropertyInfo(
+						DebuggingLogger.getLogger().logPropertyInfo(
 								Messages.TargetImpl_6 + a.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP + a.getValue());
 						dmap.put(a.getName(), a);
 					}

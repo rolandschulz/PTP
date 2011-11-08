@@ -412,14 +412,15 @@ public class CommandJob extends Job implements ICommandJob {
 		attrMgr = new AttributeManager();
 		attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
 
-		AttributeType attr = (AttributeType) vars.get(JAXBControlConstants.MPI_NUMPROCS);
-		String numProcsStr = String.valueOf(attr.getValue());
-		int numProcs = Integer.parseInt(numProcsStr);
-		BitSet procRanks = new BitSet(numProcs);
-		procRanks.set(0, numProcs, true);
-		job.addProcessesByJobRanks(procRanks, attrMgr);
-
-		prm.addJobs(null, Arrays.asList(job));
+		AttributeType attr = (AttributeType) vars.get(JAXBControlConstants.MPI_CORES);
+		if (attr != null) {
+			String numProcsStr = String.valueOf(attr.getValue());
+			int numProcs = Integer.parseInt(numProcsStr);
+			BitSet procRanks = new BitSet(numProcs);
+			procRanks.set(0, numProcs, true);
+			job.addProcessesByJobRanks(procRanks, attrMgr);
+			prm.addJobs(null, Arrays.asList(job));
+		}
 
 		/*
 		 * Listen for job change events to cleanup model

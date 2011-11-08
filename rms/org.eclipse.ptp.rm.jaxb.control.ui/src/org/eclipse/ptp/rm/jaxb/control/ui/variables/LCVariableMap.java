@@ -73,6 +73,7 @@ public class LCVariableMap implements IVariableMap {
 		}
 
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DIRECTORY);
+		configuration.removeAttribute(rmPrefix + JAXBControlConstants.PTP_DIRECTORY);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.EXEC_PATH);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.EXEC_DIR);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.PROG_ARGS);
@@ -83,6 +84,11 @@ public class LCVariableMap implements IVariableMap {
 		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.DIRECTORY, attr);
 		}
+		String ptp_dir = JAXBControlConstants.ECLIPSESETTINGS;
+		if (!JAXBControlConstants.ZEROSTR.equals(cdir)) {
+			ptp_dir = new Path(cdir).append(JAXBControlConstants.ECLIPSESETTINGS).toString();
+		}
+		configuration.setAttribute(rmPrefix + JAXBControlConstants.PTP_DIRECTORY, ptp_dir);
 		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR);
 		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.EXEC_PATH, attr);

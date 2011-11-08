@@ -271,7 +271,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			return null;
 		}
 
-		updatePropertyValuesFromTab(configuration, null);
+		updatePropertyValues(configuration, null);
 
 		Object changedValue = null;
 
@@ -560,9 +560,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.put(uuid, p);
 
 		/*
-		 * overwrite property/attribute values based on user choices
+		 * Overwrite property/attribute values based on user choices. Note that the launch can also modify attributes.
 		 */
-		updatePropertyValuesFromTab(configuration, progress.newChild(5));
+		updatePropertyValues(configuration, progress.newChild(5));
 
 		/*
 		 * process script
@@ -1052,7 +1052,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @throws CoreException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+	private void updatePropertyValues(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 40);
 
 		setFixedConfigurationProperties(progress.newChild(10));
@@ -1105,6 +1105,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_ARGS, JAXBControlConstants.DEBUGGER_ARGS, lcattr);
+		rmVarMap.overwrite(JAXBControlConstants.PTP_DIRECTORY, JAXBControlConstants.PTP_DIRECTORY, lcattr);
 
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));

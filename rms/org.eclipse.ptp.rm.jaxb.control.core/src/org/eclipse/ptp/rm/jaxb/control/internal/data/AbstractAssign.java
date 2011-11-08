@@ -22,7 +22,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.IAssign;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.control.internal.utils.TokenizerLogger;
+import org.eclipse.ptp.rm.jaxb.control.internal.utils.DebuggingLogger;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AddType;
@@ -261,10 +261,10 @@ public abstract class AbstractAssign implements IAssign {
 		Object[] value = getValue(previous, values);
 		set(target, field, value);
 		index++;
-		TokenizerLogger.getLogger().logActionInfo(
+		DebuggingLogger.getLogger().logActionInfo(
 				Messages.AbstractAssign_0 + this + Messages.AbstractAssign_1 + target + Messages.AbstractAssign_2 + field
 						+ Messages.AbstractAssign_3 + Arrays.asList(value));
-		TokenizerLogger.getLogger().logActionInfo(this + Messages.AbstractAssign_4 + index);
+		DebuggingLogger.getLogger().logActionInfo(this + Messages.AbstractAssign_4 + index);
 	}
 
 	/**

@@ -11,7 +11,9 @@
  *****************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
@@ -30,6 +32,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.control.internal.utils.DebuggingLogger;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
@@ -66,7 +69,7 @@ public class SimpleCommandJob extends Job {
 	 *            the calling resource manager
 	 */
 	public SimpleCommandJob(String uuid, SimpleCommandType command, String directory, IJAXBResourceManager rm) {
-		super(command.getName() != null ? command.getName() : "simple"); //$NON-NLS-1$
+		super(command.getName() != null ? command.getName() : "Simple Command"); //$NON-NLS-1$
 		fUuid = uuid;
 		fCommand = command;
 		fDirectory = command.getDirectory() != null ? command.getDirectory() : directory;
@@ -163,6 +166,38 @@ public class SimpleCommandJob extends Job {
 				fActive = true;
 			}
 			progress.worked(20);
+
+			if (DebuggingLogger.getLogger().getCommandOutput()) {
+				final BufferedReader stdout = new BufferedReader(new InputStreamReader(fProcess.getInputStream()));
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							String output;
+							while ((output = stdout.readLine()) != null) {
+								DebuggingLogger.getLogger().logCommandOutput(getName() + ": " + output); //$NON-NLS-1$
+							}
+							stdout.close();
+						} catch (IOException e) {
+							// Ignore
+						}
+					}
+				}, getName() + " stdout").start(); //$NON-NLS-1$
+
+				final BufferedReader stderr = new BufferedReader(new InputStreamReader(fProcess.getErrorStream()));
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							String output;
+							while ((output = stderr.readLine()) != null) {
+								DebuggingLogger.getLogger().logCommandOutput(getName() + ": " + output); //$NON-NLS-1$
+							}
+							stderr.close();
+						} catch (IOException e) {
+							// Ignore
+						}
+					}
+				}, getName() + " stderr").start(); //$NON-NLS-1$
+			}
 
 			int exit = 0;
 
