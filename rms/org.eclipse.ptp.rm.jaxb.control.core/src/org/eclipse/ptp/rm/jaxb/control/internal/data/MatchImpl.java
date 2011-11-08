@@ -16,7 +16,7 @@ import java.util.List;
 import org.eclipse.ptp.rm.jaxb.control.data.RegexImpl;
 import org.eclipse.ptp.rm.jaxb.control.internal.IAssign;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.control.internal.utils.TokenizerLogger;
+import org.eclipse.ptp.rm.jaxb.control.internal.utils.DebuggingLogger;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
@@ -84,18 +84,18 @@ public class MatchImpl {
 		int end = 0;
 		String[] tokens = null;
 
-		TokenizerLogger.getLogger().logSegmentInfo(Messages.MatchImpl_0 + sequence);
-		TokenizerLogger.getLogger().logSegmentInfo(
+		DebuggingLogger.getLogger().logSegmentInfo(Messages.MatchImpl_0 + sequence);
+		DebuggingLogger.getLogger().logSegmentInfo(
 				Messages.MatchImpl_1 + regex.getExpression() + Messages.MatchImpl_2 + regex.getFlags());
 
 		if (regex == null) {
 			matched = true;
-			TokenizerLogger.getLogger().logMatchInfo(Messages.MatchImpl_3);
+			DebuggingLogger.getLogger().logMatchInfo(Messages.MatchImpl_3);
 			return sequence.length();
 		} else {
 			tokens = regex.getMatched(sequence);
 			if (tokens == null) {
-				TokenizerLogger.getLogger().logMatchInfo(Messages.MatchImpl_4);
+				DebuggingLogger.getLogger().logMatchInfo(Messages.MatchImpl_4);
 				return end;
 			}
 			/*
@@ -103,7 +103,7 @@ public class MatchImpl {
 			 */
 			matched = true;
 			end = regex.getLastChar();
-			TokenizerLogger.getLogger().logMatchInfo(Messages.MatchImpl_5 + Arrays.asList(tokens));
+			DebuggingLogger.getLogger().logMatchInfo(Messages.MatchImpl_5 + Arrays.asList(tokens));
 		}
 
 		if (target == null || assign == null) {

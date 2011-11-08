@@ -23,11 +23,11 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
  * @author arossi
  * 
  */
-public class TokenizerLogger {
+public class DebuggingLogger {
 
-	private static TokenizerLogger instance;
+	private static DebuggingLogger instance;
 
-	public synchronized static TokenizerLogger getLogger() {
+	public synchronized static DebuggingLogger getLogger() {
 		if (instance == null) {
 			initialize();
 		}
@@ -35,21 +35,23 @@ public class TokenizerLogger {
 	}
 
 	public synchronized static void initialize() {
-		instance = new TokenizerLogger();
+		instance = new DebuggingLogger();
 	}
 
 	private PrintWriter out;
 
-	private final boolean segment;
-	private final boolean match;
-	private final boolean action;
-	private final boolean properties;
+	private final boolean fSegment;
+	private final boolean fMatch;
+	private final boolean fAction;
+	private final boolean fProperties;
+	private final boolean fCommandOutput;
 
-	private TokenizerLogger() {
-		segment = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN);
-		match = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.MATCH_STATUS);
-		action = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS);
-		properties = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES);
+	private DebuggingLogger() {
+		fSegment = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN);
+		fMatch = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.MATCH_STATUS);
+		fAction = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS);
+		fProperties = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES);
+		fCommandOutput = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.COMMAND_OUTPUT);
 		String path = Preferences.getString(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.LOG_FILE);
 		if (out != null) {
 			out.flush();
@@ -67,29 +69,56 @@ public class TokenizerLogger {
 		}
 	}
 
+	public boolean getActionInfo() {
+		return fAction;
+	}
+
+	public boolean getCommandOutput() {
+		return fCommandOutput;
+	}
+
+	public boolean getMatch() {
+		return fMatch;
+	}
+
+	public boolean getProperties() {
+		return fProperties;
+	}
+
+	public boolean getSegment() {
+		return fSegment;
+	}
+
 	public void logActionInfo(String message) {
-		if (action) {
+		if (fAction) {
+			out.println(message);
+			out.flush();
+		}
+	}
+
+	public void logCommandOutput(String message) {
+		if (fCommandOutput) {
 			out.println(message);
 			out.flush();
 		}
 	}
 
 	public void logMatchInfo(String message) {
-		if (match) {
+		if (fMatch) {
 			out.println(message);
 			out.flush();
 		}
 	}
 
 	public void logPropertyInfo(String message) {
-		if (properties) {
+		if (fProperties) {
 			out.println(message);
 			out.flush();
 		}
 	}
 
 	public void logSegmentInfo(String message) {
-		if (segment) {
+		if (fSegment) {
 			out.println(message);
 			out.flush();
 		}
