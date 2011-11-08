@@ -13,9 +13,12 @@
 package org.eclipse.ptp.remotetools.internal.ssh;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -58,9 +61,25 @@ public class Connection implements IRemoteConnection {
 		}
 
 		ConnectionSlot(Session session, int initialLoad) {
+			assert(initialLoad<=ConnectionProperties.maxChannelsPerConnection);
 			this.session = session;
 			this.numberUsedChannels = initialLoad;
 		}
+		
+		/* Acquire right to create channel */
+		synchronized boolean acquire() {
+			if (numberUsedChannels < ConnectionProperties.maxChannelsPerConnection) {
+				numberUsedChannels++;
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
+		void release() {
+			numberUsedChannels--;
+		}
+		
 	}
 
 /**
@@ -156,7 +175,7 @@ public class Connection implements IRemoteConnection {
 	/**
 	 * Tunnels to remote host.
 	 */
-	private final Set<RemoteTunnel> tunnels = new HashSet<RemoteTunnel>();
+	private final Set<RemoteTunnel> tunnels = Collections.synchronizedSet(new HashSet<RemoteTunnel>());
 
 	/**
 	 * sftp channel pool shared by all executions managers and file tools.
@@ -188,12 +207,12 @@ public class Connection implements IRemoteConnection {
 	/**
 	 * Array of all connections and how many pty channels were used.
 	 */
-	private final ArrayList<ConnectionSlot> connectionPool = new ArrayList<ConnectionSlot>();
+	private final List<ConnectionSlot> connectionPool = Collections.synchronizedList(new ArrayList<ConnectionSlot>());
 
 	/**
 	 * Maps a channel to the connection where it was created.
 	 */
-	private final HashMap<Channel, ConnectionSlot> channelToConnectioPool = new HashMap<Channel, ConnectionSlot>();
+	private final Map<Channel, ConnectionSlot> channelToConnectioPool = Collections.synchronizedMap(new HashMap<Channel, ConnectionSlot>());
 
 	/**
 	 * Locks used on synchronized operations.
@@ -610,13 +629,15 @@ public class Connection implements IRemoteConnection {
 			 */
 			ConnectionSlot suggestedSlot = null;
 			for (ConnectionSlot slot : connectionPool) {
-				if (slot.numberUsedChannels < ConnectionProperties.maxChannelsPerConnection) {
+				if (slot.acquire()) {
 					suggestedSlot = slot;
 					break;
 				}
 			}
 			if (suggestedSlot == null) {
 				suggestedSlot = createConnectionSlot();
+				boolean isAcquired = suggestedSlot.acquire(); 
+				assert isAcquired;   // a new connectionSlot should always have a free channel
 			}
 			/*
 			 * Create the channel and update the pool.
@@ -625,9 +646,10 @@ public class Connection implements IRemoteConnection {
 			try {
 				channel = (ChannelExec) suggestedSlot.session.openChannel("exec"); //$NON-NLS-1$
 			} catch (JSchException e) {
+				suggestedSlot.release();
 				throw new RemoteConnectionException(Messages.Connection_CreateExecChannel_FailedCreateNewExecChannel, e);
 			}
-			suggestedSlot.numberUsedChannels++;
+			
 			channelToConnectioPool.put(channel, suggestedSlot);
 			return channel;
 		} else {
@@ -720,7 +742,7 @@ public class Connection implements IRemoteConnection {
 		channel.disconnect();
 		ConnectionSlot slot = channelToConnectioPool.remove(channel);
 		if (slot != null) {
-			slot.numberUsedChannels--;
+			slot.release();
 		}
 	}
 
