@@ -108,13 +108,13 @@
 										<zip basedir="${project.build.directory}/checksumFix" destfile="${ptp-install}/org.eclipse.ptp.repo.${unqualifiedVersion}.${buildQualifier}.zip" />
 										<copy todir="${ptp-install}">
 											<fileset dir="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars">
-												<filename name="rdt-server-aix-${unqualifiedVersion}.tar" />
-												<filename name="rdt-server-linux-${unqualifiedVersion}.tar" />
-												<filename name="rdt-server-linux.ppc-${unqualifiedVersion}.tar" />
-												<filename name="rdt-server-linux.x86-${unqualifiedVersion}.tar" />
-												<filename name="rdt-server-macosx-${unqualifiedVersion}.tar" />
-												<filename name="rdt-server-unix-${unqualifiedVersion}.tar" />
-												<filename name="rdt-server-windows-${unqualifiedVersion}.zip" />
+												<include name="rdt-server-aix-${unqualifiedVersion}.tar" />
+												<include name="rdt-server-linux-${unqualifiedVersion}.tar" />
+												<include name="rdt-server-linux.ppc-${unqualifiedVersion}.tar" />
+												<include name="rdt-server-linux.x86-${unqualifiedVersion}.tar" />
+												<include name="rdt-server-macosx-${unqualifiedVersion}.tar" />
+												<include name="rdt-server-unix-${unqualifiedVersion}.tar" />
+												<include name="rdt-server-windows-${unqualifiedVersion}.zip" />
 											</fileset>
 										</copy>
 										<unzip src="${basedir}/../../releng/org.eclipse.ptp.aix.ppc/target/org.eclipse.ptp.aix.ppc-${project.version}.jar"
