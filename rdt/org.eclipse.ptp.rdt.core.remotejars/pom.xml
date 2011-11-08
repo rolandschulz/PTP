@@ -12,7 +12,7 @@
 	</parent>
 
 	<artifactId>org.eclipse.ptp.rdt.core.remotejars</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>6.0.0-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 
 	<profiles>
@@ -68,6 +68,7 @@
 							<tasks>
 								<ant target="server.all">
 									<property name="serverVersion" value="${unqualifiedVersion}"/>
+									<property name="buildQualifier" value="${buildQualifier}"/>
 								</ant>
 							</tasks>
 						</configuration>
@@ -83,6 +84,7 @@
 							<tasks>
 								<ant target="clean">
 									<property name="serverVersion" value="${unqualifiedVersion}"/>
+									<property name="buildQualifier" value="${buildQualifier}"/>
 								</ant>
 							</tasks>
 						</configuration>

@@ -13,13 +13,17 @@
 <!--
  Script for generating the RDT remote server packages.  
  NOTE: This script will no longer work with PDE build
+ 
+ serverVersion and buildQualifier must be passed via maven-antrun-plugin
+ 
+ These properties are derived from the plugin manifest version in the pom.xml, 
+ so the plugin version must be the same as the server version.
 -->
 
 <project name="RDT Remote JARs" default="server.all" basedir=".">
 	<tstamp/>
 	<property name="serverBaseName" value="rdt-server"/>
 	<property name="serverJar" value="${basedir}/${serverBaseName}"/>
-	<property name="serverVersion" value="6.0.0"/>
 	
 	<property name="stylesheet" value="${basedir}/jardesc.xsl"/>
 	<property name="downloads" value="${basedir}/downloads"/>
@@ -60,7 +64,6 @@
 
 	<property name="lpgRuntimeVersion" value="1.1.0.v201004271650"/>
 	<property name="lpgRuntimeJar" value="net.sourceforge.lpg.lpgjavaruntime_${lpgRuntimeVersion}.jar"/>
-	
 	
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
 	
@@ -567,7 +570,7 @@ export serverpath CLASSPATH LIBPATH
 		</copy>
 		
 		<touch file="${remoteServerTempDir}/rdtserver_version.dat"/>
-		<concat destfile="${remoteServerTempDir}/rdtserver_version.dat">${serverVersion}-${timestamp}</concat>
+		<concat destfile="${remoteServerTempDir}/rdtserver_version.dat">${serverVersion}-${buildQualifier}</concat>
 		
 		<!--Create empty URICreator.dat file-->
 		<touch file="${remoteServerTempDir}/URICreator.dat"/>
@@ -621,9 +624,6 @@ export serverpath CLASSPATH LIBPATH
 				<include name="rdt-server/**/*"/>
 			</tarfileset>
 		</tar>
-		
-		<!--copy file="${serverJar}-${platform}-${serverVersion}.tar" 
-			todir="${copyToDir}"/-->
 				
 		<delete dir="${remoteServerTempDir}"/>
 	</target>
@@ -637,9 +637,6 @@ export serverpath CLASSPATH LIBPATH
 				<include name="rdt-server/**/*"/>
 			</fileset>
 		</zip>
-		
-		<!--copy file="${serverJar}-${platform}-${serverVersion}.zip" 
-			todir="${copyToDir}"/-->
 		
 		<delete dir="${remoteServerTempDir}"/>
 	</target>
