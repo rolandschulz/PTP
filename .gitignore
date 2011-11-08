@@ -1,6 +1,5 @@
 bin
 build
-eclipse
 *.o
 *.a
 .deps
