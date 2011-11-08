@@ -16,6 +16,7 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.jaxb.ui.messages.messages"; //$NON-NLS-1$
 
 	public static String JAXBRMConfigurationImportWizard_createResourceManagersProject;
+
 	public static String InvalidConfiguration;
 	public static String InvalidConfiguration_title;
 	public static String ConfigurationImportWizardTitle;
@@ -25,8 +26,9 @@ public class Messages extends NLS {
 	public static String ConfigurationImportWizardPageLabel;
 	public static String ResourceManagersNotExist_title;
 
-	public static String Preferences_options;
-	public static String Debug_options;
+	public static String JAXBRMPreferencesPage_Preferences_options;
+	public static String JAXBRMPreferencesPage_ParserDebug_options;
+	public static String JAXBRMPreferencesPage_CommandDebug_options;
 
 	static {
 		// initialize resource bundle

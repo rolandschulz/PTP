@@ -29,7 +29,8 @@ public class Messages extends NLS {
 	public static String ShowMatchStatus;
 	public static String ShowActionsForMatch;
 	public static String ShowCreatedProperties;
-	public static String TokenizerLog;
+	public static String ShowCommandOutput;
+	public static String LogFile;
 
 	static {
 		// initialize resource bundle
