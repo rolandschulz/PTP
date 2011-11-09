@@ -132,6 +132,8 @@ public class Messages extends NLS {
 	public static String GemPreferencePage_8;
 	public static String GemPreferencePage_9;
 	public static String GemPreferencePage_10;
+	public static String GemUtilities_0;
+
 	public static String GemUtilities_1;
 	public static String GemUtilities_10;
 	public static String GemUtilities_11;

@@ -553,7 +553,7 @@ public class GemUtilities {
 						break;
 					}
 				} else {
-					showErrorDialog("Project URI was NULL");
+					showErrorDialog(Messages.GemUtilities_0);
 				}
 			}
 		}
