@@ -150,9 +150,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			try {
 				IResourceManager rm = fLaunch.getResourceManager();
 				String jobId = fLaunch.getJobId();
+				IJobStatus status;
+
 				fSubLock.lock();
 				try {
-					while (rm.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
+					while ((status = rm.getJobStatus(jobId, subMon.newChild(50))).getState().equals(IJobStatus.SUBMITTED)
 							&& !subMon.isCanceled()) {
 						try {
 							fSubCondition.await(100, TimeUnit.MILLISECONDS);
@@ -164,7 +166,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 					fSubLock.unlock();
 				}
 
-				if (!subMon.isCanceled()) {
+				/*
+				 * If job state is COMPLETED, only complete the launch if the job state detail is not FAILED or CANCELLED. This
+				 * prevents the debugger staring if the job fails or is cancelled.
+				 */
+				if (!subMon.isCanceled()
+						&& (!status.getState().equals(IJobStatus.COMPLETED) || (!status.getStateDetail().equals(IJobStatus.FAILED) && !status
+								.getStateDetail().equals(IJobStatus.CANCELED)))) {
 					doCompleteJobLaunch(fLaunch, fDebugger);
 
 					fSubLock.lock();
@@ -193,21 +201,21 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						} catch (CoreException e) {
 							PTPLaunchPlugin.log(e);
 						}
+					}
+				}
 
-						/*
-						 * Clean up any launch activities.
-						 */
-						doCleanupLaunch(fLaunch);
+				/*
+				 * Clean up any launch activities.
+				 */
+				doCleanupLaunch(fLaunch);
 
-						/*
-						 * Remove job submission
-						 */
-						synchronized (jobSubmissions) {
-							jobSubmissions.remove(jobId);
-							if (jobSubmissions.size() == 0) {
-								rm.removeJobListener(fJobListener);
-							}
-						}
+				/*
+				 * Remove job submission
+				 */
+				synchronized (jobSubmissions) {
+					jobSubmissions.remove(jobId);
+					if (jobSubmissions.size() == 0) {
+						rm.removeJobListener(fJobListener);
 					}
 				}
 				return Status.OK_STATUS;

@@ -43,7 +43,6 @@ import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
-import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.launch.internal.PreferenceConstants;
 import org.eclipse.ptp.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.launch.messages.Messages;
@@ -169,10 +168,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 
 			try {
 				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-					/*
-					 * Show ptp debug view
-					 */
-					showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 					progress.subTask(Messages.ParallelLaunchConfigurationDelegate_6);
 
 					/*
