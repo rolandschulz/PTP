@@ -401,13 +401,21 @@ public class CommandJob extends Job implements ICommandJob {
 	 */
 	private void createDebugModel(String jobId, IResourceManager rm, IVariableMap vars) {
 		IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
-		AttributeManager attrMgr = new AttributeManager();
 
+		/*
+		 * Remove any old jobs with the same job ID
+		 */
+		IPJob job = prm.getJobById(jobId);
+		if (job != null) {
+			prm.removeJobs(Arrays.asList(job));
+		}
+
+		AttributeManager attrMgr = new AttributeManager();
 		attrMgr.addAttribute(JobAttributes.getJobIdAttributeDefinition().create(jobId));
 		attrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(JobAttributes.State.RUNNING));
 		attrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 
-		IPJob job = prm.newJob(jobId, attrMgr);
+		job = prm.newJob(jobId, attrMgr);
 
 		attrMgr = new AttributeManager();
 		attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
@@ -834,7 +842,11 @@ public class CommandJob extends Job implements ICommandJob {
 				ICommandJob job = control.getInteractiveJob();
 				if (job != null && job.isActive()) {
 					IRemoteProcess process = job.getProcess();
-					if (process != null && !process.isCompleted()) {
+					/*
+					 * Do not allow relaunching debugger. This can't be easily supported currently since the debugger assumes each
+					 * launch will have a unique job ID.
+					 */
+					if (process != null && !process.isCompleted() && !launchMode.equals(ILaunchManager.DEBUG_MODE)) {
 						jobStatus = job.getJobStatus();
 						return writeInputToProcess(process);
 					} else {
@@ -938,36 +950,39 @@ public class CommandJob extends Job implements ICommandJob {
 				if (input) {
 					if (process != null && !process.isCompleted()) {
 						status = writeInputToProcess(process);
+
+						if (status.isOK() && launchMode.equals(ILaunchManager.DEBUG_MODE)) {
+							createDebugModel(jobStatus.getJobId(), rm, rmVarMap);
+						}
+					}
+				}
+
+				if (status.isOK()) {
+					/*
+					 * Once job has started running, execute any post launch commands
+					 */
+					for (SimpleCommandType cmd : command.getPostLaunchCmd()) {
+						Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), rm);
+						job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
+						job.schedule();
+						if (cmd.isWait()) {
+							try {
+								job.join();
+								if (!cmd.isIgnoreExitStatus()) {
+									if (!job.getResult().isOK()) {
+										terminate();
+										status = job.getResult();
+									}
+								}
+							} catch (InterruptedException ignored) {
+							}
+						}
 					}
 				}
 			} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
 				terminate();
 			}
 
-			if (launchMode.equals(ILaunchManager.DEBUG_MODE)) {
-				createDebugModel(jobStatus.getJobId(), rm, rmVarMap);
-			}
-
-			/*
-			 * Once job has started running, execute any nested commands
-			 */
-			for (SimpleCommandType cmd : command.getPostLaunchCmd()) {
-				Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), rm);
-				job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
-				job.schedule();
-				if (cmd.isWait()) {
-					try {
-						job.join();
-						if (!cmd.isIgnoreExitStatus()) {
-							if (!job.getResult().isOK()) {
-								terminate();
-								// return job.getResult();
-							}
-						}
-					} catch (InterruptedException ignored) {
-					}
-				}
-			}
 		} finally {
 			if (monitor != null) {
 				monitor.done();
