@@ -409,8 +409,18 @@ public class GemUtilities {
 	/**
 	 * Returns the current project being verified.
 	 * 
+	 * @param resoruce The active resource from the current project.
+	 * @return The current project being verified.
+	 */
+	public static IProject getCurrentProject(IResource resource) {
+		return resource.getProject();
+	}
+	
+	/**
+	 * Returns the current project being verified.
+	 * 
 	 * @param none
-	 * @return The current project being verified,
+	 * @return The current project being verified.
 	 */
 	public static IProject getCurrentProject() {
 		return gemActiveResource.getProject();
@@ -529,7 +539,7 @@ public class GemUtilities {
 		IRemoteConnectionManager connectionManager = null;
 		IRemoteConnection[] connections = null;
 
-		final IProject project = getCurrentProject();
+		final IProject project = getCurrentProject(gemActiveResource);
 
 		if (service != null) {
 			connectionManager = service.getConnectionManager();
@@ -919,12 +929,12 @@ public class GemUtilities {
 	//
 	private static boolean isRemoteBuildConfiguration() {
 
-		final IProject project = getCurrentProject();
+		final IProject project = getCurrentProject(gemActiveResource);
 		final IConfiguration configuration = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
 		String buildLocation = null;
 		buildLocation = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration).getLocation();
 		// BuildConfigurationManager.getInstance().getActiveSyncLocationURI(gemInputResource).getPath();
-		final String projectLocation = gemActiveResource.getProject().getLocationURI().getPath();
+		final String projectLocation = project.getLocationURI().getPath();
 
 		return !buildLocation.equals(projectLocation);
 	}
@@ -959,7 +969,7 @@ public class GemUtilities {
 	public static boolean isSynchronizedProject() {
 		boolean isSync = false;
 		try {
-			isSync = getCurrentProject().hasNature(RemoteSyncNature.NATURE_ID);
+			isSync = getCurrentProject(gemActiveResource).hasNature(RemoteSyncNature.NATURE_ID);
 		} catch (final CoreException e) {
 			GemUtilities.logExceptionDetail(e);
 		}
@@ -975,7 +985,7 @@ public class GemUtilities {
 		final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
 		final String processName = pstore.getString(PreferenceConstants.GEM_PREF_PROCESS_NAME);
 		final String command = "pkill " + processName; //$NON-NLS-1$
-		final IProject currentProject = getCurrentProject();
+		final IProject currentProject = getCurrentProject(gemActiveResource);
 		final boolean isRemote = isRemoteProject() || (isSynchronizedProject() && isRemoteBuildConfiguration());
 
 		if (isRemote) {
@@ -1102,7 +1112,7 @@ public class GemUtilities {
 	public static int runCommand(String command, boolean verbose) {
 
 		// Find out if the current project is local or remote
-		final IProject currentProject = getCurrentProject();
+		final IProject currentProject = getCurrentProject(gemActiveResource);
 		final boolean isRemote = isRemoteProject() || (isSynchronizedProject() && isRemoteBuildConfiguration());
 
 		try {
@@ -1364,7 +1374,7 @@ public class GemUtilities {
 	//
 	private static void sync() {
 		final IProgressMonitor monitor = new NullProgressMonitor();
-		final IProject project = getCurrentProject();
+		final IProject project = getCurrentProject(gemActiveResource);
 		try {
 			SyncManager.syncBlocking(null, project, SyncFlag.FORCE, monitor);
 		} catch (final CoreException e) {
