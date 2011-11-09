@@ -972,10 +972,9 @@ public class GemUtilities {
 		final String processName = pstore.getString(PreferenceConstants.GEM_PREF_PROCESS_NAME);
 		final String command = "pkill " + processName; //$NON-NLS-1$
 		final IProject currentProject = getCurrentProject();
-		final boolean isRemoteProject = isRemoteProject();
-		;
+		final boolean isRemote = isRemoteProject() || isSynchronizedProject();
 
-		if (isRemoteProject) {
+		if (isRemote) {
 			final String[] args = command.split(" ", -1); //$NON-NLS-1$
 			final IRemoteProcessBuilder rpb = getRemoteProcessBuilder(currentProject, args);
 			try {
