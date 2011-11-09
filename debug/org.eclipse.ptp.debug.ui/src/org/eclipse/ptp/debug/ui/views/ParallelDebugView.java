@@ -493,9 +493,10 @@ public class ParallelDebugView extends ParallelJobsView {
 			IStructuredSelection structSelection = (IStructuredSelection) selection;
 			if (structSelection.size() == 1 && structSelection.getFirstElement() instanceof IElement) {
 				IElement element = (IElement) structSelection.getFirstElement();
-				if (element.isRegistered()) {
+				IPJob job = getJobManager().getJob();
+				if (job != null && element.isRegistered()) {
 					try {
-						focusOnDebugTarget(getJobManager().getJob().getID(), Integer.parseInt(element.getName()));
+						focusOnDebugTarget(job.getID(), Integer.parseInt(element.getName()));
 					} catch (NumberFormatException e) {
 						// The element name had better be the process number
 					}
