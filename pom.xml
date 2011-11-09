@@ -235,14 +235,9 @@
 			<url>${tm-site}</url>
 			<layout>p2</layout>
 		</repository>
-		<repository>
-			<id>indigo</id>
-			<url>http://download.eclipse.org/releases/indigo</url>
-			<layout>p2</layout>
-		</repository>
 	</repositories>
 
-	<pluginRepositories>
+	<!--pluginRepositories>
 		<pluginRepository>
 			<id>sonatype</id>
 			<url>https://repository.sonatype.org/content/repositories/public</url>
@@ -257,7 +252,7 @@
 			<id>maven.eclipse.org</id>
 			<url>http://maven.eclipse.org/nexus/content/repositories/nightly-indigo</url>
 		</pluginRepository>
-	</pluginRepositories>
+	</pluginRepositories-->
 
 	<build>
 		<plugins>
