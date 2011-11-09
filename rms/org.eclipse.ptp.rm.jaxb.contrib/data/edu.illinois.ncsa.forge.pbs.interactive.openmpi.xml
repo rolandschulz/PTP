@@ -181,7 +181,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</match>
 				</target>
 			</stderr-parser>
-			<post-launch-cmd exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
+			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
 		</submit-interactive-debug>
 		<get-job-status name="get-job-status" ignoreExitStatus="true">
 			<arg>${ptp_rm:bindir#value}qstat</arg>
