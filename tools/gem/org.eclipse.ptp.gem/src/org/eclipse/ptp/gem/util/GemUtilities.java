@@ -68,6 +68,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
@@ -409,21 +410,22 @@ public class GemUtilities {
 	/**
 	 * Returns the current project being verified.
 	 * 
-	 * @param resoruce The active resource from the current project.
-	 * @return The current project being verified.
-	 */
-	public static IProject getCurrentProject(IResource resource) {
-		return resource.getProject();
-	}
-	
-	/**
-	 * Returns the current project being verified.
-	 * 
 	 * @param none
 	 * @return The current project being verified.
 	 */
 	public static IProject getCurrentProject() {
 		return gemActiveResource.getProject();
+	}
+
+	/**
+	 * Returns the current project being verified.
+	 * 
+	 * @param resoruce
+	 *            The active resource from the current project.
+	 * @return The current project being verified.
+	 */
+	public static IProject getCurrentProject(IResource resource) {
+		return resource.getProject();
 	}
 
 	/**
@@ -567,6 +569,16 @@ public class GemUtilities {
 				}
 			}
 		}
+
+		// Open the connection if it's closed
+		if (currentConnection != null && !currentConnection.isOpen()) {
+			try {
+				currentConnection.open(null);
+			} catch (final RemoteConnectionException e) {
+				logExceptionDetail(e);
+			}
+		}
+
 		return currentConnection;
 	}
 
