@@ -584,7 +584,7 @@ public class GemAnalyzer extends ViewPart {
 					public void widgetSelected(SelectionEvent e) {
 						if (GemAnalyzer.this.transitions.hasPreviousInterleaving()) {
 							while (GemAnalyzer.this.transitions.setPreviousInterleaving()) {
-								;
+								// do nothing
 							}
 							updateTransitionLabels(true);
 						} else {

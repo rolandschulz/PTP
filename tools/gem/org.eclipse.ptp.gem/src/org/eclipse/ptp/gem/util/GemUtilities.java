@@ -546,10 +546,14 @@ public class GemUtilities {
 					e.printStackTrace();
 				}
 				final String addr = connection.getAddress();
-				final String host = projectURI.getHost();
-				if (host.equals(addr.substring(0, addr.indexOf(".")))) { //$NON-NLS-1$
-					currentConnection = connection;
-					break;
+				if (projectURI != null) {
+					final String host = projectURI.getHost();
+					if (host.equals(addr.substring(0, addr.indexOf(".")))) { //$NON-NLS-1$
+						currentConnection = connection;
+						break;
+					}
+				} else {
+					showErrorDialog("Project URI was NULL");
 				}
 			}
 		}
