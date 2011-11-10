@@ -145,14 +145,14 @@ public class GemUtilities {
 		taskStatus = TaskStatus.IDLE;
 	}
 
-	//
-	private static void createGemFolder(final boolean remote, final IFolder gemFolder) {
+	// Creates the GEM folder for the log file
+	private static void createGemFolder(final boolean isRemote, final IFolder gemFolder) {
 		try {
 			gemFolder.create(IResource.FORCE, true, null);
 		} catch (final CoreException e) {
 			logExceptionDetail(e);
 		}
-		if (remote) {
+		if (isRemote) {
 			sync();
 		}
 	}
@@ -1383,7 +1383,7 @@ public class GemUtilities {
 		JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	//
+	// Triggers a blocking remote-2-local sync.
 	private static void sync() {
 		final IProgressMonitor monitor = new NullProgressMonitor();
 		final IProject project = getCurrentProject(gemActiveResource);

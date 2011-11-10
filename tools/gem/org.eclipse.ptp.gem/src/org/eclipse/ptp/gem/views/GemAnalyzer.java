@@ -699,7 +699,7 @@ public class GemAnalyzer extends ViewPart {
 				if (inputLocation != null) {
 					path = new Path(inputLocation.getPath());
 				}
-				final IFile file = GemUtilities.getCurrentProject(activeFile).getFile(path.lastSegment());
+				final IFile file = GemUtilities.getCurrentProject(GemAnalyzer.this.activeFile).getFile(path.lastSegment());
 				path = file.getFullPath();
 				final String extension = file.getFileExtension();
 				boolean isSourceFile = false;
