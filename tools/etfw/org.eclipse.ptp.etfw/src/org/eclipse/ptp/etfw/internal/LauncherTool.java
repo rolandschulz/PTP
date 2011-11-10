@@ -112,18 +112,31 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 				testStore=utilBlob.getFile(progPath);
 			}
 			
-			if (testStore != null&&testStore.fetchInfo().exists()&&!testStore.fetchInfo().isDirectory()) {
+			IFileStore progStore=utilBlob.getFile(projectLocation);
+			boolean progStoreGood=false;
+			if(progStore.fetchInfo().exists()){
+				progStore=progStore.getChild(progPath);
+				if(progStore.fetchInfo().exists()){
+					progStoreGood=true;
+				}
+			}
+			else{
+				progStore=null;
+			}
+			
+			if ((testStore != null&&testStore.fetchInfo().exists()&&!testStore.fetchInfo().isDirectory()) || progStoreGood) {
 				
 				savePath = confWC.getAttribute(apppathattrib, (String) null);
 				
 				//IFileStore testStore=utilBlob.getFile(progPath);
-				IFileStore progStore=utilBlob.getFile(projectLocation);
-				if(progStore.fetchInfo().exists()){
-					progStore=progStore.getChild(progPath);
+				//IFileStore progStore=utilBlob.getFile(projectLocation);
+				if(progStoreGood){
+					//progStore=progStore.getChild(progPath);
 					
 					String jaxbAtt=confWC.getAttribute(EXTOOL_JAXB_EXECUTABLE_PATH_TAG, EMPTY_STRING);
-					if(jaxbAtt.length()>0)
-					confWC.setAttribute(jaxbAtt, progStore.toURI().getPath());
+					if(jaxbAtt.length()>0){
+						confWC.setAttribute(jaxbAtt, progStore.toURI().getPath());
+					}
 				}
 				
 				

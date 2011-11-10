@@ -699,7 +699,7 @@ public class GemAnalyzer extends ViewPart {
 				if (inputLocation != null) {
 					path = new Path(inputLocation.getPath());
 				}
-				final IFile file = GemUtilities.getCurrentProject().getFile(path.lastSegment());
+				final IFile file = GemUtilities.getCurrentProject(activeFile).getFile(path.lastSegment());
 				path = file.getFullPath();
 				final String extension = file.getFileExtension();
 				boolean isSourceFile = false;
@@ -1192,7 +1192,8 @@ public class GemAnalyzer extends ViewPart {
 		final StringBuffer stringBuffer = new StringBuffer();
 
 		// determine which ranks are involved; by default only call's rank
-		String ranks = Messages.GemAnalyzer_53 + env.getRank() + newline;
+		String ranks = Messages.GemAnalyzer_53 + env.getRank()
+				+ (System.getProperty("os.name").contains("Windows") ? "\t" : newline); //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
 		if (env.isCollective() && this.lockedRank == -1) {
 
 			// If it was a group call then discover who else is here

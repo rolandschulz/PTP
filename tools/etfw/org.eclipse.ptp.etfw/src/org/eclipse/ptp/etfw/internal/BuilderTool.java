@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
@@ -365,7 +364,8 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		}
 		
 		
-		progPath = newname + File.separator + binary;//TODO: Need to get rid of this file
+		progPath = newname + File.separator + binary;
+		//TODO: Need to get rid of this file
 
 		// TODO: We have to do this because PTP puts its output in the build
 		// directory

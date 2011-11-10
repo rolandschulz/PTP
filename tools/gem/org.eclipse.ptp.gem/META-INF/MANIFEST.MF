@@ -18,4 +18,5 @@ Import-Package: org.eclipse.cdt.core.model,
  org.eclipse.jface.text,
  org.eclipse.ptp.rdt.sync.core,
  org.eclipse.ptp.rdt.sync.core.resources,
- org.eclipse.ptp.remote.core
+ org.eclipse.ptp.remote.core,
+ org.eclipse.ptp.remote.core.exception

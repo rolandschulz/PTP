@@ -113,6 +113,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	 * @param message
 	 *            the message to be displayed at the top of this dialog, or
 	 *            <code>null</code> to display a default message
+	 * @since 4.0
 	 */
 	public PapiListSelectionDialog(Shell parentShell, IFileStore papiloc, IBuildLaunchUtils blt, IStructuredContentProvider contentProvider,
 			ILabelProvider labelProvider, String message, int papiCountType) {
