@@ -183,7 +183,7 @@
                       <optvalue type="toggle" seton="1"/>
                 </togoption>
                 
-                <togoption label="Profile Output Directory" optname="TAU_PROFILEDIR" envvar="true" tooltip="Location of profile output.  Current directory by default.  Changing this may disable automatic profile storage.">
+                <togoption label="Profile Output Directory" optname="PROFILEDIR" envvar="true" tooltip="Location of profile output.  Current directory by default.  Changing this may disable automatic profile storage.">
                       <optvalue type="dir" default="."/>
                 </togoption>
                 
@@ -227,7 +227,7 @@
                       <optvalue type="toggle" seton="1"/>
                 </togoption>
                 
-                <togoption label="Trace Output Directory" optname="TAU_TRACEDIR" envvar="true" tooltip="Location of trace output.  Current directory by default.">
+                <togoption label="Trace Output Directory" optname="TRACEDIR" envvar="true" tooltip="Location of trace output.  Current directory by default.">
                       <optvalue type="dir" default="."/>
                 </togoption>
                 

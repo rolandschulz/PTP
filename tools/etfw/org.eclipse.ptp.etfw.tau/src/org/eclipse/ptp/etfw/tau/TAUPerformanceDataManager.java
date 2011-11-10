@@ -26,12 +26,14 @@ import java.net.URI;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.etfw.AbstractToolDataManager;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
@@ -41,6 +43,7 @@ import org.eclipse.ptp.etfw.internal.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.tau.perfdmf.PerfDMFUIPlugin;
 import org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView;
+import org.eclipse.ptp.etfw.toolopts.ToolsOptionsConstants;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -216,6 +219,19 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 		
 		
 		tbpath=utilBlob.getToolPath(Messages.TAUPerformanceDataManager_0);
+		
+		
+		Map<String, String>saveEnv = configuration.getAttribute("TAU Runtime" + ToolsOptionsConstants.TOOL_PANE_VAR_ID_SUFFIX, (Map<String, String>) null);
+		if(saveEnv!=null){
+			String envDirectory=saveEnv.get("PROFILEDIR");
+			if(envDirectory!=null){
+				IFileStore testDir=utilBlob.getFile(envDirectory);
+				IFileInfo testInfo=testDir.fetchInfo();
+				if(testInfo.exists()&&testInfo.isDirectory()){
+					directory=testDir.toURI().getPath();
+				}
+			}
+		}
 		
 		profiles=getProfiles(directory);
 		xmlFile = utilBlob.getFile(directory).getChild(PROFXML);
