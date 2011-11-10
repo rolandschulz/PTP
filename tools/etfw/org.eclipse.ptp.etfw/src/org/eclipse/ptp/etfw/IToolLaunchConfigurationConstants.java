@@ -41,6 +41,11 @@ public interface IToolLaunchConfigurationConstants {
 	public static final String FILENAME_SWAP = "%%FILENAME%%";
 	
 	/**
+	 * @since 5.0
+	 */
+	public static final String PROJECT_DIR = "%%PROJECT_DIR%%";
+	
+	/**
 	 * ID for boolean: true = keep instrumented executable
 	 */
 	//public static final String NOCLEAN = "keep_instrumented_executable";

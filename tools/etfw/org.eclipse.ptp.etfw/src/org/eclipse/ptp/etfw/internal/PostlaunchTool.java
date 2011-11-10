@@ -53,10 +53,10 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 		}
 		projectLocation = outputLocation = outLoc;
 		
-		String wdir = utilBlob.getWorkingDirectory();
-		if(wdir!=null){
-			outputLocation=wdir;
-		}
+//		String wdir = utilBlob.getWorkingDirectory();
+//		if(wdir!=null){
+//			outputLocation=wdir;
+//		}
 	}
 
 	/**

@@ -33,7 +33,6 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.etfw.AbstractToolDataManager;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
@@ -225,6 +224,9 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 		if(saveEnv!=null){
 			String envDirectory=saveEnv.get("PROFILEDIR");
 			if(envDirectory!=null){
+				if(envDirectory.equals("%%PROJECT_DIR%%")){
+					envDirectory=projectDirectory;
+				}
 				IFileStore testDir=utilBlob.getFile(envDirectory);
 				IFileInfo testInfo=testDir.fetchInfo();
 				if(testInfo.exists()&&testInfo.isDirectory()){

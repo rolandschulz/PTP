@@ -1,8 +1,11 @@
 package org.eclipse.ptp.etfw.internal;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -100,6 +103,8 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 	public boolean performLaunch(LaunchConfigurationDelegate paraDel, ILaunch launch, IProgressMonitor monitor) throws Exception {
 		try {
 
+			String path = null;
+			String prog = null;
 			ILaunchConfigurationWorkingCopy confWC = configuration.getWorkingCopy();
 			application = confWC.getAttribute(appnameattrib, (String) null);
 
@@ -147,7 +152,7 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 				else{
 				confWC.setAttribute(appnameattrib, progPath);
 				if (apppathattrib != null) {
-					String path=null;
+					//String path=null;
 					if(isSyncProject)
 					{
 						path=progStore.toURI().getPath();//outputLocation;
@@ -164,7 +169,7 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 
 			if (tool != null)
 			{
-				String prog = confWC.getAttribute(appnameattrib, EMPTY_STRING);
+				prog = confWC.getAttribute(appnameattrib, EMPTY_STRING);
 				boolean usepathforapp=false;
 				if(prog==null||prog.equals(EMPTY_STRING)){
 					prog = confWC.getAttribute(apppathattrib, EMPTY_STRING);
@@ -219,6 +224,25 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 				}
 
 				if (envMap.size() > 0) {
+					String projectDir=getDirectory(path);
+					if(projectDir==null){
+						projectDir=getDirectory(prog);
+					}
+					if(projectDir==null){
+						projectDir=DOT;
+					}
+					if(projectDir!=null){
+					this.outputLocation=projectDir;
+					Set<String> mapKeys = envMap.keySet();
+					Iterator<String> keyIt = mapKeys.iterator();
+					while(keyIt.hasNext()){
+						String key = keyIt.next();
+						String var = envMap.get(key);
+						if(var.equals(PROJECT_DIR)){
+							envMap.put(key, projectDir);
+						}
+					}
+					}
 					saveEnv = confWC.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map<String, String>) null);
 					Map<String, String> newvars = null;
 					if (saveEnv != null)
@@ -258,6 +282,30 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 		}
 	}
 
+	/**
+	 * Given a string which may be a valid path, returns the last directory in the path, or null if it is not a path.
+	 * @param path
+	 * @return
+	 */
+	private String getDirectory(String path){
+		String projectDir=null;
+		IFileStore pdStore=null;
+		IFileInfo pdInfo=null;
+		if(path!=null)
+		{	
+			pdStore = utilBlob.getFile(path);
+			pdInfo = pdStore.fetchInfo();
+			if(pdInfo.exists()){
+				if(!pdInfo.isDirectory()){
+					pdStore=pdStore.getParent();
+				}
+				projectDir=pdStore.toURI().getPath();
+			}
+		}
+		
+		return projectDir;
+	}
+	
 	/**
 	 * Restore the previous default build configuration and optionally remove
 	 * the performance tool's build configuration Restore the previous launch
