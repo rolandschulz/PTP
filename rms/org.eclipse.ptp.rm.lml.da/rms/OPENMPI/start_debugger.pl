@@ -16,7 +16,7 @@ my $patnode="([\^\\s]+(\\.[\^\\s]*)*)";       # Pattern for domain name (a.b.c)
 
 my $portbase=50000;
 my $portrange=10000;
-my $verbose=1;
+my $verbose=0;
 my $ROUTING_FILE="routing_file";
 my $TOTAL_PROCS=0;
 my @JOB;
