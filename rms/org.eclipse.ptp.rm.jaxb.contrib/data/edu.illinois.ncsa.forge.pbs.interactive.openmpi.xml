@@ -83,6 +83,9 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<arg>-V</arg>
 			<input isUndefinedIfMatches=".+ -np">${ptp_rm:mpiPrefix#value}</input>
 			<input>${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</input>
+			<environment name="OMPI_MCA_btl_openib_flags" value="1"/>
+			<environment name="OMPI_MCA_btl_mpi_leave_pinned" value="0"/>
+			<environment name="OMPI_MCA_btl_openib_warn_default_gid_prefix" value="0"/>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
@@ -139,6 +142,9 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<input isUndefinedIfMatches="-np">-np ${ptp_rm:mpiCores#value}</input>
 			<input>-hostfile $PBS_NODEFILE</input>
 			<input>${ptp_rm:debuggerExecutablePath#value} ${ptp_rm:debuggerArgs#value}</input>
+			<environment name="OMPI_MCA_btl_openib_flags" value="1"/>
+			<environment name="OMPI_MCA_btl_mpi_leave_pinned" value="0"/>
+			<environment name="OMPI_MCA_btl_openib_warn_default_gid_prefix" value="0"/>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
