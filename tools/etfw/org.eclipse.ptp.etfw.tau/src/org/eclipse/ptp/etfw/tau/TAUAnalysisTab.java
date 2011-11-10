@@ -498,9 +498,9 @@ private IBuildLaunchUtils blt;
 	 */
 	private void initMakefiles() {
 		//IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
-		if(allmakefiles!=null){
-			return;
-		}
+//		if(allmakefiles!=null){
+//			return;
+//		}
 		
 		String binpath = blt.getToolPath("tau");//pstore.getString(ITAULaunchConfigurationConstants.TAU_ARCH_PATH); //$NON-NLS-1$
 		IFileStore bindir =null;
@@ -1134,7 +1134,7 @@ private static final String TAU_MAKEFILE_PREFIX="Makefile.tau";
 	@SuppressWarnings("unchecked")
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			if(blt==null){
+			//if(blt==null){
 			IResourceManager rm = getResourceManager(configuration);
 			if(rm!=null){
 				blt=new RemoteBuildLaunchUtils(rm);
@@ -1142,7 +1142,7 @@ private static final String TAU_MAKEFILE_PREFIX="Makefile.tau";
 			else{
 				blt=new BuildLaunchUtils();
 			}
-			}
+			//}
 			selopts = new LinkedHashSet<String>();
 
 			initMakefiles();

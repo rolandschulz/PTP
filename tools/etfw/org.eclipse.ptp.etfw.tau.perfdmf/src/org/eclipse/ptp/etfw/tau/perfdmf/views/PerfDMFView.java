@@ -761,6 +761,9 @@ public class PerfDMFView extends ViewPart {
 		return true;
 	}
 
+	/**
+	 * @since 3.0
+	 */
 	public boolean addProfile(String project, String projectType, String trialName, IFileStore directory, String dbname) {
 		TreeTuple database = getDatabase(dbname);
 		if (database == null)

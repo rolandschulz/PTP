@@ -219,6 +219,7 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager{
 		
 		profiles=getProfiles(directory);
 		xmlFile = utilBlob.getFile(directory).getChild(PROFXML);
+		ppkFile=null;
 		if(!xmlFile.fetchInfo().exists()){
 			xmlFile=null;
 		}
