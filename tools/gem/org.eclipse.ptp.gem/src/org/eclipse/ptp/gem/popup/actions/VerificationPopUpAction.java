@@ -116,14 +116,18 @@ public class VerificationPopUpAction implements IObjectActionDelegate {
 
 					// Save the URI of the most recent project resource
 					// if (isValidSourceFile) {
+					final boolean isSync = GemUtilities.isSynchronizedProject(resource);
 					URI resourceLocation = null;
 					try {
-						resourceLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(resource);
+						if (isSync) {
+							resourceLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(resource);
+						} else {
+							resourceLocation = resource.getLocationURI();
+						}
 					} catch (final CoreException e) {
 						GemUtilities.logExceptionDetail(e);
 					}
 					GemUtilities.saveMostRecentURI(resourceLocation);
-					// }
 
 					GemUtilities.initGemViews(resource, isValidSourceFile, true);
 
