@@ -420,7 +420,7 @@ public class GemUtilities {
 	/**
 	 * Returns the current project being verified.
 	 * 
-	 * @param resoruce
+	 * @param resource
 	 *            The active resource from the current project.
 	 * @return The current project being verified.
 	 */
