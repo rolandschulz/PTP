@@ -61,7 +61,7 @@
 						<goals>
 							<goal>run</goal>
 						</goals>
-						<phase>package</phase>
+						<phase>prepare-package</phase>
 						<inherited>false</inherited>
 						<configuration>
 							<tasks>
