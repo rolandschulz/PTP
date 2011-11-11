@@ -4,8 +4,7 @@
       label="%featureName"
       version="5.0.4.qualifier"
       provider-name="%providerName"
-      license-feature="org.eclipse.ptp.license"
-      license-feature-version="1.0.0.qualifier">
+      >
 
    <description url="http://ppw.hcs.ufl.edu/">
       %description
