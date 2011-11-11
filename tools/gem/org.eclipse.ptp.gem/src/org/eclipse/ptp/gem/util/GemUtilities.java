@@ -560,7 +560,7 @@ public class GemUtilities {
 				final String addr = connection.getAddress();
 				if (projectURI != null) {
 					final String host = projectURI.getHost();
-					if (host.equals(addr.substring(0, addr.indexOf(".")))) { //$NON-NLS-1$
+					if (host.equals(addr) || host.equals(addr.substring(0, addr.indexOf(".")))) { //$NON-NLS-1$
 						currentConnection = connection;
 						break;
 					}
