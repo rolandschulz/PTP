@@ -146,6 +146,11 @@ public interface IToolLaunchConfigurationConstants {
 	 */
 	public static final String EMPTY = "";
 	
+	/**
+	 * @since 5.0
+	 */
+	public static final String UNIX_SLASH = "/";
+	
 	//The following are for parametric test values
 	
 	public static final String PARA_NUM_PROCESSORS="processors to use in parametric study";

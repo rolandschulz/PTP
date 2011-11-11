@@ -369,7 +369,10 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 		if(toolPath==null||toolPath.length()==0)
 			toolPath=utilBlob.checkToolEnvPath(command);
 		if (toolPath != null && toolPath.length() > 0) {
-			command = toolPath + File.separator + command;
+			String fiSep=File.separator;
+			if(toolPath.startsWith(UNIX_SLASH))
+				fiSep=UNIX_SLASH;
+			command = toolPath + fiSep + command;
 		}
 
 		return command;

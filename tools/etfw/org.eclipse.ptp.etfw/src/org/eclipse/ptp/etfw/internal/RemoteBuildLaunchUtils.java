@@ -290,7 +290,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 	 * 
 	 */
 	public String checkToolEnvPath(String toolname) {
-		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0) //$NON-NLS-1$
+		if (conn ==null && org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0) //$NON-NLS-1$
 			return null;
 		String pPath = null;
 		try {
