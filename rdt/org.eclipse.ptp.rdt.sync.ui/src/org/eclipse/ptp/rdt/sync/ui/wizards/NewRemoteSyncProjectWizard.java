@@ -116,13 +116,14 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 		boolean success = super.performFinish();
 		if (success) {
 			IProject project = this.getProject(true);
-			try {
+			// Uncomment try/catch statements if run is ever changed to spawn a thread.
+//			try {
 				this.run(project, null);
-			} catch (InvocationTargetException e) {
-				success = false;
-			} catch (InterruptedException e) {
-				success = false;
-			}
+//			} catch (InvocationTargetException e) {
+//				success = false;
+//			} catch (InterruptedException e) {
+//				success = false;
+//			}
 		}
 
 		return success;
@@ -157,7 +158,7 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 		setDefaultPageImageDescriptor(SyncPluginImages.DESC_WIZBAN_NEW_REMOTE_C_PROJ);
 	}
 	
-	public void run(IProject project, IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+	public void run(IProject project, IProgressMonitor monitor) {
 		// monitor.beginTask("configure model services", 100); //$NON-NLS-1$
 
 		ISynchronizeParticipant participant = ((SyncMainWizardPage) fMainPage).getSynchronizeParticipant();
