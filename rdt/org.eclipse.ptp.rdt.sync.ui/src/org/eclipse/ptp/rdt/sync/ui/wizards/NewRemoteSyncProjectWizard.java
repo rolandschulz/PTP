@@ -141,8 +141,8 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 		try {
 			CProjectNature.addCNature(prj, new NullProgressMonitor());
 			CCProjectNature.addCCNature(prj, new NullProgressMonitor());
-			RemoteSyncNature.addNature(prj, new NullProgressMonitor());
 		} catch (CoreException e) {
+			// TODO: What to do here?
 		}
 		return prj;
 	}
@@ -161,6 +161,12 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	public void run(IProject project, IProgressMonitor monitor) {
 		// monitor.beginTask("configure model services", 100); //$NON-NLS-1$
 
+		// Add sync nature here so that "Synchronize" properties page does not appear inside wizard, before sync data has been added.
+		try {
+			RemoteSyncNature.addNature(project, new NullProgressMonitor());
+		} catch (CoreException e1) {
+			// TODO: What to do here?
+		}
 		ISynchronizeParticipant participant = ((SyncMainWizardPage) fMainPage).getSynchronizeParticipant();
 		if (participant == null) {
 			// monitor.done();
