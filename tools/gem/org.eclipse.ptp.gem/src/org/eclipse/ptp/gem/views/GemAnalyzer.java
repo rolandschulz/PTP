@@ -782,7 +782,8 @@ public class GemAnalyzer extends ViewPart {
 				}
 
 				if (sourceFile != null) {
-					if (GemUtilities.isRemoteProject() || GemUtilities.isSynchronizedProject()) {
+					if (GemUtilities.isRemoteProject(GemAnalyzer.this.activeFile)
+							|| GemUtilities.isSynchronizedProject(GemAnalyzer.this.activeFile)) {
 						GemUtilities.showInformationDialog(Messages.GemAnalyzer_23);
 						return;
 					}
