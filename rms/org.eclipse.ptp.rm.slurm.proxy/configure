@@ -2275,20 +2275,18 @@ VERSION="_$PACKAGE_VERSION"
 if  `expr "$VERSION" : "_@[^@]*@"` -gt 0 ; then
 	VERSION=
 fi
-
-UTILS="../../core/org.eclipse.ptp.utils"
+UTILS="`echo ../org.eclipse.ptp.utils${VERSION}`"
 if test ! -d $UTILS; then
-	UTILS="`echo ${UTILS}${VERSION}`"
+	UTILS="`echo ../../core/org.eclipse.ptp.utils${VERSION}`"
 	if test ! -d $UTILS; then
 		{ { echo "$as_me:$LINENO: error: utils directory not found" >&5
 echo "$as_me: error: utils directory not found" >&2;}
    { (exit 1); exit 1; }; }
 	fi
 fi
-
-PROXY="../../core/org.eclipse.ptp.proxy"
+PROXY="`echo ../org.eclipse.ptp.proxy${VERSION}`"
 if test ! -d $PROXY; then
-	PROXY="`echo ${PROXY}${VERSION}`"
+	PROXY="`echo ../../core/org.eclipse.ptp.proxy${VERSION}`"
 	if test ! -d $PROXY; then
 		{ { echo "$as_me:$LINENO: error: proxy directory not found" >&5
 echo "$as_me: error: proxy directory not found" >&2;}
@@ -3504,7 +3502,7 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
 else
   eval ac_cv_prog_cc_${ac_cc}_c_o=no
 fi
-rm -f core conftest*
+rm -f -r core conftest*
 
 fi
 if eval test \$ac_cv_prog_cc_${ac_cc}_c_o = yes; then
@@ -4428,7 +4426,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 fi
 
@@ -4449,7 +4447,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 fi
 
