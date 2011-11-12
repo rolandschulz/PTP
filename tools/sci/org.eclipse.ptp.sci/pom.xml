@@ -25,7 +25,7 @@
 						<goals>
 							<goal>run</goal>
 						</goals>
-						<phase>package</phase>
+						<phase>prepare-package</phase>
 						<configuration>
 							<tasks>
 								<replace file="configure">
