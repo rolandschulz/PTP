@@ -108,34 +108,40 @@ public class RemoteIndexManager {
 	 */
 	public StandaloneFastIndexer getIndexerForScope(String scope, IRemoteIndexerInfoProvider provider, DataStore dataStore, DataElement status) {
 		StandaloneFastIndexer indexer = getIndexerForScope(scope, dataStore, status);
-		
-		// configure the indexer using the provider
-		indexer.setScannerInfoProvider(provider);
-		indexer.setLanguageMapper(new RemoteLanguageMapper(provider, dataStore));
-		indexer.setFilesToParseUpFront(provider.getFilesToParseUpFront().toArray(new String[]{}));
-		indexer.setFileEncodingRegistry(provider.getFileEncodingRegistry());
-		
-		if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_ALL_REFERENCES)) {
-			indexer.setSkipReferences(PDOMWriter.SKIP_ALL_REFERENCES);
-		}
-		else {
-			int skipReferences = 0;
-			if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_TYPE_REFERENCES))
-				skipReferences |= PDOMWriter.SKIP_TYPE_REFERENCES;
-			if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_MACRO_REFERENCES))
-				skipReferences |= PDOMWriter.SKIP_MACRO_REFERENCES;
-			//if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_IMPLICIT_REFERENCES))
-			//	skipReferences |= PDOMWriter.SKIP_IMPLICIT_REFERENCES;
+		if(indexer!=null){
+			// configure the indexer using the provider
+			indexer.setScannerInfoProvider(provider);
+			indexer.setLanguageMapper(new RemoteLanguageMapper(provider, dataStore));
+			indexer.setFilesToParseUpFront(provider.getFilesToParseUpFront().toArray(new String[]{}));
+			indexer.setFileEncodingRegistry(provider.getFileEncodingRegistry());
 			
-			if(skipReferences == 0)
-				indexer.setSkipReferences(PDOMWriter.SKIP_NO_REFERENCES);
-			else
-				indexer.setSkipReferences(skipReferences);
-		}
-		
-		indexer.setIndexAllFiles(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_INDEX_ALL_FILES));
+			if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_ALL_REFERENCES)) {
+				indexer.setSkipReferences(PDOMWriter.SKIP_ALL_REFERENCES);
+			}
+			else {
+				int skipReferences = 0;
+				if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_TYPE_REFERENCES))
+					skipReferences |= PDOMWriter.SKIP_TYPE_REFERENCES;
+				if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_MACRO_REFERENCES))
+					skipReferences |= PDOMWriter.SKIP_MACRO_REFERENCES;
+				//if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_IMPLICIT_REFERENCES))
+				//	skipReferences |= PDOMWriter.SKIP_IMPLICIT_REFERENCES;
+				
+				if(skipReferences == 0)
+					indexer.setSkipReferences(PDOMWriter.SKIP_NO_REFERENCES);
+				else
+					indexer.setSkipReferences(skipReferences);
+			}
+			
+			indexer.setIndexAllFiles(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_INDEX_ALL_FILES));
 
-		
+		}else{
+			if(dataStore!=null){
+				UniversalServerUtilities.logError(CLASS_NAME, "Unable to create a new indexer", null, dataStore);  //$NON-NLS-1$
+			}else{
+				StandaloneLogService.getInstance().errorLog(CLASS_NAME +":" + "Unable to create a new indexer", null);  //$NON-NLS-1$//$NON-NLS-2$
+			}
+		}
 		return indexer;
 	}
 	
@@ -212,8 +218,9 @@ public class RemoteIndexManager {
 				LOG = StandaloneLogService.getInstance();
 			}
 			indexer = new StandaloneFastIndexer(indexFile, locationConverter, linkageFactoryMap, null, null, LOG);
-
-			scopeToIndexerMap.put(scope, indexer);
+			if(indexer!=null){	
+				scopeToIndexerMap.put(scope, indexer);
+			}
 		} catch (CoreException e) {
 			if(dataStore!=null){
 				UniversalServerUtilities.logError(CLASS_NAME, "Core Exception while getting indexer for scope", e, dataStore);  //$NON-NLS-1$

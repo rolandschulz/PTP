@@ -1803,30 +1803,32 @@ public class CDTMiner extends Miner {
 			IRemoteIndexerInfoProvider provider, String scheme, String host, String rootPath, String mappedPath, DataElement status) {
 
 		StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName, provider, _dataStore, status);
-		ScopeManager scopeManager = ScopeManager.getInstance();
-		
-		// update the scope if required
-		for(String file : addedFiles)
-			scopeManager.addFileToScope(scopeName, scheme, host, file, rootPath, mappedPath);
-		for(String file : changedFiles)
-			scopeManager.addFileToScope(scopeName, scheme, host, file, rootPath, mappedPath);
-		for(String file : removedFiles)
-			scopeManager.removeFileFromScope(scopeName, file);
-		
-		// if there is already an indexer thread running wait for it (highly unlikely since indexer tasks are only executed one at a time on the client)
-		if(indexerThread != null) {
-			try {
-				indexerThread.join();
-			} catch (InterruptedException e) {
-				UniversalServerUtilities.logError(LOG_TAG, "Indexer thread got interrupted", e, _dataStore); //$NON-NLS-1$
-			} catch (NullPointerException e) {
+		if(indexer!=null){
+			ScopeManager scopeManager = ScopeManager.getInstance();
+			
+			// update the scope if required
+			for(String file : addedFiles)
+				scopeManager.addFileToScope(scopeName, scheme, host, file, rootPath, mappedPath);
+			for(String file : changedFiles)
+				scopeManager.addFileToScope(scopeName, scheme, host, file, rootPath, mappedPath);
+			for(String file : removedFiles)
+				scopeManager.removeFileFromScope(scopeName, file);
+			
+			// if there is already an indexer thread running wait for it (highly unlikely since indexer tasks are only executed one at a time on the client)
+			if(indexerThread != null) {
+				try {
+					indexerThread.join();
+				} catch (InterruptedException e) {
+					UniversalServerUtilities.logError(LOG_TAG, "Indexer thread got interrupted", e, _dataStore); //$NON-NLS-1$
+				} catch (NullPointerException e) {
+					
+				}
 				
 			}
 			
+			indexerThread = IndexerThread.createIndexDeltaThread(indexer, addedFiles, changedFiles, removedFiles, status, this);
+			indexerThread.start();
 		}
-		
-		indexerThread = IndexerThread.createIndexDeltaThread(indexer, addedFiles, changedFiles, removedFiles, status, this);
-		indexerThread.start();
 	}
 	
 	
@@ -1834,21 +1836,23 @@ public class CDTMiner extends Miner {
 		RemoteIndexManager indexManager = RemoteIndexManager.getInstance();
 		indexManager.setIndexFileLocation(scopeName, newIndexLocation);
 		StandaloneFastIndexer indexer = indexManager.getIndexerForScope(scopeName, provider, _dataStore, status);
-		Set<String> sources = ScopeManager.getInstance().getFilesForScope(scopeName);
-		
-		List<String> sourcesList = new LinkedList<String>(sources);
-		
-		// if there is already an indexer thread running wait for it (highly unlikely since indexer tasks are only executed one at a time on the client)
-		if(indexerThread != null) {
-			try {
-				indexerThread.join();
-			} catch (InterruptedException e) {
-				UniversalServerUtilities.logError(LOG_TAG, "Indexer thread got interrupted", e, _dataStore); //$NON-NLS-1$
-			} 
+		if(indexer!=null){
+			Set<String> sources = ScopeManager.getInstance().getFilesForScope(scopeName);
+			
+			List<String> sourcesList = new LinkedList<String>(sources);
+			
+			// if there is already an indexer thread running wait for it (highly unlikely since indexer tasks are only executed one at a time on the client)
+			if(indexerThread != null) {
+				try {
+					indexerThread.join();
+				} catch (InterruptedException e) {
+					UniversalServerUtilities.logError(LOG_TAG, "Indexer thread got interrupted", e, _dataStore); //$NON-NLS-1$
+				} 
+			}
+			
+			indexerThread = IndexerThread.createReindexThread(indexer, sourcesList, status, this);
+			indexerThread.start();
 		}
-		
-		indexerThread = IndexerThread.createReindexThread(indexer, sourcesList, status, this);
-		indexerThread.start();
 	}
 
 	
