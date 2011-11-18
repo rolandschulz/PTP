@@ -84,8 +84,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 * @param s
 	 */
 	public static void errorDialog(Shell shell, String title, String message, IStatus s) {
-		if (s != null && message.equals(s.getMessage()))
+		if (s != null && message.equals(s.getMessage())) {
 			message = null;
+		}
 
 		ErrorDialog.openError(shell, title, message, s);
 	}
@@ -192,8 +193,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path.
+	 * Returns an image descriptor for the image file at the given plug-in relative path.
 	 * 
 	 * @param path
 	 *            the path
@@ -204,8 +204,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns the string from the plugin's resource bundle, or 'key' if not
-	 * found.
+	 * Returns the string from the plugin's resource bundle, or 'key' if not found.
 	 */
 	public static String getResourceString(String key) {
 		ResourceBundle bundle = PTPDebugUIPlugin.getDefault().getResourceBundle();
@@ -236,8 +235,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	public static Display getStandardDisplay() {
 		Display display;
 		display = Display.getCurrent();
-		if (display == null)
+		if (display == null) {
 			display = Display.getDefault();
+		}
 		return display;
 	}
 
@@ -251,8 +251,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 * @return plugin identifier
 	 */
 	public static String getUniqueIdentifier() {
-		if (getDefault() == null)
+		if (getDefault() == null) {
 			return PLUGIN_ID;
+		}
 
 		return getDefault().getBundle().getSymbolicName();
 	}
@@ -263,7 +264,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 * @return true if the current perspective is the PTP debug perspective
 	 */
 	public static boolean isPTPDebugPerspective() {
-		return getCurrentPerspectiveID().equals(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG);
+		return IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG.equals(getCurrentPerspectiveID());
 	}
 
 	/**
@@ -273,8 +274,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 */
 	public static boolean isPTPPerspective() {
 		String curID = getCurrentPerspectiveID();
-		if (curID == null)
+		if (curID == null) {
 			return false;
+		}
 		return (curID.equals(IPTPUIConstants.PERSPECTIVE_RUN) || curID.equals(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG));
 	}
 
@@ -311,7 +313,10 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 * @return current perspective ID
 	 */
 	private static String getCurrentPerspectiveID() {
-		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
+		if (getActiveWorkbenchWindow() != null) {
+			return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
+		}
+		return null;
 	}
 
 	public static final String PDEBUGGERCONFIGURATION_EXTENSION_POINT_ID = "debuggerConfigurations"; //$NON-NLS-1$
@@ -353,8 +358,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 */
 	public ResourceBundle getResourceBundle() {
 		try {
-			if (resourceBundle == null)
+			if (resourceBundle == null) {
 				resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.debug.ui.UiPluginResources"); //$NON-NLS-1$
+			}
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}
@@ -400,9 +406,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#initializeImageRegistry(org.eclipse
-	 * .jface.resource.ImageRegistry)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#initializeImageRegistry(org.eclipse .jface.resource.ImageRegistry)
 	 */
 	@Override
 	protected void initializeImageRegistry(ImageRegistry reg) {
