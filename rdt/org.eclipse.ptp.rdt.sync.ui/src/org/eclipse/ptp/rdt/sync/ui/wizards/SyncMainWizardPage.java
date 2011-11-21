@@ -1,18 +1,18 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 Intel Corporation and others.
+ * Copyright (c) 2011 Oak Ridge National Laboratory and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Intel Corporation - initial API and implementation
- *     IBM Corporation
+ *    John Eblen - initial implementation
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui.wizards;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -63,6 +63,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
@@ -78,15 +79,24 @@ import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 
+/**
+ * Main wizard page for creating new synchronized projects. All elements needed for a synchronized project are configured here.
+ * This includes:
+ * 1) Project name and workspace location
+ * 2) Remote connection and directory
+ * 3) Project type
+ * 4) Local and remote toolchains
+ *
+ * Since this wizard page's operation differs greatly from a normal CDT wizard page, this class simply reimplements (overrides) all
+ * functionality in the two immediate superclasses (CDTMainWizardPage and WizardNewProjectCreationPage) but borrows much of the code
+ * from those two classes. Thus, except for very basic functionality, such as jface methods, this class is self-contained.
+ */
 public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItemsListListener {
 	public static final String REMOTE_SYNC_WIZARD_PAGE_ID = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage"; //$NON-NLS-1$
 	public static final String SERVICE_PROVIDER_PROPERTY = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage.serviceProvider"; //$NON-NLS-1$
-	private static String RDT_PROJECT_TYPE = "org.eclipse.ptp.rdt"; //$NON-NLS-1$
+	private static final String RDT_PROJECT_TYPE = "org.eclipse.ptp.rdt"; //$NON-NLS-1$
 	private static final Image IMG_CATEGORY = CDTSharedImages.getImage(CDTSharedImages.IMG_OBJS_SEARCHFOLDER);
 	private static final Image IMG_ITEM = CDTSharedImages.getImage(CDTSharedImages.IMG_OBJS_VARIABLE);
-
-	public static final String PAGE_ID = "org.eclipse.cdt.managedbuilder.ui.wizard.NewModelProjectWizardPage"; //$NON-NLS-1$
-
 	private static final String EXTENSION_POINT_ID = "org.eclipse.cdt.ui.CDTWizard"; //$NON-NLS-1$
 	private static final String ELEMENT_NAME = "wizard"; //$NON-NLS-1$
 	private static final String CLASS_NAME = "class"; //$NON-NLS-1$
@@ -105,14 +115,11 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private Button showSupportedOnlyButton;
 	private Label projectLocalOptionsLabel;
 	private Label projectRemoteOptionsLabel;
-
 	private Label categorySelectedForLocalLabel;
 	private Label categorySelectedForRemoteLabel;
 
 	private SortedMap<String, IToolChain> toolChainMap;
-
 	private ISynchronizeParticipant fSelectedParticipant = null;
-	
 	private String message = null;
 	private int messageType = IMessageProvider.NONE;
 	private String errorMessage = null;
@@ -227,26 +234,34 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}		
 
 	/**
-	 * Returns the current project location path as entered by 
-	 * the user, or its anticipated initial value.
-	 * Note that if the default has been returned the path
-	 * in a project description used to create a project
-	 * should not be set.
+	 * Returns the current project location path as entered by the user
 	 *
-	 * TODO: Implement this method
 	 * @return the project location path or its anticipated initial value.
 	 */
 	@Override
 	public IPath getLocationPath() {
-		return new Path(""); //$NON-NLS-1$
+		return new Path(projectLocationField.getText());
 	}
 	
-    // TODO: Implement this method
+
+	/**
+	 * Get workspace URI
+	 * 
+	 * @return URI or null if location path is not a valid URI
+	 */
     @Override
     public URI getLocationURI() {
-    	return null;
+    	try {
+			return new URI(getLocationPath().toString());
+		} catch (URISyntaxException e) {
+			return null;
+		}
     }
 
+    /**
+     * Get project location URI
+     * @return URI (may be null if location path is not a valid URI)
+     */
     @Override
     public URI getProjectLocation() {
     	return useDefaults() ? null : getLocationURI();
@@ -815,15 +830,15 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 * should first check if the project name passed already exists 
 	 * in the workspace.
 	 * 
-	 * TODO: Implement this method
 	 * @param name initial project name for this page
 	 * 
 	 * @see IWorkspace#validateName(String, int)
 	 * 
+	 * TODO: Calls to this function can be ignored probably, but I'm not certain.
 	 */
 	@Override
 	public void setInitialProjectName(String name) {
-		// Empty for now
+		// Ignore
 	}
 
 	/*
@@ -863,5 +878,14 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			String toolChainName = selectedToolChains[0].getText();
 			return toolChainMap.get(toolChainName);
 		}
+	}
+	
+    /**
+	 * No working sets for this wizard
+	 * @return null
+	 */
+	@Override
+	public IWorkingSet[] getSelectedWorkingSets() {
+		return null;
 	}
 }
