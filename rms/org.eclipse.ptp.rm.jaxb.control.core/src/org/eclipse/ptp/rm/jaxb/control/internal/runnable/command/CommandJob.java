@@ -57,6 +57,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.control.internal.IStreamParserTokenizer;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.control.internal.utils.DebuggingLogger;
 import org.eclipse.ptp.rm.jaxb.control.internal.utils.EnvironmentVariableUtils;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
@@ -70,6 +71,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.utils.core.ArgumentParser;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
@@ -205,6 +207,7 @@ public class CommandJob extends Job implements ICommandJob {
 	private final JobMode jobMode;
 	private final boolean keepOpen;
 	private final String launchMode;
+	private final List<Job> cmdJobs = new ArrayList<Job>();
 
 	private final StringBuffer error;
 	private Thread jobThread;
@@ -375,6 +378,12 @@ public class CommandJob extends Job implements ICommandJob {
 					jobThread.interrupt();
 				}
 			}
+			for (Job job : cmdJobs) {
+				if (job.getState() == Job.RUNNING) {
+					job.cancel();
+				}
+			}
+			cmdJobs.clear();
 			cancel();
 		}
 	}
@@ -619,7 +628,7 @@ public class CommandJob extends Job implements ICommandJob {
 			if (args == null) {
 				throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, null);
 			}
-			String[] cmdArgs = ArgImpl.getArgs(uuid, args, rmVarMap);
+			ArgumentParser cmdArgs = new ArgumentParser(ArgImpl.getArgs(uuid, args, rmVarMap));
 			RemoteServicesDelegate delegate = control.getRemoteServicesDelegate(progress.newChild(5));
 			if (progress.isCanceled()) {
 				return null;
@@ -637,7 +646,10 @@ public class CommandJob extends Job implements ICommandJob {
 			if (progress.isCanceled()) {
 				return null;
 			}
-			IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, cmdArgs);
+			if (DebuggingLogger.getLogger().getCommand()) {
+				System.out.println(getName() + ": " + cmdArgs.getCommandLine(false)); //$NON-NLS-1$
+			}
+			IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, cmdArgs.getTokenList());
 			String directory = command.getDirectory();
 			if (directory != null && !JAXBControlConstants.ZEROSTR.equals(directory)) {
 				directory = rmVarMap.getString(uuid, directory);
@@ -874,6 +886,8 @@ public class CommandJob extends Job implements ICommandJob {
 						}
 					} catch (InterruptedException ignored) {
 					}
+				} else {
+					cmdJobs.add(job);
 				}
 			}
 
@@ -950,14 +964,17 @@ public class CommandJob extends Job implements ICommandJob {
 				if (input) {
 					if (process != null && !process.isCompleted()) {
 						status = writeInputToProcess(process);
-
-						if (status.isOK() && launchMode.equals(ILaunchManager.DEBUG_MODE)) {
-							createDebugModel(jobStatus.getJobId(), rm, rmVarMap);
-						}
 					}
 				}
 
 				if (status.isOK()) {
+					/*
+					 * Create the debug model if necessary
+					 */
+					if (launchMode.equals(ILaunchManager.DEBUG_MODE)) {
+						createDebugModel(jobStatus.getJobId(), rm, rmVarMap);
+					}
+
 					/*
 					 * Once job has started running, execute any post launch commands
 					 */
@@ -976,6 +993,8 @@ public class CommandJob extends Job implements ICommandJob {
 								}
 							} catch (InterruptedException ignored) {
 							}
+						} else {
+							cmdJobs.add(job);
 						}
 					}
 				}

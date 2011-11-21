@@ -44,14 +44,17 @@ public class DebuggingLogger {
 	private final boolean fMatch;
 	private final boolean fAction;
 	private final boolean fProperties;
-	private final boolean fCommandOutput;
+	private final boolean fShowCommand;
+	private final boolean fShowCommandOutput;
 
 	private DebuggingLogger() {
 		fSegment = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN);
 		fMatch = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.MATCH_STATUS);
 		fAction = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS);
 		fProperties = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES);
-		fCommandOutput = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.COMMAND_OUTPUT);
+		fShowCommand = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SHOW_COMMAND);
+		fShowCommandOutput = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT);
 		String path = Preferences.getString(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.LOG_FILE);
 		if (out != null) {
 			out.flush();
@@ -73,8 +76,12 @@ public class DebuggingLogger {
 		return fAction;
 	}
 
+	public boolean getCommand() {
+		return fShowCommand;
+	}
+
 	public boolean getCommandOutput() {
-		return fCommandOutput;
+		return fShowCommandOutput;
 	}
 
 	public boolean getMatch() {
@@ -96,8 +103,15 @@ public class DebuggingLogger {
 		}
 	}
 
+	public void logCommand(String message) {
+		if (fShowCommand) {
+			out.println(message);
+			out.flush();
+		}
+	}
+
 	public void logCommandOutput(String message) {
-		if (fCommandOutput) {
+		if (fShowCommandOutput) {
 			out.println(message);
 			out.flush();
 		}
