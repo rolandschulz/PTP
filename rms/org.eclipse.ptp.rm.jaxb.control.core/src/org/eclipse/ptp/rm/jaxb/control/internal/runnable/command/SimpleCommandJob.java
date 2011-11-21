@@ -151,6 +151,9 @@ public class SimpleCommandJob extends Job {
 				fActive = false;
 			}
 			IRemoteProcessBuilder builder = prepareCommand(progress.newChild(10));
+			if (progress.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
 			prepareEnv(builder);
 			progress.worked(10);
 
@@ -201,9 +204,20 @@ public class SimpleCommandJob extends Job {
 
 			int exit = 0;
 
-			try {
-				exit = fProcess.waitFor();
-			} catch (InterruptedException ignored) {
+			while (!fProcess.isCompleted() && !progress.isCanceled()) {
+				synchronized (this) {
+					try {
+						wait(500);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+
+			if (progress.isCanceled()) {
+				if (!fProcess.isCompleted()) {
+					fProcess.destroy();
+				}
+				return Status.CANCEL_STATUS;
 			}
 
 			progress.worked(20);
@@ -258,18 +272,27 @@ public class SimpleCommandJob extends Job {
 	 * @throws CoreException
 	 */
 	private IRemoteProcessBuilder prepareCommand(IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		ArgumentParser args = new ArgumentParser(fRmVarMap.getString(fUuid, fCommand.getExec()));
-		RemoteServicesDelegate delegate = fControl.getRemoteServicesDelegate(monitor);
+		RemoteServicesDelegate delegate = fControl.getRemoteServicesDelegate(progress.newChild(5));
 		if (delegate.getRemoteConnection() == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, new Throwable(
 					Messages.UninitializedRemoteServices));
 		}
+		if (progress.isCanceled()) {
+			return null;
+		}
 		IRemoteConnection conn = delegate.getRemoteConnection();
-		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			JAXBResourceManagerControl.checkConnection(conn, progress);
+			JAXBResourceManagerControl.checkConnection(conn, progress.newChild(5));
 		} catch (RemoteConnectionException rce) {
 			throw CoreExceptionUtils.newException(rce.getLocalizedMessage(), rce);
+		}
+		if (progress.isCanceled()) {
+			return null;
+		}
+		if (DebuggingLogger.getLogger().getCommand()) {
+			System.out.println(getName() + ": " + args.getCommandLine(false)); //$NON-NLS-1$
 		}
 		IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, args.getTokenList());
 		if (fDirectory != null && !JAXBControlConstants.ZEROSTR.equals(fDirectory)) {

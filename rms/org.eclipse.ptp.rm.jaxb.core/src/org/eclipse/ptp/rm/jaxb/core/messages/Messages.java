@@ -29,6 +29,7 @@ public class Messages extends NLS {
 	public static String ShowMatchStatus;
 	public static String ShowActionsForMatch;
 	public static String ShowCreatedProperties;
+	public static String ShowCommand;
 	public static String ShowCommandOutput;
 	public static String LogFile;
 

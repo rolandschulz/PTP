@@ -144,11 +144,14 @@ public class LguiItem implements ILguiItem {
 				if (overview != null) {
 					String oid = overview.getOIDByJobId(jobId);
 					if (oid == null) {
-						final TableType table = getTableHandler().getTable(getGidFromJobStatus(status.getState()));
-						if (table != null) {
-							oid = generateOid();
-							status.setOid(oid);
-							addJobToTable(table, oid, status);
+						TableHandler handler = getTableHandler();
+						if (handler != null) {
+							final TableType table = handler.getTable(getGidFromJobStatus(status.getState()));
+							if (table != null) {
+								oid = generateOid();
+								status.setOid(oid);
+								addJobToTable(table, oid, status);
+							}
 						}
 					}
 				}
@@ -307,7 +310,7 @@ public class LguiItem implements ILguiItem {
 	 * @see org.eclipse.ptp.rm.lml.core.elemhents.ILguiItem#isLayout()
 	 */
 	public boolean isLayout() {
-		return (lgui == null) && lgui.isLayout();
+		return lgui != null && lgui.isLayout();
 	}
 
 	/*
@@ -389,22 +392,25 @@ public class LguiItem implements ILguiItem {
 	public void removeUserJob(String jobId) {
 		final JobStatusData status = fJobMap.get(jobId);
 		if (status != null) {
-			final TableType table = getTableHandler().getTable(getGidFromJobStatus(status.getState()));
-			if (table != null) {
-				int index = -1;
-				for (int i = 0; i < table.getRow().size(); i++) {
-					final RowType row = table.getRow().get(i);
-					final String rowJobId = getTableHandler().getCellValue(table, row, JOB_ID);
-					if (rowJobId.equals(jobId)) {
-						index = i;
-						break;
+			final TableHandler handler = getTableHandler();
+			if (handler != null) {
+				final TableType table = handler.getTable(getGidFromJobStatus(status.getState()));
+				if (table != null) {
+					int index = -1;
+					for (int i = 0; i < table.getRow().size(); i++) {
+						final RowType row = table.getRow().get(i);
+						final String rowJobId = handler.getCellValue(table, row, JOB_ID);
+						if (rowJobId.equals(jobId)) {
+							index = i;
+							break;
+						}
+					}
+					if (index >= 0) {
+						table.getRow().remove(index);
 					}
 				}
-				if (index >= 0) {
-					table.getRow().remove(index);
-				}
+				status.setRemoved();
 			}
-			status.setRemoved();
 		}
 	}
 
@@ -544,53 +550,56 @@ public class LguiItem implements ILguiItem {
 		if (jobStatus != null && status != null) {
 			final String gidOld = getGidFromJobStatus(jobStatus.getState());
 			final String gidNew = getGidFromJobStatus(status);
-			final TableType tableOld = getTableHandler().getTable(gidOld);
-			if (tableOld != null) {
-				RowType rowOld = null;
-				int index = -1;
-				for (int i = 0; i < tableOld.getRow().size(); i++) {
-					final RowType row = tableOld.getRow().get(i);
-					if (getTableHandler().getCellValue(tableOld, row, JOB_ID).equals(jobId)) {
-						getTableHandler().setCellValue(tableOld, row, JOB_STATUS, status);
-						rowOld = row;
-						index = i;
-						break;
+			final TableHandler handler = getTableHandler();
+			if (handler != null) {
+				final TableType tableOld = handler.getTable(gidOld);
+				if (tableOld != null) {
+					RowType rowOld = null;
+					int index = -1;
+					for (int i = 0; i < tableOld.getRow().size(); i++) {
+						final RowType row = tableOld.getRow().get(i);
+						if (handler.getCellValue(tableOld, row, JOB_ID).equals(jobId)) {
+							handler.setCellValue(tableOld, row, JOB_STATUS, status);
+							rowOld = row;
+							index = i;
+							break;
+						}
 					}
-				}
-				if (!gidOld.equals(gidNew)) {
-					final TableType tableNew = getTableHandler().getTable(gidNew);
-					if (tableNew != null) {
-						if (index >= 0 && rowOld != null) {
-							final RowType rowNew = new RowType();
-							rowNew.setOid(rowOld.getOid());
-							for (final ColumnType columnOld : tableOld.getColumn()) {
-								final CellType cellNew = new CellType();
-								cellNew.setCid(columnOld.getId());
-								boolean filled = false;
-								for (final ColumnType columnNew : tableNew.getColumn()) {
-									if (columnOld.getName().equals(columnNew.getName())) {
-										for (final CellType cellOld : rowOld.getCell()) {
-											if (cellOld.getCid().equals(columnOld.getId())) {
-												cellNew.setValue(cellOld.getValue());
-												filled = true;
-												break;
+					if (!gidOld.equals(gidNew)) {
+						final TableType tableNew = handler.getTable(gidNew);
+						if (tableNew != null) {
+							if (index >= 0 && rowOld != null) {
+								final RowType rowNew = new RowType();
+								rowNew.setOid(rowOld.getOid());
+								for (final ColumnType columnOld : tableOld.getColumn()) {
+									final CellType cellNew = new CellType();
+									cellNew.setCid(columnOld.getId());
+									boolean filled = false;
+									for (final ColumnType columnNew : tableNew.getColumn()) {
+										if (columnOld.getName().equals(columnNew.getName())) {
+											for (final CellType cellOld : rowOld.getCell()) {
+												if (cellOld.getCid().equals(columnOld.getId())) {
+													cellNew.setValue(cellOld.getValue());
+													filled = true;
+													break;
+												}
 											}
 										}
 									}
+									if (!filled) {
+										cellNew.setValue("?"); //$NON-NLS-1$
+									}
+									rowNew.getCell().add(cellNew);
 								}
-								if (!filled) {
-									cellNew.setValue("?"); //$NON-NLS-1$
-								}
-								rowNew.getCell().add(cellNew);
+								tableNew.getRow().add(rowNew);
+								tableOld.getRow().remove(index);
 							}
-							tableNew.getRow().add(rowNew);
-							tableOld.getRow().remove(index);
 						}
 					}
-				}
 
+				}
+				jobStatus.updateState(status, detail);
 			}
-			jobStatus.updateState(status, detail);
 		}
 	}
 
@@ -620,21 +629,26 @@ public class LguiItem implements ILguiItem {
 		table.getRow().add(row);
 	}
 
-	private void checkTables() {
-		if (getTableHandler().getTable(ACTIVE_JOB_TABLE) == null) {
-			getTableHandler().generateDefaultTable(ACTIVE_JOB_TABLE);
-		}
-		if (getTableHandler().getTable(INACTIVE_JOB_TABLE) == null) {
-			getTableHandler().generateDefaultTable(INACTIVE_JOB_TABLE);
+	private void checkTables(TableHandler handler) {
+		if (handler != null) {
+			if (handler.getTable(ACTIVE_JOB_TABLE) == null) {
+				handler.generateDefaultTable(ACTIVE_JOB_TABLE);
+			}
+			if (handler.getTable(INACTIVE_JOB_TABLE) == null) {
+				handler.generateDefaultTable(INACTIVE_JOB_TABLE);
+			}
 		}
 	}
 
 	private boolean cidSet() {
-		for (final TableType table : getTableHandler().getTables()) {
-			for (final RowType row : table.getRow()) {
-				for (final CellType cell : row.getCell()) {
-					if (cell.getCid() == null) {
-						return false;
+		final TableHandler handler = getTableHandler();
+		if (handler != null) {
+			for (final TableType table : handler.getTables()) {
+				for (final RowType row : table.getRow()) {
+					for (final CellType cell : row.getCell()) {
+						if (cell.getCid() == null) {
+							return false;
+						}
 					}
 				}
 			}
@@ -714,16 +728,19 @@ public class LguiItem implements ILguiItem {
 	}
 
 	private void setCid() {
-		for (final TableType table : getTableHandler().getTables()) {
-			for (final RowType row : table.getRow()) {
-				int cid = 1;
-				for (final CellType cell : row.getCell()) {
-					if (cell.getCid() == null) {
-						cell.setCid(BigInteger.valueOf(cid));
-					} else {
-						cid = cell.getCid().intValue();
+		final TableHandler handler = getTableHandler();
+		if (handler != null) {
+			for (final TableType table : handler.getTables()) {
+				for (final RowType row : table.getRow()) {
+					int cid = 1;
+					for (final CellType cell : row.getCell()) {
+						if (cell.getCid() == null) {
+							cell.setCid(BigInteger.valueOf(cid));
+						} else {
+							cid = cell.getCid().intValue();
+						}
+						cid++;
 					}
-					cid++;
 				}
 			}
 		}
@@ -771,35 +788,39 @@ public class LguiItem implements ILguiItem {
 		/*
 		 * Remove any rows for removed jobs
 		 */
-		for (final TableType table : getTableHandler().getTables()) {
-			for (final String row : oidsToRemove) {
-				table.getRow().remove(row);
+		final TableHandler handler = getTableHandler();
+		if (handler != null) {
+			for (final TableType table : handler.getTables()) {
+				for (final String row : oidsToRemove) {
+					table.getRow().remove(row);
+				}
+				oidsToRemove.clear();
 			}
-			oidsToRemove.clear();
-		}
 
-		checkTables();
+			checkTables(handler);
 
-		/*
-		 * Next find any jobs that are no longer in any of the tables. We need to create a "fake" entry in the jobslistwait table
-		 * for these. Note that these jobs are now considered "COMPLETED".
-		 */
-		TableType table = getTableHandler().getTable(INACTIVE_JOB_TABLE);
-		if (table == null) {
-			table = getTableHandler().generateDefaultTable(INACTIVE_JOB_TABLE);
-		}
+			/*
+			 * Next find any jobs that are no longer in any of the tables. We need to create a "fake" entry in the jobslistwait
+			 * table for these. Note that these jobs are now considered "COMPLETED".
+			 */
+			TableType table = getTableHandler().getTable(INACTIVE_JOB_TABLE);
+			if (table == null) {
+				table = getTableHandler().generateDefaultTable(INACTIVE_JOB_TABLE);
+			}
 
-		synchronized (fJobMap) {
-			for (final JobStatusData status : fJobMap.values()) {
-				if (!status.isRemoved() && !jobsInTable.contains(status)) {
-					if (!status.isCompleted()) {
-						status.setState(JobStatusData.COMPLETED);
-						status.setOid(generateOid());
+			synchronized (fJobMap) {
+				for (final JobStatusData status : fJobMap.values()) {
+					if (!status.isRemoved() && !jobsInTable.contains(status)) {
+						if (!status.isCompleted()) {
+							status.setState(JobStatusData.COMPLETED);
+							status.setOid(generateOid());
+						}
+						addJobToTable(table, status.getOid(), status);
 					}
-					addJobToTable(table, status.getOid(), status);
 				}
 			}
 		}
+
 	}
 
 }

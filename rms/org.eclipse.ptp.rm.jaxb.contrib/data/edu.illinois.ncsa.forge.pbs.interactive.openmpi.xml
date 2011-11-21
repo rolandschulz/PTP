@@ -126,7 +126,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				</target>
 			</stderr-parser>
 		</submit-interactive>
-		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:directory#value}" waitForId="true" keepOpen="true"
+		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true"
 			flags="ALLOCATE_PTY">
 			<arg>${ptp_rm:bindir#value}qsub</arg>
 			<arg>-I</arg>
@@ -134,11 +134,13 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<arg>-l nodes=1,mem=${ptp_rm:Resource_List.mem#value},walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			<arg isUndefinedIfMatches="-A">-A ${ptp_rm:Account_Name#value}</arg>
 			<arg>-V</arg>
-			<input>perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</input>
-			<input>${ptp_rm:executableDirectory#value}</input>
+			<input>cd ${ptp_rm:executableDirectory#value} &amp;&amp; perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</input>
 			<input isUndefinedIfMatches="-np">-np ${ptp_rm:mpiCores#value}</input>
 			<input>-hostfile $PBS_NODEFILE</input>
-			<input>${ptp_rm:debuggerExecutablePath#value} ${ptp_rm:debuggerArgs#value}</input>
+			<input>${ptp_rm:debuggerExecutablePath#value}</input>
+			<environment name="OMPI_MCA_btl_openib_flags" value="1"/>
+			<environment name="OMPI_MCA_btl_mpi_leave_pinned" value="0"/>
+			<environment name="OMPI_MCA_btl_openib_warn_default_gid_prefix" value="0"/>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
@@ -181,6 +183,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</match>
 				</target>
 			</stderr-parser>
+			<pre-launch-cmd name="Cleanup" exec="rm -f routing_file" wait="true"/>
 			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
 		</submit-interactive-debug>
 		<get-job-status name="get-job-status" ignoreExitStatus="true">

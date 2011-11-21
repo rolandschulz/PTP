@@ -42,7 +42,8 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 	private Button matchStatus;
 	private Button actions;
 	private Button createdProperties;
-	private Button commandOutput;
+	private Button showCommandOutput;
+	private Button showCommand;
 	private Text logFile;
 
 	@Override
@@ -79,8 +80,10 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 		actions.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.ACTIONS, false));
 		createdProperties.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(),
 				JAXBRMPreferenceConstants.CREATED_PROPERTIES, false));
-		commandOutput.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(),
-				JAXBRMPreferenceConstants.COMMAND_OUTPUT, false));
+		showCommand.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND,
+				false));
+		showCommandOutput.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(),
+				JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, false));
 		logFile.setText(Preferences.getDefaultString(getPreferenceQualifier(), JAXBRMPreferenceConstants.LOG_FILE,
 				JAXBUIConstants.ZEROSTR));
 		updateApplyButton();
@@ -129,9 +132,12 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 		} else if (source == createdProperties) {
 			boolean b = createdProperties.getSelection();
 			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES, b);
-		} else if (source == commandOutput) {
-			boolean b = commandOutput.getSelection();
-			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.COMMAND_OUTPUT, b);
+		} else if (source == showCommand) {
+			boolean b = showCommand.getSelection();
+			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND, b);
+		} else if (source == showCommandOutput) {
+			boolean b = showCommandOutput.getSelection();
+			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, b);
 		}
 	}
 
@@ -188,9 +194,12 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 		gd.grabExcessVerticalSpace = false;
 		commandOptionsGroup.setLayoutData(gd);
 
-		commandOutput = new Button(commandOptionsGroup, SWT.CHECK | SWT.LEFT);
-		commandOutput.addSelectionListener(this);
-		commandOutput.setText(JAXBRMPreferenceConstants.COMMAND_OUTPUT);
+		showCommand = new Button(commandOptionsGroup, SWT.CHECK | SWT.LEFT);
+		showCommand.addSelectionListener(this);
+		showCommand.setText(JAXBRMPreferenceConstants.SHOW_COMMAND);
+		showCommandOutput = new Button(commandOptionsGroup, SWT.CHECK | SWT.LEFT);
+		showCommandOutput.addSelectionListener(this);
+		showCommandOutput.setText(JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT);
 
 		Composite c = new Composite(preferences, SWT.NONE);
 		c.setLayout(new GridLayout(7, false));
@@ -236,10 +245,14 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 		b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES,
 				def, null);
 		createdProperties.setSelection(b);
-		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.COMMAND_OUTPUT, false);
-		b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.COMMAND_OUTPUT, def,
-				null);
-		commandOutput.setSelection(b);
+		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND, false);
+		b = Platform.getPreferencesService()
+				.getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND, def, null);
+		showCommand.setSelection(b);
+		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, false);
+		b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT,
+				def, null);
+		showCommandOutput.setSelection(b);
 		String defText = Preferences.getDefaultString(getPreferenceQualifier(), JAXBRMPreferenceConstants.LOG_FILE,
 				JAXBUIConstants.ZEROSTR);
 		String text = Platform.getPreferencesService().getString(getPreferenceQualifier(), JAXBRMPreferenceConstants.LOG_FILE,
