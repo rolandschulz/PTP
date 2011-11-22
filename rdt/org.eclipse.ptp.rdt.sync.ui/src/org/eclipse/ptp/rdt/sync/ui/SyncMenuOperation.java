@@ -41,6 +41,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String setActiveCommand = "set_active"; //$NON-NLS-1$
 	private static final String setAllCommand = "set_all"; //$NON-NLS-1$
 	private static final String syncAutoCommand = "sync_auto"; //$NON-NLS-1$
+	private static final String syncFileList = "sync_file_list"; //$NON-NLS-1$
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		String command = event.getParameter(SYNC_COMMAND_PARAMETER_ID);
@@ -76,6 +77,8 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 						SyncManager.syncAll(null, project, SyncFlag.FORCE, null);
 					}
 				}
+			} else if (command.equals(syncFileList)) {
+				new SyncFileTree(project).launch();
 			}
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
