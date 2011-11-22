@@ -17,7 +17,7 @@
 		<property name="local_prefix" visible="false" type="string">
 			<default>/usr/local/mpi/bin/</default>
 		</property>
-		<attribute name="numProcs" min="1" type="integer"/>
+		<attribute name="mpiCores" min="1" type="integer"/>
 		<attribute name="byNodeOption" type="boolean"/>
 		<attribute name="bySlotOption" type="boolean"/>
 		<attribute name="noOversubscribeOption" type="boolean"/>
@@ -95,8 +95,8 @@
 					</match>
 					<test op="LT">
 						<value>#value</value>
-						<value>7</value>
-						<throw message="Only supports Open MPI 1.7 and later"/>
+						<value>3</value>
+						<throw message="Only supports Open MPI 1.3 and later"/>
 					</test>
 				</target>
 			</stdout-parser>
@@ -105,7 +105,7 @@
 			<arg>${ptp_rm:local_prefix#value}mpirun</arg>
 			<arg>--report-pid</arg>
 			<arg>-np</arg>
-			<arg>${ptp_rm:numProcs#value}</arg>
+			<arg>${ptp_rm:mpiCores#value}</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
 			<arg>${ptp_rm:progArgs#value}</arg>
 			<stdout-parser delim="\n">
@@ -120,7 +120,7 @@
 						</set>
 					</match>
 				</target>
-				<exit-after>^([\d]+)$</exit-after>
+				<exit-after>^mpirun pid: ([\d]+)$</exit-after>
 			</stdout-parser>
 			<stderr-parser delim="\n">
 				<target ref="@jobId">
@@ -136,17 +136,14 @@
 				</target>
 			</stderr-parser>
 		</submit-interactive>
-		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:directory#value}" waitForId="true" keepOpen="true">
-			<arg>${ptp_rm:local_prefix#value}mpirun</arg>
-			<arg>--report-pid</arg>
-			<arg>-np</arg>
-			<arg>${ptp_rm:numProcs#value}</arg>
+		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true">
+			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</arg>
+			<arg>-np ${ptp_rm:mpiCores#value}</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
-			<arg>${ptp_rm:debuggerArgs#value}</arg>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
-						<expression>^([\d]+)$</expression>
+						<expression>^mpirun pid: ([\d]+)$</expression>
 						<set field="name">
 							<entry valueGroup="1"/>
 						</set>
@@ -155,7 +152,7 @@
 						</set>
 					</match>
 				</target>
-				<exit-after>^([\d]+)$</exit-after>
+				<exit-after>^mpirun pid: ([\d]+)$</exit-after>
 			</stdout-parser>
 			<stderr-parser delim="\n">
 				<target ref="@jobId">
@@ -170,8 +167,8 @@
 					</match>
 				</target>
 			</stderr-parser>
-			<cmd exec="${ptp_rm:debuggerExecutablePath#value} --master" wait="false"/>
-			<cmd exec="${ptp_rm:directory#value}/generate_routing_table" wait="true"/>
+			<pre-launch-cmd name="Cleanup" exec="rm -f routing_file" wait="true"/>
+			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
 		</submit-interactive-debug>		
 		<launch-tab>
 			<dynamic>
@@ -186,7 +183,7 @@
 					<widget type="label" style="SWT.LEFT">
 						<fixed-text>Number of processes:</fixed-text>
 					</widget>
-					<widget type="spinner" style="SWT.BORDER" readOnly="false" saveValueTo="numProcs">
+					<widget type="spinner" style="SWT.BORDER" readOnly="false" saveValueTo="mpiCores">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.CENTER"
 								grabExcessHorizontal="false" grabExcessVertical="false"/>
