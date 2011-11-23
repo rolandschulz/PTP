@@ -15,7 +15,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckStateProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -25,6 +27,8 @@ import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.TreeEvent;
+import org.eclipse.swt.events.TreeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -73,9 +77,10 @@ public class SyncFileTree extends ApplicationWindow {
 		// Create the tree viewer to display the file tree
 		final CheckboxTreeViewer tv = new CheckboxTreeViewer(composite);
 		tv.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
-		tv.setContentProvider(new SFFTreeContentProvider());
-		tv.setLabelProvider(new SFFTreeLabelProvider());
-		tv.setCheckStateProvider(new SFFCheckStateProvider());
+		tv.setContentProvider(new SFTTreeContentProvider());
+		tv.setLabelProvider(new SFTTreeLabelProvider());
+		tv.setCheckStateProvider(new SFTCheckStateProvider());
+		tv.addCheckStateListener(new SFTCheckStateListener());
 		tv.setInput(project);
 
 		return composite;
@@ -90,7 +95,7 @@ public class SyncFileTree extends ApplicationWindow {
 		Display.getCurrent().dispose();
 	}
 
-	private class SFFTreeContentProvider implements ITreeContentProvider {
+	private class SFTTreeContentProvider implements ITreeContentProvider {
 		/**
 		 * Gets the children of the specified object
 		 * 
@@ -175,7 +180,7 @@ public class SyncFileTree extends ApplicationWindow {
 		}
 	}
 
-	private class SFFTreeLabelProvider implements ILabelProvider {
+	private class SFTTreeLabelProvider implements ILabelProvider {
 		// Images for tree nodes
 		private Image folderImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
 		private Image fileImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
@@ -244,7 +249,7 @@ public class SyncFileTree extends ApplicationWindow {
 	}
 	
 	// Simple check state provider - just refer to the project's file filter to see if the entry should be checked.
-	private class SFFCheckStateProvider implements ICheckStateProvider {
+	private class SFTCheckStateProvider implements ICheckStateProvider {
 		public boolean isChecked(Object element) {
 			IPath path = ((IResource) element).getProjectRelativePath();
 			if (filter.shouldIgnore(path)) {
@@ -256,6 +261,18 @@ public class SyncFileTree extends ApplicationWindow {
 
 		public boolean isGrayed(Object element) {
 			return false;
+		}
+	}
+	
+	// Simple listener to update file filter as user checks and unchecks.
+	private class SFTCheckStateListener implements ICheckStateListener {
+		public void checkStateChanged(CheckStateChangedEvent event) {
+			IPath path = ((IResource) (event.getElement())).getProjectRelativePath();
+			if (event.getChecked()) {
+				filter.addPath(path);
+			} else {
+				filter.removePath(path);
+			}
 		}
 	}
 }
