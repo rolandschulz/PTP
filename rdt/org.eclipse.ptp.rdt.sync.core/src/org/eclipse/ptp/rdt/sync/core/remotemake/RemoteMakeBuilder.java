@@ -72,6 +72,7 @@ import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -396,7 +397,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 
 					// Synchronize before building
 					if (syncProvider != null) {
-						syncProvider.synchronize(null, new SubProgressMonitor(monitor, 10), SyncFlag.FORCE);
+						SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10));
 					}
 
 					// Before launching give visual cues via the monitor
@@ -477,7 +478,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 
 						// Synchronize after building
 						if (syncProvider != null) {
-							syncProvider.synchronize(null, new SubProgressMonitor(monitor, 10), SyncFlag.FORCE);
+							SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10));
 						}
 
 						// create a Job for the refresh

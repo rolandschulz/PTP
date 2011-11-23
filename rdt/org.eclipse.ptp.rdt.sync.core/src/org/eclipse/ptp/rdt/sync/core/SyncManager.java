@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
-import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -46,6 +45,10 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 
 public class SyncManager  {
+	// Static class - do not allow creating of instances
+	private SyncManager() {
+	}
+
 	public static enum SYNC_MODE {
 		ACTIVE, ALL, NONE
 	};
@@ -66,6 +69,8 @@ public class SyncManager  {
 			.synchronizedMap(new HashMap<IProject, SYNC_MODE>());
 	private static final Map<IProject, Boolean> fProjectToShowErrorMap = Collections
 			.synchronizedMap(new HashMap<IProject, Boolean>());
+	private static final Map<IProject, SyncFileFilter> fProjectToFileFilterMap = Collections
+			.synchronizedMap(new HashMap<IProject, SyncFileFilter>());
 
 	static {
 		try {
@@ -82,15 +87,17 @@ public class SyncManager  {
 	}
 
 	private static class SynchronizeJob extends Job {
-		private final ISyncServiceProvider fSyncProvider;
 		private final IResourceDelta fDelta;
+		private final IProject fProject;
+		private final ISyncServiceProvider fSyncProvider;
 		private final EnumSet<SyncFlag> fSyncFlags;
 		private final SyncExceptionHandler fSyncExceptionHandler;
 
-		public SynchronizeJob(IResourceDelta delta, ISyncServiceProvider provider, EnumSet<SyncFlag> syncFlags,
+		public SynchronizeJob(IResourceDelta delta, IProject project, ISyncServiceProvider provider, EnumSet<SyncFlag> syncFlags,
 				SyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
 			fDelta = delta;
+			fProject = project;
 			fSyncProvider = provider;
 			fSyncFlags = syncFlags;
 			fSyncExceptionHandler = seHandler;
@@ -105,7 +112,7 @@ public class SyncManager  {
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor progress = SubMonitor.convert(monitor, 100);
 			try {
-				fSyncProvider.synchronize(fDelta, progress.newChild(100), fSyncFlags);
+				fSyncProvider.synchronize(fDelta, getFileFilter(fProject), progress.newChild(100), fSyncFlags);
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
 					System.out.println(Messages.SyncManager_8 + e.getLocalizedMessage());
@@ -118,12 +125,50 @@ public class SyncManager  {
 			return Status.OK_STATUS;
 		}
 	};
+	
+	/**
+	 * Return a copy of the project's file filter.
+	 * Since only a copy is returned, users must execute "saveFileFilter(IProject, SyncFileFilter)" after making changes to have
+	 * those changes actually applied.
+	 *
+	 * @param project cannot be null
+	 * @return the file filter. This is never null.
+	 */
+	public static SyncFileFilter getFileFilter(IProject project) {
+		if (project == null) {
+			throw new NullPointerException();
+		}
+		
+		if (!(fProjectToFileFilterMap.containsKey(project))) {
+			fProjectToFileFilterMap.put(project, SyncFileFilter.createDefaultFilter(project));
+			try {
+				saveConfigurationData();
+			} catch (IOException e) {
+				RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+			}
+		}
+		return new SyncFileFilter(fProjectToFileFilterMap.get(project));
+	}
+	
+	/**
+	 * Save a new file filter for a project.
+	 * Use this in conjunction with "getFileFilter(IProject)" to modify the current file filtering for a project.
+	 *
+	 * @param project cannot be null
+	 * @param filter cannot be null
+	 */
+	public static void saveFileFilter(IProject project, SyncFileFilter filter) {
+		if (project == null || filter == null) {
+			throw new NullPointerException();
+		}
+		fProjectToFileFilterMap.put(project, filter);
+	}
 
 	/**
 	 * Return project's current sync mode
 	 * On first access, set sync mode to ACTIVE.
 	 * 
-	 * @param project
+	 * @param project cannot be null
 	 * @return sync mode. This is never null.
 	 */
 	public static SYNC_MODE getSyncMode(IProject project) {
@@ -213,26 +258,6 @@ public class SyncManager  {
 		} catch (IOException e) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
 		}
-	}
-
-	public void addHandlerListener(IHandlerListener handlerListener) {
-		// Listeners not yet supported
-	}
-
-	public void dispose() {
-		// Nothing to do
-	}
-
-	public boolean isEnabled() {
-		return true;
-	}
-
-	public boolean isHandled() {
-		return true;
-	}
-
-	public void removeHandlerListener(IHandlerListener handlerListener) {
-		// Listeners not yet supported
 	}
 
 	/**
@@ -326,9 +351,9 @@ public class SyncManager  {
 				ISyncServiceProvider provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
 				if (provider != null) {
 					if (isBlocking) {
-						provider.synchronize(delta, monitor, syncFlags);
+						provider.synchronize(delta, getFileFilter(project), monitor, syncFlags);
 					} else {
-						job = new SynchronizeJob(delta, provider, syncFlags, seHandler);
+						job = new SynchronizeJob(delta, project, provider, syncFlags, seHandler);
 						job.schedule();
 					}
 				}
