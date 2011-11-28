@@ -74,7 +74,7 @@ public class GitRemoteSyncConnection {
 	private static final String gitCommand = "git --git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 	private final IRemoteConnection connection;
-	private final SyncFileFilter fileFilter;
+	private SyncFileFilter fileFilter;
 	private final String localDirectory;
 	private final String remoteDirectory;
 	private Git git;
@@ -756,5 +756,14 @@ public class GitRemoteSyncConnection {
 				monitor.done();
 			}
 		}
+	}
+	
+	/**
+	 * Set the file filter used. This method allows file filtering behavior to be changed after instance is created, which is
+	 * necessary to support user changes to the filter.
+	 * @param sff
+	 */
+	public void setFileFilter(SyncFileFilter sff) {
+		fileFilter = sff;
 	}
 }

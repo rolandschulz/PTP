@@ -189,8 +189,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#
 	 * synchronize(org.eclipse.core.resources.IResourceDelta, org.eclipse.core.runtime.IProgressMonitor, boolean)
 	 */
-	public void synchronize(IResourceDelta delta, SyncFileFilter filter, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags)
-			throws CoreException {
+	public void synchronize(IResourceDelta delta, SyncFileFilter fileFilter, IProgressMonitor monitor,
+			EnumSet<SyncFlag> syncFlags) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
 		// On first sync, place .gitignore in directories. This is useful for folders that are already present and thus are never
 		// captured by a resource add or change event. (This can happen for projects converted to sync projects.)
@@ -323,7 +323,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				if (fSyncConnection == null) {
 					// Open a remote sync connection
 					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation()
-							.toString(), this.getLocation(), filter, progress);
+							.toString(), this.getLocation(), fileFilter, progress);
+				} else {
+					fSyncConnection.setFileFilter(fileFilter);
 				}
 
 				// Open remote connection if necessary

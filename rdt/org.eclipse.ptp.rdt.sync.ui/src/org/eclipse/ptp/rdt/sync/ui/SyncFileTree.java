@@ -27,11 +27,14 @@ import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.events.TreeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -57,6 +60,7 @@ public class SyncFileTree extends ApplicationWindow {
 	 *
 	 * @param shell
 	 */
+	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText("Synchronized Files"); //$NON-NLS-1$
@@ -72,27 +76,37 @@ public class SyncFileTree extends ApplicationWindow {
 	 */
 	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout(1, false));
+		composite.setLayout(new GridLayout(2, false));
 
 		// Create the tree viewer to display the file tree
 		final CheckboxTreeViewer tv = new CheckboxTreeViewer(composite);
-		tv.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
+		tv.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		tv.setContentProvider(new SFTTreeContentProvider());
 		tv.setLabelProvider(new SFTTreeLabelProvider());
 		tv.setCheckStateProvider(new SFTCheckStateProvider());
 		tv.addCheckStateListener(new SFTCheckStateListener());
 		tv.setInput(project);
 
-		return composite;
-	}
+	    Button cancelButton = new Button(composite, SWT.PUSH);
+	    cancelButton.setText("    Cancel    "); //$NON-NLS-1$
+	    cancelButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, true, false));
+	    cancelButton.addSelectionListener(new SelectionAdapter() {
+	      public void widgetSelected(SelectionEvent event) {
+	    	  getShell().close();
+	      }
+	    });
+	    
+	    Button okButton = new Button(composite, SWT.PUSH);
+	    okButton.setText("      OK      "); //$NON-NLS-1$
+	    okButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, false, false));
+	    okButton.addSelectionListener(new SelectionAdapter() {
+	      public void widgetSelected(SelectionEvent event) {
+	    	  SyncManager.saveFileFilter(project, filter);
+	    	  getShell().close();
+	      }
+	    });
 
-	/**
-	 * Launch the file tree window
-	 */
-	public void launch() {
-		setBlockOnOpen(true);
-		open();
-		Display.getCurrent().dispose();
+		return composite;
 	}
 
 	private class SFTTreeContentProvider implements ITreeContentProvider {
@@ -182,8 +196,8 @@ public class SyncFileTree extends ApplicationWindow {
 
 	private class SFTTreeLabelProvider implements ILabelProvider {
 		// Images for tree nodes
-		private Image folderImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
-		private Image fileImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
+		private final Image folderImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
+		private final Image fileImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
 
 		/**
 		 * Gets the image to display for a node in the tree
@@ -215,11 +229,7 @@ public class SyncFileTree extends ApplicationWindow {
 		 * Called when this LabelProvider is being disposed
 		 */
 		public void dispose() {
-			// Dispose the images
-			if (folderImage != null)
-				folderImage.dispose();
-			if (fileImage != null)
-				fileImage.dispose();
+			// Nothing to dispose
 		}
 
 		/**
@@ -269,9 +279,9 @@ public class SyncFileTree extends ApplicationWindow {
 		public void checkStateChanged(CheckStateChangedEvent event) {
 			IPath path = ((IResource) (event.getElement())).getProjectRelativePath();
 			if (event.getChecked()) {
-				filter.addPath(path);
-			} else {
 				filter.removePath(path);
+			} else {
+				filter.addPath(path);
 			}
 		}
 	}

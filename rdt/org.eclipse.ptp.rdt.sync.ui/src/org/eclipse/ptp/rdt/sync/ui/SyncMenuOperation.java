@@ -43,7 +43,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String syncAutoCommand = "sync_auto"; //$NON-NLS-1$
 	private static final String syncFileList = "sync_file_list"; //$NON-NLS-1$
 
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(ExecutionEvent event) {
 		String command = event.getParameter(SYNC_COMMAND_PARAMETER_ID);
 		IProject project = getProject();
 		if (project == null) {
@@ -78,16 +78,18 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 					}
 				}
 			} else if (command.equals(syncFileList)) {
-				new SyncFileTree(project).launch();
+				new SyncFileTree(project).open();
 			}
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
 			RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_1);
 		}
-
-		ICommandService service = (ICommandService) HandlerUtil.getActiveWorkbenchWindowChecked(event).getService(
-				ICommandService.class);
-		service.refreshElements(event.getCommand().getId(), null);
+		
+		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+		if (window != null) {
+			ICommandService service = (ICommandService) window.getService(ICommandService.class);
+			service.refreshElements(event.getCommand().getId(), null);
+		}
 
 		return null;
 	}
