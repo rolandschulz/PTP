@@ -147,8 +147,7 @@ class RemoteItem implements IRemoteItem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.core.IRemoteItemProperties#isReadableByUser()
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteItemProperties#isReadableByUser()
 	 */
 	public boolean isReadable() {
 		return isReadable;
@@ -157,8 +156,7 @@ class RemoteItem implements IRemoteItem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.core.IRemoteItemProperties#isWritableByUser()
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteItemProperties#isWritableByUser()
 	 */
 	public boolean isWritable() {
 		return isWritable;
@@ -210,8 +208,7 @@ class RemoteItem implements IRemoteItem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.core.IRemoteItem#setModificationTime(long)
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#setModificationTime(long)
 	 */
 	public void setModificationTime(long time) {
 		int oldModificationTime = modificationTime;
@@ -311,7 +308,6 @@ class RemoteItem implements IRemoteItem {
 		exist = true;
 		changes = 0;
 
-		assert (isDirectory == attrs.isDir());
 		isDirectory = attrs.isDir();
 
 		userID = attrs.getUId();
