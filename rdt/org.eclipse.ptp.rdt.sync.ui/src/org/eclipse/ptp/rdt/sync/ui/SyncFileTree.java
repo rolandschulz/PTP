@@ -29,15 +29,12 @@ import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TreeEvent;
-import org.eclipse.swt.events.TreeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -48,6 +45,30 @@ import org.eclipse.ui.PlatformUI;
 public class SyncFileTree extends ApplicationWindow {
 	private final IProject project;
 	private final SyncFileFilter filter;
+	private SyncCheckboxTreeViewer treeViewer;
+	
+	// A checkbox tree viewer that does not allow unchecked directories to be expanded.
+	// Note: This illegally extends CheckboxTreeViewer but is the only simple way known to implement this behavior.
+	// Also, the "isExpandable" method exists in the grandparent class and comments say that it may be overriden.
+	private class SyncCheckboxTreeViewer extends CheckboxTreeViewer {
+		public SyncCheckboxTreeViewer(Composite parent) {
+			super(parent);
+		}
+		
+		@Override
+		public boolean isExpandable(Object element) {
+			if (!super.isExpandable(element)) {
+				return false;
+			}
+			
+			IPath path = ((IResource) element).getProjectRelativePath();
+			if (filter.shouldIgnore(path)) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+	}
 
 	public SyncFileTree(IProject p) {
 		super(null);
@@ -79,13 +100,13 @@ public class SyncFileTree extends ApplicationWindow {
 		composite.setLayout(new GridLayout(2, false));
 
 		// Create the tree viewer to display the file tree
-		final CheckboxTreeViewer tv = new CheckboxTreeViewer(composite);
-		tv.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-		tv.setContentProvider(new SFTTreeContentProvider());
-		tv.setLabelProvider(new SFTTreeLabelProvider());
-		tv.setCheckStateProvider(new SFTCheckStateProvider());
-		tv.addCheckStateListener(new SFTCheckStateListener());
-		tv.setInput(project);
+		treeViewer = new SyncCheckboxTreeViewer(composite);
+		treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		treeViewer.setContentProvider(new SFTTreeContentProvider());
+		treeViewer.setLabelProvider(new SFTTreeLabelProvider());
+		treeViewer.setCheckStateProvider(new SFTCheckStateProvider());
+		treeViewer.addCheckStateListener(new SFTCheckStateListener());
+		treeViewer.setInput(project);
 
 	    Button cancelButton = new Button(composite, SWT.PUSH);
 	    cancelButton.setText("    Cancel    "); //$NON-NLS-1$
@@ -283,6 +304,8 @@ public class SyncFileTree extends ApplicationWindow {
 			} else {
 				filter.addPath(path);
 			}
+			
+			treeViewer.refresh(event.getElement());
 		}
 	}
 }

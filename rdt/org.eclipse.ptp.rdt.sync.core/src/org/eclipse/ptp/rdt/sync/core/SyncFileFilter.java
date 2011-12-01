@@ -10,14 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import java.util.Arrays;
+import java.util.List;
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 
 /**
  * Class for filtering files during synchronization. Instead of a constructor, the user can create an empty filter or a filter that
@@ -28,7 +26,7 @@ import org.eclipse.core.runtime.Path;
 public class SyncFileFilter {
 	private final IProject project;
 	private boolean filterBinaries = false;
-	private final Set<IPath> filteredPaths = new HashSet<IPath>();
+	private final BasicTree filteredPaths = new BasicTree();
 
 	// Private constructor - user should use create methods
 	private SyncFileFilter(IProject p) {
@@ -39,7 +37,10 @@ public class SyncFileFilter {
 	public SyncFileFilter(SyncFileFilter oldFilter) {
 		project = oldFilter.project;
 		filterBinaries = oldFilter.filterBinaries;
-		filteredPaths.addAll(oldFilter.filteredPaths);
+		List<List<String>> allPaths = oldFilter.filteredPaths.getItems();
+		for (List<String> path : allPaths) {
+			filteredPaths.add(path);
+		}
 	}
 	
 	public static SyncFileFilter createEmptyFilter(IProject project) {
@@ -57,11 +58,11 @@ public class SyncFileFilter {
 	 * Add the common, default list of paths to be filtered.
 	 */
 	public void addDefaults() {
-		filteredPaths.add(new Path(".project")); //$NON-NLS-1$
-		filteredPaths.add(new Path(".cproject")); //$NON-NLS-1$
-		filteredPaths.add(new Path(".settings")); //$NON-NLS-1$
+		filteredPaths.add(".project"); //$NON-NLS-1$
+		filteredPaths.add(".cproject"); //$NON-NLS-1$
+		filteredPaths.add(".settings"); //$NON-NLS-1$
 		// TODO: This Git-specific directory is defined in multiple places - need to refactor.
-		filteredPaths.add(new Path(".ptp-sync")); //$NON-NLS-1$
+		filteredPaths.add(".ptp-sync"); //$NON-NLS-1$
 	}
 	
 	/**
@@ -97,23 +98,30 @@ public class SyncFileFilter {
 		}
 	}
 	
-	public boolean addPath(IPath path) {
-		return filteredPaths.add(path);
+	/**
+	 * Add a path to the filter
+	 * @param path
+	 */
+	public void addPath(IPath path) {
+		filteredPaths.add(Arrays.asList(path.segments()));
 	}
 	
-	public boolean removePath(IPath path) {
-		return filteredPaths.remove(path);
+	/**
+	 * Remove a path from the filter
+	 * @param path
+	 */
+	public void removePath(IPath path) {
+		filteredPaths.remove(Arrays.asList(path.segments()));
 	}
+
 	/**
 	 * Apply the filter to the given path
 	 * @param path
 	 * @return whether the path should be ignored
 	 */
 	public boolean shouldIgnore(IPath path) {
-		for (IPath p : filteredPaths) {
-			if (p.isPrefixOf(path)) {
-				return true;
-			}
+		if (filteredPaths.contains(Arrays.asList(path.segments()))) {
+			return true;
 		}
 		return filterBinaries && this.isBinaryFile(project, path);
 	}
