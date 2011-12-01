@@ -59,6 +59,7 @@ public class SyncManager  {
 	private static final String SYNC_MANAGER_ELEMENT_NAME = "sync-manager-data"; //$NON-NLS-1$
 	private static final String SYNC_MODE_ELEMENT_NAME = "project-to-sync-mode"; //$NON-NLS-1$
 	private static final String SHOW_ERROR_ELEMENT_NAME = "project-to-show-error"; //$NON-NLS-1$
+	private static final String FILE_FILTER_ELEMENT_NAME = "project-to-file-filter"; //$NON-NLS-1$
 	private static final String ATTR_PROJECT_NAME = "project"; //$NON-NLS-1$
 	private static final String ATTR_SYNC_MODE = "sync-mode"; //$NON-NLS-1$
 	private static final String ATTR_SHOW_ERROR = "show-error"; //$NON-NLS-1$
@@ -148,20 +149,6 @@ public class SyncManager  {
 			}
 		}
 		return new SyncFileFilter(fProjectToFileFilterMap.get(project));
-	}
-	
-	/**
-	 * Save a new file filter for a project.
-	 * Use this in conjunction with "getFileFilter(IProject)" to modify the current file filtering for a project.
-	 *
-	 * @param project cannot be null
-	 * @param filter cannot be null
-	 */
-	public static void saveFileFilter(IProject project, SyncFileFilter filter) {
-		if (project == null || filter == null) {
-			throw new NullPointerException();
-		}
-		fProjectToFileFilterMap.put(project, filter);
 	}
 
 	/**
@@ -253,6 +240,25 @@ public class SyncManager  {
 	 */
 	public static void setShowErrors(IProject project, boolean shouldBeDisplayed) {
 		fProjectToShowErrorMap.put(project, shouldBeDisplayed);
+		try {
+			saveConfigurationData();
+		} catch (IOException e) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+		}
+	}
+
+	/**
+	 * Save a new file filter for a project.
+	 * Use this in conjunction with "getFileFilter(IProject)" to modify the current file filtering for a project.
+	 *
+	 * @param project cannot be null
+	 * @param filter cannot be null
+	 */
+	public static void saveFileFilter(IProject project, SyncFileFilter filter) {
+		if (project == null || filter == null) {
+			throw new NullPointerException();
+		}
+		fProjectToFileFilterMap.put(project, filter);
 		try {
 			saveConfigurationData();
 		} catch (IOException e) {
@@ -396,6 +402,14 @@ public class SyncManager  {
 			}
 		}
 		
+		// Save project to "file filter" map
+		synchronized (fProjectToFileFilterMap) {
+			for (SyncFileFilter filter : fProjectToFileFilterMap.values()) {
+				IMemento fileFilterMemento = rootMemento.createChild(FILE_FILTER_ELEMENT_NAME);
+				filter.saveFilter(fileFilterMemento);
+			}
+		}
+		
 		// Save auto-sync setting
 		rootMemento.putBoolean(ATTR_AUTO_SYNC, fSyncAuto);
 
@@ -447,6 +461,13 @@ public class SyncManager  {
 				throw new RuntimeException(Messages.SyncManager_0 + project);
 			}
 			fProjectToShowErrorMap.put(project, showErrorMemento.getBoolean(ATTR_SHOW_ERROR));
+		}
+		
+		// Load project "file filter" settings
+		fProjectToFileFilterMap.clear();
+		for (IMemento fileFilterMemento : rootMemento.getChildren(FILE_FILTER_ELEMENT_NAME)) {
+			SyncFileFilter filter = SyncFileFilter.loadFilter(fileFilterMemento);
+			fProjectToFileFilterMap.put(filter.getProject(), filter);
 		}
 		
 		// Load auto-sync setting
