@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.ApplicationWindow;
+import org.eclipse.ptp.rdt.sync.core.RegexPatternMatcher;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.swt.SWT;
@@ -62,7 +63,7 @@ public class SyncFileTree extends ApplicationWindow {
 			}
 			
 			IPath path = ((IResource) element).getProjectRelativePath();
-			if (filter.shouldIgnore(path)) {
+			if (filter.shouldIgnore(path.toOSString())) {
 				return false;
 			} else {
 				return true;
@@ -283,7 +284,7 @@ public class SyncFileTree extends ApplicationWindow {
 	private class SFTCheckStateProvider implements ICheckStateProvider {
 		public boolean isChecked(Object element) {
 			IPath path = ((IResource) element).getProjectRelativePath();
-			if (filter.shouldIgnore(path)) {
+			if (filter.shouldIgnore(path.toOSString())) {
 				return false;
 			} else {
 				return true;
@@ -300,9 +301,9 @@ public class SyncFileTree extends ApplicationWindow {
 		public void checkStateChanged(CheckStateChangedEvent event) {
 			IPath path = ((IResource) (event.getElement())).getProjectRelativePath();
 			if (event.getChecked()) {
-				filter.removePath(path);
+				filter.removePattern(new RegexPatternMatcher(path.toOSString()));
 			} else {
-				filter.addPath(path);
+				filter.addExclusivePattern(new RegexPatternMatcher(path.toOSString()));
 			}
 			
 			treeViewer.refresh(event.getElement());

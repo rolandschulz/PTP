@@ -445,7 +445,7 @@ public class GitRemoteSyncConnection {
 				fn = QuotedString.GIT_PATH.dequote(fn);
 				if (status == 'R') {
 					filesToDelete.add(fn);
-				} else if (!(fileFilter.shouldIgnore(new Path(fn)))) {
+				} else if (!(fileFilter.shouldIgnore(new Path(fn).toOSString()))) {
 					filesToAdd.add(fn);
 				}
 			}
@@ -481,7 +481,7 @@ public class GitRemoteSyncConnection {
 
 		Set<String> filesToBeIgnored = new HashSet<String>();
 		for (String fileName : filesToAdd) {
-			if (fileFilter.shouldIgnore(new Path(fileName))) {
+			if (fileFilter.shouldIgnore(new Path(fileName).toOSString())) {
 				filesToBeIgnored.add(fileName);
 			}
 		}

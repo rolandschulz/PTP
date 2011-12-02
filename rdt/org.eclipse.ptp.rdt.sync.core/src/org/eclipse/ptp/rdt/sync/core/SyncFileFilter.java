@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
@@ -34,8 +36,18 @@ public class SyncFileFilter {
 	private static final String ATTR_FILE_FILTER_PATH = "filter-path"; //$NON-NLS-1$
 	
 	private final IProject project;
-	private boolean filterBinaries = false;
-	private final BasicTree filteredPaths = new BasicTree();
+	private final LinkedList<PatternToFilter> filteredPaths = new LinkedList<PatternToFilter>();
+
+	// Couple a pattern with whether it is exclusive
+	private class PatternToFilter {
+		boolean isExclusive;
+		PatternMatcher pattern;
+		
+		public PatternToFilter(boolean exc, PatternMatcher p) {
+			isExclusive = exc;
+			pattern = p;
+		}
+	}
 
 	// Private constructor - user should use create methods
 	private SyncFileFilter(IProject p) {
@@ -45,11 +57,7 @@ public class SyncFileFilter {
 	// Copy constructor
 	public SyncFileFilter(SyncFileFilter oldFilter) {
 		project = oldFilter.project;
-		filterBinaries = oldFilter.filterBinaries;
-		List<List<String>> allPaths = oldFilter.filteredPaths.getItems();
-		for (List<String> path : allPaths) {
-			filteredPaths.add(path);
-		}
+		filteredPaths.addAll(oldFilter.filteredPaths);
 	}
 	
 	/**
@@ -71,7 +79,6 @@ public class SyncFileFilter {
 	public static SyncFileFilter createDefaultFilter(IProject project) {
 		SyncFileFilter sff = new SyncFileFilter(project);
 		sff.addDefaults();
-		sff.setFilterBinaries(true);
 		return sff;
 	}
 	
@@ -84,22 +91,46 @@ public class SyncFileFilter {
 	}
 	
 	/**
-	 * Add the common, default list of paths to be filtered.
+	 * Get all patterns for this filter
+	 * @return patterns
 	 */
-	public void addDefaults() {
-		filteredPaths.add(".project"); //$NON-NLS-1$
-		filteredPaths.add(".cproject"); //$NON-NLS-1$
-		filteredPaths.add(".settings"); //$NON-NLS-1$
-		// TODO: This Git-specific directory is defined in multiple places - need to refactor.
-		filteredPaths.add(".ptp-sync"); //$NON-NLS-1$
+	public PatternMatcher[] getPatterns() {
+		PatternMatcher[] patterns = new PatternMatcher[filteredPaths.size()];
+		
+		int counter = 0;
+		for (PatternToFilter ptf : filteredPaths) {
+				patterns[counter] = ptf.pattern;
+				counter++;
+		}
+		
+		return patterns;
 	}
 	
 	/**
-	 * Should binary files be filtered?
-	 * @param b: true means filter, false means don't.
+	 * Get a "bitmask" (boolean array) of whether each pattern is exclusive or inclusive (true indicates exclusive)
+	 * @return the mask
 	 */
-	public void setFilterBinaries(boolean b) {
-		filterBinaries = b;
+	public boolean[] getExclusionMask() {
+		boolean[] mask = new boolean[filteredPaths.size()];
+		
+		int counter = 0;
+		for (PatternToFilter ptf : filteredPaths) {
+				mask[counter] = ptf.isExclusive;
+				counter++;
+		}
+		
+		return mask;
+	}
+	
+	/**
+	 * Add the common, default list of paths to be filtered.
+	 */
+	public void addDefaults() {
+		filteredPaths.add(new PatternToFilter(true, new RegexPatternMatcher(".project"))); //$NON-NLS-1$
+		filteredPaths.add(new PatternToFilter(true, new RegexPatternMatcher(".cproject"))); //$NON-NLS-1$
+		filteredPaths.add(new PatternToFilter(true, new RegexPatternMatcher(".settings"))); //$NON-NLS-1$
+		// TODO: This Git-specific directory is defined in multiple places - need to refactor.
+		filteredPaths.add(new PatternToFilter(true, new RegexPatternMatcher(".ptp-sync"))); //$NON-NLS-1$
 	}
 	
 	/**
@@ -128,31 +159,59 @@ public class SyncFileFilter {
 	}
 	
 	/**
-	 * Add a path to the filter
-	 * @param path
+	 * Add an exclusive pattern to the filter
+	 * @param pattern
 	 */
-	public void addPath(IPath path) {
-		filteredPaths.add(Arrays.asList(path.segments()));
+	public void addExclusivePattern(PatternMatcher pattern) {
+		filteredPaths.add(new PatternToFilter(true, pattern));
 	}
 	
 	/**
-	 * Remove a path from the filter
-	 * @param path
+	 * Add an inclusive pattern to the filter
+	 * @param pattern
 	 */
-	public void removePath(IPath path) {
-		filteredPaths.remove(Arrays.asList(path.segments()));
+	public void addInclusivePattern(PatternMatcher pattern) {
+		filteredPaths.add(new PatternToFilter(false, pattern));
+	}
+	
+	/**
+	 * Remove a pattern from the filter
+	 * @param pattern
+	 */
+	public void removePattern(PatternMatcher pattern) {
+		for (PatternToFilter ptf : filteredPaths) {
+			if (pattern == ptf.pattern) {
+				filteredPaths.remove(ptf);
+			}
+		}
 	}
 
 	/**
-	 * Apply the filter to the given path
-	 * @param path
-	 * @return whether the path should be ignored
+	 * Apply the filter to the given string
+	 * @param s - the string
+	 * @return whether the string should be ignored
 	 */
-	public boolean shouldIgnore(IPath path) {
-		if (filteredPaths.contains(Arrays.asList(path.segments()))) {
-			return true;
+	public boolean shouldIgnore(String s) {
+		boolean isExcluded = false;
+		
+		// Test all patterns in order
+		for (PatternToFilter ptf : filteredPaths) {
+			// Based on current state, we can skip either exclusive or inclusive patterns.
+			if (isExcluded && ptf.isExclusive) {
+				continue;
+			}
+			
+			if (!isExcluded && !ptf.isExclusive) {
+				continue;
+			}
+			
+			// Now test and switch if string matches pattern
+			if (ptf.pattern.match(s)) {
+				isExcluded = !isExcluded;
+			}
 		}
-		return filterBinaries && this.isBinaryFile(project, path);
+		
+		return isExcluded;
 	}
 	
 	/**
@@ -162,16 +221,10 @@ public class SyncFileFilter {
 	 */
 	public void saveFilter(IMemento memento) {
 		memento.putString(ATTR_PROJECT_NAME, project.getName());
-		memento.putBoolean(ATTR_FILTER_BINARIES, filterBinaries);
 
-		for (List<String> path : filteredPaths.getItems()) {
-			StringBuilder pathBuilder = new StringBuilder();
-			for (String segment : path) {
-				pathBuilder.append(segment);
-				pathBuilder.append(IPath.SEPARATOR);
-			}
+		for (PatternToFilter ptf : filteredPaths) {
 			IMemento pathMemento = memento.createChild(FILE_FILTER_PATH_ELEMENT_NAME);
-			pathMemento.putString(ATTR_FILE_FILTER_PATH, pathBuilder.toString());
+			// ptf.pattern.savePattern(pathMemento);
 		}
 	}
 	
@@ -189,12 +242,9 @@ public class SyncFileFilter {
 		}
 
 		SyncFileFilter filter = createEmptyFilter(project);
-		filter.setFilterBinaries(memento.getBoolean(ATTR_FILTER_BINARIES));
 		
 		for (IMemento pathMemento : memento.getChildren(FILE_FILTER_PATH_ELEMENT_NAME)) {
-			String path = pathMemento.getString(ATTR_FILE_FILTER_PATH);
-			String[] segments = path.split(Character.toString(IPath.SEPARATOR));
-			filter.filteredPaths.add(Arrays.asList(segments));
+			// filter.filteredPaths.add(PatternMatcher.loadFilter(pathMemento));
 		}
 		
 		return filter;
