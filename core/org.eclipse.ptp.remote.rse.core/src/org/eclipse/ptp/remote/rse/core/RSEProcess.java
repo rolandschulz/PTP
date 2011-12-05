@@ -117,7 +117,9 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 		inputStream = new PipedInputStream(hostShellInput);
 		outputStream = new HostShellOutputStream(hostShell);
 		this.hostShell.getStandardOutputReader().addOutputListener(this);
-		this.hostShell.getStandardErrorReader().addOutputListener(this);
+		
+		if(this.hostShell.getStandardErrorReader() != null)
+			this.hostShell.getStandardErrorReader().addOutputListener(this);
 		
 		if(hostShell instanceof DStoreHostShell) {
 			fStatus = ((DStoreHostShell) hostShell).getStatus();
