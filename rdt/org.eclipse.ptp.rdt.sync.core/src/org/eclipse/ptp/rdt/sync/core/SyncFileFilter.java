@@ -10,17 +10,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
+
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
 /**
@@ -36,20 +34,14 @@ public class SyncFileFilter {
 	private static final String ATTR_FILE_FILTER_PATH = "filter-path"; //$NON-NLS-1$
 	
 	private final IProject project;
-	private final LinkedList<PatternToFilter> filteredPaths = new LinkedList<PatternToFilter>();
-
-	// Couple a pattern with whether it is exclusive
-	private class PatternToFilter {
-		boolean isExclusive;
-		PatternMatcher pattern;
-		
-		public PatternToFilter(boolean exc, PatternMatcher p) {
-			isExclusive = exc;
-			pattern = p;
-		}
+	private final LinkedList<PatternMatcher> filteredPaths = new LinkedList<PatternMatcher>();
+	private final Map<PatternMatcher, PatternType> patternToTypeMap = new HashMap<PatternMatcher, PatternType>();
+	
+	public enum PatternType {
+		EXCLUDE, INCLUDE
 	}
 
-	// Private constructor - user should use create methods
+	// Private constructor - create instances with "create" methods.
 	private SyncFileFilter(IProject p) {
 		project = p;
 	}
@@ -58,6 +50,7 @@ public class SyncFileFilter {
 	public SyncFileFilter(SyncFileFilter oldFilter) {
 		project = oldFilter.project;
 		filteredPaths.addAll(oldFilter.filteredPaths);
+		patternToTypeMap.putAll(oldFilter.patternToTypeMap);
 	}
 	
 	/**
@@ -95,42 +88,27 @@ public class SyncFileFilter {
 	 * @return patterns
 	 */
 	public PatternMatcher[] getPatterns() {
-		PatternMatcher[] patterns = new PatternMatcher[filteredPaths.size()];
-		
-		int counter = 0;
-		for (PatternToFilter ptf : filteredPaths) {
-				patterns[counter] = ptf.pattern;
-				counter++;
-		}
-		
-		return patterns;
+		return filteredPaths.toArray(new PatternMatcher[filteredPaths.size()]);
 	}
 	
 	/**
-	 * Get a "bitmask" (boolean array) of whether each pattern is exclusive or inclusive (true indicates exclusive)
-	 * @return the mask
+	 * Get the pattern type for the pattern
+	 * @param pattern
+	 * @return the type or null if this pattern is unknown in this filter.
 	 */
-	public boolean[] getExclusionMask() {
-		boolean[] mask = new boolean[filteredPaths.size()];
-		
-		int counter = 0;
-		for (PatternToFilter ptf : filteredPaths) {
-				mask[counter] = ptf.isExclusive;
-				counter++;
-		}
-		
-		return mask;
+	public PatternType getPatternType(PatternMatcher pattern) {
+		return patternToTypeMap.get(pattern);
 	}
 	
 	/**
 	 * Add the common, default list of paths to be filtered.
 	 */
 	public void addDefaults() {
-		filteredPaths.add(new PatternToFilter(true, new RegexPatternMatcher(".project"))); //$NON-NLS-1$
-		filteredPaths.add(new PatternToFilter(true, new RegexPatternMatcher(".cproject"))); //$NON-NLS-1$
-		filteredPaths.add(new PatternToFilter(true, new RegexPatternMatcher(".settings"))); //$NON-NLS-1$
+		this.addPattern(new RegexPatternMatcher(".project"), PatternType.EXCLUDE); //$NON-NLS-1$
+		this.addPattern(new RegexPatternMatcher(".cproject"), PatternType.EXCLUDE); //$NON-NLS-1$
+		this.addPattern(new RegexPatternMatcher(".settings"), PatternType.EXCLUDE); //$NON-NLS-1$
 		// TODO: This Git-specific directory is defined in multiple places - need to refactor.
-		filteredPaths.add(new PatternToFilter(true, new RegexPatternMatcher(".ptp-sync"))); //$NON-NLS-1$
+		this.addPattern(new RegexPatternMatcher(".ptp-sync"), PatternType.EXCLUDE); //$NON-NLS-1$
 	}
 	
 	/**
@@ -159,19 +137,13 @@ public class SyncFileFilter {
 	}
 	
 	/**
-	 * Add an exclusive pattern to the filter
+	 * Add a new pattern to the filter of the specified type
 	 * @param pattern
+	 * @param type
 	 */
-	public void addExclusivePattern(PatternMatcher pattern) {
-		filteredPaths.add(new PatternToFilter(true, pattern));
-	}
-	
-	/**
-	 * Add an inclusive pattern to the filter
-	 * @param pattern
-	 */
-	public void addInclusivePattern(PatternMatcher pattern) {
-		filteredPaths.add(new PatternToFilter(false, pattern));
+	public void addPattern(PatternMatcher pattern, PatternType type) {
+		filteredPaths.add(pattern);
+		patternToTypeMap.put(pattern, type);
 	}
 	
 	/**
@@ -179,11 +151,8 @@ public class SyncFileFilter {
 	 * @param pattern
 	 */
 	public void removePattern(PatternMatcher pattern) {
-		for (PatternToFilter ptf : filteredPaths) {
-			if (pattern == ptf.pattern) {
-				filteredPaths.remove(ptf);
-			}
-		}
+		filteredPaths.remove(pattern);
+		patternToTypeMap.remove(pattern);
 	}
 
 	/**
@@ -192,16 +161,19 @@ public class SyncFileFilter {
 	 * @return whether the string should be ignored
 	 */
 	public boolean shouldIgnore(String s) {
-		boolean isExcluded = false;
-		
-		for (PatternToFilter ptf : filteredPaths) {
-			if (ptf.pattern.match(s)) {
-				isExcluded = ptf.isExclusive;
-				break;
+		for (PatternMatcher pm : filteredPaths) {
+			if (pm.match(s)) {
+				PatternType type = patternToTypeMap.get(pm);
+				assert(pm != null);
+				if (type == PatternType.EXCLUDE) {
+					return true;
+				} else {
+					return false;
+				}
 			}
 		}
 		
-		return isExcluded;
+		return false;
 	}
 	
 	/**
@@ -211,11 +183,7 @@ public class SyncFileFilter {
 	 */
 	public void saveFilter(IMemento memento) {
 		memento.putString(ATTR_PROJECT_NAME, project.getName());
-
-		for (PatternToFilter ptf : filteredPaths) {
-			IMemento pathMemento = memento.createChild(FILE_FILTER_PATH_ELEMENT_NAME);
 			// ptf.pattern.savePattern(pathMemento);
-		}
 	}
 	
 	/**

@@ -21,6 +21,7 @@ import org.eclipse.ui.IMemento;
 public abstract class PatternMatcher {
 	private static final String ATTR_CLASS_NAME = "class-name"; //$NON-NLS-1$
 	public abstract boolean match(String candidate);
+	public abstract String toString();
 //	public static abstract PatternMatcher loadPattern(IMemento memento);
 //	public PatternMatcher loadUnknownPattern(IMemento memento) {
 //		String className = memento.getString(ATTR_CLASS_NAME);

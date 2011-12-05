@@ -24,19 +24,26 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.ApplicationWindow;
+import org.eclipse.ptp.rdt.sync.core.PatternMatcher;
 import org.eclipse.ptp.rdt.sync.core.RegexPatternMatcher;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter.PatternType;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
@@ -47,7 +54,8 @@ public class SyncFileTree extends ApplicationWindow {
 	private final IProject project;
 	private final SyncFileFilter filter;
 	private SyncCheckboxTreeViewer treeViewer;
-	
+	private Table patternTable;
+
 	// A checkbox tree viewer that does not allow unchecked directories to be expanded.
 	// Note: This illegally extends CheckboxTreeViewer but is the only simple way known to implement this behavior.
 	// Also, the "isExpandable" method exists in the grandparent class and comments say that it may be overriden.
@@ -100,7 +108,7 @@ public class SyncFileTree extends ApplicationWindow {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(2, false));
 
-		// Create the tree viewer to display the file tree
+		// File tree viewer
 		treeViewer = new SyncCheckboxTreeViewer(composite);
 		treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		treeViewer.setContentProvider(new SFTTreeContentProvider());
@@ -108,6 +116,25 @@ public class SyncFileTree extends ApplicationWindow {
 		treeViewer.setCheckStateProvider(new SFTCheckStateProvider());
 		treeViewer.addCheckStateListener(new SFTCheckStateListener());
 		treeViewer.setInput(project);
+		
+		// List of patterns
+		patternTable = new Table(composite, SWT.SINGLE | SWT.V_SCROLL | SWT.BORDER);
+		patternTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		TableColumn patternTableColumn = new TableColumn(patternTable, SWT.LEAD, 0);
+		patternTableColumn.setWidth(100);
+		Display display = Display.getCurrent();
+		Color includeGreen = display.getSystemColor(SWT.COLOR_GREEN);
+		Color excludeRed = display.getSystemColor(SWT.COLOR_RED);
+
+		for (PatternMatcher pattern : filter.getPatterns()) {
+			TableItem ti = new TableItem(patternTable, SWT.LEAD);
+			ti.setText(pattern.toString());
+			if (filter.getPatternType(pattern) == PatternType.INCLUDE) {
+				ti.setForeground(includeGreen);
+			} else {
+				ti.setForeground(excludeRed);
+			}
+		}
 
 	    Button cancelButton = new Button(composite, SWT.PUSH);
 	    cancelButton.setText("    Cancel    "); //$NON-NLS-1$
@@ -166,7 +193,7 @@ public class SyncFileTree extends ApplicationWindow {
 		 * Returns whether the passed object has children
 		 * 
 		 * @param element
-		 *            the parent object
+		 *            the parent object	private class SFTStyledCellLabelProvider extends 
 		 * @return boolean
 		 */
 		public boolean hasChildren(Object element) {
@@ -303,7 +330,7 @@ public class SyncFileTree extends ApplicationWindow {
 			if (event.getChecked()) {
 				filter.removePattern(new RegexPatternMatcher(path.toOSString()));
 			} else {
-				filter.addExclusivePattern(new RegexPatternMatcher(path.toOSString()));
+				filter.addPattern(new RegexPatternMatcher(path.toOSString()), PatternType.EXCLUDE);
 			}
 			
 			treeViewer.refresh(event.getElement());

@@ -26,6 +26,10 @@ public class RegexPatternMatcher extends PatternMatcher {
 		return regexCompare(regex, candidate);
 	}
 	
+	public String toString() {
+		return regex;
+	}
+	
 	/**
 	 * Compare a regular expression to a candidate string. Since this functionality may be generally useful, this function
 	 * is both public and static.
