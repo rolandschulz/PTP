@@ -194,20 +194,10 @@ public class SyncFileFilter {
 	public boolean shouldIgnore(String s) {
 		boolean isExcluded = false;
 		
-		// Test all patterns in order
 		for (PatternToFilter ptf : filteredPaths) {
-			// Based on current state, we can skip either exclusive or inclusive patterns.
-			if (isExcluded && ptf.isExclusive) {
-				continue;
-			}
-			
-			if (!isExcluded && !ptf.isExclusive) {
-				continue;
-			}
-			
-			// Now test and switch if string matches pattern
 			if (ptf.pattern.match(s)) {
-				isExcluded = !isExcluded;
+				isExcluded = ptf.isExclusive;
+				break;
 			}
 		}
 		
