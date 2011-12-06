@@ -40,6 +40,8 @@ public class Messages extends NLS {
 	public static String BCM_LocalServiceError;
 	public static String BCM_ProjectError;
 
+	public static String BinaryPatternMatcher_0;
+
 	public static String WorkspaceConfigName;
 
 	public static String SyncBuildServiceProvider_configDir;

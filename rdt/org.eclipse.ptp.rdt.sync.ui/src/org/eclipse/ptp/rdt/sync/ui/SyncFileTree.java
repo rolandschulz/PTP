@@ -34,16 +34,20 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
@@ -51,6 +55,11 @@ import org.eclipse.ui.PlatformUI;
  * File tree where users can select the files to be sync'ed
  */
 public class SyncFileTree extends ApplicationWindow {
+	private static final int WINDOW_WIDTH = 600;
+	private static final Display display = Display.getCurrent();
+	private static final Color excludeRed = display.getSystemColor(SWT.COLOR_RED);
+	private static final Color includeGreen = display.getSystemColor(SWT.COLOR_GREEN);
+	
 	private final IProject project;
 	private final SyncFileFilter filter;
 	private SyncCheckboxTreeViewer treeViewer;
@@ -94,7 +103,6 @@ public class SyncFileTree extends ApplicationWindow {
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText("Synchronized Files"); //$NON-NLS-1$
-		shell.setSize(400, 400);
 	}
 
 	/**
@@ -106,37 +114,129 @@ public class SyncFileTree extends ApplicationWindow {
 	 */
 	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout(2, false));
+		GridLayout gl = new GridLayout(1, false);
+		gl.verticalSpacing = 20;
+		composite.setLayout(gl);
 
 		// File tree viewer
 		treeViewer = new SyncCheckboxTreeViewer(composite);
 		treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		treeViewer.setContentProvider(new SFTTreeContentProvider());
 		treeViewer.setLabelProvider(new SFTTreeLabelProvider());
-		treeViewer.setCheckStateProvider(new SFTCheckStateProvider());
-		treeViewer.addCheckStateListener(new SFTCheckStateListener());
+		treeViewer.setCheckStateProvider(new ICheckStateProvider() {
+			public boolean isChecked(Object element) {
+				IPath path = ((IResource) element).getProjectRelativePath();
+				if (filter.shouldIgnore(path.toOSString())) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+
+			public boolean isGrayed(Object element) {
+				return false;
+			}
+		});
+		treeViewer.addCheckStateListener(new ICheckStateListener() {
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				IPath path = ((IResource) (event.getElement())).getProjectRelativePath();
+				if (event.getChecked()) {
+					filter.addPattern(new RegexPatternMatcher(path.toOSString()), PatternType.INCLUDE);
+				} else {
+					filter.addPattern(new RegexPatternMatcher(path.toOSString()), PatternType.EXCLUDE);
+				}
+
+				update();
+			}
+		});
 		treeViewer.setInput(project);
 		
-		// List of patterns
-		patternTable = new Table(composite, SWT.SINGLE | SWT.V_SCROLL | SWT.BORDER);
-		patternTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		// Composite for pattern table and buttons
+		Composite patternTableComposite = new Composite(composite, SWT.BORDER);
+		patternTableComposite.setLayout(new GridLayout(2, false));
+		patternTableComposite.setLayoutData(new GridData(WINDOW_WIDTH, 150));
+		
+		// Pattern table
+		patternTable = new Table(patternTableComposite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+		patternTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
 		TableColumn patternTableColumn = new TableColumn(patternTable, SWT.LEAD, 0);
-		patternTableColumn.setWidth(100);
-		Display display = Display.getCurrent();
-		Color includeGreen = display.getSystemColor(SWT.COLOR_GREEN);
-		Color excludeRed = display.getSystemColor(SWT.COLOR_RED);
+		patternTableColumn.setWidth(1);
+		
+		// Pattern table buttons (up, down, and delete)
+		Button upButton = new Button(patternTableComposite, SWT.PUSH);
+	    upButton.setText("      Up      "); //$NON-NLS-1$
+	    upButton.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
 
-		for (PatternMatcher pattern : filter.getPatterns()) {
-			TableItem ti = new TableItem(patternTable, SWT.LEAD);
-			ti.setText(pattern.toString());
-			if (filter.getPatternType(pattern) == PatternType.INCLUDE) {
-				ti.setForeground(includeGreen);
-			} else {
-				ti.setForeground(excludeRed);
-			}
-		}
+	    Button downButton = new Button(patternTableComposite, SWT.PUSH);
+	    downButton.setText("     Down     "); //$NON-NLS-1$
+	    downButton.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
 
-	    Button cancelButton = new Button(composite, SWT.PUSH);
+	    Button deleteButton = new Button(patternTableComposite, SWT.PUSH);
+	    deleteButton.setText("    Delete    "); //$NON-NLS-1$
+	    deleteButton.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false));
+	    deleteButton.addSelectionListener(new SelectionAdapter() {
+	    	public void widgetSelected(SelectionEvent event) {
+	    		TableItem[] selectedPatternItems = patternTable.getSelection();
+	    		for (TableItem selectedPatternItem : selectedPatternItems) {
+	    			PatternMatcher selectedPattern = (PatternMatcher) selectedPatternItem.getData();
+	    			filter.removePattern(selectedPattern);
+	    		}
+	    		update();
+	    	}
+	    });
+	    
+	    //Composite for text box, combo, and buttons to enter a new pattern
+	    Composite patternEnterComposite = new Composite(composite, SWT.FILL);
+	    patternEnterComposite.setLayout(new GridLayout(3, false));
+		patternEnterComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+	    // Text box to enter new pattern
+	    final Text newPattern = new Text(patternEnterComposite, SWT.NONE);
+	    newPattern.setLayoutData(new GridData(SWT.FILL, SWT.LEAD, true, false));
+
+	    // Submit buttons (exclude and include)
+	    Button excludeButton = new Button(patternEnterComposite, SWT.PUSH);
+	    excludeButton.setText("    Exclude    "); //$NON-NLS-1$
+	    excludeButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    excludeButton.addSelectionListener(new SelectionAdapter() {
+	    	public void widgetSelected(SelectionEvent event) {
+	    		String pattern = newPattern.getText();
+	    		if (!pattern.isEmpty()) {
+	    			filter.addPattern(new RegexPatternMatcher(pattern), SyncFileFilter.PatternType.EXCLUDE);
+	    			newPattern.setText(""); //$NON-NLS-1$
+	    			update();
+	    		}
+	    	}
+	    });
+
+	    Button includeButton = new Button(patternEnterComposite, SWT.PUSH);
+	    includeButton.setText("    Include    "); //$NON-NLS-1$
+	    includeButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    includeButton.addSelectionListener(new SelectionAdapter() {
+	    	public void widgetSelected(SelectionEvent event) {
+	    		String pattern = newPattern.getText();
+	    		if (!pattern.isEmpty()) {
+	    			filter.addPattern(new RegexPatternMatcher(pattern), SyncFileFilter.PatternType.INCLUDE);
+	    			newPattern.setText(""); //$NON-NLS-1$
+	    			update();
+	    		}
+	    	}
+	    });
+	    
+	    Combo specialFiltersCombo = new Combo(patternEnterComposite, SWT.READ_ONLY);
+	    specialFiltersCombo.addSelectionListener(new SelectionAdapter() {
+	    	public void widgetSelected(SelectionEvent event) {
+	    		// Nothing yet - todo Dec. 7
+	    	}
+	    });
+
+	    // Composite for cancel and OK buttons
+	    Composite buttonComposite = new Composite(composite, SWT.FILL);
+	    buttonComposite.setLayout(new GridLayout(2, false));
+		buttonComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+	    // Cancel button
+	    Button cancelButton = new Button(buttonComposite, SWT.PUSH);
 	    cancelButton.setText("    Cancel    "); //$NON-NLS-1$
 	    cancelButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, true, false));
 	    cancelButton.addSelectionListener(new SelectionAdapter() {
@@ -145,7 +245,8 @@ public class SyncFileTree extends ApplicationWindow {
 	      }
 	    });
 	    
-	    Button okButton = new Button(composite, SWT.PUSH);
+	    // OK button
+	    Button okButton = new Button(buttonComposite, SWT.PUSH);
 	    okButton.setText("      OK      "); //$NON-NLS-1$
 	    okButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, false, false));
 	    okButton.addSelectionListener(new SelectionAdapter() {
@@ -155,9 +256,25 @@ public class SyncFileTree extends ApplicationWindow {
 	      }
 	    });
 
+	    update();
 		return composite;
 	}
 
+	private void update() {
+		patternTable.removeAll();
+		for (PatternMatcher pattern : filter.getPatterns()) {
+			TableItem ti = new TableItem(patternTable, SWT.LEAD);
+			ti.setText(pattern.toString());
+			ti.setData(pattern);
+			if (filter.getPatternType(pattern) == PatternType.INCLUDE) {
+				ti.setForeground(includeGreen);
+			} else {
+				ti.setForeground(excludeRed);
+			}
+		}
+		
+		treeViewer.refresh();
+	}
 	private class SFTTreeContentProvider implements ITreeContentProvider {
 		/**
 		 * Gets the children of the specified object
@@ -304,36 +421,6 @@ public class SyncFileTree extends ApplicationWindow {
 		@Override
 		public void removeListener(ILabelProviderListener listener) {
 			// Listeners not supported
-		}
-	}
-	
-	// Simple check state provider - just refer to the project's file filter to see if the entry should be checked.
-	private class SFTCheckStateProvider implements ICheckStateProvider {
-		public boolean isChecked(Object element) {
-			IPath path = ((IResource) element).getProjectRelativePath();
-			if (filter.shouldIgnore(path.toOSString())) {
-				return false;
-			} else {
-				return true;
-			}
-		}
-
-		public boolean isGrayed(Object element) {
-			return false;
-		}
-	}
-	
-	// Simple listener to update file filter as user checks and unchecks.
-	private class SFTCheckStateListener implements ICheckStateListener {
-		public void checkStateChanged(CheckStateChangedEvent event) {
-			IPath path = ((IResource) (event.getElement())).getProjectRelativePath();
-			if (event.getChecked()) {
-				filter.removePattern(new RegexPatternMatcher(path.toOSString()));
-			} else {
-				filter.addPattern(new RegexPatternMatcher(path.toOSString()), PatternType.EXCLUDE);
-			}
-			
-			treeViewer.refresh(event.getElement());
 		}
 	}
 }

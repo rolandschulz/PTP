@@ -30,8 +30,6 @@ import org.eclipse.ui.IMemento;
 public class SyncFileFilter {
 	private static final String FILE_FILTER_PATH_ELEMENT_NAME = "file-filter-path"; //$NON-NLS-1$
 	private static final String ATTR_PROJECT_NAME = "project"; //$NON-NLS-1$
-	private static final String ATTR_FILTER_BINARIES = "filter-binaries"; //$NON-NLS-1$
-	private static final String ATTR_FILE_FILTER_PATH = "filter-path"; //$NON-NLS-1$
 	
 	private final IProject project;
 	private final LinkedList<PatternMatcher> filteredPaths = new LinkedList<PatternMatcher>();
@@ -110,39 +108,14 @@ public class SyncFileFilter {
 		// TODO: This Git-specific directory is defined in multiple places - need to refactor.
 		this.addPattern(new RegexPatternMatcher(".ptp-sync"), PatternType.EXCLUDE); //$NON-NLS-1$
 	}
-	
-	/**
-	 * Return whether this is a binary file. Note that this only works for files recognized by CDT. This function does not yet
-	 * recognize binary files in general.
-	 * @param project
-	 * @param path
-	 * @return whether file is a binary file
-	 */
-	public boolean isBinaryFile(IProject project, IPath path) {
-		try {
-			ICElement fileElement = CoreModel.getDefault().create(project.getFile(path));
-			if (fileElement == null) {
-				return false;
-			}
-			int resType = fileElement.getElementType();
-			if (resType == ICElement.C_BINARY) {
-				return true;
-			} else {
-				return false;
-			}
-		} catch (NullPointerException e) {
-			// CDT throws this exception for files not recognized. For now, be conservative and allow these files.
-			return false;
-		}
-	}
-	
+
 	/**
 	 * Add a new pattern to the filter of the specified type
 	 * @param pattern
 	 * @param type
 	 */
 	public void addPattern(PatternMatcher pattern, PatternType type) {
-		filteredPaths.add(pattern);
+		filteredPaths.add(0, pattern);
 		patternToTypeMap.put(pattern, type);
 	}
 	
