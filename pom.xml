@@ -15,12 +15,8 @@
 
 	<properties>
 		<tycho-version>0.13.0</tycho-version>
-		<platform-version>3.7</platform-version>
-		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
-		<orbit-version>R20110523182458</orbit-version>
-		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</orbit-site>
-		<tm-version>3.3</tm-version>
-		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
+		<eclipse-release>indigo</eclipse-release>
+		<eclipse-site>http://download.eclipse.org/releases/${eclipse-release}</eclipse-site>
 	</properties>
 
 	<licenses>
@@ -63,30 +59,6 @@
 		<module>debug/org.eclipse.ptp.debug.sdm.core</module>
 		<module>debug/org.eclipse.ptp.debug.sdm.ui</module>
 		<module>debug/org.eclipse.ptp.debug.ui</module>
-		<module>photran/org.eclipse.photran.cdtinterface</module>
-		<module>photran/org.eclipse.photran.cdtinterface.vpg</module>
-		<module>photran/org.eclipse.photran.core</module>
-		<module>photran/org.eclipse.photran.core.intel</module>
-		<module>photran/org.eclipse.photran.core.vpg</module>
-		<module>photran/org.eclipse.photran.doc.user</module>
-		<module>photran/org.eclipse.photran.errorparsers.xlf</module>
-		<module>photran/org.eclipse.photran-feature</module>
-		<module>photran/org.eclipse.photran.intel-feature</module>
-		<module>photran/org.eclipse.photran.managedbuilder.core</module>
-		<module>photran/org.eclipse.photran.managedbuilder.gnu.ui</module>
-		<module>photran/org.eclipse.photran.managedbuilder.intel.ui</module>
-		<module>photran/org.eclipse.photran.managedbuilder.ui</module>
-		<module>photran/org.eclipse.photran.managedbuilder.xlf.ui</module>
-		<module>photran/org.eclipse.photran.ui</module>
-		<module>photran/org.eclipse.photran.ui.vpg</module>
-		<module>photran/org.eclipse.photran.xlf-feature</module>
-		<module>photran/org.eclipse.rephraserengine.core</module>
-		<module>photran/org.eclipse.rephraserengine.core.refactoring</module>
-		<module>photran/org.eclipse.rephraserengine.core.vpg</module>
-		<module>photran/org.eclipse.rephraserengine-feature</module>
-		<module>photran/org.eclipse.rephraserengine.ui</module>
-		<module>photran/org.eclipse.rephraserengine.ui.refactoring</module>
-		<module>photran/org.eclipse.rephraserengine.ui.vpg</module>
 		<module>rdt/org.eclipse.ptp.rdt.core</module>
 		<module>rdt/org.eclipse.ptp.rdt.core.remotejars</module>
 		<module>rdt/org.eclipse.ptp.rdt.core.stubs</module>
@@ -221,23 +193,8 @@
 
 	<repositories>
 		<repository>
-			<id>platform-${platform-version}</id>
-			<url>${platform-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>orbit-${orbit-version}</id>
-			<url>${orbit-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>tm-${tm-version}</id>
-			<url>${tm-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>indigo</id>
-			<url>http://download.eclipse.org/releases/indigo</url>
+			<id>eclipse-${eclipse-release}</id>
+			<url>${eclipse-site}</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>

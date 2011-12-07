@@ -14,19 +14,6 @@
 	<artifactId>org.eclipse.ptp.repo</artifactId>
 	<packaging>eclipse-repository</packaging>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-p2-publisher-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<publishArtifacts>true</publishArtifacts>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-
 	<profiles>
 		<profile>
 			<id>production</id>
@@ -35,54 +22,6 @@
 			</properties>
 			<build>
 				<plugins>
-					<plugin>
-						<groupId>org.eclipse.dash.maven</groupId>
-						<artifactId>eclipse-signing-maven-plugin</artifactId>
-						<version>1.0.5</version>
-						<executions>
-							<execution>
-								<id>pack</id>
-								<configuration>
-									<inputFile>${project.build.directory}/org.eclipse.ptp.repo.zip</inputFile>
-								</configuration>
-								<phase>package</phase>
-								<goals>
-									<goal>pack</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>sign</id>
-								<configuration>
-									<inputFile>${project.build.directory}/packed/org.eclipse.ptp.repo.zip</inputFile>
-									<signerInputDirectory>/home/data/httpd/download-staging.priv/tools/ptp</signerInputDirectory>
-								</configuration>
-								<phase>package</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>repack</id>
-								<configuration>
-									<inputFile>${project.build.directory}/signed/site_assembly.zip</inputFile>
-								</configuration>
-								<phase>package</phase>
-								<goals>
-									<goal>pack</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>fixCheckSums</id>
-								<configuration>
-									<inputFile>${project.build.directory}/packed/site_assembly.zip</inputFile>
-								</configuration>
-								<phase>package</phase>
-								<goals>
-									<goal>fixCheckSums</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
 					<plugin>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
@@ -100,12 +39,6 @@
 												<include name="**/*" />
 											</fileset>
 										</delete>
-										<copy includeemptydirs="false" todir="${ptp-install}">
-											<fileset dir="${project.build.directory}/checksumFix">
-												<include name="**" />
-											</fileset>
-										</copy>
-										<zip basedir="${project.build.directory}/checksumFix" destfile="${ptp-install}/org.eclipse.ptp.repo.${unqualifiedVersion}.${buildQualifier}.zip" />
 										<copy todir="${ptp-install}">
 											<fileset dir="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars">
 												<include name="rdt-server-aix-${unqualifiedVersion}.tar" />
@@ -117,6 +50,12 @@
 												<include name="rdt-server-windows-${unqualifiedVersion}.zip" />
 											</fileset>
 										</copy>
+										<copy
+											file="target/org.eclipse.ptp.repo.zip"
+											tofile="${ptp-install}/org.eclipse.ptp.repo.${unqualifiedVersion}.${buildQualifier}.zip"/>
+										<unzip
+											src="target/org.eclipse.ptp.repo.zip"
+											dest="${ptp-install}"/>
 										<unzip src="${basedir}/../../releng/org.eclipse.ptp.aix.ppc/target/org.eclipse.ptp.aix.ppc-${project.version}.jar"
 											dest="${ptp-install}/proxy/org.eclipse.ptp.aix.ppc_${unqualifiedVersion}.${buildQualifier}" />
 										<unzip src="${basedir}/../../releng/org.eclipse.ptp.linux.ppc/target/org.eclipse.ptp.linux.ppc-${project.version}.jar"
