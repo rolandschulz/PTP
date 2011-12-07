@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,14 +25,12 @@ import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.dstore.core.model.DataStoreResources;
 import org.eclipse.dstore.core.model.DataStoreSchema;
-import org.eclipse.rse.internal.services.dstore.shells.DStoreShellOutputReader;
 import org.eclipse.rse.services.dstore.util.DStoreStatusMonitor;
 import org.eclipse.rse.services.shells.AbstractHostShell;
 import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.services.shells.IHostShellOutputReader;
 
 
-@SuppressWarnings("restriction")
 public class DStoreHostShell extends AbstractHostShell implements IHostShell
 {
 	private IHostShellOutputReader _stdoutHandler;
@@ -44,7 +42,7 @@ public class DStoreHostShell extends AbstractHostShell implements IHostShell
 	private DataStore _dataStore;
 	
 	@SuppressWarnings("restriction")
-	public DStoreHostShell(DStoreStatusMonitor statusMonitor, DataElement status, DataStore dataStore, String initialWorkingDirectory, String invocation, String encoding, String[] environment)
+	public DStoreHostShell(DStoreStatusMonitor statusMonitor, DataElement status, DataStore dataStore, String initialWorkingDirectory, String invocation, String encoding, String[] environment, boolean redirectStderr)
 	{
 		_dataStore = dataStore;
 		
@@ -53,8 +51,19 @@ public class DStoreHostShell extends AbstractHostShell implements IHostShell
 		dataStore.setObject(contextDir);
 		
 		_status = status;
-		_stdoutHandler = new DStoreShellOutputReader(this, _status, false);
-		_stderrHandler = new DStoreShellOutputReader(this, _status,true);	
+		
+		if(redirectStderr) {
+			// we redirect stderr to stdout using our own hacked up copy of DStoreShellOutputReader
+			_stdoutHandler = new DStoreShellOutputReader(this, _status, false);
+			_stderrHandler = null;
+		}
+		
+		else {
+			// use normal RSE stuff
+			_stdoutHandler = new org.eclipse.rse.internal.services.dstore.shells.DStoreShellOutputReader(this, _status, false);
+			_stderrHandler = new org.eclipse.rse.internal.services.dstore.shells.DStoreShellOutputReader(this, _status, true);
+		}
+		
 		_statusMonitor = statusMonitor;
 		
 		

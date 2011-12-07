@@ -157,6 +157,7 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 			IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
 			
 			remoteEnvMap = processBuilder.environment();
+			remoteEnvMap.clear();
 			
 			for(String envVar : env) {
 				String[] splitStr = envVar.split("="); //$NON-NLS-1$
@@ -171,9 +172,7 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 			
 			// combine stdout and stderr
 			processBuilder.redirectErrorStream(true);
-			
-
-			
+	
 			IRemoteProcess p = null;
 			try {
 				p = processBuilder.start();
@@ -193,14 +192,6 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 			
 			fRemoteProcess = p;
 			fProcess = new RemoteProcessAdapter(p);
-			// wait for the process to finish
-			while (!p.isCompleted()) {
-				try {
-					p.waitFor();
-				} catch (InterruptedException e) {
-					// just keep waiting until the process is done
-				}
-			}
 				
 			return fProcess;
 		}
