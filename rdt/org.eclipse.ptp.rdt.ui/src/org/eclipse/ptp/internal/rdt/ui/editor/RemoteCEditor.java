@@ -189,6 +189,11 @@ public class RemoteCEditor extends CEditor {
 			actionBars.setGlobalActionHandler(CdtActionConstants.EXTRACT_LOCAL_VARIABLE, null);
 			actionBars.setGlobalActionHandler(CdtActionConstants.EXTRACT_METHOD, null);
 			actionBars.setGlobalActionHandler(CdtActionConstants.HIDE_METHOD, null);
+			
+			actionBars.setGlobalActionHandler(CdtActionConstants.GETTERS_AND_SETTERS, null);
+			actionBars.setGlobalActionHandler(CdtActionConstants.IMPLEMENT_METHOD, null);
+			actionBars.setGlobalActionHandler(CdtActionConstants.ADD_INCLUDE, null);
+			actionBars.setGlobalActionHandler(CdtActionConstants.SORT_LINES, null);
 		}
 	}
 
