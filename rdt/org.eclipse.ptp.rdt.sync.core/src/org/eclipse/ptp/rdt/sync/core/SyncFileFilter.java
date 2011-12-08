@@ -14,11 +14,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.eclipse.cdt.core.model.CoreModel;
-import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.IMemento;
 
 /**
@@ -111,21 +108,59 @@ public class SyncFileFilter {
 
 	/**
 	 * Add a new pattern to the filter of the specified type
+	 * This function and others that manipulate the pattern list must enforce the invariant that no pattern appears more than once.
+	 * This invariant is assumed by other functions.
 	 * @param pattern
 	 * @param type
 	 */
 	public void addPattern(PatternMatcher pattern, PatternType type) {
+		if (patternToTypeMap.get(pattern) != null) {
+			filteredPaths.remove(pattern);
+		}
 		filteredPaths.add(0, pattern);
 		patternToTypeMap.put(pattern, type);
 	}
 	
 	/**
 	 * Remove a pattern from the filter
+	 * Assumes pattern appears no more than once
 	 * @param pattern
 	 */
 	public void removePattern(PatternMatcher pattern) {
 		filteredPaths.remove(pattern);
 		patternToTypeMap.remove(pattern);
+	}
+	
+	/**
+	 * Swap a pattern with its lower-index neighbor
+	 * Assumes pattern only appears once
+	 * @param whether pattern was actually promoted
+	 */
+	public boolean promote(PatternMatcher pattern) {
+		int oldIndex = filteredPaths.indexOf(pattern);
+		if (oldIndex > 0) {
+			filteredPaths.remove(oldIndex);
+			filteredPaths.add(oldIndex-1, pattern);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Swap a pattern with its higher-index neighbor
+	 * Assumes pattern appears no more than once
+	 * @param whether pattern was actually demoted
+	 */
+	public boolean demote(PatternMatcher pattern) {
+		int oldIndex = filteredPaths.indexOf(pattern);
+		if (oldIndex > -1 && oldIndex < filteredPaths.size() - 1) {
+			filteredPaths.remove(oldIndex);
+			filteredPaths.add(oldIndex+1, pattern);
+			return true;
+		}
+		
+		return false;
 	}
 
 	/**
