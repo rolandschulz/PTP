@@ -191,41 +191,47 @@ if($rawfile) {
 
     # check for hints about queueing system
     my $rms="undef";
+    my $r;
     my %cmds=();
     print STDERR "$0: check_for rms ...\n"  if($opt_verbose);
     if(exists($filehandler_request->{DATA}->{REQUEST})) {
-	if(exists($filehandler_request->{DATA}->{REQUEST}->{driver})) {
-	    my $driver_ref=$filehandler_request->{DATA}->{REQUEST}->{driver};
-	    if(exists($driver_ref->{attr})) {
-		if(exists($driver_ref->{attr}->{name})) {
-		    $rms=lc($driver_ref->{attr}->{name});
-		    print STDERR "$0: check_for rms, got hint from request ... ($rms)\n" if($opt_verbose);
-		}
-	    }
-	    
-	    if(exists($driver_ref->{command})) {
-		my($key);
-		foreach $key ( keys(%{$driver_ref->{command}}) ) {
-		    if(exists($driver_ref->{command}->{$key}->{exec})) {
-			my $cmd_key="cmd_".$key;
-			$cmds{$cmd_key}=$driver_ref->{command}->{$key}->{exec};
-			print STDERR "$0: check_for rms, got hint from for cmd $cmd_key ... ($cmds{$cmd_key})\n"  if($opt_verbose);
+		if(exists($filehandler_request->{DATA}->{REQUEST}->{driver})) {
+		    my $driver_ref=$filehandler_request->{DATA}->{REQUEST}->{driver};
+		    if(exists($driver_ref->{attr})) {
+				if(exists($driver_ref->{attr}->{name})) {
+				    $rms=uc($driver_ref->{attr}->{name});
+				    print STDERR "$0: check_for rms, got hint from request ... ($rms)\n" if($opt_verbose);
+				}
+		    }
+		    
+		    if(exists($driver_ref->{command})) {
+				my($key);
+				foreach $key ( keys(%{$driver_ref->{command}}) ) {
+				    if(exists($driver_ref->{command}->{$key}->{exec})) {
+						my $cmd_key="cmd_".$key;
+						$cmds{$cmd_key}=$driver_ref->{command}->{$key}->{exec};
+						print STDERR "$0: check_for rms, got hint from for cmd $cmd_key ... ($cmds{$cmd_key})\n"  if($opt_verbose);
+				    }
+				}
 		    }
 		}
-	    }
-	}
     } 
-    &check_rms_torque_or_pbs(\$rms,\%cmds) if(($rms eq "undef") || ($rms eq "torque")|| ($rms eq "pbs"));
-    &check_rms_LL(\$rms,\%cmds)     if(($rms eq "undef") || ($rms eq "ll"));
-    &check_rms_OpenMPI(\$rms,\%cmds)if(($rms eq "undef") || ($rms eq "openmpi"));
-    if($rms eq "undef") {
-	&exit_witherror($outputfile,"$0: could not determine rms (not one of: torque, pbs, LL, OpenMPI), exiting ...\n");
+    if ($rms ne "undef") {
+    	do "rms/$rms/da_check_info_LML.pl" || &exit_witherror($outputfile,"$0: unable to locate rms\n");
+    	&check_rms(\$rms,\%cmds,$opt_verbose) || &exit_witherror($outputfile,"$0: unable to locate rms\n");
+    } else {
+    	foreach $r (<rms/*>) {
+    		if (do "$r/da_check_info_LML.pl" && &check_rms(\$rms,\%cmds,$opt_verbose)) {
+    			$rms=substr($r, 4);
+    			last;
+    		}
+    	}
+		if($rms eq "undef") {
+			&exit_witherror($outputfile,"$0: could not determine rms, exiting ...\n");
+		}
     }
 
-    $laststep=&generate_step_rms_torque($workflowxml, $laststep, \%cmds)  if($rms eq "torque");
-    $laststep=&generate_step_rms_pbs($workflowxml, $laststep, \%cmds)  if($rms eq "pbs");
-    $laststep=&generate_step_rms_LL($workflowxml, $laststep, \%cmds)      if($rms eq "ll");
-    $laststep=&generate_step_rms_OpenMPI($workflowxml, $laststep, \%cmds) if($rms eq "openmpi");
+    $laststep=&generate_step_rms($workflowxml, $laststep, \%cmds);
 
     $step="addcolor";
     &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
@@ -477,322 +483,5 @@ sub create_layout_from_request {
 }
 
 
-#########################
-# rms: Torque
-#########################
-sub check_rms_torque_or_pbs {
-    my($rmsref,$cmdsref)=@_;
-    my($key);
-    my $rc=1;
-
-    my %cmdname=(
-	"job"  => "qstat",
-	"node" => "pbsnodes",
-	);
-    my %cmdpath=(
-	"job" => "/usr/bin/qstat",
-	"node" => "/usr/bin/pbsnodes",
-	);
-   
-    foreach $key (keys(%cmdname)) {
-	# check for job query cmd
-	if(exists($cmdsref->{"cmd_${key}info"})) {
-	    $cmd=$cmdsref->{"cmd_${key}info"};
-	} else {
-	    $cmd=$cmdpath{$key};
-	}
-	if(! -f $cmd) {
-	    my $cmdpath=`which $cmdname{$key} 2>/dev/null`; 	# last try: which 
-	    if(!$?) {
-		chomp($cmdpath);
-		$cmd=$cmdpath;
-		print STDERR "$0: check_rms_torque_or_pbs: found $cmdname{$key} by which ($cmd)\n" if($opt_verbose);
-	    } else {
-		last;
-	    }
-	}
-	if(-f $cmd) {
-	    $$rmsref="torque" if($$rmsref eq "undef");
-	    $cmdsref->{"cmd_${key}info"}=$cmd;
-	}
-    }
-    # check if it is not a PBSpro system
-    if($$rmsref eq "torque") {
-	
-	if(exists($cmdsref->{"cmd_jobinfo"})) {
-	    $cmd=$cmdsref->{"cmd_jobinfo"}." --version";
-	    my $cmdversion=`$cmd 2>/dev/null`; 	
-	    chomp($cmdversion);
-	    if($cmdversion=~/version/) {
-		if($cmdversion=~/PBSPro/) {
-		    print STDERR "$0: check_rms_torque_or_pbs: PBSpro found, not torque ($cmdversion)\n" if($opt_verbose);
-		    $$rmsref="pbs"; 
-	    	}
-	    } else {
-		print STDERR "$0: check_rms_torque_or_pbs: could not obtain version info from command $cmd\n" if($opt_verbose);
-	    }
-	    
-	}
-    }
-
-    if($$rmsref eq "torque")  {
-	print STDERR "$0: check_rms_torque_or_pbs: found torque commands (",
-	join(",",(values(%{$cmdsref}))),")\n" if($opt_verbose);
-    } elsif($$rmsref eq "pbs")  {
-	print STDERR "$0: check_rms_torque_or_pbs: found PBSpro commands (",
-	join(",",(values(%{$cmdsref}))),")\n" if($opt_verbose);
-    } else {
-	print STDERR "$0: check_rms_torque_or_pbs: seems not to be a torque or pbs system\n" if($opt_verbose);
-    }
-
-    
-    return($rc);
-}
 
 
-sub generate_step_rms_torque {
-    my($workflowxml, $laststep, $cmdsref)=@_;
-    my($step,$envs,$key,$ukey);
-
-    $envs="";
-    foreach $key (keys(%{$cmdsref})) {
-	$ukey=uc($key);
-	$envs.="$ukey=$cmdsref->{$key} ";
-    }
-    $step="getdata";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$envs $^X rms/TORQUE/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
-			       "$envs $^X rms/TORQUE/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
-			       "$envs $^X rms/TORQUE/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
-    $laststep=$step;
-
-    $step="combineLML";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$^X \$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
-			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/jobs_LML.xml \$tmpdir/nodes_LML.xml");
-    $laststep=$step;
-
-    return($laststep);
-
-}
-
-
-sub generate_step_rms_pbs {
-    my($workflowxml, $laststep, $cmdsref)=@_;
-    my($step,$envs,$key,$ukey);
-
-    $envs="";
-    foreach $key (keys(%{$cmdsref})) {
-	$ukey=uc($key);
-	$envs.="$ukey=$cmdsref->{$key} ";
-    }
-    $step="getdata";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$envs $^X rms/PBS/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
-			       "$envs $^X rms/PBS/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
-			       "$envs $^X rms/PBS/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
-    $laststep=$step;
-
-    $step="combineLML";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$^X \$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
-			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/jobs_LML.xml \$tmpdir/nodes_LML.xml");
-    $laststep=$step;
-
-    return($laststep);
-
-}
-
-
-#########################
-# rms: LoadLeveler
-#########################
-sub check_rms_LL {
-    my($rmsref,$cmdsref)=@_;
-    my($key);
-    my $rc=1;
-
-    my %cmdname=(
-	"job"  => "llq",
-	"node" => "llstatus",
-	);
-    my %cmdpath=(
-	"job" => "/usr/bin/llq",
-	"node" => "/usr/bin/llstatus",
-	);
-   
-    foreach $key (keys(%cmdname)) {
-	# check for job query cmd
-	if(exists($cmdsref->{"cmd_${key}info"})) {
-	    $cmd=$cmdsref->{"cmd_${key}info"};
-	} else {
-	    $cmd=$cmdpath{$key};
-	}
-	if(! -f $cmd) {
-	    my $cmdpath=`which $cmdname{$key} 2>/dev/null`; 	# last try: which 
-	    if(!$?) {
-		chomp($cmdpath);
-		$cmd=$cmdpath;
-		print STDERR "$0: check_rms_LL: found $cmdname{$key} by which ($cmd)\n" if($opt_verbose);
-	    } else {
-		last;
-	    }
-	}
-	if(-f $cmd) {
-	    $$rmsref="ll" if($$rmsref eq "undef");
-	    $cmdsref->{"cmd_${key}info"}=$cmd;
-	}
-    }
-    if($$rmsref eq "ll") {
-	print STDERR "$0: check_rms_LL: found LL commands (",
-	join(",",(values(%{$cmdsref}))),")\n" if($opt_verbose);
-    } else {
-	print STDERR "$0: check_rms_LL: seems not to be a LL system\n" if($opt_verbose);
-    }
-
-    return($rc);
-}
-
-
-sub generate_step_rms_LL {
-    my($workflowxml, $laststep, $cmdsref)=@_;
-    my($step,$envs,$key,$ukey);
-
-    $envs="";
-    foreach $key (keys(%{$cmdsref})) {
-	$ukey=uc($key);
-	$envs.="$ukey=$cmdsref->{$key} ";
-    }
-
-    $step="getdata";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$envs $^X rms/LL/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
-			       "$envs $^X rms/LL/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
-			       "$envs $^X rms/LL/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
-    $laststep=$step;
-
-    $step="combineLML";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$^X \$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
-			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/jobs_LML.xml \$tmpdir/nodes_LML.xml");
-    $laststep=$step;
-
-    return($laststep);
-
-}
-
-#########################
-# rms: OpenMPI
-#########################
-sub check_rms_OpenMPI {
-    my($rmsref,$cmdsref)=@_;
-    my($key,$infocmd);
-    my $rc=1;
-
-    my %cmdname=(
-	"job"  => "orte-ps",
-	"node" => "orte-ps",
-	"sys"  => "ompi_info",
-	);
-        
-    my %cmdpath=(
-	"job"  => "",
-	"node" => "",
-	"sys"  => "/usr/lib/mpi/gcc/openmpi/bin/ompi_info",
-	);
-
-    $infocmd=undef;
-
-    # first:  check if ompi_info is given by request info
-    if(exists($cmdsref->{"cmd_sysinfo"})) {
-	if(-f $cmdsref->{"cmd_sysinfo"}) {
-	    $infocmd=$cmdsref->{"cmd_sysinfo"}." --path bindir";
-	}
-    } 
-
-    # second: check if ompi_info is given in PATH
-    if(!$infocmd) {
-	my $cmdpath=`which $cmdname{sys} 2>/dev/null`; 	
-	if(!$?) {
-	    chomp($cmdpath);
-	    $infocmd=$cmdpath." --path bindir";
-	}
-    }
-
-    # second: check if ompi_info is given in default path
-    if(!$infocmd) {
-	my $cmdpath=$cmdpath{sys}; 	
-	if(! -f $cmdpath) {
-	    $infocmd=$cmdpath." --path bindir";
-	}
-    }
- 
-    # return if no ompi_info found
-    if(!$infocmd) {
-	return($rc);
-    }
-   
-    # get openmpi bindir
-    my $bindir=`$infocmd`;
-    chomp($bindir);
-    $bindir=~s/^Bindir:\s*//gs;
-	
-    foreach $key (keys(%cmdname)) {
-	$cmdpath{$key}=$bindir."/".$cmdname{$key};
-
-	if(exists($cmdsref->{"cmd_${key}info"})) {
-	    $cmd=$cmdsref->{"cmd_${key}info"};
-	} else {
-	    $cmd=$cmdpath{$key};
-	}
-	if(! -f $cmd) {
-	    my $cmdpath=`which $cmdname{$key} 2>/dev/null`; 	# last try: which 
-	    if(!$?) {
-		chomp($cmdpath);
-		$cmd=$cmdpath;
-		print STDERR "$0: check_rms_OpenMPI: found $cmdname{$key} by which ($cmd)\n" if($opt_verbose);
-	    } else {
-		last;
-	    }
-	}
-	if(-f $cmd) {
-	    $$rmsref="openmpi" if($$rmsref eq "undef");
-	    $cmdsref->{"cmd_${key}info"}=$cmd;
-	}
-    }
-    if($$rmsref eq "openmpi") {
-	print STDERR "$0: check_rms_OpenMPI: found OpenMPI commands (",
-	join(",",(values(%{$cmdsref}))),")\n" if($opt_verbose);
-    } else {
-	print STDERR "$0: check_rms_OpenMPI: seems not to be a OpenMPI system\n" if($opt_verbose);
-    }
-
-    return($rc);
-}
-
-
-sub generate_step_rms_OpenMPI {
-    my($workflowxml, $laststep, $cmdsref)=@_;
-    my($step,$envs,$key,$ukey);
-
-    $envs="";
-    foreach $key (keys(%{$cmdsref})) {
-	$ukey=uc($key);
-	$envs.="$ukey=$cmdsref->{$key} ";
-    }
-
-    $step="getdata";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$envs $^X rms/OPENMPI/da_orte_info_LML.pl   \$tmpdir/jobs_nodes_LML.xml",
-			       "$envs $^X rms/OPENMPI/da_system_info_LML.pl \$tmpdir/sysinfo_LML.xml");
-    $laststep=$step;
-
-    $step="combineLML";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$^X \$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
-			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/jobs_nodes_LML.xml");
-    $laststep=$step;
-
-    return($laststep);
-
-}
