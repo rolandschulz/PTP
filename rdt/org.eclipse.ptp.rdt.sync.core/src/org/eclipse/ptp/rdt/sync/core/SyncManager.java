@@ -60,6 +60,7 @@ public class SyncManager  {
 	private static final String SYNC_MODE_ELEMENT_NAME = "project-to-sync-mode"; //$NON-NLS-1$
 	private static final String SHOW_ERROR_ELEMENT_NAME = "project-to-show-error"; //$NON-NLS-1$
 	private static final String FILE_FILTER_ELEMENT_NAME = "project-to-file-filter"; //$NON-NLS-1$
+	private static final String FILE_FILTER_INTERNAL_ELEMENT_NAME = "project-to-file-filter-internal"; //$NON-NLS-1$
 	private static final String ATTR_PROJECT_NAME = "project"; //$NON-NLS-1$
 	private static final String ATTR_SYNC_MODE = "sync-mode"; //$NON-NLS-1$
 	private static final String ATTR_SHOW_ERROR = "show-error"; //$NON-NLS-1$
@@ -141,7 +142,7 @@ public class SyncManager  {
 		}
 		
 		if (!(fProjectToFileFilterMap.containsKey(project))) {
-			fProjectToFileFilterMap.put(project, SyncFileFilter.createDefaultFilter(project));
+			fProjectToFileFilterMap.put(project, SyncFileFilter.createDefaultFilter());
 			try {
 				saveConfigurationData();
 			} catch (IOException e) {
@@ -404,9 +405,12 @@ public class SyncManager  {
 		
 		// Save project to "file filter" map
 		synchronized (fProjectToFileFilterMap) {
-			for (SyncFileFilter filter : fProjectToFileFilterMap.values()) {
+			for (IProject project : fProjectToFileFilterMap.keySet()) {
+				SyncFileFilter filter = fProjectToFileFilterMap.get(project);
 				IMemento fileFilterMemento = rootMemento.createChild(FILE_FILTER_ELEMENT_NAME);
-				filter.saveFilter(fileFilterMemento);
+				IMemento fileFilterInternalMemento = fileFilterMemento.createChild(FILE_FILTER_INTERNAL_ELEMENT_NAME);
+				filter.saveFilter(fileFilterInternalMemento);
+				fileFilterMemento.putString(ATTR_PROJECT_NAME, project.getName());
 			}
 		}
 		
@@ -466,8 +470,14 @@ public class SyncManager  {
 		// Load project "file filter" settings
 		fProjectToFileFilterMap.clear();
 		for (IMemento fileFilterMemento : rootMemento.getChildren(FILE_FILTER_ELEMENT_NAME)) {
-			SyncFileFilter filter = SyncFileFilter.loadFilter(fileFilterMemento);
-			fProjectToFileFilterMap.put(filter.getProject(), filter);
+			String projectName = fileFilterMemento.getString(ATTR_PROJECT_NAME);
+			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			if (project == null) {
+				throw new RuntimeException(Messages.SyncManager_0 + project);
+			}
+			IMemento fileFilterInternalMemento = fileFilterMemento.getChild(FILE_FILTER_INTERNAL_ELEMENT_NAME);
+			SyncFileFilter filter = SyncFileFilter.loadFilter(fileFilterInternalMemento);
+			fProjectToFileFilterMap.put(project, filter);
 		}
 		
 		// Load auto-sync setting

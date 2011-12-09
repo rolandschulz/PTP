@@ -10,16 +10,21 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.util.NoSuchElementException;
+
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
+import org.eclipse.ui.IMemento;
 
 /**
  * Matcher for a binary file. Note that it is conservative. It works only for files recognized by CDT and is not yet a general
  * binary file matcher.
  */
 public class BinaryPatternMatcher extends PatternMatcher {
+	private static final String ATTR_PROJECT_NAME = "project-name"; //$NON-NLS-1$
 	private final IProject project;
 	
 	public BinaryPatternMatcher(IProject p) {
@@ -46,5 +51,37 @@ public class BinaryPatternMatcher extends PatternMatcher {
 
 	public String toString() {
 		return Messages.BinaryPatternMatcher_0;
+	}
+
+	/**
+	 * Place needed data for recreating inside the memento
+	 */
+	@Override
+	public void savePattern(IMemento memento) {
+		super.savePattern(memento);
+		memento.putString(ATTR_PROJECT_NAME, project.getName());
+	}
+
+	/**
+	 * Recreate instance from memento
+	 * 
+	 * @param memento
+	 * @return the recreated instance
+	 * @throws NoSuchElementException
+	 * 				if expected data is not in the memento.
+	 */
+	public static PatternMatcher loadPattern(IMemento memento) throws NoSuchElementException {
+		String r = memento.getString(ATTR_PROJECT_NAME);
+		if (r == null) {
+			throw new NoSuchElementException("Project name not found in memento"); //$NON-NLS-1$
+		}
+		String projectName = memento.getString(ATTR_PROJECT_NAME);
+
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		if (project == null) {
+			throw new NoSuchElementException("Project unknown: " + projectName); //$NON-NLS-1$
+		}
+
+		return new BinaryPatternMatcher(project);
 	}
 }

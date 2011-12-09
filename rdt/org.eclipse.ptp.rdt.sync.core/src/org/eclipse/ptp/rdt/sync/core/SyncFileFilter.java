@@ -10,12 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ui.IMemento;
 
 /**
@@ -25,10 +24,12 @@ import org.eclipse.ui.IMemento;
  * Facilities are then provided for adding and removing files and directories from filtering.
  */
 public class SyncFileFilter {
-	private static final String FILE_FILTER_PATH_ELEMENT_NAME = "file-filter-path"; //$NON-NLS-1$
-	private static final String ATTR_PROJECT_NAME = "project"; //$NON-NLS-1$
+	private static final String PATTERN_ELEMENT_NAME = "pattern"; //$NON-NLS-1$
+	private static final String PATTERN_INTERNAL_ELEMENT_NAME = "pattern"; //$NON-NLS-1$
+	private static final String ATTR_PATTERN_RANK = "pattern-rank"; //$NON-NLS-1$
+	private static final String ATTR_PATTERN_TYPE = "pattern-type"; //$NON-NLS-1$
+	private static final String ATTR_NUM_PATTERNS = "num-patterns"; //$NON-NLS-1$
 	
-	private final IProject project;
 	private final LinkedList<PatternMatcher> filteredPaths = new LinkedList<PatternMatcher>();
 	private final Map<PatternMatcher, PatternType> patternToTypeMap = new HashMap<PatternMatcher, PatternType>();
 	
@@ -37,45 +38,33 @@ public class SyncFileFilter {
 	}
 
 	// Private constructor - create instances with "create" methods.
-	private SyncFileFilter(IProject p) {
-		project = p;
+	private SyncFileFilter() {
 	}
 	
 	// Copy constructor
 	public SyncFileFilter(SyncFileFilter oldFilter) {
-		project = oldFilter.project;
 		filteredPaths.addAll(oldFilter.filteredPaths);
 		patternToTypeMap.putAll(oldFilter.patternToTypeMap);
 	}
 	
 	/**
-	 * Constructor for an empty filter for a given project. Most clients will want to use "createDefaultFilter"
+	 * Constructor for an empty filter. Most clients will want to use "createDefaultFilter"
 	 *
-	 * @param project
 	 * @return the new filter
 	 */
-	public static SyncFileFilter createEmptyFilter(IProject project) {
-		return new SyncFileFilter(project);
+	public static SyncFileFilter createEmptyFilter() {
+		return new SyncFileFilter();
 	}
 	
 	/**
 	 * Constructor for a filter with all of the usual default paths already included.
 	 *
-	 * @param project
 	 * @return the new filter
 	 */
-	public static SyncFileFilter createDefaultFilter(IProject project) {
-		SyncFileFilter sff = new SyncFileFilter(project);
+	public static SyncFileFilter createDefaultFilter() {
+		SyncFileFilter sff = new SyncFileFilter();
 		sff.addDefaults();
 		return sff;
-	}
-	
-	/**
-	 * Get filter's project
-	 * @return project
-	 */
-	public IProject getProject() {
-		return project;
 	}
 	
 	/**
@@ -190,8 +179,14 @@ public class SyncFileFilter {
 	 * @param memento
 	 */
 	public void saveFilter(IMemento memento) {
-		memento.putString(ATTR_PROJECT_NAME, project.getName());
-			// ptf.pattern.savePattern(pathMemento);
+		memento.putInteger(ATTR_NUM_PATTERNS, filteredPaths.size());
+		for (PatternMatcher pm : filteredPaths) {
+			IMemento pathMemento = memento.createChild(PATTERN_ELEMENT_NAME);
+			IMemento patternInternalMemento = pathMemento.createChild(PATTERN_INTERNAL_ELEMENT_NAME);
+			pm.savePattern(patternInternalMemento);
+			pathMemento.putInteger(ATTR_PATTERN_RANK, filteredPaths.indexOf(pm));
+			pathMemento.putString(ATTR_PATTERN_TYPE, patternToTypeMap.get(pm).name());
+		}
 	}
 	
 	/**
@@ -201,16 +196,36 @@ public class SyncFileFilter {
 	 * @return the restored filter
 	 */
 	public static SyncFileFilter loadFilter(IMemento memento) {
-		String projectName = memento.getString(ATTR_PROJECT_NAME);
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		if (project == null) {
-			throw new RuntimeException("Project not found for filter data: " + project); //$NON-NLS-1$
-		}
+		int numPatterns = memento.getInteger(ATTR_NUM_PATTERNS);
+		PatternMatcher[] pmArray = new PatternMatcher[numPatterns];
+		SyncFileFilter.PatternType[] typeArray = new SyncFileFilter.PatternType[numPatterns];
 
-		SyncFileFilter filter = createEmptyFilter(project);
+		SyncFileFilter filter = createEmptyFilter();
 		
-		for (IMemento pathMemento : memento.getChildren(FILE_FILTER_PATH_ELEMENT_NAME)) {
-			// filter.filteredPaths.add(PatternMatcher.loadFilter(pathMemento));
+		for (IMemento pathMemento : memento.getChildren(PATTERN_ELEMENT_NAME)) {
+			IMemento patternInternalMemento = pathMemento.getChild(PATTERN_INTERNAL_ELEMENT_NAME);
+			PatternMatcher pm;
+			try {
+				pm = PatternMatcher.loadPattern(patternInternalMemento);
+			} catch (InvocationTargetException e) {
+				RDTSyncCorePlugin.log("Unable to load pattern for file filtering: "+ e.getMessage(), e); //$NON-NLS-1$
+				continue;
+			} catch (NoSuchMethodException e) {
+				RDTSyncCorePlugin.log("Unable to load pattern for file filtering: "+ e.getMessage(), e); //$NON-NLS-1$
+				continue;
+			} catch (ClassNotFoundException e) {
+				RDTSyncCorePlugin.log("Unable to load pattern for file filtering: "+ e.getMessage(), e); //$NON-NLS-1$
+				continue;
+			}
+
+			int rank = pathMemento.getInteger(ATTR_PATTERN_RANK);
+			String type = pathMemento.getString(ATTR_PATTERN_TYPE);
+			pmArray[rank] = pm;
+			typeArray[rank] = SyncFileFilter.PatternType.valueOf(type);
+		}
+		
+		for (int i=pmArray.length-1; i>=0; i--) {
+			filter.addPattern(pmArray[i], typeArray[i]);
 		}
 		
 		return filter;
