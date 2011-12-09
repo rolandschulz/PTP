@@ -27,6 +27,10 @@
             configurationFile="data/edu.sdsc.trestles.pbs.batch.xml"
             name="edu.sdsc.trestles.pbs.batch">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/openmpi-generic-interactive.xml"
+            name="Open MPI-Generic-Interactive">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>

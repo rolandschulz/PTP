@@ -11,6 +11,9 @@
 
 package org.eclipse.ptp.rm.lml.ui.views;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -46,6 +49,8 @@ import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -96,7 +101,6 @@ public class TableView extends ViewPart {
 					}
 				}
 			});
-
 		}
 
 		/*
@@ -477,6 +481,24 @@ public class TableView extends ViewPart {
 		treeColumn.setMoveable(false);
 		treeColumn.setResizable(false);
 		treeColumn.setAlignment(SWT.LEFT);
+		treeColumn.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlMoved(ControlEvent e) {
+				final List<Integer> newOrder = new ArrayList<Integer>();
+				newOrder.add(0);
+				for (final int column : tree.getColumnOrder()) {
+					if (column != 0) {
+						newOrder.add(column);
+					}
+				}
+				final int[] newOrderArray = new int[newOrder.size()];
+				for (int i = 0; i < newOrder.size(); i++) {
+					newOrderArray[i] = newOrder.get(i);
+				}
+
+				tree.setColumnOrder(newOrderArray);
+			}
+		});
 		createMenuItem(headerMenu, treeColumn, 0);
 		treeColumnLayout.setColumnData(treeColumn, new ColumnPixelData(40, true));
 
