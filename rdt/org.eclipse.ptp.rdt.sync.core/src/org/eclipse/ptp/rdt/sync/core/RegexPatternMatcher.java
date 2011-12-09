@@ -11,40 +11,54 @@
 package org.eclipse.ptp.rdt.sync.core;
 
 import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.ui.IMemento;
 
 /**
  * Class for matching a string against a regular expression.
+ * Currently, we simply use java's regex engine.
  *
  *
  */
 public class RegexPatternMatcher extends PatternMatcher {
 	private static final String ATTR_REGEX = "regex"; //$NON-NLS-1$
 	private final String regex;
+	private final Pattern pattern;
 	
-	public RegexPatternMatcher(String r) {
+	/**
+	 * Constructor
+	 * Although PatternSyntaxException is unchecked, callers probably should catch this exception, especially if regular
+	 * expressions are entered by users.
+	 * 
+	 * @param r - the regular expression
+	 * @throws PatternSyntaxException
+	 * 				if the pattern is invalid
+	 */
+	public RegexPatternMatcher(String r) throws PatternSyntaxException {
 		regex = r;
-	}
-	
-	public boolean match(String candidate) {
-		return regexCompare(regex, candidate);
-	}
-	
-	public String toString() {
-		return regex;
+		pattern = Pattern.compile(regex);
 	}
 	
 	/**
-	 * Compare a regular expression to a candidate string. Since this functionality may be generally useful, this function
-	 * is both public and static.
+	 * Return whether the given string matches the regex pattern.
 	 * 
-	 * @param regex
-	 * @param candidate
-	 * @return whether or not candidate matches the regular expression
+	 * @param candidate string
+	 * @return whether the string matches the regex pattern
 	 */
-	public static boolean regexCompare(String regex, String candidate) {
-		return candidate.startsWith(regex);
+	public boolean match(String candidate) {
+		Matcher m = pattern.matcher(candidate);
+		return m.matches();
+	}
+	
+	/**
+	 * Represent a regex pattern textually as just the regex string itself
+	 * @return the string
+	 */
+	public String toString() {
+		return regex;
 	}
 	
 	/**
