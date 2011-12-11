@@ -68,10 +68,10 @@
 		<version><xsl:value-of select="$newVersion"/>-SNAPSHOT</version>
 	</xsl:template>
 
-	<xsl:template match="p:*">
-	    <xsl:element name="{name()}">
-	      <xsl:apply-templates/>
-	    </xsl:element>
+	<xsl:template match="@*|node()">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()"/>
+		</xsl:copy>
 	</xsl:template>
 	
 	<xsl:template match="comment()">
