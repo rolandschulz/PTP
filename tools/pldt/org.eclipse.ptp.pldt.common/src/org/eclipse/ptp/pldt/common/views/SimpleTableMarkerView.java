@@ -60,6 +60,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ArtifactManager;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.IArtifact;
@@ -96,7 +97,8 @@ import org.osgi.framework.Bundle;
  * Names and last column name provided on ctor. Intended for quick reuse.
  * 
  * All information comes from the marker. Artifact objects containing arbitrary
- * information can be used (not extensively tested here yet).
+ * information can be used (not extensively tested here yet).195
+ * 
  * 
  * 
  */
@@ -192,16 +194,6 @@ public class SimpleTableMarkerView extends ViewPart {
 
 	/** Marker id for storage of additional information about the artifact */
 	protected static final String DESCRIPTION = "description"; //$NON-NLS-1$
-
-	public static final int NONE = 0;
-
-	public static final int FUNCTION_CALL = 1;
-
-	public static final int CONSTANT = 2;
-
-	/** types of constructs, for the default case */
-	public static String[] CONSTRUCT_TYPE_NAMES = { Messages.SimpleTableMarkerView_none,
-			Messages.SimpleTableMarkerView_function_call, Messages.SimpleTableMarkerView_constant };
 
 	/**
 	 * Simple Artifact Table View constructor
@@ -594,7 +586,7 @@ public class SimpleTableMarkerView extends ViewPart {
 		Integer temp = (Integer) marker.getAttribute(columnID_);
 		if (temp != null) {
 			Integer constructType = (Integer) temp;
-			return CONSTRUCT_TYPE_NAMES[constructType.intValue()];
+			return Artifact.CONSTRUCT_TYPE_NAMES[constructType.intValue()];
 		} else
 			return " "; //$NON-NLS-1$
 	}
