@@ -61,6 +61,9 @@
 	<xsl:template match="p:version[preceding-sibling::p:artifactId='org.eclipse.ptp.utils']">
 		<version><xsl:value-of select="$newVersion"/>-SNAPSHOT</version>
 	</xsl:template>
+	<xsl:template match="p:version[preceding-sibling::p:artifactId='org.eclipse.ptp.repo']">
+		<version><xsl:value-of select="$newVersion"/>-SNAPSHOT</version>
+	</xsl:template>
 	<xsl:template match="p:version[preceding-sibling::p:artifactId='org.eclipse.ptp']">
 		<version><xsl:value-of select="$newVersion"/>-SNAPSHOT</version>
 	</xsl:template>

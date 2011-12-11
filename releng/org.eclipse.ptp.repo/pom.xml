@@ -10,8 +10,8 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<version>5.0.4-SNAPSHOT</version>
 	<artifactId>org.eclipse.ptp.repo</artifactId>
+	<version>5.0.4-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
 
 	<profiles>
