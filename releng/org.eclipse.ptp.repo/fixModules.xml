@@ -1,0 +1,13 @@
+<project name="fixModules" default="fix">
+	<property name="newVersion" value="a.b.c"/>
+
+	<target name="fix">
+		<xslt style="generateModules.xsl" in="../pom.xml" out="modules.xml">
+			<param name="newVersion" expression="${newVersion}"/>
+		</xslt>
+		<ant antfile="modules.xml">
+			<property name="newVersion" value="${newVersion}"/>
+		</ant>
+		<delete file="modules.xml"/>
+	</target>
+</project>
