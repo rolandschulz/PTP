@@ -57,14 +57,40 @@ PTP_FEATURES="\
 	org.eclipse.ptp.services-feature \
 	org.eclipse.ptp.utils-feature"
 
+PTP_PLUGINS="\
+	releng/org.eclipse.ptp.aix.ppc \
+	releng/org.eclipse.ptp.linux.ppc \
+	releng/org.eclipse.ptp.linux.x86 \
+	releng/org.eclipse.ptp.linux.x86_64 \
+	releng/org.eclipse.ptp.macosx.ppc \
+	releng/org.eclipse.ptp.macosx.x86 \
+	releng/org.eclipse.ptp \
+	debug/org.eclipse.ptp.debug.sdm \
+	core/org.eclipse.ptp.proxy \
+	rms/org.eclipse.ptp.rm.ibm.pe.proxy \
+	rms/org.eclipse.ptp.rm.ibm.ll.proxy \
+	rms/org.eclipse.ptp.rm.slurm.proxy \
+	tools/sci/org.eclipse.ptp.sci \
+	core/org.eclipse.ptp.utils"
+	
 update_feature() {
 	sed -e "s/^\([ \t]*\)version=\"[0-9]\.[0-9]\.[0-9]\.qualifier\"/\1version=\"$2\.qualifier\"/" < releng/$1/feature.xml > $TMP_DIR/${1}_feature.xml
 	mv $TMP_DIR/${1}_feature.xml releng/$1/feature.xml
 }
 
+update_manifest() {
+	sed -e "s/^Bundle-Version: *[0-9]\.[0-9]\.[0-9]\.qualifier/Bundle-Version: $2.qualifier/" < $1/META-INF/MANIFEST.MF > $TMP_DIR/${1}_MANIFEST.MF
+	mv $TMP_DIR/${1}_MANIFEST.MF $1/META-INF/MANIFEST.MF
+}
+
 for feature in $PTP_FEATURES; do
 	echo "Updating $feature..."
 	update_feature $feature $ptp_version
+done
+
+for plugin in $PTP_PLUGINS; do
+	echo "Updating $plugin..."
+	update_manifest $plugin $ptp_version
 done
 
 (cd releng/org.eclipse.ptp.repo && ant -DnewVersion="$ptp_version" -f fixModules.xml)
