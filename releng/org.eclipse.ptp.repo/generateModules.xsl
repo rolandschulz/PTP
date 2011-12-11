@@ -12,16 +12,16 @@
 			<target name="fix">
 				<xsl:template match="p:project">
 					<xsl:for-each select="p:modules/p:module">
-						<xslt style="fixPom.xsl" in="../{text()}/pom.xml" out="pom.xml.tmp">
+						<xslt style="fixPom.xsl" in="../../{text()}/pom.xml" out="pom.xml.tmp">
 							<param name="newVersion" expression="{$newVersion}"/>
 						</xslt>
-						<move file="pom.xml.tmp" tofile="../{text()}/pom.xml"/>
+						<move file="pom.xml.tmp" tofile="../../{text()}/pom.xml"/>
 					</xsl:for-each>
 				</xsl:template>
-				<xslt style="fixPom.xsl" in="../pom.xml" out="pom.xml.tmp">
+				<xslt style="fixPom.xsl" in="../../pom.xml" out="pom.xml.tmp">
 					<param name="newVersion" expression="{$newVersion}"/>
 				</xslt>
-				<move file="pom.xml.tmp" tofile="../pom.xml"/>
+				<move file="pom.xml.tmp" tofile="../../pom.xml"/>
 			</target>
 		</project>
 	</xsl:template>

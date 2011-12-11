@@ -58,8 +58,8 @@ PTP_FEATURES="\
 	org.eclipse.ptp.utils-feature"
 
 update_feature() {
-	sed -e "s/^\([ \t]*\)version=\"[0-9]\.[0-9]\.[0-9]\.qualifier\"/\1version=\"$2\.qualifier\"/" < $1/feature.xml > $TMP_DIR/${1}_feature.xml
-	mv $TMP_DIR/${1}_feature.xml $1/feature.xml
+	sed -e "s/^\([ \t]*\)version=\"[0-9]\.[0-9]\.[0-9]\.qualifier\"/\1version=\"$2\.qualifier\"/" < releng/$1/feature.xml > $TMP_DIR/${1}_feature.xml
+	mv $TMP_DIR/${1}_feature.xml releng/$1/feature.xml
 }
 
 for feature in $PTP_FEATURES; do
@@ -67,6 +67,6 @@ for feature in $PTP_FEATURES; do
 	update_feature $feature $ptp_version
 done
 
-(cd org.eclipse.ptp.repo && ant -DnewVersion="$ptp_version" -f fixModules.xml)
+(cd releng/org.eclipse.ptp.repo && ant -DnewVersion="$ptp_version" -f fixModules.xml)
 
 exit 0
