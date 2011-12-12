@@ -12,6 +12,7 @@ package org.eclipse.ptp.rdt.sync.ui;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -28,6 +29,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.ptp.rdt.sync.core.BinaryPatternMatcher;
+import org.eclipse.ptp.rdt.sync.core.PathPatternMatcher;
 import org.eclipse.ptp.rdt.sync.core.PatternMatcher;
 import org.eclipse.ptp.rdt.sync.core.RegexPatternMatcher;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -45,6 +47,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -58,14 +61,25 @@ import org.eclipse.ui.PlatformUI;
  */
 public class SyncFileTree extends ApplicationWindow {
 	private static final int WINDOW_WIDTH = 600;
+	private static final int ERROR_DISPLAY_SECONDS = 3;
 	private static final Display display = Display.getCurrent();
-	private static final Color excludeRed = display.getSystemColor(SWT.COLOR_RED);
-	private static final Color includeGreen = display.getSystemColor(SWT.COLOR_GREEN);
+	private static final Color excludeRed = display.getSystemColor(SWT.COLOR_DARK_RED);
+	private static final Color includeGreen = display.getSystemColor(SWT.COLOR_DARK_GREEN);
 	
 	private final IProject project;
 	private final SyncFileFilter filter;
 	private SyncCheckboxTreeViewer treeViewer;
 	private Table patternTable;
+	private Button upButton;
+	private Button downButton;
+	private Button deleteButton;
+	private Text newPattern;
+	private Button excludeButton;
+	private Button includeButton;
+	private Combo specialFiltersCombo;
+	private Label patternErrorLabel;
+	private Button cancelButton;
+	private Button okButton;
 	private final Map<String, PatternMatcher> specialFilterNameToPatternMap = new HashMap<String, PatternMatcher>();
 
 	// A checkbox tree viewer that does not allow unchecked directories to be expanded.
@@ -96,8 +110,8 @@ public class SyncFileTree extends ApplicationWindow {
 		project = p;
 		filter = SyncManager.getFileFilter(project);
 		
-		// Only one special (non-regex) filter at the moment. If more are added later, we need a more sophisticated method for
-		// handling these special filters.
+		// Only one special (not path or regex) filter at the moment. If more are added later, we need a more sophisticated
+		// method for handling these special filters.
 		BinaryPatternMatcher bpm = new BinaryPatternMatcher(project);
 		specialFilterNameToPatternMap.put(bpm.toString(), bpm);
 	}
@@ -149,9 +163,9 @@ public class SyncFileTree extends ApplicationWindow {
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				IPath path = ((IResource) (event.getElement())).getProjectRelativePath();
 				if (event.getChecked()) {
-					filter.addPattern(new RegexPatternMatcher(path.toOSString()), PatternType.INCLUDE);
+					filter.addPattern(new PathPatternMatcher(path.toOSString()), PatternType.INCLUDE);
 				} else {
-					filter.addPattern(new RegexPatternMatcher(path.toOSString()), PatternType.EXCLUDE);
+					filter.addPattern(new PathPatternMatcher(path.toOSString()), PatternType.EXCLUDE);
 				}
 
 				update();
@@ -167,12 +181,19 @@ public class SyncFileTree extends ApplicationWindow {
 		// Pattern table
 		patternTable = new Table(patternTableComposite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		patternTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
+		patternTable.setHeaderVisible(true);
+		patternTable.setLinesVisible(true);
 
-		TableColumn patternTableColumn = new TableColumn(patternTable, SWT.LEAD, 0);
-		patternTableColumn.setWidth(300);
+		TableColumn patternColumn = new TableColumn(patternTable, SWT.LEAD, 0);
+		patternColumn.setText("Pattern"); //$NON-NLS-1$
+		patternColumn.setWidth(250);
+		
+		TableColumn typeColumn = new TableColumn(patternTable, SWT.LEAD, 1);
+		typeColumn.setText("Type"); //$NON-NLS-1$
+		typeColumn.setWidth(50);
 		
 		// Pattern table buttons (up, down, and delete)
-		final Button upButton = new Button(patternTableComposite, SWT.PUSH);
+		upButton = new Button(patternTableComposite, SWT.PUSH);
 	    upButton.setText("      Up      "); //$NON-NLS-1$
 	    upButton.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
 	    upButton.addSelectionListener(new SelectionAdapter() {
@@ -190,7 +211,7 @@ public class SyncFileTree extends ApplicationWindow {
 	    	}
 	    });
 
-	    final Button downButton = new Button(patternTableComposite, SWT.PUSH);
+	    downButton = new Button(patternTableComposite, SWT.PUSH);
 	    downButton.setText("     Down     "); //$NON-NLS-1$
 	    downButton.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
 	    downButton.addSelectionListener(new SelectionAdapter() {
@@ -208,7 +229,7 @@ public class SyncFileTree extends ApplicationWindow {
 	    	}
 	    });
 
-	    Button deleteButton = new Button(patternTableComposite, SWT.PUSH);
+	    deleteButton = new Button(patternTableComposite, SWT.PUSH);
 	    deleteButton.setText("    Delete    "); //$NON-NLS-1$
 	    deleteButton.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false));
 	    deleteButton.addSelectionListener(new SelectionAdapter() {
@@ -228,48 +249,30 @@ public class SyncFileTree extends ApplicationWindow {
 		patternEnterComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 	    // Text box to enter new pattern
-	    final Text newPattern = new Text(patternEnterComposite, SWT.NONE);
+	    newPattern = new Text(patternEnterComposite, SWT.NONE);
 	    newPattern.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 	    // Submit buttons (exclude and include)
-	    Button excludeButton = new Button(patternEnterComposite, SWT.PUSH);
+	    excludeButton = new Button(patternEnterComposite, SWT.PUSH);
 	    excludeButton.setText("    Exclude    "); //$NON-NLS-1$
 	    excludeButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
 	    excludeButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
-	    		String pattern = newPattern.getText();
-	    		if (!pattern.isEmpty()) {
-	    			if (specialFilterNameToPatternMap.get(pattern) != null) {
-	    				filter.addPattern(specialFilterNameToPatternMap.get(pattern), PatternType.EXCLUDE);
-	    			} else {
-	    				filter.addPattern(new RegexPatternMatcher(pattern), SyncFileFilter.PatternType.EXCLUDE);
-	    			}
-    				newPattern.setText(""); //$NON-NLS-1$
-    				update();
-	    		}
+	    		enterNewPattern(PatternType.EXCLUDE);
 	    	}
 	    });
 
-	    Button includeButton = new Button(patternEnterComposite, SWT.PUSH);
+	    includeButton = new Button(patternEnterComposite, SWT.PUSH);
 	    includeButton.setText("    Include    "); //$NON-NLS-1$
 	    includeButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
 	    includeButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
-	    		String pattern = newPattern.getText();
-	    		if (!pattern.isEmpty()) {
-	    			if (specialFilterNameToPatternMap.get(pattern) != null) {
-	    				filter.addPattern(specialFilterNameToPatternMap.get(pattern), PatternType.INCLUDE);
-	    			} else {
-	    				filter.addPattern(new RegexPatternMatcher(pattern), SyncFileFilter.PatternType.INCLUDE);
-	    			}
-    				newPattern.setText(""); //$NON-NLS-1$
-    				update();
-	    		}
+	    		enterNewPattern(PatternType.INCLUDE);
 	    	}
 	    });
 	    
 	    // Combo for special filters
-	    final Combo specialFiltersCombo = new Combo(patternEnterComposite, SWT.READ_ONLY);
+	    specialFiltersCombo = new Combo(patternEnterComposite, SWT.READ_ONLY);
 		specialFiltersCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 	    for (String filterName : specialFilterNameToPatternMap.keySet()) {
 	    	specialFiltersCombo.add(filterName);
@@ -280,6 +283,15 @@ public class SyncFileTree extends ApplicationWindow {
 	    		specialFiltersCombo.deselectAll();
 	    	}
 	    });
+	    
+	    // Blank labels to occupy two spaces
+	    new Label(patternEnterComposite, SWT.NONE).setVisible(false);
+	    new Label(patternEnterComposite, SWT.NONE).setVisible(false);
+	    
+	    // Place for displaying error message if pattern is illegal
+	    patternErrorLabel = new Label(patternEnterComposite, SWT.NONE);
+	    patternErrorLabel.setForeground(excludeRed);
+		patternErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
 
 	    // Composite for cancel and OK buttons
 	    Composite buttonComposite = new Composite(composite, SWT.FILL);
@@ -287,7 +299,7 @@ public class SyncFileTree extends ApplicationWindow {
 		buttonComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 	    // Cancel button
-	    Button cancelButton = new Button(buttonComposite, SWT.PUSH);
+	    cancelButton = new Button(buttonComposite, SWT.PUSH);
 	    cancelButton.setText("    Cancel    "); //$NON-NLS-1$
 	    cancelButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, true, false));
 	    cancelButton.addSelectionListener(new SelectionAdapter() {
@@ -297,7 +309,7 @@ public class SyncFileTree extends ApplicationWindow {
 	    });
 	    
 	    // OK button
-	    Button okButton = new Button(buttonComposite, SWT.PUSH);
+	    okButton = new Button(buttonComposite, SWT.PUSH);
 	    okButton.setText("      OK      "); //$NON-NLS-1$
 	    okButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, false, false));
 	    okButton.addSelectionListener(new SelectionAdapter() {
@@ -310,13 +322,58 @@ public class SyncFileTree extends ApplicationWindow {
 	    update();
 		return composite;
 	}
+	
+	private void enterNewPattern(PatternType type) {
+		String pattern = newPattern.getText();
+		if (pattern.isEmpty()) {
+			return;
+		}
+
+		if (specialFilterNameToPatternMap.get(pattern) != null) {
+			filter.addPattern(specialFilterNameToPatternMap.get(pattern), type);
+		} else {
+			RegexPatternMatcher matcher = null;
+			try {
+				matcher = new RegexPatternMatcher(pattern);
+			} catch (PatternSyntaxException e) {
+				// Do nothing but display an error message for a few seconds
+				patternErrorLabel.setText("Invalid regular expression"); //$NON-NLS-1$
+				display.timerExec(ERROR_DISPLAY_SECONDS*1000, new Runnable() {
+					@Override
+					public void run() {
+						if (patternErrorLabel.isDisposed ()) {
+							return;
+						}
+						patternErrorLabel.setText(""); //$NON-NLS-1$
+					}
+				});
+				return;
+			}
+			
+			filter.addPattern(matcher, type);
+		}
+
+		newPattern.setText(""); //$NON-NLS-1$
+		update();
+	}
 
 	private void update() {
 		patternTable.removeAll();
 		for (PatternMatcher pattern : filter.getPatterns()) {
 			TableItem ti = new TableItem(patternTable, SWT.LEAD);
-			ti.setText(pattern.toString());
 			ti.setData(pattern);
+
+			String[] tableValues = new String[2];
+			tableValues[0] = pattern.toString();
+			if (pattern instanceof PathPatternMatcher) {
+				tableValues[1] = "path"; //$NON-NLS-1$
+			} else if (pattern instanceof RegexPatternMatcher) {
+				tableValues[1] = "regex"; //$NON-NLS-1$
+			} else {
+				tableValues[1] = "special"; //$NON-NLS-1$
+			}
+			ti.setText(tableValues);
+
 			if (filter.getPatternType(pattern) == PatternType.INCLUDE) {
 				ti.setForeground(includeGreen);
 			} else {

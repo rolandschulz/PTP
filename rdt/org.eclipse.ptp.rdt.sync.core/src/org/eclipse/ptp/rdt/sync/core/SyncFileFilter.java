@@ -88,11 +88,11 @@ public class SyncFileFilter {
 	 * Add the common, default list of paths to be filtered.
 	 */
 	public void addDefaults() {
-		this.addPattern(new RegexPatternMatcher(".project"), PatternType.EXCLUDE); //$NON-NLS-1$
-		this.addPattern(new RegexPatternMatcher(".cproject"), PatternType.EXCLUDE); //$NON-NLS-1$
-		this.addPattern(new RegexPatternMatcher(".settings"), PatternType.EXCLUDE); //$NON-NLS-1$
+		this.addPattern(new PathPatternMatcher(".project"), PatternType.EXCLUDE); //$NON-NLS-1$
+		this.addPattern(new PathPatternMatcher(".cproject"), PatternType.EXCLUDE); //$NON-NLS-1$
+		this.addPattern(new PathPatternMatcher(".settings"), PatternType.EXCLUDE); //$NON-NLS-1$
 		// TODO: This Git-specific directory is defined in multiple places - need to refactor.
-		this.addPattern(new RegexPatternMatcher(".ptp-sync"), PatternType.EXCLUDE); //$NON-NLS-1$
+		this.addPattern(new PathPatternMatcher(".ptp-sync"), PatternType.EXCLUDE); //$NON-NLS-1$
 	}
 
 	/**
