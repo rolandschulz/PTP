@@ -9,8 +9,8 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
+  <groupId>org.eclipse.ptp.features</groupId>
   <artifactId>org.eclipse.ptp.rm.jaxb.pbs</artifactId>
   <version>5.0.4-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
-  <groupId>org.eclipse.ptp.features</groupId>
 </project>

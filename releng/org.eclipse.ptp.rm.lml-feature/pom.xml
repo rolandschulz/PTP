@@ -9,8 +9,8 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.ptp.rm.lml</artifactId>
-  <version>5.0.4-SNAPSHOT</version>
-  <packaging>eclipse-feature</packaging>
   <groupId>org.eclipse.ptp.features</groupId>
+  <artifactId>org.eclipse.ptp.rm.lml</artifactId>
+  <version>5.0.5-SNAPSHOT</version>
+  <packaging>eclipse-feature</packaging>
 </project>
