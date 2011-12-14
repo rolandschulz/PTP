@@ -362,13 +362,11 @@ public class JAXBUtil {
 	 *            new layout, which is placed into the positions of old layouts
 	 */
 	@SuppressWarnings("unchecked")
-	public void replaceComponentLayout(LguiType lgui, ILguiItem lguiItem,
-			ComponentlayoutType newLayout) {
+	public void replaceComponentLayout(LguiType lgui, ILguiItem lguiItem, ComponentlayoutType newLayout) {
 		if (newLayout == null) {
 			return;
 		}
-		final List<JAXBElement<?>> objects = lgui
-				.getObjectsAndRelationsAndInformation();
+		final List<JAXBElement<?>> objects = lgui.getObjectsAndRelationsAndInformation();
 
 		boolean replaced = false;
 
