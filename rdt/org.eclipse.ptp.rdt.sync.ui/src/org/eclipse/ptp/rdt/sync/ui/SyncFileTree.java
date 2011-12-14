@@ -10,15 +10,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.PatternSyntaxException;
 
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -29,6 +34,8 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.ptp.rdt.sync.core.BinaryPatternMatcher;
+import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.PathPatternMatcher;
 import org.eclipse.ptp.rdt.sync.core.PatternMatcher;
 import org.eclipse.ptp.rdt.sync.core.RegexPatternMatcher;
@@ -69,6 +76,7 @@ public class SyncFileTree extends ApplicationWindow {
 	private final IProject project;
 	private final SyncFileFilter filter;
 	private SyncCheckboxTreeViewer treeViewer;
+	private Button showRemoteButton;
 	private Table patternTable;
 	private Button upButton;
 	private Button downButton;
@@ -124,7 +132,7 @@ public class SyncFileTree extends ApplicationWindow {
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		shell.setText("Synchronized Files"); //$NON-NLS-1$
+		shell.setText("Sync File Exclude/Include List"); //$NON-NLS-1$
 	}
 
 	/**
@@ -140,9 +148,17 @@ public class SyncFileTree extends ApplicationWindow {
 		gl.verticalSpacing = 20;
 		composite.setLayout(gl);
 
+		// Composite for tree viewer
+		Composite treeViewerComposite = new Composite(composite, SWT.BORDER);
+		treeViewerComposite.setLayout(new GridLayout(1, false));
+		treeViewerComposite.setLayoutData(new GridData(WINDOW_WIDTH, 200));
+
+		// Label for tree viewer
+		new Label(treeViewerComposite, SWT.NONE).setText("File View"); //$NON-NLS-1$
+
 		// File tree viewer
-		treeViewer = new SyncCheckboxTreeViewer(composite);
-		treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		treeViewer = new SyncCheckboxTreeViewer(treeViewerComposite);
+		treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		treeViewer.setContentProvider(new SFTTreeContentProvider());
 		treeViewer.setLabelProvider(new SFTTreeLabelProvider());
 		treeViewer.setCheckStateProvider(new ICheckStateProvider() {
@@ -173,10 +189,26 @@ public class SyncFileTree extends ApplicationWindow {
 		});
 		treeViewer.setInput(project);
 		
+		showRemoteButton = new Button(treeViewerComposite, SWT.CHECK);
+		showRemoteButton.setText("Show remote files"); //$NON-NLS-1$
+		showRemoteButton.setSelection(((SFTTreeContentProvider) treeViewer.getContentProvider()).getShowRemoteFiles());
+        showRemoteButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+            	((SFTTreeContentProvider) treeViewer.getContentProvider()).setShowRemoteFiles(showRemoteButton.getSelection());
+            	update();
+            }
+        });
+		
 		// Composite for pattern table and buttons
 		Composite patternTableComposite = new Composite(composite, SWT.BORDER);
 		patternTableComposite.setLayout(new GridLayout(2, false));
-		patternTableComposite.setLayoutData(new GridData(WINDOW_WIDTH, 150));
+		patternTableComposite.setLayoutData(new GridData(WINDOW_WIDTH, 200));
+		
+		// Label for pattern table
+		Label patternTableLabel = new Label(patternTableComposite, SWT.NONE);
+		patternTableLabel.setText("Pattern View"); //$NON-NLS-1$
+		patternTableLabel.setLayoutData(new GridData(SWT.LEAD, SWT.CENTER, false, false, 4, 1));
 		
 		// Pattern table
 		patternTable = new Table(patternTableComposite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
@@ -245,8 +277,11 @@ public class SyncFileTree extends ApplicationWindow {
 	    
 	    //Composite for text box, combo, and buttons to enter a new pattern
 	    Composite patternEnterComposite = new Composite(composite, SWT.FILL);
-	    patternEnterComposite.setLayout(new GridLayout(3, false));
+	    patternEnterComposite.setLayout(new GridLayout(4, false));
 		patternEnterComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		// Label for entering new pattern
+		new Label(patternEnterComposite, SWT.NONE).setText("Enter pattern: "); //$NON-NLS-1$
 
 	    // Text box to enter new pattern
 	    newPattern = new Text(patternEnterComposite, SWT.NONE);
@@ -271,6 +306,8 @@ public class SyncFileTree extends ApplicationWindow {
 	    	}
 	    });
 	    
+	    // Label for special filters combo
+	    new Label(patternEnterComposite, SWT.NONE).setText("Select pattern: "); //$NON-NLS-1$
 	    // Combo for special filters
 	    specialFiltersCombo = new Combo(patternEnterComposite, SWT.READ_ONLY);
 		specialFiltersCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -385,6 +422,34 @@ public class SyncFileTree extends ApplicationWindow {
 	}
 
 	private class SFTTreeContentProvider implements ITreeContentProvider {
+		private final RemoteContentProvider remoteFiles;
+		private boolean showRemoteFiles = false;
+
+		public SFTTreeContentProvider() {
+			IConfiguration bconf = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
+			BuildScenario bs = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(bconf);
+			if (bs == null) {
+				remoteFiles = null;
+			} else {
+				remoteFiles = new RemoteContentProvider(bs.getRemoteConnection(), new Path(bs.getLocation()), project);
+			}
+		}
+
+		/**
+		 * Get whether remote files are displayed
+		 */
+		public boolean getShowRemoteFiles() {
+			return showRemoteFiles;
+		}
+
+		/**
+		 * Set displaying of remote files
+		 * @param b
+		 */
+		public void setShowRemoteFiles(boolean b) {
+			showRemoteFiles = b;
+		}
+
 		/**
 		 * Gets the children of the specified object
 		 * 
@@ -392,16 +457,29 @@ public class SyncFileTree extends ApplicationWindow {
 		 *            the parent object
 		 * @return Object[]
 		 */
+		@Override
 		public Object[] getChildren(Object element) {
+			ArrayList<IResource> children = new ArrayList<IResource>();
+
 			if (element instanceof IFolder) {
-				try {
-					return ((IFolder) element).members();
-				} catch (CoreException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (((IFolder) element).isAccessible()) {
+					try {
+						for (IResource localChild : ((IFolder) element).members()) {
+							children.add(localChild);
+						}
+					} catch (CoreException e) {
+						assert(false); // This should never happen, since we check for existence before accessing the folder.
+					}
+				}
+				
+				if (showRemoteFiles) {
+					for (Object remoteChild : remoteFiles.getChildren(element)) {
+						this.addUniqueResource(children, (IResource) remoteChild);
+					}
 				}
 			}
-			return new Object[0];
+
+			return children.toArray();
 		}
 
 		/**
@@ -432,19 +510,33 @@ public class SyncFileTree extends ApplicationWindow {
 
 		/**
 		 * Gets the root element(s) of the tree
+		 * This code is very similar to "getChildren" but the root of the project tree requires special handling (no IFolder
+		 * for the root).
 		 * 
 		 * @param element
 		 *            the input data
 		 * @return Object[]
 		 */
 		public Object[] getElements(Object element) {
-			try {
-				 return ((IProject) element).members();
-			} catch (CoreException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			ArrayList<IResource> children = new ArrayList<IResource>();
+
+			if (element instanceof IProject && ((IProject) element).isAccessible()) {
+				try {
+					for (IResource localChild : ((IProject) element).members()) {
+						children.add(localChild);
+					}
+				} catch (CoreException e) {
+					assert(false); // This should never happen, since we check for existence before accessing the project.
+				}
+
+				if (showRemoteFiles) {
+					for (Object remoteChild : remoteFiles.getElements(element)) {
+						this.addUniqueResource(children, (IResource) remoteChild);
+					}
+				}
 			}
-			return new Object[0];
+
+			return children.toArray();
 		}
 
 		/**
@@ -465,7 +557,20 @@ public class SyncFileTree extends ApplicationWindow {
 		 *            the new input
 		 */
 		public void inputChanged(Viewer element, Object arg1, Object arg2) {
-			// Nothing to change
+			// Nothing to do
+		}
+		
+		// Utility function to add resources to a list only if it is unique.
+		// Returns whether the resource was added.
+		private boolean addUniqueResource(Collection<IResource> resList, IResource newRes) {
+			for (IResource res : resList) {
+				if (res.getProjectRelativePath().equals(newRes.getProjectRelativePath())) {
+					return false;
+				}
+			}
+			
+			resList.add(newRes);
+			return true;
 		}
 	}
 
