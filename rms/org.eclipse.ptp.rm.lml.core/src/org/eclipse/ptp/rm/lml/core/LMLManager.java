@@ -15,12 +15,8 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.bind.JAXBException;
-
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
@@ -238,18 +234,8 @@ public class LMLManager {
 			lguiItem = LGUIS.get(name);
 		}
 		if (lguiItem != null) {
-			try {
-				lguiItem.getCurrentLayout(output);
-			} catch (final JAXBException e) {
-				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
-						.getLocalizedMessage()));
-			}
-			try {
-				lguiItem.update(input);
-			} catch (final JAXBException e) {
-				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
-						.getLocalizedMessage()));
-			}
+			lguiItem.getCurrentLayout(output);
+			lguiItem.update(input);
 
 			if (fLguiItem == lguiItem) {
 				if (!isDisplayed) {

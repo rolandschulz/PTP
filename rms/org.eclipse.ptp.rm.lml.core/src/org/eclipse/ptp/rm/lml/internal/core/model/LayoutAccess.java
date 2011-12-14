@@ -11,7 +11,6 @@
 
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,10 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
@@ -64,6 +60,11 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarlayoutType;
  * functions, which allow to merge layouts to one lml-model
  */
 public class LayoutAccess extends LguiHandler {
+	/*
+	 * create an objectfactory for all functions in this class
+	 */
+	private static ObjectFactory objectFactory = new ObjectFactory();
+
 	/**
 	 * This method merges the layout information given by the "layout"-instance
 	 * with the layout, which is included in "data". Component-layouts in "data"
@@ -280,45 +281,6 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	/**
-	 * @param obj
-	 *            LguiType-instance
-	 * @param output
-	 *            OutputStream to save xml-representation of obj in
-	 * @throws JAXBException
-	 */
-	@SuppressWarnings("unused")
-	private static void objToLML(LguiType obj, OutputStream output) throws JAXBException {
-
-		final JAXBContext jc = JAXBContext.newInstance("lml"); //$NON-NLS-1$
-
-		final Marshaller mar = jc.createMarshaller();
-
-		mar.setProperty("jaxb.schemaLocation", "http://www.llview.de lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		final QName tagname = new QName("http://www.llview.de", "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-		final JAXBElement<LguiType> rootel = new JAXBElement<LguiType>(tagname, LguiType.class, obj);
-
-		mar.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-		mar.marshal(rootel, output);
-	}
-
-	// DefaultLayouts
-	private final UsagebarlayoutType defaultUsagebar;
-
-	private final ChartlayoutType defaultChart;
-
-	private final TablelayoutType defaultTable;
-
-	private final InfoboxlayoutType defaultInfobox;
-
-	/*
-	 * create an objectfactory for all functions in this class
-	 */
-	private static ObjectFactory objectFactory = new ObjectFactory();
-
-	/**
 	 * @param lguiItem
 	 *            LML-data-handler, which groups this handler and others to a
 	 *            set of LMLHandler. This instance is needed to notify all
@@ -326,10 +288,6 @@ public class LayoutAccess extends LguiHandler {
 	 */
 	public LayoutAccess(ILguiItem lguiItem, LguiType lgui) {
 		super(lguiItem, lgui);
-		defaultUsagebar = objectFactory.createUsagebarlayoutType();
-		defaultChart = objectFactory.createChartlayoutType();
-		defaultTable = objectFactory.createTablelayoutType();
-		defaultInfobox = objectFactory.createInfoboxlayoutType();
 
 		this.lguiItem.addListener(new ILguiListener() {
 			public void handleEvent(ILguiUpdatedEvent e) {

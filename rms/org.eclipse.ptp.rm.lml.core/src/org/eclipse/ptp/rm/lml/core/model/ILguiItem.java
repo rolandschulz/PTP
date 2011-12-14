@@ -82,7 +82,7 @@ public interface ILguiItem {
 	 * 
 	 * @param output
 	 */
-	public void getCurrentLayout(OutputStream output) throws JAXBException;
+	public void getCurrentLayout(OutputStream output);
 
 	/**
 	 * @return
@@ -203,7 +203,7 @@ public interface ILguiItem {
 	 * @param stream
 	 * @throws JAXBException
 	 */
-	public void update(InputStream stream) throws JAXBException;
+	public void update(InputStream stream);
 
 	/**
 	 * @param name

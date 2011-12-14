@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.lml.internal.core.model;
 
 import org.eclipse.ptp.rm.lml.core.model.ILguiHandler;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.core.util.JAXBUtil;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 
 /**
@@ -39,6 +40,8 @@ public class LguiHandler implements ILguiHandler {
 	 * saves current lml-model, which is partly managed by this class
 	 */
 	protected LguiType lgui;
+
+	protected static final JAXBUtil jaxbUtil = JAXBUtil.getInstance();
 
 	/**
 	 * @param lguiItem
