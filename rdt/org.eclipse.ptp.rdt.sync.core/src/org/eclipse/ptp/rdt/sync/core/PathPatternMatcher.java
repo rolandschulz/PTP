@@ -24,19 +24,57 @@ public class PathPatternMatcher extends PatternMatcher {
 	String path;
 
 	public PathPatternMatcher(String p) {
-		path = p;
+		if (p == null) {
+			path = ""; //$NON-NLS-1$
+		} else {
+			path = p;
+		}
 	}
 
-	@Override
 	public boolean match(String candidate) {
 		return candidate.startsWith(path);
 	}
 
-	@Override
 	public String toString() {
 		return path;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((path == null) ? 0 : path.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof PathPatternMatcher)) {
+			return false;
+		}
+		PathPatternMatcher other = (PathPatternMatcher) obj;
+		if (path == null) {
+			if (other.path != null) {
+				return false;
+			}
+		} else if (!path.equals(other.path)) {
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Place needed data for recreating inside the memento
 	 */

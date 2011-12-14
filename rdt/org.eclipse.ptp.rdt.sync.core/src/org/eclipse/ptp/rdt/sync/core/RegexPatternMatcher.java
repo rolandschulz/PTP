@@ -38,7 +38,11 @@ public class RegexPatternMatcher extends PatternMatcher {
 	 * 				if the pattern is invalid
 	 */
 	public RegexPatternMatcher(String r) throws PatternSyntaxException {
-		regex = r;
+		if (r == null) {
+			regex = ""; //$NON-NLS-1$
+		} else {
+			regex = r;
+		}
 		pattern = Pattern.compile(regex);
 	}
 	
@@ -61,6 +65,42 @@ public class RegexPatternMatcher extends PatternMatcher {
 		return regex;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((regex == null) ? 0 : regex.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof RegexPatternMatcher)) {
+			return false;
+		}
+		RegexPatternMatcher other = (RegexPatternMatcher) obj;
+		if (regex == null) {
+			if (other.regex != null) {
+				return false;
+			}
+		} else if (!regex.equals(other.regex)) {
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Place needed data for recreating inside the memento
 	 */

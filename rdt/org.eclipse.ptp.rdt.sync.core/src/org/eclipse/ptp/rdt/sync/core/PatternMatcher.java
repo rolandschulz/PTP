@@ -27,6 +27,8 @@ public abstract class PatternMatcher {
 	private static final String ATTR_CLASS_NAME = "class-name"; //$NON-NLS-1$
 	public abstract boolean match(String candidate);
 	public abstract String toString();
+	public abstract boolean equals(Object o);
+	public abstract int hashCode();
 	
 	/**
 	 * Save pattern to the given memento. Subclasses may override, first calling super.savePattern(), if they need to save
