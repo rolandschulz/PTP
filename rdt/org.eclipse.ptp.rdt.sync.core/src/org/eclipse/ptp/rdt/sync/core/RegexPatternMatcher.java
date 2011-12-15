@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
 /**
@@ -121,7 +122,7 @@ public class RegexPatternMatcher extends PatternMatcher {
 	public static PatternMatcher loadPattern(IMemento memento) throws NoSuchElementException {
 		String r = memento.getString(ATTR_REGEX);
 		if (r == null) {
-			throw new NoSuchElementException("Regex pattern not found in memento"); //$NON-NLS-1$
+			throw new NoSuchElementException(Messages.RegexPatternMatcher_0);
 		}
 		return new RegexPatternMatcher(memento.getString(ATTR_REGEX));
 	}

@@ -12,6 +12,7 @@ package org.eclipse.ptp.rdt.sync.core;
 
 import java.util.NoSuchElementException;
 
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
 /**
@@ -95,7 +96,7 @@ public class PathPatternMatcher extends PatternMatcher {
 	public static PatternMatcher loadPattern(IMemento memento) throws NoSuchElementException {
 		String p = memento.getString(ATTR_PATH);
 		if (p == null) {
-			throw new NoSuchElementException("Path not found in memento"); //$NON-NLS-1$
+			throw new NoSuchElementException(Messages.PathPatternMatcher_0);
 		}
 		return new PathPatternMatcher(memento.getString(ATTR_PATH));
 	}

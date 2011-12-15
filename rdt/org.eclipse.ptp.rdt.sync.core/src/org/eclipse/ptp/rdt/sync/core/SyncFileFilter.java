@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
 /**
@@ -208,13 +209,13 @@ public class SyncFileFilter {
 			try {
 				pm = PatternMatcher.loadPattern(patternInternalMemento);
 			} catch (InvocationTargetException e) {
-				RDTSyncCorePlugin.log("Unable to load pattern for file filtering: "+ e.getMessage(), e); //$NON-NLS-1$
+				RDTSyncCorePlugin.log(Messages.SyncFileFilter_0 + e.getMessage(), e);
 				continue;
 			} catch (NoSuchMethodException e) {
-				RDTSyncCorePlugin.log("Unable to load pattern for file filtering: "+ e.getMessage(), e); //$NON-NLS-1$
+				RDTSyncCorePlugin.log(Messages.SyncFileFilter_0 + e.getMessage(), e);
 				continue;
 			} catch (ClassNotFoundException e) {
-				RDTSyncCorePlugin.log("Unable to load pattern for file filtering: "+ e.getMessage(), e); //$NON-NLS-1$
+				RDTSyncCorePlugin.log(Messages.SyncFileFilter_0 + e.getMessage(), e);
 				continue;
 			}
 

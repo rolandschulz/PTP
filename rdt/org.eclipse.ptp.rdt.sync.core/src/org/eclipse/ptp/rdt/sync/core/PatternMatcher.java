@@ -14,6 +14,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
 /**
@@ -55,13 +57,13 @@ public abstract class PatternMatcher {
 	public static PatternMatcher loadPattern(IMemento memento) throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException {
 		String className = memento.getString(ATTR_CLASS_NAME);
 		if (className == null) {
-			throw new ClassNotFoundException("Subclass name not found"); //$NON-NLS-1$
+			throw new ClassNotFoundException(Messages.PatternMatcher_0);
 		}
 
 		// Sanity check on the retrieved class
 		if (!PatternMatcher.class.isAssignableFrom(Class.forName(className)) ||
 				Modifier.isAbstract(Class.forName(className).getModifiers())) {
-			throw new ClassNotFoundException("Class is not a concrete subclass of PatternMatcher"); //$NON-NLS-1$
+			throw new ClassNotFoundException(Messages.PatternMatcher_1);
 		}
 
 		// First, try to invoke the subclass's "loadPattern" method
@@ -84,7 +86,6 @@ public abstract class PatternMatcher {
 				// Treat as if method does not exist
 			}
 		}
-		System.out.println("Checkpoint 5"); //$NON-NLS-1$
 
 		// Next, try to instantiate from subclass's default constructor (code is very similar to the above).
 		hasMethod = true;
@@ -109,6 +110,6 @@ public abstract class PatternMatcher {
 			}
 		}
 		
-		throw new NoSuchMethodException("Unable to create subclass instance - no loadPattern method or default constructor found."); //$NON-NLS-1$
+		throw new NoSuchMethodException(Messages.PatternMatcher_2);
 	}
 }

@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
@@ -44,7 +45,7 @@ public class RemoteContentProvider implements ITreeContentProvider {
 	 */
 	public RemoteContentProvider(IRemoteConnection conn, IPath dir, IProject proj) {
 		if (conn == null || dir == null) {
-			throw new IllegalArgumentException("Null argument passed to RemoteContentProvider constructor."); //$NON-NLS-1$
+			throw new IllegalArgumentException(Messages.RemoteContentProvider_0);
 		}
 		connection = conn;
 		rootDir = dir;
