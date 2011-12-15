@@ -44,9 +44,13 @@ import org.eclipse.ptp.rdt.sync.core.SyncFileFilter.PatternType;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -155,7 +159,9 @@ public class SyncFileTree extends ApplicationWindow {
 		treeViewerComposite.setLayoutData(new GridData(WINDOW_WIDTH, 200));
 
 		// Label for tree viewer
-		new Label(treeViewerComposite, SWT.NONE).setText(Messages.SyncFileTree_1);
+		Label treeViewerLabel = new Label(treeViewerComposite, SWT.NONE);
+		treeViewerLabel.setText(Messages.SyncFileTree_1);
+		this.formatAsHeader(treeViewerLabel);
 
 		// File tree viewer
 		treeViewer = new SyncCheckboxTreeViewer(treeViewerComposite);
@@ -209,6 +215,7 @@ public class SyncFileTree extends ApplicationWindow {
 		// Label for pattern table
 		Label patternTableLabel = new Label(patternTableComposite, SWT.NONE);
 		patternTableLabel.setText(Messages.SyncFileTree_3);
+		this.formatAsHeader(patternTableLabel);
 		patternTableLabel.setLayoutData(new GridData(SWT.LEAD, SWT.CENTER, false, false, 4, 1));
 		
 		// Pattern table
@@ -291,6 +298,7 @@ public class SyncFileTree extends ApplicationWindow {
 	    // Submit buttons (exclude and include)
 	    excludeButton = new Button(patternEnterComposite, SWT.PUSH);
 	    excludeButton.setText(Messages.SyncFileTree_10);
+	    excludeButton.setForeground(excludeRed);
 	    excludeButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
 	    excludeButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -300,6 +308,7 @@ public class SyncFileTree extends ApplicationWindow {
 
 	    includeButton = new Button(patternEnterComposite, SWT.PUSH);
 	    includeButton.setText(Messages.SyncFileTree_11);
+	    includeButton.setForeground(includeGreen);
 	    includeButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
 	    includeButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -359,6 +368,22 @@ public class SyncFileTree extends ApplicationWindow {
 
 	    update();
 		return composite;
+	}
+	
+	// Utility function to bold and resize labels to be headers
+	private void formatAsHeader(Label widget) {
+		FontData[] fontData = widget.getFont().getFontData();
+		for (FontData data : fontData) {
+			data.setStyle(SWT.BOLD);
+		}
+
+		final Font newFont = new Font(display, fontData);
+		widget.setFont(newFont);
+		widget.addDisposeListener(new DisposeListener() {
+		    public void widgetDisposed(DisposeEvent e) {
+		        newFont.dispose();
+		    }
+		});
 	}
 	
 	private void enterNewPattern(PatternType type) {
