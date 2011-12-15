@@ -14,12 +14,17 @@ import java.util.Map;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.rdt.sync.core.PathPatternMatcher;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SYNC_MODE;
@@ -41,6 +46,8 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String setAllCommand = "set_all"; //$NON-NLS-1$
 	private static final String syncAutoCommand = "sync_auto"; //$NON-NLS-1$
 	private static final String syncFileList = "sync_file_list"; //$NON-NLS-1$
+	private static final String syncExcludeCommand = "sync_exclude"; //$NON-NLS-1$
+	private static final String syncIncludeCommand = "sync_include"; //$NON-NLS-1$
 
 	public Object execute(ExecutionEvent event) {
 		String command = event.getParameter(SYNC_COMMAND_PARAMETER_ID);
@@ -76,6 +83,20 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 						SyncManager.syncAll(null, project, SyncFlag.FORCE, null);
 					}
 				}
+			} else if (command.equals(syncExcludeCommand) || command.equals(syncIncludeCommand)) {
+				SyncFileFilter sff = SyncManager.getFileFilter(project);
+				IStructuredSelection sel = this.getSelectedElements();
+				SyncFileFilter.PatternType type = SyncFileFilter.PatternType.EXCLUDE;
+				if (command.equals(syncIncludeCommand)) {
+					type = SyncFileFilter.PatternType.INCLUDE;
+				}
+
+				for (Object element : sel.toArray()) {
+					assert((element instanceof IFolder) || (element instanceof IFile));
+					IPath path = ((IResource) element).getProjectRelativePath();
+					sff.addPattern(new PathPatternMatcher(path.toOSString()), type);
+				}
+				SyncManager.saveFileFilter(project, sff);
 			} else if (command.equals(syncFileList)) {
 				new SyncFileTree(project).open();
 			}
@@ -121,14 +142,10 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	 * Portions copied from org.eclipse.ptp.services.ui.wizards.setDefaultFromSelection
 	 */
 	private IProject getProject() {
-		IWorkbenchWindow wnd = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		IWorkbenchPage pg = wnd.getActivePage();
-		ISelection sel = pg.getSelection();
-
-		if (!(sel instanceof IStructuredSelection)) {
+		IStructuredSelection selection = this.getSelectedElements();
+		if (selection == null) {
 			return null;
 		}
-		IStructuredSelection selection = (IStructuredSelection) sel;
 
 		Object firstElement = selection.getFirstElement();
 		if (!(firstElement instanceof IAdaptable)) {
@@ -141,5 +158,17 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 		IResource resource = (IResource) o;
 
 		return resource.getProject();
+	}
+	
+	private IStructuredSelection getSelectedElements() {
+		IWorkbenchWindow wnd = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchPage pg = wnd.getActivePage();
+		ISelection sel = pg.getSelection();
+
+		if (!(sel instanceof IStructuredSelection)) {
+			return null;
+		} else {
+			return (IStructuredSelection) sel;
+		}
 	}
 }
