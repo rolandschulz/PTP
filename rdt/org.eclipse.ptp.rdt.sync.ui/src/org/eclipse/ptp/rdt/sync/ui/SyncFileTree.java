@@ -72,12 +72,14 @@ import org.eclipse.ui.PlatformUI;
  * File tree where users can select the files to be sync'ed
  */
 public class SyncFileTree extends ApplicationWindow {
-	private static final int WINDOW_WIDTH = 600;
 	private static final int ERROR_DISPLAY_SECONDS = 3;
 	private static final Display display = Display.getCurrent();
 	private static final Color excludeRed = display.getSystemColor(SWT.COLOR_DARK_RED);
 	private static final Color includeGreen = display.getSystemColor(SWT.COLOR_DARK_GREEN);
 	
+	private final int windowWidth;
+	private final int viewHeight; // Used for file tree and pattern table
+
 	private final IProject project;
 	private final SyncFileFilter filter;
 	private SyncCheckboxTreeViewer treeViewer;
@@ -128,6 +130,9 @@ public class SyncFileTree extends ApplicationWindow {
 		// method for handling these special filters.
 		BinaryPatternMatcher bpm = new BinaryPatternMatcher(project);
 		specialFilterNameToPatternMap.put(bpm.toString(), bpm);
+		
+		windowWidth = display.getBounds().width / 3;
+		viewHeight = display.getBounds().height / 6;
 	}
 
 	/**
@@ -157,7 +162,7 @@ public class SyncFileTree extends ApplicationWindow {
 		// Composite for tree viewer
 		Composite treeViewerComposite = new Composite(composite, SWT.BORDER);
 		treeViewerComposite.setLayout(new GridLayout(2, false));
-		treeViewerComposite.setLayoutData(new GridData(WINDOW_WIDTH, 200));
+		treeViewerComposite.setLayoutData(new GridData(windowWidth, viewHeight));
 
 		// Label for tree viewer
 		Label treeViewerLabel = new Label(treeViewerComposite, SWT.NONE);
@@ -215,7 +220,7 @@ public class SyncFileTree extends ApplicationWindow {
 		// Composite for pattern table and buttons
 		Composite patternTableComposite = new Composite(composite, SWT.BORDER);
 		patternTableComposite.setLayout(new GridLayout(2, false));
-		patternTableComposite.setLayoutData(new GridData(WINDOW_WIDTH, 200));
+		patternTableComposite.setLayoutData(new GridData(windowWidth, viewHeight));
 		
 		// Label for pattern table
 		Label patternTableLabel = new Label(patternTableComposite, SWT.NONE);
@@ -291,7 +296,7 @@ public class SyncFileTree extends ApplicationWindow {
 	    //Composite for text box, combo, and buttons to enter a new pattern
 	    Composite patternEnterComposite = new Composite(composite, SWT.FILL);
 	    patternEnterComposite.setLayout(new GridLayout(4, false));
-		patternEnterComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		patternEnterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
 		// Label for entering new pattern
 		new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileTree_9);
