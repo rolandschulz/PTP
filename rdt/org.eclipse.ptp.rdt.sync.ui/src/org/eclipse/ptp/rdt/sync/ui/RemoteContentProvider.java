@@ -85,11 +85,10 @@ public class RemoteContentProvider implements ITreeContentProvider {
 		
 		IResource[] childObjects = new IResource[childFiles.length];
 		for (int i=0; i<childFiles.length; i++) {
-			String childPath = childFiles[i].getName();
 			if (childFiles[i].isDirectory()) {
-				childObjects[i] = project.getFolder(childPath);
+				childObjects[i] = project.getFolder(childFiles[i].getName());
 			} else {
-				childObjects[i] = project.getFile(childPath);
+				childObjects[i] = project.getFile(childFiles[i].getName());
 			}
 		}
 		
@@ -119,7 +118,7 @@ public class RemoteContentProvider implements ITreeContentProvider {
 		
 		IResource[] childObjects = new IResource[childFiles.length];
 		for (int i=0; i<childFiles.length; i++) {
-			String childPath = ((IFolder) parentElement).getProjectRelativePath().addTrailingSeparator() + childFiles[i].getName();
+			IPath childPath = ((IFolder) parentElement).getProjectRelativePath().addTrailingSeparator().append(childFiles[i].getName());
 			if (childFiles[i].isDirectory()) {
 				childObjects[i] = project.getFolder(childPath);
 			} else {

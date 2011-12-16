@@ -22,8 +22,6 @@ import org.eclipse.ui.IMemento;
  * Abstract class to be inherited to support various ways of testing strings.
  * Subclasses must implement either a public static "loadPattern" method that takes a memento or a default constructor to
  * support persistence. Otherwise, calling PatternMatcher.loadPattern(IMemento) for a saved instance will throw an exception.
- *
- *
  */
 public abstract class PatternMatcher {
 	private static final String ATTR_CLASS_NAME = "class-name"; //$NON-NLS-1$
