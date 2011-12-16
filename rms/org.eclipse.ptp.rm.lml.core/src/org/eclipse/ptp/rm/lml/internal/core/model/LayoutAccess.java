@@ -31,12 +31,9 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfoboxlayoutType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.NodedisplaylayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
-import org.eclipse.ptp.rm.lml.internal.core.elements.PaneType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.SplitlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TablelayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarlayoutType;
@@ -113,32 +110,6 @@ public class LayoutAccess extends LguiHandler {
 
 		JAXBUtil.replaceGlobalLayout(layout, data);
 		return data;
-	}
-
-	/**
-	 * Search for gid-attributes of a pane and put it into neededComponents
-	 * Recursively search all graphical objects referenced by this pane
-	 * 
-	 * @param pane
-	 *            part of SplitLayout, which is scanned for gid-attributes
-	 * @param components
-	 *            resulting Hashset
-	 */
-	private static void collectComponents(PaneType pane, HashSet<String> components) {
-
-		if (pane.getGid() != null) {
-			components.add(pane.getGid());
-		} else {
-			// top and bottom components?
-			if (pane.getBottom() != null) {
-				collectComponents(pane.getBottom(), components);
-				collectComponents(pane.getTop(), components);
-			} else {// Left and right
-				collectComponents(pane.getLeft(), components);
-				collectComponents(pane.getRight(), components);
-			}
-		}
-
 	}
 
 	/**
@@ -389,52 +360,21 @@ public class LayoutAccess extends LguiHandler {
 
 		final HashSet<String> components = new HashSet<String>();
 
-		for (final Object object : jaxbUtil.getObjects(lgui)) {
+		jaxbUtil.getLayoutComponents(result, lgui, components);
 
-			// add normal global layouts
-			if (object instanceof LayoutType) {
-				jaxbUtil.addLayoutElement(result, object);
-
-				if (object instanceof SplitlayoutType) {
-					final SplitlayoutType splitLayout = (SplitlayoutType) object;
-					// Collect needed components from layout recursively
-					if (splitLayout.getLeft() != null) {
-						collectComponents(splitLayout.getLeft(), components);
-						collectComponents(splitLayout.getRight(), components);
-					}
-				} else if (object instanceof AbslayoutType) {
-					final AbslayoutType absLayout = (AbslayoutType) object;
-					// Just traverse comp-list for gid-attributes
-					for (final ComponentType component : absLayout.getComp()) {
-						components.add(component.getGid());
-					}
-				}
-
-			} else if (object instanceof ComponentlayoutType) {
-				if (((ComponentlayoutType) object).isActive()) {
-					jaxbUtil.addComponentLayoutElement(result,
-							(ComponentlayoutType) object);
-					components.add(((ComponentlayoutType) object).getGid());
-				}
-			}
-		}
-
-		final List<GobjectType> idToGobject = new LinkedList<GobjectType>();
-		// Search needed components in data-tag to discover, which type the
-		// needed components have
+		final List<GobjectType> gobjectList = new LinkedList<GobjectType>();
 		for (final Object object : jaxbUtil.getObjects(lgui)) {
 			// is it a graphical object?
 			if (object instanceof GobjectType) {
-				final GobjectType gobject = (GobjectType) object;
-				if (components.contains(gobject.getId())) {
-					idToGobject.add(gobject);
+				if (components.contains(((GobjectType) object).getId())) {
+					gobjectList.add((GobjectType) object);
 				}
 			}
 		}
 
 		// Add all gobjects in idtoGobject to the result, so that lml-model is
 		// valid
-		for (final GobjectType gobject : idToGobject) {
+		for (final GobjectType gobject : gobjectList) {
 			result.getObjectsAndRelationsAndInformation().add(
 					JAXBUtil.minimizeGobjectType(gobject, objectFactory));
 		}

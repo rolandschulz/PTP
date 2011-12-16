@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -22,6 +23,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.AbslayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ChartType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ChartgroupType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.DataType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
@@ -31,6 +33,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.internal.core.elements.NodedisplaylayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
+import org.eclipse.ptp.rm.lml.internal.core.elements.PaneType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.PatternMatchType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.PatternType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeType;
@@ -180,6 +183,32 @@ public class JAXBUtil {
 		}
 	}
 
+	/**
+	 * Search for gid-attributes of a pane and put it into neededComponents
+	 * Recursively search all graphical objects referenced by this pane
+	 * 
+	 * @param pane
+	 *            part of SplitLayout, which is scanned for gid-attributes
+	 * @param components
+	 *            resulting Hashset
+	 */
+	private static void collectComponents(PaneType pane, HashSet<String> components) {
+
+		if (pane.getGid() != null) {
+			components.add(pane.getGid());
+		} else {
+			// top and bottom components?
+			if (pane.getBottom() != null) {
+				collectComponents(pane.getBottom(), components);
+				collectComponents(pane.getTop(), components);
+			} else {// Left and right
+				collectComponents(pane.getLeft(), components);
+				collectComponents(pane.getRight(), components);
+			}
+		}
+
+	}
+
 	private JAXBUtil() {
 		jaxbUtil = this;
 		try {
@@ -272,10 +301,6 @@ public class JAXBUtil {
 
 	}
 
-	public void addLayoutTag(LguiType lgui, LayoutType layout) {
-
-	}
-
 	public void addPatternInclude(PatternType pattern,
 			PatternMatchType patternMatch) {
 		pattern.getIncludeAndExclude().add(
@@ -289,6 +314,38 @@ public class JAXBUtil {
 				new JAXBElement<TableType>(new QName(
 						ILMLCoreConstants.TABLE_ELEMENT), TableType.class,
 						table));
+	}
+
+	public void getLayoutComponents(LguiType result, LguiType lgui, HashSet<String> components) {
+
+		for (final JAXBElement<?> element : lgui.getObjectsAndRelationsAndInformation()) {
+
+			final Object object = element.getValue();
+
+			if (object instanceof LayoutType) {
+				if (object instanceof SplitlayoutType) {
+					lgui.getObjectsAndRelationsAndInformation().add(element);
+				} else if (object instanceof AbslayoutType) {
+					lgui.getObjectsAndRelationsAndInformation().add(element);
+				}
+
+				if (object instanceof SplitlayoutType) {
+					if (((SplitlayoutType) object).getLeft() != null) {
+						collectComponents(((SplitlayoutType) object).getLeft(), components);
+						collectComponents(((SplitlayoutType) object).getRight(), components);
+					}
+				} else if (object instanceof AbslayoutType) {
+					for (final ComponentType component : ((AbslayoutType) object).getComp()) {
+						components.add(component.getGid());
+					}
+				}
+			} else if (object instanceof ComponentlayoutType) {
+				if (((ComponentlayoutType) object).isActive()) {
+					addComponentLayoutElement(result, (ComponentlayoutType) object);
+					components.add(((ComponentlayoutType) object).getGid());
+				}
+			}
+		}
 	}
 
 	public ArrayList<Object> getObjects(LguiType lgui) {
