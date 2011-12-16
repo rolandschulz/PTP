@@ -81,8 +81,9 @@ public class SyncFileTree extends ApplicationWindow {
 	private final IProject project;
 	private final SyncFileFilter filter;
 	private SyncCheckboxTreeViewer treeViewer;
-	private Button showRemoteButton;
 	private Table patternTable;
+	private Button showRemoteButton;
+	private Label remoteErrorLabel;
 	private Button upButton;
 	private Button downButton;
 	private Button deleteButton;
@@ -155,17 +156,18 @@ public class SyncFileTree extends ApplicationWindow {
 
 		// Composite for tree viewer
 		Composite treeViewerComposite = new Composite(composite, SWT.BORDER);
-		treeViewerComposite.setLayout(new GridLayout(1, false));
+		treeViewerComposite.setLayout(new GridLayout(2, false));
 		treeViewerComposite.setLayoutData(new GridData(WINDOW_WIDTH, 200));
 
 		// Label for tree viewer
 		Label treeViewerLabel = new Label(treeViewerComposite, SWT.NONE);
 		treeViewerLabel.setText(Messages.SyncFileTree_1);
+		treeViewerLabel.setLayoutData(new GridData(SWT.LEAD, SWT.CENTER, false, false, 2, 1));
 		this.formatAsHeader(treeViewerLabel);
 
 		// File tree viewer
 		treeViewer = new SyncCheckboxTreeViewer(treeViewerComposite);
-		treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		treeViewer.setContentProvider(new SFTTreeContentProvider());
 		treeViewer.setLabelProvider(new SFTTreeLabelProvider());
 		treeViewer.setCheckStateProvider(new ICheckStateProvider() {
@@ -202,10 +204,13 @@ public class SyncFileTree extends ApplicationWindow {
         showRemoteButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-            	((SFTTreeContentProvider) treeViewer.getContentProvider()).setShowRemoteFiles(showRemoteButton.getSelection());
             	update();
             }
         });
+        
+        remoteErrorLabel = new Label(treeViewerComposite, SWT.CENTER);
+        remoteErrorLabel.setForeground(excludeRed);
+        remoteErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
 		// Composite for pattern table and buttons
 		Composite patternTableComposite = new Composite(composite, SWT.BORDER);
@@ -421,6 +426,18 @@ public class SyncFileTree extends ApplicationWindow {
 	}
 
 	private void update() {
+		boolean showRemote = showRemoteButton.getSelection();
+		if (showRemote) {
+			if (!((SFTTreeContentProvider) treeViewer.getContentProvider()).isConnected()) {
+				showRemote = false;
+				remoteErrorLabel.setText(Messages.SyncFileTree_19);
+			} else {
+				remoteErrorLabel.setText(""); //$NON-NLS-1$
+			}
+		}
+		showRemoteButton.setSelection(showRemote);
+		((SFTTreeContentProvider) treeViewer.getContentProvider()).setShowRemoteFiles(showRemote);
+
 		patternTable.removeAll();
 		for (PatternMatcher pattern : filter.getPatterns()) {
 			TableItem ti = new TableItem(patternTable, SWT.LEAD);
@@ -455,6 +472,7 @@ public class SyncFileTree extends ApplicationWindow {
 			IConfiguration bconf = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
 			BuildScenario bs = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(bconf);
 			if (bs == null) {
+				// System error handled by BuildConfigurationManager
 				remoteFiles = null;
 			} else {
 				remoteFiles = new RemoteContentProvider(bs.getRemoteConnection(), new Path(bs.getLocation()), project);
@@ -498,7 +516,7 @@ public class SyncFileTree extends ApplicationWindow {
 					}
 				}
 				
-				if (showRemoteFiles) {
+				if (showRemoteFiles && remoteFiles != null) {
 					for (Object remoteChild : remoteFiles.getChildren(element)) {
 						this.addUniqueResource(children, (IResource) remoteChild);
 					}
@@ -555,7 +573,7 @@ public class SyncFileTree extends ApplicationWindow {
 					assert(false); // This should never happen, since we check for existence before accessing the project.
 				}
 
-				if (showRemoteFiles) {
+				if (showRemoteFiles && remoteFiles != null) {
 					for (Object remoteChild : remoteFiles.getElements(element)) {
 						this.addUniqueResource(children, (IResource) remoteChild);
 					}
@@ -597,6 +615,18 @@ public class SyncFileTree extends ApplicationWindow {
 			
 			resList.add(newRes);
 			return true;
+		}
+
+		/**
+		 * Check that connection is still open - useful for client to inform user when the connection goes down.
+		 * @return whether connection is still open
+		 */
+		public boolean isConnected() {
+			if (remoteFiles == null) {
+				return false;
+			} else {
+				return remoteFiles.isOpen();
+			}
 		}
 	}
 

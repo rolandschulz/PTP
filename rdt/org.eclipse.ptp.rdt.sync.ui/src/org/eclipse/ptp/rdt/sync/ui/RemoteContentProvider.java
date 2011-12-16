@@ -153,4 +153,12 @@ public class RemoteContentProvider implements ITreeContentProvider {
 		Object[] obj = getChildren(element);
 		return obj == null ? false : obj.length > 0;
 	}
+	
+	/**
+	 * Provide a way to test if the remote connection is still open.
+	 * @return whether connection is still open
+	 */
+	public boolean isOpen() {
+		return connection.isOpen();
+	}
 }
