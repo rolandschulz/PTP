@@ -1,10 +1,13 @@
 package org.eclipse.ptp.rm.lml.core.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +19,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
@@ -43,6 +51,8 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.TablelayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TextboxType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarType;
 import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public class JAXBUtil {
 
@@ -59,6 +69,8 @@ public class JAXBUtil {
 	private static String SCHEMA_LGUI = "lgui";//$NON-NLS-1$
 	private static String SCHEMA_LML = "lml";//$NON-NLS-1$
 	private static String SCHEMA_DIRECTORY = "http://www.llview.de";//$NON-NLS-1$
+
+	private static Validator validator;
 
 	public static JAXBUtil getInstance() {
 		if (jaxbUtil == null) {
@@ -209,11 +221,37 @@ public class JAXBUtil {
 
 	}
 
+	/**
+	 * * Uses the ResourceManagerData schema.
+	 * 
+	 * @return static singleton
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	@SuppressWarnings("unused")
+	private synchronized static Validator getValidator() throws IOException, SAXException {
+		if (validator == null) {
+
+			final URL xsd = new File(ILMLCoreConstants.RM_XSD).toURI().toURL();
+			final SchemaFactory factory = SchemaFactory.newInstance(ILMLCoreConstants.XMLSchema);
+			final Schema schema = factory.newSchema(xsd);
+			validator = schema.newValidator();
+		}
+		return validator;
+	}
+
+	private static void validate(Source source) throws SAXException, IOException, URISyntaxException {
+		try {
+			getValidator().validate(source);
+		} catch (final SAXParseException sax) {
+			throw sax;
+		}
+	}
+
 	private JAXBUtil() {
 		jaxbUtil = this;
 		try {
-			final JAXBContext jaxbContext = JAXBContext
-					.newInstance(JAXB_CLASSES);
+			final JAXBContext jaxbContext = JAXBContext.newInstance(JAXB_CLASSES);
 			marshaller = jaxbContext.createMarshaller();
 			unmarshaller = jaxbContext.createUnmarshaller();
 
@@ -359,12 +397,9 @@ public class JAXBUtil {
 
 	public void marshal(LguiType lgui, OutputStream output) {
 		try {
-			marshaller.setProperty(SCHEMA_LOCATION, SCHEMA_DIRECTORY
-					+ SCHEMA_FILE);
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-					Boolean.TRUE);
-			final QName tagname = new QName(SCHEMA_DIRECTORY, SCHEMA_LGUI,
-					SCHEMA_LML);
+			marshaller.setProperty(SCHEMA_LOCATION, SCHEMA_DIRECTORY + SCHEMA_FILE);
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			final QName tagname = new QName(SCHEMA_DIRECTORY, SCHEMA_LGUI, SCHEMA_LML);
 
 			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(
 					tagname, LguiType.class, lgui);
@@ -387,12 +422,9 @@ public class JAXBUtil {
 
 	public void marshal(LguiType lgui, StringWriter writer) {
 		try {
-			marshaller.setProperty(SCHEMA_LOCATION, SCHEMA_DIRECTORY
-					+ SCHEMA_FILE);
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-					Boolean.TRUE);
-			final QName tagname = new QName(SCHEMA_DIRECTORY, SCHEMA_LGUI,
-					SCHEMA_LML);
+			marshaller.setProperty(SCHEMA_LOCATION, SCHEMA_DIRECTORY + SCHEMA_FILE);
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			final QName tagname = new QName(SCHEMA_DIRECTORY, SCHEMA_LGUI, SCHEMA_LML);
 
 			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(
 					tagname, LguiType.class, lgui);
@@ -493,11 +525,23 @@ public class JAXBUtil {
 		 * Synchronize to avoid the dreaded
 		 * "FWK005 parse may not be called while parsing" message
 		 */
+		final Source source = new StreamSource(new StringReader(string));
+		try {
+			validate(source);
+		} catch (final SAXException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (final IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (final URISyntaxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		JAXBElement<LguiType> jaxb = null;
 		try {
 			synchronized (LguiItem.class) {
-				jaxb = (JAXBElement<LguiType>) unmarshaller
-						.unmarshal(new StringReader(string));
+				jaxb = (JAXBElement<LguiType>) unmarshaller.unmarshal(source);
 			}
 		} catch (final JAXBException e) {
 			// TODO ErrorMessage

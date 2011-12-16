@@ -126,8 +126,8 @@ public interface ILMLCoreConstants {
 	public static final String JAVA_TMP_DIR = "java.io.tmpdir";//$NON-NLS-1$
 	public static final String FILE_SCHEME = "file";//$NON-NLS-1$
 	public static final String XMLSchema = "http://www.w3.org/2001/XMLSchema"; //$NON-NLS-1$
-	public static final String DATA = "data/"; //$NON-NLS-1$
-	public static final String RM_XSD = DATA + "resource_manager_type.xsd";//$NON-NLS-1$
+	public static final String SCHEMA = "schema/"; //$NON-NLS-1$
+	public static final String RM_XSD = SCHEMA + "lgui.xsd";//$NON-NLS-1$
 	public static final String JAXB = "JAXB";//$NON-NLS-1$
 	public static final String JAXB_CONTEXT = "org.eclipse.ptp.rm.jaxb.core.data";//$NON-NLS-1$
 	public static final String RM_CONFIG_PROPS = "rm_configurations.properties";//$NON-NLS-1$
