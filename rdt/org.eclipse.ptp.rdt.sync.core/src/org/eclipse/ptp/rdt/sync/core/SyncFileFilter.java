@@ -58,11 +58,12 @@ public class SyncFileFilter {
 	}
 	
 	/**
-	 * Constructor for a filter with all of the usual default paths already included.
+	 * Constructor for a filter with a standard set of defaults. Note that this is a "default default". It may be overwritten if the user has
+	 * altered the default global filter.
 	 *
 	 * @return the new filter
 	 */
-	public static SyncFileFilter createDefaultFilter() {
+	public static SyncFileFilter createBuiltInDefaultFilter() {
 		SyncFileFilter sff = new SyncFileFilter();
 		sff.addDefaults();
 		return sff;

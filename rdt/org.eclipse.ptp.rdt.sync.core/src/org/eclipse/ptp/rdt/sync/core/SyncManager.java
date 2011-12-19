@@ -59,6 +59,7 @@ public class SyncManager  {
 	private static final String SYNC_MANAGER_ELEMENT_NAME = "sync-manager-data"; //$NON-NLS-1$
 	private static final String SYNC_MODE_ELEMENT_NAME = "project-to-sync-mode"; //$NON-NLS-1$
 	private static final String SHOW_ERROR_ELEMENT_NAME = "project-to-show-error"; //$NON-NLS-1$
+	private static final String DEFAULT_FILE_FILTER_ELEMENT_NAME = "default-file-filter"; //$NON-NLS-1$
 	private static final String FILE_FILTER_ELEMENT_NAME = "project-to-file-filter"; //$NON-NLS-1$
 	private static final String FILE_FILTER_INTERNAL_ELEMENT_NAME = "project-to-file-filter-internal"; //$NON-NLS-1$
 	private static final String ATTR_PROJECT_NAME = "project"; //$NON-NLS-1$
@@ -73,6 +74,7 @@ public class SyncManager  {
 			.synchronizedMap(new HashMap<IProject, Boolean>());
 	private static final Map<IProject, SyncFileFilter> fProjectToFileFilterMap = Collections
 			.synchronizedMap(new HashMap<IProject, SyncFileFilter>());
+	private static SyncFileFilter defaultFilter = SyncFileFilter.createBuiltInDefaultFilter();
 
 	static {
 		try {
@@ -142,7 +144,7 @@ public class SyncManager  {
 		}
 		
 		if (!(fProjectToFileFilterMap.containsKey(project))) {
-			fProjectToFileFilterMap.put(project, SyncFileFilter.createDefaultFilter());
+			fProjectToFileFilterMap.put(project, new SyncFileFilter(defaultFilter));
 			try {
 				saveConfigurationData();
 			} catch (IOException e) {
@@ -403,6 +405,10 @@ public class SyncManager  {
 			}
 		}
 		
+		// Save default filter
+		IMemento defaultfileFilterMemento = rootMemento.createChild(DEFAULT_FILE_FILTER_ELEMENT_NAME);
+		defaultFilter.saveFilter(defaultfileFilterMemento);
+		
 		// Save project to "file filter" map
 		synchronized (fProjectToFileFilterMap) {
 			for (IProject project : fProjectToFileFilterMap.keySet()) {
@@ -465,6 +471,12 @@ public class SyncManager  {
 				throw new RuntimeException(Messages.SyncManager_0 + project);
 			}
 			fProjectToShowErrorMap.put(project, showErrorMemento.getBoolean(ATTR_SHOW_ERROR));
+		}
+		
+		// Load default file filter
+		IMemento defaultFileFilterMemento = rootMemento.getChild(DEFAULT_FILE_FILTER_ELEMENT_NAME);
+		if (defaultFileFilterMemento != null) {
+			defaultFilter = SyncFileFilter.loadFilter(defaultFileFilterMemento);
 		}
 		
 		// Load project "file filter" settings
