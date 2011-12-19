@@ -1,6 +1,5 @@
 package org.eclipse.ptp.rm.lml.core.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
@@ -26,6 +25,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
+import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.AbslayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ChartType;
@@ -232,7 +232,7 @@ public class JAXBUtil {
 	private synchronized static Validator getValidator() throws IOException, SAXException {
 		if (validator == null) {
 
-			final URL xsd = new File(ILMLCoreConstants.RM_XSD).toURI().toURL();
+			final URL xsd = LMLCorePlugin.getResource(ILMLCoreConstants.RM_XSD);
 			final SchemaFactory factory = SchemaFactory.newInstance(ILMLCoreConstants.XMLSchema);
 			final Schema schema = factory.newSchema(xsd);
 			validator = schema.newValidator();
@@ -525,7 +525,7 @@ public class JAXBUtil {
 		 * Synchronize to avoid the dreaded
 		 * "FWK005 parse may not be called while parsing" message
 		 */
-		final Source source = new StreamSource(new StringReader(string));
+		Source source = new StreamSource(new StringReader(string));
 		try {
 			validate(source);
 		} catch (final SAXException e1) {
@@ -538,6 +538,7 @@ public class JAXBUtil {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		source = new StreamSource(new StringReader(string));
 		JAXBElement<LguiType> jaxb = null;
 		try {
 			synchronized (LguiItem.class) {

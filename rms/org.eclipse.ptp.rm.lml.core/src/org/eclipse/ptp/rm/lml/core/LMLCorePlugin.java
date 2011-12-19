@@ -21,14 +21,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.core;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.lml.core.messages.Messages;
 import org.eclipse.ptp.rm.lml.core.util.DebugUtil;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 public class LMLCorePlugin extends Plugin {
@@ -42,6 +48,17 @@ public class LMLCorePlugin extends Plugin {
 	 */
 	public static LMLCorePlugin getDefault() {
 		return fPlugin;
+	}
+
+	public static URL getResource(String resource) throws IOException {
+		URL url = null;
+		if (getDefault() != null) {
+			final Bundle bundle = getDefault().getBundle();
+			url = FileLocator.find(bundle, new Path(ILMLCoreConstants.PATH_SEP + resource), null);
+		} else {
+			url = new File(resource).toURI().toURL();
+		}
+		return url;
 	}
 
 	/**
