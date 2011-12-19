@@ -33,6 +33,7 @@ import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiHandler;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.core.model.IPattern;
 import org.eclipse.ptp.rm.lml.core.util.JAXBUtil;
 import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
@@ -67,6 +68,10 @@ public class LguiItem implements ILguiItem {
 	 */
 	private final List<ILguiListener> listeners = new LinkedList<ILguiListener>();
 
+	private final Map<String, Map<String, IPattern>> oldFilters = new HashMap<String, Map<String, IPattern>>();
+
+	private final Map<String, Map<String, IPattern>> newFilters = new HashMap<String, Map<String, IPattern>>();
+
 	/**
 	 * List of encapsulated classes, which handle parts of the lml-hierarchy
 	 */
@@ -81,6 +86,12 @@ public class LguiItem implements ILguiItem {
 	private final JAXBUtil jaxbUtil = JAXBUtil.getInstance();
 
 	private RequestType request;
+
+	private String username = null;
+
+	private boolean lockUpdate = true;
+
+	private boolean lockPattern = false;
 
 	/**
 	 * Constructor with LML-model as argument
@@ -97,8 +108,9 @@ public class LguiItem implements ILguiItem {
 	/**
 	 * 
 	 */
-	public LguiItem(String name) {
+	public LguiItem(String name, String username) {
 		this.name = name;
+		this.username = username;
 	}
 
 	/**
@@ -151,6 +163,11 @@ public class LguiItem implements ILguiItem {
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getCurrentLayout(java.io. OutputStream)
 	 */
 	public void getCurrentLayout(OutputStream output) {
+		while (lockPattern) {
+			// wait until the pattern have been set
+
+		}
+		lockUpdate = true;
 		LguiType layoutLgui = null;
 		if (lgui == null) {
 			layoutLgui = firstRequest();
@@ -255,6 +272,13 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
+	public String getUsername() {
+		if (username == null) {
+			return new String();
+		}
+		return username;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -288,38 +312,10 @@ public class LguiItem implements ILguiItem {
 	 */
 	public void notifyListeners() {
 		final LguiUpdatedEvent event = new LguiUpdatedEvent(this, lgui);
-		for (final ILguiListener l : listeners) {
-			l.handleEvent(event);
+		for (final ILguiListener listener : listeners) {
+			listener.handleEvent(event);
 		}
 	}
-
-	// public void reloadLastLayout(IMemento memento) {
-	// final StringBuilder layout = new StringBuilder();
-	//
-	// if (memento != null) {
-	// final IMemento child = memento.getChild(LAYOUT);
-	// layout.append(child.getID());
-	// }
-	// LguiType lguiType = null;
-	// if (layout.length() > 0) {
-	// try {
-	// lguiType = parseLML(layout.toString());
-	// } catch (final JAXBException e) {
-	// LMLCorePlugin.log(e);
-	// }
-	// }
-	// if (lguiType != null) {
-	// for (final JAXBElement<?> tag : lguiType
-	// .getObjectsAndRelationsAndInformation()) {
-	// if (tag.getValue() instanceof ComponentlayoutType) {
-	// lgui = lguiType;
-	// if (listeners.isEmpty()) {
-	// createLguiHandlers();
-	// }
-	// }
-	// }
-	// }
-	// }
 
 	public void reloadLastLayout(StringBuilder layout) {
 		LguiType lguiType = null;
@@ -392,42 +388,14 @@ public class LguiItem implements ILguiItem {
 		return writer.getBuffer().toString();
 	}
 
-	// public void saveCurrentLayout(IMemento memento) {
-	// if (memento == null) {
-	// return;
-	// }
-	// final StringWriter writer = new StringWriter();
-	// LguiType layoutLgui = null;
-	// if (lgui == null) {
-	// layoutLgui = firstRequest();
-	// } else {
-	// layoutLgui = getLayoutAccess().getLayoutFromModel();
-	// }
-	// try {
-	// marshaller.setProperty(
-	//					"jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
-	// marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-	// Boolean.TRUE);
-	//			final QName tagname = new QName(lmlNamespace, "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$
-	//
-	// final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(
-	// tagname, LguiType.class, layoutLgui);
-	// /*
-	// * Synchronize to avoid the dreaded
-	// * "FWK005 parse may not be called while parsing" message
-	// */
-	// synchronized (LguiItem.class) {
-	// marshaller.marshal(rootElement, writer);
-	//
-	// }
-	// } catch (final PropertyException e) {
-	// LMLCorePlugin.log(e);
-	// } catch (final JAXBException e) {
-	// LMLCorePlugin.log(e);
-	// }
-	// final IMemento layoutMemento = memento.createChild(LAYOUT, writer
-	// .getBuffer().toString());
-	// }
+	public void setPattern(Map<String, IPattern> filterValues, String gid) {
+		while (lockUpdate) {
+			// wait until the update with the server is finished
+		}
+		lockPattern = true;
+		// TODO setPattern
+		lockPattern = false;
+	}
 
 	public void setRequest(RequestType request) {
 		this.request = request;
@@ -487,6 +455,7 @@ public class LguiItem implements ILguiItem {
 			}
 			updateJobData();
 		}
+		lockUpdate = false;
 	}
 
 	/*
@@ -634,7 +603,6 @@ public class LguiItem implements ILguiItem {
 		layoutLgui.setVersion("1"); //$NON-NLS-1$
 		layoutLgui.setLayout(true);
 
-		// final RequestType request = objectFactory.createRequestType();
 		final LayoutRequestType layoutReq = objectFactory.createLayoutRequestType();
 		layoutReq.setGetDefaultData(true);
 

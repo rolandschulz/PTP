@@ -364,32 +364,38 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 			jobs = reload(memento);
 		}
-		/*
-		 * Initialize LML classes
-		 */
-		fLMLManager.openLgui(getResourceManager().getUniqueName(), getMonitorConfigurationRequestType(), layout, jobs);
-		/*
-		 * Open connection and launch periodic job
-		 */
 		final IRemoteConnection conn = getRemoteConnection(monitor);
-		if (conn != null) {
-			if (!conn.isOpen()) {
-				try {
-					conn.open(monitor);
-				} catch (final RemoteConnectionException e) {
-					throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(), e.getMessage()));
-				}
+		if (conn == null) {
+			throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
+					Messages.LMLResourceManagerMonitor_unableToOpenConnection));
+		}
+
+		if (!conn.isOpen()) {
+			try {
+				conn.open(monitor);
+			} catch (final RemoteConnectionException e) {
+				throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(), e.getMessage()));
 			}
 			if (!conn.isOpen()) {
 				throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
 						Messages.LMLResourceManagerMonitor_unableToOpenConnection));
 			}
-			synchronized (this) {
-				if (fMonitorJob == null) {
-					fMonitorJob = new MonitorJob(Messages.LMLResourceManagerMonitor_LMLMonitorJob, conn);
-				}
-				fMonitorJob.schedule();
+		}
+
+		/*
+		 * Initialize LML classes
+		 */
+		fLMLManager.openLgui(getResourceManager().getUniqueName(), conn.getUsername(), getMonitorConfigurationRequestType(),
+				layout, jobs);
+
+		/*
+		 * Start monitoring job
+		 */
+		synchronized (this) {
+			if (fMonitorJob == null) {
+				fMonitorJob = new MonitorJob(Messages.LMLResourceManagerMonitor_LMLMonitorJob, conn);
 			}
+			fMonitorJob.schedule();
 		}
 
 		/*

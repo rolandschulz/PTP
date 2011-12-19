@@ -38,6 +38,11 @@ public class TableColumnLayout implements ITableColumnLayout {
 	 */
 	private final boolean active;
 
+	/*
+	 * Order of the data.
+	 */
+	private String order;
+
 	/**
 	 * Constructor
 	 * 
@@ -50,12 +55,12 @@ public class TableColumnLayout implements ITableColumnLayout {
 	 * @param activity
 	 *            of the column
 	 */
-	public TableColumnLayout(String title, Double width, String style,
-			boolean active) {
+	public TableColumnLayout(String title, Double width, String style, boolean active, String order) {
 		this.title = title;
 		this.width = width;
 		this.style = style;
 		this.active = active;
+		this.order = order;
 		if (title == null) {
 			this.title = new String();
 		}
@@ -65,6 +70,13 @@ public class TableColumnLayout implements ITableColumnLayout {
 		if (style == null) {
 			this.style = ITableColumnLayout.COLUMN_STYLE_LEFT;
 		}
+		if (order == null) {
+			this.order = new String("alpha");
+		}
+	}
+
+	public String getOrder() {
+		return order;
 	}
 
 	/*

@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.lml.core.model;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
@@ -130,6 +131,8 @@ public interface ILguiItem {
 	 */
 	public JobStatusData[] getUserJobs();
 
+	public String getUsername();
+
 	/**
 	 * Getting the version of the LguiType:
 	 * 
@@ -157,15 +160,9 @@ public interface ILguiItem {
 
 	/**
 	 * 
-	 * @param memento
+	 * @param layout
 	 */
 	public void reloadLastLayout(StringBuilder layout);
-
-	// /**
-	// *
-	// * @param memento
-	// */
-	// public void reloadLastLayout(IMemento memento);
 
 	/**
 	 * @param name
@@ -179,15 +176,7 @@ public interface ILguiItem {
 	 */
 	public String saveCurrentLayout();
 
-	// /**
-	// * The Resource Manager is being closed. The current layout of the
-	// different
-	// * monitoring parts should be saved during the closing.
-	// *
-	// * @param memento
-	// * Memento in which the current layout should be saved
-	// */
-	// public void saveCurrentLayout(IMemento memento);
+	public void setPattern(Map<String, IPattern> filterValues, String gid);
 
 	public void setRequest(RequestType request);
 

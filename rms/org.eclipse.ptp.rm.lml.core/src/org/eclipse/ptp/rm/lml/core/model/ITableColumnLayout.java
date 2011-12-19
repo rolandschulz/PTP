@@ -25,6 +25,8 @@ public interface ITableColumnLayout {
 	public static String COLUMN_TYPE_MANDATORY = "mandatory"; //$NON-NLS-1$
 	public static String COLUMN_TYPE_OPTIONAL = "optional"; //$NON-NLS-1$
 
+	public String getOrder();
+
 	/**
 	 * Getting the style (LEFT or RIGHT) of the column.
 	 * 
