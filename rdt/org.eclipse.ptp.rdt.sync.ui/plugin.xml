@@ -277,6 +277,15 @@
                      value="sync_file_list">
                </parameter>
             </command>
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  label="Modify Default Exclude/Include List for New Projects"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_default_file_list">
+               </parameter>
+            </command>
          </menu>
       </menuContribution>
    </extension>

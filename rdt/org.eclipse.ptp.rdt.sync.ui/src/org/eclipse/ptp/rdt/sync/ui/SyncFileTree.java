@@ -82,6 +82,7 @@ public class SyncFileTree extends ApplicationWindow {
 
 	private final IProject project;
 	private final SyncFileFilter filter;
+	private final boolean modify_default_filter;
 	private SyncCheckboxTreeViewer treeViewer;
 	private Table patternTable;
 	private Button showRemoteButton;
@@ -121,11 +122,31 @@ public class SyncFileTree extends ApplicationWindow {
 		}
 	}
 
+	/**
+	 * Constructor for a new tree. This constructor will modify the passed project's filter
+	 * @param p project
+	 */
 	public SyncFileTree(IProject p) {
+		this(p, false);
+	}
+
+	/**
+	 * General constructor for a new tree. Even if we are modifying the default filter, a project is still needed to give content
+	 * to the file tree.
+	 *
+	 * @param p project
+	 * @param modify_default whether to modify the default filter
+	 */
+	public SyncFileTree(IProject p, boolean modify_default) {
 		super(null);
 		project = p;
-		filter = SyncManager.getFileFilter(project);
-		
+		modify_default_filter = modify_default;
+		if (modify_default_filter) {
+			filter = SyncManager.getDefaultFileFilter();
+		} else {
+			filter = SyncManager.getFileFilter(project);
+		}
+
 		// Only one special (not path or regex) filter at the moment. If more are added later, we need a more sophisticated
 		// method for handling these special filters.
 		BinaryPatternMatcher bpm = new BinaryPatternMatcher(project);
@@ -143,7 +164,11 @@ public class SyncFileTree extends ApplicationWindow {
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		shell.setText(Messages.SyncFileTree_0);
+		if (modify_default_filter) {
+			shell.setText(Messages.SyncFileTree_20);
+		} else {
+			shell.setText(Messages.SyncFileTree_0);
+		}
 	}
 
 	/**
@@ -371,7 +396,11 @@ public class SyncFileTree extends ApplicationWindow {
 	    okButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, false, false));
 	    okButton.addSelectionListener(new SelectionAdapter() {
 	      public void widgetSelected(SelectionEvent event) {
-	    	  SyncManager.saveFileFilter(project, filter);
+	    	  if (modify_default_filter) {
+	    		  SyncManager.saveDefaultFileFilter(filter);
+	    	  } else {
+	    		  SyncManager.saveFileFilter(project, filter);
+	    	  }
 	    	  getShell().close();
 	      }
 	    });

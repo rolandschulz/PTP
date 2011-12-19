@@ -153,6 +153,14 @@ public class SyncManager  {
 		}
 		return new SyncFileFilter(fProjectToFileFilterMap.get(project));
 	}
+	
+	/**
+	 * Return the default file filter
+	 * @return filter
+	 */
+	public static SyncFileFilter getDefaultFileFilter() {
+		return new SyncFileFilter(defaultFilter);
+	}
 
 	/**
 	 * Return project's current sync mode
@@ -267,6 +275,18 @@ public class SyncManager  {
 		} catch (IOException e) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
 		}
+	}
+	
+	/**
+	 * Save a new default file filter.
+	 * Use this in conjunction with "getDefaultFileFilter()" to modify the default filter.
+	 * @param filter cannot be null
+	 */
+	public static void saveDefaultFileFilter(SyncFileFilter filter) {
+		if (filter == null) {
+			throw new NullPointerException();
+		}
+		defaultFilter = filter;
 	}
 
 	/**

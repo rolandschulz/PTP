@@ -46,6 +46,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String setAllCommand = "set_all"; //$NON-NLS-1$
 	private static final String syncAutoCommand = "sync_auto"; //$NON-NLS-1$
 	private static final String syncFileList = "sync_file_list"; //$NON-NLS-1$
+	private static final String syncDefaultFileList = "sync_default_file_list"; //$NON-NLS-1$
 	private static final String syncExcludeCommand = "sync_exclude"; //$NON-NLS-1$
 	private static final String syncIncludeCommand = "sync_include"; //$NON-NLS-1$
 
@@ -99,6 +100,8 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				SyncManager.saveFileFilter(project, sff);
 			} else if (command.equals(syncFileList)) {
 				new SyncFileTree(project).open();
+			} else if (command.equals(syncDefaultFileList)) {
+				new SyncFileTree(project, true).open();
 			}
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
