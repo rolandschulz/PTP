@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
@@ -51,6 +52,7 @@ import org.eclipse.jgit.transport.TransportGitSsh;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.QuotedString;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
@@ -72,7 +74,7 @@ public class GitRemoteSyncConnection {
 	private static final String gitCommand = "git --git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 	private final IRemoteConnection connection;
-	private final SyncFileFilter fileFilter;
+	private SyncFileFilter fileFilter;
 	private final String localDirectory;
 	private final String remoteDirectory;
 	private Git git;
@@ -443,7 +445,7 @@ public class GitRemoteSyncConnection {
 				fn = QuotedString.GIT_PATH.dequote(fn);
 				if (status == 'R') {
 					filesToDelete.add(fn);
-				} else if (!(fileFilter.shouldIgnore(fn))) {
+				} else if (!(fileFilter.shouldIgnore(new Path(fn).toOSString()))) {
 					filesToAdd.add(fn);
 				}
 			}
@@ -479,7 +481,7 @@ public class GitRemoteSyncConnection {
 
 		Set<String> filesToBeIgnored = new HashSet<String>();
 		for (String fileName : filesToAdd) {
-			if (fileFilter.shouldIgnore(fileName)) {
+			if (fileFilter.shouldIgnore(new Path(fileName).toOSString())) {
 				filesToBeIgnored.add(fileName);
 			}
 		}
@@ -754,5 +756,14 @@ public class GitRemoteSyncConnection {
 				monitor.done();
 			}
 		}
+	}
+	
+	/**
+	 * Set the file filter used. This method allows file filtering behavior to be changed after instance is created, which is
+	 * necessary to support user changes to the filter.
+	 * @param sff
+	 */
+	public void setFileFilter(SyncFileFilter sff) {
+		fileFilter = sff;
 	}
 }

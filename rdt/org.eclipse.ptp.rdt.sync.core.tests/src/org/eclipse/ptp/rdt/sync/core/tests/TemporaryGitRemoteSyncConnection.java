@@ -15,8 +15,8 @@ import static org.junit.Assert.*;
 
 import java.util.Random;
 
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.git.core.GitRemoteSyncConnection;
-import org.eclipse.ptp.rdt.sync.git.core.SyncFileFilter;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
