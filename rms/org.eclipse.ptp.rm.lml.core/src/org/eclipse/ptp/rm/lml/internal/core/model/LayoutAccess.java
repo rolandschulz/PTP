@@ -129,9 +129,8 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	/**
-	 * Generates an absolute layout without needing a layout tag. Active
-	 * components are placed in a grid on the screen. Use this function, if no
-	 * layout was specified by the lml-file.
+	 * Generates an absolute layout without needing a layout tag. Active components are placed in a grid on the screen. Use this
+	 * function, if no layout was specified by the lml-file.
 	 * 
 	 * @param width
 	 *            width in pixels of the area, on which this layout is shown
@@ -143,8 +142,7 @@ public class LayoutAccess extends LguiHandler {
 
 		final ArrayList<GobjectType> activeObjects = new ArrayList<GobjectType>();
 		// Go through all graphical objects
-		for (final GobjectType gobject : lguiItem.getOverviewAccess()
-				.getGraphicalObjects()) {
+		for (final GobjectType gobject : lguiItem.getOverviewAccess().getGraphicalObjects()) {
 			// Get layouts for this object, normally there is only one
 			final List<ComponentlayoutType> layouts = getComponentLayoutByGid(gobject
 					.getId());
@@ -208,8 +206,7 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	/**
-	 * Simply returns the first layout found for a chart with the given id or a
-	 * default-layout
+	 * Simply returns the first layout found for a chart with the given id or a default-layout
 	 * 
 	 * @param chartId
 	 * @return defaultlayout for a chart or first layout for chart with id
@@ -235,8 +232,7 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	/**
-	 * Search in component-layouts for layout for the graphical object with id
-	 * gid.
+	 * Search in component-layouts for layout for the graphical object with gid.
 	 * 
 	 * @param gid
 	 *            id of corresponding graphical object, for which layouts are
@@ -299,15 +295,13 @@ public class LayoutAccess extends LguiHandler {
 		for (final ComponentlayoutType object : getComponentLayouts()) {
 			if (!object.isActive()) {
 				if (object instanceof TablelayoutType) {
-					final TableType table = lguiItem.getTableHandler()
-							.getTable(object.getGid());
+					final TableType table = lguiItem.getTableHandler().getTable(object.getGid());
 					if (table != null) {
 						inactiveMap.put(table.getTitle(), object.getGid());
 					}
 				} else if (object instanceof NodedisplaylayoutType) {
-					inactiveMap.put(lguiItem.getNodedisplayAccess()
-							.getNodedisplayById(object.getGid()).getTitle(),
-							object.getGid());
+					inactiveMap
+							.put(lguiItem.getNodedisplayAccess().getNodedisplayById(object.getGid()).getTitle(), object.getGid());
 				}
 			}
 		}
@@ -315,8 +309,7 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	/**
-	 * Simply returns the first layout found for a infobox with the given id or
-	 * a default-layout
+	 * Simply returns the first layout found for a infobox with the given id or a default-layout
 	 * 
 	 * @param infoID
 	 * @return defaultlayout for a table or first layout for table with id
@@ -331,12 +324,10 @@ public class LayoutAccess extends LguiHandler {
 		return objectFactory.createInfoboxlayoutType();
 	}
 
-	public ColumnlayoutType[] getLayoutColumsToCids(BigInteger[] cids,
-			String gid) {
+	public ColumnlayoutType[] getLayoutColumsToCids(BigInteger[] cids, String gid) {
 		final ColumnlayoutType[] columns = new ColumnlayoutType[cids.length];
 		for (int i = 0; i < cids.length; i++) {
-			for (final ColumnlayoutType column : getTableLayout(gid)
-					.getColumn()) {
+			for (final ColumnlayoutType column : getTableLayout(gid).getColumn()) {
 				if (column.getCid().equals(cids[i])) {
 					columns[i] = column;
 					break;
@@ -348,8 +339,7 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	/**
-	 * Remove all real data from model return only layout-information and data,
-	 * which is needed to make lml-model valid
+	 * Remove all real data from model return only layout-information and data, which is needed to make lml-model valid
 	 * 
 	 * @param model
 	 *            lml-model with data and layout-information
@@ -375,8 +365,7 @@ public class LayoutAccess extends LguiHandler {
 		// Add all gobjects in idtoGobject to the result, so that lml-model is
 		// valid
 		for (final GobjectType gobject : gobjectList) {
-			result.getObjectsAndRelationsAndInformation().add(
-					JAXBUtil.minimizeGobjectType(gobject, objectFactory));
+			result.getObjectsAndRelationsAndInformation().add(JAXBUtil.minimizeGobjectType(gobject, objectFactory));
 		}
 
 		// Set layout-attribute
@@ -402,8 +391,7 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	/**
-	 * Getting the layout of a given table, the identifier of the layout is the
-	 * shared ID of table and layout.
+	 * Getting the layout of a given table, the identifier of the layout is the shared ID of table and layout.
 	 * 
 	 * @param tablelayoutID
 	 *            ID of the desired tablelayout
@@ -434,8 +422,7 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	/**
-	 * This function is only for easier understanding this class Textboxlayouts
-	 * are identical to infoboxlayouts, so you could call
+	 * This function is only for easier understanding this class Textboxlayouts are identical to infoboxlayouts, so you could call
 	 * getInfoboxLayout(textid) and would get the same result.
 	 * 
 	 * @param textID
@@ -447,8 +434,7 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	/**
-	 * Simply returns the first layout found for a usagebar with the given id or
-	 * a default-layout
+	 * Simply returns the first layout found for a usagebar with the given id or a default-layout
 	 * 
 	 * @param usagebarId
 	 * @return defaultlayout for a usagebar or first layout for usagebar with id
