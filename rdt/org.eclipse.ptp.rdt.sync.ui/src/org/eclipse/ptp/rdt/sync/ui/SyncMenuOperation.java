@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.rdt.sync.core.PathPatternMatcher;
+import org.eclipse.ptp.rdt.sync.core.PathResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
@@ -95,7 +95,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				for (Object element : sel.toArray()) {
 					assert((element instanceof IFolder) || (element instanceof IFile));
 					IPath path = ((IResource) element).getProjectRelativePath();
-					sff.addPattern(new PathPatternMatcher(path.toOSString()), type);
+					sff.addPattern(new PathResourceMatcher(path), type);
 				}
 				SyncManager.saveFileFilter(project, sff);
 			} else if (command.equals(syncFileList)) {

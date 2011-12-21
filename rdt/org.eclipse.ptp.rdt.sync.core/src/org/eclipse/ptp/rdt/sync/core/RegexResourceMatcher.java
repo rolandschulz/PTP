@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
@@ -24,7 +25,7 @@ import org.eclipse.ui.IMemento;
  *
  *
  */
-public class RegexPatternMatcher extends PatternMatcher {
+public class RegexResourceMatcher extends ResourceMatcher {
 	private static final String ATTR_REGEX = "regex"; //$NON-NLS-1$
 	private final String regex;
 	private final Pattern pattern;
@@ -38,7 +39,7 @@ public class RegexPatternMatcher extends PatternMatcher {
 	 * @throws PatternSyntaxException
 	 * 				if the pattern is invalid
 	 */
-	public RegexPatternMatcher(String r) throws PatternSyntaxException {
+	public RegexResourceMatcher(String r) throws PatternSyntaxException {
 		if (r == null) {
 			regex = ""; //$NON-NLS-1$
 		} else {
@@ -53,8 +54,11 @@ public class RegexPatternMatcher extends PatternMatcher {
 	 * @param candidate string
 	 * @return whether the string matches the regex pattern
 	 */
-	public boolean match(String candidate) {
-		Matcher m = pattern.matcher(candidate);
+	public boolean match(IResource candidate) {
+		if (candidate == null) {
+			return false;
+		}
+		Matcher m = pattern.matcher(candidate.getProjectRelativePath().toOSString());
 		return m.matches();
 	}
 	
@@ -88,10 +92,10 @@ public class RegexPatternMatcher extends PatternMatcher {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof RegexPatternMatcher)) {
+		if (!(obj instanceof RegexResourceMatcher)) {
 			return false;
 		}
-		RegexPatternMatcher other = (RegexPatternMatcher) obj;
+		RegexResourceMatcher other = (RegexResourceMatcher) obj;
 		if (regex == null) {
 			if (other.regex != null) {
 				return false;
@@ -119,11 +123,11 @@ public class RegexPatternMatcher extends PatternMatcher {
 	 * @throws NoSuchElementException
 	 * 				if expected data is not in the memento.
 	 */
-	public static PatternMatcher loadPattern(IMemento memento) throws NoSuchElementException {
+	public static ResourceMatcher loadPattern(IMemento memento) throws NoSuchElementException {
 		String r = memento.getString(ATTR_REGEX);
 		if (r == null) {
 			throw new NoSuchElementException(Messages.RegexPatternMatcher_0);
 		}
-		return new RegexPatternMatcher(memento.getString(ATTR_REGEX));
+		return new RegexResourceMatcher(memento.getString(ATTR_REGEX));
 	}
 }

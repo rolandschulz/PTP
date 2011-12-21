@@ -426,8 +426,8 @@ public class SyncManager  {
 		}
 		
 		// Save default filter
-		IMemento defaultfileFilterMemento = rootMemento.createChild(DEFAULT_FILE_FILTER_ELEMENT_NAME);
-		defaultFilter.saveFilter(defaultfileFilterMemento);
+		IMemento defaultFileFilterMemento = rootMemento.createChild(DEFAULT_FILE_FILTER_ELEMENT_NAME);
+		defaultFilter.saveFilter(defaultFileFilterMemento);
 		
 		// Save project to "file filter" map
 		synchronized (fProjectToFileFilterMap) {

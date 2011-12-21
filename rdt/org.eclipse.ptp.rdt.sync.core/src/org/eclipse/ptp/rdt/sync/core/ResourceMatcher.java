@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
@@ -23,9 +24,9 @@ import org.eclipse.ui.IMemento;
  * Subclasses must implement either a public static "loadPattern" method that takes a memento or a default constructor to
  * support persistence. Otherwise, calling PatternMatcher.loadPattern(IMemento) for a saved instance will throw an exception.
  */
-public abstract class PatternMatcher {
+public abstract class ResourceMatcher {
 	private static final String ATTR_CLASS_NAME = "class-name"; //$NON-NLS-1$
-	public abstract boolean match(String candidate);
+	public abstract boolean match(IResource candidate);
 	public abstract String toString();
 	public abstract boolean equals(Object o);
 	public abstract int hashCode();
@@ -52,14 +53,14 @@ public abstract class PatternMatcher {
 	 * 					if subclass does not contain either a static "loadPattern" method or a default constructor.
 	 * 					if the class name is not in the memento, is not known, or is not a PatternMatcher.
 	 */
-	public static PatternMatcher loadPattern(IMemento memento) throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException {
+	public static ResourceMatcher loadPattern(IMemento memento) throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException {
 		String className = memento.getString(ATTR_CLASS_NAME);
 		if (className == null) {
 			throw new ClassNotFoundException(Messages.PatternMatcher_0);
 		}
 
 		// Sanity check on the retrieved class
-		if (!PatternMatcher.class.isAssignableFrom(Class.forName(className)) ||
+		if (!ResourceMatcher.class.isAssignableFrom(Class.forName(className)) ||
 				Modifier.isAbstract(Class.forName(className).getModifiers())) {
 			throw new ClassNotFoundException(Messages.PatternMatcher_1);
 		}
@@ -77,7 +78,7 @@ public abstract class PatternMatcher {
 		
 		if (hasMethod && subClassMethod != null) {
 			try {
-				return (PatternMatcher) subClassMethod.invoke(Class.forName(className), memento);
+				return (ResourceMatcher) subClassMethod.invoke(Class.forName(className), memento);
 			} catch (IllegalArgumentException e) {
 				assert(false); // This should never happen
 			} catch (IllegalAccessException e) {
@@ -98,7 +99,7 @@ public abstract class PatternMatcher {
 		
 		if (hasMethod && subClassConstructor != null) {
 			try {
-				return (PatternMatcher) subClassConstructor.newInstance();
+				return (ResourceMatcher) subClassConstructor.newInstance();
 			} catch (IllegalArgumentException e) {
 				assert(false); // This should never happen
 			} catch (InstantiationException e) {

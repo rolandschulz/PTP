@@ -33,12 +33,12 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.ApplicationWindow;
-import org.eclipse.ptp.rdt.sync.core.BinaryPatternMatcher;
+import org.eclipse.ptp.rdt.sync.core.BinaryResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
-import org.eclipse.ptp.rdt.sync.core.PathPatternMatcher;
-import org.eclipse.ptp.rdt.sync.core.PatternMatcher;
-import org.eclipse.ptp.rdt.sync.core.RegexPatternMatcher;
+import org.eclipse.ptp.rdt.sync.core.PathResourceMatcher;
+import org.eclipse.ptp.rdt.sync.core.ResourceMatcher;
+import org.eclipse.ptp.rdt.sync.core.RegexResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter.PatternType;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
@@ -97,7 +97,7 @@ public class SyncFileTree extends ApplicationWindow {
 	private Label patternErrorLabel;
 	private Button cancelButton;
 	private Button okButton;
-	private final Map<String, PatternMatcher> specialFilterNameToPatternMap = new HashMap<String, PatternMatcher>();
+	private final Map<String, ResourceMatcher> specialFilterNameToPatternMap = new HashMap<String, ResourceMatcher>();
 
 	// A checkbox tree viewer that does not allow unchecked directories to be expanded.
 	// Note: This illegally extends CheckboxTreeViewer but is the only simple way known to implement this behavior.
@@ -113,8 +113,7 @@ public class SyncFileTree extends ApplicationWindow {
 				return false;
 			}
 			
-			IPath path = ((IResource) element).getProjectRelativePath();
-			if (filter.shouldIgnore(path.toOSString())) {
+			if (filter.shouldIgnore((IResource) element)) {
 				return false;
 			} else {
 				return true;
@@ -149,7 +148,7 @@ public class SyncFileTree extends ApplicationWindow {
 
 		// Only one special (not path or regex) filter at the moment. If more are added later, we need a more sophisticated
 		// method for handling these special filters.
-		BinaryPatternMatcher bpm = new BinaryPatternMatcher(project);
+		BinaryResourceMatcher bpm = new BinaryResourceMatcher();
 		specialFilterNameToPatternMap.put(bpm.toString(), bpm);
 		
 		windowWidth = display.getBounds().width / 3;
@@ -202,8 +201,7 @@ public class SyncFileTree extends ApplicationWindow {
 		treeViewer.setLabelProvider(new SFTTreeLabelProvider());
 		treeViewer.setCheckStateProvider(new ICheckStateProvider() {
 			public boolean isChecked(Object element) {
-				IPath path = ((IResource) element).getProjectRelativePath();
-				if (filter.shouldIgnore(path.toOSString())) {
+				if (filter.shouldIgnore((IResource) element)) {
 					return false;
 				} else {
 					return true;
@@ -218,9 +216,9 @@ public class SyncFileTree extends ApplicationWindow {
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				IPath path = ((IResource) (event.getElement())).getProjectRelativePath();
 				if (event.getChecked()) {
-					filter.addPattern(new PathPatternMatcher(path.toOSString()), PatternType.INCLUDE);
+					filter.addPattern(new PathResourceMatcher(path), PatternType.INCLUDE);
 				} else {
-					filter.addPattern(new PathPatternMatcher(path.toOSString()), PatternType.EXCLUDE);
+					filter.addPattern(new PathResourceMatcher(path), PatternType.EXCLUDE);
 				}
 
 				update();
@@ -278,7 +276,7 @@ public class SyncFileTree extends ApplicationWindow {
 	    			return;
 	    		}
 	    		int patternIndex = patternTable.getSelectionIndex();
-	    		if (filter.promote((PatternMatcher) selectedPatternItems[0].getData())) {
+	    		if (filter.promote((ResourceMatcher) selectedPatternItems[0].getData())) {
 	    			patternIndex--;
 	    		}
 	    		update();
@@ -296,7 +294,7 @@ public class SyncFileTree extends ApplicationWindow {
 	    			return;
 	    		}
 	    		int patternIndex = patternTable.getSelectionIndex();
-	    		if (filter.demote((PatternMatcher) selectedPatternItems[0].getData())) {
+	    		if (filter.demote((ResourceMatcher) selectedPatternItems[0].getData())) {
 	    			patternIndex++;
 	    		}
 	    		update();
@@ -311,7 +309,7 @@ public class SyncFileTree extends ApplicationWindow {
 	    	public void widgetSelected(SelectionEvent event) {
 	    		TableItem[] selectedPatternItems = patternTable.getSelection();
 	    		for (TableItem selectedPatternItem : selectedPatternItems) {
-	    			PatternMatcher selectedPattern = (PatternMatcher) selectedPatternItem.getData();
+	    			ResourceMatcher selectedPattern = (ResourceMatcher) selectedPatternItem.getData();
 	    			filter.removePattern(selectedPattern);
 	    		}
 	    		update();
@@ -434,9 +432,9 @@ public class SyncFileTree extends ApplicationWindow {
 		if (specialFilterNameToPatternMap.get(pattern) != null) {
 			filter.addPattern(specialFilterNameToPatternMap.get(pattern), type);
 		} else {
-			RegexPatternMatcher matcher = null;
+			RegexResourceMatcher matcher = null;
 			try {
-				matcher = new RegexPatternMatcher(pattern);
+				matcher = new RegexResourceMatcher(pattern);
 			} catch (PatternSyntaxException e) {
 				// Do nothing but display an error message for a few seconds
 				patternErrorLabel.setText(Messages.SyncFileTree_15);
@@ -473,15 +471,15 @@ public class SyncFileTree extends ApplicationWindow {
 		((SFTTreeContentProvider) treeViewer.getContentProvider()).setShowRemoteFiles(showRemote);
 
 		patternTable.removeAll();
-		for (PatternMatcher pattern : filter.getPatterns()) {
+		for (ResourceMatcher pattern : filter.getPatterns()) {
 			TableItem ti = new TableItem(patternTable, SWT.LEAD);
 			ti.setData(pattern);
 
 			String[] tableValues = new String[2];
 			tableValues[0] = pattern.toString();
-			if (pattern instanceof PathPatternMatcher) {
+			if (pattern instanceof PathResourceMatcher) {
 				tableValues[1] = Messages.SyncFileTree_16;
-			} else if (pattern instanceof RegexPatternMatcher) {
+			} else if (pattern instanceof RegexResourceMatcher) {
 				tableValues[1] = Messages.SyncFileTree_17;
 			} else {
 				tableValues[1] = Messages.SyncFileTree_18;

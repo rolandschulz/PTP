@@ -22,9 +22,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
@@ -79,6 +79,7 @@ public class GitRemoteSyncConnection {
 	private final String remoteDirectory;
 	private Git git;
 	private TransportGitSsh transport;
+	private final IProject project;
 
 	/**
 	 * Create a remote sync connection using git. Assumes that the local
@@ -93,10 +94,11 @@ public class GitRemoteSyncConnection {
 	 *             exception nested. Upon such an exception, the instance is
 	 *             invalid and should not be used.
 	 */
-	public GitRemoteSyncConnection(IRemoteConnection conn, String localDir, String remoteDir, SyncFileFilter filter,
+	public GitRemoteSyncConnection(IProject proj, IRemoteConnection conn, String localDir, String remoteDir, SyncFileFilter filter,
 			IProgressMonitor monitor) throws RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
+			project = proj;
 			connection = conn;
 			fileFilter = filter;
 			localDirectory = localDir;
@@ -445,7 +447,7 @@ public class GitRemoteSyncConnection {
 				fn = QuotedString.GIT_PATH.dequote(fn);
 				if (status == 'R') {
 					filesToDelete.add(fn);
-				} else if (!(fileFilter.shouldIgnore(new Path(fn).toOSString()))) {
+				} else if (!(fileFilter.shouldIgnore(project.getFile(fn)))) {
 					filesToAdd.add(fn);
 				}
 			}
@@ -481,7 +483,7 @@ public class GitRemoteSyncConnection {
 
 		Set<String> filesToBeIgnored = new HashSet<String>();
 		for (String fileName : filesToAdd) {
-			if (fileFilter.shouldIgnore(new Path(fileName).toOSString())) {
+			if (fileFilter.shouldIgnore(project.getFile(fileName))) {
 				filesToBeIgnored.add(fileName);
 			}
 		}

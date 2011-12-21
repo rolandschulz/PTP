@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
@@ -31,8 +33,8 @@ public class SyncFileFilter {
 	private static final String ATTR_PATTERN_TYPE = "pattern-type"; //$NON-NLS-1$
 	private static final String ATTR_NUM_PATTERNS = "num-patterns"; //$NON-NLS-1$
 	
-	private final LinkedList<PatternMatcher> filteredPaths = new LinkedList<PatternMatcher>();
-	private final Map<PatternMatcher, PatternType> patternToTypeMap = new HashMap<PatternMatcher, PatternType>();
+	private final LinkedList<ResourceMatcher> filteredPaths = new LinkedList<ResourceMatcher>();
+	private final Map<ResourceMatcher, PatternType> patternToTypeMap = new HashMap<ResourceMatcher, PatternType>();
 	
 	public enum PatternType {
 		EXCLUDE, INCLUDE
@@ -73,8 +75,8 @@ public class SyncFileFilter {
 	 * Get all patterns for this filter
 	 * @return patterns
 	 */
-	public PatternMatcher[] getPatterns() {
-		return filteredPaths.toArray(new PatternMatcher[filteredPaths.size()]);
+	public ResourceMatcher[] getPatterns() {
+		return filteredPaths.toArray(new ResourceMatcher[filteredPaths.size()]);
 	}
 	
 	/**
@@ -82,7 +84,7 @@ public class SyncFileFilter {
 	 * @param pattern
 	 * @return the type or null if this pattern is unknown in this filter.
 	 */
-	public PatternType getPatternType(PatternMatcher pattern) {
+	public PatternType getPatternType(ResourceMatcher pattern) {
 		return patternToTypeMap.get(pattern);
 	}
 	
@@ -90,11 +92,12 @@ public class SyncFileFilter {
 	 * Add the common, default list of paths to be filtered.
 	 */
 	public void addDefaults() {
-		this.addPattern(new PathPatternMatcher(".project"), PatternType.EXCLUDE); //$NON-NLS-1$
-		this.addPattern(new PathPatternMatcher(".cproject"), PatternType.EXCLUDE); //$NON-NLS-1$
-		this.addPattern(new PathPatternMatcher(".settings"), PatternType.EXCLUDE); //$NON-NLS-1$
+		this.addPattern(new PathResourceMatcher(new Path(".project")), PatternType.EXCLUDE); //$NON-NLS-1$
+		this.addPattern(new PathResourceMatcher(new Path(".cproject")), PatternType.EXCLUDE); //$NON-NLS-1$
+		this.addPattern(new PathResourceMatcher(new Path(".settings")), PatternType.EXCLUDE); //$NON-NLS-1$
 		// TODO: This Git-specific directory is defined in multiple places - need to refactor.
-		this.addPattern(new PathPatternMatcher(".ptp-sync"), PatternType.EXCLUDE); //$NON-NLS-1$
+		this.addPattern(new PathResourceMatcher(new Path(".ptp-sync")), PatternType.EXCLUDE); //$NON-NLS-1$
+		this.addPattern(new BinaryResourceMatcher(), PatternType.EXCLUDE);
 	}
 
 	/**
@@ -104,7 +107,7 @@ public class SyncFileFilter {
 	 * @param pattern
 	 * @param type
 	 */
-	public void addPattern(PatternMatcher pattern, PatternType type) {
+	public void addPattern(ResourceMatcher pattern, PatternType type) {
 		if (patternToTypeMap.get(pattern) != null) {
 			filteredPaths.remove(pattern);
 		}
@@ -117,7 +120,7 @@ public class SyncFileFilter {
 	 * Assumes pattern appears no more than once
 	 * @param pattern
 	 */
-	public void removePattern(PatternMatcher pattern) {
+	public void removePattern(ResourceMatcher pattern) {
 		filteredPaths.remove(pattern);
 		patternToTypeMap.remove(pattern);
 	}
@@ -127,7 +130,7 @@ public class SyncFileFilter {
 	 * Assumes pattern only appears once
 	 * @param whether pattern was actually promoted
 	 */
-	public boolean promote(PatternMatcher pattern) {
+	public boolean promote(ResourceMatcher pattern) {
 		int oldIndex = filteredPaths.indexOf(pattern);
 		if (oldIndex > 0) {
 			filteredPaths.remove(oldIndex);
@@ -143,7 +146,7 @@ public class SyncFileFilter {
 	 * Assumes pattern appears no more than once
 	 * @param whether pattern was actually demoted
 	 */
-	public boolean demote(PatternMatcher pattern) {
+	public boolean demote(ResourceMatcher pattern) {
 		int oldIndex = filteredPaths.indexOf(pattern);
 		if (oldIndex > -1 && oldIndex < filteredPaths.size() - 1) {
 			filteredPaths.remove(oldIndex);
@@ -159,9 +162,9 @@ public class SyncFileFilter {
 	 * @param s - the string
 	 * @return whether the string should be ignored
 	 */
-	public boolean shouldIgnore(String s) {
-		for (PatternMatcher pm : filteredPaths) {
-			if (pm.match(s)) {
+	public boolean shouldIgnore(IResource r) {
+		for (ResourceMatcher pm : filteredPaths) {
+			if (pm.match(r)) {
 				PatternType type = patternToTypeMap.get(pm);
 				assert(pm != null);
 				if (type == PatternType.EXCLUDE) {
@@ -182,7 +185,7 @@ public class SyncFileFilter {
 	 */
 	public void saveFilter(IMemento memento) {
 		memento.putInteger(ATTR_NUM_PATTERNS, filteredPaths.size());
-		for (PatternMatcher pm : filteredPaths) {
+		for (ResourceMatcher pm : filteredPaths) {
 			IMemento pathMemento = memento.createChild(PATTERN_ELEMENT_NAME);
 			IMemento patternInternalMemento = pathMemento.createChild(PATTERN_INTERNAL_ELEMENT_NAME);
 			pm.savePattern(patternInternalMemento);
@@ -199,16 +202,16 @@ public class SyncFileFilter {
 	 */
 	public static SyncFileFilter loadFilter(IMemento memento) {
 		int numPatterns = memento.getInteger(ATTR_NUM_PATTERNS);
-		PatternMatcher[] pmArray = new PatternMatcher[numPatterns];
+		ResourceMatcher[] pmArray = new ResourceMatcher[numPatterns];
 		SyncFileFilter.PatternType[] typeArray = new SyncFileFilter.PatternType[numPatterns];
 
 		SyncFileFilter filter = createEmptyFilter();
 		
 		for (IMemento pathMemento : memento.getChildren(PATTERN_ELEMENT_NAME)) {
 			IMemento patternInternalMemento = pathMemento.getChild(PATTERN_INTERNAL_ELEMENT_NAME);
-			PatternMatcher pm;
+			ResourceMatcher pm;
 			try {
-				pm = PatternMatcher.loadPattern(patternInternalMemento);
+				pm = ResourceMatcher.loadPattern(patternInternalMemento);
 			} catch (InvocationTargetException e) {
 				RDTSyncCorePlugin.log(Messages.SyncFileFilter_0 + e.getMessage(), e);
 				continue;

@@ -322,8 +322,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				// TODO: Review exception handling
 				if (fSyncConnection == null) {
 					// Open a remote sync connection
-					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation()
-							.toString(), this.getLocation(), fileFilter, progress);
+					fSyncConnection = new GitRemoteSyncConnection(this.getProject(), this.getRemoteConnection(),
+							this.getProject().getLocation().toString(), this.getLocation(), fileFilter, progress);
 				} else {
 					fSyncConnection.setFileFilter(fileFilter);
 				}

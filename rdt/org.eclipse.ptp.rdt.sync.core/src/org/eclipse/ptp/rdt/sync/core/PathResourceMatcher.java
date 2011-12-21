@@ -12,6 +12,9 @@ package org.eclipse.ptp.rdt.sync.core;
 
 import java.util.NoSuchElementException;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
@@ -20,26 +23,29 @@ import org.eclipse.ui.IMemento;
  * Note that this does exact matching only. This class should be used when the user wants to filter a specific, literal path.
  * Using RegexPatternMatcher could cause trouble with directory and file names containing wildcard characters.
  */
-public class PathPatternMatcher extends PatternMatcher {
+public class PathResourceMatcher extends ResourceMatcher {
 	private static final String ATTR_PATH = "path"; //$NON-NLS-1$
-	String path;
+	IPath path;
 
-	public PathPatternMatcher(String p) {
+	public PathResourceMatcher(IPath p) {
 		if (p == null) {
-			path = ""; //$NON-NLS-1$
+			path = new Path(""); //$NON-NLS-1$
 		} else {
 			path = p;
 		}
 	}
 
-	public boolean match(String candidate) {
-		return candidate.startsWith(path);
+	public boolean match(IResource candidate) {
+		if (candidate == null) {
+			return false;
+		}
+		return path.isPrefixOf(candidate.getProjectRelativePath());
 	}
 
 	public String toString() {
-		return path;
+		return path.toOSString();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -47,7 +53,7 @@ public class PathPatternMatcher extends PatternMatcher {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((path == null) ? 0 : path.hashCode());
+		result = prime * result + ((path == null) ? 0 : path.toOSString().hashCode());
 		return result;
 	}
 
@@ -62,15 +68,15 @@ public class PathPatternMatcher extends PatternMatcher {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof PathPatternMatcher)) {
+		if (!(obj instanceof PathResourceMatcher)) {
 			return false;
 		}
-		PathPatternMatcher other = (PathPatternMatcher) obj;
+		PathResourceMatcher other = (PathResourceMatcher) obj;
 		if (path == null) {
 			if (other.path != null) {
 				return false;
 			}
-		} else if (!path.equals(other.path)) {
+		} else if (!path.toOSString().equals(other.path.toOSString())) {
 			return false;
 		}
 		return true;
@@ -82,7 +88,7 @@ public class PathPatternMatcher extends PatternMatcher {
 	@Override
 	public void savePattern(IMemento memento) {
 		super.savePattern(memento);
-		memento.putString(ATTR_PATH, path);
+		memento.putString(ATTR_PATH, path.toPortableString());
 	}
 	
 	/**
@@ -93,11 +99,11 @@ public class PathPatternMatcher extends PatternMatcher {
 	 * @throws NoSuchElementException
 	 * 				if expected data is not in the memento.
 	 */
-	public static PatternMatcher loadPattern(IMemento memento) throws NoSuchElementException {
+	public static ResourceMatcher loadPattern(IMemento memento) throws NoSuchElementException {
 		String p = memento.getString(ATTR_PATH);
 		if (p == null) {
 			throw new NoSuchElementException(Messages.PathPatternMatcher_0);
 		}
-		return new PathPatternMatcher(memento.getString(ATTR_PATH));
+		return new PathResourceMatcher(Path.fromPortableString(p));
 	}
 }
