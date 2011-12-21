@@ -12,10 +12,23 @@ package org.eclipse.ptp.rm.lml.core.model;
 
 public interface IPattern {
 
-	public String getRelation();
+	public String getColumnTitle();
+
+	public String getMaxValueRange();
+
+	public String getMinValueRange();
+
+	public String getRelationOperator();
 
 	public String getType();
 
-	public String getValue();
+	public String getRelationValue();
 
+	public boolean isRange();
+
+	public boolean isRelation();
+
+	public IPattern setRange(String minValueRange, String maxValueRange);
+
+	public IPattern setRelation(String relationOperator, String valueRelation);
 }

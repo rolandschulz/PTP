@@ -1,11 +1,21 @@
 package org.eclipse.ptp.rm.lml.ui.providers;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.core.model.IPattern;
 import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
+import org.eclipse.ptp.rm.lml.internal.core.model.Pattern;
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -27,25 +37,35 @@ import org.eclipse.swt.widgets.Text;
 
 public class FilterDialog extends Dialog {
 
-	final SelectionAdapter pickDate = new SelectionAdapter() {
+	public class SelectDateAdpater extends SelectionAdapter {
+
+		private final Button button;
+
+		public SelectDateAdpater(Button button) {
+			super();
+			this.button = button;
+		}
+
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			final Shell dialog = new Shell(shell, SWT.DIALOG_TRIM);
+			final Shell dialog = new Shell(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 			dialog.setLayout(new GridLayout(2, false));
 
-			final DateTime calendar = new DateTime(dialog, SWT.CALENDAR);
-			calendar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-					false, 2, 1));
+			final DateTime calendar = new DateTime(dialog, SWT.CALENDAR | SWT.BORDER);
+			calendar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 			final DateTime time = new DateTime(dialog, SWT.TIME);
 			time.setLayoutData(new GridData());
 
 			final Button ok = new Button(dialog, SWT.PUSH);
-			ok.setText("ok");
+			ok.setText("OK");
 			ok.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			ok.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-
+					final NumberFormat formatter = new DecimalFormat("00");
+					button.setText(calendar.getYear() + "-" + formatter.format(calendar.getMonth() + 1) + "-"
+							+ formatter.format(calendar.getDay()) + " " + formatter.format(time.getHours()) + ":"
+							+ formatter.format(time.getMinutes()) + ":" + formatter.format(time.getSeconds()));
 					dialog.close();
 				}
 			});
@@ -53,7 +73,8 @@ public class FilterDialog extends Dialog {
 			dialog.pack();
 			dialog.open();
 		}
-	};
+
+	}
 
 	private FilterDataRow[] filterData;
 
@@ -66,9 +87,8 @@ public class FilterDialog extends Dialog {
 		super(parentShell);
 		lguiItem = LMLManager.getInstance().getSelectedLguiItem();
 		this.gid = gid;
-		this.shell = parentShell;
-		shell.setText("Filters");
 		setShellStyle(SWT.RESIZE | SWT.APPLICATION_MODAL);
+		this.shell = parentShell;
 	}
 
 	private boolean includeStatus(ITableColumnLayout[] columnLayouts) {
@@ -82,38 +102,131 @@ public class FilterDialog extends Dialog {
 
 	@Override
 	protected void buttonPressed(int buttonId) {
+
 		if (buttonId == IDialogConstants.CANCEL_ID) {
 			// Cancel Button
+			// TODO Old patterns should be set back
 			close();
 			return;
 		}
 
-		// Auslesen der Daten
+		boolean error = false;
+		for (final FilterDataRow row : filterData) {
+
+			if (!row.isCheckboxSet()) {
+				continue;
+			}
+			if (row.getType().equals("alpha")) {
+				if (row.getRelationValueTextAlpha().getText().equals("")) {
+					error = true;
+					break;
+				}
+			} else {
+				if (row.getRadioButtonRelation().getSelection()) {
+					if (row.getType().equals("numeric")) {
+						if (row.getRelationValueTextNumeric().getText().equals("")) {
+							error = true;
+							break;
+						}
+					} else if (row.getType().equals("date")) {
+						if (row.getRelationValueButtonDate().getText().equals("")) {
+							error = true;
+							break;
+						}
+					}
+				} else if (row.getRadioButtonRange().getSelection()) {
+					if (row.getType().equals("numeric")) {
+						if (row.getMinValueTextNumeric().getText().equals("")
+								|| row.getMaxValueTextNumeric().equals("")
+								|| (Integer.parseInt(row.getMinValueTextNumeric().getText()) >= Integer.parseInt(row
+										.getMaxValueTextNumeric().getText()))) {
+							error = true;
+							break;
+						}
+					} else if (row.getType().equals("date")) {
+						if (row.getMinValueButtonDate().getText().equals("") || row.getMaxValueButtonDate().equals("")
+								|| (row.getMinValueButtonDate().getText().compareTo(row.getMaxValueButtonDate().getText()) >= 0)) {
+							error = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		if (error) {
+			final Status status = new Status(IStatus.ERROR, "Missing/wrong arguments", 0, "Error", null);
+			// TODO Write messages
+			final ErrorDialog dialog = new ErrorDialog(shell, "Missing/wrong arguments", "", status, IStatus.ERROR);
+			dialog.open();
+			return;
+		}
+
+		final List<IPattern> filterValues = new LinkedList<IPattern>();
+		// Apply and Okay Button
+		for (final FilterDataRow row : filterData) {
+			boolean complete = false;
+			if (!row.isCheckboxSet()) {
+				continue;
+			}
+			final IPattern pattern = new Pattern(row.getTitle(), row.getType());
+			if (row.getType().equals("alpha")) {
+				pattern.setRelation(row.getRelationComboAlpha().getText(), row.getRelationValueTextAlpha().getText());
+				complete = true;
+			} else {
+				if (row.getRadioButtonRelation().getSelection()) {
+					if (row.getType().equals("numeric")) {
+						pattern.setRelation(row.getRelationComboNumericDate().getText(), row.getRelationValueTextNumeric()
+								.getText());
+						complete = true;
+					} else if (row.getType().equals("date")) {
+						pattern.setRelation(row.getRelationComboNumericDate().getText(), row.getRelationValueButtonDate().getText());
+						complete = true;
+					}
+				} else if (row.getRadioButtonRange().getSelection()) {
+					if (row.getType().equals("numeric")) {
+						pattern.setRange(row.getMinValueTextNumeric().getText(), row.getMaxValueTextNumeric().getText());
+						complete = true;
+					} else if (row.getType().equals("date")) {
+						pattern.setRange(row.getMinValueButtonDate().getText(), row.getMaxValueButtonDate().getText());
+						complete = true;
+					}
+				}
+			}
+			if (complete) {
+				filterValues.add(pattern);
+			}
+		}
+
+		LMLManager.getInstance().filter(gid, filterValues);
 
 		if (buttonId == IDialogConstants.OK_ID) {
 			// Okay Button
-		} else {
-			// Apply Button
+			// TODO Write in LguiItem
+			close();
 		}
+
+	}
+
+	@Override
+	protected void configureShell(Shell shell) {
+		super.configureShell(shell);
+		shell.setText("Filters");
+
 	}
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
-				true);
-		createButton(parent, 0, "Apply", true);
-		createButton(parent, IDialogConstants.CANCEL_ID,
-				IDialogConstants.CANCEL_LABEL, true);
+		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+		createButton(parent, 5, "Apply", true);
+		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, true);
 	}
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		// final Composite composite = (Composite)
-		// super.createDialogArea(parent);
-		final ScrolledComposite scrolledComposite = new ScrolledComposite(
-				parent, SWT.H_SCROLL | SWT.V_SCROLL);
-		GridDataFactory.swtDefaults().align(SWT.FILL, SWT.FILL)
-				.hint(SWT.DEFAULT, SWT.DEFAULT).grab(true, true)
+
+		final ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		GridDataFactory.swtDefaults().align(SWT.FILL, SWT.FILL).hint(SWT.DEFAULT, SWT.DEFAULT).grab(true, true)
 				.applyTo(scrolledComposite);
 		final Composite composite = new Composite(scrolledComposite, SWT.NONE);
 		boolean error = false;
@@ -162,186 +275,166 @@ public class FilterDialog extends Dialog {
 
 		int dif = 0;
 		for (int i = 0; i < columnLayouts.length; i++) {
-			if (gid.equals(ILMLUIConstants.VIEW_TABLE_1)
-					&& columnLayouts[i].getTitle().equals(ILMLUIConstants.COLUMN_STATUS)) {
+			if (gid.equals(ILMLUIConstants.VIEW_TABLE_1) && columnLayouts[i].getTitle().equals(ILMLUIConstants.COLUMN_STATUS)) {
 				dif = 1;
 				continue;
 			}
 
 			final String type = columnLayouts[i].getOrder();
 
-			final FilterDataRow row = new FilterDataRow(type);
-
 			final Button checkbox = new Button(composite, SWT.CHECK);
 
 			checkbox.setText(columnLayouts[i].getTitle());
 			checkbox.setLayoutData(new GridData());
 
-			row.addCheckbox(checkbox);
+			final FilterDataRow row = new FilterDataRow(type, checkbox);
 
 			if (type == "alpha") {
-				final Composite compositeText = new Composite(composite,
-						SWT.NONE);
+				// Input in text elements with choosing a relation operator before
+				final Composite compositeText = new Composite(composite, SWT.NONE);
 				compositeText.setLayout(new GridLayout(2, false));
-				final Combo relationText = new Combo(compositeText, SWT.READ_ONLY);
-				relationText.setItems(new String[] { "=", "!=" });
-				relationText.select(0);
-				relationText.setLayoutData(new GridData());
-				relationText.setEnabled(false);
-				row.addRelationText(relationText);
+				final Combo relationCombo = new Combo(compositeText, SWT.READ_ONLY);
+				relationCombo.setItems(new String[] { "=", "!=", "=~", "!~" });
+				relationCombo.select(0);
+				relationCombo.setLayoutData(new GridData());
+				relationCombo.setEnabled(false);
+				row.addRelationComboAlpha(relationCombo);
 
-				final Text text = new Text(compositeText, SWT.LEAD | SWT.SINGLE);
-				text.setEnabled(false);
-				text.addVerifyListener(alphaListener);
-				text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-				row.addText(text);
+				final Text relationValue = new Text(compositeText, SWT.LEAD | SWT.SINGLE);
+				relationValue.setEnabled(false);
+				relationValue.addVerifyListener(alphaListener);
+				relationValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+				row.addRelationValueAlpha(relationValue);
 
-				compositeText.setLayoutData(new GridData(
-						GridData.FILL_HORIZONTAL));
+				compositeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			} else {
-				final Composite compositeRadio = new Composite(composite,
-						SWT.NONE);
+				// Choose between 2 different kinds of input
+				final Composite compositeRadio = new Composite(composite, SWT.NONE);
 				compositeRadio.setLayout(new GridLayout(2, false));
-				final Button buttonRelation = new Button(compositeRadio,
-						SWT.RADIO);
-				buttonRelation.setLayoutData(new GridData());
-				buttonRelation.setSelection(true);
-				buttonRelation.setEnabled(false);
-				buttonRelation.setText("");
+				// 1. A relation to one number
+				final Button radioButtonRelation = new Button(compositeRadio, SWT.RADIO);
+				radioButtonRelation.setLayoutData(new GridData());
+				radioButtonRelation.setSelection(true);
+				radioButtonRelation.setEnabled(false);
+				radioButtonRelation.setText("");
 
-				row.addRadioRelation(buttonRelation);
+				row.addRadioRelation(radioButtonRelation);
 
-				final Composite compositeRel = new Composite(compositeRadio,
-						SWT.NONE);
-				compositeRel.setLayout(new GridLayout(2, false));
-				final Combo relations = new Combo(compositeRel, SWT.READ_ONLY);
+				final Composite compositeRelation = new Composite(compositeRadio, SWT.NONE);
+				compositeRelation.setLayout(new GridLayout(2, false));
+				final Combo relations = new Combo(compositeRelation, SWT.READ_ONLY);
 				relations.setItems(new String[] { "=", "<", "<=", ">", ">=",
 						"!=" });
 				relations.select(0);
 
 				relations.setEnabled(false);
 				relations.setLayoutData(new GridData(GridData.FILL));
-				row.addRelation(relations);
+				row.addRelationComboNumericDate(relations);
 
 				if (type == "numeric") {
-					final Text relationValueText = new Text(compositeRel,
-							SWT.SINGLE | SWT.TRAIL);
+					final Text relationValueText = new Text(compositeRelation, SWT.SINGLE | SWT.TRAIL);
 					relationValueText.addVerifyListener(numericListener);
 					relationValueText.setEnabled(false);
-					relationValueText.setLayoutData(new GridData(
-							GridData.FILL_HORIZONTAL));
-					row.addRelationValueText(relationValueText);
+					relationValueText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					row.addRelationValueNumeric(relationValueText);
 				} else {
-					final Button relationValueButton = new Button(compositeRel,
-							SWT.NONE);
+					final Button relationValueButton = new Button(compositeRelation, SWT.NONE);
 					relationValueButton.setEnabled(false);
-					relationValueButton.setLayoutData(new GridData(
-							GridData.FILL_HORIZONTAL));
-
-					relationValueButton.addSelectionListener(pickDate);
-					row.addRelationValueButton(relationValueButton);
+					relationValueButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					relationValueButton.addSelectionListener(new SelectDateAdpater(relationValueButton));
+					row.addRelationValueDate(relationValueButton);
 				}
 
-				buttonRelation.addSelectionListener(new SelectionListener() {
+				radioButtonRelation.addSelectionListener(new SelectionListener() {
 
 					public void widgetDefaultSelected(SelectionEvent e) {
 					}
 
 					public void widgetSelected(SelectionEvent e) {
-						final boolean selected = buttonRelation.getSelection();
-						if (row.getRelation() != null) {
-							row.getRelation().setEnabled(selected);
+						final boolean selected = radioButtonRelation.getSelection();
+						if (row.getRelationComboNumericDate() != null) {
+							row.getRelationComboNumericDate().setEnabled(selected);
 						}
-						if (row.getRelationValueText() != null) {
-							row.getRelationValueText().setEnabled(selected);
+						if (row.getRelationValueTextNumeric() != null) {
+							row.getRelationValueTextNumeric().setEnabled(selected);
 						}
-						if (row.getRelationValueButton() != null) {
-							row.getRelationValueButton().setEnabled(selected);
+						if (row.getRelationValueButtonDate() != null) {
+							row.getRelationValueButtonDate().setEnabled(selected);
 						}
 					}
 				});
 
-				compositeRel.setLayoutData(new GridData(
-						GridData.FILL_HORIZONTAL));
+				compositeRelation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-				final Button buttonRange = new Button(compositeRadio, SWT.RADIO);
-				buttonRange.setEnabled(false);
-				buttonRange.setLayoutData(new GridData());
+				// 2. A range between two numbers
+				final Button radioButtonRange = new Button(compositeRadio, SWT.RADIO);
+				radioButtonRange.setEnabled(false);
+				radioButtonRange.setLayoutData(new GridData());
 
-				row.addRadioRange(buttonRange);
+				row.addRadioRange(radioButtonRange);
 
-				final Composite compositeRange = new Composite(compositeRadio,
-						SWT.NONE);
+				final Composite compositeRange = new Composite(compositeRadio, SWT.NONE);
 				compositeRange.setLayout(new GridLayout(3, false));
 				if (type == "numeric") {
-					final Text valueMinText = new Text(compositeRange,
-							SWT.SINGLE | SWT.TRAIL);
-					valueMinText.setLayoutData(new GridData(
-							GridData.FILL_HORIZONTAL));
-					valueMinText.setEnabled(false);
-					valueMinText.addVerifyListener(numericListener);
+					final Text textValueMin = new Text(compositeRange, SWT.SINGLE | SWT.TRAIL);
+					textValueMin.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					textValueMin.setEnabled(false);
+					textValueMin.addVerifyListener(numericListener);
 
-					final Label minusLabel = new Label(compositeRange, SWT.NONE);
-					minusLabel.setText(" - ");
-					minusLabel.setLayoutData(new GridData(GridData.FILL));
+					// TODO replace with another combo box
+					final Label labelMinus = new Label(compositeRange, SWT.NONE);
+					labelMinus.setText(" - ");
+					labelMinus.setLayoutData(new GridData(GridData.FILL));
 
-					final Text valueMaxText = new Text(compositeRange,
-							SWT.SINGLE | SWT.TRAIL);
-					valueMaxText.setLayoutData(new GridData(
-							GridData.FILL_HORIZONTAL));
-					valueMaxText.setEnabled(false);
-					valueMaxText.addVerifyListener(numericListener);
+					final Text textValueMax = new Text(compositeRange, SWT.SINGLE | SWT.TRAIL);
+					textValueMax.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					textValueMax.setEnabled(false);
+					textValueMax.addVerifyListener(numericListener);
 
-					row.addValueMinText(valueMinText);
-					row.addValueMaxText(valueMaxText);
+					row.addMinValueNumeric(textValueMin);
+					row.addMaxValueNumeric(textValueMax);
 				} else {
-					final Button valueMinButton = new Button(compositeRange,
-							SWT.NONE);
-					valueMinButton.setEnabled(false);
-					valueMinButton.setLayoutData(new GridData(
-							GridData.FILL_HORIZONTAL));
-					valueMinButton.addSelectionListener(pickDate);
+					final Button buttonValueMin = new Button(compositeRange, SWT.NONE);
+					buttonValueMin.setEnabled(false);
+					buttonValueMin.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					buttonValueMin.addSelectionListener(new SelectDateAdpater(buttonValueMin));
 
-					final Label minusLabel = new Label(compositeRange, SWT.NONE);
-					minusLabel.setText(" - ");
-					minusLabel.setLayoutData(new GridData(GridData.FILL));
+					final Label labelMinus = new Label(compositeRange, SWT.NONE);
+					labelMinus.setText(" - ");
+					labelMinus.setLayoutData(new GridData(GridData.FILL));
 
-					final Button valueMaxButton = new Button(compositeRange,
-							SWT.NONE);
-					valueMaxButton.setEnabled(false);
-					valueMaxButton.setLayoutData(new GridData(
-							GridData.FILL_HORIZONTAL));
-					valueMaxButton.addSelectionListener(pickDate);
+					final Button buttonValueMax = new Button(compositeRange, SWT.NONE);
+					buttonValueMax.setEnabled(false);
+					buttonValueMax.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					buttonValueMax.addSelectionListener(new SelectDateAdpater(buttonValueMax));
 
-					row.addValueMinButton(valueMinButton);
-					row.addValueMaxButton(valueMaxButton);
+					row.addMinValueDate(buttonValueMin);
+					row.addMaxValueDate(buttonValueMax);
 				}
 
-				buttonRange.addSelectionListener(new SelectionListener() {
+				radioButtonRange.addSelectionListener(new SelectionListener() {
 
 					public void widgetDefaultSelected(SelectionEvent e) {
 					}
 
 					public void widgetSelected(SelectionEvent e) {
-						final boolean selected = buttonRange.getSelection();
-						if (row.getValueMinText() != null
-								&& row.getValueMaxText() != null) {
-							row.getValueMinText().setEnabled(selected);
-							row.getValueMaxText().setEnabled(selected);
+						final boolean selected = radioButtonRange.getSelection();
+						if (row.getMinValueTextNumeric() != null
+								&& row.getMaxValueTextNumeric() != null) {
+							row.getMinValueTextNumeric().setEnabled(selected);
+							row.getMaxValueTextNumeric().setEnabled(selected);
 						}
-						if (row.getValueMinButton() != null
-								&& row.getValueMaxButton() != null) {
-							row.getValueMinButton().setEnabled(selected);
-							row.getValueMaxButton().setEnabled(selected);
+						if (row.getMinValueButtonDate() != null
+								&& row.getMaxValueButtonDate() != null) {
+							row.getMinValueButtonDate().setEnabled(selected);
+							row.getMaxValueButtonDate().setEnabled(selected);
 						}
 					}
 				});
 
-				compositeRange.setLayoutData(new GridData(
-						GridData.FILL_HORIZONTAL));
+				compositeRange.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-				compositeRadio.setLayoutData(new GridData(
-						GridData.FILL_HORIZONTAL));
+				compositeRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			}
 
 			checkbox.addSelectionListener(new SelectionListener() {
@@ -351,37 +444,34 @@ public class FilterDialog extends Dialog {
 
 				public void widgetSelected(SelectionEvent e) {
 					final boolean selected = checkbox.getSelection();
-					if (row.getText() != null) {
-						row.getText().setEnabled(selected);
+					if (row.getRelationValueTextAlpha() != null) {
+						row.getRelationValueTextAlpha().setEnabled(selected);
 					}
-					if (row.getRelationText() != null) {
-						row.getRelationText().setEnabled(selected);
+					if (row.getRelationComboAlpha() != null) {
+						row.getRelationComboAlpha().setEnabled(selected);
 					}
-					if (row.getRadioRelation() != null
-							&& row.getRadioRange() != null) {
-						row.getRadioRelation().setEnabled(selected);
-						row.getRadioRange().setEnabled(checkbox.getSelection());
-						if (row.getRadioRelation().getSelection()) {
-							if (row.getRelation() != null) {
-								row.getRelation().setEnabled(selected);
+					if (row.getRadioButtonRelation() != null && row.getRadioButtonRange() != null) {
+						row.getRadioButtonRelation().setEnabled(selected);
+						row.getRadioButtonRange().setEnabled(checkbox.getSelection());
+						if (row.getRadioButtonRelation().getSelection()) {
+							if (row.getRelationComboNumericDate() != null) {
+								row.getRelationComboNumericDate().setEnabled(selected);
 							}
-							if (row.getRelationValueText() != null) {
-								row.getRelationValueText().setEnabled(selected);
+							if (row.getRelationValueTextNumeric() != null) {
+								row.getRelationValueTextNumeric().setEnabled(selected);
 							}
-							if (row.getRelationValueButton() != null) {
-								row.getRelationValueButton().setEnabled(
+							if (row.getRelationValueButtonDate() != null) {
+								row.getRelationValueButtonDate().setEnabled(
 										selected);
 							}
 						} else {
-							if (row.getValueMinText() != null
-									&& row.getValueMaxText() != null) {
-								row.getValueMinText().setEnabled(selected);
-								row.getValueMaxText().setEnabled(selected);
+							if (row.getMinValueTextNumeric() != null && row.getMaxValueTextNumeric() != null) {
+								row.getMinValueTextNumeric().setEnabled(selected);
+								row.getMaxValueTextNumeric().setEnabled(selected);
 							}
-							if (row.getValueMinButton() != null
-									&& row.getValueMaxButton() != null) {
-								row.getValueMinButton().setEnabled(selected);
-								row.getValueMaxButton().setEnabled(selected);
+							if (row.getMinValueButtonDate() != null && row.getMaxValueButtonDate() != null) {
+								row.getMinValueButtonDate().setEnabled(selected);
+								row.getMaxValueButtonDate().setEnabled(selected);
 							}
 						}
 					}
@@ -396,8 +486,7 @@ public class FilterDialog extends Dialog {
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
 
-		scrolledComposite.setMinSize(composite.computeSize(SWT.DEFAULT,
-				SWT.DEFAULT));
+		scrolledComposite.setMinSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		scrolledComposite.setSize(100, 400);
 		// System.out.println(scrolledComposite.getVerticalBar().getIncrement());
 		return scrolledComposite;

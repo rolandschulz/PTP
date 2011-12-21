@@ -13,126 +13,280 @@ import org.eclipse.swt.widgets.Text;
 public class FilterDataRow {
 
 	// Type of the data displayed in the column
-	private final String type;
+	private String type;
 
 	// To activate the filter function for this row
-	private Button checkbox;
+	private final Button checkbox;
 
-	private Button radioRel;
+	// To active a relation; only for the types numeric and date
+	private Button radioButoonRelation;
 
-	private Button radioRange;
+	// To active a range; only for the types numeric and date
+	private Button radioButtonRange;
 
-	private Text text;
+	// The value for comparison, only for type alpha
+	private Text valueAlpha;
 
-	private Combo relation;
+	// The operator how to compare a value of the input with an given value; only for the type numeric and date
+	private Combo relationComboNumericDate;
 
-	private Text relationValueText;
+	// The value for comparison; only for the type numeric
+	private Text valueNumeric;
 
-	private Button relationValueButton;
+	// The value for comparison; only for the type date
+	private Button valueDate;
 
-	private Text valueMinText;
+	// The minimal value in a range; only for the type numeric
+	private Text minValueNumeric;
 
-	private Text valueMaxText;
+	// The maximal value in a range; only for the type numeric
+	private Text maxValueNumeric;
 
-	private Button valueMinButton;
+	// The minimal value in a range; only for the type date
+	private Button minValueDate;
 
-	private Button valueMaxButton;
+	// The maximal value in a range; only for the type date
+	private Button maxValueDate;
 
-	private Combo relationText;
+	// The value for comparison; only for the type alpha
+	private Combo relationComboAlpha;
 
-	public FilterDataRow(String type) {
+	/**
+	 * Constructor.
+	 * 
+	 * @param type
+	 * @param checkbox
+	 */
+	public FilterDataRow(String type, Button checkbox) {
 		this.type = type;
-	}
-
-	public void addCheckbox(Button checkbox) {
 		this.checkbox = checkbox;
+		if (type == null) {
+			this.type = "alpha";
+		}
 	}
 
-	public void addRadioRange(Button buttonRange) {
-		radioRange = buttonRange;
+	/**
+	 * Adding a input button for the maximal value (date).
+	 * 
+	 * @param value
+	 */
+	public void addMaxValueDate(Button value) {
+		maxValueDate = value;
 	}
 
-	public void addRadioRelation(Button buttonRelation) {
-		radioRel = buttonRelation;
+	/**
+	 * Adding a input text for the maximal value (numeric).
+	 * 
+	 * @param value
+	 */
+	public void addMaxValueNumeric(Text value) {
+		maxValueNumeric = value;
 	}
 
-	public void addRelation(Combo relations) {
-		relation = relations;
+	/**
+	 * Adding a input button for the minimal value (date).
+	 * 
+	 * @param value
+	 */
+	public void addMinValueDate(Button value) {
+		minValueDate = value;
 	}
 
-	public void addRelationText(Combo relationText) {
-		this.relationText = relationText;
+	/**
+	 * Adding a input text for the minimal value (numeric).
+	 * 
+	 * @param value
+	 */
+	public void addMinValueNumeric(Text value) {
+		minValueNumeric = value;
 	}
 
-	public void addRelationValueButton(Button relationValueButton) {
-		this.relationValueButton = relationValueButton;
+	/**
+	 * Adding a radio button for range.
+	 * 
+	 * @param button
+	 */
+	public void addRadioRange(Button button) {
+		radioButtonRange = button;
 	}
 
-	public void addRelationValueText(Text relationValueText) {
-		this.relationValueText = relationValueText;
+	/**
+	 * Adding a radio button for relation.
+	 * 
+	 * @param button
+	 */
+	public void addRadioRelation(Button button) {
+		radioButoonRelation = button;
 	}
 
-	public void addText(Text text) {
-		this.text = text;
+	/**
+	 * Adding a combo box which includes all possible relation operators for alpha.
+	 * 
+	 * @param relation
+	 */
+	public void addRelationComboAlpha(Combo relation) {
+		relationComboAlpha = relation;
 	}
 
-	public void addValueMaxButton(Button valueMaxButton) {
-		this.valueMaxButton = valueMaxButton;
+	/**
+	 * Adding a combo box which includes all possible relation operators for numeric and date.
+	 * 
+	 * @param relation
+	 */
+	public void addRelationComboNumericDate(Combo relation) {
+		relationComboNumericDate = relation;
 	}
 
-	public void addValueMaxText(Text valueMaxText) {
-		this.valueMaxText = valueMaxText;
+	/**
+	 * Adding a input text for the comparison value (alpha).
+	 * 
+	 * @param value
+	 */
+	public void addRelationValueAlpha(Text value) {
+		valueAlpha = value;
 	}
 
-	public void addValueMinButton(Button valueMinButton) {
-		this.valueMinButton = valueMinButton;
+	/**
+	 * Adding a input button for the comparison value (date).
+	 * 
+	 * @param value
+	 */
+	public void addRelationValueDate(Button value) {
+		valueDate = value;
 	}
 
-	public void addValueMinText(Text valueMinText) {
-		this.valueMinText = valueMinText;
+	/**
+	 * Adding a input text for comparison value (numeric).
+	 * 
+	 * @param value
+	 */
+	public void addRelationValueNumeric(Text value) {
+		valueNumeric = value;
 	}
 
-	public Button getRadioRange() {
-		return radioRange;
+	/**
+	 * Getting the button with the maximal value (date).
+	 * 
+	 * @return button
+	 */
+	public Button getMaxValueButtonDate() {
+		return maxValueDate;
 	}
 
-	public Button getRadioRelation() {
-		return radioRel;
+	/**
+	 * Getting the text with the maximal value (numeric).
+	 * 
+	 * @return text
+	 */
+	public Text getMaxValueTextNumeric() {
+		return maxValueNumeric;
 	}
 
-	public Combo getRelation() {
-		return relation;
+	/**
+	 * Getting the button with the minimal value (date).
+	 * 
+	 * @return button
+	 */
+	public Button getMinValueButtonDate() {
+		return minValueDate;
 	}
 
-	public Combo getRelationText() {
-		return relationText;
+	/**
+	 * Getting the text with the minimal value (numeric).
+	 * 
+	 * @return text
+	 */
+	public Text getMinValueTextNumeric() {
+		return minValueNumeric;
 	}
 
-	public Button getRelationValueButton() {
-		return relationValueButton;
+	/**
+	 * Getting the button for range.
+	 * 
+	 * @return button for range
+	 */
+	public Button getRadioButtonRange() {
+		return radioButtonRange;
 	}
 
-	public Text getRelationValueText() {
-		return relationValueText;
+	/**
+	 * Getting the button for relation.
+	 * 
+	 * @return button for relation.
+	 */
+	public Button getRadioButtonRelation() {
+		return radioButoonRelation;
 	}
 
-	public Text getText() {
-		return text;
+	/**
+	 * Getting the combo box including all comparison operators (alpha).
+	 * 
+	 * @return combo box
+	 */
+	public Combo getRelationComboAlpha() {
+		return relationComboAlpha;
 	}
 
-	public Button getValueMaxButton() {
-		return valueMaxButton;
+	/**
+	 * Getting the combo box including all comparison operators (numeric and date).
+	 * 
+	 * @return combo box
+	 */
+	public Combo getRelationComboNumericDate() {
+		return relationComboNumericDate;
 	}
 
-	public Text getValueMaxText() {
-		return valueMaxText;
+	/**
+	 * Getting the button with the comparison value (date).
+	 * 
+	 * @return button
+	 */
+	public Button getRelationValueButtonDate() {
+		return valueDate;
 	}
 
-	public Button getValueMinButton() {
-		return valueMinButton;
+	/**
+	 * Getting the text with the comparison value (alpha).
+	 * 
+	 * @return text
+	 */
+	public Text getRelationValueTextAlpha() {
+		return valueAlpha;
 	}
 
-	public Text getValueMinText() {
-		return valueMinText;
+	/**
+	 * Getting the text with the comparison value (numeric).
+	 * 
+	 * @return
+	 */
+	public Text getRelationValueTextNumeric() {
+		return valueNumeric;
+	}
+
+	/**
+	 * Getting the title of the row
+	 * 
+	 * @return title
+	 */
+	public String getTitle() {
+		return checkbox.getText();
+	}
+
+	/**
+	 * Getting the sort type of the row.
+	 * 
+	 * @return type
+	 */
+	public String getType() {
+		return type;
+	}
+
+	/**
+	 * Checks if the checkbox is set.
+	 * 
+	 * @return
+	 */
+	public boolean isCheckboxSet() {
+		return checkbox.getSelection();
 	}
 }

@@ -381,8 +381,7 @@ public class TableHandler extends LguiHandler {
 		return tableData;
 	}
 
-	public Row[] getTableDataWithColor(String gid, boolean addColor,
-			Map<String, IPattern> filterTitlesValues) {
+	public Row[] getTableDataWithColor(String gid, boolean addColor, List<IPattern> filterTitlesValues) {
 		final Row[] rows = getTableDataWithColor(gid, addColor);
 		if (rows.length == 0) {
 			return rows;
@@ -392,10 +391,10 @@ public class TableHandler extends LguiHandler {
 
 		// Convert Map filterTitlesValues into Map filterPosValues
 		final Map<Integer, IPattern> filterPosValues = new HashMap<Integer, IPattern>();
-		for (final String columnTitle : filterTitlesValues.keySet()) {
+		for (final IPattern pattern : filterTitlesValues) {
 			BigInteger cid = BigInteger.valueOf(-1);
 			for (final ColumnType column : table.getColumn()) {
-				if (column.getName().equals(columnTitle)) {
+				if (column.getName().equals(pattern.getColumnTitle())) {
 					cid = column.getId();
 					break;
 				}
@@ -403,27 +402,29 @@ public class TableHandler extends LguiHandler {
 			if (cid.equals(BigInteger.valueOf(-1))) {
 				continue;
 			}
-			int pos = -1;
+			int position = -1;
 			for (int i = 0; i < cids.length; i++) {
-				if (cids.equals(cid)) {
-					pos = i;
+				if (cids[i].equals(cid)) {
+					position = i;
 					break;
 				}
 			}
-			if (pos == -1) {
+			if (position == -1) {
 				continue;
 			}
-			filterPosValues.put(pos, filterTitlesValues.get(columnTitle));
+
+			filterPosValues.put(position, pattern);
 		}
 
 		// Filter the rows
-		// TODO take relations into account
 		final List<Row> filterRows = new ArrayList<Row>();
+		// TODO turn around
 		for (final Row row : rows) {
 			boolean allIncluded = true;
-			for (final int pos : filterPosValues.keySet()) {
-				if (!row.cells[pos].value.equals(filterPosValues.get(pos)
-						.getValue())) {
+			for (final int position : filterPosValues.keySet()) {
+				// TODO take relations into account
+				// TODO changes of the input
+				if (!row.cells[position].value.equals(filterPosValues.get(position).getRelationValue())) {
 					allIncluded = false;
 					break;
 				}

@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.lml.core;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -27,6 +28,7 @@ import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.core.model.IPattern;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiAddedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiRemovedEvent;
@@ -101,6 +103,10 @@ public class LMLManager {
 				LGUIS.remove(name);
 			}
 		}
+
+	}
+
+	public void filter(String gid, List<IPattern> filterValues) {
 
 	}
 

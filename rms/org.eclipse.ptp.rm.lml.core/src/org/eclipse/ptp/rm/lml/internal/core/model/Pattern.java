@@ -13,38 +13,93 @@ import org.eclipse.ptp.rm.lml.core.model.IPattern;
 
 public class Pattern implements IPattern {
 
-	private String value;
-
-	private String relation;
+	private String columntitle;
 
 	private String type;
 
-	public Pattern(String value, String relation, String type) {
-		this.value = value;
-		this.relation = relation;
-		this.type = type;
-		if (this.value == null) {
-			this.value = new String();
-		}
-		if (this.relation == null) {
-			this.relation = new String("=");
-		}
+	private boolean relation;
 
+	private boolean range;
+
+	// Relation
+	private String valueRelation;
+
+	private String relationOperator;
+
+	// Range
+	private String minValueRange;
+
+	private String maxValueRange;
+
+	public Pattern(String title, String type) {
+		columntitle = title;
+		this.type = type;
+		if (columntitle == null) {
+			columntitle = new String();
+		}
 		if (this.type == null) {
 			this.type = new String("alpha");
 		}
 	}
 
-	public String getRelation() {
-		return relation;
+	public String getColumnTitle() {
+		return columntitle;
+	}
+
+	public String getMaxValueRange() {
+		return maxValueRange;
+	}
+
+	public String getMinValueRange() {
+		return minValueRange;
+	}
+
+	public String getRelationOperator() {
+		return relationOperator;
 	}
 
 	public String getType() {
 		return type;
 	}
 
-	public String getValue() {
-		return value;
+	public String getRelationValue() {
+		return valueRelation;
+	}
+
+	public boolean isRange() {
+		return (range && !relation);
+	}
+
+	public boolean isRelation() {
+		return (relation && !range);
+	}
+
+	public IPattern setRange(String minValueRange, String maxValueRange) {
+		this.range = true;
+		this.relation = false;
+		this.minValueRange = minValueRange;
+		this.maxValueRange = maxValueRange;
+		if (minValueRange == null) {
+			this.minValueRange = new String();
+		}
+		if (maxValueRange == null) {
+			this.maxValueRange = new String();
+		}
+		return this;
+	}
+
+	public IPattern setRelation(String relationOperator, String valueRelation) {
+		this.relation = true;
+		this.range = false;
+		this.relationOperator = relationOperator;
+		this.valueRelation = valueRelation;
+		if (relationOperator == null) {
+			this.relationOperator = new String("=");
+		}
+		if (valueRelation == null) {
+			this.valueRelation = new String();
+		}
+		return this;
 	}
 
 }

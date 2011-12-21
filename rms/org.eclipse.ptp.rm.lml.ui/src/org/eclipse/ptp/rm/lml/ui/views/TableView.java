@@ -12,9 +12,8 @@
 package org.eclipse.ptp.rm.lml.ui.views;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -404,12 +403,12 @@ public class TableView extends ViewPart {
 
 			@Override
 			public void run() {
-				final Map<String, IPattern> filterValues = new HashMap<String, IPattern>();
+				final List<IPattern> filterValues = new LinkedList<IPattern>();
 				if (isChecked()) {
-					filterValues.put(new String("owner"),
-							new Pattern(fLguiItem.getUsername(), new String("="), new String("alpha")));
+					filterValues.add((new Pattern("owner", "alpha")).setRelation("=", fLguiItem.getUsername()));
 				}
-				fLguiItem.setPattern(filterValues, gid);
+				// TODO After decision about new structure of LML and server side
+				// fLguiItem.setPattern(filterValues, gid);
 				setViewerInput(filterValues);
 			}
 
@@ -922,7 +921,7 @@ public class TableView extends ViewPart {
 	/**
 	 * 
 	 */
-	private void setViewerInput(Map<String, IPattern> filterValues) {
+	private void setViewerInput(List<IPattern> filterValues) {
 		/*
 		 * Don't change input if mouse is down as this causes a SIGSEGV in SWT!
 		 */
