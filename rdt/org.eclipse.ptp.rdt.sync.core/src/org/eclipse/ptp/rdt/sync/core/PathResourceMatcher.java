@@ -19,9 +19,9 @@ import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 
 /**
- * A simple pattern matcher to match against strings contained in a certain path (files in a subdirectory, for example).
- * Note that this does exact matching only. This class should be used when the user wants to filter a specific, literal path.
- * Using RegexPatternMatcher could cause trouble with directory and file names containing wildcard characters.
+ * A simple resource matcher to test for resources contained inside a specific directory path.
+ * This should be used to filter resources in a specific, named path. (As opposed to RegexPatternMatcher, which may not work with
+ * directory and file names that contain wildcard characters.)
  */
 public class PathResourceMatcher extends ResourceMatcher {
 	private static final String ATTR_PATH = "path"; //$NON-NLS-1$
@@ -51,10 +51,7 @@ public class PathResourceMatcher extends ResourceMatcher {
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((path == null) ? 0 : path.toOSString().hashCode());
-		return result;
+		return path.toOSString().hashCode();
 	}
 
 	/* (non-Javadoc)
@@ -65,18 +62,11 @@ public class PathResourceMatcher extends ResourceMatcher {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
-			return false;
-		}
 		if (!(obj instanceof PathResourceMatcher)) {
 			return false;
 		}
 		PathResourceMatcher other = (PathResourceMatcher) obj;
-		if (path == null) {
-			if (other.path != null) {
-				return false;
-			}
-		} else if (!path.toOSString().equals(other.path.toOSString())) {
+		if (!path.toOSString().equals(other.path.toOSString())) {
 			return false;
 		}
 		return true;
@@ -86,8 +76,8 @@ public class PathResourceMatcher extends ResourceMatcher {
 	 * Place needed data for recreating inside the memento
 	 */
 	@Override
-	public void savePattern(IMemento memento) {
-		super.savePattern(memento);
+	public void saveMatcher(IMemento memento) {
+		super.saveMatcher(memento);
 		memento.putString(ATTR_PATH, path.toPortableString());
 	}
 	
@@ -99,10 +89,10 @@ public class PathResourceMatcher extends ResourceMatcher {
 	 * @throws NoSuchElementException
 	 * 				if expected data is not in the memento.
 	 */
-	public static ResourceMatcher loadPattern(IMemento memento) throws NoSuchElementException {
+	public static ResourceMatcher loadMatcher(IMemento memento) throws NoSuchElementException {
 		String p = memento.getString(ATTR_PATH);
 		if (p == null) {
-			throw new NoSuchElementException(Messages.PathPatternMatcher_0);
+			throw new NoSuchElementException(Messages.PathResourceMatcher_0);
 		}
 		return new PathResourceMatcher(Path.fromPortableString(p));
 	}

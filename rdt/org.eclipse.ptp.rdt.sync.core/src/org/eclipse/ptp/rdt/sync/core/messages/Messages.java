@@ -40,21 +40,19 @@ public class Messages extends NLS {
 	public static String BCM_LocalServiceError;
 	public static String BCM_ProjectError;
 
-	public static String BinaryPatternMatcher_0;
+	public static String BinaryResourceMatcher_0;
 
-	public static String BinaryPatternMatcher_1;
+	public static String PathResourceMatcher_0;
 
-	public static String BinaryPatternMatcher_2;
+	public static String RegexResourceMatcher_0;
 
-	public static String PathPatternMatcher_0;
+	public static String ResourceMatcher_0;
 
-	public static String PatternMatcher_0;
+	public static String ResourceMatcher_1;
 
-	public static String PatternMatcher_1;
+	public static String ResourceMatcher_2;
 
-	public static String PatternMatcher_2;
-
-	public static String RegexPatternMatcher_0;
+	public static String ResourceMatcher_3;
 
 	public static String WorkspaceConfigName;
 

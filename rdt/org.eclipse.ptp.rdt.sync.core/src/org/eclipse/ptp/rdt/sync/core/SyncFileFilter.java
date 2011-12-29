@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
@@ -188,7 +190,7 @@ public class SyncFileFilter {
 		for (ResourceMatcher pm : filteredPaths) {
 			IMemento pathMemento = memento.createChild(PATTERN_ELEMENT_NAME);
 			IMemento patternInternalMemento = pathMemento.createChild(PATTERN_INTERNAL_ELEMENT_NAME);
-			pm.savePattern(patternInternalMemento);
+			pm.saveMatcher(patternInternalMemento);
 			pathMemento.putInteger(ATTR_PATTERN_RANK, filteredPaths.indexOf(pm));
 			pathMemento.putString(ATTR_PATTERN_TYPE, patternToTypeMap.get(pm).name());
 		}
@@ -211,14 +213,11 @@ public class SyncFileFilter {
 			IMemento patternInternalMemento = pathMemento.getChild(PATTERN_INTERNAL_ELEMENT_NAME);
 			ResourceMatcher pm;
 			try {
-				pm = ResourceMatcher.loadPattern(patternInternalMemento);
+				pm = ResourceMatcher.loadMatcher(patternInternalMemento);
 			} catch (InvocationTargetException e) {
 				RDTSyncCorePlugin.log(Messages.SyncFileFilter_0 + e.getMessage(), e);
 				continue;
-			} catch (NoSuchMethodException e) {
-				RDTSyncCorePlugin.log(Messages.SyncFileFilter_0 + e.getMessage(), e);
-				continue;
-			} catch (ClassNotFoundException e) {
+			} catch (ParserConfigurationException e) {
 				RDTSyncCorePlugin.log(Messages.SyncFileFilter_0 + e.getMessage(), e);
 				continue;
 			}

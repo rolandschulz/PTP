@@ -22,8 +22,6 @@ import org.eclipse.ui.IMemento;
 /**
  * Class for matching a string against a regular expression.
  * Currently, we simply use java's regex engine.
- *
- *
  */
 public class RegexResourceMatcher extends ResourceMatcher {
 	private static final String ATTR_REGEX = "regex"; //$NON-NLS-1$
@@ -75,10 +73,7 @@ public class RegexResourceMatcher extends ResourceMatcher {
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((regex == null) ? 0 : regex.hashCode());
-		return result;
+		return regex.hashCode();
 	}
 
 	/* (non-Javadoc)
@@ -89,18 +84,11 @@ public class RegexResourceMatcher extends ResourceMatcher {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
-			return false;
-		}
 		if (!(obj instanceof RegexResourceMatcher)) {
 			return false;
 		}
 		RegexResourceMatcher other = (RegexResourceMatcher) obj;
-		if (regex == null) {
-			if (other.regex != null) {
-				return false;
-			}
-		} else if (!regex.equals(other.regex)) {
+		if (!regex.equals(other.regex)) {
 			return false;
 		}
 		return true;
@@ -110,8 +98,8 @@ public class RegexResourceMatcher extends ResourceMatcher {
 	 * Place needed data for recreating inside the memento
 	 */
 	@Override
-	public void savePattern(IMemento memento) {
-		super.savePattern(memento);
+	public void saveMatcher(IMemento memento) {
+		super.saveMatcher(memento);
 		memento.putString(ATTR_REGEX, regex);
 	}
 	
@@ -123,10 +111,10 @@ public class RegexResourceMatcher extends ResourceMatcher {
 	 * @throws NoSuchElementException
 	 * 				if expected data is not in the memento.
 	 */
-	public static ResourceMatcher loadPattern(IMemento memento) throws NoSuchElementException {
+	public static ResourceMatcher loadMatcher(IMemento memento) throws NoSuchElementException {
 		String r = memento.getString(ATTR_REGEX);
 		if (r == null) {
-			throw new NoSuchElementException(Messages.RegexPatternMatcher_0);
+			throw new NoSuchElementException(Messages.RegexResourceMatcher_0);
 		}
 		return new RegexResourceMatcher(memento.getString(ATTR_REGEX));
 	}

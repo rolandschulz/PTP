@@ -38,7 +38,7 @@ public class BinaryResourceMatcher extends ResourceMatcher {
 		}
 	}
 	
-	// All binary matchers should be equal
+	// All binary matchers are equal
 	@Override
 	public int hashCode() {
 		return 1;
@@ -54,6 +54,6 @@ public class BinaryResourceMatcher extends ResourceMatcher {
 	}
 
 	public String toString() {
-		return Messages.BinaryPatternMatcher_0;
+		return Messages.BinaryResourceMatcher_0;
 	}
 }

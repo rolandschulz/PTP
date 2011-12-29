@@ -14,6 +14,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
@@ -21,13 +22,19 @@ import org.eclipse.ui.IMemento;
 
 /**
  * Abstract class to be inherited to support various ways of testing strings.
- * Subclasses must implement either a public static "loadPattern" method that takes a memento or a default constructor to
- * support persistence. Otherwise, calling PatternMatcher.loadPattern(IMemento) for a saved instance will throw an exception.
+ * Subclasses must implement either a public static "loadMatcher" method that takes a memento or a default constructor to
+ * support persistence. Otherwise, calling PatternMatcher.loadMatcher(IMemento) for a saved instance will throw an exception.
  */
 public abstract class ResourceMatcher {
 	private static final String ATTR_CLASS_NAME = "class-name"; //$NON-NLS-1$
 	public abstract boolean match(IResource candidate);
+	
+	// This method should return a human readable name appropriate for displaying in a UI
 	public abstract String toString();
+	
+	// ideally, these two methods should identify two matchers as equal if and only if the set of matching resources is identical.
+	// This is used to remove duplicate matchers from the user's list. Matchers should be considered unequal if it is unknown whether
+	// they match the same set of resources. (This can happen with regular expressions, for example.)
 	public abstract boolean equals(Object o);
 	public abstract int hashCode();
 	
@@ -36,7 +43,7 @@ public abstract class ResourceMatcher {
 	 * additional data beyond the class type.
 	 * @param memento
 	 */
-	public void savePattern(IMemento memento) {
+	public void saveMatcher(IMemento memento) {
 		memento.putString(ATTR_CLASS_NAME, this.getClass().getName());
 	}
 
@@ -48,67 +55,70 @@ public abstract class ResourceMatcher {
 	 * @return new pattern matcher instance
 	 *
 	 * @throws InvocationTargetException
-	 * 					if an exception occurs inside subclass's static "loadPattern" method.
-	 * @throws NoSuchMethodException
-	 * 					if subclass does not contain either a static "loadPattern" method or a default constructor.
-	 * 					if the class name is not in the memento, is not known, or is not a PatternMatcher.
+	 * 					if an exception occurs inside subclass's static "loadMatcher" method.
+	 * @throws ParserConfigurationException
+	 * 					for various problems while parsing and attempting to instantiate the matcher class.
 	 */
-	public static ResourceMatcher loadPattern(IMemento memento) throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException {
+	public static ResourceMatcher loadMatcher(IMemento memento) throws InvocationTargetException, ParserConfigurationException {
 		String className = memento.getString(ATTR_CLASS_NAME);
 		if (className == null) {
-			throw new ClassNotFoundException(Messages.PatternMatcher_0);
+			throw new ParserConfigurationException(Messages.ResourceMatcher_1);
 		}
 
-		// Sanity check on the retrieved class
-		if (!ResourceMatcher.class.isAssignableFrom(Class.forName(className)) ||
-				Modifier.isAbstract(Class.forName(className).getModifiers())) {
-			throw new ClassNotFoundException(Messages.PatternMatcher_1);
-		}
-
-		// First, try to invoke the subclass's "loadPattern" method
-		boolean hasMethod = true;
-		Method subClassMethod = null;
 		try {
-			subClassMethod = Class.forName(className).getDeclaredMethod("loadPattern", IMemento.class); //$NON-NLS-1$
-		} catch (SecurityException e) {
-			hasMethod = false; // Treat as if method does not exist
-		} catch (NoSuchMethodException e) {
-			hasMethod = false;
-		}
-		
-		if (hasMethod && subClassMethod != null) {
-			try {
-				return (ResourceMatcher) subClassMethod.invoke(Class.forName(className), memento);
-			} catch (IllegalArgumentException e) {
-				assert(false); // This should never happen
-			} catch (IllegalAccessException e) {
-				// Treat as if method does not exist
+			// Sanity check on the retrieved class
+			if (!ResourceMatcher.class.isAssignableFrom(Class.forName(className)) ||
+					Modifier.isAbstract(Class.forName(className).getModifiers())) {
+				throw new ParserConfigurationException(Messages.ResourceMatcher_2);
 			}
-		}
 
-		// Next, try to instantiate from subclass's default constructor (code is very similar to the above).
-		hasMethod = true;
-		Constructor<? extends Object> subClassConstructor = null;
-		try {
-			subClassConstructor = Class.forName(className).getConstructor();
-		} catch (SecurityException e) {
-			hasMethod = false; // Treat as if method does not exist
-		} catch (NoSuchMethodException e) {
-			hasMethod = false;
-		}
-		
-		if (hasMethod && subClassConstructor != null) {
+			// First, try to invoke the subclass's "loadMatcher" method
+			boolean hasMethod = true;
+			Method subClassMethod = null;
 			try {
-				return (ResourceMatcher) subClassConstructor.newInstance();
-			} catch (IllegalArgumentException e) {
-				assert(false); // This should never happen
-			} catch (InstantiationException e) {
-				// Treat as if method does not exist
-			} catch (IllegalAccessException e) {
-				// Treat as if method does not exist
+				subClassMethod = Class.forName(className).getDeclaredMethod("loadMatcher", IMemento.class); //$NON-NLS-1$
+			} catch (SecurityException e) {
+				hasMethod = false; // Treat as if method does not exist
+			} catch (NoSuchMethodException e) {
+				hasMethod = false;
 			}
+
+			if (hasMethod && subClassMethod != null) {
+				try {
+					return (ResourceMatcher) subClassMethod.invoke(Class.forName(className), memento);
+				} catch (IllegalArgumentException e) {
+					assert(false); // This should never happen
+				} catch (IllegalAccessException e) {
+					// Treat as if method does not exist
+				}
+			}
+
+			// Next, try to instantiate from subclass's default constructor (code is very similar to the above).
+			hasMethod = true;
+			Constructor<? extends Object> subClassConstructor = null;
+			try {
+				subClassConstructor = Class.forName(className).getConstructor();
+			} catch (SecurityException e) {
+				hasMethod = false; // Treat as if method does not exist
+			} catch (NoSuchMethodException e) {
+				hasMethod = false;
+			}
+
+			if (hasMethod && subClassConstructor != null) {
+				try {
+					return (ResourceMatcher) subClassConstructor.newInstance();
+				} catch (IllegalArgumentException e) {
+					assert(false); // This should never happen
+				} catch (InstantiationException e) {
+					// Treat as if method does not exist
+				} catch (IllegalAccessException e) {
+					// Treat as if method does not exist
+				}
+			}
+		} catch (ClassNotFoundException e) {
+			throw new ParserConfigurationException(Messages.ResourceMatcher_0 + className);
 		}
 		
-		throw new NoSuchMethodException(Messages.PatternMatcher_2);
+		throw new ParserConfigurationException(Messages.ResourceMatcher_3);
 	}
 }
