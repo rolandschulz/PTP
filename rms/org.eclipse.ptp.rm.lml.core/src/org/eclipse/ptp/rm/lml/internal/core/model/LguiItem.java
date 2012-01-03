@@ -68,9 +68,7 @@ public class LguiItem implements ILguiItem {
 	 */
 	private final List<ILguiListener> listeners = new LinkedList<ILguiListener>();
 
-	private final Map<String, Map<String, IPattern>> oldFilters = new HashMap<String, Map<String, IPattern>>();
-
-	private final Map<String, Map<String, IPattern>> newFilters = new HashMap<String, Map<String, IPattern>>();
+	private final Map<String, List<IPattern>> filters = new HashMap<String, List<IPattern>>();
 
 	/**
 	 * List of encapsulated classes, which handle parts of the lml-hierarchy
@@ -101,7 +99,7 @@ public class LguiItem implements ILguiItem {
 	 */
 	public LguiItem(LguiType lgui) {
 		this.lgui = lgui;
-		// TODO Give the LguiItem a name
+		// k
 		createLguiHandlers();
 	}
 
@@ -388,12 +386,15 @@ public class LguiItem implements ILguiItem {
 		return writer.getBuffer().toString();
 	}
 
-	public void setPattern(Map<String, IPattern> filterValues, String gid) {
+	public void setPattern(String gid, List<IPattern> filterValues) {
 		while (lockUpdate) {
 			// wait until the update with the server is finished
 		}
 		lockPattern = true;
-		// TODO setPattern
+		if (filters.containsKey(gid)) {
+			filters.remove(gid);
+		}
+		filters.put(gid, filterValues);
 		lockPattern = false;
 	}
 
@@ -718,6 +719,14 @@ public class LguiItem implements ILguiItem {
 			}
 		}
 
+	}
+
+	@Override
+	public List<IPattern> getPattern(String gid) {
+		if (filters.containsKey(gid)) {
+			return filters.get(gid);
+		}
+		return new LinkedList<IPattern>();
 	}
 
 }

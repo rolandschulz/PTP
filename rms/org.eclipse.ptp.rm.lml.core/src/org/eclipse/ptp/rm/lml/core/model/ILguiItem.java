@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.lml.core.model;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
@@ -176,7 +177,7 @@ public interface ILguiItem {
 	 */
 	public String saveCurrentLayout();
 
-	public void setPattern(Map<String, IPattern> filterValues, String gid);
+	public void setPattern(String gid, List<IPattern> filterValues);
 
 	public void setRequest(RequestType request);
 
@@ -200,4 +201,6 @@ public interface ILguiItem {
 	 * @param detail
 	 */
 	public void updateUserJob(String name, String status, String detail);
+
+	public List<IPattern> getPattern(String gid);
 }

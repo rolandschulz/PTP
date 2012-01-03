@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+// TODO Handling the status column in joblistactive
 public class FilterDialog extends Dialog {
 
 	public class SelectDateAdpater extends SelectionAdapter {
@@ -203,6 +204,7 @@ public class FilterDialog extends Dialog {
 		if (buttonId == IDialogConstants.OK_ID) {
 			// Okay Button
 			// TODO Write in LguiItem
+			lguiItem.setPattern(gid, filterValues);
 			close();
 		}
 
@@ -488,7 +490,50 @@ public class FilterDialog extends Dialog {
 
 		scrolledComposite.setMinSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		scrolledComposite.setSize(100, 400);
-		// System.out.println(scrolledComposite.getVerticalBar().getIncrement());
+		
+		List<IPattern> oldFilters = lguiItem.getPattern(gid);
+		if (oldFilters.size() > 0) {
+			for (IPattern filter : oldFilters) {
+				for (FilterDataRow row : filterData) {
+					if (!filter.getColumnTitle().equals(row.getTitle())) {
+						continue;
+					}
+					if (filter.getType().equals("alpha")) {
+						row.getRelationValueTextNumeric().setText(filter.getRelationValue());
+						String[] items = row.getRelationComboAlpha().getItems();
+						for (int i = 0; i < items.length; i++) {
+							if (filter.getRelationOperator().equals(items[i])) {
+								row.getRelationComboAlpha().select(i);
+							}
+						};
+					} else {
+						if (filter.isRange()) {
+							row.getRadioButtonRange().setSelection(true);
+							if (filter.getType().equals("numeric")) {
+								row.getMinValueTextNumeric().setText(filter.getMinValueRange());
+								row.getMaxValueTextNumeric().setText(filter.getMaxValueRange());
+							} else {
+								row.getMinValueButtonDate().setText(filter.getMinValueRange());
+								row.getMaxValueButtonDate().setText(filter.getMaxValueRange());
+							}
+						} else if (filter.isRelation()) {
+							String[] items = row.getRelationComboNumericDate().getItems();
+							for (int i = 0; i < items.length; i++) {
+								if (filter.getRelationOperator().equals(items[i])) {
+									row.getRelationComboNumericDate().select(i);
+								}
+							};
+							row.getRadioButtonRelation().setSelection(true);
+							if (filter.getType().equals("numeric")) {
+								row.getRelationValueTextNumeric().setText(filter.getRelationValue());
+							} else {
+								row.getRelationValueButtonDate().setText(filter.getRelationValue());
+							}
+						}
+					}
+				}
+			}
+		}
 		return scrolledComposite;
 	}
 
