@@ -21,26 +21,21 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.core;
 
-import java.net.MalformedURLException;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.lml.core.messages.Messages;
 import org.eclipse.ptp.rm.lml.core.util.DebugUtil;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.xml.sax.SAXException;
 
 public class LMLCorePlugin extends Plugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.lml.core"; //$NON-NLS-1$
@@ -48,21 +43,22 @@ public class LMLCorePlugin extends Plugin {
 	// The shared instance.
 	private static LMLCorePlugin fPlugin;
 
-	/*
-	 * Unmarshaller for JAXB-generator
-	 */
-	private static Unmarshaller unmarshaller;
-
-	/*
-	 * Marshaller for JAXB-model
-	 */
-	private static Marshaller marshaller;
-
 	/**
 	 * Returns the shared instance.
 	 */
 	public static LMLCorePlugin getDefault() {
 		return fPlugin;
+	}
+
+	public static URL getResource(String resource) throws IOException {
+		URL url = null;
+		if (getDefault() != null) {
+			final Bundle bundle = getDefault().getBundle();
+			url = FileLocator.find(bundle, new Path(ILMLCoreConstants.PATH_SEP + resource), null);
+		} else {
+			url = new File(resource).toURI().toURL();
+		}
+		return url;
 	}
 
 	/**
@@ -144,44 +140,10 @@ public class LMLCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Get the JAXB marshaller
-	 * 
-	 * @return the JAXB marshaller
-	 */
-	public Marshaller getMarshaller() {
-		if (marshaller == null) {
-			try {
-				createMarshaller();
-			} catch (final JAXBException e) {
-				log(e);
-			}
-		}
-		return marshaller;
-	}
-
-	/**
 	 * Returns the plugin's resource bundle,
 	 */
 	public ResourceBundle getResourceBundle() {
 		return resourceBundle;
-	}
-
-	/**
-	 * Get the JAXB unmarshaller.
-	 * 
-	 * @return the JAXB unmarshaller
-	 */
-	public Unmarshaller getUnmarshaller() {
-		if (unmarshaller == null) {
-			try {
-				createUnmarshaller();
-			} catch (final JAXBException e) {
-				log(e);
-			} catch (final MalformedURLException e) {
-				log(e);
-			}
-		}
-		return unmarshaller;
 	}
 
 	/**
@@ -190,7 +152,6 @@ public class LMLCorePlugin extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		createUnmarshaller();
 		DebugUtil.configurePluginDebugOptions();
 	}
 
@@ -204,49 +165,6 @@ public class LMLCorePlugin extends Plugin {
 		} finally {
 			super.stop(context);
 			fPlugin = null;
-		}
-	}
-
-	private void createMarshaller() throws JAXBException {
-		final JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements", //$NON-NLS-1$
-				LMLCorePlugin.class.getClassLoader());
-		marshaller = jc.createMarshaller();
-	}
-
-	/**
-	 * For the generation of instances from classes by JAXB a unmarshaller is
-	 * needed. In the method the needed unmarshaller is created. It is said
-	 * where the classes for the instantiation are.
-	 * 
-	 * @throws MalformedURLException
-	 * @throws JAXBException
-	 */
-	private void createUnmarshaller() throws MalformedURLException, JAXBException {
-		final URL xsd = getBundle().getEntry("/schema/lgui.xsd"); //$NON-NLS-1$
-
-		final JAXBContext jc = JAXBContext.newInstance("org.eclipse.ptp.rm.lml.internal.core.elements", //$NON-NLS-1$
-				LMLCorePlugin.class.getClassLoader());
-
-		unmarshaller = jc.createUnmarshaller();
-
-		// if xsd is null => do not check for validity
-		if (xsd != null) {
-
-			Schema mySchema;
-			final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-			try {
-
-				mySchema = sf.newSchema(xsd);
-			} catch (final SAXException saxe) {
-				// ...(error handling)
-				mySchema = null;
-
-			}
-
-			// Connect schema to unmarshaller
-			unmarshaller.setSchema(mySchema);
-
 		}
 	}
 
