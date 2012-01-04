@@ -49,6 +49,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String syncDefaultFileList = "sync_default_file_list"; //$NON-NLS-1$
 	private static final String syncExcludeCommand = "sync_exclude"; //$NON-NLS-1$
 	private static final String syncIncludeCommand = "sync_include"; //$NON-NLS-1$
+	private static final String syncMergeCommand = "sync_merge"; //$NON-NLS-1$
 
 	public Object execute(ExecutionEvent event) {
 		String command = event.getParameter(SYNC_COMMAND_PARAMETER_ID);
@@ -110,6 +111,8 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				SyncFileFilterPage.open(project, null);
 			} else if (command.equals(syncDefaultFileList)) {
 				SyncFileFilterPage.open(null, null);
+			} else if (command.equals(syncMergeCommand)) {
+				new SyncMergeEditor().open();
 			}
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
