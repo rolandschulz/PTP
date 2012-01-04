@@ -116,6 +116,10 @@ public interface ILguiItem {
 	 */
 	public OverviewAccess getOverviewAccess();
 
+	public Map<String, List<IPattern>> getPattern();
+
+	public List<IPattern> getPattern(String gid);
+
 	/**
 	 * @return
 	 */
@@ -177,6 +181,8 @@ public interface ILguiItem {
 	 */
 	public String saveCurrentLayout();
 
+	public void setPattern(Map<String, List<IPattern>> pattern);
+
 	public void setPattern(String gid, List<IPattern> filterValues);
 
 	public void setRequest(RequestType request);
@@ -201,6 +207,4 @@ public interface ILguiItem {
 	 * @param detail
 	 */
 	public void updateUserJob(String name, String status, String detail);
-
-	public List<IPattern> getPattern(String gid);
 }

@@ -164,6 +164,10 @@ public class FilterDataRow {
 		valueNumeric = value;
 	}
 
+	public Button getCheckbox() {
+		return checkbox;
+	}
+
 	/**
 	 * Getting the button with the maximal value (date).
 	 * 
@@ -288,5 +292,9 @@ public class FilterDataRow {
 	 */
 	public boolean isCheckboxSet() {
 		return checkbox.getSelection();
+	}
+
+	public void setCheckbox(boolean value) {
+		checkbox.setSelection(value);
 	}
 }

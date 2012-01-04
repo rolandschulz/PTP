@@ -22,6 +22,7 @@ import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.ITableFilterEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
@@ -34,6 +35,7 @@ import org.eclipse.ptp.rm.lml.internal.core.events.LguiAddedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.MarkObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.SelectObjectEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.TableFilterEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.TableSortedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.UnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.UnselectObjectEvent;
@@ -106,8 +108,8 @@ public class LMLManager {
 
 	}
 
-	public void filter(String gid, List<IPattern> filterValues) {
-
+	public void filterLgui(String gid, List<IPattern> filterValues) {
+		fireFilterLgui(gid, filterValues);
 	}
 
 	public String getCurrentLayout(String name) {
@@ -124,6 +126,18 @@ public class LMLManager {
 			return string;
 		}
 		return null;
+	}
+
+	public Map<String, List<IPattern>> getCurrentPattern(String name) {
+		ILguiItem item = null;
+		synchronized (LGUIS) {
+			item = LGUIS.get(name);
+		}
+		if (item != null) {
+			final Map<String, List<IPattern>> map = item.getPattern();
+			return map;
+		}
+		return new HashMap<String, List<IPattern>>();
 	}
 
 	public ILguiItem getSelectedLguiItem() {
@@ -164,8 +178,10 @@ public class LMLManager {
 	 *            Layout from an earlier Eclipse session
 	 * @param jobs
 	 *            Array of earlier started jobs
+	 * @param pattern
 	 */
-	public void openLgui(String name, String username, RequestType request, StringBuilder layout, JobStatusData[] jobs) {
+	public void openLgui(String name, String username, RequestType request, StringBuilder layout, JobStatusData[] jobs,
+			Map<String, List<IPattern>> pattern) {
 		synchronized (LGUIS) {
 			ILguiItem item = LGUIS.get(name);
 			if (item == null) {
@@ -177,6 +193,7 @@ public class LMLManager {
 
 		fLguiItem.reloadLastLayout(layout);
 		fLguiItem.setRequest(request);
+		fLguiItem.setPattern(pattern);
 		restoreJobStatusData(fLguiItem, jobs);
 
 		if (!fLguiItem.isEmpty()) {
@@ -265,6 +282,13 @@ public class LMLManager {
 
 	private void fireChangeSelectedObject(String oid) {
 		final ISelectObjectEvent event = new SelectObjectEvent(oid);
+		for (final Object listener : viewListeners.getListeners()) {
+			((ILMLListener) listener).handleEvent(event);
+		}
+	}
+
+	private void fireFilterLgui(String gid, List<IPattern> filterValues) {
+		final ITableFilterEvent event = new TableFilterEvent(gid, filterValues);
 		for (final Object listener : viewListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}

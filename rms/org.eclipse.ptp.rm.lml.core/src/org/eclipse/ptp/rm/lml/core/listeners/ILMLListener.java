@@ -12,6 +12,7 @@ import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.ITableFilterEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
@@ -30,13 +31,15 @@ public interface ILMLListener {
 
 	public void handleEvent(ISelectObjectEvent event);
 
+	public void handleEvent(ITableFilterEvent event);
+
 	/**
 	 * Handles an IJobListSortedEevnt.
 	 * 
-	 * @param e
+	 * @param event
 	 *            an IJobListSortedEvent
 	 */
-	public void handleEvent(ITableSortedEvent e);
+	public void handleEvent(ITableSortedEvent event);
 
 	public void handleEvent(IUnmarkObjectEvent event);
 

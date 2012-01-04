@@ -418,15 +418,87 @@ public class TableHandler extends LguiHandler {
 
 		// Filter the rows
 		final List<Row> filterRows = new ArrayList<Row>();
-		// TODO turn around
 		for (final Row row : rows) {
 			boolean allIncluded = true;
 			for (final int position : filterPosValues.keySet()) {
-				// TODO take relations into account
-				// TODO changes of the input
-				if (!row.cells[position].value.equals(filterPosValues.get(position).getRelationValue())) {
-					allIncluded = false;
-					break;
+
+				if (row.cells[position] == null) {
+					continue;
+				}
+				final IPattern pattern = filterPosValues.get(position);
+				final String rowValue = row.cells[position].value;
+
+				final String type = pattern.getType();
+
+				if (pattern.isRange()) {
+					// Range
+					final String minValue = pattern.getMinValueRange();
+					final String maxValue = pattern.getMaxValueRange();
+					if (type.equals("numeric")) {
+						if ((Integer.valueOf(rowValue) < Integer.valueOf(minValue))
+								|| (Integer.valueOf(maxValue) < Integer.valueOf(rowValue))) {
+							allIncluded = false;
+							break;
+						}
+					} else {
+						if (rowValue.compareTo(minValue) < 0 || maxValue.compareTo(rowValue) < 0) {
+							allIncluded = false;
+							break;
+						}
+					}
+				} else if (pattern.isRelation()) {
+					// Relation
+					final String compareValue = pattern.getRelationValue();
+					final String compareOperator = pattern.getRelationOperator();
+					if (type.equals("numeric")) {
+						final int rowValueInt = Integer.valueOf(rowValue);
+						final int compareValueInt = Integer.valueOf(compareValue);
+						if (compareOperator.equals("=") && rowValueInt != compareValueInt) {
+							allIncluded = false;
+							break;
+						} else if (compareOperator.equals("!=") && rowValueInt == compareValueInt) {
+							allIncluded = false;
+							break;
+						} else if (compareOperator.equals("<") && rowValueInt >= compareValueInt) {
+							allIncluded = false;
+							break;
+						} else if (compareOperator.equals("<=") && rowValueInt > compareValueInt) {
+							allIncluded = false;
+							break;
+						} else if (compareOperator.equals(">") && rowValueInt <= compareValueInt) {
+							allIncluded = false;
+							break;
+						} else if (compareOperator.equals(">=") && rowValueInt < compareValueInt) {
+							allIncluded = false;
+							break;
+						}
+					} else {
+						if ((compareOperator.equals("=") && !compareValue.equals(rowValue))
+								|| (compareOperator.equals("!=") && compareValue.equals(rowValue))) {
+							allIncluded = false;
+							break;
+						} else if (type.equals("alpha")) {
+							if ((compareOperator.equals("=~") && !rowValue.contains(compareValue))
+									|| (compareOperator.equals("!~") && rowValue.contains(compareValue))) {
+								allIncluded = false;
+								break;
+							}
+						} else if (type.equals("date")) {
+							if (compareOperator.equals("<") && rowValue.compareTo(compareValue) >= 0) {
+								allIncluded = false;
+								break;
+							} else if (compareOperator.equals("<=") && rowValue.compareTo(compareValue) > 0) {
+								allIncluded = false;
+								break;
+							} else if (compareOperator.equals(">") && rowValue.compareTo(compareValue) <= 0) {
+								allIncluded = false;
+								break;
+							} else if (compareOperator.equals(">=") && rowValue.compareTo(compareValue) < 0) {
+								allIncluded = false;
+								break;
+							}
+						}
+					}
 				}
 			}
 			if (allIncluded) {

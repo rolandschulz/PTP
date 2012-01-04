@@ -68,7 +68,7 @@ public class LguiItem implements ILguiItem {
 	 */
 	private final List<ILguiListener> listeners = new LinkedList<ILguiListener>();
 
-	private final Map<String, List<IPattern>> filters = new HashMap<String, List<IPattern>>();
+	private Map<String, List<IPattern>> filters = new HashMap<String, List<IPattern>>();
 
 	/**
 	 * List of encapsulated classes, which handle parts of the lml-hierarchy
@@ -99,7 +99,6 @@ public class LguiItem implements ILguiItem {
 	 */
 	public LguiItem(LguiType lgui) {
 		this.lgui = lgui;
-		// k
 		createLguiHandlers();
 	}
 
@@ -237,6 +236,17 @@ public class LguiItem implements ILguiItem {
 			return null;
 		}
 		return (OverviewAccess) lguiHandlers.get(OverviewAccess.class);
+	}
+
+	public Map<String, List<IPattern>> getPattern() {
+		return filters;
+	}
+
+	public List<IPattern> getPattern(String gid) {
+		if (filters.containsKey(gid)) {
+			return filters.get(gid);
+		}
+		return new LinkedList<IPattern>();
 	}
 
 	public TableHandler getTableHandler() {
@@ -384,6 +394,12 @@ public class LguiItem implements ILguiItem {
 		}
 		jaxbUtil.marshal(layoutLgui, writer);
 		return writer.getBuffer().toString();
+	}
+
+	public void setPattern(Map<String, List<IPattern>> pattern) {
+		if (pattern != null) {
+			filters = pattern;
+		}
 	}
 
 	public void setPattern(String gid, List<IPattern> filterValues) {
@@ -719,14 +735,6 @@ public class LguiItem implements ILguiItem {
 			}
 		}
 
-	}
-
-	@Override
-	public List<IPattern> getPattern(String gid) {
-		if (filters.containsKey(gid)) {
-			return filters.get(gid);
-		}
-		return new LinkedList<IPattern>();
 	}
 
 }

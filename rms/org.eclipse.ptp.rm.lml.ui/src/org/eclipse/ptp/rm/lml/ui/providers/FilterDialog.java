@@ -35,26 +35,46 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-// TODO Handling the status column in joblistactive
 public class FilterDialog extends Dialog {
 
 	public class SelectDateAdpater extends SelectionAdapter {
 
 		private final Button button;
 
+		private String date;
+
+		private Button comparisonButton = null;
+
 		public SelectDateAdpater(Button button) {
 			super();
 			this.button = button;
+			if (button.getText() == null) {
+				date = new String();
+			} else {
+				date = button.getText();
+			}
+		}
+
+		public SelectDateAdpater(Button button, Button comparisonButton) {
+			super();
+			this.button = button;
+			this.comparisonButton = comparisonButton;
+			date = comparisonButton.getText();
 		}
 
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			final Shell dialog = new Shell(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-			dialog.setLayout(new GridLayout(2, false));
+			dialog.setLayout(new GridLayout(5, false));
+
+			if (button.getText().length() == 0 && comparisonButton != null && comparisonButton.getText().length() > 0) {
+				date = comparisonButton.getText();
+			}
 
 			final DateTime calendar = new DateTime(dialog, SWT.CALENDAR | SWT.BORDER);
-			calendar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 			final DateTime time = new DateTime(dialog, SWT.TIME);
+
+			calendar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 5, 1));
 			time.setLayoutData(new GridData());
 
 			final Button ok = new Button(dialog, SWT.PUSH);
@@ -67,9 +87,40 @@ public class FilterDialog extends Dialog {
 					button.setText(calendar.getYear() + "-" + formatter.format(calendar.getMonth() + 1) + "-"
 							+ formatter.format(calendar.getDay()) + " " + formatter.format(time.getHours()) + ":"
 							+ formatter.format(time.getMinutes()) + ":" + formatter.format(time.getSeconds()));
+					date = button.getText();
 					dialog.close();
 				}
 			});
+
+			final Button delete = new Button(dialog, SWT.PUSH);
+			delete.setText("Delete");
+			delete.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			delete.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					button.setText("");
+					date = new String();
+					dialog.close();
+				}
+			});
+
+			final Button cancel = new Button(dialog, SWT.PUSH);
+			cancel.setText("Cancel");
+			cancel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			cancel.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					dialog.close();
+				}
+			});
+
+			if (!date.isEmpty()) {
+				calendar.setDate(Integer.valueOf(date.substring(0, 4)), Integer.valueOf(date.substring(5, 7)) - 1,
+						Integer.valueOf(date.substring(8, 10)));
+				time.setTime(Integer.valueOf(date.substring(11, 13)), Integer.valueOf(date.substring(14, 16)),
+						Integer.valueOf(date.substring(17)));
+			}
+
 			dialog.setDefaultButton(ok);
 			dialog.pack();
 			dialog.open();
@@ -84,10 +135,13 @@ public class FilterDialog extends Dialog {
 
 	private final Shell shell;
 
+	private final List<IPattern> filterOld;
+
 	public FilterDialog(Shell parentShell, String gid) {
 		super(parentShell);
 		lguiItem = LMLManager.getInstance().getSelectedLguiItem();
 		this.gid = gid;
+		filterOld = lguiItem.getPattern(gid);
 		setShellStyle(SWT.RESIZE | SWT.APPLICATION_MODAL);
 		this.shell = parentShell;
 	}
@@ -106,7 +160,8 @@ public class FilterDialog extends Dialog {
 
 		if (buttonId == IDialogConstants.CANCEL_ID) {
 			// Cancel Button
-			// TODO Old patterns should be set back
+			LMLManager.getInstance().filterLgui(gid, filterOld);
+			lguiItem.setPattern(gid, filterOld);
 			close();
 			return;
 		}
@@ -156,9 +211,17 @@ public class FilterDialog extends Dialog {
 		}
 
 		if (error) {
-			final Status status = new Status(IStatus.ERROR, "Missing/wrong arguments", 0, "Error", null);
-			// TODO Write messages
-			final ErrorDialog dialog = new ErrorDialog(shell, "Missing/wrong arguments", "", status, IStatus.ERROR);
+			final Status status = new Status(
+					IStatus.ERROR,
+					"Missing/wrong arguments",
+					0,
+					"- there is/are one/more requested value(s) missing\n- or the minimal value of a range is bigger than the maximal value.",
+					null);
+			final ErrorDialog dialog = new ErrorDialog(
+					shell,
+					"Missing/wrong arguments",
+					"An error occured!",
+					status, IStatus.ERROR);
 			dialog.open();
 			return;
 		}
@@ -199,12 +262,11 @@ public class FilterDialog extends Dialog {
 			}
 		}
 
-		LMLManager.getInstance().filter(gid, filterValues);
+		LMLManager.getInstance().filterLgui(gid, filterValues);
+		lguiItem.setPattern(gid, filterValues);
 
 		if (buttonId == IDialogConstants.OK_ID) {
 			// Okay Button
-			// TODO Write in LguiItem
-			lguiItem.setPattern(gid, filterValues);
 			close();
 		}
 
@@ -220,8 +282,8 @@ public class FilterDialog extends Dialog {
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
-		createButton(parent, 5, "Apply", true);
-		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, true);
+		createButton(parent, 5, "Apply", false);
+		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
 	@Override
@@ -318,7 +380,6 @@ public class FilterDialog extends Dialog {
 				radioButtonRelation.setLayoutData(new GridData());
 				radioButtonRelation.setSelection(true);
 				radioButtonRelation.setEnabled(false);
-				radioButtonRelation.setText("");
 
 				row.addRadioRelation(radioButtonRelation);
 
@@ -399,7 +460,6 @@ public class FilterDialog extends Dialog {
 					final Button buttonValueMin = new Button(compositeRange, SWT.NONE);
 					buttonValueMin.setEnabled(false);
 					buttonValueMin.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-					buttonValueMin.addSelectionListener(new SelectDateAdpater(buttonValueMin));
 
 					final Label labelMinus = new Label(compositeRange, SWT.NONE);
 					labelMinus.setText(" - ");
@@ -408,7 +468,9 @@ public class FilterDialog extends Dialog {
 					final Button buttonValueMax = new Button(compositeRange, SWT.NONE);
 					buttonValueMax.setEnabled(false);
 					buttonValueMax.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-					buttonValueMax.addSelectionListener(new SelectDateAdpater(buttonValueMax));
+
+					buttonValueMin.addSelectionListener(new SelectDateAdpater(buttonValueMin, buttonValueMax));
+					buttonValueMax.addSelectionListener(new SelectDateAdpater(buttonValueMax, buttonValueMin));
 
 					row.addMinValueDate(buttonValueMin);
 					row.addMaxValueDate(buttonValueMax);
@@ -480,6 +542,61 @@ public class FilterDialog extends Dialog {
 				}
 			});
 
+			final List<IPattern> oldFilters = lguiItem.getPattern(gid);
+			if (oldFilters.size() > 0) {
+				for (final IPattern filter : oldFilters) {
+					if (!filter.getColumnTitle().equals(row.getTitle())) {
+						continue;
+					}
+					row.getCheckbox().setSelection(true);
+					if (filter.getType().equals("alpha")) {
+						row.getRelationValueTextAlpha().setText(filter.getRelationValue());
+						row.getRelationValueTextAlpha().setEnabled(true);
+						final String[] items = row.getRelationComboAlpha().getItems();
+						row.getRelationComboAlpha().setEnabled(true);
+						for (int j = 0; j < items.length; j++) {
+							if (filter.getRelationOperator().equals(items[j])) {
+								row.getRelationComboAlpha().select(j);
+							}
+						}
+					} else {
+						row.getRadioButtonRange().setEnabled(true);
+						row.getRadioButtonRelation().setEnabled(true);
+						if (filter.isRange()) {
+							row.getRadioButtonRange().setSelection(true);
+							row.getRadioButtonRelation().setSelection(false);
+							if (filter.getType().equals("numeric")) {
+								row.getMinValueTextNumeric().setText(filter.getMinValueRange());
+								row.getMaxValueTextNumeric().setText(filter.getMaxValueRange());
+								row.getMinValueTextNumeric().setEnabled(true);
+								row.getMaxValueTextNumeric().setEnabled(true);
+							} else {
+								row.getMinValueButtonDate().setText(filter.getMinValueRange());
+								row.getMaxValueButtonDate().setText(filter.getMaxValueRange());
+								row.getMinValueButtonDate().setEnabled(true);
+								row.getMaxValueButtonDate().setEnabled(true);
+							}
+						} else if (filter.isRelation()) {
+							row.getRadioButtonRelation().setSelection(true);
+							row.getRelationComboNumericDate().setEnabled(true);
+							final String[] items = row.getRelationComboNumericDate().getItems();
+							for (int j = 0; j < items.length; j++) {
+								if (filter.getRelationOperator().equals(items[j])) {
+									row.getRelationComboNumericDate().select(j);
+								}
+							}
+							if (filter.getType().equals("numeric")) {
+								row.getRelationValueTextNumeric().setText(filter.getRelationValue());
+								row.getRelationValueTextNumeric().setEnabled(true);
+							} else {
+								row.getRelationValueButtonDate().setText(filter.getRelationValue());
+								row.getRelationValueButtonDate().setEnabled(true);
+							}
+						}
+					}
+				}
+			}
+
 			filterData[i - dif] = row;
 		}
 
@@ -490,65 +607,7 @@ public class FilterDialog extends Dialog {
 
 		scrolledComposite.setMinSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		scrolledComposite.setSize(100, 400);
-		
-		List<IPattern> oldFilters = lguiItem.getPattern(gid);
-		if (oldFilters.size() > 0) {
-			for (IPattern filter : oldFilters) {
-				for (FilterDataRow row : filterData) {
-					if (!filter.getColumnTitle().equals(row.getTitle())) {
-						continue;
-					}
-					if (filter.getType().equals("alpha")) {
-						row.getRelationValueTextNumeric().setText(filter.getRelationValue());
-						String[] items = row.getRelationComboAlpha().getItems();
-						for (int i = 0; i < items.length; i++) {
-							if (filter.getRelationOperator().equals(items[i])) {
-								row.getRelationComboAlpha().select(i);
-							}
-						};
-					} else {
-						if (filter.isRange()) {
-							row.getRadioButtonRange().setSelection(true);
-							if (filter.getType().equals("numeric")) {
-								row.getMinValueTextNumeric().setText(filter.getMinValueRange());
-								row.getMaxValueTextNumeric().setText(filter.getMaxValueRange());
-							} else {
-								row.getMinValueButtonDate().setText(filter.getMinValueRange());
-								row.getMaxValueButtonDate().setText(filter.getMaxValueRange());
-							}
-						} else if (filter.isRelation()) {
-							String[] items = row.getRelationComboNumericDate().getItems();
-							for (int i = 0; i < items.length; i++) {
-								if (filter.getRelationOperator().equals(items[i])) {
-									row.getRelationComboNumericDate().select(i);
-								}
-							};
-							row.getRadioButtonRelation().setSelection(true);
-							if (filter.getType().equals("numeric")) {
-								row.getRelationValueTextNumeric().setText(filter.getRelationValue());
-							} else {
-								row.getRelationValueButtonDate().setText(filter.getRelationValue());
-							}
-						}
-					}
-				}
-			}
-		}
+
 		return scrolledComposite;
 	}
-
-	// @Override
-	// protected void okPressed() {
-	//
-	// // TODO lguiItem.getTableHandler().deletePattern();
-	// //
-	// // final String stringCombo = combo.getText();
-	// // if (!stringCombo.equals("No Filtering")) {
-	// // final String stringText = text.getText();
-	// // TODO lguiItem.getTableHandler().generatePattern(stringCombo,
-	// // stringText);
-	// // LMLManager.getInstance().filterLgui(stringCombo, stringText);
-	// // }
-	// close();
-	// }
 }

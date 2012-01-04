@@ -41,6 +41,7 @@ import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.ITableFilterEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
@@ -208,6 +209,39 @@ public class TableView extends ViewPart {
 
 		}
 
+		public void handleEvent(final ITableFilterEvent event) {
+			if (event.getGid().equals(gid)) {
+				UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+					public void run() throws Exception {
+						if (composite != null && viewCreated) {
+							if (selectedItem != null && !selectedItem.isDisposed()) {
+								lmlManager.unmarkObject(selectedItem.getData().toString());
+								selectedItem = null;
+							}
+							if (componentAdded) {
+								if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
+									fLguiItem.getObjectStatus().removeComponent(eventForwarder);
+								}
+								componentAdded = false;
+							}
+							fLguiItem = lmlManager.getSelectedLguiItem();
+
+							if (fLguiItem != null && fLguiItem.getTableHandler() != null && tree.getSortColumn() != null) {
+								fLguiItem.getTableHandler().getSortProperties(gid);
+								fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
+							}
+							setViewerInput(event.getPattern());
+							if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
+								fLguiItem.getObjectStatus().addComponent(eventForwarder);
+								componentAdded = true;
+							}
+
+						}
+					}
+				});
+			}
+		}
+
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -220,7 +254,11 @@ public class TableView extends ViewPart {
 							&& tree.getSortColumn() != null) {
 						fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
 					}
-					setViewerInput();
+					if (fLguiItem.getPattern(gid).size() > 0) {
+						setViewerInput(fLguiItem.getPattern(gid));
+					} else {
+						setViewerInput();
+					}
 				}
 			});
 
@@ -286,7 +324,12 @@ public class TableView extends ViewPart {
 							fLguiItem.getTableHandler().getSortProperties(gid);
 							fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
 						}
-						setViewerInput();
+						if (fLguiItem.getPattern(gid).size() > 0) {
+							System.out.println("here");
+							setViewerInput(fLguiItem.getPattern(gid));
+						} else {
+							setViewerInput();
+						}
 						if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
 							fLguiItem.getObjectStatus().addComponent(eventForwarder);
 							componentAdded = true;
@@ -408,7 +451,7 @@ public class TableView extends ViewPart {
 					filterValues.add((new Pattern("owner", "alpha")).setRelation("=", fLguiItem.getUsername()));
 				}
 				// TODO After decision about new structure of LML and server side
-				// fLguiItem.setPattern(filterValues, gid);
+				fLguiItem.setPattern(gid, filterValues);
 				setViewerInput(filterValues);
 			}
 
@@ -466,7 +509,11 @@ public class TableView extends ViewPart {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (viewer != null) {
-					setViewerInput();
+					if (fLguiItem.getPattern(gid).size() > 0) {
+						setViewerInput(fLguiItem.getPattern(gid));
+					} else {
+						setViewerInput();
+					}
 					viewer.refresh();
 				}
 				return Status.OK_STATUS;
@@ -728,10 +775,15 @@ public class TableView extends ViewPart {
 				filterOwnJobsActionItem.getAction().setEnabled(true);
 				filterActionItem.getAction().setEnabled(true);
 			}
-		}
 
-		// Insert the input
-		setViewerInput();
+			// Insert the input
+			if (fLguiItem.getPattern(gid).size() > 0) {
+				setViewerInput(fLguiItem.getPattern(gid));
+			} else {
+				setViewerInput();
+			}
+
+		}
 		composite.layout();
 	}
 
