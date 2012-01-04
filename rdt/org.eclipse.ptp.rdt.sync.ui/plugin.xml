@@ -220,6 +220,15 @@
                   class="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu"
                   id="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu">
             </dynamic>
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  label="Resolve Merge Conflict"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_merge">
+               </parameter>
+            </command>
          </menu>
       </menuContribution>
    </extension>
