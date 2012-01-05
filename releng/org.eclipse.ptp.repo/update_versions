@@ -1,0 +1,72 @@
+#!/bin/sh
+#
+# script to update PTP versions
+#
+# Usage: update_versions ptp_version
+#
+# ptp_version - new version string for PTP (e.g. "5.0.1")
+#
+# Note: a "qualifier" suffix will automatically be added to the version where appropriate
+#
+
+TMP_DIR=/tmp
+
+if [ $# -lt 1 ]; then
+	echo "usage: update_versions ptp_version"
+	exit 1
+fi
+
+ptp_version=$1
+
+PTP_FEATURES="\
+	org.eclipse.ptp-feature \
+	org.eclipse.ptp.core-feature \
+	org.eclipse.ptp.etfw-feature \
+	org.eclipse.ptp.etfw.ppw-feature \
+	org.eclipse.ptp.etfw.tau-feature \
+	org.eclipse.ptp.etfw.tau.fortran-feature \
+	org.eclipse.ptp.external-feature \
+	org.eclipse.ptp.gem-feature \
+	org.eclipse.ptp.master \
+	org.eclipse.ptp.pldt-feature \
+	org.eclipse.ptp.pldt.lapi-feature \
+	org.eclipse.ptp.pldt.upc-feature \
+	org.eclipse.ptp.rdt-feature \
+	org.eclipse.ptp.rdt.remotejars-feature \
+	org.eclipse.ptp.rdt.remotetools-feature \
+	org.eclipse.ptp.rdt.sync-feature \
+	org.eclipse.ptp.rdt.sync.fortran-feature \
+	org.eclipse.ptp.rdt.xlc-feature \
+	org.eclipse.ptp.remote-feature \
+	org.eclipse.ptp.remote.remotetools-feature \
+	org.eclipse.ptp.remote.rse-feature \
+	org.eclipse.ptp.remotetools-feature \
+	org.eclipse.ptp.rm.ibm.ll-feature \
+	org.eclipse.ptp.rm.ibm.pe-feature \
+	org.eclipse.ptp.rm.jaxb-feature \
+	org.eclipse.ptp.rm.jaxb.contrib-feature \
+	org.eclipse.ptp.rm.jaxb.pbs-feature \
+	org.eclipse.ptp.rm.lml_jaxb-feature \
+	org.eclipse.ptp.rm.lml-feature \
+	org.eclipse.ptp.rm.mpich2-feature \
+	org.eclipse.ptp.rm.openmpi-feature \
+	org.eclipse.ptp.rm.slurm-feature \
+	org.eclipse.ptp.sci-feature \
+	org.eclipse.ptp.sdk-feature \
+	org.eclipse.ptp.sdm-feature \
+	org.eclipse.ptp.services-feature \
+	org.eclipse.ptp.utils-feature"
+
+update_feature() {
+	sed -e "s/^\([ \t]*\)version=\"[0-9]\.[0-9]\.[0-9]\.qualifier\"/\1version=\"$2\.qualifier\"/" < releng/$1/feature.xml > $TMP_DIR/${1}_feature.xml
+	mv $TMP_DIR/${1}_feature.xml releng/$1/feature.xml
+}
+
+for feature in $PTP_FEATURES; do
+	echo "Updating $feature..."
+	update_feature $feature $ptp_version
+done
+
+(cd releng/org.eclipse.ptp.repo && ant -DnewVersion="$ptp_version" -f fixModules.xml)
+
+exit 0
