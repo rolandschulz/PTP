@@ -79,6 +79,8 @@ public interface ILguiItem {
 	 */
 	public void addUserJob(String jobId, JobStatusData status, boolean force);
 
+	public String[] getColumnTitlePattern(String gid);
+
 	/**
 	 * The meth
 	 * 

@@ -296,7 +296,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 				}
 			}
 		}
-		// System.out.println(pattern.keySet().size());
 		return pattern;
 	}
 

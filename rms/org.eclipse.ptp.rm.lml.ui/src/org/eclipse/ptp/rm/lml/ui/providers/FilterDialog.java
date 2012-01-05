@@ -262,8 +262,8 @@ public class FilterDialog extends Dialog {
 			}
 		}
 
-		LMLManager.getInstance().filterLgui(gid, filterValues);
 		lguiItem.setPattern(gid, filterValues);
+		LMLManager.getInstance().filterLgui(gid, filterValues);
 
 		if (buttonId == IDialogConstants.OK_ID) {
 			// Okay Button
