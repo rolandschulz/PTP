@@ -154,6 +154,17 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
+	public String[] getColumnTitlePattern(String gid) {
+		final List<String> titles = new ArrayList<String>();
+		final List<IPattern> patternList = filters.get(gid);
+		if (patternList != null) {
+			for (final IPattern pattern : patternList) {
+				titles.add(pattern.getColumnTitle());
+			}
+		}
+		return titles.toArray(new String[titles.size()]);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

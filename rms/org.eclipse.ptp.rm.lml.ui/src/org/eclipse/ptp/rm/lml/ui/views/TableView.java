@@ -213,29 +213,25 @@ public class TableView extends ViewPart {
 			if (event.getGid().equals(gid)) {
 				UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 					public void run() throws Exception {
-						if (composite != null && viewCreated) {
-							if (selectedItem != null && !selectedItem.isDisposed()) {
-								lmlManager.unmarkObject(selectedItem.getData().toString());
-								selectedItem = null;
-							}
+						if (composite != null && fLguiItem != null && viewCreated) {
 							if (componentAdded) {
-								if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
-									fLguiItem.getObjectStatus().removeComponent(eventForwarder);
-								}
+								fLguiItem.getObjectStatus().removeComponent(eventForwarder);
 								componentAdded = false;
 							}
+							saveColumnLayout();
+							disposeTable();
+							viewCreated = false;
+						}
+						if (composite != null && !viewCreated) {
 							fLguiItem = lmlManager.getSelectedLguiItem();
-
-							if (fLguiItem != null && fLguiItem.getTableHandler() != null && tree.getSortColumn() != null) {
-								fLguiItem.getTableHandler().getSortProperties(gid);
-								fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
+							if (fLguiItem != null) {
+								createTable();
+								viewCreated = true;
+								if (fLguiItem.getObjectStatus() != null) {
+									fLguiItem.getObjectStatus().addComponent(eventForwarder);
+									componentAdded = true;
+								}
 							}
-							setViewerInput(event.getPattern());
-							if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
-								fLguiItem.getObjectStatus().addComponent(eventForwarder);
-								componentAdded = true;
-							}
-
 						}
 					}
 				});
@@ -325,7 +321,6 @@ public class TableView extends ViewPart {
 							fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
 						}
 						if (fLguiItem.getPattern(gid).size() > 0) {
-							System.out.println("here");
 							setViewerInput(fLguiItem.getPattern(gid));
 						} else {
 							setViewerInput();
@@ -544,6 +539,8 @@ public class TableView extends ViewPart {
 		treeColumns = new TreeColumn[tableColumnLayouts.length];
 		savedColumnWidths = new int[tableColumnLayouts.length + 1];
 
+		final String[] columnTitlesPattern = fLguiItem.getColumnTitlePattern(gid);
+
 		// first column with color rectangle
 		TreeViewerColumn treeViewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
 		treeViewerColumn.setLabelProvider(new ColumnLabelProvider() {
@@ -611,7 +608,18 @@ public class TableView extends ViewPart {
 			});
 			treeColumn = treeViewerColumn.getColumn();
 			treeColumn.setMoveable(true);
-			treeColumn.setText(tableColumnLayouts[i].getTitle());
+			boolean isFiltered = false;
+			for (final String title : columnTitlesPattern) {
+				if (title.equals(tableColumnLayouts[i].getTitle())) {
+					isFiltered = true;
+				}
+			}
+			if (isFiltered) {
+				treeColumn.setText(tableColumnLayouts[i].getTitle() + " #");
+			} else {
+				treeColumn.setText(tableColumnLayouts[i].getTitle());
+			}
+
 			treeColumn.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
 
 			if (tableColumnLayouts[i].isActive()) {
