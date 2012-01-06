@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
@@ -25,9 +23,8 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.InformationType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 
 /**
- * This class provides access to information-objects within a lml-model. It can
- * be used for fast and simple access to information filtered by the
- * information-type or the object-id.
+ * This class provides access to information-objects within a lml-model. It can be used for fast and simple access to information
+ * filtered by the information-type or the object-id.
  * 
  * @author karbach
  * 
@@ -41,9 +38,8 @@ public class OIDToInformation extends LguiHandler {
 	 * Create an information-handler with standard-parameters.
 	 * 
 	 * @param psuperHandler
-	 *            LML-data-handler, which groups this handler and others to a
-	 *            set of LMLHandler. This instance is needed to notify all
-	 *            LMLHandler, if any data of the LguiType-instance was changed.
+	 *            LML-data-handler, which groups this handler and others to a set of LMLHandler. This instance is needed to notify
+	 *            all LMLHandler, if any data of the LguiType-instance was changed.
 	 */
 	public OIDToInformation(ILguiItem psuperHandler, LguiType model) {
 		super(psuperHandler, model);
@@ -52,6 +48,7 @@ public class OIDToInformation extends LguiHandler {
 
 		lguiItem.addListener(new ILguiListener() {
 
+			@Override
 			public void handleEvent(ILguiUpdatedEvent e) {
 				updateData(e.getLgui());
 			}
@@ -107,14 +104,12 @@ public class OIDToInformation extends LguiHandler {
 	 * }
 	 * </pre>
 	 * 
-	 * getInfosById("job1") returns a list with the last two info-tags, which
-	 * are associated with object "job1"
+	 * getInfosById("job1") returns a list with the last two info-tags, which are associated with object "job1"
 	 * 
 	 * 
 	 * @param id
 	 *            ID-name of an object defined in objects-tag
-	 * @return all info-elements for this object, null if no info exists for
-	 *         this id
+	 * @return all info-elements for this object, null if no info exists for this id
 	 */
 	public List<InfoType> getInfosById(String id) {
 		return oidtoinfo.get(id);
@@ -148,16 +143,14 @@ public class OIDToInformation extends LguiHandler {
 	 * }
 	 * </pre>
 	 * 
-	 * getInfosByType( "job1", "short") returns the second info-tag
-	 * getInfosByType( "empty", "short") returns the first info-tag
+	 * getInfosByType( "job1", "short") returns the second info-tag getInfosByType( "empty", "short") returns the first info-tag
 	 * 
 	 * 
 	 * @param id
 	 *            identification for an object
 	 * @param type
 	 *            type of information
-	 * @return all infos of a type for object with given id, null if no infos
-	 *         there, empty list if no infos with this type exist
+	 * @return all infos of a type for object with given id, null if no infos there, empty list if no infos with this type exist
 	 */
 	public List<InfoType> getInfosByType(String id, String type) {
 
@@ -178,9 +171,8 @@ public class OIDToInformation extends LguiHandler {
 	}
 
 	/**
-	 * Call this method, if lml-model changed. The new model is passed to this
-	 * handler. All getter-functions accessing the handler will then return
-	 * data, which is collected from this new model
+	 * Call this method, if lml-model changed. The new model is passed to this handler. All getter-functions accessing the handler
+	 * will then return data, which is collected from this new model
 	 * 
 	 * @param lgui
 	 *            new lml-data-model
@@ -198,18 +190,13 @@ public class OIDToInformation extends LguiHandler {
 
 		oidtoinfo = new HashMap<String, List<InfoType>>();
 
-		final List<JAXBElement<?>> alltags = lgui.getObjectsAndRelationsAndInformation();
+		for (final Object object : jaxbUtil.getObjects(lgui)) {
 
-		for (final JAXBElement<?> jaxbtag : alltags) {// over all
-														// information-tags
-
-			final Object tag = jaxbtag.getValue();
-
-			if (!(tag instanceof InformationType)) {
+			if (!(object instanceof InformationType)) {
 				continue;
 			}
 
-			final InformationType ainfos = (InformationType) tag;
+			final InformationType ainfos = (InformationType) object;
 
 			final List<InfoType> realinfos = ainfos.getInfo();
 

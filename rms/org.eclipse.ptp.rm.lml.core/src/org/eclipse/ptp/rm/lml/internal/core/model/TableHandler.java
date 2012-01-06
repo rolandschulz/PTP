@@ -17,9 +17,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-
 import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
@@ -45,6 +42,7 @@ public class TableHandler extends LguiHandler {
 
 	public class TableListener implements ILguiListener {
 
+		@Override
 		public void handleEvent(ILguiUpdatedEvent e) {
 			update(e.getLgui());
 		}
@@ -131,8 +129,7 @@ public class TableHandler extends LguiHandler {
 				table.getColumn().add(column);
 			}
 		}
-		lgui.getObjectsAndRelationsAndInformation().add(
-				new JAXBElement<TableType>(new QName(ILMLCoreConstants.TABLE_ELEMENT), TableType.class, table));
+		jaxbUtil.addTable(lgui, table);
 		return table;
 	}
 
@@ -434,9 +431,7 @@ public class TableHandler extends LguiHandler {
 		final PatternType pattern = new PatternType();
 		final PatternMatchType patternMatch = new PatternMatchType();
 		patternMatch.setRegexp(regexp);
-		pattern.getIncludeAndExclude().add(
-				new JAXBElement<PatternMatchType>(new QName(ILMLCoreConstants.INCLUDE_ELEMENT), PatternMatchType.class,
-						patternMatch));
+		jaxbUtil.addPatternInclude(pattern, patternMatch);
 		column.setPattern(pattern);
 	}
 
