@@ -54,7 +54,7 @@ public class LMLCorePlugin extends Plugin {
 		URL url = null;
 		if (getDefault() != null) {
 			final Bundle bundle = getDefault().getBundle();
-			url = FileLocator.find(bundle, new Path(resource).makeAbsolute(), null);
+			url = FileLocator.find(bundle, new Path(ILMLCoreConstants.PATH_SEP + resource), null);
 		} else {
 			url = new File(resource).toURI().toURL();
 		}
@@ -62,7 +62,8 @@ public class LMLCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Returns the string from the plugin's resource bundle, or 'key' if not found.
+	 * Returns the string from the plugin's resource bundle, or 'key' if not
+	 * found.
 	 */
 	public static String getResourceString(String key) {
 		final ResourceBundle bundle = LMLCorePlugin.getDefault().getResourceBundle();

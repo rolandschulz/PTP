@@ -33,7 +33,6 @@ public class OverviewAccess extends LguiHandler {
 		super(lguiItem, lgui);
 
 		this.lguiItem.addListener(new ILguiListener() {
-			@Override
 			public void handleEvent(ILguiUpdatedEvent e) {
 				update(e.getLgui());
 			}

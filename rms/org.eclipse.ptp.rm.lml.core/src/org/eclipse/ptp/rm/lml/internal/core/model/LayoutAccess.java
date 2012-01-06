@@ -31,21 +31,20 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfoboxlayoutType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.NodedisplaylayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
-import org.eclipse.ptp.rm.lml.internal.core.elements.PaneType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.SplitlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TablelayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarlayoutType;
 
 /**
- * This class provides access to component-layout-definitions. Returns layout-objects for standard-lml-objects
+ * This class provides access to component-layout-definitions. Returns
+ * layout-objects for standard-lml-objects
  * 
- * Moreover with this class one is able to manipulate layout definitions LML-Models can be transformed into layout-only definitions
- * There are functions, which allow to merge layouts to one lml-model
+ * Moreover with this class one is able to manipulate layout definitions
+ * LML-Models can be transformed into layout-only definitions There are
+ * functions, which allow to merge layouts to one lml-model
  */
 public class LayoutAccess extends LguiHandler {
 	/*
@@ -60,15 +59,19 @@ public class LayoutAccess extends LguiHandler {
 	private static JAXBUtil jaxbUtil = JAXBUtil.getInstance();
 
 	/**
-	 * This method merges the layout information given by the "layout"-instance with the layout, which is included in "data".
-	 * Component-layouts in "data" are replaced with corresponding layouts in layout. Global layouts of "layout" replace global
-	 * layouts in data with the same name. New layouts in "layout" are added. Remark: "data" is modified by this method. A reference
-	 * to data is returned.
+	 * This method merges the layout information given by the "layout"-instance
+	 * with the layout, which is included in "data". Component-layouts in "data"
+	 * are replaced with corresponding layouts in layout. Global layouts of
+	 * "layout" replace global layouts in data with the same name. New layouts
+	 * in "layout" are added. Remark: "data" is modified by this method. A
+	 * reference to data is returned.
 	 * 
 	 * @param data
-	 *            model of lml-data, contingently with layout-information, this object will be modified and returned
+	 *            model of lml-data, contingently with layout-information, this
+	 *            object will be modified and returned
 	 * @param layout
-	 *            more important layout-data, overwrite componentlayouts of data-model, but add additional abs/-splitlayouts
+	 *            more important layout-data, overwrite componentlayouts of
+	 *            data-model, but add additional abs/-splitlayouts
 	 * @return merged lml-model
 	 */
 	public static LguiType mergeLayouts(LguiType data, LguiType layout) {
@@ -85,19 +88,24 @@ public class LayoutAccess extends LguiHandler {
 		}
 
 		/**
-		 * really merge layouts, do not overwrite //Collect existing layout-ids HashSet<String> layoutids=new HashSet<String>();
+		 * really merge layouts, do not overwrite //Collect existing layout-ids
+		 * HashSet<String> layoutids=new HashSet<String>();
 		 * 
-		 * for(JAXBElement<?> el:data.getObjectsAndRelationsAndInformation()){ if(el.getValue() instanceof LayoutType){ LayoutType
-		 * lay=(LayoutType) el.getValue(); layoutids.add(lay.getId()); } }
+		 * for(JAXBElement<?> el:data.getObjectsAndRelationsAndInformation()){
+		 * if(el.getValue() instanceof LayoutType){ LayoutType lay=(LayoutType)
+		 * el.getValue(); layoutids.add(lay.getId()); } }
 		 * 
-		 * //Generate new ids if layout-ids already exist in data, then add new layout to data for(JAXBElement<?>
-		 * el:layout.getObjectsAndRelationsAndInformation()){ if(el.getValue() instanceof LayoutType){ LayoutType lay=(LayoutType)
-		 * el.getValue();
+		 * //Generate new ids if layout-ids already exist in data, then add new
+		 * layout to data for(JAXBElement<?>
+		 * el:layout.getObjectsAndRelationsAndInformation()){ if(el.getValue()
+		 * instanceof LayoutType){ LayoutType lay=(LayoutType) el.getValue();
 		 * 
-		 * String newid=lay.getId(); while(layoutids.contains( newid )){ newid=newid+"'"; }
+		 * String newid=lay.getId(); while(layoutids.contains( newid )){
+		 * newid=newid+"'"; }
 		 * 
-		 * lay.setId(newid); layoutids.add(newid); //Add this layout with new id to data-instance
-		 * data.getObjectsAndRelationsAndInformation().add(el); } }
+		 * lay.setId(newid); layoutids.add(newid); //Add this layout with new id
+		 * to data-instance data.getObjectsAndRelationsAndInformation().add(el);
+		 * } }
 		 **/
 
 		JAXBUtil.replaceGlobalLayout(layout, data);
@@ -106,14 +114,14 @@ public class LayoutAccess extends LguiHandler {
 
 	/**
 	 * @param lguiItem
-	 *            LML-data-handler, which groups this handler and others to a set of LMLHandler. This instance is needed to notify
-	 *            all LMLHandler, if any data of the LguiType-instance was changed.
+	 *            LML-data-handler, which groups this handler and others to a
+	 *            set of LMLHandler. This instance is needed to notify all
+	 *            LMLHandler, if any data of the LguiType-instance was changed.
 	 */
 	public LayoutAccess(ILguiItem lguiItem, LguiType lgui) {
 		super(lguiItem, lgui);
 
 		this.lguiItem.addListener(new ILguiListener() {
-			@Override
 			public void handleEvent(ILguiUpdatedEvent e) {
 				update(e.getLgui());
 			}
@@ -136,7 +144,8 @@ public class LayoutAccess extends LguiHandler {
 		// Go through all graphical objects
 		for (final GobjectType gobject : lguiItem.getOverviewAccess().getGraphicalObjects()) {
 			// Get layouts for this object, normally there is only one
-			final List<ComponentlayoutType> layouts = getComponentLayoutByGid(gobject.getId());
+			final List<ComponentlayoutType> layouts = getComponentLayoutByGid(gobject
+					.getId());
 
 			if (layouts.size() == 0) {// assume gobject to be active if there is
 										// no componentlayout
@@ -200,7 +209,8 @@ public class LayoutAccess extends LguiHandler {
 	 * Simply returns the first layout found for a chart with the given id or a default-layout
 	 * 
 	 * @param chartId
-	 * @return defaultlayout for a chart or first layout for chart with id chartid given by lml-file
+	 * @return defaultlayout for a chart or first layout for chart with id
+	 *         chartid given by lml-file
 	 */
 	public ChartlayoutType getChartLayout(String chartId) {
 		for (final ChartlayoutType chartLayout : getChartLayouts()) {
@@ -222,11 +232,13 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	/**
-	 * Search in component-layouts for layout for the graphical object with id gid.
+	 * Search in component-layouts for layout for the graphical object with gid.
 	 * 
 	 * @param gid
-	 *            id of corresponding graphical object, for which layouts are searched
-	 * @return list of componentlayouts corresponding to the graphical object id gid
+	 *            id of corresponding graphical object, for which layouts are
+	 *            searched
+	 * @return list of componentlayouts corresponding to the graphical object id
+	 *         gid
 	 */
 	public List<ComponentlayoutType> getComponentLayoutByGid(String gid) {
 		final ArrayList<ComponentlayoutType> result = new ArrayList<ComponentlayoutType>();
@@ -300,7 +312,8 @@ public class LayoutAccess extends LguiHandler {
 	 * Simply returns the first layout found for a infobox with the given id or a default-layout
 	 * 
 	 * @param infoID
-	 * @return defaultlayout for a table or first layout for table with id tableid given by lml-file
+	 * @return defaultlayout for a table or first layout for table with id
+	 *         tableid given by lml-file
 	 */
 	public InfoboxlayoutType getInfoboxLayout(String infoId) {
 		for (final InfoboxlayoutType infoboxLayout : getInfoboxLayout()) {
@@ -424,7 +437,8 @@ public class LayoutAccess extends LguiHandler {
 	 * Simply returns the first layout found for a usagebar with the given id or a default-layout
 	 * 
 	 * @param usagebarId
-	 * @return defaultlayout for a usagebar or first layout for usagebar with id usagebarid given by lml-file
+	 * @return defaultlayout for a usagebar or first layout for usagebar with id
+	 *         usagebarid given by lml-file
 	 */
 	public UsagebarlayoutType getUsagebarLayout(String usagebarId) {
 		// Over all objects in lml-file

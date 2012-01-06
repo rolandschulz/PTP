@@ -28,13 +28,12 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBException;
-
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiHandler;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.core.model.IPattern;
 import org.eclipse.ptp.rm.lml.core.util.JAXBUtil;
 import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
@@ -69,6 +68,8 @@ public class LguiItem implements ILguiItem {
 	 */
 	private final List<ILguiListener> listeners = new LinkedList<ILguiListener>();
 
+	private Map<String, List<IPattern>> filters = new HashMap<String, List<IPattern>>();
+
 	/**
 	 * List of encapsulated classes, which handle parts of the lml-hierarchy
 	 */
@@ -84,6 +85,12 @@ public class LguiItem implements ILguiItem {
 
 	private RequestType request;
 
+	private String username = null;
+
+	private boolean lockUpdate = true;
+
+	private boolean lockPattern = false;
+
 	/**
 	 * Constructor with LML-model as argument
 	 * 
@@ -92,15 +99,15 @@ public class LguiItem implements ILguiItem {
 	 */
 	public LguiItem(LguiType lgui) {
 		this.lgui = lgui;
-		// TODO Give the LguiItem a name
 		createLguiHandlers();
 	}
 
 	/**
 	 * 
 	 */
-	public LguiItem(String name) {
+	public LguiItem(String name, String username) {
 		this.name = name;
+		this.username = username;
 	}
 
 	/**
@@ -109,7 +116,6 @@ public class LguiItem implements ILguiItem {
 	 * @param listener
 	 *            new listening instance
 	 */
-	@Override
 	public void addListener(ILguiListener listener) {
 		listeners.add(listener);
 	}
@@ -120,7 +126,6 @@ public class LguiItem implements ILguiItem {
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#addUserJob(java.lang.String,
 	 * org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData)
 	 */
-	@Override
 	public void addUserJob(String jobId, JobStatusData status, boolean force) {
 		final JobStatusData jobStatus = fJobMap.get(jobId);
 
@@ -149,13 +154,28 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
+	public String[] getColumnTitlePattern(String gid) {
+		final List<String> titles = new ArrayList<String>();
+		final List<IPattern> patternList = filters.get(gid);
+		if (patternList != null) {
+			for (final IPattern pattern : patternList) {
+				titles.add(pattern.getColumnTitle());
+			}
+		}
+		return titles.toArray(new String[titles.size()]);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getCurrentLayout(java.io. OutputStream)
 	 */
-	@Override
-	public void getCurrentLayout(OutputStream output) throws JAXBException {
+	public void getCurrentLayout(OutputStream output) {
+		while (lockPattern) {
+			// wait until the pattern have been set
+
+		}
+		lockUpdate = true;
 		LguiType layoutLgui = null;
 		if (lgui == null) {
 			layoutLgui = firstRequest();
@@ -169,7 +189,6 @@ public class LguiItem implements ILguiItem {
 	/**
 	 * @return object to map component-ids to corresponding layout definitions
 	 */
-	@Override
 	public LayoutAccess getLayoutAccess() {
 		if (lguiHandlers.get(LayoutAccess.class) == null) {
 			return null;
@@ -184,7 +203,6 @@ public class LguiItem implements ILguiItem {
 	/**
 	 * @return NodedisplayAccess-instance for accessing layouts of nodedisplays
 	 */
-	@Override
 	public NodedisplayAccess getNodedisplayAccess() {
 		if (lguiHandlers.get(NodedisplayAccess.class) == null) {
 			return null;
@@ -196,7 +214,6 @@ public class LguiItem implements ILguiItem {
 	 * @return a object, which saves which object has to be highlighted. All user interactions are saved globally for all components
 	 *         in this object.
 	 */
-	@Override
 	public ObjectStatus getObjectStatus() {
 		if (lguiHandlers.get(ObjectStatus.class) == null) {
 			return null;
@@ -207,7 +224,6 @@ public class LguiItem implements ILguiItem {
 	/**
 	 * @return object for getting infos for objects
 	 */
-	@Override
 	public OIDToInformation getOIDToInformation() {
 		if (lguiHandlers.get(OIDToInformation.class) == null) {
 			return null;
@@ -219,7 +235,6 @@ public class LguiItem implements ILguiItem {
 	 * @return a class, which provides an index for fast access to objects within the objects tag of LML. You can pass the id of the
 	 *         objects to the returned object. It then returns the corresponding objects.
 	 */
-	@Override
 	public OIDToObject getOIDToObject() {
 		if (lguiHandlers.get(OIDToObject.class) == null) {
 			return null;
@@ -227,7 +242,6 @@ public class LguiItem implements ILguiItem {
 		return (OIDToObject) lguiHandlers.get(OIDToObject.class);
 	}
 
-	@Override
 	public OverviewAccess getOverviewAccess() {
 		if (lguiHandlers.get(OverviewAccess.class) == null) {
 			return null;
@@ -235,7 +249,17 @@ public class LguiItem implements ILguiItem {
 		return (OverviewAccess) lguiHandlers.get(OverviewAccess.class);
 	}
 
-	@Override
+	public Map<String, List<IPattern>> getPattern() {
+		return filters;
+	}
+
+	public List<IPattern> getPattern(String gid) {
+		if (filters.containsKey(gid)) {
+			return filters.get(gid);
+		}
+		return new LinkedList<IPattern>();
+	}
+
 	public TableHandler getTableHandler() {
 		if (lguiHandlers.get(TableHandler.class) == null) {
 			return null;
@@ -248,7 +272,6 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getUserJob(java.lang.String)
 	 */
-	@Override
 	public JobStatusData getUserJob(String jobId) {
 		final JobStatusData status = fJobMap.get(jobId);
 		if (status != null && !status.isRemoved()) {
@@ -262,11 +285,17 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getUserJobs()
 	 */
-	@Override
 	public JobStatusData[] getUserJobs() {
 		synchronized (fJobMap) {
 			return fJobMap.values().toArray(new JobStatusData[0]);
 		}
+	}
+
+	public String getUsername() {
+		if (username == null) {
+			return new String();
+		}
+		return username;
 	}
 
 	/*
@@ -274,12 +303,10 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getVersion()
 	 */
-	@Override
 	public String getVersion() {
 		return lgui.getVersion();
 	}
 
-	@Override
 	public boolean isEmpty() {
 		final TableHandler handler = getTableHandler();
 		if (handler != null) {
@@ -293,7 +320,6 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.elemhents.ILguiItem#isLayout()
 	 */
-	@Override
 	public boolean isLayout() {
 		return lgui != null && lgui.isLayout();
 	}
@@ -303,43 +329,13 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#notifyListeners()
 	 */
-	@Override
 	public void notifyListeners() {
 		final LguiUpdatedEvent event = new LguiUpdatedEvent(this, lgui);
-		for (final ILguiListener l : listeners) {
-			l.handleEvent(event);
+		for (final ILguiListener listener : listeners) {
+			listener.handleEvent(event);
 		}
 	}
 
-	// public void reloadLastLayout(IMemento memento) {
-	// final StringBuilder layout = new StringBuilder();
-	//
-	// if (memento != null) {
-	// final IMemento child = memento.getChild(LAYOUT);
-	// layout.append(child.getID());
-	// }
-	// LguiType lguiType = null;
-	// if (layout.length() > 0) {
-	// try {
-	// lguiType = parseLML(layout.toString());
-	// } catch (final JAXBException e) {
-	// LMLCorePlugin.log(e);
-	// }
-	// }
-	// if (lguiType != null) {
-	// for (final JAXBElement<?> tag : lguiType
-	// .getObjectsAndRelationsAndInformation()) {
-	// if (tag.getValue() instanceof ComponentlayoutType) {
-	// lgui = lguiType;
-	// if (listeners.isEmpty()) {
-	// createLguiHandlers();
-	// }
-	// }
-	// }
-	// }
-	// }
-
-	@Override
 	public void reloadLastLayout(StringBuilder layout) {
 		LguiType lguiType = null;
 		if (layout.length() > 0) {
@@ -373,7 +369,6 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#removeUserJob(java.lang.String )
 	 */
-	@Override
 	public void removeUserJob(String jobId) {
 		final JobStatusData status = fJobMap.get(jobId);
 		if (status != null) {
@@ -399,7 +394,6 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	@Override
 	public String saveCurrentLayout() {
 
 		final StringWriter writer = new StringWriter();
@@ -413,44 +407,24 @@ public class LguiItem implements ILguiItem {
 		return writer.getBuffer().toString();
 	}
 
-	// public void saveCurrentLayout(IMemento memento) {
-	// if (memento == null) {
-	// return;
-	// }
-	// final StringWriter writer = new StringWriter();
-	// LguiType layoutLgui = null;
-	// if (lgui == null) {
-	// layoutLgui = firstRequest();
-	// } else {
-	// layoutLgui = getLayoutAccess().getLayoutFromModel();
-	// }
-	// try {
-	// marshaller.setProperty(
-	//					"jaxb.schemaLocation", lmlNamespace + " lgui.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
-	// marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-	// Boolean.TRUE);
-	//			final QName tagname = new QName(lmlNamespace, "lgui", "lml"); //$NON-NLS-1$ //$NON-NLS-2$
-	//
-	// final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(
-	// tagname, LguiType.class, layoutLgui);
-	// /*
-	// * Synchronize to avoid the dreaded
-	// * "FWK005 parse may not be called while parsing" message
-	// */
-	// synchronized (LguiItem.class) {
-	// marshaller.marshal(rootElement, writer);
-	//
-	// }
-	// } catch (final PropertyException e) {
-	// LMLCorePlugin.log(e);
-	// } catch (final JAXBException e) {
-	// LMLCorePlugin.log(e);
-	// }
-	// final IMemento layoutMemento = memento.createChild(LAYOUT, writer
-	// .getBuffer().toString());
-	// }
+	public void setPattern(Map<String, List<IPattern>> pattern) {
+		if (pattern != null) {
+			filters = pattern;
+		}
+	}
 
-	@Override
+	public void setPattern(String gid, List<IPattern> filterValues) {
+		while (lockUpdate) {
+			// wait until the update with the server is finished
+		}
+		lockPattern = true;
+		if (filters.containsKey(gid)) {
+			filters.remove(gid);
+		}
+		filters.put(gid, filterValues);
+		lockPattern = false;
+	}
+
 	public void setRequest(RequestType request) {
 		this.request = request;
 		if (lgui != null) {
@@ -477,8 +451,7 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#update(java.io.InputStream)
 	 */
-	@Override
-	public void update(InputStream stream) throws JAXBException {
+	public void update(InputStream stream) {
 
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 		StringBuilder xmlStream = new StringBuilder();
@@ -510,6 +483,7 @@ public class LguiItem implements ILguiItem {
 			}
 			updateJobData();
 		}
+		lockUpdate = false;
 	}
 
 	/*
@@ -517,7 +491,6 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#updateUserJob(java.lang.String , java.lang.String, java.lang.String)
 	 */
-	@Override
 	public void updateUserJob(String jobId, String status, String detail) {
 		final JobStatusData jobStatus = fJobMap.get(jobId);
 		if (jobStatus != null && status != null) {
@@ -658,7 +631,6 @@ public class LguiItem implements ILguiItem {
 		layoutLgui.setVersion("1"); //$NON-NLS-1$
 		layoutLgui.setLayout(true);
 
-		// final RequestType request = objectFactory.createRequestType();
 		final LayoutRequestType layoutReq = objectFactory.createLayoutRequestType();
 		layoutReq.setGetDefaultData(true);
 
