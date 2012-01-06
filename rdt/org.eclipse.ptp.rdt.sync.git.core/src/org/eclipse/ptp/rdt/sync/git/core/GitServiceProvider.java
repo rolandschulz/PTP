@@ -341,10 +341,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					willFinishTaskId = syncTaskId;
 				}
 
-				// Sync local and remote. For now, do both ways each time.
-				// TODO: Sync more efficiently and appropriately to the situation.
-				fSyncConnection.syncLocalToRemote(progress.newChild(40));
-				fSyncConnection.syncRemoteToLocal(progress.newChild(40), true); // Temporarily enable syncing new remote files
+				fSyncConnection.sync(progress.newChild(40), true); // Temporarily enable syncing new remote files
 
 				finishedSyncTaskId = willFinishTaskId;
 			} catch (final RemoteSyncException e) {

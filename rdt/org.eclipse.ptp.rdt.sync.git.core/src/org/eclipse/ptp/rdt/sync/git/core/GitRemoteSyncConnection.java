@@ -755,4 +755,80 @@ public class GitRemoteSyncConnection {
 			}
 		}
 	}
+
+	/**
+	 * Synchronize local and remote repositories. Currently, this function just interleaves the work of "syncLocalToRemote" and
+	 * "syncRemoteToLocal". Doing both simultaneously, though, gives room for more efficient code later.
+	 * 
+	 * Note that the remote is fetched and merged first. This is on purpose so that merge conflicts will occur locally, where
+	 * they can be more easily managed. Previously, "syncLocalToRemote" was called first in "GitServiceProvider", which would
+	 * cause merge conflicts to occur remotely.
+	 *
+	 * @param monitor
+	 * @param includeUntrackedFiles
+	 * 				Should currently untracked remote files be added to the repository?
+	 * @throws RemoteSyncException
+	 *             for various problems sync'ing. The specific exception is
+	 *             nested within the RemoteSyncException. Many of the listed
+	 *             exceptions appear to be unrecoverable, caused by errors in
+	 *             the initial setup. It is vital, though, that failed syncs are
+	 *             reported and handled. So all exceptions are checked
+	 *             exceptions, embedded in a RemoteSyncException.
+	 */
+	public void sync(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 25);
+		subMon.subTask(Messages.GitRemoteSyncConnection_0);
+		
+		try {
+			// Commit local and remote changes
+			doCommit();
+			if (prepareRemoteForCommit(subMon.newChild(5),includeUntrackedFiles)) {
+				commitRemoteFiles(subMon.newChild(5));
+            }
+			
+			try {
+				// Fetch the remote repository
+				transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
+
+				// Merge it with local
+				Ref masterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
+				final MergeCommand mergeCommand = git.merge().include(masterRef);
+				mergeCommand.call();
+			} catch (TransportException e) {
+				if (e.getMessage().startsWith("Remote does not have ")) { //$NON-NLS-1$
+					//just means that the remote branch isn't set up yet (and thus nothing too fetch). Can be ignored.
+				} else {
+					throw new RemoteSyncException(e);
+				}
+			}
+
+			// Push local repository to remote
+			if (git.branchList().call().size()>0) { //check whether master was already created
+				transport.push(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
+
+				// Now remotely merge changes with master branch
+				CommandResults mergeResults;
+				final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
+
+				mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
+
+				if (mergeResults.getExitCode() != 0) {
+					throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
+							+ mergeResults.getStdout()));
+				}
+			}
+		} catch (final IOException e) {
+			throw new RemoteSyncException(e);
+		} catch (final InterruptedException e) {
+			throw new RemoteSyncException(e);
+		} catch (RemoteConnectionException e) {
+			throw new RemoteSyncException(e);
+		} catch (GitAPIException e) {
+			throw new RemoteSyncException(e);
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
 }
