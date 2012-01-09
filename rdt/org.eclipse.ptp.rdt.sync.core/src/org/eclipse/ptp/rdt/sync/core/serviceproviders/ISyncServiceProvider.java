@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core.serviceproviders;
 
+import java.io.InputStream;
 import java.util.EnumSet;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -54,4 +56,10 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 *             if synchronization fails
 	 */
 	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
+	
+	public IFile [] getMergeConflictFiles() throws CoreException;
+	public InputStream getMergeConflictRemote(IFile file) throws CoreException;
+	public InputStream getMergeConflictAncestor(IFile file) throws CoreException;
+	
+	
 }

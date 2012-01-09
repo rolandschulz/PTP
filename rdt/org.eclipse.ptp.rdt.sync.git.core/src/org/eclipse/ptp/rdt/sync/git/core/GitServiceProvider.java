@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rdt.sync.git.core;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -320,11 +321,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				}
 
 				// TODO: Review exception handling
-				if (fSyncConnection == null) {
-					// Open a remote sync connection
-					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation()
-							.toString(), this.getLocation(), new FileFilter(), progress);
-				}
+				this.initConnection(progress);
 
 				// Open remote connection if necessary
 				if (this.getRemoteConnection().isOpen() == false) {
@@ -369,6 +366,27 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 
+	public IFile[] getMergeConflictFiles() throws CoreException {
+		this.initConnection(null);
+		return fSyncConnection.getMergeConflictFiles(getProject());
+	}
+
+	public InputStream getMergeConflictRemote(IFile file) throws CoreException {
+		this.initConnection(null);
+		return fSyncConnection.getMergeConflictRemote(file, getProject());
+	}
+
+	public InputStream getMergeConflictAncestor(IFile file) throws CoreException {
+		this.initConnection(null);
+		return fSyncConnection.getMergeConflictAncestor(file, getProject());
+	}
+	
+	private void initConnection(IProgressMonitor monitor) throws RemoteSyncException {
+		if (fSyncConnection == null) {
+			fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation()
+					.toString(), this.getLocation(), new FileFilter(), monitor);
+		}
+	}
 	/**
 	 * Handle sync errors appropriately. Currently, this function only handles forced sync errors by displaying them to the user.
 	 * Non-forced syncs are called by the UI, so errors are thrown for the UI to handle.
