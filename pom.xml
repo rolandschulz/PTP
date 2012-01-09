@@ -15,10 +15,16 @@
 
 	<properties>
 		<tycho-version>0.13.0</tycho-version>
-		<eclipse-release>indigo</eclipse-release>
-		<eclipse-site>http://download.eclipse.org/releases/${eclipse-release}</eclipse-site>
+		<platform-version>4.2milestones</platform-version>
+		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
+		<orbit-version>S-4.2M4-201112092100</orbit-version>
+		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</orbit-site>
+		<tm-version>3.3</tm-version>
+		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
+		<cdt-version>juno</cdt-version>
+		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/milestones/M4</cdt-site>	
 	</properties>
-
+	
 	<licenses>
 		<license>
 			<name>Eclipse Public License v1.0</name>
@@ -196,8 +202,23 @@
 
 	<repositories>
 		<repository>
-			<id>eclipse-${eclipse-release}</id>
-			<url>${eclipse-site}</url>
+			<id>platform-${platform-version}</id>
+			<url>${platform-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>orbit-${orbit-version}</id>
+			<url>${orbit-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>tm-${tm-version}</id>
+			<url>${tm-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>cdt-${cdt-version}</id>
+			<url>${cdt-site}</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>
