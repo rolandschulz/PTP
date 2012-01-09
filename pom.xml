@@ -16,6 +16,7 @@
 		<tycho-version>0.13.0</tycho-version>
 		<eclipse-release>indigo</eclipse-release>
 		<eclipse-site>http://download.eclipse.org/releases/${eclipse-release}</eclipse-site>
+		<photran-site>file://home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-photran-release</photran-site>
 	</properties>
 
 	<licenses>
@@ -194,6 +195,11 @@
 		<repository>
 			<id>eclipse-${eclipse-release}</id>
 			<url>${eclipse-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>photran</id>
+			<url>${photran-site}</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>
