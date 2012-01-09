@@ -13,6 +13,7 @@ package org.eclipse.ptp.rdt.sync.git.core;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -477,8 +479,7 @@ public class GitRemoteSyncConnection {
 	}
 
 	/*
-	 * Use "git ls-files" to obtain a list of files that need to be added or
-	 * deleted from the git index.
+	 * Use "git status" to obtain a list of files that need to be added or deleted from the git index.
 	 */
 	private void getFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, boolean includeUntrackedFiles)
 			throws RemoteSyncException {
@@ -868,5 +869,55 @@ public class GitRemoteSyncConnection {
 				monitor.done();
 			}
 		}
+	}
+	
+	/**
+	 * Get the list of files with a merge conflict
+	 *
+	 * @return list of merge-conflicted files
+	 * @throws RemoteSyncException 
+	 */
+	public IFile[] getMergeConflictFiles(IProject project) throws RemoteSyncException {
+		ArrayList<IFile> filesConflicting = new ArrayList<IFile>();
+		StatusCommand statusCommand = git.status();
+		Status status;
+		try {
+			status = statusCommand.call();
+			status.getConflicting();
+			for (String s : status.getConflicting()) {
+				filesConflicting.add(project.getFile(s));
+			}
+		} catch (NoWorkTreeException e) {
+			throw new RemoteSyncException(e);
+		} catch (IOException e) {
+			throw new RemoteSyncException(e);
+		}
+		
+		return filesConflicting.toArray(new IFile[filesConflicting.size()]);
+	}
+	
+	/**
+	 * Return an input stream representing the corresponding remote for the given merge-conflicted local file.
+	 * Be strict and return null if there is not a merge conflict with this file. This should prevent odd errors, as otherwise
+	 * it is unclear what should be returned.
+	 *
+	 * @param localFile
+	 * @return input stream or null if file is not in a merge conflict.
+	 */
+	public InputStream getMergeConflictRemote(IFile localFile, IProject project) {
+		
+		return null;
+	}
+	
+	/**
+	 * Return an input stream representing the corresponding ancestor for the given merge-conflicted local file.
+	 * Be strict and return null if there is not a merge conflict with this file. This should prevent odd errors, as otherwise
+	 * it is unclear what should be returned.
+	 *
+	 * @param localFile
+	 * @return input stream or null if file is not in a merge conflict.
+	 */
+	public InputStream getMergeConflictAncestor(IFile localFile, IProject project) {
+		return null;
 	}
 }

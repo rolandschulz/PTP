@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core.serviceproviders;
 
+import java.io.InputStream;
 import java.util.EnumSet;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -66,4 +68,8 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * touched. This is called, for example, when a project is about to be deleted.
 	 */
 	public void close();
+
+	public IFile [] getMergeConflictFiles() throws CoreException;
+	public InputStream getMergeConflictRemote(IFile file) throws CoreException;
+	public InputStream getMergeConflictAncestor(IFile file) throws CoreException;	
 }
