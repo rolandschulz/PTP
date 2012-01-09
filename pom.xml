@@ -23,6 +23,8 @@
 		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
 		<cdt-version>juno</cdt-version>
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/milestones/M4</cdt-site>	
+		<egit-version>1.1</egit-version>
+		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>	
 	</properties>
 	
 	<licenses>
@@ -219,6 +221,11 @@
 		<repository>
 			<id>cdt-${cdt-version}</id>
 			<url>${cdt-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>egit-${egit-version}</id>
+			<url>${egit-site}</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>
