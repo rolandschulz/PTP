@@ -59,12 +59,19 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 */
 	public void synchronize(IResourceDelta delta, SyncFileFilter filter, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags)
 			throws CoreException;
-	public Set<IPath> getMergeConflictFiles() throws CoreException;
-	public String[] getMergeConflictParts(IFile file) throws CoreException;
-	
-        /**
-	 * Close any resources (files, sockets) that were open by the sync provider. Resources not open by the provider should not be
-	 * touched. This is called, for example, when a project is about to be deleted.
+	/**
+	 * Get the current list of merge-conflicted files
+	 * @return set of files as project-relative IPaths. This may be an empty set but never null.
 	 */
-	public void close();
+	public Set<IPath> getMergeConflictFiles();
+	
+	/**
+	 * Get the three parts of the merge-conflicted file (left, right, and ancestor, respectively)
+	 * 
+	 * @param file
+	 * @return the three parts as strings. Either three strings (some may be empty) or null if file is not merge-conflicted.
+	 * @throws CoreException
+	 * 				for system-level problems during merge
+	 */
+	public String[] getMergeConflictParts(IFile file);
 }
