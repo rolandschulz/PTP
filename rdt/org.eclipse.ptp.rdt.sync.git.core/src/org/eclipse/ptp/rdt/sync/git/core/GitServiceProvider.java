@@ -11,8 +11,8 @@
 package org.eclipse.ptp.rdt.sync.git.core;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -373,19 +374,14 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 
-	public IFile[] getMergeConflictFiles() throws CoreException {
+	public Set<IPath> getMergeConflictFiles() throws CoreException {
 		this.initConnection(null);
-		return fSyncConnection.getMergeConflictFiles(getProject());
+		return fSyncConnection.getMergeConflictFiles();
 	}
 
-	public InputStream getMergeConflictRemote(IFile file) throws CoreException {
+	public String[] getMergeConflictParts(IFile file) throws CoreException {
 		this.initConnection(null);
-		return fSyncConnection.getMergeConflictRemote(file, getProject());
-	}
-
-	public InputStream getMergeConflictAncestor(IFile file) throws CoreException {
-		this.initConnection(null);
-		return fSyncConnection.getMergeConflictAncestor(file, getProject());
+		return fSyncConnection.getMergeConflictParts(file);
 	}
 	
 	private void initConnection(IProgressMonitor monitor) throws RemoteSyncException {

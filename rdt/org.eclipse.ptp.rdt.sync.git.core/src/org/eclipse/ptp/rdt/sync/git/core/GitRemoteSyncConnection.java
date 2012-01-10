@@ -13,21 +13,23 @@ package org.eclipse.ptp.rdt.sync.git.core;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
@@ -83,6 +85,8 @@ public class GitRemoteSyncConnection {
 	private Git git;
 	private TransportGitSsh transport;
 	private final IProject project;
+	
+	private Map<IPath, String[]> FileToMergePartsMap = new HashMap<IPath, String[]>();
 
 	/**
 	 * Create a remote sync connection using git. Assumes that the local
@@ -634,6 +638,33 @@ public class GitRemoteSyncConnection {
 			throw new RemoteSyncException(e);
 		}
 	}
+	
+	private void doMerge(boolean force) throws RemoteSyncException  {
+		boolean haveMergeConflict = (this.getMergeConflictFiles().size() > 0) ? true : false;
+		// Git complains if we try to merge during a merge conflict, and it is not necessary anyway.
+		if (haveMergeConflict && !force) {
+			return;
+		}
+
+		try {
+			if (haveMergeConflict) {
+				
+			}
+			// Merge it with local
+			Ref masterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
+			final MergeCommand mergeCommand = git.merge().include(masterRef);
+			mergeCommand.call();
+
+			// Parse merge-conflicted files and store the various parts (left, right, and ancestor).
+			for (IPath path : this.getMergeConflictFiles()) {
+				FileToMergePartsMap.put(path, Diff3Parser.parseFile(path.toFile()));
+			}
+		} catch (IOException e) {
+			throw new RemoteSyncException(e);
+		} catch (GitAPIException e) {
+			throw new RemoteSyncException(e);
+		}
+	}
 
 	/**
 	 * @return the connection (IRemoteConnection)
@@ -814,10 +845,6 @@ public class GitRemoteSyncConnection {
 				// Fetch the remote repository
 				transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
 
-				// Merge it with local
-				Ref masterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
-				final MergeCommand mergeCommand = git.merge().include(masterRef);
-				mergeCommand.call();
 			} catch (TransportException e) {
 				if (e.getMessage().startsWith("Remote does not have ")) { //$NON-NLS-1$
 					//just means that the remote branch isn't set up yet (and thus nothing too fetch). Can be ignored.
@@ -825,6 +852,9 @@ public class GitRemoteSyncConnection {
 					throw new RemoteSyncException(e);
 				}
 			}
+
+			// Do a local merge with fetched contents
+			doMerge(false);
 
 			// Push local repository to remote
 			if (git.branchList().call().size()>0) { //check whether master was already created
@@ -847,8 +877,6 @@ public class GitRemoteSyncConnection {
 			throw new RemoteSyncException(e);
 		} catch (RemoteConnectionException e) {
 			throw new RemoteSyncException(e);
-		} catch (GitAPIException e) {
-			throw new RemoteSyncException(e);
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -857,20 +885,21 @@ public class GitRemoteSyncConnection {
 	}
 	
 	/**
-	 * Get the list of files with a merge conflict
-	 *
-	 * @return list of merge-conflicted files
-	 * @throws RemoteSyncException 
+	 * Get the merge-conflicted files for the given project
+	 * 
+	 * @param project
+	 * @return set of project-relative paths of merge-conflicted files.
+	 * @throws RemoteSyncException on problems accessing the repository
 	 */
-	public IFile[] getMergeConflictFiles(IProject project) throws RemoteSyncException {
-		ArrayList<IFile> filesConflicting = new ArrayList<IFile>();
+	public Set<IPath> getMergeConflictFiles() throws RemoteSyncException {
+		Set<IPath> filesConflicting = new HashSet<IPath>();
 		StatusCommand statusCommand = git.status();
 		Status status;
 		try {
 			status = statusCommand.call();
 			status.getConflicting();
 			for (String s : status.getConflicting()) {
-				filesConflicting.add(project.getFile(s));
+				filesConflicting.add(new Path(s));
 			}
 		} catch (NoWorkTreeException e) {
 			throw new RemoteSyncException(e);
@@ -878,31 +907,31 @@ public class GitRemoteSyncConnection {
 			throw new RemoteSyncException(e);
 		}
 		
-		return filesConflicting.toArray(new IFile[filesConflicting.size()]);
+		return filesConflicting;
 	}
 	
 	/**
-	 * Return an input stream representing the corresponding remote for the given merge-conflicted local file.
-	 * Be strict and return null if there is not a merge conflict with this file. This should prevent odd errors, as otherwise
-	 * it is unclear what should be returned.
+	 * Return three strings representing the three parts of the given merge-conflicted file (local, remote, and ancestor, respectively).
+	 * Return null if the given file is not in a merge conflict, or if assertion fails, which should never happen...
 	 *
 	 * @param localFile
-	 * @return input stream or null if file is not in a merge conflict.
+	 * @param project
+	 * @return the three parts.
+	 * @throws RemoteSyncException on problems during merge
 	 */
-	public InputStream getMergeConflictRemote(IFile localFile, IProject project) {
-		
-		return null;
-	}
-	
-	/**
-	 * Return an input stream representing the corresponding ancestor for the given merge-conflicted local file.
-	 * Be strict and return null if there is not a merge conflict with this file. This should prevent odd errors, as otherwise
-	 * it is unclear what should be returned.
-	 *
-	 * @param localFile
-	 * @return input stream or null if file is not in a merge conflict.
-	 */
-	public InputStream getMergeConflictAncestor(IFile localFile, IProject project) {
-		return null;
+	public String[] getMergeConflictParts(IFile localFile) throws RemoteSyncException {
+		IPath path = localFile.getLocation();
+		// File has already been parsed and results cached
+		if (FileToMergePartsMap.containsKey(path)) {
+			return FileToMergePartsMap.get(path);
+		// File is not in a merge conflict
+		} else if (!(this.getMergeConflictFiles().contains(path))) {
+			return null;
+		// Merge conflict but results not available! Parse merge files.
+		} else {
+			this.doMerge(true);
+			assert(FileToMergePartsMap.containsKey(path));
+			return FileToMergePartsMap.get(localFile);
+		}
 	}
 }
