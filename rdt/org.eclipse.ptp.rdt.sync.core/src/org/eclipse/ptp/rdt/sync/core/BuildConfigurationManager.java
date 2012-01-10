@@ -324,14 +324,23 @@ public class BuildConfigurationManager {
 	 * @param project
 	 * @return sync provider name
 	 */
-	public String getProjectSyncProvider(IProject project) {
+	public String getProjectSyncProviderName(IProject project) {
+		ISyncServiceProvider sp = this.getProjectSyncProvider(project);
+		if (sp == null) {
+			return null;
+		} else {
+			return sp.getName();
+		}
+	}
+
+	public ISyncServiceProvider getProjectSyncProvider(IProject project) {
 		IServiceConfiguration serviceConfig = fProjectToTemplateConfigurationMap.get(project);
 		if (serviceConfig == null) {
 			return null;
 		}
 
 		IService syncService = ServiceModelManager.getInstance().getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-		return serviceConfig.getServiceProvider(syncService).getName();
+		return (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
 	}
 
 	/**
