@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.ptp.pldt.openacc; singleton:=true
+Bundle-Version: 6.0.0.qualifier
+Bundle-Activator: org.eclipse.ptp.pldt.openacc.internal.Activator
+Bundle-Vendor: %pluginProvider
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.cdt.core,
+ org.eclipse.cdt.ui,
+ org.eclipse.ptp.pldt.common,
+ org.eclipse.help
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.eclipse.ptp.pldt.openacc.internal;x-internal:=true;
+  uses:="org.eclipse.ptp.pldt.common,
+   org.osgi.framework,
+   org.eclipse.ui.plugin,
+   org.eclipse.osgi.util,
+   org.eclipse.jface.resource",
+ org.eclipse.ptp.pldt.openacc.internal.actions;x-internal:=true
