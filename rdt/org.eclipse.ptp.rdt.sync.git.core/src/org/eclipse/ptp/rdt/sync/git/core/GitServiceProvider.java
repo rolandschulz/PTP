@@ -12,6 +12,7 @@ package org.eclipse.ptp.rdt.sync.git.core;
 
 import java.io.ByteArrayInputStream;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -367,13 +368,39 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 
-	public Set<IPath> getMergeConflictFiles() throws CoreException {
-		this.initConnection(null);
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#getMergeConflictFiles()
+	 */
+	public Set<IPath> getMergeConflictFiles() {
+		try {
+			this.initConnection(null);
+		} catch (RemoteSyncException e) {
+			try {
+				this.handleRemoteSyncException(e, SyncFlag.FORCE);
+			} catch (RemoteSyncException e1) {
+				assert(false); // Should never happen since we indicate sync is forced
+			}
+			return new HashSet<IPath>();
+		}
 		return fSyncConnection.getMergeConflictFiles();
 	}
 
-	public String[] getMergeConflictParts(IFile file) throws CoreException {
-		this.initConnection(null);
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#getMergeConflictParts(org.eclipse.core.resources.IFile)
+	 */
+	public String[] getMergeConflictParts(IFile file) {
+		try {
+			this.initConnection(null);
+		} catch (RemoteSyncException e) {
+			try {
+				this.handleRemoteSyncException(e, SyncFlag.FORCE);
+			} catch (RemoteSyncException e1) {
+				assert(false); // Should never happen since we indicate sync is forced
+			}
+			return new String[0];
+		}
 		return fSyncConnection.getMergeConflictParts(file);
 	}
 	
