@@ -29,6 +29,7 @@ import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SYNC_MODE;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -39,6 +40,7 @@ import org.eclipse.ui.menus.UIElement;
 
 public class SyncMenuOperation extends AbstractHandler implements IElementUpdater {
 	private static final String SYNC_COMMAND_PARAMETER_ID = "org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"; //$NON-NLS-1$
+	private static final String SYNC_MERGE_FILE_VIEW = "org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTreeViewer"; //$NON-NLS-1$
 	private static final String syncActiveCommand = "sync_active"; //$NON-NLS-1$
 	private static final String syncAllCommand = "sync_all"; //$NON-NLS-1$
 	private static final String setNoneCommand = "set_none"; //$NON-NLS-1$
@@ -112,7 +114,14 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 			} else if (command.equals(syncDefaultFileList)) {
 				SyncFileFilterPage.open(null, null);
 			} else if (command.equals(syncMergeCommand)) {
-				new SyncMergeEditor().open();
+				try {
+				SyncMergeFileTreeViewer smftv = (SyncMergeFileTreeViewer) PlatformUI.getWorkbench().getActiveWorkbenchWindow().
+						getActivePage().showView(SYNC_MERGE_FILE_VIEW, null, IWorkbenchPage.VIEW_VISIBLE);
+				smftv.setProject(project);
+				} catch(CoreException e) {
+					throw new RuntimeException(e);
+				}
+				
 			}
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.

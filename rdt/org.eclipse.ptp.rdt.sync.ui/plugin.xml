@@ -337,4 +337,13 @@
             name="Synchronized Projects">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTreeViewer"
+            id="org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTreeViewer"
+            name="Synchronized Merge View"
+            restorable="false">
+      </view>
+   </extension>
 </plugin>
