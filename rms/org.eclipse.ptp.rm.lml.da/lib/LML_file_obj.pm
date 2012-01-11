@@ -555,7 +555,7 @@ sub lml_end {
 sub write_lml {
     my($self) = shift;
     my $outfile  = shift;
-    my($k,$rc,$id,$c,$key,$ref);
+    my($k,$rc,$id,$c,$key,$ref,$t);
     my $tstart=time;
     $rc=1;
 
@@ -572,10 +572,12 @@ sub write_lml {
     printf(OUT "<objects>\n");
     foreach $id (sort keys %{$self->{DATA}->{OBJECT}}) {
 	printf(OUT "<object");
+	$t=0;
 	foreach $k (sort keys %{$self->{DATA}->{OBJECT}->{$id}}) {
-	    printf(OUT " %s=\"%s\"",$k,$self->{DATA}->{OBJECT}->{$id}->{$k});
+	    printf(OUT " %s=\"%s\"",$k,$self->{DATA}->{OBJECT}->{$id}->{$k});$t=1;
 	}
 	printf(OUT "/>\n");
+	print "write_lml: WARNING object with id '$id' has no attributes\n" if($t==0);
     }
     printf(OUT "</objects>\n");
 

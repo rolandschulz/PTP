@@ -83,6 +83,19 @@ sub process {
 	$self->_adjust_layout_bg();
 
 
+    } elsif($self->{SYSTEMTYPE} eq "CRAYXT") {
+	my($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode)=$self->_get_system_size_crayxt();
+	if(!$self->_init_trees_crayxt($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode)) {
+	    print "ERROR: could not init internal data structures, system type: $self->{SYSTEMTYPE}, aborting ...\n";
+	    return(-1);
+	}
+	# init data tree with empty root nodes
+	$self->_add_empty_root_elements();
+	
+	$self->_adjust_layout_crayxt();
+
+
+
     } elsif($self->{SYSTEMTYPE} eq "Cluster") {
 
 	# user define scheme given
@@ -165,10 +178,11 @@ sub _insert_run_jobs {
 	$inforef=$self->{LMLFH}->{DATA}->{INFODATA}->{$key};
 	next if($inforef->{status} ne 'RUNNING');
 	if(exists($inforef->{vnodelist})) {
-	    $nodelist=$self->_remap_nodes($inforef->{vnodelist});
+	    $nodelist=$self->_remap_nodes_vnode($inforef->{vnodelist});
 	} else {
 	    $nodelist=$self->_remap_nodes($inforef->{nodelist});
 	}
+#	print "_insert_run_jobs job $key nodelist $nodelist\n";
 	$self->insert_job_into_nodedisplay($self->{SCHEMEROOT},$self->{DATAROOT},$nodelist,$key);
 	push(@idlist,$key);
 	$jcount++;
@@ -331,6 +345,41 @@ sub _remap_nodes {
 	}
 	$newnodelist.="," if($newnodelist);
 	$newnodelist.=sprintf("%s-c%02d",$newnode,$num);
+    }
+    return($newnodelist);
+}
+
+sub _remap_nodes_vnode {
+    my($self) = shift;
+    my($nodelist)=shift;
+    my($newnodelist,$spec,$node,$num,$number,$newnode,$start);
+    if($self->{SYSTEMTYPE} eq "BG/P") {
+	return($nodelist);
+    }
+    foreach $spec (split(/\),?\(/,$nodelist)) {
+	# change form '(node,number tasks)' to (node-c<num>, ...)
+	if($spec=~/\(?([^,]+),(\d+)\)?/) {
+	    $node=$1;$number=$2;
+	} elsif($spec=~/^([^,]+)$/) {
+	    $node=$1;$number=0;	
+	} else {
+	    print "ERROR: _remap_nodes: unknown node in spec '$spec', skipping\n";
+	}
+	
+	if(exists($self->{NODEMAPPING}->{$node})) {
+	    $newnode=$self->{NODEMAPPING}->{$node}; 
+	} else {
+	    $newnode=$node;
+	}
+	
+	if(!exists($self->{NODELASTTASKNUMBER}->{$node})) {
+	    $self->{NODELASTTASKNUMBER}->{$node}=-1;
+	}
+	$start=$self->{NODELASTTASKNUMBER}->{$node}+1;
+	for($num=$start;$num<$start+$number;$num++) {
+	    $newnodelist.="," if($newnodelist);
+	    $newnodelist.=sprintf("%s-c%02d",$newnode,$num);
+	}
     }
     return($newnodelist);
 }
@@ -885,6 +934,300 @@ sub _init_trees_bg  {
 			  min     => 0,
 			  max     => 3,
 			  mask    => '-%01d' });
+
+    return(1);
+}
+
+
+###############################################
+# Cray XT related
+############################################### 
+sub _adjust_layout_crayxt  {
+    my($self) = shift;
+    my($root_layout,$root_scheme,$treenode,$ltreenode,$streenode,$num,$min,$max,$lmin,$lmax);
+    my $rc=1;
+    my $maxlevel=6;
+  
+    $root_layout=$self->{LAYOUT}->{tree};
+    $root_scheme=$self->{SCHEMEROOT};
+
+    # COLS
+    ######
+    $streenode=$root_scheme->get_child({_name => "el1" });
+    $ltreenode=$root_layout->get_child({_name => "el0" });
+
+    # get number of rows (in el1 of scheme)
+    if($streenode) {
+	$min=$streenode->{ATTR}->{min};
+	$max=$streenode->{ATTR}->{max};
+	$num=$max-$min+1;
+	
+    } else {
+	print STDERR "$0: ERROR: inconsistent scheme tree for Cray XT system (cols) ...\n";return(0);
+    }
+    
+    if(!$ltreenode) {
+	$ltreenode=$root_layout->new_child();
+    }
+    # set size attributes
+    $ltreenode->{ATTR}->{rows}=1;
+    $ltreenode->{ATTR}->{cols}=$num;
+
+    # set some default layout attributes
+#    $ltreenode->{ATTR}->{maxlevel} = 6              if(!exists($ltreenode->{ATTR}->{maxlevel}));
+    $ltreenode->{ATTR}->{maxlevel} = 4              ;
+    $ltreenode->{ATTR}->{vgap} = 5                  if(!exists($ltreenode->{ATTR}->{vgap}));
+    $ltreenode->{ATTR}->{hgap} = 0                  if(!exists($ltreenode->{ATTR}->{hgap}));       
+    $ltreenode->{ATTR}->{fontsize} = 10             if(!exists($ltreenode->{ATTR}->{fontsize}));   
+    $ltreenode->{ATTR}->{border}   = 0              if(!exists($ltreenode->{ATTR}->{border}));     
+    $ltreenode->{ATTR}->{fontfamily} = "Monospaced" if(!exists($ltreenode->{ATTR}->{fontfamily})); 
+    $ltreenode->{ATTR}->{showtitle}  = "false"      if(!exists($ltreenode->{ATTR}->{showtitle}));  
+    $ltreenode->{ATTR}->{background} = "#777"       if(!exists($ltreenode->{ATTR}->{background})); 
+    $ltreenode->{ATTR}->{mouseborder}= 0            if(!exists($ltreenode->{ATTR}->{mouseborder})); 
+    $ltreenode->{ATTR}->{transparent}= "false"      if(!exists($ltreenode->{ATTR}->{transparent}));
+    $lmin=$min;$lmax=$max;
+
+    # Rack
+    ######
+    $streenode=$streenode->get_child({_name => "el2" });
+
+    # get number of rows (in el1 of scheme)
+    if($streenode) {
+	$min=$streenode->{ATTR}->{min};
+	$max=$streenode->{ATTR}->{max};
+	$num=$max-$min+1;
+    } else {
+	print STDERR "$0: ERROR: inconsistent scheme tree for Cray XT system (rows) ...\n";return(0);
+    }
+    
+    $treenode=$ltreenode->get_child({_name => "el1" });
+    if(!$treenode) {
+	$treenode=$ltreenode->new_child();
+    } 
+    $ltreenode=$treenode;
+
+    # set size attributes
+    $ltreenode->{ATTR}->{rows}=$num;
+    $ltreenode->{ATTR}->{cols}=1;
+
+    # set some default layout attributes
+#    $ltreenode->{ATTR}->{maxlevel} = 5              if(!exists($ltreenode->{ATTR}->{maxlevel}));
+    $ltreenode->{ATTR}->{maxlevel} = 5;
+    $ltreenode->{ATTR}->{vgap} = 5                  if(!exists($ltreenode->{ATTR}->{vgap}));
+    $ltreenode->{ATTR}->{hgap} = 0                  if(!exists($ltreenode->{ATTR}->{hgap}));       
+#    $ltreenode->{ATTR}->{fontsize} = 10             if(!exists($ltreenode->{ATTR}->{fontsize}));   
+#    $ltreenode->{ATTR}->{border}   = 0              if(!exists($ltreenode->{ATTR}->{border}));     
+#    $ltreenode->{ATTR}->{fontfamily} = "Monospaced" if(!exists($ltreenode->{ATTR}->{fontfamily})); 
+    $ltreenode->{ATTR}->{showtitle}  = "true"       if(!exists($ltreenode->{ATTR}->{showtitle}));  
+#    $ltreenode->{ATTR}->{background} = "#777"       if(!exists($ltreenode->{ATTR}->{background})); 
+#    $ltreenode->{ATTR}->{mouseborder}= 0            if(!exists($ltreenode->{ATTR}->{mouseborder})); 
+#    $ltreenode->{ATTR}->{transparent}= "false"      if(!exists($ltreenode->{ATTR}->{transparent}));
+    $lmin=$min;$lmax=$max;
+
+    # Cage
+    #######
+    $streenode=$streenode->get_child({_name => "el3" });
+
+    # get number of cages (in el2 of scheme)
+    if($streenode) {
+	$min=$streenode->{ATTR}->{min};
+	$max=$streenode->{ATTR}->{max};
+	$num=$max-$min+1;
+    } else {
+	print STDERR "$0: ERROR: inconsistent scheme tree for BG system (racks) ...\n";return(0);
+    }
+    
+    $treenode=$ltreenode->get_child({_name => "el2" });
+    if(!$treenode) {
+	$treenode=$ltreenode->new_child();
+    } 
+    $ltreenode=$treenode;
+
+    # set size attributes
+    $ltreenode->{ATTR}->{rows}=$num;    $ltreenode->{ATTR}->{cols}=1;
+    $ltreenode->{ATTR}->{min}=$lmin;    $ltreenode->{ATTR}->{max}=$lmax;
+
+    # set some default layout attributes
+    $ltreenode->{ATTR}->{maxlevel} = 6             if(!exists($ltreenode->{ATTR}->{maxlevel}));
+    $ltreenode->{ATTR}->{showtitle}  = "true"      if(!exists($ltreenode->{ATTR}->{showtitle}));  
+    $lmin=$min;$lmax=$max;
+
+    # blade
+    #######
+    $streenode=$streenode->get_child({_name => "el4" });
+
+    # get number of slots (in el3 of scheme)
+    if($streenode) {
+	$min=$streenode->{ATTR}->{min};
+	$max=$streenode->{ATTR}->{max};
+	$num=$max-$min+1;
+    } else {
+	print STDERR "$0: ERROR: inconsistent scheme tree for BG system (midplanes) ...\n";return(0);
+    }
+    
+    $treenode=$ltreenode->get_child({_name => "el3" });
+    if(!$treenode) {
+	$treenode=$ltreenode->new_child();
+    } 
+    $ltreenode=$treenode;
+
+    # set size attributes
+    $ltreenode->{ATTR}->{rows}=1;       $ltreenode->{ATTR}->{cols}=$num;
+    $ltreenode->{ATTR}->{min}=$lmin;    $ltreenode->{ATTR}->{max}=$lmax;
+
+    # set some default layout attributes
+    $ltreenode->{ATTR}->{maxlevel}         = 6             if(!exists($ltreenode->{ATTR}->{maxlevel}));
+    $ltreenode->{ATTR}->{showtitle}        = "false"        if(!exists($ltreenode->{ATTR}->{showtitle}));  
+    $ltreenode->{ATTR}->{highestrowfirst}  = "true"        if(!exists($ltreenode->{ATTR}->{highestrowfirst}));  
+    $ltreenode->{ATTR}->{showfulltitle}    = "false"        if(!exists($ltreenode->{ATTR}->{showfulltitle}));  
+    $lmin=$min;$lmax=$max;
+
+
+    # Node
+    ######
+    $streenode=$streenode->get_child({_name => "el5" });
+
+    # get number of midplanes (in el4 of scheme)
+    if($streenode) {
+	$min=$streenode->{ATTR}->{min};
+	$max=$streenode->{ATTR}->{max};
+	$num=$max-$min+1;
+    } else {
+	print STDERR "$0: ERROR: inconsistent scheme tree for BG system (nodeboards) ...\n";return(0);
+    }
+    
+    $treenode=$ltreenode->get_child({_name => "el4" });
+    if(!$treenode) {
+	$treenode=$ltreenode->new_child();
+    } 
+    $ltreenode=$treenode;
+
+    # set size attributes
+    $ltreenode->{ATTR}->{rows}=$num;    $ltreenode->{ATTR}->{cols}=1;
+    $ltreenode->{ATTR}->{min}=$lmin;    $ltreenode->{ATTR}->{max}=$lmax;
+
+    # set some default layout attributes
+    $ltreenode->{ATTR}->{maxlevel}         = $maxlevel     if(!exists($ltreenode->{ATTR}->{maxlevel}));
+    $ltreenode->{ATTR}->{showtitle}        = "false"        if(!exists($ltreenode->{ATTR}->{showtitle}));  
+    $ltreenode->{ATTR}->{fontsize}         = 8             if(!exists($ltreenode->{ATTR}->{fontsize}));   
+    $ltreenode->{ATTR}->{vgap}             = 0             if(!exists($ltreenode->{ATTR}->{vgap}));
+    $ltreenode->{ATTR}->{hgap}             = 0             if(!exists($ltreenode->{ATTR}->{hgap}));       
+    $ltreenode->{ATTR}->{highestrowfirst}  = "true"        if(!exists($ltreenode->{ATTR}->{highestrowfirst}));  
+    $ltreenode->{ATTR}->{showfulltitle}    = "false"       if(!exists($ltreenode->{ATTR}->{showfulltitle}));  
+    $lmin=$min;$lmax=$max;
+
+    # cores
+    #######
+    $streenode=$streenode->get_child({_name => "el6" });
+
+    # get number of midplanes (in el6 of scheme)
+    if($streenode) {
+	$min=$streenode->{ATTR}->{min};
+	$max=$streenode->{ATTR}->{max};
+	$num=$max-$min+1;
+    } else {
+	print STDERR "$0: ERROR: inconsistent scheme tree for BG system (cores) ...\n";return(0);
+    }
+    
+    $treenode=$ltreenode->get_child({_name => "el5" });
+    if(!$treenode) {
+	$treenode=$ltreenode->new_child();
+    } 
+    $ltreenode=$treenode;
+
+    # set size attributes
+    $ltreenode->{ATTR}->{rows}=1;       $ltreenode->{ATTR}->{cols}=12;
+    $ltreenode->{ATTR}->{min}=$lmin;    $ltreenode->{ATTR}->{max}=$lmax;
+
+    # set some default layout attributes
+    $ltreenode->{ATTR}->{maxlevel}         = $maxlevel     if(!exists($ltreenode->{ATTR}->{maxlevel}));
+    $lmin=$min;$lmax=$max;
+
+
+#    print "$0: LAYOUT: ",Dumper($root_layout);
+#    print "$0: SCHEME: ",Dumper($root_scheme);
+
+    return($rc);
+}
+
+
+###############################################
+# Cray XT related
+############################################### 
+sub _get_system_size_crayxt {
+    my($self) = shift;
+    my($indataref) = $self->{INDATA};
+    my($nodename,$pcol,$prow,$pcage,$pslot,$pnode);
+    my($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode);
+
+    my ($key,$ref);
+    
+    $maxpcol=    $maxprow=    $maxpcage=    $maxpslot=    $maxpnode= 0;
+    keys(%{$self->{LMLFH}->{DATA}->{OBJECT}}); # reset iterator
+    while(($key,$ref)=each(%{$self->{LMLFH}->{DATA}->{OBJECT}})) {
+	next if($ref->{type} ne 'node');
+	$nodename=$self->{LMLFH}->{DATA}->{OBJECT}->{$key}->{name};
+	if($nodename=~/^c(\d+)-(\d+)c(\d+)s(\d+)n(\d+)$/) {
+	    ($pcol,$prow,$pcage,$pslot,$pnode)=($1,$2,$3,$4,$5);
+	} else {
+	    print "_get_system_size_crayxt: node name could not be parsed: $nodename\n";
+	}
+	$maxpcol=$pcol if($pcol>$maxpcol);
+	$maxprow=$prow if($prow>$maxprow);
+	$maxpcage=$pcage if($pcage>$maxpcage);
+	$maxpslot=$pslot if($pslot>$maxpslot);
+	$maxpnode=$pnode if($pnode>$maxpnode);
+    }
+
+    printf("_get_system_size_crayxt: Cray XT system found of size: %dx%dx%d\n",
+	   $maxpcol+1,$maxprow+1,$maxpcage+1,$maxpslot+1,$maxpnode+1 ) if($self->{VERBOSE});
+    
+    return($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode);
+}
+
+
+sub _init_trees_crayxt  {
+    my($self) = shift;
+    my($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode)=@_;
+    my($id,$subid,$treenode,$schemeroot,$bgsystem);
+
+    $schemeroot=$self->{SCHEMEROOT};
+    $treenode=$schemeroot;
+    $bgsystem=$treenode=$treenode->new_child();
+    $treenode->add_attr({ tagname => 'col',
+			  min     => 0,
+			  max     => $maxpcol,
+			  mask    => 'c%d-' });
+
+    $treenode=$treenode->new_child();
+    $treenode->add_attr({ tagname => 'rack',
+			  min     => 0,
+			  max     => $maxprow,
+			  mask    => '%01d' });
+
+    $treenode=$treenode->new_child();
+    $treenode->add_attr({ tagname => 'cage',
+			  min     => 0,
+			  max     => $maxpcage,
+			  mask    => 'c%01d' });
+
+    $treenode=$treenode->new_child();
+    $treenode->add_attr({ tagname => 'blade',
+			  min     => 0,
+			  max     => $maxpslot,
+			  mask    => 's%01d' });
+
+    $treenode=$treenode->new_child();
+    $treenode->add_attr({ tagname => 'node',
+			  min     => 0,
+			  max     => $maxpnode,
+			  mask    => 'n%01d' });
+
+    $treenode=$treenode->new_child();
+    $treenode->add_attr({ tagname => 'core',
+			  min     => 0,
+			  max     => 11,
+			  mask    => '-c%02d' });
 
     return(1);
 }

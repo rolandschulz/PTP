@@ -11,51 +11,54 @@
 #*******************************************************************************/ 
 use strict;
 
-sub check_rms {
+sub check_rms_PE {
     my($rmsref,$cmdsref,$verbose)=@_;
     my($key,$cmd);
-    my $rc=0;
-
+    my $rc=1;
+    
     my %cmdname=(
 		"job"  => "poe",
 	);
-        
+    
     my %cmdpath=(
-		"job"  => "/usr/bin/poe",
+	"job"  => "/usr/bin/poe",
 	);
-	
+    
     foreach $key (keys(%cmdname)) {
-		if (exists($cmdsref->{"cmd_${key}info"})) {
-		    $cmd=$cmdsref->{"cmd_${key}info"};
-		} else {
-		    $cmd=$cmdpath{$key};
-		}
-		if (! -f $cmd) {
-		    my $cmdpath=`which $cmdname{$key} 2>/dev/null`; 	# last try: which 
-		    if(!$?) {
-				chomp($cmdpath);
-				$cmd=$cmdpath;
-				print STDERR "$0: check_rms: found $cmdname{$key} by which ($cmd)\n" if($verbose);
-		    } else {
-				last;
-		    }
-		}
-		if (-f $cmd) {
-		    $cmdsref->{"cmd_${key}info"}=$cmd;
-		    $rc=1;
-		}
+	if (exists($cmdsref->{"cmd_${key}info"})) {
+	    $cmd=$cmdsref->{"cmd_${key}info"};
+	} else {
+	    $cmd=$cmdpath{$key};
+	}
+	if (! -f $cmd) {
+	    my $cmdpath=`which $cmdname{$key} 2>/dev/null`; 	# last try: which 
+	    if(!$?) {
+		chomp($cmdpath);
+		$cmd=$cmdpath;
+		&report_if_verbose("%s","$0: check_rms_PE: found $cmdname{$key} by which ($cmd)\n");
+	    }
+	}
+	if (-f $cmd) {
+	    $cmdsref->{"cmd_${key}info"}=$cmd;
+	} else {
+	    &report_if_verbose("%s","$0: check_rms_PE: no cmd found for $cmdname{$key}\n");
+	    $rc=0;
+	}
     }
-	if ($rc) {
-		$$rmsref="PE";
+    if ($rc==1) {
+	$$rmsref="PE";
+	&report_if_verbose("%s%s%s", "$0: check_rms_PE: found PE commands (",
+			   join(",",(values(%{$cmdsref}))),
+			   ")\n");
     } else {
-		print STDERR "$0: check_rms: seems not to be a OpenMPI system\n" if($verbose);
+	&report_if_verbose("%s","$0: check_rms_PE: seems not to be a PE system\n");
     }
-
+    
     return($rc);
 }
 
 
-sub generate_step_rms {
+sub generate_step_rms_PE {
     my($workflowxml, $laststep, $cmdsref)=@_;
     my($step,$envs,$key,$ukey);
 
@@ -78,5 +81,8 @@ sub generate_step_rms {
 
     return($laststep);
 }
+
+$main::check_functions->{PE}   =\&check_rms_PE;
+$main::generate_functions->{PE}=\&generate_step_rms_PE;
 
 1;

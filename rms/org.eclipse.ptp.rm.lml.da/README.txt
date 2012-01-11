@@ -410,3 +410,27 @@ ChangeLog:
    - persistent color management
      - color db will be stored in a file in the perm-directory
    - first driver for PBSpro controlled systems
+
+1.10:
+   - bug fixes
+
+1.11:
+   - bug fixes
+
+1.12:
+   - bug fixes
+
+1.13:
+   - improved reporting: option -verbose control debug output on stderr
+     	      		 full debugging report will written $tmpdir/report.log
+   - improved support for PBS (vnodes)
+   - bug fixes
+
+1.14:
+   - Improvements for testing and demonstration purpose 
+     - option -test: use existing workflow input in tmpdir
+     - options specification file .LML_da_options 
+       - will be read if exists in current directory
+       - will overwrite command line option
+    - incoporated support for new RMS (GridEngine, PE)
+      (contributed by others)   
