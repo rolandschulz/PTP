@@ -137,7 +137,7 @@
             type="CONTAINER_ATTRIBUTE"
             value="true">
          <checkBuildProperty
-               property="org.eclipse.ptp.rdt.build.core.buildArtefactType"
+               property="org.eclipse.cdt.build.core.buildArtefactType"
                value="org.eclipse.cdt.build.core.buildArtefactType.sharedLib">
          </checkBuildProperty>
       </enablement>
@@ -345,7 +345,7 @@
              type="CONTAINER_ATTRIBUTE"
              value="true">
           <checkBuildProperty
-                property="org.eclipse.ptp.rdt.build.core.buildArtefactType"
+                property="org.eclipse.cdt.build.core.buildArtefactType"
                 value="org.eclipse.cdt.build.core.buildArtefactType.sharedLib">
           </checkBuildProperty>
        </enablement>
@@ -1254,7 +1254,7 @@
           type="CONTAINER_ATTRIBUTE"
           value="so">
        <checkBuildProperty
-             property="org.eclipse.ptp.rdt.build.core.buildArtefactType"
+             property="org.eclipse.cdt.build.core.buildArtefactType"
              value="org.eclipse.cdt.build.core.buildArtefactType.sharedLib">
        </checkBuildProperty>
     </enablement>
@@ -1264,7 +1264,7 @@
           type="CONTAINER_ATTRIBUTE"
           value="a">
        <checkBuildProperty
-             property="org.eclipse.ptp.rdt.build.core.buildArtefactType"
+             property="org.eclipse.cdt.build.core.buildArtefactType"
              value="org.eclipse.cdt.build.core.buildArtefactType.staticLib">
        </checkBuildProperty>
     </enablement>
@@ -1296,6 +1296,7 @@
           </builder>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.exe.debug"
+                natureFilter="ccnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.base">
              <option
                    id="ptp.rdt.gnu.cpp.compiler.exe.debug.option.optimization.level"
@@ -1308,6 +1309,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.exe.debug"
+                natureFilter="cnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.base">
              <option
                    id="ptp.rdt.gnu.c.compiler.exe.debug.option.optimization.level"
@@ -1320,10 +1322,12 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.linker.exe.debug"
+                natureFilter="cnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.linker.base">
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.linker.exe.debug"
+                natureFilter="ccnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.linker.base">
           </tool>
           <tool
@@ -1353,6 +1357,7 @@
           </builder>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.exe.release"
+                natureFilter="ccnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.base">
              <option
                    id="ptp.rdt.gnu.cpp.compiler.exe.release.option.optimization.level"
@@ -1365,6 +1370,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.exe.release"
+                natureFilter="cnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.base">
              <option
                    id="ptp.rdt.gnu.c.compiler.exe.release.option.optimization.level"
@@ -1377,10 +1383,12 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.linker.exe.release"
+                natureFilter="cnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.linker.base">
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.linker.exe.release"
+                natureFilter="ccnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.linker.base">
           </tool>
           <tool
@@ -1417,6 +1425,7 @@
           </builder>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.so.debug"
+                natureFilter="ccnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.base">
              <option
                    id="ptp.rdt.gnu.cpp.compiler.so.debug.option.optimization.level"
@@ -1429,6 +1438,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.so.debug"
+                natureFilter="cnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.base">
              <option
                    id="ptp.rdt.gnu.c.compiler.so.debug.option.optimization.level"
@@ -1490,6 +1500,7 @@
           </builder>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.so.release"
+                natureFilter="ccnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.base">
              <option
                    id="ptp.rdt.gnu.cpp.compiler.so.release.option.optimization.level"
@@ -1502,6 +1513,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.so.release"
+                natureFilter="cnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.base">
              <option
                    id="ptp.rdt.gnu.c.compiler.so.release.option.optimization.level"
@@ -1570,6 +1582,7 @@
           </builder>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.lib.debug"
+                natureFilter="ccnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.base">
              <option
                    id="ptp.rdt.gnu.cpp.compiler.lib.debug.option.optimization.level"
@@ -1582,6 +1595,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.lib.debug"
+                natureFilter="cnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.base">
              <option
                    id="ptp.rdt.gnu.c.compiler.lib.debug.option.optimization.level"
@@ -1594,7 +1608,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.archiver.lib.debug"
-                superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.archiver.base">
+                superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.archiver">
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.assembler.lib.debug"
@@ -1623,6 +1637,7 @@
           </builder>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.lib.release"
+                natureFilter="ccnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.cpp.compiler.base">
              <option
                    id="ptp.rdt.gnu.cpp.compiler.lib.release.option.optimization.level"
@@ -1635,6 +1650,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.lib.release"
+                natureFilter="cnature"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.base">
              <option
                    id="ptp.rdt.gnu.c.compiler.lib.release.option.optimization.level"
@@ -1647,7 +1663,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.archiver.lib.release"
-                superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.archiver.base">
+                superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.archiver">
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.assembler.lib.release"
