@@ -12,6 +12,7 @@ package org.eclipse.ptp.rdt.sync.ui;
 
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -24,12 +25,46 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.part.ViewPart;
 
-public class SyncMergeFileTreeViewer {
-	public static void open(IProject project) {
-		TreeViewer tv = new TreeViewer(null);
-		tv.setContentProvider(new ConflictedFilesContentProvider());
-		tv.setInput(project);
+public class SyncMergeFileTreeViewer extends ViewPart {
+	private IProject project;
+	private Composite parentComposite;
+	private TreeViewer fileTree;
+	private final ReentrantLock treeLock = new ReentrantLock();
+
+	public void createPartControl(Composite parent) {
+		parentComposite = parent;
+		synchronized(treeLock) {
+			TreeViewer fileTree = new TreeViewer(parent);
+			fileTree.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+			fileTree.setContentProvider(new ConflictedFilesContentProvider());
+			if (project != null) {
+				fileTree.setInput(project);
+			}
+		}
+	}
+
+	public void setFocus() {
+		parentComposite.setFocus();
+	}
+	
+	/**
+	 * Set the project displayed by this view. Ideally, this would be passed in on view creation, but Eclipse does not support
+	 * passing of parameters to views.
+	 *
+	 * @param project
+	 */
+	public void setProject(IProject p) {
+		project = p;
+		synchronized(treeLock) {
+			if (fileTree != null) {
+				fileTree.setInput(project);
+			}
+		}
 	}
 	
 	// A boilerplate content provider for project files, except that it filters files that are not merge-conflicted.
