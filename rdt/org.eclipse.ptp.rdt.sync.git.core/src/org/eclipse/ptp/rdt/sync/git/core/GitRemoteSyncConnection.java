@@ -651,13 +651,17 @@ public class GitRemoteSyncConnection {
 	
 	// Get the list of merge-conflicted files from jgit and parse each one, storing result in the cache.
 	private void readMergeConflictFiles() throws RemoteSyncException {
+		String repoPath = git.getRepository().getWorkTree().getAbsolutePath();
+		if (!repoPath.endsWith(java.io.File.separator)) { // The documentation does not say if the separator is added...
+			repoPath += java.io.File.separator;
+		}
+
 		StatusCommand statusCommand = git.status();
 		Status status;
 		try {
 			status = statusCommand.call();
 			for (String s : status.getConflicting()) {
-				Path path = new Path(s);
-				FileToMergePartsMap.put(path, Diff3Parser.parseFile(path.toFile()));
+				FileToMergePartsMap.put(new Path(s), Diff3Parser.parseFile(new File(repoPath + s)));
 			}
 		} catch (NoWorkTreeException e) {
 			throw new RemoteSyncException(e);
@@ -860,8 +864,9 @@ public class GitRemoteSyncConnection {
 				// Handle merge conflict. Read in data needed to resolve the conflict, and then reset the repo.
 				readMergeConflictFiles();
 				if (!FileToMergePartsMap.isEmpty()) {
-					final ResetCommand resetCommand = git.reset().setMode(ResetType.HARD);
+					final ResetCommand resetCommand = git.reset().setMode(ResetType.HARD); // jgit does not yet support merge reset.
 					resetCommand.call();
+					return; // Do not proceed if there is a merge conflict.
 				}
 			} catch (TransportException e) {
 				if (e.getMessage().startsWith("Remote does not have ")) { //$NON-NLS-1$
