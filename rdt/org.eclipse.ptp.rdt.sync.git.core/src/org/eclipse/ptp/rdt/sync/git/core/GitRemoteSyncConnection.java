@@ -649,25 +649,6 @@ public class GitRemoteSyncConnection {
 		}
 	}
 	
-	private void doMerge() throws RemoteSyncException  {
-		try {
-			// Merge it with local
-			Ref masterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
-			final MergeCommand mergeCommand = git.merge().include(masterRef);
-			mergeCommand.call();
-
-			readMergeConflictFiles();
-			if (!FileToMergePartsMap.isEmpty()) {
-				final ResetCommand resetCommand = git.reset().setMode(ResetType.HARD);
-				resetCommand.call();
-			}
-		} catch (IOException e) {
-			throw new RemoteSyncException(e);
-		} catch (GitAPIException e) {
-			throw new RemoteSyncException(e);
-		}
-	}
-	
 	// Get the list of merge-conflicted files from jgit and parse each one, storing result in the cache.
 	private void readMergeConflictFiles() throws RemoteSyncException {
 		StatusCommand statusCommand = git.status();
@@ -871,16 +852,27 @@ public class GitRemoteSyncConnection {
 				// Fetch the remote repository
 				transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
 
+				// Merge it with local
+				Ref masterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
+				final MergeCommand mergeCommand = git.merge().include(masterRef);
+				mergeCommand.call();
+
+				// Handle merge conflict. Read in data needed to resolve the conflict, and then reset the repo.
+				readMergeConflictFiles();
+				if (!FileToMergePartsMap.isEmpty()) {
+					final ResetCommand resetCommand = git.reset().setMode(ResetType.HARD);
+					resetCommand.call();
+				}
 			} catch (TransportException e) {
 				if (e.getMessage().startsWith("Remote does not have ")) { //$NON-NLS-1$
-					//just means that the remote branch isn't set up yet (and thus nothing too fetch). Can be ignored.
+					// Means that the remote branch isn't set up yet (and thus nothing too fetch). Can be ignored and local to
+					// remote sync can proceed.
+					// Note: It is important, though, that we do not merge if fetch fails. Merge will fail because remote ref is
+					// not created.
 				} else {
 					throw new RemoteSyncException(e);
 				}
 			}
-
-			// Do a local merge with fetched contents
-			doMerge();
 
 			// Push local repository to remote
 			if (git.branchList().call().size()>0) { //check whether master was already created
@@ -902,6 +894,8 @@ public class GitRemoteSyncConnection {
 		} catch (final InterruptedException e) {
 			throw new RemoteSyncException(e);
 		} catch (RemoteConnectionException e) {
+			throw new RemoteSyncException(e);
+		} catch (GitAPIException e) {
 			throw new RemoteSyncException(e);
 		} finally {
 			if (monitor != null) {
