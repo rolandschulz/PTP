@@ -328,7 +328,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
         // Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
         // the BuildConfigurationManager relies on the data being up-to-date.
         BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-        String syncProvider = bcm.getProjectSyncProviderName(project);
+        String syncProvider = bcm.getProjectSyncProvider(project);
         BuildScenario buildScenario = new BuildScenario(syncProvider, settings.connection, settings.rootLocation);
         bcm.setBuildScenarioForBuildConfiguration(buildScenario, config);
         try {
