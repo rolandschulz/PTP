@@ -11,10 +11,10 @@
 #*******************************************************************************/ 
 use strict;
 
-sub check_rms {
+sub check_rms_TORQUE {
     my($rmsref,$cmdsref,$verbose)=@_;
     my($key, $cmd);
-    my $rc=0;
+    my $rc=1;
     
     my %cmdname=(
 		"job"  => "qstat",
@@ -38,14 +38,14 @@ sub check_rms {
 		    if (!$?) {
 				chomp($cmdpath);
 				$cmd=$cmdpath;
-				print STDERR "$0: check_rms: found $cmdname{$key} by which ($cmd)\n" if($verbose);
-		    } else {
-				last;
-		    }
+				&report_if_verbose("%s","$0: check_rms_TORQUE: found $cmdname{$key} by which ($cmd)\n");
+		    } 
 		}
 		if (-f $cmd) {
 		    $cmdsref->{"cmd_${key}info"}=$cmd;
-		    $rc=1;
+		}  else {
+		    &report_if_verbose("%s","$0: check_rms_TORQUE: no cmd found for $cmdname{$key}\n");
+		    $rc=0;
 		}
     }
     
@@ -55,25 +55,28 @@ sub check_rms {
 	    my $cmdversion=`$cmd 2>/dev/null`; 	
 	    chomp($cmdversion);
 	    if ($cmdversion=~/version/) {
-			if ($cmdversion=~/PBSPro/) {
-			    print STDERR "$0: check_rms: PBSpro found\n" if($verbose);
-			    $rc=0;
+		if ($cmdversion=~/PBSPro/) {
+		    &report_if_verbose("%s","$0: check_rms_TORQUE: PBSpro found\n");
+		    $rc=0;
 	    	}
 	    } else {
-			print STDERR "$0: check_rms: could not obtain version info from command $cmd\n" if($verbose);
+		&report_if_verbose("%s","$0: check_rms_TORQUE: could not obtain version info from command $cmd\n");
 	    }
     }
 
-    if ($rc)  {
+    if ($rc==1)  {
     	$$rmsref = "TORQUE";
+	&report_if_verbose("%s%s%s", "$0: check_rms_TORQUE: found TORQUE commands (",
+			   join(",",(values(%{$cmdsref}))),
+			   ")\n");
     } else {
-		print STDERR "$0: check_rms: seems not to be a torque system\n" if($verbose);
+	&report_if_verbose("%s","$0: check_rms_TORQUE: seems not to be a TORQUE system\n");
     }
     
     return($rc);
 }
 
-sub generate_step_rms_torque {
+sub generate_step_rms_TORQUE {
     my($workflowxml, $laststep, $cmdsref)=@_;
     my($step,$envs,$key,$ukey);
 
@@ -98,5 +101,8 @@ sub generate_step_rms_torque {
     return($laststep);
 
 }
+
+$main::check_functions->{TORQUE}   =\&check_rms_TORQUE;
+$main::generate_functions->{TORQUE}=\&generate_step_rms_TORQUE;
 
 1;

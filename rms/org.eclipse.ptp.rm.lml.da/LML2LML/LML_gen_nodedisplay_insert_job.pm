@@ -476,7 +476,7 @@ sub _get_numbers_from_name {
     $rg=$schemeref->{ATTR}->{_maskregall};
 
     # ready if nodename matches to this level 
-#    print "get_numbers_from_name: check on level ",$schemeref->{_level}+1," $name -> $rg\n" if($debug>=2); 
+#    print "get_numbers_from_name: check on level ",$schemeref->{_level}+1," $name -> $rg subcheck ",$name=~/^$rg/,"\n" if($debug>=2); 
     if($name=~/^$rg$/) {
 	@list=$name=~/^$rg$/;
 	print "get_numbers_from_name: found on level ",$schemeref->{_level}+1," $name -> ",join(',',@list),"\n" if($debug>=2); 
