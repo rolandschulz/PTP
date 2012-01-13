@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
@@ -102,7 +103,7 @@ public class SyncMergeFileTreeViewer extends ViewPart {
 			ArrayList<IResource> children = new ArrayList<IResource>();
 
 			if (element instanceof IProject && ((IProject) element).isAccessible()) {
-				ISyncServiceProvider provider = this.getSyncProvider((IProject) element);
+				ISyncServiceProvider provider = SyncManager.getSyncProvider((IProject) element);
 				if (provider != null) {
 					conflictedFiles = provider.getMergeConflictFiles();
 					try {
@@ -156,24 +157,6 @@ public class SyncMergeFileTreeViewer extends ViewPart {
 			} else {
 				return true;
 			}
-		}
-		
-		// Low-level access to core to get sync provider. Logs error message and returns null if unable to find a provider.
-		private ISyncServiceProvider getSyncProvider(IProject project) {
-			ISyncServiceProvider provider = null;
-			IConfiguration config = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
-			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-			IServiceConfiguration serviceConfig = bcm.getConfigurationForBuildConfiguration(config);
-			if (serviceConfig != null) {
-				IServiceModelManager serviceModel = ServiceModelManager.getInstance();
-				IService syncService = serviceModel.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-				provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
-			}
-			
-			if (provider == null) {
-				RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMergeFileTreeViewer_0 + config.getName());
-			}
-			return provider;
 		}
 	}
 }
