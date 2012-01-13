@@ -51,7 +51,6 @@ public class SyncManager  {
 	};
 
 	private static final IServiceModelManager serviceModel = ServiceModelManager.getInstance();
-	private static final IService syncService = serviceModel.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
 	private static final String DEFAULT_SAVE_FILE_NAME = "SyncManagerData.xml"; //$NON-NLS-1$
 	private static final String SYNC_MANAGER_ELEMENT_NAME = "sync-manager-data"; //$NON-NLS-1$
 	private static final String SYNC_MODE_ELEMENT_NAME = "project-to-sync-mode"; //$NON-NLS-1$
@@ -318,22 +317,16 @@ public class SyncManager  {
 			throws CoreException {
 		int jobNum = 0;
 		Job[] syncJobs = new Job[buildConfigurations.length];
-		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		for (IConfiguration buildConfig : buildConfigurations) {
 			SynchronizeJob job = null;
-			IServiceConfiguration serviceConfig = bcm.getConfigurationForBuildConfiguration(buildConfig);
-			if (serviceConfig != null) {
-				ISyncServiceProvider provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
-				if (provider != null) {
-					if (isBlocking) {
-						provider.synchronize(delta, monitor, syncFlags);
-					} else {
-						job = new SynchronizeJob(delta, provider, syncFlags, seHandler);
-						job.schedule();
-					}
+			ISyncServiceProvider provider = (ISyncServiceProvider) SyncManager.getSyncProvider(buildConfig);
+			if (provider != null) {
+				if (isBlocking) {
+					provider.synchronize(delta, monitor, syncFlags);
+				} else {
+					job = new SynchronizeJob(delta, provider, syncFlags, seHandler);
+					job.schedule();
 				}
-			} else {
-				RDTSyncCorePlugin.log(Messages.SyncManager_7 + buildConfig.getName());
 			}
 
 			// Each build configuration is matched with a job, which may be null if a job could not be created.
@@ -426,5 +419,38 @@ public class SyncManager  {
 		
 		// Load auto-sync setting
 		fSyncAuto = rootMemento.getBoolean(ATTR_AUTO_SYNC);
+	}
+	
+	/**
+	 * Get the sync service provider for the given project's current active configuration. 
+	 *
+	 * @param project
+	 * @return sync service provider or null if provider cannot be found. (Logs error message in that case.)
+	 */
+	public static ISyncServiceProvider getSyncProvider(IProject project) {
+		IConfiguration config = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
+		return SyncManager.getSyncProvider(config);
+	}
+	
+	/**
+	 * Get the sync service provider for the given build configuration.
+	 *
+	 * @param config
+	 * @return sync service provider or null if provider cannot be found. (Logs error message in that case.)
+	 */
+	public static ISyncServiceProvider getSyncProvider(IConfiguration config) {
+		ISyncServiceProvider provider = null;
+		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+		IServiceConfiguration serviceConfig = bcm.getConfigurationForBuildConfiguration(config);
+		if (serviceConfig != null) {
+			IServiceModelManager serviceModel = ServiceModelManager.getInstance();
+			IService syncService = serviceModel.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
+			provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
+		}
+		
+		if (provider == null) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_7 + config.getName());
+		}
+		return provider;
 	}
 }
