@@ -173,7 +173,7 @@ public class LguiItem implements ILguiItem {
 	public void getCurrentLayout(OutputStream output) {
 		while (lockPattern) {
 			// wait until the pattern have been set
-
+			System.out.print("");
 		}
 		lockUpdate = true;
 		LguiType layoutLgui = null;
@@ -416,6 +416,7 @@ public class LguiItem implements ILguiItem {
 	public void setPattern(String gid, List<IPattern> filterValues) {
 		while (lockUpdate) {
 			// wait until the update with the server is finished
+			System.out.print("");
 		}
 		lockPattern = true;
 		if (filters.containsKey(gid)) {
