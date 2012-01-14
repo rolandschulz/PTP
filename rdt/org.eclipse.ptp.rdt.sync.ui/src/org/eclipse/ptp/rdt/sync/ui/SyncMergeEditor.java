@@ -24,25 +24,35 @@ import org.eclipse.compare.structuremergeviewer.ICompareInput;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
+import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 
+/**
+ * Static class to open a standalone merge editor for a given file.
+ */
 public class SyncMergeEditor {
+	/**
+	 * Open merge editor for the given file. Note that this is the only public method.
+	 * @param file
+	 */
 	public static void open(IFile file) {
+		if (file == null) {
+			return;
+		}
 		CompareUI.openCompareEditor(new FileCompareInput(file));
 	}
 
 	private static class FileCompareInput extends SaveableCompareEditorInput {
-		String Ancestor = "This is a stupid paragraph that I wrote to test the compare editor."; //$NON-NLS-1$
-		String Child1 = "This is a dumb paragraph that I concocted to test the compare editor feature."; //$NON-NLS-1$
-		String Child2 = "This is a stupid paregraph which I wrote to try out the compaare edit0or!"; //$NON-NLS-1$
+		private final IFile file;
 
-
-		public FileCompareInput(IFile file) {
+		public FileCompareInput(IFile f) {
 				super(createCompareConfiguration(), getPage());
+				file = f;
 		}
 		
 		private static CompareConfiguration createCompareConfiguration() {
@@ -61,7 +71,24 @@ public class SyncMergeEditor {
 		}
 
 		protected ICompareInput prepareCompareInput(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-			return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(Ancestor), new SyncMergeItem(Child1), new SyncMergeItem(Child2));
+			ISyncServiceProvider provider = SyncManager.getSyncProvider(file.getProject());
+			String[] mergeParts = null;
+
+			if (provider != null) {
+				mergeParts = provider.getMergeConflictParts(file);
+			}
+			
+			if (provider == null) {
+				return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(Messages.SyncMergeEditor_1),
+						new SyncMergeItem(Messages.SyncMergeEditor_1), new SyncMergeItem(Messages.SyncMergeEditor_1));
+			} else if (mergeParts == null) {
+				return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(Messages.SyncMergeEditor_2),
+						new SyncMergeItem(Messages.SyncMergeEditor_2), new SyncMergeItem(Messages.SyncMergeEditor_2));
+			} else {
+				ITypedElement fileElement = SaveableCompareEditorInput.createFileElement(file);
+				return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(mergeParts[0]),
+						fileElement, new SyncMergeItem(mergeParts[2]));
+			}
 		}
 
 		protected void fireInputChange() {
