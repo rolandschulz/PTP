@@ -65,6 +65,8 @@ public class Messages extends NLS {
 	public static String SyncMenuOperation_5;
 	public static String SyncMenuOperation_6;
 	public static String SyncMergeEditor_0;
+	public static String SyncMergeEditor_1;
+	public static String SyncMergeEditor_2;
 	public static String BRPPage_RemoteProviderLabel;
 	public static String BRPPage_ConnectionLabel;
 	public static String BRPPage_RootLocation;
