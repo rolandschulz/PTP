@@ -86,8 +86,8 @@ public class SyncMergeEditor {
 						new SyncMergeItem(Messages.SyncMergeEditor_2), new SyncMergeItem(Messages.SyncMergeEditor_2));
 			} else {
 				ITypedElement fileElement = SaveableCompareEditorInput.createFileElement(file);
-				return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(mergeParts[0]),
-						fileElement, new SyncMergeItem(mergeParts[2]));
+				return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(mergeParts[2]),
+						fileElement, new SyncMergeItem(mergeParts[1]));
 			}
 		}
 
