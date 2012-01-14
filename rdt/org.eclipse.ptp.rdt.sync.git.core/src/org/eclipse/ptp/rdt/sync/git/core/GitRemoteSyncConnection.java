@@ -926,6 +926,6 @@ public class GitRemoteSyncConnection {
 	 * @return the three parts or null
 	 */
 	public String[] getMergeConflictParts(IFile localFile) {
-		return FileToMergePartsMap.get(localFile.getLocation());
+		return FileToMergePartsMap.get(localFile.getFullPath().removeFirstSegments(1));
 	}
 }
