@@ -293,7 +293,10 @@ public class Activator extends AbstractUIPlugin {
 				fi= loc.getStore(new URI(fiLocs[i]));
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				
+				fi = EFS.getLocalFileSystem().getStore(new Path(fiLocs[i]));
+				
+				//e.printStackTrace();
 			}//  new IFileStore(fiLocs[i]);
 			IFileInfo finf = fi.fetchInfo();
 			

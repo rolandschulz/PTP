@@ -189,7 +189,9 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 				e.printStackTrace();
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+
+				path = EFS.getLocalFileSystem().getStore(new Path(correctPath));
+				//e.printStackTrace();
 			}
 			if (path!=null&&path.fetchInfo().exists())
 				dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path.getParent().toURI().getPath()); //TODO: This may be bad

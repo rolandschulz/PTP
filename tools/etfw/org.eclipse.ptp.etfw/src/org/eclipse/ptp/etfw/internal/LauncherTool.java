@@ -119,7 +119,7 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 			
 			IFileStore progStore=utilBlob.getFile(projectLocation);
 			boolean progStoreGood=false;
-			if(progStore.fetchInfo().exists()){
+			if(progStore.fetchInfo().exists() && progPath!=null){
 				progStore=progStore.getChild(progPath);
 				if(progStore.fetchInfo().exists()){
 					progStoreGood=true;
