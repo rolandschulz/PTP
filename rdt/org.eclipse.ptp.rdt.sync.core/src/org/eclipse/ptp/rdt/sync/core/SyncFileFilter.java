@@ -17,7 +17,9 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ui.IMemento;
@@ -165,6 +167,19 @@ public class SyncFileFilter {
 	 * @return whether the string should be ignored
 	 */
 	public boolean shouldIgnore(IResource r) {
+		// Cannot ignore a folder if it contains members that should not be ignored.
+		if (r instanceof IFolder) {
+			try {
+				for (IResource member : ((IFolder) r).members()) {
+					if (!this.shouldIgnore(member)) {
+						return false;
+					}
+				}
+			} catch (CoreException e) {
+				// Could mean folder doesn't exist, which is fine. Continue with testing.
+			}
+		}
+
 		for (ResourceMatcher pm : filteredPaths) {
 			if (pm.match(r)) {
 				PatternType type = patternToTypeMap.get(pm);
