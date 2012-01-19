@@ -77,6 +77,7 @@
 #endif
 
 #define PE_SCI_DEBUG				/* Include code for PE proxy support for the sci mode debugger.*/
+#define SDM_HELPER					/* Undefine to generate routing file and launch SDM master locally */
 
   /* #define DO_TIMING to obtain proxy timings */
 #ifdef DO_TIMING
@@ -1255,7 +1256,19 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             }
         }
     }
-    if ((debug_sdm_mode) && (cwd != NULL)) {
+    if (execdir == NULL) {
+        post_submitjob_error(trans_id, jobid, "No executable directory specified");
+        if (current_hostlist != NULL) {
+            free(current_hostlist);
+        }
+        TRACE_EXIT;
+        return PTP_PROXY_RES_OK;
+    }
+    if (cwd == NULL) {
+    	cwd = execdir;
+    }
+#ifndef SDM_HELPER
+    if (debug_sdm_mode) {
 	    char routing_file_path[_POSIX_PATH_MAX + 1];
 
 	      /*
@@ -1266,21 +1279,19 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
         sprintf(routing_file_path, "%s/routing_file", cwd);
         unlink(routing_file_path);
     }
-
+#endif /* !SDM_HELPER */
     if (jobid == NULL) {
         post_error(trans_id, PTP_PROXY_EV_RT_SUBMITJOB_ERROR, "Missing ID on job submission");
     }
-    if (cwd != NULL) {
-        status = chdir(cwd);
-        if (status == -1) {
-            post_submitjob_error(trans_id, jobid, "Invalid working directory");
-            if (current_hostlist != NULL) {
-                free(current_hostlist);
-            }
-            TRACE_EXIT;
-            return PTP_PROXY_RES_OK;
-        }
-    }
+	status = chdir(cwd);
+	if (status == -1) {
+		post_submitjob_error(trans_id, jobid, "Invalid working directory");
+		if (current_hostlist != NULL) {
+			free(current_hostlist);
+		}
+		TRACE_EXIT;
+		return PTP_PROXY_RES_OK;
+	}
     if (mp_buffer_mem_set) {
         snprintf(mp_buffer_mem_value, sizeof mp_buffer_mem_value, "MP_BUFFER_MEM=%s%s%s", mp_buffer_mem,
                 (mp_buffer_mem_max[0] == '\0') ? "" : ",", mp_buffer_mem_max);
@@ -1288,14 +1299,6 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     if (mp_rdma_count_set) {
         snprintf(mp_rdma_count_value, sizeof mp_rdma_count_value, "MP_RDMA_COUNT=%s%s%s", mp_rdma_count,
                 (mp_rdma_count_2[0] == '\0') ? "" : ",", mp_rdma_count_2);
-    }
-    if (execdir == NULL) {
-        post_submitjob_error(trans_id, jobid, "No executable directory specified");
-        if (current_hostlist != NULL) {
-            free(current_hostlist);
-        }
-        TRACE_EXIT;
-        return PTP_PROXY_RES_OK;
     }
     if (execname == NULL) {
         post_submitjob_error(trans_id, jobid, "No executable specified");
@@ -2066,6 +2069,7 @@ startup_monitor(void *job_ident)
     taskp = tasks;
     sprintf(jobid_str, "%d", ((jobinfo *) job_ident)->proxy_jobid);
     msg = proxy_new_process_event(start_events_transid, jobid_str, numtasks);
+#ifndef SDM_HELPER
     /*
      * Need to determine whether the proxy or the GUI writes the routing file.
      * If the GUI writes the routing file, that may become a problem as larger
@@ -2095,6 +2099,7 @@ startup_monitor(void *job_ident)
             TRACE_DETAIL_V("\nError writing routing file: %s\n", strerror(errno));
         }
     }
+#endif /* !SDM_HELPER */
     if (job->discovered_job) {
         /*
          * If this is a job running before the proxy started, then
@@ -2217,6 +2222,7 @@ startup_monitor(void *job_ident)
         stdio_handler_info->job = job;
         AddToList(active_stdio, stdio_handler_info);
     }
+#ifndef SDM_HELPER
     if (job->debugging) {
         /*
          * If this is a debug session then we need to start the top level SDM process
@@ -2257,6 +2263,7 @@ startup_monitor(void *job_ident)
             }
         }
     }
+#endif /* !SDM_HELPER */
     /*
      * The startup thread exits at this point, so clear the reference in
      * the job info

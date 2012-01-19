@@ -25,6 +25,7 @@ import org.eclipse.cdt.launch.ui.CMainTab;
 import org.eclipse.cdt.launch.ui.ICDTLaunchHelpContextIds;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.IManagedProject;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -255,7 +256,11 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 			return;
 		}
 
-		IConfiguration[] confs = info.getManagedProject().getConfigurations();
+		IManagedProject imp = info.getManagedProject();
+		if(imp==null)
+			return;
+		
+		IConfiguration[] confs = imp.getConfigurations();
 
 		for (int i = 0; i < confs.length; i++) {
 			buildConfCombo.add(confs[i].getName());
