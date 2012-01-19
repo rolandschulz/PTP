@@ -46,6 +46,8 @@ public class Messages extends NLS {
 
 	public static String RegexResourceMatcher_0;
 
+	public static String RemoteContentProvider_0;
+
 	public static String ResourceMatcher_0;
 
 	public static String ResourceMatcher_1;

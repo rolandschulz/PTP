@@ -37,6 +37,7 @@ import org.eclipse.ptp.rdt.sync.core.BinaryResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.PathResourceMatcher;
+import org.eclipse.ptp.rdt.sync.core.RemoteContentProvider;
 import org.eclipse.ptp.rdt.sync.core.ResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.RegexResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;

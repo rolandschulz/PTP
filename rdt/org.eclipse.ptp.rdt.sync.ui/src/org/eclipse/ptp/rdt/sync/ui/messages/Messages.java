@@ -29,7 +29,6 @@ public class Messages extends NLS {
 	public static String ConvertToRemoteWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_convertingToSyncProject;
-	public static String RemoteContentProvider_0;
 	public static String RemoteSyncWizardPage_0;
 	public static String RemoteSyncWizardPage_description;
 	public static String ResourceChangeListener_0;
