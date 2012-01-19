@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
@@ -28,9 +26,6 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
  * This class provides access to information-objects within a lml-model. It can
  * be used for fast and simple access to information filtered by the
  * information-type or the object-id.
- * 
- * @author karbach
- * 
  */
 public class OIDToInformation extends LguiHandler {
 
@@ -198,18 +193,13 @@ public class OIDToInformation extends LguiHandler {
 
 		oidtoinfo = new HashMap<String, List<InfoType>>();
 
-		final List<JAXBElement<?>> alltags = lgui.getObjectsAndRelationsAndInformation();
+		for (final Object object : jaxbUtil.getObjects(lgui)) {
 
-		for (final JAXBElement<?> jaxbtag : alltags) {// over all
-														// information-tags
-
-			final Object tag = jaxbtag.getValue();
-
-			if (!(tag instanceof InformationType)) {
+			if (!(object instanceof InformationType)) {
 				continue;
 			}
 
-			final InformationType ainfos = (InformationType) tag;
+			final InformationType ainfos = (InformationType) object;
 
 			final List<InfoType> realinfos = ainfos.getInfo();
 

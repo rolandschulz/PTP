@@ -12,12 +12,18 @@
 package org.eclipse.ptp.rm.lml.ui.views;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -35,19 +41,23 @@ import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.ITableFilterEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.core.model.IPattern;
 import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
 import org.eclipse.ptp.rm.lml.internal.core.model.Cell;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
+import org.eclipse.ptp.rm.lml.internal.core.model.Pattern;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.ui.providers.EventForwarder;
+import org.eclipse.ptp.rm.lml.ui.providers.FilterDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -67,6 +77,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -198,6 +209,35 @@ public class TableView extends ViewPart {
 
 		}
 
+		public void handleEvent(final ITableFilterEvent event) {
+			if (event.getGid().equals(gid)) {
+				UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+					public void run() throws Exception {
+						if (composite != null && fLguiItem != null && viewCreated) {
+							if (componentAdded) {
+								fLguiItem.getObjectStatus().removeComponent(eventForwarder);
+								componentAdded = false;
+							}
+							saveColumnLayout();
+							disposeTable();
+							viewCreated = false;
+						}
+						if (composite != null && !viewCreated) {
+							fLguiItem = lmlManager.getSelectedLguiItem();
+							if (fLguiItem != null) {
+								createTable();
+								viewCreated = true;
+								if (fLguiItem.getObjectStatus() != null) {
+									fLguiItem.getObjectStatus().addComponent(eventForwarder);
+									componentAdded = true;
+								}
+							}
+						}
+					}
+				});
+			}
+		}
+
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -210,7 +250,11 @@ public class TableView extends ViewPart {
 							&& tree.getSortColumn() != null) {
 						fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
 					}
-					setViewerInput();
+					if (fLguiItem.getPattern(gid).size() > 0) {
+						setViewerInput(fLguiItem.getPattern(gid));
+					} else {
+						setViewerInput();
+					}
 				}
 			});
 
@@ -276,7 +320,11 @@ public class TableView extends ViewPart {
 							fLguiItem.getTableHandler().getSortProperties(gid);
 							fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
 						}
-						setViewerInput();
+						if (fLguiItem.getPattern(gid).size() > 0) {
+							setViewerInput(fLguiItem.getPattern(gid));
+						} else {
+							setViewerInput();
+						}
 						if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
 							fLguiItem.getObjectStatus().addComponent(eventForwarder);
 							componentAdded = true;
@@ -300,10 +348,14 @@ public class TableView extends ViewPart {
 	private String gid = null;
 	private final ILMLListener lmlListener = new LMLTableListListener();
 	private final LMLManager lmlManager = LMLManager.getInstance();
+	private IMenuManager viewMenuManager;
+	private ActionContributionItem filterActionItem;
+	private ActionContributionItem filterOwnJobsActionItem;
 	private TreeItem selectedItem = null;
 	private String selectedOid = null;
 	private boolean componentAdded = false;
 	private boolean viewCreated = false;
+	private IViewSite viewSite = null;
 
 	private boolean isMouseDown = false;
 	private final EventForwarder eventForwarder = new EventForwarder();
@@ -383,7 +435,42 @@ public class TableView extends ViewPart {
 		 */
 		fLguiItem = lmlManager.getSelectedLguiItem();
 
+		// ViewMenuManager
+		viewMenuManager = getViewSite().getActionBars().getMenuManager();
+		final IAction filterOwnJobsAction = new Action("Show only my jobs", IAction.AS_CHECK_BOX) {
+
+			@Override
+			public void run() {
+				final List<IPattern> filterValues = new LinkedList<IPattern>();
+				if (isChecked()) {
+					filterValues.add((new Pattern("owner", "alpha")).setRelation("=", fLguiItem.getUsername()));
+				}
+				// TODO After decision about new structure of LML and server side
+				fLguiItem.setPattern(gid, filterValues);
+				setViewerInput(filterValues);
+			}
+
+		};
+		final IAction filterAction = new Action("Filters...") {
+
+			@Override
+			public void run() {
+				final FilterDialog dialog = new FilterDialog(new Shell(
+						viewSite.getShell()), gid);
+				dialog.open();
+			}
+		};
+
+		filterOwnJobsActionItem = new ActionContributionItem(filterOwnJobsAction);
+		filterActionItem = new ActionContributionItem(filterAction);
+		viewMenuManager.add(filterOwnJobsActionItem);
+		viewMenuManager.add(new Separator());
+		viewMenuManager.add(filterActionItem);
+		filterOwnJobsActionItem.getAction().setEnabled(false);
+		filterActionItem.getAction().setEnabled(false);
+
 		createTable();
+
 		tree.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				if (fLguiItem != null) {
@@ -406,6 +493,7 @@ public class TableView extends ViewPart {
 			e.printStackTrace();
 		}
 		lmlManager.addListener(lmlListener, this.getClass().getName());
+		viewSite = site;
 	}
 
 	/**
@@ -416,7 +504,11 @@ public class TableView extends ViewPart {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (viewer != null) {
-					setViewerInput();
+					if (fLguiItem.getPattern(gid).size() > 0) {
+						setViewerInput(fLguiItem.getPattern(gid));
+					} else {
+						setViewerInput();
+					}
 					viewer.refresh();
 				}
 				return Status.OK_STATUS;
@@ -440,12 +532,14 @@ public class TableView extends ViewPart {
 		}
 
 		final ITableColumnLayout[] tableColumnLayouts = fLguiItem.getTableHandler().getTableColumnLayout(gid);
-		if (tableColumnLayouts == null) {
+		if (tableColumnLayouts.length == 0) {
 			return;
 		}
 
 		treeColumns = new TreeColumn[tableColumnLayouts.length];
 		savedColumnWidths = new int[tableColumnLayouts.length + 1];
+
+		final String[] columnTitlesPattern = fLguiItem.getColumnTitlePattern(gid);
 
 		// first column with color rectangle
 		TreeViewerColumn treeViewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
@@ -514,7 +608,18 @@ public class TableView extends ViewPart {
 			});
 			treeColumn = treeViewerColumn.getColumn();
 			treeColumn.setMoveable(true);
-			treeColumn.setText(tableColumnLayouts[i].getTitle());
+			boolean isFiltered = false;
+			for (final String title : columnTitlesPattern) {
+				if (title.equals(tableColumnLayouts[i].getTitle())) {
+					isFiltered = true;
+				}
+			}
+			if (isFiltered) {
+				treeColumn.setText(tableColumnLayouts[i].getTitle() + " #");
+			} else {
+				treeColumn.setText(tableColumnLayouts[i].getTitle());
+			}
+
 			treeColumn.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
 
 			if (tableColumnLayouts[i].isActive()) {
@@ -674,11 +779,19 @@ public class TableView extends ViewPart {
 					tree.setSortColumn(getSortColumn((Integer) sortProperties[0]));
 					fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
 				}
-			}
-		}
 
-		// Insert the input
-		setViewerInput();
+				filterOwnJobsActionItem.getAction().setEnabled(true);
+				filterActionItem.getAction().setEnabled(true);
+			}
+
+			// Insert the input
+			if (fLguiItem.getPattern(gid).size() > 0) {
+				setViewerInput(fLguiItem.getPattern(gid));
+			} else {
+				setViewerInput();
+			}
+
+		}
 		composite.layout();
 	}
 
@@ -691,6 +804,10 @@ public class TableView extends ViewPart {
 	private void disposeTable() {
 		tree.setSortColumn(null);
 		tree.setSortDirection(0);
+
+		filterOwnJobsActionItem.getAction().setEnabled(false);
+		filterActionItem.getAction().setEnabled(false);
+
 		/*
 		 * Remove columns
 		 */
@@ -710,7 +827,6 @@ public class TableView extends ViewPart {
 		for (final MenuItem item : headerMenu.getItems()) {
 			item.dispose();
 		}
-		getViewSite().getActionBars().getMenuManager().removeAll();
 	}
 
 	private int getColumnAlignment(String alignment) {
@@ -854,6 +970,26 @@ public class TableView extends ViewPart {
 			Row[] input = new Row[0];
 			if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
 				input = fLguiItem.getTableHandler().getTableDataWithColor(gid, gid.equals(ILguiItem.ACTIVE_JOB_TABLE));
+			}
+			if (!composite.isDisposed()) {
+				viewer.setInput(input);
+				viewer.setChildCount(input, input.length);
+			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void setViewerInput(List<IPattern> filterValues) {
+		/*
+		 * Don't change input if mouse is down as this causes a SIGSEGV in SWT!
+		 */
+		if (!isMouseDown) {
+			Row[] input = new Row[0];
+			if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
+				input = fLguiItem.getTableHandler()
+						.getTableDataWithColor(gid, gid.equals(ILguiItem.ACTIVE_JOB_TABLE), filterValues);
 			}
 			if (!composite.isDisposed()) {
 				viewer.setInput(input);

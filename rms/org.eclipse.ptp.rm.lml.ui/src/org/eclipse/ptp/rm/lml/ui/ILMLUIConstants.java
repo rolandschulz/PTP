@@ -32,4 +32,5 @@ public interface ILMLUIConstants extends ILMLCoreConstants {
 	public static final String VIEW_TABLE_2 = "joblistwait"; //$NON-NLS-1$
 
 	public static final int INTERNAL_ERROR = 150;
+	public static final String COLUMN_STATUS = "status";//$NON-NLS-1$
 }

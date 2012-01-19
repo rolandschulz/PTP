@@ -12,6 +12,8 @@ package org.eclipse.ptp.rm.lml.core.model;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
@@ -77,12 +79,14 @@ public interface ILguiItem {
 	 */
 	public void addUserJob(String jobId, JobStatusData status, boolean force);
 
+	public String[] getColumnTitlePattern(String gid);
+
 	/**
 	 * The meth
 	 * 
 	 * @param output
 	 */
-	public void getCurrentLayout(OutputStream output) throws JAXBException;
+	public void getCurrentLayout(OutputStream output);
 
 	/**
 	 * @return
@@ -114,6 +118,10 @@ public interface ILguiItem {
 	 */
 	public OverviewAccess getOverviewAccess();
 
+	public Map<String, List<IPattern>> getPattern();
+
+	public List<IPattern> getPattern(String gid);
+
 	/**
 	 * @return
 	 */
@@ -129,6 +137,8 @@ public interface ILguiItem {
 	 * @return
 	 */
 	public JobStatusData[] getUserJobs();
+
+	public String getUsername();
 
 	/**
 	 * Getting the version of the LguiType:
@@ -157,15 +167,9 @@ public interface ILguiItem {
 
 	/**
 	 * 
-	 * @param memento
+	 * @param layout
 	 */
 	public void reloadLastLayout(StringBuilder layout);
-
-	// /**
-	// *
-	// * @param memento
-	// */
-	// public void reloadLastLayout(IMemento memento);
 
 	/**
 	 * @param name
@@ -179,15 +183,9 @@ public interface ILguiItem {
 	 */
 	public String saveCurrentLayout();
 
-	// /**
-	// * The Resource Manager is being closed. The current layout of the
-	// different
-	// * monitoring parts should be saved during the closing.
-	// *
-	// * @param memento
-	// * Memento in which the current layout should be saved
-	// */
-	// public void saveCurrentLayout(IMemento memento);
+	public void setPattern(Map<String, List<IPattern>> pattern);
+
+	public void setPattern(String gid, List<IPattern> filterValues);
 
 	public void setRequest(RequestType request);
 
@@ -203,7 +201,7 @@ public interface ILguiItem {
 	 * @param stream
 	 * @throws JAXBException
 	 */
-	public void update(InputStream stream) throws JAXBException;
+	public void update(InputStream stream);
 
 	/**
 	 * @param name

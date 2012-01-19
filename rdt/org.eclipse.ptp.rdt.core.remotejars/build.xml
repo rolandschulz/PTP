@@ -313,19 +313,23 @@
 	</target>
 	
 	<target name="clean" depends="clean.except.jars">
-		<delete dir="${basedir}" failonerror="false">
-			<include name="cdtminer.jar"/>
-			<include name="cdtmodel.jar"/>
-			<include name="cdtparser.jar"/>
-			<include name="stubs.jar"/>
-			<include name="lrparser.jar"/>
-			<include name="upcparser.jar"/>
-			<include name="xlcparser.jar"/>
-			<include name="spawner.jar"/>
-			<include name="${serverBaseName}-linux-*.tar"/>
-			<include name="${serverBaseName}-macosx-*.tar"/>
-			<include name="${serverBaseName}-unix-*.tar"/>
-			<include name="${serverBaseName}-windows-*.zip"/>
+		<delete failonerror="false">
+			<fileset dir="${basedir}">
+				<include name="cdtminer.jar"/>
+				<include name="cdtmodel.jar"/>
+				<include name="cdtparser.jar"/>
+				<include name="stubs.jar"/>
+				<include name="lrparser.jar"/>
+				<include name="upcparser.jar"/>
+				<include name="xlcparser.jar"/>
+				<include name="spawner.jar"/>
+				<include name="${serverBaseName}-aix-*.tar"/>
+				<include name="${serverBaseName}-linux.ppc-*.tar"/>
+				<include name="${serverBaseName}-linux.x86-*.tar"/>
+				<include name="${serverBaseName}-macosx-*.tar"/>
+				<include name="${serverBaseName}-unix-*.tar"/>
+				<include name="${serverBaseName}-windows-*.zip"/>
+			</fileset>
 		</delete>
 		<exec executable="rm">
 			<arg value="-f"/>
@@ -334,35 +338,37 @@
 		<delete dir="${remoteServerTempDir}"/>
 		<delete dir="${platformTempDir}"/>
 		<delete dir="${downloads}"/>
-		<delete dir="${basedir}/../org.eclipse.ptp.core"/>
-		<delete dir="${basedir}/../org.eclipse.ptp.core.aix"/>
-		<delete dir="${basedir}/../org.eclipse.ptp.core.linux.ppc64"/>
-		<delete dir="${basedir}/../org.eclipse.ptp.core.linux.x86"/>
-		<delete dir="${basedir}/../org.eclipse.ptp.core.lrparser"/>
-		<delete dir="${basedir}/../org.eclipse.ptp.core.lrparser.xlc"/>
-		<delete dir="${basedir}/../org.eclipse.ptp.core.parser.upc"/>
+		<delete dir="${basedir}/../org.eclipse.cdt.core"/>
+		<delete dir="${basedir}/../org.eclipse.cdt.core.aix"/>
+		<delete dir="${basedir}/../org.eclipse.cdt.core.linux.ppc64"/>
+		<delete dir="${basedir}/../org.eclipse.cdt.core.linux.x86"/>
+		<delete dir="${basedir}/../org.eclipse.cdt.core.lrparser"/>
+		<delete dir="${basedir}/../org.eclipse.cdt.core.lrparser.xlc"/>
+		<delete dir="${basedir}/../org.eclipse.cdt.core.parser.upc"/>
 		<delete dir="${basedir}/gitrepo"/>
 		<delete dir="${basedir}/build"/>
 	</target>
 	
 	<target name="clean.except.jars">
-		<delete dir="${basedir}" failonerror="false">
-			<include name="build.cdtminer.xml"/>
-			<include name="build.cdtmodel.xml"/>
-			<include name="build.cdtparser.xml"/>
-			<include name="build.stubs.xml"/>
-			<include name="build.lrparser.xml"/>
-			<include name="build.upcparser.xml"/>
-			<include name="build.xlcparser.xml"/>
-			<include name="build.spawner.xml"/>
-			<include name="cdtminer.files.xml"/>
-			<include name="cdtmodel.files.xml"/>
-			<include name="cdtparser.files.xml"/>
-			<include name="stubs.files.xml"/>
-			<include name="lrparser.files.xml"/>
-			<include name="upcparser.files.xml"/>
-			<include name="xlcparser.files.xml"/>
-			<include name="spawner.files.xml"/>
+		<delete failonerror="false">
+			<fileset dir="${basedir}">
+				<include name="build.cdtminer.xml"/>
+				<include name="build.cdtmodel.xml"/>
+				<include name="build.cdtparser.xml"/>
+				<include name="build.stubs.xml"/>
+				<include name="build.lrparser.xml"/>
+				<include name="build.upcparser.xml"/>
+				<include name="build.xlcparser.xml"/>
+				<include name="build.spawner.xml"/>
+				<include name="cdtminer.files.xml"/>
+				<include name="cdtmodel.files.xml"/>
+				<include name="cdtparser.files.xml"/>
+				<include name="stubs.files.xml"/>
+				<include name="lrparser.files.xml"/>
+				<include name="upcparser.files.xml"/>
+				<include name="xlcparser.files.xml"/>
+				<include name="spawner.files.xml"/>
+			</fileset>
 		</delete>
 	</target>
 	

@@ -18,6 +18,7 @@ import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.ITableFilterEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
@@ -78,6 +79,11 @@ public class NodesView extends ViewPart {
 			if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
 				fLguiItem.getObjectStatus().mouseOver(event.getOid());
 			}
+		}
+
+		public void handleEvent(ITableFilterEvent event) {
+			// TODO Auto-generated method stub
+
 		}
 
 		public void handleEvent(ITableSortedEvent e) {

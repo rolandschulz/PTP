@@ -13,7 +13,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -41,10 +45,12 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
+import org.eclipse.ptp.rm.lml.core.model.IPattern;
 import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
 import org.eclipse.ptp.rm.lml.internal.core.elements.CommandType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.DriverType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
+import org.eclipse.ptp.rm.lml.internal.core.model.Pattern;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
 import org.eclipse.ptp.rm.lml.monitor.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
@@ -166,6 +172,15 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	private static final String LAYOUT = "layout";//$NON-NLS-1$
 	private static final String LAYOUT_STRING = "layoutString";//$NON-NLS-1$
+	private static final String PATTERN_GID_ATTR = "gid";//$NON-NLS-1$
+	private static final String FILTER_TITLE_ATTR = "columnTitle";//$NON-NLS-1$
+	private static final String FILTER_TYPE_ATTR = "type";//$NON-NLS-1$
+	private static final String FILTER_RANGE_ATTR = "range";//$NON-NLS-1$
+	private static final String FILTER_RELATION_ATTR = "relation";//$NON-NLS-1$
+	private static final String FILTER_MAX_VALUE_RANGE_ATTR = "maxValueRange";//$NON-NLS-1$
+	private static final String FILTER_MIN_VALUE_RANGE_ATTR = "minValueRange";//$NON-NLS-1$
+	private static final String FILTER_RELATION_OPERATOR_ATTR = "relationOperartor";//$NON-NLS-1$
+	private static final String FILTER_RELATION_VALUE_ATTR = "relationValue";//$NON-NLS-1$
 	private static final String JOB_ID_ATTR = "job_id";//$NON-NLS-1$
 	private static final String RM_ID_ATTR = "rm_id";//$NON-NLS-1$
 	private static final String STDOUT_REMOTE_FILE_ATTR = "stdout_remote_path";//$NON-NLS-1$
@@ -243,7 +258,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		return null;
 	}
 
-	private JobStatusData[] reload(IMemento memento) {
+	private JobStatusData[] reloadJobs(IMemento memento) {
 		final List<JobStatusData> jobs = new ArrayList<JobStatusData>();
 		if (memento != null) {
 			final IMemento[] children = memento.getChildren(JOB_ID_ATTR);
@@ -257,7 +272,34 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		return jobs.toArray(new JobStatusData[jobs.size()]);
 	}
 
-	private void save(JobStatusData job, XMLMemento memento) {
+	private Map<String, List<IPattern>> reloadPattern(IMemento memento) {
+		final Map<String, List<IPattern>> pattern = new HashMap<String, List<IPattern>>();
+		if (memento != null) {
+			final IMemento[] childrenPattern = memento.getChildren(PATTERN_GID_ATTR);
+			for (final IMemento childPattern : childrenPattern) {
+				final List<IPattern> filters = new LinkedList<IPattern>();
+				final IMemento[] childrenFilter = childPattern.getChildren(FILTER_TITLE_ATTR);
+				for (final IMemento childFilter : childrenFilter) {
+					final IPattern filter = new Pattern(childFilter.getID(), childFilter.getString(FILTER_TYPE_ATTR));
+					if (childFilter.getBoolean(FILTER_RANGE_ATTR)) {
+						filter.setRange(childFilter.getString(FILTER_MIN_VALUE_RANGE_ATTR),
+								childFilter.getString(FILTER_MAX_VALUE_RANGE_ATTR));
+					} else if (childFilter.getBoolean(FILTER_RELATION_ATTR)) {
+						filter.setRelation(childFilter.getString(FILTER_RELATION_OPERATOR_ATTR),
+								childFilter.getString(FILTER_RELATION_VALUE_ATTR));
+					}
+					filters.add(filter);
+				}
+
+				if (filters.size() > 0) {
+					pattern.put(childPattern.getID(), filters);
+				}
+			}
+		}
+		return pattern;
+	}
+
+	private void saveJob(JobStatusData job, XMLMemento memento) {
 		final IMemento jobMemento = memento.createChild(JOB_ID_ATTR, job.getJobId());
 		jobMemento.putString(RM_ID_ATTR, job.getRmId());
 		jobMemento.putString(STATE_ATTR, job.getState());
@@ -269,6 +311,23 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		jobMemento.putString(OWNER_ATTR, job.getOwner());
 		jobMemento.putString(OID_ATTR, job.getOid());
 
+	}
+
+	private void savePattern(String key, List<IPattern> value, IMemento memento) {
+		final IMemento patternMemento = memento.createChild(PATTERN_GID_ATTR, key);
+		for (final IPattern filterValue : value) {
+			final IMemento filterMemento = patternMemento.createChild(FILTER_TITLE_ATTR, filterValue.getColumnTitle());
+			filterMemento.putString(FILTER_TYPE_ATTR, filterValue.getType());
+			filterMemento.putBoolean(FILTER_RANGE_ATTR, filterValue.isRange());
+			filterMemento.putBoolean(FILTER_RELATION_ATTR, filterValue.isRelation());
+			if (filterValue.isRange()) {
+				filterMemento.putString(FILTER_MIN_VALUE_RANGE_ATTR, filterValue.getMinValueRange());
+				filterMemento.putString(FILTER_MAX_VALUE_RANGE_ATTR, filterValue.getMaxValueRange());
+			} else if (filterValue.isRelation()) {
+				filterMemento.putString(FILTER_RELATION_OPERATOR_ATTR, filterValue.getRelationOperator());
+				filterMemento.putString(FILTER_RELATION_VALUE_ATTR, filterValue.getRelationValue());
+			}
+		}
 	}
 
 	@Override
@@ -301,6 +360,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		if (memento != null) {
 			final String layout = fLMLManager.getCurrentLayout(getResourceManager().getUniqueName());
 			final JobStatusData[] jobs = fLMLManager.getUserJobs(getResourceManager().getUniqueName());
+			final Map<String, List<IPattern>> patternMap = fLMLManager.getCurrentPattern(getResourceManager().getUniqueName());
 
 			if (layout != null) {
 				final IMemento layoutMemento = memento.createChild(LAYOUT);
@@ -310,8 +370,14 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 			if (jobs != null && jobs.length > 0) {
 				for (final JobStatusData status : jobs) {
 					if (!status.isRemoved()) {
-						save(status, memento);
+						saveJob(status, memento);
 					}
+				}
+			}
+
+			if (patternMap != null && patternMap.keySet().size() > 0) {
+				for (final Entry<String, List<IPattern>> pattern : patternMap.entrySet()) {
+					savePattern(pattern.getKey(), pattern.getValue(), memento);
 				}
 			}
 		}
@@ -354,42 +420,50 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 		final StringBuilder layout = new StringBuilder();
 		JobStatusData[] jobs = null;
+		Map<String, List<IPattern>> pattern = null;
 
 		if (memento != null) {
-			final IMemento child = memento.getChild(LAYOUT);
-			if (child != null) {
-				final String childString = child.getString(LAYOUT_STRING);
-				layout.append(childString);
+			final IMemento childLayout = memento.getChild(LAYOUT);
+			if (childLayout != null) {
+				final String childLayoutString = childLayout.getString(LAYOUT_STRING);
+				layout.append(childLayoutString);
 			}
 
-			jobs = reload(memento);
+			pattern = reloadPattern(memento);
+			jobs = reloadJobs(memento);
 		}
-		/*
-		 * Initialize LML classes
-		 */
-		fLMLManager.openLgui(getResourceManager().getUniqueName(), getMonitorConfigurationRequestType(), layout, jobs);
-		/*
-		 * Open connection and launch periodic job
-		 */
 		final IRemoteConnection conn = getRemoteConnection(monitor);
-		if (conn != null) {
-			if (!conn.isOpen()) {
-				try {
-					conn.open(monitor);
-				} catch (final RemoteConnectionException e) {
-					throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(), e.getMessage()));
-				}
+		if (conn == null) {
+			throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
+					Messages.LMLResourceManagerMonitor_unableToOpenConnection));
+		}
+
+		if (!conn.isOpen()) {
+			try {
+				conn.open(monitor);
+			} catch (final RemoteConnectionException e) {
+				throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(), e.getMessage()));
 			}
 			if (!conn.isOpen()) {
 				throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
 						Messages.LMLResourceManagerMonitor_unableToOpenConnection));
 			}
-			synchronized (this) {
-				if (fMonitorJob == null) {
-					fMonitorJob = new MonitorJob(Messages.LMLResourceManagerMonitor_LMLMonitorJob, conn);
-				}
-				fMonitorJob.schedule();
+		}
+
+		/*
+		 * Initialize LML classes
+		 */
+		fLMLManager.openLgui(getResourceManager().getUniqueName(), conn.getUsername(), getMonitorConfigurationRequestType(),
+				layout, jobs, pattern);
+
+		/*
+		 * Start monitoring job
+		 */
+		synchronized (this) {
+			if (fMonitorJob == null) {
+				fMonitorJob = new MonitorJob(Messages.LMLResourceManagerMonitor_LMLMonitorJob, conn);
 			}
+			fMonitorJob.schedule();
 		}
 
 		/*

@@ -26,7 +26,7 @@ my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
 my $patbl ="\\s+";             # Pattern for blank space (variable length)
 
-my $version="1.12";
+my $version="1.14";
  
 my ($tstart,$tdiff,$rc);
 
@@ -58,34 +58,69 @@ my ($tstart,$tdiff,$rc);
 #    - return output file
 
 # option handling
-my $opt_rawfile=""; # unset
-my $opt_verbose=0;
-my $opt_quiet=0;
 my $hostname = `hostname`;chomp($hostname);
 my $ppid = $$;
-my $opt_tmpdir=sprintf("./tmp_%s_%d",$hostname,$ppid);
-my $opt_permdir=sprintf("./perm_%s",$hostname);
-my $opt_keeptmp=0;
-my $opt_keepperm=1;
-my $opt_dump=0;
-my $opt_demo=0;
+my %options = (
+    "rawfile"             => "",
+    "tmpdir"              => "./tmp_".$hostname."_".$ppid,
+    "permdir"             => "./perm_".$hostname,
+    "keeptmp"             => 0,
+    "keepperm"            => 1,
+    "verbose"             => 0,
+    "quiet"               => 0,
+    "nocheckrequest"      => 0,
+    "rms"                 => "undef",
+    "dump"                => 0,
+    "demo"                => 0,
+    "test"                => 0
+);
+my @save_ARGV=(@ARGV);
+my @options_from_file_found;
+
 usage($0) if( ! GetOptions( 
-			    'verbose'          => \$opt_verbose,
-			    'quiet'            => \$opt_quiet,
-			    'rawfile=s'        => \$opt_rawfile,
-			    'tmpdir=s'         => \$opt_tmpdir,
-			    'permdir=s'        => \$opt_permdir,
-			    'keeptmp'          => \$opt_keeptmp,
-			    'demo'             => \$opt_demo,
-			    'dump'             => \$opt_dump
-			    ) );
+                            'verbose'          => \$options{verbose},
+                            'quiet'            => \$options{quiet},
+                            'rawfile=s'        => \$options{rawfile},
+                            'tmpdir=s'         => \$options{tmpdir},
+                            'permdir=s'        => \$options{permdir},
+                            'keeptmp'          => \$options{keeptmp},
+                            'rms=s'            => \$options{rms},
+                            'nocheckrequest'   => \$options{nocheckrequest},
+                            'demo'             => \$options{demo},
+                            'test'             => \$options{test},
+     		            'dump'             => \$options{dump}
+                            ) );
 my $date=`date`;
 chomp($date);
 
+my $REPORT;
+
+&open_report();
+
+my $options_file=".LML_da_options";
+if (-f $options_file) {
+    my ($line);
+    open(IN,$options_file);
+    while($line=<IN>) {
+        if($line=~/$patwrd=\s*$patwrd\s*$/) {
+	    my($opt_name,$opt_value)=($1,$2) ;
+	    if(exists($options{$opt_name})) {
+		$options{$opt_name}=$opt_value;
+		push(@options_from_file_found,$opt_name);
+	    } else {
+		&report_if_verbose("WARNING found unknown option (%s) in option file file %s\n",$opt_name,$options_file);
+	    }
+        }
+    }
+    close(IN);
+}
+
 # print header
-print STDERR "-"x90,"\n" if($opt_verbose);
-print STDERR"  LLVIEW Data Access Workflow Manager Driver $version, starting at ($date)\n" if(!$opt_quiet); 
-print STDERR "-"x90,"\n" if($opt_verbose);
+&report_if_verbose("%s%s","-"x90,"\n");
+&report("%s","  LLVIEW Data Access Workflow Manager Driver $version, starting at ($date)\n");
+&report_if_verbose("  %s%s%s"," command line args: ",join(" ",@save_ARGV),"\n"); 
+&report_if_verbose("  %s%s%s%s"," option file  args: ",join(" ",@options_from_file_found),"     (from file $options_file)","\n") if($#options_from_file_found>=0); 
+&report_if_verbose("%s%s", "-"x90,"\n");
 
 
 # check positional parameters 
@@ -105,70 +140,96 @@ if( ($#ARGV > 1) || ($#ARGV == 0 ) ) {
     $outputfile  = "-";
 }
 
-my $tmpdir       = $opt_tmpdir;
-my $permdir       = $opt_permdir;
+my $tmpdir       = $options{tmpdir};
+my $permdir       = $options{permdir};
 my $rawfile      = undef;
 my $removetmpdir = 0; # remove only if directory was create 
 
-# check temporary directory
+my $workflowxml = "";
+my $laststep    = "";
+
+# init global vars
+my $pwd=`pwd`;
+chomp($pwd);
+
+if(! $options{test}) {
+
+# check and/or create temporary directory
 if(! -d $tmpdir) {
-    printf(STDERR "$0: temporary directory not found, create new directory $tmpdir ...\n") if($opt_verbose);
+    &report_if_verbose("%s","$0: temporary directory not found, create new directory $tmpdir ...\n");
     if(!mkdir($tmpdir,0755)) {
-	&exit_witherror($outputfile,"$0: could not create $tmpdir ...$!\n");
+        &exit_witherror($outputfile,"$0: could not create $tmpdir ...$!\n");
     } else {
-	print STDERR "$0: tmpdir created ($tmpdir)\n"  if($opt_verbose);
+        &report_if_verbose("%s", "$0: tmpdir created ($tmpdir)\n");
     }
     $removetmpdir=1;
 }
 
 # check permanent directory
 if(! -d $permdir) {
-    printf(STDERR "$0: permanent directory not found, create new directory $permdir ...\n") if($opt_verbose);
+    &report_if_verbose("$0: permanent directory not found, create new directory $permdir ...\n");
     if(!mkdir($permdir,0755)) {
-	&exit_witherror($outputfile,"$0: could not create $permdir ...$!\n");
+        &exit_witherror($outputfile,"$0: could not create $permdir ...$!\n");
     } else {
-	print STDERR "$0: permdir created ($permdir)\n"  if($opt_verbose);
+        &report_if_verbose("%s", "$0: permdir created ($permdir)\n");
     }
 }
 
 # check request input file
 if ($requestfile ne "-") {
     if(! -f $requestfile) {
-	&exit_witherror($outputfile,"$0: requestfile $requestfile not found, exiting ...\n");
+        &exit_witherror($outputfile,"$0: requestfile $requestfile not found, exiting ...\n");
     }
 }
 
 # check rawfile
-if($opt_rawfile) {
-    if(! -f $opt_rawfile) {
-	&exit_witherror($outputfile,"$0: rawfile $rawfile specified but not found, exiting ...\n");
+if($options{rawfile}) {
+    if(! -f $options{rawfile}) {
+        &exit_witherror($outputfile,"$0: rawfile $rawfile specified but not found, exiting ...\n");
     }
-    $rawfile=$opt_rawfile;
+    $rawfile=$options{rawfile};
 }
 
+
 # read config file
-print STDERR "$0: requestfile=$requestfile\n" if($opt_verbose);
+&report_if_verbose("%s", "$0: requestfile=$requestfile\n");
 $tstart=time;
 
-my $filehandler_request = LML_file_obj->new($opt_verbose,1);
+# debug request file
+open(OUT,"> $options{tmpdir}/request.xml");
+if ($requestfile eq "-") {
+    while(<>) {
+        print OUT $_;
+    }
+    $requestfile="$options{tmpdir}/request.xml";
+} else {
+    open(IN,$requestfile);
+    while(<IN>) {
+        print OUT $_;
+    }
+    close(IN);
+}
+close(OUT);
+
+my $filehandler_request = LML_file_obj->new($options{verbose},1);
 $filehandler_request->read_lml_fast($requestfile);
 $tdiff=time-$tstart;
-printf(STDERR "$0: parsing XML requestfile in %6.4f sec\n",$tdiff) if($opt_verbose);
+&report_if_verbose("$0: parsing XML requestfile in %6.4f sec\n",$tdiff);
 if(!$filehandler_request) {
     &exit_witherror($outputfile,"$0: could not parse requestfile $requestfile, exiting ...\n");
 }
 
-# init global vars
-my $pwd=`pwd`;
-chomp($pwd);
 
 
 #########################
 # create workflow
 #########################
-my $workflowxml=&create_workflow($tmpdir,$permdir);
-my $laststep = "";
+$workflowxml=&create_workflow($tmpdir,$permdir);
 my $step     = "";
+
+# hashes containing function references to rms specific functions
+my $check_functions;
+my $generate_functions;
 
 
 #########################
@@ -178,60 +239,107 @@ my $step     = "";
 if($rawfile) {
     $step="rawfilecp";
     if($rawfile=~/\.gz$/) {
-	&add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-				   "gunzip -c $rawfile > \$stepoutfile");
+        &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
+                                   "gunzip -c $rawfile > \$stepoutfile");
     } else {
-	&add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-				   "cp $rawfile \$stepoutfile");
+        &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
+                                   "cp $rawfile \$stepoutfile");
     }
     $laststep=$step;
 } else {
     # get data from resource management system (RMS)
 
-
     # check for hints about queueing system
     my $rms="undef";
     my %cmds=();
-    print STDERR "$0: check_for rms ...\n"  if($opt_verbose);
-    if(exists($filehandler_request->{DATA}->{REQUEST})) {
-	if(exists($filehandler_request->{DATA}->{REQUEST}->{driver})) {
-	    my $driver_ref=$filehandler_request->{DATA}->{REQUEST}->{driver};
-	    if(exists($driver_ref->{attr})) {
-		if(exists($driver_ref->{attr}->{name})) {
-		    $rms=lc($driver_ref->{attr}->{name});
-		    print STDERR "$0: check_for rms, got hint from request ... ($rms)\n" if($opt_verbose);
+
+    if($options{rms} ne "undef") { 
+	&report_if_verbose("$0: rms given by command line option: $options{rms} ...\n");
+	$rms=$options{rms};
+    } else {
+	&report_if_verbose("$0: check request for rms hint ...\n");
+	if(exists($filehandler_request->{DATA}->{REQUEST})) {
+	    if(exists($filehandler_request->{DATA}->{REQUEST}->{driver})) {
+		my $driver_ref=$filehandler_request->{DATA}->{REQUEST}->{driver};
+		if(!$options{nocheckrequest}) {
+		    # check rms name
+		    if(exists($driver_ref->{attr})) {
+			if(exists($driver_ref->{attr}->{name})) {
+			    $rms=uc($driver_ref->{attr}->{name}); # upper case, except:  
+			    $rms="GridEngine" if ($rms=~/GRIDENGINE/);
+			    &report_if_verbose("$0: check_for rms, got hint from request ... ($rms)\n");
+                        }
+		    }
 		}
-	    }
-	    
-	    if(exists($driver_ref->{command})) {
-		my($key);
-		foreach $key ( keys(%{$driver_ref->{command}}) ) {
-		    if(exists($driver_ref->{command}->{$key}->{exec})) {
-			my $cmd_key="cmd_".$key;
-			$cmds{$cmd_key}=$driver_ref->{command}->{$key}->{exec};
-			print STDERR "$0: check_for rms, got hint from for cmd $cmd_key ... ($cmds{$cmd_key})\n"  if($opt_verbose);
+		
+		if(!$options{nocheckrequest}) {
+		    # check rms commands
+		    if(exists($driver_ref->{command})) {
+			my($key);
+			foreach $key ( keys(%{$driver_ref->{command}}) ) {
+			    if(exists($driver_ref->{command}->{$key}->{exec})) {
+				my $cmd_key="cmd_".$key;
+				$cmds{$cmd_key}=$driver_ref->{command}->{$key}->{exec};
+				&report_if_verbose("$0: check_for rms, got hint from for cmd $cmd_key ... ($cmds{$cmd_key})\n");
+			    }
+			}
 		    }
 		}
 	    }
-	}
-    } 
-    &check_rms_torque_or_pbs(\$rms,\%cmds) if(($rms eq "undef") || ($rms eq "torque")|| ($rms eq "pbs"));
-    &check_rms_LL(\$rms,\%cmds)     if(($rms eq "undef") || ($rms eq "ll"));
-    &check_rms_OpenMPI(\$rms,\%cmds)if(($rms eq "undef") || ($rms eq "openmpi"));
-    if($rms eq "undef") {
-	&exit_witherror($outputfile,"$0: could not determine rms (not one of: torque, pbs, LL, OpenMPI), exiting ...\n");
+	} 
     }
 
-    $laststep=&generate_step_rms_torque($workflowxml, $laststep, \%cmds)  if($rms eq "torque");
-    $laststep=&generate_step_rms_pbs($workflowxml, $laststep, \%cmds)  if($rms eq "pbs");
-    $laststep=&generate_step_rms_LL($workflowxml, $laststep, \%cmds)      if($rms eq "ll");
-    $laststep=&generate_step_rms_OpenMPI($workflowxml, $laststep, \%cmds) if($rms eq "openmpi");
+    if ($rms ne "undef") {
+	if (do "rms/$rms/da_check_info_LML.pl") {
+	    if (exists($main::check_functions->{$rms})) {
+		if ( &{$main::check_functions->{$rms}}(\$rms,\%cmds,$options{verbose})) {
+		    &report_if_verbose("$0: rms/$rms/da_check_info_LML.pl --> rms=$rms\n");
+		} else {
+		    &report_if_verbose("$0: rms/$rms/da_check_info_LML.pl unable to locate rms $rms\n");
+		    $rms="undef";
+		} 
+	    } else { 
+		&report_if_verbose("$0:  WARNING rms/$rms/da_check_info_LML.pl defines no check function\n");
+		$rms="undef";
+	    }
+	} else {
+	    &report_if_verbose("$0:  ERROR could not run rms/$rms/da_check_info_LML.pl (perhaps missing return code of script)\n");
+	    $rms="undef";
+	}
+    } else {
+        my ($r,$check_f,$generate_f,$test_rms);
+        foreach $r (<rms/*>) {
+	    $test_rms=$r;$test_rms=~s/(.*\/)//s;
+	    &report_if_verbose("$0: found rms/$r/da_check_info_LML.pl running test ...\n");
+	    if (do "$r/da_check_info_LML.pl") {
+		if (exists($main::check_functions->{$test_rms})) {
+		    if ( &{$main::check_functions->{$test_rms}}(\$rms,\%cmds,$options{verbose})) {
+			$rms=$test_rms;
+			&report_if_verbose("$0: rms/$r/da_check_info_LML.pl --> rms=$rms\n");
+			last;
+		    } 
+		} else {
+		    &report_if_verbose("$0:  WARNING rms/$r/da_check_info_LML.pl defines no check function\n");
+		}
+	    } else {
+		&report_if_verbose("$0:  ERROR could not run rms/$r/da_check_info_LML.pl (perhaps missing return code of script)\n");
+	    }
+	}
+    }
+
+    if($rms eq "undef") {
+	&exit_witherror($outputfile,"$0: could not determine rms, exiting ...\n");
+    }
+    
+    if (exists($main::generate_functions->{$rms})) {
+	$laststep=&{$main::generate_functions->{$rms}}($workflowxml, $laststep, \%cmds);
+    }
 
     $step="addcolor";
     &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$^X \$instdir/LML_color/LML_color_obj.pl -colordefs \$instdir/LML_color/default.conf " .
-			       "-dbdir \$permdir " .
-			       "-o     \$stepoutfile \$stepinfile");
+                               "$^X \$instdir/LML_color/LML_color_obj.pl -colordefs \$instdir/LML_color/default.conf " .
+                               "-dbdir \$permdir " .
+                               "-o     \$stepoutfile \$stepinfile");
     $laststep=$step;
 
 }
@@ -243,9 +351,9 @@ if($rawfile) {
 my $usedefaultlayout=0;
 if(exists($filehandler_request->{DATA}->{request})) {
     if(exists($filehandler_request->{DATA}->{request}->[0]->{getDefaultData})) {
-	if($filehandler_request->{DATA}->{request}->[0]->{getDefaultData}=~/^true$/i) {
-	    $usedefaultlayout=1;
-	}
+        if($filehandler_request->{DATA}->{request}->[0]->{getDefaultData}=~/^true$/i) {
+            $usedefaultlayout=1;
+        }
     }
 }
 #check if layout is given in request
@@ -253,11 +361,11 @@ my $layoutfound=0;
 if(!$usedefaultlayout) {
     my $key;
     foreach $key (keys(%{$filehandler_request->{DATA}})) {
-	$layoutfound=1 if ($key=~/LAYOUT$/);
+        $layoutfound=1 if ($key=~/LAYOUT$/);
     }
     $usedefaultlayout=1 if(!$layoutfound);
 }
-print STDERR "$0: layoutfound=$layoutfound usedefaultlayout=$usedefaultlayout\n" if($opt_verbose);
+&report_if_verbose("$0: layoutfound=$layoutfound usedefaultlayout=$usedefaultlayout\n");
 
 my $filehandler_layout;
 if($usedefaultlayout) {
@@ -275,43 +383,60 @@ $filehandler_layout->write_lml("$tmpdir/layout.xml");
 #########################
 $step="LML2LML";
 my $demo="";
-$demo="-demo" if $opt_demo;
+$demo="-demo" if $options{demo};
 &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			   "$^X LML2LML/LML2LML.pl -v $demo -layout \$tmpdir/layout.xml".
-			   " -output \$stepoutfile \$stepinfile");
+                           "$^X LML2LML/LML2LML.pl -v $demo -layout \$tmpdir/layout.xml".
+                           " -output \$stepoutfile \$stepinfile");
 $laststep=$step;
+
 
 #########################
 # Dump?
 #########################
-if($opt_dump) {
+if($options{dump}) {
     print STDERR Dumper($filehandler_request->{DATA});
     print STDERR Dumper($workflowxml);
     print STDERR Dumper($filehandler_layout->{DATA});
     exit(1);
 }
 
+} #  ! $options{test}
+
 #########################
 # execute Workflow
 #########################
-# write workflow to tmpdir
-
-my $workflow_obj = LML_da_workflow_obj->new($opt_verbose,0);
-$workflow_obj->{DATA}=$workflowxml;
-$workflow_obj->write_xml("$tmpdir/workflow.xml");
-
-my $cmd="$^X ./LML_da.pl";
-$cmd .= " -v"  if($opt_verbose);
-$cmd .= " -c $tmpdir/workflow.xml";
-$cmd .= " > $tmpdir/LML_da.log";
-$cmd .= " 2> $tmpdir/LML_da.errlog";
-printf( STDERR  "$0: executing: %s ...\n",$cmd) if($opt_verbose);
-$tstart=time;
-system($cmd);$rc=$?;
-$tdiff=time-$tstart;
-printf(STDERR "$0: %60s -> ready, time used %10.4ss\n","",$tdiff) if($opt_verbose);
-if($rc) {     
-    &exit_witherror($outputfile,"$0 failed executing: $cmd rc=$rc\n");
+if(! $options{test}) {
+    my $workflow_obj = LML_da_workflow_obj->new($options{verbose},0);
+    $workflow_obj->{DATA}=$workflowxml;
+    $workflow_obj->write_xml("$tmpdir/workflow.xml");
+    my $cmd="$^X ./LML_da.pl";
+    $cmd .= " -v"  if($options{verbose});
+    $cmd .= " -c $tmpdir/workflow.xml";
+    $cmd .= " > $tmpdir/LML_da.log";
+    $cmd .= " 2> $tmpdir/LML_da.errlog";
+    &report_if_verbose("$0: executing: %s ...\n",$cmd);
+    $tstart=time;
+    system($cmd);$rc=$?;
+    $tdiff=time-$tstart;
+    &report_if_verbose("$0: %60s -> ready, time used %10.4ss\n","",$tdiff);
+    if($rc) {     
+        &exit_witherror($outputfile,"$0 failed executing: $cmd rc=$rc\n");
+    }
+} else {
+    $laststep="LML2LML";
+    my $cmd="( cd $tmpdir/..; $^X $pwd/LML_da.pl";
+    $cmd .= " -v"  if($options{verbose});
+    $cmd .= " -c $tmpdir/workflow.xml";
+    $cmd .= " > $tmpdir/LML_da.log";
+    $cmd .= " 2> $tmpdir/LML_da.errlog )";
+    &report_if_verbose("$0: executing: %s ...\n",$cmd);
+    $tstart=time;
+    system($cmd);$rc=$?;
+    $tdiff=time-$tstart;
+    &report_if_verbose("$0: %60s -> ready, time used %10.4ss\n","",$tdiff);
+    if($rc) {     
+        &exit_witherror($outputfile,"$0 failed executing: $cmd rc=$rc\n");
+    }
 }
 
 #########################
@@ -324,39 +449,42 @@ if(! -f $stepoutfile) {
 if($outputfile eq "-") {
     open(IN,$stepoutfile);
     while(<IN>) {
-	print $_;
+        print $_;
     }
     close(IN);
 } else {
     open(IN,$stepoutfile);
     open(OUT," > $outputfile") || die "could not open for write '$outputfile'";
     while(<IN>) {
-	print OUT $_;
+        print OUT $_;
     }
     close(OUT);
     close(IN);
 }
 
 # clean up
-if(($removetmpdir) && (!$opt_keeptmp)) {
+if(($removetmpdir) && (!$options{keeptmp})) {
     my $file;
     foreach $file (`ls $tmpdir`) {
-	chomp($file);
-#	print STDERR "unlink $tmpdir/$file\n";
-	unlink("$tmpdir/$file");
+        chomp($file);
+#       print STDERR "unlink $tmpdir/$file\n";
+        unlink("$tmpdir/$file");
     }
     if(!rmdir($tmpdir)) {
-	printf(STDERR "$0: could not rmdir $tmpdir ...$!, exiting ...\n");
+        &report("$0: could not rmdir $tmpdir ...$!, exiting ...\n");
     } else {
-	print STDERR "$0: tmpdir removed ($tmpdir)\n"  if($opt_verbose);
+        &report_if_verbose("$0: tmpdir removed ($tmpdir)\n");
     }
 }
 
 
-print STDERR "-"x90,"\n" if($opt_verbose);
-print STDERR"  LLVIEW Data Access Workflow Manager Driver $version, ending at   ($date)\n"  if(!$opt_quiet); 
-print STDERR "-"x90,"\n" if($opt_verbose);
+&report_if_verbose("%s%s","-"x90,"\n");
+&report("  LLVIEW Data Access Workflow Manager Driver $version, ending at   ($date)\n");
+&report_if_verbose("%s%s","-"x90,"\n");
 
+if(! (($removetmpdir) && (!$options{keeptmp}))) {
+    close_report("$tmpdir/report.log");
+}
 
 sub usage {
     die " 
@@ -374,6 +502,10 @@ sub usage {
                 -permdir  <dir>          : use this directory for permanent data 
                                            (e.g., databases, default: ./tmp) 
                 -keeptmp                 : keep temporary directory
+                -test                    : use input files from temporary directory
+                -demo                    : generate anonymous data
+                -rms <rms>               : check only for this rms
+                -nocheckrequest          : don't check request for hints 
                 -verbose                 : verbose mode
                 -quiet                   : prints no messages on stderr
 
@@ -385,6 +517,7 @@ sub exit_witherror {
     my($outputfile,$errormsg)=@_;
     my $xmlout="";
 
+    
     $xmlout.="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
     $xmlout.="<lml:lgui xmlns:lml=\"http://www.llview.de\"\n";
     $xmlout.="          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
@@ -400,17 +533,19 @@ sub exit_witherror {
     $xmlout.="</information>\n";
 
     $xmlout.="</lml:lgui>\n";
-    
-    printf(STDERR "$errormsg\n");
 
+    &report("$0: ERROR $errormsg\n");
+    
     if($outputfile eq "-") {
-	print $xmlout;
+        print $xmlout;
     } else {
-	open(OUT," > $outputfile") || die "could not open for write '$outputfile'";
-	print OUT $xmlout;
-	close(OUT);
+        open(OUT," > $outputfile") || die "could not open for write '$outputfile'";
+        print OUT $xmlout;
+        close(OUT);
     }
 
+    close_report("$tmpdir/report.log");
+    
     exit(1);
 
 }
@@ -442,9 +577,9 @@ sub add_exec_step_to_workflow {
     $stepref->{type}        = "execute";
     
     foreach $cmd (@cmds) {
-	$cmdref={};
-	$cmdref->{exec}         = $cmd;
-	push(@{$stepref->{cmd}},$cmdref);
+        $cmdref={};
+        $cmdref->{exec}         = $cmd;
+        push(@{$stepref->{cmd}},$cmdref);
     }
     
     $datastructref->{step}->{$id}=$stepref;
@@ -455,7 +590,7 @@ sub add_exec_step_to_workflow {
 sub create_default_layout {
     my($filehandler_request)=@_;
 
-    my $filehandler_layout = LML_file_obj->new($opt_verbose,1);
+    my $filehandler_layout = LML_file_obj->new($options{verbose},1);
     $filehandler_layout->read_lml_fast("$FindBin::RealBin/samples/layout_default.xml");
     $filehandler_layout->check_lml();
     return($filehandler_layout);
@@ -465,334 +600,48 @@ sub create_layout_from_request {
     my($filehandler_request)=@_;
     my($key);
 
-    my $filehandler_layout = LML_file_obj->new($opt_verbose,1);
+    my $filehandler_layout = LML_file_obj->new($options{verbose},1);
     $filehandler_layout -> init_file_obj();
     foreach $key ("TABLELAYOUT","TABLE","NODEDISPLAYLAYOUT","NODEDISPLAY","OBJECT") {
-	if (exists($filehandler_request->{DATA}->{$key})) {
-	    $filehandler_layout->{DATA}->{$key}=dclone($filehandler_request->{DATA}->{$key});
-	}
+        if (exists($filehandler_request->{DATA}->{$key})) {
+            $filehandler_layout->{DATA}->{$key}=dclone($filehandler_request->{DATA}->{$key});
+        }
     }
     $filehandler_layout->check_lml();
     return($filehandler_layout);
 }
 
+sub open_report {
+    $REPORT="";
+}
 
-#########################
-# rms: Torque
-#########################
-sub check_rms_torque_or_pbs {
-    my($rmsref,$cmdsref)=@_;
-    my($key);
-    my $rc=1;
 
-    my %cmdname=(
-	"job"  => "qstat",
-	"node" => "pbsnodes",
-	);
-    my %cmdpath=(
-	"job" => "/usr/bin/qstat",
-	"node" => "/usr/bin/pbsnodes",
-	);
-   
-    foreach $key (keys(%cmdname)) {
-	# check for job query cmd
-	if(exists($cmdsref->{"cmd_${key}info"})) {
-	    $cmd=$cmdsref->{"cmd_${key}info"};
-	} else {
-	    $cmd=$cmdpath{$key};
-	}
-	if(! -f $cmd) {
-	    my $cmdpath=`which $cmdname{$key} 2>/dev/null`; 	# last try: which 
-	    if(!$?) {
-		chomp($cmdpath);
-		$cmd=$cmdpath;
-		print STDERR "$0: check_rms_torque_or_pbs: found $cmdname{$key} by which ($cmd)\n" if($opt_verbose);
-	    } else {
-		last;
-	    }
-	}
-	if(-f $cmd) {
-	    $$rmsref="torque" if($$rmsref eq "undef");
-	    $cmdsref->{"cmd_${key}info"}=$cmd;
-	}
+sub report {
+    my $format = shift;
+    # print to protocol file
+    $REPORT.=sprintf( $format, @_ );
+
+    if(!$options{quiet}) {
+        # print to stderr
+        printf(STDERR $format, @_);
     }
-    # check if it is not a PBSpro system
-    if($$rmsref eq "torque") {
-	
-	if(exists($cmdsref->{"cmd_jobinfo"})) {
-	    $cmd=$cmdsref->{"cmd_jobinfo"}." --version";
-	    my $cmdversion=`$cmd 2>/dev/null`; 	
-	    chomp($cmdversion);
-	    if($cmdversion=~/version/) {
-		if($cmdversion=~/PBSPro/) {
-		    print STDERR "$0: check_rms_torque_or_pbs: PBSpro found, not torque ($cmdversion)\n" if($opt_verbose);
-		    $$rmsref="pbs"; 
-	    	}
-	    } else {
-		print STDERR "$0: check_rms_torque_or_pbs: could not obtain version info from command $cmd\n" if($opt_verbose);
-	    }
-	    
-	}
-    }
+}
 
-    if($$rmsref eq "torque")  {
-	print STDERR "$0: check_rms_torque_or_pbs: found torque commands (",
-	join(",",(values(%{$cmdsref}))),")\n" if($opt_verbose);
-    } elsif($$rmsref eq "pbs")  {
-	print STDERR "$0: check_rms_torque_or_pbs: found PBSpro commands (",
-	join(",",(values(%{$cmdsref}))),")\n" if($opt_verbose);
-    } else {
-	print STDERR "$0: check_rms_torque_or_pbs: seems not to be a torque or pbs system\n" if($opt_verbose);
-    }
-
+sub report_if_verbose {
+    my $format = shift;
+    # print to protocol file
+    $REPORT.=sprintf( $format, @_ );
     
-    return($rc);
+    if($options{verbose}) {
+        # print to stderr
+        printf(STDERR $format, @_);
+    }
 }
 
-
-sub generate_step_rms_torque {
-    my($workflowxml, $laststep, $cmdsref)=@_;
-    my($step,$envs,$key,$ukey);
-
-    $envs="";
-    foreach $key (keys(%{$cmdsref})) {
-	$ukey=uc($key);
-	$envs.="$ukey=$cmdsref->{$key} ";
+sub close_report {
+    my($reportfile)=@_;
+    if(open(REPORT,"> $reportfile")) {
+        print REPORT $REPORT;
+        close(REPORT);
     }
-    $step="getdata";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$envs $^X rms/TORQUE/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
-			       "$envs $^X rms/TORQUE/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
-			       "$envs $^X rms/TORQUE/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
-    $laststep=$step;
-
-    $step="combineLML";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$^X \$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
-			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/jobs_LML.xml \$tmpdir/nodes_LML.xml");
-    $laststep=$step;
-
-    return($laststep);
-
-}
-
-
-sub generate_step_rms_pbs {
-    my($workflowxml, $laststep, $cmdsref)=@_;
-    my($step,$envs,$key,$ukey);
-
-    $envs="";
-    foreach $key (keys(%{$cmdsref})) {
-	$ukey=uc($key);
-	$envs.="$ukey=$cmdsref->{$key} ";
-    }
-    $step="getdata";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$envs $^X rms/PBS/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
-			       "$envs $^X rms/PBS/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
-			       "$envs $^X rms/PBS/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
-    $laststep=$step;
-
-    $step="combineLML";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$^X \$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
-			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/jobs_LML.xml \$tmpdir/nodes_LML.xml");
-    $laststep=$step;
-
-    return($laststep);
-
-}
-
-
-#########################
-# rms: LoadLeveler
-#########################
-sub check_rms_LL {
-    my($rmsref,$cmdsref)=@_;
-    my($key);
-    my $rc=1;
-
-    my %cmdname=(
-	"job"  => "llq",
-	"node" => "llstatus",
-	);
-    my %cmdpath=(
-	"job" => "/usr/bin/llq",
-	"node" => "/usr/bin/llstatus",
-	);
-   
-    foreach $key (keys(%cmdname)) {
-	# check for job query cmd
-	if(exists($cmdsref->{"cmd_${key}info"})) {
-	    $cmd=$cmdsref->{"cmd_${key}info"};
-	} else {
-	    $cmd=$cmdpath{$key};
-	}
-	if(! -f $cmd) {
-	    my $cmdpath=`which $cmdname{$key} 2>/dev/null`; 	# last try: which 
-	    if(!$?) {
-		chomp($cmdpath);
-		$cmd=$cmdpath;
-		print STDERR "$0: check_rms_LL: found $cmdname{$key} by which ($cmd)\n" if($opt_verbose);
-	    } else {
-		last;
-	    }
-	}
-	if(-f $cmd) {
-	    $$rmsref="ll" if($$rmsref eq "undef");
-	    $cmdsref->{"cmd_${key}info"}=$cmd;
-	}
-    }
-    if($$rmsref eq "ll") {
-	print STDERR "$0: check_rms_LL: found LL commands (",
-	join(",",(values(%{$cmdsref}))),")\n" if($opt_verbose);
-    } else {
-	print STDERR "$0: check_rms_LL: seems not to be a LL system\n" if($opt_verbose);
-    }
-
-    return($rc);
-}
-
-
-sub generate_step_rms_LL {
-    my($workflowxml, $laststep, $cmdsref)=@_;
-    my($step,$envs,$key,$ukey);
-
-    $envs="";
-    foreach $key (keys(%{$cmdsref})) {
-	$ukey=uc($key);
-	$envs.="$ukey=$cmdsref->{$key} ";
-    }
-
-    $step="getdata";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$envs $^X rms/LL/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
-			       "$envs $^X rms/LL/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
-			       "$envs $^X rms/LL/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
-    $laststep=$step;
-
-    $step="combineLML";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$^X \$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
-			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/jobs_LML.xml \$tmpdir/nodes_LML.xml");
-    $laststep=$step;
-
-    return($laststep);
-
-}
-
-#########################
-# rms: OpenMPI
-#########################
-sub check_rms_OpenMPI {
-    my($rmsref,$cmdsref)=@_;
-    my($key,$infocmd);
-    my $rc=1;
-
-    my %cmdname=(
-	"job"  => "orte-ps",
-	"node" => "orte-ps",
-	"sys"  => "ompi_info",
-	);
-        
-    my %cmdpath=(
-	"job"  => "",
-	"node" => "",
-	"sys"  => "/usr/lib/mpi/gcc/openmpi/bin/ompi_info",
-	);
-
-    $infocmd=undef;
-
-    # first:  check if ompi_info is given by request info
-    if(exists($cmdsref->{"cmd_sysinfo"})) {
-	if(-f $cmdsref->{"cmd_sysinfo"}) {
-	    $infocmd=$cmdsref->{"cmd_sysinfo"}." --path bindir";
-	}
-    } 
-
-    # second: check if ompi_info is given in PATH
-    if(!$infocmd) {
-	my $cmdpath=`which $cmdname{sys} 2>/dev/null`; 	
-	if(!$?) {
-	    chomp($cmdpath);
-	    $infocmd=$cmdpath." --path bindir";
-	}
-    }
-
-    # second: check if ompi_info is given in default path
-    if(!$infocmd) {
-	my $cmdpath=$cmdpath{sys}; 	
-	if(! -f $cmdpath) {
-	    $infocmd=$cmdpath." --path bindir";
-	}
-    }
- 
-    # return if no ompi_info found
-    if(!$infocmd) {
-	return($rc);
-    }
-   
-    # get openmpi bindir
-    my $bindir=`$infocmd`;
-    chomp($bindir);
-    $bindir=~s/^Bindir:\s*//gs;
-	
-    foreach $key (keys(%cmdname)) {
-	$cmdpath{$key}=$bindir."/".$cmdname{$key};
-
-	if(exists($cmdsref->{"cmd_${key}info"})) {
-	    $cmd=$cmdsref->{"cmd_${key}info"};
-	} else {
-	    $cmd=$cmdpath{$key};
-	}
-	if(! -f $cmd) {
-	    my $cmdpath=`which $cmdname{$key} 2>/dev/null`; 	# last try: which 
-	    if(!$?) {
-		chomp($cmdpath);
-		$cmd=$cmdpath;
-		print STDERR "$0: check_rms_OpenMPI: found $cmdname{$key} by which ($cmd)\n" if($opt_verbose);
-	    } else {
-		last;
-	    }
-	}
-	if(-f $cmd) {
-	    $$rmsref="openmpi" if($$rmsref eq "undef");
-	    $cmdsref->{"cmd_${key}info"}=$cmd;
-	}
-    }
-    if($$rmsref eq "openmpi") {
-	print STDERR "$0: check_rms_OpenMPI: found OpenMPI commands (",
-	join(",",(values(%{$cmdsref}))),")\n" if($opt_verbose);
-    } else {
-	print STDERR "$0: check_rms_OpenMPI: seems not to be a OpenMPI system\n" if($opt_verbose);
-    }
-
-    return($rc);
-}
-
-
-sub generate_step_rms_OpenMPI {
-    my($workflowxml, $laststep, $cmdsref)=@_;
-    my($step,$envs,$key,$ukey);
-
-    $envs="";
-    foreach $key (keys(%{$cmdsref})) {
-	$ukey=uc($key);
-	$envs.="$ukey=$cmdsref->{$key} ";
-    }
-
-    $step="getdata";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$envs $^X rms/OPENMPI/da_orte_info_LML.pl   \$tmpdir/jobs_nodes_LML.xml",
-			       "$envs $^X rms/OPENMPI/da_system_info_LML.pl \$tmpdir/sysinfo_LML.xml");
-    $laststep=$step;
-
-    $step="combineLML";
-    &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$^X \$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
-			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/jobs_nodes_LML.xml");
-    $laststep=$step;
-
-    return($laststep);
-
 }

@@ -56,7 +56,6 @@ my %mapping = (
     "Resource_List.depend"                   => "dependency",
     "Resource_List.mem"                      => "",
     "Resource_List.nodect"                   => "",
-    "Resource_List.nodes"                    => "totalcores",
     "Resource_List.pmem"                     => "",
     "Resource_List.walltime"                 => "wall",
     "Shell_Path_List"                        => "",
@@ -71,7 +70,7 @@ my %mapping = (
     "fault_tolerant"                         => "",
     "interactive"                            => "",
     "job_state"                              => "state",
-    "mtime"                                  => "",
+    "mtime"                                  => "dispatchdate",
     "qtime"                                  => "queuedate",
     "queue"                                  => "queue",
     "resources_used.cput"                    => "",
@@ -81,11 +80,12 @@ my %mapping = (
     "server"                                 => "",
     "session_id"                             => "",
     "start_count"                            => "",
-    "start_time"                             => "dispatchdate",
+    "start_time"                             => "",
     "submit_args"                            => "",
 
     "step"                                   => "step",
     "totaltasks"                             => "totaltasks",
+    "totalcores"                             => "totalcores",
     "spec"                                   => "spec",
 
     "status"                                 => "status",
@@ -110,9 +110,23 @@ my %mapping = (
     "resources_used.ncpus"                   => "",
     "stime"                                  => "",
     "substate"                               => "",
-    
+
 # unknown attributes
     "group"                                  => "group",
+    "Account_Name"                           => "",
+    "Exit_status"                            => "",
+    "Resource_List.Qlist"                    => "",
+    "estimated.exec_vnode"                   => "",
+    "estimated.start_time"                   => "",
+    "Resource_List.nodes"                    => "",
+    "argument_list"                          => "",
+    "array"                                  => "",
+    "array_indices_remaining"                => "",
+    "array_indices_submitted"                => "",
+    "array_state_count"                      => "",
+    "executable"                             => "",
+    "group_list"                             => "",
+    "umask"                                  => "",
     );
 
 my $cmd="/usr/bin/qstat";
@@ -121,7 +135,6 @@ $cmd=$ENV{"CMD_JOBINFO"} if($ENV{"CMD_JOBINFO"});
 open(IN,"$cmd -f |");
 my $jobid="-";
 my $lastkey="-";
-
 
 while($line=<IN>) {
     chomp($line);
@@ -145,11 +158,19 @@ close(IN);
 foreach $jobid (sort(keys(%jobs))) {
     $jobs{$jobid}{group}      = "unknown" if(!exists($jobs{$jobid}{group}));
     $jobs{$jobid}{exec_host}  = "-" if(!exists($jobs{$jobid}{exec_host}));
-    $jobs{$jobid}{totaltasks} = $jobs{$jobid}{"Resource_List.nodes"} if(!exists($jobs{$jobid}{totaltasks}));
-    $jobs{$jobid}{spec}       = $jobs{$jobid}{"Resource_List.nodes"} if(!exists($jobs{$jobid}{spec}));
+    if(!exists($jobs{$jobid}{totaltasks})) {
+	$jobs{$jobid}{totaltasks} = $jobs{$jobid}{"Resource_List.nodes"} if(exists($jobs{$jobid}{"Resource_List.nodes"}));
+	$jobs{$jobid}{totaltasks} = $jobs{$jobid}{"Resource_List.ncpus"} if(exists($jobs{$jobid}{"Resource_List.ncpus"}));
+    }
+    if(!exists($jobs{$jobid}{spec})) {
+	$jobs{$jobid}{spec}       = $jobs{$jobid}{"Resource_List.nodes"} if(!exists($jobs{$jobid}{"Resource_List.nodes"}));
+	$jobs{$jobid}{spec}       = $jobs{$jobid}{"Resource_List.ncpus"} if(!exists($jobs{$jobid}{"Resource_List.ncpus"}));
+	
+    }    
     # check state
     ($jobs{$jobid}{status},$jobs{$jobid}{detailedstatus}) = &get_state($jobs{$jobid}{job_state},
 								       $jobs{$jobid}{Hold_Types}); 
+    $jobs{$jobid}{"totalcores"}=$jobs{$jobid}{"totaltasks"} if(!exists($jobs{$jobid}{"totalcores"}));
 }
 
 open(OUT,"> $filename") || die "cannot open file $filename";
@@ -274,23 +295,35 @@ sub modify {
 
     if($mkey eq "vnodelist") {
 	if($ret ne "-") {
+#	    my $save=$ret;
+	    $ret=~s/\(//gs;$ret=~s/\)//gs;
 	    my @nodes = split(/\+/,$ret);
-	    my ($c,$nd,$num);
-	    for($c=0;$c<$#nodes;$c++) {
-		if($nodes[$c]=~/([^\(\)\:]+)\:.*ncpus=(\d+)/s) {
-		    $nd=$1;$num=$2;
+	    my ($c,$nd,$num,$rest);
+	    for($c=0;$c<=$#nodes;$c++) {
+		# get nodename
+		if($nodes[$c]=~/^([^\:]+)\:(.*)$/s) {
+		    ($nd,$rest)=($1,$2);
+		    # get number of procs
+		    if($rest=~/ncpus=(\d+)/) {
+			$num=$1;
+		    } elsif($rest=~/mpiprocs=(\d+)/) {
+			$num=$1;
+		    } else {
+			# default:  1 core
+			$num=1;
+		    }
 		    $nodes[$c]="$nd,$num";
-		} elsif($nodes[$c]=~/([^\(\)\:]+)\:.*mpiprocs=(\d+)/s) {
-		    $nd=$1;$num=$2;
-		    $nodes[$c]="$nd,$num";
-		} elsif($nodes[$c]=~/([^\(\)\:]+)/s) {
-		    $nd=$1;$num=1;
+		} elsif($nodes[$c]=~/^([^\:]+)$/s) {
+		    $nd=$1;
+		    $num=1;
 		    $nodes[$c]="$nd,$num";
 		} else {
 		    print STDERR "Error in job node list: $nodes[$c]\n";
+		    $nodes[$c]="unknown,0";
 		}
 	    }
 	    $ret="(".join(')(',@nodes).")";
+#	    print "$save -> $ret\n";
 	}
     }
 

@@ -13,7 +13,10 @@ package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIncludeStatement;
+import org.eclipse.cdt.core.index.IIndexFile;
+import org.eclipse.cdt.core.parser.ISignificantMacros;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
+import org.eclipse.core.runtime.CoreException;
 
 /**
  * 
@@ -87,6 +90,39 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 	public boolean isResolvedByHeuristics() {
 		return false;
 
+	}
+
+	/**
+	 * CDT 8.1 implement
+	 */
+	@Override
+	public ISignificantMacros getSignificantMacros() throws CoreException {
+		return incl_.getSignificantMacros();
+	}
+
+	@Override
+	public boolean hasPragmaOnceSemantics() throws CoreException {
+		return incl_.hasPragmaOnceSemantics();
+	}
+
+	@Override
+	public ISignificantMacros[] getLoadedVersions() {
+		return incl_.getLoadedVersions();
+	}
+
+	@Override
+	public long getContentsHash() {
+		return incl_.getContentsHash();
+	}
+
+	@Override
+	public boolean createsAST() {
+		return incl_.createsAST();
+	}
+
+	@Override
+	public IIndexFile getImportedIndexFile() {
+		return incl_.getImportedIndexFile();
 	}
 
 }

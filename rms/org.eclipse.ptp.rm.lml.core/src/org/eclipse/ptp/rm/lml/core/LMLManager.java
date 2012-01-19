@@ -13,29 +13,29 @@ package org.eclipse.ptp.rm.lml.core;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBException;
-
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.ITableFilterEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
+import org.eclipse.ptp.rm.lml.core.model.IPattern;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiAddedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.LguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.MarkObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.SelectObjectEvent;
+import org.eclipse.ptp.rm.lml.internal.core.events.TableFilterEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.TableSortedEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.UnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.internal.core.events.UnselectObjectEvent;
@@ -70,7 +70,7 @@ public class LMLManager {
 	/*
 	 * A list of all listeners on the ILguiItem
 	 */
-	private final ListenerList lmlListeners = new ListenerList();
+	private final ListenerList viewListeners = new ListenerList();
 
 	/*
 	 * An instance of this class.
@@ -84,7 +84,7 @@ public class LMLManager {
 	}
 
 	public void addListener(ILMLListener listener, String view) {
-		lmlListeners.add(listener);
+		viewListeners.add(listener);
 	}
 
 	public void addUserJob(String name, String jobId, JobStatusData status) {
@@ -108,6 +108,10 @@ public class LMLManager {
 
 	}
 
+	public void filterLgui(String gid, List<IPattern> filterValues) {
+		fireFilterLgui(gid, filterValues);
+	}
+
 	public String getCurrentLayout(String name) {
 		ILguiItem item = null;
 		synchronized (LGUIS) {
@@ -122,6 +126,18 @@ public class LMLManager {
 			return string;
 		}
 		return null;
+	}
+
+	public Map<String, List<IPattern>> getCurrentPattern(String name) {
+		ILguiItem item = null;
+		synchronized (LGUIS) {
+			item = LGUIS.get(name);
+		}
+		if (item != null) {
+			final Map<String, List<IPattern>> map = item.getPattern();
+			return map;
+		}
+		return new HashMap<String, List<IPattern>>();
 	}
 
 	public ILguiItem getSelectedLguiItem() {
@@ -162,12 +178,14 @@ public class LMLManager {
 	 *            Layout from an earlier Eclipse session
 	 * @param jobs
 	 *            Array of earlier started jobs
+	 * @param pattern
 	 */
-	public void openLgui(String name, RequestType request, StringBuilder layout, JobStatusData[] jobs) {
+	public void openLgui(String name, String username, RequestType request, StringBuilder layout, JobStatusData[] jobs,
+			Map<String, List<IPattern>> pattern) {
 		synchronized (LGUIS) {
 			ILguiItem item = LGUIS.get(name);
 			if (item == null) {
-				item = new LguiItem(name);
+				item = new LguiItem(name, username);
 				LGUIS.put(name, item);
 			}
 			fLguiItem = item;
@@ -175,6 +193,7 @@ public class LMLManager {
 
 		fLguiItem.reloadLastLayout(layout);
 		fLguiItem.setRequest(request);
+		fLguiItem.setPattern(pattern);
 		restoreJobStatusData(fLguiItem, jobs);
 
 		if (!fLguiItem.isEmpty()) {
@@ -183,7 +202,7 @@ public class LMLManager {
 	}
 
 	public void removeListener(ILMLListener listener) {
-		lmlListeners.remove(listener);
+		viewListeners.remove(listener);
 	}
 
 	public void removeUserJob(String name, String jobId) {
@@ -238,18 +257,8 @@ public class LMLManager {
 			lguiItem = LGUIS.get(name);
 		}
 		if (lguiItem != null) {
-			try {
-				lguiItem.getCurrentLayout(output);
-			} catch (final JAXBException e) {
-				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
-						.getLocalizedMessage()));
-			}
-			try {
-				lguiItem.update(input);
-			} catch (final JAXBException e) {
-				throw new CoreException(new Status(IStatus.ERROR, LMLCorePlugin.getUniqueIdentifier(), e.getCause()
-						.getLocalizedMessage()));
-			}
+			lguiItem.getCurrentLayout(output);
+			lguiItem.update(input);
 
 			if (fLguiItem == lguiItem) {
 				if (!isDisplayed) {
@@ -273,14 +282,21 @@ public class LMLManager {
 
 	private void fireChangeSelectedObject(String oid) {
 		final ISelectObjectEvent event = new SelectObjectEvent(oid);
-		for (final Object listener : lmlListeners.getListeners()) {
+		for (final Object listener : viewListeners.getListeners()) {
+			((ILMLListener) listener).handleEvent(event);
+		}
+	}
+
+	private void fireFilterLgui(String gid, List<IPattern> filterValues) {
+		final ITableFilterEvent event = new TableFilterEvent(gid, filterValues);
+		for (final Object listener : viewListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
 	}
 
 	private void fireMarkObject(String oid) {
 		final IMarkObjectEvent event = new MarkObjectEvent(oid);
-		for (final Object listener : lmlListeners.getListeners()) {
+		for (final Object listener : viewListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
 	}
@@ -290,7 +306,7 @@ public class LMLManager {
 	 */
 	private void fireNewLgui() {
 		final ILguiAddedEvent event = new LguiAddedEvent();
-		for (final Object listener : lmlListeners.getListeners()) {
+		for (final Object listener : viewListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
 		isDisplayed = true;
@@ -298,7 +314,7 @@ public class LMLManager {
 
 	private void fireRemovedLgui(ILguiItem title) {
 		final ILguiRemovedEvent event = new LguiRemovedEvent();
-		for (final Object listener : lmlListeners.getListeners()) {
+		for (final Object listener : viewListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
 		isDisplayed = false;
@@ -309,28 +325,28 @@ public class LMLManager {
 	 */
 	private void fireSortedLgui() {
 		final ITableSortedEvent event = new TableSortedEvent(this, fLguiItem);
-		for (final Object listener : lmlListeners.getListeners()) {
+		for (final Object listener : viewListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
 	}
 
 	private void fireUnmarkObject(String oid) {
 		final IUnmarkObjectEvent event = new UnmarkObjectEvent(oid);
-		for (final Object listener : lmlListeners.getListeners()) {
+		for (final Object listener : viewListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
 	}
 
 	private void fireUnselectObject(String oid) {
 		final IUnselectedObjectEvent event = new UnselectObjectEvent(oid);
-		for (final Object listener : lmlListeners.getListeners()) {
+		for (final Object listener : viewListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
 	}
 
 	private void fireUpdatedLgui() {
 		final IViewUpdateEvent event = new ViewUpdateEvent();
-		for (final Object listener : lmlListeners.getListeners()) {
+		for (final Object listener : viewListeners.getListeners()) {
 			((ILMLListener) listener).handleEvent(event);
 		}
 	}
@@ -348,17 +364,4 @@ public class LMLManager {
 			}
 		}
 	}
-
-	// /**
-	// * @param map
-	// * @param memento
-	// * guaranteed by caller to be non-<code>null</code>
-	// */
-	// private void saveJobStatusData(ILguiItem item, IMemento memento) {
-	// for (final JobStatusData status : item.getUserJobs()) {
-	// if (!status.isRemoved()) {
-	// status.save(memento);
-	// }
-	// }
-	// }
 }

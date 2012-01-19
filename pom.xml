@@ -15,14 +15,19 @@
 
 	<properties>
 		<tycho-version>0.13.0</tycho-version>
-		<platform-version>3.7</platform-version>
-		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
+		<platform-version>S-4.2M4-201112092100</platform-version>
+		<platform-site>http://download.eclipse.org/eclipse/updates/4.2milestones/${platform-version}</platform-site>
 		<orbit-version>R20110523182458</orbit-version>
 		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</orbit-site>
 		<tm-version>3.3</tm-version>
 		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
+		<cdt-version>juno</cdt-version>
+		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/milestones/M4</cdt-site>	
+		<egit-version>1.1</egit-version>
+		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
+		<photran-site>file://home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-photran-nightly</photran-site>
 	</properties>
-
+	
 	<licenses>
 		<license>
 			<name>Eclipse Public License v1.0</name>
@@ -62,6 +67,7 @@
 		<module>debug/org.eclipse.ptp.debug.sdm</module>
 		<module>debug/org.eclipse.ptp.debug.sdm.core</module>
 		<module>debug/org.eclipse.ptp.debug.sdm.ui</module>
+		<module>debug/org.eclipse.ptp.debug.sdm.x10</module>
 		<module>debug/org.eclipse.ptp.debug.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.core</module>
 		<module>rdt/org.eclipse.ptp.rdt.core.remotejars</module>
@@ -215,8 +221,18 @@
 			<layout>p2</layout>
 		</repository>
 		<repository>
-			<id>indigo</id>
-			<url>http://download.eclipse.org/releases/indigo</url>
+			<id>cdt-${cdt-version}</id>
+			<url>${cdt-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>egit-${egit-version}</id>
+			<url>${egit-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>photran</id>
+			<url>${photran-site}</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>

@@ -86,6 +86,14 @@ my %mapping = (
     "resv_enable"                            => "",
     "sharing"                                => "",
 # unknown attributes
+    "resources_available.Cluster"            => "",
+    "resources_available.IB"                 => "",
+    "resources_available.NodeInfo"           => "",
+    "resources_available.Qlist"              => "",
+    "resources_available.Rack"               => "",
+    "resources_available.groupn"             => "",
+    "resources_available.nodemem"            => "",
+
     );
 
 
