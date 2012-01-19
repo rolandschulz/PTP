@@ -1255,7 +1255,18 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             }
         }
     }
-    if ((debug_sdm_mode) && (cwd != NULL)) {
+    if (execdir == NULL) {
+        post_submitjob_error(trans_id, jobid, "No executable directory specified");
+        if (current_hostlist != NULL) {
+            free(current_hostlist);
+        }
+        TRACE_EXIT;
+        return PTP_PROXY_RES_OK;
+    }
+    if (cwd == NULL) {
+    	cwd = execdir;
+    }
+    if (debug_sdm_mode) {
 	    char routing_file_path[_POSIX_PATH_MAX + 1];
 
 	      /*
@@ -1270,17 +1281,15 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     if (jobid == NULL) {
         post_error(trans_id, PTP_PROXY_EV_RT_SUBMITJOB_ERROR, "Missing ID on job submission");
     }
-    if (cwd != NULL) {
-        status = chdir(cwd);
-        if (status == -1) {
-            post_submitjob_error(trans_id, jobid, "Invalid working directory");
-            if (current_hostlist != NULL) {
-                free(current_hostlist);
-            }
-            TRACE_EXIT;
-            return PTP_PROXY_RES_OK;
-        }
-    }
+	status = chdir(cwd);
+	if (status == -1) {
+		post_submitjob_error(trans_id, jobid, "Invalid working directory");
+		if (current_hostlist != NULL) {
+			free(current_hostlist);
+		}
+		TRACE_EXIT;
+		return PTP_PROXY_RES_OK;
+	}
     if (mp_buffer_mem_set) {
         snprintf(mp_buffer_mem_value, sizeof mp_buffer_mem_value, "MP_BUFFER_MEM=%s%s%s", mp_buffer_mem,
                 (mp_buffer_mem_max[0] == '\0') ? "" : ",", mp_buffer_mem_max);
@@ -1288,14 +1297,6 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     if (mp_rdma_count_set) {
         snprintf(mp_rdma_count_value, sizeof mp_rdma_count_value, "MP_RDMA_COUNT=%s%s%s", mp_rdma_count,
                 (mp_rdma_count_2[0] == '\0') ? "" : ",", mp_rdma_count_2);
-    }
-    if (execdir == NULL) {
-        post_submitjob_error(trans_id, jobid, "No executable directory specified");
-        if (current_hostlist != NULL) {
-            free(current_hostlist);
-        }
-        TRACE_EXIT;
-        return PTP_PROXY_RES_OK;
     }
     if (execname == NULL) {
         post_submitjob_error(trans_id, jobid, "No executable specified");
