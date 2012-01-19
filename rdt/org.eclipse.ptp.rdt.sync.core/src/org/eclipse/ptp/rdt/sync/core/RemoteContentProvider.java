@@ -10,14 +10,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
@@ -29,6 +38,9 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
  * root directory. From there, the user can ask for the contents of any subdirectory.
  * 
  * This is useful for GUIs that need to display the contents of a remote file system.
+ * 
+ * Class also provides a static method for getting remote file content for a given IFile. This is useful for quickly retrieving
+ * file content when the file is not available locally. The project, connection, etc. do not have to be provided.
  */
 public class RemoteContentProvider implements ITreeContentProvider {
 	private final IRemoteConnection connection;
@@ -160,5 +172,32 @@ public class RemoteContentProvider implements ITreeContentProvider {
 	 */
 	public boolean isOpen() {
 		return connection.isOpen();
+	}
+	
+	/**
+	 * Get the contents of the corresponding remote file for the given IFile. (IFile should belong to a synchronized project.)
+	 *
+	 * @param file
+	 * @return a stream
+	 * @throws CoreException on problems accessing the remote file.
+	 */
+	public static BufferedInputStream getFileContents(IFile file) throws CoreException {
+		BufferedInputStream retStream = null;
+		IProject project = file.getProject();
+		IConfiguration bconf = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
+		BuildScenario bs = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(bconf);
+		if (bs != null) {
+			IRemoteFileManager fileManager = bs.getRemoteConnection().getRemoteServices().getFileManager(bs.getRemoteConnection());
+			IPath remotePath = new Path(bs.getLocation()).addTrailingSeparator().append(file.getProjectRelativePath());
+			IFileStore fileStore = fileManager.getResource(remotePath.toString()); // Assumes "/" separator on remote
+			InputStream fileInput = fileStore.openInputStream(EFS.NONE, null);
+			if (fileInput != null) {
+				retStream = new BufferedInputStream(fileInput);
+			}
+		} else {
+			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.sync.core", Messages.RemoteContentProvider_1)); //$NON-NLS-1$
+		}
+		
+		return retStream;
 	}
 }
