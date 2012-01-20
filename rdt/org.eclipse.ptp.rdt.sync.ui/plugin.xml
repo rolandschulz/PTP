@@ -220,6 +220,72 @@
                   class="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu"
                   id="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu">
             </dynamic>
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  label="Exclude Selection"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_exclude">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <instanceof
+                              value="org.eclipse.core.resources.IFolder">
+                        </instanceof>
+                        <instanceof
+                              value="org.eclipse.core.resources.IFile">
+                        </instanceof>
+                     </or>
+                  </iterate>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  label="Include Selection"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_include">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <instanceof
+                              value="org.eclipse.core.resources.IFolder">
+                        </instanceof>
+                        <instanceof
+                              value="org.eclipse.core.resources.IFile">
+                        </instanceof>
+                     </or>
+                  </iterate>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  label="Modify Exclude/Include List"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_file_list">
+               </parameter>
+            </command>
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  label="Modify Default Exclude/Include List for New Projects"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_default_file_list">
+               </parameter>
+            </command>
          </menu>
       </menuContribution>
    </extension>
