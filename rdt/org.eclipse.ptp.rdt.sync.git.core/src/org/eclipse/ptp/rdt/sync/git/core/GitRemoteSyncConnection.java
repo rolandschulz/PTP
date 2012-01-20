@@ -22,6 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -51,6 +53,7 @@ import org.eclipse.jgit.transport.TransportGitSsh;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.QuotedString;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
@@ -72,11 +75,12 @@ public class GitRemoteSyncConnection {
 	private static final String gitCommand = "git --git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 	private final IRemoteConnection connection;
-	private final SyncFileFilter fileFilter;
+	private SyncFileFilter fileFilter;
 	private final String localDirectory;
 	private final String remoteDirectory;
 	private Git git;
 	private TransportGitSsh transport;
+	private final IProject project;
 
 	/**
 	 * Create a remote sync connection using git. Assumes that the local
@@ -91,10 +95,11 @@ public class GitRemoteSyncConnection {
 	 *             exception nested. Upon such an exception, the instance is
 	 *             invalid and should not be used.
 	 */
-	public GitRemoteSyncConnection(IRemoteConnection conn, String localDir, String remoteDir, SyncFileFilter filter,
+	public GitRemoteSyncConnection(IProject proj, IRemoteConnection conn, String localDir, String remoteDir, SyncFileFilter filter,
 			IProgressMonitor monitor) throws RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
+			project = proj;
 			connection = conn;
 			fileFilter = filter;
 			localDirectory = localDir;
@@ -182,6 +187,14 @@ public class GitRemoteSyncConnection {
 				// An initial commit to create the master branch.
 				doCommit();
 			}
+			
+			// Refresh the workspace after creating new local files
+			try {
+				project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(5));
+			} catch (CoreException e) {
+				throw new RemoteSyncException(e);
+				// Nothing to do
+			}
 
 			// Create remote directory if necessary.
 			try {
@@ -196,7 +209,7 @@ public class GitRemoteSyncConnection {
 			// Prepare remote site for committing (stage files using git) and
 			// then commit remote files if necessary
 			// Include untracked files for new git
-			boolean needToCommitRemote = prepareRemoteForCommit(subMon.newChild(90), !existingGitRepo);
+			boolean needToCommitRemote = prepareRemoteForCommit(subMon.newChild(85), !existingGitRepo);
 			// repos
 			if (needToCommitRemote) {
 				commitRemoteFiles(subMon.newChild(5));
@@ -443,7 +456,7 @@ public class GitRemoteSyncConnection {
 				fn = QuotedString.GIT_PATH.dequote(fn);
 				if (status == 'R') {
 					filesToDelete.add(fn);
-				} else if (!(fileFilter.shouldIgnore(fn))) {
+				} else if (!(fileFilter.shouldIgnore(project.getFile(fn)))) {
 					filesToAdd.add(fn);
 				}
 			}
@@ -479,7 +492,7 @@ public class GitRemoteSyncConnection {
 
 		Set<String> filesToBeIgnored = new HashSet<String>();
 		for (String fileName : filesToAdd) {
-			if (fileFilter.shouldIgnore(fileName)) {
+			if (fileFilter.shouldIgnore(project.getFile(fileName))) {
 				filesToBeIgnored.add(fileName);
 			}
 		}
@@ -754,5 +767,14 @@ public class GitRemoteSyncConnection {
 				monitor.done();
 			}
 		}
+	}
+	
+	/**
+	 * Set the file filter used. This method allows file filtering behavior to be changed after instance is created, which is
+	 * necessary to support user changes to the filter.
+	 * @param sff
+	 */
+	public void setFileFilter(SyncFileFilter sff) {
+		fileFilter = sff;
 	}
 }
