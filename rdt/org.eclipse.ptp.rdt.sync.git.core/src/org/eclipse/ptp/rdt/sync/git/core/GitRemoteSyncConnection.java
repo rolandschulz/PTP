@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -186,6 +187,14 @@ public class GitRemoteSyncConnection {
 				// An initial commit to create the master branch.
 				doCommit();
 			}
+			
+			// Refresh the workspace after creating new local files
+			try {
+				project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(5));
+			} catch (CoreException e) {
+				throw new RemoteSyncException(e);
+				// Nothing to do
+			}
 
 			// Create remote directory if necessary.
 			try {
@@ -200,7 +209,7 @@ public class GitRemoteSyncConnection {
 			// Prepare remote site for committing (stage files using git) and
 			// then commit remote files if necessary
 			// Include untracked files for new git
-			boolean needToCommitRemote = prepareRemoteForCommit(subMon.newChild(90), !existingGitRepo);
+			boolean needToCommitRemote = prepareRemoteForCommit(subMon.newChild(85), !existingGitRepo);
 			// repos
 			if (needToCommitRemote) {
 				commitRemoteFiles(subMon.newChild(5));
