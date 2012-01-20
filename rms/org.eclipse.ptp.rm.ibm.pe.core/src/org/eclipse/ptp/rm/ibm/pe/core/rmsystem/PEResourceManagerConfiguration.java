@@ -38,9 +38,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #getDebugLevel()
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #getDebugLevel()
 	 */
 	public String getDebugLevel() {
 		return getString(TAG_DEBUG_LEVEL,
@@ -50,9 +48,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #getJobPollInterval()
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #getJobPollInterval()
 	 */
 	public String getJobPollInterval() {
 		return getString(TAG_JOB_POLL_INTERVAL,
@@ -62,9 +58,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #getLibraryOverride()
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #getLibraryOverride()
 	 */
 	public String getLibraryOverride() {
 		return getString(TAG_LIBRARY_OVERRIDE,
@@ -74,9 +68,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #getLoadLevelerMode()
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #getLoadLevelerMode()
 	 */
 	public String getLoadLevelerMode() {
 		return getString(TAG_LOADLEVELER_MODE,
@@ -86,9 +78,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #getNodeMaxPollInterval()
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #getNodeMaxPollInterval()
 	 */
 	public String getNodeMaxPollInterval() {
 		return getString(TAG_MAX_NODE_POLL_INTERVAL,
@@ -98,9 +88,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #getNodeMinPollInterval()
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #getNodeMinPollInterval()
 	 */
 	public String getNodeMinPollInterval() {
 		return getString(TAG_MIN_NODE_POLL_INTERVAL,
@@ -110,9 +98,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #getRunMiniproxy()
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #getRunMiniproxy()
 	 */
 	public String getRunMiniproxy() {
 		return "";
@@ -121,9 +107,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #getSuspendProxy()
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #getSuspendProxy()
 	 */
 	public String getSuspendProxy() {
 		return getString(TAG_SUSPEND_PROXY, "n"); //$NON-NLS-1$
@@ -132,9 +116,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #getUseLoadLeveler()
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #getUseLoadLeveler()
 	 */
 	public String getUseLoadLeveler() {
 		return getString(TAG_USE_LOADLEVELER,
@@ -154,9 +136,17 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #setDebugLevel(java.lang.String)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration#needsDebuggerLaunchHelp()
+	 */
+	@Override
+	public boolean needsDebuggerLaunchHelp() {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #setDebugLevel(java.lang.String)
 	 */
 	public void setDebugLevel(String debugLevel) {
 		putString(TAG_DEBUG_LEVEL, debugLevel);
@@ -165,9 +155,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc ()
 	 */
 	public void setDefaultNameAndDesc() {
 		String name = "IBM PE"; //$NON-NLS-1$
@@ -182,9 +170,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #setJobPollInterval(java.lang.String)
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #setJobPollInterval(java.lang.String)
 	 */
 	public void setJobPollInterval(String interval) {
 		putString(TAG_JOB_POLL_INTERVAL, interval);
@@ -193,9 +179,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #setLibraryOverride(java.lang.String)
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #setLibraryOverride(java.lang.String)
 	 */
 	public void setLibraryOverride(String override) {
 		putString(TAG_LIBRARY_OVERRIDE, override);
@@ -204,9 +188,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #setLoadLevelerMode(java.lang.String)
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #setLoadLevelerMode(java.lang.String)
 	 */
 	public void setLoadLevelerMode(String mode) {
 		putString(TAG_LOADLEVELER_MODE, mode);
@@ -215,9 +197,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #setNodeMaxPollInterval(java.lang.String)
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #setNodeMaxPollInterval(java.lang.String)
 	 */
 	public void setNodeMaxPollInterval(String interval) {
 		putString(TAG_MAX_NODE_POLL_INTERVAL, interval);
@@ -226,9 +206,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #setNodeMinPollInterval(java.lang.String)
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #setNodeMinPollInterval(java.lang.String)
 	 */
 	public void setNodeMinPollInterval(String interval) {
 		putString(TAG_MIN_NODE_POLL_INTERVAL, interval);
@@ -237,9 +215,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #setRunMiniproxy(java.lang.String)
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #setRunMiniproxy(java.lang.String)
 	 */
 	public void setRunMiniproxy(String flag) {
 		putString(TAG_RUN_MINIPROXY, flag);
@@ -248,9 +224,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #setSuspendProxy(java.lang.String)
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #setSuspendProxy(java.lang.String)
 	 */
 	public void setSuspendProxy(String flag) {
 		putString(TAG_SUSPEND_PROXY, flag);
@@ -259,9 +233,7 @@ public class PEResourceManagerConfiguration extends AbstractRemoteResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
-	 * #setUseLoadLeveler(java.lang.String)
+	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration #setUseLoadLeveler(java.lang.String)
 	 */
 	public void setUseLoadLeveler(String flag) {
 		putString(TAG_USE_LOADLEVELER, flag);
