@@ -10,17 +10,43 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 
 /**
- * Matcher for a binary file. Note that it is conservative. It works only for files recognized by CDT and is not yet a general
- * binary file matcher. Ideally this would be a singleton, but the parent expects a default constructor.
+ * Matcher for binary files. Return true for files known by CDT to be binaries and for ELF binaries in general. Together, these two
+ * tests should filter most compiler-produced files, since CDT should compile most local files, and remote systems are nearly always
+ * Linux systems.
+ * 
+ * Other binary file types, such as image files, are not excluded, but compiler-produced files are the main concern.
  */
 public class BinaryResourceMatcher extends ResourceMatcher {
+	/**
+	 * Test if given resource is a binary file.
+	 * 
+	 * @return whether resource is a binary file
+	 */
 	public boolean match(IResource candidate) {
+		if (!(candidate instanceof IFile)) {
+			return false;
+		} else if (BinaryResourceMatcher.isCDTBinary((IFile) candidate)) {
+			return true;
+		} else if (BinaryResourceMatcher.isELFBinary((IFile) candidate)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private static boolean isCDTBinary(IFile candidate) {
 		try {
 			ICElement fileElement = CoreModel.getDefault().create(candidate.getFullPath());
 			if (fileElement == null) {
@@ -35,6 +61,42 @@ public class BinaryResourceMatcher extends ResourceMatcher {
 		} catch (NullPointerException e) {
 			// CDT throws this exception for files not recognized. For now, be conservative and allow these files.
 			return false;
+		}
+	}
+	
+	private static boolean isELFBinary(IFile candidate) {
+		BufferedInputStream fileInput = null;
+		try {
+			if (candidate.exists()) {
+				fileInput = new BufferedInputStream(((IFile) candidate).getContents());
+			} else {
+				fileInput = RemoteContentProvider.getFileContents((IFile) candidate);
+			}
+			
+			byte[] magicNumber = new byte[4];
+			fileInput.read(magicNumber);
+			if ((magicNumber[0] == 0x7f) &&
+			    (magicNumber[1] == 0x45) && // E
+			    (magicNumber[2] == 0x4c) && // L
+			    (magicNumber[3] == 0x46)) { // F
+				return true;
+			} else {
+				return false;
+			}
+		} catch (CoreException e) {
+			RDTSyncCorePlugin.log(Messages.BinaryResourceMatcher_1 + candidate.getProjectRelativePath().toString(), e);
+			return false;
+		} catch (IOException e) {
+			RDTSyncCorePlugin.log(Messages.BinaryResourceMatcher_1 + candidate.getProjectRelativePath().toString(), e);
+			return false;
+		} finally {
+			if (fileInput != null) {
+				try {
+					fileInput.close();
+				} catch (IOException e) {
+					RDTSyncCorePlugin.log(e);
+				}
+			}
 		}
 	}
 	
