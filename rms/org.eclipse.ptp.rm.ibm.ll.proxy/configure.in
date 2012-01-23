@@ -17,7 +17,7 @@ AM_INIT_AUTOMAKE
 AC_CANONICAL_BUILD
 
 VERSION="_$PACKAGE_VERSION"
-if [ `expr "$VERSION" : "_@[^@]*@"` -gt 0 ]; then
+if [ `expr "$VERSION" : "_@@<:@^@@:>@*@"` -gt 0 ]; then
 	VERSION=
 fi
 UTILS="`echo ../org.eclipse.ptp.utils${VERSION}`"
