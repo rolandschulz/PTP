@@ -71,7 +71,7 @@ dnl
 AC_HEADER_STDC
 AC_CHECK_HEADER([llapi.h], [], 
 	[AC_MSG_NOTICE([LoadLeveler not installed, skipping...])
-	 AS_EXIT
+	 AS_EXIT([1])
 	])
 
 dnl

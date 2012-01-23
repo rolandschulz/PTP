@@ -2272,7 +2272,7 @@ case $build_os in *\ *) build_os=`echo "$build_os" | sed 's/ /-/g'`;; esac
 
 
 VERSION="_$PACKAGE_VERSION"
-if  `expr "$VERSION" : "_@[^@]*@"` -gt 0 ; then
+if test `expr "$VERSION" : "_@^@*@"` -gt 0 ; then
 	VERSION=
 fi
 UTILS="`echo ../org.eclipse.ptp.utils${VERSION}`"
@@ -6031,7 +6031,7 @@ do
     cat >>$CONFIG_STATUS <<_ACEOF
     # First, check the format of the line:
     cat >"\$tmp/defines.sed" <<\\CEOF
-/^[	 ]*#[	 ]*undef[	 ][	 ]*$ac_word_re[	 ]*\$/b def
+/^[	 ]*#[	 ]*undef[	 ][	 ]*$ac_word_re[	 ]*/b def
 /^[	 ]*#[	 ]*define[	 ][	 ]*$ac_word_re[(	 ]/b def
 b
 :def
