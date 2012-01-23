@@ -440,7 +440,6 @@ public class SyncFileTree extends ApplicationWindow {
 				// Do nothing but display an error message for a few seconds
 				patternErrorLabel.setText(Messages.SyncFileTree_15);
 				display.timerExec(ERROR_DISPLAY_SECONDS*1000, new Runnable() {
-					@Override
 					public void run() {
 						if (patternErrorLabel.isDisposed ()) {
 							return;
@@ -534,7 +533,6 @@ public class SyncFileTree extends ApplicationWindow {
 		 *            the parent object
 		 * @return Object[]
 		 */
-		@Override
 		public Object[] getChildren(Object element) {
 			ArrayList<IResource> children = new ArrayList<IResource>();
 
@@ -715,13 +713,11 @@ public class SyncFileTree extends ApplicationWindow {
 			return false;
 		}
 
-		@Override
 		public void addListener(ILabelProviderListener listener) {
 			// Listeners not supported
 			
 		}
 
-		@Override
 		public void removeListener(ILabelProviderListener listener) {
 			// Listeners not supported
 		}
