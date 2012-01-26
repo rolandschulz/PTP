@@ -49,7 +49,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
@@ -75,22 +74,20 @@ import org.eclipse.ui.PlatformUI;
 public class SyncFileTree extends ApplicationWindow {
 	private static final int ERROR_DISPLAY_SECONDS = 3;
 	private static final Display display = Display.getCurrent();
-	private static final Color excludeRed = display.getSystemColor(SWT.COLOR_DARK_RED);
-	private static final Color includeGreen = display.getSystemColor(SWT.COLOR_DARK_GREEN);
-	
+
 	private final int windowWidth;
 	private final int viewHeight; // Used for file tree and pattern table
 
 	private final IProject project;
 	private final SyncFileFilter filter;
 	private final boolean modify_default_filter;
-	private SyncCheckboxTreeViewer treeViewer;
+	private CheckboxTreeViewer treeViewer;
 	private Table patternTable;
 	private Button showRemoteButton;
 	private Label remoteErrorLabel;
 	private Button upButton;
 	private Button downButton;
-	private Button deleteButton;
+	private Button removeButton;
 	private Text newPattern;
 	private Button excludeButton;
 	private Button includeButton;
@@ -99,28 +96,6 @@ public class SyncFileTree extends ApplicationWindow {
 	private Button cancelButton;
 	private Button okButton;
 	private final Map<String, ResourceMatcher> specialFilterNameToPatternMap = new HashMap<String, ResourceMatcher>();
-
-	// A checkbox tree viewer that does not allow unchecked directories to be expanded.
-	// Note: This illegally extends CheckboxTreeViewer but is the only simple way known to implement this behavior.
-	// Also, the "isExpandable" method exists in the grandparent class and comments say that it may be overriden.
-	private class SyncCheckboxTreeViewer extends CheckboxTreeViewer {
-		public SyncCheckboxTreeViewer(Composite parent) {
-			super(parent);
-		}
-		
-		@Override
-		public boolean isExpandable(Object element) {
-			if (!super.isExpandable(element)) {
-				return false;
-			}
-			
-			if (filter.shouldIgnore((IResource) element)) {
-				return false;
-			} else {
-				return true;
-			}
-		}
-	}
 
 	/**
 	 * Constructor for a new tree. This constructor will modify the passed project's filter
@@ -196,7 +171,7 @@ public class SyncFileTree extends ApplicationWindow {
 		this.formatAsHeader(treeViewerLabel);
 
 		// File tree viewer
-		treeViewer = new SyncCheckboxTreeViewer(treeViewerComposite);
+		treeViewer = new CheckboxTreeViewer(treeViewerComposite);
 		treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		treeViewer.setContentProvider(new SFTTreeContentProvider());
 		treeViewer.setLabelProvider(new SFTTreeLabelProvider());
@@ -238,7 +213,6 @@ public class SyncFileTree extends ApplicationWindow {
         });
         
         remoteErrorLabel = new Label(treeViewerComposite, SWT.CENTER);
-        remoteErrorLabel.setForeground(excludeRed);
         remoteErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
 		// Composite for pattern table and buttons
@@ -255,21 +229,13 @@ public class SyncFileTree extends ApplicationWindow {
 		// Pattern table
 		patternTable = new Table(patternTableComposite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		patternTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
-		patternTable.setHeaderVisible(true);
-		patternTable.setLinesVisible(true);
-
-		TableColumn patternColumn = new TableColumn(patternTable, SWT.LEAD, 0);
-		patternColumn.setText(Messages.SyncFileTree_4);
-		patternColumn.setWidth(250);
-		
-		TableColumn typeColumn = new TableColumn(patternTable, SWT.LEAD, 1);
-		typeColumn.setText(Messages.SyncFileTree_5);
-		typeColumn.setWidth(50);
+		new TableColumn(patternTable, SWT.LEAD, 0);
+		new TableColumn(patternTable, SWT.LEAD, 1); // Separate column for pattern for alignment and font change.
 		
 		// Pattern table buttons (up, down, and delete)
 		upButton = new Button(patternTableComposite, SWT.PUSH);
 	    upButton.setText(Messages.SyncFileTree_6);
-	    upButton.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
+	    upButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 	    upButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
 	    		TableItem[] selectedPatternItems = patternTable.getSelection();
@@ -287,7 +253,7 @@ public class SyncFileTree extends ApplicationWindow {
 
 	    downButton = new Button(patternTableComposite, SWT.PUSH);
 	    downButton.setText(Messages.SyncFileTree_7);
-	    downButton.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
+	    downButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 	    downButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
 	    		TableItem[] selectedPatternItems = patternTable.getSelection();
@@ -303,10 +269,10 @@ public class SyncFileTree extends ApplicationWindow {
 	    	}
 	    });
 
-	    deleteButton = new Button(patternTableComposite, SWT.PUSH);
-	    deleteButton.setText(Messages.SyncFileTree_8);
-	    deleteButton.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false));
-	    deleteButton.addSelectionListener(new SelectionAdapter() {
+	    removeButton = new Button(patternTableComposite, SWT.PUSH);
+	    removeButton.setText(Messages.SyncFileTree_8);
+	    removeButton.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false));
+	    removeButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
 	    		TableItem[] selectedPatternItems = patternTable.getSelection();
 	    		for (TableItem selectedPatternItem : selectedPatternItems) {
@@ -332,7 +298,6 @@ public class SyncFileTree extends ApplicationWindow {
 	    // Submit buttons (exclude and include)
 	    excludeButton = new Button(patternEnterComposite, SWT.PUSH);
 	    excludeButton.setText(Messages.SyncFileTree_10);
-	    excludeButton.setForeground(excludeRed);
 	    excludeButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
 	    excludeButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -342,7 +307,6 @@ public class SyncFileTree extends ApplicationWindow {
 
 	    includeButton = new Button(patternEnterComposite, SWT.PUSH);
 	    includeButton.setText(Messages.SyncFileTree_11);
-	    includeButton.setForeground(includeGreen);
 	    includeButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
 	    includeButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -371,7 +335,6 @@ public class SyncFileTree extends ApplicationWindow {
 	    
 	    // Place for displaying error message if pattern is illegal
 	    patternErrorLabel = new Label(patternEnterComposite, SWT.NONE);
-	    patternErrorLabel.setForeground(excludeRed);
 		patternErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
 
 	    // Composite for cancel and OK buttons
@@ -476,22 +439,32 @@ public class SyncFileTree extends ApplicationWindow {
 			ti.setData(pattern);
 
 			String[] tableValues = new String[2];
-			tableValues[0] = pattern.toString();
+			String patternType;
+			if (filter.getPatternType(pattern) == PatternType.EXCLUDE) {
+				patternType = Messages.SyncFileTree_21;
+			} else {
+				patternType = Messages.SyncFileTree_22;
+			}
 			if (pattern instanceof PathResourceMatcher) {
-				tableValues[1] = Messages.SyncFileTree_16;
+				patternType = patternType + " " + Messages.SyncFileTree_16; //$NON-NLS-1$
 			} else if (pattern instanceof RegexResourceMatcher) {
-				tableValues[1] = Messages.SyncFileTree_17;
-			} else {
-				tableValues[1] = Messages.SyncFileTree_18;
+				patternType = patternType + " " + Messages.SyncFileTree_17; //$NON-NLS-1$
 			}
-			ti.setText(tableValues);
+			patternType += ":  "; //$NON-NLS-1$
 
-			if (filter.getPatternType(pattern) == PatternType.INCLUDE) {
-				ti.setForeground(includeGreen);
-			} else {
-				ti.setForeground(excludeRed);
-			}
+			tableValues[0] = patternType;
+			tableValues[1] = pattern.toString();
+			ti.setText(tableValues);
+			
+			// Italicize pattern
+			FontData currentFontData = ti.getFont().getFontData()[0];
+			Font italicizedFont = new Font(display, new FontData(currentFontData.getName(), currentFontData.getHeight(), SWT.ITALIC));
+			ti.setFont(1, italicizedFont);
+
 		}
+		
+		patternTable.getColumn(0).pack();
+		patternTable.getColumn(1).pack();
 		
 		treeViewer.refresh();
 	}
