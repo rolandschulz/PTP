@@ -21,7 +21,7 @@
 		<cdt-version>indigo</cdt-version>
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/sr2</cdt-site>
 		<tm-version>R-3.3-201106080935</tm-version>
-		<tm-site>http://download.eclipse.org/dsdp/tm/downloads/drops/${rdt-version}</tm-site>
+		<tm-site>http://download.eclipse.org/dsdp/tm/downloads/drops/${tm-version}</tm-site>
 		<photran-site>file://home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-photran-release</photran-site>
 	</properties>
 
