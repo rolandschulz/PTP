@@ -403,3 +403,4 @@ sub trimtext {
     return $xml;
 }
 
+1;

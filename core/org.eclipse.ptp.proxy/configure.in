@@ -16,7 +16,7 @@ dnl Eclipse adds version number to end of package when deploying via update site
 dnl
 
 VERSION="_$PACKAGE_VERSION"
-if [ `expr "$VERSION" : "_@[^@]*@"` -gt 0 ]; then
+if test `expr "$VERSION" : "_@@<:@^@@:>@*@"` -gt 0; then
 	VERSION=
 fi
 UTILS="`echo ../org.eclipse.ptp.utils${VERSION}`"

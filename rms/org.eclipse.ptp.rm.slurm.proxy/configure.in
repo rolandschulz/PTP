@@ -15,7 +15,7 @@ dnl Eclipse adds version number to end of package when deploying via update site
 dnl
 
 VERSION="_$PACKAGE_VERSION"
-if [ `expr "$VERSION" : "_@[^@]*@"` -gt 0 ]; then
+if test `expr "$VERSION" : "_@@<:@^@@:>@*@"` -gt 0 ; then
 	VERSION=
 fi
 UTILS="`echo ../org.eclipse.ptp.utils${VERSION}`"
@@ -34,6 +34,18 @@ if test ! -d $PROXY; then
 fi
 
 dnl SLURM
+
+dnl
+dnl Check for SLURM installation
+dnl
+
+AC_PATH_PROG(SRUN, [srun], no)
+if test "$ac_cv_path_SRUN" != no; then
+	AC_DEFINE([HAVE_SRUN],[1],[Enable SLURM rms support.])
+else
+	AC_MSG_NOTICE([SLURM not installed, skipping...])
+	AS_EXIT([1])
+fi
 
 AC_ARG_WITH([slurm], AS_HELP_STRING([--with-slurm],
 	[Specify the top dir of installed SLURM rms.@<:@REQUIRED@:>@]),[],[with_slurm=no])
@@ -91,23 +103,9 @@ if test x"$SLURM_VERSION" = x"2.2"; then
 fi				
 
 dnl
-dnl Check for SLURM installation
-dnl
-
-AC_PATH_PROG(SRUN, [srun], no)
-if test "$ac_cv_path_SRUN" != no; then
-	AC_DEFINE([HAVE_SRUN],[1],[Enable SLURM rms support.])
-else
-	AC_MSG_NOTICE([SLURM not installed, skipping...])
-	AS_EXIT
-fi
-
-dnl
 dnl Check for types
 dnl
 AC_TYPE_SIGNAL
-
-
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile])

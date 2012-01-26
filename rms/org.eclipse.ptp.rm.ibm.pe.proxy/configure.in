@@ -21,7 +21,7 @@ dnl Eclipse adds version number to end of package when deploying via update site
 dnl
 
 VERSION="_$PACKAGE_VERSION"
-if [ `expr "$VERSION" : "_@[^@]*@"` -gt 0 ]; then
+if test `expr "$VERSION" : "_@@<:@^@@:>@*@"` -gt 0 ; then
 	VERSION=
 fi
 UTILS="`echo ../org.eclipse.ptp.utils${VERSION}`"
@@ -96,7 +96,7 @@ if test "$ac_cv_path_POE" != no; then
 	AC_DEFINE_UNQUOTED(POE, "$ac_cv_path_POE", [Location of poe program])
 else
 	AC_MSG_NOTICE([PE not installed, skipping...])
-	AS_EXIT
+	AS_EXIT([1])
 fi
 
 
