@@ -14,8 +14,12 @@
 
 	<properties>
 		<tycho-version>0.13.0</tycho-version>
-		<eclipse-release>indigo</eclipse-release>
-		<eclipse-site>http://download.eclipse.org/releases/${eclipse-release}</eclipse-site>
+		<platform-version>3.7</platform-version>
+		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
+		<orbit-version>R20110523182458</orbit-version>
+		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</orbit-site>
+		<cdt-version>indigo</cdt-version>
+		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/sr2</cdt-site>
 		<photran-site>file://home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-photran-release</photran-site>
 	</properties>
 
@@ -193,8 +197,18 @@
 
 	<repositories>
 		<repository>
-			<id>eclipse-${eclipse-release}</id>
-			<url>${eclipse-site}</url>
+			<id>platform-${platform-version}</id>
+			<url>${platform-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>orbit-${orbit-version}</id>
+			<url>${orbit-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>cdt-${cdt-version}</id>
+			<url>${cdt-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
