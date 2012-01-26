@@ -21,7 +21,9 @@
 		<cdt-version>indigo</cdt-version>
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/sr2</cdt-site>
 		<tm-version>3.3milestones</tm-version>
-		<tm-site>http://download.eclipse.org/dsdp/tm/updates/${tm-version}</tm-site>
+		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
+		<egit-version>1.2</egit-version>
+		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<photran-site>file://home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-photran-release</photran-site>
 	</properties>
 
@@ -216,6 +218,11 @@
 		<repository>
 			<id>tm-${tm-version}</id>
 			<url>${tm-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>egit-${egitversion}</id>
+			<url>${egit-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
