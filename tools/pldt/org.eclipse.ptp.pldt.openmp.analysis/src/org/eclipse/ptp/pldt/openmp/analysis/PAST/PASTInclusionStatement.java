@@ -40,6 +40,7 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 	/**
 	 * @since 4.1
 	 */
+	@Override
 	public IASTNode copy(CopyStyle style) {
 		return incl_.copy(style);
 	}
@@ -49,16 +50,19 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 		return "#include"; //$NON-NLS-1$
 	}
 
+	@Override
 	public String getPath() {
 		return incl_.getPath();
 	}
 
 	// cdt40
+	@Override
 	public IASTName getName() {
 		return incl_.getName();
 	}
 
 	// cdt40
+	@Override
 	public boolean isSystemInclude() {
 		return incl_.isSystemInclude();
 	}
@@ -70,6 +74,7 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 	}
 
 	// cdt40
+	@Override
 	public boolean isResolved() {
 		return incl_.isResolved();
 	}
@@ -79,14 +84,15 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 	 * 
 	 * @return
 	 */
+	@Override
 	public boolean isPartOfTranslationUnitFile() {
 		return incl_.isPartOfTranslationUnitFile();
 	}
 
 	/**
-	 * CDT 6.0 implement
-	 * IASTPreprocessorIncludeStatement.isResolvedByHeuristics()
+	 * CDT 6.0 implement IASTPreprocessorIncludeStatement.isResolvedByHeuristics()
 	 */
+	@Override
 	public boolean isResolvedByHeuristics() {
 		return false;
 
