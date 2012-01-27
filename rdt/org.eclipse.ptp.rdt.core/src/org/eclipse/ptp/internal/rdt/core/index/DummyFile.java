@@ -128,13 +128,11 @@ public class DummyFile implements IIndexFile, Serializable {
 		return 0;
 	}
 
-	@Override
 	public ISignificantMacros getSignificantMacros() throws CoreException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public boolean hasPragmaOnceSemantics() throws CoreException {
 		// TODO Auto-generated method stub
 		return false;

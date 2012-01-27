@@ -75,7 +75,6 @@ public class DummyFileLocation implements IASTFileLocation, Serializable {
 		return offset;
 	}
 
-	@Override
 	public IASTPreprocessorIncludeStatement getContextInclusionStatement() {
 		// TODO Auto-generated method stub
 		return null;
