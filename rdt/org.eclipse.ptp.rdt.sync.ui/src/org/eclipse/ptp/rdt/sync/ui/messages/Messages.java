@@ -49,6 +49,7 @@ public class Messages extends NLS {
 	public static String SyncFileTree_22;
 	public static String SyncFileTree_3;
 	public static String SyncFileTree_4;
+	public static String SyncFileTree_5;
 	public static String SyncFileTree_6;
 	public static String SyncFileTree_7;
 	public static String SyncFileTree_8;

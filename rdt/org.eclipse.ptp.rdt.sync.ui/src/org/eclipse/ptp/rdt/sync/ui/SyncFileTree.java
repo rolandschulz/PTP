@@ -88,7 +88,10 @@ public class SyncFileTree extends ApplicationWindow {
 	private Button upButton;
 	private Button downButton;
 	private Button removeButton;
-	private Text newPattern;
+	private Text newPath;
+	private Button excludeButtonForPath;
+	private Button includeButtonForPath;
+	private Text newRegex;
 	private Button excludeButtonForRegex;
 	private Button includeButtonForRegex;
 	private Combo specialFiltersCombo;
@@ -290,12 +293,38 @@ public class SyncFileTree extends ApplicationWindow {
 	    patternEnterComposite.setLayout(new GridLayout(4, false));
 		patternEnterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
-		// Label for entering new pattern
+		// Label for entering new path
+		new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileTree_5);
+
+	    // Text box to enter new path
+	    newPath = new Text(patternEnterComposite, SWT.NONE);
+	    newPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+	    // Submit buttons (exclude and include)
+	    excludeButtonForPath = new Button(patternEnterComposite, SWT.PUSH);
+	    excludeButtonForPath.setText(Messages.SyncFileTree_10);
+	    excludeButtonForPath.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    excludeButtonForPath.addSelectionListener(new SelectionAdapter() {
+	    	public void widgetSelected(SelectionEvent event) {
+	    		enterNewPathPattern(PatternType.EXCLUDE);
+	    	}
+	    });
+
+	    includeButtonForPath = new Button(patternEnterComposite, SWT.PUSH);
+	    includeButtonForPath.setText(Messages.SyncFileTree_11);
+	    includeButtonForPath.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    includeButtonForPath.addSelectionListener(new SelectionAdapter() {
+	    	public void widgetSelected(SelectionEvent event) {
+	    		enterNewPathPattern(PatternType.INCLUDE);
+	    	}
+	    });
+
+		// Label for entering new regex
 		new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileTree_9);
 
-	    // Text box to enter new pattern
-	    newPattern = new Text(patternEnterComposite, SWT.NONE);
-	    newPattern.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+	    // Text box to enter new regex
+	    newRegex = new Text(patternEnterComposite, SWT.NONE);
+	    newRegex.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 	    // Submit buttons (exclude and include)
 	    excludeButtonForRegex = new Button(patternEnterComposite, SWT.PUSH);
@@ -403,8 +432,22 @@ public class SyncFileTree extends ApplicationWindow {
 		});
 	}
 	
+	private void enterNewPathPattern(PatternType type) {
+		String pattern = newPath.getText();
+		if (pattern.isEmpty()) {
+			return;
+		}
+
+		PathResourceMatcher matcher = null;
+		matcher = new PathResourceMatcher(new Path(pattern));
+		filter.addPattern(matcher, type);
+
+		newPath.setText(""); //$NON-NLS-1$
+		update();
+	}
+
 	private void enterNewRegexPattern(PatternType type) {
-		String pattern = newPattern.getText();
+		String pattern = newRegex.getText();
 		if (pattern.isEmpty()) {
 			return;
 		}
@@ -428,7 +471,7 @@ public class SyncFileTree extends ApplicationWindow {
 
 		filter.addPattern(matcher, type);
 
-		newPattern.setText(""); //$NON-NLS-1$
+		newRegex.setText(""); //$NON-NLS-1$
 		update();
 	}
 	
