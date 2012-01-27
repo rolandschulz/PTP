@@ -101,7 +101,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 			} else if (command.equals(syncFileList)) {
 				new SyncFileTree(project).open();
 			} else if (command.equals(syncDefaultFileList)) {
-				new SyncFileTree(project, true).open();
+				new SyncFileTree().open();
 			}
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.

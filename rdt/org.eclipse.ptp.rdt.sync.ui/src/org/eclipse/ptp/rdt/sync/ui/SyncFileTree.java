@@ -80,7 +80,6 @@ public class SyncFileTree extends ApplicationWindow {
 
 	private final IProject project;
 	private final SyncFileFilter filter;
-	private final boolean modify_default_filter;
 	private CheckboxTreeViewer treeViewer;
 	private Table patternTable;
 	private Button showRemoteButton;
@@ -102,26 +101,21 @@ public class SyncFileTree extends ApplicationWindow {
 	private Button okButton;
 	private final Map<String, ResourceMatcher> specialFilterNameToPatternMap = new HashMap<String, ResourceMatcher>();
 
-	/**
-	 * Constructor for a new tree. This constructor will modify the passed project's filter
-	 * @param p project
-	 */
-	public SyncFileTree(IProject p) {
-		this(p, false);
+	public SyncFileTree() {
+		this(null);
 	}
 
 	/**
-	 * General constructor for a new tree. Even if we are modifying the default filter, a project is still needed to give content
-	 * to the file tree.
+	 * General constructor for a new tree. If project is null, the default filter will be used. Otherwise, the passed project's
+	 * filter used. Most likely, in the former case the page has been invoked from the preference menu, and in the latter case
+	 * from the sync context menu.
 	 *
 	 * @param p project
-	 * @param modify_default whether to modify the default filter
 	 */
-	public SyncFileTree(IProject p, boolean modify_default) {
+	public SyncFileTree(IProject p) {
 		super(null);
 		project = p;
-		modify_default_filter = modify_default;
-		if (modify_default_filter) {
+		if (project == null) {
 			filter = SyncManager.getDefaultFileFilter();
 		} else {
 			filter = SyncManager.getFileFilter(project);
@@ -144,7 +138,7 @@ public class SyncFileTree extends ApplicationWindow {
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		if (modify_default_filter) {
+		if (project == null) {
 			shell.setText(Messages.SyncFileTree_20);
 		} else {
 			shell.setText(Messages.SyncFileTree_0);
@@ -403,7 +397,7 @@ public class SyncFileTree extends ApplicationWindow {
 	    okButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, false, false));
 	    okButton.addSelectionListener(new SelectionAdapter() {
 	      public void widgetSelected(SelectionEvent event) {
-	    	  if (modify_default_filter) {
+	    	  if (project == null) {
 	    		  SyncManager.saveDefaultFileFilter(filter);
 	    	  } else {
 	    		  SyncManager.saveFileFilter(project, filter);
