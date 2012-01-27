@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.index.IIndexInclude;
 import org.eclipse.cdt.core.index.IIndexMacro;
 import org.eclipse.cdt.core.index.IIndexName;
+import org.eclipse.cdt.core.parser.ISignificantMacros;
 import org.eclipse.core.runtime.CoreException;
 
 /**
@@ -125,6 +126,18 @@ public class DummyFile implements IIndexFile, Serializable {
 	public int getEncodingHashcode() throws CoreException {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public ISignificantMacros getSignificantMacros() throws CoreException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean hasPragmaOnceSemantics() throws CoreException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

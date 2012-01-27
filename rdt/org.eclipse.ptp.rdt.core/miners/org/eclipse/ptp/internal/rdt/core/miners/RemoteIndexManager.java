@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 IBM Corporation and others.
+ * Copyright (c) 2007, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -91,13 +91,13 @@ public class RemoteIndexManager {
 					StandaloneLogService.getInstance().errorLog(CLASS_NAME +":" + "Index contains 0 fragments"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			
-			return new CIndex(fragments.toArray(new IIndexFragment[fragments.size()]), fragments.size()); 
+			return new CIndex(fragments.toArray(new IIndexFragment[fragments.size()])); 
 		}
 		else {
 			StandaloneFastIndexer indexer = getIndexerForScope(scope, dataStore, null);
 			//return indexer.getIndex();
 			//create a new CIndex wrapper each time to prevent deadlock.
-			return new CIndex(new IIndexFragment[]{indexer.getIndex().getWritableFragment()}, 1);
+			return new CIndex(new IIndexFragment[]{indexer.getIndex().getWritableFragment()});
 		}
 	}
 	
@@ -112,7 +112,6 @@ public class RemoteIndexManager {
 			// configure the indexer using the provider
 			indexer.setScannerInfoProvider(provider);
 			indexer.setLanguageMapper(new RemoteLanguageMapper(provider, dataStore));
-			indexer.setFilesToParseUpFront(provider.getFilesToParseUpFront().toArray(new String[]{}));
 			indexer.setFileEncodingRegistry(provider.getFileEncodingRegistry());
 			
 			if(provider.checkIndexerPreference(IRemoteIndexerInfoProvider.KEY_SKIP_ALL_REFERENCES)) {

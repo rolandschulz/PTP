@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ptp.internal.rdt.core.navigation;
 import java.io.Serializable;
 
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIncludeStatement;
 
 /**
  * @author vkong
@@ -83,6 +84,12 @@ public class SimpleASTFileLocation implements IASTFileLocation, Serializable {
 	 */
 	public int getEndingLineNumber() {
 		return endLineNumber;
+	}
+
+	@Override
+	public IASTPreprocessorIncludeStatement getContextInclusionStatement() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ptp.internal.rdt.core.index;
 import java.io.Serializable;
 
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
+import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIncludeStatement;
 import org.eclipse.cdt.core.model.ISourceRange;
 
 public class DummyFileLocation implements IASTFileLocation, Serializable {
@@ -72,6 +73,12 @@ public class DummyFileLocation implements IASTFileLocation, Serializable {
 
 	public int getNodeOffset() {
 		return offset;
+	}
+
+	@Override
+	public IASTPreprocessorIncludeStatement getContextInclusionStatement() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
