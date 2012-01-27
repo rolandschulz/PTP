@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,14 +12,12 @@ package org.eclipse.ptp.internal.rdt.core.miners;
 
 import java.io.IOException;
 
-import org.eclipse.cdt.core.dom.CDOM;
 import org.eclipse.cdt.core.dom.ICodeReaderFactory;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.CodeReader;
 import org.eclipse.cdt.core.parser.ICodeReaderCache;
 import org.eclipse.cdt.internal.core.dom.AbstractCodeReaderFactory;
-import org.eclipse.cdt.internal.core.dom.parser.EmptyCodeReaderCache;
 import org.eclipse.core.runtime.CoreException;
 
 /**
