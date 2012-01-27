@@ -24,6 +24,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.preference.IPreferencePageContainer;
+import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -52,6 +55,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -66,14 +70,17 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 
 /**
  * File tree where users can select the files to be sync'ed
  */
-public class SyncFileTree extends ApplicationWindow {
+public class SyncFileTree extends ApplicationWindow implements IWorkbenchPreferencePage {
 	private static final int ERROR_DISPLAY_SECONDS = 3;
 	private static final Display display = Display.getCurrent();
+	
 
 	private final int windowWidth;
 	private final int viewHeight; // Used for file tree and pattern table
@@ -101,20 +108,29 @@ public class SyncFileTree extends ApplicationWindow {
 	private Button okButton;
 	private final Map<String, ResourceMatcher> specialFilterNameToPatternMap = new HashMap<String, ResourceMatcher>();
 
+	/**
+	 * Default constructor creates a preference page and should never be called by clients. Instead, use the "open" method to
+	 * create a standalone GUI.
+	 */
 	public SyncFileTree() {
-		this(null);
+		this(null, true);
 	}
 
 	/**
-	 * General constructor for a new tree. If project is null, the default filter will be used. Otherwise, the passed project's
-	 * filter used. Most likely, in the former case the page has been invoked from the preference menu, and in the latter case
-	 * from the sync context menu.
+	 * Constructor for a new tree. If project is null, the default filter will be used. Otherwise, the passed project's filter is
+	 * used.
 	 *
 	 * @param p project
+	 * @param isPreferencePage
 	 */
-	public SyncFileTree(IProject p) {
+	private SyncFileTree(IProject p, boolean isPreferencePage) {
 		super(null);
 		project = p;
+		if (isPreferencePage) {
+			preferencePage = new SyncFilePreferencePage();
+		} else {
+			preferencePage = null;
+		}
 		if (project == null) {
 			filter = SyncManager.getDefaultFileFilter();
 		} else {
@@ -128,6 +144,16 @@ public class SyncFileTree extends ApplicationWindow {
 		
 		windowWidth = display.getBounds().width / 3;
 		viewHeight = display.getBounds().height / 6;
+	}
+
+	/**
+	 * Open a standalone GUI to change the filter of the passed project. Pass null to alter the default filter.
+	 *
+	 * @param p project
+	 * @return open return code
+	 */ 
+	public static int open(IProject p) {
+		return new SyncFileTree(p, false).open();
 	}
 
 	/**
@@ -158,61 +184,63 @@ public class SyncFileTree extends ApplicationWindow {
 		gl.verticalSpacing = 20;
 		composite.setLayout(gl);
 
-		// Composite for tree viewer
-		Composite treeViewerComposite = new Composite(composite, SWT.BORDER);
-		treeViewerComposite.setLayout(new GridLayout(2, false));
-		treeViewerComposite.setLayoutData(new GridData(windowWidth, viewHeight));
+		if (project != null) {
+			// Composite for tree viewer
+			Composite treeViewerComposite = new Composite(composite, SWT.BORDER);
+			treeViewerComposite.setLayout(new GridLayout(2, false));
+			treeViewerComposite.setLayoutData(new GridData(windowWidth, viewHeight));
 
-		// Label for tree viewer
-		Label treeViewerLabel = new Label(treeViewerComposite, SWT.NONE);
-		treeViewerLabel.setText(Messages.SyncFileTree_1);
-		treeViewerLabel.setLayoutData(new GridData(SWT.LEAD, SWT.CENTER, false, false, 2, 1));
-		this.formatAsHeader(treeViewerLabel);
+			// Label for tree viewer
+			Label treeViewerLabel = new Label(treeViewerComposite, SWT.NONE);
+			treeViewerLabel.setText(Messages.SyncFileTree_1);
+			treeViewerLabel.setLayoutData(new GridData(SWT.LEAD, SWT.CENTER, false, false, 2, 1));
+			this.formatAsHeader(treeViewerLabel);
 
-		// File tree viewer
-		treeViewer = new CheckboxTreeViewer(treeViewerComposite);
-		treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-		treeViewer.setContentProvider(new SFTTreeContentProvider());
-		treeViewer.setLabelProvider(new SFTTreeLabelProvider());
-		treeViewer.setCheckStateProvider(new ICheckStateProvider() {
-			public boolean isChecked(Object element) {
-				if (filter.shouldIgnore((IResource) element)) {
+			// File tree viewer
+			treeViewer = new CheckboxTreeViewer(treeViewerComposite);
+			treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+			treeViewer.setContentProvider(new SFTTreeContentProvider());
+			treeViewer.setLabelProvider(new SFTTreeLabelProvider());
+			treeViewer.setCheckStateProvider(new ICheckStateProvider() {
+				public boolean isChecked(Object element) {
+					if (filter.shouldIgnore((IResource) element)) {
+						return false;
+					} else {
+						return true;
+					}
+				}
+
+				public boolean isGrayed(Object element) {
 					return false;
-				} else {
-					return true;
 				}
-			}
+			});
+			treeViewer.addCheckStateListener(new ICheckStateListener() {
+				public void checkStateChanged(CheckStateChangedEvent event) {
+					IPath path = ((IResource) (event.getElement())).getProjectRelativePath();
+					if (event.getChecked()) {
+						filter.addPattern(new PathResourceMatcher(path), PatternType.INCLUDE);
+					} else {
+						filter.addPattern(new PathResourceMatcher(path), PatternType.EXCLUDE);
+					}
 
-			public boolean isGrayed(Object element) {
-				return false;
-			}
-		});
-		treeViewer.addCheckStateListener(new ICheckStateListener() {
-			public void checkStateChanged(CheckStateChangedEvent event) {
-				IPath path = ((IResource) (event.getElement())).getProjectRelativePath();
-				if (event.getChecked()) {
-					filter.addPattern(new PathResourceMatcher(path), PatternType.INCLUDE);
-				} else {
-					filter.addPattern(new PathResourceMatcher(path), PatternType.EXCLUDE);
+					update();
 				}
+			});
+			treeViewer.setInput(project);
 
-				update();
-			}
-		});
-		treeViewer.setInput(project);
-		
-		showRemoteButton = new Button(treeViewerComposite, SWT.CHECK);
-		showRemoteButton.setText(Messages.SyncFileTree_2);
-		showRemoteButton.setSelection(((SFTTreeContentProvider) treeViewer.getContentProvider()).getShowRemoteFiles());
-        showRemoteButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-            	update();
-            }
-        });
-        
-        remoteErrorLabel = new Label(treeViewerComposite, SWT.CENTER);
-        remoteErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			showRemoteButton = new Button(treeViewerComposite, SWT.CHECK);
+			showRemoteButton.setText(Messages.SyncFileTree_2);
+			showRemoteButton.setSelection(((SFTTreeContentProvider) treeViewer.getContentProvider()).getShowRemoteFiles());
+			showRemoteButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					update();
+				}
+			});
+
+			remoteErrorLabel = new Label(treeViewerComposite, SWT.CENTER);
+			remoteErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		}
 		
 		// Composite for pattern table and buttons
 		Composite patternTableComposite = new Composite(composite, SWT.BORDER);
@@ -376,35 +404,37 @@ public class SyncFileTree extends ApplicationWindow {
 	    patternErrorLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
 		patternErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
 
-	    // Composite for cancel and OK buttons
-	    Composite buttonComposite = new Composite(composite, SWT.FILL);
-	    buttonComposite.setLayout(new GridLayout(2, false));
-		buttonComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		// Composite for cancel and OK buttons
+		if (preferencePage == null) {
+			Composite buttonComposite = new Composite(composite, SWT.FILL);
+			buttonComposite.setLayout(new GridLayout(2, false));
+			buttonComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-	    // Cancel button
-	    cancelButton = new Button(buttonComposite, SWT.PUSH);
-	    cancelButton.setText(Messages.SyncFileTree_13);
-	    cancelButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, true, false));
-	    cancelButton.addSelectionListener(new SelectionAdapter() {
-	      public void widgetSelected(SelectionEvent event) {
-	    	  getShell().close();
-	      }
-	    });
-	    
-	    // OK button
-	    okButton = new Button(buttonComposite, SWT.PUSH);
-	    okButton.setText(Messages.SyncFileTree_14);
-	    okButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, false, false));
-	    okButton.addSelectionListener(new SelectionAdapter() {
-	      public void widgetSelected(SelectionEvent event) {
-	    	  if (project == null) {
-	    		  SyncManager.saveDefaultFileFilter(filter);
-	    	  } else {
-	    		  SyncManager.saveFileFilter(project, filter);
-	    	  }
-	    	  getShell().close();
-	      }
-	    });
+			// Cancel button
+			cancelButton = new Button(buttonComposite, SWT.PUSH);
+			cancelButton.setText(Messages.SyncFileTree_13);
+			cancelButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, true, false));
+			cancelButton.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					getShell().close();
+				}
+			});
+
+			// OK button
+			okButton = new Button(buttonComposite, SWT.PUSH);
+			okButton.setText(Messages.SyncFileTree_14);
+			okButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, false, false));
+			okButton.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					if (project == null) {
+						SyncManager.saveDefaultFileFilter(filter);
+					} else {
+						SyncManager.saveFileFilter(project, filter);
+					}
+					getShell().close();
+				}
+			});
+		}
 
 	    update();
 		return composite;
@@ -485,18 +515,6 @@ public class SyncFileTree extends ApplicationWindow {
 	}
 
 	private void update() {
-		boolean showRemote = showRemoteButton.getSelection();
-		if (showRemote) {
-			if (!((SFTTreeContentProvider) treeViewer.getContentProvider()).isConnected()) {
-				showRemote = false;
-				remoteErrorLabel.setText(Messages.SyncFileTree_19);
-			} else {
-				remoteErrorLabel.setText(""); //$NON-NLS-1$
-			}
-		}
-		showRemoteButton.setSelection(showRemote);
-		((SFTTreeContentProvider) treeViewer.getContentProvider()).setShowRemoteFiles(showRemote);
-
 		patternTable.removeAll();
 		for (ResourceMatcher pattern : filter.getPatterns()) {
 			TableItem ti = new TableItem(patternTable, SWT.LEAD);
@@ -530,7 +548,20 @@ public class SyncFileTree extends ApplicationWindow {
 		patternTable.getColumn(0).pack();
 		patternTable.getColumn(1).pack();
 		
-		treeViewer.refresh();
+		if (project != null) {
+			boolean showRemote = showRemoteButton.getSelection();
+			if (showRemote) {
+				if (!((SFTTreeContentProvider) treeViewer.getContentProvider()).isConnected()) {
+					showRemote = false;
+					remoteErrorLabel.setText(Messages.SyncFileTree_19);
+				} else {
+					remoteErrorLabel.setText(""); //$NON-NLS-1$
+				}
+			}
+			showRemoteButton.setSelection(showRemote);
+			((SFTTreeContentProvider) treeViewer.getContentProvider()).setShowRemoteFiles(showRemote);
+			treeViewer.refresh();
+		}
 	}
 
 	private class SFTTreeContentProvider implements ITreeContentProvider {
@@ -758,5 +789,118 @@ public class SyncFileTree extends ApplicationWindow {
 		public void removeListener(ILabelProviderListener listener) {
 			// Listeners not supported
 		}
+	}
+	
+	// This is a hack to implement multiple inheritance so that this class can also serve as a preference page.
+	
+	// First, define a preference page inner class and any needed methods
+	public class SyncFilePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+		public SyncFilePreferencePage() {
+			super();
+			super.noDefaultAndApplyButton();
+		}
+
+		protected Control createContents(Composite parent) {
+			return SyncFileTree.this.createContents(parent);
+		}
+		
+		public boolean performOk() {
+			SyncManager.saveDefaultFileFilter(filter);
+			return true;
+		}
+
+		public void init(IWorkbench workbench) {
+			// nothing to do
+		}
+		
+	}
+	
+	// Second, define an instance of the preference page
+	private final SyncFilePreferencePage preferencePage;
+	
+	// Finally, delegate all method calls for IWorkbenchPreferencePage to go through the preference page instance.
+	// Note: NullPointerException results if the page is not created as a preference page.
+	public Point computeSize() {
+		return preferencePage.computeSize();
+	}
+
+	public boolean isValid() {
+		return preferencePage.isValid();
+	}
+
+	public boolean okToLeave() {
+		return preferencePage.okToLeave();
+	}
+
+	public boolean performCancel() {
+		return preferencePage.performCancel();
+	}
+
+	public boolean performOk() {
+		return preferencePage.performOk();
+	}
+
+	public void setContainer(IPreferencePageContainer preferencePageContainer) {
+		preferencePage.setContainer(preferencePageContainer);
+	}
+
+	public void setSize(Point size) {
+		preferencePage.setSize(size);
+	}
+
+	public void createControl(Composite parent) {
+		preferencePage.createControl(parent);
+	}
+
+	public void dispose() {
+		preferencePage.dispose();
+	}
+
+	public Control getControl() {
+		return preferencePage.getControl();
+	}
+
+	public String getDescription() {
+		return preferencePage.getDescription();
+	}
+
+	public String getErrorMessage() {
+		return preferencePage.getErrorMessage();
+	}
+
+	public Image getImage() {
+		return preferencePage.getImage();
+	}
+
+	public String getMessage() {
+		return preferencePage.getMessage();
+	}
+
+	public String getTitle() {
+		return preferencePage.getTitle();
+	}
+
+	public void performHelp() {
+		preferencePage.performHelp();
+	}
+
+	public void setDescription(String description) {
+		preferencePage.setDescription(description);
+	}
+
+	public void setImageDescriptor(ImageDescriptor image) {
+		preferencePage.setImageDescriptor(image);
+	}
+
+	public void setTitle(String title) {
+		preferencePage.setTitle(title);
+	}
+
+	public void setVisible(boolean visible) {
+		preferencePage.setVisible(visible);
+	}
+
+	public void init(IWorkbench workbench) {
+		preferencePage.init(workbench);
 	}
 }

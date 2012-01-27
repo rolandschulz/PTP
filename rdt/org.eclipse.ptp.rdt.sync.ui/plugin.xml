@@ -311,4 +311,12 @@
          </enablement>
       </decorator>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.ptp.rdt.sync.ui.SyncFileTree"
+            id="org.eclipse.ptp.rdt.sync.ui.SyncFileTree"
+            name="Synchronized Projects">
+      </page>
+   </extension>
 </plugin>
