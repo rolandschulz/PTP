@@ -86,7 +86,6 @@ public class SimpleASTFileLocation implements IASTFileLocation, Serializable {
 		return endLineNumber;
 	}
 
-	@Override
 	public IASTPreprocessorIncludeStatement getContextInclusionStatement() {
 		// TODO Auto-generated method stub
 		return null;
