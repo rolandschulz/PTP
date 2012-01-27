@@ -89,9 +89,11 @@ public class SyncFileTree extends ApplicationWindow {
 	private Button downButton;
 	private Button removeButton;
 	private Text newPattern;
-	private Button excludeButton;
-	private Button includeButton;
+	private Button excludeButtonForRegex;
+	private Button includeButtonForRegex;
 	private Combo specialFiltersCombo;
+	private Button excludeButtonForSpecial;
+	private Button includeButtonForSpecial;
 	private Label patternErrorLabel;
 	private Button cancelButton;
 	private Button okButton;
@@ -296,21 +298,21 @@ public class SyncFileTree extends ApplicationWindow {
 	    newPattern.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 	    // Submit buttons (exclude and include)
-	    excludeButton = new Button(patternEnterComposite, SWT.PUSH);
-	    excludeButton.setText(Messages.SyncFileTree_10);
-	    excludeButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
-	    excludeButton.addSelectionListener(new SelectionAdapter() {
+	    excludeButtonForRegex = new Button(patternEnterComposite, SWT.PUSH);
+	    excludeButtonForRegex.setText(Messages.SyncFileTree_10);
+	    excludeButtonForRegex.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    excludeButtonForRegex.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
-	    		enterNewPattern(PatternType.EXCLUDE);
+	    		enterNewRegexPattern(PatternType.EXCLUDE);
 	    	}
 	    });
 
-	    includeButton = new Button(patternEnterComposite, SWT.PUSH);
-	    includeButton.setText(Messages.SyncFileTree_11);
-	    includeButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
-	    includeButton.addSelectionListener(new SelectionAdapter() {
+	    includeButtonForRegex = new Button(patternEnterComposite, SWT.PUSH);
+	    includeButtonForRegex.setText(Messages.SyncFileTree_11);
+	    includeButtonForRegex.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    includeButtonForRegex.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
-	    		enterNewPattern(PatternType.INCLUDE);
+	    		enterNewRegexPattern(PatternType.INCLUDE);
 	    	}
 	    });
 	    
@@ -322,10 +324,23 @@ public class SyncFileTree extends ApplicationWindow {
 	    for (String filterName : specialFilterNameToPatternMap.keySet()) {
 	    	specialFiltersCombo.add(filterName);
 	    }
-	    specialFiltersCombo.addSelectionListener(new SelectionAdapter() {
+	    
+	    // Submit buttons (exclude and include)
+	    excludeButtonForSpecial = new Button(patternEnterComposite, SWT.PUSH);
+	    excludeButtonForSpecial.setText(Messages.SyncFileTree_10);
+	    excludeButtonForSpecial.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    excludeButtonForSpecial.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
-	    		newPattern.setText(specialFiltersCombo.getText());
-	    		specialFiltersCombo.deselectAll();
+	    		enterNewSpecialPattern(PatternType.EXCLUDE);
+	    	}
+	    });
+
+	    includeButtonForSpecial = new Button(patternEnterComposite, SWT.PUSH);
+	    includeButtonForSpecial.setText(Messages.SyncFileTree_11);
+	    includeButtonForSpecial.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    includeButtonForSpecial.addSelectionListener(new SelectionAdapter() {
+	    	public void widgetSelected(SelectionEvent event) {
+	    		enterNewSpecialPattern(PatternType.INCLUDE);
 	    	}
 	    });
 	    
@@ -335,6 +350,7 @@ public class SyncFileTree extends ApplicationWindow {
 	    
 	    // Place for displaying error message if pattern is illegal
 	    patternErrorLabel = new Label(patternEnterComposite, SWT.NONE);
+	    patternErrorLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
 		patternErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
 
 	    // Composite for cancel and OK buttons
@@ -387,36 +403,47 @@ public class SyncFileTree extends ApplicationWindow {
 		});
 	}
 	
-	private void enterNewPattern(PatternType type) {
+	private void enterNewRegexPattern(PatternType type) {
 		String pattern = newPattern.getText();
 		if (pattern.isEmpty()) {
 			return;
 		}
 
-		if (specialFilterNameToPatternMap.get(pattern) != null) {
-			filter.addPattern(specialFilterNameToPatternMap.get(pattern), type);
-		} else {
-			RegexResourceMatcher matcher = null;
-			try {
-				matcher = new RegexResourceMatcher(pattern);
-			} catch (PatternSyntaxException e) {
-				// Do nothing but display an error message for a few seconds
-				patternErrorLabel.setText(Messages.SyncFileTree_15);
-				display.timerExec(ERROR_DISPLAY_SECONDS*1000, new Runnable() {
-					public void run() {
-						if (patternErrorLabel.isDisposed ()) {
-							return;
-						}
-						patternErrorLabel.setText(""); //$NON-NLS-1$
+		RegexResourceMatcher matcher = null;
+		try {
+			matcher = new RegexResourceMatcher(pattern);
+		} catch (PatternSyntaxException e) {
+			// Do nothing but display an error message for a few seconds
+			patternErrorLabel.setText(Messages.SyncFileTree_15);
+			display.timerExec(ERROR_DISPLAY_SECONDS*1000, new Runnable() {
+				public void run() {
+					if (patternErrorLabel.isDisposed ()) {
+						return;
 					}
-				});
-				return;
-			}
-			
-			filter.addPattern(matcher, type);
+					patternErrorLabel.setText(""); //$NON-NLS-1$
+				}
+			});
+			return;
 		}
 
+		filter.addPattern(matcher, type);
+
 		newPattern.setText(""); //$NON-NLS-1$
+		update();
+	}
+	
+	private void enterNewSpecialPattern(PatternType type) {
+		int selectionIndex = specialFiltersCombo.getSelectionIndex();
+		if (selectionIndex < 0) {
+			return;
+		}
+		String filterName = specialFiltersCombo.getItem(selectionIndex);
+		ResourceMatcher rm = specialFilterNameToPatternMap.get(filterName);
+		if (rm != null) {
+			filter.addPattern(rm, type);
+		}
+		
+		specialFiltersCombo.deselectAll();
 		update();
 	}
 
