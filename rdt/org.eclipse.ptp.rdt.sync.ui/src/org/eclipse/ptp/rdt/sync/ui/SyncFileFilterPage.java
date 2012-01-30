@@ -77,7 +77,7 @@ import org.eclipse.ui.PlatformUI;
 /**
  * File tree where users can select the files to be sync'ed
  */
-public class SyncFileTree extends ApplicationWindow implements IWorkbenchPreferencePage {
+public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchPreferencePage {
 	private static final int ERROR_DISPLAY_SECONDS = 3;
 	private static final Display display = Display.getCurrent();
 	
@@ -112,7 +112,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 	 * Default constructor creates a preference page and should never be called by clients. Instead, use the "open" method to
 	 * create a standalone GUI.
 	 */
-	public SyncFileTree() {
+	public SyncFileFilterPage() {
 		this(null, true);
 	}
 
@@ -123,7 +123,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 	 * @param p project
 	 * @param isPreferencePage
 	 */
-	private SyncFileTree(IProject p, boolean isPreferencePage) {
+	private SyncFileFilterPage(IProject p, boolean isPreferencePage) {
 		super(null);
 		project = p;
 		if (isPreferencePage) {
@@ -153,7 +153,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 	 * @return open return code
 	 */ 
 	public static int open(IProject p) {
-		return new SyncFileTree(p, false).open();
+		return new SyncFileFilterPage(p, false).open();
 	}
 
 	/**
@@ -165,9 +165,9 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		if (project == null) {
-			shell.setText(Messages.SyncFileTree_20);
+			shell.setText(Messages.SyncFileFilterPage_20);
 		} else {
-			shell.setText(Messages.SyncFileTree_0);
+			shell.setText(Messages.SyncFileFilterPage_0);
 		}
 	}
 
@@ -192,7 +192,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 
 			// Label for tree viewer
 			Label treeViewerLabel = new Label(treeViewerComposite, SWT.NONE);
-			treeViewerLabel.setText(Messages.SyncFileTree_1);
+			treeViewerLabel.setText(Messages.SyncFileFilterPage_1);
 			treeViewerLabel.setLayoutData(new GridData(SWT.LEAD, SWT.CENTER, false, false, 2, 1));
 			this.formatAsHeader(treeViewerLabel);
 
@@ -229,7 +229,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 			treeViewer.setInput(project);
 
 			showRemoteButton = new Button(treeViewerComposite, SWT.CHECK);
-			showRemoteButton.setText(Messages.SyncFileTree_2);
+			showRemoteButton.setText(Messages.SyncFileFilterPage_2);
 			showRemoteButton.setSelection(((SFTTreeContentProvider) treeViewer.getContentProvider()).getShowRemoteFiles());
 			showRemoteButton.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -249,7 +249,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 		
 		// Label for pattern table
 		Label patternTableLabel = new Label(patternTableComposite, SWT.NONE);
-		patternTableLabel.setText(Messages.SyncFileTree_3);
+		patternTableLabel.setText(Messages.SyncFileFilterPage_3);
 		this.formatAsHeader(patternTableLabel);
 		patternTableLabel.setLayoutData(new GridData(SWT.LEAD, SWT.CENTER, false, false, 4, 1));
 		
@@ -261,7 +261,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 		
 		// Pattern table buttons (up, down, and delete)
 		upButton = new Button(patternTableComposite, SWT.PUSH);
-	    upButton.setText(Messages.SyncFileTree_6);
+	    upButton.setText(Messages.SyncFileFilterPage_6);
 	    upButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 	    upButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -279,7 +279,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 	    });
 
 	    downButton = new Button(patternTableComposite, SWT.PUSH);
-	    downButton.setText(Messages.SyncFileTree_7);
+	    downButton.setText(Messages.SyncFileFilterPage_7);
 	    downButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 	    downButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -297,7 +297,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 	    });
 
 	    removeButton = new Button(patternTableComposite, SWT.PUSH);
-	    removeButton.setText(Messages.SyncFileTree_8);
+	    removeButton.setText(Messages.SyncFileFilterPage_8);
 	    removeButton.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false));
 	    removeButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -316,7 +316,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 		patternEnterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
 		// Label for entering new path
-		new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileTree_5);
+		new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileFilterPage_5);
 
 	    // Text box to enter new path
 	    newPath = new Text(patternEnterComposite, SWT.NONE);
@@ -324,7 +324,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 
 	    // Submit buttons (exclude and include)
 	    excludeButtonForPath = new Button(patternEnterComposite, SWT.PUSH);
-	    excludeButtonForPath.setText(Messages.SyncFileTree_10);
+	    excludeButtonForPath.setText(Messages.SyncFileFilterPage_10);
 	    excludeButtonForPath.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
 	    excludeButtonForPath.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -333,7 +333,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 	    });
 
 	    includeButtonForPath = new Button(patternEnterComposite, SWT.PUSH);
-	    includeButtonForPath.setText(Messages.SyncFileTree_11);
+	    includeButtonForPath.setText(Messages.SyncFileFilterPage_11);
 	    includeButtonForPath.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
 	    includeButtonForPath.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -342,7 +342,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 	    });
 
 		// Label for entering new regex
-		new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileTree_9);
+		new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileFilterPage_9);
 
 	    // Text box to enter new regex
 	    newRegex = new Text(patternEnterComposite, SWT.NONE);
@@ -350,7 +350,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 
 	    // Submit buttons (exclude and include)
 	    excludeButtonForRegex = new Button(patternEnterComposite, SWT.PUSH);
-	    excludeButtonForRegex.setText(Messages.SyncFileTree_10);
+	    excludeButtonForRegex.setText(Messages.SyncFileFilterPage_10);
 	    excludeButtonForRegex.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
 	    excludeButtonForRegex.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -359,7 +359,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 	    });
 
 	    includeButtonForRegex = new Button(patternEnterComposite, SWT.PUSH);
-	    includeButtonForRegex.setText(Messages.SyncFileTree_11);
+	    includeButtonForRegex.setText(Messages.SyncFileFilterPage_11);
 	    includeButtonForRegex.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
 	    includeButtonForRegex.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -368,7 +368,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 	    });
 	    
 	    // Label for special filters combo
-	    new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileTree_12);
+	    new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileFilterPage_12);
 	    // Combo for special filters
 	    specialFiltersCombo = new Combo(patternEnterComposite, SWT.READ_ONLY);
 		specialFiltersCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -378,7 +378,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 	    
 	    // Submit buttons (exclude and include)
 	    excludeButtonForSpecial = new Button(patternEnterComposite, SWT.PUSH);
-	    excludeButtonForSpecial.setText(Messages.SyncFileTree_10);
+	    excludeButtonForSpecial.setText(Messages.SyncFileFilterPage_10);
 	    excludeButtonForSpecial.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
 	    excludeButtonForSpecial.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -387,7 +387,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 	    });
 
 	    includeButtonForSpecial = new Button(patternEnterComposite, SWT.PUSH);
-	    includeButtonForSpecial.setText(Messages.SyncFileTree_11);
+	    includeButtonForSpecial.setText(Messages.SyncFileFilterPage_11);
 	    includeButtonForSpecial.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
 	    includeButtonForSpecial.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
@@ -412,7 +412,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 
 			// Cancel button
 			cancelButton = new Button(buttonComposite, SWT.PUSH);
-			cancelButton.setText(Messages.SyncFileTree_13);
+			cancelButton.setText(Messages.SyncFileFilterPage_13);
 			cancelButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, true, false));
 			cancelButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
@@ -422,7 +422,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 
 			// OK button
 			okButton = new Button(buttonComposite, SWT.PUSH);
-			okButton.setText(Messages.SyncFileTree_14);
+			okButton.setText(Messages.SyncFileFilterPage_14);
 			okButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, false, false));
 			okButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
@@ -481,7 +481,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 			matcher = new RegexResourceMatcher(pattern);
 		} catch (PatternSyntaxException e) {
 			// Do nothing but display an error message for a few seconds
-			patternErrorLabel.setText(Messages.SyncFileTree_15);
+			patternErrorLabel.setText(Messages.SyncFileFilterPage_15);
 			display.timerExec(ERROR_DISPLAY_SECONDS*1000, new Runnable() {
 				public void run() {
 					if (patternErrorLabel.isDisposed ()) {
@@ -523,14 +523,14 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 			String[] tableValues = new String[2];
 			String patternType;
 			if (filter.getPatternType(pattern) == PatternType.EXCLUDE) {
-				patternType = Messages.SyncFileTree_21;
+				patternType = Messages.SyncFileFilterPage_21;
 			} else {
-				patternType = Messages.SyncFileTree_22;
+				patternType = Messages.SyncFileFilterPage_22;
 			}
 			if (pattern instanceof PathResourceMatcher) {
-				patternType = patternType + " " + Messages.SyncFileTree_16; //$NON-NLS-1$
+				patternType = patternType + " " + Messages.SyncFileFilterPage_16; //$NON-NLS-1$
 			} else if (pattern instanceof RegexResourceMatcher) {
-				patternType = patternType + " " + Messages.SyncFileTree_17; //$NON-NLS-1$
+				patternType = patternType + " " + Messages.SyncFileFilterPage_17; //$NON-NLS-1$
 			}
 			patternType += ":  "; //$NON-NLS-1$
 
@@ -553,7 +553,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 			if (showRemote) {
 				if (!((SFTTreeContentProvider) treeViewer.getContentProvider()).isConnected()) {
 					showRemote = false;
-					remoteErrorLabel.setText(Messages.SyncFileTree_19);
+					remoteErrorLabel.setText(Messages.SyncFileFilterPage_19);
 				} else {
 					remoteErrorLabel.setText(""); //$NON-NLS-1$
 				}
@@ -801,7 +801,7 @@ public class SyncFileTree extends ApplicationWindow implements IWorkbenchPrefere
 		}
 
 		protected Control createContents(Composite parent) {
-			return SyncFileTree.this.createContents(parent);
+			return SyncFileFilterPage.this.createContents(parent);
 		}
 		
 		public boolean performOk() {

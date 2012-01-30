@@ -305,8 +305,8 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="org.eclipse.ptp.rdt.sync.ui.SyncFileTree"
-            id="org.eclipse.ptp.rdt.sync.ui.SyncFileTree"
+            class="org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage"
+            id="org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage"
             name="Synchronized Projects">
       </page>
    </extension>
