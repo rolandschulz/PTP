@@ -142,7 +142,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		BinaryResourceMatcher bpm = new BinaryResourceMatcher();
 		specialFilterNameToPatternMap.put(bpm.toString(), bpm);
 		
-		windowWidth = display.getBounds().width / 3;
+		windowWidth = display.getBounds().width / 4;
 		viewHeight = display.getBounds().height / 6;
 	}
 
@@ -246,6 +246,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		Composite patternTableComposite = new Composite(composite, SWT.BORDER);
 		patternTableComposite.setLayout(new GridLayout(2, false));
 		patternTableComposite.setLayoutData(new GridData(windowWidth, viewHeight));
+		patternTableComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		
 		// Label for pattern table
 		Label patternTableLabel = new Label(patternTableComposite, SWT.NONE);
@@ -311,9 +312,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	    });
 	    
 	    //Composite for text box, combo, and buttons to enter a new pattern
-	    Composite patternEnterComposite = new Composite(composite, SWT.FILL);
+	    Composite patternEnterComposite = new Composite(composite, SWT.BORDER);
 	    patternEnterComposite.setLayout(new GridLayout(4, false));
-		patternEnterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+		patternEnterComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
 		// Label for entering new path
 		new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileFilterPage_5);
@@ -325,7 +326,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	    // Submit buttons (exclude and include)
 	    excludeButtonForPath = new Button(patternEnterComposite, SWT.PUSH);
 	    excludeButtonForPath.setText(Messages.SyncFileFilterPage_10);
-	    excludeButtonForPath.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    excludeButtonForPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 	    excludeButtonForPath.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
 	    		enterNewPathPattern(PatternType.EXCLUDE);
@@ -334,7 +335,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 
 	    includeButtonForPath = new Button(patternEnterComposite, SWT.PUSH);
 	    includeButtonForPath.setText(Messages.SyncFileFilterPage_11);
-	    includeButtonForPath.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    includeButtonForPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 	    includeButtonForPath.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
 	    		enterNewPathPattern(PatternType.INCLUDE);
@@ -351,7 +352,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	    // Submit buttons (exclude and include)
 	    excludeButtonForRegex = new Button(patternEnterComposite, SWT.PUSH);
 	    excludeButtonForRegex.setText(Messages.SyncFileFilterPage_10);
-	    excludeButtonForRegex.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    excludeButtonForRegex.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 	    excludeButtonForRegex.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
 	    		enterNewRegexPattern(PatternType.EXCLUDE);
@@ -360,7 +361,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 
 	    includeButtonForRegex = new Button(patternEnterComposite, SWT.PUSH);
 	    includeButtonForRegex.setText(Messages.SyncFileFilterPage_11);
-	    includeButtonForRegex.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    includeButtonForRegex.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 	    includeButtonForRegex.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
 	    		enterNewRegexPattern(PatternType.INCLUDE);
@@ -379,7 +380,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	    // Submit buttons (exclude and include)
 	    excludeButtonForSpecial = new Button(patternEnterComposite, SWT.PUSH);
 	    excludeButtonForSpecial.setText(Messages.SyncFileFilterPage_10);
-	    excludeButtonForSpecial.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    excludeButtonForSpecial.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 	    excludeButtonForSpecial.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
 	    		enterNewSpecialPattern(PatternType.EXCLUDE);
@@ -388,32 +389,29 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 
 	    includeButtonForSpecial = new Button(patternEnterComposite, SWT.PUSH);
 	    includeButtonForSpecial.setText(Messages.SyncFileFilterPage_11);
-	    includeButtonForSpecial.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
+	    includeButtonForSpecial.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 	    includeButtonForSpecial.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent event) {
 	    		enterNewSpecialPattern(PatternType.INCLUDE);
 	    	}
 	    });
-	    
-	    // Blank labels to occupy two spaces
-	    new Label(patternEnterComposite, SWT.NONE).setVisible(false);
-	    new Label(patternEnterComposite, SWT.NONE).setVisible(false);
-	    
+
 	    // Place for displaying error message if pattern is illegal
 	    patternErrorLabel = new Label(patternEnterComposite, SWT.NONE);
 	    patternErrorLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
-		patternErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+		patternErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
 
-		// Composite for cancel and OK buttons
+		// Cancel and OK buttons
+		// Logically, these should be in a separate composite, but this will align the buttons with the exclude/include buttons
 		if (preferencePage == null) {
-			Composite buttonComposite = new Composite(composite, SWT.FILL);
-			buttonComposite.setLayout(new GridLayout(2, false));
-			buttonComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			// For spacing
+			new Label(patternEnterComposite, SWT.NONE).setVisible(false);
+			new Label(patternEnterComposite, SWT.NONE).setVisible(false);
 
 			// Cancel button
-			cancelButton = new Button(buttonComposite, SWT.PUSH);
+			cancelButton = new Button(patternEnterComposite, SWT.PUSH);
 			cancelButton.setText(Messages.SyncFileFilterPage_13);
-			cancelButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, true, false));
+			cancelButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 			cancelButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
 					getShell().close();
@@ -421,9 +419,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			});
 
 			// OK button
-			okButton = new Button(buttonComposite, SWT.PUSH);
+			okButton = new Button(patternEnterComposite, SWT.PUSH);
 			okButton.setText(Messages.SyncFileFilterPage_14);
-			okButton.setLayoutData(new GridData(SWT.RIGHT, SWT.NONE, false, false));
+			okButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 			okButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
 					if (project == null) {
