@@ -270,20 +270,11 @@
             </command>
             <command
                   commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
-                  label="Modify Exclude/Include List"
+                  label="Filter..."
                   style="push">
                <parameter
                      name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
                      value="sync_file_list">
-               </parameter>
-            </command>
-            <command
-                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
-                  label="Modify Default Exclude/Include List for New Projects"
-                  style="push">
-               <parameter
-                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
-                     value="sync_default_file_list">
                </parameter>
             </command>
          </menu>
@@ -310,5 +301,13 @@
             </and>
          </enablement>
       </decorator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage"
+            id="org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage"
+            name="Synchronized Projects">
+      </page>
    </extension>
 </plugin>
