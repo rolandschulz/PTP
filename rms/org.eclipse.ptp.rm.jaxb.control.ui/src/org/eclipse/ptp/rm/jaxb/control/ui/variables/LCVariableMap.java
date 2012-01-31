@@ -193,10 +193,10 @@ public class LCVariableMap implements IVariableMap {
 		return set;
 	}
 
-	/**
-	 * @param name
-	 *            of widget, bound to a Property or Attribute
-	 * @return value of the Property or Attribute, or <code>null</code> if none
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#get(java.lang.String)
 	 */
 	public Object get(String name) {
 		if (name == null) {
@@ -227,7 +227,7 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/*
-	 * Unsupported (non-Javadoc)
+	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getDiscovered()
 	 */
@@ -249,15 +249,16 @@ public class LCVariableMap implements IVariableMap {
 		return hidden;
 	}
 
-	/**
-	 * The ${rm: prefix points to the RMVariableResolver, ${lc: to the LCVariableResolver, so we substitute the latter and pass off
-	 * the substitution to the resolver for resolution.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param value
-	 *            expression to be resolved
-	 * @return resolved expression
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getString(java.lang.String)
 	 */
 	public String getString(String value) {
+		/*
+		 * The ${ptp_rm: prefix points to the RMVariableResolver, ${ptp_lc: to the LCVariableResolver, so we substitute the latter
+		 * and pass off the substitution to the resolver for resolution.
+		 */
 		try {
 			value = value.replaceAll(JAXBControlUIConstants.VRM, JAXBControlUIConstants.VLC);
 			return dereference(value);
@@ -267,21 +268,17 @@ public class LCVariableMap implements IVariableMap {
 		return value;
 	}
 
-	/**
-	 * Interface method. Not called in this UI class.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param jobId
-	 *            is irrelevant
-	 * @param value
-	 *            expression to be resolved
-	 * @return resolved expression
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getString(java.lang.String, java.lang.String)
 	 */
 	public String getString(String jobId, String value) {
 		return getString(value);
 	}
 
 	/*
-	 * Not supported. (non-Javadoc)
+	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getVariables()
 	 */
@@ -309,11 +306,10 @@ public class LCVariableMap implements IVariableMap {
 		}
 	}
 
-	/**
-	 * @param name
-	 *            of widget, bound to a Property or Attribute
-	 * @param value
-	 *            of Property or Attribute
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#put(java.lang.String, java.lang.Object)
 	 */
 	public void put(String name, Object value) {
 		if (name == null || JAXBUIConstants.ZEROSTR.equals(name)) {

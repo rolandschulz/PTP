@@ -154,8 +154,10 @@ public class RMVariableMap implements IVariableMap {
 		initialized = false;
 	}
 
-	/**
-	 * Reset the internal maps.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#clear()
 	 */
 	public void clear() {
 		variables.clear();
@@ -163,12 +165,10 @@ public class RMVariableMap implements IVariableMap {
 		initialized = false;
 	}
 
-	/**
-	 * Search the two maps for this reference. The predefined variables are searched first.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param name
-	 *            of Property or Attribute to find.
-	 * @return the found Property or Attribute
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#get(java.lang.String)
 	 */
 	public Object get(String name) {
 		if (name == null) {
@@ -181,30 +181,28 @@ public class RMVariableMap implements IVariableMap {
 		return o;
 	}
 
-	/**
-	 * @return map of Properties and Attributes discovered at runtime.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getDiscovered()
 	 */
 	public Map<String, Object> getDiscovered() {
 		return discovered;
 	}
 
-	/**
-	 * Delegates to {@link #getString(String)}.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param value
-	 *            expression to resolve
-	 * @return resolved expression
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getString(java.lang.String)
 	 */
 	public String getString(String value) {
 		return getString(null, value);
 	}
 
-	/**
-	 * Performs the substitution on the string.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param value
-	 *            expression to resolve
-	 * @return resolved expression
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getString(java.lang.String, java.lang.String)
 	 */
 	public String getString(String jobId, String value) {
 		try {
@@ -218,8 +216,10 @@ public class RMVariableMap implements IVariableMap {
 		return value;
 	}
 
-	/**
-	 * @return map of Properties and Attributes defined in the XML configuration.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getVariables()
 	 */
 	public Map<String, Object> getVariables() {
 		return variables;
@@ -297,13 +297,10 @@ public class RMVariableMap implements IVariableMap {
 		maybeAddProperty(key1, map.get(key2), false);
 	}
 
-	/**
-	 * Places a Property or Attribute directly in the environment.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param name
-	 *            of Property or Attribute
-	 * @param value
-	 *            of Property or Attribute
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#put(java.lang.String, java.lang.Object)
 	 */
 	public void put(String name, Object value) {
 		if (name == null) {
@@ -312,13 +309,10 @@ public class RMVariableMap implements IVariableMap {
 		variables.put(name, value);
 	}
 
-	/**
-	 * Removes a Property or Attribute. Checks first in the predefined values map, and if it does not exist there, removes from the
-	 * runtime values map.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param name
-	 *            of Property or Attribute to remove
-	 * @return value of Property or Attribute
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#remove(java.lang.String)
 	 */
 	public Object remove(String name) {
 		if (name == null) {
@@ -331,9 +325,10 @@ public class RMVariableMap implements IVariableMap {
 		return o;
 	}
 
-	/**
-	 * @param initialized
-	 *            whether the map has been initialized from an XML resource manager configuration.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#setInitialized(boolean)
 	 */
 	public void setInitialized(boolean initialized) {
 		this.initialized = initialized;

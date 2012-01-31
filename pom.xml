@@ -216,6 +216,7 @@
 			<layout>p2</layout>
 		</repository>
 		<repository>
+<<<<<<< HEAD
 			<id>tm-${tm-version}</id>
 			<url>${tm-site}</url>
 			<layout>p2</layout>
@@ -227,6 +228,19 @@
 		</repository>
 		<repository>
 			<id>egit-${egit-version}</id>
+=======
+			<id>cdt-${cdt-version}</id>
+			<url>${cdt-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>tm-${tm-version}</id>
+			<url>${tm-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>egit-${egitversion}</id>
+>>>>>>> refs/remotes/origin/ptp_5_0
 			<url>${egit-site}</url>
 			<layout>p2</layout>
 		</repository>

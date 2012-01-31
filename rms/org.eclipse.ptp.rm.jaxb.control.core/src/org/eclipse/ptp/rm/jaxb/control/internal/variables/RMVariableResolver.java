@@ -22,10 +22,13 @@ import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 /**
  * Resolver for the RMVariableMap (tag: ${ptp_rm:). <br>
  * <br>
- * In order to guarantee consistency, any implicit call to resolve should be
- * synchronized statically and should be preceded by a call to
- * {@link #setActive(RMVariableMap)}. See further
- * {@link #resolveValue(IDynamicVariable, String)}
+ * In order to guarantee consistency, any implicit call to resolve should be synchronized statically and should be preceded by a
+ * call to {@link #setActive(RMVariableMap)}. See further {@link #resolveValue(IDynamicVariable, String)}
+ * 
+ * The ${ptp_rm: tag can contain a name with a suffix, "#field", denoting the field of the retrieved object to access. Hence,
+ * ${ptp_rm:arch} would yield a string value for the Attribute object associated with the name 'arch', but
+ * ${ptp_rm:arch#description} would return the description string for that attribute. In most cases, ${ptp_rm:arch#value} will be
+ * the form the argument takes.
  * 
  * @author arossi
  * 
@@ -34,13 +37,11 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 
 	private static RMVariableMap active;
 
-	/**
-	 * The ${rm: tag can contain a name with a suffix, "#field", denoting the
-	 * field of the retrieved object to access. Hence, ${rm:arch} would yield a
-	 * string value for the Attribute object associated with the name 'arch',
-	 * but ${rm:arch#description} would return the description string for that
-	 * attribute. In most cases, ${rm:arch#value} will be the form the argument
-	 * takes.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.variables.IDynamicVariableResolver#resolveValue(org.eclipse.core.variables.IDynamicVariable,
+	 * java.lang.String)
 	 */
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
 		if (active != null && argument != null) {
@@ -70,15 +71,13 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 	}
 
 	/**
-	 * Auxiliary reflection method for retrieving the field value of the object
-	 * corresponding to the resolved name.
+	 * Auxiliary reflection method for retrieving the field value of the object corresponding to the resolved name.
 	 * 
 	 * @param target
 	 *            Property or Attribute corresponding to the resolved name
 	 * @param string
 	 *            name of the field
-	 * @return string value of the value returned by invoking "get[field]()" on
-	 *         the target
+	 * @return string value of the value returned by invoking "get[field]()" on the target
 	 * @throws SecurityException
 	 * @throws NoSuchMethodException
 	 * @throws IllegalArgumentException
