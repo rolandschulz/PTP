@@ -214,18 +214,6 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 			fRemoteProcess = p;
 			fProcess = new RemoteProcessAdapter(p);
-			// wait for the process to finish
-			while (!p.isCompleted()) {
-				try {
-					p.waitFor();
-				} catch (InterruptedException e) {
-					// just keep waiting until the process is done
-				}
-			}
-
-			// Synchronize after building
-			SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10));
-
 			return fProcess;
 		}
 
