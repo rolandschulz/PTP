@@ -30,19 +30,24 @@ public interface IVariableMap {
 	public void clear();
 
 	/**
+	 * Search for a property or attribute.
+	 * 
 	 * @param name
-	 *            of variable
-	 * @return value of variable
+	 *            of Property or Attribute to find.
+	 * @return the found Property or Attribute
 	 */
 	public Object get(String name);
 
 	/**
-	 * @return the map containing any variables added through discovery
-	 *         processes, or <code>null</code> if unsupported
+	 * Get the map of Properties and Attributes discovered at runtime.
+	 * 
+	 * @return the map containing any variables added through discovery processes, or <code>null</code> if unsupported
 	 */
 	public Map<String, Object> getDiscovered();
 
 	/**
+	 * Get the string representation of an expression.
+	 * 
 	 * @param value
 	 *            expression to resolve.
 	 * @return resolved expression
@@ -50,6 +55,9 @@ public interface IVariableMap {
 	public String getString(String value);
 
 	/**
+	 * Get the string representation of an expression. Substitutes any occurrences of {@link JAXBControlConstants#JOB_ID_TAG} with
+	 * the uuid prior to evaluating the expression.
+	 * 
 	 * @param uuid
 	 *            internal identifier associate with a job submission
 	 * @param value
@@ -59,11 +67,15 @@ public interface IVariableMap {
 	public String getString(String uuid, String value);
 
 	/**
-	 * @return the map containing the (main) variables
+	 * Get the map containing the variables.
+	 * 
+	 * @return map containing the variables
 	 */
 	public Map<String, Object> getVariables();
 
 	/**
+	 * Places a Property or Attribute directly in the environment.
+	 * 
 	 * @param name
 	 *            of variable
 	 * @param value
@@ -72,6 +84,9 @@ public interface IVariableMap {
 	public void put(String name, Object value);
 
 	/**
+	 * Removes a Property or Attribute. Checks first in the predefined values map, and if it does not exist there, removes from the
+	 * runtime values map.
+	 * 
 	 * @param name
 	 *            of variable
 	 * @return value of removed variable
@@ -79,6 +94,8 @@ public interface IVariableMap {
 	public Object remove(String name);
 
 	/**
+	 * Set a flag to indicate the map has been initialized
+	 * 
 	 * @param initialized
 	 *            indicates the map has already been initialized
 	 */
