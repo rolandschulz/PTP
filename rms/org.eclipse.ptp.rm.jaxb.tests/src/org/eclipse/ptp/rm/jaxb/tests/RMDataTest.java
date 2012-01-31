@@ -26,7 +26,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
 public class RMDataTest extends TestCase {
 
-	private static final String rmxml = JAXBCoreConstants.DATA + "test-pbs.xml"; //$NON-NLS-1$
+	private static final String rmxml = JAXBCoreConstants.DATA + "pbs-test-local.xml"; //$NON-NLS-1$
 	private static final String tokxml = JAXBCoreConstants.DATA + "tokenizer-examples.xml"; //$NON-NLS-1$
 
 	@Override
@@ -44,14 +44,13 @@ public class RMDataTest extends TestCase {
 		try {
 			JAXBTestsPlugin.validate(rmxml);
 			rmdata = JAXBInitializationUtils.initializeRMData(JAXBTestsPlugin.getURL(rmxml));
-			if (rmdata != null) {
-				RMVariableMap map = new RMVariableMap();
-				JAXBInitializationUtils.initializeMap(rmdata, map);
-				print(map);
-				String exp = map.getString(null, "${rm:stagein#description}"); //$NON-NLS-1$
-				System.out.println(exp);
-				assertEquals(Messages.RMVariableTest_1, exp);
-			}
+			assertNotNull(rmdata);
+			RMVariableMap map = new RMVariableMap();
+			JAXBInitializationUtils.initializeMap(rmdata, map);
+			print(map);
+			String exp = map.getString(null, "${ptp_rm:stagein#description}"); //$NON-NLS-1$
+			System.out.println("testJAXBRMInstantiation: " + exp); //$NON-NLS-1$
+			assertEquals(Messages.RMVariableTest_1, exp);
 		} catch (Throwable t) {
 			t.printStackTrace();
 			assert (t != null);
@@ -63,11 +62,10 @@ public class RMDataTest extends TestCase {
 		try {
 			JAXBTestsPlugin.validate(tokxml);
 			rmdata = JAXBInitializationUtils.initializeRMData(JAXBTestsPlugin.getURL(tokxml));
-			if (rmdata != null) {
-				List<CommandType> cmds = rmdata.getControlData().getStartUpCommand();
-				for (CommandType cmd : cmds) {
-					System.out.println(cmd.getName());
-				}
+			assertNotNull(rmdata);
+			List<CommandType> cmds = rmdata.getControlData().getStartUpCommand();
+			for (CommandType cmd : cmds) {
+				System.out.println("testJAXBTokenizerInstantiation: " + cmd.getName()); //$NON-NLS-1$
 			}
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -83,11 +81,12 @@ public class RMDataTest extends TestCase {
 			if (o instanceof AttributeType) {
 				AttributeType ja = (AttributeType) o;
 				buffer.append(JAXBCoreConstants.LT).append(ja.getName()).append(JAXBCoreConstants.GTLT).append(ja.getType())
-						.append(JAXBCoreConstants.GTLT).append(ja.getDefault()).append(JAXBCoreConstants.GTLT).append(ja.getChoice())
-						.append(JAXBCoreConstants.GTLT).append(ja.getMax()).append(JAXBCoreConstants.GTLT).append(ja.getMin())
-						.append(JAXBCoreConstants.GTLT).append(ja.getValidator()).append(JAXBCoreConstants.GTLT)
-						.append(ja.getDescription()).append(JAXBCoreConstants.GTLT).append(ja.getTooltip()).append(ja.getValue())
-						.append(JAXBCoreConstants.GT).append(JAXBCoreConstants.LINE_SEP);
+						.append(JAXBCoreConstants.GTLT).append(ja.getDefault()).append(JAXBCoreConstants.GTLT)
+						.append(ja.getChoice()).append(JAXBCoreConstants.GTLT).append(ja.getMax()).append(JAXBCoreConstants.GTLT)
+						.append(ja.getMin()).append(JAXBCoreConstants.GTLT).append(ja.getValidator())
+						.append(JAXBCoreConstants.GTLT).append(ja.getDescription()).append(JAXBCoreConstants.GTLT)
+						.append(ja.getTooltip()).append(ja.getValue()).append(JAXBCoreConstants.GT)
+						.append(JAXBCoreConstants.LINE_SEP);
 			} else if (o instanceof PropertyType) {
 				PropertyType p = (PropertyType) o;
 				buffer.append(JAXBCoreConstants.LT).append(p.getName()).append(JAXBCoreConstants.GTLT).append(p.getValue())
