@@ -76,13 +76,22 @@ if ( open( IN, "$cmd 2>&1 |" ) ) {
 	close(IN);
 }
 
-# add unknown but manatory attributes to jobs
+# add manatory attributes to jobs
 foreach $jobid ( sort( keys(%jobs) ) ) {
 	$jobs{$jobid}{totalcores}     = $jobs{$jobid}{totaltasks};
 	$jobs{$jobid}{queue}          = "local";
 	$jobs{$jobid}{detailedstatus} = "";
 }
 
+# add default node that is required for LML schema
+if(!keys(%nodes)) {
+    # set default
+    $nodeid=`uname -n`;chomp($nodeid);
+    $nodes{$nodeid}{id}       = $nodeid;
+    $nodes{$nodeid}{state}    = "Running";
+}
+
+# add mandatory attributes for nodes. This should be obtained from the nodes
 $arch = `uname -p`;
 chomp($arch);
 foreach $nodeid ( sort( keys(%nodes) ) ) {
@@ -216,58 +225,6 @@ sub modify {
 
 	if ( $mkey eq "owner" ) {
 		$ret =~ s/\@.*//gs;
-	}
-
-	if ( $mkey eq "state" ) {
-		$ret = "Completed"   if ( $value eq "C" );
-		$ret = "Removed"     if ( $value eq "E" );
-		$ret = "System Hold" if ( $value eq "H" );
-		$ret = "Idle"        if ( $value eq "Q" );
-		$ret = "Idle"        if ( $value eq "W" );
-		$ret = "Idle"        if ( $value eq "T" );
-		$ret = "Running"     if ( $value eq "R" );
-		$ret = "System Hold" if ( $value eq "S" );
-	}
-
-	if ( ( $mkey eq "wall" ) || ( $mkey eq "wallsoft" ) ) {
-		if ( $value =~ /\($patint seconds\)/ ) {
-			$ret = $1;
-		}
-		if ( $value =~ /$patint minutes/ ) {
-			$ret = $1 * 60;
-		}
-		if ( $value =~ /^$patint[:]$patint[:]$patint$/ ) {
-			$ret = $1 * 60 * 60 + $2 * 60 + $3;
-		}
-	}
-
-	if ( $mkey eq "totalcores" ) {
-		my $numcores = 0;
-		my ($spec);
-		foreach $spec ( split( /\s*\+\s*/, $ret ) ) {
-
-			# std job
-			if ( $ret =~ /^$patint[:]ppn=$patint/ ) {
-				$numcores += $1 * $2;
-			} elsif ( $ret =~ /^$patwrd[:]ppn=$patint/ ) {
-				$numcores += 1 * $2;
-			}
-		}
-		$ret = $numcores if ( $numcores > 0 );
-	}
-	if ( $mkey eq "totaltasks" ) {
-		my $numcores = 0;
-		my ($spec);
-		foreach $spec ( split( /\s*\+\s*/, $ret ) ) {
-
-			# std job
-			if ( $ret =~ /^$patint[:]ppn=$patint/ ) {
-				$numcores += $1 * $2;
-			} elsif ( $ret =~ /^$patwrd[:]ppn=$patint/ ) {
-				$numcores += 1 * $2;
-			}
-		}
-		$ret = $numcores if ( $numcores > 0 );
 	}
 
 	if ( ( $mkey eq "comment" ) ) {
