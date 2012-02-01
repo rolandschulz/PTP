@@ -34,7 +34,7 @@ public class ResourceChangeListener {
 
 	public static void startListening() {
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE |
-				IResourceChangeEvent.PRE_DELETE);
+				IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_BUILD);
 	}
 
 	public static void stopListening() {
@@ -96,15 +96,33 @@ public class ResourceChangeListener {
 				}
 				if (RemoteSyncNature.hasNature(project)) {
 					SYNC_MODE syncMode = SyncManager.getSyncMode(project);
-					// Note that sync'ing is necessary even if user has turned sync'ing off. The actual synchronization call does
-					// more than just sync files to remote.
+					boolean syncEnabled = true;
+					if (!(SyncManager.getSyncAuto()) || syncMode == SYNC_MODE.NONE) {
+						syncEnabled = false;
+					}
 					try {
-						if (!(SyncManager.getSyncAuto()) || syncMode == SYNC_MODE.NONE) {
-							SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
-						} else if (syncMode == SYNC_MODE.ALL) {
-							SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
-						} else if (syncMode == SYNC_MODE.ACTIVE) {
-							SyncManager.sync(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
+						// Post-build event
+						// Force a sync in order to download any new remote files but no need to sync if sync'ing is disabled.
+						if (event.getType() == IResourceChangeEvent.POST_BUILD ) {
+							if (!syncEnabled) {
+								continue;
+							} else if (syncMode == SYNC_MODE.ALL) {
+								SyncManager.syncAll(null, project, SyncFlag.FORCE, new SyncRCLExceptionHandler(project));
+							} else if (syncMode == SYNC_MODE.ACTIVE) {
+								SyncManager.sync(null, project, SyncFlag.FORCE, new SyncRCLExceptionHandler(project));
+							}
+						}
+						// Post-change event
+						// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user has
+						// disabled it. This allows for some bookkeeping but no files are transferred.
+						else {
+							if (!syncEnabled) {
+								SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
+							} else if (syncMode == SYNC_MODE.ALL) {
+								SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
+							} else if (syncMode == SYNC_MODE.ACTIVE) {
+								SyncManager.sync(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
+							}
 						}
 					} catch (CoreException e){
 						// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
