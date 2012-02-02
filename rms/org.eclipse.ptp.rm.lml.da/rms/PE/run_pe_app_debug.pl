@@ -76,7 +76,7 @@ sub wait_for_cfg_file {
 #	port_num is a semi-random port number that the debugger will listen on
 #
 #####################################################################
-sub generate_routing_file {
+sub generate_routing_table {
 	my ($pid) = @_;
 	my $line;
 	my $ntasks;
