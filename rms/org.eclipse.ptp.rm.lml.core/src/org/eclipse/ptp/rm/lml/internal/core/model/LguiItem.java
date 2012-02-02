@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
@@ -39,10 +40,13 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfoType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.InfodataType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InformationType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutRequestType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
+import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectsType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
@@ -173,7 +177,7 @@ public class LguiItem implements ILguiItem {
 	public void getCurrentLayout(OutputStream output) {
 		while (lockPattern) {
 			// wait until the pattern have been set
-			System.out.print("");
+			System.out.print(ILMLCoreConstants.EMPTY);
 		}
 		lockUpdate = true;
 		LguiType layoutLgui = null;
@@ -198,6 +202,30 @@ public class LguiItem implements ILguiItem {
 
 	public LguiType getLguiType() {
 		return lgui;
+	}
+
+	public String[] getMessageOfTheDay() {
+		String type = new String();
+		String message = new String();
+		final List<String> oidList = new LinkedList<String>();
+		for (final ObjectsType objects : getOverviewAccess().getObjects()) {
+			for (final ObjectType object : objects.getObject()) {
+				if (object.getType().value().equals(ILMLCoreConstants.SYSTEM)) {
+					oidList.add(object.getId());
+				}
+			}
+		}
+		for (final String oid : oidList) {
+			for (final InfodataType data : getOverviewAccess().getInformation(oid).getData()) {
+				if (data.getKey().equals(ILMLCoreConstants.MOTD)) {
+					type = ILMLCoreConstants.MOTD;
+					message = data.getValue();
+				} else if (data.getKey().equals(ILMLCoreConstants.ERROR)) {
+					return new String[] { ILMLCoreConstants.ERROR, data.getValue() };
+				}
+			}
+		}
+		return new String[] { type, message };
 	}
 
 	/**
