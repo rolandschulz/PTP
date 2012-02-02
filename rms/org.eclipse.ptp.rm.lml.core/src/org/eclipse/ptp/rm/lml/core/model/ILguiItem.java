@@ -93,6 +93,8 @@ public interface ILguiItem {
 	 */
 	public LayoutAccess getLayoutAccess();
 
+	public String[] getMessageOfTheDay();
+
 	/**
 	 * @return
 	 */

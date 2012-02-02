@@ -27,6 +27,13 @@
             id="joblistwait"
             name="%TableView2.name">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.ptp.ui.views"
+            class="org.eclipse.ptp.rm.lml.ui.views.InfoView"
+            id="info"
+            name="%InfoView.name">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
