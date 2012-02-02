@@ -138,13 +138,11 @@ public class JAXBUtil {
 
 			qName = ILMLCoreConstants.CHART_ELEMENT;
 		} else if (gobject instanceof ChartgroupType) {
-			final ChartgroupType chartgroupType = objectFactory
-					.createChartgroupType();
+			final ChartgroupType chartgroupType = objectFactory.createChartgroupType();
 			// Add lower chart-elements to the minimized chart-group
 			// Go through all charts minimize them and add them to ut
 			for (final ChartType chart : ((ChartgroupType) gobject).getChart()) {
-				final ChartType minimal = (ChartType) (minimizeGobjectType(
-						chart, objectFactory).getValue());
+				final ChartType minimal = (ChartType) (minimizeGobjectType(chart, objectFactory).getValue());
 				chartgroupType.getChart().add(minimal);
 			}
 
@@ -401,8 +399,7 @@ public class JAXBUtil {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			final QName tagname = new QName(SCHEMA_DIRECTORY, SCHEMA_LGUI, SCHEMA_LML);
 
-			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(
-					tagname, LguiType.class, lgui);
+			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(tagname, LguiType.class, lgui);
 			/*
 			 * Synchronize to avoid the dreaded
 			 * "FWK005 parse may not be called while parsing" message

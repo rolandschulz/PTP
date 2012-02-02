@@ -112,6 +112,7 @@ public interface ILMLCoreConstants {
 	public static final String JOB_ID_TAG = "@jobId";//$NON-NLS-1$
 	public static final String NAME_TAG = AT + NAME;
 	public static final String VALUE_TAG = AT + VALUE;
+	public static final String EMPTY = ""; //$NON-NLS-1$
 
 	/* TYPE MATCHING */
 	public static final String NT = "nt";//$NON-NLS-1$
@@ -237,18 +238,22 @@ public interface ILMLCoreConstants {
 	/*
 	 * Element keywords
 	 */
-	public static String INCLUDE_ELEMENT = "include"; //$NON-NLS-1$
-	public static String TABLE_ELEMENT = "table"; //$NON-NLS-1$
-	public static String USAGEBAR_ELEMENT = "usagebar"; //$NON-NLS-1$
-	public static String TEXT_ELEMENT = "text"; //$NON-NLS-1$
-	public static String INFOBOX_ELEMENT = "infobox"; //$NON-NLS-1$
-	public static String CHART_ELEMENT = "chart"; //$NON-NLS-1$
-	public static String CHARTGROUP_ELEMENT = "chartgroup"; //$NON-NLS-1$
-	public static String NODEDISPLAY_ELEMENT = "nodedisplay"; //$NON-NLS-1$
-	public static String ABSLAYOUT_ELEMENT = "abslayout"; //$NON-NLS-1$
-	public static String SPLITLAYOUT_ELEMENT = "splitlayout"; //$NON-NLS-1$
-	public static String TABLELAYOUT_ELEMENT = "tablelayout"; //$NON-NLS-1$
-	public static String COMPONENTLAYOUT_ELEMENT = "componentlayout"; //$NON-NLS-1$
-	public static String NODEDISPLAYLAYOUT_ELEMENT = "nodedisplaylayout"; //$NON-NLS-1$
-	public static String TITLE_PREFIX = "title_"; //$NON-NLS-1$
+	public static final String INCLUDE_ELEMENT = "include"; //$NON-NLS-1$
+	public static final String TABLE_ELEMENT = "table"; //$NON-NLS-1$
+	public static final String USAGEBAR_ELEMENT = "usagebar"; //$NON-NLS-1$
+	public static final String TEXT_ELEMENT = "text"; //$NON-NLS-1$
+	public static final String INFOBOX_ELEMENT = "infobox"; //$NON-NLS-1$
+	public static final String CHART_ELEMENT = "chart"; //$NON-NLS-1$
+	public static final String CHARTGROUP_ELEMENT = "chartgroup"; //$NON-NLS-1$
+	public static final String NODEDISPLAY_ELEMENT = "nodedisplay"; //$NON-NLS-1$
+	public static final String ABSLAYOUT_ELEMENT = "abslayout"; //$NON-NLS-1$
+	public static final String SPLITLAYOUT_ELEMENT = "splitlayout"; //$NON-NLS-1$
+	public static final String TABLELAYOUT_ELEMENT = "tablelayout"; //$NON-NLS-1$
+	public static final String COMPONENTLAYOUT_ELEMENT = "componentlayout"; //$NON-NLS-1$
+	public static final String NODEDISPLAYLAYOUT_ELEMENT = "nodedisplaylayout"; //$NON-NLS-1$
+	public static final String TITLE_PREFIX = "title_"; //$NON-NLS-1$
+	public static final String MANDATORY = "mandatory"; //$NON-NLS-1$
+	public static final String SYSTEM = "system"; //$NON-NLS-1$
+	public static final String ERROR = "error"; //$NON-NLS-1$
+	public static final String MOTD = "motd"; //$NON-NLS-1$
 }

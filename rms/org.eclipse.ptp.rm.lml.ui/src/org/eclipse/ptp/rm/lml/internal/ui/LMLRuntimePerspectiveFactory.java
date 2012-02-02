@@ -43,6 +43,7 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 
 		machinesFolder.addView(ILMLUIConstants.VIEW_PARALLELNODES);
 
+		miscFolder.addView(ILMLUIConstants.VIEW_INFO);
 		miscFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 		miscFolder.addView(IPageLayout.ID_PROP_SHEET);
 		miscFolder.addView(IPageLayout.ID_PROBLEM_VIEW);
