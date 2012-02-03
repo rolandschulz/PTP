@@ -99,9 +99,9 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				}
 				SyncManager.saveFileFilter(project, sff);
 			} else if (command.equals(syncFileList)) {
-				SyncFileFilterPage.open(project);
+				SyncFileFilterPage.open(project, null);
 			} else if (command.equals(syncDefaultFileList)) {
-				SyncFileFilterPage.open(null);
+				SyncFileFilterPage.open(null, null);
 			}
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
