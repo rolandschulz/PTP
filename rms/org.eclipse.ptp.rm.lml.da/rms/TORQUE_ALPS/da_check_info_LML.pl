@@ -11,21 +11,25 @@
 #*******************************************************************************/ 
 use strict;
 
-sub check_rms_PBS {
+sub check_rms_TORQUE_ALPS {
     my($rmsref,$cmdsref,$verbose)=@_;
     my($key, $cmd);
     my $rc=1;
     
     my %cmdname=(
-		"job"  => "qstat",
-		"node" => "pbsnodes",
+		"job"     => "qstat",
+		"app"     => "apstat",
+		"node"    => "apstat",
+		"nodemap" => "xtprocadmin",
 	);
 	
     my %cmdpath=(
-		"job" => "/usr/bin/qstat",
-		"node" => "/usr/bin/pbsnodes",
+		"job"     => "/usr/bin/qstat",
+		"app"     => "/usr/bin/apstat",
+		"node"    => "/usr/bin/apstat",
+		"nodemap" => "/opt/xt-boot/2.2.73/bin/snos64/xtprocadmin"
 	);
-    
+   
     foreach $key (keys(%cmdname)) {
 	# check for job query cmd
 	if (exists($cmdsref->{"cmd_${key}info"})) {
@@ -38,82 +42,74 @@ sub check_rms_PBS {
 	    if (!$?) {
 		chomp($cmdpath);
 		$cmd=$cmdpath;
-		&report_if_verbose("%s","$0: check_rms_PBS: found $cmdname{$key} by which ($cmd)\n");
-	    }
+		&report_if_verbose("%s","$0: check_rms_TORQUE_ALPS: found $cmdname{$key} by which ($cmd)\n");
+	    } 
 	}
 	if (-f $cmd) {
 	    $cmdsref->{"cmd_${key}info"}=$cmd;
-	} else {
-	    &report_if_verbose("%s","$0: check_rms_PBS: no cmd found for $cmdname{$key}\n");
+	}  else {
+	    &report_if_verbose("%s","$0: check_rms_TORQUE_ALPS: no cmd found for $cmdname{$key}\n");
 	    $rc=0;
 	}
     }
     
-    # Ensure it is a PBSpro system
+    # Ensure it is not a PBSpro system
     if (exists($cmdsref->{"cmd_jobinfo"})) {
 	$cmd=$cmdsref->{"cmd_jobinfo"}." --version";
-	    my $cmdversion=`$cmd 2>/dev/null`; 	
+	my $cmdversion=`$cmd 2>/dev/null`; 	
 	chomp($cmdversion);
 	if ($cmdversion=~/version/) {
 	    if ($cmdversion=~/PBSPro/) {
-		print STDERR "$0: check_rms: PBSpro found\n" if($verbose);
-	    }
+		&report_if_verbose("%s","$0: check_rms_TORQUE_ALPS: PBSpro found\n");
+		$rc=0;
+	    	}
 	} else {
-	    &report_if_verbose("%s","$0: check_rms_PBS: could not obtain version info from command $cmd\n");
-	    $rc=0;
+	    &report_if_verbose("%s","$0: check_rms_TORQUE_ALPS: could not obtain version info from command $cmd\n");
 	}
     }
 
-    # Ensure it is not a ALPS system (check 1)
-    {
-	my $alps_cmd="xtnodestat";
-	my $cmdpath=`which $alps_cmd 2>/dev/null`; 	# try: which 
-	if (!$?) {
-	    chomp($cmdpath);
-	    $cmd=$cmdpath;
-	    &report_if_verbose("%s","$0: check_rms_PBS: found $alps_cmd by which ($cmd) --> seems to be a ALPS system\n");
-	    $rc=0;
-	}
-    }
-    
     if ($rc==1)  {
-    	$$rmsref = "PBS";
-	&report_if_verbose("%s%s%s", "$0: check_rms_PBS: found PBS commands (",
+    	$$rmsref = "TORQUE_ALPS";
+	&report_if_verbose("%s%s%s", "$0: check_rms_TORQUE_ALPS: found TORQUE_ALPS commands (",
 			   join(",",(values(%{$cmdsref}))),
 			   ")\n");
     } else {
-	&report_if_verbose("%s","$0: check_rms_PBS: seems not to be a PBS system\n");
+	&report_if_verbose("%s","$0: check_rms_TORQUE_ALPS: seems not to be a TORQUE_ALPS system\n");
     }
     
     return($rc);
 }
 
-sub generate_step_rms_PBS {
+sub generate_step_rms_TORQUE_ALPS {
     my($workflowxml, $laststep, $cmdsref)=@_;
     my($step,$envs,$key,$ukey);
 
     $envs="";
     foreach $key (keys(%{$cmdsref})) {
-		$ukey=uc($key);
-		$envs.="$ukey=$cmdsref->{$key} ";
+	$ukey=uc($key);
+	$envs.="$ukey=$cmdsref->{$key} ";
     }
     $step="getdata";
     &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$envs $^X rms/PBS/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
-			       "$envs $^X rms/PBS/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
-			       "$envs $^X rms/PBS/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
+			       "$envs $^X rms/TORQUE_ALPS/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
+			       "$envs $^X rms/TORQUE_ALPS/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml",
+			       "$envs $^X rms/TORQUE_ALPS/da_apps_info_LML.pl                 \$tmpdir/apps_LML.xml",
+			       "$envs $^X rms/TORQUE_ALPS/da_nodelist_info_LML.pl             \$tmpdir/nodelist_LML.xml",
+			       "$envs $^X rms/TORQUE_ALPS/da_nodemap_info_LML.pl              \$tmpdir/nodemap_LML.xml",
+			       );
     $laststep=$step;
 
     $step="combineLML";
     &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
 			       "$^X \$instdir/LML_combiner/LML_combine_obj.pl  -v -o \$stepoutfile ".
-			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/jobs_LML.xml \$tmpdir/nodes_LML.xml");
+			       "\$tmpdir/sysinfo_LML.xml \$tmpdir/apps_LML.xml \$tmpdir/jobs_LML.xml \$tmpdir/nodelist_LML.xml \$tmpdir/nodemap_LML.xml");
     $laststep=$step;
 
     return($laststep);
+
 }
 
-$main::check_functions->{PBS}   =\&check_rms_PBS;
-$main::generate_functions->{PBS}=\&generate_step_rms_PBS;
+$main::check_functions->{TORQUE_ALPS}   =\&check_rms_TORQUE_ALPS;
+$main::generate_functions->{TORQUE_ALPS}=\&generate_step_rms_TORQUE_ALPS;
 
 1;

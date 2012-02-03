@@ -184,6 +184,24 @@ sub get_xml_tree {
 	    $xmldata.=">\n";
 	}
 	
+	# handling of special usage attribute _JOBUSAGE
+	if((exists($self->{ATTR}->{_JOBUSAGE})) && ($level>0) && ($level<6)) {
+	    my($oid,$xmlusage,$cpucount);
+	    $xmlusage="";
+	    $cpucount=0;
+	    foreach $oid (keys(%{$self->{ATTR}->{_JOBUSAGE}})) {
+		$cpucount+=$self->{ATTR}->{_JOBUSAGE}->{$oid};
+		$xmlusage.="    "x($level+1);
+		$xmlusage.="    <job oid=\"$oid\" cpucount=\"$self->{ATTR}->{_JOBUSAGE}->{$oid}\"/>\n";
+		
+	    }
+	    $xmldata.="    "x($level+1);
+	    $xmldata.="<usage cpucount=\"$cpucount\">\n";
+	    $xmldata.=$xmlusage;
+	    $xmldata.="    "x($level+1);
+	    $xmldata.="</usage>\n";
+	}
+
 	# dive in
 	foreach $child (@{$self->{_childs}}) {
 	    $xmldata.=$child->get_xml_tree();

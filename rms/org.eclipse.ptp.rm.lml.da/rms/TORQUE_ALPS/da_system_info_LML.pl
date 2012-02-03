@@ -40,7 +40,7 @@ my ($sysinfoid,$line,%sysinfo,%sysinfonr,$key,$value,$count,%notmappedkeys,%notf
 $sysinfoid="cluster";
 $sysinfo{$sysinfoid}{hostname}=$Hostname;
 $sysinfo{$sysinfoid}{date}=&get_current_date();
-$sysinfo{$sysinfoid}{type}="Cluster";
+$sysinfo{$sysinfoid}{type}="ALPS";
 
 # checking system message of today 
 my $motd = "/etc/motd";
@@ -110,10 +110,10 @@ sub modify {
     my($key,$mkey,$value)=@_;
     my $ret=$value;
 
-    # mask & in user input
-    if($ret=~/\&/) {
-	$ret=~s/\&/\&amp\;/gs;
-    } 
+    if($mkey eq "motd") {
+#	$ret=~s/\&/&amp;/gs;
+	$ret=~s/\n/\&\#10;/gs;
+    }
 
     return($ret);
 }

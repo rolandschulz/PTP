@@ -92,13 +92,15 @@ if($opt_verbose) {
 }
 
 # determine system type
-my $system_type = "unknown";
+my $system_type      = "unknown";
+my $system_idlistref = [];
 {
     my($key,$ref);
     keys(%{$filehandler_LML->{DATA}->{OBJECT}}); # reset iterator
     while(($key,$ref)=each(%{$filehandler_LML->{DATA}->{OBJECT}})) {
 	if($ref->{type} eq 'system') {
 	    $ref=$filehandler_LML->{DATA}->{INFODATA}->{$key};
+	    push(@{$system_idlistref},$key);
 	    if($ref->{type}) {
 		$system_type=$ref->{type};
 		printf("scan system: type is %s\n",$system_type);
@@ -217,8 +219,22 @@ foreach $nid (keys(%{$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}})) {
     $filehandler_out->{DATA}->{NODEDISPLAYLAYOUT}->{$nid}=$nd_handler->get_lml_nodedisplaylayout();
 }
 
-# define defalut objects, like job 'empty'
+# define defaut objects, like job 'empty'
 &define_default_objects($filehandler_out);
+
+# copy system element
+{
+    my($cnt);
+    $cnt=&copy_objects_of_elements($filehandler_LML,$filehandler_out,$system_idlistref,"OBJECT");
+    $cnt=&copy_objects_of_elements($filehandler_LML,$filehandler_out,$system_idlistref,"INFO");
+    $cnt=&copy_objects_of_elements($filehandler_LML,$filehandler_out,$system_idlistref,"INFODATA");
+}
+
+# handle layout (split, abs) for positioning elements
+if(exists($filehandler_layout->{DATA}->{SPLITLAYOUT})) {
+    $filehandler_out->{DATA}->{SPLITLAYOUT}=dclone($filehandler_layout->{DATA}->{SPLITLAYOUT});
+}
+
 
 print "Writing output: $opt_outfile\n";
 $filehandler_out->write_lml($opt_outfile);
@@ -309,6 +325,7 @@ sub modify_jobs_anonymous {
 sub usage {
     die "Usage: $_[0] <options> <filenames> 
                 -output <file>           : LML output filename
+                -layout <file>           : LML layout filename
                 -verbose                 : verbose
 ";
 }

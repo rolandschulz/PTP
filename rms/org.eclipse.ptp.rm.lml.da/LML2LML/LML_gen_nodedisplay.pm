@@ -83,16 +83,16 @@ sub process {
 	$self->_adjust_layout_bg();
 
 
-    } elsif($self->{SYSTEMTYPE} eq "CRAYXT") {
-	my($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode)=$self->_get_system_size_crayxt();
-	if(!$self->_init_trees_crayxt($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode)) {
+    } elsif($self->{SYSTEMTYPE} eq "ALPS") {
+	my($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode,$maxpcore)=$self->_get_system_size_alps();
+	if(!$self->_init_trees_alps($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode,$maxpcore)) {
 	    print "ERROR: could not init internal data structures, system type: $self->{SYSTEMTYPE}, aborting ...\n";
 	    return(-1);
 	}
 	# init data tree with empty root nodes
 	$self->_add_empty_root_elements();
 	
-	$self->_adjust_layout_crayxt();
+	$self->_adjust_layout_alps();
 
 
 
@@ -154,13 +154,14 @@ sub process {
 
     $idlistref=[];
     print "LML_gen_nodedisplay::process: gid=$gid\n" if($self->{VERBOSE});
-#    print Dumper($self->{SCHEMEROOT});
     $idlistref=$self->_insert_run_jobs();
 
     $self->{IDLISTREF}=$idlistref;
     $numids=scalar @{$idlistref};
     
     # update layout
+
+#    print Dumper($self->{DATAROOT});
     
 
     return($numids);
@@ -182,7 +183,7 @@ sub _insert_run_jobs {
 	} else {
 	    $nodelist=$self->_remap_nodes($inforef->{nodelist});
 	}
-#	print "_insert_run_jobs job $key nodelist $nodelist\n";
+#	print "_insert_run_jobs job $key \n" if($self->{VERBOSE});
 	$self->insert_job_into_nodedisplay($self->{SCHEMEROOT},$self->{DATAROOT},$nodelist,$key);
 	push(@idlist,$key);
 	$jcount++;
@@ -193,6 +194,8 @@ sub _insert_run_jobs {
 
 #	last; # WF
     }
+    $tdiff=time-$tstart;
+    printf("$0: inserted %d jobs in %6.4f sec\n",$jcount,$tdiff) if($self->{VERBOSE});
     return(\@idlist);
 }
 
@@ -352,7 +355,7 @@ sub _remap_nodes {
 sub _remap_nodes_vnode {
     my($self) = shift;
     my($nodelist)=shift;
-    my($newnodelist,$spec,$node,$num,$number,$newnode,$start);
+    my($newnodelist,$spec,$node,$num,$number,$newnode,$start,$generatelist);
     if($self->{SYSTEMTYPE} eq "BG/P") {
 	return($nodelist);
     }
@@ -376,9 +379,19 @@ sub _remap_nodes_vnode {
 	    $self->{NODELASTTASKNUMBER}->{$node}=-1;
 	}
 	$start=$self->{NODELASTTASKNUMBER}->{$node}+1;
-	for($num=$start;$num<$start+$number;$num++) {
-	    $newnodelist.="," if($newnodelist);
-	    $newnodelist.=sprintf("%s-c%02d",$newnode,$num);
+	$generatelist=1;
+	if(exists($self->{MAXCORESCHECK})) {
+	    if($number==$self->{MAXCORESCHECK}+1) {
+		$newnodelist.="," if($newnodelist);
+		$newnodelist.=$newnode;
+		$generatelist=0;
+	    } 
+	}
+	if($generatelist) {
+	    for($num=$start;$num<$start+$number;$num++) {
+		$newnodelist.="," if($newnodelist);
+		$newnodelist.=sprintf("%s-c%02d",$newnode,$num);
+	    }
 	}
     }
     return($newnodelist);
@@ -940,9 +953,9 @@ sub _init_trees_bg  {
 
 
 ###############################################
-# Cray XT related
+# ALPS related
 ############################################### 
-sub _adjust_layout_crayxt  {
+sub _adjust_layout_alps  {
     my($self) = shift;
     my($root_layout,$root_scheme,$treenode,$ltreenode,$streenode,$num,$min,$max,$lmin,$lmax);
     my $rc=1;
@@ -963,7 +976,7 @@ sub _adjust_layout_crayxt  {
 	$num=$max-$min+1;
 	
     } else {
-	print STDERR "$0: ERROR: inconsistent scheme tree for Cray XT system (cols) ...\n";return(0);
+	print STDERR "$0: ERROR: inconsistent scheme tree for ALPS system (cols) ...\n";return(0);
     }
     
     if(!$ltreenode) {
@@ -997,7 +1010,7 @@ sub _adjust_layout_crayxt  {
 	$max=$streenode->{ATTR}->{max};
 	$num=$max-$min+1;
     } else {
-	print STDERR "$0: ERROR: inconsistent scheme tree for Cray XT system (rows) ...\n";return(0);
+	print STDERR "$0: ERROR: inconsistent scheme tree for ALPS system (rows) ...\n";return(0);
     }
     
     $treenode=$ltreenode->get_child({_name => "el1" });
@@ -1007,8 +1020,8 @@ sub _adjust_layout_crayxt  {
     $ltreenode=$treenode;
 
     # set size attributes
-    $ltreenode->{ATTR}->{rows}=$num;
-    $ltreenode->{ATTR}->{cols}=1;
+    $ltreenode->{ATTR}->{rows}=$num;    $ltreenode->{ATTR}->{cols}=1;
+    $ltreenode->{ATTR}->{min}=$lmin;    $ltreenode->{ATTR}->{max}=$lmax;
 
     # set some default layout attributes
 #    $ltreenode->{ATTR}->{maxlevel} = 5              if(!exists($ltreenode->{ATTR}->{maxlevel}));
@@ -1120,13 +1133,13 @@ sub _adjust_layout_crayxt  {
     #######
     $streenode=$streenode->get_child({_name => "el6" });
 
-    # get number of midplanes (in el6 of scheme)
+    # get number of cores (in el6 of scheme)
     if($streenode) {
 	$min=$streenode->{ATTR}->{min};
 	$max=$streenode->{ATTR}->{max};
 	$num=$max-$min+1;
     } else {
-	print STDERR "$0: ERROR: inconsistent scheme tree for BG system (cores) ...\n";return(0);
+	print STDERR "$0: ERROR: inconsistent scheme tree for ALPS system (cores) ...\n";return(0);
     }
     
     $treenode=$ltreenode->get_child({_name => "el5" });
@@ -1152,17 +1165,17 @@ sub _adjust_layout_crayxt  {
 
 
 ###############################################
-# Cray XT related
+# ALPS related
 ############################################### 
-sub _get_system_size_crayxt {
+sub _get_system_size_alps {
     my($self) = shift;
     my($indataref) = $self->{INDATA};
-    my($nodename,$pcol,$prow,$pcage,$pslot,$pnode);
-    my($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode);
+    my($nodename,$pcol,$prow,$pcage,$pslot,$pnode,$pcore);
+    my($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode,$maxpcore);
 
     my ($key,$ref);
     
-    $maxpcol=    $maxprow=    $maxpcage=    $maxpslot=    $maxpnode= 0;
+    $maxpcol=    $maxprow=    $maxpcage=    $maxpslot=    $maxpnode= $maxpcore = 0;
     keys(%{$self->{LMLFH}->{DATA}->{OBJECT}}); # reset iterator
     while(($key,$ref)=each(%{$self->{LMLFH}->{DATA}->{OBJECT}})) {
 	next if($ref->{type} ne 'node');
@@ -1170,25 +1183,34 @@ sub _get_system_size_crayxt {
 	if($nodename=~/^c(\d+)-(\d+)c(\d+)s(\d+)n(\d+)$/) {
 	    ($pcol,$prow,$pcage,$pslot,$pnode)=($1,$2,$3,$4,$5);
 	} else {
-	    print "_get_system_size_crayxt: node name could not be parsed: $nodename\n";
+	    print "_get_system_size_alps: node name could not be parsed: $nodename\n";
 	}
+	if(exists($self->{LMLFH}->{DATA}->{INFODATA}->{$key}->{HW})) {
+	    $pcore=$self->{LMLFH}->{DATA}->{INFODATA}->{$key}->{HW}-1;
+	} else {
+	    $pcore=0;
+	}
+
 	$maxpcol=$pcol if($pcol>$maxpcol);
 	$maxprow=$prow if($prow>$maxprow);
 	$maxpcage=$pcage if($pcage>$maxpcage);
 	$maxpslot=$pslot if($pslot>$maxpslot);
 	$maxpnode=$pnode if($pnode>$maxpnode);
+	$maxpcore=$pcore if($pcore>$maxpcore);
     }
 
-    printf("_get_system_size_crayxt: Cray XT system found of size: %dx%dx%d\n",
-	   $maxpcol+1,$maxprow+1,$maxpcage+1,$maxpslot+1,$maxpnode+1 ) if($self->{VERBOSE});
-    
-    return($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode);
+    $self->{MAXCORESCHECK}=$maxpcore;
+
+    printf("_get_system_size_alps: ALPS system found of size: col=%d row=%d cage=%d slot=%d node=%d core=%d\n",
+	   $maxpcol+1,$maxprow+1,$maxpcage+1,$maxpslot+1,$maxpnode+1,$maxpcore+1 ) if($self->{VERBOSE});
+
+    return($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode,$maxpcore);
 }
 
 
-sub _init_trees_crayxt  {
+sub _init_trees_alps  {
     my($self) = shift;
-    my($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode)=@_;
+    my($maxpcol,$maxprow,$maxpcage,$maxpslot,$maxpnode,$maxpcore)=@_;
     my($id,$subid,$treenode,$schemeroot,$bgsystem);
 
     $schemeroot=$self->{SCHEMEROOT};
@@ -1223,10 +1245,12 @@ sub _init_trees_crayxt  {
 			  max     => $maxpnode,
 			  mask    => 'n%01d' });
 
+
+    $maxpcore=15 if ($maxpcore<=0);
     $treenode=$treenode->new_child();
     $treenode->add_attr({ tagname => 'core',
 			  min     => 0,
-			  max     => 11,
+			  max     => $maxpcore,
 			  mask    => '-c%02d' });
 
     return(1);

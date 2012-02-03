@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!---
+ Copyright (c) 2011 Forschungszentrum Juelich GmbH.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
+-->
+
+<lml:lgui xmlns:lml="http://www.llview.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.llview.de lgui.xsd " version="1.0"> 
+
+<objects>
+<object color="#FFFFFF" id="empty" name="Empty job" type="job"/>
+</objects>
+
+<nodedisplaylayout  id="nodedisplay" gid="nd_1">
+<el0 vgap="5" transparent="false" showtitle="false" rows="1" mouseborder="0" maxlevel="4" hgap="0" fontsize="10" fontfamily="Monospaced" cols="25" border="0" background="#777">
+    <el1 vgap="5" showtitle="true" rows="4" min="0" maxlevel="5" max="24" hgap="0" cols="1">
+        <el2 showtitle="true" rows="3" min="0" maxlevel="6" max="3" cols="1">
+            <el3 showtitle="false" showfulltitle="false" rows="1" min="0" maxlevel="6" max="2" highestrowfirst="true" cols="8">
+                <el4 vgap="0" showtitle="false" showfulltitle="false" rows="4" min="0" maxlevel="6" max="7" highestrowfirst="true" hgap="0" fontsize="8" cols="1">
+                    <el5 rows="1" min="0" maxlevel="6" max="3" cols="12">
+                    </el5>
+                </el4>
+            </el3>
+        </el2>
+    </el1>
+</el0>
+</nodedisplaylayout>
+<nodedisplay id="nd_1" title="system: krakenpf1">
+<scheme>
+    <el1 tagname="col" min="0" max="24" mask="c%d-">
+        <el2 tagname="rack" min="0" max="3" mask="%01d">
+            <el3 tagname="cage" min="0" max="2" mask="c%01d">
+                <el4 tagname="blade" min="0" max="7" mask="s%01d">
+                    <el5 tagname="node" min="0" max="3" mask="n%01d">
+                        <el6 tagname="core" min="0" max="11" mask="-c%02d">
+                        </el6>
+                    </el5>
+                </el4>
+            </el3>
+        </el2>
+    </el1>
+</scheme>
+
+<tablelayout id="tl_Run" gid="joblistrun" active="true">
+<column cid="1" pos="0" width="0.1" active="true" key="step"/>
+<column cid="2" pos="1" width="0.1" active="true" key="owner"/>
+<column cid="3" pos="2" width="0.1" active="true" key="queue"/>
+<column cid="4" pos="3" width="0.1" active="true" key="wall"/>
+<column cid="5" pos="4" width="0.1" active="true" key="queuedate"/>
+<column cid="6" pos="5" width="0.1" active="true" key="dispatchdate"/>
+<column cid="7" pos="6" width="0.1" active="true" key="totalcores"/>
+<column cid="8" pos="7" width="0.3" active="true" key="status"/>
+</tablelayout>
+
+<table title="Running Jobs" id="joblistrun"  contenttype="jobs" description="This is the table showing all running jobs">
+<column id="1" name="step"/>
+<column id="2" name="owner">  <pattern>    <include regexp=".*"/>  </pattern></column>
+<column id="3" name="queue"/>
+<column id="4" name="wall"/>
+<column id="5" name="queuedate"/>
+<column id="6" name="dispatchdate"/>
+<column id="7" name="totalcores"/>
+<column id="8" name="status" type="mandatory">  <pattern>    <include regexp="RUNNING"/>  </pattern> </column>
+</table>
+
+<tablelayout id="tl_WAIT" gid="joblistwait" active="true">
+<column cid="1" pos="0" width="0.1" active="true" key="step"/>
+<column cid="2" pos="1" width="0.1" active="true" key="owner"/>
+<column cid="3" pos="2" width="0.1" active="true" key="queue"/>
+<column cid="4" pos="3" width="0.1" active="true" key="wall"/>
+<column cid="5" pos="4" width="0.1" active="true" key="queuedate"/>
+<column cid="6" pos="5" width="0.1" active="true" key="dispatchdate"/>
+<column cid="7" pos="6" width="0.1" active="true" key="totalcores"/>
+<column cid="8" pos="7" width="0.3" active="true" key="status"/>
+</tablelayout>
+
+<table title="Waiting Jobs" id="joblistwait"  contenttype="jobs" description="This is the table showing all waiting jobs">
+<column id="1" name="step"/>
+<column id="2" name="owner">  <pattern>    <include regexp=".*"/>  </pattern></column>
+<column id="3" name="queue"/>
+<column id="4" name="wall"/>
+<column id="5" name="queuedate"/>
+<column id="6" name="dispatchdate"/>
+<column id="7" name="totalcores"/>
+<column id="8" name="status" type="mandatory">  <pattern>    <include regexp="SUBMITTED"/>  </pattern> </column>
+</table>
+
+</lml:lgui>

@@ -434,3 +434,12 @@ ChangeLog:
        - will overwrite command line option
     - incoporated support for new RMS (GridEngine, PE)
       (contributed by others)   
+
+1.15:
+   - LML_da_driver will now use RMS specific default layout files
+   - ,odifications for generation of usage tag inside nodedisplay,
+     needed to display of different levels of detail
+   - add remote system message of today to LML system info 
+    - incoporated support for new RMS (TORQUE-ALPS)
+   - bug fixes
+
