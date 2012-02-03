@@ -11,45 +11,75 @@
 #*******************************************************************************/ 
 use strict;
 
-use lib ".";
-
 my $patint="([\\+\\-\\d]+)";   # Pattern for Integer number
 my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
 my $patbl ="\\s+";             # Pattern for blank space (variable length)
 
 #####################################################################
-# get user sysinfo / check system 
+# get user info / check system 
 #####################################################################
 my $UserID = getpwuid($<);
 my $Hostname = `hostname`;
-chomp($Hostname);
 my $verbose=1;
+my ($line,%apps,%appnr,$key,$value,$count,%notmappedkeys,%notfoundkeys);
 
+#unless( ($Hostname =~ /jugenes\d/) && ($UserID =~ /llstat/) ) {
+#  die "da_jobs_info_LML.pl can only be used as llstat on jugenesX!";
+#}
+
+#####################################################################
+# get command line parameter
+#####################################################################
+if ($#ARGV != 0) {
+  die " Usage: $0 <filename> $#ARGV\n";
+}
 my $filename = $ARGV[0];
 
+my $system_sysprio=-1;
+my $maxtopdogs=-1;
+
 my %mapping = (
-    "hostname"                                  => "hostname",
-    "date"                                      => "system_time",
-    "type"                                      => "type",
-    "motd"                                      => "motd",
+    "apid"                                   => "apid",
+    "batchid"                                => "batchid",
+    "info"                                   => "",
     );
 
-my ($sysinfoid,$line,%sysinfo,%sysinfonr,$key,$value,$count,%notmappedkeys,%notfoundkeys);
+my $cmd="/usr/bin/apstat";
+$cmd=$ENV{"CMD_APPINFO"} if($ENV{"CMD_APPINFO"}); 
 
-$sysinfoid="cluster";
-$sysinfo{$sysinfoid}{hostname}=$Hostname;
-$sysinfo{$sysinfoid}{date}=&get_current_date();
-$sysinfo{$sysinfoid}{type}="Cluster";
+open(IN,"$cmd -a -v |");
+my $apid="-";
+my $lastkey="info";
 
-# checking system message of today 
-my $motd = "/etc/motd";
-if(-e $motd) {
-    if(open(MOTD,'<',$motd)) {
-        while(<MOTD>) {
-        $sysinfo{$sysinfoid}{motd}.="$_";
-        }
-        close MOTD;
+# skip overview
+while($line=<IN>) {
+    last if($line=~/Application detail/);
+}
+
+while($line=<IN>) {
+    chomp($line);
+    if($line=~/Ap\[$patint\]: (.*)$/) {
+	$apid=$1;
+	$apps{$apid}{$lastkey}=$line;
+	$apps{$apid}{$lastkey}.=";";
+    } else {
+	$line=~s/^\s*//gs;
+	$apps{$apid}{$lastkey}.=$line;
+	$apps{$apid}{$lastkey}.=";";
+    }
+}
+close(IN);
+
+# check info of apps
+foreach $apid (sort(keys(%apps))) {
+    my $info=$apps{$apid}{info};
+    if($info=~/apid\s+$patint[\s,;]/){
+	$apps{$apid}{apid}=$1;
+    }
+    if($info=~/Batch System ID = $patint[\s,;]/){
+	$apps{$apid}{batchid}=$1;
+#	print "$apid -> $info\n";
     }
 }
 
@@ -60,20 +90,19 @@ printf(OUT "	xsi:schemaLocation=\"http://www.llview.de lgui.xsd\"\n");
 printf(OUT "	version=\"0.7\"\>\n");
 printf(OUT "<objects>\n");
 $count=0;
-foreach $sysinfoid (sort(keys(%sysinfo))) {
-    $count++;$sysinfonr{$sysinfoid}=$count;
-    printf(OUT "<object id=\"sys%06d\" name=\"%s\" type=\"system\"/>\n",$count,$sysinfoid);
+foreach $apid (sort(keys(%apps))) {
+    $count++;$appnr{$apid}=$count;
+    printf(OUT "<object id=\"a%06d\" name=\"%s\" type=\"app\"/>\n",$count,$apid);
 }
 printf(OUT "</objects>\n");
 printf(OUT "<information>\n");
-foreach $sysinfoid (sort(keys(%sysinfo))) {
-    printf(OUT "<info oid=\"sys%06d\" type=\"short\">\n",$sysinfonr{$sysinfoid});
-    foreach $key (sort(keys(%{$sysinfo{$sysinfoid}}))) {
+foreach $apid (sort(keys(%apps))) {
+    printf(OUT "<info oid=\"a%06d\" type=\"short\">\n",$appnr{$apid});
+    foreach $key (sort(keys(%{$apps{$apid}}))) {
 	if(exists($mapping{$key})) {
 	    if($mapping{$key} ne "") {
-
-		$value=&modify($key,$mapping{$key},$sysinfo{$sysinfoid}{$key});
-		if(defined($value)) {
+		$value=&modify($key,$mapping{$key},$apps{$apid}{$key});
+		if($value) {
 		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",$value);
 		}
 	    } else {
@@ -92,29 +121,24 @@ printf(OUT "</lml:lgui>\n");
 close(OUT);
 
 foreach $key (sort(keys(%notfoundkeys))) {
-    printf("%-40s => \"\"\n","\"".$key."\"",$notfoundkeys{$key});
+    printf("%-40s => \"\",\n","\"".$key."\"",$notfoundkeys{$key});
 }
 
-1;
-
-sub get_current_date {
-    my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$idst)=localtime(time());
-    my($date);
-    $year=substr($year,1,2);
-    $date=sprintf("%02d/%02d/%02d-%02d:%02d:%02d",$mon+1,$mday,$year,$hour,$min,$sec);
-    return($date);
-}
 
 
 sub modify {
     my($key,$mkey,$value)=@_;
     my $ret=$value;
 
+    if(!$ret) {
+	return(undef);
+    }
+
     # mask & in user input
     if($ret=~/\&/) {
 	$ret=~s/\&/\&amp\;/gs;
     } 
 
+
     return($ret);
 }
-

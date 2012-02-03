@@ -20,7 +20,7 @@ use lib "$FindBin::RealBin/../lib";
 use LML_combine_file_obj;
 use LML_combine_obj_check;
 use LML_combine_obj_bgp;
-use LML_combine_obj_xt;
+use LML_combine_obj_alps;
 
 
 my $patint="([\\+\\-\\d]+)";   # Pattern for Integer number
@@ -96,8 +96,8 @@ if($system_type eq "BG/P") {
     &LML_combine_obj_bgp::update($filehandler->get_data_ref(),$opt_dbdir);
 }
 
-if($system_type eq "CRAYXT") {
-    &LML_combine_obj_crayxt::update($filehandler->get_data_ref(),$opt_dbdir);
+if($system_type eq "ALPS") {
+    &LML_combine_obj_alps::update($filehandler->get_data_ref(),$opt_dbdir);
 }
 
 # check if Cluster is a PBS controlled Altix SMP Cluster

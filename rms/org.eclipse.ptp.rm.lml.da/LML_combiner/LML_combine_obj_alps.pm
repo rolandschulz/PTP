@@ -8,7 +8,7 @@
 #* Contributors:
 #*    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
 #*******************************************************************************/ 
-package LML_combine_obj_crayxt;
+package LML_combine_obj_alps;
 use strict;
 use Data::Dumper;
 
@@ -88,7 +88,7 @@ sub update_node_info {
 	    if(exists($nodemapref->{$nid})) {
 		$dataptr->{OBJECT}->{$id}->{name}=$nodemapref->{$nid};
 	    } else {
-		print "update_node_info(Cray XT): warning unknown nid: '$nid'\n";
+		print "update_node_info(ALPS): warning unknown nid: '$nid'\n";
 	    }
 	    
 	    # update attribute: memory
@@ -192,8 +192,8 @@ sub update_class_info {
     foreach $id (keys(%{$dataptr->{OBJECT}})) {
 	if($dataptr->{OBJECT}->{$id}->{type} eq "class") {
 	    $class=$dataptr->{INFODATA}->{$id}->{name};
-	    $classes{$class}{include}=$dataptr->{INFODATA}->{$id}->{crayxt_incl_bg};
-	    $classes{$class}{exclude}=$dataptr->{INFODATA}->{$id}->{crayxt_excl_bg};
+	    $classes{$class}{include}=$dataptr->{INFODATA}->{$id}->{alps_incl_bg};
+	    $classes{$class}{exclude}=$dataptr->{INFODATA}->{$id}->{alps_excl_bg};
 	}
     }
 

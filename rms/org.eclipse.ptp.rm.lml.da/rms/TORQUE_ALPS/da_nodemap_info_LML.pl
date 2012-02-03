@@ -11,47 +11,65 @@
 #*******************************************************************************/ 
 use strict;
 
-use lib ".";
-
 my $patint="([\\+\\-\\d]+)";   # Pattern for Integer number
 my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
 my $patbl ="\\s+";             # Pattern for blank space (variable length)
 
 #####################################################################
-# get user sysinfo / check system 
+# get user info / check system 
 #####################################################################
 my $UserID = getpwuid($<);
 my $Hostname = `hostname`;
-chomp($Hostname);
 my $verbose=1;
+my ($line,%node,%nodenr,$key,$value,$count,%notmappedkeys,%notfoundkeys);
 
+#unless( ($Hostname =~ /jugenes\d/) && ($UserID =~ /llstat/) ) {
+#  die "da_jobs_info_LML.pl can only be used as llstat on jugenesX!";
+#}
+
+#####################################################################
+# get command line parameter
+#####################################################################
+if ($#ARGV != 0) {
+  die " Usage: $0 <filename> $#ARGV\n";
+}
 my $filename = $ARGV[0];
 
+my $system_sysprio=-1;
+my $maxtopdogs=-1;
+
 my %mapping = (
-    "hostname"                                  => "hostname",
-    "date"                                      => "system_time",
-    "type"                                      => "type",
-    "motd"                                      => "motd",
+    "hex"                                    => "",
+    "mode"                                   => "mode",
+    "name"                                   => "name",
+    "status"                                 => "status",
+    "type"                                   => "type",
     );
 
-my ($sysinfoid,$line,%sysinfo,%sysinfonr,$key,$value,$count,%notmappedkeys,%notfoundkeys);
+my $cmd="/opt/xt-boot/2.2.73/bin/snos64/xtprocadmin";
+$cmd=$ENV{"CMD_NODEMAPINFO"} if($ENV{"CMD_NODEMAPINFO"}); 
 
-$sysinfoid="cluster";
-$sysinfo{$sysinfoid}{hostname}=$Hostname;
-$sysinfo{$sysinfoid}{date}=&get_current_date();
-$sysinfo{$sysinfoid}{type}="Cluster";
+open(IN,"$cmd |");
+my $nid="-";
 
-# checking system message of today 
-my $motd = "/etc/motd";
-if(-e $motd) {
-    if(open(MOTD,'<',$motd)) {
-        while(<MOTD>) {
-        $sysinfo{$sysinfoid}{motd}.="$_";
-        }
-        close MOTD;
+
+# skip header
+$line=<IN>;
+
+while($line=<IN>) {
+    chomp($line);
+    
+    if($line=~/^\s*$patint\s+$patwrd\s+$patwrd\s+$patwrd\s+$patwrd\s+$patwrd\s*$/) {
+	$nid=$1;
+	$node{$nid}{hex}=$2,
+	$node{$nid}{name}=$3;
+	$node{$nid}{type}=$4;
+	$node{$nid}{status}=$5;
+	$node{$nid}{mode}=$6;
     }
-}
+} 
+close(IN);
 
 open(OUT,"> $filename") || die "cannot open file $filename";
 printf(OUT "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -60,20 +78,19 @@ printf(OUT "	xsi:schemaLocation=\"http://www.llview.de lgui.xsd\"\n");
 printf(OUT "	version=\"0.7\"\>\n");
 printf(OUT "<objects>\n");
 $count=0;
-foreach $sysinfoid (sort(keys(%sysinfo))) {
-    $count++;$sysinfonr{$sysinfoid}=$count;
-    printf(OUT "<object id=\"sys%06d\" name=\"%s\" type=\"system\"/>\n",$count,$sysinfoid);
+foreach $nid (sort(keys(%node))) {
+    $count++;$nodenr{$nid}=$count;
+    printf(OUT "<object id=\"nm%06d\" name=\"%s\" type=\"nodemap\"/>\n",$count,$nid);
 }
 printf(OUT "</objects>\n");
 printf(OUT "<information>\n");
-foreach $sysinfoid (sort(keys(%sysinfo))) {
-    printf(OUT "<info oid=\"sys%06d\" type=\"short\">\n",$sysinfonr{$sysinfoid});
-    foreach $key (sort(keys(%{$sysinfo{$sysinfoid}}))) {
+foreach $nid (sort(keys(%node))) {
+    printf(OUT "<info oid=\"nm%06d\" type=\"short\">\n",$nodenr{$nid});
+    foreach $key (sort(keys(%{$node{$nid}}))) {
 	if(exists($mapping{$key})) {
 	    if($mapping{$key} ne "") {
-
-		$value=&modify($key,$mapping{$key},$sysinfo{$sysinfoid}{$key});
-		if(defined($value)) {
+		$value=&modify($key,$mapping{$key},$node{$nid}{$key});
+		if($value) {
 		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",$value);
 		}
 	    } else {
@@ -92,29 +109,24 @@ printf(OUT "</lml:lgui>\n");
 close(OUT);
 
 foreach $key (sort(keys(%notfoundkeys))) {
-    printf("%-40s => \"\"\n","\"".$key."\"",$notfoundkeys{$key});
+    printf("%-40s => \"\",\n","\"".$key."\"",$notfoundkeys{$key});
 }
 
-1;
-
-sub get_current_date {
-    my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$idst)=localtime(time());
-    my($date);
-    $year=substr($year,1,2);
-    $date=sprintf("%02d/%02d/%02d-%02d:%02d:%02d",$mon+1,$mday,$year,$hour,$min,$sec);
-    return($date);
-}
 
 
 sub modify {
     my($key,$mkey,$value)=@_;
     my $ret=$value;
 
+    if(!$ret) {
+	return(undef);
+    }
+
     # mask & in user input
     if($ret=~/\&/) {
 	$ret=~s/\&/\&amp\;/gs;
     } 
 
+
     return($ret);
 }
-

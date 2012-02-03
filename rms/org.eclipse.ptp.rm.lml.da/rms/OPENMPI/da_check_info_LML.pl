@@ -49,13 +49,14 @@ sub check_rms_OPENMPI {
     # second: check if ompi_info is given in default path
     if (!$infocmd) {
 	my $cmdpath=$cmdpath{sys}; 	
-	if (!-f $cmdpath) {
+	if (-f $cmdpath) {
 	    $infocmd=$cmdpath." --path bindir";
 	}
     }
-    
+
     # return if no ompi_info found
     if (!$infocmd) {
+	$rc=0;
 	return($rc);
     }
     

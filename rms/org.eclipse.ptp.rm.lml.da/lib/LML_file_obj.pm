@@ -77,6 +77,11 @@ sub new {
 #                                               ... elref->{elname}  
 #                                                        ->{key}
 #                                                        ->{elements}->[elref, elref, ...]
+#                 {SPLITLAYOUT}->{$id}->{id}
+#                                     ->{elements}->[elref, elref, ...]
+#                                       ... elref->{elname}  
+#                                                ->{key}
+#                                                ->{elements}->[elref, elref, ...]
 #
 #
 # derived:
@@ -152,6 +157,13 @@ sub get_stat {
 	my($type,%types,$id);
 	if($self->{DATA}->{NODEDISPLAY}) {
 	    $log.=sprintf("nodedisplay: total #%d\n",scalar keys(%{$self->{DATA}->{NODEDISPLAY}}));
+	}
+    }
+
+    {
+	my($type,%types,$id);
+	if($self->{DATA}->{SPLITLAYOUT}) {
+	    $log.=sprintf("splitlayout: total #%d\n",scalar keys(%{$self->{DATA}->{SPLITLAYOUT}}));
 	}
     }
 
@@ -496,6 +508,30 @@ sub lml_start {
 	return(1);
     }
 
+# handling splitlayout (needed at least for java appl.)
+###########################################################################################
+    if($name eq "splitlayout") {
+	$id=$attr{id};
+	$o->{LASTSPLITLAYOUTID}=$id;
+	if(exists($o->{SPLITLAYOUT}->{$id})) {
+	    print STDERR "LML_file_obj: WARNING splitlayout with id >$id< exists, skipping\n";
+	    return(0);
+    	}
+	foreach $k (sort keys %attr) {
+	    $o->{SPLITLAYOUT}->{$id}->{$k}=$attr{$k};
+	}
+	$o->{SPLITLAYOUT}->{$id}->{tree}=LML_ndtree->new("splitlayout");
+	$o->{SPLITLAYOUT}->{$id}->{tree}->{_level}=-1;
+	push(@{$o->{SPLITLAYOUTSTACK}},$o->{SPLITLAYOUT}->{$id}->{tree});
+	return(1);
+    }
+    if(($name=~/top/) || ($name eq 'bottom') || ($name=~/left/) || ($name eq 'right') ) {
+	my $lastelem=$o->{SPLITLAYOUTSTACK}->[-1];
+	my $treenode=$lastelem->new_child(\%attr,$name);
+	push(@{$o->{SPLITLAYOUTSTACK}},$treenode);
+	return(1);
+    }
+
 # handling unused / not needed tags
 ###########################################################################################
     if($name eq "abslayout") {
@@ -547,8 +583,15 @@ sub lml_end {
     if($name=~/info/) {
 	$o->{LASTINFOID} = undef;
     }
+    if($name=~/splitlayout/) {
+	pop(@{$o->{SPLITLAYOUTSTACK}});
+	$o->{LASTSPLITLAYOUTID} = undef;
+#	print STDERR Dumper($o->{SPLITLAYOUT});
+    }
+    if( ($name=~/top/) || ($name eq 'bottom') || ($name=~/left/) || ($name eq 'right') ) {
+	pop(@{$o->{SPLITLAYOUTSTACK}});
+    }
 
-#    print STDERR Dumper($o->{NODEDISPLAYSTACK});
 }
 
 
@@ -692,6 +735,23 @@ sub write_lml {
 		print OUT "</data>\n";
 	    }
 	    printf(OUT "</nodedisplay>\n");
+	}
+    }
+
+    if(exists($self->{DATA}->{SPLITLAYOUT})) {
+
+	foreach $id (sort keys %{$self->{DATA}->{SPLITLAYOUT}}) {
+	    my $sl=$self->{DATA}->{SPLITLAYOUT}->{$id};
+	    my $attr="";
+	    if (exists($sl->{divpos})) {
+		$attr.="divpos=\"$sl->{divpos}\"";
+	    };
+	    printf(OUT "<splitlayout id=\"%s\" %s>\n", $sl->{id}, $attr);
+	    if(exists($sl->{tree})) {
+		print OUT $sl->{tree}->get_xml_tree(1);
+	    }
+	    printf(OUT "</splitlayout>\n");
+
 	}
     }
     

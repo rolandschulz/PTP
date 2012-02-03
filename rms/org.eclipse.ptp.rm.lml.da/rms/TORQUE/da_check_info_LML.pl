@@ -64,6 +64,18 @@ sub check_rms_TORQUE {
 	    }
     }
 
+    # Ensure it is not a ALPS system (check 1)
+    {
+	my $alps_cmd="xtnodestat";
+	my $cmdpath=`which $alps_cmd 2>/dev/null`; 	# try: which 
+	if (!$?) {
+	    chomp($cmdpath);
+	    $cmd=$cmdpath;
+	    &report_if_verbose("%s","$0: check_rms_TORQUE: found $alps_cmd by which ($cmd) --> seems to be a ALPS system\n");
+	    $rc=0;
+	}
+    }
+
     if ($rc==1)  {
     	$$rmsref = "TORQUE";
 	&report_if_verbose("%s%s%s", "$0: check_rms_TORQUE: found TORQUE commands (",

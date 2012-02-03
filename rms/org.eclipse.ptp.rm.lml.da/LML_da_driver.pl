@@ -26,7 +26,7 @@ my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
 my $patbl ="\\s+";             # Pattern for blank space (variable length)
 
-my $version="1.14";
+my $version="1.15";
  
 my ($tstart,$tdiff,$rc);
 
@@ -231,6 +231,7 @@ my $step     = "";
 my $check_functions;
 my $generate_functions;
 
+my $rms="undef";
 
 #########################
 # determine how raw file 
@@ -250,12 +251,11 @@ if($rawfile) {
     # get data from resource management system (RMS)
 
     # check for hints about queueing system
-    my $rms="undef";
     my %cmds=();
 
     if($options{rms} ne "undef") { 
 	&report_if_verbose("$0: rms given by command line option: $options{rms} ...\n");
-	$rms=$options{rms};
+	$rms=uc($options{rms});
     } else {
 	&report_if_verbose("$0: check request for rms hint ...\n");
 	if(exists($filehandler_request->{DATA}->{REQUEST})) {
@@ -266,7 +266,6 @@ if($rawfile) {
 		    if(exists($driver_ref->{attr})) {
 			if(exists($driver_ref->{attr}->{name})) {
 			    $rms=uc($driver_ref->{attr}->{name}); # upper case, except:  
-			    $rms="GridEngine" if ($rms=~/GRIDENGINE/);
 			    &report_if_verbose("$0: check_for rms, got hint from request ... ($rms)\n");
                         }
 		    }
@@ -303,14 +302,16 @@ if($rawfile) {
 		$rms="undef";
 	    }
 	} else {
-	    &report_if_verbose("$0:  ERROR could not run rms/$rms/da_check_info_LML.pl (perhaps missing return code of script)\n");
+	    &report_if_verbose("$0: ERROR could not run rms/$rms/da_check_info_LML.pl (perhaps missing return code of script)\n");
 	    $rms="undef";
 	}
     } else {
         my ($r,$check_f,$generate_f,$test_rms);
+	my %cmds_save=(%cmds);
         foreach $r (<rms/*>) {
+	    %cmds=(%cmds_save);
 	    $test_rms=$r;$test_rms=~s/(.*\/)//s;
-	    &report_if_verbose("$0: found rms/$r/da_check_info_LML.pl running test ...\n");
+	    &report_if_verbose("$0: found $r/da_check_info_LML.pl running test ...\n");
 	    if (do "$r/da_check_info_LML.pl") {
 		if (exists($main::check_functions->{$test_rms})) {
 		    if ( &{$main::check_functions->{$test_rms}}(\$rms,\%cmds,$options{verbose})) {
@@ -369,7 +370,7 @@ if(!$usedefaultlayout) {
 
 my $filehandler_layout;
 if($usedefaultlayout) {
-    $filehandler_layout=&create_default_layout($filehandler_request);
+    $filehandler_layout=&create_default_layout($filehandler_request,$rms);
 } else {
     $filehandler_layout=&create_layout_from_request($filehandler_request);
 }
@@ -588,10 +589,17 @@ sub add_exec_step_to_workflow {
 
 #####################################################################
 sub create_default_layout {
-    my($filehandler_request)=@_;
+    my($filehandler_request,$rms)=@_;
 
+    my $layoutfilename="$FindBin::RealBin/samples/layout_default.xml";
+    my $layoutfilename_rms="$FindBin::RealBin/samples/layout_default_$rms.xml";
+    
     my $filehandler_layout = LML_file_obj->new($options{verbose},1);
-    $filehandler_layout->read_lml_fast("$FindBin::RealBin/samples/layout_default.xml");
+    if(-f $layoutfilename_rms) {
+	$filehandler_layout->read_lml_fast($layoutfilename_rms);
+    } else {
+	$filehandler_layout->read_lml_fast($layoutfilename);
+    }
     $filehandler_layout->check_lml();
     return($filehandler_layout);
 }
