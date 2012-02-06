@@ -134,6 +134,7 @@
 		<module>rms/org.eclipse.ptp.rm.ibm.ll.help</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.ll.proxy</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.ll.ui</module>
+		<module>rms/org.eclipse.ptp.rm.ibm.pe</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.core</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.help</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.proxy</module>
