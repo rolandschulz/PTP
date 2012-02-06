@@ -1,0 +1,10 @@
+[overbey2@forge ~]$ /opt/open64/bin/opencc errors.c does_not_exist.c
+errors.c: In function 'main':
+errors.c:4: warning: unnamed struct/union that defines no instances
+errors.c:5: error: incompatible types in initialization
+errors.c:6: error: 'undefined_variable' undeclared (first use in this function)
+errors.c:6: error: (Each undeclared identifier is reported only once
+errors.c:6: error: for each function it appears in.)
+errors.c:8: error: too many arguments to function 'one_arg'
+opencc ERROR: file does not exist:  does_not_exist.c
+[overbey2@forge ~]$ 

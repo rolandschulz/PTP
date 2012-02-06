@@ -1,0 +1,10 @@
+[overbey2@forge ~]$ /opt/open64/bin/openCC errors.c does_not_exist.c
+errors.c: In function 'int main(int, char**)':
+errors.c:4: error: abstract declarator 'main(int, char**)::<anonymous struct>' used as declaration
+errors.c:5: error: cannot convert 'double' to 'char*' in initialization
+errors.c:6: error: 'undefined_variable' was not declared in this scope
+errors.c:7: error: 'function_not_declared' was not declared in this scope
+errors.c:1: error: too many arguments to function 'int one_arg(int)'
+errors.c:8: error: at this point in file
+openCC ERROR: file does not exist:  does_not_exist.c
+[overbey2@forge ~]$ 

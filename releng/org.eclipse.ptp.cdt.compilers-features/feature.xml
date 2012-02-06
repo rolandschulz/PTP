@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ptp.cdt.compilers"
+      label="%featureName"
+      version="6.0.0.qualifier"
+      provider-name="%providerName"
+      license-feature="org.eclipse.ptp.license"
+      license-feature-version="1.0.0.qualifier">
+
+   <description url="http://eclipse.org/ptp">
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
+   </url>
+
+   <requires>
+      <import feature="org.eclipse.cdt" version="8.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.ptp.cdt.compilers.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

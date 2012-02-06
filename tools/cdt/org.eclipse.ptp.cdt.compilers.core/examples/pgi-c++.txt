@@ -1,0 +1,30 @@
+joverbey@krakenpf11(XT5):~> pgCC errors.c does_not_exist.c
+errors.c:
+"errors.c", line 4: warning: declaration does not declare anything
+    struct { int a; };
+    ^
+
+"errors.c", line 5: error: a value of type "double" cannot be used to
+          initialize an entity of type "char *"
+    char *ptr = 1.2345;
+                ^
+
+"errors.c", line 6: error: identifier "undefined_variable" is undefined
+    undefined_variable = 6;
+    ^
+
+"errors.c", line 7: error: identifier "function_not_declared" is undefined
+    function_not_declared();
+    ^
+
+"errors.c", line 8: error: too many arguments in function call
+    one_arg(1, 2, 3);
+               ^
+
+4 errors detected in the compilation of "errors.c".
+does_not_exist.c:
+Catastrophic error: cannot open source file "does_not_exist.c"
+
+1 catastrophic error detected in the compilation of "does_not_exist.c".
+Compilation terminated.
+joverbey@krakenpf11(XT5):~> 
