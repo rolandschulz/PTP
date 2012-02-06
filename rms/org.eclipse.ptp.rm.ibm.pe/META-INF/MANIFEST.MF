@@ -4,5 +4,6 @@ Bundle-Name: IBM PE JAXB resource manager
 Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.pe;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: org.eclipse.ptp.rm.ibm.pe_1.0.0.201108031201.jar
-Bundle-RequiredExecutionEnvironment: JavaSE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.5,
+ JavaSE-1.6
 Bundle-ActivationPolicy: lazy
