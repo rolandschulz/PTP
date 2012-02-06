@@ -16,7 +16,7 @@
 		<tycho-version>0.13.0</tycho-version>
 		<platform-version>3.7</platform-version>
 		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
-		<orbit-version>R20110523182458</orbit-version>
+		<orbit-version>R20120119162704</orbit-version>
 		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</orbit-site>
 		<cdt-version>indigo</cdt-version>
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/sr2</cdt-site>
