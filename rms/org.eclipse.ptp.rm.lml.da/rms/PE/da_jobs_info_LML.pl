@@ -54,11 +54,14 @@ my %mapping_job = (
 	"etime"          => "wall",
 	"id"             => "",
 	"spec"           => "",
+    "queuedate"      => "queuedate",
+    "dispatchdate"   => "dispatchdate",
 
 	# unknown attributes
 );
 
 my $cmd = "ps x -o pid,user,group,etime,command | grep poe | grep -v grep";
+my $datecmd = "date '+%D %T'";
 
 if ( open( IN, "$cmd 2>&1 |" ) ) {
 	while ( $line = <IN> ) {
@@ -76,11 +79,33 @@ if ( open( IN, "$cmd 2>&1 |" ) ) {
 	close(IN);
 }
 
+# determine number of cores
+my $numcpu;
+my $os = `uname -s`;
+if ($os eq "Aix") {
+    $numcpu = `lscfg | grep proc | wc -l`;
+}
+else {
+    $numcpu = `grep -c ^processor /proc/cpuinfo`;
+}
+
+if ($? != 0) {
+    $numcpu = "-1";
+}
+
 # add manatory attributes to jobs
 foreach $jobid ( sort( keys(%jobs) ) ) {
-	$jobs{$jobid}{totalcores}     = $jobs{$jobid}{totaltasks};
+    my $jobdate = `$datecmd`; ## drw
+    if ($numcpu eq "-1") {
+	    $jobs{$jobid}{totalcores}     = $jobs{$jobid}{totaltasks};
+    }
+    else {
+        $jobs{$jobid}{totalcores} = $numcpu;
+    }
 	$jobs{$jobid}{queue}          = "local";
 	$jobs{$jobid}{detailedstatus} = "";
+	$jobs{$jobid}{queuedate} = $jobdate;
+	$jobs{$jobid}{dispatchdate} = $jobdate;
 }
 
 # add default node that is required for LML schema
