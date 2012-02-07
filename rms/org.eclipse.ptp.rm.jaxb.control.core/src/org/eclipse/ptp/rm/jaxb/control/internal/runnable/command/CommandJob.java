@@ -408,7 +408,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param vars
 	 *            variable map
 	 */
-	private void createDebugModel(String jobId, IResourceManager rm, IVariableMap vars) {
+	private IStatus createDebugModel(String jobId, IResourceManager rm, IVariableMap vars) {
 		IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
 
 		/*
@@ -429,20 +429,23 @@ public class CommandJob extends Job implements ICommandJob {
 		attrMgr = new AttributeManager();
 		attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
 
-		AttributeType attr = (AttributeType) vars.get(JAXBControlConstants.MPI_CORES);
+		Object attr = getAttributeValue(vars, JAXBControlConstants.MPI_PROCESSES);
 		if (attr != null) {
-			String numProcsStr = String.valueOf(attr.getValue());
-			int numProcs = Integer.parseInt(numProcsStr);
+			String numProcsStr = String.valueOf(attr);
+			int numProcs;
+			try {
+				numProcs = Integer.parseInt(numProcsStr);
+			} catch (NumberFormatException e) {
+				return new Status(IStatus.ERROR, JAXBControlCorePlugin.getUniqueIdentifier(),
+						Messages.CommandJob_UnableToDetermineTasksError);
+			}
 			BitSet procRanks = new BitSet(numProcs);
 			procRanks.set(0, numProcs, true);
 			job.addProcessesByJobRanks(procRanks, attrMgr);
 			prm.addJobs(null, Arrays.asList(job));
 		}
 
-		/*
-		 * Listen for job change events to cleanup model
-		 */
-		// rm.addJobListener(jobListener);
+		return Status.OK_STATUS;
 	}
 
 	/**
@@ -506,8 +509,6 @@ public class CommandJob extends Job implements ICommandJob {
 			} catch (InterruptedException ignored) {
 			}
 
-			progress.worked(20);
-
 			CoreException e = joinConsumers();
 
 			if (exit != 0) {
@@ -523,6 +524,30 @@ public class CommandJob extends Job implements ICommandJob {
 			active = false;
 		}
 		return Status.OK_STATUS;
+	}
+
+	/**
+	 * Look up the value of an attribute in the map. Checks if the attribute is linked and if so, returns the linked value instead.
+	 * 
+	 * @param vars
+	 *            map containing attributes
+	 * @param name
+	 *            name of attribute to look up
+	 * @return value of the attribute, or null if not found
+	 */
+	private Object getAttributeValue(IVariableMap vars, String name) {
+		AttributeType attr = (AttributeType) vars.get(name);
+		if (attr != null) {
+			String link = attr.getLinkValueTo();
+			if (link != null) {
+				Object linkVal = getAttributeValue(vars, link);
+				if (linkVal != null) {
+					return linkVal;
+				}
+			}
+			return attr.getValue();
+		}
+		return null;
 	}
 
 	/**
@@ -967,14 +992,14 @@ public class CommandJob extends Job implements ICommandJob {
 					}
 				}
 
-				if (status.isOK()) {
-					/*
-					 * Create the debug model if necessary
-					 */
-					if (launchMode.equals(ILaunchManager.DEBUG_MODE)) {
-						createDebugModel(jobStatus.getJobId(), rm, rmVarMap);
-					}
+				/*
+				 * Create the debug model if necessary
+				 */
+				if (status.isOK() && launchMode.equals(ILaunchManager.DEBUG_MODE)) {
+					status = createDebugModel(jobStatus.getJobId(), rm, rmVarMap);
+				}
 
+				if (status.isOK()) {
 					/*
 					 * Once job has started running, execute any post launch commands
 					 */
@@ -997,6 +1022,8 @@ public class CommandJob extends Job implements ICommandJob {
 							cmdJobs.add(job);
 						}
 					}
+				} else {
+					terminate();
 				}
 			} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
 				terminate();

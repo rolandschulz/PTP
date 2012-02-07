@@ -33,6 +33,8 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
@@ -128,6 +130,11 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		} catch (IOException e) {
 			StatusManager.getManager().handle(new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, e.getMessage(), e),
 					StatusManager.SHOW);
+		}
+		
+		SyncFileFilter customFilter = (SyncFileFilter) getMBSProperty(NewRemoteSyncProjectWizardPage.SYNC_FILE_FILTER_PROPERTY);
+		if (customFilter != null) {
+			SyncManager.saveFileFilter(project, customFilter);
 		}
 		monitor.done();
 	}

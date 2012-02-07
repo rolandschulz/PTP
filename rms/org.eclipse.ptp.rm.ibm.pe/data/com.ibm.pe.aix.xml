@@ -345,10 +345,11 @@
 			<choice>spmd,mpmd</choice>
 		</attribute>
 
-		<attribute name="MP_RESD_ATTR" type="boolean" translateBooleanAs="poe,no">
+		<attribute name="MP_RESD_ATTR" type="string">
 			<description>POE allocates nodes:</description>
 			<tooltip>Select for POE to allocate nodes. De-select to use hostfile {MP_RESD}
 			</tooltip>
+			<choice>,no,poe,yes</choice>
 		</attribute>
 
 		<attribute name="MP_TIMEOUT_ATTR" type="integer">
@@ -1621,6 +1622,21 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_PGMMODEL_ATTR#tooltip}</tooltip>
 					</widget>
+					
+					<!-- MP_RESD: POE allocates nodes -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_RESD_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="combo" readOnly="true" saveValueTo="MP_RESD_ATTR" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_RESD_ATTR#tooltip}</tooltip>
+					</widget>
 
 					<!-- MP_TIMEOUT: POE connection timeout -->
 					<widget type="label" style="SWT.LEFT">
@@ -1635,21 +1651,6 @@
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_TIMEOUT_ATTR#tooltip}</tooltip>
-					</widget>
-
-					<!-- MP_RESD: POE allocates nodes -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_RESD_ATTR#description}
-						</fixed-text>
-					</widget>
-					<widget type="checkbox" saveValueTo="MP_RESD_ATTR" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_RESD_ATTR#tooltip}</tooltip>
 					</widget>
 
 				</composite>

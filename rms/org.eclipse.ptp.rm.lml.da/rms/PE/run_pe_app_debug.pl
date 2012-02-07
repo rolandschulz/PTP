@@ -96,6 +96,7 @@ sub generate_routing_table {
 		chomp( $line = <CFG> );
 		if ( $line =~ /$patint$patbl;/ ) {
 			$ntasks = $1;
+			printf(OUT "%d\n", $ntasks);
 		}
 		while ( $line = <CFG> ) {
 			my ( $taskid, $nodeid );
