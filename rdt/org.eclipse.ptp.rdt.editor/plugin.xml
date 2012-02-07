@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point id="editorInfoProvider" name="%extension-point.name" schema="schema/editorInfoProvider.exsd"/>
+   <extension
+         id="org.eclipse.ptp.rdt.editor.remoteceditor"
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.ptp.internal.rdt.editor.RemoteCEditor"
+            contributorClass="org.eclipse.cdt.internal.ui.editor.CEditorActionContributor"
+            default="true"
+            icon="icons/view16/remoteccppeditortab.gif"
+            id="org.eclipse.ptp.rdt.ui.editor.CEditor"
+            name="%remoteEditor.name"
+            extensions="c,C,cc,cpp,cxx,c++,h,hh,hpp,hxx"
+            symbolicFontName="org.eclipse.cdt.ui.editors.textfont">
+            <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cSource"/>
+            <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cxxSource"/>
+            <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cxxHeader"/>
+            <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cHeader"/>
+            <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cSource"/>
+      </editor>
+   </extension>
+     <extension
+           point="org.eclipse.ui.popupMenus">
+        <viewerContribution
+            targetID="#RemoteCEditorRulerContext"
+            id="org.eclipse.ptp.rdt.ui.RemoteCEditorRulerActions">
+         <action
+               label="%AddTask.label"
+               helpContextId="org.eclipse.ui.AddTask_action_context"
+               class="org.eclipse.ui.texteditor.TaskRulerAction"
+               tooltip="%AddTask.tooltip"
+               menubarPath="add"
+               id="org.eclipse.ui.texteditor.TaskRulerAction">
+         </action>
+         <action
+               label="%AddBookmark.label"
+               helpContextId="org.eclipse.ui.bookmark_action_context"
+               class="org.eclipse.ui.texteditor.BookmarkRulerAction"
+               tooltip="%AddBookmark.tooltip"
+               menubarPath="add"
+               id="org.eclipse.ui.texteditor.BookmarkRulerAction">
+         </action>
+         <action
+               class="org.eclipse.debug.ui.actions.RulerBreakpointTypesActionDelegate"
+               id="org.eclipse.ptp.rdt.ui.editors.BreakpointTypesAction"
+               label="%BreakpointTypes.name"
+               menubarPath="debug"
+               style="pulldown">
+         </action>
+         <action
+               class="org.eclipse.cdt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
+               id="org.eclipse.ptp.rdt.ui.editors.EnableDisableBreakpointRulerActionDelegate"
+               label="%DisableBreakpoint.name"
+               menubarPath="debug">
+         </action>
+         <action
+               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+               id="org.eclipse.ptp.rdt.ui.editors.RulerToggleBreakpointAction"
+               label="%ToggleBreakpoint.name"
+               menubarPath="debug">
+         </action>
+      </viewerContribution>
+     </extension>
+     
+
+     <extension
+           point="org.eclipse.ui.editorActions">
+        <editorContribution
+              id="org.eclipse.ptp.rdt.ui.editors.RemoteCEditor.BreakpointRulerActions"
+              targetID="org.eclipse.ptp.rdt.ui.editor.CEditor">
+           <action
+                 actionID="RulerDoubleClick"
+                 class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+                 id="org.eclipse.ptp.rdt.ui.editors.RemoteCEditor.RulerToggleBreakpointAction"
+                 label="%ToggleBreakpointAction.name"
+                 style="push">
+           </action>
+        </editorContribution>
+     </extension>
+     
+</plugin>

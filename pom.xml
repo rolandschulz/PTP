@@ -73,6 +73,7 @@
 		<module>rdt/org.eclipse.ptp.rdt.core.remotejars</module>
 		<module>rdt/org.eclipse.ptp.rdt.core.stubs</module>
 		<module>rdt/org.eclipse.ptp.rdt.doc.user</module>
+		<module>rdt/org.eclipse.ptp.rdt.editor</module>
 		<module>rdt/org.eclipse.ptp.rdt.make.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.managedbuilder.gnu.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui</module>
@@ -105,6 +106,7 @@
 		<module>releng/org.eclipse.ptp.pldt.lapi-feature</module>
 		<module>releng/org.eclipse.ptp.pldt.upc-feature</module>
 		<module>releng/org.eclipse.ptp.rdt-feature</module>
+		<module>releng/org.eclipse.ptp.rdt.editor-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.remotejars-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.remotetools-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.sync-feature</module>
