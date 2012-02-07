@@ -77,7 +77,7 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 	public static final String DIRECTORY = "directory";//$NON-NLS-1$
 	public static final String MPI_CMD = "mpiCommand";//$NON-NLS-1$
 	public static final String MPI_ARGS = "mpiArgs";//$NON-NLS-1$
-	public static final String MPI_CORES = "mpiCores";//$NON-NLS-1$
+	public static final String MPI_PROCESSES = "mpiNumberOfProcesses";//$NON-NLS-1$
 	public static final String DEBUGGER_EXEC_PATH = "debuggerExecutablePath";//$NON-NLS-1$
 	public static final String DEBUGGER_ARGS = "debuggerArgs";//$NON-NLS-1$
 	public static final String PTP_DIRECTORY = "ptpDirectory";//$NON-NLS-1$

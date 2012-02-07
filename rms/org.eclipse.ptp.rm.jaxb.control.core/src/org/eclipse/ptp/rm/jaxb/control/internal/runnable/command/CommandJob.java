@@ -408,7 +408,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param vars
 	 *            variable map
 	 */
-	private void createDebugModel(String jobId, IResourceManager rm, IVariableMap vars) {
+	private IStatus createDebugModel(String jobId, IResourceManager rm, IVariableMap vars) {
 		IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
 
 		/*
@@ -429,20 +429,23 @@ public class CommandJob extends Job implements ICommandJob {
 		attrMgr = new AttributeManager();
 		attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
 
-		AttributeType attr = (AttributeType) vars.get(JAXBControlConstants.MPI_CORES);
+		AttributeType attr = (AttributeType) vars.get(JAXBControlConstants.MPI_PROCESSES);
 		if (attr != null) {
 			String numProcsStr = String.valueOf(attr.getValue());
-			int numProcs = Integer.parseInt(numProcsStr);
+			int numProcs;
+			try {
+				numProcs = Integer.parseInt(numProcsStr);
+			} catch (NumberFormatException e) {
+				return new Status(IStatus.ERROR, JAXBControlCorePlugin.getUniqueIdentifier(),
+						Messages.CommandJob_UnableToDetermineTasksError);
+			}
 			BitSet procRanks = new BitSet(numProcs);
 			procRanks.set(0, numProcs, true);
 			job.addProcessesByJobRanks(procRanks, attrMgr);
 			prm.addJobs(null, Arrays.asList(job));
 		}
 
-		/*
-		 * Listen for job change events to cleanup model
-		 */
-		// rm.addJobListener(jobListener);
+		return Status.OK_STATUS;
 	}
 
 	/**
@@ -505,8 +508,6 @@ public class CommandJob extends Job implements ICommandJob {
 				exit = process.waitFor();
 			} catch (InterruptedException ignored) {
 			}
-
-			progress.worked(20);
 
 			CoreException e = joinConsumers();
 
@@ -967,14 +968,14 @@ public class CommandJob extends Job implements ICommandJob {
 					}
 				}
 
-				if (status.isOK()) {
-					/*
-					 * Create the debug model if necessary
-					 */
-					if (launchMode.equals(ILaunchManager.DEBUG_MODE)) {
-						createDebugModel(jobStatus.getJobId(), rm, rmVarMap);
-					}
+				/*
+				 * Create the debug model if necessary
+				 */
+				if (status.isOK() && launchMode.equals(ILaunchManager.DEBUG_MODE)) {
+					status = createDebugModel(jobStatus.getJobId(), rm, rmVarMap);
+				}
 
+				if (status.isOK()) {
 					/*
 					 * Once job has started running, execute any post launch commands
 					 */
@@ -997,6 +998,8 @@ public class CommandJob extends Job implements ICommandJob {
 							cmdJobs.add(job);
 						}
 					}
+				} else {
+					terminate();
 				}
 			} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
 				terminate();
