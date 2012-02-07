@@ -10,6 +10,11 @@
 		wrapping text so messages don't get wrapped when reformatting -->
 	<control-data>
 
+		<!-- Required for debugger to determine number of processes to display -->
+		<attribute name="mpiNumberOfProcesses" type="integer">
+			<link-value-to>MP_PROCS</link-value-to>
+		</attribute>
+		
 		<!-- Tasks tab attributes -->
 		<attribute name="MP_HOSTFILE_ATTR" type="string">
 			<description>Host list file:</description>

@@ -429,9 +429,9 @@ public class CommandJob extends Job implements ICommandJob {
 		attrMgr = new AttributeManager();
 		attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
 
-		AttributeType attr = (AttributeType) vars.get(JAXBControlConstants.MPI_PROCESSES);
+		Object attr = getAttributeValue(vars, JAXBControlConstants.MPI_PROCESSES);
 		if (attr != null) {
-			String numProcsStr = String.valueOf(attr.getValue());
+			String numProcsStr = String.valueOf(attr);
 			int numProcs;
 			try {
 				numProcs = Integer.parseInt(numProcsStr);
@@ -524,6 +524,30 @@ public class CommandJob extends Job implements ICommandJob {
 			active = false;
 		}
 		return Status.OK_STATUS;
+	}
+
+	/**
+	 * Look up the value of an attribute in the map. Checks if the attribute is linked and if so, returns the linked value instead.
+	 * 
+	 * @param vars
+	 *            map containing attributes
+	 * @param name
+	 *            name of attribute to look up
+	 * @return value of the attribute, or null if not found
+	 */
+	private Object getAttributeValue(IVariableMap vars, String name) {
+		AttributeType attr = (AttributeType) vars.get(name);
+		if (attr != null) {
+			String link = attr.getLinkValueTo();
+			if (link != null) {
+				Object linkVal = getAttributeValue(vars, link);
+				if (linkVal != null) {
+					return linkVal;
+				}
+			}
+			return attr.getValue();
+		}
+		return null;
 	}
 
 	/**
