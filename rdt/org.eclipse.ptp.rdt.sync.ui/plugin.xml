@@ -210,10 +210,13 @@
                <iterate
                      ifEmpty="false"
                      operator="and">
-                  <test
-                        property="org.eclipse.core.resources.projectNature"
-                        value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
-                  </test>
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+                     </test>
+                  </adapt>
                </iterate>
             </visibleWhen>
             <dynamic
@@ -233,14 +236,14 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <or>
-                        <instanceof
-                              value="org.eclipse.core.resources.IFolder">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.core.resources.IFile">
-                        </instanceof>
-                     </or>
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <not>
+                           <instanceof
+                                 value="org.eclipse.core.resources.IProject">
+                           </instanceof>
+                        </not>
+                     </adapt>
                   </iterate>
                </visibleWhen>
             </command>
@@ -257,14 +260,13 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <or>
-                        <instanceof
-                              value="org.eclipse.core.resources.IFolder">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.core.resources.IFile">
-                        </instanceof>
-                     </or>
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <not>
+                           <instanceof
+                                 value="org.eclipse.core.resources.IProject">
+                           </instanceof></not>
+                     </adapt>
                   </iterate>
                </visibleWhen>
             </command>

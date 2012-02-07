@@ -93,8 +93,16 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				}
 
 				for (Object element : sel.toArray()) {
-					assert((element instanceof IFolder) || (element instanceof IFile));
-					IPath path = ((IResource) element).getProjectRelativePath();
+					IResource selection;
+					if (element instanceof IResource) {
+						selection = (IResource) element;
+					} else if (element instanceof IAdaptable) {
+						selection = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+					} else {
+						RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_6);
+						continue;
+					}
+					IPath path = selection.getProjectRelativePath();
 					sff.addPattern(new PathResourceMatcher(path), type);
 				}
 				SyncManager.saveFileFilter(project, sff);
@@ -126,7 +134,8 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 
 		IProject project = this.getProject();
 		if (project == null) {
-			RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_0);
+			// Disable error message - this happens routinely for non-IResource selections
+			// RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_0);
 			return;
 		}
 
