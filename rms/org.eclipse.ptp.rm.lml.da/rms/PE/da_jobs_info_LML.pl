@@ -10,7 +10,7 @@ use strict;
 
 my $patint = "([\\+\\-\\d]+)";      # Pattern for Integer number
 my $patfp  = "([\\+\\-\\d.E]+)";    # Pattern for Floating Point number
-my $patwrd = "([\^\\s]+)";          # Pattern for Work (all noblank characters)
+my $patwrd = "([\^\\s]+)";          # Pattern for Word (all noblank characters)
 my $patbl  = "\\s*";                # Pattern for blank space (variable length)
 my $patnode = "([\^\\s]+(\\.[\^\\s]*)*)";    # Pattern for domain name (a.b.c)
 
@@ -54,26 +54,32 @@ my %mapping_job = (
 	"etime"          => "wall",
 	"id"             => "",
 	"spec"           => "",
-    "queuedate"      => "queuedate",
-    "dispatchdate"   => "dispatchdate",
+	"queuedate"      => "queuedate",
+	"dispatchdate"   => "dispatchdate",
 
 	# unknown attributes
 );
 
-my $cmd = "ps x -o pid,user,group,etime,command | grep poe | grep -v grep";
+my $cmd     = "ps x -o pid,user,group,etime,command | grep poe | grep -v grep";
 my $datecmd = "date '+%D %T'";
 
 if ( open( IN, "$cmd 2>&1 |" ) ) {
 	while ( $line = <IN> ) {
 		chomp($line);
-		if ( $line =~ /$patbl$patint$patbl$patwrd$patbl$patwrd$patbl$patwrd/ ) {
-			my ( $jobid, $user, $group, $etime ) = ( $1, $2, $3, $4 );
-			$jobs{$jobid}{step}   = $jobid;
-			$jobs{$jobid}{status} = "RUNNING";
-			$jobs{$jobid}{user}   = $user;
-			$jobs{$jobid}{group}  = $group;
-			$jobs{$jobid}{etime}  = $etime;
-			&check_attach_cfg($jobid);
+		if ( $line =~
+			/$patbl$patint$patbl$patwrd$patbl$patwrd$patbl$patwrd$patbl$patwrd/
+		  )
+		{
+			my ( $jobid, $user, $group, $etime, $command ) =
+			  ( $1, $2, $3, $4, $5 );
+			if ( $command eq "poe" ) {
+				$jobs{$jobid}{step}   = $jobid;
+				$jobs{$jobid}{status} = "RUNNING";
+				$jobs{$jobid}{user}   = $user;
+				$jobs{$jobid}{group}  = $group;
+				$jobs{$jobid}{etime}  = $etime;
+				&check_attach_cfg($jobid);
+			}
 		}
 	}
 	close(IN);
@@ -82,38 +88,38 @@ if ( open( IN, "$cmd 2>&1 |" ) ) {
 # determine number of cores
 my $numcpu;
 my $os = `uname -s`;
-if ($os eq "Aix") {
-    $numcpu = `lscfg | grep proc | wc -l`;
-}
-else {
-    $numcpu = `grep -c ^processor /proc/cpuinfo`;
+if ( $os eq "Aix" ) {
+	$numcpu = `lscfg | grep proc | wc -l`;
+} else {
+	$numcpu = `grep -c ^processor /proc/cpuinfo`;
 }
 
-if ($? != 0) {
-    $numcpu = "-1";
+if ( $? != 0 ) {
+	$numcpu = "-1";
 }
 
 # add manatory attributes to jobs
 foreach $jobid ( sort( keys(%jobs) ) ) {
-    my $jobdate = `$datecmd`; ## drw
-    if ($numcpu eq "-1") {
-	    $jobs{$jobid}{totalcores}     = $jobs{$jobid}{totaltasks};
-    }
-    else {
-        $jobs{$jobid}{totalcores} = $numcpu;
-    }
+	my $jobdate = `$datecmd`;
+	if ( $numcpu eq "-1" ) {
+		$jobs{$jobid}{totalcores} = $jobs{$jobid}{totaltasks};
+	} else {
+		$jobs{$jobid}{totalcores} = $numcpu;
+	}
 	$jobs{$jobid}{queue}          = "local";
 	$jobs{$jobid}{detailedstatus} = "";
-	$jobs{$jobid}{queuedate} = $jobdate;
-	$jobs{$jobid}{dispatchdate} = $jobdate;
+	$jobs{$jobid}{queuedate}      = $jobdate;
+	$jobs{$jobid}{dispatchdate}   = $jobdate;
 }
 
 # add default node that is required for LML schema
-if(!keys(%nodes)) {
-    # set default
-    $nodeid=`uname -n`;chomp($nodeid);
-    $nodes{$nodeid}{id}       = $nodeid;
-    $nodes{$nodeid}{state}    = "Running";
+if ( !keys(%nodes) ) {
+
+	# set default
+	$nodeid = `uname -n`;
+	chomp($nodeid);
+	$nodes{$nodeid}{id}    = $nodeid;
+	$nodes{$nodeid}{state} = "Running";
 }
 
 # add mandatory attributes for nodes. This should be obtained from the nodes

@@ -87,6 +87,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 
 	private final IProject project;
 	private final SyncFileFilter filter;
+	private final FilterSaveTarget saveTarget;
 	private CheckboxTreeViewer treeViewer;
 	private Table patternTable;
 	private Button showRemoteButton;
@@ -108,33 +109,47 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	private Button okButton;
 	private final Map<String, ResourceMatcher> specialFilterNameToPatternMap = new HashMap<String, ResourceMatcher>();
 
-	/**
-	 * Default constructor creates a preference page and should never be called by clients. Instead, use the "open" method to
-	 * create a standalone GUI.
-	 */
-	public SyncFileFilterPage() {
-		this(null, true);
+	private enum FilterSaveTarget {
+		NONE, DEFAULT, PROJECT
 	}
 
 	/**
-	 * Constructor for a new tree. If project is null, the default filter will be used. Otherwise, the passed project's filter is
-	 * used.
+	 * Default constructor creates a preference page to alter the default filter and should never be called by clients. Instead,
+	 * use the open methods to create a standalone GUI.
+	 */
+	public SyncFileFilterPage() {
+		this(null, true, null, null);
+	}
+
+	/**
+	 * Constructor for a new tree. Behavior of the page varies based on whether arguments are null and whether isPreferencePage
+	 * is set. Specifically, whether the file view is shown, how or if the filter is saved, and if preference page
+	 * functionality is available. See comments for the default constructor and static open methods for details.
 	 *
 	 * @param p project
 	 * @param isPreferencePage
+	 * @param targetFilter
 	 */
-	private SyncFileFilterPage(IProject p, boolean isPreferencePage) {
-		super(null);
+	private SyncFileFilterPage(IProject p, boolean isPreferencePage, SyncFileFilter targetFilter, Shell parent) {
+		super(parent);
 		project = p;
 		if (isPreferencePage) {
 			preferencePage = new SyncFilePreferencePage();
 		} else {
 			preferencePage = null;
 		}
-		if (project == null) {
-			filter = SyncManager.getDefaultFileFilter();
+		
+		if (targetFilter == null) {
+			if (project == null) {
+				filter = SyncManager.getDefaultFileFilter();
+				saveTarget = FilterSaveTarget.DEFAULT;
+			} else {
+				filter = SyncManager.getFileFilter(project);
+				saveTarget = FilterSaveTarget.PROJECT;
+			}
 		} else {
-			filter = SyncManager.getFileFilter(project);
+			filter = targetFilter;
+			saveTarget = FilterSaveTarget.NONE;
 		}
 
 		// Only one special (not path or regex) filter at the moment. If more are added later, we need a more sophisticated
@@ -144,16 +159,41 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		
 		windowWidth = display.getBounds().width / 3;
 		viewHeight = display.getBounds().height / 5;
+		this.setReturnCode(CANCEL);
 	}
 
 	/**
 	 * Open a standalone GUI to change the filter of the passed project. Pass null to alter the default filter.
 	 *
-	 * @param p project
+	 * @param p
+	 * 			project
+	 * @param parent
+	 * 			the parent shell
 	 * @return open return code
-	 */ 
-	public static int open(IProject p) {
-		return new SyncFileFilterPage(p, false).open();
+	 */
+	public static int open(IProject p, Shell parent) {
+		return new SyncFileFilterPage(p, false, null, parent).open();
+	}
+	
+	/**
+	 * Open a standalone GUI to change the passed filter. This is useful for the new project wizard and other places where the
+	 * filter does not yet have a context. This method blocks, as it assumes the client wants to wait for the filter changes.
+	 *
+	 * The client most likely should pass a copy of the filter to be altered, and then check the return code for OK or Cancel
+	 * to decide if the copy should be kept.
+	 * 
+	 * Passing null alters the default filter
+	 * 
+	 * @param f
+	 * 			a sync file filter that will be modified
+	 * @param parent
+	 * 			the parent shell
+	 * @return open return code
+	 */
+	public static int openBlocking(SyncFileFilter f, Shell parent) {
+		SyncFileFilterPage page = new SyncFileFilterPage(null, false, f, parent);
+		page.setBlockOnOpen(true);
+		return page.open();
 	}
 
 	/**
@@ -414,7 +454,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			cancelButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 			cancelButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
-					getShell().close();
+					SyncFileFilterPage.this.close();
 				}
 			});
 
@@ -424,12 +464,16 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			okButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 			okButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
-					if (project == null) {
+					if (saveTarget == FilterSaveTarget.DEFAULT) {
 						SyncManager.saveDefaultFileFilter(filter);
-					} else {
+					} else if (saveTarget == FilterSaveTarget.PROJECT) {
+						assert(project != null);
 						SyncManager.saveFileFilter(project, filter);
+					} else {
+						// Nothing to do
 					}
-					getShell().close();
+					SyncFileFilterPage.this.setReturnCode(OK);
+					SyncFileFilterPage.this.close();
 				}
 			});
 		}

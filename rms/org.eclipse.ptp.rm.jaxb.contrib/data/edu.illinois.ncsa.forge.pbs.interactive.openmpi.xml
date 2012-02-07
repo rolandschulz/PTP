@@ -21,7 +21,7 @@
 		</property>
 		<property name="queues" visible="false"/>
 		<property name="mpiPrefix" visible="false">
-			<default>${ptp_rm:mpiCommand#value} -np ${ptp_rm:mpiCores#value}</default>
+			<default>${ptp_rm:mpiCommand#value} -np ${ptp_rm:mpiNumberOfProcesses#value}</default>
 		</property>
 		<attribute name="Account_Name" type="string">
 			<description>Account to which to charge this job.</description>
@@ -31,7 +31,7 @@
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
 		</attribute>
-		<attribute name="mpiCores" min="1" type="integer">
+		<attribute name="mpiNumberOfProcesses" min="1" type="integer">
 			<description>the '-np' value [usually equals Nodes*ppn]</description>
 		</attribute>
 		<attribute name="Account_Name" type="string">
@@ -135,7 +135,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<arg isUndefinedIfMatches="-A">-A ${ptp_rm:Account_Name#value}</arg>
 			<arg>-V</arg>
 			<input>cd ${ptp_rm:executableDirectory#value} &amp;&amp; perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</input>
-			<input isUndefinedIfMatches="-np">-np ${ptp_rm:mpiCores#value}</input>
+			<input isUndefinedIfMatches="-np">-np ${ptp_rm:mpiNumberOfProcesses#value}</input>
 			<input>-hostfile $PBS_NODEFILE</input>
 			<input>${ptp_rm:debuggerExecutablePath#value}</input>
 			<environment name="OMPI_MCA_btl_openib_flags" value="1"/>
@@ -388,7 +388,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>MPI Number of Cores: </fixed-text>
 					</widget>
-					<widget type="spinner" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCores">
+					<widget type="spinner" style="SWT.BORDER" readOnly="true" saveValueTo="mpiNumberOfProcesses">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
 						</layout-data>
@@ -397,7 +397,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${ptp_rm:mpiCores#description}</fixed-text>
+						<fixed-text>${ptp_rm:mpiNumberOfProcesses#description}</fixed-text>
 					</widget>
 				</composite>
 			</dynamic>

@@ -17,6 +17,7 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.sync.ui.messages.messages"; //$NON-NLS-1$
 	public static String NewRemoteSyncProjectWizard_description;
 	public static String NewRemoteSyncProjectWizard_title;
+	public static String NewRemoteSyncProjectWizardPage_0;
 	public static String NewRemoteSyncProjectWizardPage_syncProvider;
 	public static String WizardProjectConversion_windowLabel;
 	public static String ConvertFromCToSyncProjectWizardPage_0;
@@ -61,6 +62,7 @@ public class Messages extends NLS {
 	public static String SyncMenuOperation_3;
 	public static String SyncMenuOperation_4;
 	public static String SyncMenuOperation_5;
+	public static String SyncMenuOperation_6;
 	public static String BRPPage_RemoteProviderLabel;
 	public static String BRPPage_ConnectionLabel;
 	public static String BRPPage_RootLocation;

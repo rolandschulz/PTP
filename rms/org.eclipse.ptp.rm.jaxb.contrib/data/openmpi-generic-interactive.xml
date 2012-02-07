@@ -17,7 +17,7 @@
 		<property name="local_prefix" visible="false" type="string">
 			<default>/usr/local/mpi/bin/</default>
 		</property>
-		<attribute name="mpiCores" min="1" type="integer"/>
+		<attribute name="mpiNumberOfProcesses" min="1" type="integer"/>
 		<attribute name="byNodeOption" type="boolean"/>
 		<attribute name="bySlotOption" type="boolean"/>
 		<attribute name="noOversubscribeOption" type="boolean"/>
@@ -105,7 +105,7 @@
 			<arg>${ptp_rm:local_prefix#value}mpirun</arg>
 			<arg>--report-pid</arg>
 			<arg>-np</arg>
-			<arg>${ptp_rm:mpiCores#value}</arg>
+			<arg>${ptp_rm:mpiNumberOfProcesses#value}</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
 			<arg>${ptp_rm:progArgs#value}</arg>
 			<stdout-parser delim="\n">
@@ -138,7 +138,7 @@
 		</submit-interactive>
 		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true">
 			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</arg>
-			<arg>-np ${ptp_rm:mpiCores#value}</arg>
+			<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
@@ -183,7 +183,7 @@
 					<widget type="label" style="SWT.LEFT">
 						<fixed-text>Number of processes:</fixed-text>
 					</widget>
-					<widget type="spinner" style="SWT.BORDER" readOnly="false" saveValueTo="mpiCores">
+					<widget type="spinner" style="SWT.BORDER" readOnly="false" saveValueTo="mpiNumberOfProcesses">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.CENTER"
 								grabExcessHorizontal="false" grabExcessVertical="false"/>
