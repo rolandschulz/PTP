@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="tar">
 	<target name="tar" description="Creates the DA payload">
+		<delete file="lml-driver.tar" />
 		<tar destfile="lml-driver.tar" basedir="../org.eclipse.ptp.rm.lml.da" />
 	</target>
 </project>
