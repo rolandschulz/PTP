@@ -37,7 +37,8 @@ Require-Bundle: org.eclipse.cdt.core;bundle-version="5.0.2",
  org.eclipse.ptp.services.core;bundle-version="1.0.0",
  org.eclipse.ptp.services.ui;bundle-version="1.0.0",
  org.eclipse.debug.ui,
- org.eclipse.cdt.debug.ui
+ org.eclipse.cdt.debug.ui,
+ org.eclipse.ptp.rdt.editor;bundle-version="2.0.0"
 Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.internal.rdt.ui;x-internal:=true,
  org.eclipse.ptp.internal.rdt.ui.actions;x-internal:=true,
