@@ -96,7 +96,8 @@ public class SyncFileFilter {
 	 * Add the common, default list of paths to be filtered.
 	 */
 	public void addDefaults() {
-		this.addPattern(new BinaryResourceMatcher(), PatternType.EXCLUDE);
+		// In bug 370491, we decided not to filter binaries by default
+		// this.addPattern(new BinaryResourceMatcher(), PatternType.EXCLUDE);
 		this.addPattern(new PathResourceMatcher(new Path(".project")), PatternType.EXCLUDE); //$NON-NLS-1$
 		this.addPattern(new PathResourceMatcher(new Path(".cproject")), PatternType.EXCLUDE); //$NON-NLS-1$
 		this.addPattern(new PathResourceMatcher(new Path(".settings")), PatternType.EXCLUDE); //$NON-NLS-1$
