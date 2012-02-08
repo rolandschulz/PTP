@@ -443,9 +443,11 @@ public class CommandJob extends Job implements ICommandJob {
 			procRanks.set(0, numProcs, true);
 			job.addProcessesByJobRanks(procRanks, attrMgr);
 			prm.addJobs(null, Arrays.asList(job));
+			return Status.OK_STATUS;
 		}
 
-		return Status.OK_STATUS;
+		return new Status(IStatus.ERROR, JAXBControlCorePlugin.getUniqueIdentifier(),
+				Messages.CommandJob_UnableToDetermineTasksError);
 	}
 
 	/**
