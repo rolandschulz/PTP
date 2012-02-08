@@ -11,7 +11,7 @@
 
 		<!-- Required for debugger to determine number of processes to display -->
 		<attribute name="mpiNumberOfProcesses" type="integer">
-			<link-value-to>MP_PROCS</link-value-to>
+			<link-value-to>MP_PROCS_ATTR</link-value-to>
 		</attribute>
 
 		<!-- Tasks tab attributes -->
