@@ -88,6 +88,7 @@
 		<module>rdt/org.eclipse.ptp.rdt.xlc</module>
 		<module>releng/org.eclipse.ptp</module>
 		<module>releng/org.eclipse.ptp.aix.ppc</module>
+		<module>releng/org.eclipse.ptp.cdt.compilers-feature</module>
 		<module>releng/org.eclipse.ptp.core-feature</module>
 		<module>releng/org.eclipse.ptp.etfw-feature</module>
 		<module>releng/org.eclipse.ptp.etfw.ppw-feature</module>
@@ -104,6 +105,7 @@
 		<module>releng/org.eclipse.ptp.pldt-feature</module>
 		<module>releng/org.eclipse.ptp.pldt.fortran-feature</module>
 		<module>releng/org.eclipse.ptp.pldt.lapi-feature</module>
+		<module>releng/org.eclipse.ptp.pldt.openacc-feature</module>
 		<module>releng/org.eclipse.ptp.pldt.upc-feature</module>
 		<module>releng/org.eclipse.ptp.rdt-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.editor-feature</module>
@@ -170,6 +172,7 @@
 		<module>rms/org.eclipse.ptp.rm.slurm.proxy</module>
 		<module>rms/org.eclipse.ptp.rm.slurm.ui</module>
 		<module>rms/org.eclipse.ptp.rm.ui</module>
+		<module>tools/cdt/org.eclipse.ptp.cdt.compilers.core</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.doc.user</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.feedback</module>
@@ -189,6 +192,7 @@
 		<module>tools/pldt/org.eclipse.ptp.pldt.mpi.analysis.cdt</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.mpi.core</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.mpi.fortran</module>
+		<module>tools/pldt/org.eclipse.ptp.pldt.openacc</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.openmp.analysis</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.openmp.core</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.openmp.fortran</module>
