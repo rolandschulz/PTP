@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -74,6 +74,7 @@ import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
+import org.eclipse.ptp.rdt.ui.preferences.PreferenceConstants;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RSECIndexServiceProvider;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
@@ -277,13 +278,18 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 			}
 			
 			if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled() || smonitor.isNetworkDown()) { //$NON-NLS-1$//$NON-NLS-2$
+				int maxErrors = UIPlugin.getDefault().getPreferenceStore().getInt(PreferenceConstants.INDEXER_ERRORS_DISPLAY_LIMIT);
+				int errorsReported = 0;
 				for (int i = 0; i < status.getNestedSize(); i ++ ){
+					if (errorsReported >= maxErrors)
+						break;
 					DataElement element = status.get(i);
 					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
 			    		String message = element.getAttribute(DE.A_NAME)+ ".  " ;  //$NON-NLS-1$
 			    		for (int j = 0; j < fErrorMessages.size(); j++) {
 			    			if (message.indexOf(fErrorMessages.get(j)) > 0) {					    		
 					    		String msg = reportProblem(scope, message);
+					    		errorsReported++;
 					    		RDTLog.logWarning(msg);
 			    			}
 			    		}
@@ -502,13 +508,18 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
             }
 			
 			if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled() || smonitor.isNetworkDown()) { //$NON-NLS-1$//$NON-NLS-2$
+				int maxErrors = UIPlugin.getDefault().getPreferenceStore().getInt(PreferenceConstants.INDEXER_ERRORS_DISPLAY_LIMIT);
+				int errorsReported = 0;
 				for (int i = 0; i < status.getNestedSize(); i ++ ){
+					if (errorsReported >= maxErrors)
+						break;
 					DataElement element = status.get(i);
 					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
 						String message = element.getAttribute(DE.A_NAME)+ ".  " ;  //$NON-NLS-1$
 			    		for (int j = 0; j < fErrorMessages.size(); j++) {
 			    			if (message.indexOf(fErrorMessages.get(j)) > 0) {					    		
 					    		String msg = reportProblem(scope, message);
+					    		errorsReported++;
 					    		RDTLog.logWarning(msg);
 			    			}
 			    		}

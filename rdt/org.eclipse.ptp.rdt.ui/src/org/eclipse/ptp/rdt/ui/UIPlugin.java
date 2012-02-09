@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rdt.ui.serviceproviders.IndexLocationChangeListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -29,7 +30,7 @@ import org.osgi.framework.BundleContext;
  * 
  * 
  */
-public class UIPlugin extends Plugin {
+public class UIPlugin extends AbstractUIPlugin {
 
 	private static UIPlugin fInstance = null;
 

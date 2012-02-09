@@ -815,4 +815,16 @@
               class="org.eclipse.ptp.internal.rdt.ui.editor.RemoteCEditorInfoProvider">
         </editorInfoProvider>
      </extension> 
+     <extension
+           point="org.eclipse.ui.preferencePages">
+        <page
+              class="org.eclipse.ptp.rdt.ui.preferences.RemoteDevelopmentPreferencePage"
+              id="org.eclipse.ptp.rdt.ui.RemoteDevPreferencePage"
+              name="%RemoteDevPrefPage.name">
+        </page>
+     </extension> 
+     <extension
+           point="org.eclipse.core.runtime.preferences">
+           <initializer class="org.eclipse.ptp.rdt.ui.preferences.PreferenceInitializer"/>
+     </extension>
 </plugin>
