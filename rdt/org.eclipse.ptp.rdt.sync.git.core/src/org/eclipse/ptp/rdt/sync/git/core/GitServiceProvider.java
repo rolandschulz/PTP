@@ -397,7 +397,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public Set<IPath> getMergeConflictFiles() {
 		try {
-			this.initConnection(null);
+			if (fSyncConnection == null) {
+				fSyncConnection = new GitRemoteSyncConnection(this.getProject(), this.getRemoteConnection(),
+						this.getProject().getLocation().toString(), this.getLocation(), SyncManager.getDefaultFileFilter(), null);
+			}
 		} catch (RemoteSyncException e) {
 			try {
 				this.handleRemoteSyncException(e, SyncFlag.FORCE);
@@ -415,7 +418,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public String[] getMergeConflictParts(IFile file) {
 		try {
-			this.initConnection(null);
+			if (fSyncConnection == null) {
+				fSyncConnection = new GitRemoteSyncConnection(this.getProject(), this.getRemoteConnection(),
+						this.getProject().getLocation().toString(), this.getLocation(), SyncManager.getDefaultFileFilter(), null);
+			}
 		} catch (RemoteSyncException e) {
 			try {
 				this.handleRemoteSyncException(e, SyncFlag.FORCE);
@@ -426,13 +432,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 		return fSyncConnection.getMergeConflictParts(file);
 	}
-	
-	private void initConnection(IProgressMonitor monitor) throws RemoteSyncException {
-		if (fSyncConnection == null) {
-			fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation()
-					.toString(), this.getLocation(), new FileFilter(), monitor);
-		}
-	}
+
 	/**
 	 * Handle sync errors appropriately. Currently, this function only handles forced sync errors by displaying them to the user.
 	 * Non-forced syncs are called by the UI, so errors are thrown for the UI to handle.
