@@ -788,7 +788,7 @@
 		</attribute>
 
 		<!-- Invocation command definition -->
-		<submit-interactive name="POE command" waitForId="true" keepOpen="true">
+		<submit-interactive name="POE command" waitForId="true" keepOpen="true" directory="${ptp_rm:executableDirectory#value}">
 			<arg>perl</arg>
 			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app.pl</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
@@ -941,7 +941,7 @@
 		</submit-interactive>
 		
 		<!-- Invocation command definition -->
-		<submit-interactive-debug name="POE command" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true">
+		<submit-interactive-debug name="POE command" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true" >
 			<arg>perl</arg>
 			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app_debug.pl</arg>
 			<arg>poe</arg>
