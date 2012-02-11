@@ -52,8 +52,6 @@ public class RemoteServicesDelegate {
 	private IRemoteConnection localConnection;
 	private IRemoteFileManager remoteFileManager;
 	private IRemoteFileManager localFileManager;
-	private URI localHome;
-	private URI remoteHome;
 
 	/**
 	 * @param remoteServicesId
@@ -79,7 +77,10 @@ public class RemoteServicesDelegate {
 	}
 
 	public URI getLocalHome() {
-		return localHome;
+		if (localFileManager != null) {
+			return localFileManager.toURI(localConnection.getWorkingDirectory());
+		}
+		return null;
 	}
 
 	public IRemoteServices getLocalServices() {
@@ -99,7 +100,10 @@ public class RemoteServicesDelegate {
 	}
 
 	public URI getRemoteHome() {
-		return remoteHome;
+		if (remoteFileManager != null) {
+			return remoteFileManager.toURI(remoteConnection.getWorkingDirectory());
+		}
+		return null;
 	}
 
 	public IRemoteServices getRemoteServices() {
@@ -107,14 +111,15 @@ public class RemoteServicesDelegate {
 	}
 
 	/**
-	 * On the basis of the passed in identifiers, constructs the local and
-	 * remote services, connection manager, connection, file manager and home
-	 * URIs.
+	 * On the basis of the passed in identifiers, constructs the local and remote services, connection manager, connection, file
+	 * manager and home URIs.
 	 * 
 	 * @param monitor
 	 * @throws CoreException
 	 */
 	public void initialize(IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 2);
+
 		/*
 		 * could happen on shutdown
 		 */
@@ -134,7 +139,7 @@ public class RemoteServicesDelegate {
 			}
 
 			if (remoteServicesId != null) {
-				remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, monitor);
+				remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, progress.newChild(1));
 				if (remoteServices != null) {
 					remoteConnectionManager = remoteServices.getConnectionManager();
 					if (remoteConnectionManager != null) {
@@ -150,14 +155,20 @@ public class RemoteServicesDelegate {
 				remoteConnection = localConnection;
 				remoteFileManager = localFileManager;
 			}
-			if (localFileManager != null) {
-				localHome = localFileManager.toURI(localConnection.getWorkingDirectory());
-			}
-			if (remoteFileManager != null) {
-				remoteHome = remoteFileManager.toURI(remoteConnection.getWorkingDirectory());
+			/*
+			 * Bug 370775 - need to open connection before obtaining working directory otherwise root ("/") will always be returned.
+			 * This might cause problems if the connection to the target machine can't be opened, however there is a progress
+			 * monitor that the user can cancel if this happens.
+			 */
+			if (!remoteConnection.isOpen()) {
+				remoteConnection.open(progress.newChild(1));
 			}
 		} catch (Throwable t) {
 			throw newException("RemoteServicesDelegate.initialize " + remoteServicesId + COSP + remoteConnection, t); //$NON-NLS-1$
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
 	}
 
@@ -171,8 +182,7 @@ public class RemoteServicesDelegate {
 	 * @param target
 	 *            destination file
 	 * @param mkParent
-	 *            EFS.NONE = mkdir -p on the parent directory; EFS.SHALLOW =
-	 *            mkdir parent; UNDEFINED = no mkdir
+	 *            EFS.NONE = mkdir -p on the parent directory; EFS.SHALLOW = mkdir parent; UNDEFINED = no mkdir
 	 * @param progress
 	 * @throws CoreException
 	 */
@@ -207,8 +217,7 @@ public class RemoteServicesDelegate {
 	}
 
 	/**
-	 * Checks for existence of file. If it does exist, tests to see if it is
-	 * stable by checking size after the given timeout.
+	 * Checks for existence of file. If it does exist, tests to see if it is stable by checking size after the given timeout.
 	 * 
 	 * @param manager
 	 *            for resource where file is located
@@ -217,8 +226,7 @@ public class RemoteServicesDelegate {
 	 * @param intervalInSecs
 	 *            time after which to check size of file again
 	 * @param progress
-	 * @return true if file exists and is not being written to over the given
-	 *         interval.
+	 * @return true if file exists and is not being written to over the given interval.
 	 */
 	public static boolean isStable(IRemoteFileManager manager, String path, int intervalInSecs, IProgressMonitor progress)
 			throws CoreException {
