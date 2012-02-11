@@ -9,17 +9,15 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.launch;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled;
@@ -41,13 +39,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 /**
- * Implementation of the parent tab. It displays the children inside the tab
- * folder, and relays updates to them.<br>
+ * Implementation of the parent tab. It displays the children inside the tab folder, and relays updates to them.<br>
  * <br>
- * The JAXB data subtree for building tabs, remote services delegate, Script (if
- * any), update handler and launch configuration variable map (environment built
- * from the resource manager environment) are held by the parent and accessed by
- * the child tabs.
+ * The JAXB data subtree for building tabs, remote services delegate, Script (if any), update handler and launch configuration
+ * variable map (environment built from the resource manager environment) are held by the parent and accessed by the child tabs.
  * 
  * @author arossi
  */
@@ -111,11 +106,8 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	/*
 	 * No composites or controls are specific to the parent. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#createControl
-	 * (org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * @see org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#createControl (org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	@Override
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
@@ -129,14 +121,11 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	}
 
 	/*
-	 * Delegates to all registered listeners, which then call
-	 * handleContentsChanged. The ResourceTab ContentsChangedListener is always
-	 * included here, and this triggers its updateButtons and performApply
-	 * methods, which then propagates down to the child tabs. (non-Javadoc)
+	 * Delegates to all registered listeners, which then call handleContentsChanged. The ResourceTab ContentsChangedListener is
+	 * always included here, and this triggers its updateButtons and performApply methods, which then propagates down to the child
+	 * tabs. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab
-	 * #fireContentsChanged()
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab #fireContentsChanged()
 	 */
 	@Override
 	public void fireContentsChanged() {
@@ -158,8 +147,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	}
 
 	/**
-	 * @return launch tab environment map (built from the resource manager
-	 *         environment)
+	 * @return launch tab environment map (built from the resource manager environment)
 	 */
 	public LCVariableMap getLCMap() {
 		return lcMap;
@@ -182,8 +170,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	}
 
 	/**
-	 * @return handler responsible for notifying all widgets to refresh their
-	 *         values from the launch tab environment map
+	 * @return handler responsible for notifying all widgets to refresh their values from the launch tab environment map
 	 */
 	public ValueUpdateHandler getUpdateHandler() {
 		return updateHandler;
@@ -197,51 +184,40 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	}
 
 	/*
-	 * Rebuilds the launch tab environment map, and clears the controls
-	 * registered with the update handler. This is necessary because on calls to
-	 * this method subsequent to the first, the widgets it contained will have
-	 * been disposed. (non-Javadoc)
+	 * Rebuilds the launch tab environment map, and clears the controls registered with the update handler. This is necessary
+	 * because on calls to this method subsequent to the first, the widgets it contained will have been disposed. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#initializeFrom
-	 * (org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue,
+	 * @see org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#initializeFrom (org.eclipse.swt.widgets.Control,
+	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.elements.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public RMLaunchValidation initializeFrom(Control control, final IResourceManager rm, IPQueue queue,
 			final ILaunchConfiguration configuration) {
 		if (!voidRMConfig) {
-			Job j = new Job(Messages.TabInitialization) {
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					try {
-						delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate(monitor);
-						if (delegate.getRemoteConnection() == null) {
-							throw new Throwable(Messages.UninitializedRemoteServices);
-						}
-						String rmId = rm.getConfiguration().getUniqueName();
-						lcMap.initialize(rmConfig.getRMVariableMap(), rmId);
-						updateHandler.clear();
-						lcMap.updateFromConfiguration(configuration);
-					} catch (Throwable t) {
-						JAXBControlUIPlugin.log(t);
-						return CoreExceptionUtils.getErrorStatus(t.getMessage(), t);
-					}
-					return Status.OK_STATUS;
-				}
-			};
-
-			j.schedule();
 			try {
-				j.join();
-			} catch (InterruptedException ignore) {
-			}
+				getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+						try {
+							delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate(monitor);
+							if (delegate.getRemoteConnection() == null) {
+								throw new InvocationTargetException(null, Messages.UninitializedRemoteServices);
+							}
+							String rmId = rm.getConfiguration().getUniqueName();
+							lcMap.initialize(rmConfig.getRMVariableMap(), rmId);
+							updateHandler.clear();
+							lcMap.updateFromConfiguration(configuration);
+						} catch (Throwable t) {
+							JAXBControlUIPlugin.log(t);
+							throw new InvocationTargetException(t, t.getLocalizedMessage());
+						}
+					}
 
-			IStatus result = j.getResult();
-			if (result.getSeverity() == IStatus.ERROR) {
-				return new RMLaunchValidation(false, result.getMessage());
+				});
+			} catch (InvocationTargetException e) {
+				return new RMLaunchValidation(false, e.getLocalizedMessage());
+			} catch (InterruptedException e) {
+				return new RMLaunchValidation(false, e.getLocalizedMessage());
 			}
 		}
 		RMLaunchValidation validation = super.initializeFrom(control, rm, queue, configuration);

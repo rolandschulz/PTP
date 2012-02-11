@@ -216,6 +216,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			remoteServicesDelegate = new RemoteServicesDelegate(servicesId, connectionName);
 			remoteServicesDelegate.initialize(monitor);
 		}
+		/*
+		 * Bug 370775 - Attempt to open the connection before using the delegate as the connection can be closed independently of
+		 * the resource manager.
+		 */
+		IRemoteConnection conn = remoteServicesDelegate.getRemoteConnection();
+		if (!conn.isOpen()) {
+			try {
+				conn.open(monitor);
+			} catch (RemoteConnectionException e) {
+				// Just use the closed connection
+			}
+		}
 		return remoteServicesDelegate;
 	}
 
