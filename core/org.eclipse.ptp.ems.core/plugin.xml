@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <!-- Extension point for contributing new environment managers -->
+   <extension-point
+      id="org.eclipse.ptp.ems.core.envmanager"
+      name="Environment Managers"
+      schema="schema/org.eclipse.ptp.ems.core.envmanager.exsd"/>
+
+   <!-- Environment manager contributions for Modules and SoftEnv -->
+   <extension
+         point="org.eclipse.ptp.ems.core.envmanager">
+      <envManager
+            class="org.eclipse.ptp.ems.internal.core.managers.ModulesEnvManager">
+      </envManager>
+      <envManager
+            class="org.eclipse.ptp.ems.internal.core.managers.SoftEnvManager">
+      </envManager>
+   </extension>
+
+</plugin>
