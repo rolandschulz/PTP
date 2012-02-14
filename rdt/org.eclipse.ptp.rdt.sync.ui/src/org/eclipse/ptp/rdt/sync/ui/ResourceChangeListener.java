@@ -26,6 +26,7 @@ import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SYNC_MODE;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
+import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.swt.widgets.Display;
 
 public class ResourceChangeListener {
@@ -83,10 +84,12 @@ public class ResourceChangeListener {
 
 	private static IResourceChangeListener resourceListener = new IResourceChangeListener() {
 		public void resourceChanged(IResourceChangeEvent event) {
-			// Turn off sync'ing for a project before deleting it - see bug 360170
+			// Turn off sync'ing for a project before deleting it and close repository - see bug 360170
 			if (event.getType() == IResourceChangeEvent.PRE_DELETE) {
 				IProject project = (IProject) event.getResource();
 				SyncManager.setSyncMode(project, SYNC_MODE.NONE);
+				ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
+				provider.close();
 				return;
 			}
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {

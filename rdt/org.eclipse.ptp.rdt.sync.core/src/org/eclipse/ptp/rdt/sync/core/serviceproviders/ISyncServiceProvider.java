@@ -56,4 +56,10 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 */
 	public void synchronize(IResourceDelta delta, SyncFileFilter filter, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags)
 			throws CoreException;
+	
+	/**
+	 * Close any resources (files, sockets) that were open by the sync provider. Resources not open by the provider should not be
+	 * touched. This is called, for example, when a project is about to be deleted.
+	 */
+	public void close();
 }
