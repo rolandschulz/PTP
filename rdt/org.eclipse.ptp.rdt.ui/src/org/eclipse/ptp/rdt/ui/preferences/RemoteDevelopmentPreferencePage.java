@@ -28,7 +28,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
- * @since 4.0
+ * @since 4.1
  *
  */
 public class RemoteDevelopmentPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {

@@ -17,7 +17,7 @@ import org.eclipse.ptp.rdt.ui.UIPlugin;
 
 /**
  * Class used to initialize default preference values.
- * @since 4.0
+ * @since 4.1
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 

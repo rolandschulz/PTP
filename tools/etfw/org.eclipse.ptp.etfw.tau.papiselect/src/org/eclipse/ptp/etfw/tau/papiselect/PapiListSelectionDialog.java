@@ -59,9 +59,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SelectionDialog;
 
 /**
- * A heavily specialized implementation of SelectionDialog for displaying a list
- * of PAPI performance counters which can be selected by the user, with mutually
- * exclusive counters being excluded as selections are made
+ * A heavily specialized implementation of SelectionDialog for displaying a list of PAPI performance counters which can be selected
+ * by the user, with mutually exclusive counters being excluded as selections are made
  * 
  * @author wspear
  * 
@@ -111,14 +110,14 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	 * @param labelProvider
 	 *            the label provider for displaying model elements
 	 * @param message
-	 *            the message to be displayed at the top of this dialog, or
-	 *            <code>null</code> to display a default message
+	 *            the message to be displayed at the top of this dialog, or <code>null</code> to display a default message
+	 * @since 4.0
 	 */
-	public PapiListSelectionDialog(Shell parentShell, IFileStore papiloc, IBuildLaunchUtils blt, IStructuredContentProvider contentProvider,
-			ILabelProvider labelProvider, String message, int papiCountType) {
+	public PapiListSelectionDialog(Shell parentShell, IFileStore papiloc, IBuildLaunchUtils blt,
+			IStructuredContentProvider contentProvider, ILabelProvider labelProvider, String message, int papiCountType) {
 		super(parentShell);
 		setTitle(Messages.PapiListSelectionDialog_PapiCounters);// WorkbenchMessages.ListSelection_title);
-		papiCon = new PapiSelect(papiloc, blt,papiCountType);
+		papiCon = new PapiSelect(papiloc, blt, papiCountType);
 		inputElement = papiCon.getAvail().toArray();
 		this.contentProvider = contentProvider;
 		this.labelProvider = labelProvider;
@@ -215,8 +214,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	}
 
 	/**
-	 * Visually checks the previously-specified elements in this dialog's list
-	 * viewer.
+	 * Visually checks the previously-specified elements in this dialog's list viewer.
 	 */
 	private void checkInitialSelections() {
 		Iterator<?> itemsToCheck = getInitialElementSelections().iterator();
@@ -231,8 +229,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.window.Window#configureShell(
-	 * org.eclipse.swt.widgets.Shell)
+	 * @see org.eclipse.jface.window.Window#configureShell( org.eclipse.swt.widgets.Shell)
 	 */
 	@Override
 	protected void configureShell(Shell shell) {
@@ -241,13 +238,11 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	}
 
 	/**
-	 * This is the primary logic for counter exclusion. It needs to be called
-	 * whenever a counter is checked or unchecked
+	 * This is the primary logic for counter exclusion. It needs to be called whenever a counter is checked or unchecked
 	 */
 	protected void updateGrey(Object element) {
 		/*
-		 * Grey elements are not relevant, check them to show that they are
-		 * unavailable
+		 * Grey elements are not relevant, check them to show that they are unavailable
 		 */
 		try {
 			if (listViewer.getGrayed(element)) {
@@ -315,6 +310,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 
 		class PapiCheckListener implements ICheckStateListener {
 
+			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				updateGrey(event.getElement());
 			}
@@ -352,9 +348,8 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	}
 
 	/**
-	 * The <code>PapiListSelectionDialog</code> implementation of this
-	 * <code>Dialog</code> method builds a list of the selected counters for
-	 * later retrieval by the client and closes this dialog.
+	 * The <code>PapiListSelectionDialog</code> implementation of this <code>Dialog</code> method builds a list of the selected
+	 * counters for later retrieval by the client and closes this dialog.
 	 */
 	@Override
 	protected void okPressed() {

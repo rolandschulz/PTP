@@ -1,4 +1,5 @@
 package org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment;
+
 /*******************************************************************************
  * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
@@ -36,62 +37,63 @@ import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ProjectNotConfiguredException;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
-
 /**
- * Supplies remote environment variables on a per-configuration basis.
- * Right now it actually doesn't take into account service model configurations, so this just
- * acts the same as the RemoteProjectEnvironmentSupplier at the moment.
+ * Supplies remote environment variables on a per-configuration basis. Right now it actually doesn't take into account service model
+ * configurations, so this just acts the same as the RemoteProjectEnvironmentSupplier at the moment.
  * 
  * @author crecoskie
- * @since 2.0
- *
+ * @since 3.2
+ * 
  */
 @SuppressWarnings("restriction")
-public class RemoteConfigurationEnvironmentSupplier implements
-		IConfigurationEnvironmentVariableSupplier {
+public class RemoteConfigurationEnvironmentSupplier implements IConfigurationEnvironmentVariableSupplier {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.managedbuilder.envvar.IConfigurationEnvironmentVariableSupplier#getVariable(java.lang.String, org.eclipse.cdt.managedbuilder.core.IConfiguration, org.eclipse.cdt.managedbuilder.envvar.IEnvironmentVariableProvider)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.cdt.managedbuilder.envvar.IConfigurationEnvironmentVariableSupplier#getVariable(java.lang.String,
+	 * org.eclipse.cdt.managedbuilder.core.IConfiguration, org.eclipse.cdt.managedbuilder.envvar.IEnvironmentVariableProvider)
 	 */
-	public IBuildEnvironmentVariable getVariable(String variableName,
-			IConfiguration configuration, IEnvironmentVariableProvider provider) {
+	public IBuildEnvironmentVariable getVariable(String variableName, IConfiguration configuration,
+			IEnvironmentVariableProvider provider) {
 		Map<String, String> envMap = getRemoteEnvironment(configuration.getManagedProject());
-		
+
 		if (envMap != null) {
 			String value = envMap.get(variableName) == null ? new String() : envMap.get(variableName);
 			IBuildEnvironmentVariable envVar = new BuildEnvVar(variableName, value);
 			return envVar;
 		}
-		
+
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.managedbuilder.envvar.IConfigurationEnvironmentVariableSupplier#getVariables(org.eclipse.cdt.managedbuilder.core.IConfiguration, org.eclipse.cdt.managedbuilder.envvar.IEnvironmentVariableProvider)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.cdt.managedbuilder.envvar.IConfigurationEnvironmentVariableSupplier#getVariables(org.eclipse.cdt.managedbuilder
+	 * .core.IConfiguration, org.eclipse.cdt.managedbuilder.envvar.IEnvironmentVariableProvider)
 	 */
-	public IBuildEnvironmentVariable[] getVariables(
-			IConfiguration configuration, IEnvironmentVariableProvider provider) {
+	public IBuildEnvironmentVariable[] getVariables(IConfiguration configuration, IEnvironmentVariableProvider provider) {
 		List<IBuildEnvironmentVariable> vars = new LinkedList<IBuildEnvironmentVariable>();
 		Map<String, String> remoteEnvMap = null;
-		
+
 		remoteEnvMap = getRemoteEnvironment(configuration.getManagedProject());
-		
+
 		if (remoteEnvMap != null) {
 			for (String var : remoteEnvMap.keySet()) {
 				String value = remoteEnvMap.get(var);
 
-				IBuildEnvironmentVariable buildEnvVar = new BuildEnvVar(var,
-						value);
+				IBuildEnvironmentVariable buildEnvVar = new BuildEnvVar(var, value);
 				vars.add(buildEnvVar);
 			}
 
 			return vars.toArray(new IBuildEnvironmentVariable[0]);
-		}
-		
-		else
+		} else {
 			return new IBuildEnvironmentVariable[0];
+		}
 	}
-	
+
 	/**
 	 * @param project
 	 * @param remoteEnvMap
@@ -104,12 +106,9 @@ public class RemoteConfigurationEnvironmentSupplier implements
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 
 		try {
-			IServiceConfiguration serviceConfig = smm
-					.getActiveConfiguration(iProj);
-			IService buildService = smm
-					.getService(IRDTServiceConstants.SERVICE_BUILD);
-			IServiceProvider serviceProvider = serviceConfig
-					.getServiceProvider(buildService);
+			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(iProj);
+			IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
+			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(buildService);
 			IRemoteExecutionServiceProvider executionProvider = null;
 			if (serviceProvider instanceof IRemoteExecutionServiceProvider) {
 				executionProvider = (IRemoteExecutionServiceProvider) serviceProvider;
@@ -117,23 +116,22 @@ public class RemoteConfigurationEnvironmentSupplier implements
 
 			if (executionProvider != null) {
 
-				IRemoteServices remoteServices = executionProvider
-						.getRemoteServices();
-				
-				if (remoteServices == null)
+				IRemoteServices remoteServices = executionProvider.getRemoteServices();
+
+				if (remoteServices == null) {
 					return null;
-				
-				if(!remoteServices.isInitialized()) {
+				}
+
+				if (!remoteServices.isInitialized()) {
 					remoteServices.initialize();
 				}
 
-				IRemoteConnection connection = executionProvider
-						.getConnection();
+				IRemoteConnection connection = executionProvider.getConnection();
 
-				if(connection == null) {
+				if (connection == null) {
 					return null;
 				}
-				
+
 				if (!connection.isOpen()) {
 					try {
 						connection.open(new NullProgressMonitor());
@@ -144,8 +142,7 @@ public class RemoteConfigurationEnvironmentSupplier implements
 
 				List<String> command = new LinkedList<String>();
 
-				IRemoteProcessBuilder processBuilder = remoteServices
-						.getProcessBuilder(connection, command);
+				IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
 
 				remoteEnvMap = processBuilder.environment();
 

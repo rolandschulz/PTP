@@ -449,7 +449,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		try {
 			fConnection = connection;
 			putString(GIT_CONNECTION_NAME, connection.getName());
-			fSyncConnection = null; // get reinitialized by next synchronize call
+			if (fSyncConnection != null) {
+				fSyncConnection.close();
+				fSyncConnection = null; // get reinitialized by next synchronize call
+			}
 		} finally {
 			providerLock.unlock();
 		}
@@ -465,9 +468,20 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		try {
 			fLocation = configLocation;
 			putString(GIT_LOCATION, configLocation);
-			fSyncConnection = null; // get reinitialized by next synchronize call
+			if (fSyncConnection != null) {
+				fSyncConnection.close();
+				fSyncConnection = null; // get reinitialized by next synchronize call
+			}
 		} finally {
 			providerLock.unlock();
+		}
+	}
+	
+	@Override
+	public void close() {
+		if (fSyncConnection != null) {
+			fSyncConnection.close();
+			fSyncConnection = null; // get reinitialized by next synchronize call
 		}
 	}
 }

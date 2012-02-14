@@ -584,6 +584,7 @@ public class GitRemoteSyncConnection {
 
 	public void close() {
 		transport.close();
+		git.getRepository().close();
 	}
 
 	/**

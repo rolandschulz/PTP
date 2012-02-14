@@ -12,6 +12,9 @@ package org.eclipse.ptp.rdt.ui.preferences;
 
 import org.eclipse.osgi.util.NLS;
 
+/**
+ * @since 4.1
+ */
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.ui.preferences.messages"; //$NON-NLS-1$
 	public static String RemoteDevPreferencePage_ErrorReportingGroupLabel;
