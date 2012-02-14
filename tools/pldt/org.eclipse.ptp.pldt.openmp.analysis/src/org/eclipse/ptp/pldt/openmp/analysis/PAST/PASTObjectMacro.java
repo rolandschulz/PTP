@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006,2012 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
  * @author pazel
  * 
  */
+@SuppressWarnings("restriction")
 public class PASTObjectMacro extends PASTNode implements IASTPreprocessorObjectStyleMacroDefinition {
 	protected IASTPreprocessorObjectStyleMacroDefinition objMacro_ = null;
 
@@ -63,10 +64,12 @@ public class PASTObjectMacro extends PASTNode implements IASTPreprocessorObjectS
 		return objMacro_.getName();
 	}
 
+	@Deprecated
 	public void setExpansion(String exp) {
 		objMacro_.setExpansion(exp);
 	}
 
+	@Deprecated
 	public void setName(IASTName name) {
 		objMacro_.setName(name);
 	}
@@ -77,6 +80,11 @@ public class PASTObjectMacro extends PASTNode implements IASTPreprocessorObjectS
 
 	public boolean isPartOfTranslationUnitFile() {
 		return objMacro_.isPartOfTranslationUnitFile();
+	}
+
+	@Override
+	public IASTNode getOriginalNode() {
+		return objMacro_.getOriginalNode();
 	}
 
 }

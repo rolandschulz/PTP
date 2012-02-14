@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006,2007 IBM Corporation.
+ * Copyright (c) 2006,2012 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ import org.eclipse.ptp.pldt.common.util.Utility;
  * @author pazel
  * 
  */
+@SuppressWarnings("restriction")
 public class PASTPragma extends PASTNode implements IASTPreprocessorPragmaStatement {
 	protected IASTPreprocessorPragmaStatement pragma_ = null;
 	protected String content_ = "";
@@ -123,6 +124,11 @@ public class PASTPragma extends PASTNode implements IASTPreprocessorPragmaStatem
 	public boolean isPragmaOperator() {
 		return pragma_.isPragmaOperator();
 
+	}
+
+	@Override
+	public IASTNode getOriginalNode() {
+		return pragma_.getOriginalNode();
 	}
 
 }

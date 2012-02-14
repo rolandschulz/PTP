@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006,2012 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
  * @author pazel
  * 
  */
+@SuppressWarnings("restriction")
 public class PASTIfndef extends PASTNode implements IASTPreprocessorIfndefStatement {
 	protected IASTPreprocessorIfndefStatement ifndef_ = null;
 
@@ -28,6 +29,7 @@ public class PASTIfndef extends PASTNode implements IASTPreprocessorIfndefStatem
 	 * 
 	 * @param ifndef
 	 */
+
 	public PASTIfndef(IASTPreprocessorIfndefStatement ifndef) {
 		super((ASTNode) ifndef);
 		ifndef_ = ifndef;
@@ -59,6 +61,11 @@ public class PASTIfndef extends PASTNode implements IASTPreprocessorIfndefStatem
 
 	public boolean isPartOfTranslationUnitFile() {
 		return ifndef_.isPartOfTranslationUnitFile();
+	}
+
+	@Override
+	public IASTNode getOriginalNode() {
+		return ifndef_.getOriginalNode();
 	}
 
 }

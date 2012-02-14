@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation.
+ * Copyright (c) 2006, 2012 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.CoreException;
  * @author pazel
  * 
  */
+@SuppressWarnings("restriction")
 public class PASTInclusionStatement extends PASTNode implements IASTPreprocessorIncludeStatement {
 	protected IASTPreprocessorIncludeStatement incl_ = null;
 
@@ -129,6 +130,11 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 	@Override
 	public IIndexFile getImportedIndexFile() {
 		return incl_.getImportedIndexFile();
+	}
+
+	@Override
+	public IASTNode getOriginalNode() {
+		return incl_.getOriginalNode();
 	}
 
 }
