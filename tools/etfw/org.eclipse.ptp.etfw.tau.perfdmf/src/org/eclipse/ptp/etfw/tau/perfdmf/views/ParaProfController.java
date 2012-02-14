@@ -19,7 +19,10 @@ import org.eclipse.ptp.etfw.IBuildLaunchUtils;
  */
 public class ParaProfController {
 	public enum Level {
-		DATABASE, APPLICATION, EXPERIMENT, TRIAL
+		DATABASE,
+		APPLICATION,
+		EXPERIMENT,
+		TRIAL
 	}
 
 	public class TreeTuple {
@@ -54,18 +57,33 @@ public class ParaProfController {
 	private boolean canRun = true;
 
 	public static TreeTuple EMPTY;
-	private IBuildLaunchUtils utilBlob=null;
+	private IBuildLaunchUtils utilBlob = null;
+
+	/**
+	 * @since 3.0
+	 */
 	public ParaProfController(IBuildLaunchUtils utilBlob) {
-		this.utilBlob=utilBlob;
+		this.utilBlob = utilBlob;
 		createProcess();
 
 	}
-	public boolean pullReady=false;
-public static final String RESTART="RESTART";
-public static final String DONE="DONE";
+
+	/**
+	 * @since 3.0
+	 */
+	public boolean pullReady = false;
+	/**
+	 * @since 3.0
+	 */
+	public static final String RESTART = "RESTART"; //$NON-NLS-1$
+	/**
+	 * @since 3.0
+	 */
+	public static final String DONE = "DONE"; //$NON-NLS-1$
+
 	private void killProcess() {
 		pushQueue = null;
-		pullReady=false;
+		pullReady = false;
 		pullQueue.add(RESTART);
 		pullQueue = null;
 		pb = null;
@@ -74,11 +92,11 @@ public static final String DONE="DONE";
 	}
 
 	private void createProcess() {
-		String taubin=utilBlob.getToolPath("tau");
-		IFileStore paraprof = utilBlob.getFile(taubin);// + File.separator + "paraprof"; //$NON-NLS-1$ //$NON-NLS-2$
-		paraprof=paraprof.getChild("paraprof");
+		String taubin = utilBlob.getToolPath("tau"); //$NON-NLS-1$
+		IFileStore paraprof = utilBlob.getFile(taubin);// + File.separator + "paraprof";
+		paraprof = paraprof.getChild("paraprof"); //$NON-NLS-1$
 		EMPTY = new TreeTuple("None", -1, -1, Level.DATABASE); //$NON-NLS-1$
-		//File checkp = new File(paraprof);
+		// File checkp = new File(paraprof);
 		if (!paraprof.fetchInfo().exists()) {
 			canRun = false;
 			return;
@@ -102,7 +120,7 @@ public static final String DONE="DONE";
 		stdout = new PrintStream(new BufferedOutputStream(proc.getOutputStream()));
 		errRun.start();
 		inRun.start();
-		pullReady=true;
+		pullReady = true;
 	}
 
 	public List<TreeTuple> getDatabases() {
@@ -147,8 +165,9 @@ public static final String DONE="DONE";
 			}
 		}
 		int res = issueCommand(comBuf);
-		if (res != 0)
+		if (res != 0) {
 			return out;
+		}
 		List<String> l = getResults();
 
 		for (String s : l) {
@@ -164,12 +183,18 @@ public static final String DONE="DONE";
 		}
 		return out;
 	}
-	private static final String SPACE=" ";
+
+	private static final String SPACE = " "; //$NON-NLS-1$
+
+	/**
+	 * @since 3.0
+	 */
 	public TreeTuple uploadTrial(IFileStore profile, int dbid, String app, String exp, String tri) {
-		String comBuf = "control upload " + profile.toURI().getPath() + SPACE + dbid + SPACE + app + SPACE + exp + SPACE + tri; //$NON-NLS-1$ //$NON-NLS-2$ 
+		String comBuf = "control upload " + profile.toURI().getPath() + SPACE + dbid + SPACE + app + SPACE + exp + SPACE + tri; //$NON-NLS-1$
 		int res = issueCommand(comBuf);
-		if (res != 0)
+		if (res != 0) {
 			return null;
+		}
 		TreeTuple tt = null;
 		List<String> l = getResults();
 
@@ -187,7 +212,7 @@ public static final String DONE="DONE";
 	private List<String> getResults() {
 		boolean done = false;
 		List<String> l = new ArrayList<String>();
-		if (pushQueue != null)
+		if (pushQueue != null) {
 			while (!done) {// for(int i=0;i<dex;i++){
 				String s = ""; //$NON-NLS-1$
 				try {
@@ -195,12 +220,13 @@ public static final String DONE="DONE";
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				if (s.equals("control endreturn") || s.equals(DONE)) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (s.equals("control endreturn") || s.equals(DONE)) { //$NON-NLS-1$ 
 					done = true;
 				} else {
 					l.add(s);
 				}
 			}
+		}
 		return l;
 	}
 
@@ -272,20 +298,22 @@ public static final String DONE="DONE";
 					} else {
 						if (line.startsWith("control sourcecode")) { //$NON-NLS-1$
 							pullQueue.add(line);
-						} else
+						} else {
 							pushQueue.add(line);
+						}
 					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-//			if (pullQueue != null){
-//				if(!exception)
-//					pullQueue.add(DONE); //$NON-NLS-1$
-//			}
-				
-			if (pushQueue != null)
-				pushQueue.add(DONE); //$NON-NLS-1$
+			// if (pullQueue != null){
+			// if(!exception)
+			//					pullQueue.add(DONE); //$NON-NLS-1$
+			// }
+
+			if (pushQueue != null) {
+				pushQueue.add(DONE);
+			}
 		}
 	}
 

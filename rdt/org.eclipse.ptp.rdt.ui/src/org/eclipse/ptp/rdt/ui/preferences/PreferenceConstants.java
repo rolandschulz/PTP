@@ -13,7 +13,7 @@
 package org.eclipse.ptp.rdt.ui.preferences;
 
 /**
- * @since 4.0
+ * @since 4.1
  */
 public final class PreferenceConstants {
 	

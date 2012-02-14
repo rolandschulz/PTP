@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * </code>
  * 
  * @author greg
+ * @since 5.1
  * 
  */
 public interface IRemoteResource {
