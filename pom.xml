@@ -44,6 +44,8 @@
 
 	<modules>
 		<module>core/org.eclipse.ptp.core</module>
+		<module>core/org.eclipse.ptp.ems.core</module>
+		<module>core/org.eclipse.ptp.ems.ui</module>
 		<module>core/org.eclipse.ptp.launch</module>
 		<module>core/org.eclipse.ptp.proxy</module>
 		<module>core/org.eclipse.ptp.proxy.protocol</module>
