@@ -199,14 +199,14 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 				getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
 					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 						try {
-							delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate(monitor);
-							if (delegate.getRemoteConnection() == null) {
-								throw new InvocationTargetException(null, Messages.UninitializedRemoteServices);
-							}
 							String rmId = rm.getConfiguration().getUniqueName();
 							lcMap.initialize(rmConfig.getRMVariableMap(), rmId);
 							updateHandler.clear();
 							lcMap.updateFromConfiguration(configuration);
+							delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate(monitor);
+							if (delegate.getRemoteConnection() == null) {
+								throw new InvocationTargetException(null, Messages.UninitializedRemoteServices);
+							}
 						} catch (Throwable t) {
 							JAXBControlUIPlugin.log(t);
 							throw new InvocationTargetException(t, t.getLocalizedMessage());
