@@ -4,8 +4,7 @@
       label="%featureName"
       version="6.0.0.qualifier"
       provider-name="%providerName"
-      plugin="org.eclipse.ptp.core"
-      >
+      plugin="org.eclipse.ptp.core">
 
    <description url="http://eclipse.org/ptp">
       %description
@@ -151,6 +150,20 @@
 
    <plugin
          id="org.eclipse.ptp.services.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.ems.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.ems.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
