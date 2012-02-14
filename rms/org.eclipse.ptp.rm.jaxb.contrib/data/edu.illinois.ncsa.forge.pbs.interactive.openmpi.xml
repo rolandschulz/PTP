@@ -141,6 +141,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<input isUndefinedIfMatches="-np">-np ${ptp_rm:mpiNumberOfProcesses#value}</input>
 			<input>-hostfile $PBS_NODEFILE</input>
 			<input>${ptp_rm:debuggerExecutablePath#value}</input>
+			<input>${ptp_rm:debuggerArgs#value}</input>
 			<environment name="OMPI_MCA_btl_openib_flags" value="1"/>
 			<environment name="OMPI_MCA_btl_mpi_leave_pinned" value="0"/>
 			<environment name="OMPI_MCA_btl_openib_warn_default_gid_prefix" value="0"/>

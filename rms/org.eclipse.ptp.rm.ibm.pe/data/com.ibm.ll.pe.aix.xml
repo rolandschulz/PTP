@@ -946,6 +946,7 @@
 			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app_debug.pl</arg>
 			<arg>poe</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
+			<arg>${ptp_rm:debuggerArgs#value}</arg>
 
 			<!-- Tasks tab environment variables -->
 			<environment name="MP_PROCS" value="${ptp_rm:MP_PROCS_ATTR#value}" />

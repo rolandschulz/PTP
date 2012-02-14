@@ -579,6 +579,7 @@
 			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app_debug.pl</arg>
 			<arg>poe</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
+			<arg>${ptp_rm:debuggerArgs#value}</arg>
 			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH#value}" />
 			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE#value}" />
 			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC#value}" />
