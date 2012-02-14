@@ -14,6 +14,7 @@ package org.eclipse.ptp.launch.ui;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.ptp.launch.messages.Messages;
 
 /**
  * A modified version of {@link org.eclipse.debug.ui.EnvironmentTab}, where the
@@ -44,6 +45,7 @@ public class EnvironmentTab extends org.eclipse.debug.ui.EnvironmentTab {
 	 */
 	@Override
 	protected void updateAppendReplace() {
+		appendEnvironment.getParent().setToolTipText(Messages.EnvironmentTab_Tool_Tip);
 		appendEnvironment.setEnabled(false);
 		replaceEnvironment.setEnabled(false);
 	}

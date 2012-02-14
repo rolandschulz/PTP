@@ -70,6 +70,8 @@ public class Messages extends NLS {
 	public static String ArgumentsTab_Arguments;
 	public static String ArgumentsTab_Parallel_Program_Arguments;
 
+	public static String EnvironmentTab_Tool_Tip;
+	
 	public static String AbstractDebuggerTab_No_debugger_available;
 	public static String AbstractDebuggerTab_Debugger;
 	public static String AbstractDebuggerTab_ErrorLoadingDebuggerPage;
