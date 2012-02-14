@@ -89,7 +89,7 @@ session_event_handler(sdm_message msg, void *data)
  	 	return -1;
 	}
 
-	if (DbgDeserializeEvent(pmsg->msg_id, pmsg->arg_size, pmsg->args, &ev) < 0) {
+	if (DbgDeserializeEvent(pmsg->msg_id, pmsg->num_args, pmsg->args, &ev) < 0) {
  		fprintf(stderr, "bad conversion to debug event");
  	 	sdm_message_free(msg);
  	 	return -1;
@@ -132,12 +132,12 @@ DbgInit(session **sess, int argc, char *argv[])
 	
 	*sess = s = (session *)malloc(sizeof(session));
 	
-	tmp_idset = sdm_set_new();
-	tmp_bitset = bitset_new(s->sess_procs);
-
 	if (sdm_init(argc, argv) < 0) {
 		return -1;
 	}
+
+	tmp_idset = sdm_set_new();
+	tmp_bitset = bitset_new(s->sess_procs);
 
 	s->sess_procs = sdm_route_get_size() - 1;
 
