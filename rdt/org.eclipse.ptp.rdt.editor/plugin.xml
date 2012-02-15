@@ -79,5 +79,32 @@
            </action>
         </editorContribution>
      </extension>
+     <extension
+           point="org.eclipse.ui.actionSetPartAssociations">
+	      <actionSetPartAssociation 
+	            targetID="org.eclipse.cdt.ui.SearchActionSet">
+	         <part id="org.eclipse.ptp.rdt.ui.editor.CEditor"/>
+	      </actionSetPartAssociation>
+	      <actionSetPartAssociation 
+	            targetID="org.eclipse.cdt.ui.CodingActionSet">
+	         <part id="org.eclipse.ptp.rdt.ui.editor.CEditor"/>
+	      </actionSetPartAssociation>
+	      <actionSetPartAssociation 
+	      		targetID="org.eclipse.cdt.ui.OpenActionSet">
+	         <part id="org.eclipse.ptp.rdt.ui.editor.CEditor"/>
+	      </actionSetPartAssociation>
+	      <actionSetPartAssociation 
+	            targetID="org.eclipse.cdt.ui.NavigationActionSet">
+	         <part id="org.eclipse.ptp.rdt.ui.editor.CEditor"/>
+	      </actionSetPartAssociation>
+	      <actionSetPartAssociation
+	            targetID="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
+	         <part id="org.eclipse.ptp.rdt.ui.editor.CEditor"/>
+	      </actionSetPartAssociation>      
+	      <actionSetPartAssociation
+	            targetID="org.eclipse.cdt.ui.text.c.actionSet.presentation">
+	         <part id="org.eclipse.ptp.rdt.ui.editor.CEditor"/>
+	      </actionSetPartAssociation>  
+     </extension>
      
 </plugin>
