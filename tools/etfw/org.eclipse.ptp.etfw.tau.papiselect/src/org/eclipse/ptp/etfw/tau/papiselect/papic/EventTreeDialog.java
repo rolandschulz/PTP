@@ -77,7 +77,6 @@ public class EventTreeDialog extends Dialog {
 		treeV.expandToLevel(3);
 		treeV.addCheckStateListener(new ICheckStateListener() {
 
-			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				Object element = event.getElement();
 
