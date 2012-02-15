@@ -95,6 +95,8 @@ session_event_handler(sdm_message msg, void *data)
  	 	return -1;
 	}
 
+	ev->procs = idset_to_bitset(sdm_message_get_source(msg));
+
 	if (s->sess_event_handler != NULL) {
  		s->sess_event_handler(ev, s->sess_event_data);
 	}
@@ -136,10 +138,10 @@ DbgInit(session **sess, int argc, char *argv[])
 		return -1;
 	}
 
+	s->sess_procs = sdm_route_get_size() - 1;
+
 	tmp_idset = sdm_set_new();
 	tmp_bitset = bitset_new(s->sess_procs);
-
-	s->sess_procs = sdm_route_get_size() - 1;
 
 	sdm_aggregate_set_completion_callback(session_event_handler, (void *)s);
 
@@ -159,7 +161,7 @@ DbgCreate(session *s)
 }
 
 int
-DbgStartSession(session *s, char *dir, char *prog, char *args)
+DbgStartSession(session *s, char *exe, char *path, char *args)
 {
 	int				res;
 	int				len;
@@ -168,8 +170,8 @@ DbgStartSession(session *s, char *dir, char *prog, char *args)
 	proxy_msg *		msg = new_proxy_msg(DBG_STARTSESSION_CMD, 0);
 
 	proxy_msg_add_int(msg, SERVER_TIMEOUT);
-	proxy_msg_add_string(msg, dir);
-	proxy_msg_add_string(msg, prog);
+	proxy_msg_add_string(msg, exe);
+	proxy_msg_add_string(msg, path);
 	proxy_msg_add_string(msg, args);
 	proxy_serialize_msg(msg, &buf, &len);
 

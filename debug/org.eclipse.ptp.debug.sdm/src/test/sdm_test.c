@@ -59,6 +59,7 @@ event_callback(dbg_event *e, void *data)
 		printf("error: %s\n", e->dbg_event_u.error_event.error_msg);
 		switch (e->dbg_event_u.error_event.error_code) {
 		case DBGERR_NOBACKEND:
+		case DBGERR_NOFILEDIR:
 			fatal++;
 			break;
 		default:
@@ -99,6 +100,7 @@ event_callback(dbg_event *e, void *data)
 			printf("exited with signal %s\n", e->dbg_event_u.exit_event.ev_u.sig->name);
 			break;
 		}
+		break;
 	case DBGEV_DATA:
 		printf("data is "); AIFPrint(stdout, 0, e->dbg_event_u.data_event.data); printf("\n");
 		break;
@@ -173,7 +175,7 @@ do_test(session *s, char *dir, char *exe)
 	t = itimer_new("debug");
 	itimer_start(t);
 	
-	if (DbgStartSession(s, dir, exe, NULL) < 0) {
+	if (DbgStartSession(s, exe, dir, NULL) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
@@ -262,12 +264,19 @@ main(int argc, char *argv[])
 	char *		exe;
 
 	if (argc < 2) {
-		fprintf(stderr, "usage: test_proxy_clnt exe [host]\n");
+		fprintf(stderr, "usage: sdm_test [dir] exe\n");
 		return 1;
 	}
 
-	dir = getcwd(NULL, 0);
-	exe = argv[1];
+	if (argc == 2) {
+		dir = getcwd(NULL, 0);
+		exe = argv[1];
+	} else {
+		dir = argv[1];
+		exe = argv[2];
+	}
+
+	debug_level = 3;
 
 	if (DbgInit(&s, argc, argv) < 0) {
 		fprintf(stderr, "DbgInit failed\n");
