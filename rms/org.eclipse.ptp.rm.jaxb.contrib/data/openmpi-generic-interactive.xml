@@ -15,7 +15,7 @@
 		</property>
 		<property name="ompi_minor_version" visible="false" type="integer"/>
 		<property name="local_prefix" visible="false" type="string">
-			<default>/usr/local/mpi/bin/</default>
+			<default></default>
 		</property>
 		<attribute name="mpiNumberOfProcesses" min="1" type="integer"/>
 		<attribute name="byNodeOption" type="boolean"/>
@@ -24,16 +24,6 @@
 		<attribute name="noLocalOption" type="boolean"/>
 		<attribute name="prefixOption" type="boolean"/>
 		<attribute name="prefix" type="string"/>
-		<!--managed-files>
-			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
-			<file name="generate_routing_table">
-				<contents>
-<![CDATA[
-#!/usr/bin/perl
-]]>
-				</contents>
-			</file>
-		</managed-files-->
 		<start-up-command name="ompi_info">
 			<arg>${ptp_rm:local_prefix#value}ompi_info</arg>
 			<arg>-a</arg>
