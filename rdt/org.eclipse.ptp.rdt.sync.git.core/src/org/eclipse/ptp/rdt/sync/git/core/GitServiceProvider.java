@@ -287,6 +287,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			if ((syncFlags == SyncFlag.NO_FORCE) && (!(hasRelevantChangedResources))) {
 				return;
 			}
+			
+			// Do not sync if there are merge conflicts.
+			// Note: This is not just for efficiency but to prevent infinite sync loops, which can occur because we reset the
+			// repo after a merge conflict, which triggers another sync, which causes a conflict, which causes another reset...
+			if (!(this.getMergeConflictFiles().isEmpty())) {
+				return;
+			}
 
 			int mySyncTaskId;
 			synchronized (syncTaskId) {
