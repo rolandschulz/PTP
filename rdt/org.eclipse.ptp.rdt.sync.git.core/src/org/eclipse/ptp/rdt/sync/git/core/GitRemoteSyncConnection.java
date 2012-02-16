@@ -49,6 +49,7 @@ import org.eclipse.jgit.errors.UnmergedPathException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
+import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.RefSpec;
@@ -828,6 +829,10 @@ public class GitRemoteSyncConnection {
 	 *             exceptions, embedded in a RemoteSyncException.
 	 */
 	public void sync(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
+		this.syncInternal(monitor, includeUntrackedFiles, false);
+	}
+	public void syncInternal(IProgressMonitor monitor, boolean includeUntrackedFiles, boolean resolveAsLocal)
+			throws RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 25);
 		subMon.subTask(Messages.GitRemoteSyncConnection_0);
 		
@@ -845,6 +850,9 @@ public class GitRemoteSyncConnection {
 				// Merge it with local
 				Ref masterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
 				final MergeCommand mergeCommand = git.merge().include(masterRef);
+				if (resolveAsLocal) {
+					mergeCommand.setStrategy(MergeStrategy.OURS);
+				}
 				mergeCommand.call();
 
 				// Handle merge conflict. Read in data needed to resolve the conflict, and then reset the repo.
@@ -893,6 +901,10 @@ public class GitRemoteSyncConnection {
 				monitor.done();
 			}
 		}
+	}
+	
+	public void syncResolveAsLocal(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
+		this.syncInternal(monitor, includeUntrackedFiles, true);
 	}
 	
 	/**

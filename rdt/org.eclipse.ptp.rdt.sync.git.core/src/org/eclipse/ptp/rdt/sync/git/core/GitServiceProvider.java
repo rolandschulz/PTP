@@ -195,6 +195,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void synchronize(IResourceDelta delta, SyncFileFilter fileFilter, IProgressMonitor monitor,
 			EnumSet<SyncFlag> syncFlags) throws CoreException {
+		this.synchronizeInternal(delta, fileFilter, monitor, syncFlags, false);
+	}
+	
+	public void synchronizeInternal(IResourceDelta delta, SyncFileFilter fileFilter, IProgressMonitor monitor,
+			EnumSet<SyncFlag> syncFlags, boolean resolveAsLocal) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
 		// On first sync, place .gitignore in directories. This is useful for folders that are already present and thus are never
 		// captured by a resource add or change event. (This can happen for projects converted to sync projects.)
@@ -353,9 +358,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				synchronized (syncTaskId) {
 					willFinishTaskId = syncTaskId;
 				}
-
-				fSyncConnection.sync(progress.newChild(40), true); // Temporarily enable syncing new remote files
-
+				
+				if (resolveAsLocal) {
+					fSyncConnection.syncResolveAsLocal(progress.newChild(40), true);
+				} else {
+					fSyncConnection.sync(progress.newChild(40), true);
+				}
 				finishedSyncTaskId = willFinishTaskId;
 			} catch (final RemoteSyncException e) {
 				this.handleRemoteSyncException(e, syncFlags);
@@ -380,6 +388,18 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				monitor.done();
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#synchronizeResolveAsLocal
+	 * (org.eclipse.core.resources.IResourceDelta, org.eclipse.ptp.rdt.sync.core.SyncFileFilter,
+	 * org.eclipse.core.runtime.IProgressMonitor, java.util.EnumSet)
+	 */
+	@Override
+	public void synchronizeResolveAsLocal(IResourceDelta delta, SyncFileFilter fileFilter, IProgressMonitor monitor,
+			EnumSet<SyncFlag> syncFlags) throws CoreException {
+		this.synchronizeInternal(delta, fileFilter, monitor, syncFlags, true);
 	}
 
 	/*
