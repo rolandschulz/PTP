@@ -336,13 +336,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				}
 
 				// TODO: Review exception handling
-				if (fSyncConnection == null) {
-					// Open a remote sync connection
-					fSyncConnection = new GitRemoteSyncConnection(this.getProject(), this.getRemoteConnection(),
-							this.getProject().getLocation().toString(), this.getLocation(), fileFilter, progress);
-				} else {
-					fSyncConnection.setFileFilter(fileFilter);
-				}
+				this.openSyncConnection(progress);
+				fSyncConnection.setFileFilter(fileFilter);
 
 				// Open remote connection if necessary
 				if (this.getRemoteConnection().isOpen() == false) {
@@ -408,10 +403,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public Set<IPath> getMergeConflictFiles() {
 		try {
-			if (fSyncConnection == null) {
-				fSyncConnection = new GitRemoteSyncConnection(this.getProject(), this.getRemoteConnection(),
-						this.getProject().getLocation().toString(), this.getLocation(), SyncManager.getDefaultFileFilter(), null);
-			}
+			this.openSyncConnection(null);
 		} catch (RemoteSyncException e) {
 			try {
 				this.handleRemoteSyncException(e, SyncFlag.FORCE);
@@ -429,10 +421,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public String[] getMergeConflictParts(IFile file) {
 		try {
-			if (fSyncConnection == null) {
-				fSyncConnection = new GitRemoteSyncConnection(this.getProject(), this.getRemoteConnection(),
-						this.getProject().getLocation().toString(), this.getLocation(), SyncManager.getDefaultFileFilter(), null);
-			}
+			this.openSyncConnection(null);
 		} catch (RemoteSyncException e) {
 			try {
 				this.handleRemoteSyncException(e, SyncFlag.FORCE);
@@ -518,10 +507,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		try {
 			fConnection = connection;
 			putString(GIT_CONNECTION_NAME, connection.getName());
-			if (fSyncConnection != null) {
-				fSyncConnection.close();
-				fSyncConnection = null; // get reinitialized by next synchronize call
-			}
+			this.closeSyncConnection();
 		} finally {
 			providerLock.unlock();
 		}
@@ -537,20 +523,58 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		try {
 			fLocation = configLocation;
 			putString(GIT_LOCATION, configLocation);
-			if (fSyncConnection != null) {
-				fSyncConnection.close();
-				fSyncConnection = null; // get reinitialized by next synchronize call
-			}
+			this.closeSyncConnection();
 		} finally {
 			providerLock.unlock();
 		}
 	}
 	
+	// Open sync connection if it is not currently open (fSyncConnection is null)
+	// Note that the connection is given a default file filter. Clients should call "setFileFilter" on the sync connection to
+	// change it as needed.
+	private void openSyncConnection(IProgressMonitor progress) throws RemoteSyncException {
+		boolean wasLocked = true;
+		if (!(providerLock.isHeldByCurrentThread())) {
+			providerLock.lock();
+			wasLocked = false;
+		}
+
+		try {
+			if (fSyncConnection == null) {
+				fSyncConnection = new GitRemoteSyncConnection(this.getProject(), this.getRemoteConnection(),
+						this.getProject().getLocation().toString(), this.getLocation(), SyncManager.getDefaultFileFilter(), progress);
+			}
+		} finally {
+			if (!wasLocked) {
+				providerLock.unlock();
+			}
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#close()
+	 */
 	@Override
 	public void close() {
+		this.closeSyncConnection();
+	}
+	
+	// Helper function - whenever certain instance variables change, the sync connection should be closed and set to null.
+	private void closeSyncConnection() {
+		boolean wasLocked = true;
+		if (!(providerLock.isHeldByCurrentThread())) {
+			providerLock.lock();
+			wasLocked = false;
+		}
+
 		if (fSyncConnection != null) {
 			fSyncConnection.close();
 			fSyncConnection = null; // get reinitialized by next synchronize call
+		}
+		
+		if (!wasLocked) {
+			providerLock.unlock();
 		}
 	}
 }
