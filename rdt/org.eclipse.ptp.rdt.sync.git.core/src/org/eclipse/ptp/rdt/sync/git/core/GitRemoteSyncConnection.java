@@ -652,6 +652,7 @@ public class GitRemoteSyncConnection {
 
 		StatusCommand statusCommand = git.status();
 		Status status;
+		FileToMergePartsMap.clear();
 		try {
 			status = statusCommand.call();
 			for (String s : status.getConflicting()) {
