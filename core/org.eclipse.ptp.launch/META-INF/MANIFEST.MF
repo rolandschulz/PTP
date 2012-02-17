@@ -18,7 +18,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.debug.core,
  org.eclipse.ptp.debug.ui,
  org.eclipse.ptp.utils.ui,
- org.eclipse.ptp.utils.core
+ org.eclipse.ptp.utils.core,
+ org.eclipse.ptp.services.core,
+ org.eclipse.ptp.ui
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.launch,
  org.eclipse.ptp.launch.rulesengine,
