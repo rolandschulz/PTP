@@ -308,10 +308,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				return;
 			}
 			
-			// Do not sync if there are merge conflicts, and we are not told to resolve them.
+			// If there are merge conflicts, do not sync unless we are told to resolve the conflicts or this is a forced sync.
+			// The latter is useful to update any changes that occurred remotely.
 			// Note: This is not just for efficiency but to prevent infinite sync loops, which can occur because we reset the
 			// repo after a merge conflict, which triggers another sync, which causes a conflict, which causes another reset...
-			if (!resolveAsLocal && !(this.getMergeConflictFiles().isEmpty())) {
+			if (!(this.getMergeConflictFiles().isEmpty())) {
+				if (!resolveAsLocal && syncFlags == SyncFlag.NO_FORCE)
 				return;
 			}
 
