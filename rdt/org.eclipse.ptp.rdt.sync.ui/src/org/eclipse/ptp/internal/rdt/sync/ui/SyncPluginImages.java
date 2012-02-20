@@ -33,11 +33,14 @@ public class SyncPluginImages {
 		}
 	}
 	private static final String T_WIZBAN = "wizban/"; //$NON-NLS-1$
+	private static final String T_MERGE = "merge/"; //$NON-NLS-1$
 
 	/**
 	 * new sync project icon
 	 */
 	public static final ImageDescriptor DESC_WIZBAN_NEW_REMOTE_C_PROJ = create(T_WIZBAN, "newremote_proj_wiz.gif"); //$NON-NLS-1$
+	public static final ImageDescriptor DESC_RESOLVED_MERGE = create(T_MERGE, "checked.gif"); //$NON-NLS-1$
+	public static final ImageDescriptor DESC_UNRESOLVED_MERGE = create(T_MERGE, "unchecked.gif"); //$NON-NLS-1$
 
 	private static ImageDescriptor create(String prefix, String name) {
 		return ImageDescriptor.createFromURL(makeIconFileURL(prefix, name));
