@@ -112,7 +112,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				SyncFileFilterPage.open(null, null);
 			} else if (command.equals(syncMergeCommand)) {
 				try {
-				SyncMergeFileTreeViewer smftv = (SyncMergeFileTreeViewer) PlatformUI.getWorkbench().getActiveWorkbenchWindow().
+				SyncMergeFileTableViewer smftv = (SyncMergeFileTableViewer) PlatformUI.getWorkbench().getActiveWorkbenchWindow().
 						getActivePage().showView(SYNC_MERGE_FILE_VIEW, null, IWorkbenchPage.VIEW_VISIBLE);
 				smftv.setProject(project);
 				} catch(CoreException e) {

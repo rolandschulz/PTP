@@ -18,7 +18,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
@@ -73,6 +75,8 @@ public class SyncManager  {
 			.synchronizedMap(new HashMap<IProject, Boolean>());
 	private static final Map<IProject, SyncFileFilter> fProjectToFileFilterMap = Collections
 			.synchronizedMap(new HashMap<IProject, SyncFileFilter>());
+	private static final Map<IProject, Set<IPath>> fProjectToResolvedFilesMap = Collections
+			.synchronizedMap(new HashMap<IProject, Set<IPath>>());
 	private static SyncFileFilter defaultFilter = SyncFileFilter.createBuiltInDefaultFilter();
 
 	static {
@@ -212,6 +216,28 @@ public class SyncManager  {
 		}
 		return fProjectToShowErrorMap.get(project);
 	}
+	
+	/**
+	 * Is the given path for the given project resolved?
+	 *
+	 * @param project
+	 * @param path
+	 * @return whether path is resolved
+	 */
+	public static boolean getResolved(IProject project, IPath path) {
+		if (project == null || path == null) {
+			throw new NullPointerException();
+		}
+		if (!(fProjectToResolvedFilesMap.containsKey(project))) {
+			fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
+			try {
+				saveConfigurationData();
+			} catch (IOException e) {
+				RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+			}
+		}
+		return fProjectToResolvedFilesMap.get(project).contains(path);
+	}
 
 	/**
 	 * Set sync mode for project
@@ -269,6 +295,27 @@ public class SyncManager  {
 			throw new NullPointerException();
 		}
 		fProjectToFileFilterMap.put(project, filter);
+		try {
+			saveConfigurationData();
+		} catch (IOException e) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+		}
+	}
+	
+	/**
+	 * Set the given path as resolved for the given project
+	 *
+	 * @param project
+	 * @param path
+	 */
+	public static void setResolved(IProject project, IPath path) {
+		if (project == null || path == null) {
+			throw new NullPointerException();
+		}
+		if (!(fProjectToResolvedFilesMap.containsKey(project))) {
+			fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
+		}
+		fProjectToResolvedFilesMap.get(project).add(path);
 		try {
 			saveConfigurationData();
 		} catch (IOException e) {
