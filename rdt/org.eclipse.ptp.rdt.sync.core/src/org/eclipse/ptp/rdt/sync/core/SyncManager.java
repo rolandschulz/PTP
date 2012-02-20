@@ -11,6 +11,8 @@
 package org.eclipse.ptp.rdt.sync.core;
 
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
@@ -51,6 +53,8 @@ public class SyncManager  {
 	private static final String SYNC_MODE_KEY = "sync-mode"; //$NON-NLS-1$
 	private static final String SYNC_AUTO_KEY = "sync-auto"; //$NON-NLS-1$
 	private static final String SHOW_ERROR_KEY = "show-error"; //$NON-NLS-1$
+	private static final Map<IProject, Set<IPath>> fProjectToResolvedFilesMap = Collections
+			.synchronizedMap(new HashMap<IProject, Set<IPath>>());
 	
 	// Sync unavailable by default. Wizards should explicitly set the sync mode once the project is ready.
 	private static final SYNC_MODE DEFAULT_SYNC_MODE = SYNC_MODE.UNAVAILABLE;
@@ -202,9 +206,30 @@ public class SyncManager  {
 		}
 		return node.getBoolean(SHOW_ERROR_KEY, DEFAULT_SHOW_ERROR_SETTING);
 	}
-
+	
 	/**
 	 * Set sync mode for a project
+	 *
+	 * @param project
+	 * @param path
+	 * @return whether path is resolved
+	 */
+	public static boolean getResolved(IProject project, IPath path) {
+		if (project == null || path == null) {
+			throw new NullPointerException();
+		}
+		if (!(fProjectToResolvedFilesMap.containsKey(project))) {
+			fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
+			try {
+				saveConfigurationData();
+			} catch (IOException e) {
+				RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+			}
+		}
+		return fProjectToResolvedFilesMap.get(project).contains(path);
+	}
+
+	/**
 	 * 
 	 * @param project
 	 * @param mode
@@ -296,6 +321,22 @@ public class SyncManager  {
 		if (node == null) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_3);
 			return;
+	}
+	
+	/**
+	 * Set the given path as resolved for the given project
+	 *
+	 * @param project
+	 * @param path
+	 */
+	public static void setResolved(IProject project, IPath path) {
+		if (project == null || path == null) {
+			throw new NullPointerException();
+		}
+		if (!(fProjectToResolvedFilesMap.containsKey(project))) {
+			fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
+		}
+		fProjectToResolvedFilesMap.get(project).add(path);
 		}
 
 		filter.saveFilter(node);
