@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -106,7 +107,9 @@ public class ResourceChangeListener {
 					try {
 						// Post-build event
 						// Force a sync in order to download any new remote files but no need to sync if sync'ing is disabled.
-						if (event.getType() == IResourceChangeEvent.POST_BUILD ) {
+						// Ignore auto builds, which are triggered for every resource change
+						if (event.getType() == IResourceChangeEvent.POST_BUILD && 
+								event.getBuildKind() != IncrementalProjectBuilder.AUTO_BUILD) {
 							if (!syncEnabled) {
 								continue;
 							} else if (syncMode == SYNC_MODE.ALL) {
