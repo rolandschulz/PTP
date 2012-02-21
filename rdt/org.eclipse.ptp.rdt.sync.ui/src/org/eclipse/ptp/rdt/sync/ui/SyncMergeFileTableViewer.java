@@ -46,8 +46,8 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	@Override
 	public void setInitializationData(IConfigurationElement cfig, String propertyName, Object data) {
 		super.setInitializationData(cfig, propertyName, data);
-		CHECKED = SyncPluginImages.DESC_RESOLVED_MERGE.createImage();
-		UNCHECKED = SyncPluginImages.DESC_UNRESOLVED_MERGE.createImage();
+		CHECKED = SyncPluginImages.DESC_RESOLVED_MERGE.createImage(false);
+		UNCHECKED = SyncPluginImages.DESC_UNRESOLVED_MERGE.createImage(false);
 	}
 	
 	/*
@@ -88,6 +88,10 @@ public class SyncMergeFileTableViewer extends ViewPart {
 			resolveColumn.getColumn().setWidth(20);
 			resolveColumn.getColumn().setResizable(true);
 			resolveColumn.setLabelProvider(new ColumnLabelProvider() {
+				/*
+				 * (non-Javadoc)
+				 * @see org.eclipse.jface.viewers.ColumnLabelProvider#getImage(java.lang.Object)
+				 */
 				@Override
 				public Image getImage(Object element) {
 					assert(element instanceof IPath);
@@ -98,6 +102,10 @@ public class SyncMergeFileTableViewer extends ViewPart {
 					}
 				}
 				
+				/*
+				 * (non-Javadoc)
+				 * @see org.eclipse.jface.viewers.ColumnLabelProvider#getText(java.lang.Object)
+				 */
 				@Override
 				public String getText(Object element) {
 					assert(element instanceof IPath);
