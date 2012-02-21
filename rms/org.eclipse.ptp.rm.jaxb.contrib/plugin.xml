@@ -32,6 +32,10 @@
             name="edu.utexas.tacc.lonestar.sge.batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.utexas.tacc.ranger.sge.batch.xml"
+            name="edu.utexas.tacc.ranger.sge.batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
             configurationFile="data/gridengine-generic-batch.xml"
             name="Grid Engine-Generic-Batch">
       </JAXBResourceManagerConfiguration>
