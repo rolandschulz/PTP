@@ -23,6 +23,7 @@ import org.eclipse.compare.structuremergeviewer.Differencer;
 import org.eclipse.compare.structuremergeviewer.ICompareInput;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
@@ -93,6 +94,39 @@ public class SyncMergeEditor {
 
 		protected void fireInputChange() {
 			// Nothing to do
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode() {
+			IPath path = file.getLocation();
+			if (path == null) {
+				return 0;
+			} else {
+				return path.toOSString().hashCode();
+			}
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (!(obj instanceof FileCompareInput)) {
+				return false;
+			}
+			FileCompareInput other = (FileCompareInput) obj;
+			IPath path = file.getLocation();
+			IPath otherPath = other.file.getLocation();
+			if (path == null || otherPath == null) {
+					return false;
+			}
+			return path.toOSString().equals(otherPath.toOSString());
 		}
 	}
 	
