@@ -303,19 +303,23 @@ public class SyncManager  {
 	}
 	
 	/**
-	 * Set the given path as resolved for the given project
+	 * Set the given path as resolved or unresolved for the given project
 	 *
 	 * @param project
 	 * @param path
 	 */
-	public static void setResolved(IProject project, IPath path) {
+	public static void setResolved(IProject project, IPath path, boolean isResolved) {
 		if (project == null || path == null) {
 			throw new NullPointerException();
 		}
 		if (!(fProjectToResolvedFilesMap.containsKey(project))) {
 			fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
 		}
-		fProjectToResolvedFilesMap.get(project).add(path);
+		if (isResolved) {
+			fProjectToResolvedFilesMap.get(project).add(path);
+		} else {
+			fProjectToResolvedFilesMap.get(project).remove(path);
+		}
 		try {
 			saveConfigurationData();
 		} catch (IOException e) {
