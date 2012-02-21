@@ -11,87 +11,77 @@
 
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
-import java.math.BigInteger;
-
-import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement;
 
 /**
  * Saves a mask for creating implicit names
  * calculates the length of the output, which this mask will print out
- * 
- * @author karbach
- * 
  */
 public class Mask {
 
-	private static final String number = "\\s*(-|\\+)?(0x|0X)?([a-fA-F\\d]+)";// Regular expression for a printed integer //$NON-NLS-1$
+	// Regular expression for a printed integer
+	private static final String number = "\\s*(-|\\+)?(0x|0X)?([a-fA-F\\d]+)";//$NON-NLS-1$
 
-	public static void main(String[] args) {
+	private String maskString;
 
-		final ObjectFactory objf = new ObjectFactory();
+	// regular expression which printouts must match for this mask
+	private String regularMask;
 
-		final SchemeElement scheme = objf.createSchemeElement();
-		scheme.setMin(BigInteger.valueOf(5));
-		scheme.setMax(BigInteger.valueOf(10));
-		scheme.setStep(BigInteger.valueOf(1));
-		scheme.setMap("hans,peter,jupp"); //$NON-NLS-1$
+	private int outputLength;
 
-		final Mask m = new Mask(scheme);
-		System.out.println(m.getNumberOfLevelstring("peter")); //$NON-NLS-1$
-	}
+	// text-pattern before and behind the printed digit
+	private String pre, post;
 
-	private String maskstring;
+	// null, if no map-attribute specified, otherwise contains explicitly allowed names
+	private String[] names;
 
-	private String regularMask;// regular expression which printouts must match for this mask
+	// scheme-element which contains mask-definition
+	private final SchemeElement scheme;
 
-	private int outputlength;
-
-	private String pre, post;// text-pattern before and behind the printed digit
-
-	private String[] names;// null, if no map-attribute specified, otherwise contains explicitly allowed names
-
-	private final SchemeElement scheme;// scheme-element which contains mask-definition
-
-	private int[] numbers = null;// contains numbers of elements defined by scheme (list=1,17,2 => numbers={1,17,2})
+	// contains numbers of elements defined by scheme (list=1,17,2 => numbers={1,17,2})
+	private int[] numbers = null;
 
 	/**
-	 * @param pscheme
+	 * @param scheme
 	 *            scheme-element which contains the mask-definition
 	 */
-	public Mask(SchemeElement pscheme) {
+	public Mask(SchemeElement scheme) {
 
-		scheme = pscheme;
+		this.scheme = scheme;
 
-		if (pscheme.getMap() != null) {
-			names = pscheme.getMap().split(","); //$NON-NLS-1$
+		if (scheme.getMap() != null) {
+			names = scheme.getMap().split(","); //$NON-NLS-1$
 
-			outputlength = -1;// variable, because name lengths can be variable
+			outputLength = -1;// variable, because name lengths can be variable
 
-			regularMask = pscheme.getMap().replace(',', '|');
+			regularMask = scheme.getMap().replace(',', '|');
 			pre = ""; //$NON-NLS-1$
 			post = ""; //$NON-NLS-1$
-			maskstring = ""; //$NON-NLS-1$
+			maskString = ""; //$NON-NLS-1$
 
 		}
 		else {
 			names = null;
 
-			maskstring = pscheme.getMask();
+			maskString = scheme.getMask();
 			// regular expression in xsd (([^%])*%(\-|\+|\s|\#)*0(\-|\+|\s|\#)*(\d)+d([^%])*)|(([^%])*%(\-|\+|\s|\#)*d([^%])+)
-			if (maskstring.matches("([^%])*%(\\-|\\+|\\s|\\#)*d([^%])+")) {// length is unknown but there is a separator specified //$NON-NLS-1$
-				outputlength = -1;
+			if (maskString.matches("([^%])*%(\\-|\\+|\\s|\\#)*d([^%])+")) {//$NON-NLS-1$
+				// length is unknown but there is a separator specified
+				outputLength = -1;
 			}
-			else {// there must be given a length within the mask
-					// Find length by printing out the number 1 with that mask
-				outputlength = String.format(maskstring, 1).length();
+			else {
+				// there must be given a length within the mask
+				// Find length by printing out the number 1 with that mask
+				outputLength = String.format(maskString, 1).length();
 			}
 
 			// create regular expression for this mask
-			final int percent = maskstring.indexOf('%');
-			final int dpos = maskstring.indexOf('d');
-			pre = maskstring.substring(0, percent);
-			post = maskstring.substring(dpos + 1, maskstring.length());
+			final int perCent = maskString.indexOf('%');
+			// Search the first 'd'-character after the '%' character
+			final int dPos = maskString.indexOf('d', perCent);
+
+			pre = maskString.substring(0, perCent);
+			post = maskString.substring(dPos + 1, maskString.length());
 			regularMask = pre + number + post;
 		}
 
@@ -104,33 +94,33 @@ public class Mask {
 	 * @param id
 	 * @return implicit name of element with given id
 	 */
-	public String getImplicitLevelname(int id) {
+	public String getImplicitLevelName(int id) {
 		return LMLCheck.getLevelName(scheme, id);
 	}
 
 	public String getMask() {
-		return maskstring;
+		return maskString;
 	}
 
 	/**
 	 * Input is the part of the implicit name printed by this mask
 	 * 
-	 * @param levelstring
+	 * @param levelString
 	 *            output part of implicit name
 	 * @return id-nr for current level or -1, if id could not be parsed
 	 */
-	public int getNumberOfLevelstring(String levelstring) {
+	public int getNumberOfLevelString(String levelString) {
 
 		if (names == null) {
 
-			if (!isOutputAllowed(levelstring)) {
+			if (!isOutputAllowed(levelString)) {
 				return -1;// For robustness of this function
 			}
 
-			levelstring = levelstring.substring(pre.length()); // cut pre-text from inception
-			levelstring = levelstring.substring(0, levelstring.length() - post.length()); // cut post-text from end of levelstring
+			levelString = levelString.substring(pre.length()); // cut pre-text from inception
+			levelString = levelString.substring(0, levelString.length() - post.length()); // cut post-text from end of levelstring
 
-			final char[] chars = levelstring.toCharArray();
+			final char[] chars = levelString.toCharArray();
 
 			int i = 0;
 			while (i < chars.length && chars[i] < '0' || chars[i] > '9') {
@@ -155,7 +145,7 @@ public class Mask {
 		else {// special names defined, search position of levelstring within names, map position to id
 			int pos = 0;
 			for (final String name : names) {
-				if (name.equals(levelstring)) {
+				if (name.equals(levelString)) {
 
 					if (scheme.getList() != null) {
 
@@ -166,16 +156,7 @@ public class Mask {
 						return numbers[pos];
 					}
 					else {
-						final int min = scheme.getMin().intValue();
-						int max = min;
-
-						if (scheme.getMax() != null) {
-							max = scheme.getMax().intValue();
-						}
-
-						final int step = scheme.getStep().intValue();
-
-						return min + step * pos;
+						return scheme.getMin().intValue() + scheme.getStep().intValue() * pos;
 					}
 				}
 				pos++;
@@ -186,7 +167,7 @@ public class Mask {
 	}
 
 	public int getOutputLength() {
-		return outputlength;
+		return outputLength;
 	}
 
 	/**
@@ -199,7 +180,7 @@ public class Mask {
 	 */
 	public boolean isOutputAllowed(String output) {
 		if (names == null) {
-			return output.matches(regularMask) && (outputlength == -1 || outputlength == output.length());
+			return output.matches(regularMask) && (outputLength == -1 || outputLength == output.length());
 		}
 		// Just test if output is equal to one of the names
 		for (final String name : names) {

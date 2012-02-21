@@ -25,13 +25,10 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeType;
  * This class is capable of checking implicit names given by refid-attributes
  * faster than by creating all implicit names and then look if refid-values were
  * created
- * 
- * @author karbach
- * 
  */
 public class FastImpCheck {
 
-	private static ArrayList<ArrayList<Integer>> levels;
+	private static ArrayList<ArrayList<Integer>> levelsList;
 
 	/**
 	 * searches for refid within referencing nodedisplay and return errors if
@@ -39,32 +36,29 @@ public class FastImpCheck {
 	 * nodedisplay
 	 * 
 	 * @param base
-	 * @param ref
+	 * @param nodedisplay
 	 * @return
 	 */
-	public static ErrorList checkRefids(Nodedisplay base, Nodedisplay ref,
-			ErrorList pres) {
+	public static ErrorList checkRefids(Nodedisplay base, Nodedisplay nodedisplay, ErrorList errList) {
 
-		ErrorList res;
-		if (pres == null) {
-			res = new ErrorList();
+		ErrorList result;
+		if (errList == null) {
+			result = new ErrorList();
 		} else {
-			res = pres;
+			result = errList;
 		}
 
-		rekCheckRefids(ref.getData(), base.getScheme(), res);
+		recCheckRefIds(nodedisplay.getData(), base.getScheme(), result);
 
-		return res;
+		return result;
 	}
 
-	public static ArrayList<ArrayList<Integer>> getAllImpNameLevels(
-			String impname, Object scheme) {
+	public static ArrayList<ArrayList<Integer>> getAllImpNameLevels(String impName, Object scheme) {
 
-		levels = new ArrayList<ArrayList<Integer>>();
+		levelsList = new ArrayList<ArrayList<Integer>>();
+		impNameToAllPossibleLevel(impName, scheme, new ArrayList<Integer>());
 
-		impnameToAllPossibleLevel(impname, scheme, new ArrayList<Integer>());
-
-		return levels;
+		return levelsList;
 	}
 
 	/**
@@ -73,50 +67,43 @@ public class FastImpCheck {
 	 * 
 	 * only lower elements of scheme are interesting
 	 * 
-	 * @param impname
+	 * @param impName
 	 *            relative name, which might be defined in the given scheme
 	 * @param scheme
 	 *            any scheme-element on any level
-	 * @param nrs
+	 * @param numbersList
 	 *            Level-Numbers till now
 	 * @return
 	 */
-	public static void impnameToAllPossibleLevel(String impname, Object scheme,
-			ArrayList<Integer> nrs) {
+	public static void impNameToAllPossibleLevel(String impName, Object scheme, ArrayList<Integer> numbersList) {
 
-		final List<SchemeElement> lower = LMLCheck
-				.getLowerSchemeElements(scheme);
-		for (final SchemeElement low : lower) {
-
-			final Mask amask = new Mask(low);
-
+		final List<? extends SchemeElement> lowerList = LMLCheck.getLowerSchemeElements(scheme);
+		for (final SchemeElement lowerElement : lowerList) {
+			final Mask mask = new Mask(lowerElement);
 			int i = 1;
-			while (i <= impname.length()
-					&& !amask.isOutputAllowed(impname.substring(0, i))) {
+			while (i <= impName.length() && !mask.isOutputAllowed(impName.substring(0, i))) {
 				i++;
 			}
 
-			if (i > impname.length()) {
+			if (i > impName.length()) {
 				// No part-string is allowed for this mask
 				continue;
 			}
 
 			// Otherwise impname.substring(0, i) is allowed
-			while (i <= impname.length()
-					&& amask.isOutputAllowed(impname.substring(0, i))) {
-				final int id = amask.getNumberOfLevelstring(impname.substring(
-						0, i));
-				nrs.add(id);// add current number
+			while (i <= impName.length() && mask.isOutputAllowed(impName.substring(0, i))) {
+				final int id = mask.getNumberOfLevelString(impName.substring(0, i));
+				numbersList.add(id);// add current number
 
-				if (i == impname.length()) {// Solution found
-					final ArrayList<Integer> copy = LMLCheck.copyArrayList(nrs);
-					levels.add(copy);
+				if (i == impName.length()) {// Solution found
+					final ArrayList<Integer> copy = LMLCheck.copyArrayList(numbersList);
+					levelsList.add(copy);
 				} else {// Go deeper
-					impnameToAllPossibleLevel(impname.substring(i), low, nrs);
+					impNameToAllPossibleLevel(impName.substring(i), lowerElement, numbersList);
 				}
 
-				nrs.remove(nrs.size() - 1);// Remove number added on this
-											// recursion-level
+				numbersList.remove(numbersList.size() - 1);// Remove number added on this
+				// recursion-level
 				i++;
 			}
 
@@ -129,55 +116,58 @@ public class FastImpCheck {
 	 * 
 	 * only lower elements of scheme are interesting
 	 * 
-	 * @param impname
+	 * @param impName
 	 *            relative name, which might be defined in the given scheme
 	 * @param scheme
 	 *            any scheme-element on any level
-	 * @param nrs
+	 * @param numbersList
 	 *            Level-Numbers till now
 	 * @return
 	 */
-	public static ArrayList<Integer> impnameToOneLevel(String impname,
-			Object scheme, ArrayList<Integer> nrs) {
+	public static ArrayList<Integer> impNameToOneLevel(String impName, Object scheme, ArrayList<Integer> numbersList) {
 
-		final List<SchemeElement> lower = LMLCheck
-				.getLowerSchemeElements(scheme);
-		for (final SchemeElement low : lower) {
+		final List<? extends SchemeElement> lowerList = LMLCheck.getLowerSchemeElements(scheme);
+		for (final SchemeElement lowerElement : lowerList) {
 
-			final Mask amask = new Mask(low);
+			final Mask mask = new Mask(lowerElement);
 
 			int i = 1;
-			while (i <= impname.length()
-					&& !amask.isOutputAllowed(impname.substring(0, i))) {
+			while (i <= impName.length() && !mask.isOutputAllowed(impName.substring(0, i))) {
 				i++;
 			}
 
-			if (i > impname.length()) {
+			if (i > impName.length()) {
 				// No part-string is allowed for this mask
 				continue;
 			}
 
 			// Otherwise impname.substring(0, i) is allowed
-			while (i <= impname.length()
-					&& amask.isOutputAllowed(impname.substring(0, i))) {
+			while (i <= impName.length() && mask.isOutputAllowed(impName.substring(0, i))) {
 
-				final int id = amask.getNumberOfLevelstring(impname.substring(
-						0, i));
-				nrs.add(id);// add current number
+				final int id = mask.getNumberOfLevelString(impName.substring(0, i));
 
-				if (i == impname.length()) {// Solution found
-					return nrs;
+				// Check if this id is allowed within this scheme
+				final ArrayList<Integer> idList = new ArrayList<Integer>();
+				idList.add(id);
+				if (LMLCheck.getSchemeByLevels(idList, scheme) == null) {
+					i++;
+					continue;
+				}
+
+				numbersList.add(id);// add current number
+
+				if (i == impName.length()) {// Solution found
+					return numbersList;
 				} else {// Go deeper
 
-					final ArrayList<Integer> res = impnameToOneLevel(
-							impname.substring(i), low, nrs);
-					if (res != null) {
-						return res;
+					final ArrayList<Integer> result = impNameToOneLevel(impName.substring(i), lowerElement, numbersList);
+					if (result != null) {
+						return result;
 					}
 				}
 
-				nrs.remove(nrs.size() - 1);// Remove number added on this
-											// recursion-level
+				numbersList.remove(numbersList.size() - 1);
+				// Remove number added on this recursion-level
 				i++;
 			}
 
@@ -190,27 +180,26 @@ public class FastImpCheck {
 	 * Has to be called for nodedisplayviews begin level with 1 Searches all
 	 * masks within the scheme-tag of the nodedisplay
 	 * 
-	 * @param sel
+	 * @param selectObject
 	 *            schemeelement
 	 * @param level
 	 */
-	private static HashMap<Integer, Mask> findMasks(Object sel, int level,
-			HashMap<Integer, Mask> masks) {
+	@SuppressWarnings("unused")
+	private static HashMap<Integer, Mask> findMasks(Object selectObject, int level, HashMap<Integer, Mask> masksMap) {
 
-		final List els = LMLCheck.getLowerSchemeElements(sel);
+		final List<? extends SchemeElement> elementsList = LMLCheck.getLowerSchemeElements(selectObject);
 
-		for (final Object el : els) {
+		for (final Object element : elementsList) {
 
-			final SchemeElement asel = (SchemeElement) el;
-
-			if (!masks.containsKey(level) && asel.getMask() != null) {
-				masks.put(level, new Mask(asel));
+			final SchemeElement schmeElement = (SchemeElement) element;
+			if (!masksMap.containsKey(level) && schmeElement.getMask() != null) {
+				masksMap.put(level, new Mask(schmeElement));
 			}
 
-			findMasks(asel, level + 1, masks);
+			findMasks(schmeElement, level + 1, masksMap);
 		}
 
-		return masks;
+		return masksMap;
 
 	}
 
@@ -219,75 +208,67 @@ public class FastImpCheck {
 	 * 
 	 * p100-13, 0009-0-012 is transformed into 100,13,9,0,12 in an arraylist
 	 * 
-	 * @param impname
+	 * @param impName
 	 *            implicit name of a component of a parallel computer
 	 * @param scheme
 	 *            where the implicit object is defined by for masks-access
 	 * @return arraylist of level-numbers
 	 */
-	private static ArrayList<Integer> impnameToLevel(String impname,
-			HashMap<Integer, Mask> pmasks) {
+	@SuppressWarnings("unused")
+	private static ArrayList<Integer> impNameToLevel(String impName, HashMap<Integer, Mask> masksMap) {
 
-		final ArrayList<Integer> res = new ArrayList<Integer>();
+		final ArrayList<Integer> result = new ArrayList<Integer>();
 
-		final int length = impname.length();
-
-		int sumlength = 0;
-
+		final int length = impName.length();
+		int sumLength = 0;
 		int level = 1;
 
-		while (sumlength < length) {
-
-			final Mask amask = pmasks.get(level++);
-
-			if (amask == null) {// No mask for this level => error in parsing
-				// System.err.println("No mask for level "+level);
+		while (sumLength < length) {
+			final Mask mask = masksMap.get(level++);
+			if (mask == null) {
+				// No mask for this level => error in parsing
 				return null;
 			}
+			int currentLength = 0;
+			// Length of the current mask-output
 
-			int alength = 0;// Length of the current mask-output
+			if (mask.getOutputLength() >= 0) {
+				// fixed length
+				currentLength = mask.getOutputLength();
 
-			if (amask.getOutputLength() >= 0) {// fixed length
-				alength = amask.getOutputLength();
-
-				if (sumlength + alength > impname.length()
-						|| !amask.isOutputAllowed(impname.substring(sumlength,
-								sumlength + alength))) {
+				if (sumLength + currentLength > impName.length()
+						|| !mask.isOutputAllowed(impName.substring(sumLength, sumLength + currentLength))) {
 					return null;
 				}
 			} else {
 				// Variable-length-mask
-				final String rest = impname.substring(sumlength);
-
+				final String rest = impName.substring(sumLength);
 				int i = 1;
 				// Find first part that is allowed
-				while (i <= rest.length()
-						&& !amask.isOutputAllowed(rest.substring(0, i))) {
+				while (i <= rest.length() && !mask.isOutputAllowed(rest.substring(0, i))) {
 					i++;
 				}
 
 				if (i <= rest.length()) {
 					// Find last part that is allowed
 					int j = i;
-					while (j <= rest.length()
-							&& amask.isOutputAllowed(rest.substring(0, j))) {
+					while (j <= rest.length() && mask.isOutputAllowed(rest.substring(0, j))) {
 						j++;
 					}
 
-					alength = j - 1;
+					currentLength = j - 1;
 				} else {
 					return null;// Given output is not allowed
 				}
 			}
 
-			final int nr = amask.getNumberOfLevelstring(impname.substring(
-					sumlength, sumlength + alength));
-			res.add(nr);
+			final int number = mask.getNumberOfLevelString(impName.substring(sumLength, sumLength + currentLength));
+			result.add(number);
 
-			sumlength += alength;
+			sumLength += currentLength;
 		}
 
-		return res;
+		return result;
 	}
 
 	/**
@@ -302,43 +283,35 @@ public class FastImpCheck {
 	 *            mask-attributes of base nodedisplay
 	 * @param scheme
 	 *            scheme-element of base nodedisplay
-	 * @param res
+	 * @param errList
 	 *            errors
 	 * @return errorlist which occurred during checks
 	 */
-	private static ErrorList rekCheckRefids(Object data, SchemeType scheme,
-			ErrorList res) {
+	private static ErrorList recCheckRefIds(Object data, SchemeType scheme, ErrorList errList) {
 
-		final List els = LMLCheck.getLowerDataElements(data);
-		if (els == null) {
-			return res;// Keine Unterelemente gefunden
+		final List<? extends DataElement> elements = LMLCheck.getLowerDataElements(data);
+		if (elements == null) {
+			return errList;// Keine Unterelemente gefunden
 		}
-		for (int i = 0; i < els.size(); i++) {
+		for (int i = 0; i < elements.size(); i++) {
+			final String refName = elements.get(i).getRefid();
 
-			final DataElement el = (DataElement) els.get(i);
-
-			final String refname = el.getRefid();
-
-			if (refname != null) {
+			if (refName != null) {
 				// ArrayList<Integer> level=impnameToLevel(refname, masks);
-				final ArrayList<Integer> level = impnameToOneLevel(refname,
-						scheme, new ArrayList<Integer>());
-				if (level == null) {
-					res.addError(Messages.FastImpCheck_0 + refname
-							+ Messages.FastImpCheck_1);
+				final ArrayList<Integer> levelList = impNameToOneLevel(refName, scheme, new ArrayList<Integer>());
+				if (levelList == null) {
+					errList.addError(Messages.FastImpCheck_0 + refName + Messages.FastImpCheck_1);
 				} else {
-					if (LMLCheck.getSchemeByLevels(level, scheme) == null) {
-
-						res.addError(Messages.FastImpCheck_2 + refname
-								+ Messages.FastImpCheck_3);
+					if (LMLCheck.getSchemeByLevels(levelList, scheme) == null) {
+						errList.addError(Messages.FastImpCheck_2 + refName + Messages.FastImpCheck_3);
 					}
 				}
 			}
 
-			rekCheckRefids(el, scheme, res);
+			recCheckRefIds(elements.get(i), scheme, errList);
 		}
 
-		return res;
+		return errList;
 
 	}
 

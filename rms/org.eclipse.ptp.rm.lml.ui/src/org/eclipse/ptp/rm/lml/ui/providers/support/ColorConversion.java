@@ -8,7 +8,7 @@
  * Contributors:
  * 		Carsten Karbach, Claudia Knobloch,FZ Juelich
  */
-package org.eclipse.ptp.rm.lml.ui.providers;
+package org.eclipse.ptp.rm.lml.ui.providers.support;
 
 import java.util.HashMap;
 
@@ -24,9 +24,11 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ColorConversion {
 
-	// Mapping of integer-id of a color to swt-color-instances
-	// The id is created by red<<16 | green<<8 | blue, so color-values are collected in one Integer
-	private static HashMap<Integer, Color> colormap = new HashMap<Integer, Color>();
+	/**
+	 * Mapping of integer-id of a color to swt-color-instances
+	 * The id is created by red<<16 | green<<8 | blue, so color-values are collected in one Integer
+	 */
+	private static HashMap<Integer, Color> colorMap = new HashMap<Integer, Color>();
 
 	/**
 	 * Delete all colors from memory after usage.
@@ -34,8 +36,8 @@ public class ColorConversion {
 	 * are not needed any more
 	 */
 	public static void disposeColors() {
-		for (final org.eclipse.swt.graphics.Color col : colormap.values()) {
-			col.dispose();
+		for (final Color color : colorMap.values()) {
+			color.dispose();
 		}
 	}
 
@@ -53,26 +55,26 @@ public class ColorConversion {
 
 		final int id = getId(red, green, blue);
 
-		if (colormap.containsKey(id))
-			return colormap.get(id);
+		if (colorMap.containsKey(id)) {
+			return colorMap.get(id);
+		}
 
-		final Color res = new org.eclipse.swt.graphics.Color(Display.getCurrent(),
-				red, green, blue);
+		final Color result = new Color(Display.getCurrent(), red, green, blue);
 
-		colormap.put(id, res);
+		colorMap.put(id, result);
 
-		return res;
+		return result;
 	}
 
 	/**
 	 * Convert abstract LMLcolor-instance to swt-color.
 	 * 
-	 * @param lmlcolor
+	 * @param lmlColor
 	 *            abstract color instance
 	 * @return corresponding swt-color
 	 */
-	public static Color getColor(LMLColor lmlcolor) {
-		return getColor(lmlcolor.getRed(), lmlcolor.getGreen(), lmlcolor.getBlue());
+	public static Color getColor(LMLColor lmlColor) {
+		return getColor(lmlColor.getRed(), lmlColor.getGreen(), lmlColor.getBlue());
 	}
 
 	/**

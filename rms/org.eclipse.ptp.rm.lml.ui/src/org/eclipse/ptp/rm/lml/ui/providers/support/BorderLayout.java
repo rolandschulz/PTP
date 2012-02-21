@@ -8,7 +8,7 @@
  * Contributors:
  * 		Claudia Knobloch,FZ Juelich
  */
-package org.eclipse.ptp.rm.lml.ui.providers;
+package org.eclipse.ptp.rm.lml.ui.providers.support;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 
-class BorderLayout extends Layout {
+public class BorderLayout extends Layout {
 	public static class BorderData {
 		public int field;
 
