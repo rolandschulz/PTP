@@ -12,7 +12,7 @@
             icon="icons/view16/remoteccppeditortab.gif"
             id="org.eclipse.ptp.rdt.ui.editor.CEditor"
             name="%remoteEditor.name"
-            extensions="c,C,cc,cpp,cxx,c++,h,hh,hpp,hxx"
+            extensions="c,cc,cpp,cxx,c++,h,hh,hpp,hxx"
             symbolicFontName="org.eclipse.cdt.ui.editors.textfont">
             <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cSource"/>
             <contentTypeBinding contentTypeId="org.eclipse.cdt.core.cxxSource"/>
