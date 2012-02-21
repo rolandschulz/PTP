@@ -17,7 +17,12 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -67,7 +72,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 
 	public void createPartControl(Composite parent) {
 		synchronized(this) {
-			fileTableViewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+			fileTableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 			
 			// Create file column
 			TableViewerColumn fileColumn = new TableViewerColumn(fileTableViewer, SWT.NONE);
@@ -140,11 +145,22 @@ public class SyncMergeFileTableViewer extends ViewPart {
 			
 			// On selection, open the compare editor for the selected file
 			fileTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+				@Override
 				public void selectionChanged(SelectionChangedEvent event) {
 					Object selection = ((IStructuredSelection)event.getSelection()).getFirstElement();
-					if (selection instanceof IFile) {
-						SyncMergeEditor.open((IFile) selection);
-					}
+					assert(selection instanceof IPath);
+					SyncMergeEditor.open(project.getFile((IPath) selection));
+				}
+			});
+			
+			// Allow user to toggle whether file is resolved
+			fileTableViewer.addDoubleClickListener(new IDoubleClickListener() {
+				@Override
+				public void doubleClick(DoubleClickEvent event) {
+					Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
+					assert(selection instanceof IPath);
+					SyncManager.setResolved(project, (IPath) selection, !(SyncManager.getResolved(project, (IPath) selection)));
+					fileTableViewer.refresh();
 				}
 			});
 

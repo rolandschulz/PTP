@@ -37,7 +37,7 @@ import org.eclipse.ui.menus.UIElement;
 
 public class SyncMenuOperation extends AbstractHandler implements IElementUpdater {
 	private static final String SYNC_COMMAND_PARAMETER_ID = "org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"; //$NON-NLS-1$
-	private static final String SYNC_MERGE_FILE_VIEW = "org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTreeViewer"; //$NON-NLS-1$
+	private static final String SYNC_MERGE_FILE_VIEW = "org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer"; //$NON-NLS-1$
 	private static final String syncActiveCommand = "sync_active"; //$NON-NLS-1$
 	private static final String syncAllCommand = "sync_all"; //$NON-NLS-1$
 	private static final String setNoneCommand = "set_none"; //$NON-NLS-1$

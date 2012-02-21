@@ -341,7 +341,7 @@
          point="org.eclipse.ui.views">
       <view
             class="org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer"
-            id="org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTreeViewer"
+            id="org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer"
             name="Synchronized Merge View"
             restorable="false">
       </view>
