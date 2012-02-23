@@ -146,7 +146,9 @@ public class RemoteCEditorInfoProvider implements IRemoteCEditorInfoProvider {
 	 * @see org.eclipse.ptp.rdt.editor.info.IRemoteCEditorInfoProvider#doPostCreatePartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void doPostCreatePartControl(Composite parent) {
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, RDTHelpContextIds.REMOTE_C_CPP_EDITOR);
+		if (isRemote()) {
+			PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, RDTHelpContextIds.REMOTE_C_CPP_EDITOR);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -187,10 +189,27 @@ public class RemoteCEditorInfoProvider implements IRemoteCEditorInfoProvider {
 	 * @see org.eclipse.ptp.rdt.editor.info.IRemoteCEditorInfoProvider#editorContextMenuAboutToShow(org.eclipse.jface.action.IMenuManager)
 	 */
 	public void editorContextMenuAboutToShow(IMenuManager menu) {
-		// remove text search
-		menu.remove("org.eclipse.search.text.ctxmenu"); //$NON-NLS-1$
-		// remove refactoring for now
-		menu.remove("org.eclipse.cdt.ui.refactoring.menu"); //$NON-NLS-1$
+		if (isRemote()) {
+			// remove text search
+			menu.remove("org.eclipse.search.text.ctxmenu"); //$NON-NLS-1$
+			// remove refactoring menu for now
+			menu.remove("org.eclipse.cdt.ui.refactoring.menu"); //$NON-NLS-1$
+			
+			//remove some refactor menu items in the Source submenu
+			IMenuManager sourceMenu = (IMenuManager) menu.find("org.eclipse.cdt.ui.source.menu"); //$NON-NLS-1$
+			if (sourceMenu != null) {
+				sourceMenu.remove("AddIncludeOnSelection"); //$NON-NLS-1$
+				sourceMenu.remove("org.eclipse.cdt.ui.refactor.getters.and.setters"); //$NON-NLS-1$
+				sourceMenu.remove("org.eclipse.cdt.ui.refactor.implement.method"); //$NON-NLS-1$
+			}
+			
+			//remove items that don't work well for remote projects
+			menu.remove("OpenMacroExplorer"); //$NON-NLS-1$
+			menu.remove("ToggleSourceHeader"); //$NON-NLS-1$
+			
+			//quick type hierarchy
+			menu.remove("OpenHierarchy"); //$NON-NLS-1$
+		}
 	}
 
 	/* (non-Javadoc)
