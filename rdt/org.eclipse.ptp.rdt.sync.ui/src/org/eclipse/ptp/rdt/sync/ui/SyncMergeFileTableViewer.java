@@ -10,12 +10,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
@@ -23,12 +30,14 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.ptp.internal.rdt.sync.ui.SyncPluginImages;
+import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
@@ -36,6 +45,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.ISelectionService;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 public class SyncMergeFileTableViewer extends ViewPart {
@@ -43,6 +58,9 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	private Image UNCHECKED;
 	private IProject project;
 	private TableViewer fileTableViewer;
+	private Set<IPath> mergeConflictedFiles;
+	private Action syncResolveAsLocalAction;
+	private ISelectionListener selectionListener;
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.ViewPart#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String,
@@ -67,6 +85,10 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		}
 		if (UNCHECKED != null) {
 			UNCHECKED.dispose();
+		}
+		if (selectionListener != null) {
+			ISelectionService selectionService = (ISelectionService) getSite().getService(ISelectionService.class);
+			selectionService.removePostSelectionListener(selectionListener);
 		}
 	}
 
@@ -153,6 +175,19 @@ public class SyncMergeFileTableViewer extends ViewPart {
 				}
 			});
 			
+			// Add sync button to toolbar
+			syncResolveAsLocalAction = new Action(Messages.SyncMergeFileTableViewer_0) {
+				public void run() {
+					try {
+						SyncManager.syncResolveAsLocal(null, project, SyncFlag.FORCE, null);
+					} catch (CoreException e) {
+						// This should never happen because only a blocking sync can throw a core exception.
+						RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMergeFileTableViewer_1);
+					}
+				}
+			};
+			getViewSite().getActionBars().getToolBarManager().add(syncResolveAsLocalAction);
+
 			// Allow user to toggle whether file is resolved
 			fileTableViewer.addDoubleClickListener(new IDoubleClickListener() {
 				@Override
@@ -160,36 +195,94 @@ public class SyncMergeFileTableViewer extends ViewPart {
 					Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
 					assert(selection instanceof IPath);
 					SyncManager.setResolved(project, (IPath) selection, !(SyncManager.getResolved(project, (IPath) selection)));
+					if (SyncManager.getResolved(project, mergeConflictedFiles)) {
+						syncResolveAsLocalAction.setEnabled(true);
+					} else {
+						syncResolveAsLocalAction.setEnabled(false);
+					}
 					fileTableViewer.refresh();
 				}
 			});
 
-			// Set input
+			// Set contents
 			fileTableViewer.setContentProvider(ArrayContentProvider.getInstance());
-			if (project != null) {
-				ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
-				fileTableViewer.setInput(provider.getMergeConflictFiles());
-			}
+			this.update(true);
+			
+			// Listen for selection changes
+			ISelectionService selectionService = (ISelectionService) getSite().getService(ISelectionService.class);
+			selectionListener = new ISelectionListener() {
+				@Override
+				public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+					update(false);
+				}
+			};
+			selectionService.addPostSelectionListener(selectionListener);
 		}
+	}
+	
+	private void update(boolean updateCurrentProject) {
+		IProject newProject = this.getProject();
+		// Never go from displaying a project to displaying no project
+		if (newProject == null && project != null) {
+			return;
+		}
+
+		// Return if we are told not to update the current project, and there is no project change
+		if (!updateCurrentProject && newProject == project) {
+			return;
+		}
+		project = newProject;
+		
+		if (project != null) {
+			ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
+			mergeConflictedFiles = provider.getMergeConflictFiles();
+		} else {
+			mergeConflictedFiles = new HashSet<IPath>();
+		}
+		fileTableViewer.setInput(mergeConflictedFiles);
+		if (project != null && SyncManager.getResolved(project, mergeConflictedFiles)) {
+			syncResolveAsLocalAction.setEnabled(true);
+		} else {
+			syncResolveAsLocalAction.setEnabled(false);
+		}
+		fileTableViewer.refresh();
 	}
 
 	public void setFocus() {
 		fileTableViewer.getControl().setFocus();
 	}
-	
-	/**
-	 * Set the project displayed by this view. Ideally, this would be passed in on view creation, but Eclipse does not support
-	 * passing of parameters to views.
-	 *
-	 * @param project
+
+	/*
+	 * Portions copied from org.eclipse.ptp.services.ui.wizards.setDefaultFromSelection
 	 */
-	public void setProject(IProject p) {
-		project = p;
-		synchronized(this) {
-			if (fileTableViewer != null) {
-				ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
-				fileTableViewer.setInput(provider.getMergeConflictFiles());
-			}
+	private IProject getProject() {
+		IStructuredSelection selection = this.getSelectedElements();
+		if (selection == null) {
+			return null;
+		}
+
+		Object firstElement = selection.getFirstElement();
+		if (!(firstElement instanceof IAdaptable)) {
+			return null;
+		}
+		Object o = ((IAdaptable) firstElement).getAdapter(IResource.class);
+		if (o == null) {
+			return null;
+		}
+		IResource resource = (IResource) o;
+
+		return resource.getProject();
+	}
+	
+	private IStructuredSelection getSelectedElements() {
+		IWorkbenchWindow wnd = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchPage pg = wnd.getActivePage();
+		ISelection sel = pg.getSelection();
+
+		if (!(sel instanceof IStructuredSelection)) {
+			return null;
+		} else {
+			return (IStructuredSelection) sel;
 		}
 	}
 }

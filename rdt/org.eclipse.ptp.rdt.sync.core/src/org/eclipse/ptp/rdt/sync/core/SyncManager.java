@@ -246,6 +246,28 @@ public class SyncManager  {
 	}
 
 	/**
+	 * Are the given paths for the given project resolved?
+	 *
+	 * @param project
+	 * @param set of paths
+	 * @return whether paths are resolved
+	 */
+	public static boolean getResolved(IProject project, Set<IPath> paths) {
+		if (project == null || paths == null) {
+			throw new NullPointerException();
+		}
+		if (!(fProjectToResolvedFilesMap.containsKey(project))) {
+			fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
+			try {
+				saveConfigurationData();
+			} catch (IOException e) {
+				RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+			}
+		}
+		return fProjectToResolvedFilesMap.get(project).containsAll(paths);
+	}
+
+	/**
 	 * Set sync mode for project
 	 * 
 	 * @param project
