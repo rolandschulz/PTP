@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -139,13 +139,13 @@ public class CDTMiner extends Miner {
 	
 	// includes
 	public static final String C_INCLUDES_FIND_INCLUDES_TO = "C_INCLUDES_FIND_INCLUDES_TO"; //$NON-NLS-1$
-	public static final String C_INCLUDES_FIND_INCLUDES_TO_RESULT = "C_INCLUDES_FIND_INCLUDES_TO_RESULT"; //$NON-NLS-1$
+	public static final String T_INCLUDES_FIND_INCLUDES_TO_RESULT = "Type.Includes.Find.Includes.To.Result"; //$NON-NLS-1$
 	public static final String C_INCLUDES_FIND_INCLUDED_BY = "C_INCLUDES_FIND_INCLUDED_BY"; //$NON-NLS-1$
-	public static final String C_INCLUDES_FIND_INCLUDED_BY_RESULT = "C_INCLUDES_FIND_INCLUDED_BY_RESULT"; //$NON-NLS-1$
+	public static final String T_INCLUDES_FIND_INCLUDED_BY_RESULT = "Type.Includes.Find.Included.By.Result"; //$NON-NLS-1$
 	public static final String C_INCLUDES_IS_INDEXED = "C_INCLUDES_IS_INDEXED"; //$NON-NLS-1$
-	public static final String C_INCLUDES_IS_INDEXED_RESULT = "C_INCLUDES_IS_INDEXED_RESULT"; //$NON-NLS-1$
+	public static final String T_INCLUDES_IS_INDEXED_RESULT = "Type.Includes.Is.Indexed.Result"; //$NON-NLS-1$
 	public static final String C_INCLUDES_FIND_INCLUDE = "C_INCLUDES_FIND_INCLUDE"; //$NON-NLS-1$
-	public static final String C_INCLUDES_FIND_INCLUDE_RESULT = "C_INCLUDES_FIND_INCLUDE_RESULT"; //$NON-NLS-1$
+	public static final String T_INCLUDES_FIND_INCLUDE_RESULT = "Type.Includes.Find.Include.Result"; //$NON-NLS-1$
 	
 	public static String LINE_SEPARATOR;
 	
@@ -153,7 +153,7 @@ public class CDTMiner extends Miner {
 	
 	//model builder
 	public static final String C_MODEL_BUILDER = "C_MODEL_BUILDER"; //$NON-NLS-1$;
-	public static final String C_MODEL_RESULT= "C_MODEL_RESULT"; //$NON-NLS-1$;
+	public static final String T_MODEL_RESULT= "Type.Model.Result"; //$NON-NLS-1$;
 
 	
 	public static final String LOG_TAG = "CDTMiner"; //$NON-NLS-1$
@@ -776,7 +776,7 @@ public class CDTMiner extends Miner {
 	
 				// create the result object
 				String resultString = Serializer.serialize(workingCopy);
-				status.getDataStore().createObject(status, C_MODEL_RESULT, resultString);
+				status.getDataStore().createObject(status, T_MODEL_RESULT, resultString);
 			}
 		} catch (IOException e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
@@ -864,7 +864,7 @@ public class CDTMiner extends Miner {
 	
 				// create the result object
 				String resultString = Serializer.serialize(includesToReturn);
-				status.getDataStore().createObject(status, C_INCLUDES_FIND_INCLUDES_TO_RESULT, resultString);
+				status.getDataStore().createObject(status, T_INCLUDES_FIND_INCLUDES_TO_RESULT, resultString);
 			}			         
 			finally 
 			{
@@ -941,7 +941,7 @@ public class CDTMiner extends Miner {
 	
 				// create the result object
 				String resultString = Serializer.serialize(includeToReturn);
-				status.getDataStore().createObject(status, C_INCLUDES_FIND_INCLUDE_RESULT, resultString);
+				status.getDataStore().createObject(status, T_INCLUDES_FIND_INCLUDE_RESULT, resultString);
 			}			         
 			finally 
 			{
@@ -1038,7 +1038,7 @@ public class CDTMiner extends Miner {
 	
 				// create the result object
 				String resultString = Serializer.serialize(includesToReturn);
-				status.getDataStore().createObject(status, C_INCLUDES_FIND_INCLUDED_BY_RESULT, resultString);
+				status.getDataStore().createObject(status, T_INCLUDES_FIND_INCLUDED_BY_RESULT, resultString);
 			}			         
 			finally 
 			{
@@ -1076,7 +1076,7 @@ public class CDTMiner extends Miner {
 
 				// create the result object
 				String resultString = Serializer.serialize(new Boolean(files.length > 0));
-				status.getDataStore().createObject(status, C_INCLUDES_IS_INDEXED_RESULT, resultString);
+				status.getDataStore().createObject(status, T_INCLUDES_IS_INDEXED_RESULT, resultString);
 			}			         
 			finally 
 			{
