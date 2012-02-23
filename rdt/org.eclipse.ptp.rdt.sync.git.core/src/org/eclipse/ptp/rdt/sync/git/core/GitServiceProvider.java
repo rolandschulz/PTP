@@ -30,6 +30,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.ptp.rdt.sync.core.ISyncListener;
+import org.eclipse.ptp.rdt.sync.core.SyncEvent;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
@@ -61,6 +63,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private Integer fWaitingThreadsCount = 0;
 	private Integer syncTaskId = -1; // ID for most recent synchronization task, functions as a time-stamp
 	private int finishedSyncTaskId = -1; // all synchronizations up to this ID (including it) have finished
+	
+	private final Set<ISyncListener> syncListenerSet = new HashSet<ISyncListener>();
 
 	/**
 	 * Get the remote directory that will be used for synchronization
@@ -362,6 +366,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					fSyncConnection.sync(progress.newChild(40), true);
 				}
 				finishedSyncTaskId = willFinishTaskId;
+				this.notifySyncListeners();
 			} catch (final RemoteSyncException e) {
 				this.handleRemoteSyncException(e, syncFlags);
 				return;
@@ -577,6 +582,30 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		
 		if (!wasLocked) {
 			providerLock.unlock();
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#addPostSyncListener(org.eclipse.ptp.rdt.sync.core.ISyncListener)
+	 */
+	@Override
+	public void addPostSyncListener(ISyncListener listener) {
+		syncListenerSet.add(listener);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#removePostSyncListener(org.eclipse.ptp.rdt.sync.core.ISyncListener)
+	 */
+	@Override
+	public void removePostSyncListener(ISyncListener listener) {
+		syncListenerSet.remove(listener);
+	}
+	
+	private void notifySyncListeners() {
+		for (ISyncListener listener: syncListenerSet) {
+			listener.handleSyncEvent(new SyncEvent());
 		}
 	}
 }

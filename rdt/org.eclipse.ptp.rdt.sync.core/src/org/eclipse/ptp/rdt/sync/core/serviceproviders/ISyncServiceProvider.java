@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.ISyncListener;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -100,4 +101,18 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
      * touched. This is called, for example, when a project is about to be deleted.
      */
     public void close();
+    
+    /**
+     * Add a listener for post-sync events
+     *
+     * @param listener
+     */
+    public void addPostSyncListener(ISyncListener listener);
+    
+    /**
+     * Remove a listener from post-sync events
+     *
+     * @param listener
+     */
+    public void removePostSyncListener(ISyncListener listener);
 }
