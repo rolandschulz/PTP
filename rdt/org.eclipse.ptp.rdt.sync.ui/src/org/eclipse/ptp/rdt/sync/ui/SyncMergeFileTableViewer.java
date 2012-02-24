@@ -37,6 +37,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.ptp.internal.rdt.sync.ui.SyncPluginImages;
+import org.eclipse.ptp.rdt.sync.core.ISyncListener;
+import org.eclipse.ptp.rdt.sync.core.SyncEvent;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
@@ -61,6 +63,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	private Set<IPath> mergeConflictedFiles;
 	private Action syncResolveAsLocalAction;
 	private ISelectionListener selectionListener;
+	private ISyncListener syncListener;
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.ViewPart#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String,
@@ -89,6 +92,10 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		if (selectionListener != null) {
 			ISelectionService selectionService = (ISelectionService) getSite().getService(ISelectionService.class);
 			selectionService.removePostSelectionListener(selectionListener);
+		}
+		if (project != null) {
+			ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
+			provider.removePostSyncListener(syncListener);
 		}
 	}
 
@@ -204,35 +211,55 @@ public class SyncMergeFileTableViewer extends ViewPart {
 				}
 			});
 
-			// Set contents
-			fileTableViewer.setContentProvider(ArrayContentProvider.getInstance());
-			this.update(true);
-			
 			// Listen for selection changes
 			ISelectionService selectionService = (ISelectionService) getSite().getService(ISelectionService.class);
 			selectionListener = new ISelectionListener() {
 				@Override
 				public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-					update(false);
+					IProject selectedProject = getProject();
+					if (selectedProject != null && selectedProject != project) {
+						SyncMergeFileTableViewer.this.switchProject(selectedProject);
+					}
 				}
 			};
 			selectionService.addPostSelectionListener(selectionListener);
+			
+			// Create a sync listener, which will be registered with the correct project
+			syncListener = new ISyncListener() {
+				@Override
+				public void handleSyncEvent(SyncEvent event) {
+					RDTSyncUIPlugin.getStandardDisplay().syncExec(new Runnable() {
+						public void run(){
+							SyncMergeFileTableViewer.this.update();
+						}
+					});
+				}
+			};
+
+			// Set contents
+			fileTableViewer.setContentProvider(ArrayContentProvider.getInstance());
+			this.switchProject(getProject());
 		}
 	}
 	
-	private void update(boolean updateCurrentProject) {
-		IProject newProject = this.getProject();
-		// Never go from displaying a project to displaying no project
-		if (newProject == null && project != null) {
-			return;
+	// Switch to the given project, which may be null. This function always switches and then updates the viewer. It does no
+	// checking as to whether the switch is necessary.
+	private void switchProject(IProject newProject) {
+		// Move sync listener from old project to new project
+		if (project != null) {
+			ISyncServiceProvider oldProvider = SyncManager.getSyncProvider(project);
+			oldProvider.removePostSyncListener(syncListener);
 		}
-
-		// Return if we are told not to update the current project, and there is no project change
-		if (!updateCurrentProject && newProject == project) {
-			return;
+		if (newProject != null) {
+			ISyncServiceProvider newProvider = SyncManager.getSyncProvider(newProject);
+			newProvider.addPostSyncListener(syncListener);
 		}
 		project = newProject;
-		
+		update();
+	}
+	
+	// Update the viewer based on the current project set in the "project" variable. 
+	private void update() {
 		if (project != null) {
 			ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
 			mergeConflictedFiles = provider.getMergeConflictFiles();
@@ -248,6 +275,11 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		fileTableViewer.refresh();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
+	@Override
 	public void setFocus() {
 		fileTableViewer.getControl().setFocus();
 	}
@@ -255,8 +287,8 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	/*
 	 * Portions copied from org.eclipse.ptp.services.ui.wizards.setDefaultFromSelection
 	 */
-	private IProject getProject() {
-		IStructuredSelection selection = this.getSelectedElements();
+	private static IProject getProject() {
+		IStructuredSelection selection = getSelectedElements();
 		if (selection == null) {
 			return null;
 		}
@@ -274,7 +306,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		return resource.getProject();
 	}
 	
-	private IStructuredSelection getSelectedElements() {
+	private static IStructuredSelection getSelectedElements() {
 		IWorkbenchWindow wnd = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IWorkbenchPage pg = wnd.getActivePage();
 		ISelection sel = pg.getSelection();
