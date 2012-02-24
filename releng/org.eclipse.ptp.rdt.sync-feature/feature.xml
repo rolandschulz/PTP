@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.rdt.sync"
       label="%featureName"
-      version="5.0.5.qualifier"
+      version="5.0.6.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.ptp.rdt.sync.core"
       >

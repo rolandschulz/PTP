@@ -8,7 +8,7 @@
 
 	<groupId>org.eclipse.ptp</groupId>
 	<artifactId>ptp-parent</artifactId>
-	<version>5.0.5-SNAPSHOT</version>
+	<version>5.0.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>PTP Parent</name>
 

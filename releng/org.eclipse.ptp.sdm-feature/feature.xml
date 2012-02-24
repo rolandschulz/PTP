@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.debug.sdm"
       label="%featureName"
-      version="5.0.5.qualifier"
+      version="5.0.6.qualifier"
       plugin="org.eclipse.ptp.debug.sdm.core"
       provider-name="%providerName"
       >
