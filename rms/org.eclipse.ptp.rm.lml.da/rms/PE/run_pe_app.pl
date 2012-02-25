@@ -10,7 +10,13 @@
 $pid = fork();
 if ( $pid == 0 ) {
 	printf( "::::PoePid=%d::::\n", $$ );
-	exec(@ARGV);
+    $hpcrun = $ENV{'HPC_USE_HPCRUN'};
+    if ($hpcrun eq 'yes') {
+        exec('/opt/ibmhpc/ppedev.hpct/bin/hpcrun', '/usr/bin/poe', @ARGV);
+    }
+    else {
+        exec('poe', @ARGV);
+    }
 	exit(1);
 } else {
 	if ( defined($pid) ) {
