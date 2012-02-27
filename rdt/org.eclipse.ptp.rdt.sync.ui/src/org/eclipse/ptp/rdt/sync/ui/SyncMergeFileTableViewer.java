@@ -177,8 +177,10 @@ public class SyncMergeFileTableViewer extends ViewPart {
 				@Override
 				public void selectionChanged(SelectionChangedEvent event) {
 					Object selection = ((IStructuredSelection)event.getSelection()).getFirstElement();
-					assert(selection instanceof IPath);
-					SyncMergeEditor.open(project.getFile((IPath) selection));
+					if (selection != null) {
+						assert(selection instanceof IPath);
+						SyncMergeEditor.open(project.getFile((IPath) selection));
+					}
 				}
 			});
 			
