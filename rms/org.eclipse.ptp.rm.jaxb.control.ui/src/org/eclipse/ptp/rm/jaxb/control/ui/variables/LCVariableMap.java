@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.variables;
 
@@ -24,6 +25,8 @@ import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.ems.core.EnvManagerConfigString;
+import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
@@ -52,6 +55,7 @@ import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
  * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap
  * 
  * @author arossi
+ * @author Jeff Overbey - Environment Manager support
  */
 public class LCVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
@@ -110,6 +114,7 @@ public class LCVariableMap implements IVariableMap {
 		}
 	}
 
+	private final IEnvManager envManager;
 	private final Map<String, Object> linkedTo;
 	private final Map<String, Object> excluded;
 	private final Map<String, Object> values;
@@ -120,7 +125,8 @@ public class LCVariableMap implements IVariableMap {
 
 	private String rmPrefix;
 
-	public LCVariableMap() {
+	public LCVariableMap(IEnvManager envManager) {
+		this.envManager = envManager;
 		this.values = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.excluded = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.defaultValues = Collections.synchronizedMap(new TreeMap<String, String>());
@@ -552,5 +558,13 @@ public class LCVariableMap implements IVariableMap {
 				put(name, o);
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#convertEngMgmtConfigString(java.lang.String)
+	 */
+	public String convertEngMgmtConfigString(String string) {
+		assert EnvManagerConfigString.isEnvMgmtConfigString(string);
+		return envManager.getBashConcatenation("\n", false, new EnvManagerConfigString(string), null); //$NON-NLS-1$
 	}
 }
