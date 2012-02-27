@@ -188,6 +188,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 			syncResolveAsLocalAction = new Action(Messages.SyncMergeFileTableViewer_0) {
 				public void run() {
 					try {
+						SyncManager.clearResolved(project);
 						SyncManager.syncResolveAsLocal(null, project, SyncFlag.FORCE, null);
 					} catch (CoreException e) {
 						// This should never happen because only a blocking sync can throw a core exception.

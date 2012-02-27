@@ -356,6 +356,15 @@ public class SyncManager  {
 	}
 	
 	/**
+	 * Clear the list of resolved files for the given project.
+	 *
+	 * @param project
+	 */
+	public static void clearResolved(IProject project) {
+		fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
+	}
+	
+	/**
 	 * Save a new default file filter.
 	 * Use this in conjunction with "getDefaultFileFilter()" to modify the default filter.
 	 * @param filter cannot be null
