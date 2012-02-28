@@ -46,10 +46,14 @@ import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.NotSupportedException;
 import org.eclipse.jgit.errors.TransportException;
 import org.eclipse.jgit.errors.UnmergedPathException;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.merge.MergeStrategy;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.RefSpec;
@@ -59,6 +63,7 @@ import org.eclipse.jgit.transport.SshSessionFactory;
 import org.eclipse.jgit.transport.Transport;
 import org.eclipse.jgit.transport.TransportGitSsh;
 import org.eclipse.jgit.transport.URIish;
+import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.QuotedString;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -650,18 +655,52 @@ public class GitRemoteSyncConnection {
 			repoPath += java.io.File.separator;
 		}
 
-		StatusCommand statusCommand = git.status();
-		Status status;
 		FileToMergePartsMap.clear();
+
+		RevWalk walk = null;
 		try {
-			status = statusCommand.call();
+			StatusCommand statusCommand = git.status();
+			Status status = statusCommand.call();
+			if (status.getConflicting().isEmpty()) {
+				return;
+			}
+
+			walk = new RevWalk(git.getRepository());
+			// Get the head, merge head, and merge base commits
+			walk.setRevFilter(RevFilter.MERGE_BASE);
+			ObjectId headSHA = git.getRepository().resolve("HEAD"); //$NON-NLS-1$
+			ObjectId mergeHeadSHA = git.getRepository().resolve("MERGE_HEAD"); //$NON-NLS-1$
+			RevCommit head = walk.parseCommit(headSHA);
+			RevCommit mergeHead = walk.parseCommit(mergeHeadSHA);
+			walk.markStart(head);
+			walk.markStart(mergeHead);
+			RevCommit mergeBase = walk.next();
+
+			// For each merge-conflicted file, pull out and store its contents for each of the three commits
 			for (String s : status.getConflicting()) {
-				FileToMergePartsMap.put(new Path(s), Diff3Parser.parseFile(new File(repoPath + s)));
+				TreeWalk localTreeWalk = TreeWalk.forPath(git.getRepository(), s, head.getTree());
+				ObjectId localId = localTreeWalk.getObjectId(0);
+				String localContents = new String(git.getRepository().open(localId).getBytes());
+
+				TreeWalk remoteTreeWalk = TreeWalk.forPath(git.getRepository(), s, mergeHead.getTree());
+				ObjectId remoteId = remoteTreeWalk.getObjectId(0);
+				String remoteContents = new String(git.getRepository().open(remoteId).getBytes());
+
+				TreeWalk ancestorTreeWalk = TreeWalk.forPath(git.getRepository(), s, mergeBase.getTree());
+				ObjectId ancestorId = ancestorTreeWalk.getObjectId(0);
+				String ancestorContents = new String(git.getRepository().open(ancestorId).getBytes());
+
+				String[] mergeParts = {localContents, remoteContents, ancestorContents};
+				FileToMergePartsMap.put(new Path(s), mergeParts);
 			}
 		} catch (NoWorkTreeException e) {
 			throw new RemoteSyncException(e);
 		} catch (IOException e) {
 			throw new RemoteSyncException(e);
+		} finally {
+			if (walk != null) {
+				walk.dispose();
+			}
 		}
 	}
 
