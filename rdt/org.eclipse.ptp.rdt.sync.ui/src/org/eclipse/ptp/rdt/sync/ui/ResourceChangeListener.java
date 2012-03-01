@@ -43,46 +43,6 @@ public class ResourceChangeListener {
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
 	}
 
-	// For sync errors, print information and provide a toggle box so that user can turn off error displays until the next
-	// successful sync, which presumably means the problem has been resolved. Note that errors are re-enabled inside the
-	// sync call.
-	private static class SyncRCLExceptionHandler implements ISyncExceptionHandler {
-		private final IProject project;
-		public SyncRCLExceptionHandler(IProject p) {
-			project = p;
-		}
-
-		public void handle(CoreException e) {
-			if (!SyncManager.getShowErrors(project)) {
-				return;
-			}
-
-			String message;
-			String endOfLineChar = System.getProperty("line.separator"); //$NON-NLS-1$
-			Display errorDisplay = RDTSyncUIPlugin.getStandardDisplay();
-			
-			message = Messages.SyncMenuOperation_5 + project.getName() + ":" + endOfLineChar + endOfLineChar; //$NON-NLS-1$
-			if ((e.getMessage() != null && e.getMessage().length() > 0) || e.getCause() == null) {
-				message = message + e.getMessage();
-			} else {
-				message = message + e.getCause().getMessage();
-			}
-			
-			final String finalMessage = message;
-			errorDisplay.syncExec(new Runnable () {
-				public void run() {
-					MessageDialogWithToggle dialog = MessageDialogWithToggle.openError(null, Messages.SyncMenuOperation_3,
-							finalMessage, Messages.SyncMenuOperation_4, !SyncManager.getShowErrors(project), null, null);
-					if (dialog.getToggleState()) {
-						SyncManager.setShowErrors(project, false);
-					} else {
-						SyncManager.setShowErrors(project, true);
-					}
-				}
-			});
-		}
-	}
-
 	private static IResourceChangeListener resourceListener = new IResourceChangeListener() {
 		public void resourceChanged(IResourceChangeEvent event) {
 			// Turn off sync'ing for a project before deleting it and close repository - see bug 360170
@@ -113,9 +73,11 @@ public class ResourceChangeListener {
 							if (!syncEnabled) {
 								continue;
 							} else if (syncMode == SYNC_MODE.ALL) {
-								SyncManager.syncAll(null, project, SyncFlag.FORCE, new SyncRCLExceptionHandler(project));
+								SyncManager.syncAll(null, project, SyncFlag.FORCE,
+										new CommonSyncExceptionHandler(project, true, true));
 							} else if (syncMode == SYNC_MODE.ACTIVE) {
-								SyncManager.sync(null, project, SyncFlag.FORCE, new SyncRCLExceptionHandler(project));
+								SyncManager.sync(null, project, SyncFlag.FORCE,
+										new CommonSyncExceptionHandler(project, true, true));
 							}
 						}
 						// Post-change event
@@ -125,9 +87,11 @@ public class ResourceChangeListener {
 							if (!syncEnabled) {
 								SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
 							} else if (syncMode == SYNC_MODE.ALL) {
-								SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
+								SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE,
+										new CommonSyncExceptionHandler(project, true, false));
 							} else if (syncMode == SYNC_MODE.ACTIVE) {
-								SyncManager.sync(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
+								SyncManager.sync(delta, project, SyncFlag.NO_FORCE,
+										new CommonSyncExceptionHandler(project, true, false));
 							}
 						}
 					} catch (CoreException e){
