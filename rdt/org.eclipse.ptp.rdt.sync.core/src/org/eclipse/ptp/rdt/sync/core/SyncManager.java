@@ -99,10 +99,10 @@ public class SyncManager  {
 		private final ISyncServiceProvider fSyncProvider;
 		private final EnumSet<SyncFlag> fSyncFlags;
 		private final boolean fResolveAsLocal;
-		private final SyncExceptionHandler fSyncExceptionHandler;
+		private final ISyncExceptionHandler fSyncExceptionHandler;
 
 		public SynchronizeJob(IResourceDelta delta, IProject project, ISyncServiceProvider provider, EnumSet<SyncFlag> syncFlags,
-				boolean resolveAsLocal, SyncExceptionHandler seHandler) {
+				boolean resolveAsLocal, ISyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
 			fDelta = delta;
 			fProject = project;
@@ -390,7 +390,7 @@ public class SyncManager  {
 	 * @return the scheduled sync job
 	 * @throws CoreException 
 	 */
-	public static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, SyncExceptionHandler seHandler)
+	public static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler)
 			throws CoreException {
 		return sync(delta, project, syncFlags, false, false, seHandler, null);
 	}
@@ -412,7 +412,7 @@ public class SyncManager  {
 	 * @throws CoreException 
 	 */
 	public static Job syncResolveAsLocal(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags,
-			SyncExceptionHandler seHandler) throws CoreException {
+			ISyncExceptionHandler seHandler) throws CoreException {
 		return sync(delta, project, syncFlags, false, true, seHandler, null);
 	}
 	
@@ -435,7 +435,7 @@ public class SyncManager  {
 	}
 	
 	private static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, boolean isBlocking,
-			boolean resolveAsLocal, SyncExceptionHandler seHandler, IProgressMonitor monitor) throws CoreException {
+			boolean resolveAsLocal, ISyncExceptionHandler seHandler, IProgressMonitor monitor) throws CoreException {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		if (!(bcm.isInitialized(project))) {
 			return null;
@@ -464,7 +464,7 @@ public class SyncManager  {
 	 * @throws CoreException
 	 * 			  on problems sync'ing
 	 */
-	public static Job[] syncAll(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, SyncExceptionHandler seHandler)
+	public static Job[] syncAll(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler)
 			throws CoreException {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		if (!(bcm.isInitialized(project))) {
@@ -477,7 +477,7 @@ public class SyncManager  {
 
 	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor
 	private static Job[] scheduleSyncJobs(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags,
-			IConfiguration[] buildConfigurations, boolean isBlocking, boolean resolveAsLocal, SyncExceptionHandler seHandler,
+			IConfiguration[] buildConfigurations, boolean isBlocking, boolean resolveAsLocal, ISyncExceptionHandler seHandler,
 			IProgressMonitor monitor)
 			throws CoreException {
 		int jobNum = 0;

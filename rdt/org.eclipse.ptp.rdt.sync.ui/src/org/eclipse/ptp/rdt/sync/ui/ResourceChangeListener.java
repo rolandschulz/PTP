@@ -21,7 +21,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
-import org.eclipse.ptp.rdt.sync.core.SyncExceptionHandler;
+import org.eclipse.ptp.rdt.sync.core.ISyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
@@ -46,7 +46,7 @@ public class ResourceChangeListener {
 	// For sync errors, print information and provide a toggle box so that user can turn off error displays until the next
 	// successful sync, which presumably means the problem has been resolved. Note that errors are re-enabled inside the
 	// sync call.
-	private static class SyncRCLExceptionHandler implements SyncExceptionHandler {
+	private static class SyncRCLExceptionHandler implements ISyncExceptionHandler {
 		private final IProject project;
 		public SyncRCLExceptionHandler(IProject p) {
 			project = p;
