@@ -76,7 +76,13 @@ public class SyncMergeEditor {
 			String[] mergeParts = null;
 
 			if (provider != null) {
-				mergeParts = provider.getMergeConflictParts(file);
+				try {
+					mergeParts = provider.getMergeConflictParts(file);
+				} catch (CoreException e) {
+					RDTSyncUIPlugin.log(e);
+					return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(Messages.SyncMergeEditor_1),
+							new SyncMergeItem(Messages.SyncMergeEditor_1), new SyncMergeItem(Messages.SyncMergeEditor_1));
+				}
 			}
 			
 			if (provider == null) {
