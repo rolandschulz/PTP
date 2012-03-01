@@ -263,11 +263,14 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	
 	// Update the viewer based on the current project set in the "project" variable. 
 	private void update() {
+		mergeConflictedFiles = new HashSet<IPath>();
 		if (project != null) {
 			ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
-			mergeConflictedFiles = provider.getMergeConflictFiles();
-		} else {
-			mergeConflictedFiles = new HashSet<IPath>();
+			try {
+				mergeConflictedFiles = provider.getMergeConflictFiles();
+			} catch (CoreException e) {
+				RDTSyncUIPlugin.log(e);
+			}
 		}
 		fileTableViewer.setInput(mergeConflictedFiles);
 		if (project != null && SyncManager.getResolved(project, mergeConflictedFiles)) {

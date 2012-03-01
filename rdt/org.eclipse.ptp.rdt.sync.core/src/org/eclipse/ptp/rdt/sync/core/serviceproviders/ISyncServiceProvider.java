@@ -83,8 +83,10 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	/**
 	 * Get the current list of merge-conflicted files
 	 * @return set of files as project-relative IPaths. This may be an empty set but never null.
+	 * @throws CoreException
+	 *              for system-level problems retrieving merge information
 	 */
-	public Set<IPath> getMergeConflictFiles();
+	public Set<IPath> getMergeConflictFiles() throws CoreException;
 	
 	/**
 	 * Get the three parts of the merge-conflicted file (left, right, and ancestor, respectively)
@@ -92,9 +94,9 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * @param file
 	 * @return the three parts as strings. Either three strings (some may be empty) or null if file is not merge-conflicted.
 	 * @throws CoreException
-	 * 				for system-level problems during merge
+	 * 				for system-level problems retrieving merge information
 	 */
-	public String[] getMergeConflictParts(IFile file);
+	public String[] getMergeConflictParts(IFile file) throws CoreException;
 	
     /**
      * Close any resources (files, sockets) that were open by the sync provider. Resources not open by the provider should not be
