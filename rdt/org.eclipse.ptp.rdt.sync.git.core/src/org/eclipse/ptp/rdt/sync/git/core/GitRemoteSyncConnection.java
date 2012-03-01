@@ -915,7 +915,9 @@ public class GitRemoteSyncConnection {
 				if (!FileToMergePartsMap.isEmpty()) {
 					final ResetCommand resetCommand = git.reset().setMode(ResetType.HARD); // jgit does not yet support merge reset.
 					resetCommand.call();
-					return; // Do not proceed if there is a merge conflict.
+					throw new RemoteSyncMergeConflictException(Messages.GitRemoteSyncConnection_1);
+					// Even if we later decide not to throw an exception, it is important not to proceed after a merge conflict.
+					// return;
 				}
 			} catch (TransportException e) {
 				if (e.getMessage().startsWith("Remote does not have ")) { //$NON-NLS-1$
