@@ -206,7 +206,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			processBuilder.redirectErrorStream(true);
 
 			// Synchronize before building
-			SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10));
+			SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10), null);
 
 			IRemoteProcess p = null;
 			try {

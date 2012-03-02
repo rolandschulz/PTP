@@ -485,8 +485,7 @@ public class SyncManager  {
 	
 	/**
 	 * Invoke sync and block until sync finishes. This does not spawn another thread and no locking of resources is done.
-	 * Sync exceptions are handled by the passed exception handler, or by a default handler if set to null. The default handler
-	 * can only log the exception, since this is core code. 
+	 * Sync exceptions are handled by the passed exception handler or by the default handler if null.
 	 * 
 	 * @param delta
 	 *            project delta

@@ -16,6 +16,7 @@ import org.eclipse.cdt.internal.ui.ICStatusConstants;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.BundleContext;
 
@@ -55,6 +56,7 @@ public class RDTSyncUIPlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		ResourceChangeListener.startListening();
+		SyncManager.setDefaultSyncExceptionHandler(new CommonSyncExceptionHandler(false, true));
 	}
 
 	@Override
