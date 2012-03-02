@@ -60,11 +60,11 @@ public class CommonSyncExceptionHandler implements ISyncExceptionHandler {
 			public void run() {
 				String[] buttonLabels;
 				if (e instanceof RemoteSyncMergeConflictException) {
-					buttonLabels = new String[1];
+					buttonLabels = new String[2];
 					buttonLabels[0] = IDialogConstants.OK_LABEL;
 					buttonLabels[1] = Messages.CommonSyncExceptionHandler_1; // Custom button
 				} else {
-					buttonLabels = new String[2];
+					buttonLabels = new String[1];
 					buttonLabels[0] = IDialogConstants.OK_LABEL;
 				}
 				
