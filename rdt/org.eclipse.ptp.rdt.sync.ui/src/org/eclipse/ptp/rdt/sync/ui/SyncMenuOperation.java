@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.rdt.sync.core.ISyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.core.PathResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
@@ -47,6 +48,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String syncDefaultFileList = "sync_default_file_list"; //$NON-NLS-1$
 	private static final String syncExcludeCommand = "sync_exclude"; //$NON-NLS-1$
 	private static final String syncIncludeCommand = "sync_include"; //$NON-NLS-1$
+	private static final ISyncExceptionHandler syncExceptionHandler = new CommonSyncExceptionHandler(false, true);
 
 	public Object execute(ExecutionEvent event) {
 		String command = event.getParameter(SYNC_COMMAND_PARAMETER_ID);
@@ -59,16 +61,16 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 		// On sync request, sync regardless of the flags
 		try {
 			if (command.equals(syncActiveCommand)) {
-				SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+				SyncManager.sync(null, project, SyncFlag.FORCE, syncExceptionHandler);
 			} else if (command.equals(syncAllCommand)) {
-				SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+				SyncManager.syncAll(null, project, SyncFlag.FORCE, syncExceptionHandler);
 				// If user switches to active or all, assume the user wants to sync right away
 			} else if (command.equals(setActiveCommand)) {
 				SyncManager.setSyncMode(project, SYNC_MODE.ACTIVE);
-				SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+				SyncManager.sync(null, project, SyncFlag.FORCE, syncExceptionHandler);
 			} else if (command.equals(setAllCommand)) {
 				SyncManager.setSyncMode(project, SYNC_MODE.ALL);
-				SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+				SyncManager.syncAll(null, project, SyncFlag.FORCE, syncExceptionHandler);
 			} else if (command.equals(setNoneCommand)) {
 				SyncManager.setSyncMode(project, SYNC_MODE.NONE);
 			} else if (command.equals(syncAutoCommand)) {
@@ -77,9 +79,9 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				if (SyncManager.getSyncAuto()) {
 					SYNC_MODE syncMode = SyncManager.getSyncMode(project);
 					if (syncMode == SYNC_MODE.ACTIVE) {
-						SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+						SyncManager.sync(null, project, SyncFlag.FORCE, syncExceptionHandler);
 					} else if (syncMode == SYNC_MODE.ALL) {
-						SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+						SyncManager.syncAll(null, project, SyncFlag.FORCE, syncExceptionHandler);
 					}
 				}
 			} else if (command.equals(syncExcludeCommand) || command.equals(syncIncludeCommand)) {

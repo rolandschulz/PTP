@@ -73,11 +73,9 @@ public class ResourceChangeListener {
 							if (!syncEnabled) {
 								continue;
 							} else if (syncMode == SYNC_MODE.ALL) {
-								SyncManager.syncAll(null, project, SyncFlag.FORCE,
-										new CommonSyncExceptionHandler(true, true));
+								SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
 							} else if (syncMode == SYNC_MODE.ACTIVE) {
-								SyncManager.sync(null, project, SyncFlag.FORCE,
-										new CommonSyncExceptionHandler(true, true));
+								SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
 							}
 						}
 						// Post-change event
@@ -87,11 +85,9 @@ public class ResourceChangeListener {
 							if (!syncEnabled) {
 								SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
 							} else if (syncMode == SYNC_MODE.ALL) {
-								SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE,
-										new CommonSyncExceptionHandler(true, false));
+								SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new CommonSyncExceptionHandler(true, false));
 							} else if (syncMode == SYNC_MODE.ACTIVE) {
-								SyncManager.sync(delta, project, SyncFlag.NO_FORCE,
-										new CommonSyncExceptionHandler(true, false));
+								SyncManager.sync(delta, project, SyncFlag.NO_FORCE, new CommonSyncExceptionHandler(true, false));
 							}
 						}
 					} catch (CoreException e){
