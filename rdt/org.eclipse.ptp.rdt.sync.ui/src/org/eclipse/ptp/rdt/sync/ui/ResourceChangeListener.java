@@ -74,10 +74,10 @@ public class ResourceChangeListener {
 								continue;
 							} else if (syncMode == SYNC_MODE.ALL) {
 								SyncManager.syncAll(null, project, SyncFlag.FORCE,
-										new CommonSyncExceptionHandler(project, true, true));
+										new CommonSyncExceptionHandler(true, true));
 							} else if (syncMode == SYNC_MODE.ACTIVE) {
 								SyncManager.sync(null, project, SyncFlag.FORCE,
-										new CommonSyncExceptionHandler(project, true, true));
+										new CommonSyncExceptionHandler(true, true));
 							}
 						}
 						// Post-change event
@@ -88,10 +88,10 @@ public class ResourceChangeListener {
 								SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
 							} else if (syncMode == SYNC_MODE.ALL) {
 								SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE,
-										new CommonSyncExceptionHandler(project, true, false));
+										new CommonSyncExceptionHandler(true, false));
 							} else if (syncMode == SYNC_MODE.ACTIVE) {
 								SyncManager.sync(delta, project, SyncFlag.NO_FORCE,
-										new CommonSyncExceptionHandler(project, true, false));
+										new CommonSyncExceptionHandler(true, false));
 							}
 						}
 					} catch (CoreException e){

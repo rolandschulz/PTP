@@ -130,7 +130,7 @@ public class SyncManager  {
 				if (fSyncExceptionHandler == null) {
 					System.out.println(Messages.SyncManager_8 + e.getLocalizedMessage());
 				} else {
-					fSyncExceptionHandler.handle(e);
+					fSyncExceptionHandler.handle(fProject, e);
 				}
 			} finally {
 				monitor.done();

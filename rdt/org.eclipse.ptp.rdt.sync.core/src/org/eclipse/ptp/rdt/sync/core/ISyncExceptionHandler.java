@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
 /**
@@ -17,5 +18,5 @@ import org.eclipse.core.runtime.CoreException;
  * packages, particularly the ui, so that the caller can specify how to handle errors.
  */
 public interface ISyncExceptionHandler {
-	public void handle(CoreException e);
+	public void handle(IProject project, CoreException e);
 }

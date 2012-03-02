@@ -59,16 +59,16 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 		// On sync request, sync regardless of the flags
 		try {
 			if (command.equals(syncActiveCommand)) {
-				SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(project, false, true));
+				SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
 			} else if (command.equals(syncAllCommand)) {
-				SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(project, false, true));
+				SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
 				// If user switches to active or all, assume the user wants to sync right away
 			} else if (command.equals(setActiveCommand)) {
 				SyncManager.setSyncMode(project, SYNC_MODE.ACTIVE);
-				SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(project, false, true));
+				SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
 			} else if (command.equals(setAllCommand)) {
 				SyncManager.setSyncMode(project, SYNC_MODE.ALL);
-				SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(project, false, true));
+				SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
 			} else if (command.equals(setNoneCommand)) {
 				SyncManager.setSyncMode(project, SYNC_MODE.NONE);
 			} else if (command.equals(syncAutoCommand)) {
@@ -77,9 +77,9 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				if (SyncManager.getSyncAuto()) {
 					SYNC_MODE syncMode = SyncManager.getSyncMode(project);
 					if (syncMode == SYNC_MODE.ACTIVE) {
-						SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(project, false, true));
+						SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
 					} else if (syncMode == SYNC_MODE.ALL) {
-						SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(project, false, true));
+						SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
 					}
 				}
 			} else if (command.equals(syncExcludeCommand) || command.equals(syncIncludeCommand)) {
