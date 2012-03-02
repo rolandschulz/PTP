@@ -66,6 +66,13 @@ public class SyncManager  {
 	private static final String ATTR_SYNC_MODE = "sync-mode"; //$NON-NLS-1$
 	private static final String ATTR_SHOW_ERROR = "show-error"; //$NON-NLS-1$
 	private static final String ATTR_AUTO_SYNC = "auto-sync"; //$NON-NLS-1$
+	
+	private static ISyncExceptionHandler defaultSyncExceptionHandler = new ISyncExceptionHandler() {
+		@Override
+		public void handle(IProject project, CoreException e) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_8 + project.getName(), e);
+		}
+	};
 
 	private static boolean fSyncAuto = true;
 	private static final Map<IProject, SYNC_MODE> fProjectToSyncModeMap = Collections
@@ -127,7 +134,7 @@ public class SyncManager  {
 				}
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
-					RDTSyncCorePlugin.log(Messages.SyncManager_8 + e.getLocalizedMessage(), e);
+					defaultSyncExceptionHandler.handle(fProject, e);
 				} else {
 					fSyncExceptionHandler.handle(fProject, e);
 				}
@@ -249,7 +256,8 @@ public class SyncManager  {
 	 *
 	 * @param project
 	 * @param set of paths
-	 * @return whether paths are resolved
+	 * @return whether paths are resolved	 * @param seHandler
+	 *            sync exception handler
 	 */
 	public static boolean getResolved(IProject project, Set<IPath> paths) {
 		if (project == null || paths == null) {
@@ -524,7 +532,7 @@ public class SyncManager  {
 						if (!useExceptionHandler) {
 							throw e;
 						} else if (seHandler == null) {
-							RDTSyncCorePlugin.log(Messages.SyncManager_8 + e.getLocalizedMessage(), e);
+							defaultSyncExceptionHandler.handle(project, e);
 						} else {
 							seHandler.handle(project, e);
 						}
@@ -692,5 +700,21 @@ public class SyncManager  {
 			RDTSyncCorePlugin.log(Messages.SyncManager_7 + config.getName());
 		}
 		return provider;
+	}
+	
+	/**
+	 * Get the current default sync exception handler
+	 * @return default sync exception handler
+	 */
+	public static ISyncExceptionHandler getDefaultSyncExceptionHandler() {
+		return defaultSyncExceptionHandler;
+	}
+	
+	/**
+	 * Set the default sync exception handler
+	 * @param handler
+	 */
+	public static void setDefaultSyncExceptionHandler(ISyncExceptionHandler handler) {
+		defaultSyncExceptionHandler = handler;
 	}
 }
