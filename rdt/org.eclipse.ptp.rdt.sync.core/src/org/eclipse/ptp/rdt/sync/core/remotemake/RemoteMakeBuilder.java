@@ -397,7 +397,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 
 					// Synchronize before building
 					if (syncProvider != null) {
-						SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10));
+						SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10), null);
 					}
 
 					// Before launching give visual cues via the monitor
@@ -478,7 +478,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 
 						// Synchronize after building
 						if (syncProvider != null) {
-							SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10));
+							SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10), null);
 						}
 
 						// create a Job for the refresh
