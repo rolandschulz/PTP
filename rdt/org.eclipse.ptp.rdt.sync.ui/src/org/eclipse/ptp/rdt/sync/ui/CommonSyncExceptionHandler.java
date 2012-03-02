@@ -30,18 +30,16 @@ import org.eclipse.ui.PlatformUI;
  */
 public class CommonSyncExceptionHandler implements ISyncExceptionHandler {
 	private static final String SYNC_MERGE_FILE_VIEW = "org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer"; //$NON-NLS-1$
-	private final IProject project;
 	private final boolean showErrorMessageToggle;
 	private final boolean alwaysShowDialog;
 	
-	public CommonSyncExceptionHandler(IProject p, boolean showToggle, boolean alwaysShow) {
-		project = p;
+	public CommonSyncExceptionHandler(boolean showToggle, boolean alwaysShow) {
 		showErrorMessageToggle = showToggle;
 		alwaysShowDialog = alwaysShow;
 	}
 
 	@Override
-	public void handle(final CoreException e) {
+	public void handle(final IProject project, final CoreException e) {
 		if (!alwaysShowDialog && !SyncManager.getShowErrors(project)) {
 			return;
 		}

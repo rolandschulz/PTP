@@ -189,7 +189,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 				public void run() {
 					try {
 						SyncManager.clearResolved(project);
-						SyncManager.syncResolveAsLocal(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(project, false, true));
+						SyncManager.syncResolveAsLocal(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
 					} catch (CoreException e) {
 						// This should never happen because only a blocking sync can throw a core exception.
 						RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMergeFileTableViewer_1);
