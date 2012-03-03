@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,8 @@
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCCodeFoldingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteSemanticHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
@@ -32,4 +34,14 @@ public interface IIndexServiceProvider2 extends IIndexServiceProvider {
 	 * @since 4.1
 	 */
 	public INavigationService getNavigationService();
+	
+	/**
+	 * @since 4.1
+	 */
+	public IRemoteSemanticHighlightingService getRemoteSemanticHighlightingService();
+	
+	/**
+	 * @since 4.1
+	 */
+	public IRemoteCCodeFoldingService getRemoteCodeFoldingService();
 }

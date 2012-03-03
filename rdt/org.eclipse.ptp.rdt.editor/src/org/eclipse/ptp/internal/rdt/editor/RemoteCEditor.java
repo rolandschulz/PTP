@@ -17,6 +17,8 @@ import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
+import org.eclipse.cdt.internal.ui.editor.SemanticHighlightings;
+import org.eclipse.cdt.ui.PreferenceConstants;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuManager;
@@ -27,6 +29,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.rdt.editor.info.IRemoteCEditorInfoProvider;
 import org.eclipse.ptp.rdt.editor.info.RemoteCInfoProviderUtilities;
 import org.eclipse.swt.events.HelpEvent;
@@ -48,7 +51,7 @@ public class RemoteCEditor extends CEditor implements HelpListener {
 	private IEditorInput input;
 	private List<IRemoteCEditorInfoProvider> infoProviders;
 	private IRemoteCEditorInfoProvider provider;
-
+	ISourceViewer viewer;
 	/**
 	 * Default constructor.
 	 */
@@ -89,8 +92,11 @@ public class RemoteCEditor extends CEditor implements HelpListener {
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		
-		if (provider != null)
+		if (provider != null){
+			if (isSemanticHighlightingEnabled())
+				provider.installSemanticHighlighting(getSourceViewer(), getPreferenceStore());
 			provider.doPostCreatePartControl(parent);
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -223,9 +229,7 @@ public class RemoteCEditor extends CEditor implements HelpListener {
 	@Override
 	protected boolean isSemanticHighlightingEnabled() {
 		if (provider != null) {
-			Boolean enabled = provider.isSemanticHighlightingEnabled();
-			if (enabled != null)
-				return enabled.booleanValue();
+			return provider.isSemanticHighlightingEnabled(getPreferenceStore());
 		}		
 		return super.isSemanticHighlightingEnabled();	
 	}
@@ -281,6 +285,7 @@ public class RemoteCEditor extends CEditor implements HelpListener {
 	public void dispose() {
 		if (provider != null)
 			provider.dispose();
+		
 		super.dispose();
 	}
 
@@ -293,9 +298,14 @@ public class RemoteCEditor extends CEditor implements HelpListener {
 
 	@Override
 	protected ISourceViewer createSourceViewer(Composite parent, IVerticalRuler ruler, int styles) {
-		ISourceViewer viewer = super.createSourceViewer(parent, ruler, styles);
+		viewer = super.createSourceViewer(parent, ruler, styles);
 		// add ability to provide context help
 		viewer.getTextWidget().addHelpListener(this);
+		
+		if(provider != null && isFoldingEnabled())  {
+			provider.installRemoteCodeFolding(viewer);  
+		}
+		
 		return viewer;
 	}
 
@@ -390,6 +400,25 @@ public class RemoteCEditor extends CEditor implements HelpListener {
 			}
 		}
 		return result;
+	}
+	
+	protected void handlePreferenceStoreChanged(PropertyChangeEvent event) {
+		super.handlePreferenceStoreChanged(event);
+		
+		if (provider != null && SemanticHighlightings.affectsEnablement(getPreferenceStore(), event )
+				|| (isEnableScalablilityMode() && PreferenceConstants.SCALABILITY_SEMANTIC_HIGHLIGHT.equals(event.getProperty()))) {
+			if (isSemanticHighlightingEnabled()) {
+				provider.installSemanticHighlighting(getSourceViewer(), getPreferenceStore());
+				provider.refreshRemoteSemanticManager();
+			} else {
+				provider.uninstallSemanticHighlighting();
+			}
+			return;
+		}
+	}
+	
+	public void uninstallProjectionModelUpdater() {
+		super.uninstallProjectionModelUpdater();
 	}
 	
 	/**

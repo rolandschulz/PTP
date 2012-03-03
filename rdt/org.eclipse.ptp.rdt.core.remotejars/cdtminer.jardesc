@@ -12,23 +12,21 @@
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.search"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core{RemoteScannerInfo.java"/>
-        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.typehierarchy{TypeHierarchyUtil.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.index{IndexQueries.java"/>
+        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.typehierarchy{TypeHierarchyUtil.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core{RemoteIndexerInputAdapter.java"/>
-        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.navigation{SimpleASTFileLocation.java"/>
-        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.navigation{SimpleName.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core{RemoteIndexerInfoProvider.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.model"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/miners"/>
-        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.callhierarchy{CElementSet.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core{Serializer.java"/>
+        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.callhierarchy{CElementSet.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.index{DummyName.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.contentassist"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.includebrowser{IndexIncludeValue.java"/>
-        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.navigation{OpenDeclarationResult.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core{RemoteUtil.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.rdt.core{IConfigurableLanguage.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core{IRemoteIndexerInfoProvider.java"/>
+        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.navigation"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.typehierarchy{THGraphEdge.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.callhierarchy{CalledByResult.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.index{DummyFileLocation.java"/>

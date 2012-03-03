@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -261,6 +261,12 @@ public abstract class CElement implements ICElement, Serializable, IHasManagedLo
 		URI location = other.getLocationURI();
 		if (fLocation != null) {
 			if (!fLocation.equals(location)) {
+				return false;
+			}
+		}
+		
+		if (o instanceof CElement) {
+			if (((CElement)o).getIndex() != getIndex()) {
 				return false;
 			}
 		}
