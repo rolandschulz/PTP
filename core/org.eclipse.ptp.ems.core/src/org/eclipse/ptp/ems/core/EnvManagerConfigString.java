@@ -57,7 +57,7 @@ public final class EnvManagerConfigString implements IEnvManagerConfig {
 
 	/** @return true iff <code>string</code> is a valid environment management configuration string */
 	public static boolean isEnvMgmtConfigString(String string) {
-		return string != null && (string.equals("") || string.startsWith(MAGIC + KV_SEPARATOR)); //$NON-NLS-1$
+		return string != null && (string.equals("") || string.startsWith(MAGIC)); //$NON-NLS-1$
 	}
 
 	private final Map<String, String> settings = new TreeMap<String, String>();
@@ -98,7 +98,13 @@ public final class EnvManagerConfigString implements IEnvManagerConfig {
 	}
 
 	private String removeMagicPrefix(String configuration) {
-		return configuration.substring(MAGIC.length() + KV_SEPARATOR.length());
+		if (configuration.startsWith(MAGIC + KV_SEPARATOR)) {
+			return configuration.substring(MAGIC.length() + KV_SEPARATOR.length());
+		} else if (configuration.startsWith(MAGIC)) {
+			return configuration.substring(MAGIC.length());
+		} else {
+			throw new IllegalStateException();
+		}
 	}
 
 	@Override
