@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
-import java.util.List;
-
 import org.eclipse.ptp.ems.ui.EnvManagerConfigButton;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
-import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
+import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 
 /**
  * Update Model for {@link EnvManagerConfigButton} widgets.
@@ -23,28 +23,12 @@ import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
  * @author arossi
  * @author Jeff Overbey
  */
-public class EnvConfigButtonUpdateModel extends DynamicControlUpdateModel {
+public class EnvConfigButtonUpdateModel extends AbstractUpdateModel implements ModifyListener {
 
 	private final EnvManagerConfigButton button;
 
 	/**
-	 * Read-only dynamic text.
-	 * 
-	 * @param args
-	 *            to be resolved in refreshed environment and used as the text
-	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
-	 * @param text
-	 *            the widget to which this model corresponds
-	 */
-	public EnvConfigButtonUpdateModel(List<ArgType> args, ValueUpdateHandler handler, EnvManagerConfigButton button) {
-		super(args, handler);
-		this.button = button;
-	}
-
-	/**
-	 * Default (editable) text.
+	 * Constructor.
 	 * 
 	 * @param name
 	 *            name of the model, which will correspond to the name of a
@@ -58,6 +42,7 @@ public class EnvConfigButtonUpdateModel extends DynamicControlUpdateModel {
 	public EnvConfigButtonUpdateModel(String name, ValueUpdateHandler handler, EnvManagerConfigButton button) {
 		super(name, handler);
 		this.button = button;
+		button.addModifyListener(this);
 	}
 
 	@Override
@@ -75,6 +60,25 @@ public class EnvConfigButtonUpdateModel extends DynamicControlUpdateModel {
 	}
 
 	/*
+	 * Model serves as widget modify listener; calls {@link #storeValue()}
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events
+	 * .ModifyEvent)
+	 */
+	public void modifyText(ModifyEvent e) {
+		if (refreshing) {
+			return;
+		}
+		try {
+			Object value = storeValue();
+			handleUpdate(value);
+		} catch (Exception ignored) {
+		}
+	}
+
+	/*
 	 * Sets the value on the text, either by resolving the arguments for
 	 * read-only, or by retrieving the value. Turns on the refreshing flag so as
 	 * not to trigger further updates from the listener. (non-Javadoc)
@@ -83,10 +87,9 @@ public class EnvConfigButtonUpdateModel extends DynamicControlUpdateModel {
 	 */
 	public void refreshValueFromMap() {
 		refreshing = true;
-		if (!canSave) {
-			mapValue = getResolvedDynamic();
-		} else {
-			mapValue = lcMap.get(name);
+		mapValue = lcMap.get(name);
+		if (JAXBUIConstants.ZEROSTR.equals(mapValue)) {
+			mapValue = null;
 		}
 		String s = JAXBControlUIConstants.ZEROSTR;
 		if (mapValue != null) {
