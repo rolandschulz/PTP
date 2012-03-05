@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.ISyncListener;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.SyncEvent;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
@@ -382,10 +383,16 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					willFinishTaskId = syncTaskId;
 				}
 				
-				if (resolveAsLocal) {
-					fSyncConnection.syncResolveAsLocal(progress.newChild(40), true);
-				} else {
-					fSyncConnection.sync(progress.newChild(40), true);
+				try {
+					if (resolveAsLocal) {
+						fSyncConnection.syncResolveAsLocal(progress.newChild(40), true);
+					} else {
+						fSyncConnection.sync(progress.newChild(40), true);
+					}
+				// Notify listeners if there is a merge conflict
+				} catch (RemoteSyncMergeConflictException e) {
+					this.notifySyncListeners();
+					throw e;
 				}
 				finishedSyncTaskId = willFinishTaskId;
 				this.notifySyncListeners();
