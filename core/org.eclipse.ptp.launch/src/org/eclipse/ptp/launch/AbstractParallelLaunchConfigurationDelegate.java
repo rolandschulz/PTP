@@ -314,17 +314,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Get the name of the queue for the launch
-	 * 
-	 * @param configuration
-	 * @return
-	 * @throws CoreException
-	 */
-	protected static String getQueueName(ILaunchConfiguration configuration) throws CoreException {
-		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_QUEUE_NAME, (String) null);
-	}
-
-	/**
 	 * Get the resource manager to use for the launch
 	 * 
 	 * @param configuration

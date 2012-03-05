@@ -19,7 +19,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.remote.core.PreferenceConstants;
+import org.eclipse.ptp.remote.core.IRemotePreferenceConstants;
 import org.eclipse.ptp.remote.core.Preferences;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -168,7 +168,7 @@ public class RemoteConnectionWidget extends Composite {
 		 * default provider
 		 */
 		String id = Preferences
-				.getString(PTPRemoteCorePlugin.getUniqueIdentifier(), PreferenceConstants.DEFAULT_REMOTE_SERVICES_ID);
+				.getString(PTPRemoteCorePlugin.getUniqueIdentifier(), IRemotePreferenceConstants.DEFAULT_REMOTE_SERVICES_ID);
 		if (id != null) {
 			fSelectedServices = getRemoteServices(id);
 		}
