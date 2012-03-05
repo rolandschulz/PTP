@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
@@ -47,6 +48,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchPage;
@@ -99,7 +101,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		}
 	}
 
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 		synchronized(this) {
 			fileTableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 			
@@ -188,8 +190,12 @@ public class SyncMergeFileTableViewer extends ViewPart {
 			syncResolveAsLocalAction = new Action(Messages.SyncMergeFileTableViewer_0) {
 				public void run() {
 					try {
-						SyncManager.clearResolved(project);
-						SyncManager.syncResolveAsLocal(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+						boolean shouldProceed = MessageDialog.openConfirm(parent.getShell(), Messages.SyncMergeFileTableViewer_2,
+								Messages.SyncMergeFileTableViewer_3);
+						if (shouldProceed) {
+							SyncManager.clearResolved(project);
+							SyncManager.syncResolveAsLocal(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+						}
 					} catch (CoreException e) {
 						// This should never happen because only a blocking sync can throw a core exception.
 						RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMergeFileTableViewer_1);
