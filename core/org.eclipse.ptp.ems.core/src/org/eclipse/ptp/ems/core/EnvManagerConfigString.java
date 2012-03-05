@@ -35,7 +35,7 @@ public final class EnvManagerConfigString implements IEnvManagerConfig {
 	 * Separator character used to separate key-value pairs. Individual keys and values (and module names) must not contain this
 	 * character.
 	 */
-	private static final String KV_SEPARATOR = "\n"; //$NON-NLS-1$
+	private static final String KV_SEPARATOR = "\r"; //$NON-NLS-1$
 
 	/** Separator character used to create a list of module names. Individual module names must not contain this character. */
 	private static final String SEPARATOR = ";"; //$NON-NLS-1$
