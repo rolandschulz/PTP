@@ -854,7 +854,8 @@ public class GitRemoteSyncConnection {
 
 	/**
 	 * Synchronize local and remote repositories. Currently, this function just interleaves the work of "syncLocalToRemote" and
-	 * "syncRemoteToLocal". Doing both simultaneously, though, gives room for more efficient code later.
+	 * "syncRemoteToLocal". Doing both simultaneously, though, gives room for more efficient code later. (See "syncInternal"
+	 * for the actual implementation.)
 	 * 
 	 * Note that the remote is fetched and merged first. This is on purpose so that merge conflicts will occur locally, where
 	 * they can be more easily managed. Previously, "syncLocalToRemote" was called first in "GitServiceProvider", which would
@@ -874,7 +875,8 @@ public class GitRemoteSyncConnection {
 	public void sync(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
 		this.syncInternal(monitor, includeUntrackedFiles, false);
 	}
-	public void syncInternal(IProgressMonitor monitor, boolean includeUntrackedFiles, boolean resolveAsLocal)
+
+	private void syncInternal(IProgressMonitor monitor, boolean includeUntrackedFiles, boolean resolveAsLocal)
 			throws RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 25);
 		subMon.subTask(Messages.GitRemoteSyncConnection_0);
@@ -948,6 +950,21 @@ public class GitRemoteSyncConnection {
 		}
 	}
 	
+	/**
+	 * Do a "resolve sync" instead of a full sync. This sync completes a merge conflict by resolving differences in favor of the
+	 * local copy. No committing or fetching of the remote side is done. 
+	 *
+	 * @param monitor
+	 * @param includeUntrackedFiles
+	 * 				Should currently untracked remote files be added to the repository?
+	 * @throws RemoteSyncException
+	 *             for various problems sync'ing. The specific exception is
+	 *             nested within the RemoteSyncException. Many of the listed
+	 *             exceptions appear to be unrecoverable, caused by errors in
+	 *             the initial setup. It is vital, though, that failed syncs are
+	 *             reported and handled. So all exceptions are checked
+	 *             exceptions, embedded in a RemoteSyncException.
+	 */
 	public void syncResolveAsLocal(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
 		this.syncInternal(monitor, includeUntrackedFiles, true);
 	}
