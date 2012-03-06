@@ -12,6 +12,7 @@ package org.eclipse.ptp.pldt.openacc.internal.fortran.editorHelp;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.help.IHelpResource;
 import org.eclipse.photran.ui.IFortranAPIHelpProvider;
@@ -25,6 +26,10 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public class OpenACCFortranHelpProvider implements IFortranAPIHelpProvider {
 	/** Plug-in ID for the main (non-Fortran) OpenACC plug-in, which contains HTML documentation. */
 	private static final String OPENACC_PLUGIN_ID = "org.eclipse.ptp.pldt.openacc"; //$NON-NLS-1$
+
+	/** Regular expression matching the start of an OpenACC directive */
+	private static final Pattern OPENACC_DIRECTIVE_PREFIX = Pattern
+			.compile("(^[Cc*]|[ \\t]*!)\\$acc([ \\t]+end)?([ \\t]+parallel)?[ \\t]*"); //$NON-NLS-1$
 
 	private final Set<String> procedures = new HashSet<String>(32);
 	private final Set<String> directives = new HashSet<String>(32);
@@ -58,11 +63,11 @@ public class OpenACCFortranHelpProvider implements IFortranAPIHelpProvider {
 	}
 
 	@Override
-	public IHelpResource[] getHelpResources(ITextEditor fortranEditor, String apiName) {
+	public IHelpResource[] getHelpResources(ITextEditor fortranEditor, String apiName, String precedingText) {
 		final String fname = apiName.toLowerCase();
 		if (procedures.contains(fname)) {
 			return getHelpResourceForFilename(fname);
-		} else if (directives.contains(fname)) {
+		} else if (directives.contains(fname) && OPENACC_DIRECTIVE_PREFIX.matcher(precedingText).matches()) {
 			return getHelpResourceForFilename("pragma_acc_" + fname); //$NON-NLS-1$
 		}
 		return null;
@@ -74,6 +79,7 @@ public class OpenACCFortranHelpProvider implements IFortranAPIHelpProvider {
 			public String getHref() {
 				return String.format("/%s/html/%s.html", OPENACC_PLUGIN_ID, filename); //$NON-NLS-1$
 			}
+
 			@Override
 			public String getLabel() {
 				return filename;

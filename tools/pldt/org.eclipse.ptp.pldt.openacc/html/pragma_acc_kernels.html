@@ -1,16 +1,16 @@
 <html>
-<head><title>OpenACC&trade; parallel directive</title></head>
+<head><title>OpenACC&trade; kernels directive</title></head>
 <body>
-<h2>OpenACC&trade; parallel directive</h2>
-<dl><dd>Delineates a block of code that will be executed on an accelerator device.</dd></dl>
+<h2>OpenACC&trade; kernels directive</h2>
+<dl><dd>Delineates a block of code that will, at the compiler's discretion, be compiled into a sequence of kernels to be executed on an accelerator device.</dd></dl>
 <table width="100%" border="0" cellspacing="5" cellpadding="3"><tr bgcolor="#eeeeee">
 <td align="left" valign="top">
-  <tt><b><font color="#b46432">!$acc parallel</font></b></tt> <i>[clause [, clause ...]]</i><br>
+  <tt><b><font color="#b46432">!$acc kernels</font></b></tt> <i>[clause [, clause ...]]</i><br>
   &nbsp;&nbsp;&nbsp;&nbsp;<i>block</i><br>
-  <tt><b><font color="#b46432">!$acc end parallel</font></b></tt>
+  <tt><b><font color="#b46432">!$acc end kernels</font></b></tt>
 </td>
 <td align="left" valign="top">
-  <tt><b><font color="#931a68">#pragma </font>acc parallel</b></tt> <i>[clause [, clause ...]]</i><br>
+  <tt><b><font color="#931a68">#pragma </font>acc kernels</b></tt> <i>[clause [, clause ...]]</i><br>
   &nbsp;&nbsp;&nbsp;&nbsp;<i>block</i>
 </td>
 </tr></table>
@@ -19,10 +19,6 @@
   <tt>
   <b>if</b>,
   <b>async</b>,
-  <b>num_gangs</b>,
-  <b>num_workers</b>,
-  <b>vector_length</b>,
-  <b>reduction</b>,
   <b>copy</b>,
   <b>copyin</b>,
   <b>copyout</b>,
@@ -32,13 +28,11 @@
   <b>present_or_copyin</b>,
   <b>present_or_copyout</b>,
   <b>present_or_create</b>,
-  <b>deviceptr</b>,
-  <b>private</b>,
-  <b>firstprivate</b>.
+  <b>deviceptr</b>.
   </tt>
 </p>
 <p>For more information, see Section
-2.4.1
+2.4.2
 of <i>The OpenACC&trade; Application Programming Interface</i>, Version 1.0,
 available from <a href="http://www.openacc-standard.org/">http://www.openacc-standard.org</a>.</p>
 <br/>
