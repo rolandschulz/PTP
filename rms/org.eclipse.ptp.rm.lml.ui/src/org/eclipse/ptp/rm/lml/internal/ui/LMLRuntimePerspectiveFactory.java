@@ -24,22 +24,20 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 	 * 
 	 * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui .IPageLayout)
 	 */
+	@Override
 	public void createInitialLayout(IPageLayout layout) {
 		final String editorArea = layout.getEditorArea();
 		layout.setEditorAreaVisible(false);
 
 		final IFolderLayout mainFolder = layout.createFolder("mainFolder", IPageLayout.LEFT, (float) 0.4, editorArea); //$NON-NLS-1$
-		final IFolderLayout activeJobsFolder = layout.createFolder(
-				"activeJobsFolder", IPageLayout.BOTTOM, (float) 0.15, "mainFolder"); //$NON-NLS-1$ //$NON-NLS-2$
-		final IFolderLayout inactiveJobsFolder = layout.createFolder(
-				"inactiveJobsFolder", IPageLayout.BOTTOM, (float) 0.33, "activeJobsFolder"); //$NON-NLS-1$ //$NON-NLS-2$
-		final IFolderLayout miscFolder = layout.createFolder("miscFolder", IPageLayout.BOTTOM, (float) 0.5, "inactiveJobsFolder"); //$NON-NLS-1$//$NON-NLS-2$
+		final IFolderLayout jobsFolder = layout.createFolder("jobsFolder", IPageLayout.BOTTOM, (float) 0.15, "mainFolder"); //$NON-NLS-1$ //$NON-NLS-2$
+		final IFolderLayout miscFolder = layout.createFolder("miscFolder", IPageLayout.BOTTOM, (float) 0.5, "jobsFolder"); //$NON-NLS-1$//$NON-NLS-2$
 		final IFolderLayout machinesFolder = layout.createFolder("machinesFolder", IPageLayout.BOTTOM, 0, editorArea); //$NON-NLS-1$
 
 		mainFolder.addView("org.eclipse.ptp.ui.views.resourceManagerView"); //$NON-NLS-1$
 
-		activeJobsFolder.addView(ILMLUIConstants.VIEW_TABLE_1);
-		inactiveJobsFolder.addView(ILMLUIConstants.VIEW_TABLE_2);
+		jobsFolder.addView(ILMLUIConstants.VIEW_TABLE_1);
+		jobsFolder.addView(ILMLUIConstants.VIEW_TABLE_2);
 
 		machinesFolder.addView(ILMLUIConstants.VIEW_PARALLELNODES);
 

@@ -95,15 +95,16 @@ public class TableView extends ViewPart {
 		 * 
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILMLListener# handleEvent (org.eclipse.ptp.core.events.ILguiAddedEvent)
 		 */
+		@Override
 		public void handleEvent(ILguiAddedEvent event) {
 
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					if (composite != null && !viewCreated) {
 						fLguiItem = lmlManager.getSelectedLguiItem();
 						if (fLguiItem != null) {
-							createTable();
-							viewCreated = true;
+							viewCreated = createTable();
 							if (fLguiItem.getObjectStatus() != null) {
 								fLguiItem.getObjectStatus().addComponent(eventForwarder);
 								componentAdded = true;
@@ -119,8 +120,10 @@ public class TableView extends ViewPart {
 		 * 
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILMLListener# handleEvent (org.eclipse.ptp.core.events.ILguiRemovedEvent)
 		 */
+		@Override
 		public void handleEvent(ILguiRemovedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					if (composite != null && fLguiItem != null && viewCreated) {
 						if (componentAdded) {
@@ -143,9 +146,11 @@ public class TableView extends ViewPart {
 		 * 
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILMLListener# handleEvent (org.eclipse.ptp.core.events.IMarkObjectEvent)
 		 */
+		@Override
 		public void handleEvent(IMarkObjectEvent event) {
 			selectedOid = event.getOid();
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					// if (composite != null && !composite.isDisposed()) {
 					// viewer.refresh();
@@ -179,9 +184,11 @@ public class TableView extends ViewPart {
 		 * 
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILMLListener# handleEvent (org.eclipse.ptp.core.events.ISelectObjectEvent)
 		 */
+		@Override
 		public void handleEvent(ISelectObjectEvent event) {
 			final String oid = event.getOid();
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					if (composite != null && !composite.isDisposed() && viewer.getInput() != null) {
 						tree.deselectAll();
@@ -209,9 +216,11 @@ public class TableView extends ViewPart {
 
 		}
 
+		@Override
 		public void handleEvent(final ITableFilterEvent event) {
 			if (event.getGid().equals(gid)) {
 				UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+					@Override
 					public void run() throws Exception {
 						if (composite != null && fLguiItem != null && viewCreated) {
 							if (componentAdded) {
@@ -225,8 +234,7 @@ public class TableView extends ViewPart {
 						if (composite != null && !viewCreated) {
 							fLguiItem = lmlManager.getSelectedLguiItem();
 							if (fLguiItem != null) {
-								createTable();
-								viewCreated = true;
+								viewCreated = createTable();
 								if (fLguiItem.getObjectStatus() != null) {
 									fLguiItem.getObjectStatus().addComponent(eventForwarder);
 									componentAdded = true;
@@ -243,8 +251,10 @@ public class TableView extends ViewPart {
 		 * 
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILMLListener# handleEvent (org.eclipse.ptp.core.events.ITableSortedEvent)
 		 */
+		@Override
 		public void handleEvent(ITableSortedEvent e) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					if (fLguiItem != null && fLguiItem.getTableHandler() != null && tree.getSortDirection() != 0
 							&& tree.getSortColumn() != null) {
@@ -265,8 +275,10 @@ public class TableView extends ViewPart {
 		 * 
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILMLListener# handleEvent (org.eclipse.ptp.core.events.IUnmarkObjectEvent)
 		 */
+		@Override
 		public void handleEvent(IUnmarkObjectEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					selectedOid = null;
 					// if (composite != null && !composite.isDisposed()) {
@@ -285,8 +297,10 @@ public class TableView extends ViewPart {
 		 * 
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILMLListener# handleEvent (org.eclipse.ptp.core.events.IUnselectedObjectEvent)
 		 */
+		@Override
 		public void handleEvent(IUnselectedObjectEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					if (composite != null && !composite.isDisposed()) {
 						tree.deselectAll();
@@ -300,8 +314,10 @@ public class TableView extends ViewPart {
 		 * 
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.ILMLListener# handleEvent (org.eclipse.ptp.core.events.IViewUpdateEvent)
 		 */
+		@Override
 		public void handleEvent(IViewUpdateEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					if (composite != null && viewCreated) {
 						if (selectedItem != null && !selectedItem.isDisposed()) {
@@ -374,10 +390,12 @@ public class TableView extends ViewPart {
 		viewer.setContentProvider(new ILazyTreeContentProvider() {
 			private Row[] rows;
 
+			@Override
 			public void dispose() {
 				// Nothing
 			}
 
+			@Override
 			public Object getParent(Object element) {
 				if (element instanceof Cell) {
 					return ((Cell) element).row;
@@ -385,14 +403,17 @@ public class TableView extends ViewPart {
 				return rows;
 			}
 
+			@Override
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 				this.rows = (Row[]) newInput;
 			}
 
+			@Override
 			public void updateChildCount(Object element, int currentChildCount) {
 				// Nothing
 			}
 
+			@Override
 			public void updateElement(Object parent, int index) {
 				Object element;
 				if (parent instanceof Row) {
@@ -422,6 +443,7 @@ public class TableView extends ViewPart {
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
 		tree.addListener(SWT.MenuDetect, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				final Point pt = tree.getDisplay().map(null, tree, new Point(event.x, event.y));
 				final Rectangle clientArea = tree.getClientArea();
@@ -469,9 +491,10 @@ public class TableView extends ViewPart {
 		filterOwnJobsActionItem.getAction().setEnabled(false);
 		filterActionItem.getAction().setEnabled(false);
 
-		createTable();
+		viewCreated = createTable();
 
 		tree.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				if (fLguiItem != null) {
 					saveColumnLayout();
@@ -518,6 +541,9 @@ public class TableView extends ViewPart {
 
 	@Override
 	public void setFocus() {
+		if (!viewCreated) {
+			viewCreated = createTable();
+		}
 		viewer.getControl().setFocus();
 	}
 
@@ -673,6 +699,7 @@ public class TableView extends ViewPart {
 		 * Sorting is done in the model as the table is virtual and has a lazy content provider.
 		 */
 		final Listener sortListener = new Listener() {
+			@Override
 			public void handleEvent(Event e) {
 				final TreeColumn currentColumn = (TreeColumn) e.widget;
 
@@ -745,6 +772,7 @@ public class TableView extends ViewPart {
 		itemName.setText(column.getText());
 		itemName.setSelection(column.getResizable());
 		itemName.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				boolean active = true;
 				if (itemName.getSelection()) {
@@ -767,8 +795,9 @@ public class TableView extends ViewPart {
 
 	}
 
-	private void createTable() {
-		if (fLguiItem != null) {
+	private boolean createTable() {
+		boolean viewChanged = false;
+		if (fLguiItem != null && composite.getClientArea().width > 0) {
 			createColumns();
 			if (fLguiItem.getTableHandler() != null) {
 				final Object[] sortProperties = fLguiItem.getTableHandler().getSortProperties(gid);
@@ -790,9 +819,10 @@ public class TableView extends ViewPart {
 			} else {
 				setViewerInput();
 			}
-
+			viewChanged = true;
 		}
 		composite.layout();
+		return viewChanged;
 	}
 
 	/**
