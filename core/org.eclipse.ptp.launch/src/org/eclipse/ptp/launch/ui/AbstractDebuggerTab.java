@@ -20,16 +20,16 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 
 /**
  * TODO: NEEDS TO BE DOCUMENTED
@@ -85,8 +85,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * Overridden here so that any error message in the dynamic UI gets
-	 * returned.
+	 * Overridden here so that any error message in the dynamic UI gets returned.
 	 * 
 	 * @see ILaunchConfigurationTab#getErrorMessage()
 	 */
@@ -139,8 +138,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * Show the contributed piece of UI that was registered for the debugger id
-	 * of the currently selected debugger.
+	 * Show the contributed piece of UI that was registered for the debugger id of the currently selected debugger.
 	 */
 	protected void loadDynamicDebugArea() {
 		// Dispose of any current child widgets in the tab holder area
@@ -273,9 +271,9 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 		dlabel.setText(Messages.Launch_common_DebuggerColon);
 		fDCombo = new Combo(comboComp, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fDCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		fDCombo.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				if (!isInitializing()) {
+		fDCombo.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				if (!isInitializing() && event.type == SWT.Selection) {
 					setInitializeDefault(true);
 					updateComboFromSelection();
 				}
@@ -336,9 +334,8 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * Return the class that implements <code>ILaunchConfigurationTab</code>
-	 * that is registered against the debugger id of the currently selected
-	 * debugger.
+	 * Return the class that implements <code>ILaunchConfigurationTab</code> that is registered against the debugger id of the
+	 * currently selected debugger.
 	 */
 	protected IPDebugConfiguration getConfigForCurrentDebugger() {
 		int selectedIndex = fDCombo.getSelectionIndex();
