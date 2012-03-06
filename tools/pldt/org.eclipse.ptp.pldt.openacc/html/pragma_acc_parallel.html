@@ -1,0 +1,45 @@
+<html>
+<head><title>OpenACC&trade; parallel directive</title></head>
+<body>
+<h2>OpenACC&trade; parallel directive</h2>
+<dl><dd>Denotes a block of code that will be executed on an accelerator device.</dd></dl>
+<table width="100%" border="0" cellspacing="5" cellpadding="3"><tr bgcolor="#eeeeee">
+<td align="left" valign="top">
+  <tt><b><font color="#b46432">!$acc parallel</font></b></tt> <i>[clause [, clause ...]]</i><br>
+  &nbsp;&nbsp;&nbsp;&nbsp;<i>block</i><br>
+  <tt><b><font color="#b46432">!$acc end parallel</font></b></tt>
+</td>
+<td align="left" valign="top">
+  <tt><b><font color="#931a68">#pragma</font> acc parallel</b></tt> <i>[clause [, clause ...]]</i><br>
+  &nbsp;&nbsp;&nbsp;&nbsp;<i>block</i>
+</td>
+</tr></table>
+<p>
+  Supported clauses are
+  <tt>
+  <b>if</b>,
+  <b>async</b>,
+  <b>num_gangs</b>,
+  <b>num_workers</b>,
+  <b>vector_length</b>,
+  <b>reduction</b>,
+  <b>copy</b>,
+  <b>copyin</b>,
+  <b>copyout</b>,
+  <b>create</b>,
+  <b>present</b>,
+  <b>present_or_copy</b>,
+  <b>present_or_copyin</b>,
+  <b>present_or_copyout</b>,
+  <b>present_or_create</b>,
+  <b>deviceptr</b>,
+  <b>private</b>,
+  <b>firstprivate</b>.
+  </tt>
+</p>
+<br/>
+<table width="100%" border="0"><tr>
+<td align="right"><font color="#C0C0C0" size="1">OpenACC&trade; Application Programming Interface Version 1.0</font></td>
+</tr></table>
+</body>
+</html>
