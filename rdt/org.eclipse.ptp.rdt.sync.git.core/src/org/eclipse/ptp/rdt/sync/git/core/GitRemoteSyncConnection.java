@@ -945,7 +945,7 @@ public class GitRemoteSyncConnection {
 
 				// Now remotely merge changes with master branch
 				CommandResults mergeResults;
-				final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
+				final String command = gitCommand + " merge --ff-only " + remotePushBranch; //$NON-NLS-1$
 
 				mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
 
