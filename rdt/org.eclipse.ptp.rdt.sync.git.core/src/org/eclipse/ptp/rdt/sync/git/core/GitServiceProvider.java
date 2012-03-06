@@ -203,7 +203,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		this.synchronizeInternal(delta, fileFilter, monitor, syncFlags, false);
 	}
 	
-	public void synchronizeInternal(IResourceDelta delta, SyncFileFilter fileFilter, IProgressMonitor monitor,
+	private void synchronizeInternal(IResourceDelta delta, SyncFileFilter fileFilter, IProgressMonitor monitor,
 			EnumSet<SyncFlag> syncFlags, boolean resolveAsLocal) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
 		// On first sync, place .gitignore in directories. This is useful for folders that are already present and thus are never
