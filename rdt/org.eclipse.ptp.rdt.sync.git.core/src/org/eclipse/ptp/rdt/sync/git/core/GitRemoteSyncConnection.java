@@ -875,6 +875,7 @@ public class GitRemoteSyncConnection {
 	 * they can be more easily managed. Previously, "syncLocalToRemote" was called first in "GitServiceProvider", which would
 	 * cause merge conflicts to occur remotely.
 	 *
+	 *
 	 * @param monitor
 	 * @param includeUntrackedFiles
 	 * 				Should currently untracked remote files be added to the repository?
@@ -898,13 +899,17 @@ public class GitRemoteSyncConnection {
 		try {
 			// Commit local and remote changes
 			doCommit();
-			if (prepareRemoteForCommit(subMon.newChild(5),includeUntrackedFiles)) {
-				commitRemoteFiles(subMon.newChild(5));
+			if (!resolveAsLocal) {
+				if (prepareRemoteForCommit(subMon.newChild(5),includeUntrackedFiles)) {
+					commitRemoteFiles(subMon.newChild(5));
+				}
             }
 			
 			try {
 				// Fetch the remote repository
-				transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
+				if (!resolveAsLocal) {
+					transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
+				}
 
 				// Merge it with local
 				Ref masterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -925,7 +930,7 @@ public class GitRemoteSyncConnection {
 				}
 			} catch (TransportException e) {
 				if (e.getMessage().startsWith("Remote does not have ")) { //$NON-NLS-1$
-					// Means that the remote branch isn't set up yet (and thus nothing too fetch). Can be ignored and local to
+					// Means that the remote branch isn't set up yet (and thus nothing to fetch). Can be ignored and local to
 					// remote sync can proceed.
 					// Note: It is important, though, that we do not merge if fetch fails. Merge will fail because remote ref is
 					// not created.
