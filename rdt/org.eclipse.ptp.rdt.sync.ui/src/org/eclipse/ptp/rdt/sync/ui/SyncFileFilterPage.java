@@ -279,7 +279,8 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			});
 
 			remoteErrorLabel = new Label(treeViewerComposite, SWT.CENTER);
-			remoteErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			remoteErrorLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
+			remoteErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 		}
 		
 		// Composite for pattern table and buttons
@@ -352,7 +353,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	    });
 	    
 	    //Composite for text box, combo, and buttons to enter a new pattern
-	    Composite patternEnterComposite = new Composite(composite, SWT.BORDER);
+	    Composite patternEnterComposite = new Composite(composite, SWT.NONE);
 	    patternEnterComposite.setLayout(new GridLayout(4, false));
 		patternEnterComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
@@ -444,6 +445,10 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		// Cancel and OK buttons
 		// Logically, these should be in a separate composite, but this will align the buttons with the exclude/include buttons
 		if (preferencePage == null) {
+			// Separator
+			Label horizontalLine = new Label(patternEnterComposite, SWT.SEPARATOR | SWT.HORIZONTAL);
+			horizontalLine.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false, 4, 1));
+
 			// For spacing
 			new Label(patternEnterComposite, SWT.NONE).setVisible(false);
 			new Label(patternEnterComposite, SWT.NONE).setVisible(false);
