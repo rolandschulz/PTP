@@ -71,7 +71,7 @@ sub process {
     
     # determine scheme of system
     ($self->{SYSTEMTYPE},$self->{SYSTEMNAME})=$self->_get_system_type();    
-    if($self->{SYSTEMTYPE} eq "BG/P") {
+    if($self->{SYSTEMTYPE} eq "BG/P" or $self->{SYSTEMTYPE} eq "BG/Q") {
 	my($maxlx,$maxly,$maxlz,$maxpx,$maxpy,$maxpz)=$self->_get_system_size_bg();
 	if(!$self->_init_trees_bg($maxlx,$maxly,$maxlz,$maxpx,$maxpy,$maxpz)) {
 	    print "ERROR: could not init internal data structures, system type: $self->{SYSTEMTYPE}, aborting ...\n";
@@ -328,7 +328,7 @@ sub _remap_nodes {
     my($self) = shift;
     my($nodelist)=shift;
     my($newnodelist,$spec,$node,$num,$newnode);
-    if($self->{SYSTEMTYPE} eq "BG/P") {
+    if($self->{SYSTEMTYPE} eq "BG/P" or $self->{SYSTEMTYPE} eq "BG/Q") {
 	return($nodelist);
     }
     foreach $spec (split(/\),?\(/,$nodelist)) {
@@ -658,7 +658,7 @@ sub _adjust_layout_pbs  {
 
 
 ###############################################
-# BG/P related
+# BG/P and BG/Q related
 ############################################### 
 sub _adjust_layout_bg  {
     my($self) = shift;
@@ -864,7 +864,7 @@ sub _adjust_layout_bg  {
 
 
 ###############################################
-# BG/P related
+# BG/P and BG/Q related
 ############################################### 
 sub _get_system_size_bg  {
     my($self) = shift;
@@ -913,10 +913,18 @@ sub _init_trees_bg  {
     $schemeroot=$self->{SCHEMEROOT};
     $treenode=$schemeroot;
     $bgsystem=$treenode=$treenode->new_child();
-    $treenode->add_attr({ tagname => 'row',
-			  min     => 0,
-			  max     => $maxpx,
-			  mask    => 'R%01d' });
+    if($self->{SYSTEMTYPE} eq "BG/P") {
+        $treenode->add_attr({ tagname => 'row',
+			     min     => 0,
+			     max     => $maxpx,
+			     mask    => 'R%01d' });
+    }
+    if($self->{SYSTEMTYPE} eq "BG/Q") {
+        $treenode->add_attr({ tagname => 'row',
+                 min     => 0,
+                 max     => $maxpx,
+                 mask    => 'R%02d' });
+    }
 
     $treenode=$treenode->new_child();
     $treenode->add_attr({ tagname => 'rack',
@@ -943,10 +951,18 @@ sub _init_trees_bg  {
 			  mask    => '-C%02d' });
 
     $treenode=$treenode->new_child();
-    $treenode->add_attr({ tagname => 'core',
-			  min     => 0,
-			  max     => 3,
-			  mask    => '-%01d' });
+    if($self->{SYSTEMTYPE} eq "BG/P") {
+        $treenode->add_attr({ tagname => 'core',
+			     min     => 0,
+			     max     => 3,
+			     mask    => '-%01d' });
+    }
+    if($self->{SYSTEMTYPE} eq "BG/Q") {
+        $treenode->add_attr({ tagname => 'core',
+                 min     => 0,
+                 max     => 15,
+                 mask    => '-%02d' });
+    }    
 
     return(1);
 }

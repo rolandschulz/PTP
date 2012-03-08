@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ptp.internal.rdt.editor.RemoteCEditor;
@@ -125,6 +126,15 @@ public interface IRemoteCEditorInfoProvider {
 
 	public boolean shouldProcessLocalParsingCompletions();
 
-	public Boolean isSemanticHighlightingEnabled();
+	public boolean isSemanticHighlightingEnabled(IPreferenceStore store);
+	
+	public void installSemanticHighlighting(ISourceViewer sourceViewer, IPreferenceStore prefStore);
 
+	public void installRemoteCodeFolding(ISourceViewer sourceViewer);
+	
+	public void uninstallRemoteCodeFolding();
+
+	public void uninstallSemanticHighlighting();
+	
+	public void refreshRemoteSemanticManager();
 }

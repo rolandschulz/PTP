@@ -25,7 +25,7 @@ public class BorderComposite extends Composite {
 	/**
 	 * The used layout for this composite
 	 */
-	private final FillLayout filllayout;
+	private final FillLayout fillLayout;
 
 	/**
 	 * Create a composite with black border. The border has width 1 px in every direction.
@@ -38,11 +38,11 @@ public class BorderComposite extends Composite {
 	public BorderComposite(Composite parent, int style) {
 		super(parent, style);
 
-		filllayout = new FillLayout();
-		filllayout.marginWidth = 1;
-		filllayout.marginHeight = 1;
+		fillLayout = new FillLayout();
+		fillLayout.marginWidth = 1;
+		fillLayout.marginHeight = 1;
 
-		setLayout(filllayout);
+		setLayout(fillLayout);
 
 		setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
 	}
@@ -64,8 +64,8 @@ public class BorderComposite extends Composite {
 	 *            border-width
 	 */
 	public void setBorderWidth(int width) {
-		filllayout.marginHeight = width;
-		filllayout.marginWidth = width;
+		fillLayout.marginHeight = width;
+		fillLayout.marginWidth = width;
 
 		this.layout(true);
 	}

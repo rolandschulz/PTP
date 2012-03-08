@@ -9,6 +9,7 @@ Require-Bundle: org.eclipse.cdt.core,
  org.eclipse.core.filesystem,
  org.eclipse.core.resources,
  org.eclipse.cdt.managedbuilder.core,
+ org.eclipse.ptp.ems.core,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.services.core,
  org.eclipse.ui

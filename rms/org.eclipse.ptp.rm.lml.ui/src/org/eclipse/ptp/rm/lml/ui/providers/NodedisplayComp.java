@@ -12,36 +12,38 @@
 package org.eclipse.ptp.rm.lml.ui.providers;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.AccessControlException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.ptp.rm.lml.core.events.INodedisplayZoomEvent;
+import org.eclipse.ptp.rm.lml.core.listeners.INodedisplayZoomListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.AlignType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.DataElement;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplayelement;
-import org.eclipse.ptp.rm.lml.internal.core.elements.NodedisplaylayoutType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.PictureType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement;
-import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeType;
+import org.eclipse.ptp.rm.lml.internal.core.events.NodedisplayZoomEvent;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLCheck;
-import org.eclipse.ptp.rm.lml.internal.core.model.LMLCheck.SchemeAndData;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
+import org.eclipse.ptp.rm.lml.internal.core.model.LMLNodeData;
+import org.eclipse.ptp.rm.lml.internal.core.model.Node;
 import org.eclipse.ptp.rm.lml.internal.core.model.NodedisplayAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.OIDToObject;
 import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable;
-import org.eclipse.ptp.rm.lml.ui.providers.BorderLayout.BorderData;
+import org.eclipse.ptp.rm.lml.internal.core.model.RowColumnSorter;
+import org.eclipse.ptp.rm.lml.internal.core.model.TreeExpansion;
+import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
+import org.eclipse.ptp.rm.lml.ui.providers.support.BorderLayout;
+import org.eclipse.ptp.rm.lml.ui.providers.support.BorderLayout.BorderData;
+import org.eclipse.ptp.rm.lml.ui.providers.support.ColorConversion;
+import org.eclipse.ptp.rm.lml.ui.providers.support.CompositeListenerChooser;
+import org.eclipse.ptp.rm.lml.ui.providers.support.MouseInteraction;
+import org.eclipse.ptp.rm.lml.ui.providers.support.RectanglePaintListener;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -51,6 +53,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -61,496 +64,481 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 
 /**
- * SWT-Translation of NodedisplayPanel, which is a Swing-Component
  * 
- * Composite to create output of a nodedisplay.
+ * This is a composite for creating output of a nodedisplay.
  * 
- * Inner composites are NodedisplayComp again (recursive)
+ * Inner composites are NodedisplayComp again (recursive).
  * 
- * A NodedisplayComp represents one physical element within the nodedisplay-tag. This might be a row, midplane, node or cpu. Through
- * NodedisplayComp the reduced collapsed tree of lml is fully expanded to maxlevel. Every visible component in the nodedisplay is
- * shown by a NodedisplayComp. There is one exception: For performance reasons the lowest-level rectangles are painted directly. So
- * for the rectangles (physical elements) in the lowest level no composites are created.
+ * A NodedisplayComp represents one physical element within the nodedisplay-tag.
+ * This might be a row, midplane, node or cpu. This composite visualizes a {@code Node<LMLNodeData>}.
+ * It takes this node and paints it in exactly the way the tree --given by the
+ * Node-- is expanded.
+ * Every visible component in the tree passed to this instance is shown by a
+ * NodedisplayComp.
  * 
  * The look of the nodedisplay is defined by the lml-Nodedisplay-Layout.
+ * For a non-root nodedisplay lower elements within the nodedisplay-layout are
+ * searched.
  * 
  */
 public class NodedisplayComp extends LguiWidget implements Updatable {
 
 	/**
-	 * Class for comparing integer-values in ascending or descending way.
-	 */
-	public static class NumberComparator implements Comparator<Integer> {
-
-		private final boolean ascending;// if true => sort ascending, otherwise
-										// descending
-
-		public NumberComparator(boolean ascending) {
-			this.ascending = ascending;
-		}
-
-		public int compare(Integer o1, Integer o2) {
-			if (ascending) {
-				return o1 - o2;
-			} else {
-				return o2 - o1;
-			}
-		}
-
-	}
-
-	/**
-	 * Parses through scheme and generates suitable preferences for every level of the nodedisplay-tree
+	 * This class is a workaround for a SWT-bug.
+	 * The mouselistener callbacks receive negative coordinates
+	 * as cursor positions, if the window is too large. This seems
+	 * to be the result of an integer overflow. Thus this listener
+	 * will use the last coordinates passed to the mousemove function
+	 * as coordinates in the mousedown function.
 	 * 
-	 * @param scheme
-	 *            scheme of nodedisplay
-	 * @return preferences for every level
+	 * 
 	 */
-	public static ArrayList<Nodedisplayelement> generatePrefsFromScheme(SchemeType scheme) {
-		final int depth = LMLCheck.getDeepestSchemeLevel(scheme);
+	private class MouseMoveAndDownListener implements MouseListener,
+			MouseMoveListener {
 
-		final ArrayList<Nodedisplayelement> res = new ArrayList<Nodedisplayelement>();
-		final ObjectFactory objf = new ObjectFactory();// For creating
-														// lml-objects
+		/**
+		 * Saves the last coordinates passed to the mouseMove-function.
+		 */
+		private int lastX = 0, lastY = 0;
 
-		final int[] maxcounts = new int[depth];
-		for (int i = 0; i < maxcounts.length; i++) {
-			maxcounts[i] = 0;
-		}
-		// Search for maximum amount of elements defined in scheme
-		findMaximum(scheme, 1, maxcounts);
-
-		for (int i = 0; i < depth; i++) {
-
-			int cols = 8;
-			if (maxcounts[i] < cols) {
-				cols = maxcounts[i];
-			}
-
-			final Nodedisplayelement apref = objf.createNodedisplayelement();
-			apref.setCols(BigInteger.valueOf(cols));
-
-			// Only level 1 shows title
-			if (i != 1) {
-				apref.setShowtitle(false);
-			}
-			// bigger Level-0 gap between level1-panels
-			if (i == 0) {
-				apref.setHgap(BigInteger.valueOf(3));
-				apref.setHgap(BigInteger.valueOf(4));
-			}
-
-			res.add(apref);
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
+		 */
+		public void mouseDoubleClick(MouseEvent e) {
 		}
 
-		// For last level, which does not have inner elements
-		res.add(NodedisplayAccess.getDefaultLayout());
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
+		 */
+		public void mouseDown(MouseEvent e) {
+			// Use the last coordinates from the mouseMove action
+			final Node<LMLNodeData> focussed = rectanglePaintListener.getNodeAtPos(
+					lastX, lastY);
 
-		return res;
+			if (rectanglePaintListener.isUsagebarConnectedToNode(focussed)) {
+				mouseInteraction.mouseDownAction(rectanglePaintListener.getJobAtPos(focussed, lastX));
+			}
+			else {
+				mouseInteraction.mouseDownAction(focussed);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.events.MouseMoveListener#mouseMove(org.eclipse.swt.events.MouseEvent)
+		 */
+		public void mouseMove(MouseEvent e) {
+			lastX = e.x;
+			lastY = e.y;
+			final Node<LMLNodeData> focussed = rectanglePaintListener.getNodeAtPos(lastX, lastY);
+
+			if (rectanglePaintListener.isUsagebarConnectedToNode(focussed)) {
+				mouseInteraction.mouseMoveAction(rectanglePaintListener.getJobAtPos(focussed, lastX));
+			}
+			else {
+				mouseInteraction.mouseMoveAction(focussed);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
+		 */
+		public void mouseUp(MouseEvent e) {
+			// Use the last coordinates from the mouseMove action
+			final Node<LMLNodeData> focussed = rectanglePaintListener.getNodeAtPos(lastX, lastY);
+
+			if (rectanglePaintListener.isUsagebarConnectedToNode(focussed)) {
+				mouseInteraction.mouseUpAction(rectanglePaintListener.getJobAtPos(focussed, lastX));
+			}
+			else {
+				mouseInteraction.mouseUpAction(focussed);
+			}
+		}
+
 	}
 
 	/**
-	 * @return default GridData instance, which simulates Swing-behaviour of gridlayout
+	 * Creates a new GridData-instance every time this function is called.
+	 * 
+	 * @return default GridData instance, which simulates Swing-behaviour of
+	 *         gridlayout
 	 */
 	public static GridData getDefaultGridData() {
-		final GridData griddata = new GridData();
-		griddata.grabExcessHorizontalSpace = true;
-		griddata.grabExcessVerticalSpace = true;
-		griddata.horizontalAlignment = GridData.FILL;
-		griddata.verticalAlignment = GridData.FILL;
-
-		return griddata;
-
+		return new GridData(GridData.FILL, GridData.FILL, true, true);
 	}
 
 	/**
-	 * Find maximum count of elements per level Traverses the whole scheme
+	 * Generates the bounds of the inner composite
+	 * relative to the surrounding nodedisplay.
 	 * 
-	 * @param scheme
-	 *            lml-scheme
-	 * @param level
-	 *            current level (first is 1)
-	 * @param maxcounts
-	 *            array with length at least scheme.depth
+	 * @return bounds of the inner composite relative to surrounding
+	 *         nodedisplaycomp
 	 */
-	private static void findMaximum(Object scheme, int level, int[] maxcounts) {
+	public static Rectangle getNextNodedisplayBounds(Composite innerComp) {
 
-		final List subschemes = LMLCheck.getLowerSchemeElements(scheme);
+		final Rectangle bounds = innerComp.getBounds();
 
-		int sum = 0;
+		Composite currentComp = innerComp;
 
-		for (final Object subscheme : subschemes) {
+		while (currentComp.getParent() != null && !(currentComp.getParent() instanceof NodedisplayComp)) {
+			currentComp = currentComp.getParent();
 
-			final SchemeElement sub = (SchemeElement) subscheme;
-
-			if (sub.getList() != null) {// list-attribute
-				sum += LMLCheck.getNumbersFromNumberlist(sub.getList()).length;
-			} else {// min- max-attributes
-
-				final int min = sub.getMin().intValue();
-				int max = min;
-				if (sub.getMax() != null) {
-					max = sub.getMax().intValue();
-				}
-
-				final int step = sub.getStep().intValue();
-
-				sum += (max - min) / step + 1;
-			}
-			// Recursive call for lower level
-			findMaximum(sub, level + 1, maxcounts);
+			final Rectangle newBounds = currentComp.getBounds();
+			bounds.x += newBounds.x;
+			bounds.y += newBounds.y;
 		}
 
-		if (sum > 0 && sum > maxcounts[level - 1]) {
-			maxcounts[level - 1] = sum;
-		}
-
+		return bounds;
 	}
 
-	// parent composite for zooming
-	private NodedisplayView fNodedisplayView;
+	// TODO insert levelsPaintedByPaintListener into LML nodedisplaylayout
+	// This will allow individual performance configuration
+	/**
+	 * Holds the amount of tree levels, which
+	 * are painted in fast way, but less configurable.
+	 * This fast painting is done by the rectpaintlistener.
+	 */
+	private int levelsPaintedByPaintListener = 2;
 
-	private String title;// implicit name of this node
-	private Color jobColor;// Color of the job, to which this panel is connected
+	/**
+	 * implicit name of this node
+	 */
+	private String title;
 
+	/**
+	 * Color of the job, to which this panel is connected
+	 */
+	private Color jobColor;
+
+	/**
+	 * Stores the current font used in title label and
+	 * later used in other UI-elements, which contain
+	 * characters
+	 */
 	private Font fontObject;
-	private Nodedisplay fNodedisplay;// surrounding lml-Nodedisplay
 
-	private DisplayNode fDisplayNode;// Node-model which has to be displayed
-	private int maxLevel; // Deepest level, which should be displayed
+	/**
+	 * Node-model which has to be displayed, contains partly expanded LML-tree
+	 */
+	private Node<LMLNodeData> node;
 
-	private Composite pictureFrame;// this panel contains pictures as direct
-									// children and the mainpanel in center
+	/**
+	 * this panel contains pictures as direct
+	 * children and the mainPanel in center
+	 */
+	private Composite pictureComp;
 
-	private Composite mainPanel;// Important panel where everything but pictures
-								// is in
+	/**
+	 * Important panel where everything but pictures is in
+	 */
+	private Composite mainComp;
 
-	private Composite innerPanel = null;
+	/**
+	 * Has gridlayout and all lower nodedisplays as children
+	 */
+	protected Composite innerComp = null;
 
-	private Label titleLabel;// For title-line
-	// Settings for lower level
-	private Nodedisplayelement apref;
+	/**
+	 * Holds a usagebar-composite, if this nodedisplay is the lowest level
+	 * composite and a usage-tag is provided by the nodedisplay.
+	 */
+	protected Usagebar usagebar;
 
-	// current level, which is displayed
-	private int currentLevel;
+	/**
+	 * Instance handling all types of mouse actions.
+	 * Creates tooltip.
+	 */
+	protected MouseInteraction mouseInteraction;
 
-	private GridData gridData;// layout definitions for gridlayouts, makes inner
-								// panels resize
-	private Color backgroundColor;// Current backgroundcolor
+	/**
+	 * For title-line
+	 */
+	private Label titleLabel;
+	/**
+	 * Settings for lower level provided by the corresponding
+	 * layout.
+	 */
+	private Nodedisplayelement nodedisplayLayout;
 
+	/**
+	 * Current backgroundcolor
+	 */
+	private Color backgroundColor;
+
+	/**
+	 * Background color of title label
+	 */
 	private Color titleBackgroundColor;
 
-	// Borders
-	private BorderComposite borderFrame;// The only frame which has a border,
-										// borderwidth changes when mouse
-										// touches the panel
-
-	private ArrayList<ImageComp> pictures;
-
-	private Image centerPic;// Picture in center is special
-
-	private ArrayList<NodedisplayComp> innerComps;// Save created inner
-													// NodedisplayComp-instances
-													// for disposing them if
-													// needed
-
-	private static final int httpsport = 4444;// Special port for https-access
-
-	private NodedisplayComp parentNodedisplay = null;// Reference to parent
-														// nodedisplay
-
-	private int minWidth = 0, minHeight = 0;// Minimal width and height of this
-											// nodedisplay
-
-	private int x = 0, y = 0;// Position of this nodedisplay within surrounding
-								// grid
-
-	// Saves rectpaintlistener, which is needed for fast painting of inner
-	// rectangles
-	private RectPaintListener rectpaintlistener = null;
-
-	// The name of the special empty job
-	private final String emptyJobName = "empty"; //$NON-NLS-1$
+	/**
+	 * The only frame which has a border,
+	 * borderwidth changes when mouse
+	 * touches the panel
+	 */
+	private BorderComposite borderComp;
 
 	/**
-	 * Call this constructor for start, maxlevel is chosen from lml-file
+	 * List with pictures, which are directly aligned to this nodedisplay
+	 */
+	private List<ImageComp> picturesList;
+
+	/**
+	 * Picture in center is special and has to be handled separately.
+	 */
+	private Image centerPicture;
+
+	/**
+	 * Save created inner NodedisplayComp-instances
+	 * for disposing them afterwards
+	 */
+	protected List<NodedisplayComp> innerCompsList;
+
+	/**
+	 * Reference to parent nodedisplay
+	 */
+	protected NodedisplayComp parentNodedisplayComp = null;
+
+	/**
+	 * Position of this nodedisplay within surrounding grid
+	 */
+	protected int x = 0, y = 0;
+
+	/**
+	 * Saves rectpaintlistener, which is needed for fast painting of inner
+	 * rectangles.
+	 */
+	protected RectanglePaintListener rectanglePaintListener = null;
+
+	/**
+	 * Save references to those instances interested in the zooming-events
+	 */
+	private final List<INodedisplayZoomListener> zoomListeners = new ArrayList<INodedisplayZoomListener>();
+
+	/**
+	 * Call this constructor for start, maxlevel is chosen from
+	 * nodedisplaylayout.
+	 * The pnode has to be expanded as much as desired. The nodedisplay does not
+	 * expand non-root nodes.
 	 * 
-	 * @param lgui
-	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
-	 * @param pmodel
-	 *            lml-model, which has data for this Nodedisplay
-	 * @param pnodeview
-	 *            root-nodedisplay is needed for zooming
-	 * @param pnode
-	 *            current node, which is root-data-element of this NodedisplayComp
+	 * This constructor is designed for non-root nodes, which should appear
+	 * as the root-node in the display. One could call this constructor for
+	 * showing one rack of a supercomputer.
+	 * 
+	 * @param lguiItem
+	 *            wrapper instance around LguiType-instance -- provides easy
+	 *            access to lml-information
+	 * @param node
+	 *            current node, which is root-data-element of this
+	 *            NodedisplayComp
+	 * @param layout
+	 *            layout definition for this nodedisplay part
+	 * @param parent
+	 *            parent composite, in which this nodedisplay is located
 	 * @param style
 	 *            SWT Style
 	 */
-	public NodedisplayComp(ILguiItem lgui, Nodedisplay pmodel, DisplayNode pnode, NodedisplayView pnodeview, int style) {
+	public NodedisplayComp(ILguiItem lguiItem, Node<LMLNodeData> node, Nodedisplayelement layout, Composite parent, int style) {
 
-		super(lgui, pnodeview.getScrollPane(), style);
+		super(lguiItem, parent, style);
 
-		// get maxlevel from lml-file
-		calculateCurrentlevel(pnode);
-
-		fNodedisplay = pmodel;
-		fDisplayNode = pnode;
-
-		apref = findLayout();// Searches for corresponding layout-definitions
-
-		maxLevel = 10;
-		if (apref.getMaxlevel() != null) {
-			maxLevel = apref.getMaxlevel().intValue();
+		// Expand the node, if it is a root-node and not expanded at all
+		if (node.getData().isRootNode() && node.getChildren().size() == 0) {
+			int maxLevel = 10;
+			if (layout.getMaxlevel() != null) {
+				maxLevel = layout.getMaxlevel().intValue();
+			}
+			TreeExpansion.expandLMLNode(node, maxLevel);
 		}
 
-		init(pmodel, pnode, pnodeview);
-
-		setScrollBarPreferences();
-
-		addPaintListener();
+		init(node, layout);
 	}
 
 	/**
-	 * easy constructor for a nodedisplay as root-node
+	 * This is an easy to use constructor for a nodedisplay as root-node.
 	 * 
-	 * @param lgui
-	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
-	 * @param pmodel
-	 *            lml-model for the nodedisplay, which should be shown in this panel
-	 * @param lgui
-	 *            complete lml-model containing this nodedisplay
+	 * @param lguiItem
+	 *            wrapper instance around LguiType-instance -- provides easy
+	 *            access to lml-information
+	 * @param nodedisplay
+	 *            lml-model for the nodedisplay, which should be shown in this
+	 *            panel
 	 * @param parent
 	 *            parameter for calling super constructor
 	 * @param style
 	 *            parameter for calling super constructor
 	 */
-	public NodedisplayComp(ILguiItem lgui, Nodedisplay pmodel, NodedisplayView pnodeview, int style) {
+	public NodedisplayComp(ILguiItem lguiItem, Nodedisplay nodedisplay, Composite parent, int style) {
 
-		this(lgui, pmodel, null, pnodeview, style);
+		this(lguiItem, new Node<LMLNodeData>(new LMLNodeData("", nodedisplay)), //$NON-NLS-1$
+				// get the layout for this nodedisplay
+				lguiItem.getLayoutAccess().getLayoutForNodedisplay(nodedisplay.getId()).getEl0(), parent, style);
 
 	}
 
 	/**
-	 * Call this constructor for inner or lower elements, rellevel is counted to zero with every level
+	 * Call this constructor for inner or lower elements. It is not allowed
+	 * to call this constructor from outside.
 	 * 
-	 * @param lgui
-	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
-	 * @param pmodel
-	 *            lml-model, which has data for this Nodedisplay
-	 * @param pnode
-	 *            current node, which is root-data-element of this NodedisplayComp
-	 * @param pnodeview
-	 *            root-nodedisplay is needed for zooming
-	 * @param pparentNodedisplay
+	 * @param lguiItem
+	 *            wrapper instance around LguiType-instance -- provides easy
+	 *            access to lml-information
+	 * @param node
+	 *            current node, which is root-data-element of this
+	 *            NodedisplayComp
+	 * @param layout
+	 *            nodedisplay-layout part for this nodedisplay
+	 * @param levelsPaintedByPaintListener
+	 *            Holds the amount of tree levels, which
+	 *            are painted in fast way, but less configurable.
+	 *            This fast painting is done by the rectpaintlistener.
+	 *            This parameter is currently only forwarded from the
+	 *            root node to all of its children.
+	 * @param parentNodedisplay
 	 *            father of this nodedisplay
-	 * @param px
+	 * @param x
 	 *            horizontal position of this nodedisplay in surrounding grid
-	 * @param py
+	 * @param y
 	 *            horizontal position of this nodedisplay in surrounding grid
-	 * @param rellevel
-	 *            relative level, rellevel==0 means show no lower elements
 	 * @param parent
-	 *            parent composite for SWT constructor
+	 *            parent composite for SWT constructor, differs from
+	 *            pparentNodedisplay, because
+	 *            parent is the innerPanel of pparentNodedisplay
 	 * @param style
 	 *            SWT-style of this nodedisplay
 	 */
-	protected NodedisplayComp(ILguiItem lgui, Nodedisplay pmodel, DisplayNode pnode, NodedisplayView pnodeview,
-			NodedisplayComp pparentNodedisplay, int px, int py, int rellevel, Composite parent, int style) {
+	protected NodedisplayComp(ILguiItem lguiItem, Node<LMLNodeData> node, Nodedisplayelement layout,
+			int levelsPaintedByPaintListener, NodedisplayComp parentNodedisplay, int x, int y, Composite parent, int style) {
 
-		super(lgui, parent, style);
+		super(lguiItem, parent, style);
 
-		// Calculate maxlevel with rellevel
-
-		// Set Preferences
-		calculateCurrentlevel(pnode);
-
-		maxLevel = currentLevel + rellevel;
 		// Save father reference
-		parentNodedisplay = pparentNodedisplay;
+		this.parentNodedisplayComp = parentNodedisplay;
 
 		// Save grid-positions
-		x = px;
-		y = py;
+		this.x = x;
+		this.y = y;
 
-		init(pmodel, pnode, pnodeview);
+		// Get listener painted levels from parent node
+		this.levelsPaintedByPaintListener = levelsPaintedByPaintListener;
+
+		init(node, layout);
 	}
 
 	/**
-	 * Search for a layout-section for this nodedisplay-panel
+	 * Add a reference, which is informed about every zoom event
+	 * within this nodedisplay.
 	 * 
-	 * @return lml-Nodedisplay-layout-section for this displaynode, or default-layout if no layout is defined
+	 * @param listener
+	 *            the new listener
 	 */
-	public Nodedisplayelement findLayout() {
+	public void addZoomListener(INodedisplayZoomListener listener) {
+		zoomListeners.add(listener);
+	}
 
-		Nodedisplayelement res = null;
+	/**
+	 * Search a layout-section for a lower node <code>nodeData</code>.
+	 * This lower node must be a child of this instance.
+	 * 
+	 * @param nodeData
+	 *            a child of this nodedisplay's node, for which a layout is searched.
+	 * @return lml-Nodedisplay-layout-section for this node, or
+	 *         default-layout if no layout is defined
+	 */
+	public Nodedisplayelement findLayout(LMLNodeData nodeData) {
+
+		Nodedisplayelement result = null;
 
 		if (lguiItem.getNodedisplayAccess() != null) {
-			final ArrayList<NodedisplaylayoutType> allNodedisplayLayouts = lguiItem.getNodedisplayAccess().getLayouts(
-					fNodedisplay.getId());
-
-			// Is there any Layout for this nodedisplay?
-			if (allNodedisplayLayouts == null || allNodedisplayLayouts.size() == 0) {
-				return NodedisplayAccess.getDefaultLayout();
-			}
-			// Later it should be possible to choose one of possibly multiple
-			// defined layouts
-			final NodedisplaylayoutType first = allNodedisplayLayouts.get(0);
-
-			if (fDisplayNode == null) {// Root-level => return
-										// el0-Nodedisplayelement
-				if (first.getEl0() != null) {
-					return first.getEl0();
-				} else {
-					return NodedisplayAccess.getDefaultLayout();
-				}
-			}
-
-			if (first.getEl0() == null) {
-				return NodedisplayAccess.getDefaultLayout();
-			}
 
 			// Copy level-numbers
-			final ArrayList<Integer> levelnrs = LMLCheck.copyArrayList(fDisplayNode.getLevelNrs());
+			final ArrayList<Integer> levelNumbers = new ArrayList<Integer>();
+			for (int i = node.getData().getLevelIds().size(); i < nodeData.getLevelIds().size(); i++) {
+				levelNumbers.add(nodeData.getLevelIds().get(i));
+			}
 
 			// deeper-level => traverse layout-tree
-			res = LMLCheck.getNodedisplayElementByLevels(levelnrs, first.getEl0());
+			result = LMLCheck.getNodedisplayElementByLevels(levelNumbers, nodedisplayLayout);
 		}
 
-		if (res == null) {
+		if (result == null) {
 			return NodedisplayAccess.getDefaultLayout();
 		} else {
-			return res;
+			return result;
 		}
 
 	}
 
 	/**
-	 * Generates a hashmap, which connects DisplayNodes to their SWT-colors.
+	 * Generates a hashmap, which connects nodes to their SWT-colors.
 	 * 
-	 * @param displayNodes
-	 *            The DisplayNodes, which are keys from the resulting hashmap
-	 * @return hashmap, which connects DisplayNodes to their SWT-colors
+	 * @param nodesList
+	 *            The nodes, which are keys from the resulting hashmap
+	 * @return hashmap, which connects nodes to their SWT-colors
 	 */
-	public HashMap<DisplayNode, Color> generateDisplayNodeToColorMap(ArrayList<DisplayNode> displayNodes) {
+	public HashMap<Node<LMLNodeData>, Color> generateNodeToColorMap(List<Node<LMLNodeData>> nodesList) {
 		final OIDToObject oidToObject = lguiItem.getOIDToObject();
 
-		final HashMap<DisplayNode, Color> displayNodeToColor = new HashMap<DisplayNode, Color>();
+		final HashMap<Node<LMLNodeData>, Color> nodeToColorMap = new HashMap<Node<LMLNodeData>, Color>();
 		if (oidToObject != null) {
-			for (final DisplayNode displayNode : displayNodes) {
-				if (displayNode.getData() != null) {
-					final String conOID = displayNode.getData().getOid();
-					displayNodeToColor.put(displayNode, ColorConversion.getColor(oidToObject.getColorById(conOID)));
+			for (final Node<LMLNodeData> node : nodesList) {
+				if (node.getData() != null) {
+					nodeToColorMap.put(node,
+							ColorConversion.getColor(oidToObject.getColorById(node.getData().getDataElement().getOid())));
 				}
 			}
 		}
 
-		return displayNodeToColor;
+		return nodeToColorMap;
 	}
 
 	/**
 	 * @return lml-data-access to data shown by this nodedisplay
 	 */
+	@Override
 	public ILguiItem getLguiItem() {
 		return lguiItem;
 	}
 
 	/**
-	 * Generates DisplayNodes for every visible component, which is a child of the element identified by the level-ids.
-	 * 
-	 * @param aScheme
-	 *            current lml-scheme describing a node
-	 * @param aData
-	 *            current lml-data for this node
-	 * @param levels
-	 *            ids for every level to identify a node in the lml-tree (1,1,1) means first cpu in first nodecard in first row
-	 * @param nodedisplay
-	 *            full LML-Model for a nodedisplay
-	 * @param highestRowfirst
-	 *            defines how the result will be sorted, true=> descending, false ascending
-	 * @return list of DisplayNodes
+	 * @return the layout used for this nodedisplay for configuration
 	 */
-	public ArrayList<DisplayNode> getLowerDisplayNodes(Object aScheme, Object aData, ArrayList<Integer> levels,
-			Nodedisplay nodedisplay, boolean highestRowfirst) {
-
-		final int aLevel = levels.size();
-		final ArrayList<DisplayNode> result = new ArrayList<DisplayNode>();
-
-		final HashMap<Integer, SchemeElement> schemesForIds = new HashMap<Integer, SchemeElement>();
-
-		final ArrayList<Integer> numbers = new ArrayList<Integer>();// Indices
-																	// within
-																	// scheme of
-																	// lower
-																	// elements
-		final List<?> lScheme = LMLCheck.getLowerSchemeElements(aScheme);
-		for (int i = 0; i < lScheme.size(); i++) {
-			// getNumbers
-			final SchemeElement laScheme = (SchemeElement) lScheme.get(i);
-			if (laScheme.getList() != null) {// get list-elements
-				final int[] aNumbers = LMLCheck.getNumbersFromNumberlist(laScheme.getList());
-				for (final int aNumber : aNumbers) {
-					numbers.add(aNumber);
-					schemesForIds.put(aNumber, laScheme);
-				}
-
-			} else if (laScheme.getMin() != null) {// min- max-attributes
-				final int min = laScheme.getMin().intValue();
-				int max = min;
-				if (laScheme.getMax() != null) {
-					max = laScheme.getMax().intValue();
-				}
-
-				final int step = laScheme.getStep() != null ? laScheme.getStep().intValue() : 1;
-				for (int j = min; j <= max; j += step) {
-					numbers.add(j);
-					schemesForIds.put(j, laScheme);
-				}
-
-			}
-		}
-
-		Collections.sort(numbers, new NumberComparator(!highestRowfirst));
-
-		// Process numbers
-		for (int j = 0; j < numbers.size(); j++) {
-			final int aId = numbers.get(j);
-			// Get all information for new DisplayNode
-			final SchemeAndData schemeData = LMLCheck.getSchemeAndDataByLevels(aId, aData, aScheme);
-
-			DataElement lowData = schemeData.data;
-
-			if (LMLCheck.getDataLevel(aData) < LMLCheck.getSchemeLevel(aScheme) && aData instanceof DataElement) {
-				lowData = (DataElement) aData;// Then do not go deeper , makes
-												// no sense
-			}
-
-			levels.add(aId);
-			DisplayNode displayNode = null;
-			if (lguiItem.getNodedisplayAccess() != null) {
-				displayNode = new DisplayNode(lguiItem,
-						lguiItem.getNodedisplayAccess().getTagname(nodedisplay.getId(), aLevel + 1), lowData,
-						schemesForIds.get(aId), levels, nodedisplay);
-			}
-			levels.remove(levels.size() - 1);
-
-			if (displayNode != null) {
-				result.add(displayNode);
-			}
-		}
-
-		return result;
-
+	public Nodedisplayelement getNodedisplayLayout() {
+		return nodedisplayLayout;
 	}
 
 	/**
-	 * @return implicit name of node within nodedisplay, which is shown by this NodedisplayPanel
+	 * @return implicit name of node within nodedisplay, which is shown by this
+	 *         NodedisplayPanel
 	 */
-	public String getShownImpname() {
-		if (fDisplayNode == null) {
+	public String getShownImpName() {
+		if (node == null) {
 			return null;
 		}
 
-		return fDisplayNode.getFullImplicitName();
+		return node.getData().getFullImpName();
+	}
+
+	/**
+	 * @return x-directed position of this nodedisplay in the parent's
+	 *         gridlayout
+	 */
+	public int getXPosition() {
+		return x;
+	}
+
+	/**
+	 * @return y-directed position of this nodedisplay in the parent's
+	 *         gridlayout
+	 */
+	public int getYPosition() {
+		return y;
 	}
 
 	/**
@@ -558,96 +546,115 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 */
 	public void hideTitle() {
 		titleLabel.setVisible(false);
-		apref.setShowtitle(false);
+		nodedisplayLayout.setShowtitle(false);
 	}
 
 	/**
-	 * Add height-parameter to minHeight
+	 * Check if a rectangle within this nodedisplay is visible for the
+	 * user on the gui.
 	 * 
-	 * @param height
-	 *            difference to be added
+	 * @param area
+	 *            a rectangle with relative coordinates to this nodedisplay
+	 * @return <code>true</code>, if this rectangle is visible to the user, <code>false</code> otherwise
 	 */
-	public synchronized void increaseMinHeight(int height) {
-		minHeight += height;
+	public boolean isRectangleVisible(Rectangle area) {
+		if (parentNodedisplayComp == null) {
+			final Rectangle bounds = getBounds();
+			final Point parentSize = getParent().getSize();
 
-		if (parentNodedisplay != null) {
-			// Only first column sends minheight-increases to parent composites
-			if (x == 0) {
-				parentNodedisplay.increaseMinHeight(height);
+			// Assume parent nodedisplays are in scrollpane
+			final int x = -bounds.x;
+			final int y = -bounds.y;
+			final int x2 = x + parentSize.x - 1;
+			final int y2 = y + parentSize.y - 1;
+
+			if (area.x + area.width <= x) {
+				return false;
 			}
+			if (area.x > x2) {
+				return false;
+			}
+			if (area.y > y2) {
+				return false;
+			}
+			if (area.y + area.height <= y) {
+				return false;
+			}
+			return true;
+		}
+		else {
+			final Rectangle bounds = getNextNodedisplayBounds(this);
+
+			area.x += bounds.x;
+			area.y += bounds.y;
+			return parentNodedisplayComp.isRectangleVisible(area);
 		}
 	}
 
 	/**
-	 * Add width-parameter to minWidth
+	 * Stop listening.
 	 * 
-	 * @param width
-	 *            difference to be added
+	 * @param listener
+	 *            listener for zoom-events
 	 */
-	public synchronized void increaseMinWidth(int width) {
-		minWidth += width;
-
-		if (parentNodedisplay != null) {
-			// Only first row sends minwidth-increases to parent composites
-			if (y == 0) {
-				parentNodedisplay.increaseMinWidth(width);
-			}
-		}
+	public void removeZoomListener(INodedisplayZoomListener listener) {
+		zoomListeners.remove(listener);
 	}
 
 	/**
-	 * Calculate minimum size of this nodedisplay, which is needed to show all painted rectangles in defined minimum size.
-	 * 
-	 */
-	public void showMinRectangleSizes() {
-		callMinSizeCalculation();
-
-		fNodedisplayView.getScrollPane().setMinSize(minWidth, minHeight);
-	}
-
-	/**
-	 * Show title or name for this panel
+	 * Show title or name for this panel.
 	 */
 	public void showTitle() {
 		titleLabel.setVisible(true);
-		apref.setShowtitle(true);
+		nodedisplayLayout.setShowtitle(true);
 	}
 
-	public void updateStatus(ObjectType j, boolean mouseover, boolean mousedown) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable#
+	 * updateStatus(org.eclipse.ptp.rm.lml.internal.core.elements
+	 * .ObjectType, boolean, boolean)
+	 */
+	public void updateStatus(ObjectType object, boolean mouseOver, boolean mouseDown) {
 
-		if (fDisplayNode == null) {
-			if (innerPanel != null) {
-				innerPanel.redraw();
+		if (parentNodedisplayComp == null) {
+			if (innerComp != null) {
+				innerComp.redraw();
 			}
 			return;
 		}
 
-		final ObjectType conobject = fDisplayNode.getConnectedObject();
+		final ObjectType connectedObject = getConnectedObject();
 		if (lguiItem.getObjectStatus() != null) {
-			if (currentLevel == maxLevel) {
+			// Is this node a leaf?
+			if (node.getLowerLevelCount() == 0) {
 
-				if (lguiItem.getObjectStatus().isMouseover(conobject)) {
-					borderFrame.setBorderWidth(apref.getMouseborder().intValue());
+				if (lguiItem.getObjectStatus().isMouseOver(connectedObject)) {
+					borderComp.setBorderWidth(nodedisplayLayout.getMouseborder().intValue());
 				} else {
-					borderFrame.setBorderWidth(apref.getBorder().intValue());
+					borderComp.setBorderWidth(nodedisplayLayout.getBorder().intValue());
 				}
 
-				if (lguiItem.getObjectStatus().isAnyMousedown() && !lguiItem.getObjectStatus().isMousedown(conobject)) {// Change
-																														// color
-					innerPanel.setBackground(ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(null)));
+				if (lguiItem.getObjectStatus().isAnyMouseDown() && !lguiItem.getObjectStatus().isMouseDown(connectedObject)) {
+					// Change color
+					innerComp.setBackground(ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(null)));
 				} else {
-					innerPanel.setBackground(jobColor);
+					innerComp.setBackground(jobColor);
 				}
-			} else if (currentLevel == maxLevel - 1) {// For rectangle-paint of
-														// lowest-level-elements
-				innerPanel.redraw();
+			} else if (node.getLowerLevelCount() <= levelsPaintedByPaintListener) {
+				// For rectangle-paint of
+				// lowest-level-elements
+				innerComp.redraw();
 			}
 
 		}
 	}
 
 	/**
-	 * Adds a dispose-listener, which removes this nodedisplay and its children from Objectstatus.
+	 * Adds a dispose-listener, which removes this nodedisplay and its children
+	 * from <code>ObjectStatus</code>.
 	 */
 	private void addDisposeAction() {
 		this.addDisposeListener(new DisposeListener() {
@@ -664,115 +671,150 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Adds listeners to innerPanel, which react to user interaction on lowest level rectangles.
+	 * Add listener, which reacts when user focuses this panel.
+	 * This method is not needed, if elements on the lowest level are painted
+	 * with rectangles instead of painting composites. These listeners are used for
+	 * nodedisplay composites, which represent only one node.
 	 */
-	private void addMouseListenerToInnerPanel() {
+	private void addLowestLevelListeners() {
 
-		innerPanel.addMouseMoveListener(new MouseMoveListener() {
-
+		final MouseMoveListener mouseMove = new MouseMoveListener() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.MouseMoveListener#mouseMove(org.eclipse.swt.events.MouseEvent)
+			 */
 			public void mouseMove(MouseEvent e) {
-
-				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
-
-				if (lguiItem.getObjectStatus() != null) {
-					if (focussed != null && !isDisplayNodeEmpty(focussed)) {
-						lguiItem.getObjectStatus().mouseover(focussed.getConnectedObject());
-					} else {
-						lguiItem.getObjectStatus().mouseExitLast();
-					}
-				}
-				innerPanel.setToolTipText(getToolTipText(focussed));
-
-			}
-		});
-
-		innerPanel.addMouseListener(new MouseListener() {
-
-			public void mouseDoubleClick(MouseEvent e) {
-			}
-
-			public void mouseDown(MouseEvent e) {
-				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
-
-				if (focussed != null && !isDisplayNodeEmpty(focussed) && lguiItem.getObjectStatus() != null) {
-					lguiItem.getObjectStatus().mousedown(focussed.getConnectedObject());
-				}
-
-				innerPanel.setToolTipText(getToolTipText(focussed));
-			}
-
-			public void mouseUp(MouseEvent e) {
-				final DisplayNode focussed = rectpaintlistener.getDisplayNodeAtPos(e.x, e.y);
-
-				if (focussed != null && !isDisplayNodeEmpty(focussed) && lguiItem.getObjectStatus() != null) {
-					lguiItem.getObjectStatus().mouseup(focussed.getConnectedObject());
-				}
-
-				innerPanel.setToolTipText(getToolTipText(focussed));
-			}
-		});
-
-		innerPanel.addListener(SWT.MouseExit, new Listener() {
-
-			public void handleEvent(Event event) {
-				if (lguiItem.getObjectStatus() != null) {
-					lguiItem.getObjectStatus().mouseExitLast();
-				}
-
-				innerPanel.setToolTipText(getToolTipText(null));
-			}
-
-		});
-
-	}
-
-	/**
-	 * Adds a listener, which calls showMinRectangleSize everytime this component is painted. This is needed to change minimum size
-	 * in surrounding ScrollPane.
-	 */
-	private void addPaintListener() {
-
-		final Listener l = new Listener() {
-
-			public void handleEvent(Event event) {
-				showMinRectangleSizes();
+				mouseInteraction.mouseMoveAction(node);
 			}
 		};
 
-		innerPanel.addListener(SWT.Paint, l);
+		final MouseListener mouselistener = new MouseListener() {
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
+			 */
+			public void mouseDoubleClick(MouseEvent e) {
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
+			 */
+			public void mouseDown(MouseEvent e) {
+				mouseInteraction.mouseDownAction(node);
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
+			 */
+			public void mouseUp(MouseEvent e) {
+				if (e.x >= 0 && e.x <= getSize().x && e.y >= 0 && e.y <= getSize().y) {
+					mouseInteraction.mouseUpAction(node);
+				}
+			}
+		};
+
+		final Listener mouseexit = new Listener() {
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+			 */
+			public void handleEvent(Event event) {
+				mouseInteraction.mouseExitAction();
+			}
+
+		};
+
+		borderComp.addMouseMoveListener(mouseMove);
+		borderComp.addMouseListener(mouselistener);
+		borderComp.addListener(SWT.MouseExit, mouseexit);
+
+		innerComp.addMouseMoveListener(mouseMove);
+		innerComp.addMouseListener(mouselistener);
+		innerComp.addListener(SWT.MouseExit, mouseexit);
+	}
+
+	/**
+	 * Adds listeners to innerPanel, which react to user interaction on lowest
+	 * level rectangles. Generates tooltips and forwards mouse actions to the
+	 * object status.
+	 * These listeners are used for nodedisplay composites, which paint
+	 * lower nodes by using the paintlistener.
+	 */
+	private void addMouseListenerToInnerPanelWithRectPaintListener() {
+		// Create a listener for both: mouse moving and mouse clicks
+		final MouseMoveAndDownListener mouseListener = new MouseMoveAndDownListener();
+
+		innerComp.addMouseMoveListener(mouseListener);
+		innerComp.addMouseListener(mouseListener);
+		innerComp.addListener(SWT.MouseExit, new Listener() {
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+			 */
+			public void handleEvent(Event event) {
+				mouseInteraction.mouseExitAction();
+			}
+
+		});
 
 	}
 
 	/**
-	 * Add Listener to titlelabel, which allow to zoom in and zoom out
+	 * Add Listener to titlelabel, which allows to zoom in and zoom out
+	 * These action only inform zoom-listeners. They have to take
+	 * care that zooming is really invoked.
 	 */
 	private void addZoomFunction() {
 
 		// Zoom in by clicking on title-panels
 		titleLabel.addMouseListener(new MouseListener() {
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
+			 */
 			public void mouseDoubleClick(MouseEvent e) {
-
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
+			 */
 			public void mouseDown(MouseEvent e) {
 
 				titleLabel.setBackground(titleBackgroundColor);
 
-				if (fDisplayNode == null) {
-					return;
+				NodedisplayZoomEvent event = null;
+				// Is this nodedisplay the root-display?
+				if (parentNodedisplayComp == null) {
+					event = new NodedisplayZoomEvent(null, false);
 				}
-
-				if (fNodedisplayView.getRootNodedisplay() == NodedisplayComp.this) {
-					fNodedisplayView.zoomOut();
-				} else {
-					fNodedisplayView.zoomIn(fDisplayNode.getFullImplicitName());
+				else {
+					event = new NodedisplayZoomEvent(node.getData().getFullImpName(), true);
 				}
+				notifyZoomListeners(event);
 
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
+			 */
 			public void mouseUp(MouseEvent e) {
-
 			}
 		});
 		// Show different background if titlelabel is covered by the mouse
@@ -793,217 +835,158 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Calculates current level and saves it to currentlevel
-	 * 
-	 * @param pnode
-	 */
-	private void calculateCurrentlevel(DisplayNode pnode) {
-		currentLevel = 0;
-		if (pnode != null) {
-			currentLevel = pnode.getLevel();
-		}
-	}
-
-	/**
-	 * Forward call to calculate desired minimum size to all inner components. If this nodedisplay paints rectangles itself, this
-	 * method calls the calculateResize-function of the rectangle-painting-listener.
-	 */
-	private void callMinSizeCalculation() {
-
-		final Point size = getSize();
-		setMinSize(size.x, size.y);
-
-		for (final NodedisplayComp icomp : innerComps) {
-			if (icomp.x == 0 || icomp.y == 0) {
-				icomp.callMinSizeCalculation();
-			}
-		}
-
-		if (rectpaintlistener != null) {
-			rectpaintlistener.calculateResize();
-		}
-
-	}
-
-	/**
-	 * Check if maxlevel is bigger than deepest possible level within this scheme-part. Change this fault by setting maxLevel to
-	 * maximum possible value.
-	 */
-	private void checkMaxLevel() {
-
-		if (fDisplayNode != null) {
-			// calculation of absolute maximal level within this part of tree
-			// realmax=current node level + deepest possible level
-			final int realmax = LMLCheck.getSchemeLevel(fDisplayNode.getScheme())
-					+ LMLCheck.getDeepestSchemeLevel(fDisplayNode.getScheme()) - 1;
-			if (realmax < maxLevel) {
-				maxLevel = realmax;
-			}
-		}
-
-	}
-
-	/**
 	 * Creates borderFrame and innerPanel.
 	 * 
-	 * @param bordercolor
+	 * @param borderColor
 	 *            the color for the border
 	 */
-	private void createFramePanels(Color bordercolor) {
+	private void createFramePanels(Color borderColor) {
 
 		// At least insert one panel with backgroundcolor as bordercomposite
-		borderFrame = new BorderComposite(mainPanel, SWT.NONE);
+		borderComp = new BorderComposite(mainComp, SWT.NONE);
 
-		borderFrame.setBorderColor(bordercolor);
-		borderFrame.setBorderWidth(apref.getBorder().intValue());
-		borderFrame.setLayoutData(new BorderData(BorderLayout.MFIELD));
+		borderComp.setBorderColor(borderColor);
+		borderComp.setBorderWidth(nodedisplayLayout.getBorder().intValue());
+		borderComp.setLayoutData(new BorderData(BorderLayout.MFIELD));
 
-		innerPanel = new Composite(borderFrame, SWT.NONE);
+		innerComp = new Composite(borderComp, SWT.NONE);
 
-		innerPanel.setBackground(backgroundColor);
+		mouseInteraction = new MouseInteraction(lguiItem, innerComp);
 
-		if (centerPic != null) {
-			innerPanel.setBackgroundImage(centerPic);
+		if (node.getLowerLevelCount() == 0) {
+			innerComp.setBackground(jobColor);
 		}
-
-		// if( (apref.isHighestrowfirst() && !apref.isHighestcolfirst()) ||
-		// (!apref.isHighestrowfirst() &&
-		// apref.isHighestcolfirst()) ){
-		// innerpanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		// }
+		else {
+			innerComp.setBackground(backgroundColor);
+			// Do not set the central picture on lowest level nodedisplays
+			if (centerPicture != null) {
+				innerComp.setBackgroundImage(centerPicture);
+			}
+		}
 
 	}
 
 	/**
-	 * Initializes the surrounding pictureFrame and inserts pictures for this nodedisplay-level.
+	 * Initializes the surrounding pictureFrame and inserts pictures for this
+	 * nodedisplay-level.
 	 */
 	private void createPictureFrame() {
 
-		pictureFrame = new Composite(this, SWT.None);
-		pictureFrame.setLayout(new BorderLayout());
+		pictureComp = new Composite(this, SWT.None);
+		pictureComp.setLayout(new BorderLayout());
 		// Redo layout when resized
-		pictureFrame.addListener(SWT.Resize, new Listener() {
+		pictureComp.addListener(SWT.Resize, new Listener() {
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+			 */
 			public void handleEvent(Event event) {
-				pictureFrame.layout(true);
+				pictureComp.layout(true);
 			}
 
 		});
 
 		insertPictures();
 
-		pictureFrame.setBackground(backgroundColor);
+		pictureComp.setBackground(backgroundColor);
 	}
 
 	/**
-	 * @return 1 if layout defines 0 for cols, otherwise the value set by the layout
-	 */
-	@SuppressWarnings("unused")
-	private int getCols() {
-		if (apref.getCols().intValue() == 0) {
-			return 1;
-		} else {
-			return apref.getCols().intValue();
-		}
-	}
-
-	/**
-	 * Converts a URL given as String into a https-URL. The standard httpsport is set in the result-URL.
+	 * Check required instances to be <code>!=null</code> and return connected job-object for this node.
 	 * 
-	 * @param lmlurl
-	 *            normal URL as String
-	 * @return HTTPS-URL
+	 * @return connected object to this node
 	 */
-	private URL getHttpsURL(String lmlurl) {
+	private ObjectType getConnectedObject() {
+		if (lguiItem.getOIDToObject() == null) {
+			return null;
+		}
+		if (node.getData().getDataElement() == null) {
+			return null;
+		}
+		return lguiItem.getOIDToObject().getObjectById(node.getData().getDataElement().getOid());
+	}
 
-		URL res = null;
+	/**
+	 * This is a helper-function for inserting pictures.
+	 * It checks if the given URL is trying to access a bundle-file.
+	 * Therefor the protocol of the URL has to be equal to "bundleentry".
+	 * If the bundle cannot be accessed or there is no file available
+	 * this function will return null.
+	 * 
+	 * @param urlString
+	 *            any url, a working example is "bundleentry:/images/img1.png", if this entry exists in this bundle
+	 * @return an URL to a file within the bundle or null, if anything fails
+	 */
+	private URL getRealBundleURL(String urlString) {
 
-		try {
-			// Get picture from url and put it into a panel
-			try {
-				final URL httpURL = new URL(lmlurl);
-				res = new URL("https", httpURL.getHost(), httpsport, httpURL.getFile()); //$NON-NLS-1$
-			} catch (final MalformedURLException e) {
-				return null;
-			}
-		} catch (final AccessControlException er) {
+		if (LMLUIPlugin.getDefault() == null) {
 			return null;
 		}
 
-		return res;
+		// Extract the file from the URL-string
+		final int firstColon = urlString.indexOf(':');
+		if (firstColon == -1) {
+			return null;
+		}
+		final String string = urlString.substring(0, firstColon);
+		if (!string.equals("bundleentry")) { //$NON-NLS-1$
+			return null;
+		}
+		final String file = urlString.substring(firstColon + 1);
+
+		// Use a different bundle here, if the file should be taken from another bundle
+		return LMLUIPlugin.getDefault().getBundle().getEntry(file);
 	}
 
 	/**
-	 * Generate the text shown for a displaynode, which is covered by mouse-cursor.
+	 * Part of constructor, which is equal in two constructors therefore
+	 * outsourced. Initializes and creates all inner composites. Invokes
+	 * lower level nodedisplay creation.
 	 * 
-	 * @param focussed
-	 *            the displaynode which is covered
-	 * @return tooltiptext
+	 * @param currentNode
+	 *            the node, which is shown by this nodedisplay
+	 * @param layout
+	 *            the layout-configuration for this nodedisplay
 	 */
-	private String getToolTipText(DisplayNode focussed) {
-		if (focussed == null) {
-			return null;
-		}
-		if (focussed.getConnectedObject() == null) {
-			return null;
-		}
-		if (focussed.getConnectedObject().getName() != null) {
-			return focussed.getConnectedObject().getName();
-		}
-		return focussed.getConnectedObject().getId();
-	}
-
-	/**
-	 * Part of constructor, which is equal in two constructors therefore outsourced
-	 * 
-	 * @param nodedisplay
-	 */
-	private void init(Nodedisplay nodedisplay, DisplayNode displayNode, NodedisplayView nodedisplayView) {
+	private void init(Node<LMLNodeData> currentNode, Nodedisplayelement layout) {
 		// Transfer parameters
-		fNodedisplayView = nodedisplayView;
-		fDisplayNode = displayNode;
-		fNodedisplay = nodedisplay;
+		this.node = currentNode;
+		nodedisplayLayout = layout;
 
 		setLayout(new FillLayout());
 
-		innerComps = new ArrayList<NodedisplayComp>();
-
-		addDisposeAction();
-
-		if (apref == null) {
-			apref = findLayout();// Searches for corresponding
-									// layout-definitions
+		// Root-nodedisplays choose the amount of levels,
+		// which are painted by listeners
+		if (parentNodedisplayComp == null) {
+			final CompositeListenerChooser chooser = new CompositeListenerChooser(node);
+			levelsPaintedByPaintListener = chooser.getLevelsPaintedByPaintListener();
 		}
 
-		checkMaxLevel();
-
-		backgroundColor = ColorConversion.getColor(LMLColor.stringToColor(apref.getBackground()));
-
+		innerCompsList = new ArrayList<NodedisplayComp>();
+		addDisposeAction();
+		backgroundColor = ColorConversion.getColor(LMLColor.stringToColor(nodedisplayLayout.getBackground()));
 		createPictureFrame();
-
 		fontObject = this.getDisplay().getSystemFont();
 
-		mainPanel = new Composite(pictureFrame, SWT.None);
-		mainPanel.setLayout(new BorderLayout());
-		mainPanel.setLayoutData(new BorderData(BorderLayout.MFIELD));
+		mainComp = new Composite(pictureComp, SWT.None);
+		mainComp.setLayout(new BorderLayout());
+		mainComp.setLayoutData(new BorderData(BorderLayout.MFIELD));
 
 		if (lguiItem.getOIDToObject() != null) {
-			if (fDisplayNode != null) {// Is this nodedisplay the
-										// root-nodedisplay?
-				jobColor = ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(fDisplayNode.getData().getOid()));
-				title = apref.isShowfulltitle() ? fDisplayNode.getFullImplicitName() : fDisplayNode.getImplicitName();
-
-				insertTitleLabel();
-
-				insertInnerPanel();
+			// Is this nodedisplay connected to a job
+			if (node.getData().getDataElement() != null) {
+				jobColor = ColorConversion.getColor(lguiItem.getOIDToObject()
+						.getColorById(node.getData().getDataElement().getOid()));
+				title = nodedisplayLayout.isShowfulltitle() ? node.getData().getFullImpName() : node.getData().getImpName();
 			} else {
 				jobColor = ColorConversion.getColor(lguiItem.getOIDToObject().getColorById(null));
 				title = lguiItem.getNodedisplayAccess().getNodedisplayTitel(0);
-
-				insertTitleLabel();
-
-				insertInnerPanel(0, fNodedisplay.getScheme(), fNodedisplay.getData(), new ArrayList<Integer>());
 			}
+
+			insertTitleLabel();
+			insertInnerPanel();
 
 			lguiItem.getObjectStatus().addComponent(this);
 		}
@@ -1011,78 +994,56 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Adds rectangle-painting listener to innerPanel.
-	 * 
-	 * @param displayNodes
-	 * @param borderColor
-	 */
-	private void initRectPaintListener(ArrayList<DisplayNode> displayNodes, Color borderColor) {
-		rectpaintlistener = new RectPaintListener(displayNodes, apref.getCols().intValue(), this, innerPanel);
-		rectpaintlistener.horizontalSpacing = apref.getHgap().intValue();
-		rectpaintlistener.verticalSpacing = apref.getVgap().intValue();
-
-		rectpaintlistener.normalborder = apref.getBorder().intValue();
-		rectpaintlistener.mouseborder = apref.getMouseborder().intValue();
-
-		rectpaintlistener.bordercolor = borderColor;
-
-		innerPanel.addListener(SWT.Paint, rectpaintlistener);
-	}
-
-	/**
-	 * Call this function if displaynode != null
+	 * Insert all children of node-instance as recursive NodedisplayComps.
 	 */
 	private void insertInnerPanel() {
-		insertInnerPanel(fDisplayNode.getLevel(), fDisplayNode.getScheme(), fDisplayNode.getData(), fDisplayNode.getLevelNrs());
-	}
-
-	/**
-	 * If inner panels exist and maxlevel is greater than alevel, then insert lower level-panels
-	 */
-	private void insertInnerPanel(int aLevel, Object aScheme, Object aData, ArrayList<Integer> levels) {
 
 		// Bordercolor is defined by this parameter
-		final Color borderColor = ColorConversion.getColor(LMLColor.stringToColor(apref.getBordercolor()));
+		final Color borderColor = ColorConversion.getColor(LMLColor.stringToColor(nodedisplayLayout.getBordercolor()));
 
 		createFramePanels(borderColor);
 
-		// Generate all displaynodes for elements in lml-tree which are childs
-		// of the current node
-		final ArrayList<DisplayNode> displayNodes = getLowerDisplayNodes(aScheme, aData, levels, fNodedisplay,
-				apref.isHighestrowfirst());
+		// Is painting already finished?
+		if (node.getLowerLevelCount() == 0) {
 
-		if (aLevel == maxLevel - 1) {// Paint rects instead of use composites
-										// for lowest-level-rectangles
+			if (!insertUsagebar()) {
+				// Try to insert the usagebar, otherwise add listeners for lowest level rectangles
+				addLowestLevelListeners();
+			}
+			return;
+		}
 
-			initRectPaintListener(displayNodes, borderColor);
-			addMouseListenerToInnerPanel();
+		final List<Node<LMLNodeData>> reorderedChildren = (new RowColumnSorter<Node<LMLNodeData>>(
+				node.getChildren())).reorder(nodedisplayLayout.isHighestrowfirst(), nodedisplayLayout.isHighestcolfirst(),
+				nodedisplayLayout.getCols().intValue());
+
+		// Paint rects instead of use composites for lowest-level-rectangles
+		if (node.getLowerLevelCount() <= levelsPaintedByPaintListener) {
+			initRectanglePaintListener(reorderedChildren);
+			addMouseListenerToInnerPanelWithRectPaintListener();
 
 		} else { // insert lower nodedisplays, nest composites
-
 			// Set Gridlayout only if needed
-			final int cols = apref.getCols().intValue();
+			final int cols = nodedisplayLayout.getCols().intValue();
 			final GridLayout layout = new GridLayout(cols, true);
-			layout.horizontalSpacing = apref.getHgap().intValue();
-			layout.verticalSpacing = apref.getVgap().intValue();
+			layout.horizontalSpacing = nodedisplayLayout.getHgap().intValue();
+			layout.verticalSpacing = nodedisplayLayout.getVgap().intValue();
 
 			layout.marginWidth = 1;
 			layout.marginHeight = 1;
 
-			innerPanel.setLayout(layout);
+			innerComp.setLayout(layout);
 
 			int index = 0;
 
-			for (final DisplayNode displayNode : displayNodes) {
+			for (final Node<LMLNodeData> node : reorderedChildren) {
 
-				final NodedisplayComp inner = new NodedisplayComp(lguiItem, fNodedisplay, displayNode, fNodedisplayView, this,
-						index % cols, index / cols, maxLevel - currentLevel - 1, innerPanel, SWT.NONE);
-				innerComps.add(inner);
+				final NodedisplayComp innerComp = createNodedisplayComp(lguiItem, node, findLayout(node.getData()),
+						levelsPaintedByPaintListener, this, index % cols, index / cols, this.innerComp, SWT.None);
 
-				if (gridData == null) {
-					gridData = getDefaultGridData();
-				}
+				innerCompsList.add(innerComp);
 
-				inner.setLayoutData(gridData);
+				innerComp.setLayoutData(getDefaultGridData());
 
 				index++;
 			}
@@ -1090,56 +1051,64 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Search for pictures in layout-definition and add them at right position
+	 * Search for pictures in layout-definition and add them at appropriate
+	 * position.
 	 */
 	private void insertPictures() {
 
-		pictures = new ArrayList<ImageComp>();
+		picturesList = new ArrayList<ImageComp>();
 
 		// insert pictures
-		final List<PictureType> lmlPictures = apref.getImg();
+		final List<PictureType> lmlPictures = nodedisplayLayout.getImg();
 		for (final PictureType picture : lmlPictures) {
 
-			final URL aUrl = getHttpsURL(picture.getSrc());
-			if (aUrl == null) {
-				continue;
-			}
-
-			ImageComp imageComposite;
+			URL urlString = null;
 			try {
-				imageComposite = new ImageComp(pictureFrame, SWT.None, aUrl, picture.getWidth(), picture.getHeight());
-			} catch (final IOException e) {
+				urlString = new URL(picture.getSrc());
+			} catch (final MalformedURLException e1) {
+				urlString = getRealBundleURL(picture.getSrc());
+			}
+
+			if (urlString == null) {
 				continue;
 			}
 
-			if (fDisplayNode == null) {
-				imageComposite.setBackground(backgroundColor);
+			ImageComp imageComp;
+			try {
+				imageComp = new ImageComp(pictureComp, SWT.None, urlString, picture.getWidth(), picture.getHeight());
+			} catch (final IOException e) {
+				e.printStackTrace();
+				continue;
+			}
+
+			if (parentNodedisplayComp == null) {
+				imageComp.setBackground(backgroundColor);
 			} else {
-				imageComposite.setBackground(this.getParent().getBackground());
+				imageComp.setBackground(this.getParent().getBackground());
+			}
+
+			switch (picture.getAlign()) {
+			case WEST:
+				imageComp.setLayoutData(new BorderData(BorderLayout.WFIELD));
+				break;
+			case EAST:
+				imageComp.setLayoutData(new BorderData(BorderLayout.EFIELD));
+				break;
+			case NORTH:
+				imageComp.setLayoutData(new BorderData(BorderLayout.NFIELD));
+				break;
+			case SOUTH:
+				imageComp.setLayoutData(new BorderData(BorderLayout.SFIELD));
+				break;
 			}
 
 			// Add borderpics to pictures and save center-pic in
 			// centerpic-variable
 
 			if (picture.getAlign() == AlignType.CENTER) {
-				centerPic = imageComposite.getImage();
+				centerPicture = imageComp.getImage();
 			} else {
-				pictures.add(imageComposite);
-			}
-
-			switch (picture.getAlign()) {
-			case WEST:
-				imageComposite.setLayoutData(new BorderData(BorderLayout.WFIELD));
-				break;
-			case EAST:
-				imageComposite.setLayoutData(new BorderData(BorderLayout.EFIELD));
-				break;
-			case NORTH:
-				imageComposite.setLayoutData(new BorderData(BorderLayout.NFIELD));
-				break;
-			case SOUTH:
-				imageComposite.setLayoutData(new BorderData(BorderLayout.SFIELD));
-				break;
+				picturesList.add(imageComp);
 			}
 		}
 	}
@@ -1149,10 +1118,10 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * 
 	 */
 	private void insertTitleLabel() {
-		if (apref.isShowtitle()) {
-			titleBackgroundColor = ColorConversion.getColor(LMLColor.stringToColor(apref.getTitlebackground()));
+		if (nodedisplayLayout.isShowtitle()) {
+			titleBackgroundColor = ColorConversion.getColor(LMLColor.stringToColor(nodedisplayLayout.getTitlebackground()));
 
-			titleLabel = new Label(mainPanel, SWT.None);
+			titleLabel = new Label(mainComp, SWT.None);
 			titleLabel.setText(title);
 			titleLabel.setFont(fontObject);
 			titleLabel.setBackground(titleBackgroundColor);
@@ -1163,32 +1132,39 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Check if given displaynode is connected to empty jobs.
+	 * Insert a usagebar composite inside the inner panel.
+	 * This usagebar uses the given usage-information from
+	 * the nodedisplay tag.
 	 * 
-	 * @param displayNode
-	 *            the displaynode, which is checked
-	 * @return true, if anything in request-chain is null or if object-id is "empty"
+	 * @return true, if usagebar was inserted, false otherwise
 	 */
-	private boolean isDisplayNodeEmpty(DisplayNode displayNode) {
-		if (displayNode == null) {
-			return true;
-		}
-		if (displayNode.getConnectedObject() == null) {
-			return true;
-		}
-		if (displayNode.getConnectedObject().getId() == null) {
-			return true;
-		}
-		if (displayNode.getConnectedObject().getId().equals(emptyJobName)) {
-			return true;
-		}
+	private boolean insertUsagebar() {
+		if (node.getData() != null) {
+			if (node.getData().getDataElement() != null) {
+				if (node.getData().getDataElement().getUsage() != null) {
+					if (node.getData().isDataElementOnNodeLevel()) {
 
+						innerComp.setLayout(new FillLayout());
+						usagebar = new Usagebar(node.getData().getDataElement().getUsage(), lguiItem, innerComp, SWT.None);
+						// Do not paint scales here
+						usagebar.setPaintScale(false);
+						// Take all available space for the usagebar
+						usagebar.setBarFactor(1);
+						// Set frame sizes
+						usagebar.setStandardFrame(nodedisplayLayout.getBorder().intValue());
+						usagebar.setMouseOverFrame(nodedisplayLayout.getMouseborder().intValue());
+
+						return true;
+					}
+				}
+			}
+		}
 		return false;
 	}
 
 	/**
-	 * Remove recursively this component and all inner NodedisplayComp-instances from ObjectStatus. Call this function before this
-	 * Composite is disposed
+	 * Remove recursively this component and all inner NodedisplayComp-instances
+	 * from ObjectStatus. Call this function before this Composite is disposed
 	 */
 	private void removeUpdatable() {
 
@@ -1196,53 +1172,52 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			lguiItem.getObjectStatus().removeComponent(this);
 		}
 
-		for (final NodedisplayComp nd : innerComps) {
-			nd.removeUpdatable();
+		for (final NodedisplayComp nodedisplayComp : innerCompsList) {
+			nodedisplayComp.removeUpdatable();
 		}
 	}
 
 	/**
-	 * Set minimum height for this nodedisplay. At least this height should be used to display it. No forwarding to parent
-	 * components.
+	 * Generate a new NodedisplayComp with all parameters.
+	 * This function must be overridden by all subclasses.
+	 * It implements the factory-method pattern. The factory for
+	 * NodedisplayComp-instances is the specific class itself by
+	 * providing this method.
 	 * 
-	 * @param height
-	 *            minimum height
+	 * @return generated MinSizeNodedisplayComp, which can be exchanged by
+	 *         instances of sub-class
 	 */
-	private synchronized void setMinHeight(int height) {
-		minHeight = height;
+	protected NodedisplayComp createNodedisplayComp(ILguiItem lguiItem, Node<LMLNodeData> node, Nodedisplayelement layout,
+			int levelsPaintedByPaintListener, NodedisplayComp parentNodedisplay, int x, int y, Composite parent, int style) {
+
+		return new NodedisplayComp(lguiItem, node, layout, levelsPaintedByPaintListener, parentNodedisplay, x, y, parent, style);
 	}
 
 	/**
-	 * Set minimum size for this nodedisplay. At least this size should be used to display it. Use this function to initialize
-	 * minWidth and minHeight. No forwarding to parent components.
+	 * Adds rectangle-painting listener to innerPanel.
 	 * 
-	 * @param width
-	 *            minimum width
-	 * @param height
-	 *            minimum height
+	 * @param nodes
+	 *            the nodes painted by this RectPaintListener
 	 */
-	private void setMinSize(int width, int height) {
-		setMinWidth(width);
-		setMinHeight(height);
+	protected void initRectanglePaintListener(List<Node<LMLNodeData>> nodes) {
+		rectanglePaintListener = new RectanglePaintListener(nodes, this, innerComp);
+		innerComp.addPaintListener(rectanglePaintListener);
 	}
 
 	/**
-	 * Set minimum width for this nodedisplay. At least this width should be used to display it. No forwarding to parent components.
+	 * Inform all listeners and parent listeners about
+	 * a new zooming event.
 	 * 
-	 * @param width
-	 *            minimum width
+	 * @param event
+	 *            the corresponding event describing what happened
 	 */
-	private synchronized void setMinWidth(int width) {
-		minWidth = width;
-	}
+	protected void notifyZoomListeners(INodedisplayZoomEvent event) {
+		if (parentNodedisplayComp != null) {
+			parentNodedisplayComp.notifyZoomListeners(event);
+		}
 
-	/**
-	 * Set default preferences for scrollpane. This function is only used for root-NodedisplayComposites.
-	 */
-	private void setScrollBarPreferences() {
-		final ScrolledComposite scrolledComposite = fNodedisplayView.getScrollPane();
-		scrolledComposite.setContent(this);
-		scrolledComposite.setExpandHorizontal(true);
-		scrolledComposite.setExpandVertical(true);
+		for (final INodedisplayZoomListener listener : zoomListeners) {
+			listener.handleEvent(event);
+		}
 	}
 }

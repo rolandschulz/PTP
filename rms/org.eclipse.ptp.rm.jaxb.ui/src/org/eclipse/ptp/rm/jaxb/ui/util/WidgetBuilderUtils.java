@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
@@ -16,6 +17,12 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.FontRegistry;
+import org.eclipse.ptp.ems.ui.EnvManagerConfigButton;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
@@ -51,7 +58,7 @@ import org.eclipse.swt.widgets.Tree;
  * Convenience methods for constructing and configuring widgets.
  * 
  * @author arossi
- * 
+ * @author Jeff Overbey - Environment Manager support
  */
 public class WidgetBuilderUtils {
 
@@ -163,6 +170,52 @@ public class WidgetBuilderUtils {
 			}
 		}
 		return combo;
+	}
+
+	public static EnvManagerConfigButton createEnvConfig(Composite parent, Integer style, Object layoutData, String initialValue,
+			String label, String tooltip, Object listener, IJAXBResourceManager resourceManager) {
+		if (label != null) {
+			Label buttonLabel = createLabel(parent, label, SWT.RIGHT, 1);
+			if (tooltip != null) {
+				buttonLabel.setToolTipText(tooltip);
+			}
+		}
+		final EnvManagerConfigButton button = new EnvManagerConfigButton(parent, getRemoteServices(resourceManager), getConnection(resourceManager));
+		if (label != null) {
+			button.setText(label);
+		}
+		button.setLayoutData(layoutData);
+		if (initialValue != null) {
+			button.setConfiguration(initialValue);
+		}
+		return button;
+	}
+
+	private static IRemoteServices getRemoteServices(IJAXBResourceManager rm) {
+		if (rm == null) {
+			return null;
+		} else {
+			return PTPRemoteCorePlugin.getDefault().getRemoteServices(rm.getControlConfiguration().getRemoteServicesId(), null);
+		}
+	}
+
+	private static IRemoteConnection getConnection(IJAXBResourceManager rm) {
+		if (rm == null) {
+			return null;
+		} else {
+			final String connName = rm.getControlConfiguration().getConnectionName();
+			final IRemoteServices rsrv = getRemoteServices(rm);
+			if (rsrv == null) {
+				return null;
+			} else {
+				IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
+				if (connMgr == null) {
+					return null;
+				} else {
+					return connMgr.getConnection(connName);
+				}
+			}
+		}
 	}
 
 	/**

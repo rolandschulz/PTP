@@ -14,9 +14,12 @@ import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
+import org.eclipse.cdt.internal.ui.editor.CSourceViewer;
+import org.eclipse.cdt.internal.ui.editor.SemanticHighlightings;
 import org.eclipse.cdt.internal.ui.text.CTextTools;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.ui.CUIPlugin;
+import org.eclipse.cdt.ui.PreferenceConstants;
 import org.eclipse.cdt.ui.actions.CdtActionConstants;
 import org.eclipse.cdt.ui.text.ICPartitions;
 import org.eclipse.core.resources.IProject;
@@ -25,8 +28,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.help.IContextProvider;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.ptp.internal.rdt.editor.RemoteCEditor;
 import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
 import org.eclipse.ptp.internal.rdt.ui.actions.OpenViewActionGroup;
@@ -58,6 +63,13 @@ public class RemoteCEditorInfoProvider implements IRemoteCEditorInfoProvider {
 	
 	private RemoteCEditor editor;
 	private IEditorInput input;
+	
+	/**
+	 * Remote Semantic highlighting manager
+	 */
+	private RemoteSemanticHighlightingManager fRemoteSemanticManager;
+	
+	private RemoteCFoldingStructureProvider fRemoteFoldingProvider; 
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.editor.info.IRemoteCEditorInfoProvider#initializeEditor(org.eclipse.ptp.internal.rdt.editor.RemoteCEditor)
@@ -146,7 +158,9 @@ public class RemoteCEditorInfoProvider implements IRemoteCEditorInfoProvider {
 	 * @see org.eclipse.ptp.rdt.editor.info.IRemoteCEditorInfoProvider#doPostCreatePartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void doPostCreatePartControl(Composite parent) {
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, RDTHelpContextIds.REMOTE_C_CPP_EDITOR);
+		if (isRemote()) {
+			PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, RDTHelpContextIds.REMOTE_C_CPP_EDITOR);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -187,18 +201,34 @@ public class RemoteCEditorInfoProvider implements IRemoteCEditorInfoProvider {
 	 * @see org.eclipse.ptp.rdt.editor.info.IRemoteCEditorInfoProvider#editorContextMenuAboutToShow(org.eclipse.jface.action.IMenuManager)
 	 */
 	public void editorContextMenuAboutToShow(IMenuManager menu) {
-		// remove text search
-		menu.remove("org.eclipse.search.text.ctxmenu"); //$NON-NLS-1$
-		// remove refactoring for now
-		menu.remove("org.eclipse.cdt.ui.refactoring.menu"); //$NON-NLS-1$
+		if (isRemote()) {
+			// remove text search
+			menu.remove("org.eclipse.search.text.ctxmenu"); //$NON-NLS-1$
+			// remove refactoring menu for now
+			menu.remove("org.eclipse.cdt.ui.refactoring.menu"); //$NON-NLS-1$
+			
+			//remove some refactor menu items in the Source submenu
+			IMenuManager sourceMenu = (IMenuManager) menu.find("org.eclipse.cdt.ui.source.menu"); //$NON-NLS-1$
+			if (sourceMenu != null) {
+				sourceMenu.remove("AddIncludeOnSelection"); //$NON-NLS-1$
+				sourceMenu.remove("org.eclipse.cdt.ui.refactor.getters.and.setters"); //$NON-NLS-1$
+				sourceMenu.remove("org.eclipse.cdt.ui.refactor.implement.method"); //$NON-NLS-1$
+			}
+			
+			//remove items that don't work well for remote projects
+			menu.remove("OpenMacroExplorer"); //$NON-NLS-1$
+			menu.remove("ToggleSourceHeader"); //$NON-NLS-1$
+			
+			//quick type hierarchy
+			menu.remove("OpenHierarchy"); //$NON-NLS-1$
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.editor.info.IRemoteCEditorInfoProvider#dispose()
 	 */
 	public void dispose() {
-		// nothing to do
-
+		uninstallRemoteCodeFolding();
 	}
 
 	/* (non-Javadoc)
@@ -392,8 +422,50 @@ public class RemoteCEditorInfoProvider implements IRemoteCEditorInfoProvider {
 		return isLocalServiceProvider();
 	}
 
-	public Boolean isSemanticHighlightingEnabled() {
-		return isRemote() ? new Boolean(false) : null;
+	/**
+	 * Install Semantic Highlighting.
+	 */
+	public void installSemanticHighlighting(ISourceViewer sourceViewer, IPreferenceStore prefStore) {
+		if (!isLocalServiceProvider() && fRemoteSemanticManager == null && isSemanticHighlightingEnabled(prefStore)) {
+			fRemoteSemanticManager= new RemoteSemanticHighlightingManager();
+			fRemoteSemanticManager.install(editor, (CSourceViewer) sourceViewer, CUIPlugin.getDefault().getTextTools().getColorManager(), prefStore);
+		} else if (isLocalServiceProvider()) { //airplane mode
+			//reset so when workspace is online, semantic highlighting gets triggered
+			uninstallSemanticHighlighting();
+		}
+	}
+	
+	public void refreshRemoteSemanticManager() {
+		if (fRemoteSemanticManager != null)
+			fRemoteSemanticManager.refresh();
+	}
+	
+	public boolean isSemanticHighlightingEnabled(IPreferenceStore prefStore) {
+		return SemanticHighlightings.isEnabled(prefStore) && !(editor.isEnableScalablilityMode() && prefStore.getBoolean(PreferenceConstants.SCALABILITY_SEMANTIC_HIGHLIGHT));
+	}
+	
+	public void installRemoteCodeFolding(ISourceViewer sourceViewer){
+		String id= CUIPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.EDITOR_FOLDING_PROVIDER);
+
+		// If the folding provider is the default one and we are not 
+		// in off-line mode, then uninstall local folding and install remote folding:
+		if (id.compareTo("org.eclipse.cdt.ui.text.defaultFoldingProvider") == 0 && !isLocalServiceProvider()) { //$NON-NLS-1$
+			editor.uninstallProjectionModelUpdater();
+			fRemoteFoldingProvider = new RemoteCFoldingStructureProvider();
+			ProjectionViewer projectionViewer = (ProjectionViewer) sourceViewer;
+			fRemoteFoldingProvider.install(editor, projectionViewer);
+		}
+	}
+	
+	public void uninstallRemoteCodeFolding() {
+		if (fRemoteFoldingProvider != null)
+			fRemoteFoldingProvider.uninstall();
 	}
 
+	public void uninstallSemanticHighlighting() {
+		if (fRemoteSemanticManager != null) {
+			fRemoteSemanticManager.uninstall();
+			fRemoteSemanticManager= null;
+		}
+	}
 }

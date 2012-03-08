@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.variables;
 
@@ -16,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IDynamicVariable;
 import org.eclipse.core.variables.IDynamicVariableResolver;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 
@@ -31,7 +33,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
  * the form the argument takes.
  * 
  * @author arossi
- * 
+ * @author Jeff Overbey - Environment Manager support
  */
 public class RMVariableResolver implements IDynamicVariableResolver {
 
@@ -55,7 +57,11 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 						throw CoreExceptionUtils.newException(Messages.RMVariableResolver_derefError, t);
 					}
 				} else {
-					return String.valueOf(value);
+					if (value instanceof String && EnvManagerConfigString.isEnvMgmtConfigString((String)value)) {
+						return active.convertEngMgmtConfigString((String) value);
+					} else {
+						return String.valueOf(value);
+					}
 				}
 			}
 		}

@@ -34,6 +34,13 @@ public class Messages extends NLS {
 	public static String LMLCheck_7;
 	public static String LMLCheck_8;
 	public static String LMLCheck_9;
+	public static String LMLNodeData_0;
+	public static String LMLNodeData_1;
+	public static String LMLNodeData_2;
+
+	public static String LMLNodeData_3;
+
+	public static String LMLNodeData_4;
 	public static String NodedisplayAccess_2;
 
 	static {

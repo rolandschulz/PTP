@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,10 @@ import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.RemoteTypeHierarchyService;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.RemoteContentAssistService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCCodeFoldingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteSemanticHighlightingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.RemoteCCodeFoldingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.RemoteSemanticHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.RemoteNavigationService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
@@ -51,6 +55,14 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	protected IModelBuilderService fModelBuilderService = null;
 	protected RemoteSearchService fSearchService = null;
 	protected IContentAssistService fContentAssistService = null;
+	/**
+	 * @since 3.0
+	 */
+	protected RemoteSemanticHighlightingService fRemoteSemanticHighlightingService = null;
+	/**
+	 * @since 3.0
+	 */
+	protected RemoteCCodeFoldingService fRemoteCCodeFoldingService = null;
 	protected RemoteToolsCIndexSubsystem fSubsystem = null;
 	protected boolean fIsDirty = false;
 	protected RemoteToolsCIndexServiceProvider fProvider = null;
@@ -433,5 +445,30 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 		fSubsystem = new RemoteToolsCIndexSubsystem(this);
 		setConfigured(true);
 	}
+	
+	/**
+	 * @since 3.0
+	 */
+	public IRemoteSemanticHighlightingService getRemoteSemanticHighlightingService() {
+		if(!isConfigured())
+			return null;
 
+		if(fRemoteSemanticHighlightingService== null)
+			fRemoteSemanticHighlightingService = new RemoteSemanticHighlightingService(fSubsystem);
+
+		return fRemoteSemanticHighlightingService;
+	}
+
+	/**
+	 * @since 3.0
+	 */
+	public IRemoteCCodeFoldingService getRemoteCodeFoldingService() {
+		if(!isConfigured())
+			return null;
+
+		if(fRemoteCCodeFoldingService== null)
+			fRemoteCCodeFoldingService = new RemoteCCodeFoldingService(fSubsystem);
+
+		return fRemoteCCodeFoldingService;
+	}
 }

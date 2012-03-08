@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.ptp.pldt.openacc.fortran; singleton:=true
+Bundle-Version: 6.0.0.qualifier
+Bundle-Activator: org.eclipse.ptp.pldt.openacc.internal.fortran.Activator
+Bundle-Vendor: %pluginProvider
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.help,
+ org.eclipse.ui,
+ org.eclipse.ui.editors,
+ org.eclipse.cdt.core,
+ org.eclipse.cdt.ui,
+ org.eclipse.ptp.pldt.common,
+ org.eclipse.ptp.pldt.openacc,
+ org.eclipse.photran.ui;bundle-version="8.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.eclipse.ptp.pldt.openacc.internal.fortran;x-internal:=true,
+ org.eclipse.ptp.pldt.openacc.internal.fortran.editorHelp;x-internal:=true,
+ org.eclipse.ptp.pldt.openacc.internal.fortran.messages;x-internal:=true

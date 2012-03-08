@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.model.CElementInfo;
+import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.core.model.OpenableInfo;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.WorkingCopy;
@@ -88,5 +89,17 @@ public class RemoteModelWorkingCopy extends WorkingCopy {
 			}
 		}
 		parent.removeChildren();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.internal.core.model.Openable#generateInfos(org.eclipse.cdt.internal.core.model.CElementInfo, java.util.Map, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected void generateInfos(CElementInfo info,
+			Map<ICElement, CElementInfo> newElements, IProgressMonitor monitor)
+			throws CModelException {
+		super.generateInfos(info, newElements, monitor);
+		// remove out of sync buffer for this element
+		CModelManager.getDefault().getElementsOutOfSynchWithBuffers().remove(fOriginal);
 	}
 }

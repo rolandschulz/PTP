@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 
+import org.eclipse.ptp.rm.lml.ui.providers.support.BorderLayout;
+import org.eclipse.ptp.rm.lml.ui.providers.support.BorderLayout.BorderData;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Image;
@@ -23,98 +25,120 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * SWT-Conversion of class ImagePanel
- * 
- * Just a composite with an background image loaded from an url
+ * This is the SWT-Conversion of class ImagePanel.
+ * It is just a composite with a background image loaded from an URL.
  */
 public class ImageComp extends Composite {
 
 	public static void disposeAll() {
-		for (final Image img : urlToImage.values()) {
-			img.dispose();
+		for (final Image image : urlToImage.values()) {
+			image.dispose();
 		}
 		urlToImage.clear();
 	}
 
-	private Image img;// Image which is painted on this Composite
+	/**
+	 * Image which is painted on this Composite
+	 */
+	private Image image;
 
 	private static HashMap<URL, Image> urlToImage = new HashMap<URL, Image>();
 
-	private double prefwidth, prefheight;// Preferred with and height 0..1 in percentage of parent component
+	/**
+	 * Preferred width and height 0..1 in
+	 * percentage of parent component.
+	 */
+	private double prefWidth, prefHeight;
 
 	/**
+	 * Create a composite with an image painted on it.
+	 * 
 	 * @param parent
 	 *            parent Component
 	 * @param style
 	 *            SWT-Style
-	 * @param imageurl
+	 * @param imageUrl
 	 *            url of background image
-	 * @param pwidth
+	 * @param width
 	 *            preferred percentage width 0..1
-	 * @param pheight
+	 * @param height
 	 *            preferred percentage height 0..1
 	 * @throws IOException
 	 */
-	public ImageComp(Composite parent, int style, URL imageurl, double pwidth, double pheight) throws IOException {
+	public ImageComp(Composite parent, int style, URL imageUrl, double width, double height) throws IOException {
 
 		super(parent, style);
 
-		if (urlToImage.containsKey(imageurl)) {
-			init(urlToImage.get(imageurl));
+		if (urlToImage.containsKey(imageUrl)) {
+			init(urlToImage.get(imageUrl));
 		}
 		else {
-			final Image img = new Image(Display.getCurrent(), imageurl.openConnection().getInputStream());
-			urlToImage.put(imageurl, img);
-			init(img);
+			final Image image = new Image(Display.getCurrent(), imageUrl.openConnection().getInputStream());
+			urlToImage.put(imageUrl, image);
+			init(image);
 		}
 
-		setPreferredPercentageSize(pwidth, pheight);
+		setPreferredPercentageSize(width, height);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Control#computeSize(int, int)
+	 */
 	@Override
-	public Point computeSize(int wHint, int hHint) {
+	public Point computeSize(int width, int height) {
 
-		return computeSize(wHint, hHint, true);
+		return computeSize(width, height, true);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int, boolean)
+	 */
 	@Override
-	public Point computeSize(int wHint, int hHint, boolean changed) {
+	public Point computeSize(int cWidth, int cHeight, boolean changed) {
 
-		final Point psize = this.getParent().getSize();// size of parent component
+		// size of parent component
+		final Point point = this.getParent().getSize();
 
-		return new Point((int) Math.round(psize.x * prefwidth), (int) Math.round(psize.y * prefheight));
-	}
+		double width = 0;
+		double height = 0;
 
-	public Image getImage() {
-		return img;
+		final BorderData layoutData = (BorderData) getLayoutData();
+
+		if (layoutData.field == BorderLayout.NFIELD || layoutData.field == BorderLayout.SFIELD) {
+			height = point.y * prefHeight;
+		}
+		if (layoutData.field == BorderLayout.EFIELD || layoutData.field == BorderLayout.WFIELD) {
+			width = point.x * prefWidth;
+		}
+
+		return new Point((int) Math.round(width), (int) Math.round(height));
 	}
 
 	/**
-	 * @param parent
-	 *            from Composite constructor
-	 * @param style
-	 *            from Composite constructor
-	 * @param pimg
-	 *            Image-instance
-	 * @throws IOException
+	 * A ImageComp is mainly used in a nodedisplay for showing
+	 * images aligned to nodedisplays. This function returns the
+	 * alignment corresponding to the constants defined in the
+	 * BorderLayout-class.
+	 * 
+	 * @return integer in correspondence with constants of the BorderLayout-class, -1 if something went wrong
 	 */
-	public void init(Image pimg) {
+	public int getAlignment() {
+		if (getLayoutData() instanceof BorderData) {
+			return ((BorderData) getLayoutData()).field;
+		}
 
-		setLayout(new FillLayout());
+		return -1;
+	}
 
-		img = pimg;
-
-		// Paint image if component is painted
-		addPaintListener(new PaintListener() {
-
-			public void paintControl(PaintEvent e) {
-
-				e.gc.drawImage(img, 0, 0, img.getBounds().width, img.getBounds().height,
-						0, 0, getSize().x, getSize().y);
-
-			}
-		});
-
+	/**
+	 * @return the currently painted image of this composite.
+	 */
+	public Image getImage() {
+		return image;
 	}
 
 	/**
@@ -122,11 +146,40 @@ public class ImageComp extends Composite {
 	 * Defines dimensions of pictures
 	 * 
 	 * @param pwith
-	 * @param pheight
+	 * @param height
 	 */
-	public void setPreferredPercentageSize(double pwidth, double pheight) {
-		prefwidth = pwidth;
-		prefheight = pheight;
+	public void setPreferredPercentageSize(double width, double height) {
+		prefWidth = width;
+		prefHeight = height;
+	}
+
+	/**
+	 * Set layout definitions and make sure that
+	 * the created image is painted.
+	 * 
+	 * @param parent
+	 *            from Composite constructor
+	 * @param style
+	 *            from Composite constructor
+	 * @param img
+	 *            Image-instance
+	 * @throws IOException
+	 */
+	protected void init(Image img) {
+
+		setLayout(new FillLayout());
+
+		image = img;
+
+		// Paint image if component is painted
+		addPaintListener(new PaintListener() {
+
+			public void paintControl(PaintEvent e) {
+				e.gc.drawImage(image, 0, 0, image.getBounds().width, image.getBounds().height, 0, 0, getSize().x, getSize().y);
+
+			}
+		});
+
 	}
 
 }

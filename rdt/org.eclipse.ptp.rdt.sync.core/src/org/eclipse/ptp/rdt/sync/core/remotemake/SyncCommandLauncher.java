@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,15 +7,20 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeff Overbey (Illinois) - Environment management support
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core.remotemake;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ICommandLauncher;
@@ -32,11 +37,15 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.ptp.ems.core.EnvManagerRegistry;
+import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
+import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -56,9 +65,22 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  * this API will work or that it will remain the same. Please do not use this API without consulting with the RDT team.
  * 
  * @author crecoskie
- * 
+ * @author Jeff Overbey
  */
+// TODO (Jeff): Remove/replace NON_ESCAPED_ASCII_CHARS, static initializer, and escape(String) after Bug 371691 is fixed
 public class SyncCommandLauncher implements ICommandLauncher {
+
+	/** ASCII characters that do <i>not</i> need to be escaped on a Bash command line */
+	private static final Set<Character> NON_ESCAPED_ASCII_CHARS;
+
+	static {
+		NON_ESCAPED_ASCII_CHARS = new HashSet<Character>();
+		CharacterIterator it = new StringCharacterIterator("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/._-"); //$NON-NLS-1$
+		for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
+			NON_ESCAPED_ASCII_CHARS.add(c);
+		}
+	}
+
 	protected IProject fProject;
 
 	protected Process fProcess;
@@ -160,13 +182,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 				}
 			}
 
-			List<String> command = new LinkedList<String>();
-
-			command.add(commandPath.toString());
-
-			for (int k = 0; k < args.length; k++) {
-				command.add(args[k]);
-			}
+			List<String> command = constructCommand(commandPath, args, executionProvider);
 
 			IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
 
@@ -218,6 +234,82 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		}
 
 		return null;
+	}
+
+	private List<String> constructCommand(IPath commandPath, String[] args, IRemoteExecutionServiceProvider executionProvider) throws CoreException {
+		/*
+		 * Prior to Modules/SoftEnv support, this was the following:
+		 * 
+		 * List<String> command = new LinkedList<String>();
+		 * command.add(commandPath.toString());
+		 * for (int k = 0; k < args.length; k++) {
+		 *     command.add(args[k]);
+		 * }
+		 */
+
+		final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
+		if (projectProperties.isEnvMgmtEnabled()) {
+			// Environment management is enabled for the build.  Issue custom Modules/SoftEnv commands to configure the environment.
+			IEnvManager envManager = EnvManagerRegistry.getEnvManager(executionProvider.getRemoteServices(), executionProvider.getConnection());
+			try {
+				// Create and execute a Bash script which will configure the environment and then execute the command
+				final List<String> command = new LinkedList<String>();
+				command.add("bash"); //$NON-NLS-1$
+				command.add("-l"); //$NON-NLS-1$
+				final String bashScriptFilename = envManager.createBashScript(true, projectProperties, getCommandAsString(commandPath, args));
+				command.add(bashScriptFilename);
+				return command;
+			} catch (final Exception e) {
+				// An error occurred creating the Bash script, so attempt to put the whole thing onto the command line
+				RDTSyncCorePlugin.log("Error creating bash script for launch; reverting to bash -l -c", e); //$NON-NLS-1$
+				final List<String> command = new LinkedList<String>();
+				command.add("bash"); //$NON-NLS-1$
+				command.add("-l"); //$NON-NLS-1$
+				command.add("-c"); //$NON-NLS-1$
+				final String bashCommand = envManager.getBashConcatenation("; ", true, projectProperties, getCommandAsString(commandPath, args)); //$NON-NLS-1$
+				command.add(bashCommand);
+				return command;
+			}
+		} else {
+			// Environment management disabled.  Execute the build command in a login shell (so the default environment is configured).
+			final List<String> command = new LinkedList<String>();
+			command.add("bash"); //$NON-NLS-1$
+			command.add("-l"); //$NON-NLS-1$
+			command.add("-c"); //$NON-NLS-1$
+			command.add(getCommandAsString(commandPath, args));
+			return command;
+		}
+	}
+
+	private static String getCommandAsString(IPath commandPath, String[] args) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append(escape(commandPath.toOSString()));
+		sb.append(' ');
+		for (int k = 0; k < args.length; k++) {
+			sb.append(escape(args[k]));
+			sb.append(' ');
+		}
+		return sb.toString();
+	}
+
+	// See RemoteToolsProcessBuilder ctor and #charEscapify(String, Set<String>)
+	private static String escape(String inputString) {
+		if (inputString == null) {
+			return null;
+		}
+
+		final StringBuilder newString = new StringBuilder(inputString.length()+16);
+		final CharacterIterator it = new StringCharacterIterator(inputString);
+		for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
+			if (c == '\'') {
+				newString.append("'\\\\\\''"); //$NON-NLS-1$
+			} else if (c > 127 || NON_ESCAPED_ASCII_CHARS.contains(c)) { // Do not escape non-ASCII characters (> 127)
+				newString.append(c);
+			} else {
+				newString.append("\\" + c); //$NON-NLS-1$
+			}
+		}
+		return newString.toString();
 	}
 
 	private String getCommandLine(String[] commandArgs) {

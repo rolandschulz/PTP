@@ -339,6 +339,28 @@ public class LayoutAccess extends LguiHandler {
 	}
 
 	/**
+	 * Get the first possible NodedisplayLayout for a nodedisplay
+	 * with ID <code>gid</code>. If there is no layout defined, an
+	 * empty layout instance will be returned.
+	 * 
+	 * @param gid
+	 *            ID of the nodedisplay, for which a layout is searched
+	 * @return default layout if none is defined, otherwise first found layout associated with this ID.
+	 */
+	public NodedisplaylayoutType getLayoutForNodedisplay(String gid) {
+		final List<ComponentlayoutType> layouts = getComponentLayoutByGid(gid);
+		if (layouts != null && layouts.size() > 0) {
+			return (NodedisplaylayoutType) layouts.get(0);
+		}
+		else {
+			final ObjectFactory objfc = new ObjectFactory();
+			final NodedisplaylayoutType layout = objfc.createNodedisplaylayoutType();
+			layout.setEl0(objfc.createNodedisplayelement0());
+			return layout;
+		}
+	}
+
+	/**
 	 * Remove all real data from model return only layout-information and data, which is needed to make lml-model valid
 	 * 
 	 * @param model

@@ -18,12 +18,15 @@ public class LguiWidget extends Composite {
 	@SuppressWarnings("unused")
 	private static final long serialVersionUID = 1L;
 
-	protected ILguiItem lguiItem;// wrapper instance around LguiType-instance --
-									// provides easy access to lml-information
+	/**
+	 * Wrapper instance around LguiType-instance --
+	 * provides easy access to lml-information
+	 */
+	protected ILguiItem lguiItem;
 
 	/**
 	 * Create the smallest possible LMLWidget by passing the lml-model wrapper
-	 * class plml, which manages all important data.
+	 * class lguiItem, which manages all important data.
 	 * 
 	 * @param lguiItem
 	 *            LML-Manager
@@ -34,6 +37,23 @@ public class LguiWidget extends Composite {
 	 */
 	public LguiWidget(ILguiItem lguiItem, Composite parent, int style) {
 		super(parent, style);
+		this.lguiItem = lguiItem;
+	}
+
+	/**
+	 * @return LML-handler for one LguiType-instance
+	 */
+	public ILguiItem getLguiItem() {
+		return lguiItem;
+	}
+
+	/**
+	 * Set new data-model.
+	 * 
+	 * @param lguiItem
+	 *            new LML-handler for one LguiType-instance
+	 */
+	public void setLguiItem(ILguiItem lguiItem) {
 		this.lguiItem = lguiItem;
 	}
 

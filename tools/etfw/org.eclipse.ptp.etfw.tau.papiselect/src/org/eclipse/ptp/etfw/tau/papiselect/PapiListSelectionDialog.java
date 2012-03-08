@@ -310,7 +310,6 @@ public class PapiListSelectionDialog extends SelectionDialog {
 
 		class PapiCheckListener implements ICheckStateListener {
 
-			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				updateGrey(event.getElement());
 			}

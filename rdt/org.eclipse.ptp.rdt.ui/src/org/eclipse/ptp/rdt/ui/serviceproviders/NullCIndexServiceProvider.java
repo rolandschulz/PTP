@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,11 +37,14 @@ import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask;
 import org.eclipse.ptp.internal.rdt.core.index.IRemoteFastIndexerUpdateEvent.EventType;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
+import org.eclipse.ptp.internal.rdt.core.navigation.FoldingRegionsResult;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteCIndexServiceProvider;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCCodeFoldingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteSemanticHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
@@ -315,4 +318,20 @@ public class NullCIndexServiceProvider extends
 		return Messages.getString("NullServiceProvider.config"); //$NON-NLS-1$
 	}
 
+	public IRemoteSemanticHighlightingService getRemoteSemanticHighlightingService() {
+		 return new IRemoteSemanticHighlightingService() {
+			public String computeSemanticHighlightingPositions(
+					IWorkingCopy workingCopy) {
+				return null;
+			}
+		 };
+	}
+
+	public IRemoteCCodeFoldingService getRemoteCodeFoldingService() {
+		 return new IRemoteCCodeFoldingService() {
+			public FoldingRegionsResult computeCodeFoldingRegions(IWorkingCopy workingCopy, int docLength, boolean fPreprocessorBranchFoldingEnabled, boolean fStatementsFoldingEnabled) {
+				return null;
+			}
+		 };
+	}
 }
