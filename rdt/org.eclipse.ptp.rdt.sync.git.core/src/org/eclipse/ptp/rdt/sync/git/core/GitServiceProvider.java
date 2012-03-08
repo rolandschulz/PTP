@@ -477,7 +477,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 	
-	@Override
 	public void close() {
 		if (fSyncConnection != null) {
 			fSyncConnection.close();
