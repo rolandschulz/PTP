@@ -128,7 +128,7 @@ public class ObjectStatus extends LguiHandler {
 	/**
 	 * @return true {@code <=>} at least one job has mousedown=true
 	 */
-	public boolean isAnyMousedown() {
+	public boolean isAnyMouseDown() {
 		return lastMouseDown != null;
 	}
 
@@ -143,7 +143,7 @@ public class ObjectStatus extends LguiHandler {
 	 * @param obj
 	 * @return true, if mouse is pressed on this object
 	 */
-	public boolean isMousedown(ObjectType obj) {
+	public boolean isMouseDown(ObjectType obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -160,7 +160,7 @@ public class ObjectStatus extends LguiHandler {
 	 * @param obj
 	 * @return true, if the connected object is currently touched by the cursor
 	 */
-	public boolean isMouseover(ObjectType obj) {
+	public boolean isMouseOver(ObjectType obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -179,7 +179,7 @@ public class ObjectStatus extends LguiHandler {
 	 * 
 	 * @param obj
 	 */
-	public void mousedown(ObjectType obj) {
+	public void mouseDown(ObjectType obj) {
 		if (obj == null) {
 			return;
 		}
@@ -206,7 +206,7 @@ public class ObjectStatus extends LguiHandler {
 	 */
 	public void mouseDown(String oid) {
 		final ObjectType object = lguiItem.getOIDToObject().getObjectById(oid);
-		mousedown(object);
+		mouseDown(object);
 	}
 
 	/**
@@ -251,7 +251,7 @@ public class ObjectStatus extends LguiHandler {
 	 */
 	public void mouseExitLast() {
 		mouseexit(lastMouseOver);
-		mouseup(lastMouseDown);
+		mouseUp(lastMouseDown);
 	}
 
 	/**
@@ -262,7 +262,7 @@ public class ObjectStatus extends LguiHandler {
 	 * 
 	 * @param obj
 	 */
-	public void mouseover(ObjectType obj) {
+	public void mouseOver(ObjectType obj) {
 		if (obj == null) {
 			return;
 		}
@@ -275,7 +275,7 @@ public class ObjectStatus extends LguiHandler {
 			mouseExitLast();
 		}
 		if (obj != lastMouseDown) {
-			mouseup(lastMouseDown);
+			mouseUp(lastMouseDown);
 		}
 
 		lastMouseOver = obj;
@@ -293,7 +293,7 @@ public class ObjectStatus extends LguiHandler {
 	 */
 	public void mouseOver(String oid) {
 		final ObjectType object = lguiItem.getOIDToObject().getObjectById(oid);
-		mouseover(object);
+		mouseOver(object);
 	}
 
 	/**
@@ -301,16 +301,16 @@ public class ObjectStatus extends LguiHandler {
 	 * 
 	 * @param obj
 	 */
-	public void mouseup(ObjectType obj) {
+	public void mouseUp(ObjectType obj) {
 		if (obj == null) {
 			return;
 		}
 
 		// Release the last object, on which the mouse pressed
 		if (lastMouseDown != obj) {
-			mouseup(lastMouseDown);
+			mouseUp(lastMouseDown);
 			mouseExitLast();
-			mouseover(obj);
+			mouseOver(obj);
 		}
 
 		if (!mapping.containsKey(obj)) {
@@ -333,7 +333,7 @@ public class ObjectStatus extends LguiHandler {
 	 */
 	public void mouseUp(String oid) {
 		final ObjectType object = lguiItem.getOIDToObject().getObjectById(oid);
-		mouseup(object);
+		mouseUp(object);
 	}
 
 	/**

@@ -12,8 +12,8 @@
 <li><a href="#create">Creating a new Synchronized Project</a>
 <li><a href="#work">Working with a Synchronized Project</a>
 <li><a href="#context-menu">Changing sync behavior with the Sync Context Menu</a>
+<li><a href="#file-filter">Changing which files are synchronized</a>
 <li><a href="#conversion-wizard">Converting a project to a Synchronized Project</a>
-<li><a href="#props">Project Properties specific to Synchronized Projects</a>
 </ul>
 <p>Synchronized projects consist of files that are mirrored on the local system as well as on one or more remote systems.
 Editing occurs locally and each file is synchronized with the currently active remote system when it is changed, created, or deleted.  
@@ -112,10 +112,24 @@ properties page. If "Workspace" is the active configuration, no synchronization 
 </p>
 
 <h2 id="context-menu">Changing sync behavior with the Sync Context Menu</h2>
-<p>
-The sync context menu lets you alter the sync behavior and can be accessed with a right click on a sync project. From this menu, you can turn off automatic sync'ing (sync after saving files and other resource changes) so that syncs only occur on request. This setting is applied to all projects in the workspace. The "Project Auto-Sync Settings" submenu allows you to alter the behavior of automatic sync'ing per project. Finally, the last two selections allow you to force an immediate sync of the current project. A "sync all" syncs all configurations of a project. Note that this can be quite slow if your project has several configurations. When a build is requested, a sync of the active configuration, and only the active configuration, is forced regardless of any settings.
-</p>
+<p>The sync context menu lets you alter the sync behavior and can be accessed with a right click on a sync project. From this menu, you can turn off automatic sync'ing (sync after saving files and other resource changes) so that syncs only occur on request. This setting is applied to all projects in the workspace. The "Project Auto-Sync Settings" submenu allows you to alter the behavior of automatic sync'ing per project. The next two selections allow you to force an immediate sync of the current project. A "sync all" syncs all configurations of a project. Note that this can be quite slow if your project has several configurations. Prior to a build, files are always updated with a forced sync of only the active configuration, regardless of any settings. This ensures that the build is based on the latest revisions. Another sync may occur after the build to update files, since the build may alter the remote files during compilation. (This sync, however, does respect the user's settings.) See "<a href="#file-filter">Changing which files are synchronized</a>" for information on the "Filter..." option.
+
 <p><img src="images/sync-contextMenu.png">
+
+<h2 id="file-filter">Changing which files are synchronized</h2>
+<p>
+From the "Filter..." option of the sync context menu, you can change which files are synchronized for the current project. You can also change the default settings for future projects on the "Synchronized Project" preference page. For files and folders, "Exclude Selection" and "Include Selection" shortcut options are also available from the context menu. 
+By default, files and directories specifically used by Eclipse are excluded. (Note that these files, such as <code>.project</code> etc.  are normally not visible.)
+The "File View" always indicates the currently excluded and included directories and files, while the "Pattern View" always shows the current exclude and include patterns. (The file view is not shown on the preference page.) Each view updates automatically if the other view is changed, so that they are always in agreement. This allows you to see immediately the effect of adding a new pattern. By default, remote files are not shown. Showing remote files may lead to a slower response time while updating views. An error message is printed if the remote is disconnected.
+
+<p>
+You can deselect or select directories or files in the File View, which will add the corresponding exclude or include pattern to the pattern view. These are "path" patterns, meaning that directories or files in the specified path are excluded or included. 
+Underneath the Pattern View, you can manually enter a path (Enter Path:). You can also enter a regular expression ("regex") that is compared to the project-relative path. The regular expression syntax is that of the Java programming language. An error message is printed if the regular expression is not valid. Finally, you can select "special" patterns from the "Select pattern" drop-down. Currently the only special pattern is one for matching binary files.
+
+<p>
+Patterns are applied in the order given in the Pattern View, and new patterns are always placed at the top (highest priority). So a file will be excluded or included based on the first matching pattern, or included if no pattern matches. Use the "Up" and "Down" buttons to change a pattern's priority. If a new pattern is identical to an old pattern and has the same type, the old pattern is removed. Note that it doesn't matter whether the old pattern was an exclude or include pattern, since the new pattern supersedes it.
+
+<p><img src="images/sync-fileExcludeIncludeList.png">
 
 <h2 id="conversion-wizard">Converting a project to a Synchronized Project</h2>
 <p>

@@ -1,0 +1,815 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2012 IBM Corporation and others. All rights reserved. 
+	This program and the accompanying materials are made available under the 
+	terms of the Eclipse Public License v1.0s which accompanies this distribution, 
+	and is available at http://www.eclipse.org/legal/epl-v10.html -->
+<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="resource_manager_type.xsd"
+	name="pe_aix">
+	<!-- Make sure XML editor line length is set long enough (160) to avoid wrapping text so messages don't get wrapped when reformatting -->
+	<control-data>
+		<!-- Required for debugger to determine number of processes to display -->
+		<attribute name="mpiNumberOfProcesses" type="integer">
+			<link-value-to>MP_PROCS</link-value-to>
+		</attribute>
+	
+		<attribute name="MP_ACK_THRESH" type="string">
+			<description>Acknowledgment threshold:</description>
+			<tooltip>Specify packet acknowledgment threshold </tooltip>
+		</attribute>
+
+		<attribute name="MP_ADAPTER_USE" type="string">
+			<description>Exclusive adapter use:</description>
+			<tooltip>Specify how node's adapter should be used</tooltip>
+		</attribute>
+
+		<attribute name="MP_BINDPROC" type="string">
+			<description>Bind tasks to first CPU:</description>
+			<tooltip>Bind tasks to first logical CPU. Use for OpenMP Only</tooltip>
+		</attribute>
+
+		<attribute name="MP_BULK_MIN_MSG_SIZE" type="string">
+			<description>Minimum bulk message size:</description>
+			<tooltip>Specify minimum message size for messages using bulk transfer (Default: 153600)</tooltip>
+		</attribute>
+
+		<attribute name="MP_CC_SCRATCH_BUF" type="string">
+			<description>Fastest collectives:</description>
+			<tooltip>Specify if fastest collective algorithm is used</tooltip>
+		</attribute>
+
+		<attribute name="MP_CLOCK_SOURCE" type="string">
+			<description>Clock source:</description>
+			<tooltip>Specify if high performance switch is clock source</tooltip>
+		</attribute>
+
+		<attribute name="MP_CMDFILE" type="string">
+			<description>Command file:</description>
+			<tooltip>Specify script to load nodes in partition</tooltip>
+		</attribute>
+
+		<attribute name="MP_COLLECTIVE_GROUPS" type="string">
+			<description>CAU groups:</description>
+			<tooltip>Specify the number of CAU groups (Default: 0)</tooltip>
+		</attribute>
+
+		<attribute name="MP_CONFIG" type="string">
+			<description>Use PE release level:</description>
+			<tooltip>Specify the PE release level to use</tooltip>
+		</attribute>
+
+		<attribute name="MP_COREDIR" type="string">
+			<description>Core file directory:</description>
+			<tooltip>Specify directory where core files are stored.</tooltip>
+		</attribute>
+
+		<attribute name="MP_COREFILE_FORMAT" type="string">
+			<description>Corefile format:</description>
+			<tooltip>Specify 'STDERR' to write core data to stderr, blank for standard core file or name of lightweight corefile</tooltip>
+		</attribute>
+
+		<attribute name="MP_COREFILE_SIGTERM" type="string">
+			<description>Corefile on SIGTERM:</description>
+			<tooltip>Select to create corefile if application gets SIGTERM</tooltip>
+		</attribute>
+
+		<attribute name="MP_COSCHEDULER_VERSION" type="string">
+			<description>Use runqueue co-scheduler:</description>
+			<tooltip>Specifies if POE runqueue co-scheduler is used</tooltip>
+		</attribute>
+
+		<attribute name="MP_CPU_USE" type="string">
+			<description>Exclusive CPU use:</description>
+			<tooltip>Specify how node's CPU should be used</tooltip>
+		</attribute>
+
+		<attribute name="MP_CSS_INTERRUPT" type="string">
+			<description>Packets generate interrupts:</description>
+			<tooltip>Specify if arriving packets generate interrupts (Default:no)</tooltip>
+		</attribute>
+
+		<attribute name="MP_DEVTYPE" type="string">
+			<description>Device type class:</description>
+			<tooltip>Select 'hfi' to use HFI device type, blank otherwise</tooltip>
+		</attribute>
+
+		<attribute name="MP_EAGER_LIMIT" type="string">
+			<description>Eager limit:</description>
+			<tooltip>Specify rendezvous protocol message size threshold (Default:4096)</tooltip>
+		</attribute>
+
+		<attribute name="MP_EUIDEVELOP" type="string">
+			<description>MPI parameter checking:</description>
+			<tooltip>Specify level of MPI parameter checking. (Default: no)</tooltip>
+		</attribute>
+
+		<attribute name="MP_EUIDEVICE" type="string">
+			<description>Adapter:</description>
+			<tooltip>Specify adapter to use for message passing</tooltip>
+		</attribute>
+
+		<attribute name="MP_EUILIB" type="string">
+			<description>Communications subsystem:</description>
+			<tooltip>Communication subsystem to be used (Default: ip)</tooltip>
+		</attribute>
+
+		<attribute name="MP_EUILIBPATH" type="string">
+			<description>Library path:</description>
+			<tooltip>Specify path to message passing and communication libraries (Default: /opt/ibmhpc/pe1100/ppe.poe/lib)</tooltip>
+		</attribute>
+
+		<attribute name="MP_FIFO_ROUTE_MODE" type="string">
+			<description>FIFO routing mode:</description>
+			<tooltip>Routing mode to be used for FIFO operations (Default:hw_direct)</tooltip>
+		</attribute>
+
+		<attribute name="MP_FORCED_INTERRUPTS_ENABLED" type="string">
+			<description>Use forced interrupts:</description>
+			<tooltip>Use forced interrupts for rondezvous message in RDMA transfer (Default: no)</tooltip>
+		</attribute>
+
+		<attribute name="MP_HINTS_FILTERED" type="string">
+			<description>Hints filtered:</description>
+			<tooltip>Specify if MPI info objects reject hints (Default: no)</tooltip>
+		</attribute>
+
+		<attribute name="MP_HOSTFILE" type="string">
+			<description>Host list file:</description>
+			<tooltip>Specify the name of the hostfile that maps tasks to nodes.</tooltip>
+		</attribute>
+
+		<attribute name="MP_IMM_SEND_BUFFERS" type="string">
+			<description>Immediate send buffers:</description>
+			<tooltip>Specify the number of immediate send buffers (Default: 1)</tooltip>
+		</attribute>
+
+		<attribute name="MP_INFOLEVEL" type="string">
+			<description>PE diagnostic message level:</description>
+			<tooltip>Specify PE diagnostic message level. (Default: 1)</tooltip>
+		</attribute>
+
+		<attribute name="MP_INSTANCES" type="string">
+			<description>Window instances:</description>
+			<tooltip>Specify number of user space windows or IP addresses to use (Default: 1)</tooltip>
+		</attribute>
+
+		<attribute name="MP_IOAGENT_CNT" type="string">
+			<description>I/O agent count:</description>
+			<tooltip>Specify the number I/O agents.</tooltip>
+		</attribute>
+
+		<attribute name="MP_IONODEFILE" type="string">
+			<description>MPI I/O Node List:</description>
+			<tooltip>Specify the file listing nodes performing parallel I/O</tooltip>
+		</attribute>
+
+		<attribute name="MP_IOTASKLIST" type="string">
+			<description>I/O agents tasks:</description>
+			<tooltip>Specify a ':' separated list of I/O agent tasks</tooltip>
+		</attribute>
+
+		<attribute name="MP_IO_BUFFER_SIZE" type="string">
+			<description>MPI_IO buffer size:</description>
+			<tooltip>Specify size of MPI_IO buffer </tooltip>
+		</attribute>
+
+		<attribute name="MP_IO_ERRLOG" type="string">
+			<description>Create I/O error log:</description>
+			<tooltip>Specify if I/O error logging is enabled (Default: no)</tooltip>
+		</attribute>
+
+		<attribute name="MP_LABELIO" type="string">
+			<description>Label STDIO with task number:</description>
+			<tooltip>Prefix stdout and stderr for each task with task number.</tooltip>
+		</attribute>
+
+		<attribute name="MP_MC_INET_ADDR_LEN" type="string">
+			<description>Number of multicast addresses:</description>
+			<tooltip>Specify size of multicase address range (Default: 16)</tooltip>
+		</attribute>
+
+		<attribute name="MP_MC_INET_BASE_ADDR" type="string">
+			<description>Base multicast IP address:</description>
+			<tooltip>Specify the base IPv4 multicast address (Default: 224.3.0.1)</tooltip>
+		</attribute>
+
+		<attribute name="MP_MC_INET_PORT" type="string" min="1024" max="65535">
+			<description>Multicast port number:</description>
+			<tooltip>Specify port number to use for multicasting (Default: 2008)</tooltip>
+		</attribute>
+		
+		<attribute name="MP_MPILIB" type="string">
+			<description>MPI library:</description>
+			<tooltip>MPI library used (mpich2 or shim)</tooltip>
+		</attribute>
+
+		<attribute name="MP_MSG_API" type="string">
+			<description>Message passing API:</description>
+			<tooltip>Specify message passing API(s) used by application (Default:mpi)</tooltip>
+		</attribute>
+
+		<attribute name="MP_MSG_ENVELOPE_BUF" type="string">
+			<description>Envelope buffer size:</description>
+			<tooltip>Specify size of message envelope buffer (Default 8388608)</tooltip>
+		</attribute>
+
+		<attribute name="MP_NEWJOB" type="string">
+			<description>Keep job partition:</description>
+			<tooltip>Specifies if partition manager maintains partition for multiple job steps</tooltip>
+		</attribute>
+
+		<attribute name="MP_NODES" type="string">
+			<description>Number of nodes:</description>
+			<tooltip>Specify the number of nodes to run application.</tooltip>
+		</attribute>
+
+		<attribute name="MP_PGMMODEL" type="string">
+			<description>Programming model:</description>
+			<tooltip>Specify programming model (Default: spmd)</tooltip>
+		</attribute>
+
+		<attribute name="MP_PMDLOG" type="string">
+			<description>Generate PMD diagnostic log:</description>
+			<tooltip>Generate a PMD log for diagnostic purposes. (Default: no)</tooltip>
+		</attribute>
+
+		<attribute name="MP_PMDLOG_DIR" type="string">
+			<description>PMD log directory:</description>
+			<tooltip>Specify directory where PMD log is stored. (Default: /tmp)</tooltip>
+		</attribute>
+
+		<attribute name="MP_PMDSUFFIX" type="string">
+			<description>Alternate PMD service suffix:</description>
+			<tooltip>Specify the suffix for the PMD service name</tooltip>
+		</attribute>
+
+		<attribute name="MP_POLLING_INTERVAL" type="string">
+			<description>MPI polling interval:</description>
+			<tooltip>Specify PE polling interval (Default: 400000)</tooltip>
+		</attribute>
+
+		<attribute name="MP_PRINTENV" type="string">
+			<description>Print environment:</description>
+			<tooltip>Print MPI environment variables for all tasks (Default: no)</tooltip>
+		</attribute>
+
+		<attribute name="MP_PRIORITY" type="string">
+			<description>Co-scheduler priority:</description>
+			<tooltip>Specify co-scheduler priority class name </tooltip>
+		</attribute>
+
+		<attribute name="MP_PRIORITY_LOG" type="string">
+			<description>Create co-scheduler log:</description>
+			<tooltip>Specify if co-scheduler log should be created (Default: no)</tooltip>
+		</attribute>
+
+		<attribute name="MP_PRIORITY_LOG_DIR" type="string">
+			<description>Coscheduler log directory:</description>
+			<tooltip>Specify directory where co-scheduler log is stored. (Default: /tmp)</tooltip>
+		</attribute>
+
+		<attribute name="MP_PRIORITY_LOG_NAME" type="string">
+			<description>Co-scheduler log name:</description>
+			<tooltip>Specify name of co-scheduler log (Default: pmadjpri.log)</tooltip>
+		</attribute>
+
+		<attribute name="MP_PRIORITY_NTP" type="string">
+			<description>Co-scheduler disables NTP:</description>
+			<tooltip>Specify if PE co-scheduler disables NTP during adjustment period (Default: no)</tooltip>
+		</attribute>
+
+		<attribute name="MP_PROCS" type="string">
+			<description>Number of application tasks:</description>
+			<tooltip>Specify the number of application tasks. (Default: 1)</tooltip>
+		</attribute>
+
+		<attribute name="MP_PROFDIR" type="string">
+			<description>GMON file directory:</description>
+			<tooltip>Specify directory where GMON files are stored.</tooltip>
+		</attribute>
+
+		<attribute name="MP_PULSE" type="string">
+			<description>Pulse interval:</description>
+			<tooltip>Specify the interval at which PE checks remote nodes (Default: 600)</tooltip>
+		</attribute>
+
+		<attribute name="MP_RC_MAX_QP" type="string">
+			<description>Maximum QPairs:</description>
+			<tooltip>Specify the maximum number of QPairs (Default: 8156)</tooltip>
+		</attribute>
+
+		<attribute name="MP_RC_USE_LMC" type="string">
+			<description>Use LMC:</description>
+			<tooltip>Use lid mask control (LMC) (Default: no) </tooltip>
+		</attribute>
+
+		<attribute name="MP_RDMA_ROUTE_MODE" type="string">
+			<description>RDMA routing mode:</description>
+			<tooltip>Routing mode to be used for RDMA operations (Default:hw_direct)</tooltip>
+		</attribute>
+
+		<attribute name="MP_REMOTEDIR" type="string">
+			<description>Remote directory script:</description>
+			<tooltip>Specify script to echo name of current directory to be used on remote nodes</tooltip>
+		</attribute>
+		
+		<attribute name="MP_RESD" type="string">
+			<description>Use resource manager:</description>
+			<tooltip>Use resource manager to handle resource allocations</tooltip>
+		</attribute>
+
+		<attribute name="MP_RETRANSMIT_INTERVAL" type="string">
+			<description>MPI retransmit interval:</description>
+			<tooltip>Specify interval to check if retransmit required</tooltip>
+		</attribute>
+
+		<attribute name="MP_RETRY" type="string">
+			<description>Job submission timeout:</description>
+			<tooltip>"Specify job submission timeout ( &lt;0: wait indefinitely, 0: no wait, &gt;0, wait specified interval) (Default: 0)</tooltip>
+		</attribute>
+
+		<attribute name="MP_REXMIT_BUF_CNT" type="string">
+			<description>Retransmit buffers:</description>
+			<tooltip>Specify number of retransmit buffers per task (Default: 128)</tooltip>
+		</attribute>
+
+		<attribute name="MP_REXMIT_BUF_SIZE" type="string">
+			<description>Maximum PAMI/LAPI buffered message:</description>
+			<tooltip>Specify maximum LAPI buffer size (Default: 16352)</tooltip>
+		</attribute>
+
+		<attribute name="MP_RMFILE" type="string">
+			<description>Node allocation file:</description>
+			<tooltip>Specify resource manager command file for node allocation</tooltip>
+		</attribute>
+
+		<attribute name="MP_RMPOOL" type="string">
+			<description>Node allocation pool:</description>
+			<tooltip>"Specify name of node allocation pool</tooltip>
+		</attribute>
+
+		<attribute name="MP_RM_TIMEOUT" type="string">
+			<description>Resource mgr connect timeout:</description>
+			<tooltip>"Specify resource manager connection timeout (&lt;0: wait indefinitely, 0: no wait, &gt;0, wait specified interval) (Default:30)</tooltip>
+		</attribute>
+		
+		<attribute name="MP_RMA_PENDING" type="string">
+			<description>Maximum outstanding RMA requests:</description>
+			<tooltip>"Maximum outstanding RMA requests. Limits number of PAMI_Request objects allocated</tooltip>
+		</attribute>
+
+		<attribute name="MP_SAVEHOSTFILE" type="string">
+			<description>Generated host file:</description>
+			<tooltip>Specify path to saved hostfile generated by partition manager</tooltip>
+		</attribute>
+
+		<attribute name="MP_SAVE_RMFILE" type="string">
+			<description>Generated job command file:</description>
+			<tooltip>Specify path to saved job command file generated by partition manager</tooltip>
+		</attribute>
+
+		<attribute name="MP_SHARED_MEMORY" type="string">
+			<description>Use shared memory:</description>
+			<tooltip>Specify if shared memory is used for communication (Default:yes)</tooltip>
+		</attribute>
+
+		<attribute name="MP_SHMCC_EXCLUDE_LIST" type="string">
+			<description>Shared memory exclusions:</description>
+			<tooltip>Specify list of MPI collecttives excluded from using shared memory</tooltip>
+		</attribute>
+
+		<attribute name="MP_SHMEM_PT2PT" type="string">
+			<description>Point to point shared memory:</description>
+			<tooltip>Intranode point to point communication uses shared memory</tooltip>
+		</attribute>
+
+		<attribute name="MP_SINGLE_THREAD" type="string">
+			<description>Single MPI thread:</description>
+			<tooltip>Specify if application has single thread with MPI calls (Default: no)</tooltip>
+		</attribute>
+
+		<attribute name="MP_STATISTICS" type="string">
+			<description>MPI statistics:</description>
+			<tooltip>Obtain communication statistics for user space jobs.</tooltip>
+		</attribute>
+
+		<attribute name="MP_STDINMODE" type="string">
+			<description>STDIN processing mode:</description>
+			<tooltip>Specify how stdin is handled. (Default: all)</tooltip>
+		</attribute>
+
+		<attribute name="MP_STDOUTMODE" type="string">
+			<description>STDOUT/STDERR processing mode:</description>
+			<tooltip>Specify how stdout and stderr are handled. (Default:unordered)</tooltip>
+		</attribute>
+
+		<attribute name="MP_TASKS_PER_NODE" type="string">
+			<description>Number of tasks per node:</description>
+			<tooltip>Specify the number application tasks per node.</tooltip>
+		</attribute>
+
+		<attribute name="MP_TASK_AFFINITY" type="string">
+			<description>Task affinity:</description>
+			<tooltip>Attach application tasks to system rset for task affinity</tooltip>
+		</attribute>
+
+		<attribute name="MP_THREAD_STACKSIZE" type="string">
+			<description>Additional MPI thread stack size:</description>
+			<tooltip>Specify additional stack size for MPI service thread (Default: 0)</tooltip>
+		</attribute>
+
+		<attribute name="MP_TIMEOUT" type="string">
+			<description>Connection timeout:</description>
+			<tooltip>Specify timeout limit for connecting to remote nodes (Default: 150)</tooltip>
+		</attribute>
+
+		<attribute name="MP_TIMEOUT" type="string">
+			<description>POE connection timeout:</description>
+			<tooltip>"Specify POE connection timeout</tooltip>
+		</attribute>
+
+		<attribute name="MP_TLP_REQUIRED" type="string">
+			<description>Large pages required:</description>
+			<tooltip>Specifies if POE shuld check if application was compiled for large pages</tooltip>
+		</attribute>
+
+		<attribute name="MP_UDP_PACKET_SIZE" type="string">
+			<description>UDP packet size:</description>
+			<tooltip>Specify UDP packet size</tooltip>
+		</attribute>
+
+		<attribute name="MP_USE_BULK_XFER" type="string">
+			<description>Use bulk transfer:</description>
+			<tooltip>Use adapter bult data transfer mechanisms (Default: no)</tooltip>
+		</attribute>
+
+		<attribute name="MP_USE_MC" type="string">
+			<description>Use hardware multicast:</description>
+			<tooltip>Specifies if hardware multicast feature is used (Default:no)</tooltip>
+		</attribute>
+
+		<attribute name="MP_WAIT_MODE" type="string">
+			<description>Wait mode:</description>
+			<tooltip>Specify thread behavior when waiting for messages (Default:poll) </tooltip>
+		</attribute>
+
+		<attribute name="MP_WORLD_SIZES" type="string">
+			<description>MPI world sizes:</description>
+			<tooltip>Specify a ':' separated list of MPI world sizes</tooltip>
+		</attribute>
+
+		<attribute name="SCI_DEBUG_FANOUT" type="string">
+			<description>SCI fanout:</description>
+			<tooltip>Specify fanout value for SCI agent tree (Default: 32)</tooltip>
+		</attribute>
+
+
+		<!-- Invocation command definition -->
+		<submit-interactive name="POE command" waitForId="true" keepOpen="true" directory="${ptp_rm:executableDirectory#value}">
+			<arg>perl</arg>
+			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app.pl</arg>
+			<arg>${ptp_rm:executablePath#value}</arg>
+			<arg>${ptp_rm:progArgs#value}</arg>
+			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH#value}" />
+			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE#value}" />
+			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC#value}" />
+			<environment name="MP_BULK_MIN_MSG_SIZE" value="${ptp_rm:MP_BULK_MIN_MSG_SIZE#value}" />
+			<environment name="MP_CC_SCRATCH_BUF" value="${ptp_rm:MP_SCRATCH_BUF#value}" />
+			<environment name="MP_CLOCK_SOURCE" value="${ptp_rm:MP_CLOCK_SOURCE#value}" />
+			<environment name="MP_CMDFILE" value="${ptp_rm:MP_CMDFILE#value}" />
+			<environment name="MP_COLLECTIVE_GROUPS" value="${ptp_rm:MP_COLLECTIVE_GROUPS#value}" />
+			<environment name="MP_CONFIG" value="${ptp_rm:MP_CONFIG#value}" />
+			<environment name="MP_COREDIR" value="${ptp_rm:MP_COREDIR#value}" />
+			<environment name="MP_COREFILE_FORMAT" value="${ptp_rm:MP_COREFILE_FORMAT#value}" />
+			<environment name="MP_COREFILE_SIGTERM" value="${ptp_rm:MP_COREFILE_SIGTERM#value}" />
+			<environment name="MP_COSCHEDULER_VERSION" value="${ptp_rm:MP_COSCHEDULER_VERSION#value}" />
+			<environment name="MP_CPU_USE" value="${ptp_rm:MP_CPU_USE#value}" />
+			<environment name="MP_CSS_INTERRUPT" value="${ptp_rm:MP_CSS_INTERRUPT#value}" />
+			<environment name="MP_DEVTYPE" value="${ptp_rm:MP_DEVTYPE#value}" />
+			<environment name="MP_EAGER_LIMIT" value="${ptp_rm:MP_EAGER_LIMIT#value}" />
+			<environment name="MP_EUIDEVELOP" value="${ptp_rm:MP_EUIDEVELOP#value}" />
+			<environment name="MP_EUIDEVICE" value="${ptp_rm:MP_EUIDEVICE#value}" />
+			<environment name="MP_EUILIB" value="${ptp_rm:MP_EUILIB#value}" />
+			<environment name="MP_EUILIBPATH" value="${ptp_rm:MP_EUILIBPATH#value}" />
+			<environment name="MP_FIFO_ROUTE_MODE" value="${ptp_rm:MP_FIFO_ROUTE_MODE#value}" />
+			<environment name="MP_FORCED_INTERRUPTS_ENABLED" value="${ptp_rm:MP_FORCED_INTERRUPTS_ENABLED#value}" />
+			<environment name="MP_HINTS_FILTERED" value="${ptp_rm:MP_HINTS_FILTERED#value}" />
+			<environment name="MP_HOSTFILE" value="${ptp_rm:MP_HOSTFILE#value}" />
+			<environment name="MP_IMM_SEND_BUFFERS" value="${ptp_rm:MP_IMM_SEND_BUFFERS#value}" />
+			<environment name="MP_INFOLEVEL" value="${ptp_rm:MP_INFOLEVEL#value}" />
+			<environment name="MP_INSTANCES" value="${ptp_rm:MP_INSTANCES#value}" />
+			<environment name="MP_IOAGENT_CNT" value="${ptp_rm:MP_IOAGENT_CNT#value}" />
+			<environment name="MP_IONODEFILE" value="${ptp_rm:MP_IONODEFILE#value}" />
+			<environment name="MP_IOTASKLIST" value="${ptp_rm:MP_IOTASKLIST#value}" />
+			<environment name="MP_IO_BUFFER_SIZE" value="${ptp_rm:MP_IO_BUFFER_SIZE#value}" />
+			<environment name="MP_IO_ERRLOG" value="${ptp_rm:MP_IO_ERRLOG#value}" />
+			<environment name="MP_LABELIO" value="${ptp_rm:MP_LABELIO#value}" />
+			<environment name="MP_MC_INET_ADDR_LEN" value="${ptp_rm:MP_MC_INET_ADDR_LEN#value}" />
+			<environment name="MP_MC_INET_BASE_ADDR" value="${ptp_rm:MP_MC_INET_BASE_ADDR#value}" />
+			<environment name="MP_MC_INET_PORT" value="${ptp_rm:MP_MC_INET_PORT#value}" />
+			<environment name="MP_MPILIB" value="${ptp_rm:MP_MPILIB#value}" />
+			<environment name="MP_MSG_API" value="${ptp_rm:MP_MSG_API#value}" />
+			<environment name="MP_MSG_ENVELOPE_BUF" value="${ptp_rm:MP_MSG_ENVELOPE_BUF#value}" />
+			<environment name="MP_NEWJOB" value="${ptp_rm:MP_NEWJOB#value}" />
+			<environment name="MP_NODES" value="${ptp_rm:MP_NODES#value}" />
+			<environment name="MP_PGMMODEL" value="${ptp_rm:MP_PGMMODEL#value}" />
+			<environment name="MP_PMDLOG" value="${ptp_rm:MP_PMDLOG#value}" />
+			<environment name="MP_PMDLOG_DIR" value="${ptp_rm:MP_PMDLOG_DIR#value}" />
+			<environment name="MP_PMDSUFFIX" value="${ptp_rm:MP_PMDSUFFIX#value}" />
+			<environment name="MP_POLLING_INTERVAL" value="${ptp_rm:MP_POLLING_INTERVAL#value}" />
+			<environment name="MP_PRINTENV" value="${ptp_rm:MP_PRINTENV#value}" />
+			<environment name="MP_PRIORITY" value="${ptp_rm:MP_PRIORITY#value}" />
+			<environment name="MP_PRIORITY_LOG" value="${ptp_rm:MP_PRIORITY_LOG#value}" />
+			<environment name="MP_PRIORITY_LOG_DIR" value="${ptp_rm:MP_PRIORITY_LOG_DIR#value}" />
+			<environment name="MP_PRIORITY_LOG_NAME" value="${ptp_rm:MP_PRIORITY_LOG_NAME#value}" />
+			<environment name="MP_PRIORITY_NTP" value="${ptp_rm:MP_PRIORITY_NTP#value}" />
+			<environment name="MP_PROCS" value="${ptp_rm:MP_PROCS#value}" />
+			<environment name="MP_PROFDIR" value="${ptp_rm:MP_PROFDIR#value}" />
+			<environment name="MP_PULSE" value="${ptp_rm:MP_PULSE#value}" />
+			<environment name="MP_RC_MAX_QP" value="${ptp_rm:MP_RC_MAX_QP#value}" />
+			<environment name="MP_RC_USE_LMC" value="${ptp_rm:MP_RC_USE_LMC#value}" />
+			<environment name="MP_RDMA_ROUTE_MODE" value="${ptp_rm:MP_RDMA_ROUTE_MODE#value}" />
+			<environment name="MP_REMOTEDIR" value="${ptp_rm:MP_REMOTEDIR#value}" />
+			<environment name="MP_RESD" value="${ptp_rm:MP_RESD#value}" />
+			<environment name="MP_RETRANSMIT_INTERVAL" value="${ptp_rm:MP_RETRANSMIT_INTERVAL#value}" />
+			<environment name="MP_RETRY" value="${ptp_rm:MP_RETRY#value}" />
+			<environment name="MP_REXMIT_BUF_CNT" value="${ptp_rm:MP_REXMIT_BUF_CNT#value}" />
+			<environment name="MP_REXMIT_BUF_SIZE" value="${ptp_rm:MP_REXMIT_BUF_SIZE#value}" />
+			<environment name="MP_RMA_PENDING" value="${ptp_rm:MP_RMA_PENDING#value}" />
+			<environment name="MP_RMFILE" value="${ptp_rm:MP_RMFILE#value}" />
+			<environment name="MP_RMPOOL" value="${ptp_rm:MP_RMPOOL#value}" />
+			<environment name="MP_RM_TIMEOUT" value="${ptp_rm:MP_RM_TIMEOUT#value}" />
+			<environment name="MP_SAVEHOSTFILE" value="${ptp_rm:MP_SAVEHOSTFILE#value}" />
+			<environment name="MP_SAVE_RMFILE" value="${ptp_rm:MP_SAVE_RMFILE#value}" />
+			<environment name="MP_SHARED_MEMORY" value="${ptp_rm:MP_SHARED_MEMORY#value}" />
+			<environment name="MP_SHMCC_EXCLUDE_LIST" value="${ptp_rm:MP_SHMCC_EXCLUDE_LIST#value}" />
+			<environment name="MP_SHMEM_PT2PT" value="${ptp_rm:MP_SHMEM_PT2PT#value}" />
+			<environment name="MP_SINGLE_THREAD" value="${ptp_rm:MP_SINGLE_THREAD#value}" />
+			<environment name="MP_STATISTICS" value="${ptp_rm:MP_STATISTICS#value}" />
+			<environment name="MP_STDINMODE" value="${ptp_rm:MP_STDINMODE#value}" />
+			<environment name="MP_STDOUTMODE" value="${ptp_rm:MP_STDOUTMODE#value}" />
+			<environment name="MP_TASKS_PER_NODE" value="${ptp_rm:MP_TASKS_PER_NODE#value}" />
+			<environment name="MP_TASK_AFFINITY" value="${ptp_rm:MP_TASK_AFFINITY#value}" />
+			<environment name="MP_THREAD_STACKSIZE" value="${ptp_rm:MP_THREAD_STACKSIZE#value}" />
+			<environment name="MP_TIMEOUT" value="${ptp_rm:MP_TIMEOUT#value}" />
+			<environment name="MP_TLP_REQUIRED" value="${ptp_rm:MP_TLP_REQUIRED#value}" />
+			<environment name="MP_UDP_PACKET_SIZE" value="${ptp_rm:MP_UDP_PACKET_SIZE#value}" />
+			<environment name="MP_USE_BULK_XFER" value="${ptp_rm:MP_USE_BULK_XFER#value}" />
+			<environment name="MP_USE_MC" value="${ptp_rm:MP_USE_MC#value}" />
+			<environment name="MP_WAIT_MODE" value="${ptp_rm:MP_WAIT_MODE#value}" />
+			<environment name="MP_WORLD_SIZES" value="${ptp_rm:MP_WORLD_SIZES#value}" />
+			<environment name="SCI_DEBUG_FANOUT" value="${ptp_rm:SCI_DEBUG_FANOUT#value}" />
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>::::PoePid=([0-9]+)::::</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
+						<set field="value">
+							<entry value="RUNNING" />
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+
+		</submit-interactive>
+
+		<submit-interactive-debug name="POE command" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true">
+			<arg>perl</arg>
+			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app_debug.pl</arg>
+			<arg>poe</arg>
+			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
+			<arg>${ptp_rm:debuggerArgs#value}</arg>
+			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH#value}" />
+			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE#value}" />
+			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC#value}" />
+			<environment name="MP_BULK_MIN_MSG_SIZE" value="${ptp_rm:MP_BULK_MIN_MSG_SIZE#value}" />
+			<environment name="MP_CC_SCRATCH_BUF" value="${ptp_rm:MP_SCRATCH_BUF#value}" />
+			<environment name="MP_CLOCK_SOURCE" value="${ptp_rm:MP_CLOCK_SOURCE#value}" />
+			<environment name="MP_CMDFILE" value="${ptp_rm:MP_CMDFILE#value}" />
+			<environment name="MP_COLLECTIVE_GROUPS" value="${ptp_rm:MP_COLLECTIVE_GROUPS#value}" />
+			<environment name="MP_CONFIG" value="${ptp_rm:MP_CONFIG#value}" />
+			<environment name="MP_COREDIR" value="${ptp_rm:MP_COREDIR#value}" />
+			<environment name="MP_COREFILE_FORMAT" value="${ptp_rm:MP_COREFILE_FORMAT#value}" />
+			<environment name="MP_COREFILE_SIGTERM" value="${ptp_rm:MP_COREFILE_SIGTERM#value}" />
+			<environment name="MP_COSCHEDULER_VERSION" value="${ptp_rm:MP_COSCHEDULER_VERSION#value}" />
+			<environment name="MP_CPU_USE" value="${ptp_rm:MP_CPU_USE#value}" />
+			<environment name="MP_CSS_INTERRUPT" value="${ptp_rm:MP_CSS_INTERRUPT#value}" />
+			<environment name="MP_DEVTYPE" value="${ptp_rm:MP_DEVTYPE#value}" />
+			<environment name="MP_EAGER_LIMIT" value="${ptp_rm:MP_EAGER_LIMIT#value}" />
+			<environment name="MP_EUIDEVELOP" value="${ptp_rm:MP_EUIDEVELOP#value}" />
+			<environment name="MP_EUIDEVICE" value="${ptp_rm:MP_EUIDEVICE#value}" />
+			<environment name="MP_EUILIB" value="${ptp_rm:MP_EUILIB#value}" />
+			<environment name="MP_EUILIBPATH" value="${ptp_rm:MP_EUILIBPATH#value}" />
+			<environment name="MP_FIFO_ROUTE_MODE" value="${ptp_rm:MP_FIFO_ROUTE_MODE#value}" />
+			<environment name="MP_FORCED_INTERRUPTS_ENABLED" value="${ptp_rm:MP_FORCED_INTERRUPTS_ENABLED#value}" />
+			<environment name="MP_HINTS_FILTERED" value="${ptp_rm:MP_HINTS_FILTERED#value}" />
+			<environment name="MP_HOSTFILE" value="${ptp_rm:MP_HOSTFILE#value}" />
+			<environment name="MP_IMM_SEND_BUFFERS" value="${ptp_rm:MP_IMM_SEND_BUFFERS#value}" />
+			<environment name="MP_INFOLEVEL" value="${ptp_rm:MP_INFOLEVEL#value}" />
+			<environment name="MP_INSTANCES" value="${ptp_rm:MP_INSTANCES#value}" />
+			<environment name="MP_IOAGENT_CNT" value="${ptp_rm:MP_IOAGENT_CNT#value}" />
+			<environment name="MP_IONODEFILE" value="${ptp_rm:MP_IONODEFILE#value}" />
+			<environment name="MP_IOTASKLIST" value="${ptp_rm:MP_IOTASKLIST#value}" />
+			<environment name="MP_IO_BUFFER_SIZE" value="${ptp_rm:MP_IO_BUFFER_SIZE#value}" />
+			<environment name="MP_IO_ERRLOG" value="${ptp_rm:MP_IO_ERRLOG#value}" />
+			<environment name="MP_LABELIO" value="${ptp_rm:MP_LABELIO#value}" />
+			<environment name="MP_MC_INET_ADDR_LEN" value="${ptp_rm:MP_MC_INET_ADDR_LEN#value}" />
+			<environment name="MP_MC_INET_BASE_ADDR" value="${ptp_rm:MP_MC_INET_BASE_ADDR#value}" />
+			<environment name="MP_MC_INET_PORT" value="${ptp_rm:MP_MC_INET_PORT#value}" />
+			<environment name="MP_MPILIB" value="${ptp_rm:MP_MPILIB#value}" />
+			<environment name="MP_MSG_API" value="${ptp_rm:MP_MSG_API#value}" />
+			<environment name="MP_MSG_ENVELOPE_BUF" value="${ptp_rm:MP_MSG_ENVELOPE_BUF#value}" />
+			<environment name="MP_NEWJOB" value="${ptp_rm:MP_NEWJOB#value}" />
+			<environment name="MP_NODES" value="${ptp_rm:MP_NODES#value}" />
+			<environment name="MP_PGMMODEL" value="${ptp_rm:MP_PGMMODEL#value}" />
+			<environment name="MP_PMDLOG" value="${ptp_rm:MP_PMDLOG#value}" />
+			<environment name="MP_PMDLOG_DIR" value="${ptp_rm:MP_PMDLOG_DIR#value}" />
+			<environment name="MP_PMDSUFFIX" value="${ptp_rm:MP_PMDSUFFIX#value}" />
+			<environment name="MP_POLLING_INTERVAL" value="${ptp_rm:MP_POLLING_INTERVAL#value}" />
+			<environment name="MP_PRINTENV" value="${ptp_rm:MP_PRINTENV#value}" />
+			<environment name="MP_PRIORITY" value="${ptp_rm:MP_PRIORITY#value}" />
+			<environment name="MP_PRIORITY_LOG" value="${ptp_rm:MP_PRIORITY_LOG#value}" />
+			<environment name="MP_PRIORITY_LOG_DIR" value="${ptp_rm:MP_PRIORITY_LOG_DIR#value}" />
+			<environment name="MP_PRIORITY_LOG_NAME" value="${ptp_rm:MP_PRIORITY_LOG_NAME#value}" />
+			<environment name="MP_PRIORITY_NTP" value="${ptp_rm:MP_PRIORITY_NTP#value}" />
+			<environment name="MP_PROCS" value="${ptp_rm:MP_PROCS#value}" />
+			<environment name="MP_PROFDIR" value="${ptp_rm:MP_PROFDIR#value}" />
+			<environment name="MP_PULSE" value="${ptp_rm:MP_PULSE#value}" />
+			<environment name="MP_RC_MAX_QP" value="${ptp_rm:MP_RC_MAX_QP#value}" />
+			<environment name="MP_RC_USE_LMC" value="${ptp_rm:MP_RC_USE_LMC#value}" />
+			<environment name="MP_RDMA_ROUTE_MODE" value="${ptp_rm:MP_RDMA_ROUTE_MODE#value}" />
+			<environment name="MP_REMOTEDIR" value="${ptp_rm:MP_REMOTEDIR#value}" />
+			<environment name="MP_RESD" value="${ptp_rm:MP_RESD#value}" />
+			<environment name="MP_RETRANSMIT_INTERVAL" value="${ptp_rm:MP_RETRANSMIT_INTERVAL#value}" />
+			<environment name="MP_RETRY" value="${ptp_rm:MP_RETRY#value}" />
+			<environment name="MP_REXMIT_BUF_CNT" value="${ptp_rm:MP_REXMIT_BUF_CNT#value}" />
+			<environment name="MP_REXMIT_BUF_SIZE" value="${ptp_rm:MP_REXMIT_BUF_SIZE#value}" />
+			<environment name="MP_RMA_PENDING" value="${ptp_rm:MP_RMA_PENDING#value}" />
+			<environment name="MP_RMFILE" value="${ptp_rm:MP_RMFILE#value}" />
+			<environment name="MP_RMPOOL" value="${ptp_rm:MP_RMPOOL#value}" />
+			<environment name="MP_RM_TIMEOUT" value="${ptp_rm:MP_RM_TIMEOUT#value}" />
+			<environment name="MP_SAVEHOSTFILE" value="${ptp_rm:MP_SAVEHOSTFILE#value}" />
+			<environment name="MP_SAVE_RMFILE" value="${ptp_rm:MP_SAVE_RMFILE#value}" />
+			<environment name="MP_SHARED_MEMORY" value="${ptp_rm:MP_SHARED_MEMORY#value}" />
+			<environment name="MP_SHMCC_EXCLUDE_LIST" value="${ptp_rm:MP_SHMCC_EXCLUDE_LIST#value}" />
+			<environment name="MP_SHMEM_PT2PT" value="${ptp_rm:MP_SHMEM_PT2PT#value}" />
+			<environment name="MP_SINGLE_THREAD" value="${ptp_rm:MP_SINGLE_THREAD#value}" />
+			<environment name="MP_STATISTICS" value="${ptp_rm:MP_STATISTICS#value}" />
+			<environment name="MP_STDINMODE" value="${ptp_rm:MP_STDINMODE#value}" />
+			<environment name="MP_STDOUTMODE" value="${ptp_rm:MP_STDOUTMODE#value}" />
+			<environment name="MP_TASKS_PER_NODE" value="${ptp_rm:MP_TASKS_PER_NODE#value}" />
+			<environment name="MP_TASK_AFFINITY" value="${ptp_rm:MP_TASK_AFFINITY#value}" />
+			<environment name="MP_THREAD_STACKSIZE" value="${ptp_rm:MP_THREAD_STACKSIZE#value}" />
+			<environment name="MP_TIMEOUT" value="${ptp_rm:MP_TIMEOUT#value}" />
+			<environment name="MP_TLP_REQUIRED" value="${ptp_rm:MP_TLP_REQUIRED#value}" />
+			<environment name="MP_UDP_PACKET_SIZE" value="${ptp_rm:MP_UDP_PACKET_SIZE#value}" />
+			<environment name="MP_USE_BULK_XFER" value="${ptp_rm:MP_USE_BULK_XFER#value}" />
+			<environment name="MP_USE_MC" value="${ptp_rm:MP_USE_MC#value}" />
+			<environment name="MP_WAIT_MODE" value="${ptp_rm:MP_WAIT_MODE#value}" />
+			<environment name="MP_WORLD_SIZES" value="${ptp_rm:MP_WORLD_SIZES#value}" />
+			<environment name="SCI_DEBUG_FANOUT" value="${ptp_rm:SCI_DEBUG_FANOUT#value}" />
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>::::PoePid=([0-9]+)::::</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
+						<set field="value">
+							<entry value="RUNNING" />
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+			<pre-launch-cmd name="Cleanup" exec="rm -f routing_file" wait="true"/>
+			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
+
+		</submit-interactive-debug>
+		
+		<terminate-job name="cancel">
+			<arg>kill</arg>
+			<arg>-INT</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+		</terminate-job>
+
+		<!-- Launch tab definition -->
+		<launch-tab>
+			<dynamic>
+				<title>PE Settings</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="1" />
+					</layout>
+					<viewer name="PESettings" style="SWT.BORDER | SWT.MULTI" sort="true" type="table">
+						<layout-data>
+							<grid-data widthHint="600" heightHint="200" horizontalSpan="1" />
+						</layout-data>
+						<!-- These are the 6 attribute fields mappable to columns. In a "table viewer" the order of the columns is entirely arbitrary -->
+						<column-data name="Name" width="200" />
+						<column-data name="Description" width="200" />
+						<column-data name="Value" width="200" />
+						<items>
+							<include>MP_ACK_THRESH</include>
+							<include>MP_ADAPTER_USE</include>
+							<include>MP_BINDPROC</include>
+							<include>MP_BULK_MIN_MSG_SIZE</include>
+							<include>MP_SCRATCH_BUF</include>
+							<include>MP_CLOCK_SOURCE</include>
+							<include>MP_CMDFILE</include>
+							<include>MP_COLLECTIVE_GROUPS</include>
+							<include>MP_CONFIG</include>
+							<include>MP_COREDIR</include>
+							<include>MP_COREFILE_FORMAT</include>
+							<include>MP_COREFILE_SIGTERM</include>
+							<include>MP_COSCHEDULER_VERSION</include>
+							<include>MP_CPU_USE</include>
+							<include>MP_CSS_INTERRUPT</include>
+							<include>MP_DEVTYPE</include>
+							<include>MP_EAGER_LIMIT</include>
+							<include>MP_EUIDEVELOP</include>
+							<include>MP_EUIDEVICE</include>
+							<include>MP_EUILIB</include>
+							<include>MP_EUILIBPATH</include>
+							<include>MP_FIFO_ROUTE_MODE</include>
+							<include>MP_FORCED_INTERRUPS_ENABLED</include>
+							<include>MP_HINTS_FILTERED</include>
+							<include>MP_HOSTFILE</include>
+							<include>MP_IMM_SEND_BUFFERS</include>
+							<include>MP_INFOLEVEL</include>
+							<include>MP_INSTANCES</include>
+							<include>MP_IOAGENT_CNT</include>
+							<include>MP_NODEFILE</include>
+							<include>MP_IOTASKLIST</include>
+							<include>MP_IO_BUFFER_SIZE</include>
+							<include>MP_IO_ERRLOG</include>
+							<include>MP_LABELIO</include>
+							<include>MP_MC_INET_ADDR_LEN</include>
+							<include>MP_MC_INET_BASE_ADDR</include>
+							<include>MP_MC_INET_PORT</include>
+							<include>MP_MPILIB</include>
+							<include>MP_MSG_API</include>
+							<include>MP_MSG_ENVELOPE</include>
+							<include>MP_NEWJOB</include>
+							<include>MP_NODES</include>
+							<include>MP_PGMMODEL</include>
+							<include>MP_PMDLOG</include>
+							<include>MP_PMDLOG_DIR</include>
+							<include>MP_PMDSUFFIX</include>
+							<include>MP_POLLING_INTERVAL</include>
+							<include>MP_PRINTENV</include>
+							<include>MP_PRIORITY</include>
+							<include>MP_PRIORITY_LOG</include>
+							<include>MP_PRIORITY_LOG_DIR</include>
+							<include>MP_PRIORITY_LOG_NAME</include>
+							<include>MP_PRIORITY_NTP</include>
+							<include>MP_PROCS</include>
+							<include>MP_PROFDIR</include>
+							<include>MP_PULSE</include>
+							<include>MP_RC_MAX_QP</include>
+							<include>MP_RC_USE_LMC</include>
+							<include>MP_RDMA_ROUTE_MODE</include>
+							<include>MP_REMOTEDIR</include>
+							<include>MP_RESD</include>
+							<include>MP_RETRANSMIT_INTERVAL</include>
+							<include>MP_RETRY</include>
+							<include>MP_REXMIT_BUF_CNT</include>
+							<include>MP_REXMIT_BUF_SIZE</include>
+							<include>MP_RMA_PENDING</include>
+							<include>MP_RMFILE</include>
+							<include>MP_RMPOOL</include>
+							<include>MP_RM_TIMEOUT</include>
+							<include>MP_SAVEHOSTFILE</include>
+							<include>MP_SAVE_RMFILE</include>
+							<include>MP_SHARED_MEMORY</include>
+							<include>MP_SHMCC_EXCLUDE_LIST</include>
+							<include>MP_SHMEM_PT2PT</include>
+							<include>MP_SINGLE_THREAD</include>
+							<include>MP_STATISTICS</include>
+							<include>MP_STDINMODE</include>
+							<include>MP_STDOUTMODE</include>
+							<include>MP_TASKS_PER_NODE</include>
+							<include>MP_TASK_AFFINITY</include>
+							<include>MP_THREAD_STACKSIZE</include>
+							<include>MP_TIMEOUT</include>
+							<include>MP_TLP_REQUIRED</include>
+							<include>MP_UDP_PACKET_SIZE</include>
+							<include>MP_USE_BULK_XFER</include>
+							<include>MP_USE_MC</include>
+							<include>MP_WAIT_MODE</include>
+							<include>MP_WORLD_SIZES</include>
+							<include>SCI_DEBUG_FORMAT</include>
+						</items>
+						<value pattern="export @name='@value'" separator="; " />
+					</viewer>
+				</composite>
+			</dynamic>
+
+		</launch-tab>
+	</control-data>
+	<monitor-data schedulerType="PE">
+	</monitor-data>
+</resource-manager-builder>

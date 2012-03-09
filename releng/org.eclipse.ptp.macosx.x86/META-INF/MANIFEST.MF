@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %fragmentName.macosx.x86
+Bundle-Name: %fragmentName
 Bundle-SymbolicName: org.eclipse.ptp.macosx.x86;singleton:=true
 Bundle-Version: 6.0.0.qualifier
 Fragment-Host: org.eclipse.ptp.core;bundle-version="2.0.0"

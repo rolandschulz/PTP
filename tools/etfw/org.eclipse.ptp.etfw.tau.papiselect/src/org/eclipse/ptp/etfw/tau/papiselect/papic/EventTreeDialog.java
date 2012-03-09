@@ -31,11 +31,15 @@ public class EventTreeDialog extends Dialog {
 	// private Tree tree;
 	PapiCSelect cSelect;
 	private final IBuildLaunchUtils utilBlob;
+
 	// private final String treeTop="treeTop";
 
+	/**
+	 * @since 4.0
+	 */
 	public EventTreeDialog(Shell parentShell, IFileStore tp, IBuildLaunchUtils utilBlob) {
 		super(parentShell);
-		this.utilBlob=utilBlob;
+		this.utilBlob = utilBlob;
 		this.setShellStyle(this.getShellStyle() | SWT.RESIZE);
 		toolPath = tp;
 	}
@@ -57,7 +61,7 @@ public class EventTreeDialog extends Dialog {
 
 		// et=new EventTree();
 
-		cSelect = new PapiCSelect(toolPath,utilBlob);// "E:\\PAPIProject\\ptest2.xml");//
+		cSelect = new PapiCSelect(toolPath, utilBlob);// "E:\\PAPIProject\\ptest2.xml");//
 		et = cSelect.getEventTree();
 
 		treeV.setContentProvider(et);

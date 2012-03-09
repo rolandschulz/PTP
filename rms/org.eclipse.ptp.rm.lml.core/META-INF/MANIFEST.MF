@@ -10,6 +10,7 @@ Export-Package: org.eclipse.ptp.rm.lml.core;x-friends:="org.eclipse.ptp.rm.lml_j
  org.eclipse.ptp.rm.lml.core.model;x-friends:="org.eclipse.ptp.rm.lml.ui",
  org.eclipse.ptp.rm.lml.core.util;x-friends:="org.eclipse.ptp.rm.lml.ui",
  org.eclipse.ptp.rm.lml.internal.core.elements;x-friends:="org.eclipse.ptp.rm.lml.ui",
+ org.eclipse.ptp.rm.lml.internal.core.events;x-friends:="org.eclipse.ptp.rm.lml.ui",
  org.eclipse.ptp.rm.lml.internal.core.model;x-friends:="org.eclipse.ptp.rm.lml.ui,org.eclipse.ptp.rm.lml_jaxb"
 Bundle-Activator: org.eclipse.ptp.rm.lml.core.LMLCorePlugin
 Bundle-ActivationPolicy: lazy

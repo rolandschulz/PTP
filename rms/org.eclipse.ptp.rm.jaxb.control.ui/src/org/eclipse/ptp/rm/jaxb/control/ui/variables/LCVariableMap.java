@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.variables;
 
@@ -24,6 +25,8 @@ import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.ems.core.EnvManagerConfigString;
+import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
@@ -52,6 +55,7 @@ import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
  * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap
  * 
  * @author arossi
+ * @author Jeff Overbey - Environment Manager support
  */
 public class LCVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
@@ -73,6 +77,7 @@ public class LCVariableMap implements IVariableMap {
 		}
 
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DIRECTORY);
+		configuration.removeAttribute(rmPrefix + JAXBControlConstants.PTP_DIRECTORY);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.EXEC_PATH);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.EXEC_DIR);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.PROG_ARGS);
@@ -83,6 +88,11 @@ public class LCVariableMap implements IVariableMap {
 		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.DIRECTORY, attr);
 		}
+		String ptp_dir = JAXBControlConstants.ECLIPSESETTINGS;
+		if (!JAXBControlConstants.ZEROSTR.equals(cdir)) {
+			ptp_dir = new Path(cdir).append(JAXBControlConstants.ECLIPSESETTINGS).toString();
+		}
+		configuration.setAttribute(rmPrefix + JAXBControlConstants.PTP_DIRECTORY, ptp_dir);
 		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR);
 		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.EXEC_PATH, attr);
@@ -104,6 +114,7 @@ public class LCVariableMap implements IVariableMap {
 		}
 	}
 
+	private final IEnvManager envManager;
 	private final Map<String, Object> linkedTo;
 	private final Map<String, Object> excluded;
 	private final Map<String, Object> values;
@@ -114,7 +125,8 @@ public class LCVariableMap implements IVariableMap {
 
 	private String rmPrefix;
 
-	public LCVariableMap() {
+	public LCVariableMap(IEnvManager envManager) {
+		this.envManager = envManager;
 		this.values = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.excluded = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.defaultValues = Collections.synchronizedMap(new TreeMap<String, String>());
@@ -187,10 +199,10 @@ public class LCVariableMap implements IVariableMap {
 		return set;
 	}
 
-	/**
-	 * @param name
-	 *            of widget, bound to a Property or Attribute
-	 * @return value of the Property or Attribute, or <code>null</code> if none
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#get(java.lang.String)
 	 */
 	public Object get(String name) {
 		if (name == null) {
@@ -221,7 +233,7 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/*
-	 * Unsupported (non-Javadoc)
+	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getDiscovered()
 	 */
@@ -243,15 +255,16 @@ public class LCVariableMap implements IVariableMap {
 		return hidden;
 	}
 
-	/**
-	 * The ${rm: prefix points to the RMVariableResolver, ${lc: to the LCVariableResolver, so we substitute the latter and pass off
-	 * the substitution to the resolver for resolution.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param value
-	 *            expression to be resolved
-	 * @return resolved expression
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getString(java.lang.String)
 	 */
 	public String getString(String value) {
+		/*
+		 * The ${ptp_rm: prefix points to the RMVariableResolver, ${ptp_lc: to the LCVariableResolver, so we substitute the latter
+		 * and pass off the substitution to the resolver for resolution.
+		 */
 		try {
 			value = value.replaceAll(JAXBControlUIConstants.VRM, JAXBControlUIConstants.VLC);
 			return dereference(value);
@@ -261,21 +274,17 @@ public class LCVariableMap implements IVariableMap {
 		return value;
 	}
 
-	/**
-	 * Interface method. Not called in this UI class.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param jobId
-	 *            is irrelevant
-	 * @param value
-	 *            expression to be resolved
-	 * @return resolved expression
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getString(java.lang.String, java.lang.String)
 	 */
 	public String getString(String jobId, String value) {
 		return getString(value);
 	}
 
 	/*
-	 * Not supported. (non-Javadoc)
+	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getVariables()
 	 */
@@ -303,11 +312,10 @@ public class LCVariableMap implements IVariableMap {
 		}
 	}
 
-	/**
-	 * @param name
-	 *            of widget, bound to a Property or Attribute
-	 * @param value
-	 *            of Property or Attribute
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#put(java.lang.String, java.lang.Object)
 	 */
 	public void put(String name, Object value) {
 		if (name == null || JAXBUIConstants.ZEROSTR.equals(name)) {
@@ -550,5 +558,13 @@ public class LCVariableMap implements IVariableMap {
 				put(name, o);
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#convertEngMgmtConfigString(java.lang.String)
+	 */
+	public String convertEngMgmtConfigString(String string) {
+		assert EnvManagerConfigString.isEnvMgmtConfigString(string);
+		return envManager.getBashConcatenation("\n", false, new EnvManagerConfigString(string), null); //$NON-NLS-1$
 	}
 }

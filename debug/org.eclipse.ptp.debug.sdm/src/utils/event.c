@@ -611,17 +611,12 @@ dbg_str_to_memoryinfo(char ***args, int *nargs, memoryinfo **info)
 
 /*
  * Convert an array of strings (as a result of deserializing a proxy message)
- * into a debug event. This is used on the client end, so the event will include
- * a bitset.
+ * into a debug event.
  */
 int
 DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 {
 	dbg_event *	e = NULL;
-	bitset *	procs = NULL;
-
-	proxy_get_bitset((unsigned char *)*args++, &procs);
-	nargs--;
 
 	e = NewDbgEvent(id);
 
@@ -743,15 +738,11 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 		goto error_out;
 	}
 
-	e->procs = procs;
 	*ev = e;
 
 	return 0;
 
 error_out:
-
-	if (procs != NULL)
-		bitset_free(procs);
 
 	if (e != NULL)
 		FreeDbgEvent(e);

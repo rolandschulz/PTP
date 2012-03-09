@@ -19,13 +19,13 @@ import org.xml.sax.SAXException;
 public class PapiCSelect {
 	PapiInfoParser pparser;
 	IFileStore toolPath;
-	private static final String papiApp="papi_xml_event_info";
+	private static final String papiApp = "papi_xml_event_info"; //$NON-NLS-1$
 	SAXParser sp;
-	IBuildLaunchUtils blt=null;
+	IBuildLaunchUtils blt = null;
 
-	PapiCSelect(IFileStore tpath,IBuildLaunchUtils blt){
-		this.blt=blt;
-		toolPath=tpath.getChild(papiApp);//+File.separator+papiApp;
+	PapiCSelect(IFileStore tpath, IBuildLaunchUtils blt) {
+		this.blt = blt;
+		toolPath = tpath.getChild(papiApp);// +File.separator+papiApp;
 		try {
 			sp = SAXParserFactory.newInstance().newSAXParser();
 		} catch (ParserConfigurationException e) {
@@ -36,9 +36,7 @@ public class PapiCSelect {
 		pparser = new PapiInfoParser();
 	}
 
-
-
-	private EventTree parseETree(InputStream is){
+	private EventTree parseETree(InputStream is) {
 		sp.reset();
 		try {
 			sp.parse(is, pparser);
@@ -50,202 +48,204 @@ public class PapiCSelect {
 		return pparser.getEventTree();
 	}
 
-	public EventTree getEventTree(){
-		//String papi_avail=location+File.separator+"papi_avail";
-		//String s = null;
-		//InputStream is=null;
-		EventTree et=null;
+	public EventTree getEventTree() {
+		// String papi_avail=location+File.separator+"papi_avail";
+		// String s = null;
+		// InputStream is=null;
+		EventTree et = null;
 		try {
-			//Process p = Runtime.getRuntime().exec(toolPath, null, null);
+			// Process p = Runtime.getRuntime().exec(toolPath, null, null);
 
-			//BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			//is=p.getInputStream();
+			// BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			// is=p.getInputStream();
 			pparser.reset();
 			List<String> command = new ArrayList<String>();
 			command.add(toolPath.toURI().getPath());
-			
-			et=findET(command);//new String[]{toolPath.toURI().getPath()});//parseETree(execItem(new String[]{toolPath}));//p.getInputStream());//  new FileInputStream(new File(toolPath)));//
-			
-			//BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-//			boolean fault=false;
-//			while ((s = stdErr.readLine()) != null) 
-//			{
-//			fault=true;
-//			}
+			et = findET(command);// new String[]{toolPath.toURI().getPath()});//parseETree(execItem(new
+									// String[]{toolPath}));//p.getInputStream());// new FileInputStream(new File(toolPath)));//
 
-			//p.destroy();
+			// BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+			// boolean fault=false;
+			// while ((s = stdErr.readLine()) != null)
+			// {
+			// fault=true;
+			// }
+
+			// p.destroy();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		catch (Exception e) {e.printStackTrace();}
 		return et;
 	}
 
-//	public class OutReader extends Thread{
-//		StringBuffer str;
-//		BufferedReader out;
-//		
-//		OutReader(InputStream is){
-//			str=new StringBuffer();
-//			out=new BufferedReader(new InputStreamReader(is));
-//		}
-//		
-//		public void run(){
-//			String s;
-//			try {
-//				
-//				while ((s = out.readLine()) != null) 
-//				{
-//				//fault=true;
-//				//System.out.println(s);
-//					str.append(s);
-//				}
-//				
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
-	
-//	public class ETReader extends Thread{
-//		EventTree et;
-//		InputStream is;
-//		
-//		ETReader(InputStream is){
-//			//str=new StringBuffer();
-//			//out=new BufferedReader(new InputStreamReader(is));
-//			this.is = is;
-//		}
-//		
-//		public void run(){
-//			et=parseETree(is);
-//		}
-////			String s;
-////			try {
-////				
-////				while ((s = out.readLine()) != null) 
-////				{
-////				//fault=true;
-////				//System.out.println(s);
-////					str.append(s);
-////				}
-////				
-////			} catch (IOException e) {
-////				e.printStackTrace();
-////			}
-////		}
-//	}
-	
-	public EventTree findET(List<String> commands){
-		EventTree et =null;
-//		try {
-//			Process p = Runtime.getRuntime().exec(commands);
-//			
-//			//BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-//			//boolean fault=false;
-//			
-//			OutReader errThd=new OutReader(p.getErrorStream());
-//			OutReader stdThd=new OutReader(p.getInputStream());
-//			stdThd.start();
-//			errThd.start();
-//			
-//			int result=p.waitFor();
-//			
-//			stdThd.join();
-//			errThd.join();
-//			
-//			p.destroy();
-//			
-//			if(result==0){
-				//s=stdThd.str.toString();
-				byte[] xbytes=blt.runToolGetOutput(commands, null, null);//stdThd.str.toString().getBytes();
-				if(xbytes==null)
-					return null;
-				ByteArrayInputStream stringIS = new ByteArrayInputStream(xbytes);
+	// public class OutReader extends Thread{
+	// StringBuffer str;
+	// BufferedReader out;
+	//
+	// OutReader(InputStream is){
+	// str=new StringBuffer();
+	// out=new BufferedReader(new InputStreamReader(is));
+	// }
+	//
+	// public void run(){
+	// String s;
+	// try {
+	//
+	// while ((s = out.readLine()) != null)
+	// {
+	// //fault=true;
+	// //System.out.println(s);
+	// str.append(s);
+	// }
+	//
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// }
 
-				et=parseETree(stringIS);//stdThd.et;
-//			}
-//			while ((s = stdErr.readLine()) != null) 
-//			{
-//			//fault=true;
-//			System.out.println(s);
-//			}
-			
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-		
-		return et;
-	}
-	
-	public Set<Integer>[] getAvailable(int component,Set<String> checked){
-		@SuppressWarnings("unchecked")
-		Set<Integer>[] index=new HashSet[2];
-		pparser.reset();
-		
-		
-		ArrayList<String> cAl = new ArrayList<String>(checked);
-		
-		cAl.add(0,component+"");
-		cAl.add(0,"-c");
-		cAl.add(0, toolPath.toURI().getPath());
-		
-		
-		//String[]a=new String[cAl.size()];
-		//cAl.toArray(a);
-		//printCommand(a);
-		
-		EventTree et=findET(cAl);//parseETree(execItem(a));
-		//String s;
-//		Process p=null;
-//		try {
-//			p = Runtime.getRuntime().exec(a);
-//			
-//			//BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-//			//boolean fault=false;
-//			
-//			OutputReader errThd=new OutputReader(p.getErrorStream());
-//			OutputReader stdThd=new OutputReader(p.getInputStream());
-//			stdThd.start();
-//			errThd.start();
-//			
-//			int result=p.waitFor();
-//			
-//			stdThd.join();
-//			errThd.join();
-//			
-//			et=parseETree(stdThd.str.toString());
-//			p.destroy();
-////			while ((s = stdErr.readLine()) != null) 
-////			{
-////			//fault=true;
-////			System.out.println(s);
-////			}
-//			
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-		
-		
-		if(et==null)
-		{
+	// public class ETReader extends Thread{
+	// EventTree et;
+	// InputStream is;
+	//
+	// ETReader(InputStream is){
+	// //str=new StringBuffer();
+	// //out=new BufferedReader(new InputStreamReader(is));
+	// this.is = is;
+	// }
+	//
+	// public void run(){
+	// et=parseETree(is);
+	// }
+	// // String s;
+	// // try {
+	// //
+	// // while ((s = out.readLine()) != null)
+	// // {
+	// // //fault=true;
+	// // //System.out.println(s);
+	// // str.append(s);
+	// // }
+	// //
+	// // } catch (IOException e) {
+	// // e.printStackTrace();
+	// // }
+	// // }
+	// }
+
+	/**
+	 * @since 4.0
+	 */
+	public EventTree findET(List<String> commands) {
+		EventTree et = null;
+		// try {
+		// Process p = Runtime.getRuntime().exec(commands);
+		//
+		// //BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		// //boolean fault=false;
+		//
+		// OutReader errThd=new OutReader(p.getErrorStream());
+		// OutReader stdThd=new OutReader(p.getInputStream());
+		// stdThd.start();
+		// errThd.start();
+		//
+		// int result=p.waitFor();
+		//
+		// stdThd.join();
+		// errThd.join();
+		//
+		// p.destroy();
+		//
+		// if(result==0){
+		// s=stdThd.str.toString();
+		byte[] xbytes = blt.runToolGetOutput(commands, null, null);// stdThd.str.toString().getBytes();
+		if (xbytes == null) {
 			return null;
 		}
-		index[0]=((EventSet)et.children.get(0).children.get(0)).fullSet;
-		index[1]=((EventSet)et.children.get(0).children.get(1)).fullSet;
-		
+		ByteArrayInputStream stringIS = new ByteArrayInputStream(xbytes);
+
+		et = parseETree(stringIS);// stdThd.et;
+		// }
+		// while ((s = stdErr.readLine()) != null)
+		// {
+		// //fault=true;
+		// System.out.println(s);
+		// }
+
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+
+		return et;
+	}
+
+	public Set<Integer>[] getAvailable(int component, Set<String> checked) {
+		@SuppressWarnings("unchecked")
+		Set<Integer>[] index = new HashSet[2];
+		pparser.reset();
+
+		ArrayList<String> cAl = new ArrayList<String>(checked);
+
+		cAl.add(0, component + "");
+		cAl.add(0, "-c");
+		cAl.add(0, toolPath.toURI().getPath());
+
+		// String[]a=new String[cAl.size()];
+		// cAl.toArray(a);
+		// printCommand(a);
+
+		EventTree et = findET(cAl);// parseETree(execItem(a));
+		// String s;
+		// Process p=null;
+		// try {
+		// p = Runtime.getRuntime().exec(a);
+		//
+		// //BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		// //boolean fault=false;
+		//
+		// OutputReader errThd=new OutputReader(p.getErrorStream());
+		// OutputReader stdThd=new OutputReader(p.getInputStream());
+		// stdThd.start();
+		// errThd.start();
+		//
+		// int result=p.waitFor();
+		//
+		// stdThd.join();
+		// errThd.join();
+		//
+		// et=parseETree(stdThd.str.toString());
+		// p.destroy();
+		// // while ((s = stdErr.readLine()) != null)
+		// // {
+		// // //fault=true;
+		// // System.out.println(s);
+		// // }
+		//
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+
+		if (et == null) {
+			return null;
+		}
+		index[0] = ((EventSet) et.children.get(0).children.get(0)).fullSet;
+		index[1] = ((EventSet) et.children.get(0).children.get(1)).fullSet;
+
 		return index;
 	}
-//	private static void printCommand(String[] com){
-//		String s = "";
-//		
-//		for(int i=0;i<com.length;i++){
-//			s+=com[i]+" ";
-//		}
-//		
-//		System.out.println(s);
-//	}
+	// private static void printCommand(String[] com){
+	// String s = "";
+	//
+	// for(int i=0;i<com.length;i++){
+	// s+=com[i]+" ";
+	// }
+	//
+	// System.out.println(s);
+	// }
 }

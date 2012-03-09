@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006,2012 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 /**
  * @author pazel
  */
+@SuppressWarnings("restriction")
 public class PASTElif extends PASTNode implements IASTPreprocessorElifStatement {
 	protected IASTPreprocessorElifStatement elif_ = null;
 
@@ -26,6 +27,7 @@ public class PASTElif extends PASTNode implements IASTPreprocessorElifStatement 
 	 * @param elif
 	 *            : ASTElif
 	 */
+
 	public PASTElif(IASTPreprocessorElifStatement elif) {
 		super((ASTNode) elif);
 		elif_ = elif;
@@ -56,6 +58,11 @@ public class PASTElif extends PASTNode implements IASTPreprocessorElifStatement 
 	 */
 	public boolean taken() {
 		return elif_.taken();
+	}
+
+	@Override
+	public IASTNode getOriginalNode() {
+		return elif_.getOriginalNode();
 	}
 
 }

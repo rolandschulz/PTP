@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.variables;
 
@@ -20,6 +21,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.ems.core.EnvManagerConfigString;
+import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
@@ -37,10 +40,27 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
  * all the Properties and Attributes which are "discovered" at runtime (through tokenization of command output).
  * 
  * @author arossi
- * 
+ * @author Jeff Overbey - Environment Manager support
  */
 public class RMVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
+
+	/**
+	 * Gets the new value of any attributes that may have changed as a result of the launch.
+	 * 
+	 * @param name
+	 *            name of the attribute
+	 * @param config
+	 *            launch configuration
+	 * @return new attribute value, or null if the attribute is not dynamic
+	 * @throws CoreException
+	 */
+	public static Object getDynamicAttribute(String name, ILaunchConfiguration config) throws CoreException {
+		if (name.equals(JAXBControlConstants.DEBUGGER_ARGS)) {
+			return config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, JAXBControlConstants.ZEROSTR);
+		}
+		return null;
+	}
 
 	/**
 	 * Checks for current valid attributes by examining the valid list for the current controller, excluding <code>null</code> or
@@ -68,7 +88,9 @@ public class RMVariableMap implements IVariableMap {
 			}
 			if (name.startsWith(rmId)) {
 				name = name.substring(len);
-				if (isFixedValid(name)) {
+				if (isDynamicValid(name)) {
+					current.put(name, getDynamicAttribute(name, config));
+				} else if (isFixedValid(name)) {
 					current.put(name, value);
 				} else {
 					rmAttr.put(name, value);
@@ -117,22 +139,30 @@ public class RMVariableMap implements IVariableMap {
 				|| name.equals(JAXBControlConstants.EXEC_PATH) || name.equals(JAXBControlConstants.EXEC_DIR)
 				|| name.equals(JAXBControlConstants.PROG_ARGS) || name.equals(JAXBControlConstants.DEBUGGER_EXEC_PATH)
 				|| name.equals(JAXBControlConstants.DEBUGGER_ARGS) || name.equals(JAXBControlConstants.STDOUT_REMOTE_FILE)
-				|| name.equals(JAXBControlConstants.STDERR_REMOTE_FILE);
+				|| name.equals(JAXBControlConstants.STDERR_REMOTE_FILE) || name.equals(JAXBControlConstants.PTP_DIRECTORY);
 	}
 
+	public static boolean isDynamicValid(String name) {
+		return name.equals(JAXBControlConstants.DEBUGGER_ARGS);
+	}
+
+	private IEnvManager envManager;
 	private final Map<String, Object> variables;
 	private final Map<String, Object> discovered;
 
 	private boolean initialized;
 
 	public RMVariableMap() {
-		variables = Collections.synchronizedMap(new TreeMap<String, Object>());
-		discovered = Collections.synchronizedMap(new TreeMap<String, Object>());
-		initialized = false;
+		this.envManager = null;
+		this.variables = Collections.synchronizedMap(new TreeMap<String, Object>());
+		this.discovered = Collections.synchronizedMap(new TreeMap<String, Object>());
+		this.initialized = false;
 	}
 
-	/**
-	 * Reset the internal maps.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#clear()
 	 */
 	public void clear() {
 		variables.clear();
@@ -140,12 +170,10 @@ public class RMVariableMap implements IVariableMap {
 		initialized = false;
 	}
 
-	/**
-	 * Search the two maps for this reference. The predefined variables are searched first.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param name
-	 *            of Property or Attribute to find.
-	 * @return the found Property or Attribute
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#get(java.lang.String)
 	 */
 	public Object get(String name) {
 		if (name == null) {
@@ -158,30 +186,28 @@ public class RMVariableMap implements IVariableMap {
 		return o;
 	}
 
-	/**
-	 * @return map of Properties and Attributes discovered at runtime.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getDiscovered()
 	 */
 	public Map<String, Object> getDiscovered() {
 		return discovered;
 	}
 
-	/**
-	 * Delegates to {@link #getString(String)}.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param value
-	 *            expression to resolve
-	 * @return resolved expression
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getString(java.lang.String)
 	 */
 	public String getString(String value) {
 		return getString(null, value);
 	}
 
-	/**
-	 * Performs the substitution on the string.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param value
-	 *            expression to resolve
-	 * @return resolved expression
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getString(java.lang.String, java.lang.String)
 	 */
 	public String getString(String jobId, String value) {
 		try {
@@ -195,8 +221,10 @@ public class RMVariableMap implements IVariableMap {
 		return value;
 	}
 
-	/**
-	 * @return map of Properties and Attributes defined in the XML configuration.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getVariables()
 	 */
 	public Map<String, Object> getVariables() {
 		return variables;
@@ -274,13 +302,10 @@ public class RMVariableMap implements IVariableMap {
 		maybeAddProperty(key1, map.get(key2), false);
 	}
 
-	/**
-	 * Places a Property or Attribute directly in the environment.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param name
-	 *            of Property or Attribute
-	 * @param value
-	 *            of Property or Attribute
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#put(java.lang.String, java.lang.Object)
 	 */
 	public void put(String name, Object value) {
 		if (name == null) {
@@ -289,13 +314,10 @@ public class RMVariableMap implements IVariableMap {
 		variables.put(name, value);
 	}
 
-	/**
-	 * Removes a Property or Attribute. Checks first in the predefined values map, and if it does not exist there, removes from the
-	 * runtime values map.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param name
-	 *            of Property or Attribute to remove
-	 * @return value of Property or Attribute
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#remove(java.lang.String)
 	 */
 	public Object remove(String name) {
 		if (name == null) {
@@ -308,9 +330,10 @@ public class RMVariableMap implements IVariableMap {
 		return o;
 	}
 
-	/**
-	 * @param initialized
-	 *            whether the map has been initialized from an XML resource manager configuration.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#setInitialized(boolean)
 	 */
 	public void setInitialized(boolean initialized) {
 		this.initialized = initialized;
@@ -332,6 +355,26 @@ public class RMVariableMap implements IVariableMap {
 		synchronized (monitor) {
 			RMVariableResolver.setActive(this);
 			return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
+		}
+	}
+
+	/**
+	 * Sets the {@link IEnvManager} which will be used to generate Bash commands from environment manager configuration strings.
+	 * @param envManager
+	 */
+	public void setEnvManager(IEnvManager envManager) {
+		this.envManager = envManager;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#convertEngMgmtConfigString(java.lang.String)
+	 */
+	public String convertEngMgmtConfigString(String string) {
+		assert EnvManagerConfigString.isEnvMgmtConfigString(string);
+		if (envManager == null) {
+			return ""; //$NON-NLS-1$
+		} else {
+			return envManager.getBashConcatenation("\n", false, new EnvManagerConfigString(string), null); //$NON-NLS-1$
 		}
 	}
 }

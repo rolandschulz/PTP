@@ -5,8 +5,7 @@
       version="6.0.0.qualifier"
       plugin="org.eclipse.ptp.rm.ibm.pe.core"
       provider-name="%providerName"
-      license-feature="org.eclipse.ptp.license"
-      license-feature-version="1.0.0.qualifier">
+      >
 
    <description url="http://eclipse.org/ptp">
       %description
@@ -64,5 +63,11 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.rm.ibm.pe"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>

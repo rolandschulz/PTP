@@ -17,6 +17,7 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.sync.ui.messages.messages"; //$NON-NLS-1$
 	public static String NewRemoteSyncProjectWizard_description;
 	public static String NewRemoteSyncProjectWizard_title;
+	public static String NewRemoteSyncProjectWizardPage_0;
 	public static String NewRemoteSyncProjectWizardPage_syncProvider;
 	public static String WizardProjectConversion_windowLabel;
 	public static String ConvertFromCToSyncProjectWizardPage_0;
@@ -32,6 +33,28 @@ public class Messages extends NLS {
 	public static String RemoteSyncWizardPage_0;
 	public static String RemoteSyncWizardPage_description;
 	public static String ResourceChangeListener_0;
+	public static String SyncFileFilterPage_0;
+	public static String SyncFileFilterPage_1;
+	public static String SyncFileFilterPage_10;
+	public static String SyncFileFilterPage_11;
+	public static String SyncFileFilterPage_12;
+	public static String SyncFileFilterPage_13;
+	public static String SyncFileFilterPage_14;
+	public static String SyncFileFilterPage_15;
+	public static String SyncFileFilterPage_16;
+	public static String SyncFileFilterPage_17;
+	public static String SyncFileFilterPage_19;
+	public static String SyncFileFilterPage_2;
+	public static String SyncFileFilterPage_20;
+	public static String SyncFileFilterPage_21;
+	public static String SyncFileFilterPage_22;
+	public static String SyncFileFilterPage_3;
+	public static String SyncFileFilterPage_4;
+	public static String SyncFileFilterPage_5;
+	public static String SyncFileFilterPage_6;
+	public static String SyncFileFilterPage_7;
+	public static String SyncFileFilterPage_8;
+	public static String SyncFileFilterPage_9;
 	public static String SynchronizeParticipantDescriptor_invalidClass;
 	public static String SyncMainWizardPage_0;
 	public static String SyncMainWizardPage_1;
@@ -58,6 +81,7 @@ public class Messages extends NLS {
 	public static String SyncMenuOperation_3;
 	public static String SyncMenuOperation_4;
 	public static String SyncMenuOperation_5;
+	public static String SyncMenuOperation_6;
 	public static String BRPPage_RemoteProviderLabel;
 	public static String BRPPage_ConnectionLabel;
 	public static String BRPPage_RootLocation;

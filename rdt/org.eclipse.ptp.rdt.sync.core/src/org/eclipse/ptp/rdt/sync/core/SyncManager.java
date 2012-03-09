@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
-import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -46,16 +45,22 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 
 public class SyncManager  {
+	// Static class - do not allow creating of instances
+	private SyncManager() {
+	}
+
 	public static enum SYNC_MODE {
 		ACTIVE, ALL, NONE
 	};
 
 	private static final IServiceModelManager serviceModel = ServiceModelManager.getInstance();
-	private static final IService syncService = serviceModel.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
 	private static final String DEFAULT_SAVE_FILE_NAME = "SyncManagerData.xml"; //$NON-NLS-1$
 	private static final String SYNC_MANAGER_ELEMENT_NAME = "sync-manager-data"; //$NON-NLS-1$
 	private static final String SYNC_MODE_ELEMENT_NAME = "project-to-sync-mode"; //$NON-NLS-1$
 	private static final String SHOW_ERROR_ELEMENT_NAME = "project-to-show-error"; //$NON-NLS-1$
+	private static final String DEFAULT_FILE_FILTER_ELEMENT_NAME = "default-file-filter"; //$NON-NLS-1$
+	private static final String FILE_FILTER_ELEMENT_NAME = "project-to-file-filter"; //$NON-NLS-1$
+	private static final String FILE_FILTER_INTERNAL_ELEMENT_NAME = "project-to-file-filter-internal"; //$NON-NLS-1$
 	private static final String ATTR_PROJECT_NAME = "project"; //$NON-NLS-1$
 	private static final String ATTR_SYNC_MODE = "sync-mode"; //$NON-NLS-1$
 	private static final String ATTR_SHOW_ERROR = "show-error"; //$NON-NLS-1$
@@ -66,6 +71,9 @@ public class SyncManager  {
 			.synchronizedMap(new HashMap<IProject, SYNC_MODE>());
 	private static final Map<IProject, Boolean> fProjectToShowErrorMap = Collections
 			.synchronizedMap(new HashMap<IProject, Boolean>());
+	private static final Map<IProject, SyncFileFilter> fProjectToFileFilterMap = Collections
+			.synchronizedMap(new HashMap<IProject, SyncFileFilter>());
+	private static SyncFileFilter defaultFilter = SyncFileFilter.createBuiltInDefaultFilter();
 
 	static {
 		try {
@@ -82,15 +90,17 @@ public class SyncManager  {
 	}
 
 	private static class SynchronizeJob extends Job {
-		private final ISyncServiceProvider fSyncProvider;
 		private final IResourceDelta fDelta;
+		private final IProject fProject;
+		private final ISyncServiceProvider fSyncProvider;
 		private final EnumSet<SyncFlag> fSyncFlags;
 		private final SyncExceptionHandler fSyncExceptionHandler;
 
-		public SynchronizeJob(IResourceDelta delta, ISyncServiceProvider provider, EnumSet<SyncFlag> syncFlags,
+		public SynchronizeJob(IResourceDelta delta, IProject project, ISyncServiceProvider provider, EnumSet<SyncFlag> syncFlags,
 				SyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
 			fDelta = delta;
+			fProject = project;
 			fSyncProvider = provider;
 			fSyncFlags = syncFlags;
 			fSyncExceptionHandler = seHandler;
@@ -105,7 +115,7 @@ public class SyncManager  {
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor progress = SubMonitor.convert(monitor, 100);
 			try {
-				fSyncProvider.synchronize(fDelta, progress.newChild(100), fSyncFlags);
+				fSyncProvider.synchronize(fDelta, getFileFilter(fProject), progress.newChild(100), fSyncFlags);
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
 					System.out.println(Messages.SyncManager_8 + e.getLocalizedMessage());
@@ -118,12 +128,44 @@ public class SyncManager  {
 			return Status.OK_STATUS;
 		}
 	};
+	
+	/**
+	 * Return a copy of the project's file filter.
+	 * Since only a copy is returned, users must execute "saveFileFilter(IProject, SyncFileFilter)" after making changes to have
+	 * those changes actually applied.
+	 *
+	 * @param project cannot be null
+	 * @return the file filter. This is never null.
+	 */
+	public static SyncFileFilter getFileFilter(IProject project) {
+		if (project == null) {
+			throw new NullPointerException();
+		}
+		
+		if (!(fProjectToFileFilterMap.containsKey(project))) {
+			fProjectToFileFilterMap.put(project, new SyncFileFilter(defaultFilter));
+			try {
+				saveConfigurationData();
+			} catch (IOException e) {
+				RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+			}
+		}
+		return new SyncFileFilter(fProjectToFileFilterMap.get(project));
+	}
+	
+	/**
+	 * Return the default file filter
+	 * @return filter
+	 */
+	public static SyncFileFilter getDefaultFileFilter() {
+		return new SyncFileFilter(defaultFilter);
+	}
 
 	/**
 	 * Return project's current sync mode
 	 * On first access, set sync mode to ACTIVE.
 	 * 
-	 * @param project
+	 * @param project cannot be null
 	 * @return sync mode. This is never null.
 	 */
 	public static SYNC_MODE getSyncMode(IProject project) {
@@ -215,24 +257,35 @@ public class SyncManager  {
 		}
 	}
 
-	public void addHandlerListener(IHandlerListener handlerListener) {
-		// Listeners not yet supported
+	/**
+	 * Save a new file filter for a project.
+	 * Use this in conjunction with "getFileFilter(IProject)" to modify the current file filtering for a project.
+	 *
+	 * @param project cannot be null
+	 * @param filter cannot be null
+	 */
+	public static void saveFileFilter(IProject project, SyncFileFilter filter) {
+		if (project == null || filter == null) {
+			throw new NullPointerException();
+		}
+		fProjectToFileFilterMap.put(project, filter);
+		try {
+			saveConfigurationData();
+		} catch (IOException e) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+		}
 	}
-
-	public void dispose() {
-		// Nothing to do
-	}
-
-	public boolean isEnabled() {
-		return true;
-	}
-
-	public boolean isHandled() {
-		return true;
-	}
-
-	public void removeHandlerListener(IHandlerListener handlerListener) {
-		// Listeners not yet supported
+	
+	/**
+	 * Save a new default file filter.
+	 * Use this in conjunction with "getDefaultFileFilter()" to modify the default filter.
+	 * @param filter cannot be null
+	 */
+	public static void saveDefaultFileFilter(SyncFileFilter filter) {
+		if (filter == null) {
+			throw new NullPointerException();
+		}
+		defaultFilter = filter;
 	}
 
 	/**
@@ -318,22 +371,16 @@ public class SyncManager  {
 			throws CoreException {
 		int jobNum = 0;
 		Job[] syncJobs = new Job[buildConfigurations.length];
-		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		for (IConfiguration buildConfig : buildConfigurations) {
 			SynchronizeJob job = null;
-			IServiceConfiguration serviceConfig = bcm.getConfigurationForBuildConfiguration(buildConfig);
-			if (serviceConfig != null) {
-				ISyncServiceProvider provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
-				if (provider != null) {
-					if (isBlocking) {
-						provider.synchronize(delta, monitor, syncFlags);
-					} else {
-						job = new SynchronizeJob(delta, provider, syncFlags, seHandler);
-						job.schedule();
-					}
+			ISyncServiceProvider provider = (ISyncServiceProvider) SyncManager.getSyncProvider(buildConfig);
+			if (provider != null) {
+				if (isBlocking) {
+						provider.synchronize(delta, getFileFilter(project), monitor, syncFlags);
+				} else {
+						job = new SynchronizeJob(delta, project, provider, syncFlags, seHandler);
+					job.schedule();
 				}
-			} else {
-				RDTSyncCorePlugin.log(Messages.SyncManager_7 + buildConfig.getName());
 			}
 
 			// Each build configuration is matched with a job, which may be null if a job could not be created.
@@ -368,6 +415,21 @@ public class SyncManager  {
 				IMemento showErrorMemento = rootMemento.createChild(SHOW_ERROR_ELEMENT_NAME);
 				showErrorMemento.putString(ATTR_PROJECT_NAME, project.getName());
 				showErrorMemento.putBoolean(ATTR_SHOW_ERROR, fProjectToShowErrorMap.get(project));
+			}
+		}
+		
+		// Save default filter
+		IMemento defaultFileFilterMemento = rootMemento.createChild(DEFAULT_FILE_FILTER_ELEMENT_NAME);
+		defaultFilter.saveFilter(defaultFileFilterMemento);
+		
+		// Save project to "file filter" map
+		synchronized (fProjectToFileFilterMap) {
+			for (IProject project : fProjectToFileFilterMap.keySet()) {
+				SyncFileFilter filter = fProjectToFileFilterMap.get(project);
+				IMemento fileFilterMemento = rootMemento.createChild(FILE_FILTER_ELEMENT_NAME);
+				IMemento fileFilterInternalMemento = fileFilterMemento.createChild(FILE_FILTER_INTERNAL_ELEMENT_NAME);
+				filter.saveFilter(fileFilterInternalMemento);
+				fileFilterMemento.putString(ATTR_PROJECT_NAME, project.getName());
 			}
 		}
 		
@@ -424,7 +486,59 @@ public class SyncManager  {
 			fProjectToShowErrorMap.put(project, showErrorMemento.getBoolean(ATTR_SHOW_ERROR));
 		}
 		
+		// Load default file filter
+		IMemento defaultFileFilterMemento = rootMemento.getChild(DEFAULT_FILE_FILTER_ELEMENT_NAME);
+		if (defaultFileFilterMemento != null) {
+			defaultFilter = SyncFileFilter.loadFilter(defaultFileFilterMemento);
+		}
+		
+		// Load project "file filter" settings
+		fProjectToFileFilterMap.clear();
+		for (IMemento fileFilterMemento : rootMemento.getChildren(FILE_FILTER_ELEMENT_NAME)) {
+			String projectName = fileFilterMemento.getString(ATTR_PROJECT_NAME);
+			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			if (project == null) {
+				throw new RuntimeException(Messages.SyncManager_0 + project);
+			}
+			IMemento fileFilterInternalMemento = fileFilterMemento.getChild(FILE_FILTER_INTERNAL_ELEMENT_NAME);
+			SyncFileFilter filter = SyncFileFilter.loadFilter(fileFilterInternalMemento);
+			fProjectToFileFilterMap.put(project, filter);
+		}
+		
 		// Load auto-sync setting
 		fSyncAuto = rootMemento.getBoolean(ATTR_AUTO_SYNC);
+	}
+	
+	/**
+	 * Get the sync service provider for the given project's current active configuration. 
+	 *
+	 * @param project
+	 * @return sync service provider or null if provider cannot be found. (Logs error message in that case.)
+	 */
+	public static ISyncServiceProvider getSyncProvider(IProject project) {
+		IConfiguration config = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
+		return SyncManager.getSyncProvider(config);
+	}
+	
+	/**
+	 * Get the sync service provider for the given build configuration.
+	 *
+	 * @param config
+	 * @return sync service provider or null if provider cannot be found. (Logs error message in that case.)
+	 */
+	public static ISyncServiceProvider getSyncProvider(IConfiguration config) {
+		ISyncServiceProvider provider = null;
+		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+		IServiceConfiguration serviceConfig = bcm.getConfigurationForBuildConfiguration(config);
+		if (serviceConfig != null) {
+			IServiceModelManager serviceModel = ServiceModelManager.getInstance();
+			IService syncService = serviceModel.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
+			provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
+		}
+		
+		if (provider == null) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_7 + config.getName());
+		}
+		return provider;
 	}
 }

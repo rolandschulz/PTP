@@ -14,15 +14,20 @@
 	<name>PTP Parent</name>
 
 	<properties>
-		<tycho-version>0.13.0-SNAPSHOT</tycho-version>
-		<platform-version>3.7</platform-version>
-		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
+		<tycho-version>0.13.0</tycho-version>
+		<platform-version>S-4.2M4-201112092100</platform-version>
+		<platform-site>http://download.eclipse.org/eclipse/updates/4.2milestones/${platform-version}</platform-site>
 		<orbit-version>R20110523182458</orbit-version>
 		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</orbit-site>
 		<tm-version>3.3</tm-version>
 		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
+		<cdt-version>juno</cdt-version>
+		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/nightly</cdt-site>	
+		<egit-version>1.1</egit-version>
+		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
+		<photran-site>file://home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-photran-nightly</photran-site>
 	</properties>
-
+	
 	<licenses>
 		<license>
 			<name>Eclipse Public License v1.0</name>
@@ -39,6 +44,8 @@
 
 	<modules>
 		<module>core/org.eclipse.ptp.core</module>
+		<module>core/org.eclipse.ptp.ems.core</module>
+		<module>core/org.eclipse.ptp.ems.ui</module>
 		<module>core/org.eclipse.ptp.launch</module>
 		<module>core/org.eclipse.ptp.proxy</module>
 		<module>core/org.eclipse.ptp.proxy.protocol</module>
@@ -56,41 +63,19 @@
 		<module>core/org.eclipse.ptp.utils.extensionpoints.core</module>
 		<module>core/org.eclipse.ptp.utils.file.core</module>
 		<module>core/org.eclipse.ptp.utils.ui</module>
+		<module>core/org.eclipse.ptp.doc.user</module>
+		<module>core/org.eclipse.ptp.doc.isv</module>
 		<module>debug/org.eclipse.ptp.debug.core</module>
 		<module>debug/org.eclipse.ptp.debug.sdm</module>
 		<module>debug/org.eclipse.ptp.debug.sdm.core</module>
 		<module>debug/org.eclipse.ptp.debug.sdm.ui</module>
+		<module>debug/org.eclipse.ptp.debug.sdm.x10</module>
 		<module>debug/org.eclipse.ptp.debug.ui</module>
-		<module>doc/org.eclipse.ptp.doc.user</module>
-		<module>doc/org.eclipse.ptp.doc.isv</module>
-		<module>photran/org.eclipse.photran.cdtinterface</module>
-		<module>photran/org.eclipse.photran.cdtinterface.vpg</module>
-		<module>photran/org.eclipse.photran.core</module>
-		<module>photran/org.eclipse.photran.core.intel</module>
-		<module>photran/org.eclipse.photran.core.vpg</module>
-		<module>photran/org.eclipse.photran.doc.user</module>
-		<module>photran/org.eclipse.photran.errorparsers.xlf</module>
-		<module>photran/org.eclipse.photran-feature</module>
-		<module>photran/org.eclipse.photran.intel-feature</module>
-		<module>photran/org.eclipse.photran.managedbuilder.core</module>
-		<module>photran/org.eclipse.photran.managedbuilder.gnu.ui</module>
-		<module>photran/org.eclipse.photran.managedbuilder.intel.ui</module>
-		<module>photran/org.eclipse.photran.managedbuilder.ui</module>
-		<module>photran/org.eclipse.photran.managedbuilder.xlf.ui</module>
-		<module>photran/org.eclipse.photran.ui</module>
-		<module>photran/org.eclipse.photran.ui.vpg</module>
-		<module>photran/org.eclipse.photran.xlf-feature</module>
-		<module>photran/org.eclipse.rephraserengine.core</module>
-		<module>photran/org.eclipse.rephraserengine.core.refactoring</module>
-		<module>photran/org.eclipse.rephraserengine.core.vpg</module>
-		<module>photran/org.eclipse.rephraserengine-feature</module>
-		<module>photran/org.eclipse.rephraserengine.ui</module>
-		<module>photran/org.eclipse.rephraserengine.ui.refactoring</module>
-		<module>photran/org.eclipse.rephraserengine.ui.vpg</module>
 		<module>rdt/org.eclipse.ptp.rdt.core</module>
 		<module>rdt/org.eclipse.ptp.rdt.core.remotejars</module>
 		<module>rdt/org.eclipse.ptp.rdt.core.stubs</module>
 		<module>rdt/org.eclipse.ptp.rdt.doc.user</module>
+		<module>rdt/org.eclipse.ptp.rdt.editor</module>
 		<module>rdt/org.eclipse.ptp.rdt.make.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.managedbuilder.gnu.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui</module>
@@ -105,6 +90,7 @@
 		<module>rdt/org.eclipse.ptp.rdt.xlc</module>
 		<module>releng/org.eclipse.ptp</module>
 		<module>releng/org.eclipse.ptp.aix.ppc</module>
+		<module>releng/org.eclipse.ptp.cdt.compilers-feature</module>
 		<module>releng/org.eclipse.ptp.core-feature</module>
 		<module>releng/org.eclipse.ptp.etfw-feature</module>
 		<module>releng/org.eclipse.ptp.etfw.ppw-feature</module>
@@ -121,8 +107,10 @@
 		<module>releng/org.eclipse.ptp.pldt-feature</module>
 		<module>releng/org.eclipse.ptp.pldt.fortran-feature</module>
 		<module>releng/org.eclipse.ptp.pldt.lapi-feature</module>
+		<module>releng/org.eclipse.ptp.pldt.openacc-feature</module>
 		<module>releng/org.eclipse.ptp.pldt.upc-feature</module>
 		<module>releng/org.eclipse.ptp.rdt-feature</module>
+		<module>releng/org.eclipse.ptp.rdt.editor-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.remotejars-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.remotetools-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.sync-feature</module>
@@ -155,6 +143,7 @@
 		<module>rms/org.eclipse.ptp.rm.ibm.ll.help</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.ll.proxy</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.ll.ui</module>
+		<module>rms/org.eclipse.ptp.rm.ibm.pe</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.core</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.help</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.proxy</module>
@@ -185,6 +174,7 @@
 		<module>rms/org.eclipse.ptp.rm.slurm.proxy</module>
 		<module>rms/org.eclipse.ptp.rm.slurm.ui</module>
 		<module>rms/org.eclipse.ptp.rm.ui</module>
+		<module>tools/cdt/org.eclipse.ptp.cdt.compilers.core</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.doc.user</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.feedback</module>
@@ -204,6 +194,7 @@
 		<module>tools/pldt/org.eclipse.ptp.pldt.mpi.analysis.cdt</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.mpi.core</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.mpi.fortran</module>
+		<module>tools/pldt/org.eclipse.ptp.pldt.openacc</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.openmp.analysis</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.openmp.core</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.openmp.fortran</module>
@@ -239,8 +230,18 @@
 			<layout>p2</layout>
 		</repository>
 		<repository>
-			<id>indigo</id>
-			<url>http://download.eclipse.org/releases/indigo</url>
+			<id>cdt-${cdt-version}</id>
+			<url>${cdt-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>egit-${egit-version}</id>
+			<url>${egit-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>photran</id>
+			<url>${photran-site}</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>
@@ -258,7 +259,7 @@
 		</pluginRepository>
 		<pluginRepository>
 			<id>maven.eclipse.org</id>
-			<url>http://maven.eclipse.org/nexus/content/repositories/nightly-indigo</url>
+			<url>http://maven.eclipse.org/nexus/content/repositories/milestone-indigo</url>
 		</pluginRepository>
 	</pluginRepositories>
 

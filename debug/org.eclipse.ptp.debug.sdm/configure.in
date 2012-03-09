@@ -16,21 +16,19 @@ dnl Eclipse adds version number to end of package when deploying via update site
 dnl
 
 VERSION="_$PACKAGE_VERSION"
-if test `expr "$VERSION" : "_@[^@]*@"` -gt 0 ; then
+if test `expr "$VERSION" : "_@@<:@^@@:>@*@"` -gt 0 ; then
 	VERSION=
 fi
-
-UTILS="`pwd`/../org.eclipse.ptp.utils"
+UTILS="`echo ../org.eclipse.ptp.utils${VERSION}`"
 if test ! -d $UTILS; then
-	UTILS="`echo ${UTILS}${VERSION}`"
+	UTILS="`echo ../../core/org.eclipse.ptp.utils${VERSION}`"
 	if test ! -d $UTILS; then
 		AC_MSG_ERROR([utils directory not found])
 	fi
 fi
-
-PROXY="`pwd`/../org.eclipse.ptp.proxy"
+PROXY="`echo ../org.eclipse.ptp.proxy${VERSION}`"
 if test ! -d $PROXY; then
-	PROXY="`echo ${PROXY}${VERSION}`"
+	PROXY="`echo ../../core/org.eclipse.ptp.proxy${VERSION}`"
 	if test ! -d $PROXY; then
 		AC_MSG_ERROR([proxy directory not found])
 	fi

@@ -14,8 +14,6 @@ package org.eclipse.ptp.rm.lml.internal.core.model;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-
 import org.eclipse.ptp.rm.lml.core.events.ILguiUpdatedEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
@@ -63,9 +61,9 @@ public class OverviewAccess extends LguiHandler {
 	 */
 	public List<GobjectType> getGraphicalObjects() {
 		final List<GobjectType> objects = new LinkedList<GobjectType>();
-		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
-			if (tag.getValue() instanceof GobjectType) {
-				objects.add((GobjectType) tag.getValue());
+		for (final Object object : jaxbUtil.getObjects(lgui)) {
+			if (object instanceof GobjectType) {
+				objects.add((GobjectType) object);
 			}
 		}
 		return objects;
@@ -80,6 +78,17 @@ public class OverviewAccess extends LguiHandler {
 		return null;
 	}
 
+	public InfoType getInformation(String oid) {
+		for (final InformationType information : getInformations()) {
+			for (final InfoType info : information.getInfo()) {
+				if (info.getOid().equals(oid)) {
+					return info;
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Getting a list of all elements of type InformationsType from LguiType.
 	 * 
@@ -87,9 +96,9 @@ public class OverviewAccess extends LguiHandler {
 	 */
 	public List<InformationType> getInformations() {
 		final List<InformationType> informations = new LinkedList<InformationType>();
-		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
-			if (tag.getValue() instanceof InformationType) {
-				informations.add((InformationType) tag.getValue());
+		for (final Object object : jaxbUtil.getObjects(lgui)) {
+			if (object instanceof InformationType) {
+				informations.add((InformationType) object);
 			}
 		}
 		return informations;
@@ -102,9 +111,9 @@ public class OverviewAccess extends LguiHandler {
 	 */
 	public List<LayoutType> getLayouts() {
 		final List<LayoutType> layouts = new LinkedList<LayoutType>();
-		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
-			if (tag.getValue() instanceof LayoutType) {
-				layouts.add((LayoutType) tag.getValue());
+		for (final Object object : jaxbUtil.getObjects(lgui)) {
+			if (object instanceof LayoutType) {
+				layouts.add((LayoutType) object);
 			}
 		}
 		return layouts;
@@ -117,9 +126,9 @@ public class OverviewAccess extends LguiHandler {
 	 */
 	public List<ObjectsType> getObjects() {
 		final List<ObjectsType> objects = new LinkedList<ObjectsType>();
-		for (final JAXBElement<?> tag : lgui.getObjectsAndRelationsAndInformation()) {
-			if (tag.getValue() instanceof ObjectsType) {
-				objects.add((ObjectsType) tag.getValue());
+		for (final Object object : jaxbUtil.getObjects(lgui)) {
+			if (object instanceof ObjectsType) {
+				objects.add((ObjectsType) object);
 			}
 		}
 		return objects;

@@ -17,7 +17,7 @@
 		<property name="local_prefix" visible="false" type="string">
 			<default>/usr/local/mpi/bin/</default>
 		</property>
-		<attribute name="numProcs" min="1" type="integer"/>
+		<attribute name="mpiCores" min="1" type="integer"/>
 		<attribute name="byNodeOption" type="boolean"/>
 		<attribute name="bySlotOption" type="boolean"/>
 		<attribute name="noOversubscribeOption" type="boolean"/>
@@ -95,8 +95,8 @@
 					</match>
 					<test op="LT">
 						<value>#value</value>
-						<value>7</value>
-						<throw message="Only supports Open MPI 1.7 and later"/>
+						<value>4</value>
+						<throw message="Only supports Open MPI 1.4 and later"/>
 					</test>
 				</target>
 			</stdout-parser>
@@ -105,7 +105,7 @@
 			<arg>${ptp_rm:local_prefix#value}mpirun</arg>
 			<arg>--report-pid</arg>
 			<arg>-np</arg>
-			<arg>${ptp_rm:numProcs#value}</arg>
+			<arg>${ptp_rm:mpiCores#value}</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
 			<arg>${ptp_rm:progArgs#value}</arg>
 			<stdout-parser delim="\n">
@@ -140,7 +140,7 @@
 			<arg>${ptp_rm:local_prefix#value}mpirun</arg>
 			<arg>--report-pid</arg>
 			<arg>-np</arg>
-			<arg>${ptp_rm:numProcs#value}</arg>
+			<arg>${ptp_rm:mpiCores#value}</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
 			<arg>${ptp_rm:debuggerArgs#value}</arg>
 			<stdout-parser delim="\n">
@@ -186,7 +186,7 @@
 					<widget type="label" style="SWT.LEFT">
 						<fixed-text>Number of processes:</fixed-text>
 					</widget>
-					<widget type="spinner" style="SWT.BORDER" readOnly="false" saveValueTo="numProcs">
+					<widget type="spinner" style="SWT.BORDER" readOnly="false" saveValueTo="mpiCores">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.CENTER"
 								grabExcessHorizontal="false" grabExcessVertical="false"/>

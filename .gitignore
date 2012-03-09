@@ -1,6 +1,5 @@
 bin
 build
-eclipse
 *.o
 *.a
 .deps
@@ -18,3 +17,4 @@ autom4te.cache
 bitset_test
 rangeset_test
 testaif
+/.project

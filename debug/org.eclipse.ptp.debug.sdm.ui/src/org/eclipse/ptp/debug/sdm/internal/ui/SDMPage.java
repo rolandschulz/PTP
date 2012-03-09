@@ -32,7 +32,6 @@ import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -63,9 +62,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.AbstractLaunchConfigurationTab#activated(org.eclipse
-	 * .debug.core.ILaunchConfigurationWorkingCopy)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#activated(org.eclipse .debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	@Override
 	public void activated(ILaunchConfigurationWorkingCopy workingCopy) {
@@ -86,9 +83,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse
-	 * .swt.widgets.Composite)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse .swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
@@ -163,14 +158,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse
-	 * .debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse .debug.core.ILaunchConfiguration)
 	 */
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		/*
-		 * Launch configuration is selected or we have just selected SDM as the
-		 * debugger...
+		 * Launch configuration is selected or we have just selected SDM as the debugger...
 		 */
 		try {
 			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
@@ -190,9 +182,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse
-	 * .debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse .debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
@@ -225,15 +215,12 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse
-	 * .debug.core.ILaunchConfigurationWorkingCopy)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse .debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		/*
-		 * Note: performApply gets called when either text is modified via
-		 * updateLaunchConfigurationDialog(). Only update the configuration if
-		 * things are valid.
+		 * Note: performApply gets called when either text is modified via updateLaunchConfigurationDialog(). Only update the
+		 * configuration if things are valid.
 		 */
 		if (isValid(configuration)) {
 			configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
@@ -248,9 +235,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.
-	 * debug.core.ILaunchConfigurationWorkingCopy)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse. debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		/*
@@ -263,8 +248,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	}
 
 	/**
-	 * Browse for a file. If remoteServices is not null, then the currently
-	 * select resource manager supports remote browsing.
+	 * Browse for a file. If remoteServices is not null, then the currently select resource manager supports remote browsing.
 	 * 
 	 * @return path to file selected in browser
 	 */
@@ -286,21 +270,16 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	}
 
 	/**
-	 * Work out the address to supply as argument to the debug server. There are
-	 * currently two cases:
+	 * Work out the address to supply as argument to the debug server. There are currently two cases:
 	 * 
-	 * 1. If port forwarding is enabled, then the address needs to be the
-	 * localhost address of the host where the tunnel begins. Note this is
-	 * different to previous versions where the debug server machine was
-	 * possibly on a local network (e.g. a node in a cluster) but not
-	 * necessarily on the same machine as the tunnel.
+	 * 1. If port forwarding is enabled, then the address needs to be the localhost address of the host where the tunnel begins.
+	 * Note this is different to previous versions where the debug server machine was possibly on a local network (e.g. a node in a
+	 * cluster) but not necessarily on the same machine as the tunnel.
 	 * 
-	 * 2. If port forwarding is not enabled, then the address will be the
-	 * address of the host running Eclipse). NOTE: this assumes that the machine
-	 * running the debug server can contact the local host directly. In the case
-	 * of the SDM, the "master" debug server process can potentially run on any
-	 * node in the cluster. In many environments, compute nodes cannot
-	 * communicate outside their local network.
+	 * 2. If port forwarding is not enabled, then the address will be the address of the host running Eclipse). NOTE: this assumes
+	 * that the machine running the debug server can contact the local host directly. In the case of the SDM, the "master" debug
+	 * server process can potentially run on any node in the cluster. In many environments, compute nodes cannot communicate outside
+	 * their local network.
 	 * 
 	 * @param configuration
 	 * @return
@@ -318,8 +297,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
 		if (rm != null) {
 			/*
-			 * If the resource manager has been changed and this is a remote
-			 * resource manager, then update the host field
+			 * If the resource manager has been changed and this is a remote resource manager, then update the host field
 			 */
 			if (resourceManager != rm) {
 				resourceManager = rm;
@@ -346,7 +324,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	private IRemoteResourceManagerConfiguration getRemoteResourceManagerConfiguration() {
 		if (resourceManager != null) {
-			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
+			IResourceManagerComponentConfiguration rmConfig = resourceManager.getControlConfiguration();
 			if (rmConfig instanceof IRemoteResourceManagerConfiguration) {
 				return (IRemoteResourceManagerConfiguration) rmConfig;
 			}
@@ -382,8 +360,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	}
 
 	/**
-	 * Get the current remote connection selected in the RM. Will open the
-	 * connection if it is closed.
+	 * Get the current remote connection selected in the RM. Will open the connection if it is closed.
 	 * 
 	 * @return IRemoteConnection
 	 */

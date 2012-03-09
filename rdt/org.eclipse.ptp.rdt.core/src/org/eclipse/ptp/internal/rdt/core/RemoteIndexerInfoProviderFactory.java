@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -306,27 +306,9 @@ public class RemoteIndexerInfoProviderFactory {
 		// compute the indexer preferences
 		Properties props = IndexerPreferences.getProperties(project);
 		Set<String> preferences = computeIndexerPreferences(props);
-		
-		String filePref = (String) props.get(IndexerPreferences.KEY_FILES_TO_PARSE_UP_FRONT);
-		List<String> filesToParseUpFront = Arrays.asList(filePref.split("\\s*,\\s*")); //$NON-NLS-1$
-		
-		// compute the languages of the files to parse up front
-		// TODO there are two things wrong with this:
-		// 1) The file may need to be parsed as more than one language, see PDOMIndexerTask.getLanguages()
-		// 2) If there is a file in the project with the same name as a file to parse up front it may get the wrong scanner info
-		for(String filename : filesToParseUpFront) {
-			if(filename!=null && filename.length()>0){
-			IContentType ct= CCorePlugin.getContentType(project, filename);
-			if (ct != null) {
-				ILanguage language = LanguageManager.getInstance().getLanguage(ct);
-				languageMap.put(filename, language.getId());
-				}
-				addLanguageIDByContenttype(project, languageMap, ct);
-			}
-		}
 
 		return new RemoteIndexerInfoProvider(scannerInfoMap, linkageMap, languageMap, languagePropertyMap, 
-				                             headerSet, preferences, filesToParseUpFront, fileEncodingRegistry, new HashSet<String>());
+				                             headerSet, preferences, fileEncodingRegistry, new HashSet<String>());
 	}
 	/**
 	 * add the given contentTypeID's language to the language map.

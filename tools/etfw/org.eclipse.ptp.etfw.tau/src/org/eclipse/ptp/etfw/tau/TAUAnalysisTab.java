@@ -1426,7 +1426,7 @@ private static final String TAU_MAKEFILE_PREFIX="Makefile.tau";
 			configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT,selected);
 		}
 		int seldex=makecombo.getSelectionIndex();
-		if(seldex<0)return;
+		if(seldex<0||taulib==null)return;
 		String tauMakeName=makecombo.getItem(seldex);
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKENAME, tauMakeName);
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE,"-tau_makefile="+taulib.toURI().getPath()+UNIX_SLASH+makecombo.getItem(makecombo.getSelectionIndex())); //$NON-NLS-1$
@@ -1493,7 +1493,7 @@ private static final String TAU_MAKEFILE_PREFIX="Makefile.tau";
 	 */
 	private IFileStore getPapiLoc() throws FileNotFoundException {
 
-		if(makecombo==null)
+		if(makecombo==null||taulib==null)
 			return null;
 		
 		int selDex=makecombo.getSelectionIndex();

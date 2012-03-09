@@ -1,0 +1,11 @@
+joverbey@krakenpf11(XT5):~> pgcc errors.c does_not_exist.c
+errors.c:
+PGC-W-0150-Useless declaration (errors.c: 4)
+PGC-S-0092-Illegal type conversion of constant required (errors.c: 5)
+PGC-S-0039-Use of undeclared variable undefined_variable (errors.c: 6)
+PGC-S-0141-Wrong number of parameters to function (errors.c: 8)
+PGC/x86-64 Linux 11.4-0: compilation completed with severe errors
+does_not_exist.c:
+PGC-F-0002-Unable to open source input file: does_not_exist.c
+PGC/x86-64 Linux 11.4-0: compilation aborted
+joverbey@krakenpf11(XT5):~> 

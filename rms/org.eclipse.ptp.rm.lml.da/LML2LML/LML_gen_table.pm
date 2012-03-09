@@ -185,7 +185,7 @@ sub get_lml_table {
     my($ds,$rc,$id,$cid);
     my $layoutref  = $self->{LAYOUT};
     my $tableref   = $self->{TABLE};
-    my(%keylist,$key,$value,$ref, $objtype_pattern, $specref, $active, $lastcid, $cid);
+    my(%keylist,$key,$value,$ref, $objtype_pattern, $specref, $active, $lastcid);
 
     $objtype_pattern=$self->{OBJTYPE_PATTERN};
 
@@ -199,12 +199,13 @@ sub get_lml_table {
     foreach $cid (sort {$a <=> $b} (keys(%{$layoutref->{column}}))) {
 	$key     = $layoutref->{column}->{$cid}->{key};
 	$active  = $layoutref->{column}->{$cid}->{active};
-	next if($active eq "false");
 	$specref = $LML_specs::LMLattributes->{$objtype_pattern}->{$key};
 	if(!$specref) {
 	    print STDERR "unknown table column requested $key, data may be corrupted ...";
 	    $specref = ["s", "O", undef, "unknown column"];
 	}
+
+	next if ( ($active eq "false") and ($specref->[1] ne "M") );
 
 	$ds->{column}->{$cid}->{name}          = $layoutref->{column}->{$cid}->{key};
 	$ds->{column}->{$cid}->{id}            = $cid;

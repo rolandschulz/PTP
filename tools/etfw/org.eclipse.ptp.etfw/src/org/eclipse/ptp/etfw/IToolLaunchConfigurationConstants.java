@@ -27,9 +27,23 @@ public interface IToolLaunchConfigurationConstants {
 	public static final String ANALYZEONLY = "analyze_existing_perf_data_in_specified_location_build/run_nothing";
 	public static final boolean ANALYZEONLY_DEF = false;
 
+	/**
+	 * @since 5.0
+	 */
 	public static final String INTERNAL = "internal";
+	/**
+	 * @since 5.0
+	 */
 	public static final String FILE_SWAP = "%%FILE%%";
+	/**
+	 * @since 5.0
+	 */
 	public static final String FILENAME_SWAP = "%%FILENAME%%";
+	
+	/**
+	 * @since 5.0
+	 */
+	public static final String PROJECT_DIR = "%%PROJECT_DIR%%";
 	
 	/**
 	 * ID for boolean: true = keep instrumented executable
@@ -106,13 +120,36 @@ public interface IToolLaunchConfigurationConstants {
 	public static final String EXTOOL_PROJECT_NAME_TAG= "perf_project_name_tag_for_name_value";
 	public static final String EXTOOL_EXECUTABLE_PATH_TAG= "perf_executable_path_tag_for_path_value";
 	
+	/**
+	 * @since 5.0
+	 */
 	public static final String EXTOOL_JAXB_ATTR_ARGUMENTS_TAG="perf_framework_attribute_for_JAXB_arguments_value";
+	/**
+	 * @since 5.0
+	 */
 	public static final String EXTOOL_JAXB_EXECUTABLE_PATH_TAG= "perf_executable_path_tag_for_JAXB_path_value";
 	
+	/**
+	 * @since 5.0
+	 */
 	public static final String DOT = ".";
+	/**
+	 * @since 5.0
+	 */
 	public static final String SPACE = " ";
+	/**
+	 * @since 5.0
+	 */
 	public static final String NEWLINE = "\n";
+	/**
+	 * @since 5.0
+	 */
 	public static final String EMPTY = "";
+	
+	/**
+	 * @since 5.0
+	 */
+	public static final String UNIX_SLASH = "/";
 	
 	//The following are for parametric test values
 	

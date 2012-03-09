@@ -34,7 +34,7 @@
 			<description>Which mpi command to use.</description>
 			<choice>,aprun</choice>
 		</attribute>
-		<attribute name="mpiCores" min="1" type="integer">
+		<attribute name="mpiNumberOfProcesses" min="1" type="integer">
 			<description>the '-np' value</description>
 		</attribute>
 		<attribute name="Account_Name" type="string">
@@ -375,7 +375,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<arg isUndefinedIfMatches="#PBS">#PBS ${ptp_rm:export_all#value}</arg>
 			</line>
 			<line>
-				<arg>MPI_ARGS="-n ${ptp_rm:mpiCores#value}"</arg>
+				<arg>MPI_ARGS="-n ${ptp_rm:mpiNumberOfProcesses#value}"</arg>
 			</line>
 			<line>
 				<arg resolve="false">if [ "-n" == "${MPI_ARGS}" ] ; then</arg>
@@ -723,7 +723,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>MPI Number of Cores: </fixed-text>
 					</widget>
-					<widget type="spinner" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCores">
+					<widget type="spinner" style="SWT.BORDER" readOnly="true" saveValueTo="mpiNumberOfProcesses">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
 						</layout-data>
@@ -732,7 +732,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${ptp_rm:mpiCores#description}</fixed-text>
+						<fixed-text>${ptp_rm:mpiNumberOfProcesses#description}</fixed-text>
 					</widget>
 					<!-- row 9 -->
 					<widget type="label" style="SWT.LEFT">
@@ -832,6 +832,6 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			</import>
 		</launch-tab>
 	</control-data>
-	<monitor-data schedulerType="TORQUE">
+	<monitor-data schedulerType="TORQUE_ALPS">
 	</monitor-data>
 </resource-manager-builder>

@@ -23,8 +23,12 @@ import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
+import org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage;
 import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.services.core.IService;
@@ -36,6 +40,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -54,7 +59,9 @@ import org.eclipse.swt.widgets.Label;
 public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	public static final String REMOTE_SYNC_WIZARD_PAGE_ID = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage"; //$NON-NLS-1$
 	public static final String SERVICE_PROVIDER_PROPERTY = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage.serviceProvider"; //$NON-NLS-1$
+	public static final String SYNC_FILE_FILTER_PROPERTY = "org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage.syncFileFilter"; //$NON-NLS-1$
 
+	private SyncFileFilter customFilter = null;
 	private boolean fbVisited;
 	private String fTitle;
 	private String fDescription;
@@ -144,6 +151,25 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 
 		fProviderCombo.select(0);
 		handleProviderSelected();
+		
+		final Button filterButton = new Button(comp, SWT.PUSH);
+		filterButton.setText(Messages.NewRemoteSyncProjectWizardPage_0);
+		filterButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 3, 1));
+		filterButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				SyncFileFilter tmpFilter;
+				if (customFilter == null) {
+					tmpFilter = SyncManager.getDefaultFileFilter();
+				} else {
+					tmpFilter = new SyncFileFilter(customFilter);
+				}
+				int filterReturnCode = SyncFileFilterPage.openBlocking(tmpFilter, filterButton.getShell());
+				if (filterReturnCode == Window.OK) {
+					customFilter = tmpFilter;
+					MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SYNC_FILE_FILTER_PROPERTY, customFilter);
+				}
+			}
+		});
 	}
 
 	/*

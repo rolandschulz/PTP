@@ -11,18 +11,9 @@
 
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.ptp.rm.lml.core.messages.Messages;
 import org.eclipse.ptp.rm.lml.internal.core.elements.DataElement;
@@ -37,7 +28,6 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.DataElement8;
 import org.eclipse.ptp.rm.lml.internal.core.elements.DataElement9;
 import org.eclipse.ptp.rm.lml.internal.core.elements.DataType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplayelement;
@@ -52,7 +42,6 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplayelement7;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplayelement8;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplayelement9;
 import org.eclipse.ptp.rm.lml.internal.core.elements.NodedisplaylayoutType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectsType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement1;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement2;
@@ -64,7 +53,6 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement7;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement8;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement9;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeType;
-import org.xml.sax.SAXException;
 
 /**
  * This class is a copy of LMLCheck out of a lml-checking-tool only function
@@ -85,72 +73,68 @@ public class LMLCheck {
 		public DataElement data;
 		public SchemeElement scheme;
 
-		public SchemeAndData(DataElement pdata, SchemeElement pscheme) {
-			data = pdata;
-			scheme = pscheme;
+		public SchemeAndData(DataElement data, SchemeElement scheme) {
+			this.data = data;
+			this.scheme = scheme;
 		}
 
 	}
-
-	private static final String line = "-----------------------------------"; //$NON-NLS-1$
 
 	/**
 	 * Searches for allowed implicitly defined names from a name schema. Adds
 	 * all names of elements, which are directly children of the schemeElement.
 	 * Then calls this method again for all children.
 	 * 
-	 * @param errlist
+	 * @param errList
 	 *            list of errors occuring while parsing
 	 * @param names
 	 *            allowed names
 	 * @param schemeElement
 	 *            actual node in scheme-tree
-	 * @param aname
+	 * @param name
 	 *            name of this element, can be extended by the names of children
 	 */
-	public static void addAllowedNames(ErrorList errlist,
-			HashSet<String> names, Object schemeElement, String aname) {
+	public static void addAllowedNames(ErrorList errList, HashSet<String> names, Object schemeElement, String name) {
 
-		final List els = getLowerSchemeElements(schemeElement);
-		if (els == null) {
+		final List<?> elements = getLowerSchemeElements(schemeElement);
+		if (elements == null) {
 			return;// no sub-elements found
 		}
-		for (int i = 0; i < els.size(); i++) {
+		for (int i = 0; i < elements.size(); i++) {
 
-			final SchemeElement el = (SchemeElement) els.get(i);
+			final SchemeElement element = (SchemeElement) elements.get(i);
 
-			if (el.getMin() != null) {// Lower elements through ranges
-				final int min = el.getMin().intValue();
+			if (element.getMin() != null) {// Lower elements through ranges
+				final int min = element.getMin().intValue();
 				int max = min;
 
-				if (el.getMax() != null) {
-					max = el.getMax().intValue();
+				if (element.getMax() != null) {
+					max = element.getMax().intValue();
 				}
 
-				final int step = el.getStep().intValue();
+				final int step = element.getStep().intValue();
 
 				if (min > max) {
-					errlist.addError(Messages.LMLCheck_1 + aname
-							+ Messages.LMLCheck_2 + min + Messages.LMLCheck_3
-							+ max);
+					errList.addError(Messages.LMLCheck_1 + name + Messages.LMLCheck_2 + min + Messages.LMLCheck_3 + max);
 				}
 
 				for (int j = min; j <= max; j += step) {
 
-					final String thisname = aname + getLevelName(el, j);
-					names.add(thisname);
+					final String thisName = name + getLevelName(element, j);
+					names.add(thisName);
 
-					addAllowedNames(errlist, names, el, thisname);
+					addAllowedNames(errList, names, element, thisName);
 				}
-			} else if (el.getList() != null) {// Lower elements through list
+			} else if (element.getList() != null) {// Lower elements through
+													// list
 
-				final int[] numbers = getNumbersFromNumberlist(el.getList());
+				final int[] numbers = getNumbersFromNumberlist(element.getList());
 
 				for (final int number : numbers) {
-					final String thisname = aname + getLevelName(el, number);
-					names.add(thisname);
+					final String thisName = name + getLevelName(element, number);
+					names.add(thisName);
 
-					addAllowedNames(errlist, names, el, thisname);
+					addAllowedNames(errList, names, element, thisName);
 				}
 
 			}
@@ -164,122 +148,101 @@ public class LMLCheck {
 	 * corresponding scheme returns list of Errors containing messages about
 	 * not-allowed nodes in Errorlist
 	 */
-	public static void checkDataNodesinScheme(ErrorList errl, Object datanode,
-			ArrayList<Integer> upperlevelnumbers, Object scheme) {
+	public static void checkDataNodesinScheme(ErrorList errList, Object dataNode, ArrayList<Integer> upperLevelNumbers,
+			Object scheme) {
 
-		if (datanode == null) {
+		if (dataNode == null) {
 			return;
 		}
 
-		final List els = getLowerDataElements(datanode);
-		if (els == null) {
+		final List<?> elementsData = getLowerDataElements(dataNode);
+		if (elementsData == null) {
 			return;
 		}
 
-		for (int i = 0; i < els.size(); i++) {
+		for (int i = 0; i < elementsData.size(); i++) {
 
-			final DataElement dat = (DataElement) els.get(i);
+			final DataElement elementData = (DataElement) elementsData.get(i);
 
-			if (dat.getMin() != null) {// data-tag given by range => check every
-										// element in range
-				final int min = dat.getMin().intValue();
+			if (elementData.getMin() != null) {
+				// data-tag given by range => check every element in range
+				final int min = elementData.getMin().intValue();
 				int max = min;
 
-				if (dat.getMax() != null) {
-					max = dat.getMax().intValue();
+				if (elementData.getMax() != null) {
+					max = elementData.getMax().intValue();
 				}
 
-				upperlevelnumbers.add(min);
+				upperLevelNumbers.add(min);
 
-				final SchemeAndData first = getSchemeAndDataByLevels(min,
-						datanode, scheme);
-				// SchemeElement first=isDatanodeInScheme(upperlevelnumbers,
-				// scheme);
+				final SchemeAndData first = getSchemeAndDataByLevels(min, dataNode, scheme);
+				// SchemeElement first=isDatanodeInScheme(upperlevelnumbers, scheme);
 
-				if (first == null) {// Minimum of given data-node is not in
-									// scheme
-					final String levelstring = getLevelString(upperlevelnumbers);
+				if (first == null) {
+					// Minimum of given data-node is not in scheme
+					final String levelString = getLevelString(upperLevelNumbers);
 
-					errl.addError(Messages.LMLCheck_4 + levelstring
-							+ Messages.LMLCheck_5);
+					errList.addError(Messages.LMLCheck_4 + levelString + Messages.LMLCheck_5);
 				} else {
 
 					// Check Lower-Level Data-Nodes
-					checkDataNodesinScheme(errl, dat, upperlevelnumbers,
-							first.scheme);
+					checkDataNodesinScheme(errList, elementData, upperLevelNumbers, first.scheme);
 
-					final int step = first.scheme.getStep().intValue();// default
-																		// of
-																		// step
-																		// is
-																		// one,
-																		// even
-																		// if
-																		// scheme
-																		// does
-																		// not
-																		// define
-																		// min-
-																		// max-
-																		// attributes
+					final int step = first.scheme.getStep().intValue();
+					// default of step is one, even if scheme does not define min-max-attributes
 
 					for (int j = min + step; j <= max; j += step) {
 
-						upperlevelnumbers.set(upperlevelnumbers.size() - 1, j);
+						upperLevelNumbers.set(upperLevelNumbers.size() - 1, j);
 
 						// get current schemeanddata
-						final SchemeAndData asad = getSchemeAndDataByLevels(j,
-								datanode, scheme);
+						final SchemeAndData schemeAndData = getSchemeAndDataByLevels(j, dataNode, scheme);
 						// SchemeElement
-						// ascheme=isDatanodeInScheme(upperlevelnumbers,
-						// scheme);
+						// ascheme=isDatanodeInScheme(upperlevelnumbers,scheme);
 
-						if (asad == null) {// No scheme found for id j
+						if (schemeAndData == null) {
+							// No scheme found for id j
 
-							final String levelstring = getLevelString(upperlevelnumbers);
+							final String levelString = getLevelString(upperLevelNumbers);
 
-							errl.addError(Messages.LMLCheck_6 + levelstring
-									+ Messages.LMLCheck_7);
+							errList.addError(Messages.LMLCheck_6 + levelString + Messages.LMLCheck_7);
 						} else {
 							// Check inner Nodes
-							checkDataNodesinScheme(errl, dat,
-									upperlevelnumbers, asad.scheme);
+							checkDataNodesinScheme(errList, elementData, upperLevelNumbers, schemeAndData.scheme);
 						}
 
 					}
 
 				}
 
-				upperlevelnumbers.remove((upperlevelnumbers.size() - 1));
+				upperLevelNumbers.remove((upperLevelNumbers.size() - 1));
 
 			} // end of range-checks
-			else if (dat.getList() != null) {// elements in data-tag defined
-												// with a list
+			else if (elementData.getList() != null) {// elements in data-tag
+														// defined
+				// with a list
 
-				upperlevelnumbers.add(0);
+				upperLevelNumbers.add(0);
 
-				final int[] elements = getNumbersFromNumberlist(dat.getList());
+				final int[] elements = getNumbersFromNumberlist(elementData.getList());
 				for (final int number : elements) {
 
-					upperlevelnumbers.set(upperlevelnumbers.size() - 1, number);
+					upperLevelNumbers.set(upperLevelNumbers.size() - 1, number);
 
-					final SchemeAndData asad = getSchemeAndDataByLevels(number,
-							datanode, scheme);
+					final SchemeAndData schemeAndData = getSchemeAndDataByLevels(number, dataNode, scheme);
 
-					if (asad == null) {
-						final String levelstring = getLevelString(upperlevelnumbers);
+					if (schemeAndData == null) {
+						final String levelString = getLevelString(upperLevelNumbers);
 
-						errl.addError(Messages.LMLCheck_8 + levelstring
-								+ Messages.LMLCheck_9);
+						errList.addError(Messages.LMLCheck_8 + levelString + Messages.LMLCheck_9);
 					} else {// current number is allowed, check lower elements
 
-						checkDataNodesinScheme(errl, dat, upperlevelnumbers,
-								asad.scheme);
+						checkDataNodesinScheme(errList, elementData, upperLevelNumbers, schemeAndData.scheme);
 					}
 
 				}
 
-				upperlevelnumbers.remove((upperlevelnumbers.size() - 1));
+				upperLevelNumbers.remove((upperLevelNumbers.size() - 1));
 
 			}
 
@@ -295,31 +258,30 @@ public class LMLCheck {
 	 * 
 	 * Traverses all nodedisplay-references
 	 * 
-	 * @param errlist
+	 * @param errList
 	 * @param names
 	 * @param schemeElement
 	 */
-	public static void checkNamesAllowed(ErrorList errlist,
-			HashSet<String> names, Object datarefelement) {
+	public static void checkNamesAllowed(ErrorList errList, HashSet<String> names, Object dataRefElement) {
 
-		final List els = getLowerDataElements(datarefelement);
-		if (els == null) {
-			return;// Keine Unterelemente gefunden
+		final List<?> elements = getLowerDataElements(dataRefElement);
+		if (elements == null) {
+			return;
+			// No lower elements found
 		}
-		for (int i = 0; i < els.size(); i++) {
+		for (int i = 0; i < elements.size(); i++) {
 
-			final DataElement el = (DataElement) els.get(i);
+			final DataElement element = (DataElement) elements.get(i);
 
-			final String refname = el.getRefid();
+			final String refName = element.getRefid();
 
-			if (refname != null) {
-				if (!names.contains(refname)) {
-					errlist.addError(Messages.LMLCheck_10 + refname
-							+ Messages.LMLCheck_11);
+			if (refName != null) {
+				if (!names.contains(refName)) {
+					errList.addError(Messages.LMLCheck_10 + refName + Messages.LMLCheck_11);
 				}
 			}
 
-			checkNamesAllowed(errlist, names, el);
+			checkNamesAllowed(errList, names, element);
 		}
 
 	}
@@ -336,83 +298,82 @@ public class LMLCheck {
 	 */
 	public static ErrorList checkNodedisplays(LguiType lgui) {
 
-		final ErrorList res = new ErrorList();
+		final ErrorList result = new ErrorList();
 
-		final List<GobjectType> gobjects = getGraphicalObjects(lgui);
+		final List<GobjectType> gobjects = (new LguiItem(lgui)).getOverviewAccess().getGraphicalObjects();
 
 		// Search all nodedisplays and check their attributes
-		for (final GobjectType gobj : gobjects) {
-			if (gobj instanceof Nodedisplay) {
+		for (final GobjectType gobject : gobjects) {
+			if (gobject instanceof Nodedisplay) {
 
-				final Nodedisplay dis = (Nodedisplay) gobj;
+				final Nodedisplay nodedisplay = (Nodedisplay) gobject;
 
-				res.addMessage(Messages.LMLCheck_12 + dis.getId());
+				result.addMessage(Messages.LMLCheck_12 + nodedisplay.getId());
 				// This part is now done by xsl-file
 				// checkAttributesAllowedForNodedisplay(dis.getRefto()!=null,
 				// res, dis.getData(), new ArrayList<Integer>());
 
-				checkDataNodesinScheme(res, dis.getData(),
-						new ArrayList<Integer>(), dis.getScheme());
+				checkDataNodesinScheme(result, nodedisplay.getData(), new ArrayList<Integer>(), nodedisplay.getScheme());
 
 			}
 		}
 
-		return res;
+		return result;
 	}
 
 	/**
 	 * Copy an Integer-ArrayList
 	 * 
-	 * @param orig
+	 * @param origin
 	 * @return
 	 */
-	public static ArrayList<Integer> copyArrayList(ArrayList<Integer> orig) {
-		final ArrayList<Integer> res = new ArrayList<Integer>();
+	public static ArrayList<Integer> copyArrayList(ArrayList<Integer> origin) {
+		final ArrayList<Integer> result = new ArrayList<Integer>();
 
-		for (int i = 0; i < orig.size(); i++) {
-			res.add(orig.get(i));
+		for (int i = 0; i < origin.size(); i++) {
+			result.add(origin.get(i));
 		}
 
-		return res;
+		return result;
 	}
 
 	/**
-	 * @param el
+	 * @param element
 	 * @return in which level this dataelement is placed, 0 for DataType, 10 for
 	 *         DataElement (unspecific)
 	 */
-	public static int getDataLevel(Object el) {
-		if (el instanceof DataType) {
+	public static int getDataLevel(Object element) {
+		if (element instanceof DataType) {
 			return 0;
 		}
-		if (el instanceof DataElement1) {
+		if (element instanceof DataElement1) {
 			return 1;
 		}
-		if (el instanceof DataElement2) {
+		if (element instanceof DataElement2) {
 			return 2;
 		}
-		if (el instanceof DataElement3) {
+		if (element instanceof DataElement3) {
 			return 3;
 		}
-		if (el instanceof DataElement4) {
+		if (element instanceof DataElement4) {
 			return 4;
 		}
-		if (el instanceof DataElement5) {
+		if (element instanceof DataElement5) {
 			return 5;
 		}
-		if (el instanceof DataElement6) {
+		if (element instanceof DataElement6) {
 			return 6;
 		}
-		if (el instanceof DataElement7) {
+		if (element instanceof DataElement7) {
 			return 7;
 		}
-		if (el instanceof DataElement8) {
+		if (element instanceof DataElement8) {
 			return 8;
 		}
-		if (el instanceof DataElement9) {
+		if (element instanceof DataElement9) {
 			return 9;
 		}
-		if (el instanceof DataElement) {
+		if (element instanceof DataElement) {
 			return 10;
 		}
 
@@ -422,55 +383,33 @@ public class LMLCheck {
 	/**
 	 * Returns the height of the scheme-tree given by this schemeEl
 	 * 
-	 * @param schemeEl
+	 * @param schemeElement
 	 *            scheme elements or a SchemeType-instance
 	 * @return
 	 */
-	public static int getDeepestSchemeLevel(Object schemeEl) {
+	public static int getDeepestSchemeLevel(Object schemeElement) {
 
-		if (schemeEl == null) {
+		if (schemeElement == null) {
 			return 0;
 		}
 
-		final List els = getLowerSchemeElements(schemeEl);
-		if (els == null) {
+		final List<?> elements = getLowerSchemeElements(schemeElement);
+		if (elements == null) {
 			return 1;
 		}
 
 		int max = 0;
 
-		for (int i = 0; i < els.size(); i++) {
-			final int aheight = getDeepestSchemeLevel(els.get(i));
+		for (int i = 0; i < elements.size(); i++) {
+			final int height = getDeepestSchemeLevel(elements.get(i));
 
-			if (aheight > max) {
-				max = aheight;
+			if (height > max) {
+				max = height;
 			}
 		}
 
-		return max + (schemeEl instanceof SchemeType ? 0 : 1);
+		return max + (schemeElement instanceof SchemeType ? 0 : 1);
 
-	}
-
-	/**
-	 * Get all graphical objects out of the lml-file
-	 * 
-	 * @param pmodell
-	 * @return
-	 */
-	public static List<GobjectType> getGraphicalObjects(LguiType pmodell) {
-
-		final List<JAXBElement<?>> all = pmodell
-				.getObjectsAndRelationsAndInformation();
-
-		final List<GobjectType> gobj = new ArrayList<GobjectType>();
-
-		for (final JAXBElement<?> aobj : all) {
-			if (aobj.getValue() instanceof GobjectType) {
-				gobj.add((GobjectType) aobj.getValue());
-			}
-		}
-
-		return gobj;
 	}
 
 	/**
@@ -489,40 +428,17 @@ public class LMLCheck {
 		final ArrayList<Integer> id = new ArrayList<Integer>();
 		id.add(ids.get(0));
 
-		final SchemeElement subscheme = getSchemeByLevels(copyArrayList(id),
-				scheme);
+		final SchemeElement subScheme = getSchemeByLevels(copyArrayList(id), scheme);
 
-		if (subscheme == null) {
+		if (subScheme == null) {
 			return ""; //$NON-NLS-1$
 		}
 
-		final String subname = getLevelName(subscheme, id.get(0));
+		final String subName = getLevelName(subScheme, id.get(0));
 
 		ids.remove(0);
 
-		return subname + getImplicitName(ids, subscheme);
-	}
-
-	/**
-	 * Get all Layout-Definitions out of the lml-file
-	 * 
-	 * @param pmodell
-	 * @return
-	 */
-	public static List<LayoutType> getLayouts(LguiType pmodell) {
-
-		final List<JAXBElement<?>> all = pmodell
-				.getObjectsAndRelationsAndInformation();
-
-		final List<LayoutType> layouts = new ArrayList<LayoutType>();
-
-		for (final JAXBElement<?> aobj : all) {
-			if (aobj.getValue() instanceof LayoutType) {
-				layouts.add((LayoutType) aobj.getValue());
-			}
-		}
-
-		return layouts;
+		return subName + getImplicitName(ids, subScheme);
 	}
 
 	/**
@@ -532,39 +448,34 @@ public class LMLCheck {
 	 * 
 	 * @param scheme
 	 *            corresponding scheme-element
-	 * @param levelid
+	 * @param levelId
 	 *            id of the element, the name is searched for
 	 * @return implicit name of the element for this level
 	 */
-	public static String getLevelName(SchemeElement scheme, int levelid) {
+	public static String getLevelName(SchemeElement scheme, int levelId) {
 
 		if (scheme.getMap() == null) {
-			return String.format(scheme.getMask(), levelid);
+			return String.format(scheme.getMask(), levelId);
 		}
 
 		final String[] names = scheme.getMap().split(","); //$NON-NLS-1$
 		if (scheme.getMin() != null) {// min-max-attributes
 			final int min = scheme.getMin().intValue();
-			int max = min;
-
-			if (scheme.getMax() != null) {
-				max = scheme.getMax().intValue();
-			}
 
 			final int step = scheme.getStep().intValue();
 
-			final int namespos = (levelid - min) / step;
+			final int namesPosition = (levelId - min) / step;
 
-			if (namespos < names.length) {
-				return names[namespos];
+			if (namesPosition < names.length) {
+				return names[namesPosition];
 			}
 		} else {// List-attribute, map list-ids to map-names, in other words:
 				// find position of levelid in list-attribute and return
 				// corresponding positioned map-name
-			final int[] nrs = getNumbersFromNumberlist(scheme.getList());
+			final int[] numbers = getNumbersFromNumberlist(scheme.getList());
 
-			for (int i = 0; i < nrs.length; i++) {
-				if (nrs[i] == levelid) {
+			for (int i = 0; i < numbers.length; i++) {
+				if (numbers[i] == levelId) {
 					return names[i];
 				}
 			}
@@ -579,147 +490,147 @@ public class LMLCheck {
 	 */
 	public static String getLevelString(ArrayList<Integer> levels) {
 
-		String levelstring = ""; //$NON-NLS-1$
+		String levelString = ""; //$NON-NLS-1$
 
 		for (int j = 1; j <= levels.size(); j++) {
-			levelstring += "el" + j + "=" + levels.get(j - 1) + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			levelString += "el" + j + "=" + levels.get(j - 1) + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 
-		return levelstring;
+		return levelString;
 	}
 
 	/**
 	 * Returns a List of lower data-elements for a data-element or a
 	 * dataType-instance within a data-section of a nodedisplay
 	 * 
-	 * @param el
+	 * @param element
 	 * @return
 	 */
-	public static List getLowerDataElements(Object el) {
+	public static List<? extends DataElement> getLowerDataElements(Object element) {
 
-		if (el instanceof DataType) {
-			return ((DataType) el).getEl1();
+		if (element instanceof DataType) {
+			return ((DataType) element).getEl1();
 		}
-		if (el instanceof DataElement1) {
-			return ((DataElement1) el).getEl2();
+		if (element instanceof DataElement1) {
+			return ((DataElement1) element).getEl2();
 		}
-		if (el instanceof DataElement2) {
-			return ((DataElement2) el).getEl3();
+		if (element instanceof DataElement2) {
+			return ((DataElement2) element).getEl3();
 		}
-		if (el instanceof DataElement3) {
-			return ((DataElement3) el).getEl4();
+		if (element instanceof DataElement3) {
+			return ((DataElement3) element).getEl4();
 		}
-		if (el instanceof DataElement4) {
-			return ((DataElement4) el).getEl5();
+		if (element instanceof DataElement4) {
+			return ((DataElement4) element).getEl5();
 		}
-		if (el instanceof DataElement5) {
-			return ((DataElement5) el).getEl6();
+		if (element instanceof DataElement5) {
+			return ((DataElement5) element).getEl6();
 		}
-		if (el instanceof DataElement6) {
-			return ((DataElement6) el).getEl7();
+		if (element instanceof DataElement6) {
+			return ((DataElement6) element).getEl7();
 		}
-		if (el instanceof DataElement7) {
-			return ((DataElement7) el).getEl8();
+		if (element instanceof DataElement7) {
+			return ((DataElement7) element).getEl8();
 		}
-		if (el instanceof DataElement8) {
-			return ((DataElement8) el).getEl9();
+		if (element instanceof DataElement8) {
+			return ((DataElement8) element).getEl9();
 		}
-		if (el instanceof DataElement9) {
-			return ((DataElement9) el).getEl10();
+		if (element instanceof DataElement9) {
+			return ((DataElement9) element).getEl10();
 		}
 
-		return new ArrayList();
+		return new ArrayList<DataElement>();
 	}
 
 	/**
 	 * Returns a List of lower nodedisplayelements for a NodedisplayelementX or
 	 * a NodedisplaylayoutType
 	 * 
-	 * @param el
+	 * @param element
 	 * @return
 	 */
-	public static List getLowerNodedisplayElements(Object el) {
+	public static List<? extends Nodedisplayelement> getLowerNodedisplayElements(Object element) {
 
-		if (el instanceof NodedisplaylayoutType) {
-			final ArrayList<Nodedisplayelement0> justonelement = new ArrayList<Nodedisplayelement0>();
-			justonelement.add(((NodedisplaylayoutType) el).getEl0());
-			return justonelement;
+		if (element instanceof NodedisplaylayoutType) {
+			final ArrayList<Nodedisplayelement0> justOneElement = new ArrayList<Nodedisplayelement0>();
+			justOneElement.add(((NodedisplaylayoutType) element).getEl0());
+			return justOneElement;
 		}
-		if (el instanceof Nodedisplayelement0) {
-			return ((Nodedisplayelement0) el).getEl1();
+		if (element instanceof Nodedisplayelement0) {
+			return ((Nodedisplayelement0) element).getEl1();
 		}
-		if (el instanceof Nodedisplayelement1) {
-			return ((Nodedisplayelement1) el).getEl2();
+		if (element instanceof Nodedisplayelement1) {
+			return ((Nodedisplayelement1) element).getEl2();
 		}
-		if (el instanceof Nodedisplayelement2) {
-			return ((Nodedisplayelement2) el).getEl3();
+		if (element instanceof Nodedisplayelement2) {
+			return ((Nodedisplayelement2) element).getEl3();
 		}
-		if (el instanceof Nodedisplayelement3) {
-			return ((Nodedisplayelement3) el).getEl4();
+		if (element instanceof Nodedisplayelement3) {
+			return ((Nodedisplayelement3) element).getEl4();
 		}
-		if (el instanceof Nodedisplayelement4) {
-			return ((Nodedisplayelement4) el).getEl5();
+		if (element instanceof Nodedisplayelement4) {
+			return ((Nodedisplayelement4) element).getEl5();
 		}
-		if (el instanceof Nodedisplayelement5) {
-			return ((Nodedisplayelement5) el).getEl6();
+		if (element instanceof Nodedisplayelement5) {
+			return ((Nodedisplayelement5) element).getEl6();
 		}
-		if (el instanceof Nodedisplayelement6) {
-			return ((Nodedisplayelement6) el).getEl7();
+		if (element instanceof Nodedisplayelement6) {
+			return ((Nodedisplayelement6) element).getEl7();
 		}
-		if (el instanceof Nodedisplayelement7) {
-			return ((Nodedisplayelement7) el).getEl8();
+		if (element instanceof Nodedisplayelement7) {
+			return ((Nodedisplayelement7) element).getEl8();
 		}
-		if (el instanceof Nodedisplayelement8) {
-			return ((Nodedisplayelement8) el).getEl9();
+		if (element instanceof Nodedisplayelement8) {
+			return ((Nodedisplayelement8) element).getEl9();
 		}
-		if (el instanceof Nodedisplayelement9) {
-			return ((Nodedisplayelement9) el).getEl10();
+		if (element instanceof Nodedisplayelement9) {
+			return ((Nodedisplayelement9) element).getEl10();
 		}
 
-		return new ArrayList();
+		return new ArrayList<Nodedisplayelement>();
 	}
 
 	/**
 	 * Returns a List of lower scheme elements for a scheme-element or a
 	 * SchemeType-instance
 	 * 
-	 * @param el
+	 * @param element
 	 * @return
 	 */
-	public static List getLowerSchemeElements(Object el) {
+	public static List<? extends SchemeElement> getLowerSchemeElements(Object element) {
 
-		if (el instanceof SchemeType) {
-			return ((SchemeType) el).getEl1();
+		if (element instanceof SchemeType) {
+			return ((SchemeType) element).getEl1();
 		}
-		if (el instanceof SchemeElement1) {
-			return ((SchemeElement1) el).getEl2();
+		if (element instanceof SchemeElement1) {
+			return ((SchemeElement1) element).getEl2();
 		}
-		if (el instanceof SchemeElement2) {
-			return ((SchemeElement2) el).getEl3();
+		if (element instanceof SchemeElement2) {
+			return ((SchemeElement2) element).getEl3();
 		}
-		if (el instanceof SchemeElement3) {
-			return ((SchemeElement3) el).getEl4();
+		if (element instanceof SchemeElement3) {
+			return ((SchemeElement3) element).getEl4();
 		}
-		if (el instanceof SchemeElement4) {
-			return ((SchemeElement4) el).getEl5();
+		if (element instanceof SchemeElement4) {
+			return ((SchemeElement4) element).getEl5();
 		}
-		if (el instanceof SchemeElement5) {
-			return ((SchemeElement5) el).getEl6();
+		if (element instanceof SchemeElement5) {
+			return ((SchemeElement5) element).getEl6();
 		}
-		if (el instanceof SchemeElement6) {
-			return ((SchemeElement6) el).getEl7();
+		if (element instanceof SchemeElement6) {
+			return ((SchemeElement6) element).getEl7();
 		}
-		if (el instanceof SchemeElement7) {
-			return ((SchemeElement7) el).getEl8();
+		if (element instanceof SchemeElement7) {
+			return ((SchemeElement7) element).getEl8();
 		}
-		if (el instanceof SchemeElement8) {
-			return ((SchemeElement8) el).getEl9();
+		if (element instanceof SchemeElement8) {
+			return ((SchemeElement8) element).getEl9();
 		}
-		if (el instanceof SchemeElement9) {
-			return ((SchemeElement9) el).getEl10();
+		if (element instanceof SchemeElement9) {
+			return ((SchemeElement9) element).getEl10();
 		}
 
-		return new ArrayList();
+		return new ArrayList<SchemeElement>();
 	}
 
 	/**
@@ -728,60 +639,58 @@ public class LMLCheck {
 	 * 
 	 * @param numbers
 	 *            contains level-ids
-	 * @param nodeel
+	 * @param nodeElement
 	 *            upper-level-el-tag
 	 * @return nodedisplayelement describing the object`s layout given by
 	 *         element-ids through numbers
 	 */
-	public static Nodedisplayelement getNodedisplayElementByLevels(
-			ArrayList<Integer> numbers, Nodedisplayelement nodeel) {
+	public static Nodedisplayelement getNodedisplayElementByLevels(ArrayList<Integer> numbers, Nodedisplayelement nodeElement) {
 
 		if (numbers == null || numbers.size() == 0) {
 			return null;
 		}
 
-		if (nodeel == null) {
+		if (nodeElement == null) {
 			return null;
 		}
 
-		final int anum = numbers.get(0);
+		final int number0 = numbers.get(0);
 
 		numbers.remove(0);// Remove the first element of the arraylist
 
-		final List schemeEls = getLowerNodedisplayElements(nodeel);
+		final List<?> schemeElements = getLowerNodedisplayElements(nodeElement);
 
 		Nodedisplayelement scheme = null;
 
 		// Find scheme-tag which contains element with id anum
-		for (int i = 0; i < schemeEls.size(); i++) {
+		for (int i = 0; i < schemeElements.size(); i++) {
 
-			final Nodedisplayelement ascheme = (Nodedisplayelement) schemeEls
-					.get(i);
+			final Nodedisplayelement minScheme = (Nodedisplayelement) schemeElements.get(i);
 
-			if (ascheme.getMin() != null) {// Scheme-elements defined by range
-											// through min- max-attributes
-				final int amin = ascheme.getMin().intValue();
-				int amax = amin;
+			if (minScheme.getMin() != null) {// Scheme-elements defined by range
+												// through min- max-attributes
+				final int minValue = minScheme.getMin().intValue();
+				int maxValue = minValue;
 
-				if (ascheme.getMax() != null) {
-					amax = ascheme.getMax().intValue();
+				if (minScheme.getMax() != null) {
+					maxValue = minScheme.getMax().intValue();
 				}
 
-				if (anum >= amin && anum <= amax) {
-					scheme = ascheme;
+				if (number0 >= minValue && number0 <= maxValue) {
+					scheme = minScheme;
 
 					break;
 				}
 
-			} else if (ascheme.getList() != null) {// Scheme defines list of
-													// elements
+			} else if (minScheme.getList() != null) {
+				// Scheme defines list of elements
 
-				final int[] listels = getNumbersFromNumberlist(ascheme
-						.getList());// for example 1,2,16,23
+				final int[] listElements = getNumbersFromNumberlist(minScheme.getList());
+				// for example 1,2,16,23
 
-				for (final int number : listels) {
-					if (number == anum) {
-						scheme = ascheme;
+				for (final int number : listElements) {
+					if (number == number0) {
+						scheme = minScheme;
 						break;
 					}
 				}
@@ -801,12 +710,12 @@ public class LMLCheck {
 		// Real solutions are always found in this part
 
 		if (numbers.size() == 0) {
-			return scheme;// All numbers processed?
+			return scheme;
+			// All numbers processed?
 		} else {
 			// are the lower levels of the scheme-node allowed in the data-tag?
-			final Nodedisplayelement res = getNodedisplayElementByLevels(
-					numbers, scheme);
-			return res;
+			final Nodedisplayelement result = getNodedisplayElementByLevels(numbers, scheme);
+			return result;
 		}
 
 	}
@@ -815,45 +724,22 @@ public class LMLCheck {
 	 * Parses numberlist (for example 1,2,16,2,100) and returns a list of
 	 * integers like new int[]{1,2,16,2,100}
 	 * 
-	 * @param numberlist
+	 * @param numberList
 	 *            list of numbers separated by commas
 	 * @return integer list
 	 */
-	public static int[] getNumbersFromNumberlist(String numberlist) {
+	public static int[] getNumbersFromNumberlist(String numberList) {
 
-		final String[] parts = numberlist.split(","); //$NON-NLS-1$
+		final String[] parts = numberList.split(","); //$NON-NLS-1$
 
-		final int[] res = new int[parts.length];
+		final int[] result = new int[parts.length];
 
 		int i = 0;
 		for (final String part : parts) {
-			res[i++] = Integer.parseInt(part.trim());
+			result[i++] = Integer.parseInt(part.trim());
 		}
 
-		return res;
-	}
-
-	/**
-	 * get all objects-Tags
-	 * 
-	 * @param model
-	 * @return
-	 */
-	public static List<ObjectsType> getObjects(LguiType model) {
-
-		final List<JAXBElement<?>> all = model
-				.getObjectsAndRelationsAndInformation();
-
-		final List<ObjectsType> objects = new ArrayList<ObjectsType>();
-
-		for (final JAXBElement<?> aobj : all) {
-			if (aobj.getValue() instanceof ObjectsType) {
-				objects.add((ObjectsType) aobj.getValue());
-			}
-		}
-
-		return objects;
-
+		return result;
 	}
 
 	/**
@@ -866,16 +752,15 @@ public class LMLCheck {
 	 * @param numbers
 	 *            level-ids, which has to be searched in lower elements, content
 	 *            might be changed by this function
-	 * @param dataEl
+	 * @param dataElement
 	 *            root of the data-tags, which will be processed, dataEl itself
 	 *            is just used to get lower elements
-	 * @param schemeEl
+	 * @param schemeElement
 	 *            root of the scheme-tags, which will be processed, schemeEl
 	 *            itself is just used to get lower elements
 	 * @return data-element and corresponding scheme
 	 */
-	public static SchemeAndData getSchemeAndDataByLevels(
-			ArrayList<Integer> numbers, Object dataEl, Object schemeEl) {
+	public static SchemeAndData getSchemeAndDataByLevels(ArrayList<Integer> numbers, Object dataElement, Object schemeElement) {
 
 		// numbers=copyArrayList(numbers);
 
@@ -883,45 +768,44 @@ public class LMLCheck {
 			return null;
 		}
 
-		if (schemeEl == null) {
+		if (schemeElement == null) {
 			return null;
 		}
 
-		final int anum = numbers.get(0);
+		final int number0 = numbers.get(0);
 
 		numbers.remove(0);// Remove the first element of the arraylist
 
-		final List els = getLowerDataElements(dataEl);
+		final List<?> elements = getLowerDataElements(dataElement);
 
-		final List schemeEls = getLowerSchemeElements(schemeEl);
+		final List<?> schemeElements = getLowerSchemeElements(schemeElement);
 
-		for (int i = 0; i < els.size(); i++) {
+		for (int i = 0; i < elements.size(); i++) {
 
-			final DataElement ael = (DataElement) els.get(i);
+			final DataElement element = (DataElement) elements.get(i);
 
-			if (ael.getMin() != null) {// data-Element with ranges
+			if (element.getMin() != null) {// data-Element with ranges
 
-				final int min = ael.getMin().intValue();
+				final int min = element.getMin().intValue();
 				int max = min;
 
-				if (ael.getMax() != null) {
-					max = ael.getMax().intValue();
+				if (element.getMax() != null) {
+					max = element.getMax().intValue();
 				}
 
-				if (min > anum || max < anum) {
+				if (min > number0 || max < number0) {
 					continue;
 				}
 				// else data-Element for anum found
-			} else if (ael.getList() != null) {// check if anum in list
+			} else if (element.getList() != null) {// check if anum in list
 
 				boolean found = false;
 
-				final int[] listels = getNumbersFromNumberlist(ael.getList());// for
-																				// example
-																				// 1,2,16,23
+				final int[] listElements = getNumbersFromNumberlist(element.getList());
+				// for example 1,2,16,23
 
-				for (final int number : listels) {
-					if (number == anum) {
+				for (final int number : listElements) {
+					if (number == number0) {
 						found = true;
 						break;
 					}
@@ -935,38 +819,36 @@ public class LMLCheck {
 
 			// Find corresponding scheme-element
 			SchemeElement scheme = null;
-			for (int j = 0; j < schemeEls.size(); j++) {
+			for (int j = 0; j < schemeElements.size(); j++) {
 
-				final SchemeElement ascheme = (SchemeElement) schemeEls.get(j);
+				final SchemeElement aScheme = (SchemeElement) schemeElements.get(j);
 
-				if (ascheme.getMin() != null) {// Scheme-elements defined by
-												// range through min-
-												// max-attributes
-					final int amin = ascheme.getMin().intValue();
-					int amax = amin;
+				if (aScheme.getMin() != null) {
+					// Scheme-elements defined by range through min-max-attributes
+					final int min = aScheme.getMin().intValue();
+					int max = min;
 
-					if (ascheme.getMax() != null) {
-						amax = ascheme.getMax().intValue();
+					if (aScheme.getMax() != null) {
+						max = aScheme.getMax().intValue();
 					}
 
-					final int astep = ascheme.getStep().intValue();
+					final int step = aScheme.getStep().intValue();
 
-					if (anum >= amin && anum <= amax
-							&& (anum - amin) % astep == 0) {
-						scheme = ascheme;
+					if (number0 >= min && number0 <= max && (number0 - min) % step == 0) {
+						scheme = aScheme;
 
 						break;
 					}
 
-				} else if (ascheme.getList() != null) {// Scheme defines list of
-														// elements
+				} else if (aScheme.getList() != null) {
+					// Scheme defines list of elements
 
-					final int[] listels = getNumbersFromNumberlist(ascheme
-							.getList());// for example 1,2,16,23
+					final int[] listElements = getNumbersFromNumberlist(aScheme.getList());
+					// for example 1,2,16,23
 
-					for (final int number : listels) {
-						if (number == anum) {
-							scheme = ascheme;
+					for (final int number : listElements) {
+						if (number == number0) {
+							scheme = aScheme;
 							break;
 						}
 					}
@@ -986,24 +868,22 @@ public class LMLCheck {
 			// Real solutions are always found in this part
 
 			if (numbers.size() == 0) {
-				return new SchemeAndData(ael, scheme);// All numbers processed?
+				return new SchemeAndData(element, scheme);
+				// All numbers processed?
 			} else {
-				// are the lower levels of the scheme-node allowed in the
-				// data-tag?
-				final SchemeAndData res = getSchemeAndDataByLevels(numbers,
-						ael, scheme);
-				if (res != null) {
-					return res;
+				// are the lower levels of the scheme-node allowed in the data-tag?
+				final SchemeAndData result = getSchemeAndDataByLevels(numbers, element, scheme);
+				if (result != null) {
+					return result;
 				}
 			}
 
 		}
 
-		if (dataEl instanceof DataType) {
+		if (dataElement instanceof DataType) {
 			return null;
 		} else
-			return new SchemeAndData((DataElement) dataEl,
-					(SchemeElement) schemeEl);
+			return new SchemeAndData((DataElement) dataElement, (SchemeElement) schemeElement);
 
 	}
 
@@ -1013,19 +893,18 @@ public class LMLCheck {
 	 * 
 	 * @param number
 	 *            one integer value with id for the element to be checked
-	 * @param dataEl
+	 * @param dataElement
 	 *            upper-level data-element
-	 * @param schemeEl
+	 * @param schemeElement
 	 *            scheme-element on the same level as dataEl
 	 * @return Data- and Scheme which are connected to each other
 	 */
-	public static SchemeAndData getSchemeAndDataByLevels(int number,
-			Object dataEl, Object schemeEl) {
+	public static SchemeAndData getSchemeAndDataByLevels(int number, Object dataElement, Object schemeElement) {
 
 		final ArrayList<Integer> numbers = new ArrayList<Integer>();
 		numbers.add(number);
 
-		return getSchemeAndDataByLevels(numbers, dataEl, schemeEl);
+		return getSchemeAndDataByLevels(numbers, dataElement, schemeElement);
 
 	}
 
@@ -1034,61 +913,60 @@ public class LMLCheck {
 	 * 
 	 * @param numbers
 	 *            contains level-ids
-	 * @param schemeEl
+	 * @param schemeElement
 	 *            upper-level-scheme-tag
 	 * @return schemeelement describing the object given by element-ids through
 	 *         numbers
 	 */
-	public static SchemeElement getSchemeByLevels(ArrayList<Integer> numbers,
-			Object schemeEl) {
+	public static SchemeElement getSchemeByLevels(ArrayList<Integer> numbers, Object schemeElement) {
 
 		if (numbers == null || numbers.size() == 0) {
 			return null;
 		}
 
-		if (schemeEl == null) {
+		if (schemeElement == null) {
 			return null;
 		}
 
-		final int anum = numbers.get(0);
+		final int number0 = numbers.get(0);
 
 		numbers.remove(0);// Remove the first element of the arraylist
 
-		final List schemeEls = getLowerSchemeElements(schemeEl);
+		final List<?> schemeElements = getLowerSchemeElements(schemeElement);
 
 		SchemeElement scheme = null;
 
 		// Find scheme-tag which contains element with id anum
-		for (int i = 0; i < schemeEls.size(); i++) {
+		for (int i = 0; i < schemeElements.size(); i++) {
 
-			final SchemeElement ascheme = (SchemeElement) schemeEls.get(i);
+			final SchemeElement aScheme = (SchemeElement) schemeElements.get(i);
 
-			if (ascheme.getMin() != null) {// Scheme-elements defined by range
+			if (aScheme.getMin() != null) {// Scheme-elements defined by range
 											// through min- max-attributes
-				final int amin = ascheme.getMin().intValue();
-				int amax = amin;
+				final int min = aScheme.getMin().intValue();
+				int max = min;
 
-				if (ascheme.getMax() != null) {
-					amax = ascheme.getMax().intValue();
+				if (aScheme.getMax() != null) {
+					max = aScheme.getMax().intValue();
 				}
 
-				final int astep = ascheme.getStep().intValue();
+				final int aStep = aScheme.getStep().intValue();
 
-				if (anum >= amin && anum <= amax && (anum - amin) % astep == 0) {
-					scheme = ascheme;
+				if (number0 >= min && number0 <= max && (number0 - min) % aStep == 0) {
+					scheme = aScheme;
 
 					break;
 				}
 
-			} else if (ascheme.getList() != null) {// Scheme defines list of
-													// elements
+			} else if (aScheme.getList() != null) {
+				// Scheme defines list of elements
 
-				final int[] listels = getNumbersFromNumberlist(ascheme
-						.getList());// for example 1,2,16,23
+				final int[] listElements = getNumbersFromNumberlist(aScheme.getList());
+				// for example 1,2,16,23
 
-				for (final int number : listels) {
-					if (number == anum) {
-						scheme = ascheme;
+				for (final int number : listElements) {
+					if (number == number0) {
+						scheme = aScheme;
 						break;
 					}
 				}
@@ -1108,53 +986,54 @@ public class LMLCheck {
 		// Real solutions are always found in this part
 
 		if (numbers.size() == 0) {
-			return scheme;// All numbers processed?
+			return scheme;
+			// All numbers processed?
 		} else {
 			// are the lower levels of the scheme-node allowed in the data-tag?
-			final SchemeElement res = getSchemeByLevels(numbers, scheme);
-			return res;
+			final SchemeElement result = getSchemeByLevels(numbers, scheme);
+			return result;
 		}
 
 	}
 
 	/**
-	 * @param el
+	 * @param element
 	 * @return in which level this schemeelement is placed, 0 for SchemeType, 10
 	 *         for SchemeElement (unspecific)
 	 */
-	public static int getSchemeLevel(Object el) {
+	public static int getSchemeLevel(Object element) {
 
-		if (el instanceof SchemeType) {
+		if (element instanceof SchemeType) {
 			return 0;
 		}
-		if (el instanceof SchemeElement1) {
+		if (element instanceof SchemeElement1) {
 			return 1;
 		}
-		if (el instanceof SchemeElement2) {
+		if (element instanceof SchemeElement2) {
 			return 2;
 		}
-		if (el instanceof SchemeElement3) {
+		if (element instanceof SchemeElement3) {
 			return 3;
 		}
-		if (el instanceof SchemeElement4) {
+		if (element instanceof SchemeElement4) {
 			return 4;
 		}
-		if (el instanceof SchemeElement5) {
+		if (element instanceof SchemeElement5) {
 			return 5;
 		}
-		if (el instanceof SchemeElement6) {
+		if (element instanceof SchemeElement6) {
 			return 6;
 		}
-		if (el instanceof SchemeElement7) {
+		if (element instanceof SchemeElement7) {
 			return 7;
 		}
-		if (el instanceof SchemeElement8) {
+		if (element instanceof SchemeElement8) {
 			return 8;
 		}
-		if (el instanceof SchemeElement9) {
+		if (element instanceof SchemeElement9) {
 			return 9;
 		}
-		if (el instanceof SchemeElement) {
+		if (element instanceof SchemeElement) {
 			return 10;
 		}
 
@@ -1167,44 +1046,44 @@ public class LMLCheck {
 	 * 
 	 * @param number
 	 *            number of this element in current level
-	 * @param dataEl
+	 * @param dataElement
 	 *            data-object of the corresponding nodedisplay or a lower-level
 	 *            data-element
 	 * @return the DataElement in which this scheme-node is described, null if
 	 *         there is no explicitly defined data
 	 */
-	public static DataElement isSchemenodeInThisData(int number, Object dataEl) {
-		final List els = getLowerDataElements(dataEl);
+	public static DataElement isSchemenodeInThisData(int number, Object dataElement) {
+		final List<?> elements = getLowerDataElements(dataElement);
 
-		if (els == null) {
+		if (elements == null) {
 			return null;
 		}
 
-		for (int i = 0; i < els.size(); i++) {
+		for (int i = 0; i < elements.size(); i++) {
 
-			final DataElement ael = (DataElement) els.get(i);
+			final DataElement element = (DataElement) elements.get(i);
 
-			if (ael.getMin() != null) { // ranges
+			if (element.getMin() != null) {
+				// ranges
 
-				final int min = ael.getMin().intValue();
+				final int min = element.getMin().intValue();
 				int max = min;
 
-				if (ael.getMax() != null) {
-					max = ael.getMax().intValue();
+				if (element.getMax() != null) {
+					max = element.getMax().intValue();
 				}
 
 				if (number >= min && number <= max) {
-					return ael;
+					return element;
 				}
-			} else if (ael.getList() != null) {// list-attribute
+			} else if (element.getList() != null) {// list-attribute
 
-				final int[] listels = getNumbersFromNumberlist(ael.getList());// for
-																				// example
-																				// 1,2,16,23
+				final int[] listElements = getNumbersFromNumberlist(element.getList());
+				// for example 1,2,16,23
 
-				for (final int anum : listels) {
-					if (anum == number) {
-						return ael;
+				for (final int listElement : listElements) {
+					if (listElement == number) {
+						return element;
 					}
 				}
 
@@ -1212,41 +1091,6 @@ public class LMLCheck {
 		}
 
 		return null;
-	}
-
-	/**
-	 * @return Object of LguiType parsed out of an lml-File
-	 * @throws JAXBException
-	 */
-	public static LguiType parseLML(URL xml, URL xsd) throws JAXBException {
-		// Causes errors while used in applet
-
-		final JAXBContext jc = JAXBContext.newInstance("lml"); //$NON-NLS-1$
-
-		final Unmarshaller unmar = jc.createUnmarshaller();
-
-		if (xsd != null) {
-			Schema mySchema;
-			final SchemaFactory sf = SchemaFactory
-					.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			try {
-				mySchema = sf.newSchema(xsd);
-			} catch (final SAXException saxe) {
-				// ...(error handling)
-				mySchema = null;
-			}
-
-			// Connect schema to unmarshaller
-			unmar.setSchema(mySchema);
-		}
-
-		// Validate lml-file and unmarshall in one step
-		final JAXBElement<LguiType> doc = (JAXBElement<LguiType>) unmar
-				.unmarshal(xml);
-		// Get root-element
-		final LguiType lml = doc.getValue();
-
-		return lml;
 	}
 
 }

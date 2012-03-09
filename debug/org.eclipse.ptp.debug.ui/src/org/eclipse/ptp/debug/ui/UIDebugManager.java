@@ -131,9 +131,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse
-	 * .debug.core.model.IBreakpoint)
+	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse .debug.core.model.IBreakpoint)
 	 */
 	public void breakpointAdded(final IBreakpoint breakpoint) {
 		if (PTPDebugUIPlugin.isPTPDebugPerspective()) {
@@ -159,9 +157,8 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.core.IBreakpointListener#breakpointChanged(org.eclipse
-	 * .debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
+	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointChanged(org.eclipse .debug.core.model.IBreakpoint,
+	 * org.eclipse.core.resources.IMarkerDelta)
 	 */
 	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
 	}
@@ -169,9 +166,8 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse
-	 * .debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
+	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse .debug.core.model.IBreakpoint,
+	 * org.eclipse.core.resources.IMarkerDelta)
 	 */
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
 	}
@@ -179,9 +175,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.managers.AbstractElementManager#fireJobChangedEvent
-	 * (int, java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.ui.managers.AbstractElementManager#fireJobChangedEvent (int, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void fireJobChangedEvent(int type, String new_id, String old_id) {
@@ -196,40 +190,41 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.internal.ui.AbstractUIManager#fireSetEvent(int,
-	 * org.eclipse.ptp.ui.model.IElement[],
-	 * org.eclipse.ptp.ui.model.IElementSet,
-	 * org.eclipse.ptp.ui.model.IElementSet)
+	 * @see org.eclipse.ptp.internal.ui.AbstractUIManager#fireSetEvent(int, org.eclipse.ptp.ui.model.IElement[],
+	 * org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElementSet)
 	 */
 	@Override
 	public synchronized void fireSetEvent(int eventType, IElement[] elements, IElementSet cur_set, IElementSet pre_set) {
-		IPSession session = getDebugSession(getJob().getID());
-		if (session != null) {
-			switch (eventType) {
-			case CREATE_SET_TYPE:
-				TaskSet cTasks = convertElementsToBitList(session, elements);
-				debugModel.createSet(session, cur_set.getName(), cTasks);
-				break;
-			case DELETE_SET_TYPE:
-				debugModel.deleteSet(session, cur_set.getName());
-				break;
-			case CHANGE_SET_TYPE:
-				if (cur_set != null) {
-					// annotationMgr.updateAnnotation(cur_set, pre_set);
-					updateBreakpointMarker(cur_set.getName());
-					updateRegisterUnRegisterElements(cur_set, pre_set, getCurrentJobId());
+		IPJob job = getJob();
+		if (job != null) {
+			IPSession session = getDebugSession(getJob().getID());
+			if (session != null) {
+				switch (eventType) {
+				case CREATE_SET_TYPE:
+					TaskSet cTasks = convertElementsToBitList(session, elements);
+					debugModel.createSet(session, cur_set.getName(), cTasks);
+					break;
+				case DELETE_SET_TYPE:
+					debugModel.deleteSet(session, cur_set.getName());
+					break;
+				case CHANGE_SET_TYPE:
+					if (cur_set != null) {
+						// annotationMgr.updateAnnotation(cur_set, pre_set);
+						updateBreakpointMarker(cur_set.getName());
+						updateRegisterUnRegisterElements(cur_set, pre_set, getCurrentJobId());
+					}
+					break;
+				case ADD_ELEMENT_TYPE:
+					TaskSet aTasks = convertElementsToBitList(session, elements);
+					debugModel.addTasks(session, cur_set.getName(), aTasks);
+					break;
+				case REMOVE_ELEMENT_TYPE:
+					TaskSet rTasks = convertElementsToBitList(session, elements);
+					debugModel.removeTasks(session, cur_set.getName(), rTasks);
+					break;
 				}
-				break;
-			case ADD_ELEMENT_TYPE:
-				TaskSet aTasks = convertElementsToBitList(session, elements);
-				debugModel.addTasks(session, cur_set.getName(), aTasks);
-				break;
-			case REMOVE_ELEMENT_TYPE:
-				TaskSet rTasks = convertElementsToBitList(session, elements);
-				debugModel.removeTasks(session, cur_set.getName(), rTasks);
-				break;
+				super.fireSetEvent(eventType, elements, cur_set, pre_set);
 			}
-			super.fireSetEvent(eventType, elements, cur_set, pre_set);
 		}
 	}
 
@@ -249,7 +244,10 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 */
 	public IPSession getCurrentSession() {
 		if (currentSession == null) {
-			currentSession = getDebugSession(getJob().getID());
+			IPJob job = getJob();
+			if (job != null) {
+				currentSession = getDebugSession(job.getID());
+			}
 		}
 		return currentSession;
 	}
@@ -486,8 +484,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IElementManager#removeJob(org.eclipse.ptp.core.IPJob)
+	 * @see org.eclipse.ptp.ui.IElementManager#removeJob(org.eclipse.ptp.core.IPJob)
 	 */
 	@Override
 	public void removeJob(IPJob job) {
@@ -529,13 +526,15 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.managers.JobManager#setJob(org.eclipse.ptp.core.elements
-	 * .IPJob)
+	 * @see org.eclipse.ptp.ui.managers.JobManager#setJob(org.eclipse.ptp.core.elements .IPJob)
 	 */
 	@Override
 	public void setJob(IPJob job) {
-		currentSession = getDebugSession(job.getID());
+		if (job != null) {
+			currentSession = getDebugSession(job.getID());
+		} else {
+			currentSession = null;
+		}
 		super.setJob(job);
 	}
 
@@ -762,7 +761,10 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * 
 	 */
 	public void updateCurrentJobVariableValues() {
-		getJobVariableManager().updateValues(getJob());
+		IPJob job = getJob();
+		if (job != null) {
+			getJobVariableManager().updateValues(job);
+		}
 	}
 
 	/**

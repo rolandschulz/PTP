@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,6 +64,7 @@ import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask;
 import org.eclipse.ptp.internal.rdt.core.index.IRemoteFastIndexerUpdateEvent.EventType;
 import org.eclipse.ptp.internal.rdt.core.miners.CDTMiner;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
+import org.eclipse.ptp.internal.rdt.core.navigation.FoldingRegionsResult;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
@@ -74,6 +75,7 @@ import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
+import org.eclipse.ptp.rdt.ui.preferences.PreferenceConstants;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RSECIndexServiceProvider;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
@@ -277,13 +279,18 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 			}
 			
 			if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled() || smonitor.isNetworkDown()) { //$NON-NLS-1$//$NON-NLS-2$
+				int maxErrors = UIPlugin.getDefault().getPreferenceStore().getInt(PreferenceConstants.INDEXER_ERRORS_DISPLAY_LIMIT);
+				int errorsReported = 0;
 				for (int i = 0; i < status.getNestedSize(); i ++ ){
+					if (errorsReported >= maxErrors)
+						break;
 					DataElement element = status.get(i);
 					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
 			    		String message = element.getAttribute(DE.A_NAME)+ ".  " ;  //$NON-NLS-1$
 			    		for (int j = 0; j < fErrorMessages.size(); j++) {
 			    			if (message.indexOf(fErrorMessages.get(j)) > 0) {					    		
 					    		String msg = reportProblem(scope, message);
+					    		errorsReported++;
 					    		RDTLog.logWarning(msg);
 			    			}
 			    		}
@@ -502,13 +509,18 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
             }
 			
 			if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled() || smonitor.isNetworkDown()) { //$NON-NLS-1$//$NON-NLS-2$
+				int maxErrors = UIPlugin.getDefault().getPreferenceStore().getInt(PreferenceConstants.INDEXER_ERRORS_DISPLAY_LIMIT);
+				int errorsReported = 0;
 				for (int i = 0; i < status.getNestedSize(); i ++ ){
+					if (errorsReported >= maxErrors)
+						break;
 					DataElement element = status.get(i);
 					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
 						String message = element.getAttribute(DE.A_NAME)+ ".  " ;  //$NON-NLS-1$
 			    		for (int j = 0; j < fErrorMessages.size(); j++) {
 			    			if (message.indexOf(fErrorMessages.get(j)) > 0) {					    		
 					    		String msg = reportProblem(scope, message);
+					    		errorsReported++;
 					    		RDTLog.logWarning(msg);
 			    			}
 			    		}
@@ -832,6 +844,106 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 			return null;
 		}
 		return (RemoteSearchQuery) result;
+	}
+
+	/**
+	 * @since 4.1
+	 */
+	@SuppressWarnings("unchecked")
+	public String computeHighlightPositions(ITranslationUnit targetUnit) {
+		// If something goes wrong, return an empty string.
+
+		checkAllProjects(new NullProgressMonitor());
+		DataStore dataStore = getDataStore(null);
+	    if (dataStore == null) {
+	    	return ""; //$NON-NLS-1$
+	    }
+        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_SEMANTIC_HIGHTLIGHTING_COMPUTE_POSITIONS);
+        if (queryCmd == null) {
+	    	return ""; //$NON-NLS-1$
+        }
+     	NullProgressMonitor monitor = new NullProgressMonitor();
+     	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
+    	ArrayList<Object> args = new ArrayList<Object>();
+		Scope scope = new Scope(targetUnit.getCProject().getProject());
+    	DataElement dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
+
+    	args.add(dataElement);
+    	args.add(createSerializableElement(dataStore, targetUnit));
+
+    	// execute the command
+    	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
+
+    	try {
+        	smonitor.waitForUpdate(status, monitor);
+        }
+        catch (Exception e) {
+        	RDTLog.logError(e);
+        }
+
+    	DataElement element = status.get(0);
+    	String data = element.getName();
+    	try {
+			Object result = Serializer.deserialize(data);
+			if (result == null || !(result instanceof String)) {
+				return ""; //$NON-NLS-1$;
+			}
+			return (String) result;
+		} catch (IOException e) {
+			RDTLog.logError(e);
+		} catch (ClassNotFoundException e) {
+			RDTLog.logError(e);
+		}
+    	return ""; //$NON-NLS-1$
+	}
+	
+	public FoldingRegionsResult computeFoldingRegions(ITranslationUnit targetUnit, int docLength, boolean fPreprocessorBranchFoldingEnabled, boolean fStatementsFoldingEnabled) {
+		checkAllProjects(new NullProgressMonitor());
+		DataStore dataStore = getDataStore(null);
+	    if (dataStore == null) {
+	    	return null;
+	    }
+        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_CODE_FOLDING_COMPUTE_REGIONS);
+        if (queryCmd == null) {
+	    	return null;
+        }
+     	NullProgressMonitor monitor = new NullProgressMonitor();
+     	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
+    	ArrayList<Object> args = new ArrayList<Object>();
+		Scope scope = new Scope(targetUnit.getCProject().getProject());
+    	DataElement dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
+
+    	args.add(dataElement);
+    	args.add(createSerializableElement(dataStore, targetUnit));
+    	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_INT_DESCRIPTOR, Integer.toString(docLength)));
+    	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_BOOLEAN_DESCRIPTOR, Boolean.toString(fPreprocessorBranchFoldingEnabled)));
+    	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_BOOLEAN_DESCRIPTOR, Boolean.toString(fStatementsFoldingEnabled)));
+    
+    	// execute the command
+    	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
+
+    	try {
+        	smonitor.waitForUpdate(status, monitor);
+        }
+        catch (Exception e) {
+        	RDTLog.logError(e);
+        }
+
+    	DataElement element = status.get(0);
+    	
+    	String data = element.getName();
+    	try {
+    		Object result = Serializer.deserialize(data);
+			if (result == null || !(result instanceof FoldingRegionsResult)) {
+				return null;
+			}
+			return (FoldingRegionsResult) result;
+    	} catch (IOException e) {
+			RDTLog.logError(e);
+		} catch (ClassNotFoundException e) {
+			RDTLog.logError(e);
+		}
+    	return null;
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -21,20 +21,19 @@ dnl Eclipse adds version number to end of package when deploying via update site
 dnl
 
 VERSION="_$PACKAGE_VERSION"
-if [ `expr "$VERSION" : "_@[^@]*@"` -gt 0 ]; then
+if test `expr "$VERSION" : "_@@<:@^@@:>@*@"` -gt 0 ; then
 	VERSION=
 fi
-UTILS="../org.eclipse.ptp.utils"
+UTILS="`echo ../org.eclipse.ptp.utils${VERSION}`"
 if test ! -d $UTILS; then
-	UTILS="`echo ${UTILS}${VERSION}`"
+	UTILS="`echo ../../core/org.eclipse.ptp.utils${VERSION}`"
 	if test ! -d $UTILS; then
 		AC_MSG_ERROR([utils directory not found])
 	fi
 fi
-
-PROXY="../org.eclipse.ptp.proxy"
+PROXY="`echo ../org.eclipse.ptp.proxy${VERSION}`"
 if test ! -d $PROXY; then
-	PROXY="`echo ${PROXY}${VERSION}`"
+	PROXY="`echo ../../core/org.eclipse.ptp.proxy${VERSION}`"
 	if test ! -d $PROXY; then
 		AC_MSG_ERROR([proxy directory not found])
 	fi
@@ -97,7 +96,7 @@ if test "$ac_cv_path_POE" != no; then
 	AC_DEFINE_UNQUOTED(POE, "$ac_cv_path_POE", [Location of poe program])
 else
 	AC_MSG_NOTICE([PE not installed, skipping...])
-	AS_EXIT
+	AS_EXIT([1])
 fi
 
 

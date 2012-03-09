@@ -1,0 +1,32 @@
+<html>
+<head><title>OpenACC&trade; update directive</title></head>
+<body>
+<h2>OpenACC&trade; update directive</h2>
+<dl><dd>Makes the host's copy of a (sub)array consistent with the device's copy, or makes the device's copy consistent with the host's.</dd></dl>
+<table width="100%" border="0" cellspacing="5" cellpadding="3"><tr bgcolor="#eeeeee">
+<td align="left" valign="top">
+  <tt><b><font color="#b46432">!$acc update</font></b></tt> <i>clause [, clause ...]</i>
+</td>
+<td align="left" valign="top">
+  <tt><b><font color="#931a68">#pragma </font>acc update</b></tt> <i>clause [, clause ...]</i>
+</td>
+</tr></table>
+<p>
+  Supported clauses are
+  <tt>
+  <b>host</b>,
+  <b>device</b>,
+  <b>if</b>,
+  <b>async</b>.
+  </tt>
+</p>
+<p>For more information, see Section
+2.12.1
+of <i>The OpenACC&trade; Application Programming Interface</i>, Version 1.0,
+available from <a href="http://www.openacc-standard.org/">http://www.openacc-standard.org</a>.</p>
+<br/>
+<table width="100%" border="0"><tr>
+<td align="right"><font color="#C0C0C0" size="1">OpenACC&trade; Application Programming Interface Version 1.0</font></td>
+</tr></table>
+</body>
+</html>

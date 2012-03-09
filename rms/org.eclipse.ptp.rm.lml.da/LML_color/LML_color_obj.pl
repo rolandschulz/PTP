@@ -84,6 +84,7 @@ print STDERR "processing objs  ...\n" if($opt_verbose);
 {
     my ($key,$type,$color);
     foreach $key (keys(%{$filehandler->{DATA}->{OBJECT}})) {
+	next if(!exists($filehandler->{DATA}->{OBJECT}->{$key}->{type}));
 	$type=$filehandler->{DATA}->{OBJECT}->{$key}->{type};
 	$color=$colormanager->get_color($type,$key);
 	if($color) {

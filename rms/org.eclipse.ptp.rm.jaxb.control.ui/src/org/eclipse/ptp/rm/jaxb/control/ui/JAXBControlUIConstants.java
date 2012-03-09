@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui;
 
@@ -44,6 +45,7 @@ public class JAXBControlUIConstants extends JAXBUIConstants {
 	public static final String CHECKBOX = "checkbox";//$NON-NLS-1$
 	public static final String SPINNER = "spinner";//$NON-NLS-1$
 	public static final String COMBO = "combo";//$NON-NLS-1$
+	public static final String ENVCONFIG = "envconfig";//$NON-NLS-1$
 	public static final String RADIOBUTTON = "radiobutton";//$NON-NLS-1$
 	public static final String BROWSE = "browse";//$NON-NLS-1$
 	public static final String ACTION = "action";//$NON-NLS-1$

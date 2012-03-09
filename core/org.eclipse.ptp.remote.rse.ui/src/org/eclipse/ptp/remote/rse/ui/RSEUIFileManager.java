@@ -25,9 +25,10 @@ import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
 import org.eclipse.swt.widgets.Shell;
 
 public class RSEUIFileManager implements IRemoteUIFileManager {
-	private IRemoteConnectionManager connMgr;
+	private final IRemoteConnectionManager connMgr;
 	private IRemoteConnection connection = null;
 	private IHost connHost = null;
+	private boolean onlyConnection = true;
 
 	public RSEUIFileManager(IRemoteServices services) {
 		this.connMgr = services.getConnectionManager();
@@ -36,15 +37,12 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse
-	 * .swt.widgets.Shell, java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse .swt.widgets.Shell, java.lang.String,
+	 * java.lang.String)
 	 */
-	public String browseDirectory(Shell shell, String message,
-			String filterPath, int flags) {
-		SystemRemoteFolderDialog dlg = new SystemRemoteFolderDialog(shell,
-				message, connHost);
-		dlg.setDefaultSystemConnection(connHost, true);
+	public String browseDirectory(Shell shell, String message, String filterPath, int flags) {
+		SystemRemoteFolderDialog dlg = new SystemRemoteFolderDialog(shell, message, connHost);
+		dlg.setDefaultSystemConnection(connHost, onlyConnection);
 		dlg.setBlockOnOpen(true);
 		if (dlg.open() == Window.OK) {
 			connHost = dlg.getSelectedConnection();
@@ -61,15 +59,11 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.
-	 * widgets.Shell, java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt. widgets.Shell, java.lang.String, java.lang.String)
 	 */
-	public String browseFile(Shell shell, String message, String filterPath,
-			int flags) {
-		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message,
-				connHost);
-		dlg.setDefaultSystemConnection(connHost, true);
+	public String browseFile(Shell shell, String message, String filterPath, int flags) {
+		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message, connHost);
+		dlg.setDefaultSystemConnection(connHost, onlyConnection);
 		dlg.setBlockOnOpen(true);
 		if (dlg.open() == Window.OK) {
 			connHost = dlg.getSelectedConnection();
@@ -86,15 +80,11 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.
-	 * widgets.Shell, java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt. widgets.Shell, java.lang.String, java.lang.String)
 	 */
-	public String[] browseFiles(Shell shell, String message, String filterPath,
-			int flags) {
-		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message,
-				connHost);
-		dlg.setDefaultSystemConnection(connHost, true);
+	public String[] browseFiles(Shell shell, String message, String filterPath, int flags) {
+		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message, connHost);
+		dlg.setDefaultSystemConnection(connHost, onlyConnection);
 		dlg.setBlockOnOpen(true);
 		dlg.setMultipleSelectionMode(true);
 		if (dlg.open() == Window.OK) {
@@ -129,9 +119,7 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.ui.IRemoteUIFileManager#setConnection(org.eclipse
-	 * .ptp.remote.core.IRemoteConnection)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#setConnection(org.eclipse .ptp.remote.core.IRemoteConnection)
 	 */
 	public void setConnection(IRemoteConnection connection) {
 		this.connection = connection;
@@ -141,9 +129,9 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.ui.IRemoteUIFileManager#showConnections(boolean)
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#showConnections(boolean)
 	 */
 	public void showConnections(boolean enable) {
+		onlyConnection = !enable;
 	}
 }

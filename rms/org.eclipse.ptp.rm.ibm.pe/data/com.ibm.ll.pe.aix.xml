@@ -1,0 +1,2655 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2012 IBM Corporation and others. All rights reserved. 
+	This program and the accompanying materials are made available under the 
+	terms of the Eclipse Public License v1.0s which accompanies this distribution, 
+	and is available at http://www.eclipse.org/legal/epl-v10.html -->
+<resource-manager-builder xmlns="http://org.eclipse.ptp/rm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="resource_manager_type.xsd" name="pe_aix">
+	<!-- Make sure XML editor line length is set long enough (160) to avoid wrapping text so messages don't get wrapped when reformatting -->
+	<control-data>
+		<!-- Required for debugger to determine number of processes to display -->
+		<attribute name="mpiNumberOfProcesses" type="integer">
+			<link-value-to>MP_PROCS_ATTR</link-value-to>
+		</attribute>
+
+		<!-- Tasks tab attributes -->
+		<attribute name="MP_HOSTFILE_ATTR" type="string">
+			<description>Host list file:</description>
+			<tooltip>Specify the name of the hostfile that maps tasks to nodes. {MP_HOSTFILE}
+			</tooltip>
+			<validator>
+				<file-info efsAttributes="ATTRIBUTE_OWNER_READ"
+					isDirectory="false" />
+				<error-message>Host list file must be a readable file containing a list of host names
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_NEWJOB_ATTR" type="string">
+			<description>Keep job partition:</description>
+			<tooltip>Specifies if partition manager maintains partition for	multiple job steps {MP_NEWJOB}
+			</tooltip>
+			<choice>,yes,no,parallel</choice>
+		</attribute>
+
+		<attribute name="MP_WORLD_SIZES_ATTR" type="string">
+			<description>MPI world sizes:</description>
+			<tooltip>Specify a ':' separated list of MPI world sizes {MP_WORLD_SIZES}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_PROCS_ATTR" type="integer">
+			<description>Number of application tasks:</description>
+			<tooltip>Specify the number of application tasks. (Default: 1) {MP_PROCS}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Number of application tasks must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+
+		<attribute name="MP_NODES_ATTR" type="integer">
+			<description>Number of nodes:</description>
+			<tooltip>Specify the number of nodes to run application. {MP_NODES}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Number of nodes must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_TASKS_PER_NODE_ATTR" type="integer">
+			<description>Number of tasks per node:</description>
+			<tooltip>Specify the number application tasks per node.	{MP_TASKS_PER_NODE}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Number of application tasks per node must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<!-- I/O tab attributes -->
+		<attribute name="MP_STDINMODE_ATTR" type="string">
+			<description>STDIN processing mode:</description>
+			<tooltip>Specify how stdin is handled. (Default: all) {MP_STDINMODE}</tooltip>
+			<choice>all,none</choice>
+			<validator>
+				<regex expression=" *|all|none|[0-9]+" /> <!-- MP_STDINMODE options -->
+				<error-message>Input mode specification is incorrect
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_STDOUTMODE_ATTR" type="string">
+			<description>STDOUT/STDERR processing mode:</description>
+			<tooltip>Specify how stdout and stderr are handled. (Default: unordered) {MP_STDOUTMODE}
+			</tooltip>
+			<choice>unordered,ordered,combined</choice>
+			<validator>
+				<regex expression=" *|unordered|ordered|combined|[0-9]+" /> <!-- MP_STDOUTMODE options -->
+				<error-message>Output mode specification is incorrect
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_IOAGENT_CNT_ATTR" type="string">
+			<description>I/O agent count:</description>
+			<tooltip>Specify the number I/O agents.	{MP_TASKS_PER_NODE}
+			</tooltip>
+			<choice>,all</choice>
+			<validator>
+				<regex expression=" *|all|[0-9]+" /> <!-- Blank, all or numeric -->
+				<error-message>Number of I/O agents must be 'all' or numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_IOTASKLIST_ATTR" type="string">
+			<description>I/O agents tasks:</description>
+			<tooltip>Specify a ':' separated list of I/O agent tasks {MP_IOTASKLIST}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_LABELIO_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Label STDIO with task number:</description>
+			<tooltip>Prefix stdout and stderr for each task with task number. {MP_LABELIO}
+			</tooltip>
+		</attribute>
+
+		<!-- Diagnostic tab attributes -->
+		<attribute name="MP_PMDLOG_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Generate PMD diagnostic log:</description>
+			<tooltip>Generate a PMD log for diagnostic purposes. (Default: no) {MP_PMDLOG}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_INFOLEVEL_ATTR" type="integer">
+			<description>PE diagnostic message level:</description>
+			<tooltip>Specify PE diagnostic message level. (Default: 1) {MP_INFOLEVEL}
+			</tooltip>
+			<choice>0,1,2,3,4,5,6</choice>
+		</attribute>
+
+		<attribute name="MP_STATISTICS_ATTR" type="string">
+			<description>MPI statistics:</description>
+			<tooltip>Obtain communication statistics for user space jobs. {MP_STATISTICS}
+			</tooltip>
+			<choice>yes,no,print</choice>
+		</attribute>
+
+		<attribute name="MP_PMDLOG_DIR_ATTR" type="string">
+			<description>PMD log directory:</description>
+			<tooltip>Specify directory where PMD log is stored. (Default: /tmp) {MP_PMDLOG_DIR}
+			</tooltip>
+			<validator>
+				<file-info
+					efsAttributes="ATTRIBUTE_OWNER_READ|ATTRIBUTE_OWNER_WRITE|ATTRIBUTE_OWNER_EXECUTE"
+					isDirectory="true" />
+				<error-message>PMD log directory must be a writable directory
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_PRIORITY_LOG_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Create co-scheduler log:</description>
+			<tooltip>Specify if co-scheduler log should be created (Default: no) {MP_PRIORITY_LOG}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_PRIORITY_LOG_DIR_ATTR" type="string">
+			<description>Coscheduler log directory:</description>
+			<tooltip>Specify directory where co-scheduler log is stored. (Default: /tmp) {MP_PRIORITY_LOG_DIR}
+			</tooltip>
+			<validator>
+				<file-info
+					efsAttributes="ATTRIBUTE_OWNER_READ|ATTRIBUTE_OWNER_WRITE|ATTRIBUTE_OWNER_EXECUTE"
+					isDirectory="true" />
+				<error-message>Co-scheduler log directory must be a writable
+					directory
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_PRIORITY_LOG_NAME_ATTR" type="string">
+			<description>Co-scheduler log name:</description>
+			<tooltip>Specify name of co-scheduler log (Default: pmadjpri.log) {MP_PRIORITY_LOG_NAME}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_PRINTENV_ATTR" type="string">
+			<description>Print environment:</description>
+			<tooltip>Print MPI environment variables for all tasks (Default: no) {MP_PRINTENV_ATTR}
+			</tooltip>
+			<choice>,yes,no</choice>
+		</attribute>
+
+		<!-- Debug tab attributes -->
+		<attribute name="MP_COREDIR_ATTR" type="string">
+			<description>Core file directory:</description>
+			<tooltip>Specify directory where core files are stored. {MP_COREDIR}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_COREFILE_FORMAT_ATTR" type="string">
+			<description>Corefile format:</description>
+			<tooltip>Specify 'STDERR' to write core data to stderr, blank for standard core file or name of lightweight corefile {MP_COREFILE_FORMAT}
+			</tooltip>
+			<choice>,STDERR</choice>
+		</attribute>
+
+		<attribute name="MP_PROFDIR_ATTR" type="string">
+			<description>GMON file directory:</description>
+			<tooltip>Specify directory where GMON files are stored. {MP_PROFDIR}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_EUIDEVELOP_ATTR" type="string">
+			<description>MPI parameter checking:</description>
+			<tooltip>Specify level of MPI parameter checking.  (Default: no) {MP_EUIDEVELOP}
+			</tooltip>
+			<choice>yes,no,deb,min</choice>
+		</attribute>
+
+		<attribute name="MP_COREFILE_SIGTERM_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Corefile on SIGTERM:</description>
+			<tooltip>Select to create corefile if application gets SIGTERM {MP_COREFILE_SIGTERM}
+			</tooltip>
+			<choice>yes,no,debug,minimum</choice>
+		</attribute>
+
+		<!-- System tab attributes -->
+		<attribute name="MP_EUIDEVICE_ATTR" type="string">
+			<description>Adapter:</description>
+			<tooltip>Specify adapter to use for message passing {MP_EUIDEVICE}
+			</tooltip>
+			<choice>en0,fi0,tr0,sn_all,sn_single,ml0</choice>
+		</attribute>
+
+		<attribute name="MP_EUILIB_ATTR" type="string">
+			<description>Communications subsystem:</description>
+			<tooltip>Communication subsystem to be used (Default: ip) {MP_EUILIB}
+			</tooltip>
+			<choice>ip,us</choice>
+		</attribute>
+
+		<attribute name="MP_TASK_AFFINITY_ATTR" type="string">
+			<description>Task affinity:</description>
+			<tooltip>Attach application tasks to system rset for task affinity {MP_TASK_AFFINITY} )
+			</tooltip>
+			<choice>,mcm,sni,core,cpu,primary,mcm-list,1</choice>
+			<validator>
+				<regex
+					expression=" *|mcm|sni|core|cpu|mcm-list|primary|1|core:[0-9]+|cpu:[0-9]+|primary:[0-9]+" /> <!-- MP_TASK_AFFINITY options -->
+				<error-message>Task affinity election is invalid
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_FIFO_ROUTE_MODE_ATTR" type="string">
+			<description>FIFO routing mode:</description>
+			<tooltip>Routing mode to be used for FIFO operations (Default: hw_direct) {MP_FIFO_ROUTE_MODE_ADDR}
+			</tooltip>
+			<choice>hw_direct,sw_indirect,hw_direct_striped,hw_indirect</choice>
+		</attribute>
+
+		<attribute name="MP_RDMA_ROUTE_MODE_ATTR" type="string">
+			<description>RDMA routing mode:</description>
+			<tooltip>Routing mode to be used for RDMA operations (Default: hw_direct) {MP_RDMA_ROUTE_MODE_ADDR}
+			</tooltip>
+			<choice>hw_direct,sw_indirect,hw_direct_striped,hw_indirect</choice>
+		</attribute>
+
+		<attribute name="MP_INSTANCES_ATTR" type="integer">
+			<description>Window instances:</description>
+			<tooltip>Specify number of user space windows or IP addresses to use (Default: 1) {MP_INSTANCES}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Number of instances must be numeric</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_ADAPTER_USE_ATTR" type="string">
+			<description>Exclusive adapter use:</description>
+			<tooltip>Specify how node's adapter should be used {MP_ADAPTER_USE}</tooltip>
+			<choice>ip,us</choice>
+		</attribute>
+
+		<attribute name="MP_CPU_USE_ATTR" type="string">
+			<description>Exclusive CPU use:</description>
+			<tooltip>Specify how node's CPU should be used {MP_CPU_USE}
+			</tooltip>
+			<choice>ip,us</choice>
+		</attribute>
+
+		<attribute name="MP_BINDPROC_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Bind tasks to first CPU:</description>
+			<tooltip>Bind tasks to first logical CPU. Use for OpenMP Only {MP_BINDPROC}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_USE_MC_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Use hardware multicast:</description>
+			<tooltip>Specifies if hardware multicast feature is used (Default: no) {MP_USE_MC}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_MC_INET_BASE_ADDR_ATTR" type="string">
+			<description>Base multicast IP address:</description>
+			<tooltip>Specify the base IPv4 multicast address (Default: 224.3.0.1) {MP_MC_INET_BASE_ADDR}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}" /> <!-- Blank or IP address -->
+				<error-message>Multicast base address must be a valid IPv$ IP address
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_MC_INET_ADDR_LEN_ATTR" type="integer">
+			<description>Number of multicast addresses:</description>
+			<tooltip>Specify size of multicase address range (Default: 16) {MP_MC_INET_ADDR_LEN}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Size of muticast range must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_MC_INET_PORT_ATTR" type="integer" min="1024"
+			max="65535">
+			<description>Multicast port number:</description>
+			<tooltip>Specify port number to use for multicasting (Default: 2008) {MP_MC_INET_PORT}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Multicast port number must be numeric</error-message>
+			</validator>
+		</attribute>
+
+		<!-- Nodes tab attributes -->
+		<attribute name="MP_CMDFILE_ATTR" type="string">
+			<description>Command file:</description>
+			<tooltip>Specify script to load nodes in partition {MP_CMDFILE}
+			</tooltip>
+			<validator>
+				<file-info efsAttributes="ATTRIBUTE_OWNER_READ"
+					isDirectory="false" />
+				<error-message>Command file must be a readable file on remote system
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_RMFILE_ATTR" type="string">
+			<description>Node allocation file:</description>
+			<tooltip>Specify resource manager command file for node allocation {MP_RMFILE}
+			</tooltip>
+			<validator>
+				<file-info efsAttributes="ATTRIBUTE_OWNER_READ"
+					isDirectory="false" />
+				<error-message>Node allocation command file must be a readable file	on remote system
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_REMOTEDIR_ATTR" type="string">
+			<description>Remote directory script:</description>
+			<tooltip>Specify script to echo name of current directory to be used on remote nodes {MP_REMOTEDIR}
+			</tooltip>
+			<validator>
+				<file-info efsAttributes="ATTRIBUTE_OWNER_READ"
+					isDirectory="false" />
+				<error-message>Remote directory script must be a readable file on remote system
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_PGMMODEL_ATTR" type="string">
+			<description>Programming model:</description>
+			<tooltip>Specify programming model (Default: spmd) {MP_PGMMODEL}
+			</tooltip>
+			<choice>spmd,mpmd</choice>
+		</attribute>
+		
+		<attribute name="MP_RMPOOL_ATTR" type="integer">
+			<description>Node allocation pool:</description>
+			<tooltip>"Specify name of node allocation pool {MP_RMPOOL}"
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_RETRY_ATTR" type="integer">
+			<description>Job submission timeout:</description>
+			<tooltip>"Specify job submission timeout ( &lt;0: wait indefinitely, 0:	no wait, &gt;0, wait specified interval) (Default: 0) {MP_RETRY}"
+			</tooltip>
+			<validator>
+				<regex expression=" *|-?[0-9]*" /> <!-- Blank or signed numeric -->
+				<error-message>Job submission timeout must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_RM_TIMEOUT_ATTR" type="integer">
+			<description>Resource mgr connect timeout:</description>
+			<tooltip>"Specify resource manager connection timeout (&lt;0: wait indefinitely, 0:	no wait, &gt;0, wait specified interval) (Default: 30) {MP_RM_TIMEOUT}"
+			</tooltip>
+			<validator>
+				<regex expression=" *|-?[0-9]*" /> <!-- Blank or signed numeric -->
+				<error-message>Resource manager connection timeout must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_TIMEOUT_ATTR" type="integer">
+			<description>POE connection timeout:</description>
+			<tooltip>"Specify POE connection timeout {MP_TIMEOUT}"
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]*" /> <!-- Blank or numeric -->
+				<error-message>POE Connection timeout must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<!-- Performance tab 1 attributes -->
+		<attribute name="MP_ACK_THRESH_ATTR" type="integer">
+			<description>Acknowledgment threshold:</description>
+			<tooltip>Specify packet acknowledgment threshold {MP_ACK_THRESH}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Acknowledgement threshold must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_POLLING_INTERVAL_ATTR" type="integer">
+			<description>MPI polling interval:</description>
+			<tooltip>Specify PE polling interval (Default: 400000) {MP_POLLING_INTERVAL}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>MPI polling interval must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_UDP_PACKET_SIZE_ATTR" type="integer">
+			<description>UDP packet size:</description>
+			<tooltip>Specify UDP packet size {MP_UDP_PACKET_SIZE_ATTR}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>UDP packet size must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_WAIT_MODE_ATTR" type="string">
+			<description>Wait mode:</description>
+			<tooltip>Specify thread behavior when waiting for messages (Default: poll) {MP_WAIT_MODE}
+			</tooltip>
+			<choice>nopoll,poll,sleep,yield</choice>
+		</attribute>
+
+		<attribute name="MP_BULK_MIN_MSG_SIZE_ATTR" type="integer">
+			<description>Minimum bulk message size:</description>
+			<tooltip>Specify minimum message size for messages using bulk transfer (Default: 153600) {MP_BULK_MIN_MSG_SIZE}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+[GKM]{0,1}" /> <!-- Blank or numeric -->
+				<error-message>Minimum bulk message size must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_RC_MAX_QP_ATTR" type="integer">
+			<description>Maximum QPairs:</description>
+			<tooltip>Specify the maximum number of QPairs (Default: 8156) {MP_RC_MAX_QP}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Maximum number of QPairs must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_IMM_SEND_BUFFERS_ATTR" type="integer">
+			<description>Immediate send buffers:</description>
+			<tooltip>Specify the number of immediate send buffers (Default: 1) {MP_IMM_SEND_BUFFERS}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Number of immediate send buffers must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_COLLECTIVE_GROUPS_ATTR" type="integer">
+			<description>CAU groups:</description>
+			<tooltip>Specify the number of CAU groups (Default: 0) {MP_COLLECTIVE_GROUPS}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Number of CAU groups must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_CC_SCRATCH_BUF_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Fastest collectives:</description>
+			<tooltip>Specify if fastest collective algorithm is used {MP_CC_SCRATCH_BUF}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_CSS_INTERRUPT_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Packets generate interrupts:</description>
+			<tooltip>Specify if arriving packets generate interrupts (Default: no) {MP_CSS_INTERRUPT}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_USE_BULK_XFER_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Use bulk transfer:</description>
+			<tooltip>Use adapter bult data transfer mechanisms (Default: no) {MP_USE_BULK_XFER}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_RC_USE_LMC_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Use LMC:</description>
+			<tooltip>Use lid mask control (LMC) (Default: no) {MP_RC_USE_LMC}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_FORCED_INTERRUPTS_ENABLED_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Use forced interrupts:</description>
+			<tooltip>Use forced interrupts for rondezvous message in RDMA transfer (Default: no) {MP_FORCED_INTERRUPTS_ENABLED}
+			</tooltip>
+		</attribute>
+
+		<!-- Performance tab 2 attributes -->
+
+		<attribute name="MP_MSG_ENVELOPE_BUF_ATTR" type="integer">
+			<description>Envelope buffer size:</description>
+			<tooltip>Specify size of message envelope buffer (Default 8388608) {MP_MSG_ENVELOPE_BUF}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Envelope buffer size must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_IO_BUFFER_SIZE_ATTR" type="integer">
+			<description>MPI_IO buffer size:</description>
+			<tooltip>Specify size of MPI_IO buffer {MP_IO_BUFFER_SIZE}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>MPI_IO buffer size must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_EAGER_LIMIT_ATTR" type="integer">
+			<description>Eager limit:</description>
+			<tooltip>Specify rendezvous protocol message size threshold (Default: 4096)
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Eager limit must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_RETRANSMIT_INTERVAL_ATTR" type="integer">
+			<description>MPI retransmit interval:</description>
+			<tooltip>Specify interval to check if retransmit required {MP_RETRANSMIT_INTERVAL}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>MPI retransmit interval must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_REXMIT_BUF_CNT_ATTR" type="integer">
+			<description>Retransmit buffers:</description>
+			<tooltip>Specify number of retransmit buffers per task (Default: 128)
+				{MP_REXMIT_BUF_CNT}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Retransmit buffers must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_REXMIT_BUF_SIZE_ATTR" type="integer">
+			<description>Maximum PAMI/LAPI buffered message:</description>
+			<tooltip>Specify maximum LAPI buffer size (Default: 16352) {MP_REXMIT_BUF_SIZE}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Retransmit buffer size must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_PRIORITY_ATTR" type="string">
+			<description>Co-scheduler priority:</description>
+			<tooltip>Specify co-scheduler priority class name {MP_PRIORITY}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_SHARED_MEMORY_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Use shared memory:</description>
+			<tooltip>Specify if shared memory is used for communication (Default: yes) {MP_SHARED_MEMORY}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_SHMCC_EXCLUDE_LIST_ATTR" type="string">
+			<description>Shared memory exclusions:</description>
+			<tooltip>Specify list of MPI collecttives excluded from using shared memory {MP_SHMCC_EXCLUDE_LIST}
+			</tooltip>
+		</attribute>
+
+		<attribute name="SCI_DEBUG_FANOUT_ATTR" type="integer">
+			<description>SCI fanout:</description>
+			<tooltip>Specify fanout value for SCI agent tree (Default: 32) {SCI_DEBUG_FANOUT}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>SCI fanout must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_SINGLE_THREAD_ATTR" type="string">
+			<description>Single MPI thread:</description>
+			<tooltip>Specify if application has single thread with MPI calls (Default: no) {MP_SINGLE_THREAD}
+			</tooltip>
+			<choice>,yes,no,confirm</choice>
+		</attribute>
+
+		<!-- Miscellaneous tab attributes -->
+
+		<attribute name="MP_CLOCK_SOURCE_ATTR" type="string">
+			<description>Clock source:</description>
+			<tooltip>Specify if high performance switch is clock source
+				{MP_CLOCK_SOURCE}
+			</tooltip>
+			<choice>,switch,ntp,aix</choice>
+		</attribute>
+
+		<attribute name="MP_MSG_API_ATTR" type="string">
+			<description>Message passing API:</description>
+			<tooltip>Specify message passing API(s) used by application (Default: mpi) {MP_MSG_API}
+			</tooltip>
+			<choice>"mpi,pami,lapi"</choice>
+		</attribute>
+
+		<attribute name="MP_DEVTYPE_ATTR" type="string">
+			<description>Device type class:</description>
+			<tooltip>Select 'hfi' to use HFI device type, blank otherwise {MP_DEVTYPE}
+			</tooltip>
+			<choice>,hfi</choice>
+		</attribute>
+
+		<attribute name="MP_TLP_REQUIRED_ATTR" type="string">
+			<description>Large pages required:</description>
+			<tooltip>Specifies if POE shuld check if application was compiled for large pages {MP_TLP_REQUIRED}
+			</tooltip>
+			<choice>,none,warn,kill</choice>
+		</attribute>
+
+		<attribute name="MP_EUILIBPATH_ATTR" type="string">
+			<description>Library path:</description>
+			<tooltip>Specify path to message passing and communication libraries (Default: /opt/ibmhpc/pe1100/ppe.poe/lib) {MP_EUILIBPATH} 
+			</tooltip>
+			<validator>
+				<file-info
+					efsAttributes="ATTRIBUTE_OWNER_READ | ATTRIBUTE_OWNER_WRITE | ATTRIBUTE_OWNER_EXECUTE"
+					isDirectory="true" />
+				<error-message>Library path must be a directory containing communication libraries
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_SAVEHOSTFILE_ATTR" type="string">
+			<description>Generated host file:</description>
+			<tooltip>Specify path to saved hostfile generated by partition manager {MP_SAVEHOSTFILE}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_SAVE_RMFILE_ATTR" type="string">
+			<description>Generated job command file:</description>
+			<tooltip>Specify path to saved job command file generated by partition manager {MP_SAVE_RMFILE}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_IONODEFILE_ATTR" type="string">
+			<description>MPI I/O Node List:</description>
+			<tooltip>Specify the file listing nodes performing parallel I/O {MP_IONODEFILE}
+			</tooltip>
+			<validator>
+				<file-info efsAttributes="ATTRIBUTE_OWNER_READ"
+					isDirectory="false" />
+				<error-message>MPI I/O node list file must be a readable file
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_PULSE_ATTR" type="integer">
+			<description>Pulse interval:</description>
+			<tooltip>Specify the interval at which PE checks remote nodes (Default: 600) {MP_PULSE}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Pulse interval must be numeric</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_THREAD_STACKSIZE_ATTR" type="integer">
+			<description>Additional MPI thread stack size:</description>
+			<tooltip>Specify additional stack size for MPI service thread (Default: 0) {MP_THREAD_STACKSIZE}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+[KM]{0,1}" /> <!-- Blank or numeric -->
+				<error-message>Thread stack size must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_TIMEOUT_ATTR" type="integer">
+			<description>Connection timeout:</description>
+			<tooltip>Specify timeout limit for connecting to remote nodes (Default: 150) {MP_TIMEOUT}
+			</tooltip>
+			<validator>
+				<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+				<error-message>Connection timeout must be numeric
+				</error-message>
+			</validator>
+		</attribute>
+
+		<attribute name="MP_CONFIG_ATTR" type="string">
+			<description>Use PE release level:</description>
+			<tooltip>Specify the PE release level to use {MP_CONFIG}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_PMDSUFFIX_ATTR" type="string">
+			<description>Alternate PMD service suffix:</description>
+			<tooltip>Specify the suffix for the PMD service name {MP_PMD_SUFFIX}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_HINTS_FILTERED_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Hints filtered:</description>
+			<tooltip>Specify if MPI info objects reject hints (Default: no) {MP_HINTS_FILTERED}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_PRIORITY_NTP_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Co-scheduler disables NTP:</description>
+			<tooltip>Specify if PE co-scheduler disables NTP during adjustment period (Default: no) {MP_PRIORITY_NTP} 
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_COSCHEDULER_VERSION_ATTR" type="boolean"
+			translateBooleanAs="runqueue,''">
+			<description>Use runqueue co-scheduler:</description>
+			<tooltip>Specifies if POE runqueue co-scheduler is used {MP_COSCHEDULER_VERSION}
+			</tooltip>
+		</attribute>
+
+		<attribute name="MP_IO_ERRLOG_ATTR" type="boolean"
+			translateBooleanAs="yes,no">
+			<description>Create I/O error log:</description>
+			<tooltip>Specify if I/O error logging is enabled (Default: no) {MP_IO_ERRLOG}
+			</tooltip>
+		</attribute>
+
+		<!-- Invocation command definition -->
+		<submit-interactive name="POE command" waitForId="true" keepOpen="true" directory="${ptp_rm:executableDirectory#value}">
+			<arg>perl</arg>
+			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app.pl</arg>
+			<arg>${ptp_rm:executablePath#value}</arg>
+			<arg>${ptp_rm:progArgs#value}</arg>
+
+			<!-- Tasks tab environment variables -->
+			<environment name="MP_PROCS" value="${ptp_rm:MP_PROCS_ATTR#value}" />
+			<environment name="MP_HOSTFILE" value="${ptp_rm:MP_HOSTFILE_ATTR#value}" />
+			<environment name="MP_NEWJOB" value="${ptp_rm:MP_NEWJOB_ATTR#value}" />
+			<environment name="MP_NODES" value="${ptp_rm:MP_NODES_ATTR#value}" />
+			<environment name="MP_TASKS_PER_NODE"
+				value="${ptp_rm:MP_TASKS_PER_NODE_ATTR#value}" />
+			<environment name="MP_WORLD_SIZES" value="${ptp_rm:MP_WORLD_SIZES_ATTR#value}" />
+
+			<!-- I/O tab environment variables -->
+			<environment name="MP_STDINMODE" value="${ptp_rm:MP_STDINMODE_ATTR#value}" />
+			<environment name="MP_STDOUTMODE" value="${ptp_rm:MP_STDOUTMODE_ATTR#value}" />
+			<environment name="MP_IOAGENT_CNT" value="${ptp_rm:MP_IOAGENT_CNT_ATTR#value}" />
+			<environment name="MP_IOTASKLIST" value="${ptp_rm:MP_IOTASKLIST_ATTR#value}" />
+			<environment name="MP_LABELIO" value="${ptp_rm:MP_LABELIO_ATTR#value}" />
+
+			<!-- Diagnostic tab environment variables -->
+			<environment name="MP_PMDLOG_DIR" value="${ptp_rm:MP_PMDLOG_DIR_ATTR#value}" />
+			<environment name="MP_INFOLEVEL" value="${ptp_rm:MP_INFOLEVEL_ATTR#value}" />
+			<environment name="MP_PMDLOG" value="${ptp_rm:MP_PMDLOG_ATTR#value}" />
+			<environment name="MP_STATISTICS" value="${ptp_rm:MP_STATISTICS_ATTR#value}" />
+			<environment name="MP_PRINTENV" value="${ptp_rm:MP_PRINTENV_ATTR#value}" />
+			<environment name="MP_PRIORITY_LOG_DIR"
+				value="${ptp_rm:MP_PRIORITY_LOG_DIR_ATTR#value}" />
+			<environment name="MP_PRIORITY_LOG_NAME"
+				value="${ptp_rm:MP_PRIORITY_LOG_NAME_ATTR#value}" />
+			<environment name="MP_PRIORITY_LOG" value="${ptp_rm:MP_PRIORITY_LOG_ATTR#value}" />
+
+			<!-- Debug tab environment variables -->
+			<environment name="MP_COREDIR" value="${ptp_rm:MP_COREDIR_ATTR#value}" />
+			<environment name="MP_PROFDIR" value="${ptp_rm:MP_PROFDIR_ATTR#value}" />
+			<environment name="MP_EUIDEVELOP" value="${ptp_rm:MP_EUIDEVELOP_ATTR#value}" />
+			<environment name="MP_COREFILE_FORMAT"
+				value="${ptp_rm:MP_COREFILE_FORMAT_ATTR#value}" />
+			<environment name="MP_COREFILE_SIGTERM"
+				value="${ptp_rm:MP_COREFILE_SIGTERM_ATTR#value}" />
+
+			<!-- System tab environment variables -->
+			<environment name="MP_EUIDEVICE" value="${ptp_rm:MP_EUIDEVICE_ATTR#value}" />
+			<environment name="MP_EUILIB" value="${ptp_rm:MP_EUILIB_ATTR#value}" />
+			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE_ATTR#value}" />
+			<environment name="MP_INSTANCES" value="${ptp_rm:MP_INSTANCES_ATTR#value}" />
+			<environment name="MP_CPU_USE" value="${ptp_rm:MP_CPU_USE_ATTR#value}" />
+			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC_ATTR#value}" />
+			<environment name="MP_TASK_AFFINITY" value="${ptp_rm:MP_TASK_AFFINITY_ATTR#value}" />
+			<environment name="MP_USE_MC" value="${ptp_rm:MP_USE_MC_ATTR#value}" />
+			<environment name="MP_MC_INET_BASE_ADDR"
+				value="${ptp_rm:MP_MC_INET_BASE_ADDR_ATTR#value}" />
+			<environment name="MP_MC_INET_ADDR_LEN"
+				value="${ptp_rm:MP_MC_INET_ADDR_LEN_ATTR#value}" />
+			<environment name="MP_MC_INET_PORT" value="${ptp_rm:MP_MC_INET_PORT_ATTR#value}" />
+			<environment name="MP_FIFO_ROUTE_MODE"
+				value="${ptp_rm:MP_FIFO_ROUTE_MODE_ATTR#value}" />
+			<environment name="MP_RDMA_ROUTE_MODE"
+				value="${ptp_rm:MP_RDMA_ROUTE_MODE_ATTR#value}" />
+
+			<!-- Nodes tab environment variables -->
+			<environment name="MP_CMDFILE" value="${ptp_rm:MP_CMDFILE_ATTR#value}" />
+			<environment name="MP_RMFILE" value="${ptp_rm:MP_RMFILE_ATTR#value}" />
+			<environment name="MP_REMOTEDIR" value="${ptp_rm:MP_REMOTEDIR_ATTR#value}" />
+			<environment name="MP_PGMMODEL" value="${ptp_rm:MP_PGMMODEL_ATTR#value}" />
+			<environment name="MP_RESD" value="yes" />
+			<environment name="MP_RETRY" value="${ptp_rm:MP_RETRY_ATTR#value}" />
+			<environment name="MP_RM_TIMEOUT" value="${ptp_rm:MP_RM_TIMEOUT_ATTR#value}" />
+			<environment name="MP_TIMEOUT" value="${ptp_rm:MP_TIMEOUT_ATTR#value}" />
+			<environment name="MP_RMPOOL" value="${ptp_rm:MP_RMPOOL_ATTR#value}" />
+
+			<!-- Performance tab 1 environment variables -->
+			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH_ATTR#value}" />
+			<environment name="MP_POLLING_INTERVAL"
+				value="${ptp_rm:MP_POLLING_INTERVAL_ATTR#value}" />
+			<environment name="MP_UDP_PACKET_SIZE"
+				value="${ptp_rm:MP_UDP_PACKET_SIZE_ATTR#value}" />
+			<environment name="MP_WAIT_MODE" value="${ptp_rm:MP_WAIT_MODE_ATTR#value}" />
+			<environment name="MP_CC_SCRATCH_BUF" value="${ptp_rm:MP_SCRATCH_BUF_ATTR#value}" />
+			<environment name="MP_CSS_INTERRUPT" value="${ptp_rm:MP_CSS_INTERRUPT_ATTR#value}" />
+			<environment name="MP_USE_BULK_XFER" value="${ptp_rm:MP_USE_BULK_XFER_ATTR#value}" />
+			<environment name="MP_RC_USE_LMC" value="${ptp_rm:MP_RC_USE_LMC_ATTR#value}" />
+			<environment name="MP_FORCED_INTERRUPTS_ENABLED"
+				value="${ptp_rm:MP_FORCED_INTERRUPTS_ENABLED_ATTR#value}" />
+			<environment name="MP_BULK_MIN_MSG_SIZE"
+				value="${ptp_rm:MP_BULK_MIN_MSG_SIZE_ATTR#value}" />
+			<environment name="MP_RC_MAX_QP" value="${ptp_rm:MP_RC_MAX_QP_ATTR#value}" />
+			<environment name="MP_IMM_SEND_BUFFERS"
+				value="${ptp_rm:MP_IMM_SEND_BUFFERS_ATTR#value}" />
+			<environment name="MP_COLLECTIVE_GROUPS"
+				value="${ptp_rm:MP_COLLECTIVE_GROUPS_ATTR#value}" />
+
+			<!-- Performance tab 2 environment variables -->
+			<environment name="MP_MSG_ENVELOPE_BUF" value="${ptp_rm:MP_MSG_ENVELOPE_BUF_ATTR#value}" />
+			<environment name="MP_EAGER_LIMIT" value="${ptp_rm:MP_EAGER_LIMIT_ATTR#value}" />
+			<environment name="MP_RETRANSMIT_INTERVAL"
+				value="${ptp_rm:MP_RETRANSMIT_INTERVAL_ATTR#value}" />
+			<environment name="MP_REXMIT_BUF_CNT"
+				value="${ptp_rm:MP_REXMIT_BUF_CNT_ATTR#value}" />
+			<environment name="MP_REXMIT_BUF_SIZE"
+				value="${ptp_rm:MP_REXMIT_BUF_SIZE_ATTR#value}" />
+			<environment name="MP_SHARED_MEMORY" value="${ptp_rm:MP_SHARED_MEMORY_ATTR#value}" />
+			<environment name="MP_SINGLE_THREAD"
+				value="${ptp_rm:MP_SINGLE_THREAD_ATTR#value}" />
+			<environment name="MP_IO_BUFFER_SIZE"
+				value="${ptp_rm:MP_IO_BUFFER_SIZE_ATTR#value}" />
+			<environment name="MP_SHMCC_EXCLUDE_LIST"
+				value="${ptp_rm:MP_SHMCC_EXCLUDE_LIST_ATTR#value}" />
+			<environment name="SCI_DEBUG_FANOUT" value="${ptp_rm:SCI_DEBUG_FANOUT_ATTR#value}" />
+			<environment name="MP_PRIORITY" value="${ptp_rm:MP_PRIORITY_ATTR#value}" />
+
+			<!-- Miscellaneous tab environment variables -->
+			<environment name="MP_CLOCK_SOURCE" value="${ptp_rm:MP_CLOCK_SOURCE_ATTR#value}" />
+			<environment name="MP_MSG_API" value="${ptp_rm:MP_MSG_API_ATTR#value}" />
+			<environment name="MP_DEVTYPE" value="${ptp_rm:MP_DEVTYPE_ATTR#value}" />
+			<environment name="MP_EUILIBPATH" value="${ptp_rm:MP_EUILIBPATH_ATTR#value}" />
+			<environment name="MP_IONODEFILE" value="${ptp_rm:MP_IONODEFILE_ATTR#value}" />
+			<environment name="MP_PULSE" value="${ptp_rm:MP_PULSE_ATTR#value}" />
+			<environment name="MP_THREAD_STACKSIZE"
+				value="${ptp_rm:MP_THREAD_STACKSIZE_ATTR#value}" />
+			<environment name="MP_TIMEOUT" value="${ptp_rm:MP_TIMEOUT_ATTR#value}" />
+			<environment name="MP_IO_BUFFER_SIZE"
+				value="${ptp_rm:MP_IO_BUFFER_SIZE_ATTR#value}" />
+			<environment name="MP_HINTS_FILTERED"
+				value="${ptp_rm:MP_HINTS_FILTERED_ATTR#value}" />
+			<environment name="MP_IO_ERRLOG" value="${ptp_rm:MP_IO_ERRLOG_ATTR#value}" />
+			<environment name="MP_SAVEHOSTFILE" value="${ptp_rm:MP_SAVEHOSTFILE_ATTR#value}" />
+			<environment name="MP_SAVE_RMFILE" value="${ptp_rm:MP_SAVE_RMFILE_ATTR#value}" />
+			<environment name="MP_CONFIG" value="${ptp_rm:MP_CONFIG_ATTR#value}" />
+			<environment name="MP_PMDSUFFIX" value="${ptp_rm:MP_PMDSUFFIX_ATTR#value}" />
+			<environment name="MP_PRIORITY_NTP" value="${ptp_rm:MP_PRIORITY_NTP_ATTR#value}" />
+			<environment name="MP_COSCHEDULER_VERSION"
+				value="${ptp_rm:MP_COSCHEDULER_VERSION_ATTR#value}" />
+			<environment name="MP_TLP_REQUIRED" value="${ptp_rm:MP_TLP_REQUIRED_ATTR#value}" />
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>::::PoePid=([0-9]+)::::</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
+						<set field="value">
+							<entry value="RUNNING" />
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+
+		</submit-interactive>
+		
+		<!-- Invocation command definition -->
+		<submit-interactive-debug name="POE command" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true" >
+			<arg>perl</arg>
+			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app_debug.pl</arg>
+			<arg>poe</arg>
+			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
+			<arg>${ptp_rm:debuggerArgs#value}</arg>
+
+			<!-- Tasks tab environment variables -->
+			<environment name="MP_PROCS" value="${ptp_rm:MP_PROCS_ATTR#value}" />
+			<environment name="MP_HOSTFILE" value="${ptp_rm:MP_HOSTFILE_ATTR#value}" />
+			<environment name="MP_NEWJOB" value="${ptp_rm:MP_NEWJOB_ATTR#value}" />
+			<environment name="MP_NODES" value="${ptp_rm:MP_NODES_ATTR#value}" />
+			<environment name="MP_TASKS_PER_NODE"
+				value="${ptp_rm:MP_TASKS_PER_NODE_ATTR#value}" />
+			<environment name="MP_WORLD_SIZES" value="${ptp_rm:MP_WORLD_SIZES_ATTR#value}" />
+
+			<!-- I/O tab environment variables -->
+			<environment name="MP_STDINMODE" value="${ptp_rm:MP_STDINMODE_ATTR#value}" />
+			<environment name="MP_STDOUTMODE" value="${ptp_rm:MP_STDOUTMODE_ATTR#value}" />
+			<environment name="MP_IOAGENT_CNT" value="${ptp_rm:MP_IOAGENT_CNT_ATTR#value}" />
+			<environment name="MP_IOTASKLIST" value="${ptp_rm:MP_IOTASKLIST_ATTR#value}" />
+			<environment name="MP_LABELIO" value="${ptp_rm:MP_LABELIO_ATTR#value}" />
+
+			<!-- Diagnostic tab environment variables -->
+			<environment name="MP_PMDLOG_DIR" value="${ptp_rm:MP_PMDLOG_DIR_ATTR#value}" />
+			<environment name="MP_INFOLEVEL" value="${ptp_rm:MP_INFOLEVEL_ATTR#value}" />
+			<environment name="MP_PMDLOG" value="${ptp_rm:MP_PMDLOG_ATTR#value}" />
+			<environment name="MP_STATISTICS" value="${ptp_rm:MP_STATISTICS_ATTR#value}" />
+			<environment name="MP_PRINTENV" value="${ptp_rm:MP_PRINTENV_ATTR#value}" />
+			<environment name="MP_PRIORITY_LOG_DIR"
+				value="${ptp_rm:MP_PRIORITY_LOG_DIR_ATTR#value}" />
+			<environment name="MP_PRIORITY_LOG_NAME"
+				value="${ptp_rm:MP_PRIORITY_LOG_NAME_ATTR#value}" />
+			<environment name="MP_PRIORITY_LOG" value="${ptp_rm:MP_PRIORITY_LOG_ATTR#value}" />
+
+			<!-- Debug tab environment variables -->
+			<environment name="MP_COREDIR" value="${ptp_rm:MP_COREDIR_ATTR#value}" />
+			<environment name="MP_PROFDIR" value="${ptp_rm:MP_PROFDIR_ATTR#value}" />
+			<environment name="MP_EUIDEVELOP" value="${ptp_rm:MP_EUIDEVELOP_ATTR#value}" />
+			<environment name="MP_COREFILE_FORMAT"
+				value="${ptp_rm:MP_COREFILE_FORMAT_ATTR#value}" />
+			<environment name="MP_COREFILE_SIGTERM"
+				value="${ptp_rm:MP_COREFILE_SIGTERM_ATTR#value}" />
+
+			<!-- System tab environment variables -->
+			<environment name="MP_EUIDEVICE" value="${ptp_rm:MP_EUIDEVICE_ATTR#value}" />
+			<environment name="MP_EUILIB" value="${ptp_rm:MP_EUILIB_ATTR#value}" />
+			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE_ATTR#value}" />
+			<environment name="MP_INSTANCES" value="${ptp_rm:MP_INSTANCES_ATTR#value}" />
+			<environment name="MP_CPU_USE" value="${ptp_rm:MP_CPU_USE_ATTR#value}" />
+			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC_ATTR#value}" />
+			<environment name="MP_TASK_AFFINITY" value="${ptp_rm:MP_TASK_AFFINITY_ATTR#value}" />
+			<environment name="MP_USE_MC" value="${ptp_rm:MP_USE_MC_ATTR#value}" />
+			<environment name="MP_MC_INET_BASE_ADDR"
+				value="${ptp_rm:MP_MC_INET_BASE_ADDR_ATTR#value}" />
+			<environment name="MP_MC_INET_ADDR_LEN"
+				value="${ptp_rm:MP_MC_INET_ADDR_LEN_ATTR#value}" />
+			<environment name="MP_MC_INET_PORT" value="${ptp_rm:MP_MC_INET_PORT_ATTR#value}" />
+			<environment name="MP_FIFO_ROUTE_MODE"
+				value="${ptp_rm:MP_FIFO_ROUTE_MODE_ATTR#value}" />
+			<environment name="MP_RDMA_ROUTE_MODE"
+				value="${ptp_rm:MP_RDMA_ROUTE_MODE_ATTR#value}" />
+
+			<!-- Nodes tab environment variables -->
+			<environment name="MP_CMDFILE" value="${ptp_rm:MP_CMDFILE_ATTR#value}" />
+			<environment name="MP_RMFILE" value="${ptp_rm:MP_RMFILE_ATTR#value}" />
+			<environment name="MP_REMOTEDIR" value="${ptp_rm:MP_REMOTEDIR_ATTR#value}" />
+			<environment name="MP_PGMMODEL" value="${ptp_rm:MP_PGMMODEL_ATTR#value}" />
+			<environment name="MP_RESD" value="yes" />
+			<environment name="MP_RETRY" value="${ptp_rm:MP_RETRY_ATTR#value}" />
+			<environment name="MP_RM_TIMEOUT" value="${ptp_rm:MP_RM_TIMEOUT_ATTR#value}" />
+			<environment name="MP_TIMEOUT" value="${ptp_rm:MP_TIMEOUT_ATTR#value}" />
+			<environment name="MP_RMPOOL" value="${ptp_rm:MP_RMPOOL_ATTR#value}" />
+
+			<!-- Performance tab 1 environment variables -->
+			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH_ATTR#value}" />
+			<environment name="MP_POLLING_INTERVAL"
+				value="${ptp_rm:MP_POLLING_INTERVAL_ATTR#value}" />
+			<environment name="MP_UDP_PACKET_SIZE"
+				value="${ptp_rm:MP_UDP_PACKET_SIZE_ATTR#value}" />
+			<environment name="MP_WAIT_MODE" value="${ptp_rm:MP_WAIT_MODE_ATTR#value}" />
+			<environment name="MP_CC_SCRATCH_BUF" value="${ptp_rm:MP_SCRATCH_BUF_ATTR#value}" />
+			<environment name="MP_CSS_INTERRUPT" value="${ptp_rm:MP_CSS_INTERRUPT_ATTR#value}" />
+			<environment name="MP_USE_BULK_XFER" value="${ptp_rm:MP_USE_BULK_XFER_ATTR#value}" />
+			<environment name="MP_RC_USE_LMC" value="${ptp_rm:MP_RC_USE_LMC_ATTR#value}" />
+			<environment name="MP_FORCED_INTERRUPTS_ENABLED"
+				value="${ptp_rm:MP_FORCED_INTERRUPTS_ENABLED_ATTR#value}" />
+			<environment name="MP_BULK_MIN_MSG_SIZE"
+				value="${ptp_rm:MP_BULK_MIN_MSG_SIZE_ATTR#value}" />
+			<environment name="MP_RC_MAX_QP" value="${ptp_rm:MP_RC_MAX_QP_ATTR#value}" />
+			<environment name="MP_IMM_SEND_BUFFERS"
+				value="${ptp_rm:MP_IMM_SEND_BUFFERS_ATTR#value}" />
+			<environment name="MP_COLLECTIVE_GROUPS"
+				value="${ptp_rm:MP_COLLECTIVE_GROUPS_ATTR#value}" />
+
+			<!-- Performance tab 2 environment variables -->
+			<environment name="MP_MSG_ENVELOPE_BUF" value="${ptp_rm:MP_MSG_ENVELOPE_BUF_ATTR#value}" />
+			<environment name="MP_EAGER_LIMIT" value="${ptp_rm:MP_EAGER_LIMIT_ATTR#value}" />
+			<environment name="MP_RETRANSMIT_INTERVAL"
+				value="${ptp_rm:MP_RETRANSMIT_INTERVAL_ATTR#value}" />
+			<environment name="MP_REXMIT_BUF_CNT"
+				value="${ptp_rm:MP_REXMIT_BUF_CNT_ATTR#value}" />
+			<environment name="MP_REXMIT_BUF_SIZE"
+				value="${ptp_rm:MP_REXMIT_BUF_SIZE_ATTR#value}" />
+			<environment name="MP_SHARED_MEMORY" value="${ptp_rm:MP_SHARED_MEMORY_ATTR#value}" />
+			<environment name="MP_SINGLE_THREAD"
+				value="${ptp_rm:MP_SINGLE_THREAD_ATTR#value}" />
+			<environment name="MP_IO_BUFFER_SIZE"
+				value="${ptp_rm:MP_IO_BUFFER_SIZE_ATTR#value}" />
+			<environment name="MP_SHMCC_EXCLUDE_LIST"
+				value="${ptp_rm:MP_SHMCC_EXCLUDE_LIST_ATTR#value}" />
+			<environment name="SCI_DEBUG_FANOUT" value="${ptp_rm:SCI_DEBUG_FANOUT_ATTR#value}" />
+			<environment name="MP_PRIORITY" value="${ptp_rm:MP_PRIORITY_ATTR#value}" />
+
+			<!-- Miscellaneous tab environment variables -->
+			<environment name="MP_CLOCK_SOURCE" value="${ptp_rm:MP_CLOCK_SOURCE_ATTR#value}" />
+			<environment name="MP_MSG_API" value="${ptp_rm:MP_MSG_API_ATTR#value}" />
+			<environment name="MP_DEVTYPE" value="${ptp_rm:MP_DEVTYPE_ATTR#value}" />
+			<environment name="MP_EUILIBPATH" value="${ptp_rm:MP_EUILIBPATH_ATTR#value}" />
+			<environment name="MP_IONODEFILE" value="${ptp_rm:MP_IONODEFILE_ATTR#value}" />
+			<environment name="MP_PULSE" value="${ptp_rm:MP_PULSE_ATTR#value}" />
+			<environment name="MP_THREAD_STACKSIZE"
+				value="${ptp_rm:MP_THREAD_STACKSIZE_ATTR#value}" />
+			<environment name="MP_TIMEOUT" value="${ptp_rm:MP_TIMEOUT_ATTR#value}" />
+			<environment name="MP_IO_BUFFER_SIZE"
+				value="${ptp_rm:MP_IO_BUFFER_SIZE_ATTR#value}" />
+			<environment name="MP_HINTS_FILTERED"
+				value="${ptp_rm:MP_HINTS_FILTERED_ATTR#value}" />
+			<environment name="MP_IO_ERRLOG" value="${ptp_rm:MP_IO_ERRLOG_ATTR#value}" />
+			<environment name="MP_SAVEHOSTFILE" value="${ptp_rm:MP_SAVEHOSTFILE_ATTR#value}" />
+			<environment name="MP_SAVE_RMFILE" value="${ptp_rm:MP_SAVE_RMFILE_ATTR#value}" />
+			<environment name="MP_CONFIG" value="${ptp_rm:MP_CONFIG_ATTR#value}" />
+			<environment name="MP_PMDSUFFIX" value="${ptp_rm:MP_PMDSUFFIX_ATTR#value}" />
+			<environment name="MP_PRIORITY_NTP" value="${ptp_rm:MP_PRIORITY_NTP_ATTR#value}" />
+			<environment name="MP_COSCHEDULER_VERSION"
+				value="${ptp_rm:MP_COSCHEDULER_VERSION_ATTR#value}" />
+			<environment name="MP_TLP_REQUIRED" value="${ptp_rm:MP_TLP_REQUIRED_ATTR#value}" />
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>::::PoePid=([0-9]+)::::</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
+						<set field="value">
+							<entry value="RUNNING" />
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+			<pre-launch-cmd name="Cleanup" exec="rm -f routing_file" wait="true"/>
+			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
+		</submit-interactive-debug>
+		
+		<terminate-job name="cancel">
+			<arg>kill</arg>
+			<arg>-INT</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+		</terminate-job>
+
+		<!-- Launch tab definition -->
+		<launch-tab>
+			<dynamic
+				includeWidgetValuesFrom="I/O,Diagnostic,Debug,System,Nodes,Performance 1,Performance2,Miscellaneous">
+				<title>Tasks</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite>
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+					</layout>
+
+					<!--MP_HOSTFILE: Specifies task to node mapping -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_HOSTFILE_ATTR#description}</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" saveValueTo="MP_HOSTFILE_ATTR"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_HOSTFILE_ATTR#tooltip}</tooltip>
+					</browse>
+
+					<!--MP_NEWJOB: Keep partition for multiple job steps -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_NEWJOB_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_NEWJOB_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_NEWJOB_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_WORLD_SIZES: Specifies MPI world sizes -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_WORLD_SIZES_ATTR#description}</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_WORLD_SIZES_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_WORLD_SIZES_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_PROCS: Specifies number of application tasks -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PROCS_ATTR#description}</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_PROCS_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PROCS_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_NODES: Number of nodes to allocate -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_NODES_ATTR#description}</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_NODES_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_NODES_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_TASKS_PER_NODE: Number of tasks to allocate per node -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_TASKS_PER_NODE_ATTR#description}:
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_TASKS_PER_NODE_ATTR"
+						style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_TASKS_PER_NODE_ATTR#tooltip}</tooltip>
+					</widget>
+				</composite>
+			</dynamic>
+
+			<dynamic
+				includeWidgetValuesFrom="Tasks,Diagnostic,Debug,System,Nodes,Performance 1,Performance2,Miscellaneous">
+				<title>I/O</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite>
+					<layout>
+						<grid-layout numColumns="2" makeColumnsEqualWidth="false" />
+					</layout>
+
+					<!--MP_STDINMODE: Specifies STDIN processing mode -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_STDINMODE_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="false" saveValueTo="MP_STDINMODE_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_STDINMODE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_STDOUTMODE: Specifies STDOUT processing mode -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_STDOUTMODE_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="false" saveValueTo="MP_STDOUTMODE_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_STDOUTMODE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_IOAGENT_CNT: MPI I/O agent count -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_IOAGENT_CNT_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="false" saveValueTo="MP_IOAGENT_CNT_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_IOAGENT_CNT_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_IOTASKLIST: List of I/O agent tasks -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_IOTASKLIST_ATTR#description}</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_IOTASKLIST_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_IOTASKLIST_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_LABELIO: Specifies MP_LABELIO processing mode -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_LABELIO_ATTR#description}</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_LABELIO_ATTR" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_LABELIO_ATTR#tooltip}</tooltip>
+					</widget>
+				</composite>
+			</dynamic>
+
+
+			<dynamic
+				includeWidgetValuesFrom="Tasks,I/O,Debug,System,Nodes,Performance 1,Performance2,Miscellaneous">
+				<title>Diagnostic</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite>
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+					</layout>
+					<!--MP_PMDLOG_DIR - specifies directory where PMD log is stored -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PMDLOG_DIR_ATTR#description}</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" saveValueTo="MP_PMDLOG_DIR_ATTR" title="Browse" directory="true">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_PMDLOG_DIR_ATTR#tooltip}</tooltip>
+					</browse>
+
+					<!--MP_PRIORITY_LOG_DIR - specifies directory where co-scheduler log is stored -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PRIORITY_LOG_DIR_ATTR#description}
+						</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" saveValueTo="MP_PRIORITY_LOG_DIR_ATTR" title="Browse" directory="true">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_PRIORITY_LOG_DIR_ATTR#tooltip}</tooltip>
+					</browse>
+
+					<!--MP_PRINTENV - Print PE Environment variables -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PRINTENV_ATTR#description}</fixed-text>
+					</widget>
+					<widget type="combo" readOnly="false" saveValueTo="MP_PRINTENV_ATTR" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PRINTENV_ATTR#tooltip}</tooltip>
+					</widget>
+										
+					<!--MP_INFOLEVEL: Specifies PE diagnostic level -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_INFOLEVEL_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_INFOLEVEL_ATTR" type="combo">
+						<layout-data>
+							<grid-data widthHint="200" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_INFOLEVEL_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_STATISTICS Specifies if MPI user space communication statistics are printed -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_STATISTICS_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_STATISTICS_ATTR" type="combo">
+						<layout-data>
+							<grid-data widthHint="200" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_STATISTICS_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_PRIORITY_LOG_NAME: Name of co-scheduler log -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PRIORITY_LOG_NAME_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_PRIORITY_LOG_NAME_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PRIORITY_LOG_NAME_ATTR#tooltip}</tooltip>
+					</widget>
+					
+					<!--MP_PMDLOG: Specifies whether PMD log is generated -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PMDLOG_ATTR#description}</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_PMDLOG_ATTR" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PMDLOG_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_PRIORITY_LOG: Specifies if co-scheduler log is created -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PRIORITY_LOG_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_PRIORITY_LOG_ATTR" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PRIORITY_LOG_ATTR#tooltip}</tooltip>
+					</widget>
+				</composite>
+			</dynamic>
+
+
+			<dynamic
+				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,System,Nodes,Performance 1,Performance2,Miscellaneous">
+				<title>Debug</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite>
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+					</layout>
+
+					<!--MP_COREDIR - specifies directory where core files are stored -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_COREDIR_ATTR#description}</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" saveValueTo="MP_COREDIR_ATTR"
+						title="Browse" directory="true">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_COREDIR_ATTR#tooltip}</tooltip>
+					</browse>
+
+					<!--MP_PROFDIR - specifies directory where gmon.out files are stored -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PROFDIR_ATTR#description}</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" saveValueTo="MP_PROFDIR_ATTR"
+						title="Browse" directory="true">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_PROFDIR_ATTR#tooltip}</tooltip>
+					</browse>
+
+					<!--MP_COREFILE_FORMAT: core file format -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_COREFILE_FORMAT_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="false"
+						saveValueTo="MP_COREFILE_FORMAT_ATTR" type="combo">
+						<layout-data>
+							<grid-data widthHint="200" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_COREFILE_FORMAT_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_EUIDEVELOP: Specifies MPI parameter checking level -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_EUIDEVELOP_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_EUIDEVELOP_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_EUIDEVELOP_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_COREFILE_SIGTERM: Create corefile on SIGTERM -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_COREFILE_SIGTERM_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_COREFILE_SIGTERM_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_COREFILE_SIGTERM_ATTR#tooltip}</tooltip>
+					</widget>
+				</composite>
+
+			</dynamic>
+
+
+			<dynamic
+				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,Nodes,Performance 1,Performance2,Miscellaneous">
+				<title>System</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite>
+					<layout>
+						<grid-layout numColumns="2" makeColumnsEqualWidth="false" />
+					</layout>
+
+					<!-- MP_EUIDEVICE: specifies device to be used for communications -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_EUIDEVICE_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="false" saveValueTo="MP_EUIDEVICE_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_EUIDEVICE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_EUILIB: Specifies which communication library to use -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_EUILIB_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_EUILIB_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_EUILIB_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_TASK_AFFINITY: Specifies task affinity -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_TASK_AFFINITY_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="false" saveValueTo="MP_TASK_AFFINITY_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_TASK_AFFINITY_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_FIFO_ROUTE_MODE: Specifies FIFO routing mode -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_FIFO_ROUTE_MODE_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="true"
+						saveValueTo="MP_FIFO_ROUTE_MODE_ATTR" type="combo">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_FIFO_ROUTE_MODE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_RDMA_ROUTE_MODE: Specifies RDMA routing mode -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_RDMA_ROUTE_MODE_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="true"
+						saveValueTo="MP_RDMA_ROUTE_MODE_ATTR" type="combo">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_RDMA_ROUTE_MODE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_INSTANCES: Number of window/IP instances -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_INSTANCES_ATTR#description}</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_INSTANCES_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_INSTANCES_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_MC_INET_BASE_ADDR: Mulitcast base addr -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_MC_INET_BASE_ADDR_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_MC_INET_BASE_ADDR_ATTR"
+						style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_MC_INET_BASE_ADDR_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_MC_INET_ADDR_LEN: Multicast address range size -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_MC_INET_ADDR_LEN_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_MC_INET_ADDR_LEN_ATTR"
+						style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_MC_INET_ADDR_LEN_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_MC_INET_PORT: Multicast port -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_MC_INET_PORT_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_MC_INET_PORT_ATTR"
+						style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_MC_INET_PORT_ATTR#tooltip}</tooltip>
+					</widget>
+					<!-- MP_ADAPTER_USE: Specifies whether communication adapter is shared -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_ADAPTER_USE_ATTR#description}</fixed-text>
+					</widget>
+
+					<button-group saveValueTo="MP_ADAPTER_USE_ATTR" group="true">
+						<layout>
+							<row-layout type="SWT.HORIZONTAL" center="true" fill="true"
+								justify="true" />
+						</layout>
+						<button type="radiobutton" title="dedicated" />
+						<button type="radiobutton" title="shared" />
+					</button-group>
+
+					<!-- MP_CPU_USE: Specifies if CPU is shared -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_CPU_USE_ATTR#description}</fixed-text>
+					</widget>
+					<button-group saveValueTo="MP_CPU_USE_ATTR" group="true">
+						<layout>
+							<row-layout type="SWT.HORIZONTAL" center="true" fill="true"
+								justify="true" />
+						</layout>
+						<button type="radiobutton" title="multiple" />
+						<button type="radiobutton" title="unique" />
+					</button-group>
+
+					<!-- MP_BINDPROC: Bind tasks to CPU -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_BINDPROC_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_BINDPROC_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_BINDPROC_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_USE_MC: Use hardware multicast -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_USE_MC_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_USE_MC_ATTR" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_USE_MC_ATTR#tooltip}</tooltip>
+					</widget>
+				</composite>
+			</dynamic>
+
+
+			<dynamic
+				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Performance 1,Performance2,Miscellaneous">
+				<title>Nodes</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite>
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+					</layout>
+
+					<!-- MP_CMDFILE: Specifies path to command file used to load nodes in 
+						partition -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_CMDFILE_ATTR#description}</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" saveValueTo="MP_CMDFILE_ATTR"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_CMDFILE_ATTR#tooltip}</tooltip>
+					</browse>
+
+					<!-- MP_RMFILE: Command file for node allocation -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_RMFILE_ATTR#description}</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" saveValueTo="MP_RMFILE_ATTR"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_RMFILE_ATTR#tooltip}</tooltip>
+					</browse>
+
+					<!-- MP_REMOTEDIR: Scrit to echo current directory on remote nodes -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_REMOTEDIR_ATTR#description}</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" saveValueTo="MP_REMOTEDIR_ATTR"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_REMOTEDIR_ATTR#tooltip}</tooltip>
+					</browse>
+
+					<!-- MP_PGMMODEL: Specifies programming model, SPMD or MPMD -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PGMMODEL_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_PGMMODEL_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PGMMODEL_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_TIMEOUT: POE connection timeout -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_TIMEOUT_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_TIMEOUT_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_TIMEOUT_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_RETRY: Job submission retry interval -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_RETRY_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_RETRY_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_RETRY_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_RM_TIMEOUT: Resource manager connection timeout -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_RM_TIMEOUT_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_RM_TIMEOUT_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_RM_TIMEOUT_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_RMPOOL: Node allocation pool -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_RMPOOL_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_RMPOOL_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_RMPOOL_ATTR#tooltip}</tooltip>
+					</widget>
+
+				</composite>
+			</dynamic>
+
+
+			<dynamic
+				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Nodes,Performance2,Miscellaneous">
+				<title>Performance 1</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite>
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+					</layout>
+
+					<!-- MP_ACK_THRESH: Acknowledgment threshold -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_ACK_THRESH_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_ACK_THRESH_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_ACK_THRESH_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_POLLING_INTERVAL: MPI polling interval -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_POLLING_INTERVAL_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_POLLING_INTERVAL_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_POLLING_INTERVAL_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_UDP_PACKET_SIZE: UDP packet size -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_UDP_PACKET_SIZE_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_UDP_PACKET_SIZE_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_UDP_PACKET_SIZE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_WAIT_MODE: Wait mode -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_WAIT_MODE_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_WAIT_MODE_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_WAIT_MODE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_BULK_MIN_MSG_SIZE: Minimum bulk message transfer size -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_BULK_MIN_MSG_SIZE_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_BULK_MIN_MSG_SIZE_ATTR"
+						style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_BULK_MIN_MSG_SIZE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_RC_MAX_QP: Maximum number of qpairs -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_RC_MAX_QP_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_RC_MAX_QP_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_RC_MAX_QP_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_IMM_SEND_BUFFERS: Minimum bulk message transfer size -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_IMM_SEND_BUFFERS_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_IMM_SEND_BUFFERS_ATTR"
+						style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_IMM_SEND_BUFFERS_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_COLLECTIVE_GROUPS: Minimum bulk message transfer size -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_COLLECTIVE_GROUPS_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" saveValueTo="MP_COLLECTIVE_GROUPS_ATTR"
+						style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_COLLECTIVE_GROUPS_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_CC_SCRATCH_BUF: Fastest collectives -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_CC_SCRATCH_BUF_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_CC_SCRATCH_BUF_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_CC_SCRATCH_BUF_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_CSS_INTERRUPT: Packets generate interrupts -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_CSS_INTERRUPT_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_CSS_INTERRUPT_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_CSS_INTERRUPT_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_USE_BULK_XFER: Use adapter bulk data transfer -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_USE_BULK_XFER_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_USE_BULK_XFER_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_USE_BULK_XFER_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_RC_USE_LMC: Use lid mask control -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_RC_USE_LMC_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_RC_USE_LMC_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_RC_USE_LMC_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_FORCED_INTERRUPTS_ENABLED: Use forced interrupts for RDMA transfer -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_FORCED_INTERRUPTS_ENABLED_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_FORCED_INTERRUPTS_ENABLED_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_FORCED_INTERRUPTS_ENABLED_ATTR#tooltip}
+						</tooltip>
+					</widget>
+				</composite>
+			</dynamic>
+
+
+			<dynamic
+				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Nodes,Performance 1,Miscellaneous">
+				<title>Performance 2</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite>
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+					</layout>
+
+					<!-- MP_SINGLE_THREAD: Single MPI thread -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_SINGLE_THREAD_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="combo" saveValueTo="MP_SINGLE_THREAD_ATTR"
+						readOnly="true" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_SINGLE_THREAD_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_MSG_ENVELOPE_BUF: Envelope buffer size -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_MSG_ENVELOPE_BUF_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_MSG_ENVELOPE_BUF_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_MSG_ENVELOPE_BUF_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_IO_BUFFER_SIZE: MPI_IO buffer size -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_IO_BUFFER_SIZE_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_IO_BUFFER_SIZE_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_IO_BUFFER_SIZE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_EAGER_LIMIT: Eager limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_EAGER_LIMIT_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_EAGER_LIMIT_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_EAGER_LIMIT_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_RETRANSMIT_INTERVAL: MPI retransmit interval -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_RETRANSMIT_INTERVAL_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_RETRANSMIT_INTERVAL_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_RETRANSMIT_INTERVAL_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_REXMIT_BUF_CNT: Retransmit buffers -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_REXMIT_BUF_CNT_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_REXMIT_BUF_CNT_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_REXMIT_BUF_CNT_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_REXMIT_BUF_SIZE: Maximum LAPI buffered message -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_REXMIT_BUF_SIZE_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_REXMIT_BUF_SIZE_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_REXMIT_BUF_SIZE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_PRIORITY: Co-scheduler priority class name -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PRIORITY_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_PRIORITY_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PRIORITY_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- SCI_DEBUG_FANOUT: SCI agent tree fanout -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:SCI_DEBUG_FANOUT_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="SCI_DEBUG_FANOUT_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:SCI_DEBUG_FANOUT_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_SHMCC_EXCLUDE_LIST: Collective operations excluded from shared 
+						memory -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_SHMCC_EXCLUDE_LIST_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_SHMCC_EXCLUDE_LIST_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_SHMCC_EXCLUDE_LIST_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_SHARED_MEMORY: Use shared memory -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_SHARED_MEMORY_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_SHARED_MEMORY_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_SHARED_MEMORY_ATTR#tooltip}</tooltip>
+					</widget>
+
+				</composite>
+			</dynamic>
+
+			<dynamic
+				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Nodes,Performance 1,Performance2">
+				<title>Miscellaneous</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite>
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+					</layout>
+
+					<!-- MP_CLOCK_SOURCE: clock source -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_CLOCK_SOURCE_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_CLOCK_SOURCE_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_CLOCK_SOURCE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_MSG_API: Message passing API -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_MSG_API_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="false" saveValueTo="MP_MSG_API_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_MSG_API_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_TLP_REQUIRED: POE checks if compiled for large pages -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_TLP_REQUIRED_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_TLP_REQUIRED_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_TLP_REQUIRED_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_DEVTYPE: Device type class -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_DEVTYPE_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.LEFT" saveValueTo="MP_DEVTYPE_ATTR" type="combo" readOnly="true">
+						<layout-data>
+							<grid-data widthHint="200" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_DEVTYPE_ATTR#tooltip}</tooltip>
+					</widget>
+					
+					<!-- MP_EUILIBPATH: Specify alternate communication and protocol library 
+						path -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_EUILIBPATH_ATTR#description}</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" saveValueTo="MP_EUILIBPATH_ATTR"
+						title="Browse" directory="true">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_EUILIBPATH_ATTR#tooltip}</tooltip>
+					</browse>
+
+					<!-- MP_IONODEFILE: File specifying list of nodes participating in MPI 
+						parallel I/O -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_IONODEFILE_ATTR#description}</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" saveValueTo="MP_IONODEFILE_ATTR"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_IONODEFILE_ATTR#tooltip}</tooltip>
+					</browse>
+
+					<!-- MP_SAVEHOSTFILE: Host file generated by partition manager -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_SAVEHOSTFILE_ATTR#description}
+						</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" saveValueTo="MP_SAVEHOSTFILE_ATTR"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_SAVEHOSTFILE_ATTR#tooltip}</tooltip>
+					</browse>
+
+					<!-- MP_SAVE_RMFILE: Job command file generated by partition manager -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_SAVE_RMFILE_ATTR#description}</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" saveValueTo="MP_SAVE_RMFILE_ATTR"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_SAVE_RMFILE_ATTR#tooltip}</tooltip>
+					</browse>
+
+					<!-- MP_PULSE: interval PE checks remote nodes -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PULSE_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_PULSE_ATTR" type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PULSE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_THREAD_STACKSIZE: MPI service thread stack size -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_THREAD_STACKSIZE_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_THREAD_STACKSIZE_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_THREAD_STACKSIZE_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_TIMEOUT: Connection timeout -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_TIMEOUT_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_TIMEOUT_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_TIMEOUT_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_CONFIG: PE Release level -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_CONFIG_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_CONFIG_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_CONFIG_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_PMDSUFFIX: Alternate PMD service suffix -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PMDSUFFIX_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" saveValueTo="MP_PMDSUFFIX_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PMDSUFFIX_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_HINTS_FILTERED: MPI info hints filtered -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_HINTS_FILTERED_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_HINTS_FILTERED_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_HINTS_FILTERED_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_IO_ERRLOG: I/O error log -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_IO_ERRLOG_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_IO_ERRLOG_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_IO_ERRLOG_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_PRIORITY_NTP: co-scheduler disables NTP -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PRIORITY_NTP_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_PRIORITY_NTP_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PRIORITY_NTP_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_COSCHEDULER_VERSION: Use runqueue co-scheduler -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_COSCHEDULER_VERSION_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" saveValueTo="MP_COSCHEDULER_VERSION_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_COSCHEDULER_VERSION_ATTR#tooltip}</tooltip>
+					</widget>
+				</composite>
+			</dynamic>
+		</launch-tab>
+	</control-data>
+	<monitor-data schedulerType="PE">
+	</monitor-data>
+</resource-manager-builder>

@@ -11,7 +11,55 @@
 
 /*
  * Message transport implementation. This provides an implementation of
- * SDM messages using TCP/IP.
+ * SDM messages using TCP/IP. It includes SDM startup and wiring up the
+ * master and server processes.
+ *
+ * Typically, the SDM master and server processes are started independently,
+ * with the servers usually being started using an MPI launcher such as mpirun.
+ * The order that the SDM master and server processes are started is not defined.
+ *
+ * The startup sequence is as follows:
+ *
+ * 1. The SDM processes form a tree with a parent/children relationship. A parent
+ *    may have many children, but each child has only one parent. The master process
+ *    is at the top of the tree and is a parent. A server process may be both a parent
+ *    and a child, but is always a child.
+ *
+ * 2. All SDM processes (including the master) will wait for the routing information
+ *    to become available. The routing information contains the task ID, hostname,
+ *    and port number for each of the server processes.
+ *
+ * 3. The master will attempt to connect to each of its direct children in turn
+ *    using sdm_connect_to_child(). This will try to connect to the child
+ *    CHILD_CONNECT_TRIES times, sleeping for CHILD_CONNECT_SLEEP seconds. If
+ *    this fails, it will increment the child's port number by one and try again.
+ *    This will continue for MAX_PORT_INCREMENT attempts before failing.
+ *
+ * 4. Each server attempts to bind to its port number contained in the routing information.
+ *    If the bind fails, it will increment the port number by one and try again. This
+ *    will continue MAX_PORT_INCREMENT times before failing. Once the bind has succeeded,
+ *    the server will wait for an incoming connection on the port. This wait continues
+ *    indefinitely.
+ *
+ * 5. Once the server has received a connection from its parent, it will attempt to
+ *    connect to its children (if it has any) using the same strategy as step 3.
+ *
+ * 6. Initialization is completed when all children have been connected.
+ *
+ * There is obviously a race condition between a parent (master or server) attempting to connect
+ * to the child and the child setting up the socket. This should be handled by step 3 since
+ * the parent will retry the connection. However, if the child does not start within
+ * (CHILD_CONNECT_TRIES * CHILD_CONNECT_SLEEP) seconds of the parent, the debugger launch will
+ * fail.
+ *
+ * The other issue is that the port numbers used to connect to the children must be
+ * pre-generated so that everyone agrees. However, there is a possibility that one or
+ * more of the port numbers are already in use. The SDM attempts to deal with this by
+ * incrementing the port number by one if the bind fails. The problem is that the master
+ * won't try a new port number for (CHILD_CONNECT_TRIES * CHILD_CONNECT_SLEEP) seconds
+ * (currently 25) so it may take a long time for the SDM to start (possibly longer
+ * than the timeout at the frontend). It may actually be better to just fail at this
+ * point and let the user try a relaunch.
  */
 
 #include <sys/types.h>
@@ -60,7 +108,7 @@ static void	(*deliver_callback)(const sdm_message msg) = NULL;
 
 #define MAX_PORT_INCREMENT	1000	/* Max port increment before failing */
 #define CHILD_CONNECT_TRIES	5		/* Number of times to try each port */
-#define CHILD_CONNECT_SLEEP	1		/* Seconds to sleep between each connection attempt */
+#define CHILD_CONNECT_SLEEP	5		/* Seconds to sleep between each connection attempt */
 
 sdm_id_sockd_map_p children_sockd_map, parent_sockd_map; /* Leaf case, children = NULL
 									 						Root case, parent = NULL */

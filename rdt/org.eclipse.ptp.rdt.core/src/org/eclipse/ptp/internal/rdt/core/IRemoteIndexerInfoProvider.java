@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -75,12 +75,6 @@ public interface IRemoteIndexerInfoProvider extends IStandaloneScannerInfoProvid
 	 * TODO is this information actually being used?
 	 */
 	boolean isHeaderUnit(String path);
-
-	/**
-	 * Returns a list of files to be parsed up front before the project is
-	 * indexed.
-	 */
-	List<String> getFilesToParseUpFront();
 
 	/**
 	 * Returns an extensible set of language properties. TODO

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,7 +47,6 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 																	// pairs
 	private Set<String> headerSet; // (path -> isHeaderUnit(boolean))
 	private Set<String> indexerPreferences; // (preference key -> boolean)
-	private List<String> filesToParseUpFront;
 	private FileEncodingRegistry fFileEncodingRegistry;
 	private Set<String> fValidSourceUnitNames;
 
@@ -57,7 +56,7 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 
 	public RemoteIndexerInfoProvider(Map<String, RemoteScannerInfo> pathMap, Map<Integer, RemoteScannerInfo> linkageMap,
 			Map<String, String> languageMap, Map<String, Map<String, String>> languagePropertyMap, Set<String> headerSet,
-			Set<String> indexerPreferences, List<String> filesToParseUpFront, FileEncodingRegistry fileEncodingRegistry, Set<String> fValidSourceUnitNames) {
+			Set<String> indexerPreferences, FileEncodingRegistry fileEncodingRegistry, Set<String> fValidSourceUnitNames) {
 
 		this.pathMap = pathMap;
 		this.linkageMap = linkageMap;
@@ -65,7 +64,6 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 		this.languagePropertyMap = languagePropertyMap;
 		this.headerSet = headerSet;
 		this.indexerPreferences = indexerPreferences;
-		this.filesToParseUpFront = filesToParseUpFront;
 		this.fFileEncodingRegistry = fileEncodingRegistry;
 		this.fValidSourceUnitNames = fValidSourceUnitNames;
 	}
@@ -84,8 +82,6 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 			headerSet = null;
 		if (empty(indexerPreferences))
 			indexerPreferences = null;
-		if (empty(filesToParseUpFront))
-			filesToParseUpFront = null;
 
 		out.defaultWriteObject();
 	}
@@ -125,12 +121,6 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 		return indexerPreferences == null ? false : indexerPreferences.contains(key);
 	}
 
-	public List<String> getFilesToParseUpFront() {
-		if (filesToParseUpFront == null)
-			return Collections.emptyList();
-		return filesToParseUpFront;
-	}
-
 	public Map<String, String> getLanguageProperties(String languageId) {
 		if (languagePropertyMap == null)
 			return Collections.emptyMap();
@@ -159,7 +149,6 @@ public class RemoteIndexerInfoProvider implements IRemoteIndexerInfoProvider, Se
 				" languagePropertyMap" + languagePropertyMap + //$NON-NLS-1$
 				" isHeaderMap:" + headerSet + //$NON-NLS-1$
 				" preferences: " + indexerPreferences + //$NON-NLS-1$
-				" filesToParseUpFront: " + filesToParseUpFront + //$NON-NLS-1$
 				" fFileEncodingRegistry: " + fFileEncodingRegistry +  //$NON-NLS-1$
 				" fValidSourceUnitNames: " + fValidSourceUnitNames; //$NON-NLS-1$
 	}

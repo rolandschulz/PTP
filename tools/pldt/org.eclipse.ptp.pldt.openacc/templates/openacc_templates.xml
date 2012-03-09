@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<templates>
+	<template id="org.eclipse.ptp.pldt.openacc.cache" autoinsert="true"
+		context="org.eclipse.cdt.ui.text.templates.c" deleted="false"
+		description="OpenACC Cache Pragma" enabled="true"
+		name="acc cache">#pragma acc cache(${cursor})</template>
+	<template id="org.eclipse.ptp.pldt.openacc.data" autoinsert="true"
+		context="org.eclipse.cdt.ui.text.templates.c" deleted="false"
+		description="OpenACC Data Pragma" enabled="true"
+		name="acc data">#pragma acc data${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.declare" autoinsert="true"
+		context="org.eclipse.cdt.ui.text.templates.c" deleted="false"
+		description="OpenACC Declare Pragma" enabled="true"
+		name="acc declare">#pragma acc declare ${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.host_data"
+		autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c"
+		deleted="false" description="OpenACC Host Data Pragma" enabled="true"
+		name="acc host_data">#pragma acc host_data${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.kernels"
+		autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c"
+		deleted="false" description="OpenACC Kernels Pragma" enabled="true"
+		name="acc kernels">#pragma acc kernels${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.kernelsloop"
+		autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c"
+		deleted="false" description="OpenACC Kernels Loop Pragma" enabled="true"
+		name="acc kernels loop">#pragma acc kernels loop${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.loop" autoinsert="true"
+		context="org.eclipse.cdt.ui.text.templates.c" deleted="false"
+		description="OpenACC Loop Pragma" enabled="true"
+		name="acc loop">#pragma acc loop${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.parallel"
+		autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c"
+		deleted="false" description="OpenACC Parallel Pragma" enabled="true"
+		name="acc parallel">#pragma acc parallel${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.parallelloop"
+		autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c"
+		deleted="false" description="OpenACC Parallel Loop Pragma" enabled="true"
+		name="acc parallel loop">#pragma acc parallel loop${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.update" autoinsert="true"
+		context="org.eclipse.cdt.ui.text.templates.c" deleted="false"
+		description="OpenACC Update Pragma" enabled="true"
+		name="acc update">#pragma acc update ${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.wait" autoinsert="true"
+		context="org.eclipse.cdt.ui.text.templates.c" deleted="false"
+		description="OpenACC Wait Pragma" enabled="true"
+		name="acc wait">#pragma acc wait${cursor}</template>
+</templates>

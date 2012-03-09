@@ -140,9 +140,10 @@ CLIGetGDBVersion(MICommand *cmd)
 		}
 
 		/*
-		 * linux self: GUN gdb 6.5.0
-		 * fedore: GNU gdb Red Hat Linux (6.5-8.fc6rh)
+		 * Linux: GUN gdb 6.5.0
+		 * Fedora: GNU gdb Red Hat Linux (6.5-8.fc6rh)
 		 * Mac OS X: GNU gdb 6.1-20040303 (Apple version gdb-384) (Mon Mar 21 00:05:26 GMT 2005)
+		 * Ubuntu: GNU gdb (Ubuntu/Linaro 7.2-1ubuntu11) 7.2
 		 */
 		if (strncmp(text, "GNU gdb", 7) == 0) {
 			/*

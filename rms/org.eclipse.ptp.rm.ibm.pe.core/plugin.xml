@@ -17,7 +17,7 @@
       <provider
             class="org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider"
             id="org.eclipse.ptp.rm.ibm.pe.resourceManager"
-            name="IBM Parallel Environment"
+            name="IBM Parallel Environment (proxy)"
             serviceId="org.eclipse.ptp.core.LaunchService">
       </provider>
    </extension>

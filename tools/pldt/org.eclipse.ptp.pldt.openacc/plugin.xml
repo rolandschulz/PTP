@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+   <!-- OpenACC workbench preference page -->
+   <extension
+         point="org.eclipse.ui.preferencePages">
+         <page
+            class="org.eclipse.ptp.pldt.openacc.internal.prefs.OpenACCPreferencePage"
+            id="org.eclipse.ptp.pldt.openacc.prefpage"
+            category="org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
+            name="%openacc.page.name"/>
+         
+   </extension>
+
+   <!--  OpenACC artifact detection - markers, view, command, preference initializer -->
+   <extension point="org.eclipse.core.resources.markers"
+		id="openaccMarker"
+        name="%openacc.artifactMarker.extension.name">
+    <super type="org.eclipse.core.resources.textmarker"/>
+   </extension>
+   <!-- this changes the marker image in the editor marker bar  -->
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerType="org.eclipse.ptp.pldt.openacc.openaccMarker"
+            name="org.eclipse.ptp.pldt.openacc.openaccMarkerAnnotation">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.eclipse.ptp.pldt.openacc.openaccMarkerAnnotation"
+            icon="icons/openacc.gif" 
+            
+            presentationLayer="3"
+            label="%openacc.annotMarker.specification.label"
+            
+            textPreferenceKey="openaccIndication"
+            textPreferenceValue="true"
+            highlightPreferenceKey="artifactHighlighting"
+            highlightPreferenceValue="false"
+            colorPreferenceKey="artifactIndicationColor"
+            colorPreferenceValue="128,128,192"
+            verticalRulerPreferenceKey="artifactIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="true"
+			showInNextPrevDropdownToolbarActionKey="showPortingInNextPrevDropdownToolbarAction"
+            showInNextPrevDropdownToolbarAction="false"
+            overviewRulerPreferenceKey="artifactIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            
+            includeOnPreferencePage="true"
+            isGoToPreviousNavigationTargetKey="isPortingGoToPreviousNavigationTarget"
+
+            isGoToNextNavigationTargetKey="isPortingRecordGoToNextNavigationTarget"
+            >
+      </specification>  
+   </extension>
+   <!-- end marker info -->
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            name="%view.name"
+            icon="icons/openacc.gif"
+            category="org.eclipse.ptp.ui.views"
+            class="org.eclipse.ptp.pldt.openacc.internal.views.OpenACCArtifactView"
+            id="org.eclipse.ptp.pldt.openacc.views.OpenACCArtifactView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.ptp.pldt.openacc.internal.actions.RunAnalyseOpenACCcommandHandler"
+            id="org.eclipse.ptp.pldt.openacc.command2"
+            name="%find.openacc.artifacts.command.name">
+      </command>
+   </extension>
+      <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1 ">
+         <command
+               commandId="org.eclipse.ptp.pldt.openacc.command2"
+               icon="icons/openacc.gif"
+               label="%show.openacc.artifacts.command.label">
+         </command>
+      </menuContribution>
+   </extension>
+      <extension
+            point="org.eclipse.core.runtime.preferences">
+         <initializer
+               class="org.eclipse.ptp.pldt.openacc.internal.prefs.OpenACCPreferenceInitializer">
+         </initializer>
+      </extension>
+
+   <!-- OpenACC C help book -->
+   <extension
+         point="org.eclipse.cdt.ui.CHelpProvider">
+      <provider
+            class="org.eclipse.ptp.pldt.openacc.internal.editorHelp.OpenACCCHelpInfoProvider"
+            id="org.eclipse.ptp.pldt.openacc.editorHelp.OpenACCCHelpInfoProvider"/>
+   </extension>
+
+   <!-- OpenACC C code templates -->
+   <extension point="org.eclipse.ui.editors.templates">
+      <include file="templates/openacc_templates.xml" />
+   </extension>
+</plugin>

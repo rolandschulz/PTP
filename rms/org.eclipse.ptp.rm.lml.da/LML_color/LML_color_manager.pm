@@ -515,7 +515,7 @@ sub get_color {
 	    $color="red"; 
 	}
 	if($self->{USEDCOLORS}[$cat]->{$color}) {
-	    printf( "llview_manage_color: warning color in use .. by: %10s %-15s -> %-20s #buffer=%3d\n",
+	    printf( "llview_manage_color: warning color $color in use by: %10s %-15s -> %-20s #buffer=%3d\n",
 		    $self->{USEDCOLORS}[$cat]->{$color},$id,$color,$#{$self->{BUFFER}[$cat]});
 	}
 	$self->{KNOWNIDS}[$cat]->{$id}=$color;

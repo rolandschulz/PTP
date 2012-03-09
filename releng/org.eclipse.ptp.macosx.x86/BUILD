@@ -16,13 +16,33 @@ if [ $# -gt 0 ]; then
 	CMD=$1
 fi
 
-KNOWN_PLUGINS="\
+
+cd `dirname $0`
+
+if [ "$(basename `dirname $PWD`)" = "releng" ] ; then # building in GIT with subdirectories
+
+    KNOWN_PLUGINS="\
 	core/org.eclipse.ptp.utils$VERSION\
 	core/org.eclipse.ptp.proxy$VERSION\
 	debug/org.eclipse.ptp.debug.sdm$VERSION\
 	rms/org.eclipse.ptp.rm.ibm.ll.proxy$VERSION\
 	rms/org.eclipse.ptp.rm.ibm.pe.proxy$VERSION\
 	rms/org.eclipse.ptp.rm.slurm.proxy$VERSION"
+    PARENT=$(dirname `dirname $PWD`)
+
+else
+
+    KNOWN_PLUGINS="\
+	org.eclipse.ptp.utils$VERSION\
+	org.eclipse.ptp.proxy$VERSION\
+	org.eclipse.ptp.debug.sdm$VERSION\
+	org.eclipse.ptp.rm.ibm.ll.proxy$VERSION\
+	org.eclipse.ptp.rm.ibm.pe.proxy$VERSION\
+	org.eclipse.ptp.rm.slurm.proxy$VERSION"
+    PARENT=`dirname $PWD`
+
+fi
+
 	
 if [ "$CMD" = "configure" ]; then
 	UTILS_CONFIGURE_OPTIONS=""
@@ -41,8 +61,7 @@ if [ "$CMD" = "configure" ]; then
 	    "$PBS_CONFIGURE_OPTIONS"\
 	    "$SLURM_CONFIGURE_OPTIONS"
 fi
-		
-PARENT=$(dirname `dirname $PWD`)
+
 PREFIX=$PWD
 
 if [ ! -d bin ]; then

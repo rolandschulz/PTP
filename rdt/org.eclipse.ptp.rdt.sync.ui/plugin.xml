@@ -106,11 +106,32 @@
               class="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesPage"
               id="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesPage"
               name="Synchronize">
-		<filter
-			name="projectNature"
-			value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
-		</filter>
+  <enabledWhen>
+     <adapt
+           type="org.eclipse.core.resources.IProject">
+        <test
+              property="org.eclipse.core.resources.projectNature"
+              value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+        </test>
+     </adapt>
+  </enabledWhen>
         </page>
+        <!-- category="org.eclipse.cdt.managedbuilder.ui.properties.Page_Environment -->
+        <page
+              category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
+              class="org.eclipse.ptp.rdt.sync.ui.properties.EnvManagerPropertiesPage"
+              id="org.eclipse.ptp.rdt.sync.ui.properties.ModulesPropertiesPage"
+              name="Environment Management">
+           <enabledWhen>
+              <adapt type="org.eclipse.core.resources.IProject">
+                 <test
+                    property="org.eclipse.core.resources.projectNature"
+                    value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+                 </test>
+              </adapt>
+           </enabledWhen>
+        </page>
+
      </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -194,16 +215,75 @@
                <iterate
                      ifEmpty="false"
                      operator="and">
-                  <test
-                        property="org.eclipse.core.resources.projectNature"
-                        value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
-                  </test>
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+                     </test>
+                  </adapt>
                </iterate>
             </visibleWhen>
             <dynamic
                   class="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu"
                   id="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu">
             </dynamic>
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  label="Exclude Selection"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_exclude">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <not>
+                           <instanceof
+                                 value="org.eclipse.core.resources.IProject">
+                           </instanceof>
+                        </not>
+                     </adapt>
+                  </iterate>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  label="Include Selection"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_include">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <not>
+                           <instanceof
+                                 value="org.eclipse.core.resources.IProject">
+                           </instanceof></not>
+                     </adapt>
+                  </iterate>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  label="Filter..."
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_file_list">
+               </parameter>
+            </command>
          </menu>
       </menuContribution>
    </extension>
@@ -228,5 +308,13 @@
             </and>
          </enablement>
       </decorator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage"
+            id="org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage"
+            name="Synchronized Projects">
+      </page>
    </extension>
 </plugin>

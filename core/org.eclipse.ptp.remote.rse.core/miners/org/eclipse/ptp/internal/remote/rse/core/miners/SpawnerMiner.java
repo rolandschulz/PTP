@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.cdt.utils.pty.PTY;
 import org.eclipse.cdt.utils.spawner.ProcessFactory;
 import org.eclipse.dstore.core.miners.Miner;
 import org.eclipse.dstore.core.model.DE;
@@ -177,12 +178,14 @@ public class SpawnerMiner extends Miner {
 		return null;
 	}
 
-	private synchronized void handleSpawnCancel(DataElement cancelStatus) {
+	private void handleSpawnCancel(DataElement cancelStatus) {
 		Process processToCancel = fProcessMap.get(cancelStatus);
 		
 		if(processToCancel != null) {
 			processToCancel.destroy();
-			fProcessMap.put(cancelStatus, null);
+			synchronized(fProcessMap) {
+				fProcessMap.put(cancelStatus, null);
+			}
 		}
 		
 	}
@@ -197,7 +200,7 @@ public class SpawnerMiner extends Miner {
 	private void handleSpawnRedirected(DataElement subject, String cmd, File dir, String[] envp, DataElement status) {
 			
 		try {
-			final Process process = ProcessFactory.getFactory().exec(cmd, envp, dir);
+			final Process process = ProcessFactory.getFactory().exec(cmd.split(" "), envp, dir, new PTY()); //$NON-NLS-1$
 			
 			synchronized(this) {
 				fProcessMap.put(status, process);

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006,2012 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
  * @author pazel
  * 
  */
+@SuppressWarnings("restriction")
 public class PASTElse extends PASTNode implements IASTPreprocessorElseStatement {
 	protected IASTPreprocessorElseStatement else_ = null;
 
@@ -54,6 +55,11 @@ public class PASTElse extends PASTNode implements IASTPreprocessorElseStatement 
 
 	public boolean isPartOfTranslationUnitFile() {
 		return else_.isPartOfTranslationUnitFile();
+	}
+
+	@Override
+	public IASTNode getOriginalNode() {
+		return else_.getOriginalNode();
 	}
 
 }

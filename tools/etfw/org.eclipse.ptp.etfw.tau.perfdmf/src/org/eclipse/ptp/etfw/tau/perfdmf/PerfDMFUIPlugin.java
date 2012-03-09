@@ -30,7 +30,7 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  * 
- * @since 2.0
+ * @since 3.0
  */
 public class PerfDMFUIPlugin extends AbstractUIPlugin {
 
@@ -55,9 +55,7 @@ public class PerfDMFUIPlugin extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
@@ -67,9 +65,7 @@ public class PerfDMFUIPlugin extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
@@ -87,8 +83,7 @@ public class PerfDMFUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path
+	 * Returns an image descriptor for the image file at the given plug-in relative path
 	 * 
 	 * @param path
 	 *            the path
@@ -103,8 +98,7 @@ public class PerfDMFUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Add the profile data at location to the user's perfdmf database,
-	 * organized by projectName and projectType
+	 * Add the profile data at location to the user's perfdmf database, organized by projectName and projectType
 	 * 
 	 * @param projectName
 	 *            The project that produced the data
@@ -136,8 +130,7 @@ public class PerfDMFUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Add the profile data at location to the user's perfdmf database,
-	 * organized by projectName and projectType
+	 * Add the profile data at location to the user's perfdmf database, organized by projectName and projectType
 	 * 
 	 * @param projectName
 	 *            The project that produced the data
@@ -146,7 +139,7 @@ public class PerfDMFUIPlugin extends AbstractUIPlugin {
 	 * @param location
 	 *            The location of the profile data
 	 * @return True on success, false on failure to upload
-	 * @since 2.0
+	 * @since 3.0
 	 */
 	public static boolean addPerformanceData(String projectName, String projectType, String trialName, IFileStore location,
 			String dbname) {
@@ -178,8 +171,9 @@ public class PerfDMFUIPlugin extends AbstractUIPlugin {
 			for (int i = 0; i < viewReferences.length; i++) {
 				if (VIEW_ID.equals(viewReferences[i].getId())) {
 					theView = (PerfDMFView) viewReferences[i].getView(false);
-					if (theView != null)
+					if (theView != null) {
 						return theView;
+					}
 				}
 			}
 

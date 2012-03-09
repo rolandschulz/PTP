@@ -89,12 +89,12 @@ public class OIDToObject extends LguiHandler {
 		if (id == null) {
 			return notConnectedColor;
 		}
-		final LMLColor res = oidToColor.get(id);
+		final LMLColor result = oidToColor.get(id);
 
-		if (res == null) {
+		if (result == null) {
 			return notConnectedColor;
 		} else {
-			return res;
+			return result;
 		}
 	}
 
@@ -120,6 +120,23 @@ public class OIDToObject extends LguiHandler {
 	 */
 	public ObjectType getObjectById(String id) {
 		return oidToObject.get(id);
+	}
+
+	/**
+	 * Save method to get the connected LML-object for
+	 * a nodeData. Checks for null-pointers and then calls
+	 * getObjectById with the String-parameter.
+	 * 
+	 * @param nodeData
+	 *            instance with information about one physical element of a computing resource
+	 * @return corresponding object from LML-file or null, if nothing is found
+	 */
+	public ObjectType getObjectByLMLNode(LMLNodeData nodeData) {
+		if (nodeData == null || nodeData.getDataElement() == null) {
+			return null;
+		}
+
+		return getObjectById(nodeData.getDataElement().getOid());
 	}
 
 	/**
@@ -157,22 +174,22 @@ public class OIDToObject extends LguiHandler {
 	 */
 	private void updateData() {
 
-		final List<ObjectsType> allobjs = lguiItem.getOverviewAccess().getObjects();
+		final List<ObjectsType> objectsList = lguiItem.getOverviewAccess().getObjects();
 
-		for (final ObjectsType frame : allobjs) {
+		for (final ObjectsType objects : objectsList) {
 
-			final List<ObjectType> objects = frame.getObject();
+			final List<ObjectType> objectList = objects.getObject();
 
 			oidToObject = new HashMap<String, ObjectType>();
 
 			oidToColor = new HashMap<String, LMLColor>();
 
-			for (final ObjectType obj : objects) {
-				oidToObject.put(obj.getId(), obj);
-				oidToColor.put(obj.getId(), LMLColor.stringToColor(obj.getColor()));
+			for (final ObjectType object : objectList) {
+				oidToObject.put(object.getId(), object);
+				oidToColor.put(object.getId(), LMLColor.stringToColor(object.getColor()));
 
-				if (obj.getType() == ObjectName.SYSTEM) {
-					systemId = obj.getId();
+				if (object.getType() == ObjectName.SYSTEM) {
+					systemId = object.getId();
 				}
 			}
 

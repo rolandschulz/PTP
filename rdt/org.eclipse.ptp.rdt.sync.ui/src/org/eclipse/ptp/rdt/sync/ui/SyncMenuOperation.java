@@ -14,13 +14,17 @@ import java.util.Map;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.rdt.sync.core.PathResourceMatcher;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SYNC_MODE;
@@ -41,8 +45,12 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String setActiveCommand = "set_active"; //$NON-NLS-1$
 	private static final String setAllCommand = "set_all"; //$NON-NLS-1$
 	private static final String syncAutoCommand = "sync_auto"; //$NON-NLS-1$
+	private static final String syncFileList = "sync_file_list"; //$NON-NLS-1$
+	private static final String syncDefaultFileList = "sync_default_file_list"; //$NON-NLS-1$
+	private static final String syncExcludeCommand = "sync_exclude"; //$NON-NLS-1$
+	private static final String syncIncludeCommand = "sync_include"; //$NON-NLS-1$
 
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(ExecutionEvent event) {
 		String command = event.getParameter(SYNC_COMMAND_PARAMETER_ID);
 		IProject project = getProject();
 		if (project == null) {
@@ -76,15 +84,43 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 						SyncManager.syncAll(null, project, SyncFlag.FORCE, null);
 					}
 				}
+			} else if (command.equals(syncExcludeCommand) || command.equals(syncIncludeCommand)) {
+				SyncFileFilter sff = SyncManager.getFileFilter(project);
+				IStructuredSelection sel = this.getSelectedElements();
+				SyncFileFilter.PatternType type = SyncFileFilter.PatternType.EXCLUDE;
+				if (command.equals(syncIncludeCommand)) {
+					type = SyncFileFilter.PatternType.INCLUDE;
+				}
+
+				for (Object element : sel.toArray()) {
+					IResource selection;
+					if (element instanceof IResource) {
+						selection = (IResource) element;
+					} else if (element instanceof IAdaptable) {
+						selection = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+					} else {
+						RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_6);
+						continue;
+					}
+					IPath path = selection.getProjectRelativePath();
+					sff.addPattern(new PathResourceMatcher(path), type);
+				}
+				SyncManager.saveFileFilter(project, sff);
+			} else if (command.equals(syncFileList)) {
+				SyncFileFilterPage.open(project, null);
+			} else if (command.equals(syncDefaultFileList)) {
+				SyncFileFilterPage.open(null, null);
 			}
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
 			RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_1);
 		}
-
-		ICommandService service = (ICommandService) HandlerUtil.getActiveWorkbenchWindowChecked(event).getService(
-				ICommandService.class);
-		service.refreshElements(event.getCommand().getId(), null);
+		
+		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+		if (window != null) {
+			ICommandService service = (ICommandService) window.getService(ICommandService.class);
+			service.refreshElements(event.getCommand().getId(), null);
+		}
 
 		return null;
 	}
@@ -98,7 +134,8 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 
 		IProject project = this.getProject();
 		if (project == null) {
-			RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_0);
+			// Disable error message - this happens routinely for non-IResource selections
+			// RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_0);
 			return;
 		}
 
@@ -117,14 +154,10 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	 * Portions copied from org.eclipse.ptp.services.ui.wizards.setDefaultFromSelection
 	 */
 	private IProject getProject() {
-		IWorkbenchWindow wnd = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		IWorkbenchPage pg = wnd.getActivePage();
-		ISelection sel = pg.getSelection();
-
-		if (!(sel instanceof IStructuredSelection)) {
+		IStructuredSelection selection = this.getSelectedElements();
+		if (selection == null) {
 			return null;
 		}
-		IStructuredSelection selection = (IStructuredSelection) sel;
 
 		Object firstElement = selection.getFirstElement();
 		if (!(firstElement instanceof IAdaptable)) {
@@ -137,5 +170,17 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 		IResource resource = (IResource) o;
 
 		return resource.getProject();
+	}
+	
+	private IStructuredSelection getSelectedElements() {
+		IWorkbenchWindow wnd = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchPage pg = wnd.getActivePage();
+		ISelection sel = pg.getSelection();
+
+		if (!(sel instanceof IStructuredSelection)) {
+			return null;
+		} else {
+			return (IStructuredSelection) sel;
+		}
 	}
 }

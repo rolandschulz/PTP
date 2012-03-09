@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control;
 
@@ -25,9 +26,13 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
@@ -74,7 +79,7 @@ import org.eclipse.ui.progress.IProgressConstants;
  * Currently, it is the control which handles updating the monitor component.
  * 
  * @author arossi
- * 
+ * @author Jeff Overbey - Environment Manager support
  */
 public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl {
 
@@ -216,6 +221,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			remoteServicesDelegate = new RemoteServicesDelegate(servicesId, connectionName);
 			remoteServicesDelegate.initialize(monitor);
 		}
+		/*
+		 * Bug 370775 - Attempt to open the connection before using the delegate as the connection can be closed independently of
+		 * the resource manager.
+		 */
+		IRemoteConnection conn = remoteServicesDelegate.getRemoteConnection();
+		if (!conn.isOpen()) {
+			try {
+				conn.open(monitor);
+			} catch (RemoteConnectionException e) {
+				// Just use the closed connection
+			}
+		}
 		return remoteServicesDelegate;
 	}
 
@@ -271,7 +288,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			return null;
 		}
 
-		updatePropertyValuesFromTab(configuration, null);
+		updatePropertyValues(configuration, null);
 
 		Object changedValue = null;
 
@@ -560,9 +577,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.put(uuid, p);
 
 		/*
-		 * overwrite property/attribute values based on user choices
+		 * Overwrite property/attribute values based on user choices. Note that the launch can also modify attributes.
 		 */
-		updatePropertyValuesFromTab(configuration, progress.newChild(5));
+		updatePropertyValues(configuration, progress.newChild(5));
 
 		/*
 		 * process script
@@ -908,6 +925,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (script == null) {
 			return false;
 		}
+		rmVarMap.setEnvManager(EnvManagerRegistry.getEnvManager(getRemoteServices(), getRemoteConnection()));
 		ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, launchEnv, false);
 		job.schedule();
 		try {
@@ -915,6 +933,25 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		} catch (InterruptedException ignored) {
 		}
 		return script.isDeleteAfterSubmit();
+	}
+
+	private IRemoteServices getRemoteServices() {
+		return PTPRemoteCorePlugin.getDefault().getRemoteServices(getControlConfiguration().getRemoteServicesId(), null);
+	}
+
+	private IRemoteConnection getRemoteConnection() {
+		final String connName = getControlConfiguration().getConnectionName();
+		final IRemoteServices rsrv = getRemoteServices();
+		if (rsrv == null) {
+			return null;
+		} else {
+			IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
+			if (connMgr == null) {
+				return null;
+			} else {
+				return connMgr.getConnection(connName);
+			}
+		}
 	}
 
 	/**
@@ -1052,7 +1089,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @throws CoreException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void updatePropertyValuesFromTab(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+	private void updatePropertyValues(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 40);
 
 		setFixedConfigurationProperties(progress.newChild(10));
@@ -1105,6 +1142,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_ARGS, JAXBControlConstants.DEBUGGER_ARGS, lcattr);
+		rmVarMap.overwrite(JAXBControlConstants.PTP_DIRECTORY, JAXBControlConstants.PTP_DIRECTORY, lcattr);
 
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));

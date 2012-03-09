@@ -1,0 +1,38 @@
+<html>
+<head><title>OpenACC&trade; loop directive</title></head>
+<body>
+<h2>OpenACC&trade; loop directive</h2>
+<dl><dd>Identifies a loop which will be executed on an accelerator device.</dd></dl>
+<table width="100%" border="0" cellspacing="5" cellpadding="3"><tr bgcolor="#eeeeee">
+<td align="left" valign="top">
+  <tt><b><font color="#b46432">!$acc loop</font></b></tt> <i>[clause [, clause ...]]</i><br>
+  &nbsp;&nbsp;&nbsp;&nbsp;<i>do loop</i>
+</td>
+<td align="left" valign="top">
+  <tt><b><font color="#931a68">#pragma </font>acc loop</b></tt> <i>[clause [, clause ...]]</i><br>
+  &nbsp;&nbsp;&nbsp;&nbsp;for loop
+</td>
+</tr></table>
+<p>
+  Supported clauses are
+  <tt>
+  <b>collapse</b>,
+  <b>gang</b>,
+  <b>worker</b>,
+  <b>vector</b>,
+  <b>seq</b>,
+  <b>independent</b>,
+  <b>private</b>,
+  <b>reduction</b>.
+  </tt>
+</p>
+<p>For more information, see Section
+2.8
+of <i>The OpenACC&trade; Application Programming Interface</i>, Version 1.0,
+available from <a href="http://www.openacc-standard.org/">http://www.openacc-standard.org</a>.</p>
+<br/>
+<table width="100%" border="0"><tr>
+<td align="right"><font color="#C0C0C0" size="1">OpenACC&trade; Application Programming Interface Version 1.0</font></td>
+</tr></table>
+</body>
+</html>

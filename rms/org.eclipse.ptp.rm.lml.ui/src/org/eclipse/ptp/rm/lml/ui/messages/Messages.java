@@ -19,6 +19,9 @@ public class Messages extends NLS {
 	public static String UIUtils_3;
 	public static String UIUtils_4;
 
+	public static String UsagebarPainter_NodeText;
+	public static String UsagebarPainter_CPUText;
+
 	public static String TableUpdate;
 
 	static {

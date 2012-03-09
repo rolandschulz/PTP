@@ -11,12 +11,14 @@
 
 package org.eclipse.ptp.rdt.sync.core.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.Random;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.git.core.GitRemoteSyncConnection;
-import org.eclipse.ptp.rdt.sync.git.core.SyncFileFilter;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -26,8 +28,6 @@ import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
 
-import org.eclipse.core.filesystem.EFS;
-
 @SuppressWarnings("restriction")
 public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 	private GitRemoteSyncConnection fGITConn;
@@ -35,10 +35,10 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 	private TemporaryFolder localFolder;
 	private static Random random = new Random();
 	private IRemoteFileManager fileManager;
-	private BasicGitSyncTests test;
+	private final BasicGitSyncTests test;
 	private String remoteFolder;
 	private IRemoteConnectionManager connMgr;
-	
+
 	public TemporaryGitRemoteSyncConnection(BasicGitSyncTests basicGitSyncTests) {
 		test = basicGitSyncTests;
 	}
@@ -52,15 +52,15 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 	protected void after() {
 		delete();
 	}
-	
+
 	public GitRemoteSyncConnection getGITConn() {
 		return fGITConn;
 	}
-	
+
 	public TemporaryFolder getLocalFolder() {
 		return localFolder;
 	}
-	
+
 	public String getRemoteFolder() {
 		return remoteFolder;
 	}
@@ -72,20 +72,19 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 	private void create() throws Exception {
 		long n = random.nextInt(1000000);
 		remoteFolder = test.remoteBaseDir + "/junit" + n;
-		
+
 		/* setup remote connection */
 		IRemoteServices fRemoteServices;
-		
-		fRemoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
-				"org.eclipse.ptp.remote.RemoteTools"); //$NON-NLS-1$
+
+		fRemoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.RemoteTools"); //$NON-NLS-1$
 		assertNotNull(fRemoteServices);
 
 		connMgr = fRemoteServices.getConnectionManager();
 		assertNotNull(connMgr);
 
-		//TODO: understand why it is causes problem when all connections are called the same. Should be fine because 
+		// TODO: understand why it is causes problem when all connections are called the same. Should be fine because
 		// connections are deleted. There seems to be a problem in RemoteTools with creating a new connection with the same name
-		fRemoteConnection = connMgr.newConnection("test_connection"+n); //$NON-NLS-1$  
+		fRemoteConnection = connMgr.newConnection("test_connection" + n); //$NON-NLS-1$  
 
 		assertNotNull(fRemoteConnection);
 		fRemoteConnection.setAddress(test.host);
@@ -97,53 +96,45 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 			fRemoteConnection.setAttribute(ConfigFactory.ATTR_KEY_PASSPHRASE, test.password);
 			fRemoteConnection.setAttribute(ConfigFactory.ATTR_IS_PASSWORD_AUTH, Boolean.toString(false));
 		}
-		
+
 		if (!fRemoteConnection.isOpen()) {
 			fRemoteConnection.open(null);
 		}
-		
+
 		fileManager = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection);
-		
-		/*local folder*/
+
+		/* local folder */
 		localFolder = new TemporaryFolder();
 		localFolder.create();
-		
-		/*remote folder (just delete - is created by GitRemoteSyncConnection)*/
+
+		/* remote folder (just delete - is created by GitRemoteSyncConnection) */
 		fileManager.getResource(remoteFolder).delete(EFS.NONE, null);
-		
-		fGITConn = new GitRemoteSyncConnection(fRemoteConnection,
-				localFolder.getRoot().getPath(), remoteFolder,
-				new SyncFileFilter() {
-					public boolean shouldIgnore(String fileName) {
-						if (fileName.startsWith(GitRemoteSyncConnection.gitDir)) {
-							return true;
-						}
-						return false;
-					}
-				}, null);
+
+		fGITConn = new GitRemoteSyncConnection(null, fRemoteConnection, localFolder.getRoot().getPath(), remoteFolder,
+				SyncFileFilter.createBuiltInDefaultFilter(), null);
 	}
 
-	private void delete()  {
-		String failMessage="";
-		
+	private void delete() {
+		String failMessage = "";
+
 		fGITConn.close();
 		localFolder.delete();
-		
+
 		try {
 			fileManager.getResource(remoteFolder).delete(EFS.NONE, null);
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
-			failMessage += e.getMessage(); //don't fail yet - try to clean up as much as possible
+			failMessage += e.getMessage(); // don't fail yet - try to clean up as much as possible
 		}
-		
+
 		fRemoteConnection.close();
 		try {
 			connMgr.removeConnection(fRemoteConnection);
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
-			failMessage += e.getMessage(); //don't fail yet - try to clean up as much as possible
+			failMessage += e.getMessage(); // don't fail yet - try to clean up as much as possible
 		}
-		
+
 		if (!failMessage.equals("")) {
 			fail(failMessage);
 		}

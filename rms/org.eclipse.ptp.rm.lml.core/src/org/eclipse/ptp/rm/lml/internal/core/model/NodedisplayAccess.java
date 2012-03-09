@@ -498,7 +498,7 @@ public class NodedisplayAccess extends LguiHandler {
 			return null;
 		}
 
-		return FastImpCheck.impnameToOneLevel(impname, nodedisplay, new ArrayList<Integer>());
+		return FastImpCheck.impNameToOneLevel(impname, nodedisplay, new ArrayList<Integer>());
 	}
 
 	@Override

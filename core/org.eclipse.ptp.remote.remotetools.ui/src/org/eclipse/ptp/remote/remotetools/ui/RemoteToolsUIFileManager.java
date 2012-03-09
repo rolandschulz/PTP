@@ -39,6 +39,7 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 				connection, shell, RemoteResourceBrowser.SINGLE);
 		browser.setType(RemoteResourceBrowser.DIRECTORY_BROWSER);
 		browser.setInitialPath(filterPath);
+		browser.setTitle(message);
 		browser.showConnections(showConnections);
 		if (browser.open() == Window.CANCEL) {
 			return null;
@@ -64,6 +65,7 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 				connection, shell, RemoteResourceBrowser.SINGLE);
 		browser.setType(RemoteResourceBrowser.FILE_BROWSER);
 		browser.setInitialPath(filterPath);
+		browser.setTitle(message);
 		browser.showConnections(showConnections);
 		if (browser.open() == Window.CANCEL) {
 			return null;
@@ -89,6 +91,7 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 				connection, shell, RemoteResourceBrowser.MULTI);
 		browser.setType(RemoteResourceBrowser.FILE_BROWSER);
 		browser.setInitialPath(filterPath);
+		browser.setTitle(message);
 		browser.showConnections(showConnections);
 		if (browser.open() == Window.CANCEL) {
 			return null;

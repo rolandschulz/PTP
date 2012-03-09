@@ -48,8 +48,7 @@ public class ServiceConfigurationView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ui.model.WorkbenchLabelProvider#getFont(java.lang.Object)
+		 * @see org.eclipse.ui.model.WorkbenchLabelProvider#getFont(java.lang.Object)
 		 */
 		@Override
 		public Font getFont(Object element) {
@@ -80,9 +79,10 @@ public class ServiceConfigurationView extends ViewPart {
 
 	private TreeViewer fViewer;
 	private final IServiceModelManager fManager = ServiceModelManager.getInstance();
+	private final ServiceModelEventListener fEventListener = new ServiceModelEventListener();
 
 	public ServiceConfigurationView() {
-		fManager.addEventListener(new ServiceModelEventListener(), IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED
+		fManager.addEventListener(fEventListener, IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED
 				| IServiceModelEvent.SERVICE_CONFIGURATION_SELECTED | IServiceModelEvent.SERVICE_CONFIGURATION_ADDED
 				| IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED);
 	}
@@ -90,9 +90,7 @@ public class ServiceConfigurationView extends ViewPart {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
-	 * .Composite)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets .Composite)
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
@@ -120,6 +118,7 @@ public class ServiceConfigurationView extends ViewPart {
 	 */
 	@Override
 	public synchronized void dispose() {
+		fManager.removeEventListener(fEventListener);
 		super.dispose();
 	}
 

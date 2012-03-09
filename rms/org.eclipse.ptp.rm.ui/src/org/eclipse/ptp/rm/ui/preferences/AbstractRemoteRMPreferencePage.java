@@ -22,10 +22,7 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.rm.core.RMPreferenceConstants;
-import org.eclipse.ptp.rm.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -35,7 +32,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -51,7 +47,6 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			fManualButton.setEnabled(true);
 			updatePreferencePage();
 		}
 	}
@@ -61,7 +56,6 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	protected Button fNoneButton = null;
 	protected Button fPortForwardingButton = null;
 	protected Button fManualButton = null;
-
 	protected WidgetListener listener = new WidgetListener();
 
 	public AbstractRemoteRMPreferencePage() {
@@ -79,8 +73,8 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	}
 
 	/**
-	 * Gets the preference qualifier used to access settings for the RM. Each RM
-	 * should supply different preference qualifier (usually the plugin ID).
+	 * Gets the preference qualifier used to access settings for the RM. Each RM should supply different preference qualifier
+	 * (usually the plugin ID).
 	 * 
 	 * @return preference qualifier
 	 * @since 2.0
@@ -90,8 +84,7 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench) {
 		// Nothing to do
@@ -104,7 +97,6 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	 */
 	@Override
 	public void performDefaults() {
-		loadDefaults();
 		defaultSetting();
 		updateApplyButton();
 	}
@@ -116,18 +108,7 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	 */
 	@Override
 	public boolean performOk() {
-
-		int options = 0;
-		if (fPortForwardingButton.getSelection()) {
-			options |= IRemoteProxyOptions.PORT_FORWARDING;
-		}
-		if (fManualButton.getSelection()) {
-			options |= IRemoteProxyOptions.MANUAL_LAUNCH;
-		}
-		Preferences.setInt(getPreferenceQualifier(), RMPreferenceConstants.OPTIONS, options);
-
 		savePreferences();
-
 		return true;
 	}
 
@@ -135,35 +116,6 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	 * Called to save the current preferences to the store.
 	 */
 	public abstract void savePreferences();
-
-	/**
-	 * Update options fields in UI
-	 */
-	private void updateOptions(int options) {
-		fPortForwardingButton.setSelection(false);
-		fNoneButton.setSelection(true);
-		if ((options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING) {
-			fPortForwardingButton.setSelection(true);
-			fNoneButton.setSelection(false);
-		}
-
-		fManualButton.setSelection((options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH);
-
-	}
-
-	/**
-	 * Load values from preference store
-	 */
-	private void loadSaved() {
-		updateOptions(Preferences.getInt(getPreferenceQualifier(), RMPreferenceConstants.OPTIONS));
-	}
-
-	/**
-	 * Load default values from preference store
-	 */
-	private void loadDefaults() {
-		updateOptions(Preferences.getDefaultInt(getPreferenceQualifier(), RMPreferenceConstants.OPTIONS, 0));
-	}
 
 	/**
 	 * @param parent
@@ -215,9 +167,7 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse
-	 * .swt.widgets.Composite)
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse .swt.widgets.Composite)
 	 */
 	@Override
 	protected Control createContents(Composite parent) {
@@ -225,22 +175,6 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 
-		Group mxGroup = new Group(composite, SWT.SHADOW_ETCHED_IN);
-		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
-		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		mxGroup.setText(Messages.AbstractRemotePreferencePage_4);
-
-		fNoneButton = createRadioButton(mxGroup, Messages.AbstractRemotePreferencePage_5, "mxGroup", listener); //$NON-NLS-1$
-		fPortForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemotePreferencePage_6, "mxGroup", listener); //$NON-NLS-1$
-
-		Group otherGroup = new Group(composite, SWT.SHADOW_ETCHED_IN);
-		otherGroup.setLayout(createGridLayout(1, true, 10, 10));
-		otherGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		otherGroup.setText(Messages.AbstractRemotePreferencePage_8);
-
-		fManualButton = createCheckButton(otherGroup, Messages.AbstractRemotePreferencePage_9);
-
-		loadSaved();
 		defaultSetting();
 		return composite;
 	}

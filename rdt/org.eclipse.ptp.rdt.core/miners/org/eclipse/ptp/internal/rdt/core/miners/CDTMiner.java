@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
@@ -64,6 +65,9 @@ import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvoca
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
+import org.eclipse.ptp.internal.rdt.core.miners.RemoteFoldingRegionsHandler.Branch;
+import org.eclipse.ptp.internal.rdt.core.miners.RemoteFoldingRegionsHandler.StatementRegion;
+import org.eclipse.ptp.internal.rdt.core.miners.RemoteFoldingRegionsHandler.StatementVisitor;
 import org.eclipse.ptp.internal.rdt.core.model.CModelBuilder2;
 import org.eclipse.ptp.internal.rdt.core.model.CProject;
 import org.eclipse.ptp.internal.rdt.core.model.IIndexLocationConverterFactory;
@@ -71,6 +75,7 @@ import org.eclipse.ptp.internal.rdt.core.model.RemoteCProjectFactory;
 import org.eclipse.ptp.internal.rdt.core.model.RemoteIndexLocationConverterFactory;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.model.WorkingCopy;
+import org.eclipse.ptp.internal.rdt.core.navigation.FoldingRegionsResult;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
@@ -85,6 +90,7 @@ import org.eclipse.rse.dstore.universal.miners.UniversalServerUtilities;
 public class CDTMiner extends Miner {
 	
 	public static final String CLASSNAME="org.eclipse.ptp.internal.rdt.core.miners.CDTMiner"; //$NON-NLS-1$
+
 	// index management
 	public static final String C_INDEX_REINDEX = "C_INDEX_REINDEX"; //$NON-NLS-1$
 	public static final String C_INDEX_DELTA = "C_INDEX_DELTA"; //$NON-NLS-1$
@@ -92,6 +98,7 @@ public class CDTMiner extends Miner {
 	public static final String T_INDEX_STRING_DESCRIPTOR = "Type.Index.String"; //$NON-NLS-1$
 	public static final String T_INDEX_FILENAME_DESCRIPTOR = "Type.Scope.Filename"; //$NON-NLS-1$
 	public static final String T_INDEX_INT_DESCRIPTOR = "Type.Index.Int"; //$NON-NLS-1$
+	public static final String T_INDEX_BOOLEAN_DESCRIPTOR = "Type.Index.Boolean";  //$NON-NLS-1$
 	public static final String T_INDEX_DELTA_CHANGED = "Type.Index.Delta.Changed"; //$NON-NLS-1$
 	public static final String T_INDEX_DELTA_ADDED = "Type.Index.Delta.Added"; //$NON-NLS-1$
 	public static final String T_INDEX_DELTA_REMOVED = "Type.Index.Delta.Removed"; //$NON-NLS-1$
@@ -139,13 +146,19 @@ public class CDTMiner extends Miner {
 	
 	// includes
 	public static final String C_INCLUDES_FIND_INCLUDES_TO = "C_INCLUDES_FIND_INCLUDES_TO"; //$NON-NLS-1$
-	public static final String C_INCLUDES_FIND_INCLUDES_TO_RESULT = "C_INCLUDES_FIND_INCLUDES_TO_RESULT"; //$NON-NLS-1$
+	public static final String T_INCLUDES_FIND_INCLUDES_TO_RESULT = "Type.Includes.Find.Includes.To.Result"; //$NON-NLS-1$
 	public static final String C_INCLUDES_FIND_INCLUDED_BY = "C_INCLUDES_FIND_INCLUDED_BY"; //$NON-NLS-1$
-	public static final String C_INCLUDES_FIND_INCLUDED_BY_RESULT = "C_INCLUDES_FIND_INCLUDED_BY_RESULT"; //$NON-NLS-1$
+	public static final String T_INCLUDES_FIND_INCLUDED_BY_RESULT = "Type.Includes.Find.Included.By.Result"; //$NON-NLS-1$
 	public static final String C_INCLUDES_IS_INDEXED = "C_INCLUDES_IS_INDEXED"; //$NON-NLS-1$
-	public static final String C_INCLUDES_IS_INDEXED_RESULT = "C_INCLUDES_IS_INDEXED_RESULT"; //$NON-NLS-1$
+	public static final String T_INCLUDES_IS_INDEXED_RESULT = "Type.Includes.Is.Indexed.Result"; //$NON-NLS-1$
 	public static final String C_INCLUDES_FIND_INCLUDE = "C_INCLUDES_FIND_INCLUDE"; //$NON-NLS-1$
-	public static final String C_INCLUDES_FIND_INCLUDE_RESULT = "C_INCLUDES_FIND_INCLUDE_RESULT"; //$NON-NLS-1$
+	public static final String T_INCLUDES_FIND_INCLUDE_RESULT = "Type.Includes.Find.Include.Result"; //$NON-NLS-1$
+	
+	//semantic highlighting and code folding
+	public static final String C_SEMANTIC_HIGHTLIGHTING_COMPUTE_POSITIONS = "C_SEMANTIC_HIGHTLIGHTING_COMPUTE_POSITIONS"; //$NON-NLS-1$
+	public static final String T_HIGHTLIGHTING_POSITIONS_RESULT = "Highlighting.Positions.Result"; //$NON-NLS-1$
+	public static final String C_CODE_FOLDING_COMPUTE_REGIONS = "C_CODE_FOLDING_COMPUTE_REGIONS"; //$NON-NLS-1$
+	public static final String T_CODE_FOLDING_RESULT = "Folding.Region.Result"; //$NON-NLS-1$
 	
 	public static String LINE_SEPARATOR;
 	
@@ -153,7 +166,7 @@ public class CDTMiner extends Miner {
 	
 	//model builder
 	public static final String C_MODEL_BUILDER = "C_MODEL_BUILDER"; //$NON-NLS-1$;
-	public static final String C_MODEL_RESULT= "C_MODEL_RESULT"; //$NON-NLS-1$;
+	public static final String T_MODEL_RESULT= "Type.Model.Result"; //$NON-NLS-1$;
 
 	
 	public static final String LOG_TAG = "CDTMiner"; //$NON-NLS-1$
@@ -718,8 +731,115 @@ public class CDTMiner extends Miner {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 			}			
 		}
+		else if (name.equals(C_SEMANTIC_HIGHTLIGHTING_COMPUTE_POSITIONS)) {
+			try {
+				String scopeName = getString(theCommand, 1);
+				ITranslationUnit tu = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 2));
+
+				hanleComputeSemanticHightlightingPositions(scopeName, tu, status);
+			} catch (IOException e) {
+				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			} catch (ClassNotFoundException e) {
+				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			}
+		}
+		else if (name.equals(C_CODE_FOLDING_COMPUTE_REGIONS)) {
+			try {
+				String scopeName = getString(theCommand, 1);
+				ITranslationUnit tu = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 2));
+				int docSize = getInteger(theCommand, 3);
+				boolean preprocessorFoldingEnabled = getBoolean(theCommand, 4);
+				boolean statementsFoldingEnabled = getBoolean(theCommand, 5);
+	
+				hanleComputeCodeFoldingRegions(scopeName, tu, status, statementsFoldingEnabled, preprocessorFoldingEnabled, docSize);
+			} catch (IOException e) {
+				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			} catch (ClassNotFoundException e) {
+				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			}
+		}
 		
 		return status;
+	}
+	
+	protected void hanleComputeSemanticHightlightingPositions(String scopeName, ITranslationUnit tu, DataElement status) {
+		try {
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
+			index.acquireReadLock();
+			try  {
+				IASTTranslationUnit ast = tu.getAST(index,  ITranslationUnit.AST_SKIP_ALL_HEADERS | ITranslationUnit.AST_PARSE_INACTIVE_CODE);
+				PositionCollector collector = new PositionCollector(true);
+				ast.accept(collector);
+				ArrayList<ArrayList<Integer>> positionList = collector.getPositions();
+				String clumpedPositions = new String();
+				for (ArrayList<Integer> position : positionList) {
+					clumpedPositions += position.get(0) + "," + position.get(1) + "," + position.get(2) + ","; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+				String resultString = Serializer.serialize(clumpedPositions);
+				status.getDataStore().createObject(status, T_HIGHTLIGHTING_POSITIONS_RESULT, resultString);
+			}
+			finally {
+				index.releaseReadLock();
+			}
+		} catch (IOException e) {
+			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		} catch (CoreException e) {
+			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		} catch (InterruptedException e) {
+			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		finally {
+			statusDone(status);
+		}
+	}
+	
+	protected void hanleComputeCodeFoldingRegions(String scopeName, ITranslationUnit tu, DataElement status, 
+			boolean statementsFoldingEnabled, boolean preprocessorFoldingEnabled, int docSize) {
+		try {
+			final Stack<StatementRegion> iral = new Stack<StatementRegion>();	
+			List<Branch> branches = new ArrayList<Branch>();
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
+			index.acquireReadLock();
+			try  {
+				IASTTranslationUnit ast = tu.getAST(index,  ITranslationUnit.AST_SKIP_ALL_HEADERS | ITranslationUnit.AST_PARSE_INACTIVE_CODE);
+				
+				if (ast == null) {
+					return;
+				}
+				String fileName = ast.getFilePath();
+				if (fileName == null) {
+					return;
+				}
+				
+				RemoteFoldingRegionsHandler rfrh = new RemoteFoldingRegionsHandler();
+				FoldingRegionsResult result = new FoldingRegionsResult();
+				
+				if (statementsFoldingEnabled) {
+					StatementVisitor sv = rfrh.createStatementVisitor(iral);
+					ast.accept(sv);
+					result.iral = iral;
+				}
+				if (preprocessorFoldingEnabled) {
+					rfrh.computePreprocessorFoldingStructure(ast, docSize, branches);
+					result.branches = branches;
+				}
+				
+				String resultString = Serializer.serialize(result);
+				status.getDataStore().createObject(status, T_CODE_FOLDING_RESULT, resultString);
+			}
+			finally {
+				index.releaseReadLock();
+			}
+		} catch (IOException e) {
+			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		} catch (CoreException e) {
+			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		} catch (InterruptedException e) {
+			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		finally {
+			statusDone(status);
+		}
 	}
 	
 	protected void handleIndexFileMove(String scopeName, String newIndexLocation, DataElement status) throws IOException {
@@ -776,7 +896,7 @@ public class CDTMiner extends Miner {
 	
 				// create the result object
 				String resultString = Serializer.serialize(workingCopy);
-				status.getDataStore().createObject(status, C_MODEL_RESULT, resultString);
+				status.getDataStore().createObject(status, T_MODEL_RESULT, resultString);
 			}
 		} catch (IOException e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
@@ -864,7 +984,7 @@ public class CDTMiner extends Miner {
 	
 				// create the result object
 				String resultString = Serializer.serialize(includesToReturn);
-				status.getDataStore().createObject(status, C_INCLUDES_FIND_INCLUDES_TO_RESULT, resultString);
+				status.getDataStore().createObject(status, T_INCLUDES_FIND_INCLUDES_TO_RESULT, resultString);
 			}			         
 			finally 
 			{
@@ -941,7 +1061,7 @@ public class CDTMiner extends Miner {
 	
 				// create the result object
 				String resultString = Serializer.serialize(includeToReturn);
-				status.getDataStore().createObject(status, C_INCLUDES_FIND_INCLUDE_RESULT, resultString);
+				status.getDataStore().createObject(status, T_INCLUDES_FIND_INCLUDE_RESULT, resultString);
 			}			         
 			finally 
 			{
@@ -1038,7 +1158,7 @@ public class CDTMiner extends Miner {
 	
 				// create the result object
 				String resultString = Serializer.serialize(includesToReturn);
-				status.getDataStore().createObject(status, C_INCLUDES_FIND_INCLUDED_BY_RESULT, resultString);
+				status.getDataStore().createObject(status, T_INCLUDES_FIND_INCLUDED_BY_RESULT, resultString);
 			}			         
 			finally 
 			{
@@ -1076,7 +1196,7 @@ public class CDTMiner extends Miner {
 
 				// create the result object
 				String resultString = Serializer.serialize(new Boolean(files.length > 0));
-				status.getDataStore().createObject(status, C_INCLUDES_IS_INDEXED_RESULT, resultString);
+				status.getDataStore().createObject(status, T_INCLUDES_IS_INDEXED_RESULT, resultString);
 			}			         
 			finally 
 			{
@@ -1468,6 +1588,10 @@ public class CDTMiner extends Miner {
 		createCommandDescriptor(schemaRoot, "Find input from element", C_TYPE_HIERARCHY_FIND_INPUT1, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Find input from text selection", C_TYPE_HIERARCHY_FIND_INPUT2, false); //$NON-NLS-1$
 		
+		// semantic highlighting and code folding
+		createCommandDescriptor(schemaRoot, "Compute added & removed positions for semantic highlighting", C_SEMANTIC_HIGHTLIGHTING_COMPUTE_POSITIONS, false); //$NON-NLS-1$
+		createCommandDescriptor(schemaRoot, "Compute code folding regions for the Remote C Editor", C_CODE_FOLDING_COMPUTE_REGIONS, false); //$NON-NLS-1$
+		
 		// navigation
 		createCommandDescriptor(schemaRoot, "Open declaration", C_NAVIGATION_OPEN_DECLARATION, false); //$NON-NLS-1$
 		
@@ -1803,30 +1927,32 @@ public class CDTMiner extends Miner {
 			IRemoteIndexerInfoProvider provider, String scheme, String host, String rootPath, String mappedPath, DataElement status) {
 
 		StandaloneFastIndexer indexer = RemoteIndexManager.getInstance().getIndexerForScope(scopeName, provider, _dataStore, status);
-		ScopeManager scopeManager = ScopeManager.getInstance();
-		
-		// update the scope if required
-		for(String file : addedFiles)
-			scopeManager.addFileToScope(scopeName, scheme, host, file, rootPath, mappedPath);
-		for(String file : changedFiles)
-			scopeManager.addFileToScope(scopeName, scheme, host, file, rootPath, mappedPath);
-		for(String file : removedFiles)
-			scopeManager.removeFileFromScope(scopeName, file);
-		
-		// if there is already an indexer thread running wait for it (highly unlikely since indexer tasks are only executed one at a time on the client)
-		if(indexerThread != null) {
-			try {
-				indexerThread.join();
-			} catch (InterruptedException e) {
-				UniversalServerUtilities.logError(LOG_TAG, "Indexer thread got interrupted", e, _dataStore); //$NON-NLS-1$
-			} catch (NullPointerException e) {
+		if(indexer!=null){
+			ScopeManager scopeManager = ScopeManager.getInstance();
+			
+			// update the scope if required
+			for(String file : addedFiles)
+				scopeManager.addFileToScope(scopeName, scheme, host, file, rootPath, mappedPath);
+			for(String file : changedFiles)
+				scopeManager.addFileToScope(scopeName, scheme, host, file, rootPath, mappedPath);
+			for(String file : removedFiles)
+				scopeManager.removeFileFromScope(scopeName, file);
+			
+			// if there is already an indexer thread running wait for it (highly unlikely since indexer tasks are only executed one at a time on the client)
+			if(indexerThread != null) {
+				try {
+					indexerThread.join();
+				} catch (InterruptedException e) {
+					UniversalServerUtilities.logError(LOG_TAG, "Indexer thread got interrupted", e, _dataStore); //$NON-NLS-1$
+				} catch (NullPointerException e) {
+					
+				}
 				
 			}
 			
+			indexerThread = IndexerThread.createIndexDeltaThread(indexer, addedFiles, changedFiles, removedFiles, status, this);
+			indexerThread.start();
 		}
-		
-		indexerThread = IndexerThread.createIndexDeltaThread(indexer, addedFiles, changedFiles, removedFiles, status, this);
-		indexerThread.start();
 	}
 	
 	
@@ -1834,21 +1960,23 @@ public class CDTMiner extends Miner {
 		RemoteIndexManager indexManager = RemoteIndexManager.getInstance();
 		indexManager.setIndexFileLocation(scopeName, newIndexLocation);
 		StandaloneFastIndexer indexer = indexManager.getIndexerForScope(scopeName, provider, _dataStore, status);
-		Set<String> sources = ScopeManager.getInstance().getFilesForScope(scopeName);
-		
-		List<String> sourcesList = new LinkedList<String>(sources);
-		
-		// if there is already an indexer thread running wait for it (highly unlikely since indexer tasks are only executed one at a time on the client)
-		if(indexerThread != null) {
-			try {
-				indexerThread.join();
-			} catch (InterruptedException e) {
-				UniversalServerUtilities.logError(LOG_TAG, "Indexer thread got interrupted", e, _dataStore); //$NON-NLS-1$
-			} 
+		if(indexer!=null){
+			Set<String> sources = ScopeManager.getInstance().getFilesForScope(scopeName);
+			
+			List<String> sourcesList = new LinkedList<String>(sources);
+			
+			// if there is already an indexer thread running wait for it (highly unlikely since indexer tasks are only executed one at a time on the client)
+			if(indexerThread != null) {
+				try {
+					indexerThread.join();
+				} catch (InterruptedException e) {
+					UniversalServerUtilities.logError(LOG_TAG, "Indexer thread got interrupted", e, _dataStore); //$NON-NLS-1$
+				} 
+			}
+			
+			indexerThread = IndexerThread.createReindexThread(indexer, sourcesList, status, this);
+			indexerThread.start();
 		}
-		
-		indexerThread = IndexerThread.createReindexThread(indexer, sourcesList, status, this);
-		indexerThread.start();
 	}
 
 	

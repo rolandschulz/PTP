@@ -2,15 +2,18 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="Parallel Language Development Tools (PLDT)" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpPLDT" topic="html/toc.html">
-   <topic href="html/toc.html" label="Contents"/>
-   <topic href="html/overview.html" label="Overview"/>
-      <topic label="Setup for PTP MPI tools"  href="html/setup.html"/> 
-      <topic label="Running PTP MPI tools"  href="html/run.html"/> 
-           <topic label="Setup for PTP OpenMP tools"  href="html/setupOMP.html"/> 
-      <topic label="Running PTP OpenMP tools"  href="html/runOMP.html"/> 
-   <topic href="html/barrier.html" label="MPI Barrier Analysis">
-   </topic> 
-      <topic href="html/upc.html" label="UPC tools"/>
-   <topic href="html/whatsnew.html" label="New and Noteworthy"/>
+   <topic label="Contents" href="html/toc.html"/>
+   <topic label="Overview" href="html/overview.html" />
+   <topic label="Setup for PTP MPI tools"  href="html/setup.html"/> 
+   <topic label="Running PTP MPI tools"  href="html/run.html"/> 
+   <topic label="Setup for PTP OpenMP tools"  href="html/setupOMP.html"/> 
+   <topic label="Running PTP OpenMP tools"  href="html/runOMP.html"/> 
+   <!-- insertion point for tools related to OpenMP-->
+   <anchor id="ptpPLDTopenmp"/>
+   <topic label="MPI Barrier Analysis"  href="html/barrier.html"/> 
+   <topic label="UPC tools" href="html/upc.html" />
+   <!-- insertion point for other docs -->
+   <anchor id="ptpPLDTother"/>
+   <topic label="New and Noteworthy" href="html/whatsnew.html" />
 
 </toc>

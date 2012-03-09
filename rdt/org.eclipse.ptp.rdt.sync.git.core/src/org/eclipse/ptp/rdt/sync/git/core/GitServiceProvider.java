@@ -15,8 +15,6 @@ import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.eclipse.cdt.core.model.CoreModel;
-import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -29,6 +27,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
@@ -55,6 +54,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private boolean hasBeenSynced = false;
 
 	private static final ReentrantLock syncLock = new ReentrantLock();
+	private final ReentrantLock providerLock = new ReentrantLock();
 	private Integer fWaitingThreadsCount = 0;
 	private Integer syncTaskId = -1; // ID for most recent synchronization task, functions as a time-stamp
 	private int finishedSyncTaskId = -1; // all synchronizations up to this ID (including it) have finished
@@ -190,7 +190,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#
 	 * synchronize(org.eclipse.core.resources.IResourceDelta, org.eclipse.core.runtime.IProgressMonitor, boolean)
 	 */
-	public void synchronize(IResourceDelta delta, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
+	public void synchronize(IResourceDelta delta, SyncFileFilter fileFilter, IProgressMonitor monitor,
+			EnumSet<SyncFlag> syncFlags) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
 		// On first sync, place .gitignore in directories. This is useful for folders that are already present and thus are never
 		// captured by a resource add or change event. (This can happen for projects converted to sync projects.)
@@ -322,8 +323,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				// TODO: Review exception handling
 				if (fSyncConnection == null) {
 					// Open a remote sync connection
-					fSyncConnection = new GitRemoteSyncConnection(this.getRemoteConnection(), this.getProject().getLocation()
-							.toString(), this.getLocation(), new FileFilter(), progress);
+					fSyncConnection = new GitRemoteSyncConnection(this.getProject(), this.getRemoteConnection(),
+							this.getProject().getLocation().toString(), this.getLocation(), fileFilter, progress);
+				} else {
+					fSyncConnection.setFileFilter(fileFilter);
 				}
 
 				// Open remote connection if necessary
@@ -418,46 +421,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 
-	private class FileFilter implements SyncFileFilter {
-		public boolean shouldIgnore(String fileName) {
-			if (fileName.equals(".cproject") || fileName.equals(".project")) { //$NON-NLS-1$ //$NON-NLS-2$
-				return true;
-			}
-
-			if (fileName.startsWith(".settings")) { //$NON-NLS-1$
-				return true;
-			}
-
-			if (fileName.startsWith(GitRemoteSyncConnection.gitDir)) {
-				return true;
-			}
-
-			if (this.isBinaryFile(fileName)) {
-				return true;
-			}
-
-			return false;
-		}
-
-		private boolean isBinaryFile(String fileName) {
-			try {
-				ICElement fileElement = CoreModel.getDefault().create(getProject().getFile(fileName));
-				if (fileElement == null) {
-					return false;
-				}
-				int resType = fileElement.getElementType();
-				if (resType == ICElement.C_BINARY) {
-					return true;
-				} else {
-					return false;
-				}
-			} catch (NullPointerException e) {
-				// CDT throws this exception for files not recognized. For now, be conservative and allow these files.
-				return false;
-			}
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -482,13 +445,16 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setRemoteToolsConnection()
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
-		syncLock.lock();
+		providerLock.lock();
 		try {
 			fConnection = connection;
 			putString(GIT_CONNECTION_NAME, connection.getName());
-			fSyncConnection = null; // get reinitialized by next synchronize call
+			if (fSyncConnection != null) {
+				fSyncConnection.close();
+				fSyncConnection = null; // get reinitialized by next synchronize call
+			}
 		} finally {
-			syncLock.unlock();
+			providerLock.unlock();
 		}
 	}
 
@@ -498,13 +464,24 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setConfigLocation()
 	 */
 	public void setConfigLocation(String configLocation) {
-		syncLock.lock();
+		providerLock.lock();
 		try {
 			fLocation = configLocation;
 			putString(GIT_LOCATION, configLocation);
-			fSyncConnection = null; // get reinitialized by next synchronize call
+			if (fSyncConnection != null) {
+				fSyncConnection.close();
+				fSyncConnection = null; // get reinitialized by next synchronize call
+			}
 		} finally {
-			syncLock.unlock();
+			providerLock.unlock();
+		}
+	}
+	
+	@Override
+	public void close() {
+		if (fSyncConnection != null) {
+			fSyncConnection.close();
+			fSyncConnection = null; // get reinitialized by next synchronize call
 		}
 	}
 }

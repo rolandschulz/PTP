@@ -25,8 +25,7 @@ public class JAXBRMPreferenceManager extends AbstractPreferenceInitializer {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#
-	 * initializeDefaultPreferences()
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer# initializeDefaultPreferences()
 	 */
 	@Override
 	public void initializeDefaultPreferences() {
@@ -35,6 +34,8 @@ public class JAXBRMPreferenceManager extends AbstractPreferenceInitializer {
 		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.MATCH_STATUS, false);
 		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS, false);
 		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES, false);
+		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SHOW_COMMAND, false);
+		Preferences.setDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, false);
 		Preferences.setDefaultString(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.LOG_FILE,
 				JAXBCoreConstants.ZEROSTR);
 	}

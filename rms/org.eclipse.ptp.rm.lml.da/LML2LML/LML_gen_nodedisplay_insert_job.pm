@@ -10,6 +10,7 @@
 #*******************************************************************************/ 
 package LML_gen_nodedisplay;
 my($debug)=0;
+my($generateusage)=1;
 use strict;
 use Time::Local;
 use Time::HiRes qw ( time );
@@ -37,10 +38,11 @@ sub insert_job_into_nodedisplay  {
     my($dataref) = shift;
     my($nodelist) = shift;
     my($oid) = shift;
-    my($data,$node,$listref,@nodelistrefs,@nodelistrefs_reduced, $allcovered, $child);
+    my($data,$node,$listref,@nodelistrefs,@nodelistrefs_reduced,@nodesizelistrefs_reduced, $allcovered, $child);
 
     # Transfer each node name of the nodelist to a list of ordering number for each level of the tree
     # according to the mask or map attribute in th escheme definition
+#    print "insert_job_into_nodedisplay $oid >$nodelist<\n";
     foreach $node (sort(split(/\s*,\s*/,$nodelist))) {
 	$listref=$self->get_numbers_from_name($node,$schemeref);
 	if(!defined($listref)) {
@@ -62,15 +64,20 @@ sub insert_job_into_nodedisplay  {
     # covered tree nodes which
     # This scan will run recursively on each subtree of the root node   
     foreach $child (@{$schemeref->{_childs}}) {
-	$allcovered=$self->_reduce_nodelist($child,\@nodelistrefs,\@nodelistrefs_reduced);
+	$allcovered=$self->_reduce_nodelist($child,\@nodelistrefs,\@nodelistrefs_reduced,\@nodesizelistrefs_reduced);
     }
 
     print "insert_job_into_nodedisplay, allcovered=$allcovered\n"  if($debug>=2); 
 
     # Insert job into each node of the reduced list
+    my($allsize) ;
     foreach $listref (@nodelistrefs_reduced) {
-	$self->_insert_jobnode_nodedisplay($dataref,$listref,$oid);
+	$allsize=shift(@nodesizelistrefs_reduced);
+	$self->_insert_jobnode_nodedisplay($dataref,$listref,$allsize,$oid);
     }
+
+    # scan all created data tree structure for empty nodes
+    
 
     return(1);
 }
@@ -93,23 +100,35 @@ sub _insert_jobnode_nodedisplay {
     my($self) = shift;
     my($dataref)=shift;
     my($nodelistref)=shift;
+    my($sizelistref)=shift;
     my($oid) = shift;
-    my($myspec,$min,$max,$subspec,$child);
+    my($myspec,$mysizespec,$min,$max,$subspec,$child);
+    my($allsize);
     my($lmin,$lmax,$subchilds);
     my $level=$dataref->{_level};
     my $xspace=" "x$level;
-    my (@covered, @childlist, $newchild, @newlist, $isleaf, $i, @notcoveredlist, $newlist, $updatechild);
+    my (@covered, @childlist, $newchild, @newlist, @newsizelist, $isleaf, $i, @notcoveredlist, $updatechild);
     
-    print "_insert_jobnode_nodedisplay: $xspace # START level=$level nodelistref=>",join(',',@{$nodelistref}),"<\n"  if($debug>=2); 
+    print "_insert_jobnode_nodedisplay: $xspace # START level=$level nodelistref=>",join(',',@{$nodelistref}),
+          "< sizelistref=>",join(',',@{$sizelistref}),"<\n"  if($debug>=2); 
     
     $myspec=$nodelistref->[0];
     if($myspec=~/^\((.*)\)$/) {
-	my $list=$1;
+	my($list,$mysizespec,$tmplist,@sizespec);
+
+	$list      = $1;
+	$mysizespec=$sizelistref->[0];
+	$mysizespec=~/^\((.*)\)$/;
+	$tmplist   =$1;
+	@sizespec  =(split(',',$tmplist));
+
 	for $subspec (split(',',$list)) {
-	    my @list = @{$nodelistref};
+	    my @list     = @{$nodelistref};
+	    my @sizelist = @{$sizelistref};
 	    $list[0]=$subspec;
-	    print "_insert_jobnode_nodedisplay: $xspace  -> re-calling with top subspec >$subspec<\n"  if($debug>=2); 
-	    $self->_insert_jobnode_nodedisplay($dataref,\@list, $oid);
+	    $sizelist[0]=shift(@sizespec);
+	    print "_insert_jobnode_nodedisplay: $xspace  -> re-calling with top subspec >$subspec< subsize>$sizelist[0]<\n"  if($debug>=2); 
+	    $self->_insert_jobnode_nodedisplay($dataref,\@list, \@sizelist, $oid);
 	}
 	print "_insert_jobnode_nodedisplay: $xspace # END   level=$level nodelistref=>",join(',',@{$nodelistref}),"<\n" if($debug>=2); 
 	return();
@@ -120,7 +139,9 @@ sub _insert_jobnode_nodedisplay {
     }
     for($i=$min;$i<=$max;$i++) {$covered[$i]=1;}
 
-    @newlist = @{$nodelistref};shift(@newlist);
+    @newlist     = @{$nodelistref};shift(@newlist);
+    @newsizelist = @{$sizelistref};
+    $allsize     = shift(@newsizelist);
     $isleaf=($#newlist == -1)?1:0;
     # scan child
     @childlist=@{$dataref->{_childs}};
@@ -150,7 +171,7 @@ sub _insert_jobnode_nodedisplay {
 		    $child->{ATTR}->{min}=$min;
 		} 
 		if($max<$lmax) {                   # overlap after, copy tree
-		    print "_insert_jobnode_nodedisplay: $xspace  -> duplicate child   with (",($max+1),"..",($max),")\n" if($debug>=2); 
+		    print "_insert_jobnode_nodedisplay: $xspace  -> duplicate child   with (",($max+1),"..",($lmax),")\n" if($debug>=2); 
 		    $newchild=$dataref->duplicate_child($child);
 		    $newchild->{ATTR}->{min}=$max+1;
 		    $newchild->{ATTR}->{max}=$lmax;
@@ -172,7 +193,7 @@ sub _insert_jobnode_nodedisplay {
 #		$updatechild->{ATTR}->{min}=$min;
 #		$updatechild->{ATTR}->{max}=$max;
 		print "_insert_jobnode_nodedisplay: $xspace  -> duplicate child   with (",($min),"..",($max),"), inserting subnodes ...\n" if($debug>=2); 
-		$self->_insert_jobnode_nodedisplay($updatechild,\@newlist, $oid) ;
+		$self->_insert_jobnode_nodedisplay($updatechild,\@newlist, \@newsizelist, $oid) ;
 	    }
  	    for($i=$min;$i<=$max;$i++) {$covered[$i]=0}
 
@@ -195,7 +216,7 @@ sub _insert_jobnode_nodedisplay {
 		$child->{ATTR}->{min}=$lmin;
 		$child->{ATTR}->{max}=$max;
 		print "_insert_jobnode_nodedisplay: $xspace  -> adjust range      with (",($lmin),"..",($max),"), inserting subnodes ...\n" if($debug>=2); 
-		$self->_insert_jobnode_nodedisplay($child,\@newlist, $oid) ;
+		$self->_insert_jobnode_nodedisplay($child,\@newlist, \@newsizelist, $oid) ;
 	    }
  	    for($i=$min;$i<=$lmin;$i++) {$covered[$i]=0}
 	} elsif(($min>=$lmin) && ($max>$lmax)) {
@@ -216,7 +237,7 @@ sub _insert_jobnode_nodedisplay {
 		$child->{ATTR}->{min}=$min;
 		$child->{ATTR}->{max}=$lmax;
 		print "_insert_jobnode_nodedisplay: $xspace  -> adjust range      with (",($min),"..",($lmax),"), inserting subnodes ...\n" if($debug>=2); 
-		$self->_insert_jobnode_nodedisplay($child,\@newlist, $oid) ;
+		$self->_insert_jobnode_nodedisplay($child,\@newlist, \@newsizelist, $oid) ;
 	    }
  	    for($i=$min;$i<=$lmax;$i++) {$covered[$i]=0}
 	}
@@ -227,7 +248,7 @@ sub _insert_jobnode_nodedisplay {
 	push(@notcoveredlist,$i) if($covered[$i]==1);
     }
     if(@notcoveredlist) {
-	$newlist=reduce_list(@notcoveredlist);$newlist=~s/\(//gs;$newlist=~s/\)//gs;
+	my $newlist=reduce_list(@notcoveredlist);$newlist=~s/\(//gs;$newlist=~s/\)//gs;
 	print "_insert_jobnode_nodedisplay: $xspace  -> notcoveredlist= >$newlist<\n" if($debug>=2); 
 	for $subspec (split(',',$newlist)) {
 	    if($subspec=~/(\d+)\-(\d+)/) {$min=$1;$max=$2;  } 
@@ -240,12 +261,20 @@ sub _insert_jobnode_nodedisplay {
 	} else {
 	    $newchild->add_attr({ min => $min, max => $max, oid => $dataref->{ATTR}->{oid} });
 	    print "_insert_jobnode_nodedisplay: $xspace  -> insert new child with (",($min),"..",($max),"), inserting subnodes ...\n" if($debug>=2); 
-	    $self->_insert_jobnode_nodedisplay($newchild,\@newlist, $oid) ;
+	    $self->_insert_jobnode_nodedisplay($newchild,\@newlist, \@newsizelist, $oid) ;
 	}
 	
     }
 
-    print "_insert_jobnode_nodedisplay: $xspace # END   level=$level nodelistref=>",join(',',@{$nodelistref}),"<\n" if($debug>=2); 
+    # adjust usage information
+    if($generateusage) {
+	if(!exists($dataref->{ATTR}->{_JOBUSAGE})) {
+	    $dataref->{ATTR}->{_JOBUSAGE}={};
+	} 
+	$dataref->{ATTR}->{_JOBUSAGE}->{$oid}+=$allsize;
+    }
+
+    print "_insert_jobnode_nodedisplay: $xspace # END   level=$level allsize=$allsize nodelistref=>",join(',',@{$nodelistref}),"<\n" if($debug>=2); 
 
 }    
 
@@ -270,11 +299,13 @@ sub _reduce_nodelist {
     my($schemeref)=shift;
     my($nodelistrefs)=shift;
     my($newnodelistrefs)=shift;
-    my($rg,$child, $listref, @covered, $allcovered, $nodenum,@shortlists,@newshortlists, $lastfound);
+    my($newsizelistrefs)=shift;
+    my($rg,$child, $listref, @covered, $allcovered, $allsize, @allsize, $nodenum,@shortlists,@newshortlists,@newshortsizelists, $lastfound, $allsizelist);
     my $level=$schemeref->{_level};
     my $xspace=" "x$level;
 
     print "_reduce_nodelist: $xspace # START level=$level scheme min..max=$schemeref->{ATTR}->{min}..$schemeref->{ATTR}->{max}\n" if($debug>=2); 
+    print "_reduce_nodelist: $xspace #       ",&print_nodelists($nodelistrefs),"\n" if($debug>=3); 
 
     # Initialization
     for($nodenum=$schemeref->{ATTR}->{min};$nodenum<=$schemeref->{ATTR}->{max};$nodenum++) {
@@ -290,12 +321,13 @@ sub _reduce_nodelist {
 	# check only nodes which are described by this subtree of the scheme
 	next if($nodenum<$schemeref->{ATTR}->{min});
 	next if($nodenum>$schemeref->{ATTR}->{max});
-	print "_reduce_nodelist: $xspace # CHECK nodenum=$nodenum\n" if($debug>=2); 
 	if($#{$listref}==0) {
 	    $covered[$nodenum]=1; # node full covered
+	    print "_reduce_nodelist: $xspace # nodenum=$nodenum full covered (",join(',',@{$listref}),")\n" if($debug>=2); 
 	} else {
 	    my(@list);
 	    $covered[$nodenum]=2 if($covered[$nodenum]==0);
+	    print "_reduce_nodelist: $xspace # nodenum=$nodenum not full covered, rescan on sub-level (",join(',',@{$listref}),")\n" if($debug>=2); 
 
 	    # remove top elem and add it to sublist
 	    @list=@{$listref};shift(@list);push(@{$shortlists[$nodenum]},\@list);
@@ -305,40 +337,62 @@ sub _reduce_nodelist {
     # check childs of all nodes which are not fully covered
     $allcovered=1;
     for($nodenum=$schemeref->{ATTR}->{min};$nodenum<=$schemeref->{ATTR}->{max};$nodenum++) { 
+	# partly covered
 	if($covered[$nodenum]==2) {
+	    # partly covered, go down
 	    my $allcovered_=1;
 	    foreach $child (@{$schemeref->{_childs}}) {
-		my(@newlist,$allcovered__);
-		$allcovered__=$self->_reduce_nodelist($child,$shortlists[$nodenum],\@newlist);
+		my(@newsublist,@newsizelist,$allcovered__,$allsize__);
+		($allcovered__,$allsize__)=$self->_reduce_nodelist($child,$shortlists[$nodenum],\@newsublist,\@newsizelist);
 		$allcovered_=0 if(!$allcovered__);
-		push(@{$newshortlists[$nodenum]},@newlist);
+		$allsize[$nodenum]+=$allsize__;
+		push(@{$newshortlists[$nodenum]},@newsublist);
+		push(@{$newshortsizelists[$nodenum]},@newsizelist);
+		print "_reduce_nodelist: $xspace # covered[$nodenum]==2 allsize[$nodenum]=$allsize[$nodenum] allsize__=$allsize__\n" if($debug>=3); 
 	    }
 	    # reduce if all covered
 	    if($allcovered_) {
 		$covered[$nodenum]=1;
 		$newshortlists[$nodenum]=[];
+		$newshortsizelists[$nodenum]=[];
 	    } else {
 		$allcovered=0;
 	    }
-
+	} elsif($covered[$nodenum]==1) {
+	    # full covered, get size
+	    $allsize[$nodenum]=$self->_get_size_for_node($schemeref,$nodenum);
+	    
 	} elsif($covered[$nodenum]==0) {
 	    $allcovered=0;
+	    $allsize[$nodenum]=0;
 	}
+    }
+
+    # compute total size of job in this subtree
+    for($allsize=0,$nodenum=$schemeref->{ATTR}->{min};$nodenum<=$schemeref->{ATTR}->{max};$nodenum++) { 
+	$allsize+=$allsize[$nodenum];
     }
     
     # build new node list
     if($allcovered) {
+	
 	push(@{$newnodelistrefs},[$schemeref->{ATTR}->{min}."-".$schemeref->{ATTR}->{max}]);
+	push(@{$newsizelistrefs},[$allsize]);
 
     } else {
 	# build list of allcovered subnodes
 	my(@nlist,$newlist);
 	for($nodenum=$schemeref->{ATTR}->{min};$nodenum<=$schemeref->{ATTR}->{max};$nodenum++) { 
-	    push(@nlist, $nodenum) if($covered[$nodenum]==1);
+	    if($covered[$nodenum]==1) {
+		push(@nlist, $nodenum); 
+	    }
 	}
 	if(@nlist) {
 	    $newlist=reduce_list(@nlist);
 	    push(@{$newnodelistrefs},[$newlist]); 
+	    
+	    $allsizelist=&create_size_list( $newlist,\@allsize);
+	    push(@{$newsizelistrefs},[$allsizelist]);
 	}
 
 
@@ -354,8 +408,13 @@ sub _reduce_nodelist {
 			}
 		    }
 		}
-		$newlist=reduce_list(@nlist);
+		$newlist     = reduce_list(@nlist);
+		$allsizelist = &create_size_list( $newlist,\@allsize);
 	
+		foreach $listref (@{$newshortsizelists[$nodenum]}) {
+		    unshift(@$listref,  $allsizelist );
+		    push(@{$newsizelistrefs},$listref);
+		}
 		foreach $listref (@{$newshortlists[$nodenum]}) {
 		    unshift(@$listref,  $newlist );
 		    push(@{$newnodelistrefs},$listref);
@@ -365,7 +424,44 @@ sub _reduce_nodelist {
 	
     }
 
-    return($allcovered);
+    print "_reduce_nodelist: $xspace # END   level=$level scheme min..max=$schemeref->{ATTR}->{min}..$schemeref->{ATTR}->{max} allsize=$allsize\n" if($debug>=2); 
+    print "_reduce_nodelist: $xspace #       nodes ",&print_nodelists($newnodelistrefs),"\n" if($debug>=3); 
+    print "_reduce_nodelist: $xspace #       sizes ",&print_nodelists($newsizelistrefs),"\n" if($debug>=3); 
+    return($allcovered,$allsize);
+}
+
+# create list of sizes, according to given reduced nodelist 
+sub create_size_list {
+    my($list,$allsizeref) = @_;
+    my($allsize,$myspec,@allsizelist,$nodenum);
+
+    
+    print "create_size_list >$list<\n" if($debug>=3); 
+    if($list=~/^\((.*)\)$/) {
+	my $sublist=$1;
+	my $newlist=&create_size_list($sublist,$allsizeref);
+	push(@allsizelist,$newlist);
+    } else {
+        foreach $myspec (split(',',$list)) { 
+	    print "create_size_list myspec=>$myspec<\n" if($debug>=3); 
+	    if($myspec=~/(\d+)\-(\d+)/) {
+		$allsize=0;
+		for($nodenum=$1;$nodenum<=$2;$nodenum++) {
+		    $allsize+=$allsizeref->[$nodenum];
+		}
+		push(@allsizelist,$allsize);
+	    } else {
+		$nodenum=$myspec;
+		push(@allsizelist,$allsizeref->[$nodenum]);
+	    }
+	}
+    }
+    if($#allsizelist>0) {
+	return("(" . (join(',',@allsizelist)) .")");
+    } else {
+	return($allsizelist[0]);
+    }
+    
 }
 
 sub twolist_compare  {
@@ -418,6 +514,72 @@ sub reduce_list  {
 }
 
 
+sub _get_size_for_node  {
+    my($self) = shift;
+    my($schemeref,$nodenum) = @_;
+    my($allsize,$child);
+    my $subchilds=$#{$schemeref->{_childs}}+1;
+    my $level=$schemeref->{_level};
+    my $xspace=" "x$level;
+
+    print "_get_size_for_node: $xspace # START nodenum=$nodenum subchilds=$subchilds\n" if($debug>=2); 
+
+    $allsize=0;
+    if($subchilds>0) {
+	foreach $child (@{$schemeref->{_childs}}) {
+	    next if($nodenum<$child->{ATTR}->{min});
+	    next if($nodenum>$child->{ATTR}->{max});
+	    $allsize+=$self->_get_size_of_node($child);
+	}
+    } else {
+	$allsize=1;
+    }
+    
+    print "_get_size_for_node: $xspace # END  nodenum=$nodenum allsize=$allsize\n" if($debug>=2); 
+
+
+    return($allsize);
+}
+
+sub _get_size_of_node  {
+    my($self) = shift;
+    my($schemeref) = @_;
+    my($allsize,$child);
+    my $subchilds=$#{$schemeref->{_childs}}+1;
+    my $level=$schemeref->{_level};
+    my $xspace=" "x$level;
+
+    print "_get_size_of_node:   $xspace # START level=$level subchilds=$subchilds\n" if($debug>=2); 
+
+    $allsize=0;
+    if($subchilds>0) {
+	foreach $child (@{$schemeref->{_childs}}) {
+	    $allsize+=$self->_get_size_of_node($child);
+	}
+    } else {
+	$allsize=$schemeref->{ATTR}->{max}-$schemeref->{ATTR}->{min}+1;
+    }
+    
+    print "_get_size_of_node:   $xspace # START allsize=$allsize\n" if($debug>=2); 
+
+    return($allsize);
+}
+
+
+sub print_nodelists  {
+    my($nodelistrefs) = @_;
+    my($listref);
+    my $result="";
+    foreach $listref (@{$nodelistrefs}) {
+	$result.="(".print_nodelist($listref).")";
+    }
+    return($result);
+}
+
+sub print_nodelist  {
+    my($nodelistref) = @_;
+    return("".join(",",@{$nodelistref}));
+}
 
 ################################################################################################################
 # get_numbers_from_name: nodename to location numbers (main)
@@ -445,7 +607,9 @@ sub get_numbers_from_name  {
 	$listref=$self->_get_numbers_from_name($child,$name);
 	last if(defined($listref)); 
     }
-    
+    if(!defined($listref)) {
+	print "get_numbers_from_name: not found >$name<\n";
+    }
     return($listref);
 }
 
@@ -476,7 +640,7 @@ sub _get_numbers_from_name {
     $rg=$schemeref->{ATTR}->{_maskregall};
 
     # ready if nodename matches to this level 
-#    print "get_numbers_from_name: check on level ",$schemeref->{_level}+1," $name -> $rg\n" if($debug>=2); 
+#    print "get_numbers_from_name: check on level ",$schemeref->{_level}+1," $name -> $rg subcheck ",$name=~/^$rg/,"\n" if($debug>=2); 
     if($name=~/^$rg$/) {
 	@list=$name=~/^$rg$/;
 	print "get_numbers_from_name: found on level ",$schemeref->{_level}+1," $name -> ",join(',',@list),"\n" if($debug>=2); 

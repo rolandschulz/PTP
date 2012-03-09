@@ -38,18 +38,19 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  * Supplies environment variables from the remote system.
  * 
  * @author crecoskie
- * @since 2.0
- *
+ * @since 3.2
+ * 
  */
 @SuppressWarnings("restriction")
-public class RemoteProjectEnvironmentSupplier implements
-		IProjectEnvironmentVariableSupplier {
+public class RemoteProjectEnvironmentSupplier implements IProjectEnvironmentVariableSupplier {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.managedbuilder.envvar.IProjectEnvironmentVariableSupplier#getVariable(java.lang.String, org.eclipse.cdt.managedbuilder.core.IManagedProject, org.eclipse.cdt.managedbuilder.envvar.IEnvironmentVariableProvider)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.cdt.managedbuilder.envvar.IProjectEnvironmentVariableSupplier#getVariable(java.lang.String,
+	 * org.eclipse.cdt.managedbuilder.core.IManagedProject, org.eclipse.cdt.managedbuilder.envvar.IEnvironmentVariableProvider)
 	 */
-	public IBuildEnvironmentVariable getVariable(String variableName,
-			IManagedProject project, IEnvironmentVariableProvider provider) {
+	public IBuildEnvironmentVariable getVariable(String variableName, IManagedProject project, IEnvironmentVariableProvider provider) {
 		Map<String, String> envMap = getRemoteEnvironment(project);
 		if (envMap != null) {
 			String value = envMap.get(variableName) == null ? new String() : envMap.get(variableName);
@@ -59,31 +60,32 @@ public class RemoteProjectEnvironmentSupplier implements
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.managedbuilder.envvar.IProjectEnvironmentVariableSupplier#getVariables(org.eclipse.cdt.managedbuilder.core.IManagedProject, org.eclipse.cdt.managedbuilder.envvar.IEnvironmentVariableProvider)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.cdt.managedbuilder.envvar.IProjectEnvironmentVariableSupplier#getVariables(org.eclipse.cdt.managedbuilder.core
+	 * .IManagedProject, org.eclipse.cdt.managedbuilder.envvar.IEnvironmentVariableProvider)
 	 */
-	public IBuildEnvironmentVariable[] getVariables(IManagedProject project,
-			IEnvironmentVariableProvider provider) {
-		
+	public IBuildEnvironmentVariable[] getVariables(IManagedProject project, IEnvironmentVariableProvider provider) {
+
 		List<IBuildEnvironmentVariable> vars = new LinkedList<IBuildEnvironmentVariable>();
 		Map<String, String> remoteEnvMap = null;
-		
+
 		remoteEnvMap = getRemoteEnvironment(project);
-		
+
 		if (remoteEnvMap != null) {
 			for (String var : remoteEnvMap.keySet()) {
 				String value = remoteEnvMap.get(var);
 
-				IBuildEnvironmentVariable buildEnvVar = new BuildEnvVar(var,
-						value);
+				IBuildEnvironmentVariable buildEnvVar = new BuildEnvVar(var, value);
 				vars.add(buildEnvVar);
 			}
 
 			return vars.toArray(new IBuildEnvironmentVariable[0]);
-		}
-		
-		else
+		} else {
 			return new IBuildEnvironmentVariable[0];
+		}
 
 	}
 
@@ -99,12 +101,9 @@ public class RemoteProjectEnvironmentSupplier implements
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 
 		try {
-			IServiceConfiguration serviceConfig = smm
-					.getActiveConfiguration(iProj);
-			IService buildService = smm
-					.getService(IRDTServiceConstants.SERVICE_BUILD);
-			IServiceProvider serviceProvider = serviceConfig
-					.getServiceProvider(buildService);
+			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(iProj);
+			IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
+			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(buildService);
 			IRemoteExecutionServiceProvider executionProvider = null;
 			if (serviceProvider instanceof IRemoteExecutionServiceProvider) {
 				executionProvider = (IRemoteExecutionServiceProvider) serviceProvider;
@@ -112,20 +111,19 @@ public class RemoteProjectEnvironmentSupplier implements
 
 			if (executionProvider != null) {
 
-				IRemoteServices remoteServices = executionProvider
-						.getRemoteServices();
-				
-				if (remoteServices == null)
+				IRemoteServices remoteServices = executionProvider.getRemoteServices();
+
+				if (remoteServices == null) {
 					return null;
-				
-				if(!remoteServices.isInitialized()) {
+				}
+
+				if (!remoteServices.isInitialized()) {
 					remoteServices.initialize();
 				}
 
-				IRemoteConnection connection = executionProvider
-						.getConnection();
-				
-				if(connection == null) {
+				IRemoteConnection connection = executionProvider.getConnection();
+
+				if (connection == null) {
 					return remoteEnvMap;
 				}
 
@@ -139,10 +137,9 @@ public class RemoteProjectEnvironmentSupplier implements
 
 				List<String> command = new LinkedList<String>();
 
-				IRemoteProcessBuilder processBuilder = remoteServices
-						.getProcessBuilder(connection, command);
+				IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
 
-				if(processBuilder != null) {
+				if (processBuilder != null) {
 					remoteEnvMap = processBuilder.environment();
 				}
 
@@ -155,5 +152,3 @@ public class RemoteProjectEnvironmentSupplier implements
 		return remoteEnvMap;
 	}
 }
-
-

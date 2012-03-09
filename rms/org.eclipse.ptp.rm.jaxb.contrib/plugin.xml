@@ -19,6 +19,38 @@
             configurationFile="data/edu.illinois.ncsa.forge.pbs.batch.openmpi.xml"
             name="edu.illinois.ncsa.forge.pbs.batch.openmpi">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.illinois.ncsa.forge.pbs.interactive.openmpi.xml"
+            name="edu.illinois.ncsa.forge.pbs.interactive.openmpi">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.sdsc.trestles.pbs.batch.xml"
+            name="edu.sdsc.trestles.pbs.batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.utexas.tacc.lonestar.sge.batch.xml"
+            name="edu.utexas.tacc.lonestar.sge.batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.utexas.tacc.ranger.sge.batch.xml"
+            name="edu.utexas.tacc.ranger.sge.batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/gridengine-generic-batch.xml"
+            name="Grid Engine-Generic-Batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/openmpi-generic-interactive.xml"
+            name="Open MPI-Generic-Interactive">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/slurm-bgp-batch.xml"
+            name="SLURM-BG/P-Batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/slurm-bgq-batch.xml"
+            name="SLURM-BG/Q-Batch">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>

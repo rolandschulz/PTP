@@ -11,7 +11,9 @@
  *****************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
@@ -30,6 +32,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.control.internal.utils.DebuggingLogger;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
@@ -66,7 +69,7 @@ public class SimpleCommandJob extends Job {
 	 *            the calling resource manager
 	 */
 	public SimpleCommandJob(String uuid, SimpleCommandType command, String directory, IJAXBResourceManager rm) {
-		super(command.getName() != null ? command.getName() : "simple"); //$NON-NLS-1$
+		super(command.getName() != null ? command.getName() : "Simple Command"); //$NON-NLS-1$
 		fUuid = uuid;
 		fCommand = command;
 		fDirectory = command.getDirectory() != null ? command.getDirectory() : directory;
@@ -148,6 +151,9 @@ public class SimpleCommandJob extends Job {
 				fActive = false;
 			}
 			IRemoteProcessBuilder builder = prepareCommand(progress.newChild(10));
+			if (progress.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
 			prepareEnv(builder);
 			progress.worked(10);
 
@@ -164,11 +170,54 @@ public class SimpleCommandJob extends Job {
 			}
 			progress.worked(20);
 
+			if (DebuggingLogger.getLogger().getCommandOutput()) {
+				final BufferedReader stdout = new BufferedReader(new InputStreamReader(fProcess.getInputStream()));
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							String output;
+							while ((output = stdout.readLine()) != null) {
+								DebuggingLogger.getLogger().logCommandOutput(getName() + ": " + output); //$NON-NLS-1$
+							}
+							stdout.close();
+						} catch (IOException e) {
+							// Ignore
+						}
+					}
+				}, getName() + " stdout").start(); //$NON-NLS-1$
+
+				final BufferedReader stderr = new BufferedReader(new InputStreamReader(fProcess.getErrorStream()));
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							String output;
+							while ((output = stderr.readLine()) != null) {
+								DebuggingLogger.getLogger().logCommandOutput(getName() + ": " + output); //$NON-NLS-1$
+							}
+							stderr.close();
+						} catch (IOException e) {
+							// Ignore
+						}
+					}
+				}, getName() + " stderr").start(); //$NON-NLS-1$
+			}
+
 			int exit = 0;
 
-			try {
-				exit = fProcess.waitFor();
-			} catch (InterruptedException ignored) {
+			while (!fProcess.isCompleted() && !progress.isCanceled()) {
+				synchronized (this) {
+					try {
+						wait(500);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+
+			if (progress.isCanceled()) {
+				if (!fProcess.isCompleted()) {
+					fProcess.destroy();
+				}
+				return Status.CANCEL_STATUS;
 			}
 
 			progress.worked(20);
@@ -223,18 +272,27 @@ public class SimpleCommandJob extends Job {
 	 * @throws CoreException
 	 */
 	private IRemoteProcessBuilder prepareCommand(IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		ArgumentParser args = new ArgumentParser(fRmVarMap.getString(fUuid, fCommand.getExec()));
-		RemoteServicesDelegate delegate = fControl.getRemoteServicesDelegate(monitor);
+		RemoteServicesDelegate delegate = fControl.getRemoteServicesDelegate(progress.newChild(5));
 		if (delegate.getRemoteConnection() == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, new Throwable(
 					Messages.UninitializedRemoteServices));
 		}
+		if (progress.isCanceled()) {
+			return null;
+		}
 		IRemoteConnection conn = delegate.getRemoteConnection();
-		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			JAXBResourceManagerControl.checkConnection(conn, progress);
+			JAXBResourceManagerControl.checkConnection(conn, progress.newChild(5));
 		} catch (RemoteConnectionException rce) {
 			throw CoreExceptionUtils.newException(rce.getLocalizedMessage(), rce);
+		}
+		if (progress.isCanceled()) {
+			return null;
+		}
+		if (DebuggingLogger.getLogger().getCommand()) {
+			System.out.println(getName() + ": " + args.getCommandLine(false)); //$NON-NLS-1$
 		}
 		IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, args.getTokenList());
 		if (fDirectory != null && !JAXBControlConstants.ZEROSTR.equals(fDirectory)) {

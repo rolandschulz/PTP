@@ -32,6 +32,7 @@ my %mapping = (
     "hostname"                                  => "hostname",
     "date"                                      => "system_time",
     "type"                                      => "type",
+    "motd"                                      => "motd",
     );
 
 my ($sysinfoid,$line,%sysinfo,%sysinfonr,$key,$value,$count,%notmappedkeys,%notfoundkeys);
@@ -40,6 +41,17 @@ $sysinfoid="cluster";
 $sysinfo{$sysinfoid}{hostname}=$Hostname;
 $sysinfo{$sysinfoid}{date}=&get_current_date();
 $sysinfo{$sysinfoid}{type}="Cluster";
+
+# checking system message of today 
+my $motd = "/etc/motd";
+if(-e $motd) {
+    if(open(MOTD,'<',$motd)) {
+        while(<MOTD>) {
+        $sysinfo{$sysinfoid}{motd}.="$_";
+        }
+        close MOTD;
+    }
+}
 
 open(OUT,"> $filename") || die "cannot open file $filename";
 printf(OUT "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -97,6 +109,11 @@ sub get_current_date {
 sub modify {
     my($key,$mkey,$value)=@_;
     my $ret=$value;
+
+    # mask & in user input
+    if($ret=~/\&/) {
+	$ret=~s/\&/\&amp\;/gs;
+    } 
 
     return($ret);
 }

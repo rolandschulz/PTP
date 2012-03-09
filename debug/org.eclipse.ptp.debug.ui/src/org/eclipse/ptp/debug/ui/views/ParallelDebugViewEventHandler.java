@@ -100,6 +100,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 				}
 				break;
 			case IPDebugEvent.DEBUGGER:
+				getPView().changeJobRefresh(getJob(info.getLaunch(), jobId));
 				break;
 			case IPDebugEvent.BREAKPOINT:
 				break;
@@ -189,15 +190,11 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 			case IPDebugEvent.EVALUATION:
 			case IPDebugEvent.CONTENT:
 				/*
-				 * int[] diffTasks = info.getAllProcesses().toArray();
-				 * IElementHandler elementHandler =
-				 * getPView().getElementHandler(job.getID()); for (int j=0;
-				 * j<diffTasks.length; j++) { IElement element =
-				 * elementHandler.getSetRoot
-				 * ().get(String.valueOf(diffTasks[j])); if (element instanceof
-				 * DebugElement) { if (detail == IPDebugEvent.EVALUATION) {
-				 * ((DebugElement)element).setType(DebugElement.VALUE_DIFF); }
-				 * else { ((DebugElement)element).resetType(); } } }
+				 * int[] diffTasks = info.getAllProcesses().toArray(); IElementHandler elementHandler =
+				 * getPView().getElementHandler(job.getID()); for (int j=0; j<diffTasks.length; j++) { IElement element =
+				 * elementHandler.getSetRoot ().get(String.valueOf(diffTasks[j])); if (element instanceof DebugElement) { if (detail
+				 * == IPDebugEvent.EVALUATION) { ((DebugElement)element).setType(DebugElement.VALUE_DIFF); } else {
+				 * ((DebugElement)element).resetType(); } } }
 				 */
 				break;
 			}
@@ -238,16 +235,21 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 		}
 	}
 
-	private String getProcessId(IPLaunch launch, int task) {
+	private IPJob getJob(IPLaunch launch, String jobId) {
 		IResourceManager rmc = launch.getResourceManager();
 		if (rmc != null) {
 			IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
 			if (rm != null) {
-				IPJob job = rm.getJobById(launch.getJobId());
-				if (job != null) {
-					return job.getProcessName(task);
-				}
+				return rm.getJobById(launch.getJobId());
 			}
+		}
+		return null;
+	}
+
+	private String getProcessId(IPLaunch launch, int task) {
+		IPJob job = getJob(launch, launch.getJobId());
+		if (job != null) {
+			return job.getProcessName(task);
 		}
 		return null;
 	}

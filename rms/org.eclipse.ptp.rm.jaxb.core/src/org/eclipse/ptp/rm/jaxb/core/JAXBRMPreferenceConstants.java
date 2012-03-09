@@ -20,5 +20,7 @@ public class JAXBRMPreferenceConstants {
 	public static final String MATCH_STATUS = Messages.ShowMatchStatus;
 	public static final String ACTIONS = Messages.ShowActionsForMatch;
 	public static final String CREATED_PROPERTIES = Messages.ShowCreatedProperties;
-	public static final String LOG_FILE = Messages.TokenizerLog;
+	public static final String SHOW_COMMAND_OUTPUT = Messages.ShowCommandOutput;
+	public static final String SHOW_COMMAND = Messages.ShowCommand;
+	public static final String LOG_FILE = Messages.LogFile;
 }

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation.
+ * Copyright (c) 2006, 2012 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ import org.eclipse.ptp.pldt.openmp.analysis.parser.OpenMPToken;
  * @author pazel
  * 
  */
+@SuppressWarnings("restriction")
 public class PASTOMPFactory {
 	protected PASTPragma pragma_ = null;
 	protected PASTOMPPragma ompPragma_ = null;
@@ -73,6 +74,7 @@ public class PASTOMPFactory {
 		// otherinit(null);
 	}
 
+	@SuppressWarnings("unused")
 	private void experiment() {
 		IASTFileLocation loc = pragma_.getFileLocation();
 		if (loc != null) {
@@ -256,7 +258,7 @@ public class PASTOMPFactory {
 	 * @return OpenMPToken []
 	 */
 	protected OpenMPToken[] getIdentifierList() {
-		LinkedList l = new LinkedList();
+		LinkedList<OpenMPToken> l = new LinkedList<OpenMPToken>();
 
 		if (token_ == null)
 			return null;
@@ -284,8 +286,8 @@ public class PASTOMPFactory {
 		// build the list
 		OpenMPToken[] ompl = new OpenMPToken[l.size()];
 		int count = 0;
-		for (Iterator i = l.iterator(); i.hasNext();) {
-			ompl[count++] = (OpenMPToken) i.next();
+		for (Iterator<OpenMPToken> i = l.iterator(); i.hasNext();) {
+			ompl[count++] = i.next();
 			// check to see if in dictionary
 			Symbol[] symbols = dictionary_.getSymbolsFor(ompl[count - 1].getImage());
 			if (symbols.length == 0) {
@@ -325,7 +327,6 @@ public class PASTOMPFactory {
 		if (traceOn)
 			System.out.println("Symbol: " + symbol.getName() + "  PASTOMPFactory.isSymbolRelevant()");
 		IASTNode node = null;
-		IASTNode parent, gp = null;
 		try {
 			// node=symbol.getScope().getPhysicalNode(); // no longer in CDT 4.0
 			// BRT replacement for getPhysicalNode() for CDT 4.0
@@ -828,7 +829,7 @@ public class PASTOMPFactory {
 	 * @return OpenMPToken []
 	 */
 	private OpenMPToken[] getExpression() {
-		LinkedList l = new LinkedList();
+		LinkedList<OpenMPToken> l = new LinkedList<OpenMPToken>();
 		int parenCt = 1;
 
 		nextToken();
@@ -855,7 +856,7 @@ public class PASTOMPFactory {
 
 		OpenMPToken[] list = new OpenMPToken[l.size()];
 		for (int i = 0; i < l.size(); i++)
-			list[i] = (OpenMPToken) l.get(i);
+			list[i] = l.get(i);
 
 		nextToken(); // move ahead
 		return list;
@@ -1129,7 +1130,6 @@ public class PASTOMPFactory {
 		 * @return int
 		 */
 		@Override
-		@SuppressWarnings("restriction")
 		// remove later
 		public int visit(IASTStatement statement) { // BRT debugging here.
 													// region is being set
