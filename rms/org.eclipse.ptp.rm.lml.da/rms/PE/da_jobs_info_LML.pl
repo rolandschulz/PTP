@@ -60,7 +60,16 @@ my %mapping_job = (
 	# unknown attributes
 );
 
-my $cmd     = "ps x -o pid,user,group,etime,command | grep poe | grep -v grep";
+my $is_aix = `uname -s` =~ /aix/i;
+my $cmd;
+
+if ($is_aix) {
+	$cmd = "ps -u $ENV{LOGNAME} -o pid,user,group,etime,command | grep poe | grep -v grep";
+	}
+else {
+	$cmd = "ps x -o pid,user,group,etime,command | grep poe | grep -v grep";
+}
+
 my $datecmd = "date '+%D %T'";
 
 if ( open( IN, "$cmd 2>&1 |" ) ) {
@@ -87,8 +96,7 @@ if ( open( IN, "$cmd 2>&1 |" ) ) {
 
 # determine number of cores
 my $numcpu;
-my $os = `uname -s`;
-if ( $os eq "Aix" ) {
+if ( $is_aix ) {
 	$numcpu = `lscfg | grep proc | wc -l`;
 } else {
 	$numcpu = `grep -c ^processor /proc/cpuinfo`;
