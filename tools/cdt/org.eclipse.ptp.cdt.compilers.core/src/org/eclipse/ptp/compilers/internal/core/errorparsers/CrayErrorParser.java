@@ -10,6 +10,7 @@
 package org.eclipse.ptp.compilers.internal.core.errorparsers;
 
 import static org.eclipse.cdt.core.IMarkerGenerator.SEVERITY_ERROR_RESOURCE;
+import static org.eclipse.cdt.core.IMarkerGenerator.SEVERITY_INFO;
 import static org.eclipse.cdt.core.IMarkerGenerator.SEVERITY_WARNING;
 
 import java.util.regex.Matcher;
@@ -40,6 +41,8 @@ import org.eclipse.core.resources.IFile;
  *   The source file "file_does_not_exist.c" is unavailable.
  * </pre>
  * <p>
+ * It can also recognize informational messages from loopmark listings.
+ * <p>
  * Note that Photran provides its own error parser for Cray Fortran.
  * 
  * @author Jeff Overbey
@@ -47,19 +50,19 @@ import org.eclipse.core.resources.IFile;
 public class CrayErrorParser implements IErrorParser {
 
 	private static final Pattern C_ERROR_WARNING_LINE = Pattern.compile( //
-			// Capture Group 1-----------2-------3--------4------------5
-			"^CC-[0-9]+ crayc(c|\\+\\+): ([A-Z]+)( File = (.*), Line = ([0-9]+)|.*)?[ \t]*$"); //$NON-NLS-1$
+			// Group ---1------2----------------3-------4--------5------------6------------7
+			"^CC-[0-9]+ (cray)?(cc|c\\+\\+|CC): ([A-Z]+)( File = (.*), Line = ([0-9]+)|.*)?[ \t]*$"); //$NON-NLS-1$
 
 	// Capture groups in the above regexes
-	private static final int SEVERITY_GROUP = 2;
-	private static final int FILENAME_GROUP = 4;
-	private static final int LINE_NUMBER_GROUP = 5;
+	private static final int SEVERITY_GROUP = 3;
+	private static final int FILENAME_GROUP = 5;
+	private static final int LINE_NUMBER_GROUP = 6;
 
 	@Override
 	public boolean processLine(String currentLine, ErrorParserManager eoParser) {
 		final Matcher matcher = matchErrorWarningLine(eoParser.getPreviousLine());
 		if (matcher != null) {
-			final int severity = matcher.group(SEVERITY_GROUP).equals("WARNING") ? SEVERITY_WARNING : SEVERITY_ERROR_RESOURCE; //$NON-NLS-1$
+			final int severity = determineSeverity(matcher.group(SEVERITY_GROUP));
 			final String filename = matcher.group(FILENAME_GROUP);
 			final IFile file = filename == null ? null : eoParser.findFileName(filename);
 			final int lineNumber = atoi(matcher.group(LINE_NUMBER_GROUP));
@@ -83,6 +86,16 @@ public class CrayErrorParser implements IErrorParser {
 
 		return null;
 	}
+
+    private int determineSeverity(String text) {
+        if (text.equals("WARNING")) { //$NON-NLS-1$
+            return SEVERITY_WARNING;
+        } else if (text.equals("IPA") || text.equals("SCALAR") || text.equals("VECTOR") || text.equals("ACCEL")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            return SEVERITY_INFO;
+        } else {
+            return SEVERITY_ERROR_RESOURCE;
+        }
+    }
 
 	private int atoi(String string) {
 		if (string == null) {

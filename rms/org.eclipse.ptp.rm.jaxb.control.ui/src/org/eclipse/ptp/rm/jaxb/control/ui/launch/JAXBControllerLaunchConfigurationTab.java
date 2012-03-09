@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.launch;
 
@@ -17,7 +18,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
@@ -44,6 +50,7 @@ import org.eclipse.swt.widgets.Control;
  * variable map (environment built from the resource manager environment) are held by the parent and accessed by the child tabs.
  * 
  * @author arossi
+ * @author Jeff Overbey - Environment Manager support
  */
 public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControllerTab implements IUpdateModelEnabled,
 		SelectionListener {
@@ -93,12 +100,39 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 					addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, importTab, this));
 				}
 			}
-			lcMap = new LCVariableMap();
+			lcMap = new LCVariableMap(EnvManagerRegistry.getEnvManager(getRemoteServices(rm), getConnection(rm)));
 		} else {
 			getControllers().clear();
 			launchTabData = null;
 			updateHandler = null;
 			lcMap = null;
+		}
+	}
+
+	private static IRemoteServices getRemoteServices(IJAXBResourceManager rm) {
+		if (rm == null) {
+			return null;
+		} else {
+			return PTPRemoteCorePlugin.getDefault().getRemoteServices(rm.getControlConfiguration().getRemoteServicesId(), null);
+		}
+	}
+
+	private static IRemoteConnection getConnection(IJAXBResourceManager rm) {
+		if (rm == null) {
+			return null;
+		} else {
+			final String connName = rm.getControlConfiguration().getConnectionName();
+			final IRemoteServices rsrv = getRemoteServices(rm);
+			if (rsrv == null) {
+				return null;
+			} else {
+				IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
+				if (connMgr == null) {
+					return null;
+				} else {
+					return connMgr.getConnection(connName);
+				}
+			}
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.ptp.internal.rdt.core.model.RemoteModelWorkingCopy;
 import org.eclipse.ptp.internal.rdt.core.model.RemoteReconcileWorkingCopyOperation;
+import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 public class RemoteCReconcilingStrategy extends CReconcilingStrategy {
@@ -64,6 +66,7 @@ public class RemoteCReconcilingStrategy extends CReconcilingStrategy {
 	
 	private void reconcile(final boolean initialReconcile) {
 		boolean computeAST= fEditor instanceof ICReconcilingListener;
+		RemoteModelWorkingCopy rmWorkingCopy = null;
 		IWorkingCopy workingCopy = fManager.getWorkingCopy(fEditor.getEditorInput());
 		if (workingCopy == null) {
 			return;
@@ -76,13 +79,23 @@ public class RemoteCReconcilingStrategy extends CReconcilingStrategy {
 				
 				RemoteReconcileWorkingCopyOperation op = new RemoteReconcileWorkingCopyOperation(workingCopy, computeAST, true);
 		        op.runOperation(fProgressMonitor);
-		        ((ICReconcilingListener)fEditor).reconciled(null, true, fProgressMonitor);
+		        rmWorkingCopy = op.fRmWorkingCopy;
 			}
 		} catch (OperationCanceledException oce) {
 			// document was modified while parsing
 		} catch (CModelException e) {
 			IStatus status= new Status(IStatus.ERROR, CUIPlugin.PLUGIN_ID, IStatus.OK, "Error in CDT UI during reconcile", e);  //$NON-NLS-1$
-			CUIPlugin.log(status);
-		} 
+			UIPlugin.log(status);
+		} finally {
+			try {
+				synchronized (rmWorkingCopy) {
+					((ICReconcilingListener)fEditor).reconciled(null, true, fProgressMonitor);
+				}
+			} catch(Exception e) {
+				IStatus status= new Status(IStatus.ERROR, CUIPlugin.PLUGIN_ID, IStatus.OK, "Error in CDT UI during reconcile", e);  //$NON-NLS-1$
+				UIPlugin.log(status);
+			}
+		}
+		
  	}
 }

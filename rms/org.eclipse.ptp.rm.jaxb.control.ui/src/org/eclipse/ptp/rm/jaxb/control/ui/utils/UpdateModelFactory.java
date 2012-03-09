@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.utils;
 
@@ -22,6 +23,7 @@ import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ptp.ems.ui.EnvManagerConfigButton;
 import org.eclipse.ptp.remote.ui.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
@@ -34,11 +36,13 @@ import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationT
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ButtonGroupUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ButtonUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ComboUpdateModel;
+import org.eclipse.ptp.rm.jaxb.control.ui.model.EnvConfigButtonUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.SpinnerUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.TableRowUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.TextUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ValueTreeNodeUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
@@ -75,7 +79,7 @@ import org.eclipse.swt.widgets.Text;
  * viewers.
  * 
  * @author arossi
- * 
+ * @author Jeff Overbey - Environment Manager support
  */
 public class UpdateModelFactory {
 
@@ -573,6 +577,8 @@ public class UpdateModelFactory {
 			model = new SpinnerUpdateModel(name, handler, (Spinner) control);
 		} else if (control instanceof Button) {
 			model = new ButtonUpdateModel(name, handler, (Button) control, cd.translateBooleanAs);
+		} else if (control instanceof EnvManagerConfigButton) {
+			model = new EnvConfigButtonUpdateModel(name, handler, (EnvManagerConfigButton) control);
 		}
 
 		if (name != null && !JAXBUIConstants.ZEROSTR.equals(name)) {
@@ -790,6 +796,21 @@ public class UpdateModelFactory {
 	}
 
 	/**
+	 * @see EnvManagerConfigButton
+	 * 
+	 * @param parent
+	 *            to which the control belongs
+	 * @param cd
+	 *            internal data object carrying model description info
+	 * @param rmConfig 
+	 * @return the Combo widget
+	 */
+	private static EnvManagerConfigButton createEnvConfig(Composite parent, final ControlDescriptor cd, IJAXBResourceManager resourceManager) {
+		return WidgetBuilderUtils.createEnvConfig(parent, cd.style, cd.layoutData, JAXBControlUIConstants.ZEROSTR, cd.title,
+				cd.tooltip, null, resourceManager);
+	}
+
+	/**
 	 * 
 	 * @param parent
 	 *            to which the control belongs
@@ -825,6 +846,8 @@ public class UpdateModelFactory {
 			c = WidgetBuilderUtils.createSpinner(parent, cd.style, cd.layoutData, cd.title, cd.min, cd.max, cd.min, null);
 		} else if (JAXBControlUIConstants.COMBO.equals(cd.widgetType)) {
 			c = createCombo(parent, cd);
+		} else if (JAXBControlUIConstants.ENVCONFIG.equals(cd.widgetType)) {
+			c = createEnvConfig(parent, cd, tab.getResourceManager());
 		}
 
 		if (c != null) {

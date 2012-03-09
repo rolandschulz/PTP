@@ -1,15 +1,18 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.core;
 
 import java.util.Map;
+
+import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 
 /**
  * High-level interface for resolver environments.
@@ -20,7 +23,7 @@ import java.util.Map;
  * @see org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap
  * 
  * @author arossi
- * 
+ * @author Jeff Overbey - Environment Manager support
  */
 public interface IVariableMap {
 
@@ -100,4 +103,15 @@ public interface IVariableMap {
 	 *            indicates the map has already been initialized
 	 */
 	public void setInitialized(boolean initialized);
+
+	/**
+	 * Given an environment manager configuration string, returns the corresponding sequence of Bash commands.
+	 * <p>
+	 * It is a precondition that <code>string</code> satisfies {@link EnvManagerConfigString#isEnvMgmtConfigString(String)}.
+	 * 
+	 * @param string
+	 *            non-<code>null</code>
+	 * @return non-<code>null</code>
+	 */
+	public String convertEngMgmtConfigString(String string);
 }

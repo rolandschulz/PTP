@@ -198,7 +198,7 @@ public class CModelBuilder2 {
 				if (delta == 0) {
 					delta= info1.getIdStartPos() - info2.getIdStartPos();
 				}
-				return delta;				
+				return delta;
 			}});
 
 		if (isCanceled()) {
@@ -751,7 +751,7 @@ public class CModelBuilder2 {
 				final ICPPASTDeclSpecifier cppSpecifier= (ICPPASTDeclSpecifier)specifier;
 				fieldInfo.setMutable(cppSpecifier.getStorageClass() == IASTDeclSpecifier.sc_mutable);
 			}
-			fieldInfo.setTypeName(ASTStringUtil.getSignatureString(specifier, declarator));			
+			fieldInfo.setTypeName(ASTStringUtil.getSignatureString(specifier, declarator));
 			fieldInfo.setVisibility(getCurrentVisibility());
 			fieldInfo.setConst(specifier.isConst());
 			fieldInfo.setVolatile(specifier.isVolatile());

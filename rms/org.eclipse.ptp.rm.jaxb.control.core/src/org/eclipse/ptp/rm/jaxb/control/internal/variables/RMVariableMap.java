@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.variables;
 
@@ -20,6 +21,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.ems.core.EnvManagerConfigString;
+import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
@@ -37,7 +40,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
  * all the Properties and Attributes which are "discovered" at runtime (through tokenization of command output).
  * 
  * @author arossi
- * 
+ * @author Jeff Overbey - Environment Manager support
  */
 public class RMVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
@@ -143,15 +146,17 @@ public class RMVariableMap implements IVariableMap {
 		return name.equals(JAXBControlConstants.DEBUGGER_ARGS);
 	}
 
+	private IEnvManager envManager;
 	private final Map<String, Object> variables;
 	private final Map<String, Object> discovered;
 
 	private boolean initialized;
 
 	public RMVariableMap() {
-		variables = Collections.synchronizedMap(new TreeMap<String, Object>());
-		discovered = Collections.synchronizedMap(new TreeMap<String, Object>());
-		initialized = false;
+		this.envManager = null;
+		this.variables = Collections.synchronizedMap(new TreeMap<String, Object>());
+		this.discovered = Collections.synchronizedMap(new TreeMap<String, Object>());
+		this.initialized = false;
 	}
 
 	/*
@@ -350,6 +355,26 @@ public class RMVariableMap implements IVariableMap {
 		synchronized (monitor) {
 			RMVariableResolver.setActive(this);
 			return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
+		}
+	}
+
+	/**
+	 * Sets the {@link IEnvManager} which will be used to generate Bash commands from environment manager configuration strings.
+	 * @param envManager
+	 */
+	public void setEnvManager(IEnvManager envManager) {
+		this.envManager = envManager;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#convertEngMgmtConfigString(java.lang.String)
+	 */
+	public String convertEngMgmtConfigString(String string) {
+		assert EnvManagerConfigString.isEnvMgmtConfigString(string);
+		if (envManager == null) {
+			return ""; //$NON-NLS-1$
+		} else {
+			return envManager.getBashConcatenation("\n", false, new EnvManagerConfigString(string), null); //$NON-NLS-1$
 		}
 	}
 }

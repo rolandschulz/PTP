@@ -43,6 +43,18 @@
             configurationFile="data/openmpi-generic-interactive.xml"
             name="Open MPI-Generic-Interactive">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/slurm-bgp-batch.xml"
+            name="SLURM-BGP-Batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/slurm-bgq-batch.xml"
+            name="SLURM-BGQ-Batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/slurm-generic-batch.xml"
+            name="SLURM-Generic-Batch">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>

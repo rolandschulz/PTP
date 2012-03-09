@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+   <!-- OpenACC API help for Fortran -->
+   <extension
+         point="org.eclipse.photran.ui.apiHelpProvider">
+      <apiHelpProvider
+            class="org.eclipse.ptp.pldt.openacc.internal.fortran.editorHelp.OpenACCFortranHelpProvider">
+      </apiHelpProvider>
+   </extension>
+
+   <!-- OpenACC Fortran code templates -->
+   <extension point="org.eclipse.ui.editors.templates">
+      <include file="templates/openacc_templates.xml" />
+   </extension>
+
+</plugin>

@@ -1,17 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.data;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
@@ -23,7 +25,7 @@ import org.eclipse.ptp.utils.core.ArgumentParser;
  * eliminated).
  * 
  * @author arossi
- * 
+ * @author Jeff Overbey - Environment Manager support
  */
 public class ArgImpl {
 
@@ -96,6 +98,9 @@ public class ArgImpl {
 			return arg.getContent();
 		}
 		String dereferenced = map.getString(uuid, arg.getContent());
+		if (EnvManagerConfigString.isEnvMgmtConfigString(dereferenced)) {
+			dereferenced = map.convertEngMgmtConfigString(dereferenced);
+		}
 		String undefined = arg.getIsUndefinedIfMatches();
 		if (undefined != null && dereferenced != null) {
 			String dtrim = dereferenced.trim();

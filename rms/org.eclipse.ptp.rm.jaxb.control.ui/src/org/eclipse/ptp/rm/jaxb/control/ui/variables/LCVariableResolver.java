@@ -1,17 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.variables;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IDynamicVariable;
 import org.eclipse.core.variables.IDynamicVariableResolver;
+import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 
 /**
@@ -25,7 +27,7 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
  * <br>
  * 
  * @author arossi
- * 
+ * @author Jeff Overbey - Environment Manager support
  */
 public class LCVariableResolver implements IDynamicVariableResolver {
 
@@ -47,7 +49,11 @@ public class LCVariableResolver implements IDynamicVariableResolver {
 			}
 			Object value = active.get(argument);
 			if (value != null) {
-				return String.valueOf(value);
+				if (value instanceof String && EnvManagerConfigString.isEnvMgmtConfigString((String)value)) {
+					return active.convertEngMgmtConfigString((String) value);
+				} else {
+					return String.valueOf(value);
+				}
 			}
 		}
 		return JAXBCoreConstants.ZEROSTR;

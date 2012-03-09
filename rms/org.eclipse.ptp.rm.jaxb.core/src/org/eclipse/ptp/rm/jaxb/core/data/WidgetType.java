@@ -54,6 +54,7 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;enumeration value="radiobutton"/>
  *             &lt;enumeration value="spinner"/>
  *             &lt;enumeration value="combo"/>
+ *             &lt;enumeration value="envconfig"/>
  *           &lt;/restriction>
  *         &lt;/simpleType>
  *       &lt;/attribute>

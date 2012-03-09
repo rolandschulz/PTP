@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,10 @@ package org.eclipse.ptp.rdt.ui.serviceproviders;
 import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteCIndexServiceProvider;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.RemoteContentAssistService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCCodeFoldingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteSemanticHighlightingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.RemoteCCodeFoldingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.RemoteSemanticHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.RemoteNavigationService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
@@ -42,6 +46,8 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 	private RemoteSearchService fSearchService;
 	private IContentAssistService fContentAssistService;
 	private INavigationService fNavigationService;
+	private IRemoteSemanticHighlightingService fRemoteSemanticHighlightingService;
+	private IRemoteCCodeFoldingService fRemoteCCodeFoldingService;
 
 	/**
 	 * @since 4.1
@@ -134,5 +140,25 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 	@Override
 	public String toString() {
 		return "RSECIndexServiceProvider(" + getHostName() + "," + getIndexLocation() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public synchronized IRemoteSemanticHighlightingService getRemoteSemanticHighlightingService() {
+		if(!isConfigured())
+			return null;
+
+		if(fRemoteSemanticHighlightingService== null)
+			fRemoteSemanticHighlightingService = new RemoteSemanticHighlightingService(fConnectorService);
+
+		return fRemoteSemanticHighlightingService;
+	}
+
+	public IRemoteCCodeFoldingService getRemoteCodeFoldingService() {
+		if(!isConfigured())
+			return null;
+
+		if(fRemoteCCodeFoldingService== null)
+			fRemoteCCodeFoldingService = new RemoteCCodeFoldingService(fConnectorService);
+
+		return fRemoteCCodeFoldingService;
 	}
 }

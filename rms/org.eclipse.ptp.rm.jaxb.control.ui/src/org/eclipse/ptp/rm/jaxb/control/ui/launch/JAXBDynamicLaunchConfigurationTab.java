@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
+ * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html 
+ * 
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.launch;
 
@@ -78,7 +79,7 @@ import org.eclipse.swt.widgets.Shell;
  * the <code>shared</code> property is given a list of other controllors, their values are included in the local environment.
  * 
  * @author arossi
- * 
+ * @author Jeff Overbey - Environment Manager support
  */
 public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements SelectionListener {
 
@@ -216,6 +217,13 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		return title;
 	}
 
+	/**
+	 * @return the resource manager
+	 */
+	public IJAXBResourceManager getResourceManager() {
+		return rm;
+	}
+	
 	/*
 	 * Resets the configuation then re-initializes all widgets: 1. clears viewers and repopulate that list. 2. repopulates the
 	 * handler with local widgets. 3. initializes the (new) widgets from the map. 4. initializes the checked state on any checkbox
