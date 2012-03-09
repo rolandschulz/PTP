@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -44,6 +45,32 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	private ILaunchConfiguration launchConfiguration = null;
 
 	/**
+	 * @return the launchConfiguration
+	 */
+	public ILaunchConfiguration getLaunchConfiguration() {
+		return launchConfiguration;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse .debug.core.ILaunchConfiguration)
+	 */
+	public void initializeFrom(ILaunchConfiguration configuration) {
+		// cache the launch configuration for updates
+		setLaunchConfiguration(configuration);
+	}
+
+	/**
+	 * Cache the launch configuration
+	 * 
+	 * @param configuration
+	 */
+	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
+		launchConfiguration = configuration;
+	}
+
+	/**
 	 * Utility routine to create a grid layout
 	 * 
 	 * @param columns
@@ -59,6 +86,19 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 		gridLayout.marginHeight = mh;
 		gridLayout.marginWidth = mw;
 		return gridLayout;
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	protected String getConnectionName(ILaunchConfiguration configuration) {
+		final String type;
+		try {
+			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, EMPTY_STRING);
+		} catch (CoreException e) {
+			return null;
+		}
+		return type;
 	}
 
 	/**
@@ -125,6 +165,19 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	}
 
 	/**
+	 * @since 6.0
+	 */
+	protected String getRemoteServicesId(ILaunchConfiguration configuration) {
+		final String type;
+		try {
+			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, EMPTY_STRING);
+		} catch (CoreException e) {
+			return null;
+		}
+		return type;
+	}
+
+	/**
 	 * Returns the selected workspace resource, or <code>null</code>
 	 * 
 	 * @param workspaceDir
@@ -134,13 +187,8 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 		return getWorkspaceRoot().findMember(new Path(workspaceDir));
 	}
 
-	protected IWorkspaceRoot getWorkspaceRoot() {
-		return ResourcesPlugin.getWorkspace().getRoot();
-	}
-
 	/**
-	 * Given a launch configuration, find the resource manager that was been
-	 * selected.
+	 * Given a launch configuration, find the resource manager that was been selected.
 	 * 
 	 * @param configuration
 	 * @return resource manager
@@ -159,6 +207,52 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	}
 
 	/**
+	 * Given a launch configuration, find the resource manager type that was been selected.
+	 * 
+	 * @param configuration
+	 * @return resource manager type
+	 * @throws CoreException
+	 * @since 6.0
+	 */
+	protected String getResourceManagerType(ILaunchConfiguration configuration) {
+		final String type;
+		try {
+			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_TYPE, EMPTY_STRING);
+		} catch (CoreException e) {
+			return null;
+		}
+		return type;
+	}
+
+	/**
+	 * @return
+	 */
+	protected IWorkspaceRoot getWorkspaceRoot() {
+		return ResourcesPlugin.getWorkspace().getRoot();
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	protected void setConnectionName(ILaunchConfigurationWorkingCopy configuration, String name) {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, name);
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	protected void setRemoteServicesId(ILaunchConfigurationWorkingCopy configuration, String id) {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, id);
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	protected void setResourceManagerType(ILaunchConfigurationWorkingCopy configuration, String type) {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_TYPE, type);
+	}
+
+	/**
 	 * Utility routing to create a GridData
 	 * 
 	 * @param style
@@ -174,33 +268,5 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 		}
 		gd.horizontalSpan = space;
 		return gd;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse
-	 * .debug.core.ILaunchConfiguration)
-	 */
-	public void initializeFrom(ILaunchConfiguration configuration) {
-		// cache the launch configuration for updates
-		setLaunchConfiguration(configuration);
-	}
-
-	/**
-	 * Cache the launch configuration
-	 * 
-	 * @param configuration
-	 */
-	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
-		launchConfiguration = configuration;
-	}
-
-	/**
-	 * @return the launchConfiguration
-	 */
-	public ILaunchConfiguration getLaunchConfiguration() {
-		return launchConfiguration;
 	}
 }

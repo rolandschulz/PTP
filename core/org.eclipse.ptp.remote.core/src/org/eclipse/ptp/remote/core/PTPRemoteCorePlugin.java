@@ -18,7 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.ISaveContext;
+import org.eclipse.core.resources.ISaveParticipant;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -44,6 +48,7 @@ import org.osgi.framework.BundleContext;
 public class PTPRemoteCorePlugin extends Plugin {
 
 	private class RemoteServicesSorter implements Comparator<IRemoteServices> {
+		@Override
 		public int compare(IRemoteServices o1, IRemoteServices o2) {
 			return o1.getName().compareToIgnoreCase(o2.getName());
 		}
@@ -59,15 +64,13 @@ public class PTPRemoteCorePlugin extends Plugin {
 	private static PTPRemoteCorePlugin plugin;
 
 	/**
-	 * If it is possible to adapt the given object to the given type, this
-	 * returns the adapter. Performs the following checks:
+	 * If it is possible to adapt the given object to the given type, this returns the adapter. Performs the following checks:
 	 * 
 	 * <ol>
-	 * <li>Returns <code>sourceObject</code> if it is an instance of the adapter
-	 * type.</li>
+	 * <li>Returns <code>sourceObject</code> if it is an instance of the adapter type.</li>
 	 * <li>If sourceObject implements IAdaptable, it is queried for adapters.</li>
-	 * <li>If sourceObject is not an instance of PlatformObject (which would
-	 * have already done so), the adapter manager is queried for adapters</li>
+	 * <li>If sourceObject is not an instance of PlatformObject (which would have already done so), the adapter manager is queried
+	 * for adapters</li>
 	 * </ol>
 	 * 
 	 * Otherwise returns null.
@@ -76,8 +79,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 *            object to adapt, or null
 	 * @param adapterType
 	 *            type to adapt to
-	 * @return a representation of sourceObject that is assignable to the
-	 *         adapter type, or null if no such representation exists
+	 * @return a representation of sourceObject that is assignable to the adapter type, or null if no such representation exists
 	 */
 	@SuppressWarnings("rawtypes")
 	public static Object getAdapter(Object sourceObject, Class adapterType) {
@@ -175,11 +177,9 @@ public class PTPRemoteCorePlugin extends Plugin {
 	/**
 	 * Retrieve a sorted list of remote services.
 	 * 
-	 * Note that these services are not initialized and clients must call
-	 * {@link IRemoteServices#initialized} before they are used.
+	 * Note that these services are not initialized and clients must call {@link IRemoteServices#initialized} before they are used.
 	 * 
-	 * Alternatively, use {@link #getAllRemoteServices(IProgressMonitor)} to
-	 * obtain all initialized services.
+	 * Alternatively, use {@link #getAllRemoteServices(IProgressMonitor)} to obtain all initialized services.
 	 * 
 	 * @return remote services
 	 */
@@ -194,11 +194,9 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Retrieve a sorted list of remote services. The remote services are
-	 * guaranteed to have been initialized.
+	 * Retrieve a sorted list of remote services. The remote services are guaranteed to have been initialized.
 	 * 
-	 * Note that this will trigger plugin loading for all remote services
-	 * implementations.
+	 * Note that this will trigger plugin loading for all remote services implementations.
 	 * 
 	 * @return remote services
 	 * @since 5.0
@@ -223,8 +221,8 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Retrieve the default remote services plugin. The default is the
-	 * LocalServices provider, which is guaranteed to exist and be initialized.
+	 * Retrieve the default remote services plugin. The default is the LocalServices provider, which is guaranteed to exist and be
+	 * initialized.
 	 * 
 	 * @return default remote services provider
 	 */
@@ -236,10 +234,8 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Get the remote services implementation identified by id. The remote
-	 * services retrieved may not have been initialized.
-	 * {@link IRemoteServices#initialize()} must be called before any attempt is
-	 * made to use the services.
+	 * Get the remote services implementation identified by id. The remote services retrieved may not have been initialized.
+	 * {@link IRemoteServices#initialize()} must be called before any attempt is made to use the services.
 	 * 
 	 * @param id
 	 *            id of the remote services
@@ -255,16 +251,14 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Get the remote services implementation identified by id and ensure that
-	 * it is initialized. This method will present the user with a dialog box
-	 * that can be canceled.
+	 * Get the remote services implementation identified by id and ensure that it is initialized. This method will present the user
+	 * with a dialog box that can be canceled.
 	 * 
 	 * @param id
 	 *            id of remote services to retrieve
 	 * @param monitor
 	 *            progress monitor to allow user to cancel operation
-	 * @return initialized remote services, or null if the services cannot be
-	 *         found or initialized
+	 * @return initialized remote services, or null if the services cannot be found or initialized
 	 * @since 5.0
 	 */
 	public IRemoteServices getRemoteServices(String id, IProgressMonitor monitor) {
@@ -276,10 +270,8 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Get the remote services identified by a URI. The remote services
-	 * retrieved may not have been initialized.
-	 * {@link IRemoteServices#initialize()} must be called before any attempt is
-	 * made to use the services.
+	 * Get the remote services identified by a URI. The remote services retrieved may not have been initialized.
+	 * {@link IRemoteServices#initialize()} must be called before any attempt is made to use the services.
 	 * 
 	 * @param uri
 	 *            URI of remote services to retrieve
@@ -298,16 +290,14 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Get the remote services implementation identified by URI and ensure that
-	 * it is initialized. This method will present the user with a dialog box
-	 * that can be canceled.
+	 * Get the remote services implementation identified by URI and ensure that it is initialized. This method will present the user
+	 * with a dialog box that can be canceled.
 	 * 
 	 * @param uri
 	 *            URI of remote services to retrieve
 	 * @param monitor
 	 *            progress monitor to allow user to cancel operation
-	 * @return initialized remote services, or null if the services cannot be
-	 *         found or initialized
+	 * @return initialized remote services, or null if the services cannot be found or initialized
 	 * @since 5.0
 	 */
 	public IRemoteServices getRemoteServices(URI uri, IProgressMonitor monitor) {
@@ -333,41 +323,54 @@ public class PTPRemoteCorePlugin extends Plugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 		DebugUtil.configurePluginDebugOptions();
+		ResourcesPlugin.getWorkspace().addSaveParticipant(getUniqueIdentifier(), new ISaveParticipant() {
+			@Override
+			public void saving(ISaveContext saveContext) throws CoreException {
+				Preferences.savePreferences(getUniqueIdentifier());
+			}
+
+			@Override
+			public void rollback(ISaveContext saveContext) {
+			}
+
+			@Override
+			public void prepareToSave(ISaveContext saveContext) throws CoreException {
+			}
+
+			@Override
+			public void doneSaving(ISaveContext saveContext) {
+			}
+		});
 		defaultRemoteServices = null;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		Preferences.savePreferences(getUniqueIdentifier());
 		plugin = null;
 		super.stop(context);
 	}
 
 	/**
-	 * Ensure the remote services is initialized. This method will present the
-	 * user with a dialog box that can be canceled.
+	 * Ensure the remote services is initialized. This method will present the user with a dialog box that can be canceled.
 	 * 
 	 * @param services
 	 *            remote services to initialize
 	 * @param monitor
-	 *            progress monitor to show initialization progress. Note that
-	 *            initialization cannot be cancelled to prevent the remote
-	 *            system from being left in an undefined state.
+	 *            progress monitor to show initialization progress. Note that initialization cannot be cancelled to prevent the
+	 *            remote system from being left in an undefined state.
 	 * @return true if the remote services was initialized, or false otherwise
 	 */
 	private void initializeRemoteServices(IRemoteServices services, IProgressMonitor monitor) {

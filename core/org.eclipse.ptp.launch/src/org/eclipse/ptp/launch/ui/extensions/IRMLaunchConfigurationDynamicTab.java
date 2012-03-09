@@ -19,7 +19,6 @@ package org.eclipse.ptp.launch.ui.extensions;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -27,43 +26,37 @@ import org.eclipse.swt.widgets.Control;
 public interface IRMLaunchConfigurationDynamicTab {
 
 	/**
-	 * The events for this listener should be fired when GUI elements are
-	 * modified by the user, e.g. a Text widget should have its ModifyListener's
-	 * modifyText method set up to notify all of the contents changed listeners.
+	 * The events for this listener should be fired when GUI elements are modified by the user, e.g. a Text widget should have its
+	 * ModifyListener's modifyText method set up to notify all of the contents changed listeners.
 	 * 
 	 * @param launchContentsChangedListener
 	 */
 	public abstract void addContentsChangedListener(IRMLaunchConfigurationContentsChangedListener launchContentsChangedListener);
 
 	/**
-	 * Returns whether this tab is in a state that allows the launch
-	 * configuration whose values this tab is showing to be saved. This differs
-	 * from <code>isValid()</code> in that <code>canSave()</code> determines if
-	 * this tab prevents the current launch configuration from being saved,
-	 * whereas <code>isValid()</code> determines if this tab prevents the
-	 * current launch configuration from being launched.
+	 * Returns whether this tab is in a state that allows the launch configuration whose values this tab is showing to be saved.
+	 * This differs from <code>isValid()</code> in that <code>canSave()</code> determines if this tab prevents the current launch
+	 * configuration from being saved, whereas <code>isValid()</code> determines if this tab prevents the current launch
+	 * configuration from being launched.
 	 * 
 	 * <p>
-	 * This information is typically used by the launch configuration dialog to
-	 * decide when it is okay to save a launch configuration.
+	 * This information is typically used by the launch configuration dialog to decide when it is okay to save a launch
+	 * configuration.
 	 * </p>
 	 * 
 	 * @param control
 	 * @param rm
 	 * @param queue
-	 * @return whether this tab is in a state that allows the current launch
-	 *         configuration to be saved
-	 * @since 5.0
+	 * @return whether this tab is in a state that allows the current launch configuration to be saved
+	 * @since 6.0
 	 */
-	public abstract RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue);
+	public abstract RMLaunchValidation canSave(Control control, IResourceManager rm);
 
 	/**
-	 * Creates the top level control for the dynamic part of the parallel launch
-	 * configuration tab under the given parent composite. This method is called
-	 * every time a new resource manager or queue is selected by the user.
+	 * Creates the top level control for the dynamic part of the parallel launch configuration tab under the given parent composite.
+	 * This method is called every time a new resource manager or queue is selected by the user.
 	 * <p>
-	 * Implementors are responsible for ensuring that the created control can be
-	 * accessed via <code>getControl</code>
+	 * Implementors are responsible for ensuring that the created control can be accessed via <code>getControl</code>
 	 * </p>
 	 * 
 	 * @param parent
@@ -71,13 +64,12 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @param rm
 	 * @param queue
 	 * @throws CoreException
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public abstract void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException;
+	public abstract void createControl(Composite parent, IResourceManager rm) throws CoreException;
 
 	/**
-	 * Returns the top level control for the dynamic portion of the parallel
-	 * tab.
+	 * Returns the top level control for the dynamic portion of the parallel tab.
 	 * <p>
 	 * May return <code>null</code> if the control has not been created yet.
 	 * </p>
@@ -87,12 +79,10 @@ public interface IRMLaunchConfigurationDynamicTab {
 	public Control getControl();
 
 	/**
-	 * Initializes this dynamic tab's controls with values from the given launch
-	 * configuration. This method is called when a configuration is selected to
-	 * view or edit, after this tab's control has been created. It is also
-	 * called every time the user selects a new resource manager or queue. In
-	 * this case the configuration that is passed in has been cached by the
-	 * parallel tab.
+	 * Initializes this dynamic tab's controls with values from the given launch configuration. This method is called when a
+	 * configuration is selected to view or edit, after this tab's control has been created. It is also called every time the user
+	 * selects a new resource manager or queue. In this case the configuration that is passed in has been cached by the parallel
+	 * tab.
 	 * 
 	 * @param queue
 	 * @param rm
@@ -100,29 +90,25 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @param configuration
 	 *            launch configuration
 	 * @return
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public abstract RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue,
-			ILaunchConfiguration configuration);
+	public abstract RMLaunchValidation initializeFrom(Control control, IResourceManager rm, ILaunchConfiguration configuration);
 
 	/**
-	 * Returns whether this tab is in a valid state in the context of the
-	 * specified launch configuration.
+	 * Returns whether this tab is in a valid state in the context of the specified launch configuration.
 	 * <p>
-	 * This information is typically used by the launch configuration dialog to
-	 * decide when it is okay to launch.
+	 * This information is typically used by the launch configuration dialog to decide when it is okay to launch.
 	 * </p>
 	 * 
 	 * 
 	 * @param launchConfig
-	 *            launch configuration which provides context for validating
-	 *            this tab. This value must not be <code>null</code>.
+	 *            launch configuration which provides context for validating this tab. This value must not be <code>null</code>.
 	 * @param rm
 	 * @param queue
 	 * @return whether this tab is in a valid state
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public abstract RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue);
+	public abstract RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm);
 
 	/**
 	 * Copies values from this tab into the given launch configuration.
@@ -132,10 +118,9 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @param rm
 	 * @param queue
 	 * @return
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public abstract RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
-			IPQueue queue);
+	public abstract RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm);
 
 	/**
 	 * @param launchContentsChangedListener
@@ -143,18 +128,17 @@ public interface IRMLaunchConfigurationDynamicTab {
 	public abstract void removeContentsChangedListener(IRMLaunchConfigurationContentsChangedListener launchContentsChangedListener);
 
 	/**
-	 * Initializes the given launch configuration with default values for this
-	 * tab. This method is called when a new launch configuration is created
-	 * such that the configuration can be initialized with meaningful values.
-	 * This method may be called before this tab's control is created.
+	 * Initializes the given launch configuration with default values for this tab. This method is called when a new launch
+	 * configuration is created such that the configuration can be initialized with meaningful values. This method may be called
+	 * before this tab's control is created.
 	 * 
 	 * @param configuration
 	 *            launch configuration
 	 * @param rm
 	 * @param queue
 	 * @return
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public abstract RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue);
+	public abstract RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm);
 
 }

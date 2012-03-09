@@ -30,7 +30,6 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
@@ -52,9 +51,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * The Resources tab is used to specify the resources required for a successful
- * job launch. It is populated by the selected resource manager (specified in
- * the Main tab)
+ * The Resources tab is used to specify the resources required for a successful job launch. It is populated by the selected resource
+ * manager (specified in the Main tab)
  */
 public class ResourcesTab extends LaunchConfigurationTab {
 	private final class ContentsChangedListener implements IRMLaunchConfigurationContentsChangedListener {
@@ -100,7 +98,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { resourceManager.getName() }));
 			return false;
 		}
-		RMLaunchValidation validation = rmDynamicTab.canSave(launchComp, resourceManager, null);
+		RMLaunchValidation validation = rmDynamicTab.canSave(launchComp, resourceManager);
 		if (!validation.isSuccess()) {
 			setErrorMessage(validation.getMessage());
 			return false;
@@ -111,9 +109,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse
-	 * .swt.widgets.Composite)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse .swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
 		final int numColumns = 2;
@@ -144,7 +140,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			public void widgetSelected(SelectionEvent e) {
 				if (e.getSource() == resourceManagerCombo) {
 					rmSelectionChanged();
-					updateLaunchAttributeControls(resourceManager, null, getLaunchConfiguration());
+					updateLaunchAttributeControls(resourceManager, getLaunchConfiguration());
 					updateLaunchConfigurationDialog();
 				}
 			}
@@ -189,9 +185,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse
-	 * .debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse .debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
@@ -215,7 +209,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		/*
 		 * Update the dynamic portions of the launch configuration tab.
 		 */
-		updateLaunchAttributeControls(resourceManager, null, getLaunchConfiguration());
+		updateLaunchAttributeControls(resourceManager, getLaunchConfiguration());
 
 		if (resourceManager == null) {
 			setErrorMessage(Messages.ApplicationTab_No_Resource_Manager_Available);
@@ -225,9 +219,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse
-	 * .debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse .debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration configuration) {
@@ -246,7 +238,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setErrorMessage(Messages.ResourcesTab_Resource_Manager_Not_Started);
 			return false;
 		}
-		RMLaunchValidation validation = rmDynamicTab.isValid(configuration, resourceManager, null);
+		RMLaunchValidation validation = rmDynamicTab.isValid(configuration, resourceManager);
 		if (!validation.isSuccess()) {
 			setErrorMessage(validation.getMessage());
 			return false;
@@ -258,9 +250,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse
-	 * .debug.core.ILaunchConfigurationWorkingCopy)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse .debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		if (resourceManager != null) {
@@ -271,7 +261,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { resourceManager.getName() }));
 				return;
 			}
-			RMLaunchValidation validation = rmDynamicTab.performApply(configuration, resourceManager, null);
+			RMLaunchValidation validation = rmDynamicTab.performApply(configuration, resourceManager);
 			if (!validation.isSuccess()) {
 				setErrorMessage(validation.getMessage());
 				return;
@@ -283,9 +273,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.
-	 * debug.core.ILaunchConfigurationWorkingCopy)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse. debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		IResourceManager rm = getResourceManagerDefault();
@@ -300,15 +288,14 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		if (rmDynamicTab == null) {
 			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { resourceManager.getName() }));
 		} else {
-			rmDynamicTab.setDefaults(configuration, rm, null);
+			rmDynamicTab.setDefaults(configuration, rm);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#
-	 * setLaunchConfigurationDialog
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab# setLaunchConfigurationDialog
 	 * (org.eclipse.debug.ui.ILaunchConfigurationDialog)
 	 */
 	@Override
@@ -360,8 +347,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * Find a default resource manager. If there is only one, then it is the
-	 * default. If there are more or less than one, there is no default.
+	 * Find a default resource manager. If there is only one, then it is the default. If there are more or less than one, there is
+	 * no default.
 	 * 
 	 * @return resource manager
 	 */
@@ -385,8 +372,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * Returns a cached launch configuration dynamic tab. If it isn't in the
-	 * cache then it creates a new one, and puts it in the cache.
+	 * Returns a cached launch configuration dynamic tab. If it isn't in the cache then it creates a new one, and puts it in the
+	 * cache.
 	 * 
 	 * @param rm
 	 * @return
@@ -436,15 +423,14 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * This routine is called when the resource manager has been changed via the
-	 * combo boxes. It's job is to regenerate the dynamic ui components,
-	 * dependent on the resource manager choice.
+	 * This routine is called when the resource manager has been changed via the combo boxes. It's job is to regenerate the dynamic
+	 * ui components, dependent on the resource manager choice.
 	 * 
 	 * @param rm
 	 * @param queue
 	 * @param launchConfiguration
 	 */
-	private void updateLaunchAttributeControls(IResourceManager rm, IPQueue queue, ILaunchConfiguration launchConfiguration) {
+	private void updateLaunchAttributeControls(IResourceManager rm, ILaunchConfiguration launchConfiguration) {
 		final ScrolledComposite launchAttrsScrollComp = getLaunchAttrsScrollComposite();
 		launchAttrsScrollComp.setContent(null);
 		for (Control child : launchAttrsScrollComp.getChildren()) {
@@ -454,12 +440,12 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
 			if (rmDynamicTab != null) {
 				try {
-					rmDynamicTab.createControl(launchAttrsScrollComp, rm, queue);
+					rmDynamicTab.createControl(launchAttrsScrollComp, rm);
 					final Control dynControl = rmDynamicTab.getControl();
 					launchAttrsScrollComp.setContent(dynControl);
 					Point size = dynControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 					launchAttrsScrollComp.setMinSize(size);
-					rmDynamicTab.initializeFrom(launchAttrsScrollComp, rm, queue, launchConfiguration);
+					rmDynamicTab.initializeFrom(launchAttrsScrollComp, rm, launchConfiguration);
 				} catch (CoreException e) {
 					setErrorMessage(e.getMessage());
 					Throwable t = e.getCause();

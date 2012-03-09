@@ -16,7 +16,6 @@ import java.util.TreeSet;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
@@ -28,9 +27,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Base class for the JAXB LaunchConfiguration tabs which provide views of
- * editable widgets. Up to three such tabs can be configured as children of the
- * controller tab.<br>
+ * Base class for the JAXB LaunchConfiguration tabs which provide views of editable widgets. Up to three such tabs can be configured
+ * as children of the controller tab.<br>
  * <br>
  * 
  * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab
@@ -76,10 +74,8 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	public abstract String getText();
 
 	/**
-	 * This performApply is triggered whenever there is an update on the
-	 * controller. We do not want the values of the tab to be flushed to the
-	 * configuration unless this tab is the origin of the change; hence we check
-	 * to see if the tab is visible.<br>
+	 * This performApply is triggered whenever there is an update on the controller. We do not want the values of the tab to be
+	 * flushed to the configuration unless this tab is the origin of the change; hence we check to see if the tab is visible.<br>
 	 * <br>
 	 * 
 	 * @param configuration
@@ -89,7 +85,7 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	 * @param queue
 	 *            (unused)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
 		if (control.isVisible()) {
 			try {
 				refreshLocal(configuration);
@@ -150,8 +146,7 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	}
 
 	/**
-	 * Sets the current environment of the configuration implicitly by defining
-	 * which variables are valid.
+	 * Sets the current environment of the configuration implicitly by defining which variables are valid.
 	 */
 	protected abstract void writeLocalProperties();
 }

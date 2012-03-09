@@ -25,10 +25,10 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
  * 
  */
 public interface IJAXBResourceManagerControl extends IResourceManagerControl {
+	public void initialize(IProgressMonitor monitor) throws Throwable;
 
 	/**
-	 * @return whether the launch environment should be appended to (or replace)
-	 *         the environment for a given command execution.
+	 * @return whether the launch environment should be appended to (or replace) the environment for a given command execution.
 	 */
 	public boolean getAppendEnv();
 

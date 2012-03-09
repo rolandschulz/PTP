@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled;
@@ -107,14 +106,14 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * No composites or controls are specific to the parent. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#createControl (org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.elements.IPQueue)
+	 * org.eclipse.ptp.rmsystem.IResourceManager)
 	 */
 	@Override
-	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
+	public void createControl(Composite parent, IResourceManager rm) throws CoreException {
 		if (!voidRMConfig) {
 			updateHandler.clear();
 		}
-		super.createControl(parent, rm, queue);
+		super.createControl(parent, rm);
 		if (tabFolder != null) {
 			tabFolder.addSelectionListener(this);
 		}
@@ -188,12 +187,10 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * because on calls to this method subsequent to the first, the widgets it contained will have been disposed. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#initializeFrom (org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.elements.IPQueue,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
-	public RMLaunchValidation initializeFrom(Control control, final IResourceManager rm, IPQueue queue,
-			final ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, final IResourceManager rm, final ILaunchConfiguration configuration) {
 		if (!voidRMConfig) {
 			try {
 				getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
@@ -220,7 +217,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 				return new RMLaunchValidation(false, e.getLocalizedMessage());
 			}
 		}
-		RMLaunchValidation validation = super.initializeFrom(control, rm, queue, configuration);
+		RMLaunchValidation validation = super.initializeFrom(control, rm, configuration);
 		if (!getControllers().isEmpty()) {
 			tabFolder.setSelection(lastIndex);
 			setVisibleOnSelected();

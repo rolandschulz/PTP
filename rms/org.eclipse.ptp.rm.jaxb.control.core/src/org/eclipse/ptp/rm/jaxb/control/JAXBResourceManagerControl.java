@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -28,6 +30,8 @@ import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
@@ -54,6 +58,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
+import org.eclipse.ptp.rm.jaxb.core.data.SiteType;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IJobStatus;
@@ -208,27 +213,34 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @throws CoreException
 	 */
 	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
-		String cname = config.getConnectionName();
-		String sid = config.getRemoteServicesId();
-		if (remoteServicesDelegate == null || !cname.equals(connectionName) || !sid.equals(servicesId)) {
-			connectionName = cname;
-			servicesId = sid;
-			remoteServicesDelegate = new RemoteServicesDelegate(servicesId, connectionName);
-			remoteServicesDelegate.initialize(monitor);
-		}
-		/*
-		 * Bug 370775 - Attempt to open the connection before using the delegate as the connection can be closed independently of
-		 * the resource manager.
-		 */
-		IRemoteConnection conn = remoteServicesDelegate.getRemoteConnection();
-		if (!conn.isOpen()) {
-			try {
-				conn.open(monitor);
-			} catch (RemoteConnectionException e) {
-				// Just use the closed connection
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		try {
+			String cname = config.getConnectionName();
+			String sid = config.getRemoteServicesId();
+			if (remoteServicesDelegate == null || !cname.equals(connectionName) || !sid.equals(servicesId)) {
+				connectionName = cname;
+				servicesId = sid;
+				remoteServicesDelegate = new RemoteServicesDelegate(servicesId, connectionName);
+				remoteServicesDelegate.initialize(progress.newChild(5));
+			}
+			/*
+			 * Bug 370775 - Attempt to open the connection before using the delegate as the connection can be closed independently
+			 * of the resource manager.
+			 */
+			IRemoteConnection conn = remoteServicesDelegate.getRemoteConnection();
+			if (!conn.isOpen()) {
+				try {
+					conn.open(progress.newChild(5));
+				} catch (RemoteConnectionException e) {
+					// Just use the closed connection
+				}
+			}
+			return remoteServicesDelegate;
+		} finally {
+			if (monitor != null) {
+				monitor.done();
 			}
 		}
-		return remoteServicesDelegate;
 	}
 
 	/*
@@ -531,7 +543,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		try {
-			initialize(progress.newChild(30));
+			// initialize(progress.newChild(30));
 			doOnStartUp();
 		} catch (CoreException ce) {
 			throw ce;
@@ -781,34 +793,13 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	/**
-	 * Run the start up commands, if any
+	 * Do any startup activities
 	 * 
 	 * @throws CoreException
 	 */
 	private void doOnStartUp() throws CoreException {
-		List<CommandType> onStartUp = controlData.getStartUpCommand();
-		runCommands(onStartUp);
-	}
-
-	/**
-	 * Sets the maps and data tree.
-	 */
-	private void initialize(IProgressMonitor monitor) throws Throwable {
 		launchEnv = new TreeMap<String, String>();
 		pinTable = new JobIdPinTable();
-
-		/*
-		 * Use the base configuration which contains the config file information
-		 */
-		IJAXBResourceManagerConfiguration base = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
-		base.clearReferences(false);
-		rmVarMap = (RMVariableMap) base.getRMVariableMap();
-		ResourceManagerData data = base.getResourceManagerData();
-		if (data != null) {
-			controlData = data.getControlData();
-		}
-		setFixedConfigurationProperties(monitor);
-		launchEnv.clear();
 		appendLaunchEnv = true;
 
 		/*
@@ -816,6 +807,58 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		jobStatusMap = new JobStatusMap(this, getResourceManager());
 		((Thread) jobStatusMap).start();
+
+		/*
+		 * Run the start up commands, if any
+		 */
+		List<CommandType> onStartUp = controlData.getStartUpCommand();
+		runCommands(onStartUp);
+	}
+
+	/**
+	 * Sets the maps and data tree.
+	 */
+	public void initialize(IProgressMonitor monitor) throws Throwable {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		try {
+			/*
+			 * Use the base configuration which contains the config file information
+			 */
+			IJAXBResourceManagerConfiguration base = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
+			base.clearReferences(false);
+			rmVarMap = (RMVariableMap) base.getRMVariableMap();
+			ResourceManagerData data = base.getResourceManagerData();
+			if (data != null) {
+				controlData = data.getControlData();
+				/*
+				 * Set connection information from the site configuration. This may get overidden by the launch configuration later
+				 */
+				SiteType site = data.getSiteData();
+				if (site != null) {
+					String controlURI = site.getControlConnection();
+					if (controlURI != null) {
+						try {
+							URI uri = new URI(controlURI);
+							IRemoteServices remServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(uri,
+									progress.newChild(5));
+							if (remServices != null) {
+								IRemoteConnection remConn = remServices.getConnectionManager().getConnection(uri);
+								if (remConn != null) {
+									config.setRemoteServicesId(remServices.getId());
+									config.setConnectionName(remConn.getName());
+								}
+							}
+						} catch (URISyntaxException e) {
+						}
+					}
+				}
+			}
+			setFixedConfigurationProperties(progress.newChild(5));
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
 	}
 
 	/**

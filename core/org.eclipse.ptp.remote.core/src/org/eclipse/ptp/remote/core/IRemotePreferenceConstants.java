@@ -14,7 +14,7 @@ package org.eclipse.ptp.remote.core;
  * @since 6.0
  */
 public interface IRemotePreferenceConstants {
-	public static final String DEFAULT_REMOTE_SERVICES_ID = "remoteServicesId"; //$NON-NLS-1$
+	public static final String PREF_REMOTE_SERVICES_ID = "remoteServicesId"; //$NON-NLS-1$
 	/**
 	 * @since 6.0
 	 */
