@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.ptp.rm.launch;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.ptp.rm.launch.RMLaunchPlugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.debug.ui,
+ org.eclipse.ptp.launch,
+ org.eclipse.ptp.core,
+ org.eclipse.ptp.remote.core,
+ org.eclipse.ptp.remote.ui,
+ org.eclipse.ptp.services.core,
+ org.eclipse.ptp.ui,
+ org.eclipse.ptp.rm.jaxb.core,
+ org.eclipse.ptp.rm.jaxb.control.core,
+ org.eclipse.ptp.rm.jaxb.control.ui,
+ org.eclipse.ptp.rm.core
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: %pluginProvider
+Bundle-Localization: plugin
+
