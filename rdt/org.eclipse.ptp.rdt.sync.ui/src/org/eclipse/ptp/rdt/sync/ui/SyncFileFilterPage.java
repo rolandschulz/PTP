@@ -505,7 +505,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	
 	private void enterNewPathPattern(PatternType type) {
 		String pattern = newPath.getText();
-		if (pattern.length() == 0) {
+		if (pattern.isEmpty()) {
 			return;
 		}
 
@@ -519,7 +519,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 
 	private void enterNewRegexPattern(PatternType type) {
 		String pattern = newRegex.getText();
-		if (pattern.length() == 0) {
+		if (pattern.isEmpty()) {
 			return;
 		}
 
