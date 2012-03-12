@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.ptp.license"
-      version="5.0.6.qualifier"
+      version="1.0.0.qualifier"
       image="eclipse_update_120.jpg">
 
    <description>
