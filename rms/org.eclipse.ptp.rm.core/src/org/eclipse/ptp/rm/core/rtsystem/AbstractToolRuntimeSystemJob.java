@@ -50,12 +50,9 @@ import org.eclipse.ptp.rm.core.utils.DebugUtil;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
- * Implements a job that controls the parallel application launched with a
- * command line tool. This class is different from
- * {@link AbstractRemoteCommandJob} because it is not aimed towards parsing
- * output of the tool called by command line, but to prepare a whole launch
- * environment for the command line tool, also supporting semantics of the
- * parallel application launcher.
+ * Implements a job that controls the parallel application launched with a command line tool. This class is different from
+ * {@link AbstractRemoteCommandJob} because it is not aimed towards parsing output of the tool called by command line, but to
+ * prepare a whole launch environment for the command line tool, also supporting semantics of the parallel application launcher.
  * 
  * @author Daniel Felix Ferber
  */
@@ -70,14 +67,11 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	protected boolean terminateJobFlag = false;
 
 	/*
-	 * Pattern to fined variables according these rules: Starts with "${" and
-	 * ends with "}" The content is a name and a set of parameters separated by
-	 * ":" In the parameters, "\" may be used to quote following chars: '\', '}'
-	 * and ':'
+	 * Pattern to fined variables according these rules: Starts with "${" and ends with "}" The content is a name and a set of
+	 * parameters separated by ":" In the parameters, "\" may be used to quote following chars: '\', '}' and ':'
 	 * 
-	 * TODO move this patter substitution code into the attribute manager TODO
-	 * enable the attribute manager to do substitution -> have this feature
-	 * available on entire PTP.
+	 * TODO move this patter substitution code into the attribute manager TODO enable the attribute manager to do substitution ->
+	 * have this feature available on entire PTP.
 	 */
 	private static final Pattern variablePattern = Pattern
 			.compile(("/$/{(/w+)(" + "(?:(?:////)|(?:///})|[^/}])*" + ")/}").replace('/', '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -144,8 +138,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	}
 
 	/**
-	 * Called just prior to starting job. Allows implementers to modify the
-	 * process startup.
+	 * Called just prior to starting job. Allows implementers to modify the process startup.
 	 * 
 	 * @param monitor
 	 *            progress monitor
@@ -164,8 +157,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	protected abstract void doExecutionCleanUp(IProgressMonitor monitor);
 
 	/**
-	 * Called once execution has finished. Returns the job state that should be
-	 * set.
+	 * Called once execution has finished. Returns the job state that should be set.
 	 * 
 	 * @param monitor
 	 *            progress monitor
@@ -184,8 +176,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	protected abstract void doExecutionStarted(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Prepare for job execution. Called to allow any actions to be taken to
-	 * prepare for execution.
+	 * Prepare for job execution. Called to allow any actions to be taken to prepare for execution.
 	 * 
 	 * @param monitor
 	 *            progress monitor
@@ -194,8 +185,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	protected abstract void doPrepareExecution(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Retrieve additional attributes to expand macros that are specific for the
-	 * tool.
+	 * Retrieve additional attributes to expand macros that are specific for the tool.
 	 */
 	protected abstract IAttribute<?, ?, ?>[] doRetrieveToolBaseSubstitutionAttributes() throws CoreException;
 
@@ -223,8 +213,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	protected abstract void doTerminateJob();
 
 	/**
-	 * Wait for execution to complete. Should block until execution has
-	 * completed or the progress monitor is cancelled.
+	 * Wait for execution to complete. Should block until execution has completed or the progress monitor is cancelled.
 	 * 
 	 * @param monitor
 	 *            progress monitor
@@ -238,8 +227,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
 	@Override
-	public Object getAdapter(@SuppressWarnings("rawtypes")
-	Class adapter) {
+	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
 		if (adapter == IToolRuntimeSystemJob.class) {
 			return this;
 		}
@@ -256,8 +244,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	}
 
 	/**
-	 * A list of all attributes definitions from the launch configuration that
-	 * can be used to expand macros.
+	 * A list of all attributes definitions from the launch configuration that can be used to expand macros.
 	 * 
 	 * @return
 	 */
@@ -307,8 +294,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	}
 
 	/**
-	 * Performs substitution of variables using attributes from the attribute
-	 * manager as variables.
+	 * Performs substitution of variables using attributes from the attribute manager as variables.
 	 * 
 	 * @param input
 	 *            the string with variables.
@@ -391,8 +377,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			}
 
 			/*
-			 * If failed to resolve variable, keep it on the string. Else
-			 * replace by its value.
+			 * If failed to resolve variable, keep it on the string. Else replace by its value.
 			 */
 			if (resolvedValue == null) {
 				output.append(variable);
@@ -418,9 +403,8 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		AttributeManager newAttributeManager = new AttributeManager(getAttrMgr().getAttributes());
 
 		/*
-		 * First, add all default attributes that are default attributes for the
-		 * launch. If they are not present in the launch attributes, then use
-		 * default value.
+		 * First, add all default attributes that are default attributes for the launch. If they are not present in the launch
+		 * attributes, then use default value.
 		 */
 		for (IAttributeDefinition<?, ?, ?> attributeDefinition : getDefaultSubstitutionAttributes()) {
 			IAttribute<?, ?, ?> attribute = newAttributeManager.getAttribute(attributeDefinition.getId());
@@ -448,8 +432,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	}
 
 	/**
-	 * Creates an AttributeManager containing attributes after performing
-	 * variable substitution
+	 * Creates an AttributeManager containing attributes after performing variable substitution
 	 * 
 	 * @param baseSubstitutionAttributeManager
 	 * @param directory
@@ -483,8 +466,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 */
 	protected List<String> retrieveCreateDebugCommand(AttributeManager substitutionAttributeManager) {
 		/*
-		 * Create debug command. If there is no debug command, simply launch the
-		 * executable.
+		 * Create debug command. If there is no debug command, simply launch the executable.
 		 */
 		AbstractEffectiveToolRMConfiguration effectiveConfiguration = getRtSystem().retrieveEffectiveToolRmConfiguration();
 		List<String> command = new ArrayList<String>();
@@ -517,8 +499,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 */
 	protected List<String> retrieveCreateLaunchCommand(AttributeManager substitutionAttributeManager) {
 		/*
-		 * Create launch command. If there is no launch command, simply launch
-		 * the executable.
+		 * Create launch command. If there is no launch command, simply launch the executable.
 		 */
 		AbstractEffectiveToolRMConfiguration effectiveConfiguration = getRtSystem().retrieveEffectiveToolRmConfiguration();
 		List<String> command = new ArrayList<String>();
@@ -620,8 +601,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
-	 * IProgressMonitor)
+	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime. IProgressMonitor)
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
@@ -799,6 +779,8 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 					case STARTING:
 					case SUSPENDED:
 						changeJobState(JobAttributes.State.COMPLETED);
+						break;
+					default:
 						break;
 					}
 				}

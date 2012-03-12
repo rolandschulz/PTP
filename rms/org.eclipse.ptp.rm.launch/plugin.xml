@@ -5,7 +5,7 @@
 		point="org.eclipse.debug.core.launchConfigurationTypes">
 		<launchConfigurationType
 			name="%ParallelLaunch.name"
-			delegate="org.eclipse.ptp.launch.ParallelLaunchConfigurationDelegate"
+			delegate="org.eclipse.ptp.rm.launch.ParallelLaunchConfigurationDelegate"
 			sourceLocatorId="org.eclipse.ptp.debug.core.sourceLocator"
 			sourcePathComputerId="org.eclipse.ptp.debug.core.sourcePathComputer"
 			modes="run,debug"
@@ -181,5 +181,11 @@
                after="org.eclipse.debug.ui.sourceLookupTab">
          </placement>
       </tab>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.rm.launch.internal.PreferenceInitializer">
+      </initializer>
    </extension>
 </plugin>

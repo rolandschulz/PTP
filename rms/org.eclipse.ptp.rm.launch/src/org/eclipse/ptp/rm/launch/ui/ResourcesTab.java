@@ -162,9 +162,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 */
 	@Override
 	public void createControl(Composite parent) {
-		// Preferences.setString(PTPRemoteCorePlugin.getUniqueIdentifier(), IRemotePreferenceConstants.PREF_REMOTE_SERVICES_ID,
-		// IRemotePreferenceConstants.REMOTE_TOOLS_REMOTE_SERVICES_ID);
-
 		final int numColumns = 2;
 		final Composite comp = new Composite(parent, SWT.NONE);
 		setControl(comp);
