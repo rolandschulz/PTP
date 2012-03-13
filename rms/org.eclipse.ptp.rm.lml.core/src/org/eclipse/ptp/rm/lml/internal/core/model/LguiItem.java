@@ -208,10 +208,12 @@ public class LguiItem implements ILguiItem {
 		String type = new String();
 		String message = new String();
 		final List<String> oidList = new LinkedList<String>();
-		for (final ObjectsType objects : getOverviewAccess().getObjects()) {
-			for (final ObjectType object : objects.getObject()) {
-				if (object.getType().value().equals(ILMLCoreConstants.SYSTEM)) {
-					oidList.add(object.getId());
+		if (getOverviewAccess().getObjects() != null) {
+			for (final ObjectsType objects : getOverviewAccess().getObjects()) {
+				for (final ObjectType object : objects.getObject()) {
+					if (object.getType().value().equals(ILMLCoreConstants.SYSTEM)) {
+						oidList.add(object.getId());
+					}
 				}
 			}
 		}
