@@ -223,7 +223,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	public IJAXBResourceManager getResourceManager() {
 		return rm;
 	}
-	
+
 	/*
 	 * Resets the configuation then re-initializes all widgets: 1. clears viewers and repopulate that list. 2. repopulates the
 	 * handler with local widgets. 3. initializes the (new) widgets from the map. 4. initializes the checked state on any checkbox
