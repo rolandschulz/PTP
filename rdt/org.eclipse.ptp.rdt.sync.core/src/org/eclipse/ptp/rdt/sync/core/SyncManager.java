@@ -24,6 +24,7 @@ import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -32,6 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
@@ -43,6 +45,8 @@ import org.eclipse.ptp.services.core.ServicesCorePlugin;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 public class SyncManager  {
 	// Static class - do not allow creating of instances
@@ -53,24 +57,21 @@ public class SyncManager  {
 		ACTIVE, ALL, NONE
 	};
 
-	private static final IServiceModelManager serviceModel = ServiceModelManager.getInstance();
+	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String DEFAULT_SAVE_FILE_NAME = "SyncManagerData.xml"; //$NON-NLS-1$
 	private static final String SYNC_MANAGER_ELEMENT_NAME = "sync-manager-data"; //$NON-NLS-1$
-	private static final String SYNC_MODE_ELEMENT_NAME = "project-to-sync-mode"; //$NON-NLS-1$
-	private static final String SHOW_ERROR_ELEMENT_NAME = "project-to-show-error"; //$NON-NLS-1$
+	private static final String SYNC_MODE_KEY = "sync-mode"; //$NON-NLS-1$
+	private static final String SHOW_ERROR_KEY = "show-error"; //$NON-NLS-1$
 	private static final String DEFAULT_FILE_FILTER_ELEMENT_NAME = "default-file-filter"; //$NON-NLS-1$
 	private static final String FILE_FILTER_ELEMENT_NAME = "project-to-file-filter"; //$NON-NLS-1$
 	private static final String FILE_FILTER_INTERNAL_ELEMENT_NAME = "project-to-file-filter-internal"; //$NON-NLS-1$
 	private static final String ATTR_PROJECT_NAME = "project"; //$NON-NLS-1$
-	private static final String ATTR_SYNC_MODE = "sync-mode"; //$NON-NLS-1$
-	private static final String ATTR_SHOW_ERROR = "show-error"; //$NON-NLS-1$
 	private static final String ATTR_AUTO_SYNC = "auto-sync"; //$NON-NLS-1$
+	
+	private static final SYNC_MODE DEFAULT_SYNC_MODE = SYNC_MODE.ACTIVE;
+	private static final boolean DEFAULT_SHOW_ERROR_SETTING = true;
 
 	private static boolean fSyncAuto = true;
-	private static final Map<IProject, SYNC_MODE> fProjectToSyncModeMap = Collections
-			.synchronizedMap(new HashMap<IProject, SYNC_MODE>());
-	private static final Map<IProject, Boolean> fProjectToShowErrorMap = Collections
-			.synchronizedMap(new HashMap<IProject, Boolean>());
 	private static final Map<IProject, SyncFileFilter> fProjectToFileFilterMap = Collections
 			.synchronizedMap(new HashMap<IProject, SyncFileFilter>());
 	private static SyncFileFilter defaultFilter = SyncFileFilter.createBuiltInDefaultFilter();
@@ -162,8 +163,7 @@ public class SyncManager  {
 	}
 
 	/**
-	 * Return project's current sync mode
-	 * On first access, set sync mode to ACTIVE.
+	 * Get sync mode for a project
 	 * 
 	 * @param project cannot be null
 	 * @return sync mode. This is never null.
@@ -172,15 +172,14 @@ public class SyncManager  {
 		if (project == null) {
 			throw new NullPointerException();
 		}
-		if (!(fProjectToSyncModeMap.containsKey(project))) {
-			fProjectToSyncModeMap.put(project, SYNC_MODE.ACTIVE);
-			try {
-				saveConfigurationData();
-			} catch (IOException e) {
-				RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
-			}
+		IScopeContext context = new ProjectScope(project);
+		Preferences node = context.getNode(projectScopeSyncNode);
+		if (node == null) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_3);
+			return DEFAULT_SYNC_MODE;
 		}
-		return fProjectToSyncModeMap.get(project);
+		
+		return SYNC_MODE.valueOf(node.get(SYNC_MODE_KEY, DEFAULT_SYNC_MODE.name()));
 	}
 
 	/**
@@ -194,7 +193,7 @@ public class SyncManager  {
 	
 	/**
 	 * Should error messages be displayed for the given project?
-	 * 
+	 *
 	 * @param project
 	 * @return whether error messages should be displayed.
 	 */
@@ -202,29 +201,44 @@ public class SyncManager  {
 		if (project == null) {
 			throw new NullPointerException();
 		}
-		if (!(fProjectToShowErrorMap.containsKey(project))) {
-			fProjectToShowErrorMap.put(project, true);
-			try {
-				saveConfigurationData();
-			} catch (IOException e) {
-				RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
-			}
+		IScopeContext context = new ProjectScope(project);
+		Preferences node = context.getNode(projectScopeSyncNode);
+		if (node == null) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_3);
+			return DEFAULT_SHOW_ERROR_SETTING;
 		}
-		return fProjectToShowErrorMap.get(project);
+
+		return node.getBoolean(SHOW_ERROR_KEY, DEFAULT_SHOW_ERROR_SETTING);
 	}
 
 	/**
-	 * Set sync mode for project
+	 * Set sync mode for a project
 	 * 
 	 * @param project
 	 * @param mode
 	 */
 	public static void setSyncMode(IProject project, SYNC_MODE mode) {
-		fProjectToSyncModeMap.put(project, mode);
+		if (project == null || mode == null) {
+			throw new NullPointerException();
+		}
+
+		IScopeContext context = new ProjectScope(project);
+		Preferences node = context.getNode(projectScopeSyncNode);
+		if (node == null) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_3);
+			return;
+		}
+
+		if (mode == DEFAULT_SYNC_MODE) {
+			node.remove(SYNC_MODE_KEY);
+		} else {
+			node.put(SYNC_MODE_KEY, mode.name());
+		}
+
 		try {
-			saveConfigurationData();
-		} catch (IOException e) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+			node.flush();
+		} catch (BackingStoreException e) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_5, e);
 		}
 	}
 
@@ -249,11 +263,27 @@ public class SyncManager  {
 	 * @param shouldBeDisplayed
 	 */
 	public static void setShowErrors(IProject project, boolean shouldBeDisplayed) {
-		fProjectToShowErrorMap.put(project, shouldBeDisplayed);
+		if (project == null) {
+			throw new NullPointerException();
+		}
+
+		IScopeContext context = new ProjectScope(project);
+		Preferences node = context.getNode(projectScopeSyncNode);
+		if (node == null) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_3);
+			return;
+		}
+
+		if (shouldBeDisplayed == DEFAULT_SHOW_ERROR_SETTING) {
+			node.remove(SHOW_ERROR_KEY);
+		} else {
+			node.putBoolean(SHOW_ERROR_KEY, shouldBeDisplayed);
+		}
+
 		try {
-			saveConfigurationData();
-		} catch (IOException e) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
+			node.flush();
+		} catch (BackingStoreException e) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_5, e);
 		}
 	}
 
@@ -399,24 +429,6 @@ public class SyncManager  {
 	 */
 	public static synchronized void saveConfigurationData() throws IOException {
 		XMLMemento rootMemento = XMLMemento.createWriteRoot(SYNC_MANAGER_ELEMENT_NAME);
-
-		// Save project to sync mode map
-		synchronized (fProjectToSyncModeMap) {
-			for (IProject project : fProjectToSyncModeMap.keySet()) {
-				IMemento modeMemento = rootMemento.createChild(SYNC_MODE_ELEMENT_NAME);
-				modeMemento.putString(ATTR_PROJECT_NAME, project.getName());
-				modeMemento.putString(ATTR_SYNC_MODE, fProjectToSyncModeMap.get(project).name());
-			}
-		}
-		
-		// Save project to "show error" map
-		synchronized (fProjectToShowErrorMap) {
-			for (IProject project : fProjectToShowErrorMap.keySet()) {
-				IMemento showErrorMemento = rootMemento.createChild(SHOW_ERROR_ELEMENT_NAME);
-				showErrorMemento.putString(ATTR_PROJECT_NAME, project.getName());
-				showErrorMemento.putBoolean(ATTR_SHOW_ERROR, fProjectToShowErrorMap.get(project));
-			}
-		}
 		
 		// Save default filter
 		IMemento defaultFileFilterMemento = rootMemento.createChild(DEFAULT_FILE_FILTER_ELEMENT_NAME);
@@ -460,30 +472,6 @@ public class SyncManager  {
 			rootMemento = XMLMemento.createReadRoot(reader);
 		} catch (WorkbenchException e) {
 			throw e;
-		}
-
-		// Load project sync modes
-		fProjectToSyncModeMap.clear();
-		for (IMemento modeMemento : rootMemento.getChildren(SYNC_MODE_ELEMENT_NAME)) {
-			String projectName = modeMemento.getString(ATTR_PROJECT_NAME);
-			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-			if (project == null) {
-				throw new RuntimeException(Messages.SyncManager_0 + project);
-			}
-			String syncModeString = modeMemento.getString(ATTR_SYNC_MODE);
-			SYNC_MODE syncMode = SYNC_MODE.valueOf(syncModeString);
-			fProjectToSyncModeMap.put(project, syncMode);
-		}
-		
-		// Load project "show error" settings
-		fProjectToShowErrorMap.clear();
-		for (IMemento showErrorMemento : rootMemento.getChildren(SHOW_ERROR_ELEMENT_NAME)) {
-			String projectName = showErrorMemento.getString(ATTR_PROJECT_NAME);
-			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-			if (project == null) {
-				throw new RuntimeException(Messages.SyncManager_0 + project);
-			}
-			fProjectToShowErrorMap.put(project, showErrorMemento.getBoolean(ATTR_SHOW_ERROR));
 		}
 		
 		// Load default file filter

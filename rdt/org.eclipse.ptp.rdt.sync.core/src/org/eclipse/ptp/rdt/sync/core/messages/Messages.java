@@ -73,8 +73,12 @@ public class Messages extends NLS {
 	public static String SyncManager_1;
  
 	public static String SyncManager_2;
+
+	public static String SyncManager_3;
  
 	public static String SyncManager_4;
+
+	public static String SyncManager_5;
 
 	public static String SyncManager_7;
 
