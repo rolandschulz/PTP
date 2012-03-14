@@ -33,8 +33,8 @@
       <import plugin="org.eclipse.photran.core.vpg" version="7.0.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.cdt" version="8.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.photran" version="8.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.ptp.pldt" version="6.0.0.qualifier" match="greaterOrEqual"/>
-      <import feature="org.eclipse.ptp.pldt.openacc" version="6.0.0.qualifier" match="greaterOrEqual"/>
+      <import feature="org.eclipse.ptp.pldt" version="6.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.ptp.pldt.openacc" version="6.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
