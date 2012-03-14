@@ -80,10 +80,8 @@ import org.eclipse.ptp.utils.core.RangeSet;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
- * Implements the Runtime System to support calling command line tools to
- * discover, monitor and launch parallel applications. TODO: Synchronize methods
- * to avoid race conditions TODO: Split this class into two: the tools RTS and a
- * command tools RTS.
+ * Implements the Runtime System to support calling command line tools to discover, monitor and launch parallel applications. TODO:
+ * Synchronize methods to avoid race conditions TODO: Split this class into two: the tools RTS and a command tools RTS.
  * 
  * @author Daniel Felix Ferber
  */
@@ -96,8 +94,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener#
-		 * connectionChanged
+		 * @see org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener# connectionChanged
 		 * (org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent)
 		 */
 		public void connectionChanged(IRemoteConnectionChangeEvent event) {
@@ -116,8 +113,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/**
 	 * Executes jobs from the queue.
 	 * 
-	 * @author dfferber TODO: Is this JobRunner really required? Why not
-	 *         dispatching the jobs immediately?
+	 * @author dfferber TODO: Is this JobRunner really required? Why not dispatching the jobs immediately?
 	 * @since 3.0
 	 */
 	protected class JobRunner implements Runnable {
@@ -517,9 +513,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IMonitoringSystem#filterEvents(org.eclipse.ptp
-	 * .core.elements.IPElement, boolean,
+	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#filterEvents(org.eclipse.ptp .core.elements.IPElement, boolean,
 	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	public void filterEvents(IPElement element, boolean filterChildren, AttributeManager filterAttributes) throws CoreException {
@@ -529,8 +523,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IControlSystem#getAttributeDefinitionManager()
+	 * @see org.eclipse.ptp.rtsystem.IControlSystem#getAttributeDefinitionManager()
 	 */
 	/**
 	 * @since 3.0
@@ -585,8 +578,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		} finally {
 
 			/*
-			 * Stop jobs that might be in the pending queue. Also stop the
-			 * thread that dispatches pending jobs.
+			 * Stop jobs that might be in the pending queue. Also stop the thread that dispatches pending jobs.
 			 */
 			if (jobQueueThread != null) {
 				jobQueueThread.interrupt();
@@ -611,13 +603,6 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 				}
 			}
 
-			/*
-			 * Close the the connection.
-			 */
-			if (connection != null) {
-				connection.close();
-			}
-
 			jobQueueThread = null;
 			fireRuntimeShutdownStateEvent(eventFactory.newRuntimeShutdownStateEvent());
 		}
@@ -631,9 +616,8 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	public void startEvents() throws CoreException {
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: start events", getResourceManager().getConfiguration().getName()); //$NON-NLS-1$
 		/*
-		 * Create monitor jobs, if they do not already exist. They may exist but
-		 * be suspended. If the job is not applicable, then no job will be
-		 * created, according to capabilities for the RM.
+		 * Create monitor jobs, if they do not already exist. They may exist but be suspended. If the job is not applicable, then no
+		 * job will be created, according to capabilities for the RM.
 		 */
 		if (periodicMonitorJob == null) {
 			periodicMonitorJob = createPeriodicMonitorJob();
@@ -642,9 +626,8 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 			continousMonitorJob = createContinuousMonitorJob();
 		}
 		/*
-		 * Only schedule the job if they are available. If the job does not
-		 * exists, then it was not created because the capability is not defined
-		 * in the RM.
+		 * Only schedule the job if they are available. If the job does not exists, then it was not created because the capability
+		 * is not defined in the RM.
 		 */
 		if (periodicMonitorJob != null) {
 			periodicMonitorJob.schedule();
@@ -658,9 +641,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime
-	 * .IProgressMonitor)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime .IProgressMonitor)
 	 */
 	public void startup(IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
@@ -721,15 +702,13 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 			}
 
 			/*
-			 * Wait for discover job to complete so we can check it's status and
-			 * throw an exception if it fails.
+			 * Wait for discover job to complete so we can check it's status and throw an exception if it fails.
 			 */
 			Job discoverJob = createDiscoverJob();
 			if (discoverJob != null) {
 				/*
-				 * Disable error messages being displayed on job's progress
-				 * monitor. These are handled by the progress service starting
-				 * the RM.
+				 * Disable error messages being displayed on job's progress monitor. These are handled by the progress service
+				 * starting the RM.
 				 */
 				discoverJob.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 				discoverJob.schedule();
@@ -784,8 +763,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(java.lang.String,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(java.lang.String, org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	/**
 	 * @since 3.0
@@ -829,8 +807,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(java.lang.String)
+	 * @see org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(java.lang.String)
 	 */
 	/**
 	 * @since 3.0
@@ -865,8 +842,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	}
 
 	/**
-	 * Initialize the attribute manager. This is called each time the runtime is
-	 * started.
+	 * Initialize the attribute manager. This is called each time the runtime is started.
 	 */
 	private void initialize() {
 		attrMgr.clear();
@@ -883,9 +859,8 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	}
 
 	/**
-	 * Creates a job that keeps monitoring the remote machine. The default
-	 * implementation runs the continuous monitor command if defined in the RM
-	 * capability.
+	 * Creates a job that keeps monitoring the remote machine. The default implementation runs the continuous monitor command if
+	 * defined in the RM capability.
 	 * 
 	 * @return continuous monitor job
 	 * @since 3.0
@@ -893,8 +868,8 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	protected abstract Job createContinuousMonitorJob() throws CoreException;
 
 	/**
-	 * Creates a job that discovers the remote machine. The default
-	 * implementation runs the discover command if defined in the RM capability.
+	 * Creates a job that discovers the remote machine. The default implementation runs the discover command if defined in the RM
+	 * capability.
 	 * 
 	 * @return discover job
 	 * @since 3.0
@@ -902,9 +877,8 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	protected abstract Job createDiscoverJob() throws CoreException;
 
 	/**
-	 * Creates a job that periodically monitors the remote machine. The default
-	 * implementation runs the periodic monitor command if defined in the RM
-	 * capability.
+	 * Creates a job that periodically monitors the remote machine. The default implementation runs the periodic monitor command if
+	 * defined in the RM capability.
 	 * 
 	 * @return periodic monitor job
 	 * @since 3.0
