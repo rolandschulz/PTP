@@ -24,15 +24,15 @@ import org.osgi.framework.BundleContext;
  * @author unknown (IBM)
  * @author Jeff Overbey (Illinois)
  */
-public class Activator extends AbstractUIPlugin {
+public class OpenACCFortranPlugin extends AbstractUIPlugin {
 
 	/** The shared instance */
-	private static Activator plugin;
+	private static OpenACCFortranPlugin plugin;
 
 	/**
 	 * Returns the shared instance.
 	 */
-	public static Activator getDefault() {
+	public static OpenACCFortranPlugin getDefault() {
 		return plugin;
 	}
 
@@ -85,7 +85,7 @@ public class Activator extends AbstractUIPlugin {
 	/**
 	 * The constructor.
 	 */
-	public Activator() {
+	public OpenACCFortranPlugin() {
 		plugin = this;
 	}
 

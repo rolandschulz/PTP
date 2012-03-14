@@ -119,10 +119,25 @@
         
       </menuContribution>
    </extension>
-     <!-- Code templates -->
-   <extension point="org.eclipse.ui.editors.templates">
-   <include file="templates/mpi_templates.xml" />
 
+   <!-- Code templates -->
+   <extension point="org.eclipse.ui.editors.templates">
+     <include file="templates/mpi_templates.xml" />
+   </extension>
+
+   <!-- Artifact analysis extension point -->
+   <extension-point
+      id="artifactAnalysis"
+      name="MPI Artifact Analysis"
+      schema="schema/artifactAnalysis.exsd"/>
+   <!-- Artifact analyses for C and C++ -->
+   <extension point="org.eclipse.ptp.pldt.mpi.core.artifactAnalysis">
+      <artifactAnalysis
+            languageID="org.eclipse.cdt.core.gcc"
+            class="org.eclipse.ptp.pldt.mpi.core.analysis.CMPIArtifactAnalysis" />
+      <artifactAnalysis
+            languageID="org.eclipse.cdt.core.g++"
+            class="org.eclipse.ptp.pldt.mpi.core.analysis.CMPIArtifactAnalysis" />
    </extension>
 
 </plugin>

@@ -13,6 +13,8 @@ package org.eclipse.ptp.pldt.mpi.fortran;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -20,42 +22,17 @@ import org.osgi.framework.BundleContext;
 /**
  * The main plugin class to be used for MPI development Tools.
  */
-public class Activator extends AbstractUIPlugin {
+public class MPIFortranPlugin extends AbstractUIPlugin {
 	/** The shared instance */
-	private static Activator plugin;
+	private static MPIFortranPlugin plugin;
 	protected static final boolean traceOn = false;
 
 	private static final String PLUGIN_ID = "org.eclipse.ptp.pldt.mpi.fortran"; //$NON-NLS-1$
 
 	/**
-	 * The constructor.
-	 */
-	public Activator() {
-		super();
-		plugin = this;
-	}
-
-	/**
-	 * This method is called upon plug-in activation
-	 */
-	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-	}
-
-	/**
-	 * This method is called when the plug-in is stopped
-	 */
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		super.stop(context);
-		plugin = null;
-	}
-
-	/**
 	 * Returns the shared instance.
 	 */
-	public static Activator getDefault() {
+	public static MPIFortranPlugin getDefault() {
 		return plugin;
 	}
 
@@ -82,5 +59,57 @@ public class Activator extends AbstractUIPlugin {
 
 	public static String getPluginId() {
 		return PLUGIN_ID;
+	}
+
+	/**
+	 * The constructor.
+	 */
+	public MPIFortranPlugin() {
+		super();
+		plugin = this;
+	}
+
+	/**
+	 * This method is called upon plug-in activation
+	 */
+	@Override
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+	}
+
+	/**
+	 * This method is called when the plug-in is stopped
+	 */
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		super.stop(context);
+		plugin = null;
+	}
+
+	/**
+	 * Create log entry from an IStatus
+	 * 
+	 * @param status
+	 */
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+
+	/**
+	 * Create log entry from a string
+	 * 
+	 * @param msg
+	 */
+	public static void log(String msg) {
+		log(new Status(IStatus.ERROR, getPluginId(), IStatus.ERROR, msg, null));
+	}
+
+	/**
+	 * Create log entry from a Throwable
+	 * 
+	 * @param e
+	 */
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getPluginId(), IStatus.ERROR, e.getMessage(), e));
 	}
 }

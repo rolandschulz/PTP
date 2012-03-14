@@ -4,16 +4,20 @@ Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.pldt.mpi.fortran;singleton:=true
 Bundle-Version: 5.0.0.qualifier
 Bundle-ClassPath: .
-Bundle-Activator: org.eclipse.ptp.pldt.mpi.fortran.Activator
+Bundle-Activator: org.eclipse.ptp.pldt.mpi.fortran.MPIFortranPlugin
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
+ org.eclipse.help,
+ org.eclipse.ui,
+ org.eclipse.ui.editors,
  org.eclipse.cdt.core,
  org.eclipse.cdt.ui,
- org.eclipse.ptp.pldt.common,
  org.eclipse.photran.cdtinterface;bundle-version="7.0.0",
- org.eclipse.photran.core.vpg;bundle-version="7.0.0"
+ org.eclipse.photran.core.vpg;bundle-version="7.0.0",
+ org.eclipse.photran.ui;bundle-version="8.0.0",
+ org.eclipse.ptp.pldt.common,
+ org.eclipse.ptp.pldt.mpi.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

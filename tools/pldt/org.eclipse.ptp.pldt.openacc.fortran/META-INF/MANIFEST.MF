@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.pldt.openacc.fortran; singleton:=true
 Bundle-Version: 6.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.pldt.openacc.internal.fortran.Activator
+Bundle-Activator: org.eclipse.ptp.pldt.openacc.internal.fortran.OpenACCFortranPlugin
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -15,6 +15,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.cdt.ui,
  org.eclipse.ptp.pldt.common,
  org.eclipse.ptp.pldt.openacc,
+ org.eclipse.photran.core,
+ org.eclipse.photran.core.vpg,
+ org.eclipse.photran.cdtinterface,
  org.eclipse.photran.ui;bundle-version="8.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .

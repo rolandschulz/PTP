@@ -93,6 +93,21 @@
          </initializer>
       </extension>
 
+   <!-- OpenACC artifact analysis extension point -->
+   <extension-point
+      id="artifactAnalysis"
+      name="OpenACC Artifact Analysis"
+      schema="schema/artifactAnalysis.exsd"/>
+   <!-- OpenACC atifact analyses for C and C++ -->
+   <extension point="org.eclipse.ptp.pldt.openacc.artifactAnalysis">
+      <artifactAnalysis
+            languageID="org.eclipse.cdt.core.gcc"
+            class="org.eclipse.ptp.pldt.openacc.internal.actions.OpenACCCArtifactAnalysis" />
+      <artifactAnalysis
+            languageID="org.eclipse.cdt.core.g++"
+            class="org.eclipse.ptp.pldt.openacc.internal.actions.OpenACCCArtifactAnalysis" />
+   </extension>
+
    <!-- OpenACC C help book -->
    <extension
          point="org.eclipse.cdt.ui.CHelpProvider">
