@@ -102,8 +102,7 @@ public class TableView extends ViewPart {
 					if (composite != null && !viewCreated) {
 						fLguiItem = lmlManager.getSelectedLguiItem();
 						if (fLguiItem != null) {
-							createTable();
-							viewCreated = true;
+							viewCreated = createTable();
 							if (fLguiItem.getObjectStatus() != null) {
 								fLguiItem.getObjectStatus().addComponent(eventForwarder);
 								componentAdded = true;
@@ -225,8 +224,7 @@ public class TableView extends ViewPart {
 						if (composite != null && !viewCreated) {
 							fLguiItem = lmlManager.getSelectedLguiItem();
 							if (fLguiItem != null) {
-								createTable();
-								viewCreated = true;
+								viewCreated = createTable();
 								if (fLguiItem.getObjectStatus() != null) {
 									fLguiItem.getObjectStatus().addComponent(eventForwarder);
 									componentAdded = true;
@@ -469,7 +467,7 @@ public class TableView extends ViewPart {
 		filterOwnJobsActionItem.getAction().setEnabled(false);
 		filterActionItem.getAction().setEnabled(false);
 
-		createTable();
+		viewCreated = createTable();
 
 		tree.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
@@ -518,6 +516,9 @@ public class TableView extends ViewPart {
 
 	@Override
 	public void setFocus() {
+		if (!viewCreated) {
+			viewCreated = createTable();
+		}
 		viewer.getControl().setFocus();
 	}
 
@@ -767,8 +768,9 @@ public class TableView extends ViewPart {
 
 	}
 
-	private void createTable() {
-		if (fLguiItem != null) {
+	private boolean createTable() {
+		boolean viewChanged = false;
+		if (fLguiItem != null && composite.getClientArea().width > 0) {
 			createColumns();
 			if (fLguiItem.getTableHandler() != null) {
 				final Object[] sortProperties = fLguiItem.getTableHandler().getSortProperties(gid);
@@ -790,9 +792,10 @@ public class TableView extends ViewPart {
 			} else {
 				setViewerInput();
 			}
-
+			viewChanged = true;
 		}
 		composite.layout();
+		return viewChanged;
 	}
 
 	/**

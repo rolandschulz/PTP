@@ -76,63 +76,24 @@ public class InfoView extends ViewPart {
 		}
 
 		public void handleEvent(final ISelectObjectEvent event) {
-			// UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
-			// public void run() throws Exception {
-			// if (parent != null) {
-			// removeLabelText();
-			// setNewLabelText(ILMLUIConstants.INFO_JOB, event.getOid());
-			// }
-			// }
-			// });
 		}
 
 		public void handleEvent(ITableFilterEvent event) {
-			// TODO Auto-generated method stub
-
 		}
 
 		public void handleEvent(ITableSortedEvent event) {
-			// TODO Auto-generated method stub
-
 		}
 
 		public void handleEvent(IUnmarkObjectEvent event) {
-			// UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
-			// public void run() throws Exception {
-			// if (parent != null) {
-			// removeLabelText();
-			// setNewLabelText(ILMLUIConstants.INFO_MOTD, null);
-			// }
-			// }
-			// });
 		}
 
 		public void handleEvent(IUnselectedObjectEvent event) {
-			// UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
-			// public void run() throws Exception {
-			// if (parent != null) {
-			// removeLabelText();
-			// setNewLabelText(ILMLUIConstants.INFO_MOTD, null);
-			// }
-			// }
-			// });
 		}
 
 		public void handleEvent(IViewUpdateEvent event) {
-			// UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
-			// public void run() throws Exception {
-			// if (parent != null) {
-			// removeLabelText();
-			// // TODO test if something is marked or selected
-			// setNewLabelText(ILMLUIConstants.INFO_MOTD, null);
-			// }
-			// }
-			// });
 		}
 
 	}
-
-	private String gid = null;
 
 	private final LMLManager lmlManager = LMLManager.getInstance();
 
@@ -148,7 +109,6 @@ public class InfoView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		gid = getViewSite().getId();
 		lmlManager.addListener(lmlListener, this.getClass().getName());
 
 		this.parent = parent;
@@ -178,7 +138,9 @@ public class InfoView extends ViewPart {
 	}
 
 	public void removeLabelText() {
-		content.dispose();
+		if (!content.isDisposed()) {
+			content.dispose();
+		}
 		content = null;
 
 		showMessageOfTheDayActionItem.getAction().setEnabled(false);
@@ -188,8 +150,6 @@ public class InfoView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void setNewLabelText(String type, String id) {

@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.eclipse.ptp</groupId>
     <artifactId>ptp-parent</artifactId>
-    <version>5.0.6-SNAPSHOT</version>
+    <version>5.0.7-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <groupId>org.eclipse.ptp.features</groupId>
   <artifactId>org.eclipse.ptp.rm.slurm</artifactId>
-  <version>5.0.6-SNAPSHOT</version>
+  <version>5.0.7-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
 </project>
