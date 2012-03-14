@@ -18,12 +18,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
-import org.eclipse.ui.IMemento;
+import org.osgi.service.prefs.Preferences;
 
 /**
  * Abstract class to be inherited to support various ways of testing strings.
- * Subclasses must implement either a public static "loadMatcher" method that takes a memento or a default constructor to
- * support persistence. Otherwise, calling PatternMatcher.loadMatcher(IMemento) for a saved instance will throw an exception.
+ * Subclasses must implement either a public static "loadMatcher" method that takes a preference node or a default constructor to
+ * support persistence. Otherwise, calling PatternMatcher.loadMatcher(Preferences) for a saved instance will throw an exception.
  */
 public abstract class ResourceMatcher {
 	private static final String ATTR_CLASS_NAME = "class-name"; //$NON-NLS-1$
@@ -39,19 +39,20 @@ public abstract class ResourceMatcher {
 	public abstract int hashCode();
 	
 	/**
-	 * Save pattern to the given memento. Subclasses may override, first calling super.savePattern(), if they need to save
+	 * Save pattern to the given Preference node. Subclasses may override, first calling super.savePattern(), if they need to save
 	 * additional data beyond the class type.
-	 * @param memento
+	 * @param preference node
 	 */
-	public void saveMatcher(IMemento memento) {
-		memento.putString(ATTR_CLASS_NAME, this.getClass().getName());
+	public void saveMatcher(Preferences prefRootNode) {
+		prefRootNode.put(ATTR_CLASS_NAME, this.getClass().getName());
 	}
 
 	/**
-	 * Restore a pattern matcher from a given memento. Supporting the loading of subclasses requires reflection, which makes
-	 * this code somewhat involved because it must handle several possible exceptions.
+	 * Restore a pattern matcher from a given preference node.
+	 * Supporting the loading of subclasses requires reflection, which makes this code somewhat involved because it must handle
+	 * several possible exceptions.
 	 * 
-	 * @param memento of pattern matcher to restore
+	 * @param preference node of pattern matcher to restore
 	 * @return new pattern matcher instance
 	 *
 	 * @throws InvocationTargetException
@@ -59,8 +60,8 @@ public abstract class ResourceMatcher {
 	 * @throws ParserConfigurationException
 	 * 					for various problems while parsing and attempting to instantiate the matcher class.
 	 */
-	public static ResourceMatcher loadMatcher(IMemento memento) throws InvocationTargetException, ParserConfigurationException {
-		String className = memento.getString(ATTR_CLASS_NAME);
+	public static ResourceMatcher loadMatcher(Preferences prefRootNode) throws InvocationTargetException, ParserConfigurationException {
+		String className = prefRootNode.get(ATTR_CLASS_NAME, null);
 		if (className == null) {
 			throw new ParserConfigurationException(Messages.ResourceMatcher_1);
 		}
@@ -76,7 +77,7 @@ public abstract class ResourceMatcher {
 			boolean hasMethod = true;
 			Method subClassMethod = null;
 			try {
-				subClassMethod = Class.forName(className).getDeclaredMethod("loadMatcher", IMemento.class); //$NON-NLS-1$
+				subClassMethod = Class.forName(className).getDeclaredMethod("loadMatcher", Preferences.class); //$NON-NLS-1$
 			} catch (SecurityException e) {
 				hasMethod = false; // Treat as if method does not exist
 			} catch (NoSuchMethodException e) {
@@ -85,7 +86,7 @@ public abstract class ResourceMatcher {
 
 			if (hasMethod && subClassMethod != null) {
 				try {
-					return (ResourceMatcher) subClassMethod.invoke(Class.forName(className), memento);
+					return (ResourceMatcher) subClassMethod.invoke(Class.forName(className), prefRootNode);
 				} catch (IllegalArgumentException e) {
 					assert(false); // This should never happen
 				} catch (IllegalAccessException e) {

@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
-import org.eclipse.ui.IMemento;
+import org.osgi.service.prefs.Preferences;
 
 /**
  * A simple resource matcher to test for resources contained inside a specific directory path.
@@ -73,24 +73,24 @@ public class PathResourceMatcher extends ResourceMatcher {
 	}
 
 	/**
-	 * Place needed data for recreating inside the memento
+	 * Place needed data for recreating inside the preference node
 	 */
 	@Override
-	public void saveMatcher(IMemento memento) {
-		super.saveMatcher(memento);
-		memento.putString(ATTR_PATH, path.toPortableString());
+	public void saveMatcher(Preferences prefRootNode) {
+		super.saveMatcher(prefRootNode);
+		prefRootNode.put(ATTR_PATH, path.toPortableString());
 	}
 	
 	/**
-	 * Recreate instance from memento
+	 * Recreate instance from preference node
 	 * 
-	 * @param memento
+	 * @param preference node
 	 * @return the recreated instance
 	 * @throws NoSuchElementException
-	 * 				if expected data is not in the memento.
+	 * 				if expected data is not in the preference node.
 	 */
-	public static ResourceMatcher loadMatcher(IMemento memento) throws NoSuchElementException {
-		String p = memento.getString(ATTR_PATH);
+	public static ResourceMatcher loadMatcher(Preferences prefRootNode) throws NoSuchElementException {
+		String p = prefRootNode.get(ATTR_PATH, null);
 		if (p == null) {
 			throw new NoSuchElementException(Messages.PathResourceMatcher_0);
 		}

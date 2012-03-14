@@ -22,7 +22,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
-import org.eclipse.ui.IMemento;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 /**
  * Class for filtering files during synchronization. Instead of a constructor, the user can create an empty filter or a filter that
@@ -31,11 +32,9 @@ import org.eclipse.ui.IMemento;
  * Facilities are then provided for adding and removing files and directories from filtering.
  */
 public class SyncFileFilter {
-	private static final String PATTERN_ELEMENT_NAME = "pattern"; //$NON-NLS-1$
-	private static final String PATTERN_INTERNAL_ELEMENT_NAME = "pattern"; //$NON-NLS-1$
-	private static final String ATTR_PATTERN_RANK = "pattern-rank"; //$NON-NLS-1$
-	private static final String ATTR_PATTERN_TYPE = "pattern-type"; //$NON-NLS-1$
-	private static final String ATTR_NUM_PATTERNS = "num-patterns"; //$NON-NLS-1$
+	private static final String PATTERN_NODE_NAME = "pattern"; //$NON-NLS-1$
+	private static final String PATTERN_TYPE_KEY = "pattern-type"; //$NON-NLS-1$
+	private static final String NUM_PATTERNS_KEY = "num-patterns"; //$NON-NLS-1$
 	
 	private final LinkedList<ResourceMatcher> filteredPaths = new LinkedList<ResourceMatcher>();
 	private final Map<ResourceMatcher, PatternType> patternToTypeMap = new HashMap<ResourceMatcher, PatternType>();
@@ -197,57 +196,81 @@ public class SyncFileFilter {
 	}
 	
 	/**
-	 * Store filter in a given memento
+	 * Store filter in the given preference node
 	 *
-	 * @param memento
+	 * @param preference node
 	 */
-	public void saveFilter(IMemento memento) {
-		memento.putInteger(ATTR_NUM_PATTERNS, filteredPaths.size());
+	public void saveFilter(Preferences prefRootNode) {
+		// To clear pattern information, remove node, flush parent, and then recreate the node
+		try {
+			prefRootNode.node(PATTERN_NODE_NAME).removeNode();
+			prefRootNode.flush();
+		} catch (BackingStoreException e) {
+			RDTSyncCorePlugin.log(Messages.SyncFileFilter_2, e);
+			return;
+		}
+		Preferences prefPatternNode = prefRootNode.node(PATTERN_NODE_NAME);
+		prefPatternNode.putInt(NUM_PATTERNS_KEY, filteredPaths.size());
+		int i=0;
 		for (ResourceMatcher pm : filteredPaths) {
-			IMemento pathMemento = memento.createChild(PATTERN_ELEMENT_NAME);
-			IMemento patternInternalMemento = pathMemento.createChild(PATTERN_INTERNAL_ELEMENT_NAME);
-			pm.saveMatcher(patternInternalMemento);
-			pathMemento.putInteger(ATTR_PATTERN_RANK, filteredPaths.indexOf(pm));
-			pathMemento.putString(ATTR_PATTERN_TYPE, patternToTypeMap.get(pm).name());
+			Preferences prefMatcherNode = prefPatternNode.node(Integer.toString(i));
+			// Whether pattern is exclusive or inclusive
+			prefMatcherNode.put(PATTERN_TYPE_KEY, patternToTypeMap.get(pm).name());
+			pm.saveMatcher(prefMatcherNode);
+			i++;
 		}
 	}
-	
-	/**
-	 * Load filter from a given memento
-	 *
-	 * @param memento
-	 * @return the restored filter
-	 */
-	public static SyncFileFilter loadFilter(IMemento memento) {
-		int numPatterns = memento.getInteger(ATTR_NUM_PATTERNS);
-		ResourceMatcher[] pmArray = new ResourceMatcher[numPatterns];
-		SyncFileFilter.PatternType[] typeArray = new SyncFileFilter.PatternType[numPatterns];
 
-		SyncFileFilter filter = createEmptyFilter();
-		
-		for (IMemento pathMemento : memento.getChildren(PATTERN_ELEMENT_NAME)) {
-			IMemento patternInternalMemento = pathMemento.getChild(PATTERN_INTERNAL_ELEMENT_NAME);
-			ResourceMatcher pm;
-			try {
-				pm = ResourceMatcher.loadMatcher(patternInternalMemento);
-			} catch (InvocationTargetException e) {
-				RDTSyncCorePlugin.log(Messages.SyncFileFilter_0 + e.getMessage(), e);
-				continue;
-			} catch (ParserConfigurationException e) {
-				RDTSyncCorePlugin.log(Messages.SyncFileFilter_0 + e.getMessage(), e);
-				continue;
+	/**
+	 * Load filter from the given preference node
+	 *
+	 * @param preference node
+	 * @return the restored filter or null if the node does not contain a filter or if there are problems reading the filter
+	 */
+	public static SyncFileFilter loadFilter(Preferences prefRootNode) {
+		try {
+			if (!prefRootNode.nodeExists(PATTERN_NODE_NAME)) {
+				return null;
+			}
+			Preferences prefPatternNode = prefRootNode.node(PATTERN_NODE_NAME);
+			int numPatterns = prefPatternNode.getInt(NUM_PATTERNS_KEY, -1);
+			if (numPatterns == -1) {
+				RDTSyncCorePlugin.log(Messages.SyncFileFilter_1);
+				return null;
 			}
 
-			int rank = pathMemento.getInteger(ATTR_PATTERN_RANK);
-			String type = pathMemento.getString(ATTR_PATTERN_TYPE);
-			pmArray[rank] = pm;
-			typeArray[rank] = SyncFileFilter.PatternType.valueOf(type);
+			SyncFileFilter filter = createEmptyFilter();
+			for (int i=0; i<numPatterns; i++) {
+				if (!prefPatternNode.nodeExists(Integer.toString(i))) {
+					RDTSyncCorePlugin.log(Messages.SyncFileFilter_1);
+					return null;
+				}
+
+				Preferences prefMatcherNode = prefPatternNode.node(Integer.toString(i));
+
+				// Load matcher type (whether pattern is exclusive or inclusive)
+				String typeName = prefMatcherNode.get(PATTERN_TYPE_KEY, null);
+				if (typeName == null) {
+					RDTSyncCorePlugin.log(Messages.SyncFileFilter_1);
+					return null;
+				}
+				SyncFileFilter.PatternType type = SyncFileFilter.PatternType.valueOf(typeName);
+
+				// Load the actual matcher
+				ResourceMatcher pm = ResourceMatcher.loadMatcher(prefMatcherNode);
+
+				filter.addPattern(pm, type);
+			}
+			return filter;
+		} catch (BackingStoreException e) {
+			RDTSyncCorePlugin.log(Messages.SyncFileFilter_1, e);
+			return null;
+		} catch (InvocationTargetException e) {
+			RDTSyncCorePlugin.log(Messages.SyncFileFilter_1, e);
+			return null;
+		} catch (ParserConfigurationException e) {
+			RDTSyncCorePlugin.log(Messages.SyncFileFilter_1, e);
+			return null;
 		}
-		
-		for (int i=pmArray.length-1; i>=0; i--) {
-			filter.addPattern(pmArray[i], typeArray[i]);
-		}
-		
-		return filter;
 	}
 }
