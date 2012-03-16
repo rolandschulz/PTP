@@ -240,7 +240,7 @@ public class SyncFileFilter {
 			}
 
 			SyncFileFilter filter = createEmptyFilter();
-			for (int i=0; i<numPatterns; i++) {
+			for (int i=numPatterns-1; i>=0; i--) {
 				if (!prefPatternNode.nodeExists(Integer.toString(i))) {
 					RDTSyncCorePlugin.log(Messages.SyncFileFilter_1);
 					return null;
