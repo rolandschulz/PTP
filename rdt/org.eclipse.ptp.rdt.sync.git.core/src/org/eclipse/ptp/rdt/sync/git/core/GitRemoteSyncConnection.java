@@ -53,6 +53,7 @@ import org.eclipse.jgit.transport.TransportGitSsh;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.QuotedString;
+import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
@@ -171,7 +172,7 @@ public class GitRemoteSyncConnection {
 	 *             Consider evaluating the output of "git init".
 	 */
 	private Git buildRepo(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
-		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		final SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		subMon.subTask(Messages.GitRemoteSyncConnection_building_repo);
 		try {
 			final File localDir = new File(localDirectory);
@@ -189,12 +190,19 @@ public class GitRemoteSyncConnection {
 			}
 			
 			// Refresh the workspace after creating new local files
-			try {
-				project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(5));
-			} catch (CoreException e) {
-				throw new RemoteSyncException(e);
-				// Nothing to do
-			}
+			// Bug 374409 - run refresh in a separate thread to avoid possible deadlock from locking both the sync lock and the
+			// workspace lock.
+			Thread refreshWorkspaceThread = new Thread(new Runnable() {
+				public void run() {
+					try {
+						project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(5));
+					} catch (CoreException e) {
+						RDTSyncCorePlugin.log(Messages.GitRemoteSyncConnection_0, e);
+					}
+				}
+			}, "Refresh workspace thread"); //$NON-NLS-1$
+			refreshWorkspaceThread.start();
+
 
 			// Create remote directory if necessary.
 			try {
