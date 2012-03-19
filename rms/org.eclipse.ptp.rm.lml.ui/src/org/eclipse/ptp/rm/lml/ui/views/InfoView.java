@@ -152,7 +152,7 @@ public class InfoView extends ViewPart {
 	public void setFocus() {
 	}
 
-	public void setNewLabelText(String type, String id) {
+	public void setNewLabelText(String type, String oid) {
 		if (type.equals(ILMLUIConstants.INFO_MOTD)) {
 			content = new Text(parent, SWT.LEFT | SWT.MULTI | SWT.READ_ONLY | SWT.V_SCROLL);
 			((Text) content).setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -166,9 +166,6 @@ public class InfoView extends ViewPart {
 			} else if (message[0].equals(ILMLUIConstants.INFO_MOTD)) {
 				((Text) content).append(message[1]);
 			}
-			// ((Text) content).append("Message of the Day\n" +
-			// "---------------------------\n\n" +
-			// "Here will be more text!");
 		} else if (type.equals(ILMLUIConstants.INFO_JOB)) {
 			content = new Table(parent, SWT.BORDER | SWT.FULL_SELECTION);
 			((Table) content).setLinesVisible(true);
@@ -179,10 +176,13 @@ public class InfoView extends ViewPart {
 				column.setText(title);
 				column.setWidth(100);
 			}
-			for (final InfodataType infodata : lmlManager.getSelectedLguiItem().getOIDToInformation().getInfoByOid(id).getData()) {
-				final TableItem item = new TableItem(((Table) content), SWT.NONE);
-				item.setText(0, infodata.getKey());
-				item.setText(1, infodata.getValue());
+			if (lmlManager.getSelectedLguiItem().getOIDToInformation().getInfoByOid(oid) != null) {
+				for (final InfodataType infodata : lmlManager.getSelectedLguiItem().getOIDToInformation().getInfoByOid(oid)
+						.getData()) {
+					final TableItem item = new TableItem(((Table) content), SWT.NONE);
+					item.setText(0, infodata.getKey());
+					item.setText(1, infodata.getValue());
+				}
 			}
 
 			for (final TableColumn column : ((Table) content).getColumns()) {

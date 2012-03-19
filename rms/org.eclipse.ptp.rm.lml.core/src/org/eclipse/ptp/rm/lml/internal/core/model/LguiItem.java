@@ -317,7 +317,7 @@ public class LguiItem implements ILguiItem {
 	 */
 	public JobStatusData[] getUserJobs() {
 		synchronized (fJobMap) {
-			return fJobMap.values().toArray(new JobStatusData[0]);
+			return fJobMap.values().toArray(new JobStatusData[fJobMap.values().size()]);
 		}
 	}
 
