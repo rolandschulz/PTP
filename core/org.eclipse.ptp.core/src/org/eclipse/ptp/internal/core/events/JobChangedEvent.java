@@ -20,38 +20,23 @@
 package org.eclipse.ptp.internal.core.events;
 
 import org.eclipse.ptp.core.events.IJobChangedEvent;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 
-/**
- * @author grw
- * 
- */
 public class JobChangedEvent implements IJobChangedEvent {
 
-	private final IResourceManager fResourceManager;
-	private final String fJobId;
+	private final IJobStatus fJobStatus;
 
-	public JobChangedEvent(IResourceManager rm, String jobId) {
-		fResourceManager = rm;
-		fJobId = jobId;
+	public JobChangedEvent(IJobStatus jobStatus) {
+		fJobStatus = jobStatus;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.events.IJobChangedEvent#getJobId()
+	 * @see org.eclipse.ptp.core.events.IJobAddedEvent#getJobStatus()
 	 */
-	public String getJobId() {
-		return fJobId;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.events.IJobChangedEvent#getSource()
-	 */
-	public IResourceManager getSource() {
-		return fResourceManager;
+	public IJobStatus getJobStatus() {
+		return fJobStatus;
 	}
 
 }

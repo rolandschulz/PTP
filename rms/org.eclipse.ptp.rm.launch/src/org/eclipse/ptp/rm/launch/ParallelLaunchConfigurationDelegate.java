@@ -30,13 +30,9 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
@@ -44,16 +40,13 @@ import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
-import org.eclipse.ptp.rm.launch.internal.PreferenceConstants;
 import org.eclipse.ptp.rm.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 /**
@@ -127,37 +120,37 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			/*
 			 * Allow user to start resource manager if not running.
 			 */
-			final IResourceManager rm = getResourceManager(configuration);
-			if (rm == null) {
-				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
-			}
-			if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
-				if (!Preferences.getBoolean(RMLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START)) {
-					Display.getDefault().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(Display.getDefault()
-									.getActiveShell(), Messages.ParallelLaunchConfigurationDelegate_Confirm_start, NLS.bind(
-									Messages.ParallelLaunchConfigurationDelegate_RM_currently_stopped, configuration.getName()),
-									Messages.ParallelLaunchConfigurationDelegate_Always_start, false, null, null);
-							if (dialog.getReturnCode() == IDialogConstants.OK_ID) {
-								startRM(rm);
-							}
-							if (dialog.getToggleState()) {
-								Preferences.setBoolean(RMLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START,
-										dialog.getReturnCode() == IDialogConstants.OK_ID);
-							}
-						}
-
-					});
-				} else {
-					startRM(rm);
-				}
-				if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
-					return;
-				}
-			}
+			// final IResourceManager rm = getResourceManager(configuration);
+			// if (rm == null) {
+			// throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
+			// Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
+			// }
+			// if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
+			// if (!Preferences.getBoolean(RMLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START)) {
+			// Display.getDefault().syncExec(new Runnable() {
+			// @Override
+			// public void run() {
+			// MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(Display.getDefault()
+			// .getActiveShell(), Messages.ParallelLaunchConfigurationDelegate_Confirm_start, NLS.bind(
+			// Messages.ParallelLaunchConfigurationDelegate_RM_currently_stopped, configuration.getName()),
+			// Messages.ParallelLaunchConfigurationDelegate_Always_start, false, null, null);
+			// if (dialog.getReturnCode() == IDialogConstants.OK_ID) {
+			// startRM(rm);
+			// }
+			// if (dialog.getToggleState()) {
+			// Preferences.setBoolean(RMLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START,
+			// dialog.getReturnCode() == IDialogConstants.OK_ID);
+			// }
+			// }
+			//
+			// });
+			// } else {
+			// startRM(rm);
+			// }
+			// if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
+			// return;
+			// }
+			// }
 
 			progress.worked(10);
 			progress.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
@@ -258,7 +251,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	@Override
 	protected void doCompleteJobLaunch(final IPLaunch launch, final IPDebugger debugger) {
 		final String jobId = launch.getJobId();
-		final IResourceManager rm = launch.getResourceManager();
+		final IResourceManagerControl rm = launch.getResourceManagerControl();
 		final ILaunchConfiguration configuration = launch.getLaunchConfiguration();
 
 		/*
@@ -369,35 +362,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					}
 				});
 			}
-		}
-	}
-
-	private void startRM(final IResourceManager rm) {
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				try {
-					rm.start(monitor);
-				} catch (CoreException e) {
-					throw new InvocationTargetException(e);
-				}
-				if (monitor.isCanceled()) {
-					throw new InterruptedException();
-				}
-			}
-		};
-		try {
-			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
-		} catch (InvocationTargetException e) {
-			Throwable t = e.getCause();
-			IStatus status = null;
-			if (t != null && t instanceof CoreException) {
-				status = ((CoreException) t).getStatus();
-			}
-			ErrorDialog.openError(Display.getDefault().getActiveShell(), Messages.ParallelLaunchConfigurationDelegate_Start_rm,
-					Messages.ParallelLaunchConfigurationDelegate_Failed_to_start, status);
-		} catch (InterruptedException e) {
-			// Do nothing. Operation has been canceled.
 		}
 	}
 }

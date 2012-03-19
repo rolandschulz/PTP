@@ -13,12 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.core.JobManager;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rmsystem.IJobStatus;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
@@ -30,20 +29,17 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 
 	private final IResourceManagerControl control;
-	private final IResourceManager rm;
 	private final Map<String, ICommandJobStatus> map;
 	private boolean running = false;
 
-	public JobStatusMap(IResourceManagerControl control, IResourceManager rm) {
+	public JobStatusMap(IResourceManagerControl control) {
 		this.control = control;
-		this.rm = rm;
 		map = new HashMap<String, ICommandJobStatus>();
 	}
 
 	/*
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#addJobStatus(java.lang
-	 * .String, org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus)
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#addJobStatus(java.lang .String,
+	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus)
 	 */
 	public boolean addJobStatus(String jobId, ICommandJobStatus status) {
 		boolean notifyAdd = false;
@@ -55,19 +51,15 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 		}
 		if (notifyAdd) {
 			status.initialize(jobId);
-			((IJAXBResourceManager) rm).fireJobChanged(jobId);
-			rm.addJob(jobId, status);
+			JobManager.getInstance().fireJobAdded(status);
 		}
 		return !exists;
 	}
 
 	/*
-	 * Synchronized cancel. External calls are premature and thus should not
-	 * block waiting for the remote files if any.(non-Javadoc)
+	 * Synchronized cancel. External calls are premature and thus should not block waiting for the remote files if any.(non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#cancel(java.lang.String
-	 * )
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#cancel(java.lang.String )
 	 */
 	public ICommandJobStatus cancel(String jobId) {
 		ICommandJobStatus status = null;
@@ -84,9 +76,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#getStatus(java.lang
-	 * .String)
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#getStatus(java.lang .String)
 	 */
 	public ICommandJobStatus getStatus(String jobId) {
 		ICommandJobStatus status = null;
@@ -109,9 +99,8 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	}
 
 	/**
-	 * Thread daemon for cleanup on the map. Eliminates stray completed state
-	 * information, and also starts the stream proxies on jobs which have been
-	 * submitted to a scheduler and have become active.
+	 * Thread daemon for cleanup on the map. Eliminates stray completed state information, and also starts the stream proxies on
+	 * jobs which have been submitted to a scheduler and have become active.
 	 */
 	@Override
 	public void run() {
@@ -154,9 +143,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	/*
 	 * Synchronized terminate. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#terminated(java.lang
-	 * .String)
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#terminated(java.lang .String)
 	 */
 	public ICommandJobStatus terminated(String jobId, IProgressMonitor monitor) {
 		ICommandJobStatus status = null;
@@ -197,7 +184,9 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	}
 
 	/**
-	 * @return whether the daemon is running
+	 * FIXME Why not just return running?
+	 * 
+	 * @return whether the daemon is
 	 */
 	private boolean isRunning() {
 		boolean b = false;

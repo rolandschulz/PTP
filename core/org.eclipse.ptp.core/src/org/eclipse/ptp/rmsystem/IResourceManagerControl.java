@@ -17,13 +17,14 @@
 package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
  * @since 5.0
  */
-public interface IResourceManagerControl {
+public interface IResourceManagerControl extends IAdaptable {
 	/**
 	 * Control operation to suspend a job
 	 */
@@ -72,52 +73,43 @@ public interface IResourceManagerControl {
 	public IResourceManagerComponentConfiguration getControlConfiguration();
 
 	/**
-	 * Get the status of the job. The could potentially be a long running
-	 * operation. If the progress monitor is canceled, the method will return an
-	 * undetermined status. <br>
+	 * Get the status of the job. The could potentially be a long running operation. If the progress monitor is canceled, the method
+	 * will return an undetermined status. <br>
 	 * <br>
-	 * Note that this call may be throttled using a predetermined timeout by the
-	 * rsource manager implementation. To avoid the throttle, set the force flag
-	 * to true.
+	 * Note that this call may be throttled using a predetermined timeout by the rsource manager implementation. To avoid the
+	 * throttle, set the force flag to true.
 	 * 
 	 * @param jobId
 	 *            ID of job used to obtain status
 	 * @param force
-	 *            if true, tells the resource manager to ignore the throttling
-	 *            timeout.
+	 *            if true, tells the resource manager to ignore the throttling timeout.
 	 * @param monitor
 	 *            progress monitor for monitoring or canceling the operation
-	 * @return status of the job or undetermined status if the progress monitor
-	 *         is canceled
+	 * @return status of the job or undetermined status if the progress monitor is canceled
 	 */
 	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor);
 
 	/**
-	 * Get the status of the job. The could potentially be a long running
-	 * operation. If the progress monitor is canceled, the method will return an
-	 * undetermined status. <br>
+	 * Get the status of the job. The could potentially be a long running operation. If the progress monitor is canceled, the method
+	 * will return an undetermined status. <br>
 	 * <br>
-	 * Note that this call may be throttled using a predetermined timeout by the
-	 * rsource manager implementation. To avoid the throttle, use the overloaded
-	 * method.<br>
+	 * Note that this call may be throttled using a predetermined timeout by the rsource manager implementation. To avoid the
+	 * throttle, use the overloaded method.<br>
 	 * <br>
 	 * 
-	 * This method is equivalent to
-	 * {@link #getJobStatus(String, boolean, IProgressMonitor)} with flag set to
-	 * false.
+	 * This method is equivalent to {@link #getJobStatus(String, boolean, IProgressMonitor)} with flag set to false.
 	 * 
 	 * @param jobId
 	 *            ID of job used to obtain status
 	 * @param monitor
 	 *            progress monitor for monitoring or canceling the operation
-	 * @return status of the job or undetermined status if the progress monitor
-	 *         is canceled
+	 * @return status of the job or undetermined status if the progress monitor is canceled
 	 */
 	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor);
 
 	/**
-	 * Start the resource manager. Clients should not call this directly. Call
-	 * {@link IResourceManager#start(IProgressMonitor)} instead.
+	 * Start the resource manager. Clients should not call this directly. Call {@link IResourceManager#start(IProgressMonitor)}
+	 * instead.
 	 * 
 	 * @param monitor
 	 *            progress monitor
@@ -127,8 +119,7 @@ public interface IResourceManagerControl {
 	public void start(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Stop the resource manager. Clients should not call this directly. Call
-	 * {@link IResourceManager#stop()} instead.
+	 * Stop the resource manager. Clients should not call this directly. Call {@link IResourceManager#stop()} instead.
 	 * 
 	 * @throws CoreException
 	 *             this exception is thrown if the stop command fails

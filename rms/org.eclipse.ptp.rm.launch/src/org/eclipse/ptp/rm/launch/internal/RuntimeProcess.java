@@ -13,125 +13,49 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
+import org.eclipse.ptp.core.JobManager;
+import org.eclipse.ptp.core.events.IJobAddedEvent;
 import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 import org.eclipse.ptp.rmsystem.IJobStatus;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class RuntimeProcess implements IProcess, IJobListener {
 	private IPLaunch fLaunch = null;
-	private final IResourceManager fResourceManager;
+	private final IResourceManagerControl fResourceManager;
 	private String fJobId = null;
 	private Map<String, String> fAttributes;
 	private int fExitValue = -1;
 	private boolean fTerminated = false;
 
-	public RuntimeProcess(IPLaunch launch, IResourceManager rm, String jobId, Map<String, String> attributes) {
+	public RuntimeProcess(IPLaunch launch, IResourceManagerControl rm, String jobId, Map<String, String> attributes) {
 		fLaunch = launch;
 		fResourceManager = rm;
 		fJobId = jobId;
-		rm.addJobListener(this);
+		JobManager.getInstance().addListener(this);
 		initializeAttributes(attributes);
 		fTerminated = rm.getJobStatus(jobId, null).getState().equals(IJobStatus.COMPLETED);
 		launch.addProcess(this);
 	}
 
-	private void initializeAttributes(Map<String, String> attributes) {
-		if (attributes != null) {
-			Iterator<String> keys = attributes.keySet().iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
-				setAttribute(key, attributes.get(key));
-			}
-		}
-	}
-
-	/***************************************************************************************************************************************************************************************************
-	 * IProcess interface
-	 **************************************************************************************************************************************************************************************************/
-	@Override
-	public String getLabel() {
-		return fResourceManager.getName() + ": job_" + fJobId; //$NON-NLS-1$
-	}
-
-	@Override
-	public ILaunch getLaunch() {
-		return fLaunch;
-	}
-
-	@Override
-	public IStreamsProxy getStreamsProxy() {
-		return fResourceManager.getJobStatus(fJobId, null).getStreamsProxy();
-	}
-
-	@Override
-	public void setAttribute(String key, String value) {
-		if (fAttributes == null) {
-			fAttributes = new HashMap<String, String>(5);
-		}
-		Object origVal = fAttributes.get(key);
-		if (origVal != null && origVal.equals(value)) {
-			return;
-		}
-		fAttributes.put(key, value);
-	}
-
-	@Override
-	public String getAttribute(String key) {
-		if (fAttributes == null) {
-			return null;
-		}
-		return fAttributes.get(key);
-	}
-
-	@Override
-	public int getExitValue() throws DebugException {
-		if (isTerminated()) {
-			return fExitValue;
-		}
-		throw new DebugException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), IStatus.ERROR,
-				Messages.RuntimeProcess_Exit_value_not_available, null));
-	}
-
-	protected void terminated() {
-		synchronized (this) {
-			fTerminated = true;
-		}
-		fExitValue = 0;
-		fireTerminateEvent();
-	}
-
-	/***************************************************************************************************************************************************************************************************
-	 * ITerminate interface
-	 **************************************************************************************************************************************************************************************************/
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
+	 */
 	@Override
 	public synchronized boolean canTerminate() {
 		return !fTerminated;
 	}
 
-	@Override
-	public synchronized boolean isTerminated() {
-		return fTerminated;
-	}
-
-	@Override
-	public void terminate() throws DebugException {
-		if (!isTerminated()) {
-			try {
-				fResourceManager.control(fJobId, IResourceManagerControl.TERMINATE_OPERATION, null);
-			} catch (CoreException e) {
-				throw new DebugException(e.getStatus());
-			}
-		}
-	}
-
-	/***************************************************************************************************************************************************************************************************
-	 * Adapter interface
-	 **************************************************************************************************************************************************************************************************/
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
@@ -144,9 +68,72 @@ public class RuntimeProcess implements IProcess, IJobListener {
 		return null;
 	}
 
-	/***************************************************************************************************************************************************************************************************
-	 * IResourceManagerListener interface
-	 **************************************************************************************************************************************************************************************************/
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IProcess#getAttribute(java.lang.String)
+	 */
+	@Override
+	public String getAttribute(String key) {
+		if (fAttributes == null) {
+			return null;
+		}
+		return fAttributes.get(key);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IProcess#getExitValue()
+	 */
+	@Override
+	public int getExitValue() throws DebugException {
+		if (isTerminated()) {
+			return fExitValue;
+		}
+		throw new DebugException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), IStatus.ERROR,
+				Messages.RuntimeProcess_Exit_value_not_available, null));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IProcess#getLabel()
+	 */
+	@Override
+	public String getLabel() {
+		return "Runtime process " + fJobId; //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IProcess#getLaunch()
+	 */
+	@Override
+	public ILaunch getLaunch() {
+		return fLaunch;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IProcess#getStreamsProxy()
+	 */
+	@Override
+	public IStreamsProxy getStreamsProxy() {
+		return fResourceManager.getJobStatus(fJobId, null).getStreamsProxy();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
+	 */
+	@Override
+	public void handleEvent(IJobAddedEvent e) {
+		// nothing to do
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -156,17 +143,66 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	@Override
 	public void handleEvent(IJobChangedEvent e) {
 		if (!isTerminated()) {
-			IResourceManager rm = e.getSource();
-			IJobStatus status = rm.getJobStatus(e.getJobId(), null);
+			IJobStatus status = e.getJobStatus();
 			if (status.getState().equals(IJobStatus.COMPLETED)) {
 				terminated();
 			}
 		}
 	}
 
-	/***************************************************************************************************************************************************************************************************
-	 * Debug Event
-	 **************************************************************************************************************************************************************************************************/
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
+	 */
+	@Override
+	public synchronized boolean isTerminated() {
+		return fTerminated;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IProcess#setAttribute(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void setAttribute(String key, String value) {
+		if (fAttributes == null) {
+			fAttributes = new HashMap<String, String>(5);
+		}
+		Object origVal = fAttributes.get(key);
+		if (origVal != null && origVal.equals(value)) {
+			return;
+		}
+		fAttributes.put(key, value);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
+	 */
+	@Override
+	public void terminate() throws DebugException {
+		if (!isTerminated()) {
+			try {
+				fResourceManager.control(fJobId, IResourceManagerControl.TERMINATE_OPERATION, null);
+			} catch (CoreException e) {
+				throw new DebugException(e.getStatus());
+			}
+		}
+	}
+
+	private void initializeAttributes(Map<String, String> attributes) {
+		if (attributes != null) {
+			Iterator<String> keys = attributes.keySet().iterator();
+			while (keys.hasNext()) {
+				String key = keys.next();
+				setAttribute(key, attributes.get(key));
+			}
+		}
+	}
+
 	protected void fireEvent(DebugEvent event) {
 		DebugPlugin manager = DebugPlugin.getDefault();
 		if (manager != null) {
@@ -176,5 +212,14 @@ public class RuntimeProcess implements IProcess, IJobListener {
 
 	protected void fireTerminateEvent() {
 		fireEvent(new DebugEvent(this, DebugEvent.TERMINATE));
+	}
+
+	protected void terminated() {
+		synchronized (this) {
+			fTerminated = true;
+		}
+		fExitValue = 0;
+		fireTerminateEvent();
+		JobManager.getInstance().removeListener(this);
 	}
 }

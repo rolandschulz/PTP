@@ -255,7 +255,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	@Override
 	protected void doCompleteJobLaunch(final IPLaunch launch, final IPDebugger debugger) {
 		final String jobId = launch.getJobId();
-		final IResourceManager rm = launch.getResourceManager();
+		final IResourceManagerControl rm = launch.getResourceManagerControl();
 		final ILaunchConfiguration configuration = launch.getLaunchConfiguration();
 
 		/*

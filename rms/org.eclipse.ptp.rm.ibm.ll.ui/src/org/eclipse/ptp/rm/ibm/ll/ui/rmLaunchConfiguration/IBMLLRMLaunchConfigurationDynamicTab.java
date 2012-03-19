@@ -46,7 +46,6 @@ import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringSetAttribute;
 import org.eclipse.ptp.core.attributes.StringSetAttributeDefinition;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
@@ -91,8 +90,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		}
 
 		/**
-		 * Handle events sent when registered Text and Combo widgets have their
-		 * text field modified.
+		 * Handle events sent when registered Text and Combo widgets have their text field modified.
 		 */
 		public void modifyText(ModifyEvent e) {
 			print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -191,10 +189,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Exception class intended for use in validating fields within this panel.
-	 * When a validation error occurs, the validation code should create and
-	 * throw a ValidationException, which is intended to be caught by the top
-	 * level validation method.
+	 * Exception class intended for use in validating fields within this panel. When a validation error occurs, the validation code
+	 * should create and throw a ValidationException, which is intended to be caught by the top level validation method.
 	 */
 	public class ValidationException extends Exception {
 		/**
@@ -233,8 +229,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	private static int state_args = 0; /* 0=message off, 1=message on */
 	private static int state_fatal = 1; /* 0=message off, 1=message on */
 	/*
-	 * The following constants define the names of all attributes which may be
-	 * known by the IBMLL proxy.
+	 * The following constants define the names of all attributes which may be known by the IBMLL proxy.
 	 */
 	private static final String LL_PTP_JOB_COMMAND_FILE = "LL_PTP_JOB_COMMAND_FILE"; //$NON-NLS-1$
 	private static final String LL_PTP_JOB_COMMAND_FILE_TEMPLATE = "LL_PTP_JOB_COMMAND_FILE_TEMPLATE"; //$NON-NLS-1$
@@ -368,8 +363,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	private TextRowWidget llTotalTasks = null;
 
 	/*
-	 * Widgets for Limits Tab Note: llWallClockLimitHard and
-	 * llWallClockLimitSoft are duplicated here.
+	 * Widgets for Limits Tab Note: llWallClockLimitHard and llWallClockLimitSoft are duplicated here.
 	 */
 	private TextRowWidget llWallClockLimitHard = null;
 
@@ -428,12 +422,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #canSave(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control,
+	 * org.eclipse.ptp.rmsystem.IResourceManager)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation canSave(Control control, IResourceManager rm) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":canSave entered."); //$NON-NLS-1$
 		if (allFieldsValid) {
@@ -447,13 +439,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Reset all widgets within this pane to null as part of panel
-	 * initialization. Depending on OS and operation mode (with or without
-	 * LoadLeveler), some widgets will not appear on the panels, where the set
-	 * of attribute definitions sent by the proxy determines that set. New
-	 * widgets will be generated only when a corresponding attribute definition
-	 * is sent by the proxy. Any code which accesses a widget should ensure the
-	 * widget is not null before accessing the widget object.
+	 * Reset all widgets within this pane to null as part of panel initialization. Depending on OS and operation mode (with or
+	 * without LoadLeveler), some widgets will not appear on the panels, where the set of attribute definitions sent by the proxy
+	 * determines that set. New widgets will be generated only when a corresponding attribute definition is sent by the proxy. Any
+	 * code which accesses a widget should ensure the widget is not null before accessing the widget object.
 	 */
 	private void clearAllWidgets() {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -491,8 +480,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Create a radio button pair in the tabbed view. The label, button labels,
-	 * and tooltip text are obtained from the attribute definition object.
+	 * Create a radio button pair in the tabbed view. The label, button labels, and tooltip text are obtained from the attribute
+	 * definition object.
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
@@ -520,10 +509,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Create a checkbox widget in the tabbed view. The checkbox is in column 2
-	 * and column 3 is a filler (Label) widget. To ensure consistent alignment,
-	 * this method allocates extra horizontal space to the 2nd column. The label
-	 * and tooltip text are obtained from the attribute definition object.
+	 * Create a checkbox widget in the tabbed view. The checkbox is in column 2 and column 3 is a filler (Label) widget. To ensure
+	 * consistent alignment, this method allocates extra horizontal space to the 2nd column. The label and tooltip text are obtained
+	 * from the attribute definition object.
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
@@ -551,9 +539,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Create a combobox widget in the tabbed view. The widget spans columns 2
-	 * and 3 of the tabbed pane. The label and tooltip text are obtained from
-	 * the attribute definition object.
+	 * Create a combobox widget in the tabbed view. The widget spans columns 2 and 3 of the tabbed pane. The label and tooltip text
+	 * are obtained from the attribute definition object.
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
@@ -581,8 +568,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * This method creates all of the GUI elements of the resource-manager
-	 * specific pane within the parallel tab of the launch configuration dialog.
+	 * This method creates all of the GUI elements of the resource-manager specific pane within the parallel tab of the launch
+	 * configuration dialog.
 	 * 
 	 * @param parent
 	 *            This control's parent
@@ -591,7 +578,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param queue
 	 *            Currently selected queue
 	 */
-	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) {
+	public void createControl(Composite parent, IResourceManager rm) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createControl entered."); //$NON-NLS-1$
 		IIBMLLResourceManagerConfiguration config;
@@ -631,9 +618,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Create a text widget in the tabbed view. The text field spans columns 2
-	 * and 3 of the tabbed pane. The label and tooltip text are obtained from
-	 * the attribute definition object.
+	 * Create a text widget in the tabbed view. The text field spans columns 2 and 3 of the tabbed pane. The label and tooltip text
+	 * are obtained from the attribute definition object.
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
@@ -666,9 +652,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Create an editable combobox in the tabbed view. The widget spans columns
-	 * 2 and 3 of the tabbed pane. The label and tooltip text are obtained from
-	 * the attribute definition object.
+	 * Create an editable combobox in the tabbed view. The widget spans columns 2 and 3 of the tabbed pane. The label and tooltip
+	 * text are obtained from the attribute definition object.
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
@@ -698,21 +683,17 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Create a text field and pushbutton in this row. The text field is in
-	 * column 2 and the pushbutton in column 3. The user either fills in the
-	 * text field with a pathname, or clicks the button to pop up a file
-	 * selector dialog that then fills in the text field. To ensure consistent
-	 * alignment, this method allocates extra horizontal space to the 2nd
-	 * column. The label and tooltip text are obtained from the attribute
-	 * definition object.
+	 * Create a text field and pushbutton in this row. The text field is in column 2 and the pushbutton in column 3. The user either
+	 * fills in the text field with a pathname, or clicks the button to pop up a file selector dialog that then fills in the text
+	 * field. To ensure consistent alignment, this method allocates extra horizontal space to the 2nd column. The label and tooltip
+	 * text are obtained from the attribute definition object.
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
 	 * @param id
 	 *            Attribute id for rm attribute this widget represents
 	 * @param selectorID
-	 *            Identifier used to identify the browse button associated with
-	 *            this widget
+	 *            Identifier used to identify the browse button associated with this widget
 	 * @return Text entry field for this attribute
 	 */
 	private FileSelectorRowWidget createFileSelector(Composite parent, String id, int selectorID) {
@@ -761,8 +742,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Create the first performance tab of the attributes pane. Due to the
-	 * number of performance related attributes, there are two performance tabs.
+	 * Create the first performance tab of the attributes pane. Due to the number of performance related attributes, there are two
+	 * performance tabs.
 	 * 
 	 * @param rm
 	 *            resource manager associated with this launch configuration
@@ -963,9 +944,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Create a text widget in the tabbed view. The text field spans columns 2
-	 * and 3 of the tabbed pane. The label and tooltip text are obtained from
-	 * the attribute definition object.
+	 * Create a text widget in the tabbed view. The text field spans columns 2 and 3 of the tabbed pane. The label and tooltip text
+	 * are obtained from the attribute definition object.
 	 * 
 	 * @param parent
 	 *            Parent widget (the pane in the tabbed view)
@@ -993,11 +973,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Disable the tab pane widget and all children of the tab pane. Calling
-	 * setEnabled(false) on the tab pane widget disables the tab pane and
-	 * prevents interaction with child widgets, but does not change the visible
-	 * state of the child widget. This method changes the state of all widgets
-	 * to correctly indicate they are disabled.
+	 * Disable the tab pane widget and all children of the tab pane. Calling setEnabled(false) on the tab pane widget disables the
+	 * tab pane and prevents interaction with child widgets, but does not change the visible state of the child widget. This method
+	 * changes the state of all widgets to correctly indicate they are disabled.
 	 * 
 	 * @param widget
 	 *            The widget to be disabled.
@@ -1057,15 +1035,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Get the attribute value for the specified attribute. If the value is
-	 * stored in the launch configuration, that value is used. Otherwise the
-	 * default value from the resource manager is used.
+	 * Get the attribute value for the specified attribute. If the value is stored in the launch configuration, that value is used.
+	 * Otherwise the default value from the resource manager is used.
 	 * 
 	 * @param config
 	 *            The current launch configuration
 	 * @param rm
-	 *            The resource manager currently associated with the launch
-	 *            configuration
+	 *            The resource manager currently associated with the launch configuration
 	 * @param attrName
 	 *            The name of the attribute
 	 * @return The value of the attribute
@@ -1134,12 +1110,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Get the default value for an attribute from the resource manager, giving
-	 * preference to a user override of the default value (which the user does
-	 * by setting of the corresponding environment variable before starting the
-	 * proxy.) The user's override is passed to the front end by the proxy as a
-	 * string attribute where the leading 'MP_' of the attribute name is
-	 * replaced with 'EN_'
+	 * Get the default value for an attribute from the resource manager, giving preference to a user override of the default value
+	 * (which the user does by setting of the corresponding environment variable before starting the proxy.) The user's override is
+	 * passed to the front end by the proxy as a string attribute where the leading 'MP_' of the attribute name is replaced with
+	 * 'EN_'
 	 * 
 	 * @param attrName
 	 *            The name of the attribute
@@ -1181,9 +1155,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #getControl()
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #getControl()
 	 */
 	public Control getControl() {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -1194,9 +1166,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Display a directory selector dialog prompting the user for the pathname
-	 * of a directory. If the user clocks 'ok', then set the pathname into the
-	 * text field of the specified FileSelector.
+	 * Display a directory selector dialog prompting the user for the pathname of a directory. If the user clocks 'ok', then set the
+	 * pathname into the text field of the specified FileSelector.
 	 * 
 	 * @param selector
 	 *            FileSelector object to be updated
@@ -1263,9 +1234,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Display a file selector dialog prompting the user for the path of an
-	 * input file. If the user clicks 'open', then set the pathname into the
-	 * text field of the specified FileSelector object.
+	 * Display a file selector dialog prompting the user for the path of an input file. If the user clicks 'open', then set the
+	 * pathname into the text field of the specified FileSelector object.
 	 * 
 	 * @param selector
 	 *            The FileSelector object to hold path name
@@ -1306,8 +1276,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Convert a string which may have a suffix 'k', 'm' or 'g' to it's actual
-	 * numeric value, multiplying by the appropriate multiplier
+	 * Convert a string which may have a suffix 'k', 'm' or 'g' to it's actual numeric value, multiplying by the appropriate
+	 * multiplier
 	 * 
 	 * @param value
 	 *            The number to be converted
@@ -1355,9 +1325,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Display a file selector dialog prompting the user for the path of an
-	 * output file. If the user clicks 'save', then set the pathname into the
-	 * text field of the specified FileSelector object.
+	 * Display a file selector dialog prompting the user for the path of an output file. If the user clicks 'save', then set the
+	 * pathname into the text field of the specified FileSelector object.
 	 * 
 	 * @param selector
 	 *            The FileSelector object to hold path name
@@ -1401,13 +1370,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
+	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, ILaunchConfiguration configuration) {
 		currentRM = (IBMLLResourceManager) rm;
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":initializeFrom entered."); //$NON-NLS-1$
@@ -1424,12 +1390,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.rmsystem.IResourceManager)
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":isValid entered."); //$NON-NLS-1$
 		if (allFieldsValid) {
@@ -1443,9 +1407,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Verify that the value selected or entered in an editable combobox is a
-	 * valid value, as determined by checking the attribute definition for the
-	 * attribute.
+	 * Verify that the value selected or entered in an editable combobox is a valid value, as determined by checking the attribute
+	 * definition for the attribute.
 	 * 
 	 * @param widget
 	 *            The combobox to be checked
@@ -1479,8 +1442,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Mark all widget's validation state to indicate that the widget value has
-	 * changed, meaning validation is required.
+	 * Mark all widget's validation state to indicate that the widget value has changed, meaning validation is required.
 	 */
 	private void markAllFieldsChanged() {
 		Iterator<Object> i;
@@ -1509,12 +1471,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":performApply entered."); //$NON-NLS-1$
 		currentLaunchConfig = configuration;
@@ -1526,8 +1486,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Print a message: Info, Trace, Arg and Warning messages go to stdout.
-	 * Error and Fatal messages go to stderr. *
+	 * Print a message: Info, Trace, Arg and Warning messages go to stdout. Error and Fatal messages go to stderr. *
 	 */
 	private void print_message(int type, String message) {
 		switch (type) {
@@ -1658,8 +1617,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Store the value from a Text widget into the specified launch
-	 * configuration if the widget is not null
+	 * Store the value from a Text widget into the specified launch configuration if the widget is not null
 	 * 
 	 * @param config
 	 *            The launch configuration
@@ -1704,8 +1662,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Store the value from a Button widget into the specified launch
-	 * configuration if the widget is not null
+	 * Store the value from a Button widget into the specified launch configuration if the widget is not null
 	 * 
 	 * @param config
 	 *            The launch configuration
@@ -1728,8 +1685,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Store the value from a ComboRowWidget into the specified launch
-	 * configuration if the widget is not null
+	 * Store the value from a ComboRowWidget into the specified launch configuration if the widget is not null
 	 * 
 	 * @param config
 	 *            The launch configuration
@@ -1749,8 +1705,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Store the value from a file selector into the specified launch
-	 * configuration if the file selector is not null
+	 * Store the value from a file selector into the specified launch configuration if the file selector is not null
 	 * 
 	 * @param config
 	 *            The launch configuration
@@ -1770,8 +1725,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Store the value from a DialField widget into the specified launch
-	 * configuration if the widget is not null
+	 * Store the value from a DialField widget into the specified launch configuration if the widget is not null
 	 * 
 	 * @param config
 	 *            The launch configuration
@@ -1797,12 +1751,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManager rm) {
 		IAttribute<?, ?, ?> rmAttrs[];
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -1823,8 +1775,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Mark the validation state for the specified widget to indicate that the
-	 * widget value must be validated.
+	 * Mark the validation state for the specified widget to indicate that the widget value must be validated.
 	 * 
 	 * @param source
 	 *            The widget to validate.
@@ -1948,9 +1899,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Set state for widgets based on dependencies between widget values. At the
-	 * point this method is called, all widgets are in enabled state, so it is
-	 * only necessary to disable widgets.
+	 * Set state for widgets based on dependencies between widget values. At the point this method is called, all widgets are in
+	 * enabled state, so it is only necessary to disable widgets.
 	 */
 	private void setInitialWidgetState() {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -1961,9 +1911,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Set launch panel mode based on llSubmitMode setting. If checked, then set
-	 * submit mode, where the user supplies a LL setup script. Otherwise set
-	 * basic mode, where the user chooses LL options from a tabbed dialog panel.
+	 * Set launch panel mode based on llSubmitMode setting. If checked, then set submit mode, where the user supplies a LL setup
+	 * script. Otherwise set basic mode, where the user chooses LL options from a tabbed dialog panel.
 	 */
 	protected void setLaunchPanelMode() {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -2003,8 +1952,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Set checkbox to checked state if attribute has value equal to checkValue
-	 * otherwise set it unchecked
+	 * Set checkbox to checked state if attribute has value equal to checkValue otherwise set it unchecked
 	 * 
 	 * @param checkbox
 	 *            The checkbox to set
@@ -2028,8 +1976,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Set the text value for a ComboRowWidget to the specified value if the
-	 * widget is not null.
+	 * Set the text value for a ComboRowWidget to the specified value if the widget is not null.
 	 * 
 	 * @param widget
 	 *            The widget to set
@@ -2047,8 +1994,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Set the text value for a DualField widget to the specified value if the
-	 * widget is not null.
+	 * Set the text value for a DualField widget to the specified value if the widget is not null.
 	 * 
 	 * @param widget
 	 *            The widget to set
@@ -2086,8 +2032,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Set the text value for a Text widget to the specified value if the widget
-	 * is not null.
+	 * Set the text value for a Text widget to the specified value if the widget is not null.
 	 * 
 	 * @param widget
 	 *            The widget to set
@@ -2105,8 +2050,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Handle validation of all fields in the tabbed pane of the launch
-	 * configuration's parallel tab.
+	 * Handle validation of all fields in the tabbed pane of the launch configuration's parallel tab.
 	 */
 	protected void validateAllFields() {
 		// This method is the top level driver for validating the fields in the
@@ -2366,8 +2310,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Validate all text and editable combobox fields in performance tab 1, top
-	 * to bottom
+	 * Validate all text and editable combobox fields in performance tab 1, top to bottom
 	 * 
 	 * @throws ValidationException
 	 */
@@ -2382,8 +2325,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Validate that a BigInteger value is within the range allowed for the
-	 * attribute.
+	 * Validate that a BigInteger value is within the range allowed for the attribute.
 	 * 
 	 * @param value
 	 *            The value to be verified
@@ -2412,8 +2354,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Validate all text and editable combobox fields in the node allocation
-	 * tab, top to bottom
+	 * Validate all text and editable combobox fields in the node allocation tab, top to bottom
 	 * 
 	 * @throws ValidationException
 	 */
@@ -2548,15 +2489,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param attrNameMin
 	 *            The name of the min attribute
 	 * @param errorIDMin
-	 *            The id of the error message used if controlMin validation
-	 *            fails
+	 *            The id of the error message used if controlMin validation fails
 	 * @param controlMax
 	 *            The max Text widget to be verified
 	 * @param attrNameMax
 	 *            The name of the max attribute
 	 * @param errorIDMax
-	 *            The id of the error message used if controlMax validation
-	 *            fails
+	 *            The id of the error message used if controlMax validation fails
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
@@ -2591,8 +2530,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Validate that an integer value is within the range allowed for the
-	 * attribute.
+	 * Validate that an integer value is within the range allowed for the attribute.
 	 * 
 	 * @param value
 	 *            The value to be verified
@@ -2630,8 +2568,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param highLimit
 	 *            High limit of range
 	 * @param errorID
-	 *            id of the error message used if value is not in allowable
-	 *            range
+	 *            id of the error message used if value is not in allowable range
 	 * @throws ValidationException
 	 */
 	@SuppressWarnings("unused")
@@ -2653,8 +2590,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Validate that an integer value is within the range allowed for the
-	 * attribute.
+	 * Validate that an integer value is within the range allowed for the attribute.
 	 * 
 	 * @param value
 	 *            The value to be verified
@@ -2702,8 +2638,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Validate that an integer value is within the range allowed for the
-	 * attribute.
+	 * Validate that an integer value is within the range allowed for the attribute.
 	 * 
 	 * @param control
 	 *            The Text widget to be verified
@@ -2866,8 +2801,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Validate all text and editable combobox fields in the I/O tab, top to
-	 * bottom
+	 * Validate all text and editable combobox fields in the I/O tab, top to bottom
 	 * 
 	 * @throws ValidationException
 	 */
@@ -2880,8 +2814,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Validate all text and editable combobox fields in diagnostic tab, top to
-	 * bottom
+	 * Validate all text and editable combobox fields in diagnostic tab, top to bottom
 	 * 
 	 * @throws ValidationException
 	 */
@@ -2893,8 +2826,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Validate all text and editable combobox fields in the debug tab, top to
-	 * bottom
+	 * Validate all text and editable combobox fields in the debug tab, top to bottom
 	 * 
 	 * @throws ValidationException
 	 */

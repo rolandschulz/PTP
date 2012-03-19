@@ -16,7 +16,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.events;
 
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IJobStatus;
 
 /**
  * This event is sent when the status of a job changes.
@@ -27,17 +27,10 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
 public interface IJobChangedEvent {
 
 	/**
-	 * Get the resource manager controlling the job that changed.
+	 * Get the status of the added job.
 	 * 
-	 * @return resource manager
+	 * @return job status
+	 * @since 6.0
 	 */
-	public IResourceManager getSource();
-
-	/**
-	 * Get the ID of the job that changed.
-	 * 
-	 * @return job ID
-	 */
-	public String getJobId();
-
+	public IJobStatus getJobStatus();
 }

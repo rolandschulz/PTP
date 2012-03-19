@@ -33,7 +33,6 @@ import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.launch.OpenMPILaunchConfigurationDefaults;
@@ -219,7 +218,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 	/**
 	 * @since 2.0
 	 */
-	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
+	public void createControl(Composite parent, IResourceManager rm) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout());
 
@@ -314,9 +313,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see
-			 * org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.
-			 * widgets.Event)
+			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt. widgets.Event)
 			 */
 			public void handleEvent(Event event) {
 				event.detail &= ~SWT.SELECTED;
@@ -348,7 +345,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
 				OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_ARGUMENTS, OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS);
@@ -395,9 +392,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see
-			 * org.eclipse.jface.viewers.ColumnLabelProvider#getText(java.lang
-			 * .Object)
+			 * @see org.eclipse.jface.viewers.ColumnLabelProvider#getText(java.lang .Object)
 			 */
 			@Override
 			public String getText(Object element) {
@@ -420,9 +415,7 @@ public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunch
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see
-			 * org.eclipse.jface.viewers.ColumnLabelProvider#getText(java.lang
-			 * .Object)
+			 * @see org.eclipse.jface.viewers.ColumnLabelProvider#getText(java.lang .Object)
 			 */
 			@Override
 			public String getText(Object element) {

@@ -52,9 +52,11 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.JobManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.events.IJobAddedEvent;
 import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
@@ -77,6 +79,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
@@ -94,11 +97,20 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		public void handleEvent(IJobChangedEvent e) {
 			JobSubmission jobSub;
 			synchronized (jobSubmissions) {
-				jobSub = jobSubmissions.get(e.getJobId());
+				jobSub = jobSubmissions.get(e.getJobStatus().getJobId());
 			}
 			if (jobSub != null) {
 				jobSub.statusChanged();
 			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
+		 */
+		public void handleEvent(IJobAddedEvent e) {
+			// nothing to do
 		}
 	}
 
@@ -148,7 +160,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor subMon = SubMonitor.convert(monitor, 100);
 			try {
-				IResourceManager rm = fLaunch.getResourceManager();
+				IResourceManagerControl rm = fLaunch.getResourceManagerControl();
 				String jobId = fLaunch.getJobId();
 				fSubLock.lock();
 				try {
@@ -205,7 +217,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						synchronized (jobSubmissions) {
 							jobSubmissions.remove(jobId);
 							if (jobSubmissions.size() == 0) {
-								rm.removeJobListener(fJobListener);
+								JobManager.getInstance().removeListener(fJobListener);
 							}
 						}
 					}
@@ -882,7 +894,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
 			}
-			rm.addJobListener(fJobListener);
+			JobManager.getInstance().addListener(fJobListener);
 			launch.setResourceManager(rm);
 			String jobId = rm.submitJob(configuration, mode, progress.newChild(5));
 			if (rm.getJobStatus(jobId, progress.newChild(50)).equals(IJobStatus.UNDETERMINED)) {

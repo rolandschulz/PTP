@@ -29,6 +29,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.core.JobManager;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
@@ -48,6 +50,7 @@ import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
+import org.eclipse.ptp.core.events.IJobAddedEvent;
 import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
@@ -90,47 +93,56 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse
-		 * .ptp.core.events.IJobChangeEvent)
+		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse .ptp.core.events.IJobChangeEvent)
 		 */
 		public void handleEvent(IJobChangedEvent e) {
 			boolean needRefresh = false;
-			IPResourceManager rm = (IPResourceManager) e.getSource().getAdapter(IPResourceManager.class);
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(e.getJobStatus().getRmUniqueName());
 			if (rm != null) {
-				IPJob job = rm.getJobById(e.getJobId());
-				if (job != null) {
-					if ((job.getState() == JobAttributes.State.STARTING) || job.getState() == JobAttributes.State.RUNNING) {
-						/*
-						 * Add job to the graphical representation of its node
-						 */
-						final BitSet procJobRanks = job.getProcessJobRanks();
-						for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
-							final String nodeId = job.getProcessNodeId(procJobRank);
-							if (nodeId != null) {
-								nodesHashMap.get(nodeId).addJob(job.getID());
-								needRefresh = true;
+				IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
+				if (prm != null) {
+					IPJob job = prm.getJobById(e.getJobStatus().getJobId());
+					if (job != null) {
+						if ((job.getState() == JobAttributes.State.STARTING) || job.getState() == JobAttributes.State.RUNNING) {
+							/*
+							 * Add job to the graphical representation of its node
+							 */
+							final BitSet procJobRanks = job.getProcessJobRanks();
+							for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+								final String nodeId = job.getProcessNodeId(procJobRank);
+								if (nodeId != null) {
+									nodesHashMap.get(nodeId).addJob(job.getID());
+									needRefresh = true;
+								}
+							}
+						} else {
+							/*
+							 * remove job from the graphical representation of its node
+							 */
+							final BitSet procJobRanks = job.getProcessJobRanks();
+							for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+								final String nodeId = job.getProcessNodeId(procJobRank);
+								if (nodeId != null) {
+									nodesHashMap.get(nodeId).removeJob(job.getID());
+									needRefresh = true;
+								}
 							}
 						}
-					} else {
-						/*
-						 * remove job from the graphical representation of its
-						 * node
-						 */
-						final BitSet procJobRanks = job.getProcessJobRanks();
-						for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
-							final String nodeId = job.getProcessNodeId(procJobRank);
-							if (nodeId != null) {
-								nodesHashMap.get(nodeId).removeJob(job.getID());
-								needRefresh = true;
-							}
+						if (needRefresh) {
+							refreshView();
 						}
-					}
-					if (needRefresh) {
-						refreshView();
 					}
 				}
 			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
+		 */
+		public void handleEvent(IJobAddedEvent e) {
+			// nothing to do
 		}
 	}
 
@@ -138,8 +150,7 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IChangedNodeEvent)
 		 */
 		public void handleEvent(final IChangedNodeEvent e) {
@@ -148,8 +159,7 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.INewNodeEvent)
 		 */
 		public void handleEvent(final INewNodeEvent e) {
@@ -175,8 +185,7 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IRemoveNodeEvent)
 		 */
 		public void handleEvent(final IRemoveNodeEvent e) {
@@ -335,10 +344,8 @@ public class MachinesNodesView extends ViewPart {
 
 		protected void handleMouseDown(Event e) {
 			/*
-			 * Check if the user clicked on some element of our view. First,
-			 * check if the y coordinate matches with some of our machine
-			 * representations, considering that our nodes y's range will be the
-			 * same as their respective machines.
+			 * Check if the user clicked on some element of our view. First, check if the y coordinate matches with some of our
+			 * machine representations, considering that our nodes y's range will be the same as their respective machines.
 			 */
 			int mouseX = e.x - origin.x;
 			int mouseY = e.y - origin.y;
@@ -347,9 +354,8 @@ public class MachinesNodesView extends ViewPart {
 				if ((mouseY > machinegr.getGraphicalRepresentation().y)
 						&& (mouseY < machinegr.getGraphicalRepresentation().y + machinegr.getGraphicalRepresentation().height)) {
 					/*
-					 * mouseY belongs to this machine representation's Y range.
-					 * Now we check the machine and its nodes to see if we have
-					 * a match
+					 * mouseY belongs to this machine representation's Y range. Now we check the machine and its nodes to see if we
+					 * have a match
 					 */
 					if (machinegr.containsPoint(mouseX, mouseY)) {
 						selection = machinegr;
@@ -397,8 +403,7 @@ public class MachinesNodesView extends ViewPart {
 			int fontHeight = defaultFont.getFontData()[0].getHeight();
 
 			/*
-			 * If some graphical element is selected, write additional info
-			 * about it on the top of the view.
+			 * If some graphical element is selected, write additional info about it on the top of the view.
 			 */
 			String additionalInfo = null;
 			if (elementSelected != null) {
@@ -439,9 +444,8 @@ public class MachinesNodesView extends ViewPart {
 			int nodeHeight = fontHeight * 2;
 
 			/*
-			 * It seems that 2* fontHeight is equivalent to the exact height
-			 * size of the font in pixels. This space will be used to draw the
-			 * info string later
+			 * It seems that 2* fontHeight is equivalent to the exact height size of the font in pixels. This space will be used to
+			 * draw the info string later
 			 */
 			y = y + (fontHeight * 4);
 
@@ -466,8 +470,7 @@ public class MachinesNodesView extends ViewPart {
 					// paint process of this node
 					if (machinegr.getNodes() != null) {
 						/*
-						 * If the machine has more than 5 nodes, we draw them in
-						 * 2 rows. otherwise, draw them in a single row
+						 * If the machine has more than 5 nodes, we draw them in 2 rows. otherwise, draw them in a single row
 						 */
 						if (machinegr.getNodes().size() > 5) {
 							int totalSize = machinegr.getNodes().size();
@@ -527,8 +530,7 @@ public class MachinesNodesView extends ViewPart {
 							}
 						}
 						/*
-						 * If the machine has less than 5 nodes, paint all of
-						 * them in a single row.
+						 * If the machine has less than 5 nodes, paint all of them in a single row.
 						 */else {
 							for (NodeGraphicalRepresentation nodegr : machinegr.getNodes()) {
 								// adjusting node graphical representation
@@ -563,10 +565,8 @@ public class MachinesNodesView extends ViewPart {
 				}
 			}
 			/*
-			 * We write the info string now, thus it'll be on top and always
-			 * visible. Note that we use x instead of the relative position
-			 * because we want this string to be 'scrollable' on the
-			 * horizontal., but not on the vertical
+			 * We write the info string now, thus it'll be on top and always visible. Note that we use x instead of the relative
+			 * position because we want this string to be 'scrollable' on the horizontal., but not on the vertical
 			 */
 			if (additionalInfo != null) {
 				newGC.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
@@ -829,11 +829,8 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #
-		 * handleEvent(org.eclipse.ptp.core.elements.events.IChangedMachineEvent
-		 * )
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener #
+		 * handleEvent(org.eclipse.ptp.core.elements.events.IChangedMachineEvent )
 		 */
 		public void handleEvent(IChangedMachineEvent e) {
 		}
@@ -841,8 +838,7 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.IChangedQueueEvent)
 		 */
 		public void handleEvent(IChangedQueueEvent e) {
@@ -851,8 +847,7 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
 		 */
 		public void handleEvent(final INewJobEvent e) {
@@ -878,21 +873,18 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewMachineEvent)
 		 */
 		public void handleEvent(final INewMachineEvent e) {
 			boolean needRefresh = false;
 			for (IPMachine machine : e.getMachines()) {
 				/*
-				 * check if the machine wasn't added already on the start of the
-				 * view
+				 * check if the machine wasn't added already on the start of the view
 				 */
 				if (!machineRepresentationExists(machine.getID())) {
 					/*
-					 * Add us as a child listener so we get notified of node
-					 * events
+					 * Add us as a child listener so we get notified of node events
 					 */
 					machine.addChildListener(machineListener);
 					MachineGraphicalRepresentation machinegr = new MachineGraphicalRepresentation(machine.getName(),
@@ -910,8 +902,7 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
 		 */
 		public void handleEvent(INewQueueEvent e) {
@@ -920,8 +911,7 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
 		 */
 		public void handleEvent(IRemoveJobEvent e) {
@@ -947,9 +937,7 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener #
 		 * handleEvent(org.eclipse.ptp.core.elements.events.IRemoveMachineEvent)
 		 */
 		public void handleEvent(final IRemoveMachineEvent e) {
@@ -979,8 +967,7 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.IRemoveQueueEvent)
 		 */
 		public void handleEvent(IRemoveQueueEvent e) {
@@ -997,19 +984,16 @@ public class MachinesNodesView extends ViewPart {
 		 */
 		public void handleEvent(IResourceManagerAddedEvent e) {
 			/*
-			 * Add resource manager child listener so we get notified when new
-			 * machines are added to the model.
+			 * Add resource manager child listener so we get notified when new machines are added to the model.
 			 */
 			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
 			rm.addChildListener(resourceManagerChildListener);
-			e.getResourceManager().addJobListener(jobListener);
 		}
 
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * @see org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
 		 * (org.eclipse.ptp.core.events.IResourceManagerChangedEvent)
 		 */
 		public void handleEvent(IResourceManagerChangedEvent e) {
@@ -1019,8 +1003,7 @@ public class MachinesNodesView extends ViewPart {
 				if ((e.getSource().getState().equals(IResourceManager.STOPPED_STATE))
 						|| (e.getSource().getState().equals(IResourceManager.ERROR_STATE))) {
 					/*
-					 * refresh the view, removing the resource manager machines,
-					 * but not removing machine listeners.
+					 * refresh the view, removing the resource manager machines, but not removing machine listeners.
 					 */
 					for (IPMachine machine : rm.getMachines()) {
 						String machineID = machine.getID();
@@ -1035,8 +1018,7 @@ public class MachinesNodesView extends ViewPart {
 					}
 				} else {
 					/*
-					 * otherwise, reactivate machines of the started / starting
-					 * resource manager
+					 * otherwise, reactivate machines of the started / starting resource manager
 					 */
 					for (IPMachine machine : rm.getMachines()) {
 						String machineID = machine.getID();
@@ -1058,8 +1040,7 @@ public class MachinesNodesView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * @see org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
 		 * (org.eclipse.ptp.core.events.IResourceManagerErrorEvent)
 		 */
 		public void handleEvent(IResourceManagerErrorEvent e) {
@@ -1073,12 +1054,10 @@ public class MachinesNodesView extends ViewPart {
 		 */
 		public void handleEvent(IResourceManagerRemovedEvent e) {
 			/*
-			 * Removed resource manager child listener when resource manager is
-			 * removed.
+			 * Removed resource manager child listener when resource manager is removed.
 			 */
 			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
 			rm.removeChildListener(resourceManagerChildListener);
-			e.getResourceManager().removeJobListener(jobListener);
 		}
 	}
 
@@ -1119,16 +1098,13 @@ public class MachinesNodesView extends ViewPart {
 
 		synchronized (mm) {
 			/*
-			 * Add us to any existing RM's. I guess it's possible we could miss
-			 * a RM if a new event arrives while we're doing this, but is it a
-			 * problem?
+			 * Add us to any existing RM's. I guess it's possible we could miss a RM if a new event arrives while we're doing this,
+			 * but is it a problem?
 			 */
 			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 				rm.addChildListener(resourceManagerChildListener);
-				rm.getResourceManager().addJobListener(jobListener);
 				/*
-				 * We need to get the current state of the nodes on this
-				 * resource manager, browsing through the machines and adding
+				 * We need to get the current state of the nodes on this resource manager, browsing through the machines and adding
 				 * them to our view
 				 */
 				for (int i = 0; i < rm.getMachines().length; i++) {
@@ -1147,7 +1123,20 @@ public class MachinesNodesView extends ViewPart {
 			mm.addListener(resourceManagerListener);
 		}
 
+		JobManager.getInstance().addListener(jobListener);
+
 		refreshView();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	@Override
+	public void dispose() {
+		JobManager.getInstance().removeListener(jobListener);
+		super.dispose();
 	}
 
 	/*

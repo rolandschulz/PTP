@@ -21,7 +21,6 @@ import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.slurm.core.SLURMJobAttributes;
@@ -81,12 +80,10 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #canSave(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control,
+	 * org.eclipse.ptp.rmsystem.IResourceManager)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation canSave(Control control, IResourceManager rm) {
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
 			@SuppressWarnings("unused")
@@ -131,12 +128,10 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #createControl(org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.ptp.rmsystem.IResourceManager)
 	 */
-	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) {
+	public void createControl(Composite parent, IResourceManager rm) {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout(1, true));
 		GridData gd;
@@ -273,9 +268,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #getControl()
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #getControl()
 	 */
 	public Control getControl() {
 		return control;
@@ -284,13 +277,10 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
+	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, ILaunchConfiguration configuration) {
 
 		int jobnumProcs;
 		try {
@@ -370,13 +360,11 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.rmsystem.IResourceManager)
 	 */
 
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm) {
 
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
@@ -428,12 +416,10 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
 
 		IntegerAttribute iattr0 = null;
 		try {
@@ -495,12 +481,10 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
 			configuration.setAttribute(SLURMLaunchConfiguration.ATTR_NUMPROCS, numProcsAttrDef.create().getValue());
@@ -535,8 +519,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	}
 
 	/**
-	 * Get the attribute definition for the number of processes job launch
-	 * attribute
+	 * Get the attribute definition for the number of processes job launch attribute
 	 * 
 	 * @param rm
 	 * @param queue

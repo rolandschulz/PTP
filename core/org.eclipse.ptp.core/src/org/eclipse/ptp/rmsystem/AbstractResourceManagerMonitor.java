@@ -20,20 +20,32 @@ package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.core.JobManager;
 import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.events.IJobAddedEvent;
 import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
-import org.eclipse.ptp.internal.core.events.JobChangedEvent;
 
 /**
  * @since 5.0
  * 
  */
 public abstract class AbstractResourceManagerMonitor implements IResourceManagerMonitor {
-	private final ListenerList fJobListeners = new ListenerList();
+	private class JobListener implements IJobListener {
+
+		public void handleEvent(IJobAddedEvent e) {
+			doAddJob(e.getJobStatus());
+		}
+
+		public void handleEvent(IJobChangedEvent e) {
+			doUpdateJob(e.getJobStatus());
+		}
+
+	}
+
+	private final JobListener fJobListener = new JobListener();
 	private final ModelManager fModelManager = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
 	private final AbstractResourceManagerConfiguration fConfig;
 
@@ -41,30 +53,6 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 
 	public AbstractResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		fConfig = config;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#addJob(java.lang.String,
-	 * org.eclipse.ptp.rmsystem.IJobStatus)
-	 */
-	public void addJob(String jobId, IJobStatus status) {
-		doAddJob(jobId, status);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#addJobListener(org.eclipse
-	 * .ptp.core.listeners.IJobListener)
-	 */
-	/**
-	 * @since 5.0
-	 */
-	public void addJobListener(IJobListener listener) {
-		fJobListeners.add(listener);
 	}
 
 	/*
@@ -95,9 +83,7 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#getMonitorConfiguration
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#getMonitorConfiguration ()
 	 */
 	public IResourceManagerComponentConfiguration getMonitorConfiguration() {
 		return fConfig;
@@ -106,9 +92,7 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJob(java.lang.
-	 * String)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJob(java.lang. String)
 	 */
 	public void removeJob(String jobId) {
 		doRemoveJob(jobId);
@@ -117,24 +101,10 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#removeJobListener(org
-	 * .eclipse.ptp.core.listeners.IJobListener)
-	 */
-	/**
-	 * @since 5.0
-	 */
-	public void removeJobListener(IJobListener listener) {
-		fJobListeners.remove(listener);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#start(org.eclipse.core
-	 * .runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#start(org.eclipse.core .runtime.IProgressMonitor)
 	 */
 	public void start(IProgressMonitor monitor) throws CoreException {
+		JobManager.getInstance().addListener(fJobListener);
 		doStartup(monitor);
 	}
 
@@ -145,28 +115,17 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	 */
 	public void stop() throws CoreException {
 		doShutdown();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#updateJob(java.lang.
-	 * String, org.eclipse.ptp.rmsystem.IJobStatus)
-	 */
-	public void updateJob(String jobId, IJobStatus status) {
-		doUpdateJob(jobId, status);
+		JobManager.getInstance().removeListener(fJobListener);
 	}
 
 	/**
 	 * Notify monitor that job should be treated specially.
 	 * 
-	 * @param jobId
-	 *            ID of job to be treated specially
 	 * @param status
 	 *            current status of job
+	 * @since 6.0
 	 */
-	protected abstract void doAddJob(String jobId, IJobStatus status);
+	protected abstract void doAddJob(IJobStatus status);
 
 	/**
 	 * Perform any activities prior to disposing of the resource manager.
@@ -182,65 +141,40 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	protected abstract void doRemoveJob(String jobId);
 
 	/**
-	 * Stop the resource manager subsystem. This must be callable at any time
-	 * (including if the resource manager is not started). It should take any
-	 * actions necessary to shut down the subsystem. Implementations should not
-	 * modify the resource manager state, this will be handled by the main
-	 * resource manager class.
+	 * Stop the resource manager subsystem. This must be callable at any time (including if the resource manager is not started). It
+	 * should take any actions necessary to shut down the subsystem. Implementations should not modify the resource manager state,
+	 * this will be handled by the main resource manager class.
 	 * 
 	 * @throws CoreException
-	 *             this exception should be thrown if the shutdown encountered
-	 *             an error for any reason. This will not halt shutdown of the
-	 *             resource manager, but may produce a message to the user.
+	 *             this exception should be thrown if the shutdown encountered an error for any reason. This will not halt shutdown
+	 *             of the resource manager, but may produce a message to the user.
 	 */
 	protected abstract void doShutdown() throws CoreException;
 
 	/**
-	 * Start the resource manager subsystem. This should perform any actions
-	 * necessary to start the subsystem. Implementations should not modify the
-	 * resource manager state, this will be handled by the main resource manager
-	 * class. If the subsystem fails to start, implementations should throw a
-	 * CoreException with a description of what went wrong.
+	 * Start the resource manager subsystem. This should perform any actions necessary to start the subsystem. Implementations
+	 * should not modify the resource manager state, this will be handled by the main resource manager class. If the subsystem fails
+	 * to start, implementations should throw a CoreException with a description of what went wrong.
 	 * 
-	 * The progress monitor is primarily for indicating startup status to the
-	 * user. If the user cancels the progress monitor, the implementation should
-	 * assume the resource manager has not started and {@link #doShutdown()}
-	 * will be called soon after.
+	 * The progress monitor is primarily for indicating startup status to the user. If the user cancels the progress monitor, the
+	 * implementation should assume the resource manager has not started and {@link #doShutdown()} will be called soon after.
 	 * 
 	 * @param monitor
-	 *            progress monitor indicating startup progress and for
-	 *            cancelling startup
+	 *            progress monitor indicating startup progress and for cancelling startup
 	 * @throws CoreException
-	 *             this exception should be thrown if the startup encountered an
-	 *             error for any reason. This will halt shutdown of the resource
-	 *             manager, and may produce a message to the user.
+	 *             this exception should be thrown if the startup encountered an error for any reason. This will halt shutdown of
+	 *             the resource manager, and may produce a message to the user.
 	 */
 	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Notify monitor that status of job has changed.
 	 * 
-	 * @param jobId
-	 *            ID of job to be updated
 	 * @param status
 	 *            new status of job
+	 * @since 6.0
 	 */
-	protected abstract void doUpdateJob(String jobId, IJobStatus status);
-
-	/**
-	 * Notify listeners when a job has changed.
-	 * 
-	 * @param jobId
-	 *            ID of job that has changed
-	 * @since 5.0
-	 */
-	protected void fireJobChanged(String jobId) {
-		IJobChangedEvent e = new JobChangedEvent(getResourceManager(), jobId);
-
-		for (Object listener : fJobListeners.getListeners()) {
-			((IJobListener) listener).handleEvent(e);
-		}
-	}
+	protected abstract void doUpdateJob(IJobStatus status);
 
 	protected void fireResourceManagerError(String message) {
 		getResourceManager().fireResourceManagerError(message);

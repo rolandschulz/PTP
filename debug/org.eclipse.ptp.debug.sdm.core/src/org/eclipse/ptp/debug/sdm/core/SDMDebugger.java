@@ -66,6 +66,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.utils.core.BitSetIterable;
 
 /**
@@ -88,9 +89,7 @@ public class SDMDebugger implements IPDebugger {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.IPDebugger#cleanup(org.eclipse.ptp.debug.core
-	 * .launch.IPLaunch)
+	 * @see org.eclipse.ptp.debug.core.IPDebugger#cleanup(org.eclipse.ptp.debug.core .launch.IPLaunch)
 	 */
 	public synchronized void cleanup(IPLaunch launch) {
 		if (fSdmRunner != null) {
@@ -128,8 +127,7 @@ public class SDMDebugger implements IPDebugger {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.core.IPDebugger#createDebugSession(long,
-	 * org.eclipse.ptp.debug.core.launch.IPLaunch,
+	 * @see org.eclipse.ptp.debug.core.IPDebugger#createDebugSession(long, org.eclipse.ptp.debug.core.launch.IPLaunch,
 	 * org.eclipse.core.runtime.IPath)
 	 */
 	/**
@@ -154,9 +152,8 @@ public class SDMDebugger implements IPDebugger {
 			writeRoutingFile(launch, monitor);
 
 			/*
-			 * Delay starting the master SDM (aka SDM client), to wait until SDM
-			 * servers have started and until the sessions are listening on the
-			 * debugger socket.
+			 * Delay starting the master SDM (aka SDM client), to wait until SDM servers have started and until the sessions are
+			 * listening on the debugger socket.
 			 */
 			fSdmRunner.setJob(launch.getJobId());
 			fSdmRunner.schedule();
@@ -168,9 +165,8 @@ public class SDMDebugger implements IPDebugger {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.IPDebugger#initialize(org.eclipse.debug.core
-	 * .ILaunchConfiguration, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.debug.core.IPDebugger#initialize(org.eclipse.debug.core .ILaunchConfiguration,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	/**
 	 * @since 5.0
@@ -269,8 +265,7 @@ public class SDMDebugger implements IPDebugger {
 	}
 
 	/**
-	 * Work out the expected number of processes in the job. If it hasn't been
-	 * specified, assume one.
+	 * Work out the expected number of processes in the job. If it hasn't been specified, assume one.
 	 * 
 	 * @param launch
 	 *            job that was launched
@@ -278,7 +273,7 @@ public class SDMDebugger implements IPDebugger {
 	 */
 	private int getJobSize(IPLaunch launch) {
 		int nprocs = 1;
-		IResourceManager rmc = launch.getResourceManager();
+		IResourceManagerControl rmc = launch.getResourceManagerControl();
 		if (rmc != null) {
 			IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
 			if (rm != null) {
@@ -295,8 +290,7 @@ public class SDMDebugger implements IPDebugger {
 	}
 
 	/**
-	 * Helper method to locate the resource manager used by the launch
-	 * configuration
+	 * Helper method to locate the resource manager used by the launch configuration
 	 * 
 	 * @param configuration
 	 *            launch configuration
@@ -401,8 +395,7 @@ public class SDMDebugger implements IPDebugger {
 	}
 
 	/**
-	 * Verify that the resource "path" actually exists. This just checks that
-	 * the path references something real.
+	 * Verify that the resource "path" actually exists. This just checks that the path references something real.
 	 * 
 	 * @param path
 	 *            path to verify
@@ -410,8 +403,7 @@ public class SDMDebugger implements IPDebugger {
 	 *            launch configuration
 	 * @return IPath representing the path
 	 * @throws CoreException
-	 *             is thrown if the verification fails or the user cancels the
-	 *             progress monitor
+	 *             is thrown if the verification fails or the user cancels the progress monitor
 	 * @since 5.0
 	 */
 	private IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
@@ -449,9 +441,8 @@ public class SDMDebugger implements IPDebugger {
 	/**
 	 * Generate the routing file once the debugger has launched.
 	 * 
-	 * NOTE: This currently assumes a shared filesystem that all debugger
-	 * processes have access to. The plan is to replace this with a routing
-	 * distribution operation in the debugger.
+	 * NOTE: This currently assumes a shared filesystem that all debugger processes have access to. The plan is to replace this with
+	 * a routing distribution operation in the debugger.
 	 * 
 	 * @param launch
 	 *            launch configuration
@@ -470,7 +461,7 @@ public class SDMDebugger implements IPDebugger {
 			progress.subTask(Messages.SDMDebugger_6);
 			PrintWriter pw = new PrintWriter(os);
 			final String jobId = launch.getJobId();
-			final IPResourceManager rm = (IPResourceManager) launch.getResourceManager().getAdapter(IPResourceManager.class);
+			final IPResourceManager rm = (IPResourceManager) launch.getResourceManagerControl().getAdapter(IPResourceManager.class);
 			if (rm != null) {
 				final IPJob pJob = rm.getJobById(jobId);
 				BitSet processJobRanks = pJob.getProcessJobRanks();

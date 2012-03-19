@@ -53,9 +53,12 @@ import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.IServiceConstants;
+import org.eclipse.ptp.core.JobManager;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.events.IJobAddedEvent;
 import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.listeners.IJobListener;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
@@ -74,10 +77,18 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.launch.internal.ProviderInfo;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
@@ -90,13 +101,24 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		/*
 		 * (non-Javadoc)
 		 * 
+		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
+		 */
+		@Override
+		public void handleEvent(IJobAddedEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse .ptp.core.events.IJobChangeEvent)
 		 */
 		@Override
 		public void handleEvent(IJobChangedEvent e) {
 			JobSubmission jobSub;
 			synchronized (jobSubmissions) {
-				jobSub = jobSubmissions.get(e.getJobId());
+				jobSub = jobSubmissions.get(e.getJobStatus().getJobId());
 			}
 			if (jobSub != null) {
 				jobSub.statusChanged();
@@ -150,7 +172,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor subMon = SubMonitor.convert(monitor, 100);
 			try {
-				IResourceManager rm = fLaunch.getResourceManager();
+				IResourceManagerControl rm = fLaunch.getResourceManagerControl();
 				String jobId = fLaunch.getJobId();
 				fSubLock.lock();
 				try {
@@ -207,7 +229,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						synchronized (jobSubmissions) {
 							jobSubmissions.remove(jobId);
 							if (jobSubmissions.size() == 0) {
-								rm.removeJobListener(fJobListener);
+								JobManager.getInstance().removeListener(fJobListener);
 							}
 						}
 					}
@@ -414,20 +436,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	@Override
 	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
 			throws CoreException {
-		IResourceManager rm = getResourceManager(configuration);
-		if (rm != null) {
-			IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
-			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault()
-					.getRemoteServices(conf.getRemoteServicesId(), monitor);
-			if (remoteServices != null) {
-				IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
-				if (rconnMgr != null) {
-					IRemoteConnection rconn = rconnMgr.getConnection(conf.getConnectionName());
-					if (rconn != null && rconn.isOpen()) {
-						return remoteServices.getFileManager(rconn);
-					}
-				}
-			}
+		IRemoteConnection conn = getRemoteConnection(configuration, monitor);
+		if (conn != null && conn.isOpen()) {
+			return conn.getRemoteServices().getFileManager(conn);
 		}
 		return null;
 	}
@@ -618,41 +629,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * @since 5.0
-	 */
-	protected void verifyLaunchAttributes(final ILaunchConfiguration configuration, String mode, final IProgressMonitor monitor)
-			throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 30);
-
-		try {
-			/*
-			 * Verify executable path
-			 */
-			verifyExecutablePath(configuration, progress.newChild(10));
-
-			/*
-			 * Verify working directory. Use the executable path if no working directory has been set.
-			 */
-			String workPath = getWorkingDirectory(configuration);
-			if (workPath != null) {
-				verifyResource(workPath, configuration, monitor);
-			}
-			if (progress.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
-			}
-
-			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				verifyDebuggerPath(configuration, progress.newChild(10));
-			}
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
-	}
-
-	/**
 	 * Get the debugger configuration
 	 * 
 	 * @param configuration
@@ -755,6 +731,31 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
+	 * Get the remote connection that was selected in the resources tab
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 * @param monitor
+	 *            progress monitor
+	 * @return remote connection or null if it is invalid or not specified
+	 * @throws CoreException
+	 */
+	protected IRemoteConnection getRemoteConnection(ILaunchConfiguration configuration, IProgressMonitor monitor)
+			throws CoreException {
+		String remId = getRemoteServicesId(configuration);
+		if (remId != null) {
+			IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(remId, monitor);
+			if (services != null) {
+				String name = getConnectionName(configuration);
+				if (name != null) {
+					return services.getConnectionManager().getConnection(name);
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Find the resource manager that corresponds to the unique name specified in the configuration
 	 * 
 	 * @param configuration
@@ -763,10 +764,64 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
-		String rmUniqueName = getResourceManagerUniqueName(configuration);
-		if (rmUniqueName != null) {
-			return PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+	protected IResourceManagerControl getResourceManagerControl(ILaunchConfiguration configuration, IProgressMonitor monitor)
+			throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		try {
+			String type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_TYPE, (String) null);
+			if (type != null) {
+				ProviderInfo provider = ProviderInfo.getProvider(type);
+				if (provider != null) {
+					IResourceManagerControl rm = createResourceManagerControl(provider, progress.newChild(5));
+					String name = getConnectionName(configuration);
+					String id = getRemoteServicesId(configuration);
+					if (rm != null && name != null && id != null) {
+						rm.getControlConfiguration().setConnectionName(name);
+						rm.getControlConfiguration().setRemoteServicesId(id);
+						rm.start(progress.newChild(5));
+						return rm;
+					}
+				}
+			}
+			return null;
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	private String getConnectionName(ILaunchConfiguration configuration) throws CoreException {
+		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
+	}
+
+	private String getRemoteServicesId(ILaunchConfiguration configuration) throws CoreException {
+		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, (String) null);
+	}
+
+	/**
+	 * NOTE: This will eventually create the control directly
+	 */
+	private IJAXBResourceManagerControl createResourceManagerControl(ProviderInfo info, IProgressMonitor monitor)
+			throws CoreException {
+		IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(info.getDescriptor());
+		if (provider != null) {
+			IResourceManagerConfiguration baseConfig = ModelManager.getInstance().createBaseConfiguration(provider);
+			info.getFactory().setConfigurationName(info.getName(), baseConfig);
+			IServiceConfiguration config = ServiceModelManager.getInstance().newServiceConfiguration(info.getName());
+			config.setServiceProvider(ServiceModelManager.getInstance().getService(IServiceConstants.LAUNCH_SERVICE), provider);
+			ServiceModelManager.getInstance().addConfiguration(config);
+			final IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(
+					((ResourceManagerServiceProvider) provider).getUniqueName());
+			if (rm != null && rm instanceof IJAXBResourceManager) {
+				try {
+					((IJAXBResourceManagerControl) rm.getControl()).initialize(monitor);
+				} catch (Throwable e) {
+					throw new CoreException(
+							new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
+				}
+				return (IJAXBResourceManagerControl) rm.getControl();
+			}
 		}
 		return null;
 	}
@@ -804,18 +859,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected String getWorkingDirectory(ILaunchConfiguration configuration) throws CoreException {
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
-	}
-
-	/**
-	 * Set the working directory
-	 * 
-	 * @param configuration
-	 * @param dir
-	 * @throws CoreException
-	 * @since 5.0
-	 */
-	protected void setWorkingDirectory(ILaunchConfigurationWorkingCopy configuration, String dir) throws CoreException {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, dir);
 	}
 
 	/**
@@ -867,6 +910,18 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
+	 * Set the working directory
+	 * 
+	 * @param configuration
+	 * @param dir
+	 * @throws CoreException
+	 * @since 5.0
+	 */
+	protected void setWorkingDirectory(ILaunchConfigurationWorkingCopy configuration, String dir) throws CoreException {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, dir);
+	}
+
+	/**
 	 * Submit a job to the resource manager. Keeps track of the submission so we know when the job actually starts running. When
 	 * this happens, the abstract method doCompleteJobLaunch() is invoked.
 	 * 
@@ -882,15 +937,15 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			final IResourceManager rm = getResourceManager(configuration);
+			final IResourceManagerControl rm = getResourceManagerControl(configuration, progress.newChild(2));
 			if (rm == null) {
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
 			}
-			rm.addJobListener(fJobListener);
+			JobManager.getInstance().addListener(fJobListener);
 			launch.setResourceManager(rm);
 			String jobId = rm.submitJob(configuration, mode, progress.newChild(5));
-			if (rm.getJobStatus(jobId, progress.newChild(50)).equals(IJobStatus.UNDETERMINED)) {
+			if (rm.getJobStatus(jobId, progress.newChild(3)).equals(IJobStatus.UNDETERMINED)) {
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus));
 			}
@@ -971,6 +1026,41 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
+	 * @since 5.0
+	 */
+	protected void verifyLaunchAttributes(final ILaunchConfiguration configuration, String mode, final IProgressMonitor monitor)
+			throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 30);
+
+		try {
+			/*
+			 * Verify executable path
+			 */
+			verifyExecutablePath(configuration, progress.newChild(10));
+
+			/*
+			 * Verify working directory. Use the executable path if no working directory has been set.
+			 */
+			String workPath = getWorkingDirectory(configuration);
+			if (workPath != null) {
+				verifyResource(workPath, configuration, monitor);
+			}
+			if (progress.isCanceled()) {
+				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
+			}
+
+			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				verifyDebuggerPath(configuration, progress.newChild(10));
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	/**
 	 * Verify that the project exists prior to the launch.
 	 * 
 	 * @param configuration
@@ -1001,32 +1091,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @since 5.0
 	 */
 	protected IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		IResourceManager rm = getResourceManager(configuration);
-		if (rm == null) {
-			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-					Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
-		}
-		IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), monitor);
-		if (monitor.isCanceled()) {
-			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-					Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user));
-		}
-		if (remoteServices == null) {
-			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-					Messages.AbstractParallelLaunchConfigurationDelegate_Unknown_remote_services));
-		}
-		IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-		if (connMgr == null) {
-			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-					Messages.AbstractParallelLaunchConfigurationDelegate_No_connection_manager_available));
-		}
-		IRemoteConnection conn = connMgr.getConnection(conf.getConnectionName());
-		if (conn == null) {
-			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-					Messages.AbstractParallelLaunchConfigurationDelegate_Unable_to_locate_connection));
-		}
-		IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
+		IRemoteFileManager fileManager = getRemoteFileManager(configuration, monitor);
 		if (fileManager == null) {
 			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 					Messages.AbstractParallelLaunchConfigurationDelegate_No_file_manager_available));

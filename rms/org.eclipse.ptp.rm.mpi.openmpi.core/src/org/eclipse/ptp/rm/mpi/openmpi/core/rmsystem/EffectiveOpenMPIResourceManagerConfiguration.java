@@ -20,10 +20,9 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPreferenceManager;
 /**
  * Represents an Open MPI Resource Manager configuration.
  * 
- * Open MPI requires different commands for different versions. The installed
- * version is automatically discovered and the correct commands are selected
- * based on the version. Since the discover command is used to determine the
- * version, it must work for any version of Open MPI.
+ * Open MPI requires different commands for different versions. The installed version is automatically discovered and the correct
+ * commands are selected based on the version. Since the discover command is used to determine the version, it must work for any
+ * version of Open MPI.
  * 
  */
 public class EffectiveOpenMPIResourceManagerConfiguration extends AbstractEffectiveToolRMConfiguration {
@@ -38,8 +37,7 @@ public class EffectiveOpenMPIResourceManagerConfiguration extends AbstractEffect
 		String discoverCmd = null;
 
 		/*
-		 * If the selected version is AUTO, then use the detected version to
-		 * determine which commands should be used.
+		 * If the selected version is AUTO, then use the detected version to determine which commands should be used.
 		 */
 		if (conf.getVersionId().equals(IOpenMPIResourceManagerConfiguration.VERSION_AUTO)) {
 			String version = conf.getDetectedVersion();
@@ -50,8 +48,6 @@ public class EffectiveOpenMPIResourceManagerConfiguration extends AbstractEffect
 				prefix = OpenMPIPreferenceManager.PREFIX_13;
 			} else if (version.equals(IOpenMPIResourceManagerConfiguration.VERSION_14)) {
 				prefix = OpenMPIPreferenceManager.PREFIX_14;
-			} else {
-				assert false;
 			}
 			launchCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), prefix
 					+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
@@ -71,9 +67,7 @@ public class EffectiveOpenMPIResourceManagerConfiguration extends AbstractEffect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration
-	 * #completeCommand(java.lang.String)
+	 * @see org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration #completeCommand(java.lang.String)
 	 */
 	@Override
 	protected String completeCommand(String command) {

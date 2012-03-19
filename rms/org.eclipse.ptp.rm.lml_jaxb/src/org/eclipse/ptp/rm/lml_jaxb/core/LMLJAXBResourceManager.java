@@ -22,9 +22,8 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
 /**
  * The base LMLJAXB resource manager, containing control and monitor parts.<br>
  * <br>
- * The JAXB implementation uses an XML configuration validated against an
- * internal schema (XSD) to configure the manager runtime and to construct the
- * related UI parts.<br>
+ * The JAXB implementation uses an XML configuration validated against an internal schema (XSD) to configure the manager runtime and
+ * to construct the related UI parts.<br>
  * <br>
  * Refer to the resource_manager_type.xsd for more details.
  * 
@@ -45,14 +44,6 @@ public class LMLJAXBResourceManager extends AbstractResourceManager implements I
 	}
 
 	/**
-	 * Expose this for internal use by the control.
-	 */
-	@Override
-	public void fireJobChanged(String jobId) {
-		super.fireJobChanged(jobId);
-	}
-
-	/**
 	 * @return the control sub-manager.
 	 */
 	@Override
@@ -70,9 +61,7 @@ public class LMLJAXBResourceManager extends AbstractResourceManager implements I
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse
-	 * .core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse .core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {

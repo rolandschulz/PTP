@@ -45,6 +45,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.core.JobManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -65,6 +66,7 @@ import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
+import org.eclipse.ptp.core.events.IJobAddedEvent;
 import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
@@ -109,8 +111,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
 		 */
 		public void handleEvent(IChangedProcessEvent e) {
@@ -127,8 +128,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.INewProcessEvent)
 		 */
 		public void handleEvent(INewProcessEvent e) {
@@ -154,8 +154,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
 		 */
 		public void handleEvent(IRemoveProcessEvent e) {
@@ -184,12 +183,19 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse
-		 * .ptp.core.events.IJobChangeEvent)
+		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse .ptp.core.events.IJobChangeEvent)
 		 */
 		public void handleEvent(IJobChangedEvent e) {
 			refreshJobView();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
+		 */
+		public void handleEvent(IJobAddedEvent e) {
+			// nothing to do
 		}
 	}
 
@@ -197,10 +203,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerChangedMachineEvent)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events. IResourceManagerChangedMachineEvent)
 		 */
 		public void handleEvent(IChangedMachineEvent e) {
 			// Don't need to do anything
@@ -209,10 +213,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerChangedQueueEvent)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events. IResourceManagerChangedQueueEvent)
 		 */
 		public void handleEvent(IChangedQueueEvent e) {
 			// Can safely ignore
@@ -221,8 +223,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
 		 */
 		public void handleEvent(INewJobEvent e) {
@@ -246,10 +247,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerNewMachineEvent)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events. IResourceManagerNewMachineEvent)
 		 */
 		public void handleEvent(INewMachineEvent e) {
 		}
@@ -257,8 +256,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
 		 */
 		public void handleEvent(INewQueueEvent e) {
@@ -267,8 +265,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
 		 */
 		public void handleEvent(IRemoveJobEvent e) {
@@ -284,10 +281,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerRemoveMachineEvent)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events. IResourceManagerRemoveMachineEvent)
 		 */
 		public void handleEvent(IRemoveMachineEvent e) {
 		}
@@ -295,10 +290,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerRemoveQueueEvent)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events. IResourceManagerRemoveQueueEvent)
 		 */
 		public void handleEvent(IRemoveQueueEvent e) {
 		}
@@ -313,19 +306,16 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		 */
 		public void handleEvent(IResourceManagerAddedEvent e) {
 			/*
-			 * Add resource manager child listener so we get notified when new
-			 * machines are added to the model.
+			 * Add resource manager child listener so we get notified when new machines are added to the model.
 			 */
 			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
 			rm.addChildListener(resourceManagerChildListener);
-			rm.getResourceManager().addJobListener(jobListener);
 		}
 
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * @see org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
 		 * (org.eclipse.ptp.core.events.IResourceManagerChangedEvent)
 		 */
 		public void handleEvent(IResourceManagerChangedEvent e) {
@@ -334,8 +324,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * @see org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
 		 * (org.eclipse.ptp.core.events.IResourceManagerErrorEvent)
 		 */
 		public void handleEvent(IResourceManagerErrorEvent e) {
@@ -349,12 +338,10 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		 */
 		public void handleEvent(IResourceManagerRemovedEvent e) {
 			/*
-			 * Removed resource manager child listener when resource manager is
-			 * removed.
+			 * Removed resource manager child listener when resource manager is removed.
 			 */
 			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
 			rm.removeChildListener(resourceManagerChildListener);
-			rm.getResourceManager().removeJobListener(jobListener);
 		}
 	}
 
@@ -369,14 +356,13 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime
-		 * .IProgressMonitor)
+		 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime .IProgressMonitor)
 		 */
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
-			if (size() == 0)
+			if (size() == 0) {
 				return Status.CANCEL_STATUS;
+			}
 
 			ISelection selection = getLastJobSelection();
 			if (debug) {
@@ -512,8 +498,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener
 	 * (org.eclipse.jface.viewers.ISelectionChangedListener)
 	 */
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
@@ -567,10 +552,10 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 					job.removeChildListener(jobChildListener);
 				}
 				rm.removeChildListener(resourceManagerChildListener);
-				rm.getResourceManager().removeJobListener(jobListener);
 			}
 			mm.removeListener(resourceManagerListener);
 		}
+		JobManager.getInstance().removeListener(jobListener);
 		elementViewComposite.dispose();
 		super.dispose();
 	}
@@ -601,9 +586,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.
-	 * eclipse.ptp.ui.model.IElement)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org. eclipse.ptp.ui.model.IElement)
 	 */
 	@Override
 	public void doubleClick(IElement element) {
@@ -654,9 +637,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.IContentProvider#getRulerIndex(java.lang.Object,
-	 * int)
+	 * @see org.eclipse.ptp.ui.views.IContentProvider#getRulerIndex(java.lang.Object, int)
 	 */
 	@Override
 	public String getRulerIndex(Object obj, int index) {
@@ -682,15 +663,14 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java
-	 * .lang.Object)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java .lang.Object)
 	 */
 	@Override
 	public String[] getToolTipText(Object obj) {
 		IElementHandler setManager = getCurrentElementHandler();
-		if (obj == null || !(obj instanceof PProcessUI) || setManager == null || cur_element_set == null)
+		if (obj == null || !(obj instanceof PProcessUI) || setManager == null || cur_element_set == null) {
 			return IToolTipProvider.NO_TOOLTIP;
+		}
 
 		// FIXME PProcessUI goes away when we address UI scalability. See Bug
 		// 311057
@@ -706,12 +686,14 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 			buffer.append(Messages.ParallelJobsView_3 + proc.getPid());
 		}
 		IElementSet[] sets = setManager.getSetsWithElement(proc.getID());
-		if (sets.length > 1)
+		if (sets.length > 1) {
 			buffer.append(Messages.ParallelJobsView_4);
+		}
 		for (int i = 1; i < sets.length; i++) {
 			buffer.append(sets[i].getID());
-			if (i < sets.length - 1)
+			if (i < sets.length - 1) {
 				buffer.append(","); //$NON-NLS-1$
+			}
 		}
 		// buffer.append("\nStatus: " +
 		// getJobManager().getProcessStatusText(proc));
@@ -721,8 +703,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener
 	 * (org.eclipse.jface.viewers.ISelectionChangedListener)
 	 */
 	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
@@ -732,9 +713,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java.
-	 * lang.Object)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java. lang.Object)
 	 */
 	@Override
 	public void repaint(boolean all) {
@@ -749,9 +728,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(
-	 * org.eclipse.jface.viewers.SelectionChangedEvent)
+	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged( org.eclipse.jface.viewers.SelectionChangedEvent)
 	 */
 	public void selectionChanged(SelectionChangedEvent event) {
 		// Selection change could come from either the jobTableViewer of the
@@ -778,8 +755,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 * Set flag that determines if new jobs are give focus in the jobs view.
 	 * 
 	 * @param focus
-	 *            a value of true will cause new jobs to be displayed in the
-	 *            jobs view
+	 *            a value of true will cause new jobs to be displayed in the jobs view
 	 */
 	public void setJobFocus(boolean focus) {
 		jobFocus = focus;
@@ -788,9 +764,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse
-	 * .jface.viewers.ISelection)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse .jface.viewers.ISelection)
 	 */
 	public void setSelection(ISelection selection) {
 		final SelectionChangedEvent e = new SelectionChangedEvent(this, selection);
@@ -835,14 +809,13 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#convertElementObject
-	 * (org.eclipse.ptp.ui.model.IElement)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#convertElementObject (org.eclipse.ptp.ui.model.IElement)
 	 */
 	@Override
 	protected Object convertElementObject(IElement element) {
-		if (element == null)
+		if (element == null) {
 			return null;
+		}
 
 		// FIXME PProcessUI goes away when we address UI scalability. See Bug
 		// 311057
@@ -872,9 +845,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions
-	 * (org.eclipse.jface.action.IToolBarManager)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions (org.eclipse.jface.action.IToolBarManager)
 	 */
 	@Override
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
@@ -889,9 +860,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#createView(org.eclipse
-	 * .swt.widgets.Composite)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#createView(org.eclipse .swt.widgets.Composite)
 	 */
 	@Override
 	protected void createView(Composite parent) {
@@ -971,16 +940,15 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		synchronized (mm) {
 			/*
-			 * Add us to any existing RM's. I guess it's possible we could miss
-			 * a RM if a new event arrives while we're doing this, but is it a
-			 * problem?
+			 * Add us to any existing RM's. I guess it's possible we could miss a RM if a new event arrives while we're doing this,
+			 * but is it a problem?
 			 */
 			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 				rm.addChildListener(resourceManagerChildListener);
-				rm.getResourceManager().addJobListener(jobListener);
 			}
 			mm.addListener(resourceManagerListener);
 		}
+		JobManager.getInstance().addListener(jobListener);
 	}
 
 	/**
@@ -1004,8 +972,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#initialElement()
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialElement()
 	 */
 	@Override
 	protected void initialElement() {
@@ -1025,8 +992,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	}
 
 	/**
-	 * Refresh the job view. Called to notify the job view that the model has
-	 * changed and it needs to update the view.
+	 * Refresh the job view. Called to notify the job view that the model has changed and it needs to update the view.
 	 */
 	protected void refreshJobView() {
 		syncExec(new Runnable() {

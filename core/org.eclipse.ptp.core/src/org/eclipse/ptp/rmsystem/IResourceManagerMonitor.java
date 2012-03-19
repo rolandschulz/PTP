@@ -12,29 +12,13 @@
 package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.listeners.IJobListener;
 
 /**
  * @since 5.0
  */
-public interface IResourceManagerMonitor {
-	/**
-	 * Notify monitor that job should be treated specially.
-	 * 
-	 * @param jobId
-	 *            ID of job to be treated specially
-	 * @param status
-	 *            current status of job
-	 */
-	public void addJob(String jobId, IJobStatus status);
-
-	/**
-	 * Add a listener for job events
-	 * 
-	 * @param listener
-	 */
-	public void addJobListener(IJobListener listener);
+public interface IResourceManagerMonitor extends IAdaptable {
 
 	/**
 	 * Safely dispose of this resource manager monitor.
@@ -57,15 +41,8 @@ public interface IResourceManagerMonitor {
 	public void removeJob(String jobId);
 
 	/**
-	 * Remove a listener for job events
-	 * 
-	 * @param listener
-	 */
-	public void removeJobListener(IJobListener listener);
-
-	/**
-	 * Start the resource manager. Clients should not call this directly. Call
-	 * {@link IResourceManager#start(IProgressMonitor)} instead.
+	 * Start the resource manager. Clients should not call this directly. Call {@link IResourceManager#start(IProgressMonitor)}
+	 * instead.
 	 * 
 	 * @param monitor
 	 *            progress monitor
@@ -81,15 +58,5 @@ public interface IResourceManagerMonitor {
 	 *             this exception is thrown if the stop command fails
 	 */
 	public void stop() throws CoreException;
-
-	/**
-	 * Notify monitor that status of job has changed.
-	 * 
-	 * @param jobId
-	 *            ID of job to be updated
-	 * @param status
-	 *            new status of job
-	 */
-	public void updateJob(String jobId, IJobStatus status);
 
 }

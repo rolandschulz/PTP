@@ -331,12 +331,12 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	}
 
 	@Override
-	protected void doAddJob(String jobId, IJobStatus status) {
+	protected void doAddJob(IJobStatus status) {
 		final JobStatusData data = new JobStatusData(status.getRmUniqueName(), status.getJobId(), status.getQueueName(),
 				status.getOwner(), status.getOutputPath(), status.getErrorPath(), status.isInteractive());
 		data.setState(status.getState());
 		data.setStateDetail(status.getStateDetail());
-		fLMLManager.addUserJob(getResourceManager().getUniqueName(), jobId, data);
+		fLMLManager.addUserJob(getResourceManager().getUniqueName(), status.getJobId(), data);
 	}
 
 	@Override
@@ -473,7 +473,8 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	}
 
 	@Override
-	protected void doUpdateJob(String jobId, IJobStatus status) {
-		fLMLManager.updateUserJob(getResourceManager().getUniqueName(), jobId, status.getState(), status.getStateDetail());
+	protected void doUpdateJob(IJobStatus status) {
+		fLMLManager.updateUserJob(getResourceManager().getUniqueName(), status.getJobId(), status.getState(),
+				status.getStateDetail());
 	}
 }

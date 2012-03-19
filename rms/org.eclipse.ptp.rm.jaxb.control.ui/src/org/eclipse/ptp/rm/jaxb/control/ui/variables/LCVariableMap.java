@@ -303,7 +303,11 @@ public class LCVariableMap implements IVariableMap {
 	 */
 	public void initialize(IVariableMap rmVars, String rmId) throws Throwable {
 		clear();
-		this.rmPrefix = rmId + JAXBUIConstants.DOT;
+		if (rmId != null) {
+			rmPrefix = rmId + JAXBUIConstants.DOT;
+		} else {
+			rmPrefix = "";
+		}
 		for (String s : rmVars.getVariables().keySet()) {
 			loadValues(s, rmVars.getVariables().get(s), false);
 		}
@@ -335,10 +339,12 @@ public class LCVariableMap implements IVariableMap {
 	 * @throws CoreException
 	 */
 	public void relinkConfigurationProperties(ILaunchConfiguration configuration) throws CoreException {
-		for (Iterator<String> key = values.keySet().iterator(); key.hasNext();) {
-			String name = key.next();
-			if (!name.startsWith(rmPrefix)) {
-				key.remove();
+		if (!rmPrefix.equals("")) {
+			for (Iterator<String> key = values.keySet().iterator(); key.hasNext();) {
+				String name = key.next();
+				if (!name.startsWith(rmPrefix)) {
+					key.remove();
+				}
 			}
 		}
 
@@ -436,7 +442,7 @@ public class LCVariableMap implements IVariableMap {
 				continue;
 			}
 			if (var != null) {
-				if (var.startsWith(rmPrefix)) {
+				if (!rmPrefix.equals("") && var.startsWith(rmPrefix)) {
 					var = var.substring(rmPrefix.length());
 					if (valid.contains(var) || RMVariableMap.isFixedValid(var)) {
 						put(var, value);
@@ -457,7 +463,7 @@ public class LCVariableMap implements IVariableMap {
 	public void updateFromConfiguration(ILaunchConfiguration configuration) throws CoreException {
 		Map<String, Object> attr = configuration.getAttributes();
 		for (String key : attr.keySet()) {
-			if (key.startsWith(rmPrefix) || RMVariableMap.isExternal(key)) {
+			if ((!rmPrefix.equals("") && key.startsWith(rmPrefix)) || RMVariableMap.isExternal(key)) {
 				values.put(key, attr.get(key));
 			}
 		}
@@ -560,7 +566,9 @@ public class LCVariableMap implements IVariableMap {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#convertEngMgmtConfigString(java.lang.String)
 	 */
 	public String convertEngMgmtConfigString(String string) {

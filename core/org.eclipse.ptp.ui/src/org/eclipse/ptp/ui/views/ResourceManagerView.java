@@ -52,7 +52,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.core.JobManager;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -76,6 +77,7 @@ import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
+import org.eclipse.ptp.core.events.IJobAddedEvent;
 import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
@@ -116,18 +118,28 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse
-		 * .ptp.core.events.IJobChangeEvent)
+		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse .ptp.core.events.IJobChangeEvent)
 		 */
 		public void handleEvent(IJobChangedEvent e) {
-			IPResourceManager rm = (IPResourceManager) e.getSource().getAdapter(IPResourceManager.class);
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(e.getJobStatus().getRmUniqueName());
 			if (rm != null) {
-				IPJob job = rm.getJobById(e.getJobId());
-				if (job != null) {
-					updateViewer(job);
+				IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
+				if (prm != null) {
+					IPJob job = prm.getJobById(e.getJobStatus().getJobId());
+					if (job != null) {
+						updateViewer(job);
+					}
 				}
 			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
+		 */
+		public void handleEvent(IJobAddedEvent e) {
+			// nothing to do
 		}
 	}
 
@@ -135,8 +147,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IChangedNodeEvent)
 		 */
 		public void handleEvent(IChangedNodeEvent e) {
@@ -146,8 +157,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IMachineListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IMachineChangeEvent)
 		 */
 		public void handleEvent(IMachineChangeEvent e) {
@@ -157,8 +167,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.INewNodeEvent)
 		 */
 		public void handleEvent(INewNodeEvent e) {
@@ -168,8 +177,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IRemoveNodeEvent)
 		 */
 		public void handleEvent(IRemoveNodeEvent e) {
@@ -181,8 +189,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IQueueListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IQueueListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IQueueChangeEvent)
 		 */
 		public void handleEvent(IQueueChangeEvent e) {
@@ -206,8 +213,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ui.model.WorkbenchLabelProvider#getFont(java.lang.Object)
+		 * @see org.eclipse.ui.model.WorkbenchLabelProvider#getFont(java.lang.Object)
 		 */
 		@Override
 		public Font getFont(Object element) {
@@ -233,9 +239,8 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface
-		 * .viewers.Viewer, java.lang.Object, java.lang.Object)
+		 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface .viewers.Viewer, java.lang.Object,
+		 * java.lang.Object)
 		 */
 		@Override
 		public int compare(Viewer viewer, Object e1, Object e2) {
@@ -276,11 +281,8 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #
-		 * handleEvent(org.eclipse.ptp.core.elements.events.IChangedMachineEvent
-		 * )
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener #
+		 * handleEvent(org.eclipse.ptp.core.elements.events.IChangedMachineEvent )
 		 */
 		public void handleEvent(IChangedMachineEvent e) {
 			updateViewer(e.getSource());
@@ -289,10 +291,8 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerChangedQueueEvent)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events. IResourceManagerChangedQueueEvent)
 		 */
 		public void handleEvent(IChangedQueueEvent e) {
 			updateViewer(e.getSource());
@@ -301,8 +301,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
 		 */
 		public void handleEvent(INewJobEvent e) {
@@ -312,8 +311,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewMachineEvent)
 		 */
 		public synchronized void handleEvent(INewMachineEvent e) {
@@ -327,8 +325,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
 		 */
 		public void handleEvent(INewQueueEvent e) {
@@ -342,8 +339,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
 		 */
 		public void handleEvent(IRemoveJobEvent e) {
@@ -353,9 +349,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener #
 		 * handleEvent(org.eclipse.ptp.core.elements.events.IRemoveMachineEvent)
 		 */
 		public synchronized void handleEvent(IRemoveMachineEvent e) {
@@ -369,10 +363,8 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerRemoveQueueEvent)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events. IResourceManagerRemoveQueueEvent)
 		 */
 		public void handleEvent(IRemoveQueueEvent e) {
 			for (IPQueue queue : e.getQueues()) {
@@ -436,15 +428,13 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#
+		 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#
 		 * handleEvent(org.eclipse.ptp.core.events.IResourceManagerAddedEvent)
 		 */
 		public synchronized void handleEvent(IResourceManagerAddedEvent e) {
 			final IPResourceManager resourceManager = (IPResourceManager) e.getResourceManager()
 					.getAdapter(IPResourceManager.class);
 			resourceManagers.add(resourceManager);
-			e.getResourceManager().addJobListener(jobListener);
 			resourceManager.addChildListener(rmChildListener);
 			refreshViewer(PTPCorePlugin.getDefault().getModelManager().getUniverse());
 		}
@@ -452,9 +442,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#
-		 * handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener# handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent)
 		 */
 		public void handleEvent(IResourceManagerChangedEvent e) {
@@ -472,9 +460,7 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#
-		 * handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener# handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent)
 		 */
 		public void handleEvent(final IResourceManagerErrorEvent e) {
@@ -494,15 +480,13 @@ public class ResourceManagerView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#
+		 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#
 		 * handleEvent(org.eclipse.ptp.core.events.IResourceManagerRemovedEvent)
 		 */
 		public synchronized void handleEvent(IResourceManagerRemovedEvent e) {
 			final IPResourceManager resourceManager = (IPResourceManager) e.getResourceManager()
 					.getAdapter(IPResourceManager.class);
 			resourceManagers.remove(resourceManager);
-			e.getResourceManager().removeJobListener(jobListener);
 			resourceManager.removeChildListener(rmChildListener);
 			rmChildListener.removeListeners(resourceManager);
 			refreshViewer(PTPCorePlugin.getDefault().getModelManager().getUniverse());
@@ -527,9 +511,7 @@ public class ResourceManagerView extends ViewPart {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
-	 * .Composite)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets .Composite)
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
@@ -621,16 +603,8 @@ public class ResourceManagerView extends ViewPart {
 		// ----------------------------------------------------------------------
 		getSite().setSelectionProvider(viewer);
 
-		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
-
-		/*
-		 * Add us to any existing RM's. I guess it's possible we could miss a RM
-		 * if a new event arrives while we're doing this, but is it a problem?
-		 */
-		for (IResourceManager rm : mm.getResourceManagers()) {
-			rm.addJobListener(jobListener);
-		}
-		mm.addListener(rmListener);
+		PTPCorePlugin.getDefault().getModelManager().addListener(rmListener);
+		JobManager.getInstance().addListener(jobListener);
 	}
 
 	/*
@@ -642,10 +616,10 @@ public class ResourceManagerView extends ViewPart {
 	public synchronized void dispose() {
 		PTPCorePlugin.getDefault().getModelManager().removeListener(rmListener);
 		for (IPResourceManager rm : resourceManagers) {
-			rm.getResourceManager().removeJobListener(jobListener);
 			rm.removeChildListener(rmChildListener);
 		}
 		resourceManagers.clear();
+		JobManager.getInstance().removeListener(jobListener);
 		rmChildListener.dispose();
 		super.dispose();
 	}

@@ -19,12 +19,8 @@
 package org.eclipse.ptp.rm.launch.ui;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -49,6 +45,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurati
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.launch.RMLaunchPlugin;
+import org.eclipse.ptp.rm.launch.internal.ProviderInfo;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
@@ -56,10 +53,7 @@ import org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.ui.wizards.RMConfigurationSelectionFactory;
-import org.eclipse.ptp.ui.wizards.RMProviderContributor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
@@ -90,30 +84,12 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 	}
 
-	private class ProviderInfo implements Comparable<ProviderInfo> {
-		public final String name;
-		public final IServiceProviderDescriptor descriptor;
-		public final RMConfigurationSelectionFactory factory;
-
-		public ProviderInfo(String name, IServiceProviderDescriptor descriptor, RMConfigurationSelectionFactory factory) {
-			this.name = name;
-			this.descriptor = descriptor;
-			this.factory = factory;
-		}
-
-		@Override
-		public int compareTo(ProviderInfo o) {
-			return name.compareTo(o.name);
-		}
-	}
-
 	/**
 	 * @since 4.0
 	 */
 	public static final String TAB_ID = "org.eclipse.ptp.rm.launch.applicationLaunch.resourcesTab"; //$NON-NLS-1$
 
 	private Combo fResourceManagerTypeCombo = null;
-	private int fSelectionIndex = 0;
 	private boolean fDefaultConnection;
 
 	private IJAXBResourceManager fResourceManagerType = null;
@@ -121,13 +97,12 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	private RemoteConnectionWidget fRemoteConnectionWidget;
 	private IRemoteConnection fRemoteConnection = null;
 
-	private final List<IResourceManager> resourceManagers = new ArrayList<IResourceManager>();
 	// The composite that holds the RM's attributes for the launch configuration
 	private ScrolledComposite launchAttrsScrollComposite;
 
-	private final List<ProviderInfo> fProviders = new ArrayList<ProviderInfo>();
 	private final IService fLaunchService = ServiceModelManager.getInstance().getService(IServiceConstants.LAUNCH_SERVICE);
 	private final Map<IResourceManager, JAXBControllerLaunchConfigurationTab> rmDynamicTabs = new HashMap<IResourceManager, JAXBControllerLaunchConfigurationTab>();
+	private final ContentsChangedListener launchContentsChangedListener = new ContentsChangedListener();
 
 	/*
 	 * (non-Javadoc)
@@ -171,29 +146,14 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		comp.setLayoutData(gd);
 
-		Set<IServiceProviderDescriptor> providers = fLaunchService.getProvidersByPriority();
-		fProviders.clear();
-		for (IServiceProviderDescriptor desc : providers) {
-			/*
-			 * Check if this provider has an extension
-			 */
-			RMConfigurationSelectionFactory factory = RMProviderContributor.getRMConfigurationSelectionFactory(desc.getId());
-			if (factory != null) {
-				for (String name : factory.getConfigurationNames()) {
-					fProviders.add(new ProviderInfo(name, desc, factory));
-				}
-			}
-		}
-		Collections.sort(fProviders);
-
 		new Label(comp, SWT.NONE).setText("Target System Type:");
 
 		fResourceManagerTypeCombo = new Combo(comp, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		fResourceManagerTypeCombo.setLayoutData(gd);
 		fResourceManagerTypeCombo.add("Please select a target system type");
-		for (ProviderInfo provider : fProviders) {
-			fResourceManagerTypeCombo.add(provider.name);
+		for (ProviderInfo provider : ProviderInfo.getProviders()) {
+			fResourceManagerTypeCombo.add(provider.getName());
 		}
 		fResourceManagerTypeCombo.addSelectionListener(new SelectionListener() {
 			@Override
@@ -208,7 +168,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			}
 		});
 		fResourceManagerTypeCombo.deselectAll();
-		fSelectionIndex = 0;
 
 		fRemoteConnectionWidget = new RemoteConnectionWidget(comp, SWT.NONE, null, getLaunchConfigurationDialog());
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
@@ -292,13 +251,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		super.initializeFrom(configuration);
 
 		String rmType = getResourceManagerType(configuration);
-		for (ProviderInfo provider : fProviders) {
-			if (provider.name.equals(rmType)) {
-				fResourceManagerType = createResourceManager(provider);
-				fResourceManagerTypeCombo.select(fProviders.lastIndexOf(provider) + 1);
-				rmTypeSelectionChanged();
-				break;
-			}
+		ProviderInfo provider = ProviderInfo.getProvider(rmType);
+		if (provider != null) {
+			fResourceManagerType = createResourceManager(provider);
+			fResourceManagerTypeCombo.select(ProviderInfo.getProviders().lastIndexOf(provider) + 1);
+			rmTypeSelectionChanged();
 		}
 
 		/*
@@ -366,8 +323,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setRemoteServicesId(configuration, conn.getRemoteServices().getId());
 		}
 
-		if (fResourceManager != null && fSelectionIndex > 0) {
-			setResourceManagerType(configuration, fProviders.get(fSelectionIndex - 1).name);
+		int index = fResourceManagerTypeCombo.getSelectionIndex();
+		if (fResourceManager != null && index > 0) {
+			setResourceManagerType(configuration, ProviderInfo.getProviders().get(index - 1).getName());
 			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(fResourceManager);
 			if (rmDynamicTab == null) {
 				setErrorMessage(NLS
@@ -448,8 +406,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		if (i > 0) {
 			fRemoteConnectionWidget.setEnabled(true);
 			fRemoteConnectionWidget.setConnection(null);
-			ProviderInfo providerInfo = fProviders.get(i - 1);
-			if (fResourceManagerType == null || !fResourceManagerType.getJAXBConfiguration().getName().equals(providerInfo.name)) {
+			ProviderInfo providerInfo = ProviderInfo.getProviders().get(i - 1);
+			if (fResourceManagerType == null
+					|| !fResourceManagerType.getJAXBConfiguration().getName().equals(providerInfo.getName())) {
 				final IJAXBResourceManager rm = createResourceManager(providerInfo);
 				if (rm != null) {
 					if (fDefaultConnection) {
@@ -462,7 +421,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 						} catch (CoreException e) {
 						}
 					}
-					fSelectionIndex = i;
 					fResourceManagerType = rm;
 					fResourceManager = null;
 				}
@@ -526,11 +484,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @return
 	 */
 	private IJAXBResourceManager createResourceManager(ProviderInfo info) {
-		IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(info.descriptor);
+		IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(info.getDescriptor());
 		if (provider != null) {
 			IResourceManagerConfiguration baseConfig = ModelManager.getInstance().createBaseConfiguration(provider);
-			info.factory.setConfigurationName(info.name, baseConfig);
-			IServiceConfiguration config = ServiceModelManager.getInstance().newServiceConfiguration(info.name);
+			info.getFactory().setConfigurationName(info.getName(), baseConfig);
+			IServiceConfiguration config = ServiceModelManager.getInstance().newServiceConfiguration(info.getName());
 			config.setServiceProvider(fLaunchService, provider);
 			ServiceModelManager.getInstance().addConfiguration(config);
 			final IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(
@@ -577,6 +535,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			try {
 				JAXBControllerLaunchConfigurationTab rmDynamicTab = new JAXBControllerLaunchConfigurationTab(rm,
 						getLaunchConfigurationDialog());
+				rmDynamicTab.addContentsChangedListener(launchContentsChangedListener);
 				rmDynamicTabs.put(rm, rmDynamicTab);
 				return rmDynamicTab;
 			} catch (Throwable e) {

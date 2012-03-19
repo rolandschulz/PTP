@@ -114,9 +114,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse
-	 * .core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse .core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
@@ -136,21 +134,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#fireJobChanged(java.
-	 * lang.String)
-	 */
-	@Override
-	protected void fireJobChanged(String jobId) {
-		super.fireJobChanged(jobId);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#fireResourceManagerChanged
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#fireResourceManagerChanged ()
 	 */
 	@Override
 	protected void fireResourceManagerChanged() {
@@ -160,9 +144,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#fireResourceManagerError
-	 * (java.lang.String)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#fireResourceManagerError (java.lang.String)
 	 */
 	@Override
 	protected void fireResourceManagerError(String message) {
@@ -172,9 +154,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#fireResourceManagerStarted
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#fireResourceManagerStarted ()
 	 */
 	@Override
 	protected void fireResourceManagerStarted() {
@@ -184,9 +164,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#fireResourceManagerStopped
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#fireResourceManagerStopped ()
 	 */
 	@Override
 	protected void fireResourceManagerStopped() {
@@ -196,8 +174,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	/**
 	 * Get the runtime system for this resource manager
 	 * 
-	 * @return runtime system or null if there is no corresponding runtime
-	 *         system
+	 * @return runtime system or null if there is no corresponding runtime system
 	 */
 	protected IRuntimeSystem getRuntimeSystem() {
 		String uniqueId = getConfiguration().getUniqueName();

@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.ptp.core.JobManager;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -161,12 +162,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private RMVariableMap rmVarMap;
 	private ControlType controlData;
 	private String servicesId;
-
 	private String connectionName;
-
 	private RemoteServicesDelegate remoteServicesDelegate;
-
 	private boolean appendLaunchEnv;
+	private boolean isActive = false;
+	private boolean isInitialized = false;
 
 	/**
 	 * @param jaxbServiceProvider
@@ -282,8 +282,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				}
 			}
 		}
-		((IJAXBResourceManager) getResourceManager()).fireJobChanged(jobId);
-		getResourceManager().updateJob(jobId, status);
+		JobManager.getInstance().fireJobChanged(status);
 	}
 
 	/**
@@ -363,7 +362,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@Override
 	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 		if (!resourceManagerIsActive()) {
-			return;
+			throw CoreExceptionUtils.newException("Resource manager has not been started", null);
 		}
 
 		if (jobId == null) {
@@ -416,6 +415,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	@Override
 	protected IJobStatus doGetJobStatus(String jobId, boolean force, IProgressMonitor monitor) throws CoreException {
+		if (!resourceManagerIsActive()) {
+			throw CoreExceptionUtils.newException("Resource manager has not been started", null);
+		}
+
 		try {
 			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
 
@@ -546,7 +549,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		try {
-			// initialize(progress.newChild(30));
+			/*
+			 * Support legacy RM API
+			 */
+			if (!isInitialized) {
+				initialize(progress.newChild(30));
+			}
 			doOnStartUp();
 		} catch (CoreException ce) {
 			throw ce;
@@ -572,10 +580,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		String uuid = UUID.randomUUID().toString();
 
 		if (!resourceManagerIsActive()) {
-			ICommandJobStatus status = new CommandJobStatus(getResourceManager().getUniqueName(), uuid, IJobStatus.UNDETERMINED,
-					null, this);
-			status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
-			return status;
+			throw CoreExceptionUtils.newException("Resource manager has not been started", null);
 		}
 
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
@@ -793,6 +798,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		List<CommandType> onShutDown = controlData.getShutDownCommand();
 		runCommands(onShutDown);
+
+		isActive = false;
 	}
 
 	/**
@@ -808,7 +815,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * start daemon
 		 */
-		jobStatusMap = new JobStatusMap(this, getResourceManager());
+		jobStatusMap = new JobStatusMap(this);
 		((Thread) jobStatusMap).start();
 
 		/*
@@ -816,12 +823,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		List<CommandType> onStartUp = controlData.getStartUpCommand();
 		runCommands(onStartUp);
+
+		isActive = true;
 	}
 
 	/**
 	 * Sets the maps and data tree.
 	 */
-	public void initialize(IProgressMonitor monitor) throws Throwable {
+	public void initialize(IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
 			/*
@@ -857,6 +866,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 				}
 			}
 			setFixedConfigurationProperties(progress.newChild(5));
+			isInitialized = true;
+		} catch (Throwable t) {
+			throw CoreExceptionUtils.newException(t.getMessage(), t);
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -1050,12 +1062,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @return whether the state of the resource manager is stopped or not.
 	 */
 	private boolean resourceManagerIsActive() {
-		IResourceManager rm = getResourceManager();
-		if (rm != null) {
-			String rmState = rm.getState();
-			return !rmState.equals(IResourceManager.STOPPED_STATE);
-		}
-		return false;
+		return isActive;
 	}
 
 	/**

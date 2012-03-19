@@ -37,7 +37,7 @@ import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugViewEventHandler;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 
@@ -236,7 +236,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 	}
 
 	private IPJob getJob(IPLaunch launch, String jobId) {
-		IResourceManager rmc = launch.getResourceManager();
+		IResourceManagerControl rmc = launch.getResourceManagerControl();
 		if (rmc != null) {
 			IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
 			if (rm != null) {
