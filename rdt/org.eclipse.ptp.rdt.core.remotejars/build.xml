@@ -166,7 +166,7 @@
 		
 		<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
 		<property name="cdtCoreAIXJar" value="org.eclipse.cdt.core.aix_${cdtCoreAIXVersion}.jar"/>
-		<property name="cdtCoreLinuxPPCJar" value="org.eclipse.cdt.core.linux.ppc_${cdtCoreLinuxPPCVersion}.jar"/>
+		<property name="cdtCoreLinuxPPC64Jar" value="org.eclipse.cdt.core.linux.ppc64_${cdtCoreLinuxPPC64Version}.jar"/>
 		<property name="cdtCoreLinuxx86Jar" value="org.eclipse.cdt.core.linux.x86_${cdtCoreLinuxx86Version}.jar"/>
 		<property name="cdtCoreLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtCoreLRParserVersion}.jar"/>
 		<property name="cdtCoreUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtCoreUPCParserVersion}.jar"/>
@@ -340,7 +340,7 @@
 		<delete dir="${downloads}"/>
 		<delete dir="${basedir}/../org.eclipse.cdt.core"/>
 		<delete dir="${basedir}/../org.eclipse.cdt.core.aix"/>
-		<delete dir="${basedir}/../org.eclipse.cdt.core.linux.ppc"/>
+		<delete dir="${basedir}/../org.eclipse.cdt.core.linux.ppc64"/>
 		<delete dir="${basedir}/../org.eclipse.cdt.core.linux.x86"/>
 		<delete dir="${basedir}/../org.eclipse.cdt.core.lrparser"/>
 		<delete dir="${basedir}/../org.eclipse.cdt.core.lrparser.xlc"/>
@@ -595,12 +595,12 @@ export serverpath CLASSPATH LIBPATH
 	</target>
 	
 	<target name="add.so.linux.ppc">
-		<get src="${cdtBaseUrl}/plugins/${cdtCoreLinuxPPCJar}" dest="${downloads}/${cdtCoreLinuxPPCJar}"/>
-		<unzip dest="${basedir}/../org.eclipse.cdt.core.linux.ppc">
-			<fileset dir="${downloads}" includes="${cdtCoreLinuxPPCJar}"/>
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreLinuxPPC64Jar}" dest="${downloads}/${cdtCoreLinuxPPC64Jar}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.linux.ppc64">
+			<fileset dir="${downloads}" includes="${cdtCoreLinuxPPC64Jar}"/>
 		</unzip>
-		<copy file="${basedir}/../org.eclipse.cdt.core.linux.ppc/os/linux/ppc/libspawner.so" todir="${remoteServerTempDir}"/>
-		<copy file="${basedir}/../org.eclipse.cdt.core.linux.ppc/os/linux/ppc/libpty.so" todir="${remoteServerTempDir}"/>
+		<copy file="${basedir}/../org.eclipse.cdt.core.linux.ppc64/os/linux/ppc64/libspawner.so" todir="${remoteServerTempDir}"/>
+		<copy file="${basedir}/../org.eclipse.cdt.core.linux.ppc64/os/linux/ppc64/libpty.so" todir="${remoteServerTempDir}"/>
 	</target>
 	
 	<target name="add.so.linux.x86">
