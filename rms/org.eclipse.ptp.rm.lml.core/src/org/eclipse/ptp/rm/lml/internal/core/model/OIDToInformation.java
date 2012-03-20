@@ -30,20 +30,20 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 public class OIDToInformation extends LguiHandler {
 
 	// Hashmap, keys are oid-references, values are lists of InfoType
-	private HashMap<String, List<InfoType>> oidtoinfo;
+	private HashMap<String, List<InfoType>> oidToInfo;
 
 	/**
 	 * Create an information-handler with standard-parameters.
 	 * 
-	 * @param psuperHandler
+	 * @param lguiItem
 	 *            LML-data-handler, which groups this handler and others to a
 	 *            set of LMLHandler. This instance is needed to notify all
 	 *            LMLHandler, if any data of the LguiType-instance was changed.
 	 */
-	public OIDToInformation(ILguiItem psuperHandler, LguiType model) {
-		super(psuperHandler, model);
+	public OIDToInformation(ILguiItem lguiItem, LguiType lgui) {
+		super(lguiItem, lgui);
 
-		updateData(model);
+		updateData(lgui);
 
 		lguiItem.addListener(new ILguiListener() {
 
@@ -54,7 +54,7 @@ public class OIDToInformation extends LguiHandler {
 	}
 
 	/**
-	 * Not sure why this is needed. DO NOT USE.
+	 * 
 	 * 
 	 * @param oid
 	 * @return
@@ -112,7 +112,7 @@ public class OIDToInformation extends LguiHandler {
 	 *         this id
 	 */
 	public List<InfoType> getInfosById(String id) {
-		return oidtoinfo.get(id);
+		return oidToInfo.get(id);
 	}
 
 	/**
@@ -156,20 +156,20 @@ public class OIDToInformation extends LguiHandler {
 	 */
 	public List<InfoType> getInfosByType(String id, String type) {
 
-		final List<InfoType> allinfos = getInfosById(id);
-		if (allinfos == null) {
+		final List<InfoType> infoList = getInfosById(id);
+		if (infoList == null) {
 			return null;
 		}
 
-		final List<InfoType> res = new ArrayList<InfoType>();
+		final List<InfoType> result = new ArrayList<InfoType>();
 		// Get only infos with specific type
-		for (final InfoType ainfo : allinfos) {
-			if (ainfo.getType().equals(type)) {
-				res.add(ainfo);
+		for (final InfoType info : infoList) {
+			if (info.getType().equals(type)) {
+				result.add(info);
 			}
 		}
 
-		return res;
+		return result;
 	}
 
 	/**
@@ -180,8 +180,8 @@ public class OIDToInformation extends LguiHandler {
 	 * @param lgui
 	 *            new lml-data-model
 	 */
-	public void updateData(LguiType pmodel) {
-		lgui = pmodel;
+	public void updateData(LguiType lgui) {
+		this.lgui = lgui;
 
 		getInformationFromModel();
 	}
@@ -191,7 +191,7 @@ public class OIDToInformation extends LguiHandler {
 	 */
 	private void getInformationFromModel() {
 
-		oidtoinfo = new HashMap<String, List<InfoType>>();
+		oidToInfo = new HashMap<String, List<InfoType>>();
 
 		for (final Object object : jaxbUtil.getObjects(lgui)) {
 
@@ -199,22 +199,20 @@ public class OIDToInformation extends LguiHandler {
 				continue;
 			}
 
-			final InformationType ainfos = (InformationType) object;
+			for (final InfoType info : ((InformationType) object).getInfo()) {
+				// over all info-tags (information/info)
 
-			final List<InfoType> realinfos = ainfos.getInfo();
+				final String oid = info.getOid();
 
-			for (final InfoType ainfo : realinfos) { // over all info-tags
-				// (information/info)
-
-				final String oid = ainfo.getOid();
-
-				if (oidtoinfo.containsKey(oid)) {// Already list existent
-					final List<InfoType> oldlist = oidtoinfo.get(oid);
-					oldlist.add(ainfo);
-				} else {// new list for oid
-					final ArrayList<InfoType> newlist = new ArrayList<InfoType>();
-					newlist.add(ainfo);
-					oidtoinfo.put(oid, newlist);
+				if (oidToInfo.containsKey(oid)) {
+					// Already list existent
+					final List<InfoType> oldList = oidToInfo.get(oid);
+					oldList.add(info);
+				} else {
+					// new list for oid
+					final ArrayList<InfoType> newList = new ArrayList<InfoType>();
+					newList.add(info);
+					oidToInfo.put(oid, newList);
 				}
 			}
 
