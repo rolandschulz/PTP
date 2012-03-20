@@ -340,7 +340,7 @@
 		<delete dir="${downloads}"/>
 		<delete dir="${basedir}/../org.eclipse.cdt.core"/>
 		<delete dir="${basedir}/../org.eclipse.cdt.core.aix"/>
-		<delete dir="${basedir}/../org.eclipse.cdt.core.linux.ppc64"/>
+		<delete dir="${basedir}/../org.eclipse.cdt.core.linux.ppc"/>
 		<delete dir="${basedir}/../org.eclipse.cdt.core.linux.x86"/>
 		<delete dir="${basedir}/../org.eclipse.cdt.core.lrparser"/>
 		<delete dir="${basedir}/../org.eclipse.cdt.core.lrparser.xlc"/>
@@ -591,14 +591,16 @@ export serverpath CLASSPATH LIBPATH
 			<fileset dir="${downloads}" includes="${cdtCoreAIXJar}"/>
 		</unzip>
 		<copy file="${basedir}/../org.eclipse.cdt.core.aix/os/aix/ppc/libspawner.so" todir="${remoteServerTempDir}"/>
+		<copy file="${basedir}/../org.eclipse.cdt.core.aix/os/aix/ppc/libpty.so" todir="${remoteServerTempDir}"/>
 	</target>
 	
 	<target name="add.so.linux.ppc">
 		<get src="${cdtBaseUrl}/plugins/${cdtCoreLinuxPPCJar}" dest="${downloads}/${cdtCoreLinuxPPCJar}"/>
-		<unzip dest="${basedir}/../org.eclipse.cdt.core.linux.ppc64">
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.linux.ppc">
 			<fileset dir="${downloads}" includes="${cdtCoreLinuxPPCJar}"/>
 		</unzip>
-		<copy file="${basedir}/../org.eclipse.cdt.core.linux.ppc64/os/linux/ppc64/libspawner.so" todir="${remoteServerTempDir}"/>
+		<copy file="${basedir}/../org.eclipse.cdt.core.linux.ppc/os/linux/ppc/libspawner.so" todir="${remoteServerTempDir}"/>
+		<copy file="${basedir}/../org.eclipse.cdt.core.linux.ppc/os/linux/ppc/libpty.so" todir="${remoteServerTempDir}"/>
 	</target>
 	
 	<target name="add.so.linux.x86">
@@ -607,6 +609,7 @@ export serverpath CLASSPATH LIBPATH
 			<fileset dir="${downloads}" includes="${cdtCoreLinuxx86Jar}"/>
 		</unzip>
 		<copy file="${basedir}/../org.eclipse.cdt.core.linux.x86/os/linux/x86/libspawner.so" todir="${remoteServerTempDir}"/>
+		<copy file="${basedir}/../org.eclipse.cdt.core.linux.x86/os/linux/x86/libpty.so" todir="${remoteServerTempDir}"/>
 	</target>	
 	
 	<target name="add.so.unix">
