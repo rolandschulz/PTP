@@ -44,6 +44,10 @@ public class Messages extends NLS {
 
 	public static String BinaryResourceMatcher_1;
 
+	public static String BuildConfigurationManager_0;
+
+	public static String BuildConfigurationManager_1;
+
 	public static String PathResourceMatcher_0;
 
 	public static String RegexResourceMatcher_0;

@@ -18,9 +18,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.cdt.core.model.CoreModel;
@@ -35,12 +33,13 @@ import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
 import org.eclipse.cdt.managedbuilder.internal.core.ManagedProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
@@ -52,15 +51,14 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceProvider;
 import org.eclipse.ptp.services.core.ServicesCorePlugin;
-import org.eclipse.ptp.services.internal.core.ServiceConfiguration;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 /**
  * Main static class to map CDT build configurations (IConfigurations) to service configurations. For building or sync'ing, this
@@ -71,21 +69,15 @@ import org.eclipse.ui.XMLMemento;
  * 
  */
 public class BuildConfigurationManager {
+	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
+	private static final String TEMPLATE_KEY = "template"; //$NON-NLS-1$
 	private static final String DEFAULT_SAVE_FILE_NAME = "BuildConfigurationData.xml"; //$NON-NLS-1$
 	private static final String BUILD_CONFIGURATION_ELEMENT_NAME = "build-configuration-data"; //$NON-NLS-1$
-	private static final String SERVICE_ELEMENT_NAME = "service"; //$NON-NLS-1$
-	private static final String PROVIDER_ELEMENT_NAME = "provider"; //$NON-NLS-1$
-	private static final String DISABLED_PROVIDERS_ELEMENT_NAME = "disabledProviders"; //$NON-NLS-1$
 	private static final String ATTR_ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_BUILD_SCENARIO_ID = "build-id"; //$NON-NLS-1$
-	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
-	private static final String ATTR_PROJECT = "project"; //$NON-NLS-1$
 	private static final String ATTR_SERVICE_ID = "serviceId"; //$NON-NLS-1$
-	private static final String PROVIDER_CONFIGURATION_ELEMENT_NAME = "provider-configuration"; //$NON-NLS-1$
-	private static final String ATTR_PROVIDER_ID = "provider-id"; //$NON-NLS-1$
 	private static final String BUILD_SCENARIO_ELEMENT_NAME = "build-scenario"; //$NON-NLS-1$
 	private static final String CONFIG_ID_ELEMENT_NAME = "config-id-to-build-scenario"; //$NON-NLS-1$
-	private static final String TEMPLATE_SERVICE_CONFIGURATION_ELEMENT_NAME = "template-service-configuration-element-name"; //$NON-NLS-1$
 
 	// Each new configuration id appends a number to the parent id. So we strip off the last id number to get the parent. We assume
 	// the configuration does not have a parent and return null if the result does not end with a number.
@@ -100,60 +92,6 @@ public class BuildConfigurationManager {
 
 		return null;
 	}
-
-	/**
-	 * Load a service provider from persistent state This method is a copy of
-	 * org.eclipse.ptp.services.core.ServiceModelManager.loadServiceProvider with minor modifications made to satisfy the compiler.
-	 * 
-	 * @param providerMemento
-	 * @param service
-	 * @return the service provider
-	 */
-	private static IServiceProvider loadServiceProvider(IMemento providerMemento, IService service) {
-		if (service == null) {
-			return null;
-		}
-
-		String providerId = providerMemento.getString(ATTR_PROVIDER_ID);
-		IServiceProviderDescriptor descriptor = service.getProviderDescriptor(providerId);
-		if (descriptor != null) {
-			IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(descriptor);
-			if (provider != null) {
-				if (provider instanceof ServiceProvider) {
-					IMemento providerConfigMemento = providerMemento.getChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
-					((ServiceProvider) provider).restoreState(providerConfigMemento);
-				}
-				return provider;
-			} else {
-				// TODO: What to do here?
-				// ServicesCorePlugin.getDefault().logErrorMessage(Messages.ServiceModelManager_2);
-			}
-		} else {
-			// TODO: What to do here?
-			// ServicesCorePlugin.getDefault().logErrorMessage(Messages.ServiceModelManager_0 + providerId);
-		}
-		return null;
-	}
-
-	/**
-	 * Save the state of a service provider This method is a copy of
-	 * org.eclipse.ptp.services.core.ServiceModelManager.saveProviderState
-	 * 
-	 * @param provider
-	 * @param parentMemento
-	 */
-	private static void saveProviderState(IServiceProvider provider, IMemento parentMemento) {
-		if (provider instanceof ServiceProvider) {
-			IMemento providerConfigMemento = parentMemento.createChild(PROVIDER_CONFIGURATION_ELEMENT_NAME);
-			((ServiceProvider) provider).saveState(providerConfigMemento);
-		}
-	}
-
-	private final Map<IProject, IServiceConfiguration> fProjectToTemplateConfigurationMap = Collections
-			.synchronizedMap(new HashMap<IProject, IServiceConfiguration>());
-
-	private final Map<IServiceConfiguration, IProject> fTemplateToProjectMap = Collections
-			.synchronizedMap(new HashMap<IServiceConfiguration, IProject>());
 
 	private final Map<String, BuildScenario> fBuildConfigToBuildScenarioMap = Collections
 			.synchronizedMap(new HashMap<String, BuildScenario>());
@@ -274,9 +212,10 @@ public class BuildConfigurationManager {
 		if (bconf == null) {
 			throw new NullPointerException();
 		}
-		if (!(fProjectToTemplateConfigurationMap.containsKey(bconf.getOwner().getProject()))) {
+		if (getTemplateServiceConfigurationId(bconf.getOwner().getProject()) == null) {
 			throw new RuntimeException(Messages.BCM_InitError);
 		}
+
 		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
 		BuildScenario buildScenario = fBuildConfigToBuildScenarioMap.get(bconf.getId());
 		if (buildScenario == null) {
@@ -301,9 +240,10 @@ public class BuildConfigurationManager {
 		if (bconf == null) {
 			throw new NullPointerException();
 		}
-		if (!(fProjectToTemplateConfigurationMap.containsKey(bconf.getOwner().getProject()))) {
+		if (getTemplateServiceConfigurationId(bconf.getOwner().getProject()) == null) {
 			throw new RuntimeException(Messages.BCM_InitError);
 		}
+
 		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
 		BuildScenario bs = fBuildConfigToBuildScenarioMap.get(bconf.getId());
 		if (bs == null) {
@@ -325,7 +265,11 @@ public class BuildConfigurationManager {
 	 * @return sync provider name
 	 */
 	public String getProjectSyncProvider(IProject project) {
-		IServiceConfiguration serviceConfig = fProjectToTemplateConfigurationMap.get(project);
+		String serviceConfigId = getTemplateServiceConfigurationId(project);
+		if (serviceConfigId == null) {
+			return null;
+		}
+		IServiceConfiguration serviceConfig = ServiceModelManager.getInstance().getConfiguration(serviceConfigId);
 		if (serviceConfig == null) {
 			return null;
 		}
@@ -375,8 +319,20 @@ public class BuildConfigurationManager {
 		if (project == null || sc == null || bs == null) {
 			throw new NullPointerException();
 		}
-		fProjectToTemplateConfigurationMap.put(project, sc);
-		fTemplateToProjectMap.put(sc, project);
+
+		IScopeContext context = new ProjectScope(project);
+		Preferences node = context.getNode(projectScopeSyncNode);
+		if (node == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_0);
+			return;
+		}
+		node.put(TEMPLATE_KEY, sc.getId());
+		try {
+			node.flush();
+		} catch (BackingStoreException e) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_1, e);
+		}
+
 		initializeOrUpdateConfigurations(project, bs);
 	}
 
@@ -389,7 +345,11 @@ public class BuildConfigurationManager {
 		if (project == null) {
 			throw new NullPointerException();
 		}
-		return fProjectToTemplateConfigurationMap.containsKey(project);
+		if (getTemplateServiceConfigurationId(project) == null) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	/**
@@ -400,11 +360,6 @@ public class BuildConfigurationManager {
 	 */
 	public synchronized void saveConfigurationData() throws IOException {
 		XMLMemento rootMemento = XMLMemento.createWriteRoot(BUILD_CONFIGURATION_ELEMENT_NAME);
-
-		// First, save template service configurations
-		IServiceConfiguration[] templateServiceConfigurationArray = fProjectToTemplateConfigurationMap.values().toArray(
-				new IServiceConfiguration[0]);
-		saveServiceConfigurations(rootMemento, templateServiceConfigurationArray, TEMPLATE_SERVICE_CONFIGURATION_ELEMENT_NAME);
 
 		// Now save build scenarios, including creating and storing an id number for each.
 		Map<BuildScenario, Integer> buildScenarioToIdMap = new HashMap<BuildScenario, Integer>();
@@ -448,7 +403,7 @@ public class BuildConfigurationManager {
 		if (bs == null || bconf == null) {
 			throw new NullPointerException();
 		}
-		if (!(fProjectToTemplateConfigurationMap.containsKey(bconf.getOwner().getProject()))) {
+		if (getTemplateServiceConfigurationId((bconf.getOwner().getProject())) == null) {
 			throw new RuntimeException(Messages.BCM_InitError);
 		}
 		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
@@ -475,7 +430,7 @@ public class BuildConfigurationManager {
 	// Does the low-level work of creating a copy of a service configuration
 	private IServiceConfiguration copyTemplateServiceConfiguration(IProject project) {
 		IServiceConfiguration newConfig = ServiceModelManager.getInstance().newServiceConfiguration(""); //$NON-NLS-1$
-		IServiceConfiguration oldConfig = fProjectToTemplateConfigurationMap.get(project);
+		IServiceConfiguration oldConfig = ServiceModelManager.getInstance().getConfiguration(getTemplateServiceConfigurationId(project));
 		if (oldConfig == null) {
 			throw new RuntimeException(Messages.BCM_TemplateError + project.getName());
 		}
@@ -577,51 +532,6 @@ public class BuildConfigurationManager {
 		fBuildScenarioToSConfigMap.remove(buildScenario);
 	}
 
-	/**
-	 * Do the actual job of loading configurations. This method is copied from
-	 * org.eclipse.ptp.services.core.ServiceModelManager.doLoadConfigurations, which is private. It has been modified to load
-	 * project names and map projects to templates. The import parameter has been removed. (We do not care about the id numbers,
-	 * since these configurations are for our own internal purposes.) Also, the memento name is now a parameter. Other minor
-	 * modifications made to satisfy the compiler.
-	 * 
-	 * @param rootMemento
-	 */
-	private void doLoadConfigurations(IMemento rootMemento, String mementoChildName) {
-		ServiceModelManager smm = ServiceModelManager.getInstance();
-		Set<IServiceConfiguration> configs = new HashSet<IServiceConfiguration>();
-
-		for (IMemento configMemento : rootMemento.getChildren(mementoChildName)) {
-			String configName = configMemento.getString(ATTR_NAME);
-			String projectName = configMemento.getString(ATTR_PROJECT);
-			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-			if (project == null) {
-				throw new RuntimeException(Messages.BCM_ProjectError + project);
-			}
-			// Interface IServiceConfiguration cannot be used because of "addFormerServiceProvider" method.
-			ServiceConfiguration config = (ServiceConfiguration) smm.newServiceConfiguration(configName);
-
-			for (IMemento serviceMemento : configMemento.getChildren(SERVICE_ELEMENT_NAME)) {
-				String serviceId = serviceMemento.getString(ATTR_ID);
-				IService service = smm.getService(serviceId);
-				IServiceProvider provider = loadServiceProvider(serviceMemento, service);
-				config.setServiceProvider(service, provider);
-			}
-
-			for (IMemento disabledMemento : configMemento.getChildren(DISABLED_PROVIDERS_ELEMENT_NAME)) {
-				String serviceId = disabledMemento.getString(ATTR_ID);
-				IService service = smm.getService(serviceId);
-				for (IMemento providerMemento : disabledMemento.getChildren(PROVIDER_ELEMENT_NAME)) {
-					IServiceProvider provider = loadServiceProvider(providerMemento, service);
-					config.addFormerServiceProvider(service, provider);
-				}
-			}
-
-			configs.add(config);
-			fProjectToTemplateConfigurationMap.put(project, config);
-			fTemplateToProjectMap.put(config, project);
-		}
-	}
-
 	// Find the closest ancestor of the configuration that we have recorded.
 	private String findAncestorConfig(String configId) {
 		while ((configId = getParentId(configId)) != null) {
@@ -656,9 +566,8 @@ public class BuildConfigurationManager {
 						throw new RuntimeException(Messages.BCM_AncestorError + config.getId());
 					}
 					setBuildScenarioForBuildConfigurationInternal(fBuildConfigToBuildScenarioMap.get(parentConfig), config);
-
 				}
-				// Initialize
+			// Initialize
 			} else {
 				setBuildScenarioForBuildConfigurationInternal(bs, config);
 			}
@@ -687,26 +596,8 @@ public class BuildConfigurationManager {
 		}
 
 		// Clear all data structures
-		fProjectToTemplateConfigurationMap.clear();
-		fTemplateToProjectMap.clear();
 		fBuildConfigToBuildScenarioMap.clear();
 		fBuildScenarioToSConfigMap.clear();
-
-		// Load service configurations
-		doLoadConfigurations(rootMemento, TEMPLATE_SERVICE_CONFIGURATION_ELEMENT_NAME);
-
-		// Load all configurations for all projects and stash into a temporary map
-		Map<String, IConfiguration> confSet = new HashMap<String, IConfiguration>();
-		for (IProject project : fProjectToTemplateConfigurationMap.keySet()) {
-			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-			if (buildInfo == null) {
-				continue;
-			}
-			IConfiguration[] bconfs = buildInfo.getManagedProject().getConfigurations();
-			for (IConfiguration bconf : bconfs) {
-				confSet.put(bconf.getId(), bconf);
-			}
-		}
 
 		// Load build scenarios - stash them into a temporary map also
 		Map<Integer, BuildScenario> IdToBuildScenarioMap = new HashMap<Integer, BuildScenario>();
@@ -721,7 +612,7 @@ public class BuildConfigurationManager {
 		for (IMemento configMemento : rootMemento.getChildren(CONFIG_ID_ELEMENT_NAME)) {
 			String configId = configMemento.getString(ATTR_ID);
 			Integer buildScenarioId = configMemento.getInteger(ATTR_BUILD_SCENARIO_ID);
-			IConfiguration config = confSet.get(configId);
+			IConfiguration config = ManagedBuildManager.getExtensionConfiguration(configId);
 			if (config == null) {
 				continue;
 			}
@@ -754,51 +645,6 @@ public class BuildConfigurationManager {
 		}
 	}
 
-	/**
-	 * Save a collection of service configurations to the memento NOTE: does not actually save the memento. This method is copied
-	 * from org.eclipse.ptp.services.core.ServiceModelManager.saveConfigurations, which could not be used directly because it is
-	 * private. It has been modified to input a memento name and to save project name.
-	 * 
-	 * @param memento
-	 *            memento used to save configurations
-	 * @param configs
-	 *            collection of service configurations to save
-	 */
-	private void saveServiceConfigurations(IMemento memento, IServiceConfiguration[] configs, String mementoChildName) {
-		for (IServiceConfiguration config : configs) {
-			String configurationName = config.getName();
-			String projectName = fTemplateToProjectMap.get(config).getName();
-
-			IMemento configMemento = memento.createChild(mementoChildName);
-			configMemento.putString(ATTR_NAME, configurationName);
-			configMemento.putString(ATTR_PROJECT, projectName);
-
-			Set<IService> services = config.getServices();
-			for (IService service : services) {
-				if (!config.isDisabled(service)) {
-					IServiceProvider provider = config.getServiceProvider(service);
-					IMemento serviceMemento = configMemento.createChild(SERVICE_ELEMENT_NAME);
-					serviceMemento.putString(ATTR_ID, service.getId());
-					serviceMemento.putString(ATTR_PROVIDER_ID, provider.getId());
-					saveProviderState(provider, serviceMemento);
-				}
-
-				if (config instanceof ServiceConfiguration) {
-					Set<IServiceProvider> disabledProviders = ((ServiceConfiguration) config).getFormerServiceProviders(service);
-					if (!disabledProviders.isEmpty()) {
-						IMemento disabledMemento = configMemento.createChild(DISABLED_PROVIDERS_ELEMENT_NAME);
-						disabledMemento.putString(ATTR_ID, service.getId());
-						for (IServiceProvider disabledProvider : disabledProviders) {
-							IMemento providerMemento = disabledMemento.createChild(PROVIDER_ELEMENT_NAME);
-							providerMemento.putString(ATTR_PROVIDER_ID, disabledProvider.getId());
-							saveProviderState(disabledProvider, providerMemento);
-						}
-					}
-				}
-			}
-		}
-	}
-
 	// Actual internal code for setting a build scenario
 	private void setBuildScenarioForBuildConfigurationInternal(BuildScenario bs, IConfiguration bconf) {
 		synchronized (fBuildConfigToBuildScenarioMap) {
@@ -812,5 +658,21 @@ public class BuildConfigurationManager {
 			}
 			addBuildScenario(bconf.getOwner().getProject(), bs);
 		}
+	}
+	
+	// Return ID of the project's template service configuration, or null if not found (project not initialized)
+	private static String getTemplateServiceConfigurationId(IProject project) {
+		if (project == null) {
+			throw new NullPointerException();
+		}
+
+		IScopeContext context = new ProjectScope(project);
+		Preferences node = context.getNode(projectScopeSyncNode);
+		if (node == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_0);
+			return null;
+		}
+		
+		return node.get(TEMPLATE_KEY, null);
 	}
 }
