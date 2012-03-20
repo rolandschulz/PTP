@@ -166,7 +166,7 @@
 		
 		<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
 		<property name="cdtCoreAIXJar" value="org.eclipse.cdt.core.aix_${cdtCoreAIXVersion}.jar"/>
-		<property name="cdtCoreLinuxPPCJar" value="org.eclipse.cdt.core.linux.ppc64_${cdtCoreLinuxPPCVersion}.jar"/>
+		<property name="cdtCoreLinuxPPCJar" value="org.eclipse.cdt.core.linux.ppc_${cdtCoreLinuxPPCVersion}.jar"/>
 		<property name="cdtCoreLinuxx86Jar" value="org.eclipse.cdt.core.linux.x86_${cdtCoreLinuxx86Version}.jar"/>
 		<property name="cdtCoreLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtCoreLRParserVersion}.jar"/>
 		<property name="cdtCoreUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtCoreUPCParserVersion}.jar"/>
