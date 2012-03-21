@@ -10,11 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,9 +48,6 @@ import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceProvider;
-import org.eclipse.ptp.services.core.ServicesCorePlugin;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
@@ -70,14 +62,8 @@ import org.osgi.service.prefs.Preferences;
  */
 public class BuildConfigurationManager {
 	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
+	private static final String CONFIG_NODE_NAME = "config"; //$NON-NLS-1$
 	private static final String TEMPLATE_KEY = "template"; //$NON-NLS-1$
-	private static final String DEFAULT_SAVE_FILE_NAME = "BuildConfigurationData.xml"; //$NON-NLS-1$
-	private static final String BUILD_CONFIGURATION_ELEMENT_NAME = "build-configuration-data"; //$NON-NLS-1$
-	private static final String ATTR_ID = "id"; //$NON-NLS-1$
-	private static final String ATTR_BUILD_SCENARIO_ID = "build-id"; //$NON-NLS-1$
-	private static final String ATTR_SERVICE_ID = "serviceId"; //$NON-NLS-1$
-	private static final String BUILD_SCENARIO_ELEMENT_NAME = "build-scenario"; //$NON-NLS-1$
-	private static final String CONFIG_ID_ELEMENT_NAME = "config-id-to-build-scenario"; //$NON-NLS-1$
 
 	// Each new configuration id appends a number to the parent id. So we strip off the last id number to get the parent. We assume
 	// the configuration does not have a parent and return null if the result does not end with a number.
@@ -93,11 +79,8 @@ public class BuildConfigurationManager {
 		return null;
 	}
 
-	private final Map<String, BuildScenario> fBuildConfigToBuildScenarioMap = Collections
-			.synchronizedMap(new HashMap<String, BuildScenario>());
-
-	private final Map<BuildScenario, IServiceConfiguration> fBuildScenarioToSConfigMap = Collections
-			.synchronizedMap(new HashMap<BuildScenario, IServiceConfiguration>());
+	private final Map<IConfiguration, IServiceConfiguration> fBConfigToSConfigMap = Collections
+			.synchronizedMap(new HashMap<IConfiguration, IServiceConfiguration>());
 
 	private static BuildConfigurationManager fInstance = null;
 
@@ -106,17 +89,6 @@ public class BuildConfigurationManager {
 			fInstance = new BuildConfigurationManager();
 		}
 		return fInstance;
-	}
-
-	// TODO: Decide if this is the best way to do initialization and decide best way to handle exceptions.
-	private BuildConfigurationManager() {
-		try {
-			loadConfigurationData();
-		} catch (WorkbenchException e) {
-			this.handleInitError(e);
-		} catch (IOException e) {
-			this.handleInitError(e);
-		}
 	}
 
 	/**
@@ -200,34 +172,6 @@ public class BuildConfigurationManager {
 	}
 
 	/**
-	 * Return the build scenario for the passed configuration. Any newly created configurations should be recorded by the call to
-	 * "updateConfigurations". In addition, for unknown configurations (perhaps newly created configurations not yet recorded in
-	 * CDT, return the build scenario for the closest known ancestor. If no ancestor, return null.
-	 * 
-	 * @param bconf
-	 *            The build configuration
-	 * @return build scenario
-	 */
-	public BuildScenario getBuildScenarioForBuildConfiguration(IConfiguration bconf) {
-		if (bconf == null) {
-			throw new NullPointerException();
-		}
-		if (getTemplateServiceConfigurationId(bconf.getOwner().getProject()) == null) {
-			throw new RuntimeException(Messages.BCM_InitError);
-		}
-
-		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
-		BuildScenario buildScenario = fBuildConfigToBuildScenarioMap.get(bconf.getId());
-		if (buildScenario == null) {
-			String parentConfigId = findAncestorConfig(bconf.getId());
-			if (parentConfigId != null) {
-				buildScenario = fBuildConfigToBuildScenarioMap.get(parentConfigId);
-			}
-		}
-		return buildScenario;
-	}
-
-	/**
 	 * Returns the service configuration set for the given build configuration, or null if it is unavailable.
 	 * 
 	 * @param bconf
@@ -240,22 +184,26 @@ public class BuildConfigurationManager {
 		if (bconf == null) {
 			throw new NullPointerException();
 		}
-		if (getTemplateServiceConfigurationId(bconf.getOwner().getProject()) == null) {
+
+		IProject project = bconf.getOwner().getProject();
+		if (getTemplateServiceConfigurationId(project) == null) {
 			throw new RuntimeException(Messages.BCM_InitError);
 		}
 
-		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
-		BuildScenario bs = fBuildConfigToBuildScenarioMap.get(bconf.getId());
-		if (bs == null) {
-			return null;
-		}
+		initializeOrUpdateConfigurations(project, null);
 
-		IServiceConfiguration conf = fBuildScenarioToSConfigMap.get(bs);
-		if (conf == null) {
-			throw new RuntimeException(Messages.BCM_ScenarioToServiceConfigError);
+		IServiceConfiguration sconf = fBConfigToSConfigMap.get(bconf);
+		if (sconf == null) {
+			BuildScenario bs = this.getBuildScenarioForBuildConfiguration(bconf);
+			if (bs == null) {
+				return null;
+			}
+            sconf = copyTemplateServiceConfiguration(project);
+            modifyServiceConfigurationForBuildScenario(sconf, bs);
+            fBConfigToSConfigMap.put(bconf, sconf);
 		}
-
-		return conf;
+		
+		return sconf;
 	}
 
 	/**
@@ -352,81 +300,6 @@ public class BuildConfigurationManager {
 		}
 	}
 
-	/**
-	 * Save configuration data to plugin metadata area
-	 * 
-	 * @throws IOException
-	 *             on problems writing configuration data to file
-	 */
-	public synchronized void saveConfigurationData() throws IOException {
-		XMLMemento rootMemento = XMLMemento.createWriteRoot(BUILD_CONFIGURATION_ELEMENT_NAME);
-
-		// Now save build scenarios, including creating and storing an id number for each.
-		Map<BuildScenario, Integer> buildScenarioToIdMap = new HashMap<BuildScenario, Integer>();
-		int idNumber = 0;
-		synchronized (fBuildScenarioToSConfigMap) {
-			for (BuildScenario bs : fBuildScenarioToSConfigMap.keySet()) {
-				IMemento bsMemento = rootMemento.createChild(BUILD_SCENARIO_ELEMENT_NAME);
-				bs.saveScenario(bsMemento);
-				bsMemento.putString(ATTR_SERVICE_ID, fBuildScenarioToSConfigMap.get(bs).getId());
-				bsMemento.putInteger(ATTR_ID, idNumber);
-				buildScenarioToIdMap.put(bs, idNumber);
-				++idNumber;
-			}
-		}
-
-		// Finally save a map of configuration ids to build scenario ids
-		synchronized (fBuildConfigToBuildScenarioMap) {
-			for (String configId : fBuildConfigToBuildScenarioMap.keySet()) {
-				IMemento configMemento = rootMemento.createChild(CONFIG_ID_ELEMENT_NAME);
-				configMemento.putString(ATTR_ID, configId);
-				configMemento.putInteger(ATTR_BUILD_SCENARIO_ID,
-						buildScenarioToIdMap.get(fBuildConfigToBuildScenarioMap.get(configId)));
-			}
-		}
-
-		IPath savePath = ServicesCorePlugin.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
-		File saveFile = savePath.toFile();
-		rootMemento.save(new FileWriter(saveFile));
-	}
-
-	/**
-	 * Associate the given configuration with the given build scenario. It is very important that we update configurations first, so
-	 * that children of the changed configuration will be properly set to use the prior build scenario. This is not possible,
-	 * though, until the project has been initialized.
-	 * 
-	 * @param buildScenario
-	 * @param bconf
-	 *            the build configuration
-	 */
-	public void setBuildScenarioForBuildConfiguration(BuildScenario bs, IConfiguration bconf) {
-		if (bs == null || bconf == null) {
-			throw new NullPointerException();
-		}
-		if (getTemplateServiceConfigurationId((bconf.getOwner().getProject())) == null) {
-			throw new RuntimeException(Messages.BCM_InitError);
-		}
-		initializeOrUpdateConfigurations(bconf.getOwner().getProject(), null);
-		setBuildScenarioForBuildConfigurationInternal(bs, bconf);
-	}
-
-	/**
-	 * Add a new build scenario, creating a new service configuration for that scenario if necessary.
-	 * 
-	 * @param buildScenario
-	 */
-	private void addBuildScenario(IProject project, BuildScenario buildScenario) {
-		// Check if build scenario already known
-		synchronized (fBuildScenarioToSConfigMap) {
-			if (fBuildScenarioToSConfigMap.containsKey(buildScenario)) {
-				return;
-			}
-			IServiceConfiguration sConfig = copyTemplateServiceConfiguration(project);
-			modifyServiceConfigurationForBuildScenario(sConfig, buildScenario);
-			fBuildScenarioToSConfigMap.put(buildScenario, sConfig);
-		}
-	}
-
 	// Does the low-level work of creating a copy of a service configuration
 	private IServiceConfiguration copyTemplateServiceConfiguration(IProject project) {
 		IServiceConfiguration newConfig = ServiceModelManager.getInstance().newServiceConfiguration(""); //$NON-NLS-1$
@@ -486,7 +359,6 @@ public class BuildConfigurationManager {
 			configDes.setName(configName);
 			configDes.setDescription(configDesc);
 			config.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
-			this.setBuildScenarioForBuildConfigurationInternal(buildScenario, config);
 			configAdded = true;
 			try {
 				CoreModel.getDefault().setProjectDescription(project, projectDes, true, null);
@@ -497,11 +369,7 @@ public class BuildConfigurationManager {
 				creationError = Messages.BCM_SetConfigDescriptionError;
 			}
 			if (configAdded) {
-				try {
-					this.saveConfigurationData();
-				} catch (IOException e) {
-					projectDes.removeConfiguration(configDes);
-				}
+				this.setBuildScenarioForBuildConfiguration(buildScenario, config);
 			}
 		} else {
 			creationError = Messages.BCM_CreateConfigError;
@@ -518,34 +386,24 @@ public class BuildConfigurationManager {
 		return config;
 	}
 
-	/**
-	 * Delete a build scenario and also handle removal of unneeded service configurations
-	 * 
-	 * @param project
-	 * @param buildScenario
-	 */
-	private void deleteBuildScenario(IProject project, BuildScenario buildScenario) {
-		IServiceConfiguration oldConfig = fBuildScenarioToSConfigMap.get(buildScenario);
-		if (oldConfig == null) {
-			throw new RuntimeException(Messages.BCM_ScenarioToServiceConfigError);
-		}
-		fBuildScenarioToSConfigMap.remove(buildScenario);
-	}
-
 	// Find the closest ancestor of the configuration that we have recorded.
-	private String findAncestorConfig(String configId) {
-		while ((configId = getParentId(configId)) != null) {
-			if (fBuildConfigToBuildScenarioMap.containsKey(configId)) {
-				return configId;
+	private String findAncestorConfig(String configId, Preferences prefRootNode) {
+		try {
+			if (!prefRootNode.nodeExists(CONFIG_NODE_NAME)) {
+				RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_2);
+				return null;
 			}
+
+			Preferences prefGeneralConfigNode = prefRootNode.node(CONFIG_NODE_NAME);
+			while (configId != null && !prefGeneralConfigNode.nodeExists(configId)) {
+				configId = getParentId(configId);
+			}
+		} catch (BackingStoreException e) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_2, e);
+			return null;
 		}
-		return null;
 
-	}
-
-	private void handleInitError(Throwable e) {
-		fInstance = null;
-		RDTSyncCorePlugin.log(Messages.BCM_InitializationError, e);
+		return configId;
 	}
 
 	// If build scenario is not null, then set all configurations to use that build scenario (initialize). If null, set all
@@ -555,72 +413,32 @@ public class BuildConfigurationManager {
 		if (buildInfo == null) {
 			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
 		}
+		
+		// Get project root preference node
+		IScopeContext context = new ProjectScope(project);
+		Preferences prefRootNode = context.getNode(projectScopeSyncNode);
+		if (prefRootNode == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_0);
+			return;
+		}
 
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allConfigs) {
 			// Update
 			if (bs == null) {
-				if (!(fBuildConfigToBuildScenarioMap.containsKey(config.getId()))) {
-					String parentConfig = findAncestorConfig(config.getId());
-					if (parentConfig == null) {
-						throw new RuntimeException(Messages.BCM_AncestorError + config.getId());
-					}
-					setBuildScenarioForBuildConfigurationInternal(fBuildConfigToBuildScenarioMap.get(parentConfig), config);
+				String parentConfigId = findAncestorConfig(config.getId(), prefRootNode);
+				if (parentConfigId == null) {
+					throw new RuntimeException(Messages.BCM_AncestorError + config.getId());
+				}
+				IConfiguration parentConfig = buildInfo.getManagedProject().getConfiguration(parentConfigId);
+				BuildScenario parentBS = this.getBuildScenarioForBuildConfiguration(parentConfig);
+				if (parentBS != null) {
+					setBuildScenarioForBuildConfiguration(parentBS, config);
 				}
 			// Initialize
 			} else {
-				setBuildScenarioForBuildConfigurationInternal(bs, config);
+				setBuildScenarioForBuildConfiguration(bs, config);
 			}
-		}
-	}
-
-	/**
-	 * Load configuration data. All previously stored data is erased.
-	 * 
-	 * @throws IOException
-	 */
-	private void loadConfigurationData() throws IOException, WorkbenchException {
-		// Setup root memento
-		IPath loadPath = ServicesCorePlugin.getDefault().getStateLocation().append(DEFAULT_SAVE_FILE_NAME);
-		File loadFile = loadPath.toFile();
-		if (!(loadFile.exists())) {
-			return;
-		}
-
-		BufferedReader reader = new BufferedReader(new FileReader(loadFile));
-		XMLMemento rootMemento;
-		try {
-			rootMemento = XMLMemento.createReadRoot(reader);
-		} catch (WorkbenchException e) {
-			throw e;
-		}
-
-		// Clear all data structures
-		fBuildConfigToBuildScenarioMap.clear();
-		fBuildScenarioToSConfigMap.clear();
-
-		// Load build scenarios - stash them into a temporary map also
-		Map<Integer, BuildScenario> IdToBuildScenarioMap = new HashMap<Integer, BuildScenario>();
-		for (IMemento bsMemento : rootMemento.getChildren(BUILD_SCENARIO_ELEMENT_NAME)) {
-			BuildScenario bs = BuildScenario.loadScenario(bsMemento);
-			Integer id = bsMemento.getInteger(ATTR_ID);
-			IdToBuildScenarioMap.put(id, bs);
-		}
-
-		// Load config id to build scenario id mappings and use our available machinery to rebuild maps and custom service
-		// configurations. We skip any configurations not found earlier.
-		for (IMemento configMemento : rootMemento.getChildren(CONFIG_ID_ELEMENT_NAME)) {
-			String configId = configMemento.getString(ATTR_ID);
-			Integer buildScenarioId = configMemento.getInteger(ATTR_BUILD_SCENARIO_ID);
-			IConfiguration config = ManagedBuildManager.getExtensionConfiguration(configId);
-			if (config == null) {
-				continue;
-			}
-			BuildScenario bs = IdToBuildScenarioMap.get(buildScenarioId);
-			if (bs == null) {
-				continue;
-			}
-			setBuildScenarioForBuildConfigurationInternal(IdToBuildScenarioMap.get(buildScenarioId), config);
 		}
 	}
 
@@ -644,21 +462,6 @@ public class BuildConfigurationManager {
 			sConfig.disable(syncService);
 		}
 	}
-
-	// Actual internal code for setting a build scenario
-	private void setBuildScenarioForBuildConfigurationInternal(BuildScenario bs, IConfiguration bconf) {
-		synchronized (fBuildConfigToBuildScenarioMap) {
-			BuildScenario oldbs = fBuildConfigToBuildScenarioMap.get(bconf.getId());
-			fBuildConfigToBuildScenarioMap.put(bconf.getId(), bs);
-			// Remove build scenarios no longer referenced. This ensures that, at least, there are no more build scenarios than
-			// there
-			// are build configurations.
-			if ((oldbs != null) && (!(fBuildConfigToBuildScenarioMap.containsValue(oldbs)))) {
-				deleteBuildScenario(bconf.getOwner().getProject(), oldbs);
-			}
-			addBuildScenario(bconf.getOwner().getProject(), bs);
-		}
-	}
 	
 	// Return ID of the project's template service configuration, or null if not found (project not initialized)
 	private static String getTemplateServiceConfigurationId(IProject project) {
@@ -674,5 +477,85 @@ public class BuildConfigurationManager {
 		}
 		
 		return node.get(TEMPLATE_KEY, null);
+	}
+	
+	/**
+	 * Return the build scenario for the passed configuration. Any newly created configurations should be recorded by the call to
+	 * "initializeOrUpdateConfigurations". For configurations still unknown (perhaps newly created configurations not yet recorded
+	 *  in CDT), return the build scenario for the closest known ancestor.
+	 * 
+	 * @param bconf
+	 *            The build configuration
+	 * @return build scenario or null if there are problems accessing configuration's information
+	 */
+	public BuildScenario getBuildScenarioForBuildConfiguration(IConfiguration bconf) {
+		if (bconf == null) {
+			throw new NullPointerException();
+		}
+
+		IProject project = bconf.getOwner().getProject();
+		if (getTemplateServiceConfigurationId(project) == null) {
+			throw new RuntimeException(Messages.BCM_InitError);
+		}
+		
+		// Update configuration information
+		initializeOrUpdateConfigurations(project, null);
+
+		// Get project root preference node
+		IScopeContext context = new ProjectScope(project);
+		Preferences prefRootNode = context.getNode(projectScopeSyncNode);
+		if (prefRootNode == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_0);
+			return null;
+		}
+		
+		String configId = this.findAncestorConfig(bconf.getId(), prefRootNode);
+		if (configId == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_4 + bconf.getName());
+			return null;
+		}
+
+		// Load scenario from the config's node
+		Preferences prefConfigNode = prefRootNode.node(CONFIG_NODE_NAME + "/" + configId); //$NON-NLS-1$
+		BuildScenario buildScenario = BuildScenario.loadScenario(prefConfigNode);
+		if (buildScenario == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_4 + bconf.getName());
+			return null;
+		}
+
+		return buildScenario;
+	}
+
+	/**
+	 * Associate the given configuration with the given build scenario. It is very important that we update configurations first,
+	 * so that children of the changed configuration will be properly set to use the prior build scenario. This is not possible,
+	 * though, until the project has been initialized.
+	 * 
+	 * @param buildScenario
+	 * @param bconf
+	 *            the build configuration
+	 */
+	public void setBuildScenarioForBuildConfiguration(BuildScenario bs, IConfiguration bconf) {
+		if (bs == null || bconf == null) {
+			throw new NullPointerException();
+		}
+		
+		IProject project = bconf.getOwner().getProject();
+		if (getTemplateServiceConfigurationId((project)) == null) {
+			throw new RuntimeException(Messages.BCM_InitError);
+		}
+
+		initializeOrUpdateConfigurations(project, null);
+
+		// Get project root preference node
+		IScopeContext context = new ProjectScope(project);
+		Preferences prefRootNode = context.getNode(projectScopeSyncNode);
+		if (prefRootNode == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_0);
+			return;
+		}
+
+		Preferences prefConfigNode = prefRootNode.node(CONFIG_NODE_NAME + "/" + bconf.getId()); //$NON-NLS-1$
+		bs.saveScenario(prefConfigNode);
 	}
 }

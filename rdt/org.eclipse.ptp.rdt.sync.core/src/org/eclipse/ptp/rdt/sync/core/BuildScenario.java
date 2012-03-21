@@ -13,11 +13,11 @@ package org.eclipse.ptp.rdt.sync.core;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ui.IMemento;
+import org.osgi.service.prefs.Preferences;
 
 /**
  * Class for build information that will be mapped to a specific service configuration. Utility methods for reading and writing
- * the information to a memento are provided.
+ * the information to a preference node are provided.
  */
 public class BuildScenario {
 	private static final String ATTR_SYNC_PROVIDER = "sync-provider"; //$NON-NLS-1$
@@ -69,31 +69,31 @@ public class BuildScenario {
 	}
 	
 	/**
-	 * Store scenario in a given memento 
+	 * Store scenario in a given preference node 
 	 *
-	 * @param memento
+	 * @param preference node
 	 */
-	public void saveScenario(IMemento memento) {
+	public void saveScenario(Preferences prefRootNode) {
 		if (syncProvider != null) {
-			memento.putString(ATTR_SYNC_PROVIDER, syncProvider);
+			prefRootNode.put(ATTR_SYNC_PROVIDER, syncProvider);
 		}
-		memento.putString(ATTR_REMOTE_CONNECTION_ID, remoteConnection.getName());
-		memento.putString(ATTR_LOCATION, location);
-		memento.putString(ATTR_REMOTE_SERVICES_ID, remoteConnection.getRemoteServices().getId());
+		prefRootNode.put(ATTR_REMOTE_CONNECTION_ID, remoteConnection.getName());
+		prefRootNode.put(ATTR_LOCATION, location);
+		prefRootNode.put(ATTR_REMOTE_SERVICES_ID, remoteConnection.getRemoteServices().getId());
 	}
 	
 	/**
-	 * Load data from a memento into a new build scenario.
+	 * Load data from a preference node into a new build scenario.
 	 *
-	 * @param memento
+	 * @param preference node
 	 * @return a new build scenario or null if one of the values is not found or if something goes wrong while trying to find the
 	 * specified IRemoteConnection.
 	 */
-	public static BuildScenario loadScenario(IMemento memento) {
-		String sp = memento.getString(ATTR_SYNC_PROVIDER);
-		String rc = memento.getString(ATTR_REMOTE_CONNECTION_ID);
-		String l = memento.getString(ATTR_LOCATION);
-		String rs = memento.getString(ATTR_REMOTE_SERVICES_ID);
+	public static BuildScenario loadScenario(Preferences prefRootNode) {
+		String sp = prefRootNode.get(ATTR_SYNC_PROVIDER, null);
+		String rc = prefRootNode.get(ATTR_REMOTE_CONNECTION_ID, null);
+		String l = prefRootNode.get(ATTR_LOCATION, null);
+		String rs = prefRootNode.get(ATTR_REMOTE_SERVICES_ID, null);
 		if (rc == null || l == null || rs == null) {
 			return null;
 		}
