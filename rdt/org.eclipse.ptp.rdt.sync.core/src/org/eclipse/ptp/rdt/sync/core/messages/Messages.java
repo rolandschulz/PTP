@@ -54,6 +54,10 @@ public class Messages extends NLS {
 
 	public static String BuildConfigurationManager_4;
 
+	public static String BuildConfigurationManager_5;
+
+	public static String BCM_GetBuildInfoError;
+
 	public static String PathResourceMatcher_0;
 
 	public static String RegexResourceMatcher_0;
