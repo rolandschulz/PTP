@@ -275,7 +275,7 @@ public class BuildConfigurationManager {
 		
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allConfigs) {
-			setBuildScenarioForBuildConfiguration(bs, config);
+			setBuildScenarioForBuildConfigurationInternal(bs, config);
 		}
 	}
 
@@ -365,7 +365,7 @@ public class BuildConfigurationManager {
 				creationError = Messages.BCM_SetConfigDescriptionError;
 			}
 			if (configAdded) {
-				this.setBuildScenarioForBuildConfiguration(buildScenario, config);
+				this.setBuildScenarioForBuildConfigurationInternal(buildScenario, config);
 			}
 		} else {
 			creationError = Messages.BCM_CreateConfigError;
@@ -380,40 +380,6 @@ public class BuildConfigurationManager {
 		}
 
 		return config;
-	}
-
-	// Find the closest ancestor of the configuration that we have recorded.
-	private String findAncestorConfig(String configId, Preferences prefRootNode) {
-		try {
-			if (!prefRootNode.nodeExists(CONFIG_NODE_NAME)) {
-				RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_2);
-				return null;
-			}
-
-			Preferences prefGeneralConfigNode = prefRootNode.node(CONFIG_NODE_NAME);
-			while (configId != null && !prefGeneralConfigNode.nodeExists(configId)) {
-				configId = getParentId(configId);
-			}
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_2, e);
-			return null;
-		}
-
-		return configId;
-	}
-	
-	// Each new configuration id appends a number to the parent id. So we strip off the last id number to get the parent. We assume
-	// the configuration does not have a parent and return null if the result does not end with a number.
-	private static String getParentId(String configId) {
-		String idRegEx = "\\.\\d+$"; //$NON-NLS-1$
-		Pattern idPattern = Pattern.compile(idRegEx);
-		String parentConfigId = configId.replaceFirst(idRegEx, ""); //$NON-NLS-1$
-
-		if (idPattern.matcher(parentConfigId).find()) {
-			return parentConfigId;
-		}
-
-		return null;
 	}
 
 	// Set all unknown configurations (those without a build scenario) to use the build scenario of their closest ancestor
@@ -437,20 +403,16 @@ public class BuildConfigurationManager {
 
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allConfigs) {
-			String parentConfigId = findAncestorConfig(config.getId(), prefRootNode);
-			if (parentConfigId == config.getId()) {
-				continue;
-			}
-			if (parentConfigId == null) {
+			BuildScenarioAndConfiguration parentConfigInfo = getBuildScenarioForBuildConfigurationInternal(config);
+			if (parentConfigInfo == null) {
 				throw new RuntimeException(Messages.BCM_AncestorError + config.getId());
 			}
-			BuildScenario parentBS = null;
-			IConfiguration parentConfig = buildInfo.getManagedProject().getConfiguration(parentConfigId);
-			if (parentConfig != null) {
-				parentBS = this.getBuildScenarioForBuildConfiguration(parentConfig);
+			if (parentConfigInfo.configId == config.getId()) {
+				continue;
 			}
-			if (parentBS != null) {
-				setBuildScenarioForBuildConfiguration(parentBS, config);
+			IConfiguration parentConfig = buildInfo.getManagedProject().getConfiguration(parentConfigInfo.configId);
+			if (parentConfig != null) {
+				setBuildScenarioForBuildConfigurationInternal(parentConfigInfo.bs, config);
 			} else {
 				RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_5 + config.getId());
 			}
@@ -513,32 +475,81 @@ public class BuildConfigurationManager {
 			throw new RuntimeException(Messages.BCM_InitError);
 		}
 		
-		// Update configuration information
 		updateConfigurations(project);
+		BuildScenario bs = this.getBuildScenarioForBuildConfigurationInternal(bconf).bs;
+		if (bs == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_4 + bconf.getName());
+		}
+		
+		return bs;
+	}
+	
+	// Simple class for bundling a build scenario with its configuration id
+	private class BuildScenarioAndConfiguration {
+		public final BuildScenario bs;
+		public final String configId;
+		
+		BuildScenarioAndConfiguration(BuildScenario scenario, String configuration) {
+			bs = scenario;
+			configId = configuration;
+		}
+	}
 
-		// Get project root preference node
+	// Return the build scenario stored for the passed id or the build scenario of its nearest ancestor.
+	// Return null if not found.
+	private BuildScenarioAndConfiguration getBuildScenarioForBuildConfigurationInternal(IConfiguration bconf) {
+		if (bconf == null) {
+			throw new NullPointerException();
+		}
+		
+		IProject project = bconf.getOwner().getProject();
+		if (!isInitialized(project)) {
+			throw new RuntimeException(Messages.BCM_InitError);
+		}
+		
 		IScopeContext context = new ProjectScope(project);
 		Preferences prefRootNode = context.getNode(projectScopeSyncNode);
 		if (prefRootNode == null) {
 			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_0);
 			return null;
 		}
-		
-		String configId = this.findAncestorConfig(bconf.getId(), prefRootNode);
-		if (configId == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_4 + bconf.getName());
+
+		try {
+			if (!prefRootNode.nodeExists(CONFIG_NODE_NAME)) {
+				RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_2);
+				return null;
+			}
+			
+			String configId = bconf.getId();
+			Preferences prefGeneralConfigNode = prefRootNode.node(CONFIG_NODE_NAME);
+			while (configId != null && !prefGeneralConfigNode.nodeExists(configId)) {
+				configId = getParentId(configId);
+			}
+			
+			if (configId != null) {
+				BuildScenario bs = BuildScenario.loadScenario(prefGeneralConfigNode.node(configId));
+				return new BuildScenarioAndConfiguration(bs, configId);
+			} else {
+				return null;
+			}
+		} catch (BackingStoreException e) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_2, e);
 			return null;
 		}
+	}
+	
+	// Each new configuration id appends a number to the parent id. So we strip off the last id number to get the parent. We assume
+	// the configuration does not have a parent and return null if the result does not end with a number.
+	private static String getParentId(String configId) {
+		String idRegEx = "\\.\\d+$"; //$NON-NLS-1$
+		Pattern idPattern = Pattern.compile(idRegEx);
+		String parentConfigId = configId.replaceFirst(idRegEx, ""); //$NON-NLS-1$
 
-		// Load scenario from the config's node
-		Preferences prefConfigNode = prefRootNode.node(CONFIG_NODE_NAME + "/" + configId); //$NON-NLS-1$
-		BuildScenario buildScenario = BuildScenario.loadScenario(prefConfigNode);
-		if (buildScenario == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_4 + bconf.getName());
-			return null;
+		if (idPattern.matcher(parentConfigId).find()) {
+			return parentConfigId;
 		}
 
-		return buildScenario;
+		return null;
 	}
 
 	/**
@@ -551,7 +562,7 @@ public class BuildConfigurationManager {
 	 *            the build configuration
 	 */
 	public void setBuildScenarioForBuildConfiguration(BuildScenario bs, IConfiguration bconf) {
-		if (bs == null || bconf == null) {
+		if (bconf == null) {
 			throw new NullPointerException();
 		}
 		
@@ -561,6 +572,18 @@ public class BuildConfigurationManager {
 		}
 
 		updateConfigurations(project);
+		this.setBuildScenarioForBuildConfigurationInternal(bs, bconf);
+	}
+	
+	private void setBuildScenarioForBuildConfigurationInternal(BuildScenario bs, IConfiguration bconf) {
+		if (bs == null || bconf == null) {
+			throw new NullPointerException();
+		}
+		
+		IProject project = bconf.getOwner().getProject();
+		if (!isInitialized(project)) {
+			throw new RuntimeException(Messages.BCM_InitError);
+		}
 
 		// Get project root preference node
 		IScopeContext context = new ProjectScope(project);
