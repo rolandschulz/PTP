@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui.properties;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -331,13 +330,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
         String syncProvider = bcm.getProjectSyncProvider(project);
         BuildScenario buildScenario = new BuildScenario(syncProvider, settings.connection, settings.rootLocation);
         bcm.setBuildScenarioForBuildConfiguration(buildScenario, config);
-        try {
-                bcm.saveConfigurationData();
-        } catch (IOException e) {
-        	IStatus status = new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, "Error saving configuration data: " +  //$NON-NLS-1$
-        																										e.getMessage(), e);
-        	StatusManager.getManager().handle(status, StatusManager.SHOW);
-        }
 	}
 	
 	// Connection button handling

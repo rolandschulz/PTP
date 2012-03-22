@@ -32,9 +32,7 @@ import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -66,7 +64,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * Converts existing CDT projects to sync projects.
@@ -203,12 +200,6 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 			BuildScenario localBuildScenario = bcm.createLocalBuildScenario(project);
 			bcm.initProject(project, serviceConfig, localBuildScenario);
-			try {
-				BuildConfigurationManager.getInstance().saveConfigurationData();
-			} catch (IOException e) {
-				StatusManager.getManager().handle(new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, e.getMessage(), e),
-						StatusManager.SHOW);
-			}
 			
 			// Create a remote configuration
 			ISyncServiceProvider provider = participant.getProvider(project);
