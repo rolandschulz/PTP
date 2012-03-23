@@ -94,7 +94,20 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	protected String getConnectionName(ILaunchConfiguration configuration) {
 		final String type;
 		try {
-			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, EMPTY_STRING);
+			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
+		} catch (CoreException e) {
+			return null;
+		}
+		return type;
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	protected String getResourceManagerUniqueName(ILaunchConfiguration configuration) {
+		final String type;
+		try {
+			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String) null);
 		} catch (CoreException e) {
 			return null;
 		}
@@ -250,6 +263,13 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	 */
 	protected void setResourceManagerType(ILaunchConfigurationWorkingCopy configuration, String type) {
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_TYPE, type);
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	protected void setResourceManagerUniqueName(ILaunchConfigurationWorkingCopy configuration, String name) {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, name);
 	}
 
 	/**

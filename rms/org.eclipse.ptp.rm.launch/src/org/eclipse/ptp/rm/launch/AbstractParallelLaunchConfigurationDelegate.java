@@ -51,6 +51,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.IServiceConstants;
@@ -90,6 +91,7 @@ import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.utils.core.ArgumentParser;
+import org.eclipse.swt.widgets.Display;
 
 /**
  *
@@ -436,11 +438,31 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	@Override
 	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
 			throws CoreException {
-		IRemoteConnection conn = getRemoteConnection(configuration, monitor);
-		if (conn != null && conn.isOpen()) {
-			return conn.getRemoteServices().getFileManager(conn);
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		try {
+			final IRemoteConnection conn = getRemoteConnection(configuration, progress.newChild(5));
+			if (conn != null) {
+				if (!conn.isOpen()) {
+					final boolean[] result = new boolean[1];
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							result[0] = MessageDialog.openQuestion(Display.getDefault().getActiveShell(), "Open Connection",
+									"Connection '" + conn.getName() + "' is not open. Would you like to open the connection now?");
+						}
+					});
+					if (!result[0]) {
+						return null;
+					}
+				}
+				return conn.getRemoteServices().getFileManager(conn);
+			}
+			return null;
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
-		return null;
 	}
 
 	/**
@@ -485,13 +507,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		try {
 			IRemoteFileManager localFileManager = getLocalFileManager(configuration);
 			IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration, progress.newChild(5));
-			if (progress.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
-			}
-			if (remoteFileManager == null) {
-				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_0));
+			if (progress.isCanceled() || remoteFileManager == null) {
+				return;
 			}
 
 			IFileStore rres = remoteFileManager.getResource(remotePath);
@@ -526,8 +543,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			IRemoteFileManager localFileManager = getLocalFileManager(configuration);
 			IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration, progress.newChild(5));
 			if (progress.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
+				return;
 			}
 			if (remoteFileManager == null) {
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
@@ -768,11 +784,15 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			String type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_TYPE, (String) null);
+			String type = getResourceManagerType(configuration);
 			if (type != null) {
 				ProviderInfo provider = ProviderInfo.getProvider(type);
 				if (provider != null) {
 					IResourceManagerControl rm = createResourceManagerControl(provider, progress.newChild(5));
+					String uniqueName = getResourceManagerUniqueName(configuration);
+					if (uniqueName != null) {
+						rm.getControlConfiguration().setUniqueName(uniqueName);
+					}
 					String name = getConnectionName(configuration);
 					String id = getRemoteServicesId(configuration);
 					if (rm != null && name != null && id != null) {
@@ -793,6 +813,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 
 	private String getConnectionName(ILaunchConfiguration configuration) throws CoreException {
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
+
+	}
+
+	private String getResourceManagerType(ILaunchConfiguration configuration) throws CoreException {
+		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_TYPE, (String) null);
 	}
 
 	private String getRemoteServicesId(ILaunchConfiguration configuration) throws CoreException {
@@ -973,18 +998,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 *             if the path is invalid or the monitor was canceled.
 	 * @since 5.0
 	 */
-	protected void verifyDebuggerPath(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+	protected IPath verifyDebuggerPath(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		String dbgPath = getDebuggerExePath(configuration);
 		if (dbgPath == null) {
 			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 					Messages.AbstractParallelLaunchConfigurationDelegate_debuggerPathNotSpecified));
 		}
 		try {
-			verifyResource(dbgPath, configuration, monitor);
-			if (monitor.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
-			}
+			return verifyResource(dbgPath, configuration, monitor);
 		} catch (CoreException e) {
 			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 					Messages.AbstractParallelLaunchConfigurationDelegate_Debugger_path_not_found, new FileNotFoundException(
@@ -1011,12 +1032,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		} else {
 			String exePath = getExecutablePath(configuration);
 			try {
-				IPath path = verifyResource(exePath, configuration, monitor);
-				if (monitor.isCanceled()) {
-					throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-							Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
-				}
-				return path;
+				return verifyResource(exePath, configuration, monitor);
 			} catch (CoreException e) {
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
@@ -1028,7 +1044,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	/**
 	 * @since 5.0
 	 */
-	protected void verifyLaunchAttributes(final ILaunchConfiguration configuration, String mode, final IProgressMonitor monitor)
+	protected boolean verifyLaunchAttributes(final ILaunchConfiguration configuration, String mode, final IProgressMonitor monitor)
 			throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 30);
 
@@ -1036,23 +1052,29 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			/*
 			 * Verify executable path
 			 */
-			verifyExecutablePath(configuration, progress.newChild(10));
+			IPath path = verifyExecutablePath(configuration, progress.newChild(10));
+			if (progress.isCanceled() || path == null) {
+				return false;
+			}
 
 			/*
 			 * Verify working directory. Use the executable path if no working directory has been set.
 			 */
 			String workPath = getWorkingDirectory(configuration);
 			if (workPath != null) {
-				verifyResource(workPath, configuration, monitor);
-			}
-			if (progress.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
+				path = verifyResource(workPath, configuration, progress.newChild(10));
+				if (progress.isCanceled() || path == null) {
+					return false;
+				}
 			}
 
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				verifyDebuggerPath(configuration, progress.newChild(10));
+				path = verifyDebuggerPath(configuration, progress.newChild(10));
+				if (progress.isCanceled() || path == null) {
+					return false;
+				}
 			}
+			return true;
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -1092,9 +1114,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		IRemoteFileManager fileManager = getRemoteFileManager(configuration, monitor);
-		if (fileManager == null) {
-			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-					Messages.AbstractParallelLaunchConfigurationDelegate_No_file_manager_available));
+		if (monitor.isCanceled() || fileManager == null) {
+			return null;
 		}
 		if (!fileManager.getResource(path).fetchInfo().exists()) {
 			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(), NLS.bind(
@@ -1110,24 +1131,17 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 *            launch configuration
 	 * @param monitor
 	 *            progress monitor
-	 * @return path of working directory
+	 * @return path of working directory or null if the monitor was canceled
 	 * @throws CoreException
-	 *             if the working directory is invalid or the monitor was canceled.
+	 *             if the working directory is invalid.
 	 * @since 5.0
 	 */
-	protected String verifyWorkDirectory(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		IPath path;
+	protected IPath verifyWorkDirectory(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		String workPath = getWorkingDirectory(configuration);
 		if (workPath == null) {
-			path = verifyExecutablePath(configuration, monitor).removeLastSegments(1);
-		} else {
-			path = verifyResource(workPath, configuration, monitor);
+			return verifyExecutablePath(configuration, monitor).removeLastSegments(1);
 		}
-		if (monitor.isCanceled()) {
-			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-					Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
-		}
-		return path.toString();
+		return verifyResource(workPath, configuration, monitor);
 	}
 
 }

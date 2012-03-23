@@ -30,10 +30,8 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.IServiceConstants;
 import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.launch.ui.LaunchConfigurationTab;
 import org.eclipse.ptp.launch.ui.LaunchImages;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
@@ -92,7 +90,13 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	private Combo fResourceManagerTypeCombo = null;
 	private boolean fDefaultConnection;
 
-	private IJAXBResourceManager fResourceManagerType = null;
+	/**
+	 * Resource manager created when type is selected from the combo.
+	 */
+	private IJAXBResourceManager fSelectedResourceManagerType = null;
+	/**
+	 * Resource manager with all necessary configuration information.
+	 */
 	private IJAXBResourceManager fResourceManager = null;
 	private RemoteConnectionWidget fRemoteConnectionWidget;
 	private IRemoteConnection fRemoteConnection = null;
@@ -163,6 +167,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				rmTypeSelectionChanged();
+				updateEnablement();
 				updateLaunchAttributeControls(null, getLaunchConfiguration());
 				updateLaunchConfigurationDialog();
 			}
@@ -187,8 +192,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 						fRemoteConnection = conn;
 						updateLaunchAttributeControls(null, getLaunchConfiguration());
 						updateLaunchConfigurationDialog();
-					} else if (connectionChanged(fResourceManagerType)) {
-						fResourceManager = fResourceManagerType;
+					} else if (connectionChanged(fSelectedResourceManagerType)) {
+						fResourceManager = fSelectedResourceManagerType;
 						fRemoteConnection = conn;
 						updateLaunchAttributeControls(fResourceManager, getLaunchConfiguration());
 						updateLaunchConfigurationDialog();
@@ -253,29 +258,27 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		String rmType = getResourceManagerType(configuration);
 		ProviderInfo provider = ProviderInfo.getProvider(rmType);
 		if (provider != null) {
-			fResourceManagerType = createResourceManager(provider);
+			fSelectedResourceManagerType = createResourceManager(provider);
+			fSelectedResourceManagerType.getConfiguration().setUniqueName(getResourceManagerUniqueName(configuration));
 			fResourceManagerTypeCombo.select(ProviderInfo.getProviders().lastIndexOf(provider) + 1);
-			rmTypeSelectionChanged();
+			updateEnablement();
 		}
 
 		/*
 		 * Initialize remote connection widget
 		 */
-		try {
-			String remId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, (String) null);
-			String remName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
-			if (remId != null && remName != null) {
-				fRemoteConnectionWidget.setConnection(remId, remName);
-				fDefaultConnection = false;
-				if (connectionChanged(fResourceManagerType)) {
-					/*
-					 * Update the dynamic portions of the launch configuration tab.
-					 */
-					updateLaunchAttributeControls(fResourceManager, configuration);
-					fResourceManager = fResourceManagerType;
-				}
+		String remId = getRemoteServicesId(configuration);
+		String remName = getConnectionName(configuration);
+		if (remId != null && remName != null) {
+			fRemoteConnectionWidget.setConnection(remId, remName);
+			fDefaultConnection = false;
+			if (connectionChanged(fSelectedResourceManagerType)) {
+				/*
+				 * Update the dynamic portions of the launch configuration tab.
+				 */
+				fResourceManager = fSelectedResourceManagerType;
+				updateLaunchAttributeControls(fResourceManager, configuration);
 			}
-		} catch (CoreException e) {
 		}
 
 		if (fResourceManager == null) {
@@ -325,7 +328,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 		int index = fResourceManagerTypeCombo.getSelectionIndex();
 		if (fResourceManager != null && index > 0) {
-			setResourceManagerType(configuration, ProviderInfo.getProviders().get(index - 1).getName());
+			ProviderInfo provider = ProviderInfo.getProviders().get(index - 1);
+			setResourceManagerType(configuration, provider.getName());
+			setResourceManagerUniqueName(configuration, fResourceManager.getUniqueName());
 			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(fResourceManager);
 			if (rmDynamicTab == null) {
 				setErrorMessage(NLS
@@ -339,6 +344,17 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			}
 		}
 
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#dispose()
+	 */
+	@Override
+	public void dispose() {
+		removeCurrentResourceManager();
+		super.dispose();
 	}
 
 	/*
@@ -385,55 +401,46 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * Find a default resource manager. If there is only one, then it is the default. If there are more or less than one, there is
-	 * no default.
-	 * 
-	 * @return resource manager
-	 */
-	private IResourceManager getResourceManagerDefault() {
-		IResourceManager[] rms = PTPCorePlugin.getDefault().getModelManager().getResourceManagers();
-		if (rms.length != 1) {
-			return null;
-		}
-		return rms[0];
-	}
-
-	/**
 	 * Handle selection of a resource manager type
 	 */
 	private void rmTypeSelectionChanged() {
 		int i = fResourceManagerTypeCombo.getSelectionIndex();
 		if (i > 0) {
-			fRemoteConnectionWidget.setEnabled(true);
-			fRemoteConnectionWidget.setConnection(null);
 			ProviderInfo providerInfo = ProviderInfo.getProviders().get(i - 1);
-			if (fResourceManagerType == null
-					|| !fResourceManagerType.getJAXBConfiguration().getName().equals(providerInfo.getName())) {
+			if (fSelectedResourceManagerType == null
+					|| !fSelectedResourceManagerType.getJAXBConfiguration().getName().equals(providerInfo.getName())) {
 				final IJAXBResourceManager rm = createResourceManager(providerInfo);
 				if (rm != null) {
 					if (fDefaultConnection) {
 						fRemoteConnectionWidget.setConnection(rm.getControlConfiguration().getRemoteServicesId(), rm
 								.getControlConfiguration().getConnectionName());
 					}
-					if (fResourceManager != null) {
-						try {
-							fResourceManager.getControl().stop();
-						} catch (CoreException e) {
-						}
-					}
-					fResourceManagerType = rm;
-					fResourceManager = null;
+					removeCurrentResourceManager();
+					fSelectedResourceManagerType = rm;
 				}
 			}
 		} else {
-			fRemoteConnectionWidget.setEnabled(false);
-			if (fResourceManager != null) {
-				try {
-					fResourceManager.getControl().stop();
-				} catch (CoreException e) {
-				}
-				fResourceManager = null;
+			removeCurrentResourceManager();
+		}
+	}
+
+	private void removeCurrentResourceManager() {
+		if (fResourceManager != null) {
+			try {
+				fResourceManager.getControl().stop();
+				ModelManager.getInstance().removeResourceManager(fResourceManager);
+			} catch (CoreException e) {
 			}
+			fResourceManager = null;
+		}
+	}
+
+	private void updateEnablement() {
+		if (fResourceManagerTypeCombo.getSelectionIndex() > 0) {
+			fRemoteConnectionWidget.setEnabled(true);
+			fRemoteConnectionWidget.setConnection(null);
+		} else {
+			fRemoteConnectionWidget.setEnabled(false);
 		}
 	}
 

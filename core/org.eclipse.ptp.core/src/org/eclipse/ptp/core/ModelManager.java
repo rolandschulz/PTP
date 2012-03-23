@@ -273,6 +273,19 @@ public class ModelManager implements IModelManager {
 		fireNewResourceManager(rm);
 	}
 
+	/**
+	 * @since 6.0
+	 */
+	public void changeResourceManagerUniqueName(String oldName, String newName) {
+		IResourceManager rm = getResourceManagerFromUniqueName(oldName);
+		if (rm != null) {
+			synchronized (fResourceManagers) {
+				fResourceManagers.put(oldName, null);
+				fResourceManagers.put(newName, rm);
+			}
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

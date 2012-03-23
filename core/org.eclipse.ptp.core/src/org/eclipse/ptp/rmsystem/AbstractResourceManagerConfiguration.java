@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 
 /**
@@ -38,8 +39,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.services.core.ServiceProvider#equals(java.lang.Object)
+	 * @see org.eclipse.ptp.services.core.ServiceProvider#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -74,8 +74,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getAutoStart()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getAutoStart()
 	 */
 	public boolean getAutoStart() {
 		return getBoolean(BASE, TAG_AUTOSTART, false);
@@ -97,8 +96,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration#
-	 * getConnectionName()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration# getConnectionName()
 	 */
 	public String getConnectionName() {
 		return getString(TAG_CONNECTION_NAME, ""); //$NON-NLS-1$
@@ -107,8 +105,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getDescription()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getDescription()
 	 */
 	public String getDescription() {
 		return getString(BASE, TAG_DESCRIPTION, ""); //$NON-NLS-1$
@@ -139,8 +136,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration#
-	 * getRemoteServicesId()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration# getRemoteServicesId()
 	 */
 	public String getRemoteServicesId() {
 		return getString(TAG_REMOTE_SERVICES_ID, null);
@@ -149,9 +145,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getResourceManagerId
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getResourceManagerId ()
 	 */
 	public String getResourceManagerId() {
 		return fServiceProvider.getId();
@@ -182,8 +176,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getUniqueName()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getUniqueName()
 	 */
 	public String getUniqueName() {
 		return ((ResourceManagerServiceProvider) fServiceProvider).getUniqueName();
@@ -201,8 +194,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#
-	 * needsDebuggerLaunchHelp()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration# needsDebuggerLaunchHelp()
 	 */
 	public boolean needsDebuggerLaunchHelp() {
 		return false;
@@ -247,9 +239,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setAutoStart(boolean
-	 * )
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setAutoStart(boolean )
 	 */
 	public void setAutoStart(boolean flag) {
 		putBoolean(BASE, TAG_AUTOSTART, flag);
@@ -258,8 +248,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration#
-	 * setConnectionName(java.lang.String)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration# setConnectionName(java.lang.String)
 	 */
 	public void setConnectionName(String name) {
 		putString(TAG_CONNECTION_NAME, name);
@@ -268,9 +257,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDescription
-	 * (java.lang.String)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDescription (java.lang.String)
 	 */
 	public void setDescription(String description) {
 		putString(BASE, TAG_DESCRIPTION, description);
@@ -279,9 +266,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setName(java.lang
-	 * .String)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setName(java.lang .String)
 	 */
 	public void setName(String name) {
 		putString(BASE, TAG_NAME, name);
@@ -290,11 +275,23 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration#
-	 * setRemoteServicesId(java.lang.String)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration# setRemoteServicesId(java.lang.String)
 	 */
 	public void setRemoteServicesId(String id) {
 		putString(TAG_REMOTE_SERVICES_ID, id);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setUniqueName(java.lang.String)
+	 */
+	/**
+	 * @since 6.0
+	 */
+	public void setUniqueName(String name) {
+		ModelManager.getInstance().changeResourceManagerUniqueName(getUniqueName(), name);
+		((ResourceManagerServiceProvider) fServiceProvider).setUniqueName(name);
 	}
 
 	private boolean getBoolean(String namespace, String key, boolean defaultVal) {

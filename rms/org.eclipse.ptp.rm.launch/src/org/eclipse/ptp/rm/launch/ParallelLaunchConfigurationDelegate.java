@@ -33,6 +33,7 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
@@ -42,6 +43,7 @@ import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.rm.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
@@ -155,11 +157,23 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			progress.worked(10);
 			progress.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
 
-			verifyLaunchAttributes(configuration, mode, progress.newChild(10));
+			if (!verifyLaunchAttributes(configuration, mode, progress.newChild(10))) {
+				return;
+			}
+			if (progress.isCanceled()) {
+				return;
+			}
 
 			// All copy pre-"job submission" occurs here
 			copyExecutable(configuration, progress.newChild(10));
+			if (progress.isCanceled()) {
+				return;
+			}
+
 			doPreLaunchSynchronization(configuration, progress.newChild(10));
+			if (progress.isCanceled()) {
+				return;
+			}
 
 			IPDebugger debugger = null;
 
@@ -239,6 +253,17 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			} catch (CoreException e) {
 				RMLaunchPlugin.log(e);
 			}
+		}
+		IResourceManagerControl rmc = launch.getResourceManagerControl();
+		try {
+			rmc.stop();
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(
+					rmc.getControlConfiguration().getUniqueName());
+			if (rm != null) {
+				ModelManager.getInstance().removeResourceManager(rm);
+			}
+		} catch (CoreException e) {
+			RMLaunchPlugin.log(e);
 		}
 	}
 

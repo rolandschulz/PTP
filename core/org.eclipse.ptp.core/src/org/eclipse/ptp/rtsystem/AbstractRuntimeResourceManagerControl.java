@@ -668,6 +668,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		return jobStatus;
 	}
 
+	@Override
 	protected IPResourceManager getPResourceManager() {
 		return (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
 	}
