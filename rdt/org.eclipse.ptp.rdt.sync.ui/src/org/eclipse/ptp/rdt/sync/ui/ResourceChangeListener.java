@@ -89,7 +89,9 @@ public class ResourceChangeListener {
 				IProject project = (IProject) event.getResource();
 				SyncManager.setSyncMode(project, SYNC_MODE.NONE);
 				ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
-				provider.close();
+				if (provider != null) {
+					provider.close();
+				}
 				return;
 			}
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {

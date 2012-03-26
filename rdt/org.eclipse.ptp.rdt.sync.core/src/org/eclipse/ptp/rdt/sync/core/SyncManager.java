@@ -468,9 +468,6 @@ public class SyncManager  {
 			provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
 		}
 		
-		if (provider == null) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_7 + config.getName());
-		}
 		return provider;
 	}
 }
