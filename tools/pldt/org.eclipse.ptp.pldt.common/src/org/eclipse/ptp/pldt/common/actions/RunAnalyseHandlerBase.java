@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2011 IBM Corporation.
+ * Copyright (c) 2005, 2011, 2012 IBM Corporation, University of Illinois, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,17 +7,14 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeff Overbey (UIUC) - modified to use extension point
  *******************************************************************************/
-
 package org.eclipse.ptp.pldt.common.actions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.cdt.core.CCorePlugin;
-import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
-import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.model.ICContainer;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
@@ -31,8 +28,10 @@ import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -43,6 +42,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
+import org.eclipse.ptp.pldt.common.IArtifactAnalysis;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.messages.Messages;
 import org.eclipse.ptp.pldt.common.util.AnalysisUtil;
@@ -62,6 +62,7 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
  * The analysis is done in the doArtifactAnalysis() method
  * 
  * @author Beth Tibbitts
+ * @author Jeff Overbey
  * 
  *         IObjectActionDelegate enables popup menu selection <br>
  *         IWindowActionDelegate enables toolbar(or menu) selection
@@ -218,6 +219,41 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 * @return
 	 */
 	public abstract ScanReturn doArtifactAnalysis(final ITranslationUnit tu, final List<String> includes);
+
+	/**
+	 * Runs an artifact analysis for the given file by searching the given extension point for an {@link IArtifactAnalysis} that matches its language ID.
+	 * <p>
+	 * This is a utility method generally invoked from {@link #doArtifactAnalysis(ITranslationUnit, List)}.
+	 * <p>
+	 * It is assumed that only one extension will be contributed per language ID.  If multiple extensions are found, it is unspecified which one will be run.
+	 * 
+	 * @param extensionPointID
+	 * @param tu
+	 * @param includes
+	 * @param allowPrefixOnlyMatch
+	 * @return {@link ScanReturn}
+	 * 
+	 * @since 6.0
+	 */
+	protected ScanReturn runArtifactAnalysisFromExtensionPoint(String extensionPointID, final ITranslationUnit tu, final List<String> includes, final boolean allowPrefixOnlyMatch) {
+		try {
+			final String languageID = tu.getLanguage().getId();
+			for (IConfigurationElement config : Platform.getExtensionRegistry().getConfigurationElementsFor(extensionPointID)) {
+				try {
+					if (languageID.equals(config.getAttribute("languageID"))) {
+						IArtifactAnalysis artifactAnalysis = (IArtifactAnalysis) config.createExecutableExtension("class"); //$NON-NLS-1$
+						return artifactAnalysis.runArtifactAnalysis(languageID, tu, includes, allowPrefixOnlyMatch);
+					}
+				} catch (CoreException e) {
+					CommonPlugin.log(e.getClass().getSimpleName() + ": " + e.getMessage());
+				}
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+			CommonPlugin.log(IStatus.ERROR, "RunAnalyseMPICommandHandler: Error setting up analysis for project " + tu.getCProject() + " error=" + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return new ScanReturn();
+	}
 
 	/**
 	 * Implemented for Handler; this replaces run() which is for actions.
@@ -512,32 +548,6 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 * If the analysis has an additional view to bring up, override this
 	 */
 	protected void activateProblemsView() {
-	}
-
-	/**
-	 * Get AST from index, not full tu
-	 * 
-	 * @param tu
-	 *            translation unit from which to get the AST
-	 * @return
-	 */
-	protected IASTTranslationUnit getAST(ITranslationUnit tu) {
-		IIndex index;
-		try {
-			index = CCorePlugin.getIndexManager().getIndex(tu.getCProject());
-			IASTTranslationUnit ast = tu.getAST(index, ITranslationUnit.AST_SKIP_ALL_HEADERS);
-			// IASTTranslationUnit ast = tu.getAST(index, 0);
-			if (traceOn) {
-				System.out.println("    getAST(index,AST_SKIP_ALL_HEADERS)"); //$NON-NLS-1$
-			}
-
-			return ast;
-		} catch (Exception e) {
-			String msg = "RunAnalyseHandlerBase.getAST(): Error getting AST (from index) for project " + tu.getCProject() + " " + e.getMessage();//$NON-NLS-1$
-			CommonPlugin.log(IStatus.ERROR, msg);
-			return null;
-		}
-
 	}
 
 	/**

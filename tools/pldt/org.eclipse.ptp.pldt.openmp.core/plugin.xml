@@ -105,4 +105,20 @@
                class="org.eclipse.ptp.pldt.openmp.core.prefs.OpenMPPreferenceInitializer">
          </initializer>
       </extension>
+
+   <!-- Artifact analysis extension point -->
+   <extension-point
+      id="artifactAnalysis"
+      name="OpenMP Artifact Analysis"
+      schema="schema/artifactAnalysis.exsd"/>
+   <!-- Artifact analysis for C -->
+   <extension point="org.eclipse.ptp.pldt.openmp.core.artifactAnalysis">
+      <artifactAnalysis
+            languageID="org.eclipse.cdt.core.gcc"
+            class="org.eclipse.ptp.pldt.openmp.core.analysis.OpenMPCArtifactAnalysis" />
+      <artifactAnalysis
+            languageID="org.eclipse.cdt.core.g++"
+            class="org.eclipse.ptp.pldt.openmp.core.analysis.OpenMPCArtifactAnalysis" />
+   </extension>
+
 </plugin>

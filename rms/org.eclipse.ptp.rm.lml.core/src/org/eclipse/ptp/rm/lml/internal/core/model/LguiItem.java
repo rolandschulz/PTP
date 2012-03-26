@@ -317,7 +317,7 @@ public class LguiItem implements ILguiItem {
 	 */
 	public JobStatusData[] getUserJobs() {
 		synchronized (fJobMap) {
-			return fJobMap.values().toArray(new JobStatusData[0]);
+			return fJobMap.values().toArray(new JobStatusData[fJobMap.values().size()]);
 		}
 	}
 
@@ -533,13 +533,15 @@ public class LguiItem implements ILguiItem {
 				if (tableOld != null) {
 					RowType rowOld = null;
 					int index = -1;
-					for (int i = 0; i < tableOld.getRow().size(); i++) {
-						final RowType row = tableOld.getRow().get(i);
-						if (handler.getCellValue(tableOld, row, JOB_ID).equals(jobId)) {
-							handler.setCellValue(tableOld, row, JOB_STATUS, status);
-							rowOld = row;
-							index = i;
-							break;
+					if (tableOld.getRow() != null) {
+						for (int i = 0; i < tableOld.getRow().size(); i++) {
+							final RowType row = tableOld.getRow().get(i);
+							if (handler.getCellValue(tableOld, row, JOB_ID).equals(jobId)) {
+								handler.setCellValue(tableOld, row, JOB_STATUS, status);
+								rowOld = row;
+								index = i;
+								break;
+							}
 						}
 					}
 					if (!gidOld.equals(gidNew)) {

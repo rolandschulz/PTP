@@ -195,6 +195,7 @@
 		<module>tools/pldt/org.eclipse.ptp.pldt.mpi.core</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.mpi.fortran</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.openacc</module>
+		<module>tools/pldt/org.eclipse.ptp.pldt.openacc.fortran</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.openmp.analysis</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.openmp.core</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.openmp.fortran</module>

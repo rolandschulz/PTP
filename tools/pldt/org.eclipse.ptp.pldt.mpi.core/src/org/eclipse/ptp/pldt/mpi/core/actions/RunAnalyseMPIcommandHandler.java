@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2007,2011 IBM Corporation.
+/*******************************************************************************
+ * Copyright (c) 2007, 2011, 2012 IBM Corporation, University of Illinois, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,35 +7,30 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeff Overbey (UIUC) - modified to use extension point
  *******************************************************************************/
-
 package org.eclipse.ptp.pldt.mpi.core.actions;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
-import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
-import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage;
-import org.eclipse.cdt.core.dom.ast.gnu.cpp.GPPLanguage;
-import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
 import org.eclipse.ptp.pldt.common.util.ViewActivator;
 import org.eclipse.ptp.pldt.mpi.core.MPIArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
-import org.eclipse.ptp.pldt.mpi.core.analysis.MpiCASTVisitor;
-import org.eclipse.ptp.pldt.mpi.core.analysis.MpiCPPASTVisitor;
 import org.eclipse.ptp.pldt.mpi.internal.core.MpiIDs;
 
 /**
- * @author tibbitts
- * 
+ * @author Beth Tibbitts
+ * @author Jeff Overbey
  */
 public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase {
+	/**
+	 * ID for the extension point which allows plug-ins to contribute MPI artifact analyses based on language IDs.
+	 */
+	private static final String EXTENSION_POINT_ID = "org.eclipse.ptp.pldt.mpi.core.artifactAnalysis";
+
 	/**
 	 * Constructor for the "Run Analysis" action
 	 */
@@ -53,50 +48,8 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase {
 	 */
 	@Override
 	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu, final List<String> includes) {
-		final ScanReturn msr = new ScanReturn();
-		final String fileName = tu.getElementName();
-		ILanguage lang;
-		boolean allowPrefixOnlyMatch = MpiPlugin.getDefault().getPreferenceStore()
-				.getBoolean(MpiIDs.MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE);
-		try {
-			lang = tu.getLanguage();
-
-			// long startTime = System.currentTimeMillis();
-			IASTTranslationUnit atu = getAST(tu); // use index; was tu.getAST();
-
-			// long endTime = System.currentTimeMillis();
-			// System.out.println("RunAnalyseMPICommandHandler: time to build AST for "+tu+": "+(endTime-startTime)/1000.0+" sec");
-			String languageID = lang.getId();
-			if (languageID.equals(GCCLanguage.ID) || languageID.equals(GPPLanguage.ID)) {
-				// null IASTTranslationUnit when we're doing C/C++ means we should quit.
-				// but want to continue to see if this is a fortran file we are analyzing.
-				if (atu == null) {// this is null for Fortran file during JUnit testing.
-					System.out.println("RunAnalyseMPICommandHandler.doArtifactAnalysis(), atu is null (Fortran testing?)"); //$NON-NLS-1$
-					return msr;
-				}
-			}
-			if (languageID.equals(GCCLanguage.ID)) {// C
-				atu.accept(new MpiCASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
-			} else if (languageID.equals(GPPLanguage.ID)) { // C++
-				atu.accept(new MpiCPPASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
-			} else {
-				// Attempt to handle Fortran
-				// Instantiate using reflection to avoid static Photran dependencies
-				try {
-					Class<?> c = Class.forName("org.eclipse.ptp.pldt.mpi.fortran.actions.AnalyseMPIFortranHandler"); //$NON-NLS-1$
-					Method method = c.getMethod("run", String.class, ITranslationUnit.class, String.class, ScanReturn.class); //$NON-NLS-1$
-					method.invoke(c.newInstance(), languageID, tu, fileName, msr);
-				} catch (Exception e) {
-					System.err.println("RunAnalyseMPIcommandHandler.doArtifactAnalysis: Photran not installed"); //$NON-NLS-1$
-				}
-			}
-		} catch (CoreException e) {
-			e.printStackTrace();
-			CommonPlugin
-					.log(IStatus.ERROR,
-							"RunAnalyseMPICommandHandler.getAST():Error setting up visitor for project " + tu.getCProject() + " error=" + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		return msr;
+		final boolean allowPrefixOnlyMatch = MpiPlugin.getDefault().getPreferenceStore().getBoolean(MpiIDs.MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE);
+		return runArtifactAnalysisFromExtensionPoint(EXTENSION_POINT_ID, tu, includes, allowPrefixOnlyMatch);
 	}
 
 	@Override

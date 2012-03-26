@@ -60,7 +60,7 @@ public class LMLNodeData {
 					schemesMap.put(number, lowerScheme);
 				}
 
-			} else {// min- max-attributes
+			} else if (lowerScheme.getMin() != null) {// min- max-attributes
 				final int min = lowerScheme.getMin().intValue();
 				int max = min;
 				if (lowerScheme.getMax() != null) {

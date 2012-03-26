@@ -4,8 +4,7 @@
       label="%featureName"
       version="6.0.0.qualifier"
       provider-name="%providerName"
-      plugin="org.eclipse.ptp.pldt.common"
-      >
+      plugin="org.eclipse.ptp.pldt.common">
 
    <description>
       %description
@@ -32,6 +31,10 @@
       <import plugin="org.eclipse.ptp.pldt.common"/>
       <import plugin="org.eclipse.photran.cdtinterface" version="7.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.photran.core.vpg" version="7.0.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.cdt" version="8.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.photran" version="8.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.ptp.pldt" version="6.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.ptp.pldt.openacc" version="6.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -43,6 +46,13 @@
 
    <plugin
          id="org.eclipse.ptp.pldt.openmp.fortran"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.pldt.openacc.fortran"
          download-size="0"
          install-size="0"
          version="0.0.0"

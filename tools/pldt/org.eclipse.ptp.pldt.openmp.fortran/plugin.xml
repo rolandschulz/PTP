@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <!-- OpenMP artifact analysis for Fortran -->
+   <extension point="org.eclipse.ptp.pldt.openmp.core.artifactAnalysis">
+      <artifactAnalysis
+            languageID="org.eclipse.photran.cdtinterface.fortran"
+            class="org.eclipse.ptp.pldt.openmp.fortran.analysis.OpenMPFortranArtifactAnalysis" />
+   </extension>
+
+</plugin>

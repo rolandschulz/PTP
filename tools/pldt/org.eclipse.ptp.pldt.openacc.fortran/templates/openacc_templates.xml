@@ -1,7 +1,75 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <templates>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.cache"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC cache directive" enabled="true"
+		name="!$acc cache">!$$acc cache (${cursor})</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.data"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC data directive" enabled="true"
+		name="!$acc data">!$$acc data${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.endd_ata"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC end data directive" enabled="true"
+		name="!$acc end data">!$$acc end data${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.declare"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC declare directive" enabled="true"
+		name="!$acc declare">!$$acc declare ${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.host_data"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC host_data directive" enabled="true"
+		name="!$acc host_data">!$$acc host_data${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.end_host_data"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC end host_data directive" enabled="true"
+		name="!$acc end host_data">!$$acc end host_data${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.kernels"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC kernels directive" enabled="true"
+		name="!$acc kernels">!$$acc kernels${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.end_kernels"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC end kernels directive" enabled="true"
+		name="!$acc end kernels">!$$acc end kernels${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.kernels_loop"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC kernels loop directive" enabled="true"
+		name="!$acc kernels loop">!$$acc kernels loop${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.end_kernels_loop"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC end kernels loop directive" enabled="true"
+		name="!$acc end kernels loop">!$$acc end kernels loop${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.loop"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC loop directive" enabled="true"
+		name="!$acc loop">!$$acc loop${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.end_loop"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC end loop directive" enabled="true"
+		name="!$acc end loop">!$$acc end loop${cursor}</template>
 	<template id="org.eclipse.ptp.pldt.openacc.fortran.parallel"
 		autoinsert="true" context="org.eclipse.photran.ui.template.context"
 		deleted="false" description="OpenACC parallel directive" enabled="true"
 		name="!$acc parallel">!$$acc parallel${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.end_parallel"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC end parallel directive" enabled="true"
+		name="!$acc end parallel">!$$acc end parallel${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.parallel_loop"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC parallel loop directive" enabled="true"
+		name="!$acc parallel loop">!$$acc parallel loop${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.end_parallel_loop"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC end parallel loop directive" enabled="true"
+		name="!$acc end parallel loop">!$$acc end parallel loop${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.update"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC update directive" enabled="true"
+		name="!$acc update">!$$acc update ${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openacc.fortran.wait"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenACC wait directive" enabled="true"
+		name="!$acc wait">!$$acc wait${cursor}</template>
 </templates>

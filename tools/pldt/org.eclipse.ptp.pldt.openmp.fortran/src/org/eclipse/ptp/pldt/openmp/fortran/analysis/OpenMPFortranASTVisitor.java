@@ -25,6 +25,7 @@ import org.eclipse.ptp.pldt.common.util.SourceInfo;
  * @author Jeff Overbey
  * @author Beth Tibbitts
  */
+@SuppressWarnings("restriction")
 public class OpenMPFortranASTVisitor extends GenericASTVisitor {
 	private static final String PREFIX = "OMP_"; //$NON-NLS-1$
 

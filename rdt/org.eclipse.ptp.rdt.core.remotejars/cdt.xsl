@@ -29,7 +29,7 @@ cdtCoreLRParserXLCVersion=<xsl:value-of select="@version"/>
 cdtCoreAIXVersion=<xsl:value-of select="@version"/>
 	</xsl:template>
 	<xsl:template match="artifact[@classifier='osgi.bundle' and @id='org.eclipse.cdt.core.linux.ppc64']">
-cdtCoreLinuxPPCVersion=<xsl:value-of select="@version"/>
+cdtCoreLinuxPPC64Version=<xsl:value-of select="@version"/>
 	</xsl:template>
 	<xsl:template match="artifact[@classifier='osgi.bundle' and @id='org.eclipse.cdt.core.linux.x86']">
 cdtCoreLinuxx86Version=<xsl:value-of select="@version"/>

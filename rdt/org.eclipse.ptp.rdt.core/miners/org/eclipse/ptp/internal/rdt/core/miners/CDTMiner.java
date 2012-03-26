@@ -736,7 +736,7 @@ public class CDTMiner extends Miner {
 				String scopeName = getString(theCommand, 1);
 				ITranslationUnit tu = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 2));
 
-				hanleComputeSemanticHightlightingPositions(scopeName, tu, status);
+				handleComputeSemanticHightlightingPositions(scopeName, tu, status);
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 			} catch (ClassNotFoundException e) {
@@ -751,7 +751,7 @@ public class CDTMiner extends Miner {
 				boolean preprocessorFoldingEnabled = getBoolean(theCommand, 4);
 				boolean statementsFoldingEnabled = getBoolean(theCommand, 5);
 	
-				hanleComputeCodeFoldingRegions(scopeName, tu, status, statementsFoldingEnabled, preprocessorFoldingEnabled, docSize);
+				handleComputeCodeFoldingRegions(scopeName, tu, status, statementsFoldingEnabled, preprocessorFoldingEnabled, docSize);
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 			} catch (ClassNotFoundException e) {
@@ -762,7 +762,7 @@ public class CDTMiner extends Miner {
 		return status;
 	}
 	
-	protected void hanleComputeSemanticHightlightingPositions(String scopeName, ITranslationUnit tu, DataElement status) {
+	protected void handleComputeSemanticHightlightingPositions(String scopeName, ITranslationUnit tu, DataElement status) {
 		try {
 			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
 			index.acquireReadLock();
@@ -793,7 +793,7 @@ public class CDTMiner extends Miner {
 		}
 	}
 	
-	protected void hanleComputeCodeFoldingRegions(String scopeName, ITranslationUnit tu, DataElement status, 
+	protected void handleComputeCodeFoldingRegions(String scopeName, ITranslationUnit tu, DataElement status, 
 			boolean statementsFoldingEnabled, boolean preprocessorFoldingEnabled, int docSize) {
 		try {
 			final Stack<StatementRegion> iral = new Stack<StatementRegion>();	

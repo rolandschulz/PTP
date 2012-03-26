@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <!-- MPI artifact analysis for Fortran -->
+   <extension point="org.eclipse.ptp.pldt.mpi.core.artifactAnalysis">
+      <artifactAnalysis
+            languageID="org.eclipse.photran.cdtinterface.fortran"
+            class="org.eclipse.ptp.pldt.mpi.fortran.analysis.MPIFortranArtifactAnalysis" />
+   </extension>
+
+   <!-- Dynamic help for MPI in the Photran editor -->
+   <extension
+         point="org.eclipse.photran.ui.apiHelpProvider">
+      <apiHelpProvider
+            class="org.eclipse.ptp.pldt.mpi.fortran.editorHelp.MpiFortranHelpProvider">
+      </apiHelpProvider>
+   </extension>
+
+</plugin>

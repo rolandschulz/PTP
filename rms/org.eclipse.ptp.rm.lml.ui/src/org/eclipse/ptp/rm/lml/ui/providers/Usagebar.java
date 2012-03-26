@@ -104,6 +104,7 @@ public class Usagebar extends LguiWidget implements Updatable {
 		// React to mouse-over-events
 		addMouseMoveListener(new MouseMoveListener() {
 
+			@Override
 			public void mouseMove(MouseEvent e) {
 				mouse.mouseMoveAction(usagebarPainter.getJobAtPosition(e.x));
 			}
@@ -117,6 +118,7 @@ public class Usagebar extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 			}
 
@@ -125,6 +127,7 @@ public class Usagebar extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseDown(MouseEvent e) {
 				mouse.mouseDownAction(usagebarPainter.getJobAtPosition(e.x));
 			}
@@ -134,6 +137,7 @@ public class Usagebar extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseUp(MouseEvent e) {
 				mouse.mouseUpAction(usagebarPainter.getJobAtPosition(e.x));
 			}
@@ -147,12 +151,19 @@ public class Usagebar extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 			 */
+			@Override
 			public void handleEvent(Event event) {
 				mouse.mouseExitAction();
 			}
 
 		});
 
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+		lguiItem.getObjectStatus().removeComponent(this);
 	}
 
 	/**
@@ -223,8 +234,11 @@ public class Usagebar extends LguiWidget implements Updatable {
 	 * org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable#updateStatus(org.eclipse.ptp.rm.lml.internal.core.elements
 	 * .ObjectType, boolean, boolean)
 	 */
+	@Override
 	public void updateStatus(ObjectType object, boolean mouseOver, boolean mouseDown) {
-		redraw();
+		if (!isDisposed()) {
+			redraw();
+		}
 	}
 
 }
