@@ -46,6 +46,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceProvider;
 import org.eclipse.ui.XMLMemento;
@@ -53,12 +54,11 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 /**
- * Main static class to map CDT build configurations (IConfigurations) to service configurations. For building or sync'ing, this
- * class keeps track of the appropriate service configuration to use. The mapping is actually a three-way map, from build
- * configuration to build scenario to service configuration. The creation and storage of service configurations is mostly
- * transparent to the user. The user only needs to specify the build scenario for the build configuration. On project
- * initialization, though, a default service configuration must be given.
- * 
+ * Singleton that handles the storing of information about CDT build configurations. This includes the configuration's build
+ * scenario (information on the sync point for the configuration), and its service configuration. New projects should call
+ * "initProject" and specify a template service configuration and a build scenario, which is assigned to all existing
+ * configurations. The template service configuration should specify all non-sync services. (Normally, the project's active
+ * configuration should be used.) This template is copied as needed to create service configurations for build configurations.
  */
 public class BuildConfigurationManager {
 	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
@@ -73,6 +73,10 @@ public class BuildConfigurationManager {
 
 	private static BuildConfigurationManager fInstance = null;
 
+	/**
+	 * Get the single BuildConfigurationManager instance
+	 * @return instance
+	 */
 	public static synchronized BuildConfigurationManager getInstance() {
 		if (fInstance == null) {
 			fInstance = new BuildConfigurationManager();
@@ -81,10 +85,11 @@ public class BuildConfigurationManager {
 	}
 
 	/**
-	 * Create a build scenario for configurations that build in the local Eclipse workspace
+	 * Create a build scenario for configurations that build in the local Eclipse workspace.
+	 * This function makes no changes to the internal data structures and is of little value for most clients.
 	 * 
-	 * @param project
-	 * @return the build scenario
+	 * @param project - cannot be null
+	 * @return the build scenario - never null
 	 * @throws CoreException
 	 *             on problems getting local resources, either the local connection or local services
 	 */
@@ -107,12 +112,15 @@ public class BuildConfigurationManager {
 
 	/**
 	 * Create a local build configuration. The corresponding build scenario has no sync provider and points to the project's working
-	 * directory. It has a default name and description.
+	 * directory. It has a default name and description. This function is normally used as part of the setup when creating a new project
+	 * and is of little value to most clients.
 	 * 
 	 * @param project
-	 *            The project needing a local configuration
+	 *            The project needing a local configuration - cannot be null
+	 * @return the new configuration - can be null on problems during creation
 	 */
 	public IConfiguration createLocalConfiguration(IProject project) {
+		checkProject(project);
 		try {
 			BuildScenario localBuildScenario = this.createLocalBuildScenario(project);
 			if (localBuildScenario != null) {
@@ -127,19 +135,22 @@ public class BuildConfigurationManager {
 	}
 
 	/**
-	 * Create a remote build configuration.
+	 * Create a remote build configuration. This function is mainly used for internal sync purposes and is of little value to most
+	 * clients.
 	 * 
 	 * @param project
-	 *            The project needing a remote configuration
+	 *            The project needing a remote configuration - cannot be null
 	 * @param remoteBuildScenario
-	 *            Configuration's build scenario
+	 *            Configuration's build scenario - cannot be null
 	 * @param configName
 	 *            Configuration's name
 	 * @param configDesc
 	 *            Configuration's description
+	 * @return the new configuration - can be null on problems during creation
 	 */
 	public IConfiguration createRemoteConfiguration(IProject project, BuildScenario remoteBuildScenario, String configName,
 			String configDesc) {
+		checkProject(project);
 		return this.createConfiguration(project, remoteBuildScenario, configName, configDesc);
 	}
 
@@ -148,7 +159,7 @@ public class BuildConfigurationManager {
 	 * containing the resource is not a synchronized project.
 	 * 
 	 * @param resource
-	 *            target resource
+	 *            target resource - cannot be null
 	 * @return URI or null if not a sync project
 	 * @throws CoreException
 	 */
@@ -164,28 +175,23 @@ public class BuildConfigurationManager {
 	 * Returns the service configuration set for the given build configuration, or null if it is unavailable.
 	 * 
 	 * @param bconf
-	 *            The build configuration
+	 *            The build configuration - cannot be null
 	 * @return service configuration for the build configuration
-	 * @throws RuntimeException
-	 *             if the build scenario cannot be mapped to a service configuration. This should never happen.
 	 */
 	public IServiceConfiguration getConfigurationForBuildConfiguration(IConfiguration bconf) {
-		if (bconf == null) {
-			throw new NullPointerException();
-		}
-
 		IProject project = bconf.getOwner().getProject();
-		if (!isInitialized(project)) {
-			throw new RuntimeException(Messages.BCM_InitError);
-		}
-
+		checkProject(project);
 		IServiceConfiguration sconf = fBConfigToSConfigMap.get(bconf);
 		if (sconf == null) {
 			BuildScenario bs = this.getBuildScenarioForBuildConfiguration(bconf);
+			// Should never happen, but if it does do not continue. (Function call should have invoked error handling.)
 			if (bs == null) {
 				return null;
 			}
             sconf = copyTemplateServiceConfiguration(project);
+            if (sconf == null) {
+            	return null;
+            }
             modifyServiceConfigurationForBuildScenario(sconf, bs);
             fBConfigToSConfigMap.put(bconf, sconf);
 		}
@@ -196,21 +202,31 @@ public class BuildConfigurationManager {
 	/**
 	 * Return the name of the sync provider for this project, as stored in the project's template service configuration.
 	 * 
-	 * @param project
-	 * @return sync provider name
+	 * @param project - cannot be null
+	 * @return sync provider name or null if provider cannot be loaded (should not normally happen)
 	 */
 	public String getProjectSyncProvider(IProject project) {
+		checkProject(project);
 		String serviceConfigId = getTemplateServiceConfigurationId(project);
-		if (serviceConfigId == null) {
-			return null;
-		}
 		IServiceConfiguration serviceConfig = ServiceModelManager.getInstance().getConfiguration(serviceConfigId);
 		if (serviceConfig == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_10 + serviceConfigId + Messages.BuildConfigurationManager_11 + project.getName());
 			return null;
 		}
 
 		IService syncService = ServiceModelManager.getInstance().getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-		return serviceConfig.getServiceProvider(syncService).getName();
+		if (syncService == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_12);
+			return null;
+		}
+		
+		IServiceProvider provider = serviceConfig.getServiceProvider(syncService);
+		if (provider == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_13 + project.getName());
+			return null;
+		}
+
+		return provider.getName();
 	}
 
 	/**
@@ -225,6 +241,7 @@ public class BuildConfigurationManager {
 	 * @throws CoreException
 	 */
 	public URI getSyncLocationURI(IConfiguration configuration, IResource resource) throws CoreException {
+		// Project checked inside this function call
 		BuildScenario scenario = getBuildScenarioForBuildConfiguration(configuration);
 		if (scenario != null) {
 			IPath path = new Path(scenario.location).append(resource.getProjectRelativePath());
@@ -242,24 +259,30 @@ public class BuildConfigurationManager {
 	 * configurations to use the passed build scenario. This function must be called before any calls to get or set methods.
 	 * 
 	 * The template service configuration is the one that is copied and modified to create a custom configuration for each build
-	 * scenario.
+	 * configuration.
 	 * 
-	 * @param project
-	 * @param sc
-	 *            The service configuration
-	 * @param bs
-	 *            The build scenario
+	 * @param project - cannot be null
+	 * @param sc - the service configuration - cannot be null
+	 * @param bs - the build scenario - cannot be null
 	 */
 	public void initProject(IProject project, IServiceConfiguration sc, BuildScenario bs) {
 		if (project == null || sc == null || bs == null) {
 			throw new NullPointerException();
 		}
+		
+		// Cannot call "checkProject" because project not yet initialized
+		try {
+			if (!project.hasNature(RemoteSyncNature.NATURE_ID)) {
+				throw new IllegalArgumentException(Messages.BuildConfigurationManager_6);
+			}
+		} catch (CoreException e) {
+			throw new IllegalArgumentException(Messages.BuildConfigurationManager_8);
+		}
 
 		IScopeContext context = new ProjectScope(project);
 		Preferences node = context.getNode(projectScopeSyncNode);
 		if (node == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_0);
-			return;
+			throw new RuntimeException(Messages.BuildConfigurationManager_0);
 		}
 		node.put(TEMPLATE_KEY, sc.getId());
 		try {
@@ -282,6 +305,7 @@ public class BuildConfigurationManager {
 	/**
 	 * Indicate if the project has yet been initialized.
 	 * 
+	 * @param project - cannot be null
 	 * @return whether or not the project has been initialized
 	 */
 	public boolean isInitialized(IProject project) {
@@ -298,9 +322,11 @@ public class BuildConfigurationManager {
 	// Does the low-level work of creating a copy of a service configuration
 	private IServiceConfiguration copyTemplateServiceConfiguration(IProject project) {
 		IServiceConfiguration newConfig = ServiceModelManager.getInstance().newServiceConfiguration(""); //$NON-NLS-1$
-		IServiceConfiguration oldConfig = ServiceModelManager.getInstance().getConfiguration(getTemplateServiceConfigurationId(project));
+		String oldConfigId = getTemplateServiceConfigurationId(project);
+		IServiceConfiguration oldConfig = ServiceModelManager.getInstance().getConfiguration(oldConfigId);
 		if (oldConfig == null) {
-			throw new RuntimeException(Messages.BCM_TemplateError + project.getName());
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_10 + oldConfigId + Messages.BuildConfigurationManager_11 + project.getName());
+			return null;
 		}
 
 		for (IService service : oldConfig.getServices()) {
@@ -326,8 +352,7 @@ public class BuildConfigurationManager {
 	private IConfiguration createConfiguration(IProject project, BuildScenario buildScenario, String configName, String configDesc) {
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
-			RDTSyncCorePlugin.log(Messages.BCM_CreateConfigFailure + Messages.BCM_GetBuildInfoError);
-			return null;
+			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
 		}
 
 		// For recording of problems during attempt
@@ -388,24 +413,19 @@ public class BuildConfigurationManager {
 		if (buildInfo == null) {
 			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
 		}
-		
-		if (!isInitialized(project)) {
-			throw new RuntimeException(Messages.BCM_InitError);
-		}
 
 		// Get project root preference node
 		IScopeContext context = new ProjectScope(project);
 		Preferences prefRootNode = context.getNode(projectScopeSyncNode);
 		if (prefRootNode == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_0);
-			return;
+			throw new RuntimeException(Messages.BuildConfigurationManager_0);
 		}
 
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allConfigs) {
 			BuildScenarioAndConfiguration parentConfigInfo = getBuildScenarioForBuildConfigurationInternal(config);
 			if (parentConfigInfo == null) {
-				throw new RuntimeException(Messages.BCM_AncestorError + config.getId());
+				return; // Errors handled by prior function call
 			}
 			if (parentConfigInfo.configId == config.getId()) {
 				continue;
@@ -414,14 +434,15 @@ public class BuildConfigurationManager {
 			if (parentConfig != null) {
 				setBuildScenarioForBuildConfigurationInternal(parentConfigInfo.bs, config);
 			} else {
-				RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_5 + config.getId());
+				RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_10 + parentConfigInfo.configId +
+						Messages.BuildConfigurationManager_11 + project.getName());
 			}
 		}
 	}
 
 	// Does the low-level work of changing a service configuration for a new build scenario.
 	private void modifyServiceConfigurationForBuildScenario(IServiceConfiguration sConfig, BuildScenario bs) {
-		IService syncService = null;
+		IService syncService = null; // Only set if sync service should be disabled
 		for (IService service : sConfig.getServices()) {
 			ServiceProvider provider = (ServiceProvider) sConfig.getServiceProvider(service);
 			if (provider instanceof IRemoteExecutionServiceProvider) {
@@ -441,47 +462,35 @@ public class BuildConfigurationManager {
 	}
 	
 	// Return ID of the project's template service configuration, or null if not found (project not initialized)
+	// Returned value is never null
 	private static String getTemplateServiceConfigurationId(IProject project) {
-		if (project == null) {
-			throw new NullPointerException();
-		}
-
 		IScopeContext context = new ProjectScope(project);
 		Preferences node = context.getNode(projectScopeSyncNode);
 		if (node == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_0);
-			return null;
+			throw new RuntimeException(Messages.BuildConfigurationManager_0);
 		}
 		
-		return node.get(TEMPLATE_KEY, null);
+		String configId = node.get(TEMPLATE_KEY, null);
+		if (configId == null) {
+			throw new RuntimeException(Messages.BuildConfigurationManager_9);
+		}
+		
+		return configId;
 	}
 	
 	/**
 	 * Return the build scenario for the passed configuration. Any newly created configurations should be recorded by the call to
-	 * "initializeOrUpdateConfigurations." For configurations still unknown (perhaps newly created configurations not yet recorded
-	 *  in CDT), return the build scenario for the closest known ancestor.
+	 * "updateConfigurations." For configurations still unknown (perhaps newly created configurations not yet recorded in CDT),
+	 *  return the build scenario for the closest known ancestor.
 	 * 
-	 * @param bconf
-	 *            The build configuration
+	 * @param bconf - the build configuration - cannot be null
 	 * @return build scenario or null if there are problems accessing configuration's information
 	 */
 	public BuildScenario getBuildScenarioForBuildConfiguration(IConfiguration bconf) {
-		if (bconf == null) {
-			throw new NullPointerException();
-		}
-
 		IProject project = bconf.getOwner().getProject();
-		if (!isInitialized(project)) {
-			throw new RuntimeException(Messages.BCM_InitError);
-		}
-		
+		checkProject(project);
 		updateConfigurations(project);
-		BuildScenario bs = this.getBuildScenarioForBuildConfigurationInternal(bconf).bs;
-		if (bs == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_4 + bconf.getName());
-		}
-		
-		return bs;
+		return this.getBuildScenarioForBuildConfigurationInternal(bconf).bs;
 	}
 	
 	// Simple class for bundling a build scenario with its configuration id
@@ -498,15 +507,7 @@ public class BuildConfigurationManager {
 	// Return the build scenario stored for the passed id or the build scenario of its nearest ancestor.
 	// Return null if not found.
 	private BuildScenarioAndConfiguration getBuildScenarioForBuildConfigurationInternal(IConfiguration bconf) {
-		if (bconf == null) {
-			throw new NullPointerException();
-		}
-		
 		IProject project = bconf.getOwner().getProject();
-		if (!isInitialized(project)) {
-			throw new RuntimeException(Messages.BCM_InitError);
-		}
-		
 		IScopeContext context = new ProjectScope(project);
 		Preferences prefRootNode = context.getNode(projectScopeSyncNode);
 		if (prefRootNode == null) {
@@ -516,8 +517,7 @@ public class BuildConfigurationManager {
 
 		try {
 			if (!prefRootNode.nodeExists(CONFIG_NODE_NAME)) {
-				RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_2);
-				return null;
+				throw new RuntimeException(Messages.BuildConfigurationManager_0);
 			}
 			
 			String configId = bconf.getId();
@@ -528,7 +528,13 @@ public class BuildConfigurationManager {
 			
 			if (configId != null) {
 				BuildScenario bs = BuildScenario.loadScenario(prefGeneralConfigNode.node(configId));
-				return new BuildScenarioAndConfiguration(bs, configId);
+				if (bs == null) {
+					RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_14 + configId + Messages.BuildConfigurationManager_11
+							+ project.getName());
+					return null;
+				} else {
+					return new BuildScenarioAndConfiguration(bs, configId);
+				}
 			} else {
 				return null;
 			}
@@ -553,47 +559,48 @@ public class BuildConfigurationManager {
 	}
 
 	/**
-	 * Associate the given configuration with the given build scenario. It is very important that we update configurations first,
-	 * so that children of the changed configuration will be properly set to use the prior build scenario. This is not possible,
-	 * though, until the project has been initialized.
+	 * Associate the given configuration with the given build scenario.
 	 * 
-	 * @param buildScenario
-	 * @param bconf
-	 *            the build configuration
+	 * @param buildScenario - cannot be null
+	 * @param bconf - the build configuration - cannot be null
 	 */
 	public void setBuildScenarioForBuildConfiguration(BuildScenario bs, IConfiguration bconf) {
-		if (bconf == null) {
+		if (bs == null) {
 			throw new NullPointerException();
 		}
-		
 		IProject project = bconf.getOwner().getProject();
-		if (!isInitialized(project)) {
-			throw new RuntimeException(Messages.BCM_InitError);
-		}
-
+		checkProject(project);
+		// Update so that unknown children of the given configuration are set properly to use the previous build scenario
 		updateConfigurations(project);
 		this.setBuildScenarioForBuildConfigurationInternal(bs, bconf);
 	}
 	
 	private void setBuildScenarioForBuildConfigurationInternal(BuildScenario bs, IConfiguration bconf) {
-		if (bs == null || bconf == null) {
-			throw new NullPointerException();
-		}
-		
 		IProject project = bconf.getOwner().getProject();
-		if (!isInitialized(project)) {
-			throw new RuntimeException(Messages.BCM_InitError);
-		}
 
-		// Get project root preference node
 		IScopeContext context = new ProjectScope(project);
 		Preferences prefRootNode = context.getNode(projectScopeSyncNode);
 		if (prefRootNode == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_0);
-			return;
+			throw new RuntimeException(Messages.BuildConfigurationManager_0);
 		}
 
 		Preferences prefConfigNode = prefRootNode.node(CONFIG_NODE_NAME + "/" + bconf.getId()); //$NON-NLS-1$
 		bs.saveScenario(prefConfigNode);
+	}
+	
+	// Run standard checks on project and throw the appropriate exception if it is not valid
+	// All public methods should call this for any passed project or any passed configuration's project.
+	// Private methods assume projects have been checked.
+	private void checkProject(IProject project) {
+		try {
+			if (!project.hasNature(RemoteSyncNature.NATURE_ID)) {
+				throw new IllegalArgumentException(Messages.BuildConfigurationManager_6);
+			}
+		} catch (CoreException e) {
+			throw new IllegalArgumentException(Messages.BuildConfigurationManager_8);
+		}
+		if (!isInitialized(project)) {
+			throw new RuntimeException(Messages.BuildConfigurationManager_7);
+		}
 	}
 }

@@ -48,6 +48,16 @@ public class Messages extends NLS {
 
 	public static String BuildConfigurationManager_1;
 
+	public static String BuildConfigurationManager_10;
+
+	public static String BuildConfigurationManager_11;
+
+	public static String BuildConfigurationManager_12;
+
+	public static String BuildConfigurationManager_13;
+
+	public static String BuildConfigurationManager_14;
+
 	public static String BuildConfigurationManager_2;
 
 	public static String BuildConfigurationManager_3;
@@ -55,6 +65,14 @@ public class Messages extends NLS {
 	public static String BuildConfigurationManager_4;
 
 	public static String BuildConfigurationManager_5;
+
+	public static String BuildConfigurationManager_6;
+
+	public static String BuildConfigurationManager_7;
+
+	public static String BuildConfigurationManager_8;
+
+	public static String BuildConfigurationManager_9;
 
 	public static String BCM_GetBuildInfoError;
 
