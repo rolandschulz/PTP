@@ -28,7 +28,9 @@ import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
 import org.eclipse.cdt.managedbuilder.internal.core.ManagedProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -282,11 +284,7 @@ public class BuildConfigurationManager {
 			throw new RuntimeException(Messages.BuildConfigurationManager_0);
 		}
 		node.put(TEMPLATE_KEY, sc.getId());
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_1, e);
-		}
+		flushNode(node);
 
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
@@ -580,11 +578,7 @@ public class BuildConfigurationManager {
 
 		Preferences prefConfigNode = prefRootNode.node(CONFIG_NODE_NAME + "/" + bconf.getId()); //$NON-NLS-1$
 		bs.saveScenario(prefConfigNode);
-		try {
-			prefRootNode.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_2, e);
-		}
+		flushNode(prefRootNode);
 		
 		IServiceConfiguration sconf = fBConfigToSConfigMap.get(bconf);
 		if (sconf != null) {
@@ -606,5 +600,57 @@ public class BuildConfigurationManager {
 		if (!isInitialized(project)) {
 			throw new RuntimeException(Messages.BuildConfigurationManager_7);
 		}
+	}
+	
+	/**
+	 * The node flushing mechanism fails if the workspace is locked. So calling "Node.flush()" is not enough. Instead, spawn a
+	 * thread that flushes once the workspace is unlocked.
+	 *
+	 * @param prefNode node to flush
+	 */
+
+	public static void flushNode(final Preferences prefNode) {
+		final IWorkspace ws = ResourcesPlugin.getWorkspace();
+		// Avoid creating a thread if possible. 
+		try {
+			if (!ws.isTreeLocked()) {
+				prefNode.flush();
+				return;
+			}
+		} catch (BackingStoreException e) {
+			// Proceed to create thread
+		}
+
+		Thread flushThread = new Thread(new Runnable() {
+			public void run() {
+				int sleepCount = 0;
+				Throwable lastException = null;
+				while (true) {
+					try {
+						Thread.sleep(1000);
+						// Give up after 30 sleeps - this should never happen
+						sleepCount++;
+						if (sleepCount > 30) {
+							if (lastException != null) {
+								RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_17, lastException);
+							} else {
+								RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_17);
+							}
+							break;
+						}
+						if (!ws.isTreeLocked()) {
+							prefNode.flush();
+							break;
+						}
+					} catch(InterruptedException e) {
+						lastException = e;
+					} catch (BackingStoreException e) {
+						// This can happen in the rare case that the lock is locked between the check and the flush.
+						lastException = e;
+					}
+				}
+			}
+		}, "Flush project data thread"); //$NON-NLS-1$
+		flushThread.start();
 	}
 }

@@ -220,11 +220,7 @@ public class SyncManager  {
 			node.put(SYNC_MODE_KEY, mode.name());
 		}
 
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_5, e);
-		}
+		BuildConfigurationManager.flushNode(node);
 	}
 
 	/**
@@ -246,11 +242,7 @@ public class SyncManager  {
 			node.putBoolean(SYNC_AUTO_KEY, isSyncAutomatic);
 		}
 
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_9, e);
-		}
+		BuildConfigurationManager.flushNode(node);
 	}
 	
 	/**
@@ -277,11 +269,7 @@ public class SyncManager  {
 			node.putBoolean(SHOW_ERROR_KEY, shouldBeDisplayed);
 		}
 
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_5, e);
-		}
+		BuildConfigurationManager.flushNode(node);
 	}
 
 	/**
@@ -305,11 +293,7 @@ public class SyncManager  {
 
 		filter.saveFilter(node);
 
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_5, e);
-		}
+		BuildConfigurationManager.flushNode(node);
 	}
 
 	/**
@@ -331,11 +315,7 @@ public class SyncManager  {
 
 		filter.saveFilter(node);
 
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_9, e);
-		}
+		BuildConfigurationManager.flushNode(node);
 	}
 
 	/**

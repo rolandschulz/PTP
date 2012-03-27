@@ -62,6 +62,8 @@ public class Messages extends NLS {
 
 	public static String BuildConfigurationManager_16;
 
+	public static String BuildConfigurationManager_17;
+
 	public static String BuildConfigurationManager_2;
 
 	public static String BuildConfigurationManager_3;
