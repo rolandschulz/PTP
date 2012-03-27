@@ -66,8 +66,8 @@ public class BuildConfigurationManager {
 	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String CONFIG_NODE_NAME = "config"; //$NON-NLS-1$
 	private static final String TEMPLATE_KEY = "template"; //$NON-NLS-1$
-	private final Map<IConfiguration, IServiceConfiguration> fBConfigToSConfigMap = Collections
-			.synchronizedMap(new HashMap<IConfiguration, IServiceConfiguration>());
+	private final Map<String, IServiceConfiguration> fBConfigIdToSConfigMap = Collections
+			.synchronizedMap(new HashMap<String, IServiceConfiguration>());
 	
 	// Setup as a singleton
 	private BuildConfigurationManager() {
@@ -183,7 +183,7 @@ public class BuildConfigurationManager {
 	public IServiceConfiguration getConfigurationForBuildConfiguration(IConfiguration bconf) {
 		IProject project = bconf.getOwner().getProject();
 		checkProject(project);
-		IServiceConfiguration sconf = fBConfigToSConfigMap.get(bconf);
+		IServiceConfiguration sconf = fBConfigIdToSConfigMap.get(bconf.getId());
 		if (sconf == null) {
 			BuildScenario bs = this.getBuildScenarioForBuildConfiguration(bconf);
 			// Should never happen, but if it does do not continue. (Function call should have invoked error handling.)
@@ -192,7 +192,7 @@ public class BuildConfigurationManager {
 			}
             sconf = copyTemplateServiceConfiguration(project);
             modifyServiceConfigurationForBuildScenario(sconf, bs);
-            fBConfigToSConfigMap.put(bconf, sconf);
+            fBConfigIdToSConfigMap.put(bconf.getId(), sconf);
 		}
 		
 		return sconf;
@@ -580,7 +580,7 @@ public class BuildConfigurationManager {
 		bs.saveScenario(prefConfigNode);
 		flushNode(prefRootNode);
 		
-		IServiceConfiguration sconf = fBConfigToSConfigMap.get(bconf);
+		IServiceConfiguration sconf = fBConfigIdToSConfigMap.get(bconf.getId());
 		if (sconf != null) {
 			modifyServiceConfigurationForBuildScenario(sconf, bs);
 		}
