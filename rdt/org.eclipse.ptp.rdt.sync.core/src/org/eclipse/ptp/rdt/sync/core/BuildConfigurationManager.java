@@ -414,13 +414,6 @@ public class BuildConfigurationManager {
 			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
 		}
 
-		// Get project root preference node
-		IScopeContext context = new ProjectScope(project);
-		Preferences prefRootNode = context.getNode(projectScopeSyncNode);
-		if (prefRootNode == null) {
-			throw new RuntimeException(Messages.BuildConfigurationManager_0);
-		}
-
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allConfigs) {
 			BuildScenarioAndConfiguration parentConfigInfo = getBuildScenarioForBuildConfigurationInternal(config);
@@ -586,6 +579,11 @@ public class BuildConfigurationManager {
 
 		Preferences prefConfigNode = prefRootNode.node(CONFIG_NODE_NAME + "/" + bconf.getId()); //$NON-NLS-1$
 		bs.saveScenario(prefConfigNode);
+		try {
+			prefRootNode.flush();
+		} catch (BackingStoreException e) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_2, e);
+		}
 	}
 	
 	// Run standard checks on project and throw the appropriate exception if it is not valid
