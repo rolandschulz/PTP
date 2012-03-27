@@ -189,9 +189,6 @@ public class BuildConfigurationManager {
 				return null;
 			}
             sconf = copyTemplateServiceConfiguration(project);
-            if (sconf == null) {
-            	return null;
-            }
             modifyServiceConfigurationForBuildScenario(sconf, bs);
             fBConfigToSConfigMap.put(bconf, sconf);
 		}
@@ -320,8 +317,12 @@ public class BuildConfigurationManager {
 	}
 
 	// Does the low-level work of creating a copy of a service configuration
+	// Returned configuration is never null
 	private IServiceConfiguration copyTemplateServiceConfiguration(IProject project) {
 		IServiceConfiguration newConfig = ServiceModelManager.getInstance().newServiceConfiguration(""); //$NON-NLS-1$
+		if (newConfig == null) {
+			throw new RuntimeException(Messages.BuildConfigurationManager_15);
+		}
 		String oldConfigId = getTemplateServiceConfigurationId(project);
 		IServiceConfiguration oldConfig = ServiceModelManager.getInstance().getConfiguration(oldConfigId);
 		if (oldConfig == null) {
@@ -583,6 +584,11 @@ public class BuildConfigurationManager {
 			prefRootNode.flush();
 		} catch (BackingStoreException e) {
 			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_2, e);
+		}
+		
+		IServiceConfiguration sconf = fBConfigToSConfigMap.get(bconf);
+		if (sconf != null) {
+			modifyServiceConfigurationForBuildScenario(sconf, bs);
 		}
 	}
 	
