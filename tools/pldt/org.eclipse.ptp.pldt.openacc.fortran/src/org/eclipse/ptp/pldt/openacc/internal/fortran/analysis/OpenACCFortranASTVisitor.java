@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation.
+ * Copyright (c) 2005, 2010, 2012 IBM Corporation and University of Illinois.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeff Overbey (UIUC) - adapted to OpenACC
  *******************************************************************************/
-package org.eclipse.ptp.pldt.mpi.fortran.analysis;
+package org.eclipse.ptp.pldt.openacc.internal.fortran.analysis;
 
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTCallStmtNode;
@@ -26,16 +27,37 @@ import org.eclipse.ptp.pldt.common.util.SourceInfo;
  * position of the artifacts found.
  * 
  * @author Beth Tibbitts
- * @since 4.0
- * 
+ * @author Jeff Overbey
  */
-public class MpiFortranASTVisitor extends GenericASTVisitor {
-	private static final String PREFIX = "MPI_"; //$NON-NLS-1$
+@SuppressWarnings("restriction")
+public class OpenACCFortranASTVisitor extends GenericASTVisitor {
+	private static final String PREFIX = "ACC_"; //$NON-NLS-1$
 
 	@SuppressWarnings("unused")
 	private static final boolean traceOn = false;
 	private final ScanReturn scanReturn;
 	private final String fileName;
+
+	/** Constructor */
+	public OpenACCFortranASTVisitor(String fileName, ScanReturn scanReturn) {
+		super();
+		this.scanReturn = scanReturn;
+		this.fileName = fileName;
+	}
+
+	@Override
+	public void visitToken(Token node) {
+		/*
+		 * In Fortran, OpenACC directives are comments (e.g., !$acc parallel).
+		 * Photran attaches comments to the following token. Since they appear
+		 * before several types of statements (including END statements), it's
+		 * easiest to just iterate through all the tokens in the AST and collect
+		 * the preceding OpenMP directives.
+		 */
+		for (Token accDirective : node.getOpenACCComments()) {
+			addArtifact(accDirective, Artifact.PRAGMA);
+		}
+	}
 
 	@Override
 	public void visitASTCallStmtNode(ASTCallStmtNode node) {
@@ -54,18 +76,11 @@ public class MpiFortranASTVisitor extends GenericASTVisitor {
 
 	private void addArtifact(Token subroutineName, int artifactType) {
 		String callname = subroutineName.getText().toUpperCase();
-		if (callname.startsWith(PREFIX)) {
+		if (artifactType == Artifact.PRAGMA || callname.startsWith(PREFIX)) {
 			int start = subroutineName.getFileOffset();
 			int end = subroutineName.getFileOffset() + subroutineName.getLength();
 			SourceInfo si = new SourceInfo(subroutineName.getLine(), start, end, artifactType);
 			scanReturn.addArtifact(new Artifact(fileName, subroutineName.getLine(), 1, callname, si));
 		}
 	}
-
-	public MpiFortranASTVisitor(String fileName, ScanReturn scanReturn) {
-		super();
-		this.scanReturn = scanReturn;
-		this.fileName = fileName;
-	}
-
 }

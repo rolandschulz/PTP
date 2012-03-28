@@ -67,18 +67,30 @@ public class Messages extends NLS {
 	public static String SyncBuildServiceProvider_name;
 
 	public static String SyncFileFilter_0;
+
+	public static String SyncFileFilter_1;
+
+	public static String SyncFileFilter_2;
  
 	public static String SyncManager_0;
  
 	public static String SyncManager_1;
  
 	public static String SyncManager_2;
+
+	public static String SyncManager_3;
  
 	public static String SyncManager_4;
+
+	public static String SyncManager_5;
+
+	public static String SyncManager_6;
 
 	public static String SyncManager_7;
 
 	public static String SyncManager_8;
+
+	public static String SyncManager_9;
 	
 	static {
 		initializeMessages(BUNDLE_NAME, Messages.class);

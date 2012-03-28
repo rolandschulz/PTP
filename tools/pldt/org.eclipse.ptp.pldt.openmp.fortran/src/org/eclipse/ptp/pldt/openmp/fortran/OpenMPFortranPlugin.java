@@ -11,22 +11,24 @@
 
 package org.eclipse.ptp.pldt.openmp.fortran;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The main plugin class to be used in the desktop.
  */
-public class Activator extends AbstractUIPlugin {
+public class OpenMPFortranPlugin extends AbstractUIPlugin {
 
 	// The shared instance.
-	private static Activator plugin;
+	private static OpenMPFortranPlugin plugin;
 	public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.openmp.fortran"; //$NON-NLS-1$
 
 	/**
 	 * The constructor.
 	 */
-	public Activator() {
+	public OpenMPFortranPlugin() {
 		plugin = this;
 	}
 
@@ -50,7 +52,7 @@ public class Activator extends AbstractUIPlugin {
 	/**
 	 * Returns the shared instance.
 	 */
-	public static Activator getDefault() {
+	public static OpenMPFortranPlugin getDefault() {
 		return plugin;
 	}
 
@@ -58,4 +60,30 @@ public class Activator extends AbstractUIPlugin {
 		return PLUGIN_ID;
 	}
 
+	/**
+	 * Create log entry from an IStatus
+	 * 
+	 * @param status
+	 */
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+
+	/**
+	 * Create log entry from a string
+	 * 
+	 * @param msg
+	 */
+	public static void log(String msg) {
+		log(new Status(IStatus.ERROR, getPluginId(), IStatus.ERROR, msg, null));
+	}
+
+	/**
+	 * Create log entry from a Throwable
+	 * 
+	 * @param e
+	 */
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getPluginId(), IStatus.ERROR, e.getMessage(), e));
+	}
 }

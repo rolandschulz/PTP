@@ -12,8 +12,6 @@ package org.eclipse.ptp.rdt.sync.core;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.resources.IFile;

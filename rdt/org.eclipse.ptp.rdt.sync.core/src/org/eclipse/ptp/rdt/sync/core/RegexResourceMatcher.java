@@ -17,7 +17,7 @@ import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
-import org.eclipse.ui.IMemento;
+import org.osgi.service.prefs.Preferences;
 
 /**
  * Class for matching a string against a regular expression.
@@ -95,27 +95,27 @@ public class RegexResourceMatcher extends ResourceMatcher {
 	}
 
 	/**
-	 * Place needed data for recreating inside the memento
+	 * Place needed data for recreating inside the preference node
 	 */
 	@Override
-	public void saveMatcher(IMemento memento) {
-		super.saveMatcher(memento);
-		memento.putString(ATTR_REGEX, regex);
+	public void saveMatcher(Preferences prefRootNode) {
+		super.saveMatcher(prefRootNode);
+		prefRootNode.put(ATTR_REGEX, regex);
 	}
 	
 	/**
-	 * Recreate instance from memento
+	 * Recreate instance from preference node
 	 * 
-	 * @param memento
+	 * @param preference node
 	 * @return the recreated instance
 	 * @throws NoSuchElementException
-	 * 				if expected data is not in the memento.
+	 * 				if expected data is not in the preference node.
 	 */
-	public static ResourceMatcher loadMatcher(IMemento memento) throws NoSuchElementException {
-		String r = memento.getString(ATTR_REGEX);
+	public static ResourceMatcher loadMatcher(Preferences prefRootNode) throws NoSuchElementException {
+		String r = prefRootNode.get(ATTR_REGEX, null);
 		if (r == null) {
 			throw new NoSuchElementException(Messages.RegexResourceMatcher_0);
 		}
-		return new RegexResourceMatcher(memento.getString(ATTR_REGEX));
+		return new RegexResourceMatcher(r);
 	}
 }

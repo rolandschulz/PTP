@@ -1,15 +1,16 @@
-/**********************************************************************
- * Copyright (c) 2010 IBM Corporation.
+/*******************************************************************************
+ * Copyright (c) 2012 University of Illinois at Urbana-Champaign and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
+ *     UIUC - Initial API and implementation
  *******************************************************************************/
+package org.eclipse.ptp.pldt.openacc.internal.fortran.analysis;
 
-package org.eclipse.ptp.pldt.openmp.fortran.actions;
+import java.util.List;
 
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.core.resources.IFile;
@@ -18,26 +19,35 @@ import org.eclipse.photran.internal.cdtinterface.core.FortranLanguage;
 import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.ptp.pldt.common.IArtifactAnalysis;
 import org.eclipse.ptp.pldt.common.ScanReturn;
-import org.eclipse.ptp.pldt.openmp.fortran.analysis.OpenMPFortranASTVisitor;
+import org.eclipse.ptp.pldt.openacc.internal.fortran.OpenACCFortranPlugin;
 
 /**
- * @since 4.0
+ * OpenACC artifact analysis for Fortran.
+ * <p>
+ * Contributed to the <code>org.eclipse.ptp.pldt.mpi.core.artifactAnalysis</code> extension point.
+ * 
+ * @author Jeff Overbey
  */
-public class AnalyseOpenMPFortranHandler {
-	public void run(String languageID, ITranslationUnit tu, String fileName, ScanReturn msr) {
+@SuppressWarnings("restriction")
+public class OpenACCFortranArtifactAnalysis implements IArtifactAnalysis {
+	@Override
+	public ScanReturn runArtifactAnalysis(String languageID, ITranslationUnit tu, List<String> includes, boolean allowPrefixOnlyMatch) {
+		final ScanReturn msr = new ScanReturn();
+		final String fileName = tu.getElementName();
 		if (languageID.equals(FortranLanguage.LANGUAGE_ID)) {
 			IResource res = tu.getUnderlyingResource();
 			if (!(res instanceof IFile))
 				throw new IllegalStateException();
 			IFile file = (IFile) res;
-
 			try {
 				ASTExecutableProgramNode ast = new Parser().parse(new ASTLexerFactory().createLexer(file));
-				ast.accept(new OpenMPFortranASTVisitor(fileName, msr));
+				ast.accept(new OpenACCFortranASTVisitor(fileName, msr));
 			} catch (Exception e) {
-				e.printStackTrace(); // TODO
+				OpenACCFortranPlugin.log(e);
 			}
 		}
+		return msr;
 	}
 }
