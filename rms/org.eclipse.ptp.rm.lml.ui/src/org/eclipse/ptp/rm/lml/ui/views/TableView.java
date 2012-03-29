@@ -632,8 +632,8 @@ public class TableView extends ViewPart {
 					cell.setText(((Row) cell.getElement()).cells[cellNumber].value);
 				}
 			});
-			treeColumn = treeViewerColumn.getColumn();
-			treeColumn.setMoveable(true);
+			final TreeColumn treeColumnI = treeViewerColumn.getColumn();
+			treeColumnI.setMoveable(true);
 			boolean isFiltered = false;
 			for (final String title : columnTitlesPattern) {
 				if (title.equals(tableColumnLayouts[i].getTitle())) {
@@ -641,44 +641,52 @@ public class TableView extends ViewPart {
 				}
 			}
 			if (isFiltered) {
-				treeColumn.setText(tableColumnLayouts[i].getTitle() + " #");
+				treeColumnI.setText(tableColumnLayouts[i].getTitle() + " #");
 			} else {
-				treeColumn.setText(tableColumnLayouts[i].getTitle());
+				treeColumnI.setText(tableColumnLayouts[i].getTitle());
 			}
 
-			treeColumn.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
+			treeColumnI.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
 
 			if (tableColumnLayouts[i].isActive()) {
 				final boolean resizable = true;
-				treeColumn.setResizable(resizable);
+				treeColumnI.setResizable(resizable);
 
 				/*
 				 * Create the header menu for this column
 				 */
-				createMenuItem(headerMenu, treeColumn, i + 1);
+				createMenuItem(headerMenu, treeColumnI, i + 1);
 
 				/*
 				 * Set the column width
 				 */
-				treeColumnLayout.setColumnData(treeColumn,
+				treeColumnLayout.setColumnData(treeColumnI,
 						new ColumnWeightData((int) (tableColumnLayouts[i].getWidth() * composite.getClientArea().width), 10,
 								resizable));
 			} else {
 				final boolean resizable = false;
-				treeColumn.setResizable(resizable);
+				treeColumnI.setResizable(resizable);
 
 				/*
 				 * Create the header menu for this column
 				 */
-				createMenuItem(headerMenu, treeColumn, i + 1);
+				createMenuItem(headerMenu, treeColumnI, i + 1);
 
 				/*
 				 * Set the column width
 				 */
 				savedColumnWidths[i + 1] = 0;
-				treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(0, 0, resizable));
+				treeColumnLayout.setColumnData(treeColumnI, new ColumnWeightData(0, 0, resizable));
 			}
-			treeColumns[i] = treeColumn;
+			treeColumnI.addControlListener(new ControlAdapter() {
+				@Override
+				public void controlResized(ControlEvent e) {
+					if (treeColumnI.getWidth() < 10) {
+						treeColumnI.setWidth(10);
+					}
+				}
+			});
+			treeColumns[i] = treeColumnI;
 		}
 
 		// just a default column
