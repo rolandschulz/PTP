@@ -58,9 +58,12 @@ public class CrayErrorParser implements IErrorParser {
 	private static final int FILENAME_GROUP = 5;
 	private static final int LINE_NUMBER_GROUP = 6;
 
+	private String previousLine = ""; //$NON-NLS-1$
+
 	@Override
 	public boolean processLine(String currentLine, ErrorParserManager eoParser) {
-		final Matcher matcher = matchErrorWarningLine(eoParser.getPreviousLine());
+		final Matcher matcher = matchErrorWarningLine(previousLine); // eoParser.getPreviousLine() is broken?
+		previousLine = currentLine;
 		if (matcher != null) {
 			final int severity = determineSeverity(matcher.group(SEVERITY_GROUP));
 			final String filename = matcher.group(FILENAME_GROUP);
