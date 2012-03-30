@@ -1,4 +1,4 @@
- package org.eclipse.ptp.rm.lml.ui.providers;
+package org.eclipse.ptp.rm.lml.ui.providers;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -160,8 +160,8 @@ public class FilterDialog extends Dialog {
 
 		if (buttonId == IDialogConstants.CANCEL_ID) {
 			// Cancel Button
-			LMLManager.getInstance().filterLgui(gid, filterOld);
 			lguiItem.setPattern(gid, filterOld);
+			LMLManager.getInstance().filterLgui(gid, filterOld);
 			close();
 			return;
 		}
@@ -321,6 +321,7 @@ public class FilterDialog extends Dialog {
 
 		final VerifyListener numericListener = new VerifyListener() {
 
+			@Override
 			public void verifyText(VerifyEvent e) {
 				final String s = ((Text) e.widget).getText() + e.text;
 				e.doit = s.matches("0|([1-9][0-9]*)");
@@ -329,6 +330,7 @@ public class FilterDialog extends Dialog {
 
 		final VerifyListener alphaListener = new VerifyListener() {
 
+			@Override
 			public void verifyText(VerifyEvent e) {
 				final String s = ((Text) e.widget).getText() + e.text;
 				e.doit = s.matches(".+");
@@ -410,9 +412,11 @@ public class FilterDialog extends Dialog {
 
 				radioButtonRelation.addSelectionListener(new SelectionListener() {
 
+					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {
 					}
 
+					@Override
 					public void widgetSelected(SelectionEvent e) {
 						final boolean selected = radioButtonRelation.getSelection();
 						if (row.getRelationComboNumericDate() != null) {
@@ -478,9 +482,11 @@ public class FilterDialog extends Dialog {
 
 				radioButtonRange.addSelectionListener(new SelectionListener() {
 
+					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {
 					}
 
+					@Override
 					public void widgetSelected(SelectionEvent e) {
 						final boolean selected = radioButtonRange.getSelection();
 						if (row.getMinValueTextNumeric() != null
@@ -503,9 +509,11 @@ public class FilterDialog extends Dialog {
 
 			checkbox.addSelectionListener(new SelectionListener() {
 
+				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 				}
 
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					final boolean selected = checkbox.getSelection();
 					if (row.getRelationValueTextAlpha() != null) {
