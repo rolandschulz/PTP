@@ -17,6 +17,7 @@ package org.eclipse.ptp.rm.lml.core.model;
 public interface ITableColumnLayout {
 	public static String COLUMN_STYLE_LEFT = "LEFT"; //$NON-NLS-1$
 	public static String COLUMN_STYLE_RIGHT = "RIGHT"; //$NON-NLS-1$
+	public static String COLUMN_STYLE_CENTER = "CENTER"; //$NON-NLS-1$
 
 	public static String SORT_DIRECTION_UP = "UP"; //$NON-NLS-1$
 	public static String SORT_DIRECTION_DOWN = "DOWN"; //$NON-NLS-1$

@@ -160,8 +160,8 @@ public class FilterDialog extends Dialog {
 
 		if (buttonId == IDialogConstants.CANCEL_ID) {
 			// Cancel Button
-			LMLManager.getInstance().filterLgui(gid, filterOld);
 			lguiItem.setPattern(gid, filterOld);
+			LMLManager.getInstance().filterLgui(gid, filterOld);
 			close();
 			return;
 		}

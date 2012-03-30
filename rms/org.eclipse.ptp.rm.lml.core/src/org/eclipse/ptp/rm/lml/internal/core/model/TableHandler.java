@@ -270,16 +270,17 @@ public class TableHandler extends LguiHandler {
 		for (int i = 0; i < layoutColumns.length; i++) {
 			final ColumnlayoutType column = layoutColumns[i];
 			if (column != null) {
-				String style;
-				final String sort = getColumnSortProperty(getTable(gid), cids,
-						i);
+				String style = null;
+				final String sort = getColumnSortProperty(getTable(gid), cids, i);
 				// when there is a change
-				if (column.getSorted() != null
-						&& column.getSorted().value() != null && sort != null
-						&& sort.equals("numeric")) {
-					style = ITableColumnLayout.COLUMN_STYLE_RIGHT;
-				} else {
-					style = ITableColumnLayout.COLUMN_STYLE_LEFT;
+				if (column.getSorted() != null && column.getSorted().value() != null && sort != null) {
+					if (sort.equals("numeric")) {
+						style = ITableColumnLayout.COLUMN_STYLE_RIGHT;
+					} else if (sort.equals("alpha")) {
+						style = ITableColumnLayout.COLUMN_STYLE_LEFT;
+					} else {
+						style = ITableColumnLayout.COLUMN_STYLE_CENTER;
+					}
 				}
 				tableColumnLayouts[i] = new TableColumnLayout(column.getKey(),
 						column.getWidth(), style, column.isActive(), sort);

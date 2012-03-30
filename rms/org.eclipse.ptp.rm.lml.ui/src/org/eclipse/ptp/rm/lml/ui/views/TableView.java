@@ -847,6 +847,9 @@ public class TableView extends ViewPart {
 		if (alignment.equals(ITableColumnLayout.COLUMN_STYLE_RIGHT)) {
 			return SWT.TRAIL;
 		}
+		if (alignment.equals(ITableColumnLayout.COLUMN_STYLE_CENTER)) {
+			return SWT.CENTER;
+		}
 		return SWT.LEAD;
 	}
 
