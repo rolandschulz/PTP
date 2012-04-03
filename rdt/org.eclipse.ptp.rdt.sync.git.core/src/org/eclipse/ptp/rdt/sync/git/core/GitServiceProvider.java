@@ -151,11 +151,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 *            project to synchronize
 	 */
 	public void setProject(IProject project) {
-		if (fProject != null) {
-			throw new RuntimeException(Messages.GSP_ChangeProjectError);
-		}
+		providerLock.lock();
 		fProject = project;
 		putString(GIT_PROJECT_NAME, project.getName());
+		syncInfoChanged = true;
+		providerLock.unlock();
 	}
 
 	/**
