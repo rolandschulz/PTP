@@ -118,9 +118,24 @@ public class ResourceChangeListener {
 							}
 						}
 						// Post-change event
-						// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user has
-						// disabled it. This allows for some bookkeeping but no files are transferred.
 						else {
+							RDTSyncCorePlugin.log(String.valueOf(delta.getKind()));
+							if (delta.getKind() == IResourceDelta.MOVED_FROM) {
+								ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
+								if (provider == null) {
+									RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.ResourceChangeListener_1 +
+											project.getName());
+								} else {
+									provider.setProject(project);
+								}
+								continue;
+							}
+							
+							if (delta.getKind() == IResourceDelta.MOVED_TO) {
+								continue;
+							}
+							// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user has
+							// disabled it. This allows for some bookkeeping but no files are transferred.
 							if (!syncEnabled) {
 								SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
 							} else if (syncMode == SYNC_MODE.ALL) {
@@ -131,7 +146,7 @@ public class ResourceChangeListener {
 						}
 					} catch (CoreException e){
 						// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
-						RDTSyncCorePlugin.log(Messages.ResourceChangeListener_0);
+						RDTSyncUIPlugin.log(Messages.ResourceChangeListener_0, e);
 					}
 				}
 			}

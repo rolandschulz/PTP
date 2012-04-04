@@ -144,11 +144,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		putString(GIT_LOCATION, location);
 	}
 
-	/**
-	 * Set the project that will be synchronized
-	 * 
-	 * @param project
-	 *            project to synchronize
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#setProject(org.eclipse.core.resources.IProject)
 	 */
 	public void setProject(IProject project) {
 		providerLock.lock();

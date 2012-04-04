@@ -12,6 +12,7 @@ package org.eclipse.ptp.rdt.sync.core.serviceproviders;
 
 import java.util.EnumSet;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -38,6 +39,13 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * @return
 	 */
 	public IRemoteConnection getRemoteConnection();
+
+	/**
+	 * Set the project being sync'ed. This method should work after initialization to support moving and copying of projects
+	 * 
+	 * @param project
+	 */
+	public void setProject(IProject project);
 
 	/**
 	 * Performs synchronization.
