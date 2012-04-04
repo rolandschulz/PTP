@@ -161,7 +161,9 @@ public class ASTCache {
 		if (index != null && (style &  ITranslationUnit.AST_SKIP_INDEXED_HEADERS) != 0) {
 			IndexBasedFileContentProvider ibcf= new IndexBasedFileContentProvider(index, pathResolver, linkageID, fileContentsProvider);
 			if ((style &  ITranslationUnit.AST_CONFIGURE_USING_SOURCE_CONTEXT) != 0) {
-				ibcf.setSupportFillGapFromContextToHeader(true);
+				//TODO - the context to header gap shouldn't be null
+				ibcf.setContextToHeaderGap(null);
+//				ibcf.setSupportFillGapFromContextToHeader(true);
 			}
 			fileContentsProvider= ibcf;
 		}
