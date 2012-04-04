@@ -463,13 +463,21 @@ public class TableView extends ViewPart {
 
 			@Override
 			public void run() {
-				final List<IPattern> filterValues = new LinkedList<IPattern>();
+				final List<IPattern> filterValuesNew = new LinkedList<IPattern>();
+				final List<IPattern> filterValuesOld = fLguiItem.getPattern(gid);
+
+				for (final IPattern filterValue : filterValuesOld) {
+					if (!filterValue.getColumnTitle().equals("owner")) {
+						filterValuesNew.add(filterValue);
+					}
+				}
+
 				if (isChecked()) {
-					filterValues.add((new Pattern("owner", "alpha")).setRelation("=", fLguiItem.getUsername()));
+					filterValuesNew.add((new Pattern("owner", "alpha")).setRelation("=", fLguiItem.getUsername()));
 				}
 				// TODO After decision about new structure of LML and server side
-				fLguiItem.setPattern(gid, filterValues);
-				setViewerInput(filterValues);
+				fLguiItem.setPattern(gid, filterValuesNew);
+				lmlManager.filterLgui(gid, filterValuesNew);
 			}
 
 		};
@@ -477,8 +485,7 @@ public class TableView extends ViewPart {
 
 			@Override
 			public void run() {
-				final FilterDialog dialog = new FilterDialog(new Shell(
-						viewSite.getShell()), gid);
+				final FilterDialog dialog = new FilterDialog(new Shell(viewSite.getShell()), gid);
 				dialog.open();
 			}
 		};
@@ -818,6 +825,7 @@ public class TableView extends ViewPart {
 				}
 
 				filterOwnJobsActionItem.getAction().setEnabled(true);
+				filterOwnJobsActionItem.getAction().setChecked(fLguiItem.isFilterOwnJobActive(gid));
 				filterActionItem.getAction().setEnabled(true);
 			}
 
