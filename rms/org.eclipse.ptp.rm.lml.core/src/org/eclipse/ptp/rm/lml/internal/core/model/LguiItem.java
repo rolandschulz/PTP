@@ -120,6 +120,7 @@ public class LguiItem implements ILguiItem {
 	 * @param listener
 	 *            new listening instance
 	 */
+	@Override
 	public void addListener(ILguiListener listener) {
 		listeners.add(listener);
 	}
@@ -130,6 +131,7 @@ public class LguiItem implements ILguiItem {
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#addUserJob(java.lang.String,
 	 * org.eclipse.ptp.rm.lml.core.model.jobs.JobStatusData)
 	 */
+	@Override
 	public void addUserJob(String jobId, JobStatusData status, boolean force) {
 		final JobStatusData jobStatus = fJobMap.get(jobId);
 
@@ -158,6 +160,7 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
+	@Override
 	public String[] getColumnTitlePattern(String gid) {
 		final List<String> titles = new ArrayList<String>();
 		final List<IPattern> patternList = filters.get(gid);
@@ -174,6 +177,7 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getCurrentLayout(java.io. OutputStream)
 	 */
+	@Override
 	public void getCurrentLayout(OutputStream output) {
 		while (lockPattern) {
 			// wait until the pattern have been set
@@ -193,6 +197,7 @@ public class LguiItem implements ILguiItem {
 	/**
 	 * @return object to map component-ids to corresponding layout definitions
 	 */
+	@Override
 	public LayoutAccess getLayoutAccess() {
 		if (lguiHandlers.get(LayoutAccess.class) == null) {
 			return null;
@@ -204,6 +209,7 @@ public class LguiItem implements ILguiItem {
 		return lgui;
 	}
 
+	@Override
 	public String[] getMessageOfTheDay() {
 		String type = new String();
 		String message = new String();
@@ -233,6 +239,7 @@ public class LguiItem implements ILguiItem {
 	/**
 	 * @return NodedisplayAccess-instance for accessing layouts of nodedisplays
 	 */
+	@Override
 	public NodedisplayAccess getNodedisplayAccess() {
 		if (lguiHandlers.get(NodedisplayAccess.class) == null) {
 			return null;
@@ -244,6 +251,7 @@ public class LguiItem implements ILguiItem {
 	 * @return a object, which saves which object has to be highlighted. All user interactions are saved globally for all components
 	 *         in this object.
 	 */
+	@Override
 	public ObjectStatus getObjectStatus() {
 		if (lguiHandlers.get(ObjectStatus.class) == null) {
 			return null;
@@ -254,6 +262,7 @@ public class LguiItem implements ILguiItem {
 	/**
 	 * @return object for getting infos for objects
 	 */
+	@Override
 	public OIDToInformation getOIDToInformation() {
 		if (lguiHandlers.get(OIDToInformation.class) == null) {
 			return null;
@@ -265,6 +274,7 @@ public class LguiItem implements ILguiItem {
 	 * @return a class, which provides an index for fast access to objects within the objects tag of LML. You can pass the id of the
 	 *         objects to the returned object. It then returns the corresponding objects.
 	 */
+	@Override
 	public OIDToObject getOIDToObject() {
 		if (lguiHandlers.get(OIDToObject.class) == null) {
 			return null;
@@ -272,6 +282,7 @@ public class LguiItem implements ILguiItem {
 		return (OIDToObject) lguiHandlers.get(OIDToObject.class);
 	}
 
+	@Override
 	public OverviewAccess getOverviewAccess() {
 		if (lguiHandlers.get(OverviewAccess.class) == null) {
 			return null;
@@ -279,10 +290,12 @@ public class LguiItem implements ILguiItem {
 		return (OverviewAccess) lguiHandlers.get(OverviewAccess.class);
 	}
 
+	@Override
 	public Map<String, List<IPattern>> getPattern() {
 		return filters;
 	}
 
+	@Override
 	public List<IPattern> getPattern(String gid) {
 		if (filters.containsKey(gid)) {
 			return filters.get(gid);
@@ -290,6 +303,7 @@ public class LguiItem implements ILguiItem {
 		return new LinkedList<IPattern>();
 	}
 
+	@Override
 	public TableHandler getTableHandler() {
 		if (lguiHandlers.get(TableHandler.class) == null) {
 			return null;
@@ -302,6 +316,7 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getUserJob(java.lang.String)
 	 */
+	@Override
 	public JobStatusData getUserJob(String jobId) {
 		final JobStatusData status = fJobMap.get(jobId);
 		if (status != null && !status.isRemoved()) {
@@ -315,12 +330,14 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getUserJobs()
 	 */
+	@Override
 	public JobStatusData[] getUserJobs() {
 		synchronized (fJobMap) {
 			return fJobMap.values().toArray(new JobStatusData[fJobMap.values().size()]);
 		}
 	}
 
+	@Override
 	public String getUsername() {
 		if (username == null) {
 			return new String();
@@ -333,10 +350,12 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#getVersion()
 	 */
+	@Override
 	public String getVersion() {
 		return lgui.getVersion();
 	}
 
+	@Override
 	public boolean isEmpty() {
 		final TableHandler handler = getTableHandler();
 		if (handler != null) {
@@ -345,11 +364,29 @@ public class LguiItem implements ILguiItem {
 		return true;
 	}
 
+	@Override
+	public boolean isFilterOwnJobActive(String gid) {
+		final List<IPattern> filters = getPattern(gid);
+		if (filters.size() > 0) {
+			for (final IPattern filter : filters) {
+				if (filter.getColumnTitle().equals("owner")) {
+					if (filter.getRelationOperator().equals("=") && filter.getRelationValue().equals(username)) {
+						return true;
+					} else {
+						break;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.elemhents.ILguiItem#isLayout()
 	 */
+	@Override
 	public boolean isLayout() {
 		return lgui != null && lgui.isLayout();
 	}
@@ -359,6 +396,7 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#notifyListeners()
 	 */
+	@Override
 	public void notifyListeners() {
 		final LguiUpdatedEvent event = new LguiUpdatedEvent(this, lgui);
 		for (final ILguiListener listener : listeners) {
@@ -366,6 +404,7 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
+	@Override
 	public void reloadLastLayout(StringBuilder layout) {
 		LguiType lguiType = null;
 		if (layout.length() > 0) {
@@ -399,6 +438,7 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#removeUserJob(java.lang.String )
 	 */
+	@Override
 	public void removeUserJob(String jobId) {
 		final JobStatusData status = fJobMap.get(jobId);
 		if (status != null) {
@@ -424,6 +464,7 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
+	@Override
 	public String saveCurrentLayout() {
 
 		final StringWriter writer = new StringWriter();
@@ -437,12 +478,14 @@ public class LguiItem implements ILguiItem {
 		return writer.getBuffer().toString();
 	}
 
+	@Override
 	public void setPattern(Map<String, List<IPattern>> pattern) {
 		if (pattern != null) {
 			filters = pattern;
 		}
 	}
 
+	@Override
 	public void setPattern(String gid, List<IPattern> filterValues) {
 		while (lockUpdate) {
 			// wait until the update with the server is finished
@@ -456,6 +499,7 @@ public class LguiItem implements ILguiItem {
 		lockPattern = false;
 	}
 
+	@Override
 	public void setRequest(RequestType request) {
 		this.request = request;
 		if (lgui != null) {
@@ -482,6 +526,7 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#update(java.io.InputStream)
 	 */
+	@Override
 	public void update(InputStream stream) {
 
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
@@ -522,6 +567,7 @@ public class LguiItem implements ILguiItem {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#updateUserJob(java.lang.String , java.lang.String, java.lang.String)
 	 */
+	@Override
 	public void updateUserJob(String jobId, String status, String detail) {
 		final JobStatusData jobStatus = fJobMap.get(jobId);
 		if (jobStatus != null && status != null) {
