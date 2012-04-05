@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui;
 
+import java.io.IOException;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -19,6 +21,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
@@ -27,6 +30,8 @@ import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SYNC_MODE;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.widgets.Display;
 
 public class ResourceChangeListener {
@@ -84,6 +89,7 @@ public class ResourceChangeListener {
 
 	private static IResourceChangeListener resourceListener = new IResourceChangeListener() {
 		public void resourceChanged(IResourceChangeEvent event) {
+			RDTSyncCorePlugin.log("Event type of " + event.getType()); //$NON-NLS-1$
 			// Turn off sync'ing for a project before deleting it and close repository - see bug 360170
 			// Note that event.getDelta() returns null, so this event cannot be handled inside the loop below.
 			if (event.getType() == IResourceChangeEvent.PRE_DELETE) {
@@ -123,15 +129,24 @@ public class ResourceChangeListener {
 						}
 						// Post-change event
 						else {
-							RDTSyncCorePlugin.log(String.valueOf(delta.getKind()));
+							RDTSyncCorePlugin.log("Post-change event of kind: " + String.valueOf(delta.getKind()) + " on project " + project.getName()); //$NON-NLS-1$ //$NON-NLS-2$
 							// Only interested in ADDED with MOVED_FROM, which indicates a project was renamed
 							if ((delta.getKind() == IResourceDelta.ADDED) && ((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0)) {
-								ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
-								if (provider == null) {
+								BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+								ISyncServiceProvider syncProvider = bcm.getProjectSyncServiceProvider(project);
+								if (syncProvider == null) {
 									RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.ResourceChangeListener_1 +
 											project.getName());
-								} else {
-									provider.setProject(project);
+								}
+								syncProvider.setProject(project);
+								IServiceConfiguration sc = bcm.createSyncServiceConfiguration(project, syncProvider);
+								bcm.setTemplateServiceConfiguration(project, sc);
+								ServiceModelManager smm = ServiceModelManager.getInstance();
+								smm.addConfiguration(project, sc);
+								try {
+									smm.saveModelConfiguration();
+								} catch (IOException e) {
+									RDTSyncUIPlugin.log(e.toString(), e);
 								}
 							}
 							
