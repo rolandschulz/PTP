@@ -296,6 +296,24 @@ public class BuildConfigurationManager {
 			setBuildScenarioForBuildConfigurationInternal(bs, config);
 		}
 	}
+	
+	/**
+	 * Set the template service configuration for the given project to the given configuration
+	 * 
+	 * @param project
+	 * @param sc
+	 */
+	public void setTemplateServiceConfiguration(IProject project, IServiceConfiguration sc) {
+		checkProject(project);
+		IScopeContext context = new ProjectScope(project);
+		Preferences node = context.getNode(projectScopeSyncNode);
+		if (node == null) {
+			throw new RuntimeException(Messages.BuildConfigurationManager_0);
+		}
+		node.put(TEMPLATE_KEY, sc.getId());
+		flushNode(node);
+		fBConfigIdToSConfigMap.clear(); // all current custom configurations will need to be rebuilt
+	}
 
 	/**
 	 * Indicate if the project has yet been initialized.
