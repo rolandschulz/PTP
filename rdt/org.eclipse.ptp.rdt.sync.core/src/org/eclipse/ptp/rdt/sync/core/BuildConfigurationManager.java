@@ -619,6 +619,9 @@ public class BuildConfigurationManager {
 			}
 		} catch (BackingStoreException e) {
 			// Proceed to create thread
+		} catch (IllegalStateException e) {
+			// Can occur if the project has been moved or deleted, so the preference node no longer exists.
+			return;
 		}
 
 		Thread flushThread = new Thread(new Runnable() {
@@ -647,6 +650,9 @@ public class BuildConfigurationManager {
 					} catch (BackingStoreException e) {
 						// This can happen in the rare case that the lock is locked between the check and the flush.
 						lastException = e;
+					} catch (IllegalStateException e) {
+						// Can occur if the project has been moved or deleted, so the preference node no longer exists.
+						return;
 					}
 				}
 			}
