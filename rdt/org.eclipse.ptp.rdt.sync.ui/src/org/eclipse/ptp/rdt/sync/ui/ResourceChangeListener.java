@@ -124,7 +124,8 @@ public class ResourceChangeListener {
 						// Post-change event
 						else {
 							RDTSyncCorePlugin.log(String.valueOf(delta.getKind()));
-							if (delta.getKind() == IResourceDelta.MOVED_FROM) {
+							// Only interested in ADDED with MOVED_FROM, which indicates a project was renamed
+							if ((delta.getKind() == IResourceDelta.ADDED) && ((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0)) {
 								ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
 								if (provider == null) {
 									RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.ResourceChangeListener_1 +
@@ -132,21 +133,22 @@ public class ResourceChangeListener {
 								} else {
 									provider.setProject(project);
 								}
-								continue;
 							}
 							
-							if (delta.getKind() == IResourceDelta.MOVED_TO) {
-								continue;
+							// Sync project on all changed events
+							else if (delta.getKind() == IResourceDelta.CHANGED) {
+								// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user has
+								// disabled it. This allows for some bookkeeping but no files are transferred.
+								if (!syncEnabled) {
+									SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
+								} else if (syncMode == SYNC_MODE.ALL) {
+									SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
+								} else if (syncMode == SYNC_MODE.ACTIVE) {
+									SyncManager.sync(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
+								}
 							}
-							// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user has
-							// disabled it. This allows for some bookkeeping but no files are transferred.
-							if (!syncEnabled) {
-								SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
-							} else if (syncMode == SYNC_MODE.ALL) {
-								SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
-							} else if (syncMode == SYNC_MODE.ACTIVE) {
-								SyncManager.sync(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
-							}
+							
+							// Not interested in remove events
 						}
 					} catch (CoreException e){
 						// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
