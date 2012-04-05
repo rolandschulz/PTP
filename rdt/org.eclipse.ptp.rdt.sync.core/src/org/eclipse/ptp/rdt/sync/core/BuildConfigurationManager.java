@@ -210,6 +210,22 @@ public class BuildConfigurationManager {
 	 * @return sync provider name or null if provider cannot be loaded (should not normally happen)
 	 */
 	public String getProjectSyncProvider(IProject project) {
+		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
+		if (provider == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_13 + project.getName());
+			return null;
+		}
+
+		return provider.getName();
+	}
+	
+	/**
+	 * Return the sync service provider for this project, as stored in the project's template service configuration
+	 *
+	 * @param project
+	 * @return the service provider
+	 */
+	public ISyncServiceProvider getProjectSyncServiceProvider(IProject project) {
 		checkProject(project);
 		String serviceConfigId = getTemplateServiceConfigurationId(project);
 		IServiceConfiguration serviceConfig = ServiceModelManager.getInstance().getConfiguration(serviceConfigId);
@@ -224,13 +240,7 @@ public class BuildConfigurationManager {
 			return null;
 		}
 		
-		IServiceProvider provider = serviceConfig.getServiceProvider(syncService);
-		if (provider == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_13 + project.getName());
-			return null;
-		}
-
-		return provider.getName();
+		return (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
 	}
 
 	/**
