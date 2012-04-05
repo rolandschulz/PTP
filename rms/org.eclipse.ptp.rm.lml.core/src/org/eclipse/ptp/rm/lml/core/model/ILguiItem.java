@@ -154,6 +154,8 @@ public interface ILguiItem {
 	 */
 	public boolean isEmpty();
 
+	public boolean isFilterOwnJobActive(String gid);
+
 	/**
 	 * Checking if any layout is present.
 	 * 

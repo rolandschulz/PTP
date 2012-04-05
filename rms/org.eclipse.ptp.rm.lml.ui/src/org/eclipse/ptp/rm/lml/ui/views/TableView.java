@@ -463,13 +463,21 @@ public class TableView extends ViewPart {
 
 			@Override
 			public void run() {
-				final List<IPattern> filterValues = new LinkedList<IPattern>();
+				final List<IPattern> filterValuesNew = new LinkedList<IPattern>();
+				final List<IPattern> filterValuesOld = fLguiItem.getPattern(gid);
+
+				for (final IPattern filterValue : filterValuesOld) {
+					if (!filterValue.getColumnTitle().equals("owner")) {
+						filterValuesNew.add(filterValue);
+					}
+				}
+
 				if (isChecked()) {
-					filterValues.add((new Pattern("owner", "alpha")).setRelation("=", fLguiItem.getUsername()));
+					filterValuesNew.add((new Pattern("owner", "alpha")).setRelation("=", fLguiItem.getUsername()));
 				}
 				// TODO After decision about new structure of LML and server side
-				fLguiItem.setPattern(gid, filterValues);
-				setViewerInput(filterValues);
+				fLguiItem.setPattern(gid, filterValuesNew);
+				lmlManager.filterLgui(gid, filterValuesNew);
 			}
 
 		};
@@ -477,8 +485,7 @@ public class TableView extends ViewPart {
 
 			@Override
 			public void run() {
-				final FilterDialog dialog = new FilterDialog(new Shell(
-						viewSite.getShell()), gid);
+				final FilterDialog dialog = new FilterDialog(new Shell(viewSite.getShell()), gid);
 				dialog.open();
 			}
 		};
@@ -632,8 +639,8 @@ public class TableView extends ViewPart {
 					cell.setText(((Row) cell.getElement()).cells[cellNumber].value);
 				}
 			});
-			treeColumn = treeViewerColumn.getColumn();
-			treeColumn.setMoveable(true);
+			final TreeColumn treeColumnI = treeViewerColumn.getColumn();
+			treeColumnI.setMoveable(true);
 			boolean isFiltered = false;
 			for (final String title : columnTitlesPattern) {
 				if (title.equals(tableColumnLayouts[i].getTitle())) {
@@ -641,44 +648,52 @@ public class TableView extends ViewPart {
 				}
 			}
 			if (isFiltered) {
-				treeColumn.setText(tableColumnLayouts[i].getTitle() + " #");
+				treeColumnI.setText(tableColumnLayouts[i].getTitle() + " #");
 			} else {
-				treeColumn.setText(tableColumnLayouts[i].getTitle());
+				treeColumnI.setText(tableColumnLayouts[i].getTitle());
 			}
 
-			treeColumn.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
+			treeColumnI.setAlignment(getColumnAlignment(tableColumnLayouts[i].getStyle()));
 
 			if (tableColumnLayouts[i].isActive()) {
 				final boolean resizable = true;
-				treeColumn.setResizable(resizable);
+				treeColumnI.setResizable(resizable);
 
 				/*
 				 * Create the header menu for this column
 				 */
-				createMenuItem(headerMenu, treeColumn, i + 1);
+				createMenuItem(headerMenu, treeColumnI, i + 1);
 
 				/*
 				 * Set the column width
 				 */
-				treeColumnLayout.setColumnData(treeColumn,
+				treeColumnLayout.setColumnData(treeColumnI,
 						new ColumnWeightData((int) (tableColumnLayouts[i].getWidth() * composite.getClientArea().width), 10,
 								resizable));
 			} else {
 				final boolean resizable = false;
-				treeColumn.setResizable(resizable);
+				treeColumnI.setResizable(resizable);
 
 				/*
 				 * Create the header menu for this column
 				 */
-				createMenuItem(headerMenu, treeColumn, i + 1);
+				createMenuItem(headerMenu, treeColumnI, i + 1);
 
 				/*
 				 * Set the column width
 				 */
 				savedColumnWidths[i + 1] = 0;
-				treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(0, 0, resizable));
+				treeColumnLayout.setColumnData(treeColumnI, new ColumnWeightData(0, 0, resizable));
 			}
-			treeColumns[i] = treeColumn;
+			treeColumnI.addControlListener(new ControlAdapter() {
+				@Override
+				public void controlResized(ControlEvent e) {
+					if (treeColumnI.getWidth() < 10) {
+						treeColumnI.setWidth(10);
+					}
+				}
+			});
+			treeColumns[i] = treeColumnI;
 		}
 
 		// just a default column
@@ -810,6 +825,7 @@ public class TableView extends ViewPart {
 				}
 
 				filterOwnJobsActionItem.getAction().setEnabled(true);
+				filterOwnJobsActionItem.getAction().setChecked(fLguiItem.isFilterOwnJobActive(gid));
 				filterActionItem.getAction().setEnabled(true);
 			}
 
@@ -865,6 +881,9 @@ public class TableView extends ViewPart {
 		}
 		if (alignment.equals(ITableColumnLayout.COLUMN_STYLE_RIGHT)) {
 			return SWT.TRAIL;
+		}
+		if (alignment.equals(ITableColumnLayout.COLUMN_STYLE_CENTER)) {
+			return SWT.CENTER;
 		}
 		return SWT.LEAD;
 	}

@@ -345,6 +345,22 @@ public class LguiItem implements ILguiItem {
 		return true;
 	}
 
+	public boolean isFilterOwnJobActive(String gid) {
+		final List<IPattern> filters = getPattern(gid);
+		if (filters.size() > 0) {
+			for (final IPattern filter : filters) {
+				if (filter.getColumnTitle().equals("owner")) {
+					if (filter.getRelationOperator().equals("=") && filter.getRelationValue().equals(username)) {
+						return true;
+					} else {
+						break;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
