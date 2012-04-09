@@ -20,6 +20,7 @@ package org.eclipse.ptp.internal.ui.adapters;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -46,22 +47,25 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object
-	 * )
+	 * @see org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object )
 	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
-		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
-				((IPResourceManager) object).getResourceManager().getResourceManagerId());
-		if (presentation != null) {
-			final Image image = presentation.getImage(object);
-			if (image != null) {
-				return new ImageImageDescriptor(image);
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(
+				((IPResourceManager) object).getControlId());
+		if (rm != null) {
+			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+					rm.getResourceManagerId());
+			if (presentation != null) {
+				final Image image = presentation.getImage(object);
+				if (image != null) {
+					return new ImageImageDescriptor(image);
+				}
 			}
+			final String state = rm.getState();
+			return new ImageImageDescriptor(ParallelImages.rmImages.get(state));
 		}
-		final String state = ((IPResourceManager) object).getResourceManager().getState();
-		return new ImageImageDescriptor(ParallelImages.rmImages.get(state));
+		return null;
 	}
 
 	/*
@@ -71,20 +75,24 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	 */
 	@Override
 	public String getLabel(Object object) {
-		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
-				((IPResourceManager) object).getResourceManager().getResourceManagerId());
-		if (presentation != null) {
-			final String label = presentation.getText(object);
-			if (label != null) {
-				return label;
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(
+				((IPResourceManager) object).getControlId());
+		if (rm != null) {
+			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+					rm.getResourceManagerId());
+			if (presentation != null) {
+				final String label = presentation.getText(object);
+				if (label != null) {
+					return label;
+				}
 			}
+			final String type = rm.getConfiguration().getType();
+			if (type == null) {
+				return rm.getName();
+			}
+			return rm.getName() + " (" + type + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		final IResourceManager resourceManager = ((IPResourceManager) object).getResourceManager();
-		final String type = resourceManager.getConfiguration().getType();
-		if (type == null) {
-			return resourceManager.getName();
-		}
-		return resourceManager.getName() + " (" + type + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		return null;
 	}
 
 	/*

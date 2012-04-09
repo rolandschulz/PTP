@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.JobManager;
 import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
@@ -35,7 +34,9 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.core.listeners.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PResourceManager;
 
@@ -61,7 +62,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 		fConfig = config;
 		fResourceManagerControl = control;
 		fResourceManagerMonitor = monitor;
-		fPResourceManager = new PResourceManager(fModelManager.getUniverse(), this);
+		fPResourceManager = new PResourceManager(fModelManager.getUniverse(), this.getUniqueName());
 		fModelManager.getUniverse().addResourceManager(fPResourceManager);
 		fState = STOPPED_STATE;
 	}

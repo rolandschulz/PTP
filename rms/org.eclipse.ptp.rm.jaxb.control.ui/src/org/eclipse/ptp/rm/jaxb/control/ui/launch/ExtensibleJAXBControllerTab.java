@@ -192,7 +192,6 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 				ILaunchConfigurationWorkingCopy wc = configuration.getWorkingCopy();
 				wc.setAttribute(rm.getUniqueName() + JAXBUIConstants.DOT + JAXBUIConstants.INITIALIZED, true);
 				wc.doSave();
-
 			} catch (CoreException t) {
 				JAXBUIPlugin.log(t);
 			}

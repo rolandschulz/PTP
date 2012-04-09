@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -55,7 +56,6 @@ import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
 import org.eclipse.ptp.rm.lml.monitor.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.ui.IRMSelectionListener;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.managers.RMManager;
@@ -122,7 +122,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 				final TreePath path = ((ITreeSelection) selection).getPaths()[0];
 				final Object segment = path.getFirstSegment();
 				if (segment instanceof IPResourceManager) {
-					name = ((IPResourceManager) segment).getResourceManager().getUniqueName();
+					name = ((IPResourceManager) segment).getControlId();
 				}
 			}
 			final RMSelectionJob job = new RMSelectionJob(Messages.LMLResourceManagerMonitor_RMSelectionJob, name);
@@ -182,7 +182,9 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	private static final String FILTER_RELATION_OPERATOR_ATTR = "relationOperartor";//$NON-NLS-1$
 	private static final String FILTER_RELATION_VALUE_ATTR = "relationValue";//$NON-NLS-1$
 	private static final String JOB_ID_ATTR = "job_id";//$NON-NLS-1$
-	private static final String RM_ID_ATTR = "rm_id";//$NON-NLS-1$
+	private static final String CONFIG_NAME_ATTR = "config_name";//$NON-NLS-1$
+	private static final String REMOTE_SERVICES_ID_ATTR = "remote_services_id";//$NON-NLS-1$
+	private static final String CONNECTION_NAME_ATTR = "connection_name_id";//$NON-NLS-1$
 	private static final String STDOUT_REMOTE_FILE_ATTR = "stdout_remote_path";//$NON-NLS-1$
 	private static final String STDERR_REMOTE_FILE_ATTR = "stderr_remote_path";//$NON-NLS-1$
 	private static final String INTERACTIVE_ATTR = "interactive";//$NON-NLS-1$;
@@ -263,10 +265,11 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		if (memento != null) {
 			final IMemento[] children = memento.getChildren(JOB_ID_ATTR);
 			for (final IMemento child : children) {
-				jobs.add(new JobStatusData(child.getID(), child.getString(RM_ID_ATTR), child.getString(STATE_ATTR), child
-						.getString(STATE_DETAIL_ATTR), child.getString(STDOUT_REMOTE_FILE_ATTR), child
-						.getString(STDERR_REMOTE_FILE_ATTR), child.getBoolean(INTERACTIVE_ATTR), child.getString(QUEUE_NAME_ATTR),
-						child.getString(OWNER_ATTR), child.getString(OID_ATTR)));
+				jobs.add(new JobStatusData(child.getID(), child.getString(CONFIG_NAME_ATTR), child
+						.getString(REMOTE_SERVICES_ID_ATTR), child.getString(CONNECTION_NAME_ATTR), child.getString(STATE_ATTR),
+						child.getString(STATE_DETAIL_ATTR), child.getString(STDOUT_REMOTE_FILE_ATTR), child
+								.getString(STDERR_REMOTE_FILE_ATTR), child.getBoolean(INTERACTIVE_ATTR), child
+								.getString(QUEUE_NAME_ATTR), child.getString(OWNER_ATTR), child.getString(OID_ATTR)));
 			}
 		}
 		return jobs.toArray(new JobStatusData[jobs.size()]);
@@ -301,7 +304,9 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	private void saveJob(JobStatusData job, XMLMemento memento) {
 		final IMemento jobMemento = memento.createChild(JOB_ID_ATTR, job.getJobId());
-		jobMemento.putString(RM_ID_ATTR, job.getRmId());
+		jobMemento.putString(CONFIG_NAME_ATTR, job.getConfigurationName());
+		jobMemento.putString(REMOTE_SERVICES_ID_ATTR, job.getRemoteServicesId());
+		jobMemento.putString(CONNECTION_NAME_ATTR, job.getConnectionName());
 		jobMemento.putString(STATE_ATTR, job.getState());
 		jobMemento.putString(STATE_DETAIL_ATTR, job.getStateDetail());
 		jobMemento.putString(STDOUT_REMOTE_FILE_ATTR, job.getOutputPath());
@@ -332,8 +337,9 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 	@Override
 	protected void doAddJob(IJobStatus status) {
-		final JobStatusData data = new JobStatusData(status.getRmUniqueName(), status.getJobId(), status.getQueueName(),
-				status.getOwner(), status.getOutputPath(), status.getErrorPath(), status.isInteractive());
+		final JobStatusData data = new JobStatusData(status.getJobId(), getResourceManager().getUniqueName(),
+				status.getRemoteServicesId(), status.getConnectionName(), status.getQueueName(), status.getOwner(),
+				status.getOutputPath(), status.getErrorPath(), status.isInteractive());
 		data.setState(status.getState());
 		data.setStateDetail(status.getStateDetail());
 		fLMLManager.addUserJob(getResourceManager().getUniqueName(), status.getJobId(), data);

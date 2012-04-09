@@ -19,8 +19,8 @@
  */
 package org.eclipse.ptp.internal.core.events;
 
-import org.eclipse.ptp.core.events.IJobChangedEvent;
-import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.core.jobs.IJobChangedEvent;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 
 public class JobChangedEvent implements IJobChangedEvent {
 

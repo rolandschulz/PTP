@@ -43,16 +43,15 @@ import org.eclipse.ptp.internal.core.elements.events.ChangedNodeEvent;
 import org.eclipse.ptp.internal.core.elements.events.MachineChangeEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewNodeEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveNodeEvent;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class PMachine extends Parent implements IPMachine {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
-	private final IResourceManager fResourceManager;
+	private final String fControlId;
 
-	public PMachine(String id, IResourceManager rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
+	public PMachine(String id, String controlId, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
 		super(id, parent, attrs);
-		fResourceManager = rm;
+		fControlId = controlId;
 		/*
 		 * Create required attributes.
 		 */
@@ -76,9 +75,7 @@ public class PMachine extends Parent implements IPMachine {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPMachine#addChildListener(org.eclipse.
-	 * ptp.core.elements.listeners.IMachineNodeListener)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#addChildListener(org.eclipse. ptp.core.elements.listeners.IMachineNodeListener)
 	 */
 	public void addChildListener(IMachineChildListener listener) {
 		childListeners.add(listener);
@@ -87,9 +84,7 @@ public class PMachine extends Parent implements IPMachine {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPMachine#addElementListener(org.eclipse
-	 * .ptp.core.elements.listeners.IMachineListener)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#addElementListener(org.eclipse .ptp.core.elements.listeners.IMachineListener)
 	 */
 	public void addElementListener(IMachineListener listener) {
 		elementListeners.add(listener);
@@ -98,9 +93,7 @@ public class PMachine extends Parent implements IPMachine {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodeAttributes
-	 * (java.util.Collection,
+	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodeAttributes (java.util.Collection,
 	 * org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
 	 */
 	public void addNodeAttributes(Collection<IPNode> nodes, IAttribute<?, ?, ?>[] attrs) {
@@ -113,9 +106,7 @@ public class PMachine extends Parent implements IPMachine {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodes(java.util
-	 * .Collection)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodes(java.util .Collection)
 	 */
 	public void addNodes(Collection<IPNode> nodes) {
 		for (IPNode node : nodes) {
@@ -135,9 +126,7 @@ public class PMachine extends Parent implements IPMachine {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java
-	 * .util.Map)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java .util.Map)
 	 */
 	@Override
 	protected void doAddAttributeHook(AttributeManager attrs) {
@@ -195,8 +184,7 @@ public class PMachine extends Parent implements IPMachine {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPMachine#getNodeById(java.lang.String)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#getNodeById(java.lang.String)
 	 */
 	public IPNode getNodeById(String id) {
 		IPElement element = findChild(id);
@@ -223,10 +211,10 @@ public class PMachine extends Parent implements IPMachine {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
+	 * @see org.eclipse.ptp.core.elements.IPMachine#getControlId()
 	 */
-	public IResourceManager getResourceManager() {
-		return fResourceManager;
+	public String getControlId() {
+		return fControlId;
 	}
 
 	/*
@@ -241,8 +229,7 @@ public class PMachine extends Parent implements IPMachine {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPMachine#removeChildListener(org.eclipse
+	 * @see org.eclipse.ptp.core.elements.IPMachine#removeChildListener(org.eclipse
 	 * .ptp.core.elements.listeners.IMachineNodeListener)
 	 */
 	public void removeChildListener(IMachineChildListener listener) {
@@ -252,9 +239,7 @@ public class PMachine extends Parent implements IPMachine {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPMachine#removeElementListener(org.eclipse
-	 * .ptp.core.elements.listeners.IMachineListener)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#removeElementListener(org.eclipse .ptp.core.elements.listeners.IMachineListener)
 	 */
 	public void removeElementListener(IMachineListener listener) {
 		elementListeners.remove(listener);
@@ -263,8 +248,7 @@ public class PMachine extends Parent implements IPMachine {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPMachine#removeNodes(java.util.Collection)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#removeNodes(java.util.Collection)
 	 */
 	public void removeNodes(Collection<IPNode> nodes) {
 		for (IPNode node : nodes) {

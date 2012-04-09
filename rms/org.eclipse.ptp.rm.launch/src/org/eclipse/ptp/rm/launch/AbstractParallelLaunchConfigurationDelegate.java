@@ -55,13 +55,14 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.IServiceConstants;
-import org.eclipse.ptp.core.JobManager;
 import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.events.IJobAddedEvent;
-import org.eclipse.ptp.core.events.IJobChangedEvent;
-import org.eclipse.ptp.core.listeners.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobAddedEvent;
+import org.eclipse.ptp.core.jobs.IJobChangedEvent;
+import org.eclipse.ptp.core.jobs.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -82,7 +83,6 @@ import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.launch.internal.ProviderInfo;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
@@ -186,6 +186,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 							// Expect to be interrupted if monitor is canceled
 						}
 					}
+				} catch (CoreException e) {
 				} finally {
 					fSubLock.unlock();
 				}
@@ -204,6 +205,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 								// canceled
 							}
 						}
+					} catch (CoreException e) {
 					} finally {
 						fSubLock.unlock();
 					}

@@ -40,6 +40,7 @@ import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
@@ -250,6 +251,13 @@ public class ModelManager implements IModelManager {
 		fServiceManager.addEventListener(fServiceEventListener, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED
 				| IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED | IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED
 				| IServiceModelEvent.SERVICE_PROVIDER_CHANGED);
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	public IResourceManager getResourceManagerFromJobStatus(IJobStatus status) {
+		return null;
 	}
 
 	/*

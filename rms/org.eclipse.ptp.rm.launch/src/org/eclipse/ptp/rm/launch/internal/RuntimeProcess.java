@@ -13,14 +13,14 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
-import org.eclipse.ptp.core.JobManager;
-import org.eclipse.ptp.core.events.IJobAddedEvent;
-import org.eclipse.ptp.core.events.IJobChangedEvent;
-import org.eclipse.ptp.core.listeners.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobAddedEvent;
+import org.eclipse.ptp.core.jobs.IJobChangedEvent;
+import org.eclipse.ptp.core.jobs.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class RuntimeProcess implements IProcess, IJobListener {
@@ -37,7 +37,11 @@ public class RuntimeProcess implements IProcess, IJobListener {
 		fJobId = jobId;
 		JobManager.getInstance().addListener(this);
 		initializeAttributes(attributes);
-		fTerminated = rm.getJobStatus(jobId, null).getState().equals(IJobStatus.COMPLETED);
+		try {
+			fTerminated = rm.getJobStatus(jobId, null).getState().equals(IJobStatus.COMPLETED);
+		} catch (CoreException e) {
+			fTerminated = true;
+		}
 		launch.addProcess(this);
 	}
 
@@ -122,7 +126,11 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	 */
 	@Override
 	public IStreamsProxy getStreamsProxy() {
-		return fResourceManager.getJobStatus(fJobId, null).getStreamsProxy();
+		try {
+			return fResourceManager.getJobStatus(fJobId, null).getStreamsProxy();
+		} catch (CoreException e) {
+			return null;
+		}
 	}
 
 	/*

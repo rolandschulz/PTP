@@ -20,21 +20,22 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
+import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamsProxy;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 
 /**
  * Extension of the IJobStatus class to handle resource manager command jobs. Also handles availability notification for remote
@@ -77,7 +78,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 			RemoteServicesDelegate d = null;
 			SubMonitor progress = SubMonitor.convert(monitor, 120);
 			try {
-				d = control.getRemoteServicesDelegate(progress.newChild(20));
+				d = JAXBUtils.getRemoteServicesDelegate(control.getRemoteServicesId(), control.getConnectionName(),
+						progress.newChild(20));
 				if (d.getRemoteFileManager() == null) {
 					/*
 					 * could be a call initiated by closing of resource manager, the connection may be closed; just ignore and move
@@ -126,12 +128,14 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
-	private final String rmUniqueName;
-	private final IJAXBResourceManagerControl control;
+	private final IJAXBJobControl control;
+	private final IVariableMap varMap;
+
 	private final ICommandJob open;
 
 	private String jobId;
 	private String owner;
+
 	private String queue;
 	private ILaunchConfiguration launchConfig;
 	private String state;
@@ -140,12 +144,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private String remoteErrorPath;
 	private ICommandJobStreamsProxy proxy;
 	private IRemoteProcess process;
-
 	private boolean initialized;
 	private boolean waitEnabled;
+
 	private boolean dirty;
 	private boolean fFilesChecked;
-
 	private long lastRequestedUpdate;
 
 	/**
@@ -154,8 +157,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @param control
 	 *            resource manager control
 	 */
-	public CommandJobStatus(String rmUniqueName, ICommandJob open, IJAXBResourceManagerControl control) {
-		this(rmUniqueName, null, UNDETERMINED, open, control);
+	public CommandJobStatus(ICommandJob open, IJAXBJobControl control) {
+		this(null, UNDETERMINED, open, control);
 	}
 
 	/**
@@ -166,12 +169,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @param control
 	 *            resource manager control
 	 */
-	public CommandJobStatus(String rmUniqueName, String jobId, String state, ICommandJob open, IJAXBResourceManagerControl control) {
-		this.rmUniqueName = rmUniqueName;
+	public CommandJobStatus(String jobId, String state, ICommandJob open, IJAXBJobControl control) {
 		this.jobId = jobId;
 		setState(state);
 		this.open = open;
 		this.control = control;
+		this.varMap = control.getEnvironment();
 		waitEnabled = true;
 		lastRequestedUpdate = 0;
 		initialized = false;
@@ -228,10 +231,19 @@ public class CommandJobStatus implements ICommandJobStatus {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#getControl()
+	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getConfigurationName()
 	 */
-	public IJAXBResourceManagerControl getControl() {
-		return control;
+	public String getConfigurationName() {
+		return control.getConfigurationData().getName();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getConnectionName()
+	 */
+	public String getConnectionName() {
+		return control.getConnectionName();
 	}
 
 	/*
@@ -291,12 +303,13 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return queue;
 	}
 
-	/**
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return owner resource manager id
+	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getRemoteServicesId()
 	 */
-	public String getRmUniqueName() {
-		return rmUniqueName;
+	public String getRemoteServicesId() {
+		return control.getRemoteServicesId();
 	}
 
 	/**
@@ -342,8 +355,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 		String path = null;
 		remoteOutputPath = null;
 		remoteErrorPath = null;
-		IVariableMap rmVarMap = control.getEnvironment();
-		Object o = rmVarMap.get(JAXBControlConstants.STDOUT_REMOTE_FILE);
+		Object o = varMap.get(JAXBControlConstants.STDOUT_REMOTE_FILE);
 		if (o != null) {
 			if (o instanceof PropertyType) {
 				path = (String) ((PropertyType) o).getValue();
@@ -351,10 +363,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 				path = (String) ((PropertyType) o).getValue();
 			}
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
-				remoteOutputPath = rmVarMap.getString(jobId, path);
+				remoteOutputPath = varMap.getString(jobId, path);
 			}
 		}
-		o = rmVarMap.get(JAXBControlConstants.STDERR_REMOTE_FILE);
+		o = varMap.get(JAXBControlConstants.STDERR_REMOTE_FILE);
 		if (o != null) {
 			if (o instanceof PropertyType) {
 				path = (String) ((PropertyType) o).getValue();
@@ -362,7 +374,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 				path = (String) ((AttributeType) o).getValue();
 			}
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
-				remoteErrorPath = rmVarMap.getString(jobId, path);
+				remoteErrorPath = varMap.getString(jobId, path);
 			}
 		}
 		initialized = true;

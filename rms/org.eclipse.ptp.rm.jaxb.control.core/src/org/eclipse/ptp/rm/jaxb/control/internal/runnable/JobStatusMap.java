@@ -12,13 +12,15 @@ package org.eclipse.ptp.rm.jaxb.control.internal.runnable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.JobManager;
+import org.eclipse.ptp.core.jobs.IJobControl;
+import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
-import org.eclipse.ptp.rmsystem.IJobStatus;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * Class for handling status of submitted jobs.
@@ -28,11 +30,11 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
  */
 public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 
-	private final IResourceManagerControl control;
+	private final IJobControl control;
 	private final Map<String, ICommandJobStatus> map;
 	private boolean running = false;
 
-	public JobStatusMap(IResourceManagerControl control) {
+	public JobStatusMap(IJobControl control) {
 		this.control = control;
 		map = new HashMap<String, ICommandJobStatus>();
 	}
@@ -50,7 +52,11 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 			map.put(jobId, status);
 		}
 		if (notifyAdd) {
-			status.initialize(jobId);
+			try {
+				status.initialize(jobId);
+			} catch (CoreException e) {
+				JAXBControlCorePlugin.log(e);
+			}
 			JobManager.getInstance().fireJobAdded(status);
 		}
 		return !exists;
@@ -118,9 +124,12 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 				}
 
 				for (String jobId : map.keySet()) {
-					IJobStatus status = control.getJobStatus(jobId, true, null);
-					String state = status.getState();
-					if (IJobStatus.COMPLETED.equals(state)) {
+					IJobStatus status = null;
+					try {
+						status = control.getJobStatus(jobId, true, null);
+					} catch (CoreException e) {
+					}
+					if (status == null || IJobStatus.COMPLETED.equals(status.getState())) {
 						toPrune.put(jobId, jobId);
 					}
 				}

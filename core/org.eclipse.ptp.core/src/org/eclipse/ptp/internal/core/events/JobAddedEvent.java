@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.events;
 
-import org.eclipse.ptp.core.events.IJobAddedEvent;
-import org.eclipse.ptp.rmsystem.IJobStatus;
+import org.eclipse.ptp.core.jobs.IJobAddedEvent;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 
 public class JobAddedEvent implements IJobAddedEvent {
 

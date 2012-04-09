@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -80,19 +81,23 @@ import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
  */
 public class PResourceManager extends Parent implements IPResourceManager {
 
-	private static IAttribute<?, ?, ?>[] getDefaultAttributes(IResourceManagerConfiguration config) {
+	private static IAttribute<?, ?, ?>[] getDefaultAttributes(String id) {
 		ArrayList<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
-		attrs.add(ElementAttributes.getNameAttributeDefinition().create(config.getName()));
-		attrs.add(ElementAttributes.getIdAttributeDefinition().create(config.getUniqueName()));
-		attrs.add(ResourceManagerAttributes.getDescriptionAttributeDefinition().create(config.getDescription()));
-		attrs.add(ResourceManagerAttributes.getTypeAttributeDefinition().create(config.getType()));
-		attrs.add(ResourceManagerAttributes.getStateAttributeDefinition().create(ResourceManagerAttributes.State.STOPPED));
-		attrs.add(ResourceManagerAttributes.getRmIDAttributeDefinition().create(config.getUniqueName()));
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(id);
+		if (rm != null) {
+			IResourceManagerConfiguration config = rm.getConfiguration();
+			attrs.add(ElementAttributes.getNameAttributeDefinition().create(config.getName()));
+			attrs.add(ElementAttributes.getIdAttributeDefinition().create(config.getUniqueName()));
+			attrs.add(ResourceManagerAttributes.getDescriptionAttributeDefinition().create(config.getDescription()));
+			attrs.add(ResourceManagerAttributes.getTypeAttributeDefinition().create(config.getType()));
+			attrs.add(ResourceManagerAttributes.getStateAttributeDefinition().create(ResourceManagerAttributes.State.STOPPED));
+			attrs.add(ResourceManagerAttributes.getRmIDAttributeDefinition().create(config.getUniqueName()));
+		}
 		return attrs.toArray(new IAttribute<?, ?, ?>[0]);
 	}
 
 	private final ListenerList childListeners = new ListenerList();
-	private final IResourceManager fResourceManager;
+	private final String fControlId;
 
 	private final ListenerList listeners = new ListenerList();
 	private final IMachineChildListener machineNodeListener;
@@ -105,9 +110,9 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/**
 	 * @since 5.0
 	 */
-	public PResourceManager(IPUniverse universe, IResourceManager rm) {
-		super(universe.getNextResourceManagerId(), universe, getDefaultAttributes(rm.getConfiguration()));
-		fResourceManager = rm;
+	public PResourceManager(IPUniverse universe, String controlId) {
+		super(universe.getNextResourceManagerId(), universe, getDefaultAttributes(controlId));
+		fControlId = controlId;
 
 		machineNodeListener = new IMachineChildListener() {
 			public void handleEvent(IChangedNodeEvent e) {
@@ -131,8 +136,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#addChildListener(org.
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#addChildListener(org.
 	 * eclipse.ptp.core.elements.listeners.IResourceManagerChildListener)
 	 */
 	public void addChildListener(IResourceManagerChildListener listener) {
@@ -142,8 +146,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#addElementListener(org
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#addElementListener(org
 	 * .eclipse.ptp.core.elements.listeners.IResourceManagerListener)
 	 */
 	public void addElementListener(IResourceManagerListener listener) {
@@ -153,9 +156,8 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#addJobAttributes(java
-	 * .util.Collection, org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#addJobAttributes(java .util.Collection,
+	 * org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
 	 */
 	public void addJobAttributes(Collection<IPJob> jobs, IAttribute<?, ?, ?>[] attrs) {
 		for (IPJob job : jobs) {
@@ -166,9 +168,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#addJobs(org.eclipse.ptp
-	 * .core.elements.IPQueue, java.util.Collection)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#addJobs(org.eclipse.ptp .core.elements.IPQueue, java.util.Collection)
 	 */
 	public void addJobs(IPQueue queue, Collection<IPJob> jobs) {
 		Map<IPQueue, List<IPJob>> map = new HashMap<IPQueue, List<IPJob>>();
@@ -206,9 +206,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#addMachineAttributes(
-	 * java.util.Collection,
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#addMachineAttributes( java.util.Collection,
 	 * org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
 	 */
 	public void addMachineAttributes(Collection<IPMachine> machines, IAttribute<?, ?, ?>[] attrs) {
@@ -222,9 +220,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#addMachines(java.util
-	 * .Collection)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#addMachines(java.util .Collection)
 	 */
 	public void addMachines(Collection<IPMachine> machines) {
 		synchronized (machinesById) {
@@ -240,9 +236,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#addNodes(org.eclipse.
-	 * ptp.core.elements.IPMachine, java.util.Collection)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#addNodes(org.eclipse. ptp.core.elements.IPMachine, java.util.Collection)
 	 */
 	public void addNodes(IPMachine machine, Collection<IPNode> nodes) {
 		synchronized (nodesById) {
@@ -257,10 +251,8 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#addProcessesByJobRanks
-	 * (org.eclipse.ptp.core.elements.IPJob, java.util.BitSet,
-	 * org.eclipse.ptp.core.attributes.AttributeManager)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#addProcessesByJobRanks (org.eclipse.ptp.core.elements.IPJob,
+	 * java.util.BitSet, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	public void addProcessesByJobRanks(IPJob job, BitSet processJobRanks, AttributeManager attrs) {
 
@@ -287,9 +279,8 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#addQueueAttributes(java
-	 * .util.Collection, org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#addQueueAttributes(java .util.Collection,
+	 * org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
 	 */
 	public void addQueueAttributes(Collection<IPQueue> queues, IAttribute<?, ?, ?>[] attrs) {
 		for (IPQueue queue : queues) {
@@ -302,8 +293,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IPResourceManager#addQueues(java.util.
-	 * Collection)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#addQueues(java.util. Collection)
 	 */
 	public void addQueues(Collection<IPQueue> queues) {
 		synchronized (queuesById) {
@@ -335,12 +325,24 @@ public class PResourceManager extends Parent implements IPResourceManager {
 			return this;
 		}
 		if (adapter == IResourceManager.class) {
-			return fResourceManager;
+			return getResourceManager();
 		}
 		if (adapter == IResourceManagerConfiguration.class) {
-			return fResourceManager.getConfiguration();
+			return getResourceManager().getConfiguration();
 		}
 		return super.getAdapter(adapter);
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#getControlId()
+	 */
+	public String getControlId() {
+		return fControlId;
 	}
 
 	/*
@@ -358,9 +360,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#getJobById(java.lang.
-	 * String)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#getJobById(java.lang. String)
 	 */
 	/**
 	 * @since 5.0
@@ -388,9 +388,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#getMachineById(java.lang
-	 * .String)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#getMachineById(java.lang .String)
 	 */
 	public IPMachine getMachineById(String id) {
 		synchronized (machinesById) {
@@ -416,15 +414,13 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	 */
 	@Override
 	public String getName() {
-		return fResourceManager.getConfiguration().getName();
+		return getResourceManager().getConfiguration().getName();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#getNodeById(java.lang.
-	 * String)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#getNodeById(java.lang. String)
 	 */
 	/**
 	 * @since 4.0
@@ -438,9 +434,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#getQueueById(java.lang
-	 * .String)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#getQueueById(java.lang .String)
 	 */
 	public IPQueue getQueueById(String id) {
 		synchronized (queuesById) {
@@ -462,43 +456,27 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IPResourceManager#getResourceManager()
-	 */
-	/**
-	 * @since 5.0
-	 */
-	public IResourceManager getResourceManager() {
-		return fResourceManager;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#newJob(java.lang.String,
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#newJob(java.lang.String,
 	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	public IPJob newJob(String jobId, AttributeManager attrs) {
-		return new PJob(jobId, fResourceManager, this, attrs.getAttributes());
+		return new PJob(jobId, fControlId, this, attrs.getAttributes());
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#newMachine(java.lang.
-	 * String, org.eclipse.ptp.core.attributes.AttributeManager)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#newMachine(java.lang. String,
+	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	public IPMachine newMachine(String machineId, AttributeManager attrs) {
-		return new PMachine(machineId, fResourceManager, this, attrs.getAttributes());
+		return new PMachine(machineId, fControlId, this, attrs.getAttributes());
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#newNode(org.eclipse.ptp
-	 * .core.elements.IPMachine, java.lang.String,
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#newNode(org.eclipse.ptp .core.elements.IPMachine, java.lang.String,
 	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	public IPNode newNode(IPMachine machine, String nodeId, AttributeManager attrs) {
@@ -508,19 +486,17 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#newQueue(java.lang.String
-	 * , org.eclipse.ptp.core.attributes.AttributeManager)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#newQueue(java.lang.String ,
+	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	public IPQueue newQueue(String queueId, AttributeManager attrs) {
-		return new PQueue(queueId, fResourceManager, this, attrs.getAttributes());
+		return new PQueue(queueId, fControlId, this, attrs.getAttributes());
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#removeChildListener(org
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#removeChildListener(org
 	 * .eclipse.ptp.core.elements.listeners.IResourceManagerChildListener)
 	 */
 	public void removeChildListener(IResourceManagerChildListener listener) {
@@ -530,9 +506,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.IResourceManager#removeResourceManagerListener(org
-	 * .eclipse.ptp.rm.IResourceManagerListener)
+	 * @see org.eclipse.ptp.rm.IResourceManager#removeResourceManagerListener(org .eclipse.ptp.rm.IResourceManagerListener)
 	 */
 	public void removeElementListener(IResourceManagerListener listener) {
 		listeners.remove(listener);
@@ -541,9 +515,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#removeJobs(java.util.
-	 * Collection)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#removeJobs(java.util. Collection)
 	 */
 	public void removeJobs(Collection<IPJob> jobs) {
 		synchronized (jobsById) {
@@ -566,9 +538,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#removeMachines(java.util
-	 * .Collection)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#removeMachines(java.util .Collection)
 	 */
 	public void removeMachines(Collection<IPMachine> machines) {
 		synchronized (machinesById) {
@@ -585,9 +555,8 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#removeNodes(org.eclipse
-	 * .ptp.core.elements.IPMachine, java.util.Collection)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#removeNodes(org.eclipse .ptp.core.elements.IPMachine,
+	 * java.util.Collection)
 	 */
 	public void removeNodes(IPMachine machine, Collection<IPNode> nodes) {
 		machine.removeNodes(nodes);
@@ -596,9 +565,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#removeQueues(java.util
-	 * .Collection)
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#removeQueues(java.util .Collection)
 	 */
 	public void removeQueues(Collection<IPQueue> queues) {
 		synchronized (queuesById) {
@@ -614,8 +581,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#removeTerminatedJobs()
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#removeTerminatedJobs()
 	 */
 	/**
 	 * @since 5.0
@@ -638,22 +604,23 @@ public class PResourceManager extends Parent implements IPResourceManager {
 		getResourceManager().setState(state.name());
 	}
 
+	private IResourceManager getResourceManager() {
+		return ModelManager.getInstance().getResourceManagerFromUniqueName(fControlId);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java
-	 * .util.Map)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java .util.Map)
 	 */
 	@Override
 	protected void doAddAttributeHook(AttributeManager attrs) {
 		/*
-		 * The resource manager name is stored in the configuration so that it
-		 * persists. Map name attributes to the configuration.
+		 * The resource manager name is stored in the configuration so that it persists. Map name attributes to the configuration.
 		 */
 		StringAttribute nameAttr = attrs.getAttribute(ElementAttributes.getNameAttributeDefinition());
 		if (nameAttr != null) {
-			fResourceManager.getConfiguration().setName(nameAttr.getValue());
+			getResourceManager().getConfiguration().setName(nameAttr.getValue());
 		}
 	}
 

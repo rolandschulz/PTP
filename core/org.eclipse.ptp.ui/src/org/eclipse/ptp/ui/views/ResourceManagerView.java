@@ -52,7 +52,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.JobManager;
 import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPElement;
@@ -77,13 +76,14 @@ import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.core.events.IJobAddedEvent;
-import org.eclipse.ptp.core.events.IJobChangedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
-import org.eclipse.ptp.core.listeners.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobAddedEvent;
+import org.eclipse.ptp.core.jobs.IJobChangedEvent;
+import org.eclipse.ptp.core.jobs.IJobListener;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
@@ -121,7 +121,7 @@ public class ResourceManagerView extends ViewPart {
 		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse .ptp.core.events.IJobChangeEvent)
 		 */
 		public void handleEvent(IJobChangedEvent e) {
-			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(e.getJobStatus().getRmUniqueName());
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromJobStatus(e.getJobStatus());
 			if (rm != null) {
 				IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
 				if (prm != null) {
@@ -219,7 +219,7 @@ public class ResourceManagerView extends ViewPart {
 		public Font getFont(Object element) {
 			IPResourceManager rm = getResourceManager(element);
 			RMManager rmManager = PTPUIPlugin.getDefault().getRMManager();
-			if (rm != null && rmManager != null && rm.getResourceManager().getUniqueName().equals(rmManager.getSelected())) {
+			if (rm != null && rmManager != null && rm.getControlId().equals(rmManager.getSelected())) {
 				return selectedFont;
 			}
 			return unSelectedFont;
@@ -531,52 +531,59 @@ public class ResourceManagerView extends ViewPart {
 				ITreeSelection selection = (ITreeSelection) event.getSelection();
 				if (!selection.isEmpty()) {
 					if (selection.getFirstElement() instanceof IPResourceManager) {
-						final IPResourceManager rm = (IPResourceManager) selection.getFirstElement();
-						if (rm.getResourceManager().getState().equals(IResourceManager.STOPPED_STATE)
-								|| rm.getResourceManager().getState().equals(IResourceManager.ERROR_STATE)) {
-							IRunnableWithProgress runnable = new IRunnableWithProgress() {
-								public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+						final IPResourceManager prm = (IPResourceManager) selection.getFirstElement();
+						if (prm != null) {
+							final IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(
+									prm.getControlId());
+							if (rm != null) {
+								if (rm.getState().equals(IResourceManager.STOPPED_STATE)
+										|| rm.getState().equals(IResourceManager.ERROR_STATE)) {
+									IRunnableWithProgress runnable = new IRunnableWithProgress() {
+										public void run(IProgressMonitor monitor) throws InvocationTargetException,
+												InterruptedException {
+											try {
+												rm.start(monitor);
+											} catch (CoreException e) {
+												throw new InvocationTargetException(e);
+											}
+											if (monitor.isCanceled()) {
+												throw new InterruptedException();
+											}
+										}
+									};
 									try {
-										rm.getResourceManager().start(monitor);
-									} catch (CoreException e) {
-										throw new InvocationTargetException(e);
+										PlatformUI.getWorkbench().getProgressService().run(true, true, runnable);
+									} catch (InvocationTargetException e) {
+										Throwable t = e.getCause();
+										IStatus status = null;
+										if (t != null && t instanceof CoreException) {
+											status = ((CoreException) t).getStatus();
+										}
+										UIUtils.showErrorDialog(Messages.ResourceManagerView_Startup,
+												Messages.ResourceManagerView_FailedToStart, status);
+									} catch (InterruptedException e) {
+										// Do nothing. Operation has been canceled.
 									}
-									if (monitor.isCanceled()) {
-										throw new InterruptedException();
+									return;
+								} else {
+									boolean shutdown = true;
+									if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
+										shutdown = MessageDialog.openConfirm(viewer.getControl().getShell(),
+												Messages.ResourceManagerView_Shutdown,
+												NLS.bind(Messages.ResourceManagerView_AreYouSure, rm.getName()));
 									}
-								}
-							};
-							try {
-								PlatformUI.getWorkbench().getProgressService().run(true, true, runnable);
-							} catch (InvocationTargetException e) {
-								Throwable t = e.getCause();
-								IStatus status = null;
-								if (t != null && t instanceof CoreException) {
-									status = ((CoreException) t).getStatus();
-								}
-								UIUtils.showErrorDialog(Messages.ResourceManagerView_Startup,
-										Messages.ResourceManagerView_FailedToStart, status);
-							} catch (InterruptedException e) {
-								// Do nothing. Operation has been canceled.
-							}
-							return;
-						} else {
-							boolean shutdown = true;
-							if (rm.getResourceManager().getState().equals(IResourceManager.STARTED_STATE)) {
-								shutdown = MessageDialog.openConfirm(viewer.getControl().getShell(),
-										Messages.ResourceManagerView_Shutdown,
-										NLS.bind(Messages.ResourceManagerView_AreYouSure, rm.getName()));
-							}
-							if (shutdown) {
-								try {
-									rm.getResourceManager().stop();
-								} catch (CoreException e) {
-									final String message = NLS.bind(Messages.ResourceManagerView_UnableToStop, rm.getName());
-									Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1, message, e);
-									ErrorDialog dlg = new ErrorDialog(viewer.getControl().getShell(),
-											Messages.ResourceManagerView_ErrorStopping, message, status, IStatus.ERROR);
-									dlg.open();
-									PTPUIPlugin.log(status);
+									if (shutdown) {
+										try {
+											rm.stop();
+										} catch (CoreException e) {
+											final String message = NLS.bind(Messages.ResourceManagerView_UnableToStop, rm.getName());
+											Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1, message, e);
+											ErrorDialog dlg = new ErrorDialog(viewer.getControl().getShell(),
+													Messages.ResourceManagerView_ErrorStopping, message, status, IStatus.ERROR);
+											dlg.open();
+											PTPUIPlugin.log(status);
+										}
+									}
 								}
 							}
 						}
@@ -715,13 +722,16 @@ public class ResourceManagerView extends ViewPart {
 				break;
 			} else {
 				final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
-				IPResourceManager rm = (IPResourceManager) menuContrib.getAdapter(IPResourceManager.class);
-				if (rm != null) {
-					if (!rm.getResourceManager().getState().equals(IResourceManager.STOPPED_STATE)) {
-						inContextForEditRM = false;
-						inContextForRemoveRM = false;
-					} else {
-						inContextForSelectRM = false;
+				IPResourceManager prm = (IPResourceManager) menuContrib.getAdapter(IPResourceManager.class);
+				if (prm != null) {
+					IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(prm.getControlId());
+					if (rm != null) {
+						if (!rm.getState().equals(IResourceManager.STOPPED_STATE)) {
+							inContextForEditRM = false;
+							inContextForRemoveRM = false;
+						} else {
+							inContextForSelectRM = false;
+						}
 					}
 				}
 			}

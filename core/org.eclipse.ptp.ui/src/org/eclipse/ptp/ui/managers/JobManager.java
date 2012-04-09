@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -69,8 +70,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	protected final String DEFAULT_TITLE = Messages.JobManager_0;
 
 	/**
-	 * Add a new job to jobList. Check for any new processes and add these to
-	 * the element handler for the job.
+	 * Add a new job to jobList. Check for any new processes and add these to the element handler for the job.
 	 * 
 	 * @param job
 	 */
@@ -92,9 +92,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IJobManager#addProcess(org.eclipse.ptp.core.elements
-	 * .IPJob, int)
+	 * @see org.eclipse.ptp.ui.IJobManager#addProcess(org.eclipse.ptp.core.elements .IPJob, int)
 	 */
 	/**
 	 * @since 4.0
@@ -121,9 +119,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IJobManager#createElementHandler(org.eclipse.ptp.core
-	 * .elements.IPJob)
+	 * @see org.eclipse.ptp.ui.IJobManager#createElementHandler(org.eclipse.ptp.core .elements.IPJob)
 	 */
 	public IElementHandler createElementHandler(IPJob job) {
 		IElementHandler handler = getElementHandler(job.getID());
@@ -147,9 +143,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IElementManager#getFullyQualifiedName(java.lang.String
-	 * )
+	 * @see org.eclipse.ptp.ui.IElementManager#getFullyQualifiedName(java.lang.String )
 	 */
 	public String getFullyQualifiedName(String id) {
 		if (id.equals(EMPTY_ID)) {
@@ -157,7 +151,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 		}
 		IPJob job = getJob();
 		if (job != null) {
-			IResourceManager rm = job.getResourceManager();
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
 			if (rm != null) {
 				return rm.getName() + ": " + job.getName(); //$NON-NLS-1$
 			}
@@ -200,8 +194,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 * Get process status text
 	 * 
 	 * @param proc
-	 *            process (PProcessUI goes away when we address UI scalability.
-	 *            See Bug 311057)
+	 *            process (PProcessUI goes away when we address UI scalability. See Bug 311057)
 	 * @return status
 	 * @since 4.0
 	 */
@@ -227,8 +220,11 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 */
 	public IPQueue[] getQueues() {
 		if (cur_queue != null) {
-			IPResourceManager rm = (IPResourceManager) cur_queue.getResourceManager().getAdapter(IPResourceManager.class);
-			return rm.getQueues();
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(cur_queue.getControlId());
+			if (rm != null) {
+				IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
+				return prm.getQueues();
+			}
 		}
 		return new IPQueue[] {};
 	}
@@ -267,21 +263,21 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IElementManager#getImage(org.eclipse.ptp.ui.model.
-	 * IElement)
+	 * @see org.eclipse.ptp.ui.IElementManager#getImage(org.eclipse.ptp.ui.model. IElement)
 	 */
 	@Override
 	public Image getImage(IElement element) {
 		IPJob job = getJob();
 		if (job != null) {
-			IResourceManager rm = job.getResourceManager();
-			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
-					rm.getResourceManagerId());
-			if (presentation != null) {
-				final Image image = presentation.getImage(element);
-				if (image != null) {
-					return image;
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
+			if (rm != null) {
+				final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+						rm.getResourceManagerId());
+				if (presentation != null) {
+					final Image image = presentation.getImage(element);
+					if (image != null) {
+						return image;
+					}
 				}
 			}
 			IPElement pElement = element.getPElement();
@@ -383,10 +379,13 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public void removeAllStoppedJobs() {
 		Map<String, IPResourceManager> rms = new HashMap<String, IPResourceManager>();
 		for (IPJob job : getJobs()) {
-			IPResourceManager rm = (IPResourceManager) job.getResourceManager().getAdapter(IPResourceManager.class);
-			if (!rms.containsKey(rm.getID())) {
-				rm.removeTerminatedJobs();
-				rms.put(rm.getID(), rm);
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
+			if (rm != null) {
+				IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
+				if (prm != null && !rms.containsKey(prm.getID())) {
+					prm.removeTerminatedJobs();
+					rms.put(prm.getID(), prm);
+				}
 			}
 		}
 	}
@@ -394,9 +393,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IJobManager#removeJob(org.eclipse.ptp.core.elements
-	 * .IPJob)
+	 * @see org.eclipse.ptp.ui.IJobManager#removeJob(org.eclipse.ptp.core.elements .IPJob)
 	 */
 	public void removeJob(IPJob job) {
 		// remove launch from debug view
@@ -416,9 +413,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IJobManager#removeProcess(org.eclipse.ptp.core.elements
-	 * .IPJob, int)
+	 * @see org.eclipse.ptp.ui.IJobManager#removeProcess(org.eclipse.ptp.core.elements .IPJob, int)
 	 */
 	/**
 	 * @since 4.0
@@ -447,9 +442,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IJobManager#setJob(org.eclipse.ptp.core.elements.IPJob
-	 * )
+	 * @see org.eclipse.ptp.ui.IJobManager#setJob(org.eclipse.ptp.core.elements.IPJob )
 	 */
 	public void setJob(IPJob job) {
 		String old_id = null;
@@ -507,7 +500,10 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public void terminateJob() throws CoreException {
 		IPJob job = getJob();
 		if (job != null) {
-			job.getResourceManager().control(job.getID(), IResourceManagerControl.TERMINATE_OPERATION, null);
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
+			if (rm != null) {
+				rm.control(job.getID(), IResourceManagerControl.TERMINATE_OPERATION, null);
+			}
 		}
 	}
 

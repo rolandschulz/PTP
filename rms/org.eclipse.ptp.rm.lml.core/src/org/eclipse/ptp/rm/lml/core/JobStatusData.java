@@ -9,27 +9,14 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.lml.core;
 
-
 /**
- * Wrapper for job status which extracts the persistent properties and saves
- * them or reloads them from a memento.
+ * Wrapper for job status which extracts the persistent properties and saves them or reloads them from a memento.
  * 
  * @author arossi
  * 
  */
 
 public class JobStatusData {
-	//	private static final String JOB_ID_ATTR = "job_id";//$NON-NLS-1$
-	//	private static final String RM_ID_ATTR = "rm_id";//$NON-NLS-1$
-	//	private static final String STDOUT_REMOTE_FILE_ATTR = "stdout_remote_path";//$NON-NLS-1$
-	//	private static final String STDERR_REMOTE_FILE_ATTR = "stderr_remote_path";//$NON-NLS-1$
-	//	private static final String INTERACTIVE_ATTR = "interactive";//$NON-NLS-1$;
-	//	private static final String STATE_ATTR = "state";//$NON-NLS-1$;
-	//	private static final String STATE_DETAIL_ATTR = "state_detail";//$NON-NLS-1$;
-	//	private static final String OID_ATTR = "oid";//$NON-NLS-1$;
-	//	private static final String QUEUE_NAME_ATTR = "queue_name";//$NON-NLS-1$;
-	//	private static final String OWNER_ATTR = "owner";//$NON-NLS-1$;
-
 	private static final String JOB_OUTERR_READY = "JOB_OUTERR_READY";//$NON-NLS-1$
 
 	public static final String SUBMITTED = "SUBMITTED";//$NON-NLS-1$
@@ -38,29 +25,13 @@ public class JobStatusData {
 	public static final String FAILED = "FAILED";//$NON-NLS-1$
 	public static final String CANCELED = "CANCELED";//$NON-NLS-1$
 
-	// /**
-	// * Convenience method for reloading all saved job status data.
-	// *
-	// * @param memento
-	// * @return list of job status objects
-	// */
-	// public static List<JobStatusData> reload(IMemento memento) {
-	// final List<JobStatusData> jobs = new ArrayList<JobStatusData>();
-	// if (memento != null) {
-	// final IMemento[] children = memento.getChildren(JOB_ID_ATTR);
-	// for (final IMemento child : children) {
-	// jobs.add(new JobStatusData(child));
-	// }
-	// }
-	// return jobs;
-	// }
-
 	private static boolean detailIsFinal(String detail) {
-		return CANCELED.equals(detail) || FAILED.equals(detail)
-				|| JOB_OUTERR_READY.equals(detail);
+		return CANCELED.equals(detail) || FAILED.equals(detail) || JOB_OUTERR_READY.equals(detail);
 	}
 
-	private final String fRmId;
+	private final String fConfigName;
+	private final String fRemoteServicesId;
+	private final String fConnectionName;
 	private final String fJobId;
 	private final String fOutputPath;
 	private final String fErrorPath;
@@ -77,38 +48,17 @@ public class JobStatusData {
 
 	private boolean fRemoved = false;
 
-	// /**
-	// * Outgoing constructor for reloading.
-	// *
-	// * @param memento
-	// * child node for a single fJobId
-	// */
-	// public JobStatusData(IMemento memento) {
-	// fJobId = memento.getID();
-	// fRmId = memento.getString(RM_ID_ATTR);
-	// fState = memento.getString(STATE_ATTR);
-	// fStateDetail = memento.getString(STATE_DETAIL_ATTR);
-	// fOutputPath = memento.getString(STDOUT_REMOTE_FILE_ATTR);
-	// fErrorPath = memento.getString(STDERR_REMOTE_FILE_ATTR);
-	// fInteractive = memento.getBoolean(INTERACTIVE_ATTR);
-	// fQueueName = memento.getString(QUEUE_NAME_ATTR);
-	// fOwner = memento.getString(OWNER_ATTR);
-	// fOid = memento.getString(OID_ATTR);
-	// fOutReady = fOutputPath != null
-	// && JOB_OUTERR_READY.equals(fStateDetail);
-	// fErrReady = fErrorPath != null && JOB_OUTERR_READY.equals(fStateDetail);
-	// }
-
 	/**
 	 * Incoming constructor. For saving active status.
 	 * 
 	 * @param status
 	 *            to persist
 	 */
-	public JobStatusData(String rmId, String jobId, String queueName,
-			String owner, String outputPath, String errorPath,
-			boolean interactive) {
-		fRmId = rmId;
+	public JobStatusData(String jobId, String configName, String remoteServicesId, String connectionName, String queueName,
+			String owner, String outputPath, String errorPath, boolean interactive) {
+		fConfigName = configName;
+		fRemoteServicesId = remoteServicesId;
+		fConnectionName = connectionName;
 		fJobId = jobId;
 		fQueueName = queueName;
 		fOwner = owner;
@@ -117,16 +67,30 @@ public class JobStatusData {
 		fInteractive = interactive;
 	}
 
-	public JobStatusData(String jobId, String rmId, String state,
-			String stateDetail, String outputPath, String errorPath,
-			boolean interactive, String queueName, String owner, String oid) {
-		this(rmId, jobId, queueName, owner, outputPath, errorPath, interactive);
+	public JobStatusData(String jobId, String configName, String remoteServicesId, String connectionName, String state,
+			String stateDetail, String outputPath, String errorPath, boolean interactive, String queueName, String owner, String oid) {
+		this(jobId, configName, remoteServicesId, connectionName, queueName, owner, outputPath, errorPath, interactive);
 		fState = state;
 		fStateDetail = stateDetail;
 		fOid = oid;
-		fOutReady = fOutputPath != null
-				&& JOB_OUTERR_READY.equals(fStateDetail);
+		fOutReady = fOutputPath != null && JOB_OUTERR_READY.equals(fStateDetail);
 		fErrReady = fErrorPath != null && JOB_OUTERR_READY.equals(fStateDetail);
+	}
+
+	/**
+	 * 
+	 * @return configuration name
+	 */
+	public String getConfigurationName() {
+		return fConfigName;
+	}
+
+	/**
+	 * 
+	 * @return connection name
+	 */
+	public String getConnectionName() {
+		return fConnectionName;
 	}
 
 	/**
@@ -184,10 +148,10 @@ public class JobStatusData {
 
 	/**
 	 * 
-	 * @return unique name of resource manager
+	 * @return remote services ID
 	 */
-	public String getRmId() {
-		return fRmId;
+	public String getRemoteServicesId() {
+		return fRemoteServicesId;
 	}
 
 	/**
@@ -224,27 +188,6 @@ public class JobStatusData {
 	public boolean isRemoved() {
 		return fRemoved;
 	}
-
-	// /**
-	// * Save for restart.
-	// *
-	// * @param memento
-	// */
-	// public void save(IMemento memento) {
-	// if (memento == null) {
-	// return;
-	// }
-	// final IMemento jobMemento = memento.createChild(JOB_ID_ATTR, fJobId);
-	// jobMemento.putString(RM_ID_ATTR, fRmId);
-	// jobMemento.putString(STATE_ATTR, fState);
-	// jobMemento.putString(STATE_DETAIL_ATTR, fStateDetail);
-	// jobMemento.putString(STDOUT_REMOTE_FILE_ATTR, fOutputPath);
-	// jobMemento.putString(STDERR_REMOTE_FILE_ATTR, fErrorPath);
-	// jobMemento.putBoolean(INTERACTIVE_ATTR, fInteractive);
-	// jobMemento.putString(QUEUE_NAME_ATTR, fQueueName);
-	// jobMemento.putString(OWNER_ATTR, fOwner);
-	// jobMemento.putString(OID_ATTR, fOid);
-	// }
 
 	/**
 	 * @param errReady

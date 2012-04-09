@@ -52,13 +52,14 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.JobManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.events.IJobAddedEvent;
-import org.eclipse.ptp.core.events.IJobChangedEvent;
-import org.eclipse.ptp.core.listeners.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobAddedEvent;
+import org.eclipse.ptp.core.jobs.IJobChangedEvent;
+import org.eclipse.ptp.core.jobs.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -76,7 +77,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
@@ -172,6 +172,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 							// Expect to be interrupted if monitor is canceled
 						}
 					}
+				} catch (CoreException e) {
+					// getJobStatus failed, so assume it is finished
 				} finally {
 					fSubLock.unlock();
 				}
@@ -190,6 +192,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 								// canceled
 							}
 						}
+					} catch (CoreException e) {
+						// getJobStatus failed, so assume it is finished
 					} finally {
 						fSubLock.unlock();
 					}

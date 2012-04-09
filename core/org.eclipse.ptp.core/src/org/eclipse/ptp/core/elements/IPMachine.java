@@ -24,14 +24,11 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
- * Interface class for a model of a machine. Machines are comprised of nodes
- * which may have processes running on them. The Machine model is intented to be
- * a hardware representation of the machine with methods to get information like
- * the architecture and related interested bits. The model allows for the
- * Machine to have any number of nodes (even a single one to represent a
+ * Interface class for a model of a machine. Machines are comprised of nodes which may have processes running on them. The Machine
+ * model is intented to be a hardware representation of the machine with methods to get information like the architecture and
+ * related interested bits. The model allows for the Machine to have any number of nodes (even a single one to represent a
  * uniprocessor machine).
  * 
  * @author Nathan DeBardeleben
@@ -73,9 +70,16 @@ public interface IPMachine extends IPElement {
 	public void addNodes(Collection<IPNode> nodes);
 
 	/**
-	 * Given a node id, attempts to find it as a Node object contained in this
-	 * Machine. If found, the Node object is returned. Otherwise,
-	 * <code>null</code> is returned.
+	 * Get the resource manager that controls this machine.
+	 * 
+	 * @return the machine's control id
+	 * @since 6.0
+	 */
+	public String getControlId();
+
+	/**
+	 * Given a node id, attempts to find it as a Node object contained in this Machine. If found, the Node object is returned.
+	 * Otherwise, <code>null</code> is returned.
 	 * 
 	 * @param id
 	 *            The ID to find in this Machine
@@ -84,20 +88,11 @@ public interface IPMachine extends IPElement {
 	public IPNode getNodeById(String id);
 
 	/**
-	 * Returns an array of all the Nodes that this Machine is comprised of.
-	 * Returns an empty array if there are no nodes.
+	 * Returns an array of all the Nodes that this Machine is comprised of. Returns an empty array if there are no nodes.
 	 * 
 	 * @return The Nodes in this Machine - <code>null</code> if there are none.
 	 */
 	public IPNode[] getNodes();
-
-	/**
-	 * Get the resource manager that controls this machine.
-	 * 
-	 * @return the machine's parent resource manager
-	 * @since 5.0
-	 */
-	public IResourceManager getResourceManager();
 
 	/**
 	 * Get the state of the machine
@@ -130,8 +125,7 @@ public interface IPMachine extends IPElement {
 	public void removeNodes(Collection<IPNode> nodes);
 
 	/**
-	 * Counts all the Nodes associated with this Machine and returns that as an
-	 * <code>int</code>.
+	 * Counts all the Nodes associated with this Machine and returns that as an <code>int</code>.
 	 * 
 	 * @return The number of Nodes in this Machine
 	 */

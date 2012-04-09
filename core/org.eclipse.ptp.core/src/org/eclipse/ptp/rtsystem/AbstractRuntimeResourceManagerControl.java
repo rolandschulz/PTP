@@ -39,10 +39,10 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
@@ -86,6 +86,24 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		public JobStatus(String jobId, ILaunchConfiguration config) {
 			fJobId = jobId;
 			fConfig = config;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.jobs.IJobStatus#getConfigurationName()
+		 */
+		public String getConfigurationName() {
+			return getControlConfiguration().getUniqueName();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getConnectionName()
+		 */
+		public String getConnectionName() {
+			return getControlConfiguration().getConnectionName();
 		}
 
 		/*
@@ -145,11 +163,10 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * 
-		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getRmUniqueName()
+		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getRemoteServicesId()
 		 */
-		public String getRmUniqueName() {
-			return getResourceManager().getUniqueName();
+		public String getRemoteServicesId() {
+			return getControlConfiguration().getRemoteServicesId();
 		}
 
 		/*

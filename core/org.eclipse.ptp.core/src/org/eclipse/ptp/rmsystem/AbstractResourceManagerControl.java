@@ -25,10 +25,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
-import org.eclipse.ptp.core.JobManager;
 import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 
 /**
  * @since 5.0
@@ -95,6 +96,9 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang .String)
 	 */
+	/**
+	 * @since 6.0
+	 */
 	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) {
 		IJobStatus status = null;
 		try {
@@ -103,6 +107,14 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 		}
 		if (status == null) {
 			status = new IJobStatus() {
+				public String getConfigurationName() {
+					return fConfig.getUniqueName();
+				}
+
+				public String getConnectionName() {
+					return fConfig.getConnectionName();
+				}
+
 				public String getErrorPath() {
 					return null;
 				}
@@ -127,8 +139,8 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 					return null;
 				}
 
-				public String getRmUniqueName() {
-					return getResourceManager().getUniqueName();
+				public String getRemoteServicesId() {
+					return fConfig.getRemoteServicesId();
 				}
 
 				public String getState() {
@@ -156,6 +168,9 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang .String, boolean,
 	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	/**
+	 * @since 6.0
 	 */
 	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor) {
 		return getJobStatus(jobId, false, monitor);
@@ -213,6 +228,7 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 * Get the status of a job.
 	 * 
 	 * @throws CoreException
+	 * @since 6.0
 	 */
 	protected abstract IJobStatus doGetJobStatus(String jobId, boolean force, IProgressMonitor monitor) throws CoreException;
 
@@ -255,6 +271,7 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 *            progress monitor
 	 * @return job status representing the status of the submitted job
 	 * @throws CoreException
+	 * @since 6.0
 	 */
 	protected abstract IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException;

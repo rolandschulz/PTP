@@ -19,47 +19,12 @@ package org.eclipse.ptp.rmsystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.jobs.IJobControl;
 
 /**
  * @since 5.0
  */
-public interface IResourceManagerControl extends IAdaptable {
-	/**
-	 * Control operation to suspend a job
-	 */
-	public static final String SUSPEND_OPERATION = "SUSPEND"; //$NON-NLS-1$
-	/**
-	 * Control operation to resume a suspended job
-	 */
-	public static final String RESUME_OPERATION = "RESUME"; //$NON-NLS-1$
-	/**
-	 * Control operation to put a job on hold
-	 */
-	public static final String HOLD_OPERATION = "HOLD"; //$NON-NLS-1$
-	/**
-	 * Control operation to release a job from hold
-	 */
-	public static final String RELEASE_OPERATION = "RELEASE"; //$NON-NLS-1$
-	/**
-	 * Control operation to terminate a job
-	 */
-	public static final String TERMINATE_OPERATION = "TERMINATE"; //$NON-NLS-1$
-
-	/**
-	 * Perform control operation on job.
-	 * 
-	 * @param jobId
-	 *            job ID representing the job to be canceled.
-	 * @param operation
-	 *            operation to perform on the job
-	 * @param monitor
-	 *            progress monitor for monitoring operation
-	 * @throws CoreException
-	 * @since 5.0
-	 */
-	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException;
-
+public interface IResourceManagerControl extends IJobControl, IAdaptable {
 	/**
 	 * Safely dispose of this Resource Manager.
 	 */
@@ -71,41 +36,6 @@ public interface IResourceManagerControl extends IAdaptable {
 	 * @return resource manager control configuration
 	 */
 	public IResourceManagerComponentConfiguration getControlConfiguration();
-
-	/**
-	 * Get the status of the job. The could potentially be a long running operation. If the progress monitor is canceled, the method
-	 * will return an undetermined status. <br>
-	 * <br>
-	 * Note that this call may be throttled using a predetermined timeout by the rsource manager implementation. To avoid the
-	 * throttle, set the force flag to true.
-	 * 
-	 * @param jobId
-	 *            ID of job used to obtain status
-	 * @param force
-	 *            if true, tells the resource manager to ignore the throttling timeout.
-	 * @param monitor
-	 *            progress monitor for monitoring or canceling the operation
-	 * @return status of the job or undetermined status if the progress monitor is canceled
-	 */
-	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor);
-
-	/**
-	 * Get the status of the job. The could potentially be a long running operation. If the progress monitor is canceled, the method
-	 * will return an undetermined status. <br>
-	 * <br>
-	 * Note that this call may be throttled using a predetermined timeout by the rsource manager implementation. To avoid the
-	 * throttle, use the overloaded method.<br>
-	 * <br>
-	 * 
-	 * This method is equivalent to {@link #getJobStatus(String, boolean, IProgressMonitor)} with flag set to false.
-	 * 
-	 * @param jobId
-	 *            ID of job used to obtain status
-	 * @param monitor
-	 *            progress monitor for monitoring or canceling the operation
-	 * @return status of the job or undetermined status if the progress monitor is canceled
-	 */
-	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor);
 
 	/**
 	 * Start the resource manager. Clients should not call this directly. Call {@link IResourceManager#start(IProgressMonitor)}
@@ -126,12 +56,4 @@ public interface IResourceManagerControl extends IAdaptable {
 	 * @since 5.0
 	 */
 	public void stop() throws CoreException;
-
-	/**
-	 * Stop the resource manager.
-	 * 
-	 * @throws CoreException
-	 *             this exception is thrown if the stop command fails
-	 */
-	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException;
 }

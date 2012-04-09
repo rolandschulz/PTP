@@ -29,11 +29,12 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.internal.utils.DebuggingLogger;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.utils.core.ArgumentParser;
@@ -48,7 +49,7 @@ import org.eclipse.ptp.utils.core.ArgumentParser;
 public class SimpleCommandJob extends Job {
 
 	private final SimpleCommandType fCommand;
-	private final JAXBResourceManagerControl fControl;
+	private final IJAXBJobControl fControl;
 	private final IVariableMap fRmVarMap;
 	private final int fFlags;
 	private final String fUuid;
@@ -68,12 +69,12 @@ public class SimpleCommandJob extends Job {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public SimpleCommandJob(String uuid, SimpleCommandType command, String directory, IJAXBResourceManager rm) {
+	public SimpleCommandJob(String uuid, SimpleCommandType command, String directory, IJAXBJobControl control) {
 		super(command.getName() != null ? command.getName() : "Simple Command"); //$NON-NLS-1$
 		fUuid = uuid;
 		fCommand = command;
 		fDirectory = command.getDirectory() != null ? command.getDirectory() : directory;
-		fControl = (JAXBResourceManagerControl) rm.getControl();
+		fControl = control;
 		fRmVarMap = fControl.getEnvironment();
 		fFlags = getFlags(command.getFlags());
 	}
@@ -274,7 +275,8 @@ public class SimpleCommandJob extends Job {
 	private IRemoteProcessBuilder prepareCommand(IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		ArgumentParser args = new ArgumentParser(fRmVarMap.getString(fUuid, fCommand.getExec()));
-		RemoteServicesDelegate delegate = fControl.getRemoteServicesDelegate(progress.newChild(5));
+		RemoteServicesDelegate delegate = JAXBUtils.getRemoteServicesDelegate(fControl.getRemoteServicesId(),
+				fControl.getConnectionName(), progress.newChild(5));
 		if (delegate.getRemoteConnection() == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, new Throwable(
 					Messages.UninitializedRemoteServices));

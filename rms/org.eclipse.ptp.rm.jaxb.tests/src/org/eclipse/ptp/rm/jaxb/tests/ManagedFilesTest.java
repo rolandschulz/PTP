@@ -19,8 +19,12 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
+import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
@@ -34,10 +38,9 @@ import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 
-public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerControl {
+public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerControl, IJAXBJobControl {
 
 	private static final String xml = JAXBControlConstants.DATA + "test-pbs.xml"; //$NON-NLS-1$
 	private static ControlType controlData;
@@ -49,9 +52,8 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#control(java.lang.String
-	 * , java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#control(java.lang.String , java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 	}
@@ -64,22 +66,34 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	public void dispose() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getAppendEnv()
-	 */
-	public boolean getAppendEnv() {
-		return false;
+	public Object getAdapter(Class adapter) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration
-	 * ()
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getAppendEnv()
+	 */
+	public boolean getAppendEnv() {
+		return false;
+	}
+
+	public ResourceManagerData getConfigurationData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getConnectionName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration ()
 	 */
 	public IResourceManagerComponentConfiguration getControlConfiguration() {
 		return null;
@@ -88,19 +102,22 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getEnvironment()
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getEnvironment()
 	 */
 	public IVariableMap getEnvironment() {
 		return rmVarMap;
 	}
 
+	public ICommandJob getInteractiveJob() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
-	 * .String, boolean, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang .String, boolean,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) {
 		return null;
@@ -109,9 +126,8 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
-	 * .String, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang .String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor) {
 		return null;
@@ -120,8 +136,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getLaunchEnv()
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getLaunchEnv()
 	 */
 	public Map<String, String> getLaunchEnv() {
 		return null;
@@ -139,6 +154,11 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 		return d;
 	}
 
+	public String getRemoteServicesId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -148,12 +168,21 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 		return null;
 	}
 
+	public ICommandJobStatusMap getStatusMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void initialize(IProgressMonitor monitor) throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged
-	 * (java.lang.String, org.eclipse.ptp.rmsystem.IJobStatus)
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged (java.lang.String,
+	 * org.eclipse.ptp.rmsystem.IJobStatus)
 	 */
 	public void jobStateChanged(String jobId, IJobStatus status) {
 	}
@@ -161,13 +190,16 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#runActionCommand
-	 * (java.lang.String, java.lang.String,
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#runActionCommand (java.lang.String, java.lang.String,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException {
 		return null;
+	}
+
+	public void setInteractiveJob(ICommandJob interactiveJob) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -193,9 +225,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#start(org.eclipse.core
-	 * .runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#start(org.eclipse.core .runtime.IProgressMonitor)
 	 */
 	public void start(IProgressMonitor monitor) throws CoreException {
 	}
@@ -211,10 +241,8 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#submitJob(org.eclipse
-	 * .debug.core.ILaunchConfiguration, java.lang.String,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#submitJob(org.eclipse .debug.core.ILaunchConfiguration,
+	 * java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
 		return null;

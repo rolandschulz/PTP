@@ -34,16 +34,15 @@ import org.eclipse.ptp.core.elements.attributes.QueueAttributes.State;
 import org.eclipse.ptp.core.elements.events.IQueueChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 import org.eclipse.ptp.internal.core.elements.events.QueueChangeEvent;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class PQueue extends Parent implements IPQueue {
 	private final ListenerList fElementListeners = new ListenerList();
 	private final Map<String, IPJob> fJobs = new HashMap<String, IPJob>();
-	private final IResourceManager fResourceManager;
+	private final String fControlId;
 
-	public PQueue(String id, IResourceManager rm, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
+	public PQueue(String id, String controlId, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
 		super(id, parent, attrs);
-		fResourceManager = rm;
+		fControlId = controlId;
 		/*
 		 * Create required attributes.
 		 */
@@ -57,9 +56,7 @@ public class PQueue extends Parent implements IPQueue {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPQueue#addElementListener(org.eclipse.
-	 * ptp.core.elements.listeners.IQueueListener)
+	 * @see org.eclipse.ptp.core.elements.IPQueue#addElementListener(org.eclipse. ptp.core.elements.listeners.IQueueListener)
 	 */
 	public void addElementListener(IQueueListener listener) {
 		fElementListeners.add(listener);
@@ -68,9 +65,7 @@ public class PQueue extends Parent implements IPQueue {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IPQueueControl#addJobs(java.util
-	 * .Collection)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#addJobs(java.util .Collection)
 	 */
 	public void addJobs(Collection<IPJob> jobs) {
 		synchronized (fJobs) {
@@ -83,9 +78,7 @@ public class PQueue extends Parent implements IPQueue {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java
-	 * .util.Map)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java .util.Map)
 	 */
 	@Override
 	protected void doAddAttributeHook(AttributeManager attrs) {
@@ -118,10 +111,10 @@ public class PQueue extends Parent implements IPQueue {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
+	 * @see org.eclipse.ptp.core.elements.IPQueue#getControlId()
 	 */
-	public IResourceManager getResourceManager() {
-		return fResourceManager;
+	public String getControlId() {
+		return fControlId;
 	}
 
 	/*
@@ -136,9 +129,7 @@ public class PQueue extends Parent implements IPQueue {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPQueue#removeElementListener(org.eclipse
-	 * .ptp.core.elements.listeners.IQueueListener)
+	 * @see org.eclipse.ptp.core.elements.IPQueue#removeElementListener(org.eclipse .ptp.core.elements.listeners.IQueueListener)
 	 */
 	public void removeElementListener(IQueueListener listener) {
 		fElementListeners.remove(listener);
@@ -147,9 +138,7 @@ public class PQueue extends Parent implements IPQueue {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IPQueueControl#removeJobs(java.util
-	 * .Collection)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#removeJobs(java.util .Collection)
 	 */
 	public void removeJobs(Collection<IPJob> jobs) {
 		synchronized (fJobs) {

@@ -45,9 +45,7 @@ public abstract class AbstractStatusAction implements IObjectActionDelegate {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
-	 * .IAction, org.eclipse.jface.viewers.ISelection)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action .IAction, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		if (selection.isEmpty()) {
@@ -65,9 +63,7 @@ public abstract class AbstractStatusAction implements IObjectActionDelegate {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.
-	 * action.IAction, org.eclipse.ui.IWorkbenchPart)
+	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface. action.IAction, org.eclipse.ui.IWorkbenchPart)
 	 */
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		view = (TableView) targetPart;
@@ -89,7 +85,7 @@ public abstract class AbstractStatusAction implements IObjectActionDelegate {
 	 */
 	protected static boolean operationSupported(JobStatusData status, String operation, IViewPart targetPart) {
 		IJAXBResourceManager rm = (IJAXBResourceManager) ModelManager.getInstance().getResourceManagerFromUniqueName(
-				status.getRmId());
+				status.getConfigurationName());
 		if (rm == null) {
 			return false;
 		}

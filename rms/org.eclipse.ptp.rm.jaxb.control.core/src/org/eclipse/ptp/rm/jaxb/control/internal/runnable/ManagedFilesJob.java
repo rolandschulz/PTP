@@ -26,12 +26,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.control.internal.data.LineImpl;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.LineType;
@@ -40,13 +41,11 @@ import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 
 /**
- * A managed file is a client-side file which needs to be moved to the resource
- * to which the job will be submitted. This class wraps the Job runnable for
- * staging these files. <br>
+ * A managed file is a client-side file which needs to be moved to the resource to which the job will be submitted. This class wraps
+ * the Job runnable for staging these files. <br>
  * <br>
- * There are two possible operations, copy and delete. In the former case, all
- * files in the list are copied serially to the target resource; in the latter,
- * only those files with delete of the target marked as true are deleted.
+ * There are two possible operations, copy and delete. In the former case, all files in the list are copied serially to the target
+ * resource; in the latter, only those files with delete of the target marked as true are deleted.
  * 
  * @author arossi
  * 
@@ -54,11 +53,12 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 public class ManagedFilesJob extends Job {
 
 	public enum Operation {
-		COPY, DELETE
+		COPY,
+		DELETE
 	};
 
 	private final String uuid;
-	private final IJAXBResourceManagerControl control;
+	private final IJAXBJobControl control;
 	private final List<ManagedFileType> files;
 
 	private RemoteServicesDelegate delegate;
@@ -77,7 +77,7 @@ public class ManagedFilesJob extends Job {
 	 *            callback to resource manager control
 	 * @throws CoreException
 	 */
-	public ManagedFilesJob(String uuid, ManagedFilesType files, IJAXBResourceManagerControl control) throws CoreException {
+	public ManagedFilesJob(String uuid, ManagedFilesType files, IJAXBJobControl control) throws CoreException {
 		super(Messages.ManagedFilesJob);
 		this.uuid = uuid;
 		this.control = control;
@@ -102,37 +102,38 @@ public class ManagedFilesJob extends Job {
 	}
 
 	/**
-	 * First checks to see if the file references in-memory content, and if so,
-	 * writes out a temporary source file. It then copies the file and places a
-	 * property in the environment mapping the name of the ManagedFile object
-	 * against its target path.
+	 * First checks to see if the file references in-memory content, and if so, writes out a temporary source file. It then copies
+	 * the file and places a property in the environment mapping the name of the ManagedFile object against its target path.
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			delegate = control.getRemoteServicesDelegate(monitor);
-			IRemoteConnection conn = delegate.getRemoteConnection();
-			SubMonitor progress = SubMonitor.convert(monitor, 10);
-			JAXBResourceManagerControl.checkConnection(conn, progress);
-			if (delegate.getRemoteFileManager() == null) {
-				throw new Throwable(Messages.UninitializedRemoteServices);
+			try {
+				delegate = JAXBUtils.getRemoteServicesDelegate(control.getRemoteServicesId(), control.getConnectionName(),
+						progress.newChild(2));
+				IRemoteConnection conn = delegate.getRemoteConnection();
+				JAXBResourceManagerControl.checkConnection(conn, progress);
+				if (delegate.getRemoteFileManager() == null) {
+					throw new Throwable(Messages.UninitializedRemoteServices);
+				}
+			} catch (Throwable t) {
+				return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
 			}
-		} catch (Throwable t) {
-			return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
-		}
 
-		rmVarMap = control.getEnvironment();
-		success = false;
-		try {
-			if (operation == Operation.COPY) {
-				doCopy(monitor);
-			} else if (operation == Operation.DELETE) {
-				doDelete(monitor);
+			rmVarMap = control.getEnvironment();
+			success = false;
+			try {
+				if (operation == Operation.COPY) {
+					doCopy(monitor);
+				} else if (operation == Operation.DELETE) {
+					doDelete(monitor);
+				}
+				success = true;
+				return Status.OK_STATUS;
+			} catch (Throwable t) {
+				return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
 			}
-			success = true;
-			return Status.OK_STATUS;
-		} catch (Throwable t) {
-			return CoreExceptionUtils.getErrorStatus(Messages.ManagedFilesJobError, t);
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -152,8 +153,7 @@ public class ManagedFilesJob extends Job {
 	 */
 	private void copyFileToRemoteHost(String localPath, String remotePath, IProgressMonitor monitor) throws CoreException {
 		/*
-		 * EFS.NONE means mkdir -p on the parent directory (EFS.SHALLOW is mkdir
-		 * parent, UNDEFINED is no mkdir).
+		 * EFS.NONE means mkdir -p on the parent directory (EFS.SHALLOW is mkdir parent, UNDEFINED is no mkdir).
 		 */
 		RemoteServicesDelegate.copy(delegate.getLocalFileManager(), localPath, delegate.getRemoteFileManager(), remotePath,
 				EFS.NONE, monitor);
@@ -169,8 +169,7 @@ public class ManagedFilesJob extends Job {
 		boolean localTarget = delegate.getLocalFileManager() == delegate.getRemoteFileManager();
 		SubMonitor progress = SubMonitor.convert(monitor, files.size() * 10);
 		/*
-		 * for now we handle the files serially. NOTE: no support for Windows as
-		 * target ...
+		 * for now we handle the files serially. NOTE: no support for Windows as target ...
 		 */
 		for (ManagedFileType file : files) {
 			File localFile = maybeWriteFile(file);
@@ -210,8 +209,7 @@ public class ManagedFilesJob extends Job {
 	private void doDelete(IProgressMonitor monitor) {
 		SubMonitor progress = SubMonitor.convert(monitor, files.size() * 15);
 		/*
-		 * for now we handle the files serially. NOTE: no support for Windows as
-		 * target ...
+		 * for now we handle the files serially. NOTE: no support for Windows as target ...
 		 */
 		for (ManagedFileType file : files) {
 			if (!file.isDeleteTargetAfterUse()) {
@@ -231,14 +229,11 @@ public class ManagedFilesJob extends Job {
 	}
 
 	/**
-	 * If there is already a path defined for this file, this is returned. Else
-	 * a temporary source file is created to be deleted on completion. If the
-	 * file contents is a reference to a string in the environment, the normal
-	 * VariableResolver can be bypassed by setting <code>resolveContents</code>
-	 * to false; this avoids recursive resolution which might falsely interpret
-	 * shell symbols (${...}) as referring to the Eclipse default string
-	 * resolver. Otherwise, the &lt;line&gt; arguments are processed as in the
-	 * script.
+	 * If there is already a path defined for this file, this is returned. Else a temporary source file is created to be deleted on
+	 * completion. If the file contents is a reference to a string in the environment, the normal VariableResolver can be bypassed
+	 * by setting <code>resolveContents</code> to false; this avoids recursive resolution which might falsely interpret shell
+	 * symbols (${...}) as referring to the Eclipse default string resolver. Otherwise, the &lt;line&gt; arguments are processed as
+	 * in the script.
 	 * 
 	 * @param file
 	 *            JAXB data element
@@ -279,8 +274,7 @@ public class ManagedFilesJob extends Job {
 				contents = rmVarMap.getString(uuid, contents);
 			} else {
 				/*
-				 * magic to avoid attempted resolution of unknown shell
-				 * variables
+				 * magic to avoid attempted resolution of unknown shell variables
 				 */
 				int start = contents.indexOf(JAXBControlConstants.OPENVRM);
 				int end = contents.length();
