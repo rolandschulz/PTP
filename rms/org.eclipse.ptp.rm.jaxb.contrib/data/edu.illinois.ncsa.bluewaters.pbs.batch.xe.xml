@@ -238,7 +238,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<stdout-parser delim="\n">
 				<target ref="queues">
 					<match>
-						<expression>Queue: (xe[\w\d]+)</expression>
+						<expression>Queue: (xe[\w\d]*)</expression>
 						<add field="value">
 							<entry valueGroup="1"/>
 						</add>

@@ -318,6 +318,9 @@ public class NullCIndexServiceProvider extends
 		return Messages.getString("NullServiceProvider.config"); //$NON-NLS-1$
 	}
 
+	/**
+	 * @since 4.1
+	 */
 	public IRemoteSemanticHighlightingService getRemoteSemanticHighlightingService() {
 		 return new IRemoteSemanticHighlightingService() {
 			public String computeSemanticHighlightingPositions(
@@ -327,6 +330,9 @@ public class NullCIndexServiceProvider extends
 		 };
 	}
 
+	/**
+	 * @since 4.1
+	 */
 	public IRemoteCCodeFoldingService getRemoteCodeFoldingService() {
 		 return new IRemoteCCodeFoldingService() {
 			public FoldingRegionsResult computeCodeFoldingRegions(IWorkingCopy workingCopy, int docLength, boolean fPreprocessorBranchFoldingEnabled, boolean fStatementsFoldingEnabled) {

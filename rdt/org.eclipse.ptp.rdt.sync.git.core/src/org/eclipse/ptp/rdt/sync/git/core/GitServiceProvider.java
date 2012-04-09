@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
@@ -51,6 +52,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
 	private GitRemoteSyncConnection fSyncConnection = null;
+	private boolean syncInfoChanged = false; // Indicates that fSyncConnection needs to be re-initialized
 	private boolean hasBeenSynced = false;
 
 	private static final ReentrantLock syncLock = new ReentrantLock();
@@ -190,6 +192,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#
 	 * synchronize(org.eclipse.core.resources.IResourceDelta, org.eclipse.core.runtime.IProgressMonitor, boolean)
 	 */
+	@SuppressWarnings("null")
 	public void synchronize(IResourceDelta delta, SyncFileFilter fileFilter, IProgressMonitor monitor,
 			EnumSet<SyncFlag> syncFlags) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
@@ -320,11 +323,35 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					return;
 				}
 
-				// TODO: Review exception handling
-				if (fSyncConnection == null) {
-					// Open a remote sync connection
-					fSyncConnection = new GitRemoteSyncConnection(this.getProject(), this.getRemoteConnection(),
-							this.getProject().getLocation().toString(), this.getLocation(), fileFilter, progress);
+				// Safely initialize or re-initialize sync connection. Note that only the thread with the sync lock can change the
+				// fSyncConnection. To do so, it copies the sync information atomically first and then creates the connection.
+				// Copying avoids having to lock the provider lock during the initialization, a rather involved operation that may
+				// take other locks, such as the workspace lock.
+				boolean initConnection = false;
+				IRemoteConnection conn = null;
+				IProject project = null;
+				String remoteDir = null;
+				providerLock.lock();
+				try {
+					if (fSyncConnection == null || syncInfoChanged) {
+						if (fSyncConnection != null) {
+							fSyncConnection.close();
+							fSyncConnection = null;
+						}
+						syncInfoChanged = false;
+						initConnection = true;
+						project = this.getProject();
+						conn = this.getRemoteConnection();
+						remoteDir = this.getLocation();
+					}
+				} finally {
+					providerLock.unlock();
+				}
+				
+				if (initConnection && (project == null || conn == null || remoteDir == null)) {
+					RDTSyncCorePlugin.log(Messages.GitServiceProvider_0);
+				} else if (initConnection) {
+					fSyncConnection = new GitRemoteSyncConnection(project, conn, project.getLocation().toString(), remoteDir, fileFilter, progress);
 				} else {
 					fSyncConnection.setFileFilter(fileFilter);
 				}
@@ -350,6 +377,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				fSyncConnection.syncRemoteToLocal(progress.newChild(40), true); // Temporarily enable syncing new remote files
 
 				finishedSyncTaskId = willFinishTaskId;
+				// TODO: Review exception handling
 			} catch (final RemoteSyncException e) {
 				this.handleRemoteSyncException(e, syncFlags);
 				return;
@@ -446,16 +474,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		providerLock.lock();
-		try {
-			fConnection = connection;
-			putString(GIT_CONNECTION_NAME, connection.getName());
-			if (fSyncConnection != null) {
-				fSyncConnection.close();
-				fSyncConnection = null; // get reinitialized by next synchronize call
-			}
-		} finally {
-			providerLock.unlock();
-		}
+		fConnection = connection;
+		putString(GIT_CONNECTION_NAME, connection.getName());
+		syncInfoChanged = true;
+		providerLock.unlock();
 	}
 
 	/*
@@ -465,16 +487,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void setConfigLocation(String configLocation) {
 		providerLock.lock();
-		try {
-			fLocation = configLocation;
-			putString(GIT_LOCATION, configLocation);
-			if (fSyncConnection != null) {
-				fSyncConnection.close();
-				fSyncConnection = null; // get reinitialized by next synchronize call
-			}
-		} finally {
-			providerLock.unlock();
-		}
+		fLocation = configLocation;
+		putString(GIT_LOCATION, configLocation);
+		syncInfoChanged = true;
+		providerLock.unlock();
 	}
 	
 	@Override

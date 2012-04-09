@@ -85,7 +85,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#addJobListener(org.eclipse .ptp.core.listeners.IJobListener)
 	 */
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public void addJobListener(IJobListener listener) {
 		JobManager.getInstance().addListener(listener);
@@ -190,7 +190,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) {
 		return fResourceManagerControl.getJobStatus(jobId, force, monitor);
@@ -203,7 +203,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor) {
 		return fResourceManagerControl.getJobStatus(jobId, monitor);
@@ -290,7 +290,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJobListener(org .eclipse.ptp.core.listeners.IJobListener)
 	 */
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public void removeJobListener(IJobListener listener) {
 		JobManager.getInstance().removeListener(listener);

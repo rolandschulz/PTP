@@ -26,8 +26,6 @@ import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
@@ -45,7 +43,6 @@ import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * An operation which handles configuring the remote portions of the Remote
@@ -125,12 +122,6 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 		// Add information about remote location to the initial build configurations. Do this last (except for adding local
 		// configuration) so that project is not flagged as initialized prematurely.
 		BuildConfigurationManager.getInstance().initProject(project, serviceConfig, buildScenario);
-		try {
-			BuildConfigurationManager.getInstance().saveConfigurationData();
-		} catch (IOException e) {
-			StatusManager.getManager().handle(new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, e.getMessage(), e),
-					StatusManager.SHOW);
-		}
 		
 		SyncFileFilter customFilter = (SyncFileFilter) getMBSProperty(NewRemoteSyncProjectWizardPage.SYNC_FILE_FILTER_PROPERTY);
 		if (customFilter != null) {

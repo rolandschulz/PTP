@@ -31,7 +31,6 @@ import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 public class SyncManager  {
@@ -220,11 +219,7 @@ public class SyncManager  {
 			node.put(SYNC_MODE_KEY, mode.name());
 		}
 
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_5, e);
-		}
+		BuildConfigurationManager.flushNode(node);
 	}
 
 	/**
@@ -246,11 +241,7 @@ public class SyncManager  {
 			node.putBoolean(SYNC_AUTO_KEY, isSyncAutomatic);
 		}
 
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_9, e);
-		}
+		BuildConfigurationManager.flushNode(node);
 	}
 	
 	/**
@@ -277,11 +268,7 @@ public class SyncManager  {
 			node.putBoolean(SHOW_ERROR_KEY, shouldBeDisplayed);
 		}
 
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_5, e);
-		}
+		BuildConfigurationManager.flushNode(node);
 	}
 
 	/**
@@ -305,11 +292,7 @@ public class SyncManager  {
 
 		filter.saveFilter(node);
 
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_5, e);
-		}
+		BuildConfigurationManager.flushNode(node);
 	}
 
 	/**
@@ -331,11 +314,7 @@ public class SyncManager  {
 
 		filter.saveFilter(node);
 
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_9, e);
-		}
+		BuildConfigurationManager.flushNode(node);
 	}
 
 	/**
@@ -468,9 +447,6 @@ public class SyncManager  {
 			provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
 		}
 		
-		if (provider == null) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_7 + config.getName());
-		}
 		return provider;
 	}
 }

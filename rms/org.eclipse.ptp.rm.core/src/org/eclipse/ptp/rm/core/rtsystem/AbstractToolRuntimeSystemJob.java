@@ -773,8 +773,6 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				final IPJob ipJob = rm.getJobById(getJobID());
 				if (ipJob != null) {
 					switch (ipJob.getState()) {
-					case COMPLETED:
-						break;
 					case RUNNING:
 					case STARTING:
 					case SUSPENDED:

@@ -44,6 +44,44 @@ public class Messages extends NLS {
 
 	public static String BinaryResourceMatcher_1;
 
+	public static String BuildConfigurationManager_0;
+
+	public static String BuildConfigurationManager_1;
+
+	public static String BuildConfigurationManager_10;
+
+	public static String BuildConfigurationManager_11;
+
+	public static String BuildConfigurationManager_12;
+
+	public static String BuildConfigurationManager_13;
+
+	public static String BuildConfigurationManager_14;
+
+	public static String BuildConfigurationManager_15;
+
+	public static String BuildConfigurationManager_16;
+
+	public static String BuildConfigurationManager_17;
+
+	public static String BuildConfigurationManager_2;
+
+	public static String BuildConfigurationManager_3;
+
+	public static String BuildConfigurationManager_4;
+
+	public static String BuildConfigurationManager_5;
+
+	public static String BuildConfigurationManager_6;
+
+	public static String BuildConfigurationManager_7;
+
+	public static String BuildConfigurationManager_8;
+
+	public static String BuildConfigurationManager_9;
+
+	public static String BCM_GetBuildInfoError;
+
 	public static String PathResourceMatcher_0;
 
 	public static String RegexResourceMatcher_0;

@@ -142,6 +142,9 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 		return "RSECIndexServiceProvider(" + getHostName() + "," + getIndexLocation() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	/**
+	 * @since 4.1
+	 */
 	public synchronized IRemoteSemanticHighlightingService getRemoteSemanticHighlightingService() {
 		if(!isConfigured())
 			return null;
@@ -152,6 +155,9 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 		return fRemoteSemanticHighlightingService;
 	}
 
+	/**
+	 * @since 4.1
+	 */
 	public IRemoteCCodeFoldingService getRemoteCodeFoldingService() {
 		if(!isConfigured())
 			return null;

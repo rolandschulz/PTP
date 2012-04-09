@@ -897,6 +897,9 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
     	return ""; //$NON-NLS-1$
 	}
 	
+	/**
+	 * @since 4.1
+	 */
 	public FoldingRegionsResult computeFoldingRegions(ITranslationUnit targetUnit, int docLength, boolean fPreprocessorBranchFoldingEnabled, boolean fStatementsFoldingEnabled) {
 		checkAllProjects(new NullProgressMonitor());
 		DataStore dataStore = getDataStore(null);
