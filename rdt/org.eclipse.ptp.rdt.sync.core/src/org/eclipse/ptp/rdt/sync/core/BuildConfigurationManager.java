@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescription;
+import org.eclipse.cdt.core.settings.model.ICStorageElement;
 import org.eclipse.cdt.core.settings.model.WriteAccessException;
 import org.eclipse.cdt.core.settings.model.extension.CConfigurationData;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
@@ -52,7 +53,6 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceProvider;
@@ -69,7 +69,7 @@ import org.osgi.service.prefs.Preferences;
  */
 public class BuildConfigurationManager {
 	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
-	private static final String CONFIG_NODE_NAME = "config"; //$NON-NLS-1$
+	private static final String configSyncDataStorageName = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String TEMPLATE_KEY = "template"; //$NON-NLS-1$
 	private final Map<String, IServiceConfiguration> fBConfigIdToSConfigMap = Collections
 			.synchronizedMap(new HashMap<String, IServiceConfiguration>());
@@ -533,26 +533,25 @@ public class BuildConfigurationManager {
 	// Return null if not found.
 	private BuildScenarioAndConfiguration getBuildScenarioForBuildConfigurationInternal(IConfiguration bconf) {
 		IProject project = bconf.getOwner().getProject();
-		IScopeContext context = new ProjectScope(project);
-		Preferences prefRootNode = context.getNode(projectScopeSyncNode);
-		if (prefRootNode == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_0);
-			return null;
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+		if (buildInfo == null) {
+			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
 		}
 
 		try {
-			if (!prefRootNode.nodeExists(CONFIG_NODE_NAME)) {
-				throw new RuntimeException(Messages.BuildConfigurationManager_0);
-			}
-			
+			Map<String, String> scenarioData = null;
 			String configId = bconf.getId();
-			Preferences prefGeneralConfigNode = prefRootNode.node(CONFIG_NODE_NAME);
-			while (configId != null && !prefGeneralConfigNode.nodeExists(configId)) {
+			while (configId != null) {
+				Configuration config = (Configuration) buildInfo.getManagedProject().getConfiguration(configId);
+				scenarioData = this.getConfigData(config, configSyncDataStorageName);
+				if (scenarioData != null) {
+					break;
+				}
 				configId = getParentId(configId);
 			}
 			
 			if (configId != null) {
-				BuildScenario bs = BuildScenario.loadScenario(prefGeneralConfigNode.node(configId));
+				BuildScenario bs = BuildScenario.loadScenario(scenarioData);
 				if (bs == null) {
 					RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_14 + configId + Messages.BuildConfigurationManager_11
 							+ project.getName());
@@ -563,8 +562,8 @@ public class BuildConfigurationManager {
 			} else {
 				return null;
 			}
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_2, e);
+		} catch (CoreException e) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_19, e);
 			return null;
 		}
 	}
@@ -601,22 +600,74 @@ public class BuildConfigurationManager {
 	}
 	
 	private void setBuildScenarioForBuildConfigurationInternal(BuildScenario bs, IConfiguration bconf) {
-		IProject project = bconf.getOwner().getProject();
-
-		IScopeContext context = new ProjectScope(project);
-		Preferences prefRootNode = context.getNode(projectScopeSyncNode);
-		if (prefRootNode == null) {
-			throw new RuntimeException(Messages.BuildConfigurationManager_0);
+		Map<String, String> map = new HashMap<String, String>();
+		bs.saveScenario(map);
+		try {
+			this.setConfigData((Configuration) bconf, map, configSyncDataStorageName);
+		} catch (CoreException e) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_20, e);
+			return;
 		}
-
-		Preferences prefConfigNode = prefRootNode.node(CONFIG_NODE_NAME + "/" + bconf.getId()); //$NON-NLS-1$
-		bs.saveScenario(prefConfigNode);
-		flushNode(prefRootNode);
 		
 		IServiceConfiguration sconf = fBConfigIdToSConfigMap.get(bconf.getId());
 		if (sconf != null) {
 			modifyServiceConfigurationForBuildScenario(sconf, bs);
 		}
+	}
+	
+	// The below two functions give us an easy mechanism to store build scenario data inside build configurations
+	/**
+	 * Get simple java map of configuration data
+	 * 
+	 * @param config
+	 * @param storageName - name of storage module
+	 *
+	 * @return values in named storage location or null if the storage location does not exist.
+	 * @throws CoreException on problems retrieving data
+	 */ 
+	private Map<String, String> getConfigData(Configuration config, String storageName) throws CoreException {
+		ICConfigurationDescription configDesc = config.getConfigurationDescription();
+		if (configDesc == null) {
+			// Should never happen
+			throw new RuntimeException(Messages.BuildConfigurationManager_18);
+		}
+		
+		Map<String, String> m = new HashMap<String, String>();
+		ICStorageElement storage = configDesc.getStorage(storageName, false);
+		if (storage == null) {
+			return null;
+		}
+		for (String attr : storage.getAttributeNames()) {
+			m.put(attr, storage.getAttribute(attr));
+		}
+		
+		return m;
+	}
+	
+	/**
+	 * Store a simple java map as data in a configuration.
+	 * 
+	 * @param config
+	 * @param map
+	 * @param storageName - name of storage module
+	 *
+	 * @throws CoreException on problems retrieving data
+	 */
+	private void setConfigData(Configuration config, Map<String, String> map, String storageName) throws CoreException {
+		// The commented code gets a read-only description.
+		// ICConfigurationDescription configDesc = config.getConfigurationDescription();
+		ICProjectDescription projectDesc = CoreModel.getDefault().getProjectDescription(config.getOwner().getProject());
+		ICConfigurationDescription configDesc = projectDesc.getConfigurationById(config.getId());
+		if (configDesc == null) {
+			// Should never happen
+			throw new RuntimeException(Messages.BuildConfigurationManager_18);
+		}
+		
+		ICStorageElement storage = configDesc.getStorage(storageName, true);
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			storage.setAttribute(entry.getKey(), entry.getValue());
+		}
+		CoreModel.getDefault().setProjectDescription(config.getOwner().getProject(), projectDesc);
 	}
 	
 	// Run standard checks on project and throw the appropriate exception if it is not valid

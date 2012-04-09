@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.util.Map;
+
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
@@ -69,32 +71,32 @@ public class BuildScenario {
 	}
 	
 	/**
-	 * Store scenario in a given preference node 
+	 * Store scenario in the given map
 	 *
-	 * @param preference node
+	 * @param map
 	 */
-	public void saveScenario(Preferences prefRootNode) {
+	public void saveScenario(Map<String, String> map) {
 		if (syncProvider != null) {
-			prefRootNode.put(ATTR_SYNC_PROVIDER, syncProvider);
+			map.put(ATTR_SYNC_PROVIDER, syncProvider);
 		}
-		prefRootNode.put(ATTR_REMOTE_CONNECTION_ID, remoteConnection.getName());
-		prefRootNode.put(ATTR_LOCATION, location);
-		prefRootNode.put(ATTR_REMOTE_SERVICES_ID, remoteConnection.getRemoteServices().getId());
+		map.put(ATTR_REMOTE_CONNECTION_ID, remoteConnection.getName());
+		map.put(ATTR_LOCATION, location);
+		map.put(ATTR_REMOTE_SERVICES_ID, remoteConnection.getRemoteServices().getId());
 	}
 	
 	/**
-	 * Load data from a preference node into a new build scenario.
+	 * Load data from a map into a new build scenario.
 	 *
-	 * @param preference node
+	 * @param map
 	 * @return a new build scenario or null if one of the values is not found or if something goes wrong while trying to find the
 	 * specified IRemoteConnection.
 	 */
-	public static BuildScenario loadScenario(Preferences prefRootNode) {
-		String sp = prefRootNode.get(ATTR_SYNC_PROVIDER, null);
-		String rc = prefRootNode.get(ATTR_REMOTE_CONNECTION_ID, null);
-		String l = prefRootNode.get(ATTR_LOCATION, null);
-		String rs = prefRootNode.get(ATTR_REMOTE_SERVICES_ID, null);
-		if (rc == null || l == null || rs == null) {
+	public static BuildScenario loadScenario(Map<String, String> map) {
+		String sp = map.get(ATTR_SYNC_PROVIDER);
+		String rc = map.get(ATTR_REMOTE_CONNECTION_ID);
+		String l = map.get(ATTR_LOCATION);
+		String rs = map.get(ATTR_REMOTE_SERVICES_ID);
+		if (rc == null || l == null || rs == null) { // null is okay for sync provider
 			return null;
 		}
 		
