@@ -157,6 +157,9 @@ public class MPICH2ListJobsParser {
 					errorMsg += "\n" + line; //$NON-NLS-1$
 				}
 				return null;
+
+			default:
+				return null;
 			}
 		}
 
