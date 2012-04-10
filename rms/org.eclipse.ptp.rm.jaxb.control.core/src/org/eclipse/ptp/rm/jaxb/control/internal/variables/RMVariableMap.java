@@ -46,23 +46,6 @@ public class RMVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
 
 	/**
-	 * Gets the new value of any attributes that may have changed as a result of the launch.
-	 * 
-	 * @param name
-	 *            name of the attribute
-	 * @param config
-	 *            launch configuration
-	 * @return new attribute value, or null if the attribute is not dynamic
-	 * @throws CoreException
-	 */
-	public static Object getDynamicAttribute(String name, ILaunchConfiguration config) throws CoreException {
-		if (name.equals(JAXBControlConstants.DEBUGGER_ARGS)) {
-			return config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, JAXBControlConstants.ZEROSTR);
-		}
-		return null;
-	}
-
-	/**
 	 * Checks for current valid attributes by examining the valid list for the current controller, excluding <code>null</code> or
 	 * 0-length string values. Removes the rm unique id prefix.
 	 * 
@@ -88,9 +71,7 @@ public class RMVariableMap implements IVariableMap {
 			}
 			if (name.startsWith(rmId)) {
 				name = name.substring(len);
-				if (isDynamicValid(name)) {
-					current.put(name, getDynamicAttribute(name, config));
-				} else if (isFixedValid(name)) {
+				if (isFixedValid(name)) {
 					current.put(name, value);
 				} else {
 					rmAttr.put(name, value);
@@ -140,10 +121,6 @@ public class RMVariableMap implements IVariableMap {
 				|| name.equals(JAXBControlConstants.PROG_ARGS) || name.equals(JAXBControlConstants.DEBUGGER_EXEC_PATH)
 				|| name.equals(JAXBControlConstants.DEBUGGER_ARGS) || name.equals(JAXBControlConstants.STDOUT_REMOTE_FILE)
 				|| name.equals(JAXBControlConstants.STDERR_REMOTE_FILE) || name.equals(JAXBControlConstants.PTP_DIRECTORY);
-	}
-
-	public static boolean isDynamicValid(String name) {
-		return name.equals(JAXBControlConstants.DEBUGGER_ARGS);
 	}
 
 	private IEnvManager envManager;
@@ -360,13 +337,16 @@ public class RMVariableMap implements IVariableMap {
 
 	/**
 	 * Sets the {@link IEnvManager} which will be used to generate Bash commands from environment manager configuration strings.
+	 * 
 	 * @param envManager
 	 */
 	public void setEnvManager(IEnvManager envManager) {
 		this.envManager = envManager;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#convertEngMgmtConfigString(java.lang.String)
 	 */
 	public String convertEngMgmtConfigString(String string) {
