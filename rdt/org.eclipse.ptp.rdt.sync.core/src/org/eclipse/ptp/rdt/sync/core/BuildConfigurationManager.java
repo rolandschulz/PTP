@@ -514,7 +514,6 @@ public class BuildConfigurationManager {
 	public BuildScenario getBuildScenarioForBuildConfiguration(IConfiguration bconf) {
 		IProject project = bconf.getOwner().getProject();
 		checkProject(project);
-		updateConfigurations(project);
 		return this.getBuildScenarioForBuildConfigurationInternal(bconf).bs;
 	}
 	
