@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -284,6 +285,15 @@ public class BuildConfigurationManager {
 			throw new NullPointerException();
 		}
 		
+		// Store configuration independently of project, which can be useful if the project is deleted.
+		ServiceModelManager smm = ServiceModelManager.getInstance();
+		smm.addConfiguration(sc);
+		try {
+			smm.saveModelConfiguration();
+		} catch (IOException e) {
+			RDTSyncCorePlugin.log(e.toString(), e);
+		}
+
 		// Cannot call "checkProject" because project not yet initialized
 		try {
 			if (!project.hasNature(RemoteSyncNature.NATURE_ID)) {
@@ -310,6 +320,66 @@ public class BuildConfigurationManager {
 		for (IConfiguration config : allConfigs) {
 			setBuildScenarioForBuildConfigurationInternal(bs, config);
 		}
+	}
+	
+	/**
+	 * This function handles project add events for existing sync projects. These events include moving and copying sync projects.
+	 * Note: Normally clients should not call this function. It is intended only for internal use to handle add requests from the
+	 * Eclipse system. For creating new sync projects, use "initProject".
+	 *
+	 * Note: This function constructs a unique template service configuration for the project and returns it. Clients probably
+	 * should make it the active configuration for the project in the service model manager.
+	 *
+	 * @param newProject - cannot be null and must be a sync project.
+	 * @return the template service configuration created for the new project
+	 */
+	public IServiceConfiguration addProjectFromSystem(IProject newProject) {
+		if (newProject == null) {
+			throw new NullPointerException();
+		}
+
+		// Cannot call "checkProject" because project not yet initialized
+		try {
+			if (!newProject.hasNature(RemoteSyncNature.NATURE_ID)) {
+				throw new IllegalArgumentException(Messages.BuildConfigurationManager_6);
+			}
+		} catch (CoreException e) {
+			throw new IllegalArgumentException(Messages.BuildConfigurationManager_8);
+		}
+
+		IScopeContext context = new ProjectScope(newProject);
+		Preferences node = context.getNode(projectScopeSyncNode);
+		if (node == null) {
+			throw new RuntimeException(Messages.BuildConfigurationManager_0);
+		}
+
+		// Find the template configuration
+		String configId = node.get(TEMPLATE_KEY, null);
+		if (configId == null) {
+			throw new IllegalArgumentException(Messages.BuildConfigurationManager_21);
+		}
+		ServiceModelManager smm = ServiceModelManager.getInstance();
+		IServiceConfiguration oldConfig = smm.getConfiguration(configId);
+		if (oldConfig == null) {
+			throw new RuntimeException(Messages.BuildConfigurationManager_22);
+		}
+
+		// Copy the template and use the copy for the new project
+		IServiceConfiguration newConfig = copyTemplateServiceConfiguration(newProject);
+		smm.addConfiguration(newConfig);
+		try {
+			smm.saveModelConfiguration();
+		} catch (IOException e) {
+			RDTSyncCorePlugin.log(e.toString(), e);
+		}
+		node.put(TEMPLATE_KEY, newConfig.getId());
+		flushNode(node);
+
+		// Finally, change the template's project
+		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(newProject);
+		provider.setProject(newProject);
+
+		return newConfig;
 	}
 	
 	/**

@@ -130,23 +130,17 @@ public class ResourceChangeListener {
 						// Post-change event
 						else {
 							RDTSyncCorePlugin.log("Post-change event of kind: " + String.valueOf(delta.getKind()) + " on project " + project.getName()); //$NON-NLS-1$ //$NON-NLS-2$
-							// Only interested in ADDED with MOVED_FROM, which indicates a project was renamed
-							if ((delta.getKind() == IResourceDelta.ADDED) && ((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0)) {
+							if (delta.getKind() == IResourceDelta.ADDED) {
 								BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-								ISyncServiceProvider syncProvider = bcm.getProjectSyncServiceProvider(project);
-								if (syncProvider == null) {
-									RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.ResourceChangeListener_1 +
-											project.getName());
-								}
-								syncProvider.setProject(project);
-								IServiceConfiguration sc = bcm.createSyncServiceConfiguration(project, syncProvider);
-								bcm.setTemplateServiceConfiguration(project, sc);
-								ServiceModelManager smm = ServiceModelManager.getInstance();
-								smm.addConfiguration(project, sc);
-								try {
-									smm.saveModelConfiguration();
-								} catch (IOException e) {
-									RDTSyncUIPlugin.log(e.toString(), e);
+								IServiceConfiguration sc = bcm.addProjectFromSystem(project);
+								if (sc != null) { // Error handled in bcm
+									ServiceModelManager smm = ServiceModelManager.getInstance();
+									smm.addConfiguration(project, sc);
+									try {
+										smm.saveModelConfiguration();
+									} catch (IOException e) {
+										RDTSyncUIPlugin.log(e.toString(), e);
+									}
 								}
 							}
 							
@@ -163,7 +157,8 @@ public class ResourceChangeListener {
 								}
 							}
 							
-							// Not interested in remove events
+							// Not interested in remove events. For now, do not remove information about projects.
+							// Note: If implemented, be careful about move events. New project needs old project information.
 						}
 					} catch (CoreException e){
 						// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.

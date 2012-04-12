@@ -15,7 +15,6 @@ import java.util.Map;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.osgi.service.prefs.Preferences;
 
 /**
  * Class for build information that will be mapped to a specific service configuration. Utility methods for reading and writing
