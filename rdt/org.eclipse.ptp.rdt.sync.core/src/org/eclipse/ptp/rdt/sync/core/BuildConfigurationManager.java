@@ -14,9 +14,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.cdt.core.model.CoreModel;
@@ -42,11 +40,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
-import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
-import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -54,7 +50,6 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceProvider;
 import org.eclipse.ui.XMLMemento;
@@ -811,58 +806,5 @@ public class BuildConfigurationManager {
 			}
 		}, "Flush project data thread"); //$NON-NLS-1$
 		flushThread.start();
-	}
-	
-	/**
-	 * Build a service configuration appropriate for the given sync project, using the given sync service provider. The returned
-	 * configuration is appropriate as a template for the project. Note that this function changes no state, so it is up to the
-	 * client to register the service configuration with the service model manager, set it as a template, etc.
-	 * Note that this is for sync projects only. It may not work for other types of projects.
-	 *
-	 * @param project - cannot be null
-	 * @param syncProvider - cannot be null
-	 * @return new service configuration
-	 */
-	public IServiceConfiguration createSyncServiceConfiguration(IProject project, ISyncServiceProvider syncProvider) {
-		if (project == null || syncProvider == null) {
-			throw new NullPointerException();
-		}
-
-		ServiceModelManager smm = ServiceModelManager.getInstance();
-		IServiceConfiguration serviceConfig = smm.newServiceConfiguration(this.getConfigName(project.getName()));
-		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-		serviceConfig.setServiceProvider(syncService, syncProvider);
-
-		IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
-		IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(SyncBuildServiceProvider.ID);
-		SyncBuildServiceProvider rbsp = (SyncBuildServiceProvider) smm.getServiceProvider(descriptor);
-		if (rbsp != null) {
-			IRemoteConnection remoteConnection = syncProvider.getRemoteConnection();
-			rbsp.setRemoteToolsConnection(remoteConnection);
-			serviceConfig.setServiceProvider(buildService, rbsp);
-		}
-		
-		return serviceConfig;
-	}
-	
-	/**
-	 * Creates a unique name for the service configuration based on the given name - appending a qualifier as needed.
-	 * 
-	 * @return new name guaranteed to be unique
-	 */
-	private String getConfigName(String candidateName) {
-		Set<IServiceConfiguration> configs = ServiceModelManager.getInstance().getConfigurations();
-		Set<String> existingNames = new HashSet<String>();
-		for (IServiceConfiguration config : configs) {
-			existingNames.add(config.getName());
-		}
-
-		int i = 2;
-		String newConfigName = candidateName;
-		while (existingNames.contains(newConfigName)) {
-			newConfigName = candidateName + " (" + (i++) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		return newConfigName;
 	}
 }
