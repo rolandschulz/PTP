@@ -13,7 +13,6 @@ package org.eclipse.ptp.rm.jaxb.control;
 import java.net.URL;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -22,7 +21,7 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
  * JAXB Launch Control interface.
  * 
  */
-public interface IJAXBLaunchControl extends IJAXBJobControl, IAdaptable {
+public interface IJAXBLaunchControl extends IJAXBJobControl {
 
 	public void setConnectionName(String connName);
 
