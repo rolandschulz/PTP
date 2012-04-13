@@ -25,8 +25,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
@@ -168,6 +168,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private boolean appendLaunchEnv;
 	private boolean isActive = false;
 	private boolean isInitialized = false;
+
 	/**
 	 * @param jaxbServiceProvider
 	 *            the configuration object containing resource manager specifics
@@ -188,19 +189,20 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl#getConfigurationData()
+	 * @see org.eclipse.ptp.core.jobs.IJobControl#getConnectionName()
 	 */
-	public ResourceManagerData getConfigurationData() {
-		return configurationData;
+	public String getConnectionName() {
+		return connectionName;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.jobs.IJobControl#getConnectionName()
+	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl#getConfigurationData()
 	 */
-	public String getConnectionName() {
-		return connectionName;
+	@Override
+	public String getControlId() {
+		return config.getUniqueName();
 	}
 
 	/*
@@ -301,30 +303,27 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			 * Use the base configuration which contains the config file information
 			 */
 			IJAXBResourceManagerConfiguration base = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
-			base.clearReferences(false);
+			base.initialize();
 			rmVarMap = (RMVariableMap) base.getRMVariableMap();
 			configurationData = base.getResourceManagerData();
-			if (configurationData != null) {
-				/*
-				 * Set connection information from the site configuration. This may get overidden by the launch configuration later
-				 */
-				SiteType site = configurationData.getSiteData();
-				if (site != null) {
-					String controlURI = site.getControlConnection();
-					if (controlURI != null) {
-						try {
-							URI uri = new URI(controlURI);
-							IRemoteServices remServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(uri,
-									progress.newChild(5));
-							if (remServices != null) {
-								IRemoteConnection remConn = remServices.getConnectionManager().getConnection(uri);
-								if (remConn != null) {
-									config.setRemoteServicesId(remServices.getId());
-									config.setConnectionName(remConn.getName());
-								}
+			/*
+			 * Set connection information from the site configuration. This may get overidden by the launch configuration later
+			 */
+			SiteType site = configurationData.getSiteData();
+			if (site != null) {
+				String controlURI = site.getControlConnection();
+				if (controlURI != null) {
+					try {
+						URI uri = new URI(controlURI);
+						IRemoteServices remServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(uri, progress.newChild(5));
+						if (remServices != null) {
+							IRemoteConnection remConn = remServices.getConnectionManager().getConnection(uri);
+							if (remConn != null) {
+								config.setRemoteServicesId(remServices.getId());
+								config.setConnectionName(remConn.getName());
 							}
-						} catch (URISyntaxException e) {
 						}
+					} catch (URISyntaxException e) {
 					}
 				}
 			}
@@ -348,13 +347,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * Update any debug models associated with this job ID
 		 */
-		IPResourceManager prm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
-		if (prm != null) {
-			IPJob job = prm.getJobById(jobId);
-			if (job != null) {
-				if (status.getState().equals(IJobStatus.COMPLETED)) {
-					job.getAttribute(JobAttributes.getStateAttributeDefinition()).setValue(JobAttributes.State.COMPLETED);
-				}
+		IPJob job = ModelManager.getInstance().getUniverse().getJob(status);
+		if (job != null) {
+			if (status.getState().equals(IJobStatus.COMPLETED)) {
+				job.getAttribute(JobAttributes.getStateAttributeDefinition()).setValue(JobAttributes.State.COMPLETED);
 			}
 		}
 		JobManager.getInstance().fireJobChanged(status);
@@ -1097,7 +1093,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	@Override
 	protected void doShutdown() throws CoreException {
 		doOnShutdown();
-		((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).clearReferences(true);
 		jobStatusMap.halt();
 		RemoteServicesDelegate d = getRemoteServicesDelegate(null);
 		IRemoteConnection conn = d.getRemoteConnection();

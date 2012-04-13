@@ -65,6 +65,11 @@ public class LMLJAXBResourceManager extends AbstractResourceManager implements I
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
+		IJAXBResourceManagerConfiguration conf = (IJAXBResourceManagerConfiguration) getMonitorConfiguration();
+		if (conf.getUseDefault()) {
+			conf.setRemoteServicesId(getControlConfiguration().getRemoteServicesId());
+			conf.setConnectionName(getControlConfiguration().getConnectionName());
+		}
 		super.doStartup(monitor);
 		fireResourceManagerStarted();
 	}

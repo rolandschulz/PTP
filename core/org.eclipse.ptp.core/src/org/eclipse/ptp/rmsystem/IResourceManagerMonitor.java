@@ -12,13 +12,12 @@
 package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * @since 5.0
  */
-public interface IResourceManagerMonitor extends IAdaptable {
+public interface IResourceManagerMonitor {
 
 	/**
 	 * Safely dispose of this resource manager monitor.

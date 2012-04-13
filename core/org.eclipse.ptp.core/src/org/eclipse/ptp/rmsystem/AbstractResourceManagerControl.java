@@ -26,8 +26,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 
@@ -37,7 +35,6 @@ import org.eclipse.ptp.core.jobs.JobManager;
  */
 public abstract class AbstractResourceManagerControl implements IResourceManagerControl {
 	private final AbstractResourceManagerConfiguration fConfig;
-	private final ModelManager fModelManager = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
 	private IResourceManager fResourceManager = null;
 
 	public AbstractResourceManagerControl(AbstractResourceManagerConfiguration config) {
@@ -66,29 +63,22 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration ()
 	 */
-	/**
-	 * @since 6.0
-	 */
-	@SuppressWarnings({ "rawtypes" })
-	public Object getAdapter(Class adapter) {
-		if (adapter.isInstance(this)) {
-			return this;
-		}
-		if (adapter == IPResourceManager.class) {
-			return getPResourceManager();
-		}
-		return null;
+	public IResourceManagerComponentConfiguration getControlConfiguration() {
+		return fConfig;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration ()
+	 * @see org.eclipse.ptp.core.jobs.IJobControl#getControlId()
 	 */
-	public IResourceManagerComponentConfiguration getControlConfiguration() {
-		return fConfig;
+	/**
+	 * @since 6.0
+	 */
+	public String getControlId() {
+		return fConfig.getUniqueName();
 	}
 
 	/*
@@ -107,12 +97,8 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 		}
 		if (status == null) {
 			status = new IJobStatus() {
-				public String getConfigurationName() {
+				public String getControlId() {
 					return fConfig.getUniqueName();
-				}
-
-				public String getConnectionName() {
-					return fConfig.getConnectionName();
 				}
 
 				public String getErrorPath() {
@@ -137,10 +123,6 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 
 				public String getQueueName() {
 					return null;
-				}
-
-				public String getRemoteServicesId() {
-					return fConfig.getRemoteServicesId();
 				}
 
 				public String getState() {
@@ -280,20 +262,9 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 		getResourceManager().fireResourceManagerError(message);
 	}
 
-	protected ModelManager getModelManager() {
-		return fModelManager;
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	protected IPResourceManager getPResourceManager() {
-		return (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
-	}
-
 	protected AbstractResourceManager getResourceManager() {
 		if (fResourceManager == null) {
-			fResourceManager = fModelManager.getResourceManagerFromUniqueName(fConfig.getUniqueName());
+			fResourceManager = ModelManager.getInstance().getResourceManagerFromUniqueName(fConfig.getUniqueName());
 		}
 		return (AbstractResourceManager) fResourceManager;
 	}

@@ -19,6 +19,7 @@
 package org.eclipse.ptp.rm.launch;
 
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,12 +55,11 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.IServiceConstants;
-import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.jobs.IJobAddedEvent;
 import org.eclipse.ptp.core.jobs.IJobChangedEvent;
+import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
@@ -79,17 +79,11 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl;
+import org.eclipse.ptp.rm.jaxb.control.JAXBLaunchControl;
+import org.eclipse.ptp.rm.jaxb.ui.util.JAXBExtensionUtils;
 import org.eclipse.ptp.rm.launch.internal.ProviderInfo;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
-import org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider;
-import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 import org.eclipse.swt.widgets.Display;
 
@@ -146,12 +140,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	private class JobSubmission extends Job {
 		private final IPLaunch fLaunch;
 		private final IPDebugger fDebugger;
+		private final IJobControl fJobControl;
 		private final ReentrantLock fSubLock = new ReentrantLock();
 		private final Condition fSubCondition = fSubLock.newCondition();
 
-		public JobSubmission(IPLaunch launch, IPDebugger debugger) {
+		public JobSubmission(IPLaunch launch, IJobControl control, IPDebugger debugger) {
 			super(launch.getJobId());
 			fLaunch = launch;
+			fJobControl = control;
 			fDebugger = debugger;
 			setSystem(true);
 		}
@@ -174,11 +170,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor subMon = SubMonitor.convert(monitor, 100);
 			try {
-				IResourceManagerControl rm = fLaunch.getResourceManagerControl();
 				String jobId = fLaunch.getJobId();
 				fSubLock.lock();
 				try {
-					while (rm.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
+					while (fJobControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
 							&& !subMon.isCanceled()) {
 						try {
 							fSubCondition.await(100, TimeUnit.MILLISECONDS);
@@ -196,7 +191,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 
 					fSubLock.lock();
 					try {
-						while (!rm.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
+						while (!fJobControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
 								&& !subMon.isCanceled()) {
 							try {
 								fSubCondition.await(1000, TimeUnit.MILLISECONDS);
@@ -367,10 +362,25 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	private List<ISynchronizationRule> extraSynchronizationRules;
 
+	private static Map<String, URL> fJAXBConfigurations = null;
+
 	/**
 	 * Constructor
 	 */
 	public AbstractParallelLaunchConfigurationDelegate() {
+	}
+
+	/**
+	 * Wrapper method. Calls {@link JAXBExtensionUtils#loadJAXBResourceManagers(Map, boolean)}
+	 */
+	private static void loadJAXBResourceManagers(boolean showError) {
+		if (fJAXBConfigurations == null) {
+			fJAXBConfigurations = new HashMap<String, URL>();
+		} else {
+			fJAXBConfigurations.clear();
+		}
+
+		JAXBExtensionUtils.loadJAXBResourceManagers(fJAXBConfigurations, showError);
 	}
 
 	/*
@@ -773,16 +783,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		return null;
 	}
 
-	/**
-	 * Find the resource manager that corresponds to the unique name specified in the configuration
-	 * 
-	 * @param configuration
-	 *            launch configuration
-	 * @return resource manager
-	 * @throws CoreException
-	 * @since 5.0
-	 */
-	protected IResourceManagerControl getResourceManagerControl(ILaunchConfiguration configuration, IProgressMonitor monitor)
+	protected IJAXBLaunchControl getLaunchControl(ILaunchConfiguration configuration, IProgressMonitor monitor)
 			throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
@@ -790,18 +791,16 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			if (type != null) {
 				ProviderInfo provider = ProviderInfo.getProvider(type);
 				if (provider != null) {
-					IResourceManagerControl rm = createResourceManagerControl(provider, progress.newChild(5));
-					String uniqueName = getResourceManagerUniqueName(configuration);
-					if (uniqueName != null) {
-						rm.getControlConfiguration().setUniqueName(uniqueName);
-					}
+					IJAXBLaunchControl control = new JAXBLaunchControl();
+					control.setRMConfigurationURL(getJAXBConfigurationURL(provider.getName()));
 					String name = getConnectionName(configuration);
 					String id = getRemoteServicesId(configuration);
-					if (rm != null && name != null && id != null) {
-						rm.getControlConfiguration().setConnectionName(name);
-						rm.getControlConfiguration().setRemoteServicesId(id);
-						rm.start(progress.newChild(5));
-						return rm;
+					if (name != null && id != null) {
+						control.setConnectionName(name);
+						control.setRemoteServicesId(id);
+						control.initialize(progress.newChild(5));
+						control.start(progress.newChild(5));
+						return control;
 					}
 				}
 			}
@@ -811,6 +810,20 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				monitor.done();
 			}
 		}
+	}
+
+	/**
+	 * Looks up the XML configuration and returns its location
+	 * 
+	 * @param name
+	 * @return URL of the configuration
+	 */
+	private URL getJAXBConfigurationURL(String name) {
+		loadJAXBResourceManagers(false);
+		if (fJAXBConfigurations != null) {
+			return fJAXBConfigurations.get(name);
+		}
+		return null;
 	}
 
 	private String getConnectionName(ILaunchConfiguration configuration) throws CoreException {
@@ -824,33 +837,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 
 	private String getRemoteServicesId(ILaunchConfiguration configuration) throws CoreException {
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, (String) null);
-	}
-
-	/**
-	 * NOTE: This will eventually create the control directly
-	 */
-	private IJAXBResourceManagerControl createResourceManagerControl(ProviderInfo info, IProgressMonitor monitor)
-			throws CoreException {
-		IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(info.getDescriptor());
-		if (provider != null) {
-			IResourceManagerConfiguration baseConfig = ModelManager.getInstance().createBaseConfiguration(provider);
-			info.getFactory().setConfigurationName(info.getName(), baseConfig);
-			IServiceConfiguration config = ServiceModelManager.getInstance().newServiceConfiguration(info.getName());
-			config.setServiceProvider(ServiceModelManager.getInstance().getService(IServiceConstants.LAUNCH_SERVICE), provider);
-			ServiceModelManager.getInstance().addConfiguration(config);
-			final IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(
-					((ResourceManagerServiceProvider) provider).getUniqueName());
-			if (rm != null && rm instanceof IJAXBResourceManager) {
-				try {
-					((IJAXBResourceManagerControl) rm.getControl()).initialize(monitor);
-				} catch (Throwable e) {
-					throw new CoreException(
-							new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
-				}
-				return (IJAXBResourceManagerControl) rm.getControl();
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -964,20 +950,20 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			final IResourceManagerControl rm = getResourceManagerControl(configuration, progress.newChild(2));
-			if (rm == null) {
+			final IJobControl control = getLaunchControl(configuration, progress.newChild(3));
+			if (control == null) {
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
 			}
-			JobManager.getInstance().addListener(fJobListener);
-			launch.setResourceManager(rm);
-			String jobId = rm.submitJob(configuration, mode, progress.newChild(5));
-			if (rm.getJobStatus(jobId, progress.newChild(3)).equals(IJobStatus.UNDETERMINED)) {
+			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
+			String jobId = control.submitJob(configuration, mode, progress.newChild(5));
+			if (control.getJobStatus(jobId, progress.newChild(2)).equals(IJobStatus.UNDETERMINED)) {
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus));
 			}
+			launch.setJobControl(control);
 			launch.setJobId(jobId);
-			JobSubmission jobSub = new JobSubmission(launch, debugger);
+			JobSubmission jobSub = new JobSubmission(launch, control, debugger);
 			synchronized (jobSubmissions) {
 				jobSubmissions.put(jobId, jobSub);
 			}

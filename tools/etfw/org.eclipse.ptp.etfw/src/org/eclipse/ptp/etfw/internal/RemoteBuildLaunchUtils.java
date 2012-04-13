@@ -36,7 +36,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
@@ -55,14 +55,10 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.swt.widgets.Shell;
 
+public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 
-public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
-	
-	
-	
 	/**
-	 * Given a launch configuration, find the resource manager that was been
-	 * selected.
+	 * Given a launch configuration, find the resource manager that was been selected.
 	 * 
 	 * @param configuration
 	 * @return resource manager
@@ -72,55 +68,52 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 	public static IResourceManager getResourceManager(ILaunchConfiguration configuration) {
 		final String rmUniqueName;
 		try {
-			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
-					"");
+			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, "");
 		} catch (CoreException e) {
 			return null;
 		}
-		return PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		return ModelManager.getInstance().getResourceManagerFromUniqueName(rmUniqueName);
 	}
-	
-	
+
 	Shell selshell = null;
 	IResourceManager rm = null;
 	IRemoteConnection conn = null;
 	IResourceManagerComponentConfiguration conf = null;
 	IRemoteServices remoteServices = null;
 	IRemoteUIServices remoteUIServices = null;
-	IRemoteConnectionManager connMgr =null;
+	IRemoteConnectionManager connMgr = null;
 	IRemoteUIFileManager fileManagerUI = null;
-	IRemoteFileManager fileManager= null;
-	public RemoteBuildLaunchUtils(IResourceManager rm){
-		this.rm=rm;
+	IRemoteFileManager fileManager = null;
+
+	public RemoteBuildLaunchUtils(IResourceManager rm) {
+		this.rm = rm;
 		conf = rm.getControlConfiguration();
-		remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),null);//,getLaunchConfigurationDialog()
+		remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), null);// ,getLaunchConfigurationDialog()
 		remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 		connMgr = remoteServices.getConnectionManager();
 		conn = connMgr.getConnection(conf.getConnectionName());
 		fileManagerUI = remoteUIServices.getUIFileManager();
 		fileManager = remoteServices.getFileManager(conn);
 
-		//this.selshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
+		// this.selshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
 	}
-	
-	public String getWorkingDirectory(){
-		String jaxbtest=rm.getResourceManagerId();
-		if(!jaxbtest.equals("org.eclipse.ptp.rm.lml_jaxb"))
+
+	public String getWorkingDirectory() {
+		String jaxbtest = rm.getResourceManagerId();
+		if (!jaxbtest.equals("org.eclipse.ptp.rm.lml_jaxb")) {
 			return null;
+		}
 		return conn.getWorkingDirectory();
 	}
-	
 
 	/**
-	 * Returns the directory containing the tool's executable file. Prompts the
-	 * user for the location if it is not found. Returns the empty string if no
-	 * selection is made
+	 * Returns the directory containing the tool's executable file. Prompts the user for the location if it is not found. Returns
+	 * the empty string if no selection is made
 	 * 
 	 * @param toolfind
 	 *            The name of the executable being sought
 	 * @param suggPath
-	 *            The suggested path upon which to focus the directory locator
-	 *            window
+	 *            The suggested path upon which to focus the directory locator window
 	 * @param queryText
 	 *            The text asking the user to search for the binary
 	 * @param queryMessage
@@ -134,71 +127,70 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 		if (vtbinpath == null || vtbinpath.equals("")) //$NON-NLS-1$
 		{
 			vtbinpath = askToolPath(suggPath, queryText, queryMessage);
-			if (vtbinpath == null)
+			if (vtbinpath == null) {
 				vtbinpath = ""; //$NON-NLS-1$
+			}
 		}
 
 		return vtbinpath;
 	}
 
 	/**
-	 * Returns the directory containing the tool's executable file. Prompts the
-	 * user for the location if it is not found. Returns the empty string if no
-	 * selection is made
+	 * Returns the directory containing the tool's executable file. Prompts the user for the location if it is not found. Returns
+	 * the empty string if no selection is made
 	 * 
 	 * @param toolfind
 	 *            The name of the executable being sought
 	 * @param suggPath
-	 *            The suggested path upon which to focus the directory locator
-	 *            window
+	 *            The suggested path upon which to focus the directory locator window
 	 * @param toolName
-	 *            The name of the tool used when prompting the user for its
-	 *            location
+	 *            The name of the tool used when prompting the user for its location
 	 * @param selshell
 	 *            The shell in which to launch the directory locator window
 	 * @return
 	 */
-	public  String findToolBinPath(String toolfind, String suggPath, String toolName) {
+	public String findToolBinPath(String toolfind, String suggPath, String toolName) {
 		String vtbinpath = checkToolEnvPath(toolfind);
 		if (vtbinpath == null || vtbinpath.equals("")) //$NON-NLS-1$
 		{
 			vtbinpath = askToolPath(suggPath, toolName);
-			if (vtbinpath == null)
+			if (vtbinpath == null) {
 				vtbinpath = ""; //$NON-NLS-1$
+			}
 		}
 
 		return vtbinpath;
 	}
 
 	/**
-	 * Given a tool's ID, returns the path to that tool's bin directory if
-	 * already known and stored locally, otherwise returns the empty string
+	 * Given a tool's ID, returns the path to that tool's bin directory if already known and stored locally, otherwise returns the
+	 * empty string
 	 * 
 	 * @param toolID
 	 * @return
 	 */
 	public String getToolPath(String toolID) {
 		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
-		String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + toolID+"."+rm.getUniqueName(); //$NON-NLS-1$
+		String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + toolID + "." + rm.getUniqueName(); //$NON-NLS-1$
 		String path = pstore.getString(toolBinID);
-		if (path != null)
+		if (path != null) {
 			return path;
+		}
 		return ""; //$NON-NLS-1$
 	}
 
 	/**
-	 * Iterates through an array of tools, populating the preference store with
-	 * their binary directory locations
+	 * Iterates through an array of tools, populating the preference store with their binary directory locations
 	 * 
 	 * @param tools
 	 *            The array of tools to be checked
 	 * @param force
 	 *            If true existing values will be overridden.
 	 */
-	public  void getAllToolPaths(ExternalToolProcess[] tools, boolean force) {
+	public void getAllToolPaths(ExternalToolProcess[] tools, boolean force) {
 		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
 
-		//Shell ourshell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+		// Shell ourshell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
 		Iterator<Map.Entry<String, String>> eIt = null;
 		Map.Entry<String, String> me = null;
 		String entry = null;
@@ -209,10 +201,11 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 				me = eIt.next();
 				entry = me.getKey();
 
-				if (entry.equals("internal")) //$NON-NLS-1$
+				if (entry.equals("internal")) {
 					continue;
+				}
 
-				String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry+"."+rm.getUniqueName(); //$NON-NLS-1$
+				String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry + "." + rm.getUniqueName(); //$NON-NLS-1$
 				if (force || pstore.getString(toolBinID).equals("")) //$NON-NLS-1$
 				{
 					pstore.setValue(toolBinID, findToolBinPath(me.getValue(), null, entry));// findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
@@ -224,7 +217,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 	public void verifyRequestToolPath(ExternalToolProcess tool, boolean force) {
 		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
 
-		//Shell ourshell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+		// Shell ourshell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
 		Iterator<Map.Entry<String, String>> eIt = null;
 		Map.Entry<String, String> me = null;
 		String entry = null;
@@ -234,10 +227,11 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 			me = eIt.next();
 			entry = me.getKey();
 
-			if (entry.equals("internal")) //$NON-NLS-1$
+			if (entry.equals("internal")) {
 				continue;
+			}
 
-			String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry+"."+rm.getUniqueName(); //$NON-NLS-1$
+			String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry + "." + rm.getUniqueName(); //$NON-NLS-1$
 			if (force || pstore.getString(toolBinID).equals("")) //$NON-NLS-1$
 			{
 				pstore.setValue(toolBinID, findToolBinPath(me.getValue(), null, entry));// findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
@@ -259,44 +253,45 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 			me = eIt.next();
 			entry = me.getKey();
 
-			if (entry.equals("internal")) //$NON-NLS-1$
+			if (entry.equals("internal")) {
 				continue;
+			}
 
-			toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry+"."+rm.getUniqueName(); //$NON-NLS-1$
+			toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry + "." + rm.getUniqueName(); //$NON-NLS-1$
 			curTool = pstore.getString(toolBinID);
 
 			IFileStore ttool = fileManager.getResource(curTool);
-			
+
 			if (curTool == null || curTool.equals("") || !(ttool.fetchInfo().exists())) //$NON-NLS-1$
 			{
 				String gVal = me.getValue();
 				if (gVal != null && gVal.trim().length() > 0) {
 					curTool = checkToolEnvPath(gVal);
-					if (curTool != null)
+					if (curTool != null) {
 						pstore.setValue(toolBinID, curTool);// findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
+					}
 				}
 			}
 		}
 	}
 
 	/**
-	 * This locates name of the parent of the directory containing the given
-	 * tool.
+	 * This locates name of the parent of the directory containing the given tool.
 	 * 
 	 * @param The
 	 *            name of the tool whose directory is being located
-	 * @return The location of the tool's arch directory, or null if it is not
-	 *         found or if the architecture is windows
+	 * @return The location of the tool's arch directory, or null if it is not found or if the architecture is windows
 	 * 
 	 */
 	public String checkToolEnvPath(String toolname) {
-		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0) //$NON-NLS-1$
+		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0) {
 			return null;
+		}
 		String pPath = null;
 		try {
 			IRemoteProcessBuilder rpb = remoteServices.getProcessBuilder(conn);
-			rpb.command("which",toolname);
-			//rpb.
+			rpb.command("which", toolname);
+			// rpb.
 			IRemoteProcess p = rpb.start();
 			//Process p = new ProcessBuilder("which", toolname).start();//Runtime.getRuntime().exec("which "+toolname); //$NON-NLS-1$
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -310,52 +305,56 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (pPath == null)
+		if (pPath == null) {
 			return null;
-		
+		}
+
 		IFileStore test = fileManager.getResource(pPath);
-		//File test = new File(pPath);
-		//IFileStore toolin = fileManager.getResource(toolname);
-		//File toolin = new File(toolname);
+		// File test = new File(pPath);
+		// IFileStore toolin = fileManager.getResource(toolname);
+		// File toolin = new File(toolname);
 		String name = test.fetchInfo().getName();
-		if (!name.equals(toolname))//test.getPath().equals(toolin.getPath()))
+		if (!name.equals(toolname)) {
 			return null;// TODO: Make sure this is the right behavior when the
-						// full path is provided
+		}
+		// full path is provided
 		if (test.fetchInfo().exists()) {
-			return test.getParent().toURI().getPath();//pPath;//test.getParent().fetchInfo().getName(); //.getParentFile().getPath();
-		} else
+			return test.getParent().toURI().getPath();// pPath;//test.getParent().fetchInfo().getName();
+														// //.getParentFile().getPath();
+		} else {
 			return null;
+		}
 	}
 
 	/**
-	 * Given a string as a starting point, this asks the user for the location
-	 * of a tool's directory
+	 * Given a string as a starting point, this asks the user for the location of a tool's directory
 	 * */
 	public String askToolPath(String archpath, String toolText, String toolMessage) {
 		// Shell
 		// ourshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
-		if (selshell == null)
+		if (selshell == null) {
 			return null;
-		
-		//DirectoryDialog dialog = new DirectoryDialog(selshell);
-		//dialog.setText(toolText);
-		//dialog.setMessage(toolMessage);
-		
-		if (archpath != null) {
-			//File path = new File(archpath);
-//			IFileStore path = fileManager.getResource(archpath);////EFS.getLocalFileSystem().getStore(new Path(archpath));
-//			IFileInfo finf=path.fetchInfo();
-//			if (finf.exists()) {
-//				dialog.setFilterPath(!finf.isDirectory() ? archpath : path.getParent().toURI().getPath());
-//			}//TODO: We may actually want to use this initial directory checking
 		}
-		return fileManagerUI.browseDirectory(selshell, toolMessage, archpath, EFS.NONE);//dialog.open();
+
+		// DirectoryDialog dialog = new DirectoryDialog(selshell);
+		// dialog.setText(toolText);
+		// dialog.setMessage(toolMessage);
+
+		if (archpath != null) {
+			// File path = new File(archpath);
+			// IFileStore path = fileManager.getResource(archpath);////EFS.getLocalFileSystem().getStore(new Path(archpath));
+			// IFileInfo finf=path.fetchInfo();
+			// if (finf.exists()) {
+			// dialog.setFilterPath(!finf.isDirectory() ? archpath : path.getParent().toURI().getPath());
+			// }//TODO: We may actually want to use this initial directory checking
+		}
+		return fileManagerUI.browseDirectory(selshell, toolMessage, archpath, EFS.NONE);// dialog.open();
 	}
 
 	/**
 	 * Given a tool's name, ask the user for the location of the tool
 	 * */
-	public  String askToolPath(String archpath, String toolName) {
+	public String askToolPath(String archpath, String toolName) {
 
 		return askToolPath(archpath, Messages.BuildLaunchUtils_Select + toolName + Messages.BuildLaunchUtils_BinDir,
 				Messages.BuildLaunchUtils_PleaseSelectDir + toolName + ""); //$NON-NLS-1$
@@ -384,15 +383,14 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 	 * @param directory
 	 *            The directory where the tool is invoked
 	 */
-	public  boolean runTool(List<String> tool, Map<String, String> env, String directory) {
+	public boolean runTool(List<String> tool, Map<String, String> env, String directory) {
 		return runTool(tool, env, directory, null);
 	}
 
-	
-	public IFileStore getFile(String path){
+	public IFileStore getFile(String path) {
 		return fileManager.getResource(path);
 	}
-	
+
 	public boolean runTool(List<String> tool, Map<String, String> env, String directory, String output) {
 		int eval = -1;
 		try {
@@ -400,25 +398,25 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 			OutputStream fos = null;
 			if (output != null) {
 				IFileStore test = fileManager.getResource(output);
-				//File test = new File(output);
-				IFileStore parent = test.getParent();//fileManager.getResource
-				//File parent = test.getParentFile();
+				// File test = new File(output);
+				IFileStore parent = test.getParent();// fileManager.getResource
+				// File parent = test.getParentFile();
 				if (parent == null || !parent.fetchInfo().exists()) {
 					parent = fileManager.getResource(directory);
-					test=parent.getChild(output);
-					//output = directory + File.separator + output;
+					test = parent.getChild(output);
+					// output = directory + File.separator + output;
 				}
-				fos = test.openOutputStream(EFS.NONE, null);//test.openOutputStream(options, monitor)new FileOutputStream(test);
+				fos = test.openOutputStream(EFS.NONE, null);// test.openOutputStream(options, monitor)new FileOutputStream(test);
 			}
 
-//			IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);//new IRemoteProcessBuilder(tool);
-//			pb.directory(fileManager.getResource(directory));
-//			if (env != null) {
-//				pb.environment().putAll(env);
-//			}
+			// IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);//new IRemoteProcessBuilder(tool);
+			// pb.directory(fileManager.getResource(directory));
+			// if (env != null) {
+			// pb.environment().putAll(env);
+			// }
 
-			IRemoteProcess p = getProcess(tool,env,directory);//pb.start();// Runtime.getRuntime().exec(tool, env,
-									// directory);
+			IRemoteProcess p = getProcess(tool, env, directory);// pb.start();// Runtime.getRuntime().exec(tool, env,
+			// directory);
 			StreamRunner outRun = new StreamRunner(p.getInputStream(), "out", fos); //$NON-NLS-1$
 			StreamRunner errRun = new StreamRunner(p.getErrorStream(), "err", null); //$NON-NLS-1$
 			outRun.start();
@@ -436,29 +434,28 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 		}
 		return (eval == 0);// true;
 	}
-	
-	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory){
+
+	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory) {
 		int eval = -1;
 		byte[] out = null;
 		try {
 
-			ByteArrayOutputStream fos = new ByteArrayOutputStream();//null;
-//			if (output != null) {
-//				IFileStore test = fileManager.getResource(output);
-//				//File test = new File(output);
-//				IFileStore parent = test.getParent();//fileManager.getResource
-//				//File parent = test.getParentFile();
-//				if (parent == null || !parent.fetchInfo().exists()) {
-//					parent = fileManager.getResource(directory);
-//					test=parent.getChild(output);
-//					//output = directory + File.separator + output;
-//				}
-//				fos = test.openOutputStream(EFS.NONE, null);//test.openOutputStream(options, monitor)new FileOutputStream(test);
-//			}
+			ByteArrayOutputStream fos = new ByteArrayOutputStream();// null;
+			// if (output != null) {
+			// IFileStore test = fileManager.getResource(output);
+			// //File test = new File(output);
+			// IFileStore parent = test.getParent();//fileManager.getResource
+			// //File parent = test.getParentFile();
+			// if (parent == null || !parent.fetchInfo().exists()) {
+			// parent = fileManager.getResource(directory);
+			// test=parent.getChild(output);
+			// //output = directory + File.separator + output;
+			// }
+			// fos = test.openOutputStream(EFS.NONE, null);//test.openOutputStream(options, monitor)new FileOutputStream(test);
+			// }
 
-
-			IRemoteProcess p = getProcess(tool,env,directory);//pb.start();// Runtime.getRuntime().exec(tool, env,
-									// directory);
+			IRemoteProcess p = getProcess(tool, env, directory);// pb.start();// Runtime.getRuntime().exec(tool, env,
+			// directory);
 			StreamRunner outRun = new StreamRunner(p.getInputStream(), "out", fos); //$NON-NLS-1$
 			StreamRunner errRun = new StreamRunner(p.getErrorStream(), "err", null); //$NON-NLS-1$
 			outRun.start();
@@ -467,54 +464,53 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils{
 			eval = p.waitFor();
 			if (fos != null) {
 				fos.flush();
-				out=fos.toByteArray();
+				out = fos.toByteArray();
 			}
 
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
-		if (eval != 0)
+		if (eval != 0) {
 			return null;
-		
+		}
+
 		return out;
 	}
-	
-	
-	private IRemoteProcess getProcess(List<String> tool, Map<String, String> env, String directory) throws IOException{
 
+	private IRemoteProcess getProcess(List<String> tool, Map<String, String> env, String directory) throws IOException {
 
-			IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);//new IRemoteProcessBuilder(tool);
-			if(directory!=null)
-				pb.directory(fileManager.getResource(directory));
-			if (env != null) {
-				pb.environment().putAll(env);
-			}
+		IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);// new IRemoteProcessBuilder(tool);
+		if (directory != null) {
+			pb.directory(fileManager.getResource(directory));
+		}
+		if (env != null) {
+			pb.environment().putAll(env);
+		}
 
-			return pb.start();
+		return pb.start();
 	}
 
-	public  void runVis(List<String> tool, Map<String, String> env, String directory) {
-		//int eval = -1;
+	public void runVis(List<String> tool, Map<String, String> env, String directory) {
+		// int eval = -1;
 		try {
-//
-//			IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);//new IRemoteProcessBuilder(tool);
-//			pb.directory(fileManager.getResource(directory));
-//			if (env != null) {
-//				pb.environment().putAll(env);
-//			}
-//
-//			//Process p = 
-//				pb.start();
-			
-			getProcess(tool,env,directory);
+			//
+			// IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);//new IRemoteProcessBuilder(tool);
+			// pb.directory(fileManager.getResource(directory));
+			// if (env != null) {
+			// pb.environment().putAll(env);
+			// }
+			//
+			// //Process p =
+			// pb.start();
+
+			getProcess(tool, env, directory);
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			//return false;
+			// return false;
 		}
-		//return (eval == 0);// true;
+		// return (eval == 0);// true;
 	}
 
 	static class StreamRunner extends Thread {

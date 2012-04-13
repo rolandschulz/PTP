@@ -29,9 +29,7 @@ public class JobStatusData {
 		return CANCELED.equals(detail) || FAILED.equals(detail) || JOB_OUTERR_READY.equals(detail);
 	}
 
-	private final String fConfigName;
-	private final String fRemoteServicesId;
-	private final String fConnectionName;
+	private final String fControlId;
 	private final String fJobId;
 	private final String fOutputPath;
 	private final String fErrorPath;
@@ -54,11 +52,9 @@ public class JobStatusData {
 	 * @param status
 	 *            to persist
 	 */
-	public JobStatusData(String jobId, String configName, String remoteServicesId, String connectionName, String queueName,
-			String owner, String outputPath, String errorPath, boolean interactive) {
-		fConfigName = configName;
-		fRemoteServicesId = remoteServicesId;
-		fConnectionName = connectionName;
+	public JobStatusData(String jobId, String controlId, String queueName, String owner, String outputPath, String errorPath,
+			boolean interactive) {
+		fControlId = controlId;
 		fJobId = jobId;
 		fQueueName = queueName;
 		fOwner = owner;
@@ -67,9 +63,9 @@ public class JobStatusData {
 		fInteractive = interactive;
 	}
 
-	public JobStatusData(String jobId, String configName, String remoteServicesId, String connectionName, String state,
-			String stateDetail, String outputPath, String errorPath, boolean interactive, String queueName, String owner, String oid) {
-		this(jobId, configName, remoteServicesId, connectionName, queueName, owner, outputPath, errorPath, interactive);
+	public JobStatusData(String jobId, String controlId, String state, String stateDetail, String outputPath, String errorPath,
+			boolean interactive, String queueName, String owner, String oid) {
+		this(jobId, controlId, queueName, owner, outputPath, errorPath, interactive);
 		fState = state;
 		fStateDetail = stateDetail;
 		fOid = oid;
@@ -79,18 +75,10 @@ public class JobStatusData {
 
 	/**
 	 * 
-	 * @return configuration name
+	 * @return control ID
 	 */
-	public String getConfigurationName() {
-		return fConfigName;
-	}
-
-	/**
-	 * 
-	 * @return connection name
-	 */
-	public String getConnectionName() {
-		return fConnectionName;
+	public String getControlId() {
+		return fControlId;
 	}
 
 	/**
@@ -144,14 +132,6 @@ public class JobStatusData {
 	 */
 	public String getQueueName() {
 		return fQueueName;
-	}
-
-	/**
-	 * 
-	 * @return remote services ID
-	 */
-	public String getRemoteServicesId() {
-		return fRemoteServicesId;
 	}
 
 	/**

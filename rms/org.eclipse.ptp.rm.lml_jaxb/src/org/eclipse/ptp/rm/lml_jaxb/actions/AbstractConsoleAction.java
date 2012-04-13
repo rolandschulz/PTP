@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.lml_jaxb.actions;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
@@ -40,7 +40,11 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 	public void run(IAction action) {
 		if (status != null) {
 			String path = error ? status.getErrorPath() : status.getOutputPath();
-			ActionUtils.readRemoteFile(status.getRemoteServicesId(), status.getConnectionName(), path);
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(status.getControlId());
+			if (rm != null) {
+				ActionUtils.readRemoteFile(rm.getControlConfiguration().getRemoteServicesId(), rm.getControlConfiguration()
+						.getConnectionName(), path);
+			}
 		}
 	}
 
@@ -64,8 +68,7 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 			action.setEnabled(false);
 			return;
 		}
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager()
-				.getResourceManagerFromUniqueName(status.getConfigurationName());
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(status.getControlId());
 		if (rm == null || !IResourceManager.STARTED_STATE.equals(rm.getState())) {
 			action.setEnabled(false);
 		} else if (getReady()) {

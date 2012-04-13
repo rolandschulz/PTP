@@ -20,7 +20,7 @@ import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.ui.sourcelookup.AbstractSourceContainerBrowser;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceContainer;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -42,8 +42,7 @@ public class ResourceMappingSourceContainerBrowser extends AbstractSourceContain
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.debug.internal.ui.sourcelookup.ISourceContainerBrowser#
-	 * createSourceContainers(org.eclipse.swt.widgets.Shell,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * createSourceContainers(org.eclipse.swt.widgets.Shell, org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public ISourceContainer[] addSourceContainers(Shell shell, ISourceLookupDirector director) {
@@ -64,10 +63,8 @@ public class ResourceMappingSourceContainerBrowser extends AbstractSourceContain
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.ui.sourcelookup.AbstractSourceContainerBrowser#
-	 * canEditSourceContainers
-	 * (org.eclipse.debug.core.sourcelookup.ISourceLookupDirector,
-	 * org.eclipse.debug.core.sourcelookup.ISourceContainer[])
+	 * @see org.eclipse.debug.ui.sourcelookup.AbstractSourceContainerBrowser# canEditSourceContainers
+	 * (org.eclipse.debug.core.sourcelookup.ISourceLookupDirector, org.eclipse.debug.core.sourcelookup.ISourceContainer[])
 	 */
 	@Override
 	public boolean canEditSourceContainers(ISourceLookupDirector director, ISourceContainer[] containers) {
@@ -77,10 +74,8 @@ public class ResourceMappingSourceContainerBrowser extends AbstractSourceContain
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.ui.sourcelookup.AbstractSourceContainerBrowser#
-	 * editSourceContainers(org.eclipse.swt.widgets.Shell,
-	 * org.eclipse.debug.core.sourcelookup.ISourceLookupDirector,
-	 * org.eclipse.debug.core.sourcelookup.ISourceContainer[])
+	 * @see org.eclipse.debug.ui.sourcelookup.AbstractSourceContainerBrowser# editSourceContainers(org.eclipse.swt.widgets.Shell,
+	 * org.eclipse.debug.core.sourcelookup.ISourceLookupDirector, org.eclipse.debug.core.sourcelookup.ISourceContainer[])
 	 */
 	@Override
 	public ISourceContainer[] editSourceContainers(Shell shell, ISourceLookupDirector director, ISourceContainer[] containers) {
@@ -107,7 +102,7 @@ public class ResourceMappingSourceContainerBrowser extends AbstractSourceContain
 		} catch (CoreException e) {
 		}
 		if (rmName != null) {
-			IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmName);
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(rmName);
 			if (rm != null) {
 				String remId = rm.getControlConfiguration().getRemoteServicesId();
 				String connName = rm.getControlConfiguration().getConnectionName();

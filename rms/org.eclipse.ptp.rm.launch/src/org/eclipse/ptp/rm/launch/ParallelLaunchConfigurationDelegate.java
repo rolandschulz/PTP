@@ -33,8 +33,8 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
+import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.IPSession;
@@ -43,8 +43,6 @@ import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.rm.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -228,9 +226,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	 * @param job
 	 *            job to terminate
 	 */
-	private void terminateJob(final IResourceManagerControl rm, final String jobId) {
+	private void terminateJob(IPLaunch launch) {
 		try {
-			rm.control(jobId, IResourceManagerControl.TERMINATE_OPERATION, null);
+			launch.getJobControl().control(launch.getJobId(), IJobControl.TERMINATE_OPERATION, null);
 		} catch (CoreException e1) {
 			// Ignore, but log
 			RMLaunchPlugin.log(e1);
@@ -254,17 +252,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				RMLaunchPlugin.log(e);
 			}
 		}
-		IResourceManagerControl rmc = launch.getResourceManagerControl();
-		try {
-			rmc.stop();
-			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(
-					rmc.getControlConfiguration().getUniqueName());
-			if (rm != null) {
-				ModelManager.getInstance().removeResourceManager(rm);
-			}
-		} catch (CoreException e) {
-			RMLaunchPlugin.log(e);
-		}
+		IJobControl control = launch.getJobControl();
 	}
 
 	/*
@@ -276,7 +264,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	@Override
 	protected void doCompleteJobLaunch(final IPLaunch launch, final IPDebugger debugger) {
 		final String jobId = launch.getJobId();
-		final IResourceManagerControl rm = launch.getResourceManagerControl();
 		final ILaunchConfiguration configuration = launch.getLaunchConfiguration();
 
 		/*
@@ -288,7 +275,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		 * Create process that is used by the DebugPlugin for handling console output. This process gets added to the debug session
 		 * so that it is also displayed in the Debug View as the system process.
 		 */
-		new RuntimeProcess(launch, rm, jobId, null);
+		new RuntimeProcess(launch, null);
 
 		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
 			try {
@@ -302,11 +289,11 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 						try {
 							new ProgressMonitorDialog(RMLaunchPlugin.getActiveWorkbenchShell()).run(true, true, session);
 						} catch (InterruptedException e) {
-							terminateJob(rm, jobId);
+							terminateJob(launch);
 						} catch (InvocationTargetException e) {
 							RMLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_0, e.getTargetException());
 							RMLaunchPlugin.log(e.getCause());
-							terminateJob(rm, jobId);
+							terminateJob(launch);
 						}
 					}
 				});
@@ -319,7 +306,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					public void run() {
 						RMLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_1, e.getStatus());
 						RMLaunchPlugin.log(e);
-						terminateJob(rm, jobId);
+						terminateJob(launch);
 					}
 				});
 			}

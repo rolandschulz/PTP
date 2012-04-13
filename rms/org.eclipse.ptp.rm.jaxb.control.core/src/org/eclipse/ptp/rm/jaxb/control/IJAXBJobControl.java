@@ -12,31 +12,21 @@ package org.eclipse.ptp.rm.jaxb.control;
 
 import java.util.Map;
 
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
 /**
  * JAXB Launch Control interface.
  * 
  */
-public interface IJAXBJobControl extends IJobControl, IAdaptable {
-
+public interface IJAXBJobControl extends IJobControl {
 	/**
 	 * @return whether the launch environment should be appended to (or replace) the environment for a given command execution.
 	 */
 	public boolean getAppendEnv();
-
-	/**
-	 * @return the JAXB resource manager data element tree.
-	 * 
-	 * @since 5.0
-	 */
-	public ResourceManagerData getConfigurationData();
 
 	/**
 	 * Get the connection used to control the job
@@ -45,6 +35,13 @@ public interface IJAXBJobControl extends IJobControl, IAdaptable {
 	 * @since 6.0
 	 */
 	public String getConnectionName();
+
+	/**
+	 * @return the ID of the control.
+	 * 
+	 * @since 5.0
+	 */
+	public String getControlId();
 
 	/**
 	 * @return resource manager environment

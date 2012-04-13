@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
@@ -38,7 +37,6 @@ import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.messages.Messages;
-import org.eclipse.ptp.internal.core.elements.PResourceManager;
 
 /**
  * @author rsqrd
@@ -46,10 +44,9 @@ import org.eclipse.ptp.internal.core.elements.PResourceManager;
  * 
  */
 public abstract class AbstractResourceManager implements IResourceManager {
-	private final PResourceManager fPResourceManager;
+	private final IPResourceManager fPResourceManager;
 	private final AbstractResourceManagerControl fResourceManagerControl;
 	private final AbstractResourceManagerMonitor fResourceManagerMonitor;
-	private final ModelManager fModelManager = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
 
 	private AbstractResourceManagerConfiguration fConfig;
 	private String fState;
@@ -62,8 +59,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 		fConfig = config;
 		fResourceManagerControl = control;
 		fResourceManagerMonitor = monitor;
-		fPResourceManager = new PResourceManager(fModelManager.getUniverse(), this.getUniqueName());
-		fModelManager.getUniverse().addResourceManager(fPResourceManager);
+		fPResourceManager = ModelManager.getInstance().getUniverse().addResourceManager(this.getUniqueName());
 		fState = STOPPED_STATE;
 	}
 
@@ -88,7 +84,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * @since 6.0
 	 */
 	public void addJobListener(IJobListener listener) {
-		JobManager.getInstance().addListener(listener);
+		JobManager.getInstance().addListener(fConfig.getUniqueName(), listener);
 	}
 
 	/*
@@ -111,7 +107,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 */
 	public void dispose() {
 		doDispose();
-		fModelManager.getUniverse().removeResourceManager(fPResourceManager);
+		ModelManager.getInstance().getUniverse().removeResourceManager(fPResourceManager.getControlId());
 	}
 
 	/*
@@ -167,6 +163,18 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 */
 	public IResourceManagerComponentConfiguration getControlConfiguration() {
 		return fResourceManagerControl.getControlConfiguration();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IJobControl#getControlId()
+	 */
+	/**
+	 * @since 6.0
+	 */
+	public String getControlId() {
+		return getConfiguration().getUniqueName();
 	}
 
 	/*
@@ -269,7 +277,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getUniqueName()
 	 */
 	public String getUniqueName() {
-		return getConfiguration().getUniqueName();
+		return getControlId();
 	}
 
 	/*
@@ -293,7 +301,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * @since 6.0
 	 */
 	public void removeJobListener(IJobListener listener) {
-		JobManager.getInstance().removeListener(listener);
+		JobManager.getInstance().removeListener(fConfig.getUniqueName(), listener);
 	}
 
 	/**
@@ -479,7 +487,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * @since 5.0
 	 */
 	protected void fireResourceManagerChanged() {
-		fModelManager.fireResourceManagerChanged(this);
+		ModelManager.getInstance().fireResourceManagerChanged(this);
 	}
 
 	/**
@@ -490,7 +498,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 */
 	protected void fireResourceManagerError(String message) {
 		setState(ERROR_STATE);
-		fModelManager.fireResourceManagerError(this, message);
+		ModelManager.getInstance().fireResourceManagerError(this, message);
 	}
 
 	/**

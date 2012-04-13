@@ -29,7 +29,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
@@ -121,7 +121,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		comp.setLayoutData(gd);
 
-		IResourceManager[] rms = PTPCorePlugin.getDefault().getModelManager().getResourceManagers();
+		IResourceManager[] rms = ModelManager.getInstance().getResourceManagers();
 		new Label(comp, SWT.NONE).setText(Messages.ApplicationTab_RM_Selection_Label);
 
 		resourceManagerCombo = new Combo(comp, SWT.READ_ONLY);
@@ -353,7 +353,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @return resource manager
 	 */
 	private IResourceManager getResourceManagerDefault() {
-		IResourceManager[] rms = PTPCorePlugin.getDefault().getModelManager().getResourceManagers();
+		IResourceManager[] rms = ModelManager.getInstance().getResourceManagers();
 		if (rms.length != 1) {
 			return null;
 		}

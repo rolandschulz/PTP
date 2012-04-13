@@ -17,14 +17,13 @@
 package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.jobs.IJobControl;
 
 /**
  * @since 5.0
  */
-public interface IResourceManagerControl extends IJobControl, IAdaptable {
+public interface IResourceManagerControl extends IJobControl {
 	/**
 	 * Safely dispose of this Resource Manager.
 	 */

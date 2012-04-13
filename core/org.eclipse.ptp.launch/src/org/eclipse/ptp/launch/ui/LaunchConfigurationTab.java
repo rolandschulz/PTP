@@ -30,7 +30,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -216,7 +216,7 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 		} catch (CoreException e) {
 			return null;
 		}
-		return PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		return ModelManager.getInstance().getResourceManagerFromUniqueName(rmUniqueName);
 	}
 
 	/**

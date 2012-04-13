@@ -53,9 +53,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
@@ -80,10 +78,6 @@ import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
-import org.eclipse.ptp.core.jobs.IJobAddedEvent;
-import org.eclipse.ptp.core.jobs.IJobChangedEvent;
-import org.eclipse.ptp.core.jobs.IJobListener;
-import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
@@ -113,36 +107,6 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.ViewPart;
 
 public class ResourceManagerView extends ViewPart {
-	private final class JobListener implements IJobListener {
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse .ptp.core.events.IJobChangeEvent)
-		 */
-		public void handleEvent(IJobChangedEvent e) {
-			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromJobStatus(e.getJobStatus());
-			if (rm != null) {
-				IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
-				if (prm != null) {
-					IPJob job = prm.getJobById(e.getJobStatus().getJobId());
-					if (job != null) {
-						updateViewer(job);
-					}
-				}
-			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
-		 */
-		public void handleEvent(IJobAddedEvent e) {
-			// nothing to do
-		}
-	}
-
 	private final class MachineListener implements IMachineChildListener, IMachineListener {
 		/*
 		 * (non-Javadoc)
@@ -432,11 +396,11 @@ public class ResourceManagerView extends ViewPart {
 		 * handleEvent(org.eclipse.ptp.core.events.IResourceManagerAddedEvent)
 		 */
 		public synchronized void handleEvent(IResourceManagerAddedEvent e) {
-			final IPResourceManager resourceManager = (IPResourceManager) e.getResourceManager()
-					.getAdapter(IPResourceManager.class);
+			final IPResourceManager resourceManager = ModelManager.getInstance().getUniverse()
+					.getResourceManager(e.getResourceManager().getControlId());
 			resourceManagers.add(resourceManager);
 			resourceManager.addChildListener(rmChildListener);
-			refreshViewer(PTPCorePlugin.getDefault().getModelManager().getUniverse());
+			refreshViewer(ModelManager.getInstance().getUniverse());
 		}
 
 		/*
@@ -451,7 +415,7 @@ public class ResourceManagerView extends ViewPart {
 					&& rm.getUniqueName().equals(rmManager.getSelected())) {
 				rmManager.fireSetDefaultRMEvent(null);
 			}
-			IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
+			IPResourceManager prm = ModelManager.getInstance().getUniverse().getResourceManager(rm.getControlId());
 			if (prm != null) {
 				refreshViewer(prm);
 			}
@@ -464,7 +428,7 @@ public class ResourceManagerView extends ViewPart {
 		 * (org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent)
 		 */
 		public void handleEvent(final IResourceManagerErrorEvent e) {
-			IPResourceManager rm = (IPResourceManager) e.getSource().getAdapter(IPResourceManager.class);
+			IPResourceManager rm = ModelManager.getInstance().getUniverse().getResourceManager(e.getSource().getControlId());
 			if (rm != null) {
 				refreshViewer(rm);
 			}
@@ -484,12 +448,12 @@ public class ResourceManagerView extends ViewPart {
 		 * handleEvent(org.eclipse.ptp.core.events.IResourceManagerRemovedEvent)
 		 */
 		public synchronized void handleEvent(IResourceManagerRemovedEvent e) {
-			final IPResourceManager resourceManager = (IPResourceManager) e.getResourceManager()
-					.getAdapter(IPResourceManager.class);
+			final IPResourceManager resourceManager = ModelManager.getInstance().getUniverse()
+					.getResourceManager(e.getResourceManager().getControlId());
 			resourceManagers.remove(resourceManager);
 			resourceManager.removeChildListener(rmChildListener);
 			rmChildListener.removeListeners(resourceManager);
-			refreshViewer(PTPCorePlugin.getDefault().getModelManager().getUniverse());
+			refreshViewer(ModelManager.getInstance().getUniverse());
 		}
 	}
 
@@ -501,7 +465,6 @@ public class ResourceManagerView extends ViewPart {
 	private final Set<IPResourceManager> resourceManagers = new HashSet<IPResourceManager>();
 	private final RMListener rmListener = new RMListener();
 	private final RMChildListener rmChildListener = new RMChildListener();
-	private final IJobListener jobListener = new JobListener();
 	private final RMManager rmManager = PTPUIPlugin.getDefault().getRMManager();
 	private IMemento state;
 
@@ -595,7 +558,7 @@ public class ResourceManagerView extends ViewPart {
 				}
 			}
 		});
-		viewer.setInput(PTPCorePlugin.getDefault().getModelManager().getUniverse());
+		viewer.setInput(ModelManager.getInstance().getUniverse());
 
 		// -----------------------------
 		// Enable right-click popup menu
@@ -610,8 +573,7 @@ public class ResourceManagerView extends ViewPart {
 		// ----------------------------------------------------------------------
 		getSite().setSelectionProvider(viewer);
 
-		PTPCorePlugin.getDefault().getModelManager().addListener(rmListener);
-		JobManager.getInstance().addListener(jobListener);
+		ModelManager.getInstance().addListener(rmListener);
 	}
 
 	/*
@@ -621,12 +583,12 @@ public class ResourceManagerView extends ViewPart {
 	 */
 	@Override
 	public synchronized void dispose() {
-		PTPCorePlugin.getDefault().getModelManager().removeListener(rmListener);
+		ModelManager.getInstance().removeListener(rmListener);
 		for (IPResourceManager rm : resourceManagers) {
 			rm.removeChildListener(rmChildListener);
 		}
 		resourceManagers.clear();
-		JobManager.getInstance().removeListener(jobListener);
+		// JobManager.getInstance().removeListener(jobListener);
 		rmChildListener.dispose();
 		super.dispose();
 	}

@@ -11,11 +11,13 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.net.URL;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.Preferences;
+import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
@@ -38,7 +40,6 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 		IJAXBResourceManagerConfiguration {
 
 	protected ResourceManagerData rmdata;
-	protected IVariableMap map;
 
 	/**
 	 * @param namespace
@@ -51,36 +52,23 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	}
 
 	/*
-	 * Clears in-memory objects (non-Javadoc)
+	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration# clearReferences()
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration# getResourceManagerData()
 	 */
-	public void clearReferences(boolean all) {
-		if (all) {
-			map.clear();
-			map = null;
-			clearRMData();
-		} else {
-			if (map != null) {
-				map.clear();
-			}
-			rmdata = null;
-		}
+	@Override
+	public ResourceManagerData getResourceManagerData() {
+		return rmdata;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration# getResourceManagerData()
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration#initialize()
 	 */
-	public ResourceManagerData getResourceManagerData() throws Throwable {
-		if (rmdata == null) {
-			realizeRMDataFromXML();
-		}
-		if (rmdata == null) {
-			throw new InstantiationError(Messages.FailedToCreateRmData);
-		}
-		return rmdata;
+	@Override
+	public void initialize() throws CoreException {
+		realizeRMDataFromXML();
 	}
 
 	/*
@@ -88,6 +76,7 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration# setRMConfigurationURL(java.net.URL)
 	 */
+	@Override
 	public void setRMConfigurationURL(URL url) {
 		if (url != null) {
 			putString(JAXBCoreConstants.RM_URL, url.toExternalForm());
@@ -129,7 +118,7 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	 * @throws unmarshaling
 	 *             or URL exceptions
 	 */
-	private void realizeRMDataFromXML() throws Throwable {
+	private void realizeRMDataFromXML() throws CoreException {
 		String xml = getRMConfigurationXML();
 		boolean force = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD);
 		if (xml == null || force) {
@@ -139,21 +128,26 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 					xml = JAXBInitializationUtils.getRMConfigurationXML(new URL(location));
 					setRMConfigurationXML(xml);
 				} catch (Throwable t) {
-					new UIJob(Messages.CachedDefinitionWarning) {
-						@Override
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-							MessageDialog.openWarning(Display.getDefault().getActiveShell(), Messages.CachedDefinitionWarning,
-									Messages.UsingCachedDefinition);
-							return Status.OK_STATUS;
-						}
-					}.schedule();
+					if (xml != null) {
+						new UIJob(Messages.CachedDefinitionWarning) {
+							@Override
+							public IStatus runInUIThread(IProgressMonitor monitor) {
+								MessageDialog.openWarning(Display.getDefault().getActiveShell(), Messages.CachedDefinitionWarning,
+										Messages.UsingCachedDefinition);
+								return Status.OK_STATUS;
+							}
+						}.schedule();
+					}
 				}
 			}
 		}
-		if (xml != null) {
+		if (xml == null) {
+			throw CoreExceptionUtils.newException(Messages.FailedToCreateRmData, null);
+		}
+		try {
 			rmdata = JAXBInitializationUtils.initializeRMData(xml);
-		} else {
-			rmdata = null;
+		} catch (Exception e) {
+			throw CoreExceptionUtils.newException(Messages.FailedToCreateRmData, e);
 		}
 	}
 

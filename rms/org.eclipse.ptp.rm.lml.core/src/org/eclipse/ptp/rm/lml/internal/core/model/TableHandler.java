@@ -349,7 +349,7 @@ public class TableHandler extends LguiHandler {
 				if (status == null) {
 					final String queueName = getCellValue(table, row, ILguiItem.JOB_QUEUE_NAME);
 					final String owner = getCellValue(table, row, ILguiItem.JOB_OWNER);
-					status = new JobStatusData(jobId, lguiItem.toString(), null, null, queueName, owner, null, null, false);
+					status = new JobStatusData(jobId, lguiItem.toString(), queueName, owner, null, null, false);
 				}
 				tableData[i].setJobStatusData(status);
 			}

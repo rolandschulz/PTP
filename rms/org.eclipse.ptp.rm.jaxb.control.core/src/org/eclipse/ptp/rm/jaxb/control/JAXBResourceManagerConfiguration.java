@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.AbstractJAXBResourceManagerConfiguration;
@@ -23,6 +24,7 @@ import org.eclipse.ptp.services.core.IServiceProvider;
  * 
  */
 public class JAXBResourceManagerConfiguration extends AbstractJAXBResourceManagerConfiguration {
+	protected IVariableMap map;
 
 	/**
 	 * @param namespace
@@ -38,8 +40,7 @@ public class JAXBResourceManagerConfiguration extends AbstractJAXBResourceManage
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration#
-	 * getRMVariableMap()
+	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration# getRMVariableMap()
 	 */
 	public IVariableMap getRMVariableMap() throws Throwable {
 		if (map == null) {
@@ -52,12 +53,20 @@ public class JAXBResourceManagerConfiguration extends AbstractJAXBResourceManage
 	}
 
 	/*
-	 * (non-Javadoc) Sets JAXB@connection as the default service provider
-	 * description.
+	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc
-	 * ()
+	 * @see org.eclipse.ptp.rm.jaxb.core.AbstractJAXBResourceManagerConfiguration#initialize()
+	 */
+	@Override
+	public void initialize() throws CoreException {
+		map = null;
+		super.initialize();
+	}
+
+	/*
+	 * (non-Javadoc) Sets JAXB@connection as the default service provider description.
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc ()
 	 */
 	public void setDefaultNameAndDesc() {
 		String name = getName();

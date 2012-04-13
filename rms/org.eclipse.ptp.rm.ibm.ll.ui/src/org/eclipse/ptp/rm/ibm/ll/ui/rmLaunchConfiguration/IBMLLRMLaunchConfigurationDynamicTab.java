@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.attributes.BigIntegerAttribute;
 import org.eclipse.ptp.core.attributes.BigIntegerAttributeDefinition;
@@ -1760,7 +1761,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":setDefaults entered."); //$NON-NLS-1$
 		currentLaunchConfig = config;
-		IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
+		IPResourceManager prm = ModelManager.getInstance().getUniverse().getResourceManager(rm.getUniqueName());
 		rmAttrs = prm.getAttributes();
 		for (int i = 0; i < rmAttrs.length; i++) {
 			try {

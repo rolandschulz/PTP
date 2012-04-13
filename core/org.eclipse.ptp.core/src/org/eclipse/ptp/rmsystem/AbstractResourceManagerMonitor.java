@@ -21,7 +21,6 @@ package org.eclipse.ptp.rmsystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.jobs.IJobAddedEvent;
 import org.eclipse.ptp.core.jobs.IJobChangedEvent;
@@ -47,10 +46,10 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	}
 
 	private final JobListener fJobListener = new JobListener();
-	private final ModelManager fModelManager = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
 	private final AbstractResourceManagerConfiguration fConfig;
 
 	private IResourceManager fResourceManager = null;
+	private IPResourceManager fPResourceManager = null;
 
 	public AbstractResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		fConfig = config;
@@ -63,22 +62,6 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	 */
 	public void dispose() {
 		doDispose();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-	 */
-	@SuppressWarnings({ "rawtypes" })
-	public Object getAdapter(Class adapter) {
-		if (adapter.isInstance(this)) {
-			return this;
-		}
-		if (adapter == IPResourceManager.class) {
-			return getPResourceManager();
-		}
-		return null;
 	}
 
 	/*
@@ -105,7 +88,7 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#start(org.eclipse.core .runtime.IProgressMonitor)
 	 */
 	public void start(IProgressMonitor monitor) throws CoreException {
-		JobManager.getInstance().addListener(fJobListener);
+		JobManager.getInstance().addListener(fConfig.getUniqueName(), fJobListener);
 		doStartup(monitor);
 	}
 
@@ -181,18 +164,16 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 		getResourceManager().fireResourceManagerError(message);
 	}
 
-	protected ModelManager getModelManager() {
-		return fModelManager;
-	}
-
 	protected IPResourceManager getPResourceManager() {
-		return (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		if (fPResourceManager == null) {
+			fPResourceManager = ModelManager.getInstance().getUniverse().getResourceManager(fConfig.getUniqueName());
+		}
+		return fPResourceManager;
 	}
 
 	protected AbstractResourceManager getResourceManager() {
 		if (fResourceManager == null) {
-			fResourceManager = PTPCorePlugin.getDefault().getModelManager()
-					.getResourceManagerFromUniqueName(fConfig.getUniqueName());
+			fResourceManager = ModelManager.getInstance().getResourceManagerFromUniqueName(fConfig.getUniqueName());
 		}
 		return (AbstractResourceManager) fResourceManager;
 	}

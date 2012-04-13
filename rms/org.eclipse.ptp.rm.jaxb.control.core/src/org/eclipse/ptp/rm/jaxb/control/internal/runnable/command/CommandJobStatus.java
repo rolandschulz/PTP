@@ -231,19 +231,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getConfigurationName()
+	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getControlId()
 	 */
-	public String getConfigurationName() {
-		return control.getConfigurationData().getName();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getConnectionName()
-	 */
-	public String getConnectionName() {
-		return control.getConnectionName();
+	public String getControlId() {
+		return control.getControlId();
 	}
 
 	/*
@@ -301,15 +292,6 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public String getQueueName() {
 		return queue;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getRemoteServicesId()
-	 */
-	public String getRemoteServicesId() {
-		return control.getRemoteServicesId();
 	}
 
 	/**

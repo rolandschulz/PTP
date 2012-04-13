@@ -52,7 +52,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.jobs.IJobAddedEvent;
@@ -160,7 +160,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor subMon = SubMonitor.convert(monitor, 100);
 			try {
-				IResourceManagerControl rm = fLaunch.getResourceManagerControl();
+				IResourceManagerControl rm = ModelManager.getInstance().getResourceManagerFromUniqueName(
+						fLaunch.getJobControl().getControlId());
 				String jobId = fLaunch.getJobId();
 				fSubLock.lock();
 				try {
@@ -221,7 +222,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						synchronized (jobSubmissions) {
 							jobSubmissions.remove(jobId);
 							if (jobSubmissions.size() == 0) {
-								JobManager.getInstance().removeListener(fJobListener);
+								JobManager.getInstance().removeListener(rm.getControlConfiguration().getUniqueName(), fJobListener);
 							}
 						}
 					}
@@ -777,7 +778,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		String rmUniqueName = getResourceManagerUniqueName(configuration);
 		if (rmUniqueName != null) {
-			return PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+			return ModelManager.getInstance().getResourceManagerFromUniqueName(rmUniqueName);
 		}
 		return null;
 	}
@@ -898,13 +899,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
 			}
-			JobManager.getInstance().addListener(fJobListener);
-			launch.setResourceManager(rm);
+			JobManager.getInstance().addListener(rm.getControlConfiguration().getUniqueName(), fJobListener);
 			String jobId = rm.submitJob(configuration, mode, progress.newChild(5));
 			if (rm.getJobStatus(jobId, progress.newChild(50)).equals(IJobStatus.UNDETERMINED)) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus));
 			}
+			launch.setJobControl(rm);
 			launch.setJobId(jobId);
 			JobSubmission jobSub = new JobSubmission(launch, debugger);
 			synchronized (jobSubmissions) {

@@ -32,6 +32,7 @@ import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.AbstractJobSubmission;
 import org.eclipse.ptp.core.AbstractJobSubmission.JobSubStatus;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.StringAttribute;
@@ -91,19 +92,10 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.eclipse.ptp.core.jobs.IJobStatus#getConfigurationName()
+		 * @see org.eclipse.ptp.core.jobs.IJobStatus#getControlId()
 		 */
-		public String getConfigurationName() {
+		public String getControlId() {
 			return getControlConfiguration().getUniqueName();
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getConnectionName()
-		 */
-		public String getConnectionName() {
-			return getControlConfiguration().getConnectionName();
 		}
 
 		/*
@@ -158,15 +150,6 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		 */
 		public String getQueueName() {
 			return null;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getRemoteServicesId()
-		 */
-		public String getRemoteServicesId() {
-			return getControlConfiguration().getRemoteServicesId();
 		}
 
 		/*
@@ -568,6 +551,10 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		}
 	}
 
+	private IPResourceManager getPResourceManager() {
+		return ModelManager.getInstance().getUniverse().getResourceManager(getResourceManager().getUniqueName());
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -591,7 +578,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	 */
 	@Override
 	protected void doDispose() {
-	}
+	};
 
 	/*
 	 * 
@@ -605,7 +592,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		synchronized (fJobStatus) {
 			return fJobStatus.get(jobId);
 		}
-	};
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -683,11 +670,6 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		}
 
 		return jobStatus;
-	}
-
-	@Override
-	protected IPResourceManager getPResourceManager() {
-		return (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
 	}
 
 	/*

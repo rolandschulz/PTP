@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.jobs;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.internal.core.events.JobAddedEvent;
 import org.eclipse.ptp.internal.core.events.JobChangedEvent;
@@ -27,29 +30,36 @@ public class JobManager {
 		return fInstance;
 	}
 
-	private final ListenerList fJobListeners = new ListenerList();
+	private final Map<String, ListenerList> fJobListeners = new HashMap<String, ListenerList>();
 
 	private JobManager() {
 	}
 
-	public void addListener(IJobListener listener) {
-		fJobListeners.add(listener);
+	public void addListener(String qualifier, IJobListener listener) {
+		ListenerList listeners = fJobListeners.get(qualifier);
+		if (listeners == null) {
+			listeners = new ListenerList();
+			fJobListeners.put(qualifier, listeners);
+		}
+		listeners.add(listener);
 	}
 
 	/**
 	 * Notify listeners when a job has been added.
 	 * 
-	 * @param jobId
-	 *            ID of job that has been added
+	 * @param qualifier
+	 *            Unique ID for the job manager
 	 * @param jobStatus
 	 *            status of the job
 	 * @since 5.0
 	 */
 	public void fireJobAdded(IJobStatus jobStatus) {
 		IJobAddedEvent e = new JobAddedEvent(jobStatus);
-
-		for (Object listener : fJobListeners.getListeners()) {
-			((IJobListener) listener).handleEvent(e);
+		ListenerList listeners = fJobListeners.get(jobStatus.getControlId());
+		if (listeners != null) {
+			for (Object listener : listeners.getListeners()) {
+				((IJobListener) listener).handleEvent(e);
+			}
 		}
 	}
 
@@ -62,13 +72,31 @@ public class JobManager {
 	 */
 	public void fireJobChanged(IJobStatus jobStatus) {
 		IJobChangedEvent e = new JobChangedEvent(jobStatus);
-
-		for (Object listener : fJobListeners.getListeners()) {
-			((IJobListener) listener).handleEvent(e);
+		ListenerList listeners = fJobListeners.get(jobStatus.getControlId());
+		if (listeners != null) {
+			for (Object listener : listeners.getListeners()) {
+				((IJobListener) listener).handleEvent(e);
+			}
 		}
 	}
 
+	/**
+	 * @param listener
+	 */
 	public void removeListener(IJobListener listener) {
-		fJobListeners.remove(listener);
+		for (ListenerList listeners : fJobListeners.values()) {
+			listeners.remove(listener);
+		}
+	}
+
+	/**
+	 * @param qualifier
+	 * @param listener
+	 */
+	public void removeListener(String qualifier, IJobListener listener) {
+		ListenerList listeners = fJobListeners.get(qualifier);
+		if (listeners != null) {
+			listeners.remove(listener);
+		}
 	}
 }

@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
@@ -408,41 +409,42 @@ public class CommandJob extends Job implements ICommandJob {
 	 *            variable map
 	 */
 	private IStatus createDebugModel(String jobId, IVariableMap vars) {
-		IPResourceManager prm = (IPResourceManager) control.getAdapter(IPResourceManager.class);
-
-		/*
-		 * Remove any old jobs with the same job ID
-		 */
-		IPJob job = prm.getJobById(jobId);
-		if (job != null) {
-			prm.removeJobs(Arrays.asList(job));
-		}
-
-		AttributeManager attrMgr = new AttributeManager();
-		attrMgr.addAttribute(JobAttributes.getJobIdAttributeDefinition().create(jobId));
-		attrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(JobAttributes.State.RUNNING));
-		attrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
-
-		job = prm.newJob(jobId, attrMgr);
-
-		attrMgr = new AttributeManager();
-		attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
-
-		Object attr = getAttributeValue(vars, JAXBControlConstants.MPI_PROCESSES);
-		if (attr != null) {
-			String numProcsStr = String.valueOf(attr);
-			int numProcs;
-			try {
-				numProcs = Integer.parseInt(numProcsStr);
-			} catch (NumberFormatException e) {
-				return new Status(IStatus.ERROR, JAXBControlCorePlugin.getUniqueIdentifier(),
-						Messages.CommandJob_UnableToDetermineTasksError);
+		IPResourceManager rm = ModelManager.getInstance().getUniverse().getResourceManager(control.getControlId());
+		if (rm != null) {
+			/*
+			 * Remove any old jobs with the same job ID
+			 */
+			IPJob job = rm.getJobById(jobId);
+			if (job != null) {
+				rm.removeJobs(Arrays.asList(job));
 			}
-			BitSet procRanks = new BitSet(numProcs);
-			procRanks.set(0, numProcs, true);
-			job.addProcessesByJobRanks(procRanks, attrMgr);
-			prm.addJobs(null, Arrays.asList(job));
-			return Status.OK_STATUS;
+
+			AttributeManager attrMgr = new AttributeManager();
+			attrMgr.addAttribute(JobAttributes.getJobIdAttributeDefinition().create(jobId));
+			attrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(JobAttributes.State.RUNNING));
+			attrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
+
+			job = rm.newJob(jobId, attrMgr);
+
+			attrMgr = new AttributeManager();
+			attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
+
+			Object attr = getAttributeValue(vars, JAXBControlConstants.MPI_PROCESSES);
+			if (attr != null) {
+				String numProcsStr = String.valueOf(attr);
+				int numProcs;
+				try {
+					numProcs = Integer.parseInt(numProcsStr);
+				} catch (NumberFormatException e) {
+					return new Status(IStatus.ERROR, JAXBControlCorePlugin.getUniqueIdentifier(),
+							Messages.CommandJob_UnableToDetermineTasksError);
+				}
+				BitSet procRanks = new BitSet(numProcs);
+				procRanks.set(0, numProcs, true);
+				job.addProcessesByJobRanks(procRanks, attrMgr);
+				rm.addJobs(null, Arrays.asList(job));
+				return Status.OK_STATUS;
+			}
 		}
 
 		return new Status(IStatus.ERROR, JAXBControlCorePlugin.getUniqueIdentifier(),

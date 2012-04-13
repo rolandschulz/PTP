@@ -32,7 +32,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -83,14 +82,11 @@ public class JobsListView extends ViewPart {
 		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse .ptp.core.events.IJobChangeEvent)
 		 */
 		public void handleEvent(IJobChangedEvent e) {
-			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromJobStatus(e.getJobStatus());
+			IPResourceManager rm = ModelManager.getInstance().getUniverse().getResourceManager(e.getJobStatus().getControlId());
 			if (rm != null) {
-				IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
-				if (prm != null) {
-					IPJob job = prm.getJobById(e.getJobStatus().getJobId());
-					if (job != null) {
-						update(prm.getJobs());
-					}
+				IPJob job = rm.getJobById(e.getJobStatus().getJobId());
+				if (job != null) {
+					update(rm.getJobs());
 				}
 			}
 
@@ -126,7 +122,8 @@ public class JobsListView extends ViewPart {
 			/*
 			 * Add resource manager child listener so we get notified when new machines are added to the model.
 			 */
-			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			final IPResourceManager rm = ModelManager.getInstance().getUniverse()
+					.getResourceManager(e.getResourceManager().getControlId());
 			rm.addChildListener(resourceManagerChildListener);
 		}
 
@@ -159,7 +156,8 @@ public class JobsListView extends ViewPart {
 			/*
 			 * Removed resource manager child listener when resource manager is removed.
 			 */
-			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			final IPResourceManager rm = ModelManager.getInstance().getUniverse()
+					.getResourceManager(e.getResourceManager().getControlId());
 			rm.removeChildListener(resourceManagerChildListener);
 		}
 	}
@@ -302,7 +300,7 @@ public class JobsListView extends ViewPart {
 				 * Otherwise get all jobs from all queues TODO: should probably not do this!
 				 */
 				Set<IPJob> jobs = new HashSet<IPJob>();
-				for (IPResourceManager rm : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
+				for (IPResourceManager rm : ModelManager.getInstance().getUniverse().getResourceManagers()) {
 					jobs.addAll(getAllJobs(rm));
 				}
 				return jobs.toArray(new IPJob[0]);
@@ -341,7 +339,7 @@ public class JobsListView extends ViewPart {
 		 * terminateAllAction);
 		 */
 
-		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
+		IModelManager mm = ModelManager.getInstance();
 		viewer.setInput(mm.getUniverse());
 
 		/*
@@ -370,9 +368,20 @@ public class JobsListView extends ViewPart {
 						if (path.getLastSegment() instanceof IPQueue) {
 							fSelectedQueue = (IPQueue) path.getLastSegment();
 						}
+						IResourceManager rm = (IResourceManager) fSelectedRM.getAdapter(IResourceManager.class);
+						if (rm != null) {
+							JobManager.getInstance().addListener(rm.getUniqueName(), jobListener);
+						}
+
 					}
 				}
 				if (oldRM != fSelectedRM) {
+					if (oldRM != null) {
+						IResourceManager rm = (IResourceManager) oldRM.getAdapter(IResourceManager.class);
+						if (rm != null) {
+							JobManager.getInstance().removeListener(rm.getUniqueName(), jobListener);
+						}
+					}
 					createColumns(viewer);
 				}
 				refresh();
@@ -383,7 +392,6 @@ public class JobsListView extends ViewPart {
 			}
 		});
 
-		JobManager.getInstance().addListener(jobListener);
 	}
 
 	/*
@@ -576,7 +584,7 @@ public class JobsListView extends ViewPart {
 				}
 			}
 		} else {
-			for (IPResourceManager rm : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
+			for (IPResourceManager rm : ModelManager.getInstance().getUniverse().getResourceManagers()) {
 				for (IPQueue queue : rm.getQueues()) {
 					IPJob job = getFirstJob(queue);
 					if (job != null) {

@@ -30,11 +30,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.debug.core.IPBreakpointManager;
@@ -474,17 +474,14 @@ public class PSession implements IPSession, IPDIEventListener {
 	 * @param state
 	 */
 	private void changeProcessState(TaskSet tasks, State state) {
-		IPResourceManager rm = (IPResourceManager) getLaunch().getResourceManagerControl().getAdapter(IPResourceManager.class);
-		if (rm != null) {
-			IPJob job = rm.getJobById(getLaunch().getJobId());
-			if (job != null) {
-				BitSet processIndices = new BitSet();
-				for (int task : tasks.toArray()) {
-					processIndices.set(task);
-				}
-				EnumeratedAttribute<State> attr = ProcessAttributes.getStateAttributeDefinition().create(state);
-				job.addProcessAttributes(processIndices, new AttributeManager(attr));
+		IPJob job = ModelManager.getInstance().getUniverse().getJob(getLaunch().getJobControl(), getLaunch().getJobId());
+		if (job != null) {
+			BitSet processIndices = new BitSet();
+			for (int task : tasks.toArray()) {
+				processIndices.set(task);
 			}
+			EnumeratedAttribute<State> attr = ProcessAttributes.getStateAttributeDefinition().create(state);
+			job.addProcessAttributes(processIndices, new AttributeManager(attr));
 		}
 	}
 
@@ -723,17 +720,14 @@ public class PSession implements IPSession, IPDIEventListener {
 	 * @param output
 	 */
 	private void setProcessOutput(TaskSet tasks, String output) {
-		IPResourceManager rm = (IPResourceManager) getLaunch().getResourceManagerControl().getAdapter(IPResourceManager.class);
-		if (rm != null) {
-			IPJob job = rm.getJobById(getLaunch().getJobId());
-			if (job != null) {
-				BitSet processIndices = new BitSet();
-				for (int task : tasks.toArray()) {
-					processIndices.set(task);
-				}
-				StringAttribute attr = ProcessAttributes.getStdoutAttributeDefinition().create(output);
-				job.addProcessAttributes(processIndices, new AttributeManager(attr));
+		IPJob job = ModelManager.getInstance().getUniverse().getJob(getLaunch().getJobControl(), getLaunch().getJobId());
+		if (job != null) {
+			BitSet processIndices = new BitSet();
+			for (int task : tasks.toArray()) {
+				processIndices.set(task);
 			}
+			StringAttribute attr = ProcessAttributes.getStdoutAttributeDefinition().create(output);
+			job.addProcessAttributes(processIndices, new AttributeManager(attr));
 		}
 	}
 }

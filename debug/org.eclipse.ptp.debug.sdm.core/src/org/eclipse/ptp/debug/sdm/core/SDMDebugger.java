@@ -40,11 +40,10 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
@@ -66,7 +65,6 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.utils.core.BitSetIterable;
 
 /**
@@ -273,17 +271,11 @@ public class SDMDebugger implements IPDebugger {
 	 */
 	private int getJobSize(IPLaunch launch) {
 		int nprocs = 1;
-		IResourceManagerControl rmc = launch.getResourceManagerControl();
-		if (rmc != null) {
-			IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
-			if (rm != null) {
-				IPJob job = rm.getJobById(launch.getJobId());
-				if (job != null) {
-					nprocs = job.getProcessJobRanks().cardinality();
-					if (nprocs == 0) {
-						nprocs = 1;
-					}
-				}
+		IPJob job = ModelManager.getInstance().getUniverse().getJob(launch.getJobControl(), launch.getJobId());
+		if (job != null) {
+			nprocs = job.getProcessJobRanks().cardinality();
+			if (nprocs == 0) {
+				nprocs = 1;
 			}
 		}
 		return nprocs;
@@ -300,7 +292,7 @@ public class SDMDebugger implements IPDebugger {
 	private IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 				(String) null);
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(rmUniqueName);
 		if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
 			return rm;
 		}
@@ -460,10 +452,8 @@ public class SDMDebugger implements IPDebugger {
 			}
 			progress.subTask(Messages.SDMDebugger_6);
 			PrintWriter pw = new PrintWriter(os);
-			final String jobId = launch.getJobId();
-			final IPResourceManager rm = (IPResourceManager) launch.getResourceManagerControl().getAdapter(IPResourceManager.class);
-			if (rm != null) {
-				final IPJob pJob = rm.getJobById(jobId);
+			final IPJob pJob = ModelManager.getInstance().getUniverse().getJob(launch.getJobControl(), launch.getJobId());
+			if (pJob != null) {
 				BitSet processJobRanks = pJob.getProcessJobRanks();
 				pw.format("%d\n", processJobRanks.cardinality()); //$NON-NLS-1$
 				int base = 50000;
@@ -486,7 +476,7 @@ public class SDMDebugger implements IPDebugger {
 					if (progress.isCanceled()) {
 						throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
 					}
-					IPNode node = rm.getNodeById(nodeId);
+					IPNode node = ModelManager.getInstance().getUniverse().getNode(launch.getJobControl(), nodeId);
 					if (node == null) {
 						throw newCoreException(Messages.SDMDebugger_15);
 					}
@@ -496,8 +486,8 @@ public class SDMDebugger implements IPDebugger {
 					progress.setWorkRemaining(60);
 					progress.worked(10);
 				}
-				pw.close();
 			}
+			pw.close();
 			try {
 				os.close();
 			} catch (IOException e) {

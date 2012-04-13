@@ -27,9 +27,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
@@ -69,18 +69,17 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.SiteType;
-import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.eclipse.ui.progress.UIJob;
 
 /**
- * The part of the JAXB resource manager responsible for handling job submission, termination, suspension and resumption. Also
- * provides on-demand job status checking. <br>
+ * The part of the JAXB framework responsible for handling job submission, termination, suspension and resumption. Also provides
+ * on-demand job status checking. <br>
  * <br>
  * The state maintained by the control is volatile (in-memory only). The control is responsible for handing off to the caller status
- * objects containing job state, as well as means of acessing the process (if interactive) and the standard out and error streams.
+ * objects containing job state, as well as means of accessing the process (if interactive) and the standard out and error streams.
  * When the job completes, these are eliminated from its internal map.<br>
  * <br>
  * The logic of this manager is generic; the specific commands used, files staged, and script constructed (if any) are all
@@ -163,6 +162,7 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	private Map<String, String> launchEnv;
 
 	private ICommandJob interactiveJob;
+
 	private ICommandJobStatusMap jobStatusMap;
 	private JobIdPinTable pinTable;
 	private RMVariableMap rmVarMap;
@@ -182,7 +182,7 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	 * @param jaxbServiceProvider
 	 *            the configuration object containing resource manager specifics
 	 */
-	public JAXBLaunchControl(AbstractResourceManagerConfiguration jaxbServiceProvider) {
+	public JAXBLaunchControl() {
 		connectionListener = new ConnectionChangeListener();
 	}
 
@@ -266,6 +266,7 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	 * 
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		return null;
 	}
@@ -277,10 +278,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 		return appendLaunchEnv;
 	}
 
-	public ResourceManagerData getConfigurationData() {
-		return configData;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -290,12 +287,26 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 		return connectionName;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl#getControlId()
+	 */
+	public String getControlId() {
+		return servicesId + "." + connectionName + "_" + configData.getName(); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl#getEnvironment()
+	 */
 	public IVariableMap getEnvironment() {
 		if (rmVarMap == null) {
 			rmVarMap = new RMVariableMap();
 		}
 		if (!rmVarMap.isInitialized()) {
-			JAXBInitializationUtils.initializeMap(getConfigurationData(), rmVarMap);
+			JAXBInitializationUtils.initializeMap(configData, rmVarMap);
 		}
 		return rmVarMap;
 	}
@@ -418,10 +429,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	}
 
 	/*
-	 * return JAXBInitializationUtils.getRMConfigurationXML(url);
-	 */
-
-	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getJobStatus(java.lang.String,
@@ -437,6 +444,10 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	public Map<String, String> getLaunchEnv() {
 		return launchEnv;
 	}
+
+	/*
+	 * return JAXBInitializationUtils.getRMConfigurationXML(url);
+	 */
 
 	/**
 	 * Reinitializes when the connection info has been changed on a cached resource manager.
@@ -514,13 +525,12 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 			clearReferences(false);
 			realizeRMDataFromXML();
 			rmVarMap = (RMVariableMap) getEnvironment();
-			ResourceManagerData data = getConfigurationData();
-			if (data != null) {
-				controlData = data.getControlData();
+			if (configData != null) {
+				controlData = configData.getControlData();
 				/*
 				 * Set connection information from the site configuration. This may get overidden by the launch configuration later
 				 */
-				SiteType site = data.getSiteData();
+				SiteType site = configData.getSiteData();
 				if (site != null) {
 					String controlURI = site.getControlConnection();
 					if (controlURI != null) {
@@ -561,13 +571,10 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 		/*
 		 * Update any debug models associated with this job ID
 		 */
-		IPResourceManager prm = (IPResourceManager) getAdapter(IPResourceManager.class);
-		if (prm != null) {
-			IPJob job = prm.getJobById(jobId);
-			if (job != null) {
-				if (status.getState().equals(IJobStatus.COMPLETED)) {
-					job.getAttribute(JobAttributes.getStateAttributeDefinition()).setValue(JobAttributes.State.COMPLETED);
-				}
+		IPJob job = ModelManager.getInstance().getUniverse().getJob(status);
+		if (job != null) {
+			if (status.getState().equals(IJobStatus.COMPLETED)) {
+				job.getAttribute(JobAttributes.getStateAttributeDefinition()).setValue(JobAttributes.State.COMPLETED);
 			}
 		}
 		JobManager.getInstance().fireJobChanged(status);
@@ -631,12 +638,20 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 		return changedValue;
 	}
 
+	public void setConnectionName(String connName) {
+		connectionName = connName;
+	}
+
 	/**
 	 * @param interactiveJob
 	 *            open remote process
 	 */
 	public synchronized void setInteractiveJob(ICommandJob interactiveJob) {
 		this.interactiveJob = interactiveJob;
+	}
+
+	public void setRemoteServicesId(String id) {
+		servicesId = id;
 	}
 
 	/*
@@ -817,8 +832,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	 */
 	private void clearRMData() {
 		configData = null;
-		servicesId = null;
-		connectionName = null;
 	}
 
 	/**
@@ -995,10 +1008,10 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	 * @return the configuration XML used to construct the data tree.
 	 */
 	private String getRMConfigurationXML() {
-		if (JAXBCoreConstants.ZEROSTR.equals(configURL)) {
+		if (JAXBCoreConstants.ZEROSTR.equals(configXML)) {
 			return null;
 		}
-		return configURL;
+		return configXML;
 	}
 
 	/**
@@ -1186,26 +1199,27 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 					xml = JAXBInitializationUtils.getRMConfigurationXML(new URL(configURL));
 					setRMConfigurationXML(xml);
 				} catch (Throwable t) {
-					new UIJob(":Using Cached Definition") {
-						@Override
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-							MessageDialog
-									.openWarning(Display.getDefault().getActiveShell(), "Using Cached Definition",
-											"The URL for the definition file for this resource manager is either missing or invalid; using cached definition.");
-							return Status.OK_STATUS;
-						}
-					}.schedule();
+					if (xml != null) {
+						new UIJob("Using Cached Definition") {
+							@Override
+							public IStatus runInUIThread(IProgressMonitor monitor) {
+								MessageDialog
+										.openWarning(Display.getDefault().getActiveShell(), "Using Cached Definition",
+												"The URL for the definition file for this resource manager is either missing or invalid; using cached definition.");
+								return Status.OK_STATUS;
+							}
+						}.schedule();
+					}
 				}
 			}
 		}
-		if (xml != null) {
-			try {
-				configData = JAXBInitializationUtils.initializeRMData(xml);
-			} catch (Exception e) {
-				throw CoreExceptionUtils.newException(e.getLocalizedMessage(), e.getCause());
-			}
-		} else {
-			configData = null;
+		if (xml == null) {
+			throw CoreExceptionUtils.newException("Unable to load configuration data", null);
+		}
+		try {
+			configData = JAXBInitializationUtils.initializeRMData(xml);
+		} catch (Exception e) {
+			throw CoreExceptionUtils.newException(e.getLocalizedMessage(), e.getCause());
 		}
 	}
 
@@ -1280,11 +1294,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration# setRMConfigurationXML(java.lang.String)
-	 */
 	private void setRMConfigurationXML(String xml) {
 		if (xml != null) {
 			configXML = xml;

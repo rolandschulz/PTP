@@ -85,7 +85,7 @@ public abstract class AbstractStatusAction implements IObjectActionDelegate {
 	 */
 	protected static boolean operationSupported(JobStatusData status, String operation, IViewPart targetPart) {
 		IJAXBResourceManager rm = (IJAXBResourceManager) ModelManager.getInstance().getResourceManagerFromUniqueName(
-				status.getConfigurationName());
+				status.getControlId());
 		if (rm == null) {
 			return false;
 		}

@@ -23,6 +23,11 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
  * 
  */
 public interface IJAXBLaunchControl extends IJAXBJobControl, IAdaptable {
+
+	public void setConnectionName(String connName);
+
+	public void setRemoteServicesId(String id);
+
 	/**
 	 * Resets internal (in-memory) data objects.
 	 * 

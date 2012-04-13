@@ -33,6 +33,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
@@ -218,7 +219,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 */
 	public AbstractToolRuntimeSystem(AbstractToolResourceManager rm) {
 		fResourceManager = rm;
-		fPResourceManager = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		fPResourceManager = ModelManager.getInstance().getUniverse().getResourceManager(rm.getUniqueName());
 		int id = 0;
 		try {
 			id = Integer.valueOf(fPResourceManager.getID()).intValue();
@@ -397,8 +398,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		attrMgr.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.UP));
 		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));
 		mgr.setAttributeManager(new RangeSet(id), attrMgr);
-		IPResourceManager rm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
-		fireRuntimeNewMachineEvent(eventFactory.newRuntimeNewMachineEvent(rm.getID(), mgr));
+		fireRuntimeNewMachineEvent(eventFactory.newRuntimeNewMachineEvent(fPResourceManager.getID(), mgr));
 
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: new machine #{1}", getResourceManager().getConfiguration().getName(), id); //$NON-NLS-1$
 
@@ -502,8 +502,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		AttributeManager attrMgr = new AttributeManager();
 		attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(name));
 		mgr.setAttributeManager(new RangeSet(id), attrMgr);
-		IPResourceManager rm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
-		fireRuntimeNewQueueEvent(eventFactory.newRuntimeNewQueueEvent(rm.getID(), mgr));
+		fireRuntimeNewQueueEvent(eventFactory.newRuntimeNewQueueEvent(fPResourceManager.getID(), mgr));
 
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: new queue #{1}", getResourceManager().getConfiguration().getName(), id); //$NON-NLS-1$
 
@@ -534,6 +533,13 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 
 	public IRemoteConnection getConnection() {
 		return connection;
+	}
+
+	/**
+	 * @since 3.0
+	 */
+	public IPResourceManager getPResourceManager() {
+		return fPResourceManager;
 	}
 
 	public IRemoteServices getRemoteServices() {

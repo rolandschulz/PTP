@@ -15,7 +15,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
 import org.eclipse.ptp.debug.sdm.core.SDMLaunchConfigurationConstants;
@@ -167,7 +167,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		try {
 			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 					EMPTY_STRING);
-			resourceManager = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+			resourceManager = ModelManager.getInstance().getResourceManagerFromUniqueName(rmId);
 			fSDMBackendCombo.setText(configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
 					Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
 							SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)));
@@ -294,7 +294,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			return EMPTY_STRING;
 		}
 
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(rmId);
 		if (rm != null) {
 			/*
 			 * If the resource manager has been changed and this is a remote resource manager, then update the host field

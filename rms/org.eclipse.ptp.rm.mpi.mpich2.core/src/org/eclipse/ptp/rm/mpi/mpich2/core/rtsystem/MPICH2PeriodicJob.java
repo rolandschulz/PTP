@@ -46,10 +46,9 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 	@Override
 	protected void parse(BufferedReader output) throws CoreException {
 		/*
-		 * MPI resource manager have only one machine and one queue. There they
-		 * are implicitly "discovered".
+		 * MPI resource manager have only one machine and one queue. There they are implicitly "discovered".
 		 */
-		IPResourceManager rm = (IPResourceManager) rts.getResourceManager().getAdapter(IPResourceManager.class);
+		IPResourceManager rm = rts.getPResourceManager();
 
 		/*
 		 * Parse output of mpdlistjobs command.

@@ -15,30 +15,26 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.jobs.IJobAddedEvent;
 import org.eclipse.ptp.core.jobs.IJobChangedEvent;
+import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class RuntimeProcess implements IProcess, IJobListener {
 	private IPLaunch fLaunch = null;
-	private final IResourceManagerControl fResourceManager;
-	private String fJobId = null;
 	private Map<String, String> fAttributes;
 	private int fExitValue = -1;
 	private boolean fTerminated = false;
 
-	public RuntimeProcess(IPLaunch launch, IResourceManagerControl rm, String jobId, Map<String, String> attributes) {
+	public RuntimeProcess(IPLaunch launch, Map<String, String> attributes) {
 		fLaunch = launch;
-		fResourceManager = rm;
-		fJobId = jobId;
-		JobManager.getInstance().addListener(this);
+		JobManager.getInstance().addListener(launch.getJobControl().getControlId(), this);
 		initializeAttributes(attributes);
 		try {
-			fTerminated = rm.getJobStatus(jobId, null).getState().equals(IJobStatus.COMPLETED);
+			fTerminated = launch.getJobControl().getJobStatus(launch.getJobId(), null).getState().equals(IJobStatus.COMPLETED);
 		} catch (CoreException e) {
 			fTerminated = true;
 		}
@@ -106,7 +102,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	 */
 	@Override
 	public String getLabel() {
-		return "Runtime process " + fJobId; //$NON-NLS-1$
+		return "Runtime process " + fLaunch.getJobId(); //$NON-NLS-1$
 	}
 
 	/*
@@ -127,7 +123,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	@Override
 	public IStreamsProxy getStreamsProxy() {
 		try {
-			return fResourceManager.getJobStatus(fJobId, null).getStreamsProxy();
+			return fLaunch.getJobControl().getJobStatus(fLaunch.getJobId(), null).getStreamsProxy();
 		} catch (CoreException e) {
 			return null;
 		}
@@ -194,7 +190,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	public void terminate() throws DebugException {
 		if (!isTerminated()) {
 			try {
-				fResourceManager.control(fJobId, IResourceManagerControl.TERMINATE_OPERATION, null);
+				fLaunch.getJobControl().control(fLaunch.getJobId(), IJobControl.TERMINATE_OPERATION, null);
 			} catch (CoreException e) {
 				throw new DebugException(e.getStatus());
 			}

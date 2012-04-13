@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -147,8 +146,7 @@ public class ActionUtils {
 	 */
 	public static void callDoControl(JobStatusData job, String operation, TableView view, IProgressMonitor monitor)
 			throws CoreException {
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager()
-				.getResourceManagerFromUniqueName(job.getConfigurationName());
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
 		IResourceManagerControl control = rm.getControl();
 		control.control(job.getJobId(), operation, monitor);
 		maybeUpdateJobState(job, view, monitor);
@@ -160,7 +158,7 @@ public class ActionUtils {
 	 */
 	public static boolean isAuthorised(JobStatusData status) {
 		IJAXBResourceManager rm = (IJAXBResourceManager) ModelManager.getInstance().getResourceManagerFromUniqueName(
-				status.getConfigurationName());
+				status.getControlId());
 		if (rm == null) {
 			return false;
 		}
@@ -192,8 +190,7 @@ public class ActionUtils {
 	 * @throws CoreException
 	 */
 	public static void maybeUpdateJobState(JobStatusData job, TableView view, IProgressMonitor monitor) throws CoreException {
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager()
-				.getResourceManagerFromUniqueName(job.getConfigurationName());
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
 		if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
 			return;
 		}
@@ -228,32 +225,35 @@ public class ActionUtils {
 			protected IStatus run(IProgressMonitor monitor) {
 				SubMonitor progress = SubMonitor.convert(monitor, 50 * selected.size());
 				for (JobStatusData status : selected) {
-					String remotePath = status.getOutputPath();
-					if (remotePath != null) {
-						try {
-							IFileStore lres = getRemoteFile(status.getRemoteServicesId(), status.getConnectionName(), remotePath,
-									progress);
-							if (lres != null) {
-								if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
-									lres.delete(EFS.NONE, progress.newChild(25));
+					IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(status.getControlId());
+					if (rm != null) {
+						String remotePath = status.getOutputPath();
+						if (remotePath != null) {
+							try {
+								IFileStore lres = getRemoteFile(rm.getControlConfiguration().getRemoteServicesId(), rm
+										.getControlConfiguration().getConnectionName(), remotePath, progress);
+								if (lres != null) {
+									if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
+										lres.delete(EFS.NONE, progress.newChild(25));
+									}
 								}
+							} catch (Throwable t) {
+								// continue to remove if possible
 							}
-						} catch (Throwable t) {
-							// continue to remove if possible
 						}
-					}
-					remotePath = status.getErrorPath();
-					if (remotePath != null) {
-						try {
-							IFileStore lres = getRemoteFile(status.getRemoteServicesId(), status.getConnectionName(), remotePath,
-									progress);
-							if (lres != null) {
-								if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
-									lres.delete(EFS.NONE, progress.newChild(25));
+						remotePath = status.getErrorPath();
+						if (remotePath != null) {
+							try {
+								IFileStore lres = getRemoteFile(rm.getControlConfiguration().getRemoteServicesId(), rm
+										.getControlConfiguration().getConnectionName(), remotePath, progress);
+								if (lres != null) {
+									if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
+										lres.delete(EFS.NONE, progress.newChild(25));
+									}
 								}
+							} catch (Throwable t) {
+								// continue to remove if possible
 							}
-						} catch (Throwable t) {
-							// continue to remove if possible
 						}
 					}
 				}

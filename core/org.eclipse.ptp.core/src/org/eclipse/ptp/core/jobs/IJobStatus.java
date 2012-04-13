@@ -90,20 +90,12 @@ public interface IJobStatus {
 	public static String JOB_OUTERR_READY = "JOB_OUTERR_READY"; //$NON-NLS-1$
 
 	/**
-	 * Get the configuration used to launch the job
+	 * Get the ID of the controller used to launch the job
 	 * 
-	 * @return configuration name
+	 * @return control ID
 	 * @since 6.0
 	 */
-	public String getConfigurationName();
-
-	/**
-	 * Get the connection used to launch the job
-	 * 
-	 * @return remote connection name
-	 * @since 6.0
-	 */
-	public String getConnectionName();
+	public String getControlId();
 
 	/**
 	 * @return path to remote file
@@ -142,14 +134,6 @@ public interface IJobStatus {
 	 * @return queue name or null if not available
 	 */
 	public String getQueueName();
-
-	/**
-	 * Get the remote services provider used to launch the job
-	 * 
-	 * @return remote services provider
-	 * @since 6.0
-	 */
-	public String getRemoteServicesId();
 
 	/**
 	 * Get job state. This is the primary state of the job, and is one of UNDETERMINED, SUBMITTED, RUNNING, SUSPENDED or COMPLETED.

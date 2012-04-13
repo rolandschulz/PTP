@@ -35,7 +35,7 @@ public class RemoveJob extends AbstractStatusAction {
 			for (Row row : selected) {
 				JobStatusData status = row.status;
 				data.add(status);
-				LMLManager.getInstance().removeUserJob(status.getConfigurationName(), status.getJobId());
+				LMLManager.getInstance().removeUserJob(status.getControlId(), status.getJobId());
 			}
 			view.refresh();
 			ActionUtils.removeFiles(data);

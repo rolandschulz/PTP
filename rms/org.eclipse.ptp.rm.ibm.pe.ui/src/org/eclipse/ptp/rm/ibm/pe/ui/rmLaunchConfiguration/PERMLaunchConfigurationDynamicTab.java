@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.attributes.BigIntegerAttribute;
 import org.eclipse.ptp.core.attributes.BigIntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -2183,7 +2184,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		IAttribute<?, ?, ?> rmAttrs[];
 
 		currentLaunchConfig = config;
-		IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
+		IPResourceManager rm = ModelManager.getInstance().getUniverse().getResourceManager(rmc.getUniqueName());
 		rmAttrs = rm.getAttributes();
 		for (int i = 0; i < rmAttrs.length; i++) {
 			try {

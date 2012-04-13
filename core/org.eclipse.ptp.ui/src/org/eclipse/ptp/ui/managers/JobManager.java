@@ -220,10 +220,9 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 */
 	public IPQueue[] getQueues() {
 		if (cur_queue != null) {
-			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(cur_queue.getControlId());
+			IPResourceManager rm = ModelManager.getInstance().getUniverse().getResourceManager(cur_queue.getControlId());
 			if (rm != null) {
-				IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
-				return prm.getQueues();
+				return rm.getQueues();
 			}
 		}
 		return new IPQueue[] {};
@@ -379,12 +378,11 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public void removeAllStoppedJobs() {
 		Map<String, IPResourceManager> rms = new HashMap<String, IPResourceManager>();
 		for (IPJob job : getJobs()) {
-			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
+			IPResourceManager rm = ModelManager.getInstance().getUniverse().getResourceManager(job.getControlId());
 			if (rm != null) {
-				IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
-				if (prm != null && !rms.containsKey(prm.getID())) {
-					prm.removeTerminatedJobs();
-					rms.put(prm.getID(), prm);
+				if (rm != null && !rms.containsKey(rm.getID())) {
+					rm.removeTerminatedJobs();
+					rms.put(rm.getID(), rm);
 				}
 			}
 		}

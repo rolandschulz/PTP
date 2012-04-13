@@ -11,14 +11,13 @@
 package org.eclipse.ptp.core.jobs;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
  * @since 6.0
  */
-public interface IJobControl extends IAdaptable {
+public interface IJobControl {
 	/**
 	 * Control operation to suspend a job
 	 */
@@ -53,6 +52,11 @@ public interface IJobControl extends IAdaptable {
 	 * @since 5.0
 	 */
 	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException;
+
+	/**
+	 * Get the ID of this job controller
+	 */
+	public String getControlId();
 
 	/**
 	 * Get the status of the job. The could potentially be a long running operation. If the progress monitor is canceled, the method

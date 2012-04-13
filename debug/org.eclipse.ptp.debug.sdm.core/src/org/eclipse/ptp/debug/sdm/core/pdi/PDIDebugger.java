@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.core.ExtFormat;
@@ -958,7 +959,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		} catch (CoreException e) {
 			throw new PDIException(null, e.getMessage());
 		}
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(rmUniqueName);
 		if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
 			return rm;
 		}
