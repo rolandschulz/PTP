@@ -283,18 +283,6 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJob(java.lang. String)
-	 */
-	/**
-	 * @since 5.0
-	 */
-	public void removeJob(String jobId) {
-		fResourceManagerMonitor.removeJob(jobId);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJobListener(org .eclipse.ptp.core.listeners.IJobListener)
 	 */
 	/**

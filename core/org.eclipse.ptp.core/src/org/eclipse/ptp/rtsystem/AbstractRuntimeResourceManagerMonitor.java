@@ -251,16 +251,6 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doRemoveJob(java .lang.String)
-	 */
-	@Override
-	public void doRemoveJob(String jobId) {
-		// All jobs are special
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doUpdateJob( org.eclipse.ptp.rmsystem.IJobStatus)
 	 */
 	@Override

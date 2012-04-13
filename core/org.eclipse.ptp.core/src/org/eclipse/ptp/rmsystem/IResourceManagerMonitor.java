@@ -32,14 +32,6 @@ public interface IResourceManagerMonitor {
 	public IResourceManagerComponentConfiguration getMonitorConfiguration();
 
 	/**
-	 * Notify monitor that job should no longer be treated specially
-	 * 
-	 * @param jobId
-	 *            ID of job to remove
-	 */
-	public void removeJob(String jobId);
-
-	/**
 	 * Start the resource manager. Clients should not call this directly. Call {@link IResourceManager#start(IProgressMonitor)}
 	 * instead.
 	 * 

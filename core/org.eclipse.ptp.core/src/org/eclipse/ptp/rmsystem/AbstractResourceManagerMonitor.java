@@ -76,15 +76,6 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJob(java.lang. String)
-	 */
-	public void removeJob(String jobId) {
-		doRemoveJob(jobId);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#start(org.eclipse.core .runtime.IProgressMonitor)
 	 */
 	public void start(IProgressMonitor monitor) throws CoreException {
@@ -115,14 +106,6 @@ public abstract class AbstractResourceManagerMonitor implements IResourceManager
 	 * Perform any activities prior to disposing of the resource manager.
 	 */
 	protected abstract void doDispose();
-
-	/**
-	 * Notify monitor that job should no longer be treated specially
-	 * 
-	 * @param jobId
-	 *            ID of job to remove
-	 */
-	protected abstract void doRemoveJob(String jobId);
 
 	/**
 	 * Stop the resource manager subsystem. This must be callable at any time (including if the resource manager is not started). It

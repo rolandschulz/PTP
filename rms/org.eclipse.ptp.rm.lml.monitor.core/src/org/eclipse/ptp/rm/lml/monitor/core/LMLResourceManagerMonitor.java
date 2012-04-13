@@ -362,16 +362,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doRemoveJob(java.lang.String)
-	 */
-	@Override
-	protected void doRemoveJob(String jobId) {
-		fLMLManager.removeUserJob(getResourceManager().getUniqueName(), jobId);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doShutdown()
 	 */
 	@Override
