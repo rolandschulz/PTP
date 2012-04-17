@@ -297,7 +297,7 @@ public class LCVariableMap implements IVariableMap {
 		if (rmId != null) {
 			rmPrefix = rmId + JAXBUIConstants.DOT;
 		} else {
-			rmPrefix = "";
+			rmPrefix = JAXBControlConstants.ZEROSTR;
 		}
 		for (String s : rmVars.getVariables().keySet()) {
 			loadValues(s, rmVars.getVariables().get(s), false);
@@ -330,7 +330,7 @@ public class LCVariableMap implements IVariableMap {
 	 * @throws CoreException
 	 */
 	public void relinkConfigurationProperties(ILaunchConfiguration configuration) throws CoreException {
-		if (!rmPrefix.equals("")) {
+		if (!rmPrefix.equals(JAXBControlConstants.ZEROSTR)) {
 			for (Iterator<String> key = values.keySet().iterator(); key.hasNext();) {
 				String name = key.next();
 				if (!name.startsWith(rmPrefix)) {
@@ -433,7 +433,7 @@ public class LCVariableMap implements IVariableMap {
 				continue;
 			}
 			if (var != null) {
-				if (!rmPrefix.equals("") && var.startsWith(rmPrefix)) {
+				if (!rmPrefix.equals(JAXBControlConstants.ZEROSTR) && var.startsWith(rmPrefix)) {
 					var = var.substring(rmPrefix.length());
 					if (valid.contains(var) || RMVariableMap.isFixedValid(var)) {
 						put(var, value);
@@ -454,7 +454,7 @@ public class LCVariableMap implements IVariableMap {
 	public void updateFromConfiguration(ILaunchConfiguration configuration) throws CoreException {
 		Map<String, Object> attr = configuration.getAttributes();
 		for (String key : attr.keySet()) {
-			if ((!rmPrefix.equals("") && key.startsWith(rmPrefix)) || RMVariableMap.isExternal(key)) {
+			if ((!rmPrefix.equals(JAXBControlConstants.ZEROSTR) && key.startsWith(rmPrefix)) || RMVariableMap.isExternal(key)) {
 				values.put(key, attr.get(key));
 			}
 		}
