@@ -41,6 +41,7 @@ import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import org.eclipse.ptp.launch.LaunchUtils;
 import org.eclipse.ptp.rm.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 import org.eclipse.swt.widgets.Display;
@@ -77,10 +78,10 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				/*
 				 * NOTE: we assume these have already been verified prior to launch
 				 */
-				String app = getProgramName(fLaunch.getLaunchConfiguration());
-				String path = getProgramPath(fLaunch.getLaunchConfiguration());
-				String cwd = getWorkingDirectory(fLaunch.getLaunchConfiguration());
-				String[] args = getProgramArguments(fLaunch.getLaunchConfiguration());
+				String app = LaunchUtils.getProgramName(fLaunch.getLaunchConfiguration());
+				String path = LaunchUtils.getProgramPath(fLaunch.getLaunchConfiguration());
+				String cwd = LaunchUtils.getWorkingDirectory(fLaunch.getLaunchConfiguration());
+				String[] args = LaunchUtils.getProgramArguments(fLaunch.getLaunchConfiguration());
 
 				switchPerspective(DebugUITools.getLaunchPerspective(fLaunch.getLaunchConfiguration().getType(),
 						fLaunch.getLaunchMode()));
@@ -163,7 +164,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			}
 
 			// All copy pre-"job submission" occurs here
-			copyExecutable(configuration, progress.newChild(10));
+			LaunchUtils.copyExecutable(configuration, progress.newChild(10));
 			if (progress.isCanceled()) {
 				return;
 			}
@@ -188,7 +189,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					 * via the submitJob() command.
 					 */
 
-					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
+					IPDebugConfiguration debugConfig = LaunchUtils.getDebugConfig(configuration);
 					debugger = debugConfig.getDebugger();
 					debugger.initialize(configuration, progress.newChild(10));
 					if (progress.isCanceled()) {
@@ -245,7 +246,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	protected void doCleanupLaunch(IPLaunch launch) {
 		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
 			try {
-				IPDebugConfiguration debugConfig = getDebugConfig(launch.getLaunchConfiguration());
+				IPDebugConfiguration debugConfig = LaunchUtils.getDebugConfig(launch.getLaunchConfiguration());
 				IPDebugger debugger = debugConfig.getDebugger();
 				debugger.cleanup(launch);
 			} catch (CoreException e) {

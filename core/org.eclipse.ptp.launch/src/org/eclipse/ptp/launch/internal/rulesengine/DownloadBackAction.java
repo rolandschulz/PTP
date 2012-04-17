@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback;
+import org.eclipse.ptp.launch.LaunchUtils;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
@@ -30,30 +30,26 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
  */
 public class DownloadBackAction implements IRuleAction {
 
-	private final ILaunchProcessCallback fProcess;
 	private final DownloadBackRule fRule;
 	private final ILaunchConfiguration fConfiguration;
 	private final IProgressMonitor fMonitor;
 
-	public DownloadBackAction(ILaunchProcessCallback process, ILaunchConfiguration configuration,
-			DownloadBackRule downloadBackRule, IProgressMonitor monitor) {
+	public DownloadBackAction(ILaunchConfiguration configuration, DownloadBackRule downloadBackRule, IProgressMonitor monitor) {
 		super();
-		fProcess = process;
 		fRule = downloadBackRule;
 		fConfiguration = configuration;
 		fMonitor = monitor;
 	}
 
 	public void run() throws CoreException {
-		Assert.isNotNull(fProcess);
 		Assert.isNotNull(fRule);
 		Assert.isNotNull(fConfiguration);
 
 		SubMonitor progress = SubMonitor.convert(fMonitor, 10);
 
 		// Get managers
-		IRemoteFileManager remoteFileManager = fProcess.getRemoteFileManager(fConfiguration, progress.newChild(2));
-		IRemoteFileManager localFileManager = fProcess.getLocalFileManager(fConfiguration);
+		IRemoteFileManager remoteFileManager = LaunchUtils.getRemoteFileManager(fConfiguration, progress.newChild(2));
+		IRemoteFileManager localFileManager = LaunchUtils.getLocalFileManager(fConfiguration);
 
 		/*
 		 * Process files in list.

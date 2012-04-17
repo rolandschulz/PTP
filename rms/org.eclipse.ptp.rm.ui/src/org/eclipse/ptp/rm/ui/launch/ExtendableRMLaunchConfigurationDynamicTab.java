@@ -21,7 +21,6 @@ import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamic
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -50,15 +49,14 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.elements.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control)
 	 */
 	/**
 	 * @since 3.0
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManager rm) {
+	public RMLaunchValidation canSave(Control control) {
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.canSave(control, rm);
+			RMLaunchValidation validation = tabControl.canSave(control);
 			if (!validation.isSuccess()) {
 				return validation;
 			}
@@ -66,16 +64,16 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 		return new RMLaunchValidation(true, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.elements.IPQueue)
-	 */
 	/**
 	 * @since 3.0
 	 */
-	public void createControl(Composite parent, IResourceManager rm) throws CoreException {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	public void createControl(Composite parent, ILaunchConfiguration configuration) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		control.setLayout(layout);
@@ -85,7 +83,7 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			final TabItem simpleTabItem = new TabItem(tabFolder, SWT.NONE);
-			tabControl.createControl(tabFolder, rm);
+			tabControl.createControl(tabFolder, configuration);
 			simpleTabItem.setText(tabControl.getText());
 			simpleTabItem.setImage(tabControl.getImage());
 			simpleTabItem.setControl(tabControl.getControl());
@@ -115,16 +113,15 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.elements.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	/**
 	 * @since 3.0
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.initializeFrom(control, rm, configuration);
+			RMLaunchValidation validation = tabControl.initializeFrom(control, configuration);
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
 			}
@@ -136,15 +133,14 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	/**
 	 * @since 3.0
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm) {
+	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig) {
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.isValid(launchConfig, rm);
+			RMLaunchValidation validation = tabControl.isValid(launchConfig);
 			if (!validation.isSuccess()) {
 				return validation;
 			}
@@ -156,16 +152,15 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	/**
 	 * @since 3.0
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.performApply(configuration, rm);
+			RMLaunchValidation validation = tabControl.performApply(configuration);
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
 			}
@@ -177,16 +172,15 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	/**
 	 * @since 3.0
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.setDefaults(configuration, rm);
+			RMLaunchValidation validation = tabControl.setDefaults(configuration);
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
 			}

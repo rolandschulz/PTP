@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback;
+import org.eclipse.ptp.launch.LaunchUtils;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.launch.rulesengine.OverwritePolicies;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -33,23 +33,19 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
  */
 public class UploadRuleAction implements IRuleAction {
 
-	private final ILaunchProcessCallback fProcess;
 	private final UploadRule fRule;
 	private final ILaunchConfiguration fConfiguration;
 	private DownloadBackRule fDownloadBackRule;
 	private final IProgressMonitor fMonitor;
 
-	public UploadRuleAction(ILaunchProcessCallback process, ILaunchConfiguration configuration, UploadRule uploadRule,
-			IProgressMonitor monitor) {
+	public UploadRuleAction(ILaunchConfiguration configuration, UploadRule uploadRule, IProgressMonitor monitor) {
 		super();
-		fProcess = process;
 		fRule = uploadRule;
 		fConfiguration = configuration;
 		fMonitor = monitor;
 	}
 
 	public void run() throws CoreException {
-		Assert.isNotNull(fProcess);
 		Assert.isNotNull(fRule);
 		Assert.isNotNull(fConfiguration);
 
@@ -99,7 +95,7 @@ public class UploadRuleAction implements IRuleAction {
 
 			IPath localPath = localPaths[i];
 
-			IRemoteFileManager localFileManager = fProcess.getLocalFileManager(fConfiguration);
+			IRemoteFileManager localFileManager = LaunchUtils.getLocalFileManager(fConfiguration);
 			IFileStore localFileStore = localFileManager.getResource(localPath.toString());
 			IFileInfo localFileInfo = localFileStore.fetchInfo(EFS.NONE, progress.newChild(5));
 
@@ -115,7 +111,7 @@ public class UploadRuleAction implements IRuleAction {
 			IPath remotePath = remotePathParent.append(localPath.lastSegment());
 
 			// Generate the FileStore for the remote path
-			IRemoteFileManager remoteFileManager = fProcess.getRemoteFileManager(fConfiguration, progress.newChild(5));
+			IRemoteFileManager remoteFileManager = LaunchUtils.getRemoteFileManager(fConfiguration, progress.newChild(5));
 			IFileStore remoteFileStore = remoteFileManager.getResource(remotePath.toString());
 
 			/*
@@ -125,14 +121,6 @@ public class UploadRuleAction implements IRuleAction {
 			parentFileStore.mkdir(EFS.NONE, progress.newChild(5));
 
 			doUpload(localFileStore, localPath, remoteFileStore, remotePath, progress.newChild(25));
-		}
-
-		/*
-		 * If a download back fRule was created during the upload, the add this
-		 * fRule the the list of synchronize rules.
-		 */
-		if (fDownloadBackRule != null) {
-			fProcess.addSynchronizationRule(fDownloadBackRule);
 		}
 	}
 

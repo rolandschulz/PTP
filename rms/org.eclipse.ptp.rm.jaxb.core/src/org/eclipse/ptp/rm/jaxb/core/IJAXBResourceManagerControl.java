@@ -26,16 +26,6 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
  */
 public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	/**
-	 * Initialize the resource manager. The resource manager is ready to be used after initialization, however it must be started
-	 * before any control operations can be performed.
-	 * 
-	 * @param monitor
-	 *            progress monitor
-	 * @throws CoreException
-	 */
-	public void initialize(IProgressMonitor monitor) throws CoreException;
-
-	/**
 	 * @return whether the launch environment should be appended to (or replace) the environment for a given command execution.
 	 */
 	public boolean getAppendEnv();
@@ -82,4 +72,6 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	 * 
 	 */
 	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException;
+
+	public void initialize(IProgressMonitor monitor) throws CoreException;
 }

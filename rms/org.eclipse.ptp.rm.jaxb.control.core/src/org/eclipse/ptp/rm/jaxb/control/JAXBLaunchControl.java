@@ -281,6 +281,15 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl#getConfiguration()
+	 */
+	public ResourceManagerData getConfiguration() {
+		return configData;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getConnectionName()
 	 */
 	public String getConnectionName() {

@@ -22,17 +22,16 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -70,8 +69,8 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	private String selected;
 
 	/**
-	 * @param rm
-	 *            the resource manager
+	 * @param control
+	 *            the job controller
 	 * @param dialog
 	 *            the ancestor main launch dialog
 	 * @param importTab
@@ -79,36 +78,35 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	public JAXBImportedScriptLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog,
-			LaunchTabType.Import importTab, JAXBControllerLaunchConfigurationTab parentTab) {
-		super(rm, dialog, parentTab);
+	public JAXBImportedScriptLaunchConfigurationTab(IJAXBJobControl control, ILaunchConfigurationDialog dialog,
+			LaunchTabType.Import importTab, IJAXBParentLaunchConfigurationTab parentTab) {
+		super(control, dialog, parentTab);
 		this.title = importTab.getTitle();
 		this.viewerType = importTab.getExportForOverride();
 		shared = new String[0];
-		rmPrefix = rm.getConfiguration().getUniqueName() + JAXBUIConstants.DOT;
+		rmPrefix = control.getControlId() + JAXBUIConstants.DOT;
 		contents = new StringBuffer();
 	}
 
 	/*
 	 * Nothing to validate here. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, )
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control)
 	 */
 	@Override
-	public RMLaunchValidation canSave(Control control, IResourceManager rm) {
-		return super.canSave(control, rm);
+	public RMLaunchValidation canSave(Control control) {
+		return super.canSave(control);
 	}
 
 	/*
-	 * Fixed construction of read-only text field and browse button for the selection, a clear button to clear the choice, and a
-	 * large text area for displaying the script. Attribute viewer is configurable. (non-Javadoc)
+	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, )
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
-	public void createControl(final Composite parent, IResourceManager rm) throws CoreException {
+	public void createControl(final Composite parent, ILaunchConfiguration configuration) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(WidgetBuilderUtils.createGridLayout(1, false));
 
@@ -193,12 +191,12 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	 * If there is a script path in the configuration, display that script. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.debug.core.ILaunchConfiguration)
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
 		try {
-			RMLaunchValidation validation = super.initializeFrom(control, rm, configuration);
+			RMLaunchValidation validation = super.initializeFrom(control, configuration);
 			if (!validation.isSuccess()) {
 				return validation;
 			}
@@ -219,22 +217,22 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	 * Nothing to do here. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.rmsystem.IResourceManager, )
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
-	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm) {
-		return super.isValid(launchConfig, rm);
+	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig) {
+		return super.isValid(launchConfig);
 	}
 
 	/*
 	 * Nothing to do here. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager, )
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	@Override
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
-		return super.setDefaults(configuration, rm);
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+		return super.setDefaults(configuration);
 	}
 
 	/*
@@ -269,7 +267,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	@Override
 	protected void doRefreshLocal() {
 		super.doRefreshLocal();
-		LCVariableMap lcMap = parentTab.getLCMap();
+		LCVariableMap lcMap = parentTab.getVariableMap();
 		lcMap.put(JAXBControlUIConstants.SCRIPT_PATH, selected);
 	}
 
@@ -380,6 +378,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 					break;
 				}
 			}
+			br.close();
 		}
 		updateControls();
 	}

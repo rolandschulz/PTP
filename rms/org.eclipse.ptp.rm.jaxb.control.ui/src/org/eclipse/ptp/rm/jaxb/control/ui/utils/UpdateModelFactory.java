@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ptp.ems.ui.EnvManagerConfigButton;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.RemoteUIServicesUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
@@ -31,8 +32,8 @@ import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
 import org.eclipse.ptp.rm.jaxb.control.ui.cell.SpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
-import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
-import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab;
+import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab;
+import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ButtonGroupUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ButtonUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ComboUpdateModel;
@@ -42,7 +43,6 @@ import org.eclipse.ptp.rm.jaxb.control.ui.model.TableRowUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.TextUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ValueTreeNodeUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
@@ -75,8 +75,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Utilities for creating update models for control widgets, cell editors and
- * viewers.
+ * Utilities for creating update models for control widgets, cell editors and viewers.
  * 
  * @author arossi
  * @author Jeff Overbey - Environment Manager support
@@ -172,11 +171,13 @@ public class UpdateModelFactory {
 	 * 
 	 */
 	private enum CellEditorType {
-		TEXT, COMBO, SPINNER, CHECK;
+		TEXT,
+		COMBO,
+		SPINNER,
+		CHECK;
 
 		/**
-		 * Determine the CellEditor from the Property or Attribute type or
-		 * value.
+		 * Determine the CellEditor from the Property or Attribute type or value.
 		 * 
 		 * @param object
 		 *            Property or Attribute
@@ -217,8 +218,7 @@ public class UpdateModelFactory {
 		}
 
 		/**
-		 * If the Property or Attribute carries an explicit type name, determine
-		 * CellEditor type from it.
+		 * If the Property or Attribute carries an explicit type name, determine CellEditor type from it.
 		 * 
 		 * @param clzz
 		 *            type name
@@ -283,8 +283,7 @@ public class UpdateModelFactory {
 			setControlData(widget);
 			setMapDependentData(widget, rmMap);
 			/*
-			 * NOTE: this will override the attribute field, so check for null
-			 * first
+			 * NOTE: this will override the attribute field, so check for null first
 			 */
 			String s = widget.getItemsFrom();
 			if (s != null) {
@@ -293,8 +292,7 @@ public class UpdateModelFactory {
 		}
 
 		/**
-		 * Configure the fields which do not depend on the underlying data
-		 * object.
+		 * Configure the fields which do not depend on the underlying data object.
 		 * 
 		 * @param browse
 		 *            JAXB data element describing widget
@@ -317,8 +315,7 @@ public class UpdateModelFactory {
 		}
 
 		/**
-		 * Configure the fields which do not depend on the underlying data
-		 * object.
+		 * Configure the fields which do not depend on the underlying data object.
 		 * 
 		 * @param button
 		 *            JAXB data element describing widget
@@ -336,8 +333,7 @@ public class UpdateModelFactory {
 		}
 
 		/**
-		 * Configure the fields which do not depend on the underlying data
-		 * object.
+		 * Configure the fields which do not depend on the underlying data object.
 		 * 
 		 * @param widget
 		 *            JAXB data element describing widget
@@ -429,9 +425,8 @@ public class UpdateModelFactory {
 	 *            resource manager environment
 	 * @return
 	 */
-	public static IUpdateModel createModel(ButtonGroupType bGroupDescriptor, Composite bGroup,
-			JAXBDynamicLaunchConfigurationTab tab, IVariableMap rmVarMap, Map<String, Button> sources,
-			Map<ControlStateType, Control> targets) {
+	public static IUpdateModel createModel(ButtonGroupType bGroupDescriptor, Composite bGroup, IJAXBLaunchConfigurationTab tab,
+			IVariableMap rmVarMap, Map<String, Button> sources, Map<ControlStateType, Control> targets) {
 		List<WidgetType> bWidgets = bGroupDescriptor.getButton();
 		List<Button> buttons = new ArrayList<Button>();
 		for (WidgetType widget : bWidgets) {
@@ -469,8 +464,7 @@ public class UpdateModelFactory {
 	 *            launch tab being built (accessed for value handler)
 	 * @return
 	 */
-	public static ViewerUpdateModel createModel(ColumnViewer viewer, AttributeViewerType descriptor,
-			JAXBDynamicLaunchConfigurationTab tab) {
+	public static ViewerUpdateModel createModel(ColumnViewer viewer, AttributeViewerType descriptor, IJAXBLaunchConfigurationTab tab) {
 		String name = descriptor.getName();
 		TemplateType template = descriptor.getValue();
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
@@ -483,8 +477,7 @@ public class UpdateModelFactory {
 	 * @param parent
 	 *            control to which the widget belongs
 	 * @param browse
-	 *            JAXB data object describing the widget to which this model is
-	 *            bound
+	 *            JAXB data object describing the widget to which this model is bound
 	 * @param tab
 	 *            launch tab being built
 	 * @param rmVarMap
@@ -495,7 +488,7 @@ public class UpdateModelFactory {
 	 *            map of widgets on which to set state
 	 * 
 	 */
-	public static IUpdateModel createModel(Composite parent, BrowseType browse, JAXBDynamicLaunchConfigurationTab tab,
+	public static IUpdateModel createModel(Composite parent, BrowseType browse, IJAXBLaunchConfigurationTab tab,
 			IVariableMap rmVarMap, Map<ControlStateType, Control> targets) {
 		ControlDescriptor cd = new ControlDescriptor(browse, rmVarMap);
 
@@ -522,8 +515,7 @@ public class UpdateModelFactory {
 	 * @param parent
 	 *            control to which the widget belongs
 	 * @param widget
-	 *            JAXB data object describing the widget to which this model is
-	 *            bound
+	 *            JAXB data object describing the widget to which this model is bound
 	 * @param tab
 	 *            launch tab being built
 	 * @param rmVarMap
@@ -535,7 +527,7 @@ public class UpdateModelFactory {
 	 * 
 	 * @return update model if not a label
 	 */
-	public static IUpdateModel createModel(Composite parent, WidgetType widget, JAXBDynamicLaunchConfigurationTab tab,
+	public static IUpdateModel createModel(Composite parent, WidgetType widget, IJAXBLaunchConfigurationTab tab,
 			IVariableMap rmVarMap, Map<String, Button> sources, Map<ControlStateType, Control> targets) {
 		ControlDescriptor cd = new ControlDescriptor(widget, rmVarMap);
 		Control control = createControl(parent, cd, tab);
@@ -601,7 +593,7 @@ public class UpdateModelFactory {
 	 * @return
 	 */
 	public static ICellEditorUpdateModel createModel(Object data, ColumnViewer viewer, List<ColumnDataType> columnData,
-			JAXBDynamicLaunchConfigurationTab tab) {
+			IJAXBLaunchConfigurationTab tab) {
 		ICellEditorUpdateModel model = null;
 		if (viewer instanceof TableViewer) {
 			model = createModel(data, (TableViewer) viewer, columnData, tab);
@@ -613,14 +605,12 @@ public class UpdateModelFactory {
 	}
 
 	/**
-	 * Constructs push-button which activates an external command. There is no
-	 * model generated for this widget.
+	 * Constructs push-button which activates an external command. There is no model generated for this widget.
 	 * 
 	 * @param parent
 	 *            control to which the widget belongs
 	 * @param button
-	 *            JAXB data object describing the widget to which this model is
-	 *            bound
+	 *            JAXB data object describing the widget to which this model is bound
 	 * @param tab
 	 *            launch tab being built
 	 * @param rmVarMap
@@ -631,7 +621,7 @@ public class UpdateModelFactory {
 	 *            map of widgets on which to set state
 	 * 
 	 */
-	public static void createPushButton(Composite parent, PushButtonType button, JAXBDynamicLaunchConfigurationTab tab,
+	public static void createPushButton(Composite parent, PushButtonType button, IJAXBLaunchConfigurationTab tab,
 			IVariableMap rmVarMap, Map<ControlStateType, Control> targets) {
 		ControlDescriptor cd = new ControlDescriptor(button, rmVarMap);
 		Control c = createActionButton(parent, cd, tab);
@@ -668,8 +658,7 @@ public class UpdateModelFactory {
 	 * @param tab
 	 * @return
 	 */
-	private static Control createActionButton(Composite parent, final ControlDescriptor cd,
-			final JAXBDynamicLaunchConfigurationTab tab) {
+	private static Control createActionButton(Composite parent, final ControlDescriptor cd, final IJAXBLaunchConfigurationTab tab) {
 		Button b = WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, SWT.PUSH, new SelectionListener() {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -689,9 +678,8 @@ public class UpdateModelFactory {
 	}
 
 	/**
-	 * Creates a read-only Text area and adjacent browse button using remote
-	 * connection information. The update model will be attached to the returned
-	 * text widget, as its text value will trigger updates.
+	 * Creates a read-only Text area and adjacent browse button using remote connection information. The update model will be
+	 * attached to the returned text widget, as its text value will trigger updates.
 	 * 
 	 * @see org.eclipse.swt.widgets.Text
 	 * @see org.eclipse.swt.widgets.Button
@@ -710,7 +698,7 @@ public class UpdateModelFactory {
 	 * @return the text widget carrying the browse selection
 	 */
 	private static Text createBrowse(final Composite parent, BrowseType d, final ControlDescriptor cd,
-			final JAXBDynamicLaunchConfigurationTab tab, Map<ControlStateType, Control> targets) {
+			final IJAXBLaunchConfigurationTab tab, Map<ControlStateType, Control> targets) {
 		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, JAXBControlUIConstants.ZEROSTR);
 
 		Button b = WidgetBuilderUtils.createButton(parent, cd.subLayoutData, cd.title, SWT.NONE, new SelectionListener() {
@@ -723,12 +711,12 @@ public class UpdateModelFactory {
 					String initial = t.getText();
 					URI uri = null;
 					if (JAXBControlUIConstants.ZEROSTR.equals(initial)) {
-						uri = tab.getParent().getDelegate().getRemoteHome();
+						uri = tab.getParent().getRemoteServicesDelegate().getRemoteHome();
 					} else {
 						uri = new URI(initial);
 					}
-					uri = RemoteUIServicesUtils.browse(parent.getShell(), uri, tab.getParent().getDelegate(), !cd.localOnly,
-							cd.readOnly, cd.directory);
+					uri = RemoteUIServicesUtils.browse(parent.getShell(), uri, tab.getParent().getRemoteServicesDelegate(),
+							!cd.localOnly, cd.readOnly, cd.directory);
 					if (uri != null) {
 						if (cd.returnUri) {
 							t.setText(uri.toString());
@@ -802,12 +790,12 @@ public class UpdateModelFactory {
 	 *            to which the control belongs
 	 * @param cd
 	 *            internal data object carrying model description info
-	 * @param rmConfig 
+	 * @param rmConfig
 	 * @return the Combo widget
 	 */
-	private static EnvManagerConfigButton createEnvConfig(Composite parent, final ControlDescriptor cd, IJAXBResourceManager resourceManager) {
+	private static EnvManagerConfigButton createEnvConfig(Composite parent, final ControlDescriptor cd, IRemoteConnection conn) {
 		return WidgetBuilderUtils.createEnvConfig(parent, cd.style, cd.layoutData, JAXBControlUIConstants.ZEROSTR, cd.title,
-				cd.tooltip, null, resourceManager);
+				cd.tooltip, null, conn);
 	}
 
 	/**
@@ -815,14 +803,12 @@ public class UpdateModelFactory {
 	 * @param parent
 	 *            to which the control belongs
 	 * @param cd
-	 *            control descriptor for the JAXB data element describing the
-	 *            widget
+	 *            control descriptor for the JAXB data element describing the widget
 	 * @param tab
 	 *            launch tab being built
-	 * @return the resulting control (<code>null</code> if the widget is a
-	 *         Label).
+	 * @return the resulting control (<code>null</code> if the widget is a Label).
 	 */
-	private static Control createControl(final Composite parent, ControlDescriptor cd, JAXBDynamicLaunchConfigurationTab tab) {
+	private static Control createControl(final Composite parent, ControlDescriptor cd, IJAXBLaunchConfigurationTab tab) {
 		Control c = null;
 		if (JAXBControlUIConstants.LABEL.equals(cd.widgetType)) {
 			c = WidgetBuilderUtils.createLabel(parent, cd.fixedText, cd.style, cd.layoutData);
@@ -847,7 +833,7 @@ public class UpdateModelFactory {
 		} else if (JAXBControlUIConstants.COMBO.equals(cd.widgetType)) {
 			c = createCombo(parent, cd);
 		} else if (JAXBControlUIConstants.ENVCONFIG.equals(cd.widgetType)) {
-			c = createEnvConfig(parent, cd, tab.getResourceManager());
+			c = createEnvConfig(parent, cd, tab.getRemoteConnection());
 		}
 
 		if (c != null) {
@@ -919,11 +905,10 @@ public class UpdateModelFactory {
 	 *            list of JAXB data elements describing table columns
 	 * @param tab
 	 *            launch tab being built
-	 * @return the cell editor update model, which contains a reference to the
-	 *         CellEditor
+	 * @return the cell editor update model, which contains a reference to the CellEditor
 	 */
 	private static ICellEditorUpdateModel createModel(Object data, TableViewer viewer, List<ColumnDataType> columnData,
-			JAXBDynamicLaunchConfigurationTab tab) {
+			IJAXBLaunchConfigurationTab tab) {
 		CellDescriptor cd = new CellDescriptor(data, columnData);
 		CellEditor editor = createEditor(cd, data, viewer.getTable());
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
@@ -956,11 +941,10 @@ public class UpdateModelFactory {
 	 *            list of JAXB data elements describing table columns
 	 * @param tab
 	 *            launch tab being built
-	 * @return the cell editor update model, which contains a reference to the
-	 *         CellEditor
+	 * @return the cell editor update model, which contains a reference to the CellEditor
 	 */
 	private static ICellEditorUpdateModel createModel(Object data, TreeViewer viewer, List<ColumnDataType> columnData,
-			JAXBDynamicLaunchConfigurationTab tab) {
+			IJAXBLaunchConfigurationTab tab) {
 		CellDescriptor cd = new CellDescriptor(data, columnData);
 		CellEditor editor = createEditor(cd, data, viewer.getTree());
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
@@ -996,8 +980,7 @@ public class UpdateModelFactory {
 	}
 
 	/**
-	 * Checks to see if there is a validator on the attribute and adds this to
-	 * the model.
+	 * Checks to see if there is a validator on the attribute and adds this to the model.
 	 * 
 	 * @param model
 	 *            update model object to associate validator with
@@ -1006,7 +989,7 @@ public class UpdateModelFactory {
 	 * @param tab
 	 *            launch tab being built
 	 */
-	private static void maybeAddValidator(IUpdateModel model, Object data, JAXBControllerLaunchConfigurationTab tab) {
+	private static void maybeAddValidator(IUpdateModel model, Object data, IJAXBParentLaunchConfigurationTab tab) {
 		if (data != null && data instanceof AttributeType) {
 			model.setValidator(((AttributeType) data).getValidator(), tab);
 		}

@@ -161,7 +161,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private ICommandJobStatusMap jobStatusMap;
 	private JobIdPinTable pinTable;
 	private RMVariableMap rmVarMap;
-	private ResourceManagerData configurationData;
+	private ResourceManagerData configData;
 	private String servicesId;
 	private String connectionName;
 	private RemoteServicesDelegate remoteServicesDelegate;
@@ -184,6 +184,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 */
 	public boolean getAppendEnv() {
 		return appendLaunchEnv;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl#getConfiguration()
+	 */
+	public ResourceManagerData getConfiguration() {
+		return configData;
 	}
 
 	/*
@@ -299,36 +308,40 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	public void initialize(IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			/*
-			 * Use the base configuration which contains the config file information
-			 */
-			IJAXBResourceManagerConfiguration base = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
-			base.initialize();
-			rmVarMap = (RMVariableMap) base.getRMVariableMap();
-			configurationData = base.getResourceManagerData();
-			/*
-			 * Set connection information from the site configuration. This may get overidden by the launch configuration later
-			 */
-			SiteType site = configurationData.getSiteData();
-			if (site != null) {
-				String controlURI = site.getControlConnection();
-				if (controlURI != null) {
-					try {
-						URI uri = new URI(controlURI);
-						IRemoteServices remServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(uri, progress.newChild(5));
-						if (remServices != null) {
-							IRemoteConnection remConn = remServices.getConnectionManager().getConnection(uri);
-							if (remConn != null) {
-								config.setRemoteServicesId(remServices.getId());
-								config.setConnectionName(remConn.getName());
+			if (!isInitialized) {
+				/*
+				 * Use the base configuration which contains the config file information
+				 */
+				IJAXBResourceManagerConfiguration base = (IJAXBResourceManagerConfiguration) getResourceManager()
+						.getConfiguration();
+				base.initialize();
+				rmVarMap = (RMVariableMap) base.getRMVariableMap();
+				configData = base.getResourceManagerData();
+				/*
+				 * Set connection information from the site configuration. This may get overidden by the launch configuration later
+				 */
+				SiteType site = configData.getSiteData();
+				if (site != null) {
+					String controlURI = site.getControlConnection();
+					if (controlURI != null) {
+						try {
+							URI uri = new URI(controlURI);
+							IRemoteServices remServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(uri,
+									progress.newChild(5));
+							if (remServices != null) {
+								IRemoteConnection remConn = remServices.getConnectionManager().getConnection(uri);
+								if (remConn != null) {
+									config.setRemoteServicesId(remServices.getId());
+									config.setConnectionName(remConn.getName());
+								}
 							}
+						} catch (URISyntaxException e) {
 						}
-					} catch (URISyntaxException e) {
 					}
 				}
+				setFixedConfigurationProperties(progress.newChild(5));
+				isInitialized = true;
 			}
-			setFixedConfigurationProperties(progress.newChild(5));
-			isInitialized = true;
 		} catch (Throwable t) {
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
 		} finally {
@@ -383,7 +396,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		CommandType command = null;
 
-		for (CommandType cmd : configurationData.getControlData().getButtonAction()) {
+		for (CommandType cmd : configData.getControlData().getButtonAction()) {
 			if (cmd.getName().equals(action)) {
 				command = cmd;
 				break;
@@ -391,7 +404,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		if (command == null) {
-			for (CommandType cmd : configurationData.getControlData().getStartUpCommand()) {
+			for (CommandType cmd : configData.getControlData().getStartUpCommand()) {
 				if (cmd.getName().equals(action)) {
 					command = cmd;
 					break;
@@ -400,7 +413,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		if (command == null) {
-			for (CommandType cmd : configurationData.getControlData().getShutDownCommand()) {
+			for (CommandType cmd : configData.getControlData().getShutDownCommand()) {
 				if (cmd.getName().equals(action)) {
 					command = cmd;
 					break;
@@ -455,27 +468,27 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		CommandType job = null;
 		if (TERMINATE_OPERATION.equals(operation)) {
 			maybeKillInteractive(jobId);
-			job = configurationData.getControlData().getTerminateJob();
+			job = configData.getControlData().getTerminateJob();
 			if (job == null) { // there may not be an external cancel
 				return;
 			}
 		} else if (SUSPEND_OPERATION.equals(operation)) {
-			job = configurationData.getControlData().getSuspendJob();
+			job = configData.getControlData().getSuspendJob();
 			if (job == null) {
 				throw ce;
 			}
 		} else if (RESUME_OPERATION.equals(operation)) {
-			job = configurationData.getControlData().getResumeJob();
+			job = configData.getControlData().getResumeJob();
 			if (job == null) {
 				throw ce;
 			}
 		} else if (RELEASE_OPERATION.equals(operation)) {
-			job = configurationData.getControlData().getReleaseJob();
+			job = configData.getControlData().getReleaseJob();
 			if (job == null) {
 				throw ce;
 			}
 		} else if (HOLD_OPERATION.equals(operation)) {
-			job = configurationData.getControlData().getHoldJob();
+			job = configData.getControlData().getHoldJob();
 			if (job == null) {
 				throw ce;
 			}
@@ -501,18 +514,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		CommandJob.JobMode jobMode = CommandJob.JobMode.INTERACTIVE;
 
 		if (ILaunchManager.RUN_MODE.equals(mode)) {
-			command = configurationData.getControlData().getSubmitBatch();
+			command = configData.getControlData().getSubmitBatch();
 			if (command != null) {
 				jobMode = CommandJob.JobMode.BATCH;
 			} else {
-				command = configurationData.getControlData().getSubmitInteractive();
+				command = configData.getControlData().getSubmitInteractive();
 			}
 		} else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-			command = configurationData.getControlData().getSubmitBatchDebug();
+			command = configData.getControlData().getSubmitBatchDebug();
 			if (command != null) {
 				jobMode = CommandJob.JobMode.BATCH;
 			} else {
-				command = configurationData.getControlData().getSubmitInteractiveDebug();
+				command = configData.getControlData().getSubmitInteractiveDebug();
 			}
 		}
 
@@ -544,7 +557,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 		doControlJob(iJobId, TERMINATE_OPERATION, null);
 
-		List<CommandType> onShutDown = configurationData.getControlData().getShutDownCommand();
+		List<CommandType> onShutDown = configData.getControlData().getShutDownCommand();
 		runCommands(onShutDown);
 
 		isActive = false;
@@ -569,7 +582,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * Run the start up commands, if any
 		 */
-		List<CommandType> onStartUp = configurationData.getControlData().getStartUpCommand();
+		List<CommandType> onStartUp = configData.getControlData().getStartUpCommand();
 		runCommands(onStartUp);
 
 		isActive = true;
@@ -1030,7 +1043,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			try {
 				PropertyType p = (PropertyType) rmVarMap.get(jobId);
 
-				CommandType job = configurationData.getControlData().getGetJobStatus();
+				CommandType job = configData.getControlData().getGetJobStatus();
 				if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
 					pinTable.pin(jobId);
 					p = new PropertyType();
@@ -1120,12 +1133,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		try {
-			/*
-			 * Support legacy RM API
-			 */
-			if (!isInitialized) {
-				initialize(progress.newChild(30));
-			}
+			initialize(progress.newChild(30));
 			doOnStartUp();
 		} catch (CoreException ce) {
 			throw ce;
@@ -1170,11 +1178,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * process script
 		 */
-		ScriptType script = configurationData.getControlData().getScript();
+		ScriptType script = configData.getControlData().getScript();
 		boolean delScript = maybeHandleScript(uuid, script);
 		worked(progress, 20);
 
-		List<ManagedFilesType> files = configurationData.getControlData().getManagedFiles();
+		List<ManagedFilesType> files = configData.getControlData().getManagedFiles();
 
 		/*
 		 * if the script is to be staged, a managed file pointing to either its content (${ptp_rm:script#value}), or to its path

@@ -33,6 +33,17 @@ public interface IVariableMap {
 	public void clear();
 
 	/**
+	 * Given an environment manager configuration string, returns the corresponding sequence of Bash commands.
+	 * <p>
+	 * It is a precondition that <code>string</code> satisfies {@link EnvManagerConfigString#isEnvMgmtConfigString(String)}.
+	 * 
+	 * @param string
+	 *            non-<code>null</code>
+	 * @return non-<code>null</code>
+	 */
+	public String convertEngMgmtConfigString(String string);
+
+	/**
 	 * Search for a property or attribute.
 	 * 
 	 * @param name
@@ -56,6 +67,14 @@ public interface IVariableMap {
 	 * @return resolved expression
 	 */
 	public String getString(String value);
+
+	/**
+	 * Get the default value of the attribute
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public String getDefault(String name);
 
 	/**
 	 * Get the string representation of an expression. Substitutes any occurrences of {@link JAXBControlConstants#JOB_ID_TAG} with
@@ -97,21 +116,20 @@ public interface IVariableMap {
 	public Object remove(String name);
 
 	/**
+	 * Sets the default value of the attribute.
+	 * 
+	 * @param name
+	 *            of variable
+	 * @param defaultValue
+	 *            of variable
+	 */
+	public void setDefault(String name, String defaultValue);
+
+	/**
 	 * Set a flag to indicate the map has been initialized
 	 * 
 	 * @param initialized
 	 *            indicates the map has already been initialized
 	 */
 	public void setInitialized(boolean initialized);
-
-	/**
-	 * Given an environment manager configuration string, returns the corresponding sequence of Bash commands.
-	 * <p>
-	 * It is a precondition that <code>string</code> satisfies {@link EnvManagerConfigString#isEnvMgmtConfigString(String)}.
-	 * 
-	 * @param string
-	 *            non-<code>null</code>
-	 * @return non-<code>null</code>
-	 */
-	public String convertEngMgmtConfigString(String string);
 }

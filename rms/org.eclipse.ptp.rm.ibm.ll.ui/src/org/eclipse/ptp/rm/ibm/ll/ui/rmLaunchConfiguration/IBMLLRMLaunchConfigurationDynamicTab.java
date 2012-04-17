@@ -48,6 +48,7 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringSetAttribute;
 import org.eclipse.ptp.core.attributes.StringSetAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.launch.LaunchUtils;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -423,10 +424,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManager rm) {
+	public RMLaunchValidation canSave(Control control) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":canSave entered."); //$NON-NLS-1$
 		if (allFieldsValid) {
@@ -579,15 +579,15 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param queue
 	 *            Currently selected queue
 	 */
-	public void createControl(Composite parent, IResourceManager rm) {
+	public void createControl(Composite parent, ILaunchConfiguration configuration) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createControl entered."); //$NON-NLS-1$
 		IIBMLLResourceManagerConfiguration config;
 		IRemoteConnectionManager connMgr;
 
-		currentRM = (IBMLLResourceManager) rm;
+		currentRM = (IBMLLResourceManager) LaunchUtils.getResourceManager(configuration);
 
-		config = (IIBMLLResourceManagerConfiguration) ((AbstractResourceManager) rm).getConfiguration();
+		config = (IIBMLLResourceManagerConfiguration) ((AbstractResourceManager) currentRM).getConfiguration();
 		if (config != null) {
 			remoteService = PTPRemoteUIPlugin.getDefault().getRemoteServices(config.getRemoteServicesId(),
 					getLaunchConfigurationDialog());
@@ -1372,10 +1372,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.debug.core.ILaunchConfiguration)
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, ILaunchConfiguration configuration) {
-		currentRM = (IBMLLResourceManager) rm;
+	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
+		currentRM = (IBMLLResourceManager) LaunchUtils.getResourceManager(configuration);
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":initializeFrom entered."); //$NON-NLS-1$
 		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
@@ -1392,9 +1392,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.rmsystem.IResourceManager)
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm) {
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":isValid entered."); //$NON-NLS-1$
 		if (allFieldsValid) {
@@ -1473,13 +1473,12 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager)
+	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":performApply entered."); //$NON-NLS-1$
 		currentLaunchConfig = configuration;
-		currentRM = (IBMLLResourceManager) rm;
 		saveConfigurationData(configuration);
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
 				+ ":performApply returning."); //$NON-NLS-1$
@@ -1753,15 +1752,16 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager)
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManager rm) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config) {
 		IAttribute<?, ?, ?> rmAttrs[];
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":setDefaults entered."); //$NON-NLS-1$
 		currentLaunchConfig = config;
-		IPResourceManager prm = ModelManager.getInstance().getUniverse().getResourceManager(rm.getUniqueName());
+		IPResourceManager prm = ModelManager.getInstance().getUniverse()
+				.getResourceManager(LaunchUtils.getResourceManagerUniqueName(config));
 		rmAttrs = prm.getAttributes();
 		for (int i = 0; i < rmAttrs.length; i++) {
 			try {

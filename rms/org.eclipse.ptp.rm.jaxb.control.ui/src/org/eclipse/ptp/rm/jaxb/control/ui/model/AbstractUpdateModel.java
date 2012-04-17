@@ -15,20 +15,18 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
-import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
+import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
-import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ui.progress.UIJob;
 
 /**
- * Base class for implementations of the IUpdateModel controlling the data
- * associated with a widget or cell editor.
+ * Base class for implementations of the IUpdateModel controlling the data associated with a widget or cell editor.
  * 
  * @author arossi
  * 
@@ -60,22 +58,20 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 
 	protected boolean canSave;
 	protected String name;
-	protected LCVariableMap lcMap;
+	protected IVariableMap lcMap;
 	protected ValueUpdateHandler handler;
 	protected boolean refreshing;
 	protected ValidatorType validator;
-	protected JAXBControllerLaunchConfigurationTab tab;
+	protected IJAXBParentLaunchConfigurationTab tab;
 	protected String defaultValue;
 	protected String[] booleanToString;
 	protected Object mapValue;
 
 	/**
 	 * @param name
-	 *            name of the model, which will correspond to the name of a
-	 *            Property or Attribute if the widget value is to be saved
+	 *            name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be saved
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 */
 	protected AbstractUpdateModel(String name, ValueUpdateHandler handler) {
 		this.name = name;
@@ -91,20 +87,18 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	public abstract Object getControl();
 
 	/**
-	 * @return name of the model, which will correspond to the name of a
-	 *         Property or Attribute if the widget value is to be saved.
+	 * @return name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be saved.
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * If this widget saves its value to a Property or Attribute, then the
-	 * default value here is retrieved. The widget value is then refreshed from
-	 * the map, and if the value is <code>null</code>, the default value is
-	 * restored to the map and another refresh is called on the actual value.
+	 * If this widget saves its value to a Property or Attribute, then the default value here is retrieved. The widget value is then
+	 * refreshed from the map, and if the value is <code>null</code>, the default value is restored to the map and another refresh
+	 * is called on the actual value.
 	 */
-	public void initialize(RMVariableMap rmMap, LCVariableMap lcMap) {
+	public void initialize(IVariableMap rmMap, IVariableMap lcMap) {
 		this.lcMap = lcMap;
 		if (name != null) {
 			defaultValue = lcMap.getDefault(name);
@@ -134,14 +128,12 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 
 	/**
 	 * @param validator
-	 *            JAXB data element describing either regex or efs validation
-	 *            for the widget value.
+	 *            JAXB data element describing either regex or efs validation for the widget value.
 	 * @param tab
-	 *            provided in case the validation is to be done on a file path;
-	 *            the delegate must be retrieved lazily as the tab is
+	 *            provided in case the validation is to be done on a file path; the delegate must be retrieved lazily as the tab is
 	 *            initialized after the widgets are constructed
 	 */
-	public void setValidator(ValidatorType validator, JAXBControllerLaunchConfigurationTab tab) {
+	public void setValidator(ValidatorType validator, IJAXBParentLaunchConfigurationTab tab) {
 		this.validator = validator;
 		this.tab = tab;
 	}
@@ -163,8 +155,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	/**
 	 * Delegates to the handler update method.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler#handleUpdate(Object,
-	 *      Object)
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler#handleUpdate(Object, Object)
 	 * 
 	 * @param value
 	 *            updated value (currently unused)
@@ -197,8 +188,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	}
 
 	/**
-	 * If this value type is boolean and it is mapped to a string pairing, set
-	 * the mapping.
+	 * If this value type is boolean and it is mapped to a string pairing, set the mapping.
 	 * 
 	 * @param translateBooleanAs
 	 *            comma-separated pair of values corresponding to T,F
@@ -217,8 +207,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	}
 
 	/**
-	 * Retrieves the value from the control, then writes to the current
-	 * environment map and calls the update handler. <br>
+	 * Retrieves the value from the control, then writes to the current environment map and calls the update handler. <br>
 	 * <br>
 	 */
 	protected Object storeValue() throws Exception {
@@ -234,7 +223,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	 */
 	private IRemoteFileManager getRemoteFileManager() {
 		if (tab != null) {
-			RemoteServicesDelegate d = tab.getDelegate();
+			RemoteServicesDelegate d = tab.getRemoteServicesDelegate();
 			if (d != null) {
 				return d.getRemoteFileManager();
 			}
@@ -243,8 +232,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	}
 
 	/**
-	 * Gets value from control and runs validator on it, if there is one. If
-	 * there is an error, this is registered with the handler.
+	 * Gets value from control and runs validator on it, if there is one. If there is an error, this is registered with the handler.
 	 * 
 	 * @return valid value
 	 * @throws Exception

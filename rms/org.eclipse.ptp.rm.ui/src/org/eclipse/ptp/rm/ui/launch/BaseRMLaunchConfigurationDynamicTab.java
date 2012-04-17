@@ -16,7 +16,6 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 
@@ -38,13 +37,12 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control)
 	 */
 	/**
 	 * @since 3.0
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManager rm) {
+	public RMLaunchValidation canSave(Control control) {
 		if (dataSource.canSave()) {
 			return new RMLaunchValidation(true, null);
 		}
@@ -69,13 +67,12 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.debug.core.ILaunchConfiguration)
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	/**
 	 * @since 3.0
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, ILaunchConfiguration configuration) {
-		dataSource.setResourceManager(rm);
+	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
 		dataSource.setConfiguration(configuration);
 		widgetListener.disable();
 		dataSource.loadAndUpdate();
@@ -90,12 +87,12 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.rmsystem.IResourceManager)
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	/**
 	 * @since 3.0
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm) {
+	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig) {
 		if (dataSource.canAccept()) {
 			return new RMLaunchValidation(true, null);
 		}
@@ -106,13 +103,12 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager)
+	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	/**
 	 * @since 3.0
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
-		dataSource.setResourceManager(rm);
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration) {
 		dataSource.setConfigurationWorkingCopy(configuration);
 		dataSource.storeAndValidate();
 		if (dataSource.getErrorMessage() == null) {

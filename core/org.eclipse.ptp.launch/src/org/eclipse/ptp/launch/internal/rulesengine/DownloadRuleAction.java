@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback;
+import org.eclipse.ptp.launch.LaunchUtils;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.launch.rulesengine.OverwritePolicies;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -35,22 +35,18 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
  */
 public class DownloadRuleAction implements IRuleAction {
 
-	private final ILaunchProcessCallback fProcess;
 	private final DownloadRule fRule;
 	private final ILaunchConfiguration fConfiguration;
 	private final IProgressMonitor fMonitor;
 
-	public DownloadRuleAction(ILaunchProcessCallback process, ILaunchConfiguration configuration, DownloadRule rule,
-			IProgressMonitor monitor) {
+	public DownloadRuleAction(ILaunchConfiguration configuration, DownloadRule rule, IProgressMonitor monitor) {
 		super();
-		fProcess = process;
 		fRule = rule;
 		fConfiguration = configuration;
 		fMonitor = monitor;
 	}
 
 	public void run() throws CoreException {
-		Assert.isNotNull(fProcess);
 		Assert.isNotNull(fRule);
 		Assert.isNotNull(fConfiguration);
 
@@ -64,16 +60,14 @@ public class DownloadRuleAction implements IRuleAction {
 			IPath defaultPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 			localParentPath = defaultPath.append(localParentPath);
 			/*
-			 * IPath workspace =
-			 * ResourcesPlugin.getWorkspace().getRoot().getLocation(); localPath
-			 * = workspace.append(localPath);
+			 * IPath workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation(); localPath = workspace.append(localPath);
 			 */
 		}
 		localParentPath.removeTrailingSeparator();
 		Assert.isTrue(localParentPath.isAbsolute(), "localPath.isAbsolute()"); //$NON-NLS-1$
 
 		// Get the file store of the parent dir.
-		IRemoteFileManager localFileManager = fProcess.getLocalFileManager(fConfiguration);
+		IRemoteFileManager localFileManager = LaunchUtils.getLocalFileManager(fConfiguration);
 		IFileStore localFileParentResource = localFileManager.getResource(localParentPath.toString());
 		IFileInfo localFileParentInfo = localFileParentResource.fetchInfo(EFS.NONE, progress.newChild(5));
 
@@ -95,7 +89,7 @@ public class DownloadRuleAction implements IRuleAction {
 				remotePath = remoteWorkingPath.append(remotePath);
 			}
 
-			IRemoteFileManager remoteFileManager = fProcess.getRemoteFileManager(fConfiguration, progress.newChild(5));
+			IRemoteFileManager remoteFileManager = LaunchUtils.getRemoteFileManager(fConfiguration, progress.newChild(5));
 			IFileStore remoteFileStore = remoteFileManager.getResource(remotePath.toString());
 
 			// Check if the remote resource exists

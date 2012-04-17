@@ -22,7 +22,6 @@ import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
@@ -39,7 +38,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunchConfigurationDynamicTab {
 
-	protected final JAXBControllerLaunchConfigurationTab parentTab;
+	protected final IJAXBParentLaunchConfigurationTab parentTab;
 	protected final Set<String> visibleList;
 	protected final Set<String> enabledList;
 	protected final Set<String> validSet;
@@ -54,7 +53,7 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	 * @param tabIndex
 	 *            child index for the parent
 	 */
-	protected AbstractJAXBLaunchConfigurationTab(JAXBControllerLaunchConfigurationTab parentTab, ILaunchConfigurationDialog dialog) {
+	protected AbstractJAXBLaunchConfigurationTab(IJAXBParentLaunchConfigurationTab parentTab, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		this.parentTab = parentTab;
 		this.title = Messages.DefaultDynamicTab_title;
@@ -77,15 +76,14 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	 * This performApply is triggered whenever there is an update on the controller. We do not want the values of the tab to be
 	 * flushed to the configuration unless this tab is the origin of the change; hence we check to see if the tab is visible.<br>
 	 * <br>
-	 * 
-	 * @param configuration
-	 *            working copy of current launch configuration
-	 * @param rm
-	 *            resource manager
-	 * @param queue
-	 *            (unused)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#performApply(org.eclipse.debug.core.
+	 * ILaunchConfigurationWorkingCopy)
+	 */
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration) {
 		if (control.isVisible()) {
 			try {
 				refreshLocal(configuration);
@@ -138,11 +136,11 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 		enabledList.clear();
 		validSet.clear();
 		doRefreshLocal();
-		LCVariableMap lcMap = parentTab.getLCMap();
+		LCVariableMap lcMap = parentTab.getVariableMap();
 		lcMap.relinkConfigurationProperties(config);
-		parentTab.getLCMap().relinkHidden(getControllerTag());
+		parentTab.getVariableMap().relinkHidden(getControllerTag());
 		writeLocalProperties();
-		parentTab.getLCMap().flush(config);
+		parentTab.getVariableMap().flush(config);
 	}
 
 	/**

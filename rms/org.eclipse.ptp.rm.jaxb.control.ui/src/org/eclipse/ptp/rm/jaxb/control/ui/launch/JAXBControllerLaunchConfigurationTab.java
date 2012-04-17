@@ -19,12 +19,14 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
+import org.eclipse.ptp.launch.LaunchUtils;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
@@ -32,12 +34,10 @@ import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
@@ -52,11 +52,11 @@ import org.eclipse.swt.widgets.Control;
  * @author arossi
  * @author Jeff Overbey - Environment Manager support
  */
-public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControllerTab implements IUpdateModelEnabled,
-		SelectionListener {
+public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControllerTab implements IJAXBParentLaunchConfigurationTab,
+		IUpdateModelEnabled, SelectionListener {
 
 	private RemoteServicesDelegate delegate;
-	private final IJAXBResourceManagerConfiguration rmConfig;
+	private final IJAXBJobControl fControl;
 	private final LaunchTabType launchTabData;
 	private final ValueUpdateHandler updateHandler;
 	private final LCVariableMap lcMap;
@@ -70,15 +70,21 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 *            the launch dialog parent
 	 * @throws Throwable
 	 */
-	public JAXBControllerLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog) throws Throwable {
+	public JAXBControllerLaunchConfigurationTab(IJAXBJobControl control, ILaunchConfigurationDialog dialog) throws Throwable {
 		super(dialog);
-		rmConfig = rm.getJAXBConfiguration();
+		fControl = control;
+		LCVariableMap varMap = null;
 
 		try {
-			ResourceManagerData data = rmConfig.getResourceManagerData();
+			ResourceManagerData data = control.getConfiguration();
 			if (data != null) {
 				script = data.getControlData().getScript();
 			}
+			IRemoteConnection conn = getConnection(fControl);
+			if (conn == null) {
+				throw new Throwable("Unable to obtain connection information");
+			}
+			varMap = new LCVariableMap(EnvManagerRegistry.getEnvManager(conn.getRemoteServices(), conn));
 			voidRMConfig = false;
 		} catch (Throwable t) {
 			script = null;
@@ -88,66 +94,57 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		}
 
 		if (!voidRMConfig) {
-			launchTabData = rmConfig.getResourceManagerData().getControlData().getLaunchTab();
+			launchTabData = control.getConfiguration().getControlData().getLaunchTab();
 			updateHandler = new ValueUpdateHandler(this);
 			if (launchTabData != null) {
 				List<TabControllerType> dynamic = launchTabData.getDynamic();
 				for (TabControllerType controller : dynamic) {
-					addDynamicTab(new JAXBDynamicLaunchConfigurationTab(rm, dialog, controller, this));
+					addDynamicTab(new JAXBDynamicLaunchConfigurationTab(control, dialog, controller, this));
 				}
 				LaunchTabType.Import importTab = launchTabData.getImport();
 				if (importTab != null) {
-					addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, importTab, this));
+					addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(control, dialog, importTab, this));
 				}
 			}
-			lcMap = new LCVariableMap(EnvManagerRegistry.getEnvManager(getRemoteServices(rm), getConnection(rm)));
 		} else {
 			getControllers().clear();
 			launchTabData = null;
 			updateHandler = null;
-			lcMap = null;
 		}
+		lcMap = varMap;
 	}
 
-	private static IRemoteServices getRemoteServices(IJAXBResourceManager rm) {
-		if (rm == null) {
-			return null;
-		} else {
-			return PTPRemoteCorePlugin.getDefault().getRemoteServices(rm.getControlConfiguration().getRemoteServicesId(), null);
-		}
-	}
-
-	private static IRemoteConnection getConnection(IJAXBResourceManager rm) {
-		if (rm == null) {
-			return null;
-		} else {
-			final String connName = rm.getControlConfiguration().getConnectionName();
-			final IRemoteServices rsrv = getRemoteServices(rm);
-			if (rsrv == null) {
-				return null;
-			} else {
-				IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
-				if (connMgr == null) {
-					return null;
-				} else {
-					return connMgr.getConnection(connName);
+	private IRemoteConnection getConnection(final IJAXBJobControl control) {
+		final IRemoteServices[] remoteServices = new IRemoteServices[1];
+		try {
+			getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					remoteServices[0] = PTPRemoteCorePlugin.getDefault().getRemoteServices(control.getRemoteServicesId(), monitor);
 				}
+			});
+		} catch (Exception e) {
+		}
+		if (remoteServices[0] != null) {
+			IRemoteConnectionManager connMgr = remoteServices[0].getConnectionManager();
+			if (connMgr != null) {
+				return connMgr.getConnection(control.getConnectionName());
 			}
 		}
+		return null;
 	}
 
 	/*
-	 * No composites or controls are specific to the parent. (non-Javadoc)
+	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#createControl (org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.ptp.rmsystem.IResourceManager)
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.ExtensibleJAXBControllerTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
-	public void createControl(Composite parent, IResourceManager rm) throws CoreException {
+	public void createControl(Composite parent, ILaunchConfiguration configuration) throws CoreException {
 		if (!voidRMConfig) {
 			updateHandler.clear();
 		}
-		super.createControl(parent, rm);
+		super.createControl(parent, configuration);
 		if (tabFolder != null) {
 			tabFolder.addSelectionListener(this);
 		}
@@ -168,7 +165,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	/**
 	 * @return remote services info
 	 */
-	public RemoteServicesDelegate getDelegate() {
+	public RemoteServicesDelegate getRemoteServicesDelegate() {
 		return delegate;
 	}
 
@@ -182,7 +179,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	/**
 	 * @return launch tab environment map (built from the resource manager environment)
 	 */
-	public LCVariableMap getLCMap() {
+	public LCVariableMap getVariableMap() {
 		return lcMap;
 	}
 
@@ -191,8 +188,8 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * 
 	 * @return the ResourceManager (base) configuration
 	 */
-	public IJAXBResourceManagerConfiguration getRmConfig() {
-		return rmConfig;
+	public IJAXBJobControl getJobControl() {
+		return fControl;
 	}
 
 	/**
@@ -221,20 +218,21 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * because on calls to this method subsequent to the first, the widgets it contained will have been disposed. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#initializeFrom (org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.debug.core.ILaunchConfiguration)
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
-	public RMLaunchValidation initializeFrom(Control control, final IResourceManager rm, final ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, final ILaunchConfiguration configuration) {
 		if (!voidRMConfig) {
 			try {
 				getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
 					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 						try {
+							IJAXBResourceManager rm = (IJAXBResourceManager) LaunchUtils.getResourceManager(configuration);
 							String rmId = rm.getConfiguration().getUniqueName();
-							lcMap.initialize(rmConfig.getRMVariableMap(), rmId);
+							lcMap.initialize(fControl.getEnvironment(), rmId);
 							updateHandler.clear();
 							lcMap.updateFromConfiguration(configuration);
-							delegate = ((IJAXBResourceManager) rm).getControl().getRemoteServicesDelegate(monitor);
+							delegate = rm.getControl().getRemoteServicesDelegate(monitor);
 							if (delegate.getRemoteConnection() == null) {
 								throw new InvocationTargetException(null, Messages.UninitializedRemoteServices);
 							}
@@ -251,7 +249,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 				return new RMLaunchValidation(false, e.getLocalizedMessage());
 			}
 		}
-		RMLaunchValidation validation = super.initializeFrom(control, rm, configuration);
+		RMLaunchValidation validation = super.initializeFrom(control, configuration);
 		if (!getControllers().isEmpty()) {
 			tabFolder.setSelection(lastIndex);
 			setVisibleOnSelected();

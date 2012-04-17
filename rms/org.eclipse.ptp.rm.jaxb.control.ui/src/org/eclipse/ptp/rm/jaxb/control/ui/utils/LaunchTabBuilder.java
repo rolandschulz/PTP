@@ -24,6 +24,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ControlStateListener;
+import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
@@ -68,9 +69,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
 
 /**
- * Object responsible for constructing the configurable JAXB Launch
- * Configuration Tab, as well as building and registering the related model
- * objects and listeners.
+ * Object responsible for constructing the configurable JAXB Launch Configuration Tab, as well as building and registering the
+ * related model objects and listeners.
  * 
  * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab
  * 
@@ -135,8 +135,7 @@ public class LaunchTabBuilder {
 	/**
 	 * @param data
 	 *            Attribute or Property
-	 * @return whether it is visible to the user (and thus used to generate a
-	 *         widget and update model)
+	 * @return whether it is visible to the user (and thus used to generate a widget and update model)
 	 */
 	private static boolean isVisible(Object data) {
 		if (data instanceof AttributeType) {
@@ -147,7 +146,7 @@ public class LaunchTabBuilder {
 		return false;
 	}
 
-	private final JAXBDynamicLaunchConfigurationTab tab;
+	private final IJAXBLaunchConfigurationTab tab;
 	private final IVariableMap rmVarMap;
 	private final Map<Object, IUpdateModel> localWidgets;
 
@@ -161,27 +160,25 @@ public class LaunchTabBuilder {
 	 * @param tab
 	 *            whose control is configurable from the JAXB data tree
 	 */
-	public LaunchTabBuilder(JAXBDynamicLaunchConfigurationTab tab) throws Throwable {
+	public LaunchTabBuilder(IJAXBLaunchConfigurationTab tab) throws Throwable {
 		this.tab = tab;
 		this.localWidgets = tab.getLocalWidgets();
-		this.rmVarMap = tab.getParent().getRmConfig().getRMVariableMap();
+		this.rmVarMap = tab.getParent().getJobControl().getEnvironment();
 		sources = new HashMap<String, Button>();
 		targets = new HashMap<ControlStateType, Control>();
 	}
 
 	/**
-	 * Constructs the viewer, its row items and their update models, and adds it
-	 * to the tree.
+	 * Constructs the viewer, its row items and their update models, and adds it to the tree.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.utils.UpdateModelFactory#createModel(ColumnViewer,
-	 *      AttributeViewer, JAXBDynamicLaunchConfigurationTab)
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.utils.UpdateModelFactory#createModel(ColumnViewer, AttributeViewer,
+	 *      JAXBDynamicLaunchConfigurationTab)
 	 * 
 	 * @param descriptor
-	 *            JAXB data element describing CheckboxTableViewer or
-	 *            CheckboxTreeViewer for displaying a subset of the resource
+	 *            JAXB data element describing CheckboxTableViewer or CheckboxTreeViewer for displaying a subset of the resource
 	 *            manager properties and attributes
 	 * @param parent
 	 *            control to which to add the viewer
@@ -257,13 +254,11 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Constructs the widget pair and creates its update model. Adds the
-	 * widget-to-model mapping to the local widget map of the LaunchTab being
-	 * built.
+	 * Constructs the widget pair and creates its update model. Adds the widget-to-model mapping to the local widget map of the
+	 * LaunchTab being built.
 	 * 
 	 * @param browse
-	 *            JAXB data element describing type, style and layout data of
-	 *            widget
+	 *            JAXB data element describing type, style and layout data of widget
 	 * @param control
 	 *            to which to add the widget
 	 */
@@ -277,8 +272,7 @@ public class LaunchTabBuilder {
 	/**
 	 * Constructs a button group and its model, and adds it to the tree.
 	 * 
-	 * @see UpdateModelFactory#createModel(Group, List, String,
-	 *      JAXBDynamicLaunchConfigurationTab, IVariableMap)
+	 * @see UpdateModelFactory#createModel(Group, List, String, JAXBDynamicLaunchConfigurationTab, IVariableMap)
 	 * @param descriptor
 	 *            JAXB data element description the button group
 	 * @param parent
@@ -323,8 +317,7 @@ public class LaunchTabBuilder {
 	 * @param style
 	 *            of the viewer
 	 * @param descriptor
-	 *            JAXB data element describing CheckboxTableViewer or
-	 *            CheckboxTreeViewer for displaying a subset of the resource
+	 *            JAXB data element describing CheckboxTableViewer or CheckboxTreeViewer for displaying a subset of the resource
 	 *            manager properties and attributes
 	 * @return the viewer
 	 */
@@ -352,8 +345,7 @@ public class LaunchTabBuilder {
 	 * @param style
 	 *            of the viewer
 	 * @param descriptor
-	 *            JAXB data element describing CheckboxTableViewer or
-	 *            CheckboxTreeViewer for displaying a subset of the resource
+	 *            JAXB data element describing CheckboxTableViewer or CheckboxTreeViewer for displaying a subset of the resource
 	 *            manager properties and attributes
 	 * @return the viewer
 	 */
@@ -404,8 +396,7 @@ public class LaunchTabBuilder {
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer
 	 * 
 	 * @param descriptor
-	 *            JAXB data element describing the contents and layout of the
-	 *            composite
+	 *            JAXB data element describing the contents and layout of the composite
 	 * @param parent
 	 *            control to which to add the composite
 	 * @return the SWT Composite
@@ -539,8 +530,7 @@ public class LaunchTabBuilder {
 	 * Constructs the widget pair and creates its update model. Calls .
 	 * 
 	 * @param button
-	 *            JAXB data element describing type, style and layout data of
-	 *            widget
+	 *            JAXB data element describing type, style and layout data of widget
 	 * @param control
 	 *            to which to add the widget
 	 */
@@ -549,10 +539,9 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Adds the row items to the table. The row item model is both a CellEditor
-	 * update model/listener, as well as the underlying data model for the
-	 * viewer provider. Adds the cell editor-to-model mappings to the local
-	 * widget map of the LaunchTab being built.
+	 * Adds the row items to the table. The row item model is both a CellEditor update model/listener, as well as the underlying
+	 * data model for the viewer provider. Adds the cell editor-to-model mappings to the local widget map of the LaunchTab being
+	 * built.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
@@ -621,13 +610,11 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Constructs the widget and creates its update model. Adds the
-	 * widget-to-model mapping to the local widget map of the LaunchTab being
-	 * built.
+	 * Constructs the widget and creates its update model. Adds the widget-to-model mapping to the local widget map of the LaunchTab
+	 * being built.
 	 * 
 	 * @param widget
-	 *            JAXB data element describing type, style and layout data of
-	 *            widget
+	 *            JAXB data element describing type, style and layout data of widget
 	 * @param control
 	 *            to which to add the widget
 	 */
@@ -684,8 +671,7 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * Constructs a listener for each defined category of action on the target
-	 * and adds it to the sources referenced in the rule.
+	 * Constructs a listener for each defined category of action on the target and adds it to the sources referenced in the rule.
 	 */
 	private void maybeWireWidgets() throws Throwable {
 		Collection<ControlStateListener> listeners = new HashSet<ControlStateListener>();

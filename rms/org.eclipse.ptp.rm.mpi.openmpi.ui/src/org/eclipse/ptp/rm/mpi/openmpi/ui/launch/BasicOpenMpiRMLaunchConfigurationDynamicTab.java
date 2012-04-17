@@ -318,7 +318,13 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunchCon
 	/**
 	 * @since 2.0
 	 */
-	public void createControl(Composite parent, IResourceManager rm) throws CoreException {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	public void createControl(Composite parent, ILaunchConfiguration configuration) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
@@ -429,7 +435,13 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunchCon
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#setDefaults(org.eclipse.debug.core.
+	 * ILaunchConfigurationWorkingCopy)
+	 */
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_NUMPROCS, OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_BYNODE, OpenMPILaunchConfigurationDefaults.ATTR_BYNODE);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_BYSLOT, OpenMPILaunchConfigurationDefaults.ATTR_BYSLOT);

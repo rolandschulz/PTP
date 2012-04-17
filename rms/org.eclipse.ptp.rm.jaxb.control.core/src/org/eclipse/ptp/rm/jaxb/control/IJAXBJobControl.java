@@ -12,11 +12,14 @@ package org.eclipse.ptp.rm.jaxb.control;
 
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
 /**
  * JAXB Launch Control interface.
@@ -29,19 +32,19 @@ public interface IJAXBJobControl extends IJobControl {
 	public boolean getAppendEnv();
 
 	/**
+	 * Get the control configuration
+	 * 
+	 * @return configuration
+	 */
+	public ResourceManagerData getConfiguration();
+
+	/**
 	 * Get the connection used to control the job
 	 * 
 	 * @return remote connection name
 	 * @since 6.0
 	 */
 	public String getConnectionName();
-
-	/**
-	 * @return the ID of the control.
-	 * 
-	 * @since 5.0
-	 */
-	public String getControlId();
 
 	/**
 	 * @return resource manager environment
@@ -75,6 +78,20 @@ public interface IJAXBJobControl extends IJobControl {
 	 * For callbacks to the resource manager from internal jobs.
 	 */
 	public void jobStateChanged(String jobId, IJobStatus status);
+
+	/**
+	 * Runs an action command.
+	 * 
+	 * @param action
+	 *            name of action or command
+	 * @param resetValue
+	 *            name of property or attribute
+	 * @param configuration
+	 *            current values
+	 * @return result of the action on resetValue, if any
+	 * 
+	 */
+	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException;
 
 	/**
 	 * @param interactiveJob

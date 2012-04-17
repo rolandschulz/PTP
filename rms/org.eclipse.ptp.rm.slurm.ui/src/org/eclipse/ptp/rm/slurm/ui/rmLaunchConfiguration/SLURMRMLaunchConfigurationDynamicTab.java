@@ -80,10 +80,9 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManager rm) {
+	public RMLaunchValidation canSave(Control control) {
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
 			@SuppressWarnings("unused")
@@ -128,10 +127,10 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.ptp.rmsystem.IResourceManager)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public void createControl(Composite parent, IResourceManager rm) {
+	public void createControl(Composite parent, ILaunchConfiguration configuration) {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout(1, true));
 		GridData gd;
@@ -278,9 +277,9 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.debug.core.ILaunchConfiguration)
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
 
 		int jobnumProcs;
 		try {
@@ -361,10 +360,10 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.rmsystem.IResourceManager)
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm) {
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration) {
 
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
@@ -417,9 +416,9 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager)
+	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration) {
 
 		IntegerAttribute iattr0 = null;
 		try {
@@ -482,9 +481,9 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager)
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef();
 			configuration.setAttribute(SLURMLaunchConfiguration.ATTR_NUMPROCS, numProcsAttrDef.create().getValue());

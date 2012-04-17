@@ -50,6 +50,7 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringSetAttribute;
 import org.eclipse.ptp.core.attributes.StringSetAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.launch.LaunchUtils;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -588,10 +589,9 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManager rm) {
+	public RMLaunchValidation canSave(Control control) {
 		if (allFieldsValid) {
 			return success;
 		}
@@ -1579,23 +1579,18 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		peStderrPath = createFileSelector(pane, PE_STDERR_PATH, PE_STDERR_PATH_SELECTOR);
 	}
 
-	/**
-	 * This method creates all of the GUI elements of the resource-manager specific pane within the parallel tab of the launch
-	 * configuration dialog.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param parent
-	 *            This control's parent
-	 * @param rm
-	 *            The resource manager associated with this launch configuration
-	 * @param queue
-	 *            Currently selected queue
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public void createControl(Composite parent, IResourceManager rm) {
+	public void createControl(Composite parent, ILaunchConfiguration configuration) {
 		PEResourceManagerConfiguration config;
 		IRemoteConnectionManager connMgr;
-		currentRM = (PEResourceManager) rm;
+		currentRM = (PEResourceManager) LaunchUtils.getResourceManager(configuration);
 
-		config = (PEResourceManagerConfiguration) ((AbstractResourceManager) rm).getConfiguration();
+		config = (PEResourceManagerConfiguration) ((AbstractResourceManager) currentRM).getConfiguration();
 		if (config != null) {
 			remoteService = PTPRemoteUIPlugin.getDefault().getRemoteServices(config.getRemoteServicesId(),
 					getLaunchConfigurationDialog());
@@ -1949,13 +1944,13 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.debug.core.ILaunchConfiguration)
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
 		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
 			currentLaunchConfig = (ILaunchConfigurationWorkingCopy) configuration;
 		}
-		currentRM = (PEResourceManager) rm;
+		currentRM = (PEResourceManager) LaunchUtils.getResourceManager(configuration);
 		setInitialValues(configuration);
 		setInitialWidgetState();
 		return success;
@@ -1965,10 +1960,10 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.rmsystem.IResourceManager)
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@SuppressWarnings("unchecked")
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm) {
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration) {
 		// If running in basic mode, then any PE command line options and
 		// environment variables are disallowed since those settings may
 		// conflict with what is specified in the resources tab panel.
@@ -2165,11 +2160,10 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager)
+	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration) {
 		currentLaunchConfig = configuration;
-		currentRM = (PEResourceManager) rm;
 		saveConfigurationData(configuration);
 		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	}
@@ -2178,13 +2172,14 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager)
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManager rmc) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config) {
 		IAttribute<?, ?, ?> rmAttrs[];
 
 		currentLaunchConfig = config;
-		IPResourceManager rm = ModelManager.getInstance().getUniverse().getResourceManager(rmc.getUniqueName());
+		IPResourceManager rm = ModelManager.getInstance().getUniverse()
+				.getResourceManager(LaunchUtils.getResourceManagerUniqueName(config));
 		rmAttrs = rm.getAttributes();
 		for (int i = 0; i < rmAttrs.length; i++) {
 			try {

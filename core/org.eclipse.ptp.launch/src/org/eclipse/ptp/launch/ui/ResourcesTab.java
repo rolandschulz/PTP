@@ -98,7 +98,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { resourceManager.getName() }));
 			return false;
 		}
-		RMLaunchValidation validation = rmDynamicTab.canSave(launchComp, resourceManager);
+		RMLaunchValidation validation = rmDynamicTab.canSave(launchComp);
 		if (!validation.isSuccess()) {
 			setErrorMessage(validation.getMessage());
 			return false;
@@ -238,7 +238,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setErrorMessage(Messages.ResourcesTab_Resource_Manager_Not_Started);
 			return false;
 		}
-		RMLaunchValidation validation = rmDynamicTab.isValid(configuration, resourceManager);
+		RMLaunchValidation validation = rmDynamicTab.isValid(configuration);
 		if (!validation.isSuccess()) {
 			setErrorMessage(validation.getMessage());
 			return false;
@@ -261,7 +261,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { resourceManager.getName() }));
 				return;
 			}
-			RMLaunchValidation validation = rmDynamicTab.performApply(configuration, resourceManager);
+			RMLaunchValidation validation = rmDynamicTab.performApply(configuration);
 			if (!validation.isSuccess()) {
 				setErrorMessage(validation.getMessage());
 				return;
@@ -288,7 +288,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		if (rmDynamicTab == null) {
 			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { resourceManager.getName() }));
 		} else {
-			rmDynamicTab.setDefaults(configuration, rm);
+			rmDynamicTab.setDefaults(configuration);
 		}
 	}
 
@@ -440,12 +440,12 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
 			if (rmDynamicTab != null) {
 				try {
-					rmDynamicTab.createControl(launchAttrsScrollComp, rm);
+					rmDynamicTab.createControl(launchAttrsScrollComp, launchConfiguration);
 					final Control dynControl = rmDynamicTab.getControl();
 					launchAttrsScrollComp.setContent(dynControl);
 					Point size = dynControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 					launchAttrsScrollComp.setMinSize(size);
-					rmDynamicTab.initializeFrom(launchAttrsScrollComp, rm, launchConfiguration);
+					rmDynamicTab.initializeFrom(launchAttrsScrollComp, launchConfiguration);
 				} catch (CoreException e) {
 					setErrorMessage(e.getMessage());
 					Throwable t = e.getCause();

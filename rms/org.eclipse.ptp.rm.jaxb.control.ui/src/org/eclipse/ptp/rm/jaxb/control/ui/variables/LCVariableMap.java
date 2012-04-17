@@ -212,15 +212,6 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * @param viewerName
-	 *            of viewer for which to find checked rows
-	 * @return set of checked row model names
-	 */
-	public Set<String> getChecked(String viewerName) {
-		return forControlState(viewerName, JAXBControlUIConstants.CHECKED_ATTRIBUTES);
-	}
-
-	/**
 	 * @param name
 	 *            of widget, bound to a Property or Attribute
 	 * @return default value of the Property or Attribute, or <code>null</code> if none

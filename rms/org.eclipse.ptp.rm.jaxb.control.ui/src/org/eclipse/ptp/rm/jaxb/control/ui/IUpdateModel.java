@@ -9,9 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui;
 
-import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
-import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
-import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
+import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 
 /**
@@ -45,11 +44,10 @@ public interface IUpdateModel {
 	 * @param lcMap
 	 *            Launch Tab environment
 	 */
-	public void initialize(RMVariableMap rmMap, LCVariableMap lcMap);
+	public void initialize(IVariableMap rmMap, IVariableMap lcMap);
 
 	/**
-	 * Whether the value of the associated control can be written to the
-	 * environment.
+	 * Whether the value of the associated control can be written to the environment.
 	 * 
 	 * @return true is the value can be written
 	 */
@@ -73,5 +71,5 @@ public interface IUpdateModel {
 	 * @param tab
 	 *            parent tab (from which to get the remote services delegate)
 	 */
-	public void setValidator(ValidatorType validator, JAXBControllerLaunchConfigurationTab tab);
+	public void setValidator(ValidatorType validator, IJAXBParentLaunchConfigurationTab tab);
 }
