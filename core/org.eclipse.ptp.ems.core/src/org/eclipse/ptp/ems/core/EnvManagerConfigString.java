@@ -55,7 +55,13 @@ public final class EnvManagerConfigString implements IEnvManagerConfig {
 	/** Key used to persist the connection name. */
 	private static final String ENVCONFIG_CONNECTION_NAME_PROPERTY_KEY = "envConfigConnectionName"; //$NON-NLS-1$
 
-	/** @return true iff <code>string</code> is a valid environment management configuration string */
+	/**
+	 * Returns true iff <code>string</code> is a valid environment management configuration string
+	 * 
+	 * @param string string to test
+	 * 
+	 * @return true iff <code>string</code> is a valid environment management configuration string
+	 */
 	public static boolean isEnvMgmtConfigString(String string) {
 		return string != null && (string.equals("") || string.startsWith(MAGIC)); //$NON-NLS-1$
 	}
@@ -76,7 +82,7 @@ public final class EnvManagerConfigString implements IEnvManagerConfig {
 	/**
 	 * Creates an {@link EnvManagerConfigString} from a given configuration string.
 	 * 
-	 * @param configuration
+	 * @param configuration an environment configuration string, as returned by {@link #toString()}
 	 */
 	public EnvManagerConfigString(String configuration) {
 		if (configuration != null) {

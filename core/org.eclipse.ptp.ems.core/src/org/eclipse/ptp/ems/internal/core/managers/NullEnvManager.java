@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.ems.internal.core.Messages;
@@ -31,22 +32,22 @@ public final class NullEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public Set<String> determineAvailableElements() {
+	public Set<String> determineAvailableElements(IProgressMonitor pm) {
 		return Collections.<String> emptySet();
 	}
 
 	@Override
-	public Set<String> determineDefaultElements() {
+	public Set<String> determineDefaultElements(IProgressMonitor pm) {
 		return Collections.<String> emptySet();
 	}
 
 	@Override
-	public boolean checkForCompatibleInstallation() {
+	public boolean checkForCompatibleInstallation(IProgressMonitor pm) {
 		return true;
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription(IProgressMonitor pm) {
 		return Messages.NullEnvManager_NoSupportedEMSFound;
 	}
 

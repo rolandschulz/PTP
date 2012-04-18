@@ -21,7 +21,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.ems.internal.ui.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.ModifyListener;
@@ -43,8 +42,7 @@ import org.eclipse.swt.widgets.Shell;
  * <p>
  * Typically, clients will use this control as follows.
  * <ol>
- * <li>Invoke the constructor, setting the {@link IRemoteServices} and {@link IRemoteConnection} which will provide access to the
- * remote machine.
+ * <li>Invoke the constructor, setting the {@link IRemoteConnection} that will provide access to the remote machine.
  * <li>Invoke {@link #setText(String)} to change the button text, if necessary.
  * <li>Invoke {@link #setConfiguration(String)} (if necessary) to set a default configuration.
  * <li>Invoke {@link #addModifyListener(ModifyListener)} to receive callbacks when the user changes the configuration.
@@ -60,7 +58,6 @@ public final class EnvManagerConfigButton extends Composite {
 
 	private static IDialogSettings dialogSettings = new DialogSettings("EnvConfigurationDialog"); //$NON-NLS-1$
 
-	private final IRemoteServices remoteServices;
 	private final IRemoteConnection remoteConnection;
 
 	private EnvManagerConfigString configString;
@@ -70,11 +67,13 @@ public final class EnvManagerConfigButton extends Composite {
 
 	/**
 	 * Constructor.
+	 * 
+	 * @param parent parent {@link Composite} (non-<code>null</code>)
+	 * @param remoteConnection {@link IRemoteConnection} used to access files and execute shell commands on the remote machine (non-<code>null</code>)
 	 */
-	public EnvManagerConfigButton(Composite parent, IRemoteServices remoteServices, IRemoteConnection remoteConnection) {
+	public EnvManagerConfigButton(Composite parent, IRemoteConnection remoteConnection) {
 		super(parent, SWT.NONE);
 
-		this.remoteServices = remoteServices;
 		this.remoteConnection = remoteConnection;
 
 		this.configString = new EnvManagerConfigString();
@@ -128,7 +127,7 @@ public final class EnvManagerConfigButton extends Composite {
 			final Composite composite = (Composite) super.createDialogArea(parent);
 			composite.setLayout(new GridLayout());
 
-			envConfig = new EnvManagerConfigWidget(composite, null, null);
+			envConfig = new EnvManagerConfigWidget(composite, null);
 			envConfig.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 			final Label errorMessage = new Label(parent, SWT.LEFT | SWT.BOTTOM | SWT.BORDER);
@@ -153,7 +152,7 @@ public final class EnvManagerConfigButton extends Composite {
 			envConfig.setUseEMSCheckbox(configString.isEnvMgmtEnabled());
 			envConfig.setManualConfigCheckbox(configString.isManualConfigEnabled());
 			envConfig.setManualConfigText(configString.getManualConfigText());
-			envConfig.configurationChanged(null, remoteServices, remoteConnection, configString.getConfigElements());
+			envConfig.configurationChanged(null, remoteConnection, configString.getConfigElements());
 
 			return composite;
 		}
@@ -183,7 +182,7 @@ public final class EnvManagerConfigButton extends Composite {
 	 * a single '&amp;' to be displayed.
 	 * </p>
 	 * 
-	 * @param string
+	 * @param text
 	 *            the new text
 	 * 
 	 * @exception IllegalArgumentException

@@ -27,7 +27,6 @@ import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -51,10 +50,9 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 	@Override
 	public void createWidgets(Composite parent) {
 		final IRemoteExecutionServiceProvider executionProvider = getRemoteServicesExecutionProvider();
-		final IRemoteServices remoteServices = executionProvider.getRemoteServices();
 		final IRemoteConnection remoteConnection = executionProvider.getConnection();
 
-		this.ui = new EnvManagerConfigWidget(parent, remoteServices, remoteConnection);
+		this.ui = new EnvManagerConfigWidget(parent, remoteConnection);
 		this.ui.setErrorListener(new IErrorListener() {
 			public void errorRaised(String message) {
 				setErrorMessage(message);
@@ -65,7 +63,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		});
 
 		this.ui.setUseEMSCheckbox(isEnvConfigSupportEnabled());
-		this.ui.configurationChanged(getSyncURI(), remoteServices, remoteConnection, computeSelectedItems());
+		this.ui.configurationChanged(getSyncURI(), remoteConnection, computeSelectedItems());
 	}
 
 	private IRemoteExecutionServiceProvider getRemoteServicesExecutionProvider() {
@@ -145,8 +143,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		super.cfgChanged(cfgd);
 		if (ui != null) {
 			final IRemoteExecutionServiceProvider executionProvider = getRemoteServicesExecutionProvider();
-			ui.configurationChanged(getSyncURI(), executionProvider.getRemoteServices(), executionProvider.getConnection(),
-					computeSelectedItems());
+			ui.configurationChanged(getSyncURI(), executionProvider.getConnection(), computeSelectedItems());
 		}
 	}
 

@@ -586,7 +586,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * process script
 		 */
 		ScriptType script = controlData.getScript();
-		boolean delScript = maybeHandleScript(uuid, script);
+		boolean delScript = maybeHandleScript(uuid, script, progress.newChild(0));
 		worked(progress, 20);
 
 		List<ManagedFilesType> files = controlData.getManagedFiles();
@@ -918,7 +918,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 *            configuration object describing how to construct the script from the environment
 	 * @return whether the script target should be deleted
 	 */
-	private boolean maybeHandleScript(String uuid, ScriptType script) {
+	private boolean maybeHandleScript(String uuid, ScriptType script, IProgressMonitor monitor) {
 		PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
 		if (p != null && p.getValue() != null) {
 			return false;
@@ -926,7 +926,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (script == null) {
 			return false;
 		}
-		rmVarMap.setEnvManager(EnvManagerRegistry.getEnvManager(getRemoteServices(), getRemoteConnection()));
+		rmVarMap.setEnvManager(EnvManagerRegistry.getEnvManager(monitor, getRemoteConnection()));
 		ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, launchEnv, false);
 		job.schedule();
 		try {
@@ -936,13 +936,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		return script.isDeleteAfterSubmit();
 	}
 
-	private IRemoteServices getRemoteServices() {
-		return PTPRemoteCorePlugin.getDefault().getRemoteServices(getControlConfiguration().getRemoteServicesId(), null);
-	}
-
 	private IRemoteConnection getRemoteConnection() {
 		final String connName = getControlConfiguration().getConnectionName();
-		final IRemoteServices rsrv = getRemoteServices();
+		final IRemoteServices rsrv = PTPRemoteCorePlugin.getDefault().getRemoteServices(getControlConfiguration().getRemoteServicesId(), null);
 		if (rsrv == null) {
 			return null;
 		} else {

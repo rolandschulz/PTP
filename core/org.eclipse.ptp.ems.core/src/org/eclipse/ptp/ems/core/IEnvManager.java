@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 /**
@@ -40,8 +40,8 @@ public interface IEnvManager {
 	String getName();
 
 	/**
-	 * Returns a {@link Comparator} used to sort the strings returned by {@link #determineAvailableElements()} and
-	 * {@link #determineDefaultElements()} when displaying them to the user.
+	 * Returns a {@link Comparator} used to sort the strings returned by {@link #determineAvailableElements(IProgressMonitor)} and
+	 * {@link #determineDefaultElements(IProgressMonitor)} when displaying them to the user.
 	 * 
 	 * @return {@link Comparator} (non-<code>null</code>)
 	 */
@@ -57,69 +57,93 @@ public interface IEnvManager {
 	public String getInstructions();
 
 	/**
-	 * Sets the {@link IRemoteServices} and {@link IRemoteConnection} which will be used to run commands on a remote machine.
+	 * Sets the {@link IRemoteConnection} which will be used to run commands on a remote machine.
 	 * <p>
-	 * This method must be invoked before {@link #checkForCompatibleInstallation()}, {@link #getDescription()},
-	 * {@link #determineAvailableElements()}, {@link #determineDefaultElements()}, or {@link #createBashScript(Set, String)}.
+	 * This method must be invoked before {@link #checkForCompatibleInstallation(IProgressMonitor)},
+	 * {@link #getDescription(IProgressMonitor)}, {@link #determineAvailableElements(IProgressMonitor)},
+	 * {@link #determineDefaultElements(IProgressMonitor)}, or
+	 * {@link #createBashScript(IProgressMonitor, boolean, IEnvManagerConfig, String)}.
 	 * 
-	 * @param remoteServices
-	 *            {@link IRemoteServices} (non-<code>null</code>)
 	 * @param remoteConnection
 	 *            {@link IRemoteConnection} (non-<code>null</code>)
 	 */
-	void configure(IRemoteServices remoteServices, IRemoteConnection remoteConnection);
+	void configure(IRemoteConnection remoteConnection);
 
 	/**
 	 * Returns true iff the remote machine is running an environment management system supported by this {@link IEnvManager}.
 	 * 
+	 * @param pm
+	 *            progress monitor used to report the status of potentially long-running operations to the user (non-
+	 *            <code>null</code>)
+	 * 
 	 * @return true iff the remote machine is running an environment management system supported by this {@link IEnvManager}
 	 * 
 	 * @throws NullPointerException
-	 *             if {@link #configure(IRemoteServices, IRemoteConnection)} has not been called
+	 *             if {@link #configure(IRemoteConnection)} has not been called
 	 * @throws RemoteConnectionException
+	 *             if an remote connection error occurs
 	 * @throws IOException
+	 *             if an input/output error occurs
 	 */
-	public boolean checkForCompatibleInstallation() throws RemoteConnectionException, IOException;
+	public boolean checkForCompatibleInstallation(IProgressMonitor pm) throws RemoteConnectionException, IOException;
 
 	/**
 	 * If the remote machine is running an environment management system supported by this {@link IEnvManager}, returns a short
 	 * description of the environment management system (e.g., &quot;Modules 3.2.7&quot;); otherwise, returns <code>null</code>.
 	 * 
+	 * @param pm
+	 *            progress monitor used to report the status of potentially long-running operations to the user (non-
+	 *            <code>null</code>)
+	 * 
 	 * @return a short, human-readable description of the environment configuration system (e.g., &quot;SoftEnv 1.6.2&quot;), or
 	 *         <code>null</code> if a compatible environment configuration system is not present on the remote machine
 	 * 
 	 * @throws NullPointerException
-	 *             if {@link #configure(IRemoteServices, IRemoteConnection)} has not been called
+	 *             if {@link #configure(IRemoteConnection)} has not been called
 	 * @throws RemoteConnectionException
+	 *             if an remote connection error occurs
 	 * @throws IOException
+	 *             if an input/output error occurs
 	 */
-	public String getDescription() throws RemoteConnectionException, IOException;
+	public String getDescription(IProgressMonitor pm) throws RemoteConnectionException, IOException;
 
 	/**
 	 * Returns the set of all environment configuration elements available on the remote machine (e.g., the result of
 	 * <tt>module -t avail</tt>).
 	 * 
+	 * @param pm
+	 *            progress monitor used to report the status of potentially long-running operations to the user (non-
+	 *            <code>null</code>)
+	 * 
 	 * @return unmodifiable Set (non-<code>null</code>)
 	 * 
 	 * @throws NullPointerException
-	 *             if {@link #configure(IRemoteServices, IRemoteConnection)} has not been called
+	 *             if {@link #configure(IRemoteConnection)} has not been called
 	 * @throws RemoteConnectionException
+	 *             if an remote connection error occurs
 	 * @throws IOException
+	 *             if an input/output error occurs
 	 */
-	public Set<String> determineAvailableElements() throws RemoteConnectionException, IOException;
+	public Set<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException;
 
 	/**
 	 * Returns the set of all environment configuration elements loaded by default upon login (e.g., the result of
 	 * <tt>module -t list</tt> in a login shell).
 	 * 
+	 * @param pm
+	 *            progress monitor used to report the status of potentially long-running operations to the user (non-
+	 *            <code>null</code>)
+	 * 
 	 * @return unmodifiable Set (non-<code>null</code>)
 	 * 
 	 * @throws NullPointerException
-	 *             if {@link #configure(IRemoteServices, IRemoteConnection)} has not been called
+	 *             if {@link #configure(IRemoteConnection)} has not been called
 	 * @throws RemoteConnectionException
+	 *             if an remote connection error occurs
 	 * @throws IOException
+	 *             if an input/output error occurs
 	 */
-	public Set<String> determineDefaultElements() throws RemoteConnectionException, IOException;
+	public Set<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException;
 
 	/**
 	 * Returns a single Bash shell command which will configure the remote environment with the given elements and then execute the
@@ -146,6 +170,9 @@ public interface IEnvManager {
 	 * Creates a temporary file on the remote machine and writes a Bash shell script into that file which will configure the remote
 	 * environment with the given elements, execute the given command, and then delete the temporary file (shell script).
 	 * 
+	 * @param pm
+	 *            progress monitor used to report the status of potentially long-running operations to the user (non-
+	 *            <code>null</code>)
 	 * @param echo
 	 *            true iff the script should &quot;echo&quot; each command prior to execution
 	 * @param config
@@ -154,7 +181,12 @@ public interface IEnvManager {
 	 *            a Bash shell command to execute after the environment has been configured
 	 * 
 	 * @return path to the shell script on the remote machine (non-<code>null</code>)
+	 * 
+	 * @throws RemoteConnectionException
+	 *             if an remote connection error occurs
+	 * @throws IOException
+	 *             if an input/output error occurs
 	 */
-	public String createBashScript(boolean echo, IEnvManagerConfig config, String commandToExecuteAfterward)
+	public String createBashScript(IProgressMonitor pm, boolean echo, IEnvManagerConfig config, String commandToExecuteAfterward)
 			throws RemoteConnectionException, IOException;
 }

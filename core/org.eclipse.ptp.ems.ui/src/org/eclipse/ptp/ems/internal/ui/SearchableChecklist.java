@@ -67,6 +67,7 @@ import org.eclipse.swt.widgets.Text;
  * 
  * @see Composite
  */
+@SuppressWarnings("javadoc")
 public final class SearchableChecklist extends Composite {
 
 	private final Group group;
