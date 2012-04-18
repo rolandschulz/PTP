@@ -603,15 +603,16 @@ public class BuildConfigurationManager {
 		}
 
 		try {
-			Map<String, String> scenarioData = null;
-			String configId = bconf.getId();
-			while (configId != null) {
-				Configuration config = (Configuration) buildInfo.getManagedProject().getConfiguration(configId);
-				scenarioData = this.getConfigData(config, configSyncDataStorageName);
-				if (scenarioData != null) {
+			IConfiguration config = bconf;
+			String configId = config.getId();
+			Map<String, String> scenarioData = this.getConfigData((Configuration) config, configSyncDataStorageName);
+			while (scenarioData == null) {
+				configId = getParentId(configId);
+				if (configId == null) {
 					break;
 				}
-				configId = getParentId(configId);
+				config = buildInfo.getManagedProject().getConfiguration(configId);
+				scenarioData = this.getConfigData((Configuration) config, configSyncDataStorageName);
 			}
 			
 			if (configId != null) {
