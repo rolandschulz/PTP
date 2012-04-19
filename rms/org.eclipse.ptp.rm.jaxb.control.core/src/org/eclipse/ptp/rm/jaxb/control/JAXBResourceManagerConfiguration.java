@@ -42,7 +42,7 @@ public class JAXBResourceManagerConfiguration extends AbstractJAXBResourceManage
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration# getRMVariableMap()
 	 */
-	public IVariableMap getRMVariableMap() throws Throwable {
+	public IVariableMap getRMVariableMap() {
 		if (map == null) {
 			map = new RMVariableMap();
 		}

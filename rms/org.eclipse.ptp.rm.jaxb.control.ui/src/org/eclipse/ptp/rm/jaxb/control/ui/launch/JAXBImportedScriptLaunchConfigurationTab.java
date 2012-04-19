@@ -103,10 +103,10 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * java.lang.String)
 	 */
 	@Override
-	public void createControl(final Composite parent, ILaunchConfiguration configuration) throws CoreException {
+	public void createControl(final Composite parent, String id) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(WidgetBuilderUtils.createGridLayout(1, false));
 
@@ -190,13 +190,13 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	/*
 	 * If there is a script path in the configuration, display that script. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
-	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			RMLaunchValidation validation = super.initializeFrom(control, configuration);
+			RMLaunchValidation validation = super.initializeFrom(configuration);
 			if (!validation.isSuccess()) {
 				return validation;
 			}

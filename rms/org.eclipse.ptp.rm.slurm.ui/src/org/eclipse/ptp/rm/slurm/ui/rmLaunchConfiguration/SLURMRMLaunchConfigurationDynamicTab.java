@@ -128,9 +128,9 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * java.lang.String)
 	 */
-	public void createControl(Composite parent, ILaunchConfiguration configuration) {
+	public void createControl(Composite parent, String id) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout(1, true));
 		GridData gd;
@@ -276,10 +276,10 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(ILaunchConfiguration configuration) {
 
 		int jobnumProcs;
 		try {

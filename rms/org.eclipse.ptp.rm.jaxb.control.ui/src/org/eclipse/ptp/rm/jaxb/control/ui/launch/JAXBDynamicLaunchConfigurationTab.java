@@ -155,9 +155,9 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * java.lang.String)
 	 */
-	public void createControl(Composite parent, ILaunchConfiguration configuration) throws CoreException {
+	public void createControl(Composite parent, String id) throws CoreException {
 		try {
 			LaunchTabBuilder builder = new LaunchTabBuilder(this);
 			if (listeners != null) {
@@ -240,10 +240,10 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * viewers and then refreshes them; sets enabled and visible on non-viewer widgets, and then sets state only the control state
 	 * listeners.(non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(ILaunchConfiguration configuration) {
 		listenerConfiguration = configuration;
 		try {
 			ValueUpdateHandler handler = getParent().getUpdateHandler();
@@ -336,7 +336,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		getJobControl().runActionCommand(action.getAction(), action.getClearValue(), listenerConfiguration);
 		if (action.isRefresh()) {
 			try {
-				parentTab.initializeFrom(null, listenerConfiguration);
+				parentTab.initializeFrom(null);
 			} catch (Throwable t) {
 				throw CoreExceptionUtils.newException(t.getLocalizedMessage(), t);
 			}

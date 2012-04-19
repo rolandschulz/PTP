@@ -66,13 +66,13 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	/**
 	 * @since 3.0
 	 */
-	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(ILaunchConfiguration configuration) {
 		dataSource.setConfiguration(configuration);
 		widgetListener.disable();
 		dataSource.loadAndUpdate();

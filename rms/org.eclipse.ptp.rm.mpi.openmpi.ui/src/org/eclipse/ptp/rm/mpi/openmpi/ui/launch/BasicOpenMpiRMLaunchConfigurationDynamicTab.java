@@ -322,9 +322,9 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunchCon
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * java.lang.String)
 	 */
-	public void createControl(Composite parent, ILaunchConfiguration configuration) throws CoreException {
+	public void createControl(Composite parent, String id) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;

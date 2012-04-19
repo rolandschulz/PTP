@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2012 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rm.launch;
 
 import java.net.URL;
@@ -9,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl;
@@ -24,12 +35,26 @@ public class RMLaunchUtils {
 
 	private static Map<String, URL> fJAXBConfigurations = null;
 
+	/**
+	 * @param configuration
+	 * @return
+	 */
 	public static String getConnectionName(ILaunchConfiguration configuration) {
 		try {
 			return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	public static String getControlId(ILaunchConfiguration configuration) {
+		final String type;
+		try {
+			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String) null);
+		} catch (CoreException e) {
+			return null;
+		}
+		return type;
 	}
 
 	/**
@@ -46,28 +71,44 @@ public class RMLaunchUtils {
 		return null;
 	}
 
+	/**
+	 * @param configuration
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IJAXBLaunchControl getLaunchControl(ILaunchConfiguration configuration) throws CoreException {
 		String type = getResourceManagerType(configuration);
 		if (type != null) {
 			ProviderInfo provider = ProviderInfo.getProvider(type);
 			if (provider != null) {
-				return getLaunchControl(provider, configuration);
+				String controlId = getControlId(configuration);
+				IJAXBLaunchControl control = getLaunchControl(provider.getName(), controlId);
+				String name = getConnectionName(configuration);
+				String id = getRemoteServicesId(configuration);
+				if (name != null && id != null) {
+					control.setConnectionName(name);
+					control.setRemoteServicesId(id);
+					return control;
+				}
 			}
 		}
 		return null;
 	}
 
-	public static IJAXBLaunchControl getLaunchControl(ProviderInfo provider, ILaunchConfiguration configuration) {
-		IJAXBLaunchControl control = new JAXBLaunchControl();
-		control.setRMConfigurationURL(getJAXBConfigurationURL(provider.getName()));
-		String name = getConnectionName(configuration);
-		String id = getRemoteServicesId(configuration);
-		if (name != null && id != null) {
-			control.setConnectionName(name);
-			control.setRemoteServicesId(id);
-			return control;
+	/**
+	 * @param provider
+	 * @param configuration
+	 * @return
+	 */
+	public static IJAXBLaunchControl getLaunchControl(String name, String controlId) {
+		IJAXBLaunchControl control;
+		if (controlId == null) {
+			control = new JAXBLaunchControl();
+		} else {
+			control = new JAXBLaunchControl(controlId);
 		}
-		return null;
+		control.setRMConfigurationURL(getJAXBConfigurationURL(name));
+		return control;
 	}
 
 	/**
@@ -95,6 +136,25 @@ public class RMLaunchUtils {
 		return null;
 	}
 
+	/**
+	 * @param configuration
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	public static IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
+			throws CoreException {
+		IRemoteConnection conn = getRemoteConnection(configuration, monitor);
+		if (conn != null) {
+			return conn.getRemoteServices().getFileManager(conn);
+		}
+		return null;
+	}
+
+	/**
+	 * @param configuration
+	 * @return
+	 */
 	public static String getRemoteServicesId(ILaunchConfiguration configuration) {
 		try {
 			return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, (String) null);
@@ -103,6 +163,11 @@ public class RMLaunchUtils {
 		}
 	}
 
+	/**
+	 * @param configuration
+	 * @return
+	 * @throws CoreException
+	 */
 	public static String getResourceManagerType(ILaunchConfiguration configuration) throws CoreException {
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_TYPE, (String) null);
 	}

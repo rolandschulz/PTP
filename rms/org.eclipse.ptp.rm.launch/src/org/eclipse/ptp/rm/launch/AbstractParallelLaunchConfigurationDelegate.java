@@ -1,20 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California.
- * This material was produced under U.S. Government contract W-7405-ENG-36
- * for Los Alamos National Laboratory, which is operated by the University
- * of California for the U.S. Department of Energy. The U.S. Government has
- * rights to use, reproduce, and distribute this software. NEITHER THE
- * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly marked,
- * so as not to confuse it with the version available from LANL.
- *
- * Additionally, this program and the accompanying materials
+ * Copyright (c) 2012 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * LA-CC 04-115
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 package org.eclipse.ptp.rm.launch;
 
@@ -41,7 +33,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
@@ -387,18 +378,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Set the working directory
-	 * 
-	 * @param configuration
-	 * @param dir
-	 * @throws CoreException
-	 * @since 5.0
-	 */
-	protected void setWorkingDirectory(ILaunchConfigurationWorkingCopy configuration, String dir) throws CoreException {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, dir);
-	}
-
-	/**
 	 * Submit a job to the resource manager. Keeps track of the submission so we know when the job actually starts running. When
 	 * this happens, the abstract method doCompleteJobLaunch() is invoked.
 	 * 
@@ -419,8 +398,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
 			}
-			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
 			control.start(progress.newChild(3));
+			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
 			String jobId = control.submitJob(configuration, mode, progress.newChild(5));
 			if (control.getJobStatus(jobId, progress.newChild(2)).equals(IJobStatus.UNDETERMINED)) {
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
@@ -566,7 +545,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @since 5.0
 	 */
 	protected IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		IRemoteFileManager fileManager = LaunchUtils.getRemoteFileManager(configuration, monitor);
+		IRemoteFileManager fileManager = RMLaunchUtils.getRemoteFileManager(configuration, monitor);
 		if (monitor.isCanceled() || fileManager == null) {
 			return null;
 		}

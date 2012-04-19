@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
+import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
@@ -57,9 +58,8 @@ public class JAXBExtensionUtils {
 	}
 
 	/**
-	 * Gets all extensions to the
-	 * org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations extension
-	 * point and loads their names and locations.
+	 * Gets all extensions to the org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations extension point and loads their
+	 * names and locations.
 	 * 
 	 * @param resourceManagers
 	 *            map of extId to map(name, URL)
@@ -88,39 +88,35 @@ public class JAXBExtensionUtils {
 	}
 
 	/**
-	 * Wrapper method. Calls {@link #loadExtensions()} and
-	 * {@link #loadExternal(boolean)}.
+	 * Wrapper method. Calls {@link #loadExtensions()} and {@link #loadExternal(boolean)}.
 	 * 
 	 * @param resourceManagers
 	 *            map of extId to map(name, URL)
 	 * @param showError
-	 *            display an error message if any configuration is invalid
-	 *            (against the internal XSD). Only true when loading the widget
-	 *            the first time.
+	 *            display an error message if any configuration is invalid (against the internal XSD). Only true when loading the
+	 *            widget the first time.
 	 */
 	public static void loadJAXBResourceManagers(Map<String, URL> resourceManagers, boolean showError) {
 		loadExtensions(resourceManagers);
 
 		/*
-		 * Also search the workspace for managers. By convention these should
-		 * all go in a directory called "resourceManagers". Loads only valid XML
+		 * Also search the workspace for managers. By convention these should all go in a directory called "resourceManagers". Loads
+		 * only valid XML
 		 */
 		loadExternal(resourceManagers, showError);
 	}
 
 	/**
-	 * Searches for .xml files contained in the user's workspace under the
-	 * project named "resourceManagers". Validates each one found and on failed
-	 * validation displays an error message (if so indicated).
+	 * Searches for .xml files contained in the user's workspace under the project named "resourceManagers". Validates each one
+	 * found and on failed validation displays an error message (if so indicated).
 	 * 
-	 * @param resourceManagers
+	 * @param configurations
 	 *            map of extId to map(name, URL)
 	 * @param showError
-	 *            display an error message if any configuration is invalid
-	 *            (against the internal XSD). Only true when loading the widget
-	 *            the first time.
+	 *            display an error message if any configuration is invalid (against the internal XSD). Only true when loading the
+	 *            widget the first time.
 	 */
-	private static void loadExternal(Map<String, URL> resourceManagers, boolean showError) {
+	private static void loadExternal(Map<String, URL> configurations, boolean showError) {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBUIConstants.RESOURCE_MANAGERS);
 		StringBuffer invalid = new StringBuffer();
 		if (project != null) {
@@ -130,18 +126,17 @@ public class JAXBExtensionUtils {
 				File[] custom = dir.listFiles(xmlFilter);
 				for (File rm : custom) {
 					try {
-						String name = rm.getName();
-						name = name.substring(0, name.length() - 4);
+						ResourceManagerData data;
 						URI uri = rm.toURI();
 						URL url = uri.toURL();
 						try {
-							JAXBInitializationUtils.validate(url);
+							data = JAXBInitializationUtils.initializeRMData(url);
 						} catch (Throwable t) {
-							invalid.append(JAXBUIConstants.LINE_SEP).append(name);
+							invalid.append(JAXBUIConstants.LINE_SEP).append(rm.getName());
 							JAXBUIPlugin.log(t.getMessage());
 							continue;
 						}
-						resourceManagers.put(name, url);
+						configurations.put(data.getName(), url);
 					} catch (MalformedURLException t) {
 						JAXBUIPlugin.log(t);
 					}

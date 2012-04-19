@@ -153,6 +153,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	}
 
 	private final IJAXBResourceManagerConfiguration config;
+	private IJAXBResourceManagerConfiguration baseConfig;
 
 	private final ConnectionChangeListener connectionListener;
 
@@ -160,11 +161,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private ICommandJob interactiveJob;
 	private ICommandJobStatusMap jobStatusMap;
 	private JobIdPinTable pinTable;
-	private RMVariableMap rmVarMap;
-	private ResourceManagerData configData;
-	private String servicesId;
-	private String connectionName;
-	private RemoteServicesDelegate remoteServicesDelegate;
 	private boolean appendLaunchEnv;
 	private boolean isActive = false;
 	private boolean isInitialized = false;
@@ -192,7 +188,14 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl#getConfiguration()
 	 */
 	public ResourceManagerData getConfiguration() {
-		return configData;
+		return getBaseConfiguration().getResourceManagerData();
+	}
+
+	private IJAXBResourceManagerConfiguration getBaseConfiguration() {
+		if (baseConfig == null) {
+			baseConfig = (IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
+		}
+		return baseConfig;
 	}
 
 	/*
@@ -201,7 +204,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @see org.eclipse.ptp.core.jobs.IJobControl#getConnectionName()
 	 */
 	public String getConnectionName() {
-		return connectionName;
+		return config.getConnectionName();
 	}
 
 	/*
@@ -220,7 +223,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getEnvironment()
 	 */
 	public IVariableMap getEnvironment() {
-		return rmVarMap;
+		return getVarMap();
+	}
+
+	private RMVariableMap getVarMap() {
+		return (RMVariableMap) getBaseConfiguration().getRMVariableMap();
 	}
 
 	/**
@@ -245,34 +252,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @throws CoreException
 	 */
 	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 10);
-		try {
-			String cname = config.getConnectionName();
-			String sid = config.getRemoteServicesId();
-			if (remoteServicesDelegate == null || !cname.equals(connectionName) || !sid.equals(servicesId)) {
-				connectionName = cname;
-				servicesId = sid;
-				remoteServicesDelegate = new RemoteServicesDelegate(servicesId, connectionName);
-				remoteServicesDelegate.initialize(progress.newChild(5));
-			}
-			/*
-			 * Bug 370775 - Attempt to open the connection before using the delegate as the connection can be closed independently
-			 * of the resource manager.
-			 */
-			IRemoteConnection conn = remoteServicesDelegate.getRemoteConnection();
-			if (!conn.isOpen()) {
-				try {
-					conn.open(progress.newChild(5));
-				} catch (RemoteConnectionException e) {
-					// Just use the closed connection
-				}
-			}
-			return remoteServicesDelegate;
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
+		return RemoteServicesDelegate.getDelegate(config.getRemoteServicesId(), config.getConnectionName(), monitor);
 	}
 
 	/*
@@ -281,7 +261,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @see org.eclipse.ptp.core.jobs.IJobControl#getRemoteServicesId()
 	 */
 	public String getRemoteServicesId() {
-		return servicesId;
+		return config.getRemoteServicesId();
 	}
 
 	/*
@@ -310,17 +290,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		try {
 			if (!isInitialized) {
 				/*
-				 * Use the base configuration which contains the config file information
-				 */
-				IJAXBResourceManagerConfiguration base = (IJAXBResourceManagerConfiguration) getResourceManager()
-						.getConfiguration();
-				base.initialize();
-				rmVarMap = (RMVariableMap) base.getRMVariableMap();
-				configData = base.getResourceManagerData();
-				/*
 				 * Set connection information from the site configuration. This may get overidden by the launch configuration later
 				 */
-				SiteType site = configData.getSiteData();
+				SiteType site = getConfiguration().getSiteData();
 				if (site != null) {
 					String controlURI = site.getControlConnection();
 					if (controlURI != null) {
@@ -386,7 +358,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		Object changedValue = null;
 
 		if (resetValue != null) {
-			changedValue = rmVarMap.get(resetValue);
+			changedValue = getVarMap().get(resetValue);
 			if (changedValue instanceof PropertyType) {
 				((PropertyType) changedValue).setValue(null);
 			} else if (changedValue instanceof AttributeType) {
@@ -396,7 +368,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		CommandType command = null;
 
-		for (CommandType cmd : configData.getControlData().getButtonAction()) {
+		for (CommandType cmd : getConfiguration().getControlData().getButtonAction()) {
 			if (cmd.getName().equals(action)) {
 				command = cmd;
 				break;
@@ -404,7 +376,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		if (command == null) {
-			for (CommandType cmd : configData.getControlData().getStartUpCommand()) {
+			for (CommandType cmd : getConfiguration().getControlData().getStartUpCommand()) {
 				if (cmd.getName().equals(action)) {
 					command = cmd;
 					break;
@@ -413,7 +385,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 
 		if (command == null) {
-			for (CommandType cmd : configData.getControlData().getShutDownCommand()) {
+			for (CommandType cmd : getConfiguration().getControlData().getShutDownCommand()) {
 				if (cmd.getName().equals(action)) {
 					command = cmd;
 					break;
@@ -468,27 +440,27 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		CommandType job = null;
 		if (TERMINATE_OPERATION.equals(operation)) {
 			maybeKillInteractive(jobId);
-			job = configData.getControlData().getTerminateJob();
+			job = getConfiguration().getControlData().getTerminateJob();
 			if (job == null) { // there may not be an external cancel
 				return;
 			}
 		} else if (SUSPEND_OPERATION.equals(operation)) {
-			job = configData.getControlData().getSuspendJob();
+			job = getConfiguration().getControlData().getSuspendJob();
 			if (job == null) {
 				throw ce;
 			}
 		} else if (RESUME_OPERATION.equals(operation)) {
-			job = configData.getControlData().getResumeJob();
+			job = getConfiguration().getControlData().getResumeJob();
 			if (job == null) {
 				throw ce;
 			}
 		} else if (RELEASE_OPERATION.equals(operation)) {
-			job = configData.getControlData().getReleaseJob();
+			job = getConfiguration().getControlData().getReleaseJob();
 			if (job == null) {
 				throw ce;
 			}
 		} else if (HOLD_OPERATION.equals(operation)) {
-			job = configData.getControlData().getHoldJob();
+			job = getConfiguration().getControlData().getHoldJob();
 			if (job == null) {
 				throw ce;
 			}
@@ -514,18 +486,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		CommandJob.JobMode jobMode = CommandJob.JobMode.INTERACTIVE;
 
 		if (ILaunchManager.RUN_MODE.equals(mode)) {
-			command = configData.getControlData().getSubmitBatch();
+			command = getConfiguration().getControlData().getSubmitBatch();
 			if (command != null) {
 				jobMode = CommandJob.JobMode.BATCH;
 			} else {
-				command = configData.getControlData().getSubmitInteractive();
+				command = getConfiguration().getControlData().getSubmitInteractive();
 			}
 		} else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-			command = configData.getControlData().getSubmitBatchDebug();
+			command = getConfiguration().getControlData().getSubmitBatchDebug();
 			if (command != null) {
 				jobMode = CommandJob.JobMode.BATCH;
 			} else {
-				command = configData.getControlData().getSubmitInteractiveDebug();
+				command = getConfiguration().getControlData().getSubmitInteractiveDebug();
 			}
 		}
 
@@ -557,7 +529,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		}
 		doControlJob(iJobId, TERMINATE_OPERATION, null);
 
-		List<CommandType> onShutDown = configData.getControlData().getShutDownCommand();
+		List<CommandType> onShutDown = getConfiguration().getControlData().getShutDownCommand();
 		runCommands(onShutDown);
 
 		isActive = false;
@@ -582,7 +554,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * Run the start up commands, if any
 		 */
-		List<CommandType> onStartUp = configData.getControlData().getStartUpCommand();
+		List<CommandType> onStartUp = getConfiguration().getControlData().getStartUpCommand();
 		runCommands(onStartUp);
 
 		isActive = true;
@@ -630,8 +602,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 		}
 
-		PropertyType scriptVar = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT);
-		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
+		PropertyType scriptVar = (PropertyType) getVarMap().get(JAXBControlConstants.SCRIPT);
+		PropertyType scriptPathVar = (PropertyType) getVarMap().get(JAXBControlConstants.SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
 				files = new ManagedFilesType();
@@ -702,15 +674,15 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @return whether the script target should be deleted
 	 */
 	private boolean maybeHandleScript(String uuid, ScriptType script) {
-		PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
+		PropertyType p = (PropertyType) getVarMap().get(JAXBControlConstants.SCRIPT_PATH);
 		if (p != null && p.getValue() != null) {
 			return false;
 		}
 		if (script == null) {
 			return false;
 		}
-		rmVarMap.setEnvManager(EnvManagerRegistry.getEnvManager(getRemoteServices(), getRemoteConnection()));
-		ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, launchEnv, false);
+		getVarMap().setEnvManager(EnvManagerRegistry.getEnvManager(getRemoteServices(), getRemoteConnection()));
+		ScriptHandler job = new ScriptHandler(uuid, script, getVarMap(), launchEnv, false);
 		job.schedule();
 		try {
 			job.join();
@@ -835,9 +807,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private void setFixedConfigurationProperties(IProgressMonitor monitor) throws CoreException {
 		IRemoteConnection rc = getRemoteServicesDelegate(monitor).getRemoteConnection();
 		if (rc != null) {
-			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
-			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
-			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
+			getVarMap().maybeAddProperty(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
+			getVarMap().maybeAddProperty(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
+			getVarMap().maybeAddProperty(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
 		}
 	}
 
@@ -857,7 +829,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		Map lcattr = RMVariableMap.getValidAttributes(configuration);
 		for (Object key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
-			Object target = rmVarMap.get(key.toString());
+			Object target = getVarMap().get(key.toString());
 			if (target instanceof PropertyType) {
 				PropertyType p = (PropertyType) target;
 				p.setValue(value);
@@ -873,9 +845,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * The non-selected variables have been excluded from the valid attributes of the configuration; but we need to null out the
 		 * superset values here that are undefined.
 		 */
-		for (String key : rmVarMap.getVariables().keySet()) {
+		for (String key : getVarMap().getVariables().keySet()) {
 			if (!lcattr.containsKey(key)) {
-				Object target = rmVarMap.get(key.toString());
+				Object target = getVarMap().get(key.toString());
 				if (target instanceof PropertyType) {
 					PropertyType p = (PropertyType) target;
 					if (p.isVisible()) {
@@ -895,23 +867,23 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * make sure these fixed properties are included
 		 */
-		rmVarMap.overwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.DIRECTORY, JAXBControlConstants.DIRECTORY, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.EXEC_PATH, JAXBControlConstants.EXEC_PATH, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.PTP_DIRECTORY, JAXBControlConstants.PTP_DIRECTORY, lcattr);
+		getVarMap().overwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, lcattr);
+		getVarMap().overwrite(JAXBControlConstants.DIRECTORY, JAXBControlConstants.DIRECTORY, lcattr);
+		getVarMap().overwrite(JAXBControlConstants.EXEC_PATH, JAXBControlConstants.EXEC_PATH, lcattr);
+		getVarMap().overwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr);
+		getVarMap().overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
+		getVarMap().overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
+		getVarMap().overwrite(JAXBControlConstants.PTP_DIRECTORY, JAXBControlConstants.PTP_DIRECTORY, lcattr);
 
 		/*
 		 * update the dynamic properties
 		 */
 		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, (String) null);
 		if (attr != null) {
-			PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.DEBUGGER_ARGS);
+			PropertyType p = (PropertyType) getVarMap().get(JAXBControlConstants.DEBUGGER_ARGS);
 			if (p == null) {
 				p = new PropertyType();
-				rmVarMap.put(JAXBControlConstants.DEBUGGER_ARGS, p);
+				getVarMap().put(JAXBControlConstants.DEBUGGER_ARGS, p);
 			}
 			p.setValue(attr);
 		}
@@ -966,10 +938,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			PropertyType p = new PropertyType();
 			p.setVisible(false);
 			p.setName(jobId);
-			rmVarMap.put(jobId, p);
+			getVarMap().put(jobId, p);
 			worked(progress, 30);
 			doControlCommand(jobId, operation);
-			rmVarMap.remove(jobId);
+			getVarMap().remove(jobId);
 			worked(progress, 40);
 			if (TERMINATE_OPERATION.equals(operation)) {
 				IJobStatus canceledStatus = jobStatusMap.cancel(jobId);
@@ -1041,17 +1013,17 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			String state = status == null ? IJobStatus.UNDETERMINED : status.getStateDetail();
 
 			try {
-				PropertyType p = (PropertyType) rmVarMap.get(jobId);
+				PropertyType p = (PropertyType) getVarMap().get(jobId);
 
-				CommandType job = configData.getControlData().getGetJobStatus();
+				CommandType job = getConfiguration().getControlData().getGetJobStatus();
 				if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
 					pinTable.pin(jobId);
 					p = new PropertyType();
 					p.setVisible(false);
 					p.setName(jobId);
-					rmVarMap.put(jobId, p);
+					getVarMap().put(jobId, p);
 					runCommand(jobId, job, CommandJob.JobMode.STATUS, null, ILaunchManager.RUN_MODE, true);
-					p = (PropertyType) rmVarMap.remove(jobId);
+					p = (PropertyType) getVarMap().remove(jobId);
 				}
 
 				if (p != null) {
@@ -1063,7 +1035,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 			if (status == null) {
 				status = new CommandJobStatus(jobId, state, null, this);
-				status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+				status.setOwner(getVarMap().getString(JAXBControlConstants.CONTROL_USER_NAME));
 				jobStatusMap.addJobStatus(jobId, status);
 			} else {
 				status.setState(state);
@@ -1168,7 +1140,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		PropertyType p = new PropertyType();
 		p.setVisible(false);
-		rmVarMap.put(uuid, p);
+		getVarMap().put(uuid, p);
 
 		/*
 		 * Overwrite property/attribute values based on user choices. Note that the launch can also modify attributes.
@@ -1178,11 +1150,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * process script
 		 */
-		ScriptType script = configData.getControlData().getScript();
+		ScriptType script = getConfiguration().getControlData().getScript();
 		boolean delScript = maybeHandleScript(uuid, script);
 		worked(progress, 20);
 
-		List<ManagedFilesType> files = configData.getControlData().getManagedFiles();
+		List<ManagedFilesType> files = getConfiguration().getControlData().getManagedFiles();
 
 		/*
 		 * if the script is to be staged, a managed file pointing to either its content (${ptp_rm:script#value}), or to its path
@@ -1227,7 +1199,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * property containing actual jobId as name was set in the wait call; we may need the new jobId mapping momentarily to
 		 * resolve proxy-specific info
 		 */
-		rmVarMap.remove(uuid);
+		getVarMap().remove(uuid);
 		jobId = p.getName();
 
 		/*
@@ -1235,7 +1207,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		if (jobId == null) {
 			status = new CommandJobStatus(uuid, IJobStatus.CANCELED, null, this);
-			status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+			status.setOwner(getVarMap().getString(JAXBControlConstants.CONTROL_USER_NAME));
 			return status;
 		}
 
@@ -1249,8 +1221,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		/*
 		 * to ensure the most recent script is used at the next call
 		 */
-		rmVarMap.remove(JAXBControlConstants.SCRIPT_PATH);
-		rmVarMap.remove(JAXBControlConstants.SCRIPT);
+		getVarMap().remove(JAXBControlConstants.SCRIPT_PATH);
+		getVarMap().remove(JAXBControlConstants.SCRIPT);
 		return status;
 	}
 }

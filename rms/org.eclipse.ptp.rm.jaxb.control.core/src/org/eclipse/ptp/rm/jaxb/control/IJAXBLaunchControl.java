@@ -27,16 +27,6 @@ public interface IJAXBLaunchControl extends IJAXBJobControl {
 	public void setRemoteServicesId(String id);
 
 	/**
-	 * Resets internal (in-memory) data objects.
-	 * 
-	 * @param all
-	 *            if false, clears only the data tree and map, not the connections.
-	 * 
-	 * @since 5.0
-	 */
-	public void clearReferences(boolean all);
-
-	/**
 	 * Safely dispose of this Resource Manager.
 	 */
 	public void dispose();

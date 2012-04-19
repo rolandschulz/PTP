@@ -71,9 +71,9 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * java.lang.String)
 	 */
-	public void createControl(Composite parent, ILaunchConfiguration configuration) throws CoreException {
+	public void createControl(Composite parent, String id) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		control.setLayout(layout);
@@ -83,7 +83,7 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			final TabItem simpleTabItem = new TabItem(tabFolder, SWT.NONE);
-			tabControl.createControl(tabFolder, configuration);
+			tabControl.createControl(tabFolder, id);
 			simpleTabItem.setText(tabControl.getText());
 			simpleTabItem.setImage(tabControl.getImage());
 			simpleTabItem.setControl(tabControl.getControl());
@@ -112,16 +112,16 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	/**
 	 * @since 3.0
 	 */
-	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(ILaunchConfiguration configuration) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.initializeFrom(control, configuration);
+			RMLaunchValidation validation = tabControl.initializeFrom(configuration);
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
 			}

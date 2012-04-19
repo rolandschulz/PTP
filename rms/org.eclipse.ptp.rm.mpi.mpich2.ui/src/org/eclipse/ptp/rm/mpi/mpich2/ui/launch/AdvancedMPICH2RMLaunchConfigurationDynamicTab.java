@@ -11,7 +11,6 @@
 package org.eclipse.ptp.rm.mpi.mpich2.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -146,9 +145,9 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * java.lang.String)
 	 */
-	public void createControl(Composite parent, ILaunchConfiguration configuration) throws CoreException {
+	public void createControl(Composite parent, String id) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout());
 

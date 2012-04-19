@@ -58,6 +58,12 @@ public abstract class AbstractJAXBResourceManagerConfiguration extends AbstractR
 	 */
 	@Override
 	public ResourceManagerData getResourceManagerData() {
+		if (rmdata == null) {
+			try {
+				realizeRMDataFromXML();
+			} catch (CoreException e) {
+			}
+		}
 		return rmdata;
 	}
 

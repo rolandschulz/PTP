@@ -1583,12 +1583,12 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * java.lang.String)
 	 */
-	public void createControl(Composite parent, ILaunchConfiguration configuration) {
+	public void createControl(Composite parent, String id) throws CoreException {
 		PEResourceManagerConfiguration config;
 		IRemoteConnectionManager connMgr;
-		currentRM = (PEResourceManager) LaunchUtils.getResourceManager(configuration);
+		currentRM = (PEResourceManager) ModelManager.getInstance().getResourceManagerFromUniqueName(id);
 
 		config = (PEResourceManagerConfiguration) ((AbstractResourceManager) currentRM).getConfiguration();
 		if (config != null) {
@@ -1943,14 +1943,13 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(ILaunchConfiguration configuration) {
 		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
 			currentLaunchConfig = (ILaunchConfigurationWorkingCopy) configuration;
 		}
-		currentRM = (PEResourceManager) LaunchUtils.getResourceManager(configuration);
 		setInitialValues(configuration);
 		setInitialWidgetState();
 		return success;

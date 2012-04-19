@@ -34,7 +34,7 @@ public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManage
 	 * 
 	 * @since 5.0
 	 */
-	public IVariableMap getRMVariableMap() throws Throwable;
+	public IVariableMap getRMVariableMap();
 
 	/**
 	 * Initialize the configuration. Must be called prior to using the configuration

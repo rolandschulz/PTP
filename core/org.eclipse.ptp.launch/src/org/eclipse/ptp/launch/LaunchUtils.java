@@ -377,12 +377,6 @@ public class LaunchUtils {
 		return queues[0];
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback#
-	 * getRemoteFileManager(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.core.runtime.IProgressMonitor)
-	 */
 	/**
 	 * @since 5.0
 	 */

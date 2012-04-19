@@ -157,51 +157,36 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 		}
 	}
 
-	private final ConnectionChangeListener connectionListener;
-
-	private Map<String, String> launchEnv;
+	private final ConnectionChangeListener connectionListener = new ConnectionChangeListener();
+	private final Map<String, String> launchEnv = new TreeMap<String, String>();
+	private final JobIdPinTable pinTable = new JobIdPinTable();
 
 	private ICommandJob interactiveJob;
-
 	private ICommandJobStatusMap jobStatusMap;
-	private JobIdPinTable pinTable;
 	private RMVariableMap rmVarMap;
 	protected ResourceManagerData configData;
 	private ControlType controlData;
 	private String servicesId;
 	private String connectionName;
-	private RemoteServicesDelegate remoteServicesDelegate;
 	private boolean appendLaunchEnv;
 	private boolean isActive = false;
 	private boolean isInitialized = false;
 	private String configURL;
 	private String configXML;
 	private String state;
+	private RemoteServicesDelegate fRemoteServicesDelegate;
+	private final String fControlId;
 
 	/**
 	 * @param jaxbServiceProvider
 	 *            the configuration object containing resource manager specifics
 	 */
 	public JAXBLaunchControl() {
-		connectionListener = new ConnectionChangeListener();
+		this(UUID.randomUUID().toString());
 	}
 
-	/*
-	 * Clears in-memory objects (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration# clearReferences()
-	 */
-	public void clearReferences(boolean all) {
-		if (all) {
-			rmVarMap.clear();
-			rmVarMap = null;
-			clearRMData();
-		} else {
-			if (rmVarMap != null) {
-				rmVarMap.clear();
-			}
-			configData = null;
-		}
+	public JAXBLaunchControl(String controlId) {
+		fControlId = controlId;
 	}
 
 	/*
@@ -302,7 +287,7 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl#getControlId()
 	 */
 	public String getControlId() {
-		return servicesId + "." + connectionName + "_" + configData.getName(); //$NON-NLS-1$ //$NON-NLS-2$
+		return fControlId;
 	}
 
 	/*
@@ -458,44 +443,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	 * return JAXBInitializationUtils.getRMConfigurationXML(url);
 	 */
 
-	/**
-	 * Reinitializes when the connection info has been changed on a cached resource manager.
-	 * 
-	 * @param monitor
-	 * @return wrapper object for remote services, connections and file managers
-	 * @throws CoreException
-	 */
-	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 10);
-		try {
-			if (remoteServicesDelegate == null) {
-				if (connectionName != null && servicesId != null) {
-					remoteServicesDelegate = new RemoteServicesDelegate(servicesId, connectionName);
-					remoteServicesDelegate.initialize(progress.newChild(5));
-				}
-				if (remoteServicesDelegate != null) {
-					/*
-					 * Bug 370775 - Attempt to open the connection before using the delegate as the connection can be closed
-					 * independently of the resource manager.
-					 */
-					IRemoteConnection conn = remoteServicesDelegate.getRemoteConnection();
-					if (!conn.isOpen()) {
-						try {
-							conn.open(progress.newChild(5));
-						} catch (RemoteConnectionException e) {
-							// Just use the closed connection
-						}
-					}
-				}
-			}
-			return remoteServicesDelegate;
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -531,30 +478,32 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	public void initialize(IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			clearReferences(false);
 			realizeRMDataFromXML();
 			rmVarMap = (RMVariableMap) getEnvironment();
 			if (configData != null) {
 				controlData = configData.getControlData();
-				/*
-				 * Set connection information from the site configuration. This may get overidden by the launch configuration later
-				 */
-				SiteType site = configData.getSiteData();
-				if (site != null) {
-					String controlURI = site.getControlConnection();
-					if (controlURI != null) {
-						try {
-							URI uri = new URI(controlURI);
-							IRemoteServices remServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(uri,
-									progress.newChild(5));
-							if (remServices != null) {
-								IRemoteConnection remConn = remServices.getConnectionManager().getConnection(uri);
-								if (remConn != null) {
-									servicesId = remServices.getId();
-									connectionName = remConn.getName();
+				if (servicesId == null && connectionName == null) {
+					/*
+					 * Set connection information from the site configuration. This may get overidden by the launch configuration
+					 * later
+					 */
+					SiteType site = configData.getSiteData();
+					if (site != null) {
+						String controlURI = site.getControlConnection();
+						if (controlURI != null) {
+							try {
+								URI uri = new URI(controlURI);
+								IRemoteServices remServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(uri,
+										progress.newChild(5));
+								if (remServices != null) {
+									IRemoteConnection remConn = remServices.getConnectionManager().getConnection(uri);
+									if (remConn != null) {
+										servicesId = remServices.getId();
+										connectionName = remConn.getName();
+									}
 								}
+							} catch (URISyntaxException e) {
 							}
-						} catch (URISyntaxException e) {
 						}
 					}
 				}
@@ -682,28 +631,77 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	public void start(IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 60);
 		try {
-			doConnect(progress.newChild(20));
-		} catch (CoreException ce) {
-			progress.done();
-			throw ce;
-		} catch (Throwable t) {
-			progress.done();
-			throw CoreExceptionUtils.newException(t.getMessage(), t);
-		}
-
-		try {
 			/*
 			 * Support legacy RM API
 			 */
 			if (!isInitialized) {
 				initialize(progress.newChild(30));
 			}
-			doOnStartUp();
+
+			fRemoteServicesDelegate = RemoteServicesDelegate.getDelegate(servicesId, connectionName, progress.newChild(50));
+			IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
+			if (conn != null) {
+				checkConnection(conn, progress);
+				conn.addConnectionChangeListener(connectionListener);
+			}
+
+			appendLaunchEnv = true;
+
+			/*
+			 * start daemon
+			 */
+			jobStatusMap = new JobStatusMap(this);
+			((Thread) jobStatusMap).start();
+
+			/*
+			 * Run the start up commands, if any
+			 */
+			List<CommandType> onStartUp = controlData.getStartUpCommand();
+			runCommands(onStartUp);
+
+			isActive = true;
 		} catch (CoreException ce) {
 			throw ce;
 		} catch (Throwable t) {
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#stop()
+	 */
+	public void stop() throws CoreException {
+		String iJobId = null;
+		synchronized (this) {
+			if (interactiveJob != null) {
+				ICommandJobStatus status = interactiveJob.getJobStatus();
+				if (status != null) {
+					iJobId = status.getJobId();
+				}
+			}
+		}
+		control(iJobId, TERMINATE_OPERATION, null);
+
+		List<CommandType> onShutDown = controlData.getShutDownCommand();
+		runCommands(onShutDown);
+
+		if (rmVarMap != null) {
+			rmVarMap.clear();
+		}
+		jobStatusMap.halt();
+
+		IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
+		if (conn != null) {
+			conn.removeConnectionChangeListener(connectionListener);
+		}
+
+		isActive = false;
 	}
 
 	/*
@@ -712,22 +710,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getJobStatus(java.lang.String, boolean,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#stop()
-	 */
-	public void stop() throws CoreException {
-		doOnShutdown();
-		clearReferences(true);
-		jobStatusMap.halt();
-		RemoteServicesDelegate d = getRemoteServicesDelegate(null);
-		IRemoteConnection conn = d.getRemoteConnection();
-		if (conn != null) {
-			conn.removeConnectionChangeListener(connectionListener);
-		}
-	}
 
 	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
 		/*
@@ -837,31 +819,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	}
 
 	/**
-	 * Nulls out the tree as well as related service ids.
-	 */
-	private void clearRMData() {
-		configData = null;
-	}
-
-	/**
-	 * If there are special server connections to open, those need to be taken care of by a command to be run on start-up; here we
-	 * just check for an open connection and add a change listener to it.
-	 * 
-	 * @param monitor
-	 * @throws RemoteConnectionException
-	 * @throws CoreException
-	 */
-	private void doConnect(IProgressMonitor monitor) throws RemoteConnectionException, CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 100);
-		RemoteServicesDelegate d = getRemoteServicesDelegate(progress.newChild(50));
-		IRemoteConnection conn = d.getRemoteConnection();
-		if (conn != null) {
-			checkConnection(conn, progress);
-			conn.addConnectionChangeListener(connectionListener);
-		}
-	}
-
-	/**
 	 * @param jobId
 	 *            resource-specific id
 	 * @param operation
@@ -947,54 +904,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 		return runCommand(uuid, command, jobMode, configuration, mode, true);
 	}
 
-	/**
-	 * Run the shut down commands, if any. Cancel any running interactive process.
-	 * 
-	 * @throws CoreException
-	 */
-	private void doOnShutdown() throws CoreException {
-		String iJobId = null;
-		synchronized (this) {
-			if (interactiveJob != null) {
-				ICommandJobStatus status = interactiveJob.getJobStatus();
-				if (status != null) {
-					iJobId = status.getJobId();
-				}
-			}
-		}
-		control(iJobId, TERMINATE_OPERATION, null);
-
-		List<CommandType> onShutDown = controlData.getShutDownCommand();
-		runCommands(onShutDown);
-
-		isActive = false;
-	}
-
-	/**
-	 * Do any startup activities
-	 * 
-	 * @throws CoreException
-	 */
-	private void doOnStartUp() throws CoreException {
-		launchEnv = new TreeMap<String, String>();
-		pinTable = new JobIdPinTable();
-		appendLaunchEnv = true;
-
-		/*
-		 * start daemon
-		 */
-		jobStatusMap = new JobStatusMap(this);
-		((Thread) jobStatusMap).start();
-
-		/*
-		 * Run the start up commands, if any
-		 */
-		List<CommandType> onStartUp = controlData.getStartUpCommand();
-		runCommands(onStartUp);
-
-		isActive = true;
-	}
-
 	private IRemoteConnection getRemoteConnection(IProgressMonitor monitor) {
 		final IRemoteServices rsrv = getRemoteServices(monitor);
 		if (rsrv == null) {
@@ -1011,6 +920,17 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 
 	private IRemoteServices getRemoteServices(IProgressMonitor monitor) {
 		return PTPRemoteCorePlugin.getDefault().getRemoteServices(servicesId, monitor);
+	}
+
+	/**
+	 * Reinitializes when the connection info has been changed on a cached resource manager.
+	 * 
+	 * @param monitor
+	 * @return wrapper object for remote services, connections and file managers
+	 * @throws CoreException
+	 */
+	private RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
+		return RemoteServicesDelegate.getDelegate(servicesId, connectionName, monitor);
 	}
 
 	/**
@@ -1206,7 +1126,8 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 			if (configURL != null) {
 				try {
 					xml = JAXBInitializationUtils.getRMConfigurationXML(new URL(configURL));
-					setRMConfigurationXML(xml);
+					configXML = xml;
+					configData = null;
 				} catch (Throwable t) {
 					if (xml != null) {
 						new UIJob("Using Cached Definition") {
@@ -1300,13 +1221,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
 			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
-		}
-	}
-
-	private void setRMConfigurationXML(String xml) {
-		if (xml != null) {
-			configXML = xml;
-			clearRMData();
 		}
 	}
 

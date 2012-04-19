@@ -58,12 +58,12 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * 
 	 * @param parent
 	 *            the parent composite
-	 * @param configuration
-	 *            launch configuration
+	 * @param id
+	 *            ID of the controller
 	 * @throws CoreException
 	 * @since 6.0
 	 */
-	public abstract void createControl(Composite parent, ILaunchConfiguration configuration) throws CoreException;
+	public abstract void createControl(Composite parent, String id) throws CoreException;
 
 	/**
 	 * Returns the top level control for the dynamic portion of the parallel tab.
@@ -87,7 +87,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @return
 	 * @since 6.0
 	 */
-	public abstract RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration);
+	public abstract RMLaunchValidation initializeFrom(ILaunchConfiguration configuration);
 
 	/**
 	 * Returns whether this tab is in a valid state in the context of the specified launch configuration.

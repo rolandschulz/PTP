@@ -579,13 +579,19 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param queue
 	 *            Currently selected queue
 	 */
-	public void createControl(Composite parent, ILaunchConfiguration configuration) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * java.lang.String)
+	 */
+	public void createControl(Composite parent, String id) throws CoreException {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createControl entered."); //$NON-NLS-1$
 		IIBMLLResourceManagerConfiguration config;
 		IRemoteConnectionManager connMgr;
 
-		currentRM = (IBMLLResourceManager) LaunchUtils.getResourceManager(configuration);
+		currentRM = (IBMLLResourceManager) ModelManager.getInstance().getResourceManagerFromUniqueName(id);
 
 		config = (IIBMLLResourceManagerConfiguration) ((AbstractResourceManager) currentRM).getConfiguration();
 		if (config != null) {
@@ -1371,11 +1377,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, ILaunchConfiguration configuration) {
-		currentRM = (IBMLLResourceManager) LaunchUtils.getResourceManager(configuration);
+	public RMLaunchValidation initializeFrom(ILaunchConfiguration configuration) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":initializeFrom entered."); //$NON-NLS-1$
 		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
