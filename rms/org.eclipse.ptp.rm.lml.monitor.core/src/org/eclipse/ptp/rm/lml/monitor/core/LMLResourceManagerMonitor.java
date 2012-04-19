@@ -40,7 +40,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.server.RemoteServerManager;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.MonitorDriverType;
 import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
@@ -258,8 +258,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	}
 
 	private ResourceManagerData getResourceManagerData() {
-		final JAXBResourceManagerConfiguration config = (JAXBResourceManagerConfiguration) getResourceManager().getConfiguration();
-		return config.getResourceManagerData();
+		return ((IJAXBResourceManagerConfiguration) getResourceManager().getConfiguration()).getResourceManagerData();
 	}
 
 	private JobStatusData[] reloadJobs(IMemento memento) {
