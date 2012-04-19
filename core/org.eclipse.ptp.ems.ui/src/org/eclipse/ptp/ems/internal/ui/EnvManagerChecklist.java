@@ -73,8 +73,6 @@ public final class EnvManagerChecklist extends Composite {
 	private Button connectButton;
 
 	private SearchableChecklist checklist;
-	@SuppressWarnings("unused")
-	private Button loadDefaultsButton;
 
 	/**
 	 * Constructor.
@@ -245,7 +243,12 @@ public final class EnvManagerChecklist extends Composite {
 				});
 			}
 		});
-
+		checklist.addReloadButtonSelectonListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				populateModuleList(checklist.getSelectedItems());
+			}
+		});
 	}
 
 	/**

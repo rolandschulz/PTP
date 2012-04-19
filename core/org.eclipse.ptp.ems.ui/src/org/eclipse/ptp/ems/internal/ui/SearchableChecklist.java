@@ -78,6 +78,7 @@ public final class SearchableChecklist extends Composite {
 	private TableColumn textColumn = null;
 	private Button clearSelection = null;
 	private Button loadDefaults = null;
+	private Button reloadList = null;
 
 	private Comparator<String> comparator = null;
 	private Set<String> items = Collections.<String> emptySet();
@@ -228,6 +229,7 @@ public final class SearchableChecklist extends Composite {
 
 	private void createButtons() {
 		clearSelection = new Button(group, SWT.PUSH);
+		clearSelection.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		clearSelection.setText(Messages.SearchableChecklist_ClearSelection);
 		clearSelection.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -237,7 +239,12 @@ public final class SearchableChecklist extends Composite {
 		});
 
 		loadDefaults = new Button(group, SWT.PUSH);
+		loadDefaults.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		loadDefaults.setText(Messages.SearchableChecklist_SelectDefaults);
+
+		reloadList = new Button(group, SWT.PUSH);
+		reloadList.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
+		reloadList.setText(Messages.SearchableChecklist_ReloadList);
 	}
 
 	/**
@@ -252,6 +259,13 @@ public final class SearchableChecklist extends Composite {
 	 */
 	public void addDefaultButtonSelectonListener(SelectionListener listener) {
 		loadDefaults.addSelectionListener(listener);
+	}
+
+	/**
+	 * Adds the given {@link SelectionListener} to the &quot;Reload List&quot; button.
+	 */
+	public void addReloadButtonSelectonListener(SelectionListener listener) {
+		reloadList.addSelectionListener(listener);
 	}
 
 	private Pattern compilePattern() {
