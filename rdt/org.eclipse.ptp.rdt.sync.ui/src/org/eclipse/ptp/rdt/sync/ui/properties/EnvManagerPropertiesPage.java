@@ -50,7 +50,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 	@Override
 	public void createWidgets(Composite parent) {
 		final IRemoteExecutionServiceProvider executionProvider = getRemoteServicesExecutionProvider();
-		final IRemoteConnection remoteConnection = executionProvider.getConnection();
+		final IRemoteConnection remoteConnection = executionProvider == null ? null : executionProvider.getConnection();
 
 		this.ui = new EnvManagerConfigWidget(parent, remoteConnection);
 		this.ui.setErrorListener(new IErrorListener() {
