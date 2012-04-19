@@ -22,7 +22,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
-import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
@@ -97,7 +96,7 @@ public class ResourceChangeListener {
 				if (!RemoteSyncNature.hasNature(project)) {
 					return;
 				}
-				SyncManager.setSyncMode(project, SYNC_MODE.NONE);
+				SyncManager.setSyncMode(project, SYNC_MODE.UNAVAILABLE);
 				ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
 				if (provider != null) {
 					provider.close();
@@ -111,15 +110,15 @@ public class ResourceChangeListener {
 				}
 				if (RemoteSyncNature.hasNature(project)) {
 					SYNC_MODE syncMode = SyncManager.getSyncMode(project);
-					boolean syncEnabled = true;
+					boolean syncOn = true;
 					if (!(SyncManager.getSyncAuto()) || syncMode == SYNC_MODE.NONE) {
-						syncEnabled = false;
+						syncOn = false;
 					}
 					try {
 						// Post-build event
 						// Force a sync in order to download any new remote files but no need to sync if sync'ing is disabled.
 						if (event.getType() == IResourceChangeEvent.POST_BUILD ) {
-							if (!syncEnabled) {
+							if (!syncOn || syncMode == SYNC_MODE.UNAVAILABLE) {
 								continue;
 							} else if (syncMode == SYNC_MODE.ALL) {
 								SyncManager.syncAll(null, project, SyncFlag.FORCE, new SyncRCLExceptionHandler(project));
@@ -147,8 +146,10 @@ public class ResourceChangeListener {
 							// Sync project on all changed events
 							else if (delta.getKind() == IResourceDelta.CHANGED) {
 								// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user has
-								// disabled it. This allows for some bookkeeping but no files are transferred.
-								if (!syncEnabled) {
+								// turned it off. This allows for some bookkeeping but no files are transferred.
+								if (syncMode == SYNC_MODE.UNAVAILABLE) {
+									continue;
+								} else if (!syncOn) {
 									SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
 								} else if (syncMode == SYNC_MODE.ALL) {
 									SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));

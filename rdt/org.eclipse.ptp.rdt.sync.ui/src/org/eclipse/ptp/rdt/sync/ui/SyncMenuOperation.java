@@ -142,7 +142,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 		SYNC_MODE syncMode = SyncManager.getSyncMode(project);
 		if ((command.equals(setActiveCommand) && syncMode == SYNC_MODE.ACTIVE) ||
 				(command.equals(setAllCommand) && syncMode == SYNC_MODE.ALL) ||
-				(command.equals(setNoneCommand) && syncMode == SYNC_MODE.NONE) ||
+				(command.equals(setNoneCommand) && (syncMode == SYNC_MODE.NONE || syncMode == SYNC_MODE.UNAVAILABLE)) ||
 				(command.equals(syncAutoCommand) && SyncManager.getSyncAuto())) {
 			element.setChecked(true);
 		} else {

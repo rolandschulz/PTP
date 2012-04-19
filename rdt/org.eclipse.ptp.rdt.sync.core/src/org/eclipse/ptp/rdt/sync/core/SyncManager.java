@@ -38,8 +38,12 @@ public class SyncManager  {
 	private SyncManager() {
 	}
 
+	// ACTIVE: Sync with current active configuration
+	// ALL: Sync with all configurations
+	// NONE: Do not transfer files but still call sync and do bookkeeping
+	// UNAVAILABLE: Do not call sync. (Used internally during project creation and deletion.)
 	public static enum SYNC_MODE {
-		ACTIVE, ALL, NONE
+		ACTIVE, ALL, NONE, UNAVAILABLE
 	};
 
 	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
@@ -48,7 +52,8 @@ public class SyncManager  {
 	private static final String SYNC_AUTO_KEY = "sync-auto"; //$NON-NLS-1$
 	private static final String SHOW_ERROR_KEY = "show-error"; //$NON-NLS-1$
 	
-	private static final SYNC_MODE DEFAULT_SYNC_MODE = SYNC_MODE.ACTIVE;
+	// Sync unavailable by default. Wizards should explicitly set the sync mode once the project is ready.
+	private static final SYNC_MODE DEFAULT_SYNC_MODE = SYNC_MODE.UNAVAILABLE;
 	private static final boolean DEFAULT_SYNC_AUTO_SETTING = true;
 	private static final boolean DEFAULT_SHOW_ERROR_SETTING = true;
 
