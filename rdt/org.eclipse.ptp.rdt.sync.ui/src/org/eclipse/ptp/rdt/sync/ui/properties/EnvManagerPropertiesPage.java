@@ -143,7 +143,8 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		super.cfgChanged(cfgd);
 		if (ui != null) {
 			final IRemoteExecutionServiceProvider executionProvider = getRemoteServicesExecutionProvider();
-			ui.configurationChanged(getSyncURI(), executionProvider.getConnection(), computeSelectedItems());
+			IRemoteConnection connection = executionProvider == null ? null : executionProvider.getConnection();
+			ui.configurationChanged(getSyncURI(), connection, computeSelectedItems());
 		}
 	}
 

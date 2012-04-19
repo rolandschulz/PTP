@@ -250,7 +250,8 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
 		if (projectProperties.isEnvMgmtEnabled()) {
 			// Environment management is enabled for the build.  Issue custom Modules/SoftEnv commands to configure the environment.
-			IEnvManager envManager = EnvManagerRegistry.getEnvManager(monitor, executionProvider.getConnection());
+			IRemoteConnection connection = executionProvider == null ? null : executionProvider.getConnection();
+			IEnvManager envManager = EnvManagerRegistry.getEnvManager(monitor, connection);
 			try {
 				// Create and execute a Bash script which will configure the environment and then execute the command
 				final List<String> command = new LinkedList<String>();
