@@ -89,7 +89,7 @@ public class ResourceChangeListener {
 
 	private static IResourceChangeListener resourceListener = new IResourceChangeListener() {
 		public void resourceChanged(IResourceChangeEvent event) {
-			RDTSyncCorePlugin.log("Event type of " + event.getType()); //$NON-NLS-1$
+			// RDTSyncCorePlugin.log("Event type of " + event.getType()); //$NON-NLS-1$
 			// Turn off sync'ing for a project before deleting it and close repository - see bug 360170
 			// Note that event.getDelta() returns null, so this event cannot be handled inside the loop below.
 			if (event.getType() == IResourceChangeEvent.PRE_DELETE) {
@@ -129,7 +129,7 @@ public class ResourceChangeListener {
 						}
 						// Post-change event
 						else {
-							RDTSyncCorePlugin.log("Post-change event of kind: " + String.valueOf(delta.getKind()) + " on project " + project.getName()); //$NON-NLS-1$ //$NON-NLS-2$
+							// RDTSyncCorePlugin.log("Post-change event of kind: " + String.valueOf(delta.getKind()) + " on project " + project.getName()); //$NON-NLS-1$ //$NON-NLS-2$
 							if (delta.getKind() == IResourceDelta.ADDED) {
 								BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 								IServiceConfiguration sc = bcm.addProjectFromSystem(project);
