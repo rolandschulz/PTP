@@ -30,6 +30,7 @@ import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
 import org.eclipse.cdt.managedbuilder.internal.core.ManagedProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -326,9 +327,16 @@ public class BuildConfigurationManager {
 	 * should make it the active configuration for the project in the service model manager.
 	 *
 	 * @param newProject - cannot be null and must be a sync project.
-	 * @return the template service configuration created for the new project
+	 * @param delta - the delta reported by Eclipse for the "ADDED" event.
+	 * @return the template service configuration created for the new project or null if project did not previously exist.
 	 */
-	public IServiceConfiguration addProjectFromSystem(IProject newProject) {
+	public IServiceConfiguration addProjectFromSystem(IProject newProject, IResourceDelta delta) {
+		// This can happen normally when the project is initially created.
+		// We are assuming that the project has existed previously if and only if the moved from path is null.
+		if (delta.getMovedFromPath() == null) {
+			return null;
+		}
+
 		if (newProject == null) {
 			throw new NullPointerException();
 		}

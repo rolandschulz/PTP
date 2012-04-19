@@ -131,8 +131,8 @@ public class ResourceChangeListener {
 							// RDTSyncCorePlugin.log("Post-change event of kind: " + String.valueOf(delta.getKind()) + " on project " + project.getName()); //$NON-NLS-1$ //$NON-NLS-2$
 							if (delta.getKind() == IResourceDelta.ADDED) {
 								BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-								IServiceConfiguration sc = bcm.addProjectFromSystem(project);
-								if (sc != null) { // Error handled in bcm
+								IServiceConfiguration sc = bcm.addProjectFromSystem(project, delta);
+								if (sc != null) { // Errors handled in bcm
 									ServiceModelManager smm = ServiceModelManager.getInstance();
 									smm.addConfiguration(project, sc);
 									try {
