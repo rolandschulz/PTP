@@ -47,6 +47,64 @@ public class Messages extends NLS {
 	public static String AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found;
 	public static String AbstractParallelLaunchConfigurationDelegate_Path_not_found;
 
+	public static String ApplicationTab_Application;
+
+	public static String ApplicationTab_Application_program;
+
+	public static String ApplicationTab_Application_program_not_specified;
+
+	public static String ApplicationTab_Browse_1;
+
+	public static String ApplicationTab_Browse_2;
+
+	public static String ApplicationTab_Browse_3;
+
+	public static String ApplicationTab_Cannot_read_configuration;
+
+	public static String ApplicationTab_Choose_program;
+
+	public static String ApplicationTab_Choose_the_project;
+
+	public static String ApplicationTab_Copy_executable;
+
+	public static String ApplicationTab_Display_output;
+
+	public static String ApplicationTab_Enter_project;
+
+	public static String ApplicationTab_Enter_project_before_browsing;
+
+	public static String ApplicationTab_Invalid_project_name;
+
+	public static String ApplicationTab_Local_file_must_exist;
+
+	public static String ApplicationTab_Local_file_not_specified;
+
+	public static String ApplicationTab_Local_file_path_must_be_absolute;
+
+	public static String ApplicationTab_Path_to_local_executable;
+
+	public static String ApplicationTab_Please_select_the_project_first;
+
+	public static String ApplicationTab_Please_specify_remote_connection;
+
+	public static String ApplicationTab_Program_selection;
+
+	public static String ApplicationTab_Project;
+
+	public static String ApplicationTab_Project_does_not_exist;
+
+	public static String ApplicationTab_Project_is_closed;
+
+	public static String ApplicationTab_Select_application;
+
+	public static String ApplicationTab_Select_executable_to_be_copied;
+
+	public static String ApplicationTab_Select_project;
+
+	public static String ApplicationTab_Selection_must_be_a_file;
+
+	public static String ApplicationTab_Unable_to_open_connection;
+
 	public static String ParallelLaunchConfigurationDelegate_0;
 	public static String ParallelLaunchConfigurationDelegate_1;
 	public static String ParallelLaunchConfigurationDelegate_3;

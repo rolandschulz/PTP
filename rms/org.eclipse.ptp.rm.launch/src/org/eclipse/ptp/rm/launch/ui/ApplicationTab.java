@@ -55,6 +55,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.launch.RMLaunchPlugin;
 import org.eclipse.ptp.rm.launch.RMLaunchUtils;
+import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -139,49 +140,49 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		mainComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Label projLabel = new Label(mainComp, SWT.NONE);
-		projLabel.setText("Project:");
+		projLabel.setText(Messages.ApplicationTab_Project);
 		projLabel.setLayoutData(spanGridData(-1, 2));
 
 		projText = new Text(mainComp, SWT.SINGLE | SWT.BORDER);
 		projText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		projText.addModifyListener(listener);
 
-		projButton = createPushButton(mainComp, "&Browse:", null);
+		projButton = createPushButton(mainComp, Messages.ApplicationTab_Browse_1, null);
 		projButton.addSelectionListener(listener);
 
 		createVerticalSpacer(comp, 1);
 
 		Label appLabel = new Label(mainComp, SWT.NONE);
-		appLabel.setText("&Application program:");
+		appLabel.setText(Messages.ApplicationTab_Application_program);
 		appLabel.setLayoutData(spanGridData(-1, 2));
 
 		appText = new Text(mainComp, SWT.SINGLE | SWT.BORDER);
 		appText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		appText.addModifyListener(listener);
 
-		appButton = createPushButton(mainComp, "B&rowse", null);
+		appButton = createPushButton(mainComp, Messages.ApplicationTab_Browse_2, null);
 		appButton.addSelectionListener(listener);
 
 		createVerticalSpacer(mainComp, 2);
 
-		localAppButton = createCheckButton(mainComp, "Copy executable from local filesystem");
+		localAppButton = createCheckButton(mainComp, Messages.ApplicationTab_Copy_executable);
 		localAppButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		localAppButton.addSelectionListener(listener);
 
 		Label localAppLabel = new Label(mainComp, SWT.NONE);
-		localAppLabel.setText("Path to local executable:");
+		localAppLabel.setText(Messages.ApplicationTab_Path_to_local_executable);
 		localAppLabel.setLayoutData(spanGridData(-1, 2));
 
 		localAppText = new Text(mainComp, SWT.SINGLE | SWT.BORDER);
 		localAppText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		localAppText.addModifyListener(listener);
 
-		browseAppButton = createPushButton(mainComp, "Browse", null);
+		browseAppButton = createPushButton(mainComp, Messages.ApplicationTab_Browse_3, null);
 		browseAppButton.addSelectionListener(listener);
 
 		createVerticalSpacer(mainComp, 2);
 
-		consoleButton = createCheckButton(mainComp, "Display output from all processes in a console view");
+		consoleButton = createCheckButton(mainComp, Messages.ApplicationTab_Display_output);
 		consoleButton.setSelection(combinedOutputDefault);
 		consoleButton.addSelectionListener(listener);
 	}
@@ -213,7 +214,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	 */
 	@Override
 	public String getName() {
-		return "Application";
+		return Messages.ApplicationTab_Application;
 	}
 
 	/*
@@ -233,7 +234,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			localAppButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_COPY_EXECUTABLE, false));
 			consoleButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONSOLE, false));
 		} catch (CoreException e) {
-			setErrorMessage("Cannot read configuration");
+			setErrorMessage(Messages.ApplicationTab_Cannot_read_configuration);
 		}
 		handleLocalApplicationButtonSelected(); // Refreshes the local path
 		// textbox enable state.
@@ -256,36 +257,36 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			if (status.isOK()) {
 				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 				if (!project.exists()) {
-					setErrorMessage(NLS.bind("Project {0} does not exist", new Object[] { name }));
+					setErrorMessage(NLS.bind(Messages.ApplicationTab_Project_does_not_exist, new Object[] { name }));
 					return false;
 				}
 				if (!project.isOpen()) {
-					setErrorMessage(NLS.bind("Project {0} is closed", new Object[] { name }));
+					setErrorMessage(NLS.bind(Messages.ApplicationTab_Project_is_closed, new Object[] { name }));
 					return false;
 				}
 			} else {
-				setErrorMessage(NLS.bind("Invalid project name: {0}", new Object[] { status.getMessage() }));
+				setErrorMessage(NLS.bind(Messages.ApplicationTab_Invalid_project_name, new Object[] { status.getMessage() }));
 				return false;
 			}
 		}
 
 		name = getFieldContent(appText.getText());
 		if (name == null) {
-			setErrorMessage("Application program not specified");
+			setErrorMessage(Messages.ApplicationTab_Application_program_not_specified);
 			return false;
 		}
 
 		if (localAppButton.getSelection()) {
 			name = getFieldContent(localAppText.getText());
 			if (name == null) {
-				setErrorMessage("Local file not specified");
+				setErrorMessage(Messages.ApplicationTab_Local_file_not_specified);
 			}
 			File file = new File(name);
 			if (!file.isAbsolute()) {
-				setErrorMessage("Local file path must be absolute");
+				setErrorMessage(Messages.ApplicationTab_Local_file_path_must_be_absolute);
 			}
 			if (!file.exists() || !file.isFile()) {
-				setErrorMessage("Local file must exist and be valid");
+				setErrorMessage(Messages.ApplicationTab_Local_file_must_exist);
 			}
 		}
 
@@ -347,16 +348,16 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	protected IResource chooseFile() {
 		final IProject project = getProject();
 		if (project == null) {
-			MessageDialog.openInformation(getShell(), "Please select the project first",
-					"Enter project before browsing for program");
+			MessageDialog.openInformation(getShell(), Messages.ApplicationTab_Please_select_the_project_first,
+					Messages.ApplicationTab_Enter_project_before_browsing);
 			return null;
 		}
 
 		WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
 		BaseWorkbenchContentProvider contentProvider = new BaseWorkbenchContentProvider();
 		ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(), labelProvider, contentProvider);
-		dialog.setTitle("Program selection");
-		dialog.setMessage("Choose program to run");
+		dialog.setTitle(Messages.ApplicationTab_Program_selection);
+		dialog.setMessage(Messages.ApplicationTab_Choose_program);
 		dialog.setBlockOnOpen(true);
 		dialog.setAllowMultiple(false);
 		dialog.setInput(project);
@@ -365,18 +366,19 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			public IStatus validate(Object[] selection) {
 				if (selection.length == 0 || !(selection[0] instanceof IFile)) {
 					return new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(), IStatus.INFO,
-							"Selection must be a file", null);
+							Messages.ApplicationTab_Selection_must_be_a_file, null);
 				}
 				try {
 					IResource resource = project.findMember(((IFile) selection[0]).getProjectRelativePath());
 					if (resource == null || resource.getType() != IResource.FILE) {
 						return new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(), IStatus.INFO,
-								"Selection must be a file", null);
+								Messages.ApplicationTab_Selection_must_be_a_file, null);
 					}
 
 					return new Status(IStatus.OK, RMLaunchPlugin.getUniqueIdentifier(), IStatus.OK, resource.getName(), null);
 				} catch (Exception ex) {
-					return new Status(IStatus.ERROR, RMLaunchPlugin.PLUGIN_ID, IStatus.INFO, "Selection must be a file", null);
+					return new Status(IStatus.ERROR, RMLaunchPlugin.PLUGIN_ID, IStatus.INFO,
+							Messages.ApplicationTab_Selection_must_be_a_file, null);
 				}
 			}
 		});
@@ -394,8 +396,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 	protected IProject chooseProject() {
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(),
 				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
-		dialog.setTitle("Select project");
-		dialog.setMessage("Choose the project containing the program you wish to execute");
+		dialog.setTitle(Messages.ApplicationTab_Select_project);
+		dialog.setMessage(Messages.ApplicationTab_Choose_the_project);
 		dialog.setElements(getWorkspaceRoot().getProjects());
 
 		IProject project = getProject();
@@ -480,8 +482,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		if (initPath.equals(EMPTY_STRING)) {
 			final IProject project = getProject();
 			if (project == null) {
-				MessageDialog.openInformation(getShell(), "Please select the project first",
-						"Enter project before browsing for program");
+				MessageDialog.openInformation(getShell(), Messages.ApplicationTab_Please_select_the_project_first,
+						Messages.ApplicationTab_Enter_project);
 				return;
 			}
 			IRemoteResource remoteProject = (IRemoteResource) project.getAdapter(IRemoteResource.class);
@@ -515,14 +517,15 @@ public class ApplicationTab extends LaunchConfigurationTab {
 				if (fileManager != null) {
 					fileManager.setConnection(conn[0]);
 					fileManager.showConnections(false);
-					String path = fileManager.browseFile(getShell(), "Select application to execute", initPath, 0);
+					String path = fileManager.browseFile(getShell(), Messages.ApplicationTab_Select_application, initPath, 0);
 					if (path != null) {
 						appText.setText(path.toString());
 					}
 				}
 			}
 		} else {
-			MessageDialog.openInformation(getShell(), "Unable to open connection", "Please specify remote connection first");
+			MessageDialog.openInformation(getShell(), Messages.ApplicationTab_Unable_to_open_connection,
+					Messages.ApplicationTab_Please_specify_remote_connection);
 		}
 	}
 
@@ -531,8 +534,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		if (initPath.equals(EMPTY_STRING)) {
 			final IProject project = getProject();
 			if (project == null || project.getLocationURI() == null) {
-				MessageDialog.openInformation(getShell(), "Please select the project first",
-						"Enter the project before browsing the program");
+				MessageDialog.openInformation(getShell(), Messages.ApplicationTab_Please_select_the_project_first,
+						Messages.ApplicationTab_Enter_project);
 				return;
 			}
 			initPath = project.getLocationURI().getPath();
@@ -544,7 +547,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			IRemoteConnection lconn = lconnMgr.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
 			IRemoteUIFileManager localUIFileMgr = localUIServices.getUIFileManager();
 			localUIFileMgr.setConnection(lconn);
-			String path = localUIFileMgr.browseFile(getShell(), "Select the executable file to be copied", initPath, 0);
+			String path = localUIFileMgr
+					.browseFile(getShell(), Messages.ApplicationTab_Select_executable_to_be_copied, initPath, 0);
 			if (path != null) {
 				localAppText.setText(path);
 			}
