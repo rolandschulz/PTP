@@ -9,7 +9,7 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.rm.core.rtsystem;
+package org.eclipse.ptp.rm.core.proxy;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,7 +38,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
@@ -48,6 +47,9 @@ import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 
+/**
+ * @since 4.0
+ */
 public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	private class ConnectionChangeHandler implements IRemoteConnectionChangeListener {
 		public ConnectionChangeHandler() {
@@ -57,8 +59,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener#
-		 * connectionChanged
+		 * @see org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener# connectionChanged
 		 * (org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent)
 		 */
 		public void connectionChanged(IRemoteConnectionChangeEvent event) {
@@ -101,8 +102,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 	/**
 	 * Shut down remote proxy.
 	 * 
-	 * Calls shutdown() to stop the state machine, then sessionFinish() to close
-	 * down the connection.
+	 * Calls shutdown() to stop the state machine, then sessionFinish() to close down the connection.
 	 * 
 	 * @param monitor
 	 * @throws IOException
@@ -165,8 +165,8 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 			subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_1);
 
 			/*
-			 * This can fail if we are restarting the RM from saved information
-			 * and the saved remote services provider is no longer available...
+			 * This can fail if we are restarting the RM from saved information and the saved remote services provider is no longer
+			 * available...
 			 */
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
 					getConfiguration().getRemoteServicesId(), subMon.newChild(4));

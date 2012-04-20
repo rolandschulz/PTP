@@ -536,7 +536,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	}
 
 	/**
-	 * @since 3.0
+	 * @since 4.0
 	 */
 	public IPResourceManager getPResourceManager() {
 		return fPResourceManager;

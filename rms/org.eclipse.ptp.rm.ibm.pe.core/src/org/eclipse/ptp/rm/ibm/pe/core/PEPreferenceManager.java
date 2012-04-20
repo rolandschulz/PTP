@@ -28,8 +28,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.rm.core.RMPreferenceConstants;
+import org.eclipse.ptp.rm.core.proxy.IRemoteProxyOptions;
 
 public class PEPreferenceManager extends AbstractPreferenceInitializer {
 	private static final String PROXY_EXECUTABLE_NAME = "ptp_ibmpe_proxy"; //$NON-NLS-1$

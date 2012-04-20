@@ -14,7 +14,7 @@
 package org.eclipse.ptp.rm.slurm.core.rtsystem;
 
 import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
-import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteProxyRuntimeClient;
+import org.eclipse.ptp.rm.core.proxy.AbstractRemoteProxyRuntimeClient;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration;
 
 public class SLURMProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
