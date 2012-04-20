@@ -377,6 +377,18 @@ public class BuildConfigurationManager {
 		}
 		node.put(TEMPLATE_KEY, newConfig.getId());
 		flushNode(node);
+		
+		// Remove previous service configurations so they will be rebuilt for the new project
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(newProject);
+		if (buildInfo == null) {
+			throw new RuntimeException(Messages.BCM_BuildInfoError + newProject.getName());
+		}
+
+		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
+		for (IConfiguration config : allConfigs) {
+			fBConfigIdToSConfigMap.remove(config.getId());
+
+		}
 
 		// Finally, change the template's project
 		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(newProject);
