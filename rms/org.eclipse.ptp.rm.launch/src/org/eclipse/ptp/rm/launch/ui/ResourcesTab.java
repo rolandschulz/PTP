@@ -296,17 +296,13 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 */
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
-		if (conn != null) {
-			setConnectionName(configuration, conn.getName());
-			setRemoteServicesId(configuration, conn.getRemoteServices().getId());
-		}
-
 		int index = fSystemTypeCombo.getSelectionIndex();
 		if (fLaunchControl != null && index > 0) {
 			ProviderInfo provider = ProviderInfo.getProviders().get(index - 1);
 			setResourceManagerType(configuration, provider.getName());
 			setResourceManagerUniqueName(configuration, fLaunchControl.getControlId());
+			setConnectionName(configuration, fLaunchControl.getConnectionName());
+			setRemoteServicesId(configuration, fLaunchControl.getRemoteServicesId());
 			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl);
 			if (dynamicTab == null) {
 				setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { fLaunchControl

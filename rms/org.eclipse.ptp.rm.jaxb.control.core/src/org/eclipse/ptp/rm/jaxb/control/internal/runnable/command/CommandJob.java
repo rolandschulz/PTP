@@ -403,8 +403,6 @@ public class CommandJob extends Job implements ICommandJob {
 	 * 
 	 * @param jobId
 	 *            job ID for this job
-	 * @param rm
-	 *            resource manager controlling the launch
 	 * @param vars
 	 *            variable map
 	 */

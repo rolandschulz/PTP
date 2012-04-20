@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -185,6 +186,7 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 
 	public JAXBLaunchControl(String controlId) {
 		fControlId = controlId;
+		ModelManager.getInstance().getUniverse().addResourceManager(controlId);
 	}
 
 	/*
@@ -1272,8 +1274,20 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 		rmVarMap.overwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_ARGS, JAXBControlConstants.DEBUGGER_ARGS, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.PTP_DIRECTORY, JAXBControlConstants.PTP_DIRECTORY, lcattr);
+
+		/*
+		 * update the dynamic properties
+		 */
+		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, (String) null);
+		if (attr != null) {
+			PropertyType p = (PropertyType) getEnvironment().get(JAXBControlConstants.DEBUGGER_ARGS);
+			if (p == null) {
+				p = new PropertyType();
+				getEnvironment().put(JAXBControlConstants.DEBUGGER_ARGS, p);
+			}
+			p.setValue(attr);
+		}
 
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));
