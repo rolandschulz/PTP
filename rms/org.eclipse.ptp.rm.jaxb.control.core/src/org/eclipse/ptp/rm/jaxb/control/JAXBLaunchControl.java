@@ -69,7 +69,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.SiteType;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.eclipse.ui.progress.UIJob;
@@ -173,7 +172,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	private boolean isInitialized = false;
 	private String configURL;
 	private String configXML;
-	private String state;
 	private RemoteServicesDelegate fRemoteServicesDelegate;
 	private final String fControlId;
 
@@ -413,7 +411,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 
 			return status;
 		} catch (CoreException ce) {
-			state = IResourceManager.ERROR_STATE;
 			throw ce;
 		} finally {
 			if (monitor != null) {
@@ -450,15 +447,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	 */
 	public String getRemoteServicesId() {
 		return servicesId;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getState()
-	 */
-	public String getState() {
-		return state;
 	}
 
 	/*
@@ -545,8 +533,8 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException {
-		if (!IResourceManager.STARTED_STATE.equals(state)) {
-			return null;
+		if (!resourceManagerIsActive()) {
+			throw CoreExceptionUtils.newException("Resource manager has not been started", null);
 		}
 
 		updatePropertyValues(configuration, null);

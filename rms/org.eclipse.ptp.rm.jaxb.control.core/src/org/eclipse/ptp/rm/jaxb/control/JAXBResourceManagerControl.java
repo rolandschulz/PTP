@@ -349,7 +349,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#runActionCommand(java.lang.String)
 	 */
 	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException {
-		if (!IResourceManager.STARTED_STATE.equals(getResourceManager().getState())) {
+		if (!resourceManagerIsActive()) {
 			return null;
 		}
 

@@ -14,7 +14,6 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * JAXB Launch Control interface.
@@ -30,11 +29,6 @@ public interface IJAXBLaunchControl extends IJAXBJobControl {
 	 * Safely dispose of this Resource Manager.
 	 */
 	public void dispose();
-
-	/**
-	 * @return state of resource manager
-	 */
-	public String getState();
 
 	/**
 	 * Initialize the resource manager. The resource manager is ready to be used after initialization, however it must be started
@@ -55,8 +49,7 @@ public interface IJAXBLaunchControl extends IJAXBJobControl {
 	public void setRMConfigurationURL(URL url);
 
 	/**
-	 * Start the resource manager. Clients should not call this directly. Call {@link IResourceManager#start(IProgressMonitor)}
-	 * instead.
+	 * Start the launch control. This must be called before any other operations.
 	 * 
 	 * @param monitor
 	 *            progress monitor
@@ -66,7 +59,7 @@ public interface IJAXBLaunchControl extends IJAXBJobControl {
 	public void start(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Stop the resource manager. Clients should not call this directly. Call {@link IResourceManager#stop()} instead.
+	 * Stop the the launch control.
 	 * 
 	 * @throws CoreException
 	 *             this exception is thrown if the stop command fails
