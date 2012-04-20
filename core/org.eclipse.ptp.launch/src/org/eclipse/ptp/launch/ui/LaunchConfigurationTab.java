@@ -102,19 +102,6 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	}
 
 	/**
-	 * @since 6.0
-	 */
-	protected String getResourceManagerUniqueName(ILaunchConfiguration configuration) {
-		final String type;
-		try {
-			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String) null);
-		} catch (CoreException e) {
-			return null;
-		}
-		return type;
-	}
-
-	/**
 	 * Returns the selected workspace container,or <code>null</code>
 	 * 
 	 * @param workspaceDir
@@ -238,6 +225,19 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	}
 
 	/**
+	 * @since 6.0
+	 */
+	protected String getResourceManagerUniqueName(ILaunchConfiguration configuration) {
+		final String type;
+		try {
+			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String) null);
+		} catch (CoreException e) {
+			return null;
+		}
+		return type;
+	}
+
+	/**
 	 * @return
 	 */
 	protected IWorkspaceRoot getWorkspaceRoot() {
@@ -249,6 +249,13 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	 */
 	protected void setConnectionName(ILaunchConfigurationWorkingCopy configuration, String name) {
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, name);
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	protected void setDebuggerNeedsLaunchHelp(ILaunchConfigurationWorkingCopy configuration, boolean flag) {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_NEEDS_LAUNCH_HELP, flag);
 	}
 
 	/**

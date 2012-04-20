@@ -59,12 +59,9 @@ import org.eclipse.ptp.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.debug.sdm.core.pdi.PDIDebugger;
 import org.eclipse.ptp.debug.sdm.core.utils.DebugUtil;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.utils.core.BitSetIterable;
 
 /**
@@ -153,7 +150,7 @@ public class SDMDebugger implements IPDebugger {
 			 * Delay starting the master SDM (aka SDM client), to wait until SDM servers have started and until the sessions are
 			 * listening on the debugger socket.
 			 */
-			fSdmRunner.setJob(launch.getJobId());
+			fSdmRunner.setLaunch(launch);
 			fSdmRunner.schedule();
 		}
 
@@ -170,7 +167,7 @@ public class SDMDebugger implements IPDebugger {
 	 * @since 5.0
 	 */
 	public synchronized void initialize(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 30);
+		SubMonitor progress = SubMonitor.convert(monitor, 40);
 		try {
 			if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED)) {
 				int level = Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(),
@@ -229,28 +226,30 @@ public class SDMDebugger implements IPDebugger {
 			/*
 			 * Prepare the Master SDM controller thread if required by the RM.
 			 */
-			IResourceManager rm = getResourceManager(configuration);
 
-			if (rm.getConfiguration().needsDebuggerLaunchHelp()) {
-				/*
-				 * Store information to create routing file later.
-				 */
-				prepareRoutingFile(configuration, progress.newChild(10));
+			if (needsDebuggerLaunchHelp(configuration)) {
+				IRemoteConnection conn = getRemoteConnection(configuration, progress.newChild(10));
+				if (conn != null && !progress.isCanceled()) {
+					/*
+					 * Store information to create routing file later.
+					 */
+					prepareRoutingFile(configuration, progress.newChild(10));
 
-				/*
-				 * Create SDM master thread
-				 */
-				fSdmRunner = new SDMRunner(rm);
+					/*
+					 * Create SDM master thread
+					 */
+					fSdmRunner = new SDMRunner(conn);
 
-				/*
-				 * Set SDM command line.
-				 */
-				List<String> sdmCommand = new ArrayList<String>();
-				sdmCommand.add(dbgExePath);
-				sdmCommand.add("--master"); //$NON-NLS-1$
-				sdmCommand.addAll(dbgArgs);
-				fSdmRunner.setCommand(sdmCommand);
-				fSdmRunner.setWorkDir(getWorkingDirectory(configuration));
+					/*
+					 * Set SDM command line.
+					 */
+					List<String> sdmCommand = new ArrayList<String>();
+					sdmCommand.add(dbgExePath);
+					sdmCommand.add("--master"); //$NON-NLS-1$
+					sdmCommand.addAll(dbgArgs);
+					fSdmRunner.setCommand(sdmCommand);
+					fSdmRunner.setWorkDir(getWorkingDirectory(configuration));
+				}
 			}
 
 			workingCopy.doSave();
@@ -282,19 +281,24 @@ public class SDMDebugger implements IPDebugger {
 	}
 
 	/**
-	 * Helper method to locate the resource manager used by the launch configuration
+	 * Helper method to locate the remote connection used by the launch configuration
 	 * 
 	 * @param configuration
 	 *            launch configuration
-	 * @return resource manager or null if none specified
+	 * @return remote connection or null if none specified
 	 * @throws CoreException
 	 */
-	private IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
-		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
-				(String) null);
-		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(rmUniqueName);
-		if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
-			return rm;
+	private IRemoteConnection getRemoteConnection(ILaunchConfiguration configuration, IProgressMonitor monitor)
+			throws CoreException {
+		String remId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, (String) null);
+		if (remId != null) {
+			IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(remId, monitor);
+			if (services != null) {
+				String name = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
+				if (name != null) {
+					return services.getConnectionManager().getConnection(name);
+				}
+			}
 		}
 		return null;
 	}
@@ -312,6 +316,10 @@ public class SDMDebugger implements IPDebugger {
 			}
 		}
 		return wd;
+	}
+
+	private boolean needsDebuggerLaunchHelp(ILaunchConfiguration configuration) throws CoreException {
+		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_NEEDS_LAUNCH_HELP, false);
 	}
 
 	/**
@@ -341,16 +349,11 @@ public class SDMDebugger implements IPDebugger {
 			IPath routingFilePath = new Path(getWorkingDirectory(configuration));
 			routingFilePath = routingFilePath.append("routing_file"); //$NON-NLS-1$
 
-			IResourceManager rm = getResourceManager(configuration);
-			IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
-			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),
-					progress.newChild(5));
+			IRemoteConnection rconn = getRemoteConnection(configuration, progress.newChild(5));
 			if (progress.isCanceled()) {
 				throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
 			}
-			IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
-			IRemoteConnection rconn = rconnMgr.getConnection(conf.getConnectionName());
-			IRemoteFileManager remoteFileManager = remoteServices.getFileManager(rconn);
+			IRemoteFileManager remoteFileManager = rconn.getRemoteServices().getFileManager(rconn);
 
 			fRoutingFileStore = remoteFileManager.getResource(routingFilePath.toString());
 
@@ -399,27 +402,14 @@ public class SDMDebugger implements IPDebugger {
 	 * @since 5.0
 	 */
 	private IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		IResourceManager rm = getResourceManager(configuration);
-		if (rm == null) {
-			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_4));
-		}
-		IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), monitor);
+		IRemoteConnection conn = getRemoteConnection(configuration, monitor);
 		if (monitor.isCanceled()) {
 			throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
 		}
-		if (remoteServices == null) {
-			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_0));
-		}
-		IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-		if (connMgr == null) {
-			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_1));
-		}
-		IRemoteConnection conn = connMgr.getConnection(conf.getConnectionName());
 		if (conn == null) {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_2));
 		}
-		IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
+		IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
 		if (fileManager == null) {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_3));
 		}

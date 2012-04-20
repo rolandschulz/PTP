@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.core.ExtFormat;
@@ -52,14 +51,9 @@ import org.eclipse.ptp.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.debug.sdm.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEventListener;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 
 /**
  * @author clement
@@ -259,55 +253,38 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 				throw new PDIException(null, Messages.PDIDebugger_7 + e.getMessage());
 			}
 
-			IResourceManager rm = getResourceManager(configuration);
-			if (rm != null) {
+			try {
+				fRemoteConnection = getRemoteConnection(configuration, progress.newChild(5));
+			} catch (CoreException e) {
+				throw new PDIException(null, e.getMessage());
+			}
+			if (progress.isCanceled()) {
+				throw new PDIException(null, Messages.PDIDebugger_Operation_canceled_by_user);
+			}
+			if (fRemoteConnection != null) {
 				port = getSessionPort();
-				IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
-				if (conf instanceof IRemoteResourceManagerConfiguration) {
-					IRemoteResourceManagerConfiguration remConf = (IRemoteResourceManagerConfiguration) conf;
-					if (remConf.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
-						IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
-								remConf.getRemoteServicesId(), progress.newChild(5));
-						if (progress.isCanceled()) {
-							throw new PDIException(null, Messages.PDIDebugger_Operation_canceled_by_user);
-						}
-						if (remoteServices != null) {
-							IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-							if (connMgr != null) {
-								fRemoteConnection = connMgr.getConnection(remConf.getConnectionName());
-								if (fRemoteConnection != null) {
-									try {
-										/*
-										 * Bind remote port to all interfaces. This allows the sdm master process running on a
-										 * cluster node to use the tunnel.
-										 * 
-										 * FIXME: Since this requires a special option to be enabled in sshd on the head node
-										 * (GatewayPorts), I'd like this to go way.
-										 */
-										port = fRemoteConnection.forwardRemotePort("", getSessionPort(), progress.newChild(5)); //$NON-NLS-1$
-										fForwardedPort = port;
-									} catch (RemoteConnectionException e) {
-										throw new PDIException(null, e.getMessage());
-									}
-									if (progress.isCanceled()) {
-										throw new PDIException(null, Messages.PDIDebugger_Operation_canceled_by_user);
-									}
-								} else {
-									throw new PDIException(null, Messages.PDIDebugger_8);
-								}
-							} else {
-								throw new PDIException(null, Messages.PDIDebugger_9);
-							}
-						} else {
-							throw new PDIException(null, Messages.PDIDebugger_10);
-						}
+				if (fRemoteConnection.supportsTCPPortForwarding()) {
+					try {
+						/*
+						 * Bind remote port to all interfaces. This allows the sdm master process running on a cluster node to use
+						 * the tunnel.
+						 * 
+						 * FIXME: Since this requires a special option to be enabled in sshd on the head node (GatewayPorts), I'd
+						 * like this to go way.
+						 */
+						port = fRemoteConnection.forwardRemotePort("", getSessionPort(), progress.newChild(5)); //$NON-NLS-1$
+						fForwardedPort = port;
+					} catch (RemoteConnectionException e) {
+						throw new PDIException(null, e.getMessage());
+					}
+					if (progress.isCanceled()) {
+						throw new PDIException(null, Messages.PDIDebugger_Operation_canceled_by_user);
 					}
 				}
 				args.add("--port=" + port); //$NON-NLS-1$
 			} else {
-				throw new PDIException(null, Messages.PDIDebugger_11);
+				throw new PDIException(null, Messages.PDIDebugger_8);
 			}
-
 			if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
 				int level = Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_LEVEL);
 				if ((level & SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) == SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) {
@@ -319,6 +296,29 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 				monitor.done();
 			}
 		}
+	}
+
+	/**
+	 * Helper method to locate the remote connection used by the launch configuration
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 * @return remote connection or null if none specified
+	 * @throws CoreException
+	 */
+	private IRemoteConnection getRemoteConnection(ILaunchConfiguration configuration, IProgressMonitor monitor)
+			throws CoreException {
+		String remId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, (String) null);
+		if (remId != null) {
+			IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(remId, monitor);
+			if (services != null) {
+				String name = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
+				if (name != null) {
+					return services.getConnectionManager().getConnection(name);
+				}
+			}
+		}
+		return null;
 	}
 
 	/*
@@ -942,28 +942,6 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		default:
 			return "x"; //$NON-NLS-1$
 		}
-	}
-
-	/**
-	 * Get resource manager from a launch configuration
-	 * 
-	 * @param configuration
-	 * @return
-	 * @throws CoreException
-	 */
-	private IResourceManager getResourceManager(ILaunchConfiguration configuration) throws PDIException {
-		String rmUniqueName;
-		try {
-			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
-					(String) null);
-		} catch (CoreException e) {
-			throw new PDIException(null, e.getMessage());
-		}
-		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(rmUniqueName);
-		if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
-			return rm;
-		}
-		return null;
 	}
 
 	/**
