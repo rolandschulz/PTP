@@ -29,7 +29,6 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
-import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -668,8 +667,7 @@ public class TableView extends ViewPart {
 				 * Set the column width
 				 */
 				treeColumnLayout.setColumnData(treeColumnI,
-						new ColumnWeightData((int) (tableColumnLayouts[i].getWidth() * composite.getClientArea().width), 10,
-								resizable));
+						new ColumnPixelData((int) (tableColumnLayouts[i].getWidth() * composite.getClientArea().width), resizable));
 			} else {
 				final boolean resizable = false;
 				treeColumnI.setResizable(resizable);
@@ -683,7 +681,7 @@ public class TableView extends ViewPart {
 				 * Set the column width
 				 */
 				savedColumnWidths[i + 1] = 0;
-				treeColumnLayout.setColumnData(treeColumnI, new ColumnWeightData(0, 0, resizable));
+				treeColumnLayout.setColumnData(treeColumnI, new ColumnPixelData(0, resizable));
 			}
 			treeColumnI.addControlListener(new ControlAdapter() {
 				@Override
@@ -708,7 +706,7 @@ public class TableView extends ViewPart {
 		treeColumn.setText(""); //$NON-NLS-1$
 		treeColumn.setAlignment(SWT.TRAIL);
 		treeColumn.setResizable(false);
-		treeColumnLayout.setColumnData(treeColumn, new ColumnWeightData(0, 0, false));
+		treeColumnLayout.setColumnData(treeColumn, new ColumnPixelData(0, false));
 
 		/*
 		 * Sorting is done in the model as the table is virtual and has a lazy content provider.
