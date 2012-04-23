@@ -378,19 +378,25 @@ public class BuildConfigurationManager {
 		node.put(TEMPLATE_KEY, newConfig.getId());
 		flushNode(node);
 		
-		// Remove previous service configurations so they will be rebuilt for the new project
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(newProject);
 		if (buildInfo == null) {
 			throw new RuntimeException(Messages.BCM_BuildInfoError + newProject.getName());
 		}
 
+		// Remove previous service configurations so they will be rebuilt for the new project
+		// Also the Workspace configuration needs to be set to the new project location.
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allConfigs) {
 			fBConfigIdToSConfigMap.remove(config.getId());
-
+			if (config.getName() != null && config.getName().equals(Messages.WorkspaceConfigName)) {
+				BuildScenario oldbs = this.getBuildScenarioForBuildConfiguration(config);
+				BuildScenario newbs = new BuildScenario(oldbs.getSyncProvider(), oldbs.getRemoteConnection(),
+						newProject.getLocation().toString());
+				this.setBuildScenarioForBuildConfigurationInternal(newbs, config);
+			}
 		}
 
-		// Finally, change the template's project
+		// Change the template's project
 		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(newProject);
 		provider.setProject(newProject);
 
@@ -493,22 +499,13 @@ public class BuildConfigurationManager {
 		}
 
 		if (configDes != null) {
+			configAdded = true;
 			config.setConfigurationDescription(configDes);
 			configDes.setName(configName);
 			configDes.setDescription(configDesc);
 			config.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
-			configAdded = true;
-			try {
-				CoreModel.getDefault().setProjectDescription(project, projectDes, true, null);
-			} catch (CoreException e) {
-				projectDes.removeConfiguration(configDes);
-				configAdded = false;
-				creationException = e;
-				creationError = Messages.BCM_SetConfigDescriptionError;
-			}
-			if (configAdded) {
-				this.setBuildScenarioForBuildConfigurationInternal(buildScenario, config);
-			}
+			setProjectDescription(project, projectDes);
+			this.setBuildScenarioForBuildConfigurationInternal(buildScenario, config);
 		} else {
 			creationError = Messages.BCM_CreateConfigError;
 		}
@@ -752,7 +749,7 @@ public class BuildConfigurationManager {
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			storage.setAttribute(entry.getKey(), entry.getValue());
 		}
-		CoreModel.getDefault().setProjectDescription(config.getOwner().getProject(), projectDesc);
+		setProjectDescription(config.getOwner().getProject(), projectDesc);
 	}
 	
 	// Run standard checks on project and throw the appropriate exception if it is not valid
@@ -779,6 +776,7 @@ public class BuildConfigurationManager {
 	 */
 
 	public static void flushNode(final Preferences prefNode) {
+		Throwable firstException = null;
 		final IWorkspace ws = ResourcesPlugin.getWorkspace();
 		// Avoid creating a thread if possible. 
 		try {
@@ -788,15 +786,18 @@ public class BuildConfigurationManager {
 			}
 		} catch (BackingStoreException e) {
 			// Proceed to create thread
+			firstException = e;
 		} catch (IllegalStateException e) {
 			// Can occur if the project has been moved or deleted, so the preference node no longer exists.
+			firstException = e;
 			return;
 		}
 
+		final Throwable currentException = firstException;
 		Thread flushThread = new Thread(new Runnable() {
 			public void run() {
 				int sleepCount = 0;
-				Throwable lastException = null;
+				Throwable lastException = currentException;
 				while (true) {
 					try {
 						Thread.sleep(1000);
@@ -826,6 +827,65 @@ public class BuildConfigurationManager {
 				}
 			}
 		}, "Flush project data thread"); //$NON-NLS-1$
+		flushThread.start();
+	}
+	
+	/**
+	 * Writing to the .cproject file fails if the workspace is locked. So calling CoreModel.getDefault().setProjectDescription() is
+	 * not enough. Instead, spawn a thread that calls this function once the workspace is unlocked.
+	 * The overall logic for this function and "nodeFlush" is the same.
+	 *
+	 * @param project
+	 * @param desc
+	 */
+	public static void setProjectDescription(final IProject project, final ICProjectDescription desc) {
+		Throwable firstException = null;
+		final IWorkspace ws = ResourcesPlugin.getWorkspace();
+		// Avoid creating a thread if possible. 
+		try {
+			if (!ws.isTreeLocked()) {
+				CoreModel.getDefault().setProjectDescription(project, desc, true, null);
+				return;
+			}
+		} catch (CoreException e) {
+			// This can happen in the rare case that the lock is locked between the check and the flush but also for other reasons.
+			// Be optimistic and proceed to create thread.
+			firstException = e;
+		}
+
+		final Throwable currentException = firstException;
+		Thread flushThread = new Thread(new Runnable() {
+			public void run() {
+				int sleepCount = 0;
+				Throwable lastException = currentException;
+				while (true) {
+					try {
+						Thread.sleep(1000);
+						// Give up after 30 sleeps - this should never happen
+						sleepCount++;
+						if (sleepCount > 30) {
+							if (lastException != null) {
+								RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_24, lastException);
+							} else {
+								RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_24);
+							}
+							break;
+						}
+						if (!ws.isTreeLocked()) {
+							CoreModel.getDefault().setProjectDescription(project, desc, true, null);
+							break;
+						}
+					} catch(InterruptedException e) {
+						lastException = e;
+					} catch (CoreException e) {
+						// This can happen in the rare case that the lock is locked between the check and the flush but also for
+						// other reasons.
+						// Be optimistic and try again.
+						lastException = e;
+					}
+				}
+			}
+		}, "Save project CDT data thread"); //$NON-NLS-1$
 		flushThread.start();
 	}
 }
