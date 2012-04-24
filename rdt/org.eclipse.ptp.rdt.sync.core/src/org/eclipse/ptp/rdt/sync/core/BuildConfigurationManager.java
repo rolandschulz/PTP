@@ -718,6 +718,7 @@ public class BuildConfigurationManager {
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			storage.setAttribute(entry.getKey(), entry.getValue());
 		}
+		config.setDirty(true); // Fixes case where "Workspace" configuration does not compile after project rename.
 		setProjectDescription(config.getOwner().getProject(), projectDesc);
 	}
 	
