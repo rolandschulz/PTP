@@ -330,11 +330,11 @@ public class BuildConfigurationManager {
 	 * @param delta - the delta reported by Eclipse for the "ADDED" event.
 	 * @return the template service configuration created for the new project or null if project did not previously exist.
 	 */
-	public IServiceConfiguration addProjectFromSystem(IProject newProject, IResourceDelta delta) {
+	public void addProjectFromSystem(IProject newProject, IResourceDelta delta) {
 		// This can happen normally when the project is initially created.
 		// We are assuming that the project has existed previously if and only if the moved from path is null.
 		if (delta.getMovedFromPath() == null) {
-			return null;
+			return;
 		}
 
 		if (newProject == null) {
@@ -349,34 +349,6 @@ public class BuildConfigurationManager {
 		} catch (CoreException e) {
 			throw new IllegalArgumentException(Messages.BuildConfigurationManager_8);
 		}
-
-		IScopeContext context = new ProjectScope(newProject);
-		Preferences node = context.getNode(projectScopeSyncNode);
-		if (node == null) {
-			throw new RuntimeException(Messages.BuildConfigurationManager_0);
-		}
-
-		// Find the template configuration
-		String configId = node.get(TEMPLATE_KEY, null);
-		if (configId == null) {
-			throw new IllegalArgumentException(Messages.BuildConfigurationManager_21);
-		}
-		ServiceModelManager smm = ServiceModelManager.getInstance();
-		IServiceConfiguration oldConfig = smm.getConfiguration(configId);
-		if (oldConfig == null) {
-			throw new RuntimeException(Messages.BuildConfigurationManager_22);
-		}
-
-		// Copy the template and use the copy for the new project
-		IServiceConfiguration newConfig = copyTemplateServiceConfiguration(newProject);
-		smm.addConfiguration(newConfig);
-		try {
-			smm.saveModelConfiguration();
-		} catch (IOException e) {
-			RDTSyncCorePlugin.log(e.toString(), e);
-		}
-		node.put(TEMPLATE_KEY, newConfig.getId());
-		flushNode(node);
 		
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(newProject);
 		if (buildInfo == null) {
@@ -399,8 +371,6 @@ public class BuildConfigurationManager {
 		// Change the template's project
 		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(newProject);
 		provider.setProject(newProject);
-
-		return newConfig;
 	}
 	
 	/**
@@ -503,7 +473,6 @@ public class BuildConfigurationManager {
 			config.setConfigurationDescription(configDes);
 			configDes.setName(configName);
 			configDes.setDescription(configDesc);
-			config.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
 			setProjectDescription(project, projectDes);
 			this.setBuildScenarioForBuildConfigurationInternal(buildScenario, config);
 		} else {
