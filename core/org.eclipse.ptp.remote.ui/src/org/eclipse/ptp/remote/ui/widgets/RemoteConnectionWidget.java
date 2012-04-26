@@ -121,6 +121,18 @@ public class RemoteConnectionWidget extends Composite {
 	private final ListenerList fSelectionListeners = new ListenerList();
 	private final WidgetListener fWidgetListener = new WidgetListener();
 
+	/**
+	 * Constructor
+	 * 
+	 * @param parent
+	 *            parent composite
+	 * @param style
+	 *            style or SWT.NONE
+	 * @param title
+	 *            title is supplied then the widget will be placed in a group
+	 * @param context
+	 *            runnable context, or null
+	 */
 	public RemoteConnectionWidget(Composite parent, int style, String title, IRunnableContext context) {
 		super(parent, style);
 		fContext = context;
