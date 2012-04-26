@@ -59,17 +59,30 @@ public class EMSUIPlugin extends AbstractUIPlugin {
 		return plugin;
 	}
 
-	/** Writes an entry to the workbench error log for the given error */
+	/**
+	 * Writes an entry to the workbench error log for the given error
+	 *  
+	 * @param e error to log
+	 */
 	public static void log(Throwable e) {
 		log("Error", e); //$NON-NLS-1$
 	}
 
-	/** Writes an entry to the workbench error log for the given error */
+	/**
+	 * Writes an entry to the workbench error log for the given error
+	 * 
+	 * @param message human-readable error message
+	 * @param e error to log
+	 */
 	public static void log(String message, Throwable e) {
 		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, message, e));
 	}
 
-	/** Writes an entry to the workbench error log for the given error */
+	/**
+	 * Writes an entry to the workbench error log
+	 * 
+	 * @param status status object to log
+	 */
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}

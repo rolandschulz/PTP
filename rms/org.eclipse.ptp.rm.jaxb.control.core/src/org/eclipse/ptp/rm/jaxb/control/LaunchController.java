@@ -1034,25 +1034,32 @@ public class LaunchController implements ILaunchController {
 	 * @return whether the script target should be deleted
 	 */
 	private boolean maybeHandleScript(String uuid, ScriptType script, IProgressMonitor monitor) {
-		PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
-		if (p != null && p.getValue() != null) {
-			return false;
-		}
-		if (script == null) {
-			return false;
-		}
-		IRemoteConnection conn = getRemoteConnection(monitor);
-		if (conn != null) {
-			rmVarMap.setEnvManager(EnvManagerRegistry.getEnvManager(conn.getRemoteServices(), conn));
-			ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, launchEnv, false);
-			job.schedule();
-			try {
-				job.join();
-			} catch (InterruptedException ignored) {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		try {
+			PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
+			if (p != null && p.getValue() != null) {
+				return false;
 			}
-			return script.isDeleteAfterSubmit();
+			if (script == null) {
+				return false;
+			}
+			IRemoteConnection conn = getRemoteConnection(progress.newChild(5));
+			if (conn != null) {
+				rmVarMap.setEnvManager(EnvManagerRegistry.getEnvManager(progress.newChild(5), conn));
+				ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, launchEnv, false);
+				job.schedule();
+				try {
+					job.join();
+				} catch (InterruptedException ignored) {
+				}
+				return script.isDeleteAfterSubmit();
+			}
+			return false;
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
-		return false;
 	}
 
 	/**

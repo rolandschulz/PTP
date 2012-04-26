@@ -182,7 +182,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 				}
 			}
 
-			List<String> command = constructCommand(commandPath, args, executionProvider);
+			List<String> command = constructCommand(commandPath, args, executionProvider, monitor);
 
 			IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
 
@@ -236,7 +236,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		return null;
 	}
 
-	private List<String> constructCommand(IPath commandPath, String[] args, IRemoteExecutionServiceProvider executionProvider) throws CoreException {
+	private List<String> constructCommand(IPath commandPath, String[] args, IRemoteExecutionServiceProvider executionProvider, IProgressMonitor monitor) throws CoreException {
 		/*
 		 * Prior to Modules/SoftEnv support, this was the following:
 		 * 
@@ -250,13 +250,14 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
 		if (projectProperties.isEnvMgmtEnabled()) {
 			// Environment management is enabled for the build.  Issue custom Modules/SoftEnv commands to configure the environment.
-			IEnvManager envManager = EnvManagerRegistry.getEnvManager(executionProvider.getRemoteServices(), executionProvider.getConnection());
+			IRemoteConnection connection = executionProvider == null ? null : executionProvider.getConnection();
+			IEnvManager envManager = EnvManagerRegistry.getEnvManager(monitor, connection);
 			try {
 				// Create and execute a Bash script which will configure the environment and then execute the command
 				final List<String> command = new LinkedList<String>();
 				command.add("bash"); //$NON-NLS-1$
 				command.add("-l"); //$NON-NLS-1$
-				final String bashScriptFilename = envManager.createBashScript(true, projectProperties, getCommandAsString(commandPath, args));
+				final String bashScriptFilename = envManager.createBashScript(monitor, true, projectProperties, getCommandAsString(commandPath, args));
 				command.add(bashScriptFilename);
 				return command;
 			} catch (final Exception e) {

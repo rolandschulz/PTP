@@ -267,6 +267,7 @@ sub get_lml_tablelayout {
 	# check width
 	$wsum=0.0;
 	foreach $cid (sort {$a <=> $b} (keys(%{$layoutref->{column}}))) {
+	    next if($layoutref->{column}->{$cid}->{active} eq "false");
 	    $layoutref->{column}->{$cid}->{width}=1.0 if(!exists($layoutref->{column}->{$cid}->{width}));
 	    $layoutref->{column}->{$cid}->{width}=1.0 if($layoutref->{column}->{$cid}->{width}<=0);
 	    $wsum+=$layoutref->{column}->{$cid}->{width};
@@ -274,6 +275,7 @@ sub get_lml_tablelayout {
 	if($wsum>0)  {$wsumweight=1.0/$wsum;}
 	else         {$wsumweight=1.0;}
 	foreach $cid (sort {$a <=> $b} (keys(%{$layoutref->{column}}))) {
+	    next if($layoutref->{column}->{$cid}->{active} eq "false");
 	    $layoutref->{column}->{$cid}->{width}*=$wsumweight;
 	}
 

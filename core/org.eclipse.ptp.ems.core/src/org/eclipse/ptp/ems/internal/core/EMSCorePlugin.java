@@ -65,32 +65,62 @@ public final class EMSCorePlugin extends Plugin {
 		}
 	}
 
-	/** Writes an entry to the workbench error log for the given error */
+	/**
+	 * Writes an entry to the workbench error log for the given error
+	 *  
+	 * @param e error to log
+	 */
 	public static void log(String e) {
 		log(createStatus(e));
 	}
 
-	/** Writes an entry to the workbench error log for the given error */
+	/**
+	 * Writes an entry to the workbench error log for the given error
+	 *  
+	 * @param e error to log
+	 */
 	public static void log(Throwable e) {
 		log("Error", e); //$NON-NLS-1$
 	}
 
-	/** Writes an entry to the workbench error log for the given error */
+	/**
+	 * Writes an entry to the workbench error log for the given error
+	 * 
+	 * @param message a human-readable error message
+	 * @param e error to log
+	 */
 	public static void log(String message, Throwable e) {
 		log(createStatus(message, e));
 	}
 
-	/** Writes an entry to the workbench error log for the given error */
+	/**
+	 * Creates an error status with the given error message
+	 * 
+	 * @param msg
+	 *            a human-readable error message
+	 * @return {@link IStatus} (non-<code>null</code>)
+	 */
 	public static IStatus createStatus(String msg) {
 		return createStatus(msg, null);
 	}
 
-	/** Writes an entry to the workbench error log for the given error */
+	/**
+	 * Creates an error status with the given error message
+	 * 
+	 * @param msg
+	 *            a human-readable error message
+	 * @param e
+	 *            exception causing this error
+	 * @return {@link IStatus} (non-<code>null</code>)
+	 */
 	public static IStatus createStatus(String msg, Throwable e) {
 		return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, msg, e);
 	}
 
-	/** Writes an entry to the workbench error log for the given error */
+	/**
+	 * Writes an entry to the workbench error log
+	 * @param status status object to log
+	 */
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}

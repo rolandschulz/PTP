@@ -18,7 +18,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.ptp.ems.core.EnvManagerRegistry;
+import org.eclipse.ptp.ems.core.IEnvManager;
+import org.eclipse.ptp.ems.ui.LazyEnvManagerDetector;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -39,6 +40,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * Implementation of the parent tab. It displays the children inside the tab folder, and relays updates to them.<br>
@@ -82,7 +84,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 			if (conn == null) {
 				throw new Throwable("Unable to obtain connection information");
 			}
-			varMap = new LCVariableMap(EnvManagerRegistry.getEnvManager(conn.getRemoteServices(), conn));
+			varMap = new LCVariableMap(getEnvManager(control));
 			voidRMConfig = false;
 		} catch (Throwable t) {
 			script = null;
@@ -104,12 +106,18 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 					addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(control, dialog, importTab, this));
 				}
 			}
+			varMap = new LCVariableMap(getEnvManager(control));
 		} else {
 			getControllers().clear();
 			launchTabData = null;
 			updateHandler = null;
 		}
 		lcMap = varMap;
+	}
+
+	private IEnvManager getEnvManager(IJobController control) {
+		Shell shell = getLaunchConfigurationDialog().getActiveTab().getControl().getShell();
+		return new LazyEnvManagerDetector(shell, getConnection(control));
 	}
 
 	private IRemoteConnection getConnection(final IJobController control) {

@@ -205,6 +205,7 @@ sub read_lml_fast {
 	    $tag=$ctag;
 	    $ctag="";
 	} else {
+	    $ctag.="\>";
 	    next;
 	}
 	
@@ -223,12 +224,12 @@ sub read_lml_fast {
 	    $self->lml_start($self->{DATA},$tagname,());
 	} elsif($tag=~/<([^\s]+)(\s(.*)[^\/])$/) {
 	    $tagname=$1;
-	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;
+	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;$rest=~s/\s+\=\"/\=\"/gs;
 #	    print "TAG1: '$tagname' rest='$rest'\n";
 	    $self->lml_start($self->{DATA},$tagname,split(/=?\"\s*/,$rest));
 	} elsif($tag=~/<([^\s\/]+)(\s(.*)\s?)\/$/) {
 	    $tagname=$1;
-	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;
+	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;$rest=~s/\s+\=\"/\=\"/gs;
 #	    print "TAG2: '$tagname' rest='$rest' closed\n";
 	    $self->lml_start($self->{DATA},$tagname,split(/=?\"\s*/,$rest));
 	    $self->lml_end($self->{DATA},$tagname,());
@@ -790,6 +791,7 @@ sub _check_lml_tablelayout_width {
     
     $wsum=0.0;
     foreach $cid (sort {$a <=> $b} (keys(%{$tlayoutref->{column}}))) {
+	next if($tlayoutref->{column}->{$cid}->{active} eq "false");
 	$tlayoutref->{column}->{$cid}->{width}=1.0 if(!exists($tlayoutref->{column}->{$cid}->{width}));
 	$tlayoutref->{column}->{$cid}->{width}=1.0 if($tlayoutref->{column}->{$cid}->{width}<=0);
 	$wsum+=$tlayoutref->{column}->{$cid}->{width};
@@ -797,6 +799,7 @@ sub _check_lml_tablelayout_width {
     if($wsum>0)  {$wsumweight=1.0/$wsum;}
     else         {$wsumweight=1.0;}
     foreach $cid (sort {$a <=> $b} (keys(%{$tlayoutref->{column}}))) {
+	next if($tlayoutref->{column}->{$cid}->{active} eq "false");
 	$tlayoutref->{column}->{$cid}->{width}*=$wsumweight;
     }
     

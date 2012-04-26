@@ -176,7 +176,7 @@ public class WidgetBuilderUtils {
 				buttonLabel.setToolTipText(tooltip);
 			}
 		}
-		final EnvManagerConfigButton button = new EnvManagerConfigButton(parent, conn.getRemoteServices(), conn);
+		final EnvManagerConfigButton button = new EnvManagerConfigButton(parent, conn);
 		if (label != null) {
 			button.setText(label);
 		}

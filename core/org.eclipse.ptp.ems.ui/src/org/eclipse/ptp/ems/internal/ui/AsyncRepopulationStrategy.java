@@ -24,10 +24,16 @@ public interface AsyncRepopulationStrategy {
 	/** @return a message to be displayed to the user while the list is being repopulated (non-<code>null</code>) */
 	String getMessage();
 
-	/** @return the items to be displayed in the checklist (non-<code>null</code>) */
+	/**
+	 * @return the items to be displayed in the checklist (non-<code>null</code>) 
+	 * @throws Exception if an error occurs
+	 */
 	Set<String> computeItems() throws Exception;
 
-	/** @return the subset of items in the checklist which should be checked (non-<code>null</code>) */
+	/**
+	 * @return the subset of items in the checklist which should be checked (non-<code>null</code>)
+	 * @throws Exception if an error occurs
+	 */
 	Set<String> computeSelectedItems() throws Exception;
 
 	/** Code to be executed in the UI thread after the list is repopulated */

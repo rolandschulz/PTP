@@ -12,11 +12,11 @@ package org.eclipse.ptp.ems.core;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.ems.internal.core.EMSCorePlugin;
 import org.eclipse.ptp.ems.internal.core.managers.NullEnvManager;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 
 /**
  * Provides {@link IEnvManager} objects, which provide access to remote machines' environment management systems.
@@ -43,21 +43,22 @@ public final class EnvManagerRegistry {
 	 * <p>
 	 * If no supported environment managment system was detected, the result will be equal to {@link #getNullEnvManager()}.
 	 * 
-	 * @param remoteServices
-	 *            {@link IRemoteServices} used to provide access to a remote machine (non-<code>null</code>)
+	 * @param pm
+	 *            progress monitor used to report the status of potentially long-running operations to the user (non-
+	 *            <code>null</code>)
 	 * @param remoteConnection
 	 *            {@link IRemoteConnection} providing a connection to a particular remote machine (non-<code>null</code>)
 	 * 
 	 * @return {@link IEnvManager} (non-<code>null</code>)
 	 */
-	public static IEnvManager getEnvManager(IRemoteServices remoteServices, IRemoteConnection remoteConnection) {
-		if (remoteServices != null && remoteConnection != null) {
+	public static IEnvManager getEnvManager(IProgressMonitor pm, IRemoteConnection remoteConnection) {
+		if (remoteConnection != null) {
 			final IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(IEnvManager.ENV_MANAGER_EXTENSION_POINT_ID);
 			for (final IConfigurationElement element : extensionPoint.getConfigurationElements()) {
 				try {
 					final IEnvManager manager = (IEnvManager) element.createExecutableExtension("class"); //$NON-NLS-1$
-					manager.configure(remoteServices, remoteConnection);
-					if (manager.checkForCompatibleInstallation()) {
+					manager.configure(remoteConnection);
+					if (manager.checkForCompatibleInstallation(pm)) {
 						return manager;
 					}
 				} catch (final Exception e) {

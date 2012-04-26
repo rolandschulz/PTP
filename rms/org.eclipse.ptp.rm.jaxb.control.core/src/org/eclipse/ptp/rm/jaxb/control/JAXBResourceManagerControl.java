@@ -673,7 +673,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 *            configuration object describing how to construct the script from the environment
 	 * @return whether the script target should be deleted
 	 */
-	private boolean maybeHandleScript(String uuid, ScriptType script) {
+	private boolean maybeHandleScript(String uuid, ScriptType script, IProgressMonitor monitor) {
 		PropertyType p = (PropertyType) getVarMap().get(JAXBControlConstants.SCRIPT_PATH);
 		if (p != null && p.getValue() != null) {
 			return false;
@@ -681,7 +681,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (script == null) {
 			return false;
 		}
-		getVarMap().setEnvManager(EnvManagerRegistry.getEnvManager(getRemoteServices(), getRemoteConnection()));
+		getVarMap().setEnvManager(EnvManagerRegistry.getEnvManager(monitor, getRemoteConnection()));
 		ScriptHandler job = new ScriptHandler(uuid, script, getVarMap(), launchEnv, false);
 		job.schedule();
 		try {
@@ -1151,8 +1151,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * process script
 		 */
 		ScriptType script = getConfiguration().getControlData().getScript();
-		boolean delScript = maybeHandleScript(uuid, script);
-		worked(progress, 20);
+		boolean delScript = maybeHandleScript(uuid, script, progress.newChild(10));
+		worked(progress, 10);
 
 		List<ManagedFilesType> files = getConfiguration().getControlData().getManagedFiles();
 

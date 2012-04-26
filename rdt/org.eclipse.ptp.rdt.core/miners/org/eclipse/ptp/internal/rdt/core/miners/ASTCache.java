@@ -27,7 +27,6 @@ import org.eclipse.cdt.core.parser.FileContent;
 import org.eclipse.cdt.core.parser.IParserLogService;
 import org.eclipse.cdt.core.parser.IncludeFileContentProvider;
 import org.eclipse.cdt.internal.core.index.IndexBasedFileContentProvider;
-import org.eclipse.cdt.internal.core.indexer.StandaloneFastIndexer;
 import org.eclipse.cdt.internal.core.parser.scanner.AbstractCharArray;
 import org.eclipse.cdt.internal.core.parser.scanner.FileCharArray;
 import org.eclipse.cdt.internal.core.parser.scanner.InternalFileContent;
@@ -51,8 +50,6 @@ public class ASTCache {
 	private Map<String, Long> fPathToLastIndexWriteTimeMap = new TreeMap<String, Long>();
 	
 	private static ASTCache fInstance;
-	
-	private static final String SYSTEM_DEFAULT_ENCODING = System.getProperty("file.encoding"); //$NON-NLS-1$
 	
 	private ASTCache() {
 		
@@ -88,14 +85,15 @@ public class ASTCache {
 		String scope = ScopeManager.getInstance().getScopeForFile(absolutePath);
 		IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scope, dataStore);
 		
+		File file = new File(absolutePath);
+		long fileLastModifiedTime = file.lastModified();
 		
-		if(tu == null || index.getLastWriteAccess() > fPathToLastIndexWriteTimeMap.get(absolutePath).longValue()) {
+		
+		if(tu == null || fileLastModifiedTime > fPathToLastIndexWriteTimeMap.get(absolutePath).longValue()) {
 			
 			RemoteLanguageMapper languageMapper = new RemoteLanguageMapper(infoProvider, dataStore);
 			ILanguage language = languageMapper.getLanguage(absolutePath);
 			
-			
-			File file = new File(absolutePath);
 			FileInputStream in;
 			AbstractCharArray chars = null;
 			try {
@@ -127,7 +125,7 @@ public class ASTCache {
 					tu = language.getASTTranslationUnit(fileContent, infoProvider.getScannerInformation(absolutePath),
 							fileCreator, index, options, log);
 					cache.put(absolutePath, new SoftReference<IASTTranslationUnit>(tu));
-					fPathToLastIndexWriteTimeMap.put(absolutePath, new Long(index.getLastWriteAccess()));
+					fPathToLastIndexWriteTimeMap.put(absolutePath, fileLastModifiedTime);
 				} catch (CoreException e) {
 
 					// TODO: handle this properly

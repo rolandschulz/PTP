@@ -35,6 +35,8 @@ public class Messages extends NLS {
 	public static String EnvManagerConfigButton_EnvConfigurationDialogTitle;
 
 	public static String SearchableChecklist_ClearSelection;
+
+	public static String SearchableChecklist_ReloadList;
 	public static String SearchableChecklist_SearchBoxLabel;
 	public static String SearchableChecklist_SelectDefaults;
 
