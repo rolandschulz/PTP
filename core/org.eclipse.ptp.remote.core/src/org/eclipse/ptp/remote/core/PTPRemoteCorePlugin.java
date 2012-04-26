@@ -12,6 +12,7 @@ package org.eclipse.ptp.remote.core;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -165,6 +166,9 @@ public class PTPRemoteCorePlugin extends Plugin {
 	private final Map<String, RemoteServicesProxy> allRemoteServicesById = new HashMap<String, RemoteServicesProxy>();
 	private final Map<String, RemoteServicesProxy> allRemoteServicesByScheme = new HashMap<String, RemoteServicesProxy>();
 
+	// Intialized remote services
+	private final Map<String, IRemoteServices> allInitializedRemoteServices = new HashMap<String, IRemoteServices>();
+
 	// Default remote services for new RM wizard
 	private IRemoteServices defaultRemoteServices;
 
@@ -202,22 +206,26 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 * @since 5.0
 	 */
 	public synchronized IRemoteServices[] getAllRemoteServices(IProgressMonitor monitor) {
-		retrieveRemoteServices();
-		List<IRemoteServices> initializedServices = new ArrayList<IRemoteServices>();
-		SubMonitor progress = SubMonitor.convert(monitor, allRemoteServicesById.size());
-		try {
-			for (RemoteServicesProxy proxy : allRemoteServicesById.values()) {
-				IRemoteServices services = proxy.getServices();
-				initializeRemoteServices(services, progress.newChild(1));
-				initializedServices.add(services);
-			}
-			Collections.sort(initializedServices, new RemoteServicesSorter());
-			return initializedServices.toArray(new IRemoteServices[0]);
-		} finally {
-			if (monitor != null) {
-				monitor.done();
+		if (allInitializedRemoteServices.isEmpty()) {
+			retrieveRemoteServices();
+			SubMonitor progress = SubMonitor.convert(monitor, allRemoteServicesById.size());
+			try {
+				for (RemoteServicesProxy proxy : allRemoteServicesById.values()) {
+					IRemoteServices services = proxy.getServices();
+					if (!services.isInitialized()) {
+						initializeRemoteServices(services, progress.newChild(1));
+					}
+					allInitializedRemoteServices.put(services.getId(), services);
+				}
+			} finally {
+				if (monitor != null) {
+					monitor.done();
+				}
 			}
 		}
+		IRemoteServices[] res = allInitializedRemoteServices.values().toArray(new IRemoteServices[0]);
+		Arrays.sort(res, new RemoteServicesSorter());
+		return res;
 	}
 
 	/**
@@ -263,7 +271,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 */
 	public IRemoteServices getRemoteServices(String id, IProgressMonitor monitor) {
 		IRemoteServices services = getRemoteServices(id);
-		if (services != null) {
+		if (services != null && !services.isInitialized()) {
 			initializeRemoteServices(services, monitor);
 		}
 		return services;
@@ -302,14 +310,15 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 */
 	public IRemoteServices getRemoteServices(URI uri, IProgressMonitor monitor) {
 		IRemoteServices services = getRemoteServices(uri);
-		if (services != null) {
+		if (services != null && !services.isInitialized()) {
 			initializeRemoteServices(services, monitor);
 		}
 		return services;
 	}
 
 	/**
-	 * Get the remote services descriptor identified by id
+	 * Get the remote services descriptor identified by id. The remote services retrieved may not have been initialized.
+	 * {@link IRemoteServices#initialize()} must be called before any attempt is made to use the services.
 	 * 
 	 * @param id
 	 *            id of the remote services
