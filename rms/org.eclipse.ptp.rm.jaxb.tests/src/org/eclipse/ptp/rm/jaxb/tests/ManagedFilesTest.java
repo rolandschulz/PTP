@@ -380,4 +380,9 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	public String getControlId() {
 		return null;
 	}
+
+	public ResourceManagerData getConfiguration() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
