@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
+import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
@@ -40,7 +40,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 
-public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerControl, IJAXBJobControl {
+public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerControl, IJobController {
 
 	private static final String xml = JAXBControlConstants.DATA + "pbs-test-local.xml"; //$NON-NLS-1$
 	private static ControlType controlData;

@@ -24,7 +24,7 @@ import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
+import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
@@ -128,7 +128,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
-	private final IJAXBJobControl control;
+	private final IJobController control;
 	private final IVariableMap varMap;
 
 	private final ICommandJob open;
@@ -157,7 +157,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @param control
 	 *            resource manager control
 	 */
-	public CommandJobStatus(ICommandJob open, IJAXBJobControl control) {
+	public CommandJobStatus(ICommandJob open, IJobController control) {
 		this(null, UNDETERMINED, open, control);
 	}
 
@@ -169,7 +169,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @param control
 	 *            resource manager control
 	 */
-	public CommandJobStatus(String jobId, String state, ICommandJob open, IJAXBJobControl control) {
+	public CommandJobStatus(String jobId, String state, ICommandJob open, IJobController control) {
 		this.jobId = jobId;
 		setState(state);
 		this.open = open;

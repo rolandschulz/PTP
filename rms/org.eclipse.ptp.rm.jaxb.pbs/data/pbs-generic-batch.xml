@@ -9,7 +9,7 @@
 <!-- * Albert L. Rossi - design and implementation -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-generic-batch">
+	xsi:schemaLocation="resource_manager_type.xsd" name="PBS-Generic-Batch">
 	<control-data>
 		<!-- Set the default value of this property if PBS is installed in a non-standard location -->
 		<property name="bindir" visible="false"/>

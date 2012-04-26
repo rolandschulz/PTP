@@ -16,23 +16,19 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
- * JAXB Launch Control interface.
+ * Launch Control interface.
  * 
  */
-public interface IJAXBLaunchControl extends IJAXBJobControl {
-
-	public void setConnectionName(String connName);
-
-	public void setRemoteServicesId(String id);
+public interface ILaunchController extends IJobController {
 
 	/**
-	 * Safely dispose of this Resource Manager.
+	 * Safely dispose of this controller.
 	 */
 	public void dispose();
 
 	/**
-	 * Initialize the resource manager. The resource manager is ready to be used after initialization, however it must be started
-	 * before any control operations can be performed.
+	 * Initialize the controller. The controller is ready to be used after initialization, however it must be started before any
+	 * control operations can be performed.
 	 * 
 	 * @param monitor
 	 *            progress monitor
@@ -41,8 +37,29 @@ public interface IJAXBLaunchControl extends IJAXBJobControl {
 	public void initialize(IProgressMonitor monitor) throws CoreException;
 
 	/**
+	 * Check if controller is initialized.
+	 * 
+	 * @return true if controller is initialized
+	 */
+	public boolean isInitialized();
+
+	/**
+	 * Set the connection name for this control
+	 * 
+	 * @param connName
+	 */
+	public void setConnectionName(String connName);
+
+	/**
+	 * Set the remote services ID for this control
+	 * 
+	 * @param id
+	 */
+	public void setRemoteServicesId(String id);
+
+	/**
 	 * @param url
-	 *            of the JAXB configuration for this resource manager.
+	 *            of the JAXB configuration for this controller.
 	 * 
 	 * @since 5.0
 	 */

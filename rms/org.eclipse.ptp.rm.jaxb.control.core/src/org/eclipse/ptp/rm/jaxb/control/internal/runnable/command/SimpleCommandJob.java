@@ -29,7 +29,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
+import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
@@ -49,7 +49,7 @@ import org.eclipse.ptp.utils.core.ArgumentParser;
 public class SimpleCommandJob extends Job {
 
 	private final SimpleCommandType fCommand;
-	private final IJAXBJobControl fControl;
+	private final IJobController fControl;
 	private final IVariableMap fRmVarMap;
 	private final int fFlags;
 	private final String fUuid;
@@ -69,7 +69,7 @@ public class SimpleCommandJob extends Job {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public SimpleCommandJob(String uuid, SimpleCommandType command, String directory, IJAXBJobControl control) {
+	public SimpleCommandJob(String uuid, SimpleCommandType command, String directory, IJobController control) {
 		super(command.getName() != null ? command.getName() : "Simple Command"); //$NON-NLS-1$
 		fUuid = uuid;
 		fCommand = command;

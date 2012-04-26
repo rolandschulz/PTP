@@ -25,7 +25,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
+import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
@@ -53,7 +53,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		IUpdateModelEnabled, SelectionListener {
 
 	private RemoteServicesDelegate delegate;
-	private final IJAXBJobControl fControl;
+	private final IJobController fControl;
 	private final LaunchTabType launchTabData;
 	private final ValueUpdateHandler updateHandler;
 	private final LCVariableMap lcMap;
@@ -67,7 +67,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 *            the launch dialog parent
 	 * @throws Throwable
 	 */
-	public JAXBControllerLaunchConfigurationTab(IJAXBJobControl control, ILaunchConfigurationDialog dialog) throws Throwable {
+	public JAXBControllerLaunchConfigurationTab(IJobController control, ILaunchConfigurationDialog dialog) throws Throwable {
 		super(dialog);
 		fControl = control;
 		LCVariableMap varMap = null;
@@ -112,7 +112,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		lcMap = varMap;
 	}
 
-	private IRemoteConnection getConnection(final IJAXBJobControl control) {
+	private IRemoteConnection getConnection(final IJobController control) {
 		final IRemoteServices[] remoteServices = new IRemoteServices[1];
 		try {
 			getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
@@ -186,7 +186,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * 
 	 * @return the ResourceManager (base) configuration
 	 */
-	public IJAXBJobControl getJobControl() {
+	public IJobController getJobControl() {
 		return fControl;
 	}
 

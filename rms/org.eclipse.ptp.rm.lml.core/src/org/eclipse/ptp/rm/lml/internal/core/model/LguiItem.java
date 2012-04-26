@@ -120,6 +120,11 @@ public class LguiItem implements ILguiItem {
 	 * @param listener
 	 *            new listening instance
 	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#addListener(org.eclipse.ptp.rm.lml.core.listeners.ILguiListener)
+	 */
 	@Override
 	public void addListener(ILguiListener listener) {
 		listeners.add(listener);
@@ -160,6 +165,11 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getColumnTitlePattern(java.lang.String)
+	 */
 	@Override
 	public String[] getColumnTitlePattern(String gid) {
 		final List<String> titles = new ArrayList<String>();
@@ -194,8 +204,10 @@ public class LguiItem implements ILguiItem {
 		jaxbUtil.marshal(layoutLgui, output);
 	}
 
-	/**
-	 * @return object to map component-ids to corresponding layout definitions
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getLayoutAccess()
 	 */
 	@Override
 	public LayoutAccess getLayoutAccess() {
@@ -209,35 +221,54 @@ public class LguiItem implements ILguiItem {
 		return lgui;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getMessageOfTheDay()
+	 */
 	@Override
 	public String[] getMessageOfTheDay() {
 		String type = new String();
 		String message = new String();
 		final List<String> oidList = new LinkedList<String>();
-		if (getOverviewAccess().getObjects() != null) {
-			for (final ObjectsType objects : getOverviewAccess().getObjects()) {
-				for (final ObjectType object : objects.getObject()) {
-					if (object.getType().value().equals(ILMLCoreConstants.SYSTEM)) {
-						oidList.add(object.getId());
+		if (getOverviewAccess() != null) {
+			if (getOverviewAccess().getObjects() != null) {
+				for (final ObjectsType objects : getOverviewAccess().getObjects()) {
+					for (final ObjectType object : objects.getObject()) {
+						if (object.getType().value().equals(ILMLCoreConstants.SYSTEM)) {
+							oidList.add(object.getId());
+						}
 					}
 				}
 			}
-		}
-		for (final String oid : oidList) {
-			for (final InfodataType data : getOverviewAccess().getInformation(oid).getData()) {
-				if (data.getKey().equals(ILMLCoreConstants.MOTD)) {
-					type = ILMLCoreConstants.MOTD;
-					message = data.getValue();
-				} else if (data.getKey().equals(ILMLCoreConstants.ERROR)) {
-					return new String[] { ILMLCoreConstants.ERROR, data.getValue() };
+			for (final String oid : oidList) {
+				for (final InfodataType data : getOverviewAccess().getInformation(oid).getData()) {
+					if (data.getKey().equals(ILMLCoreConstants.MOTD)) {
+						type = ILMLCoreConstants.MOTD;
+						message = data.getValue();
+					} else if (data.getKey().equals(ILMLCoreConstants.ERROR)) {
+						return new String[] { ILMLCoreConstants.ERROR, data.getValue() };
+					}
 				}
 			}
 		}
 		return new String[] { type, message };
 	}
 
-	/**
-	 * @return NodedisplayAccess-instance for accessing layouts of nodedisplays
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getName()
+	 */
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getNodedisplayAccess()
 	 */
 	@Override
 	public NodedisplayAccess getNodedisplayAccess() {
@@ -247,9 +278,10 @@ public class LguiItem implements ILguiItem {
 		return (NodedisplayAccess) lguiHandlers.get(NodedisplayAccess.class);
 	}
 
-	/**
-	 * @return a object, which saves which object has to be highlighted. All user interactions are saved globally for all components
-	 *         in this object.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getObjectStatus()
 	 */
 	@Override
 	public ObjectStatus getObjectStatus() {
@@ -259,8 +291,10 @@ public class LguiItem implements ILguiItem {
 		return (ObjectStatus) lguiHandlers.get(ObjectStatus.class);
 	}
 
-	/**
-	 * @return object for getting infos for objects
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getOIDToInformation()
 	 */
 	@Override
 	public OIDToInformation getOIDToInformation() {
@@ -270,9 +304,10 @@ public class LguiItem implements ILguiItem {
 		return (OIDToInformation) lguiHandlers.get(OIDToInformation.class);
 	}
 
-	/**
-	 * @return a class, which provides an index for fast access to objects within the objects tag of LML. You can pass the id of the
-	 *         objects to the returned object. It then returns the corresponding objects.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getOIDToObject()
 	 */
 	@Override
 	public OIDToObject getOIDToObject() {
@@ -282,6 +317,11 @@ public class LguiItem implements ILguiItem {
 		return (OIDToObject) lguiHandlers.get(OIDToObject.class);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getOverviewAccess()
+	 */
 	@Override
 	public OverviewAccess getOverviewAccess() {
 		if (lguiHandlers.get(OverviewAccess.class) == null) {
@@ -290,11 +330,21 @@ public class LguiItem implements ILguiItem {
 		return (OverviewAccess) lguiHandlers.get(OverviewAccess.class);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getPattern()
+	 */
 	@Override
 	public Map<String, List<IPattern>> getPattern() {
 		return filters;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getPattern(java.lang.String)
+	 */
 	@Override
 	public List<IPattern> getPattern(String gid) {
 		if (filters.containsKey(gid)) {
@@ -303,6 +353,11 @@ public class LguiItem implements ILguiItem {
 		return new LinkedList<IPattern>();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getTableHandler()
+	 */
 	@Override
 	public TableHandler getTableHandler() {
 		if (lguiHandlers.get(TableHandler.class) == null) {
@@ -337,6 +392,11 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getUsername()
+	 */
 	@Override
 	public String getUsername() {
 		if (username == null) {
@@ -355,6 +415,11 @@ public class LguiItem implements ILguiItem {
 		return lgui.getVersion();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#isEmpty()
+	 */
 	@Override
 	public boolean isEmpty() {
 		final TableHandler handler = getTableHandler();
@@ -364,6 +429,11 @@ public class LguiItem implements ILguiItem {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#isFilterOwnJobActive(java.lang.String)
+	 */
 	@Override
 	public boolean isFilterOwnJobActive(String gid) {
 		final List<IPattern> filters = getPattern(gid);
@@ -404,8 +474,13 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#reloadLastLayout(java.lang.String)
+	 */
 	@Override
-	public void reloadLastLayout(StringBuilder layout) {
+	public void reloadLastLayout(String layout) {
 		LguiType lguiType = null;
 		if (layout.length() > 0) {
 			lguiType = jaxbUtil.unmarshal(layout.toString());

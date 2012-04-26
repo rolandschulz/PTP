@@ -86,7 +86,7 @@ public class LaunchTabBuilder {
 	 *            JAXB data element describing the layout data object
 	 * @return the data object
 	 */
-	static Object createLayoutData(LayoutDataType layoutData) {
+	public static Object createLayoutData(LayoutDataType layoutData) {
 		if (layoutData != null) {
 			if (layoutData.getRowData() != null) {
 				RowDataType rowData = layoutData.getRowData();

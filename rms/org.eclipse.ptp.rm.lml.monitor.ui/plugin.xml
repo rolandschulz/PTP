@@ -8,4 +8,119 @@
             id="org.eclipse.ptp.rm.lml.monitor">
       </configurationWizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.eclipse.ptp.rm.lml.monitor.ui.views.MonitorView"
+            id="org.eclipse.ptp.rm.ui.views.monitorView"
+            name="%MonitorView.name"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            description="Monitor Comands"
+            id="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
+            name="Monitor Commands">
+      </category>
+      <command
+            categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
+            defaultHandler="org.eclipse.ptp.rm.lml.monitor.ui.handlers.AddMonitorHandler"
+            id="org.eclipse.ptp.rm.lml.monitor.ui.addMonitor"
+            name="Add Monitor">
+      </command>
+      <command
+            categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
+            defaultHandler="org.eclipse.ptp.rm.lml.monitor.ui.handlers.RemoveMonitorHandler"
+            id="org.eclipse.ptp.rm.lml.monitor.ui.removeMonitor"
+            name="Remove Monitor">
+      </command>
+      <command
+            categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
+            defaultHandler="org.eclipse.ptp.rm.lml.monitor.ui.handlers.StartMonitorHandler"
+            id="org.eclipse.ptp.rm.lml.monitor.ui.startMonitor"
+            name="Start Monitor">
+      </command>
+      <command
+            categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
+            defaultHandler="org.eclipse.ptp.rm.lml.monitor.ui.handlers.StopMonitorHandler"
+            id="org.eclipse.ptp.rm.lml.monitor.ui.stopMonitor"
+            name="Stop Monitor">
+      </command>
+      <command
+            categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
+            defaultHandler="org.eclipse.ptp.rm.lml.monitor.ui.handlers.RefreshMonitorHandler"
+            id="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor"
+            name="Refresh Monitor">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.ptp.rm.lml.monitor.ui.handlers.AddMonitorHandler"
+            commandId="org.eclipse.ptp.rm.lml.monitor.ui.addMonitor">
+      </handler>
+      <handler
+            class="org.eclipse.ptp.rm.lml.monitor.ui.handlers.RemoveMonitorHandler"
+            commandId="org.eclipse.ptp.rm.lml.monitor.ui.removeMonitor">
+      </handler>
+      <handler
+            class="org.eclipse.ptp.rm.lml.monitor.ui.handlers.StartMonitorHandler"
+            commandId="org.eclipse.ptp.rm.lml.monitor.ui.startMonitor">
+      </handler>
+      <handler
+            class="org.eclipse.ptp.rm.lml.monitor.ui.handlers.StopMonitorHandler"
+            commandId="org.eclipse.ptp.rm.lml.monitor.ui.stopMonitor">
+      </handler>
+      <handler
+            class="org.eclipse.ptp.rm.lml.monitor.ui.handlers.RefreshMonitorHandler"
+            commandId="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ptp.rm.ui.views.monitorView"
+            sibling_order="&lt;command&#x0A;               commandId=&quot;org.eclipse.ptp.rm.lml.monitor.ui.removeMonitor&quot;&#x0A;               icon=&quot;icons/eview16/rem_monitor.gif&quot;&#x0A;               style=&quot;push&quot;&gt;&#x0A;         &lt;/command&gt;">
+         <command
+               commandId="org.eclipse.ptp.rm.lml.monitor.ui.startMonitor"
+               icon="icons/eview16/start.gif"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.ptp.rm.lml.monitor.ui.stopMonitor"
+               icon="icons/eview16/stop.gif"
+               style="push">
+         </command>
+         <separator
+               name="org.eclipse.ptp.rm.lml.monitor.ui.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor"
+               icon="icons/eview16/refresh.gif"
+               style="push">
+         </command>
+         <separator
+               name="org.eclipse.ptp.rm.lml.monitor.ui.separator2"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ptp.rm.lml.monitor.ui.addMonitor"
+               icon="icons/eview16/add_monitor.gif"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.ptp.rm.lml.monitor.ui.removeMonitor"
+               icon="icons/eview16/rem_monitor.gif"
+               style="push">
+         </command>
+         <separator
+               name="org.eclipse.ptp.rm.lml.monitor.ui.separator3"
+               visible="true">
+         </separator>
+      </menuContribution>
+   </extension>
 </plugin>

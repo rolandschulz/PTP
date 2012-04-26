@@ -437,15 +437,14 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 			memento = XMLMemento.createReadRoot(new StringReader(userJobs));
 		}
 
-		final StringBuilder layout = new StringBuilder();
+		String layout = new String();
 		JobStatusData[] jobs = null;
 		Map<String, List<IPattern>> pattern = null;
 
 		if (memento != null) {
 			final IMemento childLayout = memento.getChild(LAYOUT);
 			if (childLayout != null) {
-				final String childLayoutString = childLayout.getString(LAYOUT_STRING);
-				layout.append(childLayoutString);
+				layout = childLayout.getString(LAYOUT_STRING);
 			}
 
 			pattern = reloadPattern(memento);

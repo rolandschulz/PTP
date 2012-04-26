@@ -90,7 +90,7 @@ import org.eclipse.ui.progress.UIJob;
  * @author arossi
  * @author Jeff Overbey - Environment Manager support
  */
-public final class JAXBLaunchControl implements IJAXBLaunchControl {
+public class LaunchController implements ILaunchController {
 
 	/*
 	 * copied from AbstractToolRuntimeSystem; the RM should shut down when the remote connection is closed
@@ -118,51 +118,14 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 		}
 	}
 
-	/**
-	 * tries to open connection if closed
-	 * 
-	 * @param connection
-	 * @param progress
-	 * @throws RemoteConnectionException
-	 */
-	public static void checkConnection(IRemoteConnection connection, SubMonitor progress) throws RemoteConnectionException {
-		if (connection != null) {
-			if (!connection.isOpen()) {
-				connection.open(progress.newChild(25));
-				if (!connection.isOpen()) {
-					throw new RemoteConnectionException(Messages.RemoteConnectionError + connection.getAddress());
-				}
-			}
-		} else {
-			new RemoteConnectionException(Messages.RemoteConnectionError + connection);
-		}
-	}
-
-	/**
-	 * Checks to see if there was an exception thrown by the run method.
-	 * 
-	 * @param job
-	 * @throws CoreException
-	 *             if the job execution raised and exception
-	 */
-	private static void checkJobForError(ICommandJob job) throws CoreException {
-		IStatus status = job.getRunStatus();
-		if (status != null && status.getSeverity() == IStatus.ERROR) {
-			Throwable t = status.getException();
-			if (t instanceof CoreException) {
-				throw (CoreException) t;
-			} else {
-				throw CoreExceptionUtils.newException(status.getMessage(), t);
-			}
-		}
-	}
-
 	private final ConnectionChangeListener connectionListener = new ConnectionChangeListener();
-	private final Map<String, String> launchEnv = new TreeMap<String, String>();
-	private final JobIdPinTable pinTable = new JobIdPinTable();
 
+	private final Map<String, String> launchEnv = new TreeMap<String, String>();
+
+	private final JobIdPinTable pinTable = new JobIdPinTable();
 	private ICommandJob interactiveJob;
 	private ICommandJobStatusMap jobStatusMap;
+
 	private RMVariableMap rmVarMap;
 	protected ResourceManagerData configData;
 	private ControlType controlData;
@@ -180,11 +143,11 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	 * @param jaxbServiceProvider
 	 *            the configuration object containing resource manager specifics
 	 */
-	public JAXBLaunchControl() {
+	public LaunchController() {
 		this(UUID.randomUUID().toString());
 	}
 
-	public JAXBLaunchControl(String controlId) {
+	public LaunchController(String controlId) {
 		fControlId = controlId;
 		ModelManager.getInstance().getUniverse().addResourceManager(controlId);
 	}
@@ -439,10 +402,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 	}
 
 	/*
-	 * return JAXBInitializationUtils.getRMConfigurationXML(url);
-	 */
-
-	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getRemoteServicesId()
@@ -507,6 +466,14 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 				monitor.done();
 			}
 		}
+	}
+
+	/*
+	 * return JAXBInitializationUtils.getRMConfigurationXML(url);
+	 */
+
+	public boolean isInitialized() {
+		return isInitialized;
 	}
 
 	/*
@@ -694,13 +661,6 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 		isActive = false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getJobStatus(java.lang.String, boolean,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-
 	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
 		/*
 		 * give submission a unique id which will in most cases be replaced by the resource-generated id for the job/process
@@ -804,6 +764,52 @@ public final class JAXBLaunchControl implements IJAXBLaunchControl {
 		} finally {
 			if (monitor != null) {
 				monitor.done();
+			}
+		}
+	}
+
+	/**
+	 * tries to open connection if closed
+	 * 
+	 * @param connection
+	 * @param progress
+	 * @throws RemoteConnectionException
+	 */
+	private void checkConnection(IRemoteConnection connection, SubMonitor progress) throws RemoteConnectionException {
+		if (connection != null) {
+			if (!connection.isOpen()) {
+				connection.open(progress.newChild(25));
+				if (!connection.isOpen()) {
+					throw new RemoteConnectionException(Messages.RemoteConnectionError + connection.getAddress());
+				}
+			}
+		} else {
+			new RemoteConnectionException(Messages.RemoteConnectionError + connection);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getJobStatus(java.lang.String, boolean,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+
+	/**
+	 * Checks to see if there was an exception thrown by the run method.
+	 * 
+	 * @param job
+	 * @throws CoreException
+	 *             if the job execution raised and exception
+	 */
+	private void checkJobForError(ICommandJob job) throws CoreException {
+		IStatus status = job.getRunStatus();
+		if (status != null && status.getSeverity() == IStatus.ERROR) {
+			Throwable t = status.getException();
+			if (t instanceof CoreException) {
+				throw (CoreException) t;
+			} else {
+				throw CoreExceptionUtils.newException(status.getMessage(), t);
 			}
 		}
 	}

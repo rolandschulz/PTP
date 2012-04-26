@@ -50,7 +50,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
+import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
@@ -199,7 +199,7 @@ public class CommandJob extends Job implements ICommandJob {
 
 	private final String uuid;
 	private final CommandType command;
-	private final IJAXBJobControl control;
+	private final IJobController control;
 	private final ICommandJobStreamsProxy proxy;
 	private final IVariableMap rmVarMap;
 	private final int flags;
@@ -235,7 +235,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public CommandJob(String jobUUID, CommandType command, JobMode jobMode, IJAXBJobControl control, String launchMode) {
+	public CommandJob(String jobUUID, CommandType command, JobMode jobMode, IJobController control, String launchMode) {
 		super(command.getName() + JAXBControlConstants.CO + JAXBControlConstants.SP
 				+ (jobUUID == null ? control.getConnectionName() : jobUUID));
 		this.command = command;

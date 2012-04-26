@@ -54,7 +54,7 @@ import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 import org.eclipse.ptp.launch.rulesengine.RuleActionFactory;
 import org.eclipse.ptp.launch.rulesengine.RuleFactory;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 
 /**
@@ -393,7 +393,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			final IJAXBLaunchControl control = RMLaunchUtils.getLaunchControl(configuration);
+			final ILaunchController control = RMLaunchUtils.getLaunchControl(configuration);
 			if (control == null) {
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));

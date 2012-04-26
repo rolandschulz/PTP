@@ -9,20 +9,23 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.ui.util;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
@@ -40,21 +43,104 @@ import org.osgi.framework.Bundle;
  * 
  */
 public class JAXBExtensionUtils {
+	private static Map<String, URL> fPluginConfigurations = new HashMap<String, URL>();
+	private static Map<String, URL> fExternalConfigurations = new HashMap<String, URL>();
+	private static Set<String> fMonitorTypes = new TreeSet<String>();
 
-	/**
-	 * For searching the "resourceManagers" project for .xml files.
-	 */
-	private static final FilenameFilter xmlFilter = new FilenameFilter() {
-		public boolean accept(File dir, String name) {
-			File f = new File(dir, name);
-			return name.endsWith(JAXBUIConstants.DOT_XML) && f.isFile();
+	public static String[] getConfiguationNames() {
+		loadExtensions(true);
+		Set<Map.Entry<String, URL>> set = fPluginConfigurations.entrySet();
+		set.addAll(fExternalConfigurations.entrySet());
+		return set.toArray(new String[0]);
+	}
+
+	public static URL getConfigurationURL(String name) {
+		loadExtensions(true);
+		URL url = fPluginConfigurations.get(name);
+		if (url == null) {
+			url = fExternalConfigurations.get(name);
 		}
-	};
+		return url;
+	}
+
+	public static String[] getMonitorTypes() {
+		loadExtensions(true);
+		return fMonitorTypes.toArray(new String[0]);
+	}
+
+	public static Map<String, URL> getPluginConfiguations() {
+		loadExtensions(true);
+		Map<String, URL> map = new HashMap<String, URL>();
+		map.putAll(fPluginConfigurations);
+		map.putAll(fExternalConfigurations);
+		return map;
+	}
 
 	/**
-	 * For static access only.
+	 * Wrapper method. Calls {@link #loadExtensions()} and {@link #loadExternal(boolean)}.
+	 * 
+	 * @param showError
+	 *            display an error message if any configuration is invalid (against the internal XSD). Only true when loading the
+	 *            widget the first time.
 	 */
-	private JAXBExtensionUtils() {
+	public static void loadExtensions(boolean showError) {
+		loadPlugins();
+
+		/*
+		 * Also search the workspace for managers. By convention these should all go in a directory called "resourceManagers". Loads
+		 * only valid XML
+		 */
+		loadExternal(showError);
+	}
+
+	/**
+	 * Searches for .xml files contained in the user's workspace under the project named "resourceManagers". Validates each one
+	 * found and on failed validation displays an error message (if so indicated).
+	 * 
+	 * @param showError
+	 *            display an error message if any configuration is invalid (against the internal XSD). Only true when loading the
+	 *            widget the first time.
+	 */
+	private static void loadExternal(boolean showError) {
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBUIConstants.RESOURCE_MANAGERS);
+		StringBuffer invalid = new StringBuffer();
+		if (project != null) {
+			try {
+				IResource[] resources = project.members();
+				for (IResource resource : resources) {
+					if (resource instanceof IFile) {
+						IFile file = (IFile) resource;
+						if (file.exists() && file.getName().endsWith(JAXBUIConstants.DOT_XML)) {
+							try {
+								ResourceManagerData data;
+								URI uri = file.getLocationURI();
+								URL url = uri.toURL();
+								try {
+									data = JAXBInitializationUtils.initializeRMData(url);
+								} catch (Throwable t) {
+									invalid.append(JAXBUIConstants.LINE_SEP).append(file.getName());
+									JAXBUIPlugin.log(t.getMessage());
+									continue;
+								}
+								fExternalConfigurations.put(data.getName(), url);
+								if (data.getMonitorData() != null) {
+									fMonitorTypes.add(data.getMonitorData().getSchedulerType());
+								}
+							} catch (MalformedURLException t) {
+								JAXBUIPlugin.log(t);
+							}
+
+						}
+					}
+				}
+			} catch (CoreException e) {
+				JAXBUIPlugin.log(e);
+			}
+		}
+		if (showError && invalid.length() > 0) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.InvalidConfiguration_title,
+					Messages.InvalidConfiguration + invalid.toString());
+		}
 	}
 
 	/**
@@ -64,22 +150,28 @@ public class JAXBExtensionUtils {
 	 * @param resourceManagers
 	 *            map of extId to map(name, URL)
 	 */
-	public static void loadExtensions(Map<String, URL> resourceManagers) {
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(JAXBUIConstants.RM_CONFIG_EXTENSION_POINT);
+	private static void loadPlugins() {
+		if (fPluginConfigurations.isEmpty()) {
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry.getExtensionPoint(JAXBUIConstants.RM_CONFIG_EXTENSION_POINT);
 
-		if (extensionPoint != null) {
-			for (IExtension ext : extensionPoint.getExtensions()) {
-				for (IConfigurationElement ce : ext.getConfigurationElements()) {
-					ce.getAttribute(JAXBUIConstants.ID);
-					String name = ce.getAttribute(JAXBUIConstants.NAME);
-					String configurationFile = ce.getAttribute(JAXBUIConstants.CONFIGURATION_FILE_ATTRIBUTE);
-					String bundleId = ce.getDeclaringExtension().getContributor().getName();
-					Bundle bundle = Platform.getBundle(bundleId);
-					if (bundle != null) {
-						URL url = bundle.getEntry(configurationFile);
-						if (url != null) {
-							resourceManagers.put(name, url);
+			if (extensionPoint != null) {
+				for (IExtension ext : extensionPoint.getExtensions()) {
+					for (IConfigurationElement ce : ext.getConfigurationElements()) {
+						ce.getAttribute(JAXBUIConstants.ID);
+						String name = ce.getAttribute(JAXBUIConstants.NAME);
+						String monitorType = ce.getAttribute(JAXBUIConstants.MONITOR_TYPE);
+						if (monitorType != null) {
+							fMonitorTypes.add(monitorType);
+						}
+						String configurationFile = ce.getAttribute(JAXBUIConstants.CONFIGURATION_FILE_ATTRIBUTE);
+						String bundleId = ce.getDeclaringExtension().getContributor().getName();
+						Bundle bundle = Platform.getBundle(bundleId);
+						if (bundle != null) {
+							URL url = bundle.getEntry(configurationFile);
+							if (url != null) {
+								fPluginConfigurations.put(name, url);
+							}
 						}
 					}
 				}
@@ -88,64 +180,8 @@ public class JAXBExtensionUtils {
 	}
 
 	/**
-	 * Wrapper method. Calls {@link #loadExtensions()} and {@link #loadExternal(boolean)}.
-	 * 
-	 * @param resourceManagers
-	 *            map of extId to map(name, URL)
-	 * @param showError
-	 *            display an error message if any configuration is invalid (against the internal XSD). Only true when loading the
-	 *            widget the first time.
+	 * For static access only.
 	 */
-	public static void loadJAXBResourceManagers(Map<String, URL> resourceManagers, boolean showError) {
-		loadExtensions(resourceManagers);
-
-		/*
-		 * Also search the workspace for managers. By convention these should all go in a directory called "resourceManagers". Loads
-		 * only valid XML
-		 */
-		loadExternal(resourceManagers, showError);
-	}
-
-	/**
-	 * Searches for .xml files contained in the user's workspace under the project named "resourceManagers". Validates each one
-	 * found and on failed validation displays an error message (if so indicated).
-	 * 
-	 * @param configurations
-	 *            map of extId to map(name, URL)
-	 * @param showError
-	 *            display an error message if any configuration is invalid (against the internal XSD). Only true when loading the
-	 *            widget the first time.
-	 */
-	private static void loadExternal(Map<String, URL> configurations, boolean showError) {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBUIConstants.RESOURCE_MANAGERS);
-		StringBuffer invalid = new StringBuffer();
-		if (project != null) {
-			IPath path = project.getLocation();
-			if (path != null) {
-				File dir = path.toFile();
-				File[] custom = dir.listFiles(xmlFilter);
-				for (File rm : custom) {
-					try {
-						ResourceManagerData data;
-						URI uri = rm.toURI();
-						URL url = uri.toURL();
-						try {
-							data = JAXBInitializationUtils.initializeRMData(url);
-						} catch (Throwable t) {
-							invalid.append(JAXBUIConstants.LINE_SEP).append(rm.getName());
-							JAXBUIPlugin.log(t.getMessage());
-							continue;
-						}
-						configurations.put(data.getName(), url);
-					} catch (MalformedURLException t) {
-						JAXBUIPlugin.log(t);
-					}
-				}
-			}
-		}
-		if (showError && invalid.length() > 0) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.InvalidConfiguration_title,
-					Messages.InvalidConfiguration + invalid.toString());
-		}
+	private JAXBExtensionUtils() {
 	}
 }

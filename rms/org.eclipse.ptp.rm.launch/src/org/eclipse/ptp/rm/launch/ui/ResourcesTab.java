@@ -29,8 +29,8 @@ import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
-import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
-import org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl;
+import org.eclipse.ptp.rm.jaxb.control.IJobController;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
 import org.eclipse.ptp.rm.launch.RMLaunchPlugin;
 import org.eclipse.ptp.rm.launch.RMLaunchUtils;
@@ -77,11 +77,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/**
 	 * Job controller created when type is selected from the combo.
 	 */
-	private IJAXBLaunchControl fSelectedLaunchControl = null;
+	private ILaunchController fSelectedLaunchControl = null;
 	/**
 	 * Job controller with all necessary configuration information.
 	 */
-	private IJAXBLaunchControl fLaunchControl = null;
+	private ILaunchController fLaunchControl = null;
 	private RemoteConnectionWidget fRemoteConnectionWidget;
 	private IRemoteConnection fRemoteConnection = null;
 
@@ -134,12 +134,12 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		comp.setLayoutData(gd);
 
-		new Label(comp, SWT.NONE).setText("Target System Type:");
+		new Label(comp, SWT.NONE).setText("Target System Template:");
 
 		fSystemTypeCombo = new Combo(comp, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		fSystemTypeCombo.setLayoutData(gd);
-		fSystemTypeCombo.add("Please select a target system type");
+		fSystemTypeCombo.add("Please select a target system template");
 		for (ProviderInfo provider : ProviderInfo.getProviders()) {
 			fSystemTypeCombo.add(provider.getName());
 		}
@@ -359,7 +359,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			String controlId = RMLaunchUtils.getControlId(getLaunchConfiguration());
 			if (fSelectedLaunchControl == null || !fSelectedLaunchControl.getControlId().equals(controlId)) {
 				ProviderInfo provider = ProviderInfo.getProviders().get(i - 1);
-				final IJAXBLaunchControl control = RMLaunchUtils.getLaunchControl(provider.getName(), controlId);
+				final ILaunchController control = RMLaunchUtils.getLaunchControl(provider.getName(), controlId);
 				if (control != null) {
 					if (fDefaultConnection) {
 						fRemoteConnectionWidget.setConnection(control.getRemoteServicesId(), control.getConnectionName());
@@ -385,7 +385,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 	}
 
-	private boolean connectionChanged(final IJAXBLaunchControl control) {
+	private boolean connectionChanged(final ILaunchController control) {
 		IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
 		if (conn != null) {
 			try {
@@ -444,7 +444,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param rm
 	 * @return
 	 */
-	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final IJAXBJobControl control) {
+	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final IJobController control) {
 		if (!fDynamicTabs.containsKey(control)) {
 			try {
 				IRMLaunchConfigurationDynamicTab dynamicTab = new JAXBControllerLaunchConfigurationTab(control,
@@ -469,7 +469,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param queue
 	 * @param launchConfiguration
 	 */
-	private void updateLaunchAttributeControls(IJAXBJobControl control, ILaunchConfiguration launchConfiguration) {
+	private void updateLaunchAttributeControls(IJobController control, ILaunchConfiguration launchConfiguration) {
 		final ScrolledComposite launchAttrsScrollComp = getLaunchAttrsScrollComposite();
 		launchAttrsScrollComp.setContent(null);
 		for (Control child : launchAttrsScrollComp.getChildren()) {

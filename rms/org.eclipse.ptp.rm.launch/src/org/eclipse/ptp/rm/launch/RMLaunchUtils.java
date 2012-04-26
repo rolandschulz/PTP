@@ -10,10 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.launch;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -22,8 +18,8 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl;
-import org.eclipse.ptp.rm.jaxb.control.JAXBLaunchControl;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
+import org.eclipse.ptp.rm.jaxb.control.LaunchController;
 import org.eclipse.ptp.rm.jaxb.ui.util.JAXBExtensionUtils;
 import org.eclipse.ptp.rm.launch.internal.ProviderInfo;
 
@@ -32,8 +28,6 @@ import org.eclipse.ptp.rm.launch.internal.ProviderInfo;
  * 
  */
 public class RMLaunchUtils {
-
-	private static Map<String, URL> fJAXBConfigurations = null;
 
 	/**
 	 * @param configuration
@@ -58,31 +52,17 @@ public class RMLaunchUtils {
 	}
 
 	/**
-	 * Looks up the XML configuration and returns its location
-	 * 
-	 * @param name
-	 * @return URL of the configuration
-	 */
-	public static URL getJAXBConfigurationURL(String name) {
-		loadJAXBResourceManagers(false);
-		if (fJAXBConfigurations != null) {
-			return fJAXBConfigurations.get(name);
-		}
-		return null;
-	}
-
-	/**
 	 * @param configuration
 	 * @return
 	 * @throws CoreException
 	 */
-	public static IJAXBLaunchControl getLaunchControl(ILaunchConfiguration configuration) throws CoreException {
+	public static ILaunchController getLaunchControl(ILaunchConfiguration configuration) throws CoreException {
 		String type = getResourceManagerType(configuration);
 		if (type != null) {
 			ProviderInfo provider = ProviderInfo.getProvider(type);
 			if (provider != null) {
 				String controlId = getControlId(configuration);
-				IJAXBLaunchControl control = getLaunchControl(provider.getName(), controlId);
+				ILaunchController control = getLaunchControl(provider.getName(), controlId);
 				String name = getConnectionName(configuration);
 				String id = getRemoteServicesId(configuration);
 				if (name != null && id != null) {
@@ -100,14 +80,14 @@ public class RMLaunchUtils {
 	 * @param configuration
 	 * @return
 	 */
-	public static IJAXBLaunchControl getLaunchControl(String name, String controlId) {
-		IJAXBLaunchControl control;
+	public static ILaunchController getLaunchControl(String name, String controlId) {
+		ILaunchController control;
 		if (controlId == null) {
-			control = new JAXBLaunchControl();
+			control = new LaunchController();
 		} else {
-			control = new JAXBLaunchControl(controlId);
+			control = new LaunchController(controlId);
 		}
-		control.setRMConfigurationURL(getJAXBConfigurationURL(name));
+		control.setRMConfigurationURL(JAXBExtensionUtils.getConfigurationURL(name));
 		return control;
 	}
 
@@ -170,19 +150,6 @@ public class RMLaunchUtils {
 	 */
 	public static String getResourceManagerType(ILaunchConfiguration configuration) throws CoreException {
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_TYPE, (String) null);
-	}
-
-	/**
-	 * Wrapper method. Calls {@link JAXBExtensionUtils#loadJAXBResourceManagers(Map, boolean)}
-	 */
-	private static void loadJAXBResourceManagers(boolean showError) {
-		if (fJAXBConfigurations == null) {
-			fJAXBConfigurations = new HashMap<String, URL>();
-		} else {
-			fJAXBConfigurations.clear();
-		}
-
-		JAXBExtensionUtils.loadJAXBResourceManagers(fJAXBConfigurations, showError);
 	}
 
 	/**

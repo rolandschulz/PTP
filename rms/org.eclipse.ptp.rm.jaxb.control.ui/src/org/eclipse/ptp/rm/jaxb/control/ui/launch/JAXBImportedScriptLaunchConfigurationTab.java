@@ -22,7 +22,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
+import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.LaunchTabBuilder;
@@ -78,7 +78,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	public JAXBImportedScriptLaunchConfigurationTab(IJAXBJobControl control, ILaunchConfigurationDialog dialog,
+	public JAXBImportedScriptLaunchConfigurationTab(IJobController control, ILaunchConfigurationDialog dialog,
 			LaunchTabType.Import importTab, IJAXBParentLaunchConfigurationTab parentTab) {
 		super(control, dialog, parentTab);
 		this.title = importTab.getTitle();

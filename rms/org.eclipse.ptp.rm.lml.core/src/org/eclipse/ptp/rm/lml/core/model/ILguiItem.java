@@ -79,6 +79,10 @@ public interface ILguiItem {
 	 */
 	public void addUserJob(String jobId, JobStatusData status, boolean force);
 
+	/**
+	 * @param gid
+	 * @return
+	 */
 	public String[] getColumnTitlePattern(String gid);
 
 	/**
@@ -89,29 +93,34 @@ public interface ILguiItem {
 	public void getCurrentLayout(OutputStream output);
 
 	/**
-	 * @return
+	 * @return object to map component-ids to corresponding layout definitions
 	 */
 	public LayoutAccess getLayoutAccess();
 
+	/**
+	 * @return
+	 */
 	public String[] getMessageOfTheDay();
 
 	/**
-	 * @return
+	 * @return NodedisplayAccess-instance for accessing layouts of nodedisplays
 	 */
 	public NodedisplayAccess getNodedisplayAccess();
 
 	/**
-	 * @return
+	 * @return a object, which saves which object has to be highlighted. All user interactions are saved globally for all components
+	 *         in this object.
 	 */
 	public ObjectStatus getObjectStatus();
 
 	/**
-	 * @return
+	 * @return object for getting infos for objects
 	 */
 	public OIDToInformation getOIDToInformation();
 
 	/**
-	 * @return
+	 * @return a class, which provides an index for fast access to objects within the objects tag of LML. You can pass the id of the
+	 *         objects to the returned object. It then returns the corresponding objects.
 	 */
 	public OIDToObject getOIDToObject();
 
@@ -141,6 +150,8 @@ public interface ILguiItem {
 	public JobStatusData[] getUserJobs();
 
 	public String getUsername();
+
+	public String getName();
 
 	/**
 	 * Getting the version of the LguiType:
@@ -173,7 +184,7 @@ public interface ILguiItem {
 	 * 
 	 * @param layout
 	 */
-	public void reloadLastLayout(StringBuilder layout);
+	public void reloadLastLayout(String layout);
 
 	/**
 	 * @param name

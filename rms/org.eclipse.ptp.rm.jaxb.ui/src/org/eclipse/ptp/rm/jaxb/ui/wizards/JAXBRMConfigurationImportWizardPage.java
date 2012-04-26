@@ -13,7 +13,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
@@ -31,8 +30,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * Loads all extensions to the JAXB Resource Manager extension point and
- * displays names for user to select from.
+ * Loads all extensions to the JAXB Resource Manager extension point and displays names for user to select from.
  * 
  * @author arossi
  * 
@@ -43,7 +41,6 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements S
 	private String[] items;
 	private URL[] urls;
 	private int index;
-	private final Map<String, URL> fRMJAXBResourceManagers;
 
 	/**
 	 * @param pageName
@@ -51,15 +48,12 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements S
 	public JAXBRMConfigurationImportWizardPage(String pageName) {
 		super(pageName);
 		setDescription(Messages.ConfigurationImportWizardPageDescription);
-		fRMJAXBResourceManagers = new TreeMap<String, URL>();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets
-	 * .Composite)
+	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets .Composite)
 	 */
 	public void createControl(Composite parent) {
 		GridData gridData = WidgetBuilderUtils.createGridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL, 3);
@@ -108,12 +102,11 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements S
 	 * Populate the combo box and URL data with the available extensions.
 	 */
 	public void loadConfigurations() {
-		JAXBExtensionUtils.loadExtensions(fRMJAXBResourceManagers);
 		List<String> names = new ArrayList<String>();
 		names.add(JAXBUIConstants.ZEROSTR);
 		List<URL> locations = new ArrayList<URL>();
 		locations.add(null);
-		for (Map.Entry<String, URL> e : fRMJAXBResourceManagers.entrySet()) {
+		for (Map.Entry<String, URL> e : JAXBExtensionUtils.getPluginConfiguations().entrySet()) {
 			names.add(e.getKey());
 			locations.add(e.getValue());
 		}
@@ -124,9 +117,7 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements S
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
-	 * .swt.events.SelectionEvent)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse .swt.events.SelectionEvent)
 	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
 		widgetSelected(e);
@@ -135,9 +126,7 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements S
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
-	 * .events.SelectionEvent)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt .events.SelectionEvent)
 	 */
 	public void widgetSelected(SelectionEvent e) {
 		index = configurations.getSelectionIndex();

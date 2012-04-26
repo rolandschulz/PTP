@@ -22,10 +22,10 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
 /**
- * JAXB Launch Control interface.
+ * Job Controller interface.
  * 
  */
-public interface IJAXBJobControl extends IJobControl {
+public interface IJobController extends IJobControl {
 	/**
 	 * @return whether the launch environment should be appended to (or replace) the environment for a given command execution.
 	 */

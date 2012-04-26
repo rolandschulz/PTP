@@ -33,7 +33,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl;
+import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
@@ -77,7 +77,7 @@ import org.eclipse.swt.widgets.Shell;
  * their values (and only theirs) will appear in the environment when performApply() is called. <br>
  * <br>
  * If different widgets on different tabs reference the same Property or Attribute, its value will change everywhere. However, if
- * the <code>shared</code> property is given a list of other controllors, their values are included in the local environment.
+ * the <code>shared</code> property is given a list of other controllers, their values are included in the local environment.
  * 
  * @author arossi
  * @author Jeff Overbey - Environment Manager support
@@ -85,7 +85,7 @@ import org.eclipse.swt.widgets.Shell;
 public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements IJAXBLaunchConfigurationTab,
 		SelectionListener {
 
-	protected final IJAXBJobControl fControl;
+	protected final IJobController fControl;
 	protected final ValueUpdateHandler updateHandler;
 	protected final List<Viewer> viewers;
 	protected final Map<Object, IUpdateModel> localWidgets;
@@ -106,7 +106,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	public JAXBDynamicLaunchConfigurationTab(IJAXBJobControl control, ILaunchConfigurationDialog dialog,
+	public JAXBDynamicLaunchConfigurationTab(IJobController control, ILaunchConfigurationDialog dialog,
 			TabControllerType controller, IJAXBParentLaunchConfigurationTab parentTab) {
 		this(control, dialog, parentTab);
 		String title = controller.getTitle();
@@ -131,7 +131,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	protected JAXBDynamicLaunchConfigurationTab(IJAXBJobControl control, ILaunchConfigurationDialog dialog,
+	protected JAXBDynamicLaunchConfigurationTab(IJobController control, ILaunchConfigurationDialog dialog,
 			IJAXBParentLaunchConfigurationTab parentTab) {
 		super(parentTab, dialog);
 		fControl = control;
@@ -195,7 +195,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/**
 	 * @return the remote connection
 	 */
-	public IJAXBJobControl getJobControl() {
+	public IJobController getJobControl() {
 		return fControl;
 	}
 

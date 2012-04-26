@@ -85,7 +85,7 @@ import org.eclipse.ui.progress.IProgressConstants;
  * @author Jeff Overbey - Environment Manager support
  */
 public final class JAXBResourceManagerControl extends AbstractResourceManagerControl implements IJAXBResourceManagerControl,
-		IJAXBJobControl {
+		IJobController {
 
 	/*
 	 * copied from AbstractToolRuntimeSystem; the RM should shut down when the remote connection is closed
