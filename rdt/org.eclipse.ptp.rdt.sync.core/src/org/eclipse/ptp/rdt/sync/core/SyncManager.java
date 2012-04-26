@@ -83,7 +83,7 @@ public class SyncManager  {
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor progress = SubMonitor.convert(monitor, 100);
 			try {
-				fSyncProvider.synchronize(fDelta, getFileFilter(fProject), progress.newChild(100), fSyncFlags);
+				fSyncProvider.synchronize(fProject, fDelta, getFileFilter(fProject), progress.newChild(100), fSyncFlags);
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
 					System.out.println(Messages.SyncManager_8 + e.getLocalizedMessage());
@@ -410,7 +410,7 @@ public class SyncManager  {
 			ISyncServiceProvider provider = (ISyncServiceProvider) SyncManager.getSyncProvider(buildConfig);
 			if (provider != null) {
 				if (isBlocking) {
-						provider.synchronize(delta, getFileFilter(project), monitor, syncFlags);
+						provider.synchronize(project, delta, getFileFilter(project), monitor, syncFlags);
 				} else {
 						job = new SynchronizeJob(delta, project, provider, syncFlags, seHandler);
 					job.schedule();

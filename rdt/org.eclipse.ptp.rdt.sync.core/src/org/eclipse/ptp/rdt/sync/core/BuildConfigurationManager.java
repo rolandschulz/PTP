@@ -331,17 +331,11 @@ public class BuildConfigurationManager {
 	 * @return the template service configuration created for the new project or null if project did not previously exist.
 	 */
 	public void addProjectFromSystem(IProject newProject, IResourceDelta delta) {
-		// This can happen normally when the project is initially created.
-		// We are assuming that the project has existed previously if and only if the moved from path is null.
-		if (delta.getMovedFromPath() == null) {
-			return;
-		}
-
 		if (newProject == null) {
 			throw new NullPointerException();
 		}
 
-		// Cannot call "checkProject" because project not yet initialized
+		// Cannot call "checkProject" because project may not yet be initialized
 		try {
 			if (!newProject.hasNature(RemoteSyncNature.NATURE_ID)) {
 				throw new IllegalArgumentException(Messages.BuildConfigurationManager_6);
@@ -355,11 +349,9 @@ public class BuildConfigurationManager {
 			throw new RuntimeException(Messages.BCM_BuildInfoError + newProject.getName());
 		}
 
-		// Remove previous service configurations so they will be rebuilt for the new project
-		// Also the Workspace configuration needs to be set to the new project location.
+		// The "Workspace" configuration needs to be set to the new project location.
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allConfigs) {
-			fBConfigIdToSConfigMap.remove(config.getId());
 			if (config.getName() != null && config.getName().equals(Messages.WorkspaceConfigName)) {
 				BuildScenario oldbs = this.getBuildScenarioForBuildConfiguration(config);
 				BuildScenario newbs = new BuildScenario(oldbs.getSyncProvider(), oldbs.getRemoteConnection(),
@@ -367,10 +359,6 @@ public class BuildConfigurationManager {
 				this.setBuildScenarioForBuildConfigurationInternal(newbs, config);
 			}
 		}
-
-		// Change the template's project
-		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(newProject);
-		provider.setProject(newProject);
 	}
 	
 	/**

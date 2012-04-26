@@ -41,19 +41,14 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	public IRemoteConnection getRemoteConnection();
 
 	/**
-	 * Set the project being sync'ed. This method should work after initialization to support moving and copying of projects
-	 * 
+	 * Perform synchronization
+	 *
 	 * @param project
-	 */
-	public void setProject(IProject project);
-
-	/**
-	 * Performs synchronization.
-	 * 
+	 * 			  project to sync
 	 * @param delta
 	 *            resources requiring synchronization
 	 * @param monitor
-	 *            progress monitor for monitoring or canceling synch
+	 *            progress monitor for monitoring or canceling sync
 	 * @param syncFlags
 	 *            Various flags for the sync call. For example, the sync can be
 	 *            forced, either to local (from remote) or to remote (from
@@ -62,8 +57,8 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * @throws CoreException
 	 *             if synchronization fails
 	 */
-	public void synchronize(IResourceDelta delta, SyncFileFilter filter, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags)
-			throws CoreException;
+	public void synchronize(IProject project, IResourceDelta delta, SyncFileFilter filter, IProgressMonitor monitor,
+			EnumSet<SyncFlag> syncFlags) throws CoreException;
 	
 	/**
 	 * Close any resources (files, sockets) that were open by the sync provider. Resources not open by the provider should not be

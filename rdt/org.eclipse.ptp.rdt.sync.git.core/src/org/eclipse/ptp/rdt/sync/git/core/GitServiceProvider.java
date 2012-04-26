@@ -21,7 +21,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -47,8 +46,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 	private static final String GIT_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
 	private static final String GIT_SERVICES_ID = "servicesId"; //$NON-NLS-1$
-	private static final String GIT_PROJECT_NAME = "projectName"; //$NON-NLS-1$
-	private IProject fProject = null;
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
 	private GitRemoteSyncConnection fSyncConnection = null;
@@ -71,21 +68,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			fLocation = getString(GIT_LOCATION, null);
 		}
 		return fLocation;
-	}
-
-	/**
-	 * Get the project to be synchronized
-	 * 
-	 * @return project
-	 */
-	public IProject getProject() {
-		if (fProject == null) {
-			final String name = getString(GIT_PROJECT_NAME, null);
-			if (name != null) {
-				fProject = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
-			}
-		}
-		return fProject;
 	}
 
 	/**
@@ -125,7 +107,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#isConfigured()
 	 */
 	public boolean isConfigured() {
-		return getLocation() != null && getRemoteConnection() != null && getProject() != null;
+		return getLocation() != null && getRemoteConnection() != null;
 	}
 
 	/**
@@ -142,18 +124,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 		fLocation = location;
 		putString(GIT_LOCATION, location);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#setProject(org.eclipse.core.resources.IProject)
-	 */
-	public void setProject(IProject project) {
-		providerLock.lock();
-		fProject = project;
-		putString(GIT_PROJECT_NAME, project.getName());
-		syncInfoChanged = true;
-		providerLock.unlock();
 	}
 
 	/**
@@ -186,18 +156,15 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#
-	 * synchronize(org.eclipse.core.resources.IResourceDelta, org.eclipse.core.runtime.IProgressMonitor, boolean)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#synchronize(org.eclipse.core.resources.IProject, org.eclipse.core.resources.IResourceDelta, org.eclipse.ptp.rdt.sync.core.SyncFileFilter, org.eclipse.core.runtime.IProgressMonitor, java.util.EnumSet)
 	 */
-	@SuppressWarnings("null")
-	public void synchronize(IResourceDelta delta, SyncFileFilter fileFilter, IProgressMonitor monitor,
+	public void synchronize(final IProject project, IResourceDelta delta, SyncFileFilter fileFilter, IProgressMonitor monitor,
 			EnumSet<SyncFlag> syncFlags) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
+		
 		// On first sync, place .gitignore in directories. This is useful for folders that are already present and thus are never
 		// captured by a resource add or change event. (This can happen for projects converted to sync projects.)
 		if (!hasBeenSynced) {
-			final IProject project = getProject();
 			project.accept(new IResourceVisitor() {
 				public boolean visit(IResource resource) throws CoreException {
 					if (irrelevantPath(resource.getFullPath().toString())) {
@@ -238,7 +205,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				// Add .gitignore to empty directories
 				if (delta.getResource().getType() == IResource.FOLDER
 						&& (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
-					IFile emptyFile = getProject().getFile(
+					IFile emptyFile = project.getFile(
 							delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore"); //$NON-NLS-1$
 					try {
 						if (!(emptyFile.exists())) {
@@ -327,18 +294,16 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				// take other locks, such as the workspace lock.
 				boolean initConnection = false;
 				IRemoteConnection conn = null;
-				IProject project = null;
 				String remoteDir = null;
 				providerLock.lock();
 				try {
-					if (fSyncConnection == null || syncInfoChanged) {
+					if (fSyncConnection == null || syncInfoChanged || project != fSyncConnection.getProject()) {
 						if (fSyncConnection != null) {
 							fSyncConnection.close();
 							fSyncConnection = null;
 						}
 						syncInfoChanged = false;
 						initConnection = true;
-						project = this.getProject();
 						conn = this.getRemoteConnection();
 						remoteDir = this.getLocation();
 					}
@@ -346,10 +311,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					providerLock.unlock();
 				}
 				
-				if (initConnection && (project == null || conn == null || remoteDir == null)) {
+				if (initConnection && (conn == null || remoteDir == null)) {
 					RDTSyncCorePlugin.log(Messages.GitServiceProvider_0);
 				} else if (initConnection) {
-					fSyncConnection = new GitRemoteSyncConnection(project, conn, project.getLocation().toString(), remoteDir, fileFilter, progress);
+					fSyncConnection = new GitRemoteSyncConnection(project, conn, project.getLocation().toString(), remoteDir,
+							fileFilter, progress);
 				} else {
 					fSyncConnection.setFileFilter(fileFilter);
 				}
@@ -377,10 +343,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				finishedSyncTaskId = willFinishTaskId;
 				// TODO: Review exception handling
 			} catch (final RemoteSyncException e) {
-				this.handleRemoteSyncException(e, syncFlags);
+				this.handleRemoteSyncException(project, e, syncFlags);
 				return;
 			} catch (RemoteConnectionException e) {
-				this.handleRemoteSyncException(new RemoteSyncException(e), syncFlags);
+				this.handleRemoteSyncException(project, new RemoteSyncException(e), syncFlags);
 				return;
 			} finally {
 				syncLock.unlock();
@@ -388,12 +354,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 			// Sync successful - re-enable error messages. This is really UI code, but there is no way at the moment to notify UI
 			// of a successful sync.
-			SyncManager.setShowErrors(getProject(), true);
-
-			IProject project = this.getProject();
-			if (project != null) {
-				project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(20));
-			}
+			SyncManager.setShowErrors(project, true);
+			
+			// Refresh after sync to display changes
+			project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(20));
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -411,7 +375,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @throws RemoteSyncException
 	 *             for non-forced syncs
 	 */
-	private void handleRemoteSyncException(RemoteSyncException e, EnumSet<SyncFlag> syncFlags) throws RemoteSyncException {
+	private void handleRemoteSyncException(IProject project, RemoteSyncException e, EnumSet<SyncFlag> syncFlags)
+			throws RemoteSyncException {
 		if (syncFlags == SyncFlag.NO_FORCE) {
 			throw e;
 		}
@@ -421,10 +386,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		// RemoteSyncException is generally used by either creating a new exception with a message describing the problem or by
 		// embedding another type of error. So we need to decide which message to use.
 		if ((e.getMessage() != null && e.getMessage().length() > 0) || e.getCause() == null) {
-			message = Messages.GSP_SyncErrorMessage + this.getProject().getName()
+			message = Messages.GSP_SyncErrorMessage + project.getName()
 					+ ":" + endOfLineChar + endOfLineChar + e.getMessage(); //$NON-NLS-1$
 		} else {
-			message = Messages.GSP_SyncErrorMessage + this.getProject().getName()
+			message = Messages.GSP_SyncErrorMessage + project.getName()
 					+ ":" + endOfLineChar + endOfLineChar + e.getCause().getMessage(); //$NON-NLS-1$
 		}
 
