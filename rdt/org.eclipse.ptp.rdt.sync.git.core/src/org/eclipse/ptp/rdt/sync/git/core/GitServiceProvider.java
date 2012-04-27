@@ -51,7 +51,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private static final String GIT_SERVICES_ID = "servicesId"; //$NON-NLS-1$
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
-	private GitRemoteSyncConnection fSyncConnection = null;
 	private boolean hasBeenSynced = false;
 
 	private static final ReentrantLock syncLock = new ReentrantLock();
@@ -344,7 +343,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					syncConnectionMap.put(pas, new GitRemoteSyncConnection(project, buildScenario.getRemoteConnection(),
 							project.getLocation().toString(), buildScenario.getLocation(), fileFilter, progress));
 				}
-				fSyncConnection = syncConnectionMap.get(pas);
+				GitRemoteSyncConnection fSyncConnection = syncConnectionMap.get(pas);
 				fSyncConnection.setFileFilter(fileFilter);
 				
 				// Open remote connection if necessary
@@ -479,9 +478,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	
 	@Override
 	public void close() {
-		if (fSyncConnection != null) {
-			fSyncConnection.close();
-			fSyncConnection = null; // get reinitialized by next synchronize call
+		for (GitRemoteSyncConnection conn : syncConnectionMap.values()) {
+			conn.close();
 		}
 	}
 }
