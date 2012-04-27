@@ -58,17 +58,19 @@ public class SyncManager  {
 	private static final boolean DEFAULT_SHOW_ERROR_SETTING = true;
 
 	private static class SynchronizeJob extends Job {
-		private final IResourceDelta fDelta;
 		private final IProject fProject;
+		private final BuildScenario fBuildScenario;
+		private final IResourceDelta fDelta;
 		private final ISyncServiceProvider fSyncProvider;
 		private final EnumSet<SyncFlag> fSyncFlags;
 		private final SyncExceptionHandler fSyncExceptionHandler;
 
-		public SynchronizeJob(IResourceDelta delta, IProject project, ISyncServiceProvider provider, EnumSet<SyncFlag> syncFlags,
-				SyncExceptionHandler seHandler) {
+		public SynchronizeJob(IProject project, BuildScenario buildScenario, IResourceDelta delta, ISyncServiceProvider provider,
+				EnumSet<SyncFlag> syncFlags, SyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
-			fDelta = delta;
 			fProject = project;
+			fBuildScenario = buildScenario;
+			fDelta = delta;
 			fSyncProvider = provider;
 			fSyncFlags = syncFlags;
 			fSyncExceptionHandler = seHandler;
@@ -83,7 +85,8 @@ public class SyncManager  {
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor progress = SubMonitor.convert(monitor, 100);
 			try {
-				fSyncProvider.synchronize(fProject, fDelta, getFileFilter(fProject), progress.newChild(100), fSyncFlags);
+				fSyncProvider.synchronize(fProject, fBuildScenario, fDelta, getFileFilter(fProject), progress.newChild(100),
+						fSyncFlags);
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
 					System.out.println(Messages.SyncManager_8 + e.getLocalizedMessage());
@@ -407,12 +410,13 @@ public class SyncManager  {
 		Job[] syncJobs = new Job[buildConfigurations.length];
 		for (IConfiguration buildConfig : buildConfigurations) {
 			SynchronizeJob job = null;
+			BuildScenario buildScenario = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(buildConfig);
 			ISyncServiceProvider provider = (ISyncServiceProvider) SyncManager.getSyncProvider(buildConfig);
 			if (provider != null) {
 				if (isBlocking) {
-						provider.synchronize(project, delta, getFileFilter(project), monitor, syncFlags);
+						provider.synchronize(project, buildScenario, delta, getFileFilter(project), monitor, syncFlags);
 				} else {
-						job = new SynchronizeJob(delta, project, provider, syncFlags, seHandler);
+						job = new SynchronizeJob(project, buildScenario, delta, provider, syncFlags, seHandler);
 					job.schedule();
 				}
 			}

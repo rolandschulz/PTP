@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -57,8 +58,8 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * @throws CoreException
 	 *             if synchronization fails
 	 */
-	public void synchronize(IProject project, IResourceDelta delta, SyncFileFilter filter, IProgressMonitor monitor,
-			EnumSet<SyncFlag> syncFlags) throws CoreException;
+	public void synchronize(IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncFileFilter filter,
+			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
 	
 	/**
 	 * Close any resources (files, sockets) that were open by the sync provider. Resources not open by the provider should not be

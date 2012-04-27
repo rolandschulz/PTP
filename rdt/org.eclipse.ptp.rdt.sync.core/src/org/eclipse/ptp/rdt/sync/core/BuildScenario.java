@@ -111,4 +111,45 @@ public class BuildScenario {
 
 		return new BuildScenario(sp, remoteConnection, l);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((location == null) ? 0 : location.hashCode());
+		result = prime
+				* result
+				+ ((remoteConnection == null) ? 0 : remoteConnection.hashCode());
+		result = prime * result
+				+ ((syncProvider == null) ? 0 : syncProvider.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BuildScenario other = (BuildScenario) obj;
+		if (location == null) {
+			if (other.location != null)
+				return false;
+		} else if (!location.equals(other.location))
+			return false;
+		if (remoteConnection == null) {
+			if (other.remoteConnection != null)
+				return false;
+		} else if (!remoteConnection.equals(other.remoteConnection))
+			return false;
+		if (syncProvider == null) {
+			if (other.syncProvider != null)
+				return false;
+		} else if (!syncProvider.equals(other.syncProvider))
+			return false;
+		return true;
+	}
 }

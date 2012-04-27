@@ -11,7 +11,10 @@
 package org.eclipse.ptp.rdt.sync.git.core;
 
 import java.io.ByteArrayInputStream;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -26,7 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
@@ -49,7 +52,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private String fLocation = null;
 	private IRemoteConnection fConnection = null;
 	private GitRemoteSyncConnection fSyncConnection = null;
-	private boolean syncInfoChanged = false; // Indicates that fSyncConnection needs to be re-initialized
 	private boolean hasBeenSynced = false;
 
 	private static final ReentrantLock syncLock = new ReentrantLock();
@@ -57,6 +59,53 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private Integer fWaitingThreadsCount = 0;
 	private Integer syncTaskId = -1; // ID for most recent synchronization task, functions as a time-stamp
 	private int finishedSyncTaskId = -1; // all synchronizations up to this ID (including it) have finished
+	
+	// Simple pair class for bundling a project and build scenario.
+	// Since we use this as a key, equality testing is important.
+	private static class ProjectAndScenario {
+		private IProject project;
+		private BuildScenario scenario;
+
+		ProjectAndScenario(IProject p, BuildScenario bs) {
+			project = p;
+			scenario = bs;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ((project == null) ? 0 : project.hashCode());
+			result = prime * result
+					+ ((scenario == null) ? 0 : scenario.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ProjectAndScenario other = (ProjectAndScenario) obj;
+			if (project == null) {
+				if (other.project != null)
+					return false;
+			} else if (!project.equals(other.project))
+				return false;
+			if (scenario == null) {
+				if (other.scenario != null)
+					return false;
+			} else if (!scenario.equals(other.scenario))
+				return false;
+			return true;
+		}
+	}
+	private Map<ProjectAndScenario, GitRemoteSyncConnection> syncConnectionMap = Collections.synchronizedMap(
+			new HashMap<ProjectAndScenario, GitRemoteSyncConnection>());
 
 	/**
 	 * Get the remote directory that will be used for synchronization
@@ -158,8 +207,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#synchronize(org.eclipse.core.resources.IProject, org.eclipse.core.resources.IResourceDelta, org.eclipse.ptp.rdt.sync.core.SyncFileFilter, org.eclipse.core.runtime.IProgressMonitor, java.util.EnumSet)
 	 */
-	public void synchronize(final IProject project, IResourceDelta delta, SyncFileFilter fileFilter, IProgressMonitor monitor,
-			EnumSet<SyncFlag> syncFlags) throws CoreException {
+	public void synchronize(final IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncFileFilter fileFilter,
+			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
 		
 		// On first sync, place .gitignore in directories. This is useful for folders that are already present and thus are never
@@ -288,41 +337,20 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					return;
 				}
 
-				// Safely initialize or re-initialize sync connection. Note that only the thread with the sync lock can change the
-				// fSyncConnection. To do so, it copies the sync information atomically first and then creates the connection.
-				// Copying avoids having to lock the provider lock during the initialization, a rather involved operation that may
-				// take other locks, such as the workspace lock.
-				boolean initConnection = false;
-				IRemoteConnection conn = null;
-				String remoteDir = null;
-				providerLock.lock();
-				try {
-					if (fSyncConnection == null || syncInfoChanged || project != fSyncConnection.getProject()) {
-						if (fSyncConnection != null) {
-							fSyncConnection.close();
-							fSyncConnection = null;
-						}
-						syncInfoChanged = false;
-						initConnection = true;
-						conn = this.getRemoteConnection();
-						remoteDir = this.getLocation();
-					}
-				} finally {
-					providerLock.unlock();
+				if (buildScenario == null) {
+					throw new RuntimeException(Messages.GitServiceProvider_3 + project.getName());
 				}
+				ProjectAndScenario pas = new ProjectAndScenario(project, buildScenario);
+				if (!syncConnectionMap.containsKey(pas)) {
+					syncConnectionMap.put(pas, new GitRemoteSyncConnection(project, buildScenario.getRemoteConnection(),
+							project.getLocation().toString(), buildScenario.getLocation(), fileFilter, progress));
+				}
+				fSyncConnection = syncConnectionMap.get(pas);
+				fSyncConnection.setFileFilter(fileFilter);
 				
-				if (initConnection && (conn == null || remoteDir == null)) {
-					RDTSyncCorePlugin.log(Messages.GitServiceProvider_0);
-				} else if (initConnection) {
-					fSyncConnection = new GitRemoteSyncConnection(project, conn, project.getLocation().toString(), remoteDir,
-							fileFilter, progress);
-				} else {
-					fSyncConnection.setFileFilter(fileFilter);
-				}
-
 				// Open remote connection if necessary
-				if (this.getRemoteConnection().isOpen() == false) {
-					this.getRemoteConnection().open(progress.newChild(10));
+				if (buildScenario.getRemoteConnection().isOpen() == false) {
+					buildScenario.getRemoteConnection().open(progress.newChild(10));
 				}
 
 				// This synchronization operation will include all tasks up to current syncTaskId
@@ -439,7 +467,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		providerLock.lock();
 		fConnection = connection;
 		putString(GIT_CONNECTION_NAME, connection.getName());
-		syncInfoChanged = true;
+		// syncInfoChanged = true;
 		providerLock.unlock();
 	}
 
@@ -452,7 +480,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		providerLock.lock();
 		fLocation = configLocation;
 		putString(GIT_LOCATION, configLocation);
-		syncInfoChanged = true;
+		// syncInfoChanged = true;
 		providerLock.unlock();
 	}
 	
