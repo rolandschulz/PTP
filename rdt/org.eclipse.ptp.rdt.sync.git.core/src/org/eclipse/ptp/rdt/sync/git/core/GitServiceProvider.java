@@ -55,7 +55,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private boolean hasBeenSynced = false;
 
 	private static final ReentrantLock syncLock = new ReentrantLock();
-	private final ReentrantLock providerLock = new ReentrantLock();
 	private Integer fWaitingThreadsCount = 0;
 	private Integer syncTaskId = -1; // ID for most recent synchronization task, functions as a time-stamp
 	private int finishedSyncTaskId = -1; // all synchronizations up to this ID (including it) have finished
@@ -464,11 +463,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setRemoteToolsConnection()
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
-		providerLock.lock();
 		fConnection = connection;
 		putString(GIT_CONNECTION_NAME, connection.getName());
-		// syncInfoChanged = true;
-		providerLock.unlock();
 	}
 
 	/*
@@ -477,11 +473,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setConfigLocation()
 	 */
 	public void setConfigLocation(String configLocation) {
-		providerLock.lock();
 		fLocation = configLocation;
 		putString(GIT_LOCATION, configLocation);
-		// syncInfoChanged = true;
-		providerLock.unlock();
 	}
 	
 	@Override
