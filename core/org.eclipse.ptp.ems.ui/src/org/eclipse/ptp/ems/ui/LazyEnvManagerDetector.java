@@ -24,6 +24,7 @@ import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.ems.internal.ui.EMSUIPlugin;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -66,13 +67,18 @@ public class LazyEnvManagerDetector implements IEnvManager {
 
 	private IEnvManager ensureEnvManagerDetected() {
 		if (envManager == null) {
-			GetEnvManagerRunnable runnable = new GetEnvManagerRunnable();
-			try {
-				new ProgressMonitorDialog(shell).run(true, true, runnable);
-			} catch (InvocationTargetException e) {
-				EMSUIPlugin.log(e);
-			} catch (InterruptedException e) {
-			}
+			final GetEnvManagerRunnable runnable = new GetEnvManagerRunnable();
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						new ProgressMonitorDialog(shell).run(true, true, runnable);
+					} catch (InvocationTargetException e) {
+						EMSUIPlugin.log(e);
+					} catch (InterruptedException e) {
+					}
+				}
+			});
 			envManager = runnable.getResult();
 		}
 		return envManager;
