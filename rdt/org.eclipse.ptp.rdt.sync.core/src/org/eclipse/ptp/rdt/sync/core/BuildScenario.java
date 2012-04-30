@@ -10,8 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.net.URI;
 import java.util.Map;
 
+import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
@@ -63,10 +66,20 @@ public class BuildScenario {
 
 	/**
 	 * Get location (directory)
+	 * 
 	 * @return location (directory)
+	 * 
+	 * @deprecated as of 6.0.0, replaced by {@link #getLocation(IProject)}
+	 *   The new function supports the use of path variables, such as the project location, useful for project relocation
+	 *   (see bug 371507). Such support is not possible, though, without project information.
 	 */
-	public String getLocation() {
+	@Deprecated public String getLocation() {
 		return location;
+	}
+	
+	public String getLocation(IProject project) {
+		URI locationURI = URIUtil.toURI(location);
+		return project.getPathVariableManager().resolveURI(locationURI).toString();
 	}
 	
 	/**

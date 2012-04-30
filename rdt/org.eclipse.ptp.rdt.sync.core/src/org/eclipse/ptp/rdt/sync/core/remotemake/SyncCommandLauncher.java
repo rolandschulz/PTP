@@ -142,7 +142,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		String projectWorkspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString()
 				+ getProject().getFullPath().toPortableString();
 		String projectActualRoot = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration)
-				.getLocation();
+				.getLocation(getProject());
 		changeToDirectory = new Path(changeToDirectory.toString().replaceFirst(projectWorkspaceRoot, projectActualRoot));
 		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
 

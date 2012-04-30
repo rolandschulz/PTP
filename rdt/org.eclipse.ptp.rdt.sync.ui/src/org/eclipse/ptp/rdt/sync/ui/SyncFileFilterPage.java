@@ -622,7 +622,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 				// System error handled by BuildConfigurationManager
 				remoteFiles = null;
 			} else {
-				remoteFiles = new RemoteContentProvider(bs.getRemoteConnection(), new Path(bs.getLocation()), project);
+				remoteFiles = new RemoteContentProvider(bs.getRemoteConnection(), new Path(bs.getLocation(project)), project);
 			}
 		}
 

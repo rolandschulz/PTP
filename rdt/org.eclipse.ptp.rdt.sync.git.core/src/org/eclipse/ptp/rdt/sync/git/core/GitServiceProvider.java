@@ -341,7 +341,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				ProjectAndScenario pas = new ProjectAndScenario(project, buildScenario);
 				if (!syncConnectionMap.containsKey(pas)) {
 					syncConnectionMap.put(pas, new GitRemoteSyncConnection(project, buildScenario.getRemoteConnection(),
-							project.getLocation().toString(), buildScenario.getLocation(), fileFilter, progress));
+							project.getLocation().toString(), buildScenario.getLocation(project), fileFilter, progress));
 				}
 				GitRemoteSyncConnection fSyncConnection = syncConnectionMap.get(pas);
 				fSyncConnection.setFileFilter(fileFilter);
