@@ -64,6 +64,7 @@ public class BuildConfigurationManager {
 	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String configSyncDataStorageName = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String TEMPLATE_KEY = "template-service-configuration"; //$NON-NLS-1$
+	private static final String projectLocationPathVariable = "${project_loc:}"; //$NON-NLS-1$
 	
 	// Setup as a singleton
 	private BuildConfigurationManager() {
@@ -98,7 +99,7 @@ public class BuildConfigurationManager {
 		if (localService != null) {
 			IRemoteConnection localConnection = localService.getConnectionManager().getConnection("Local"); //$NON-NLS-1$
 			if (localConnection != null) {
-				return new BuildScenario(null, localConnection, project.getLocation().toString());
+				return new BuildScenario(null, localConnection, projectLocationPathVariable);
 			} else {
 				throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.sync.core", //$NON-NLS-1$
 						Messages.BCM_LocalConnectionError));
