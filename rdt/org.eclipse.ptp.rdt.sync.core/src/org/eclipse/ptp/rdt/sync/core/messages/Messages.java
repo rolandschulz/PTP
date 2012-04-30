@@ -94,6 +94,8 @@ public class Messages extends NLS {
 
 	public static String BuildConfigurationManager_9;
 
+	public static String BuildScenario_0;
+
 	public static String BCM_GetBuildInfoError;
 
 	public static String PathResourceMatcher_0;

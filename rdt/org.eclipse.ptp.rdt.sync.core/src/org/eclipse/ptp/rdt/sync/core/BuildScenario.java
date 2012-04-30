@@ -14,7 +14,9 @@ import java.net.URI;
 import java.util.Map;
 
 import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
@@ -77,9 +79,49 @@ public class BuildScenario {
 		return location;
 	}
 	
+	/**
+	 * Get location (directory), resolved in terms of the passed project
+	 *
+	 * @param project
+	 * @return
+	 */
 	public String getLocation(IProject project) {
-		URI locationURI = URIUtil.toURI(location);
-		return project.getPathVariableManager().resolveURI(locationURI).toString();
+		return resolveString(project, location);
+	}
+	
+	/**
+	 * Utility function to resolve a string based on path variables for a certain project. Unless string is in the form:
+	 * ${path_variable:/remainder}, where "path_variable" is a path variable defined for the project, the original string
+	 * is returned unchanged.
+	 *
+	 * The Eclipse platform should provide a standard mechanism for doing this, but various combinations of URIUtil and
+	 * PathVariableManager methods failed.
+	 *
+	 * @param project
+	 * @return resolved string
+	 */
+	public static String resolveString(IProject project, String path) {
+		// Check basic syntax
+		if (!path.startsWith("${") || !path.endsWith("}")) { //$NON-NLS-1$ //$NON-NLS-2$
+			return path;
+		}
+
+		String newPath = path.substring(2, path.length()-1);
+		
+		// Extract variable's value
+		String variable = newPath.split(":")[0]; //$NON-NLS-1$
+		IPathVariableManager pvm = project.getPathVariableManager();
+		String value = pvm.getURIValue(variable.toUpperCase()).toString();
+		if (value == null) {
+			return path;
+		}
+		
+		// Build and return new path
+		value = value.replaceFirst("file:", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		if (value.endsWith("/") || value.endsWith("\\")) { //$NON-NLS-1$ //$NON-NLS-2$
+			value = value.substring(0, path.length()-1);
+		}
+		return newPath.replaceFirst(variable + ":*", value); //$NON-NLS-1$
 	}
 	
 	/**
