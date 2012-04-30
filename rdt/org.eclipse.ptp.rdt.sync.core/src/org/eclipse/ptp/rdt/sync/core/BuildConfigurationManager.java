@@ -310,49 +310,6 @@ public class BuildConfigurationManager {
 	}
 	
 	/**
-	 * This function handles project add events for existing sync projects. These events include moving and copying sync projects.
-	 * Note: Normally clients should not call this function. It is intended only for internal use to handle add requests from the
-	 * Eclipse system. For creating new sync projects, use "initProject".
-	 *
-	 * Note: This function constructs a unique template service configuration for the project and returns it. Clients probably
-	 * should make it the active configuration for the project in the service model manager.
-	 *
-	 * @param newProject - cannot be null and must be a sync project.
-	 * @param delta - the delta reported by Eclipse for the "ADDED" event.
-	 * @return the template service configuration created for the new project or null if project did not previously exist.
-	 */
-	public void addProjectFromSystem(IProject newProject, IResourceDelta delta) {
-		if (newProject == null) {
-			throw new NullPointerException();
-		}
-
-		// Cannot call "checkProject" because project may not yet be initialized
-		try {
-			if (!newProject.hasNature(RemoteSyncNature.NATURE_ID)) {
-				throw new IllegalArgumentException(Messages.BuildConfigurationManager_6);
-			}
-		} catch (CoreException e) {
-			throw new IllegalArgumentException(Messages.BuildConfigurationManager_8);
-		}
-		
-		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(newProject);
-		if (buildInfo == null) {
-			throw new RuntimeException(Messages.BCM_BuildInfoError + newProject.getName());
-		}
-
-		// The "Workspace" configuration needs to be set to the new project location.
-		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
-		for (IConfiguration config : allConfigs) {
-			if (config.getName() != null && config.getName().equals(Messages.WorkspaceConfigName)) {
-				BuildScenario oldbs = this.getBuildScenarioForBuildConfiguration(config);
-				BuildScenario newbs = new BuildScenario(oldbs.getSyncProvider(), oldbs.getRemoteConnection(),
-						newProject.getLocation().toString());
-				this.setBuildScenarioForBuildConfigurationInternal(newbs, config);
-			}
-		}
-	}
-	
-	/**
 	 * Set the template service configuration for the given project to the given configuration
 	 * 
 	 * @param project

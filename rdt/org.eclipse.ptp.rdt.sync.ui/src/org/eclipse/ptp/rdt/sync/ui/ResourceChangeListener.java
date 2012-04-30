@@ -127,30 +127,19 @@ public class ResourceChangeListener {
 							}
 						}
 						// Post-change event
-						else {
-							// RDTSyncCorePlugin.log("Post-change event of kind: " + String.valueOf(delta.getKind()) + " on project " + project.getName()); //$NON-NLS-1$ //$NON-NLS-2$
-							if (delta.getKind() == IResourceDelta.ADDED) {
-								BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-								bcm.addProjectFromSystem(project, delta);
+						// Sync on all CHANGED events
+						else if (delta.getKind() == IResourceDelta.CHANGED) {
+							// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user has
+							// turned it off. This allows for some bookkeeping but no files are transferred.
+							if (syncMode == SYNC_MODE.UNAVAILABLE) {
+								continue;
+							} else if (!syncOn) {
+								SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
+							} else if (syncMode == SYNC_MODE.ALL) {
+								SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
+							} else if (syncMode == SYNC_MODE.ACTIVE) {
+								SyncManager.sync(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
 							}
-							
-							// Sync project on all changed events
-							else if (delta.getKind() == IResourceDelta.CHANGED) {
-								// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user has
-								// turned it off. This allows for some bookkeeping but no files are transferred.
-								if (syncMode == SYNC_MODE.UNAVAILABLE) {
-									continue;
-								} else if (!syncOn) {
-									SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
-								} else if (syncMode == SYNC_MODE.ALL) {
-									SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
-								} else if (syncMode == SYNC_MODE.ACTIVE) {
-									SyncManager.sync(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
-								}
-							}
-							
-							// Not interested in remove events. For now, do not remove information about projects.
-							// Note: If implemented, be careful about move events. New project needs old project information.
 						}
 					} catch (CoreException e){
 						// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
