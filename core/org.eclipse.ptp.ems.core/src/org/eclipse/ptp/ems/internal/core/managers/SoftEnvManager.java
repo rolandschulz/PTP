@@ -19,6 +19,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.internal.core.Messages;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
@@ -46,14 +47,14 @@ public final class SoftEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public boolean checkForCompatibleInstallation() throws RemoteConnectionException, IOException {
-		return getDescription() != null;
+	public boolean checkForCompatibleInstallation(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+		return getDescription(pm) != null;
 	}
 
 	@Override
-	public String getDescription() throws RemoteConnectionException, IOException {
+	public String getDescription(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		final Pattern pattern = Pattern.compile("^softenv is part of SoftEnv version ([^ \t\r\n]+).*"); //$NON-NLS-1$
-		final List<String> output = runCommand(true, "bash", "--login", "-c", "softenv -v"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final List<String> output = runCommand(pm, true, "bash", "--login", "-c", "softenv -v"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		if (output == null) {
 			return null;
 		} else {
@@ -73,10 +74,10 @@ public final class SoftEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public Set<String> determineAvailableElements() throws RemoteConnectionException, IOException {
+	public Set<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		// NOTE: A clean exit is NOT required because -- for reasons I don't understand -- softenv -x may deliver
 		// complete output, but Remote Tools does not think it has terminated and will hang until timeout
-		final List<String> output = runCommand(false, "bash", "--login", "-c", "softenv -x; exit"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final List<String> output = runCommand(pm, false, "bash", "--login", "-c", "softenv -x; exit"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		if (output == null) {
 			return Collections.<String> emptySet();
 		} else {
@@ -102,7 +103,7 @@ public final class SoftEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public Set<String> determineDefaultElements() throws RemoteConnectionException, IOException {
+	public Set<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		return Collections.<String> emptySet();
 	}
 

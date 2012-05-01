@@ -180,7 +180,7 @@ public class WidgetBuilderUtils {
 				buttonLabel.setToolTipText(tooltip);
 			}
 		}
-		final EnvManagerConfigButton button = new EnvManagerConfigButton(parent, getRemoteServices(resourceManager), getConnection(resourceManager));
+		final EnvManagerConfigButton button = new EnvManagerConfigButton(parent, getConnection(resourceManager));
 		if (label != null) {
 			button.setText(label);
 		}
@@ -191,20 +191,12 @@ public class WidgetBuilderUtils {
 		return button;
 	}
 
-	private static IRemoteServices getRemoteServices(IJAXBResourceManager rm) {
-		if (rm == null) {
-			return null;
-		} else {
-			return PTPRemoteCorePlugin.getDefault().getRemoteServices(rm.getControlConfiguration().getRemoteServicesId(), null);
-		}
-	}
-
 	private static IRemoteConnection getConnection(IJAXBResourceManager rm) {
 		if (rm == null) {
 			return null;
 		} else {
 			final String connName = rm.getControlConfiguration().getConnectionName();
-			final IRemoteServices rsrv = getRemoteServices(rm);
+			final IRemoteServices rsrv = PTPRemoteCorePlugin.getDefault().getRemoteServices(rm.getControlConfiguration().getRemoteServicesId(), null);
 			if (rsrv == null) {
 				return null;
 			} else {

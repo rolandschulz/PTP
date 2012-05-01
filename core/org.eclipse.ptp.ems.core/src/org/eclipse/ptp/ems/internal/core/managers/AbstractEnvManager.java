@@ -25,7 +25,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.ems.internal.core.EMSCorePlugin;
@@ -39,8 +39,10 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 /**
  * Base class for implementations of {@link IEnvManager}.
  * <p>
- * Provides default implementations of {@link #getID()} and {@link #setCallback(IEnvManagerCallback)} as well as a utility method
- * {@link #getCallback()} for use by subclasses.
+ * Provides default implementations of {@link #configure(IRemoteConnection)},
+ * {@link #createBashScript(IProgressMonitor, boolean, IEnvManagerConfig, String)},
+ * {@link #getBashConcatenation(String, boolean, IEnvManagerConfig, String)}, and {@link #getComparator()}, as well as several
+ * protected-visibility utility methods for use by subclasses.
  * 
  * @author Jeff Overbey
  */
@@ -59,9 +61,6 @@ public abstract class AbstractEnvManager implements IEnvManager {
 		}
 	};
 
-	/** {@link IRemoteServices} used to access files and execute shell commands on the remote machine. */
-	private IRemoteServices remoteServices = null;
-
 	/** {@link IRemoteConnection} used to access files and execute shell commands on the remote machine. */
 	private IRemoteConnection remoteConnection = null;
 
@@ -78,33 +77,31 @@ public abstract class AbstractEnvManager implements IEnvManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.ems.core.IEnvManager#configure(org.eclipse.ptp.remote.core.IRemoteServices,
-	 * org.eclipse.ptp.remote.core.IRemoteConnection)
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#configure(org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	@Override
-	public final void configure(IRemoteServices remoteServices, IRemoteConnection remoteConnection) {
-		if (remoteServices == null || remoteConnection == null) {
-			throw new IllegalArgumentException("remoteServices and connection must both be non-null"); //$NON-NLS-1$
+	public final void configure(IRemoteConnection remoteConnection) {
+		if (remoteConnection == null) {
+			throw new IllegalArgumentException("remoteConnection must be non-null"); //$NON-NLS-1$
 		}
 
-		this.remoteServices = remoteServices;
 		this.remoteConnection = remoteConnection;
 	}
 
 	/**
-	 * @return the {@link IRemoteServices} previously set using {@link #setRemoteServices(IRemoteServices)} (may be
-	 *         <code>null</code>)
+	 * @return the {@link IRemoteServices} corresponding to the remote connection previously set using
+	 *         {@link #configure(IRemoteConnection)} (may be <code>null</code>)
 	 */
 	protected final IRemoteServices getRemoteServices() {
-		if (remoteServices == null) {
-			throw new IllegalStateException("remoteServices cannot be null"); //$NON-NLS-1$
+		if (remoteConnection == null) {
+			throw new IllegalStateException("remoteConnection cannot be null"); //$NON-NLS-1$
 		}
 
-		return this.remoteServices;
+		return this.remoteConnection.getRemoteServices();
 	}
 
 	/**
-	 * @return the {@link IRemoteServices} previously set using {@link #setRemoteServices(IRemoteServices)} (may be
+	 * @return the {@link IRemoteConnection} object previously set using {@link #configure(IRemoteConnection)} (may be
 	 *         <code>null</code>)
 	 */
 	protected final IRemoteConnection getRemoteConnection() {
@@ -116,8 +113,7 @@ public abstract class AbstractEnvManager implements IEnvManager {
 	}
 
 	/**
-	 * Runs the given command on the remote machine that has been configured by
-	 * {@link #configure(IRemoteServices, IRemoteConnection)}.
+	 * Runs the given command on the remote machine that has been configured by {@link #configure(IRemoteConnection)}.
 	 * 
 	 * @param requireCleanExit
 	 *            if <code>true</code>, then an empty list will be returned if the process completes with a non-zero exit code or is
@@ -129,13 +125,13 @@ public abstract class AbstractEnvManager implements IEnvManager {
 	 *         standard output or standard error.
 	 * 
 	 * @throws NullPointerException
-	 *             if {@link #configure(IRemoteServices, IRemoteConnection)} has not been called
+	 *             if {@link #configure(IRemoteConnection)} has not been called
 	 * @throws RemoteConnectionException
 	 * @throws IOException
 	 */
-	protected final List<String> runCommand(boolean requireCleanExit, String... command) throws RemoteConnectionException,
+	protected final List<String> runCommand(IProgressMonitor pm, boolean requireCleanExit, String... command) throws RemoteConnectionException,
 			IOException {
-		final IRemoteProcessBuilder processBuilder = createRemoteProcessBuilder(command);
+		final IRemoteProcessBuilder processBuilder = createRemoteProcessBuilder(pm, command);
 		if (processBuilder == null) {
 			return null;
 		}
@@ -170,7 +166,7 @@ public abstract class AbstractEnvManager implements IEnvManager {
 		return p.isCompleted();
 	}
 
-	private IRemoteProcessBuilder createRemoteProcessBuilder(String... command) throws RemoteConnectionException {
+	private IRemoteProcessBuilder createRemoteProcessBuilder(IProgressMonitor pm, String... command) throws RemoteConnectionException {
 		final IRemoteConnection connection = getRemoteConnection();
 		if (connection == null) {
 			return null;
@@ -185,7 +181,7 @@ public abstract class AbstractEnvManager implements IEnvManager {
 		}
 
 		if (!connection.isOpen()) {
-			connection.open(new NullProgressMonitor());
+			connection.open(pm);
 		}
 
 		return remoteServices.getProcessBuilder(connection, command);
@@ -299,16 +295,16 @@ public abstract class AbstractEnvManager implements IEnvManager {
 	 * java.lang.String)
 	 */
 	@Override
-	public String createBashScript(boolean echo, IEnvManagerConfig config, String commandToExecuteAfterward)
+	public String createBashScript(IProgressMonitor pm, boolean echo, IEnvManagerConfig config, String commandToExecuteAfterward)
 			throws RemoteConnectionException, IOException {
-		final String pathToTempFile = createTempFile();
+		final String pathToTempFile = createTempFile(pm);
 		checkTempFile(pathToTempFile);
 		writeBashScript(echo, pathToTempFile, config, commandToExecuteAfterward);
 		return pathToTempFile;
 	}
 
-	private String createTempFile() throws RemoteConnectionException, IOException {
-		final List<String> output = runCommand(true, "mktemp", "-qt", "ptpscript_XXXXXX"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private String createTempFile(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+		final List<String> output = runCommand(pm, true, "mktemp", "-qt", "ptpscript_XXXXXX"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (output.size() != 1) {
 			throw new IOException("Unexpected output from mktemp -t ptpscript"); //$NON-NLS-1$
 		}

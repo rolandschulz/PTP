@@ -198,6 +198,7 @@ public interface ILguiItem {
 	 * 
 	 * @return string
 	 */
+	@Override
 	public String toString();
 
 	/**

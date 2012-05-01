@@ -19,6 +19,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.internal.core.Messages;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
@@ -46,14 +47,14 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public boolean checkForCompatibleInstallation() throws RemoteConnectionException, IOException {
-		return getDescription() != null;
+	public boolean checkForCompatibleInstallation(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+		return getDescription(pm) != null;
 	}
 
 	@Override
-	public String getDescription() throws RemoteConnectionException, IOException {
+	public String getDescription(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		final Pattern pattern = Pattern.compile("^  Modules Release ([^ \t\r\n]+).*"); //$NON-NLS-1$
-		final List<String> output = runCommand(true, "bash", "--login", "-c", "module help"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final List<String> output = runCommand(pm, true, "bash", "--login", "-c", "module help"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		if (output == null) {
 			return null;
 		} else {
@@ -73,8 +74,8 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public Set<String> determineAvailableElements() throws RemoteConnectionException, IOException {
-		final List<String> output = runCommand(true, "bash", "--login", "-c", "module -t avail"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	public Set<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+		final List<String> output = runCommand(pm, true, "bash", "--login", "-c", "module -t avail"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		if (output == null) {
 			return Collections.<String> emptySet();
 		} else {
@@ -146,8 +147,8 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public Set<String> determineDefaultElements() throws RemoteConnectionException, IOException {
-		final List<String> output = runCommand(true, "bash", "--login", "-c", "module -t list"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	public Set<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+		final List<String> output = runCommand(pm, true, "bash", "--login", "-c", "module -t list"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		if (output == null) {
 			return Collections.<String> emptySet();
 		} else {

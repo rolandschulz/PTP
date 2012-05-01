@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -585,7 +586,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * process script
 		 */
 		ScriptType script = controlData.getScript();
-		boolean delScript = maybeHandleScript(uuid, script);
+		boolean delScript = maybeHandleScript(uuid, script, progress.newChild(0));
 		worked(progress, 20);
 
 		List<ManagedFilesType> files = controlData.getManagedFiles();
@@ -917,7 +918,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 *            configuration object describing how to construct the script from the environment
 	 * @return whether the script target should be deleted
 	 */
-	private boolean maybeHandleScript(String uuid, ScriptType script) {
+	private boolean maybeHandleScript(String uuid, ScriptType script, IProgressMonitor monitor) {
 		PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
 		if (p != null && p.getValue() != null) {
 			return false;
@@ -925,7 +926,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (script == null) {
 			return false;
 		}
-		rmVarMap.setEnvManager(EnvManagerRegistry.getEnvManager(getRemoteServices(), getRemoteConnection()));
+		rmVarMap.setEnvManager(EnvManagerRegistry.getEnvManager(monitor, getRemoteConnection()));
 		ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, launchEnv, false);
 		job.schedule();
 		try {
@@ -935,13 +936,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		return script.isDeleteAfterSubmit();
 	}
 
-	private IRemoteServices getRemoteServices() {
-		return PTPRemoteCorePlugin.getDefault().getRemoteServices(getControlConfiguration().getRemoteServicesId(), null);
-	}
-
 	private IRemoteConnection getRemoteConnection() {
 		final String connName = getControlConfiguration().getConnectionName();
-		final IRemoteServices rsrv = getRemoteServices();
+		final IRemoteServices rsrv = PTPRemoteCorePlugin.getDefault().getRemoteServices(getControlConfiguration().getRemoteServicesId(), null);
 		if (rsrv == null) {
 			return null;
 		} else {
@@ -1141,8 +1138,20 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		rmVarMap.overwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_ARGS, JAXBControlConstants.DEBUGGER_ARGS, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.PTP_DIRECTORY, JAXBControlConstants.PTP_DIRECTORY, lcattr);
+
+		/*
+		 * update the dynamic properties
+		 */
+		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, (String) null);
+		if (attr != null) {
+			PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.DEBUGGER_ARGS);
+			if (p == null) {
+				p = new PropertyType();
+				rmVarMap.put(JAXBControlConstants.DEBUGGER_ARGS, p);
+			}
+			p.setValue(attr);
+		}
 
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));

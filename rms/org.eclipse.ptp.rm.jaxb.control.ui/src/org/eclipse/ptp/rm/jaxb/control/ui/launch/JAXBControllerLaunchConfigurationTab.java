@@ -19,7 +19,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.ems.core.EnvManagerRegistry;
+import org.eclipse.ptp.ems.core.IEnvManager;
+import org.eclipse.ptp.ems.ui.LazyEnvManagerDetector;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -43,6 +44,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * Implementation of the parent tab. It displays the children inside the tab folder, and relays updates to them.<br>
@@ -101,7 +103,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 					addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(rm, dialog, importTab, this));
 				}
 			}
-			lcMap = new LCVariableMap(EnvManagerRegistry.getEnvManager(getRemoteServices(rm), getConnection(rm)));
+			lcMap = new LCVariableMap(getEnvManager(rm));
 		} else {
 			getControllers().clear();
 			launchTabData = null;
@@ -110,12 +112,9 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		}
 	}
 
-	private static IRemoteServices getRemoteServices(IJAXBResourceManager rm) {
-		if (rm == null) {
-			return null;
-		} else {
-			return PTPRemoteCorePlugin.getDefault().getRemoteServices(rm.getControlConfiguration().getRemoteServicesId(), null);
-		}
+	private IEnvManager getEnvManager(IJAXBResourceManager rm) {
+		Shell shell = getLaunchConfigurationDialog().getActiveTab().getControl().getShell();
+		return new LazyEnvManagerDetector(shell, getConnection(rm));
 	}
 
 	private static IRemoteConnection getConnection(IJAXBResourceManager rm) {
@@ -123,7 +122,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 			return null;
 		} else {
 			final String connName = rm.getControlConfiguration().getConnectionName();
-			final IRemoteServices rsrv = getRemoteServices(rm);
+			final IRemoteServices rsrv = PTPRemoteCorePlugin.getDefault().getRemoteServices(rm.getControlConfiguration().getRemoteServicesId(), null);
 			if (rsrv == null) {
 				return null;
 			} else {

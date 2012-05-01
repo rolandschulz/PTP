@@ -102,8 +102,7 @@ public class TableHandler extends LguiHandler {
 		for (int i = 0; i < widths.length; i++) {
 			for (final ColumnlayoutType column : lguiItem.getLayoutAccess()
 					.getLayoutColumsToCids(cids, gid)) {
-				if (column.getPos() != null
-						&& BigInteger.valueOf(i).equals(column.getPos())) {
+				if (column.getPos() != null && BigInteger.valueOf(i).equals(column.getPos()) && column.isActive()) {
 					column.setWidth(widths[i]);
 					break;
 				}

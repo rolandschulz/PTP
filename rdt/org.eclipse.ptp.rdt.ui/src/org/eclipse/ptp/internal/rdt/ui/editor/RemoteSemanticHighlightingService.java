@@ -18,6 +18,7 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInfoProviderFactory;
@@ -67,7 +68,18 @@ public class RemoteSemanticHighlightingService extends AbstractRemoteService imp
 		subsystem.checkProject(project, monitor);
 		
 		if(targetUnit instanceof TranslationUnit) {
-			IScannerInfo scannerInfo = RemoteIndexerInfoProviderFactory.getScannerInfo(unit.getResource());
+			IResource resource = unit.getResource();
+			
+			IScannerInfo scannerInfo = null;
+			
+			if(resource != null) {
+				scannerInfo = RemoteIndexerInfoProviderFactory.getScannerInfo(resource);
+			}
+			
+			else { // external file
+				scannerInfo = RemoteIndexerInfoProviderFactory.getScannerInfo(project);
+			}
+			
 			Map<String,String> langaugeProperties = null;
 			try {
 				String languageId = unit.getLanguage().getId();
