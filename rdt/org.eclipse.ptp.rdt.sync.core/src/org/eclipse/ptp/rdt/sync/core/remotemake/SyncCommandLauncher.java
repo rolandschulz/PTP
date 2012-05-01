@@ -139,11 +139,10 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		// Set correct directory
 		// For managed projects and configurations other than workspace, the directory is incorrect and needs to be fixed.
 		IConfiguration configuration = ManagedBuildManager.getBuildInfo(getProject()).getDefaultConfiguration();
-		String projectWorkspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString()
-				+ getProject().getFullPath().toPortableString();
+		String projectLocalRoot = getProject().getLocation().toPortableString();
 		String projectActualRoot = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration)
 				.getLocation(getProject());
-		changeToDirectory = new Path(changeToDirectory.toString().replaceFirst(projectWorkspaceRoot, projectActualRoot));
+		changeToDirectory = new Path(changeToDirectory.toString().replaceFirst(projectLocalRoot, projectActualRoot));
 		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
 
 		// Determine the service model for this configuration, and use the provider of the build service to execute the build
