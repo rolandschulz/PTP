@@ -29,7 +29,6 @@ import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
 import org.eclipse.cdt.managedbuilder.internal.core.ManagedProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -39,6 +38,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
@@ -50,6 +50,8 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.ptp.services.core.ServiceProvider;
+import org.eclipse.ui.XMLMemento;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
@@ -172,25 +174,90 @@ public class BuildConfigurationManager {
 
 	/**
 	 * Returns the service configuration set for the given build configuration, or null if it is unavailable.
-	 * As of Juno, the service configuration for every build configuration of a project is just the template. A redesign would just
-	 * have a "getConfigurationForProject" or maybe nothing, since the ServiceModelManager could be used directly.
+	 * As of 6.0.0, the service configuration for every build configuration of a project is the same - the project's template.
+	 * However, it still has to be copied and modified when given to clients (see note below).
 	 * 
 	 * @param bconf
 	 *            The build configuration - cannot be null
 	 * @return service configuration for the build configuration or null on problems retrieving the configuration.
+	 * @deprecated This method is inefficient and unnecessary. It is inefficient because it requires a copy of the project's
+	 * 				template service configuration. It is unnecessary because it is only used for information that is more easily
+	 *              obtained from the build scenario. Thus, {@link #getBuildScenarioForBuildConfiguration} should be used instead.
+	 * 				
 	 */
 	public IServiceConfiguration getConfigurationForBuildConfiguration(IConfiguration bconf) {
 		IProject project = bconf.getOwner().getProject();
 		checkProject(project);
-		
-		String configId = getTemplateServiceConfigurationId(project);
-		IServiceConfiguration config = ServiceModelManager.getInstance().getConfiguration(configId);
-		if (config == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_10 + configId + Messages.BuildConfigurationManager_11 + project.getName());
+
+		BuildScenario bs = this.getBuildScenarioForBuildConfiguration(bconf);
+		// Should never happen, but if it does do not continue. (Function call should have invoked error handling.)
+		if (bs == null) {
+			return null;
 		}
 		
-		return config;
+        IServiceConfiguration sconf = copyTemplateServiceConfiguration(project);
+        this.modifyServiceConfigurationForBuildScenario(sconf, project, bs);
+		return sconf;
 	}
+	
+    // Does the low-level work of creating a copy of a service configuration
+    // Returned configuration is never null.
+    // This method supports deprecated code and can be removed once {@link #getConfigurationForBuildConfiguration} is removed.
+    private IServiceConfiguration copyTemplateServiceConfiguration(IProject project) {
+            IServiceConfiguration newConfig = ServiceModelManager.getInstance().newServiceConfiguration(""); //$NON-NLS-1$
+            if (newConfig == null) {
+                    throw new RuntimeException(Messages.BuildConfigurationManager_15);
+            }
+            String oldConfigId = getTemplateServiceConfigurationId(project);
+            IServiceConfiguration oldConfig = ServiceModelManager.getInstance().getConfiguration(oldConfigId);
+            if (oldConfig == null) {
+                    RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_10 + oldConfigId + Messages.BuildConfigurationManager_11 + project.getName());
+                    return null;
+            }
+
+            for (IService service : oldConfig.getServices()) {
+                    ServiceProvider oldProvider = (ServiceProvider) oldConfig.getServiceProvider(service);
+                    try {
+                            // The memento creation methods seem the most robust way to copy state. It is more robust than
+                    	    // getProperties() and setProperties(), which saveState() and restoreState() use by default but which
+                    	    // can be overriden by subclasses.
+                            ServiceProvider newProvider = oldProvider.getClass().newInstance();
+                            XMLMemento oldProviderState = XMLMemento.createWriteRoot("provider"); //$NON-NLS-1$
+                            oldProvider.saveState(oldProviderState);
+                            newProvider.restoreState(oldProviderState);
+                            newConfig.setServiceProvider(service, newProvider);
+                    } catch (InstantiationException e) {
+                            throw new RuntimeException(Messages.BCM_ProviderError + oldProvider.getClass());
+                    } catch (IllegalAccessException e) {
+                            throw new RuntimeException(Messages.BCM_ProviderError + oldProvider.getClass());
+                    }
+            }
+
+            return newConfig;
+    }
+
+    // Does the low-level work of changing a service configuration for a new build scenario.
+    // This method supports deprecated code and can be removed once {@link #getConfigurationForBuildConfiguration} is removed.
+	private void modifyServiceConfigurationForBuildScenario(IServiceConfiguration sConfig, IProject project, BuildScenario bs) {
+		IService syncService = null; // Only set if sync service should be disabled
+		for (IService service : sConfig.getServices()) {
+			ServiceProvider provider = (ServiceProvider) sConfig.getServiceProvider(service);
+			if (provider instanceof IRemoteExecutionServiceProvider) {
+				// For local configuration, for example, that does not need to sync
+				if (provider instanceof ISyncServiceProvider && bs.getSyncProvider() == null) {
+					syncService = service;
+				} else {
+					((IRemoteExecutionServiceProvider) provider).setRemoteToolsConnection(bs.getRemoteConnection());
+					((IRemoteExecutionServiceProvider) provider).setConfigLocation(bs.getLocation(project));
+
+				}
+			}
+		}
+		if (syncService != null) {
+			sConfig.disable(syncService);
+		}
+	}
+
 
 	/**
 	 * Return the name of the sync provider for this project, as stored in the project's template service configuration.
