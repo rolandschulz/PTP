@@ -10,13 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
-import java.net.URI;
 import java.util.Map;
 
-import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
