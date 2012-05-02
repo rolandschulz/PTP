@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.ptp.rm.lml.monitor.core.listeners.IMonitorChangedListener;
@@ -33,6 +32,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -95,23 +96,37 @@ public class MonitorView extends ViewPart {
 		public int compare(Viewer viewer, Object e1, Object e2) {
 			String name1 = null;
 			String name2 = null;
-			if (e1 instanceof IRemoteConnection) {
-				name1 = ((IRemoteConnection) e1).getName();
+			if (e1 instanceof IMonitorControl) {
+				name1 = ((IMonitorControl) e1).getSystemType();
 			}
-			if (e2 instanceof IRemoteConnection) {
-				name2 = ((IRemoteConnection) e2).getName();
+			if (e2 instanceof IMonitorControl) {
+				name2 = ((IMonitorControl) e2).getSystemType();
 			}
 			if (name1 != null && name2 != null) {
-				return name1.compareTo(name2);
+				int res = name1.compareTo(name2);
+				if (res == 0) {
+					res = ((IMonitorControl) e1).getConnectionName().compareTo(((IMonitorControl) e2).getConnectionName());
+				}
+				return res;
 			}
 			return super.compare(viewer, e1, e2);
 		}
-
 	}
 
 	private TableViewer fViewer;
 	private final TableColumnLayout fTableColumnLayout = new TableColumnLayout();
 	private final MonitorChangedListener fMonitorChangedListener = new MonitorChangedListener();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.ViewPart#init(org.eclipse.ui.IViewSite)
+	 */
+	@Override
+	public void init(IViewSite site) throws PartInitException {
+		// TODO Auto-generated method stub
+		super.init(site);
+	}
 
 	@Override
 	public void createPartControl(Composite parent) {

@@ -11,7 +11,9 @@
 package org.eclipse.ptp.rm.launch.ui;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -22,6 +24,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.jobs.IJobControl;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.launch.ui.LaunchConfigurationTab;
 import org.eclipse.ptp.launch.ui.LaunchImages;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
@@ -32,6 +35,7 @@ import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
+import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
 import org.eclipse.ptp.rm.launch.RMLaunchPlugin;
 import org.eclipse.ptp.rm.launch.RMLaunchUtils;
 import org.eclipse.ptp.rm.launch.internal.ProviderInfo;
@@ -71,21 +75,24 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 */
 	public static final String TAB_ID = "org.eclipse.ptp.rm.launch.applicationLaunch.resourcesTab"; //$NON-NLS-1$
 
-	private Combo fSystemTypeCombo = null;
+	private Combo fSystemTypeCombo;
+	private final List<String> fProviders = new ArrayList<String>();
 	private boolean fDefaultConnection;
 
-	/**
+	/*
 	 * Job controller created when type is selected from the combo.
 	 */
-	private ILaunchController fSelectedLaunchControl = null;
-	/**
+	private ILaunchController fSelectedLaunchControl;
+	/*
 	 * Job controller with all necessary configuration information.
 	 */
-	private ILaunchController fLaunchControl = null;
+	private ILaunchController fLaunchControl;
 	private RemoteConnectionWidget fRemoteConnectionWidget;
-	private IRemoteConnection fRemoteConnection = null;
+	private IRemoteConnection fRemoteConnection;
 
-	// The composite that holds the RM's attributes for the launch configuration
+	/*
+	 * The composite that holds the RM's attributes for the launch configuration
+	 */
 	private ScrolledComposite launchAttrsScrollComposite;
 
 	private final Map<IJobControl, IRMLaunchConfigurationDynamicTab> fDynamicTabs = new HashMap<IJobControl, IRMLaunchConfigurationDynamicTab>();
@@ -142,6 +149,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		fSystemTypeCombo.add("Please select a target system template");
 		for (ProviderInfo provider : ProviderInfo.getProviders()) {
 			fSystemTypeCombo.add(provider.getName());
+			fProviders.add(provider.getName());
 		}
 		fSystemTypeCombo.addSelectionListener(new SelectionListener() {
 			@Override
@@ -239,20 +247,20 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		super.initializeFrom(configuration);
 
-		String rmType = getResourceManagerType(configuration);
-		String controlId = RMLaunchUtils.getControlId(configuration);
+		String rmType = LaunchUtils.getTemplateName(configuration);
+		String controlId = LaunchUtils.getResourceManagerUniqueName(configuration);
 		ProviderInfo provider = ProviderInfo.getProvider(rmType);
 		if (provider != null) {
 			if (fSelectedLaunchControl == null || !fSelectedLaunchControl.getControlId().equals(controlId)) {
 				fSelectedLaunchControl = RMLaunchUtils.getLaunchControl(provider.getName(), controlId);
-				fSystemTypeCombo.select(ProviderInfo.getProviders().lastIndexOf(provider) + 1);
+				fSystemTypeCombo.select(fProviders.lastIndexOf(provider.getName()) + 1);
 				updateEnablement();
 
 				/*
 				 * Initialize remote connection widget
 				 */
-				String remId = getRemoteServicesId(configuration);
-				String remName = getConnectionName(configuration);
+				String remId = LaunchUtils.getRemoteServicesId(configuration);
+				String remName = LaunchUtils.getConnectionName(configuration);
 				if (remId != null && remName != null) {
 					fRemoteConnectionWidget.setConnection(remId, remName);
 					fDefaultConnection = false;
@@ -299,10 +307,14 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		int index = fSystemTypeCombo.getSelectionIndex();
 		if (fLaunchControl != null && index > 0) {
 			ProviderInfo provider = ProviderInfo.getProviders().get(index - 1);
-			setResourceManagerType(configuration, provider.getName());
-			setResourceManagerUniqueName(configuration, fLaunchControl.getControlId());
-			setConnectionName(configuration, fLaunchControl.getConnectionName());
-			setRemoteServicesId(configuration, fLaunchControl.getRemoteServicesId());
+			LaunchUtils.setTemplateName(configuration, provider.getName());
+			LaunchUtils.setResourceManagerUniqueName(configuration, fLaunchControl.getControlId());
+			LaunchUtils.setConnectionName(configuration, fLaunchControl.getConnectionName());
+			LaunchUtils.setRemoteServicesId(configuration, fLaunchControl.getRemoteServicesId());
+			MonitorType monitorData = fLaunchControl.getConfiguration().getMonitorData();
+			if (monitorData != null) {
+				LaunchUtils.setSystemType(configuration, monitorData.getSchedulerType());
+			}
 			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl);
 			if (dynamicTab == null) {
 				setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { fLaunchControl
@@ -356,7 +368,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	private void rmTypeSelectionChanged() {
 		int i = fSystemTypeCombo.getSelectionIndex();
 		if (i > 0) {
-			String controlId = RMLaunchUtils.getControlId(getLaunchConfiguration());
+			String controlId = LaunchUtils.getResourceManagerUniqueName(getLaunchConfiguration());
 			if (fSelectedLaunchControl == null || !fSelectedLaunchControl.getControlId().equals(controlId)) {
 				ProviderInfo provider = ProviderInfo.getProviders().get(i - 1);
 				final ILaunchController control = RMLaunchUtils.getLaunchControl(provider.getName(), controlId);

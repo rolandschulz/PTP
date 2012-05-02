@@ -26,6 +26,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -151,9 +152,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug
-	 * .core.ILaunchConfiguration)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug .core.ILaunchConfiguration)
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration configuration) {
@@ -229,7 +228,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 	 * Show a dialog that lets the user select a working directory
 	 */
 	protected void handleWorkingDirBrowseButtonSelected() {
-		IResourceManager rm = getResourceManager(getLaunchConfiguration());
+		IResourceManager rm = LaunchUtils.getResourceManager(getLaunchConfiguration());
 		if (rm != null) {
 			IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
 			IRemoteServices remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),

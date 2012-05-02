@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.launch.LaunchUtils;
+import org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.launch.rulesengine.OverwritePolicies;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -95,7 +95,7 @@ public class UploadRuleAction implements IRuleAction {
 
 			IPath localPath = localPaths[i];
 
-			IRemoteFileManager localFileManager = LaunchUtils.getLocalFileManager(fConfiguration);
+			IRemoteFileManager localFileManager = AbstractParallelLaunchConfigurationDelegate.getLocalFileManager(fConfiguration);
 			IFileStore localFileStore = localFileManager.getResource(localPath.toString());
 			IFileInfo localFileInfo = localFileStore.fetchInfo(EFS.NONE, progress.newChild(5));
 
@@ -111,7 +111,8 @@ public class UploadRuleAction implements IRuleAction {
 			IPath remotePath = remotePathParent.append(localPath.lastSegment());
 
 			// Generate the FileStore for the remote path
-			IRemoteFileManager remoteFileManager = LaunchUtils.getRemoteFileManager(fConfiguration, progress.newChild(5));
+			IRemoteFileManager remoteFileManager = AbstractParallelLaunchConfigurationDelegate.getRemoteFileManager(fConfiguration,
+					progress.newChild(5));
 			IFileStore remoteFileStore = remoteFileManager.getResource(remotePath.toString());
 
 			/*

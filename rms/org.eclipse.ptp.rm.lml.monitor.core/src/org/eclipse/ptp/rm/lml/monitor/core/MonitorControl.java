@@ -23,8 +23,14 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.jobs.IJobAddedEvent;
+import org.eclipse.ptp.core.jobs.IJobChangedEvent;
+import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -101,6 +107,16 @@ public class MonitorControl extends LaunchController implements IMonitorControl 
 		}
 	}
 
+	private class JobListener implements IJobListener {
+		public void handleEvent(IJobAddedEvent e) {
+			addJob(e.getJobStatus());
+		}
+
+		public void handleEvent(IJobChangedEvent e) {
+			updateJob(e.getJobStatus());
+		}
+	}
+
 	/*
 	 * needs to be parameter
 	 */
@@ -108,7 +124,9 @@ public class MonitorControl extends LaunchController implements IMonitorControl 
 
 	private MonitorJob fMonitorJob;
 
+	private final String fMonitorId;
 	private final LMLManager fLMLManager = LMLManager.getInstance();
+	private final JobListener fJobListener = new JobListener();
 	private String fSavedLayout = new String();
 	private JobStatusData[] fSavedJobs;
 	private Map<String, List<IPattern>> fSavedPattern;
@@ -143,11 +161,12 @@ public class MonitorControl extends LaunchController implements IMonitorControl 
 	private static final String SYSTEM_TYPE_ATTR = "systemType";//$NON-NLS-1$;
 	private static final String MONITOR_STATE = "monitorState";//$NON-NLS-1$;
 
-	public MonitorControl() {
+	public MonitorControl(String monitorId) {
+		fMonitorId = monitorId;
 	}
 
 	public String getMonitorId() {
-		return getRemoteServicesId() + "_" + getConnectionName() + "_" + getSystemType(); //$NON-NLS-1$//$NON-NLS-2$
+		return fMonitorId;
 	}
 
 	public String getSystemType() {
@@ -272,6 +291,8 @@ public class MonitorControl extends LaunchController implements IMonitorControl 
 					}
 					fMonitorJob.schedule();
 				}
+
+				JobManager.getInstance().addListener(fJobListener);
 			} finally {
 				if (monitor != null) {
 					monitor.done();
@@ -288,6 +309,8 @@ public class MonitorControl extends LaunchController implements IMonitorControl 
 	@Override
 	public void stop() throws CoreException {
 		if (isActive()) {
+			JobManager.getInstance().removeListener(fJobListener);
+
 			fLMLManager.closeLgui(getMonitorId());
 
 			synchronized (this) {
@@ -411,25 +434,34 @@ public class MonitorControl extends LaunchController implements IMonitorControl 
 		memento.putBoolean(MONITOR_STATE, isActive());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doAddJob(org.eclipse.ptp.core.jobs.IJobStatus)
-	 */
-	protected void doAddJob(IJobStatus status) {
-		final JobStatusData data = new JobStatusData(status.getJobId(), status.getControlId(), status.getQueueName(),
-				status.getOwner(), status.getOutputPath(), status.getErrorPath(), status.isInteractive());
-		data.setState(status.getState());
-		data.setStateDetail(status.getStateDetail());
-		fLMLManager.addUserJob(getMonitorId(), status.getJobId(), data);
+	private void addJob(IJobStatus status) {
+		String monitorId = getMonitorId(status);
+		if (monitorId != null && monitorId.equals(getMonitorId())) {
+			final JobStatusData data = new JobStatusData(status.getJobId(), status.getControlId(), status.getQueueName(),
+					status.getOwner(), status.getOutputPath(), status.getErrorPath(), status.isInteractive());
+			data.setState(status.getState());
+			data.setStateDetail(status.getStateDetail());
+			fLMLManager.addUserJob(getMonitorId(), status.getJobId(), data);
+		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doUpdateJob(org.eclipse.ptp.core.jobs.IJobStatus)
-	 */
-	protected void doUpdateJob(IJobStatus status) {
-		fLMLManager.updateUserJob(getMonitorId(), status.getJobId(), status.getState(), status.getStateDetail());
+	private void updateJob(IJobStatus status) {
+		String monitorId = getMonitorId(status);
+		if (monitorId != null && monitorId.equals(getMonitorId())) {
+			fLMLManager.updateUserJob(getMonitorId(), status.getJobId(), status.getState(), status.getStateDetail());
+		}
+	}
+
+	private String getMonitorId(IJobStatus status) {
+		ILaunchConfiguration configuration = status.getLaunchConfiguration();
+		if (configuration != null) {
+			String connectionName = LaunchUtils.getConnectionName(configuration);
+			String remoteServicesId = LaunchUtils.getRemoteServicesId(configuration);
+			String monitorType = LaunchUtils.getSystemType(configuration);
+			if (connectionName != null && remoteServicesId != null && monitorType != null) {
+				return MonitorControlManager.generateMonitorId(remoteServicesId, connectionName, monitorType);
+			}
+		}
+		return null;
 	}
 }

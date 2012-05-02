@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -36,26 +38,41 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.eclipse.debug.ui.DebugUITools;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.jobs.IJobAddedEvent;
 import org.eclipse.ptp.core.jobs.IJobChangedEvent;
-import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
+import org.eclipse.ptp.core.util.LaunchUtils;
+import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.launch.LaunchUtils;
+import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 import org.eclipse.ptp.launch.rulesengine.RuleActionFactory;
 import org.eclipse.ptp.launch.rulesengine.RuleFactory;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
+import org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl;
+import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 
 /**
  *
@@ -109,14 +126,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	private class JobSubmission extends Job {
 		private final IPLaunch fLaunch;
 		private final IPDebugger fDebugger;
-		private final IJobControl fJobControl;
+		private final ILaunchController fLaunchControl;
 		private final ReentrantLock fSubLock = new ReentrantLock();
 		private final Condition fSubCondition = fSubLock.newCondition();
 
-		public JobSubmission(IPLaunch launch, IJobControl control, IPDebugger debugger) {
+		public JobSubmission(IPLaunch launch, ILaunchController control, IPDebugger debugger) {
 			super(launch.getJobId());
 			fLaunch = launch;
-			fJobControl = control;
+			fLaunchControl = control;
 			fDebugger = debugger;
 			setSystem(true);
 		}
@@ -142,7 +159,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				String jobId = fLaunch.getJobId();
 				fSubLock.lock();
 				try {
-					while (fJobControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
+					while (fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
 							&& !subMon.isCanceled()) {
 						try {
 							fSubCondition.await(100, TimeUnit.MILLISECONDS);
@@ -160,7 +177,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 
 					fSubLock.lock();
 					try {
-						while (!fJobControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
+						while (!fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
 								&& !subMon.isCanceled()) {
 							try {
 								fSubCondition.await(1000, TimeUnit.MILLISECONDS);
@@ -191,6 +208,12 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						 */
 						doCleanupLaunch(fLaunch);
 
+						try {
+							fLaunchControl.stop();
+						} catch (CoreException e) {
+							// Nothing we can do now
+						}
+
 						/*
 						 * Remove job submission
 						 */
@@ -209,6 +232,36 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				}
 			}
 		}
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public static IRemoteFileManager getLocalFileManager(ILaunchConfiguration configuration) throws CoreException {
+		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
+		assert (localServices != null);
+		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
+		assert (lconnMgr != null);
+		IRemoteConnection lconn = lconnMgr.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
+		assert (lconn != null);
+		IRemoteFileManager localFileManager = localServices.getFileManager(lconn);
+		assert (localFileManager != null);
+		return localFileManager;
+	}
+
+	/**
+	 * @param configuration
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	public static IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
+			throws CoreException {
+		IRemoteConnection conn = RMLaunchUtils.getRemoteConnection(configuration, monitor);
+		if (conn != null) {
+			return conn.getRemoteServices().getFileManager(conn);
+		}
+		return null;
 	}
 
 	/*
@@ -236,6 +289,114 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	@Override
 	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
 		return new PLaunch(configuration, mode, null);
+	}
+
+	/**
+	 * Check if the copy local file is enabled. If it is, copy the executable file from the local host to the remote host.
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 * @throws CoreException
+	 *             if the copy fails or is cancelled
+	 */
+	protected void copyExecutable(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+		boolean copyExecutable = LaunchUtils.getCopyExecutable(configuration);
+
+		if (copyExecutable) {
+			// Get remote and local paths
+			String remotePath = LaunchUtils.getExecutablePath(configuration);
+			String localPath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_LOCAL_EXECUTABLE_PATH,
+					(String) null);
+
+			// Check if local path is valid
+			if (localPath == null) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_1));
+			}
+
+			// Copy data
+			copyFileToRemoteHost(localPath, remotePath, configuration, monitor);
+		}
+	}
+
+	/**
+	 * Copy a data from a path (can be a file or directory) from the remote host to the local host.
+	 * 
+	 * @param remotePath
+	 * @param localPath
+	 * @param configuration
+	 * @throws CoreException
+	 */
+	protected void copyFileFromRemoteHost(String remotePath, String localPath, ILaunchConfiguration configuration,
+			IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 15);
+		try {
+			IRemoteFileManager localFileManager = getLocalFileManager(configuration);
+			IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration, progress.newChild(5));
+			if (progress.isCanceled()) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
+			}
+			if (remoteFileManager == null) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_0));
+			}
+
+			IFileStore rres = remoteFileManager.getResource(remotePath);
+			if (!rres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
+				// Local file not found!
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist));
+			}
+			IFileStore lres = localFileManager.getResource(localPath);
+
+			// Copy file
+			rres.copy(lres, EFS.OVERWRITE, progress.newChild(5));
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	/**
+	 * Copy a data from a path (can be a file or directory) from the local host to the remote host.
+	 * 
+	 * @param localPath
+	 * @param remotePath
+	 * @param configuration
+	 * @throws CoreException
+	 */
+	protected void copyFileToRemoteHost(String localPath, String remotePath, ILaunchConfiguration configuration,
+			IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 15);
+		try {
+			IRemoteFileManager localFileManager = getLocalFileManager(configuration);
+			IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration, progress.newChild(5));
+			if (progress.isCanceled()) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
+			}
+			if (remoteFileManager == null) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_0));
+			}
+
+			IFileStore lres = localFileManager.getResource(localPath);
+			if (!lres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
+				// Local file not found!
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist));
+			}
+			IFileStore rres = remoteFileManager.getResource(remotePath);
+
+			// Copy file
+			lres.copy(rres, EFS.OVERWRITE, progress.newChild(5));
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
 	}
 
 	/**
@@ -316,6 +477,19 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
+	 * Get the debugger configuration
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 * @return debugger configuration
+	 * @throws CoreException
+	 * @since 6.0
+	 */
+	protected IPDebugConfiguration getDebugConfig(ILaunchConfiguration config) throws CoreException {
+		return PTPDebugCorePlugin.getDefault().getDebugConfiguration(LaunchUtils.getDebuggerID(config));
+	}
+
+	/**
 	 * Returns the (possible empty) list of synchronization rule objects according to the rules described in the configuration.
 	 * 
 	 * @since 5.0
@@ -390,18 +564,76 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @since 5.0
 	 */
 	protected void submitJob(ILaunchConfiguration configuration, String mode, IPLaunch launch, IPDebugger debugger,
-			IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 10);
+			IProgressMonitor progress) throws CoreException {
+		SubMonitor subMon = SubMonitor.convert(progress, 40);
 		try {
 			final ILaunchController control = RMLaunchUtils.getLaunchControl(configuration);
 			if (control == null) {
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
 			}
-			control.start(progress.newChild(3));
+			control.start(subMon.newChild(10));
 			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
-			String jobId = control.submitJob(configuration, mode, progress.newChild(5));
-			if (control.getJobStatus(jobId, progress.newChild(2)).equals(IJobStatus.UNDETERMINED)) {
+
+			if (!mode.equals(ILaunchManager.DEBUG_MODE)) {
+				boolean switchPerspective = false;
+				boolean startMonitoring = false;
+				boolean askToSwitch = false;
+
+				String monitorType = control.getConfiguration().getMonitorData().getSchedulerType();
+				if (monitorType != null) {
+					IMonitorControl monitor = MonitorControlManager.getInstance().getMonitorControl(control.getRemoteServicesId(),
+							control.getConnectionName(), monitorType);
+					if (monitor == null) {
+						final Boolean[] result = new Boolean[1];
+						Display.getDefault().syncExec(new Runnable() {
+							@Override
+							public void run() {
+								result[0] = MessageDialog.openQuestion(
+										RMLaunchPlugin.getActiveWorkbenchShell(),
+										"Monitoring Setup",
+										"This launch type allows monitoring of system and job information. Do you want to configure and start monitoring (will switch to System Monitoring perspective if necessary)?");
+							}
+						});
+						if (result[0]) {
+							monitor = MonitorControlManager.getInstance().createMonitorControl(monitorType,
+									control.getRemoteServicesId(), control.getConnectionName());
+							startMonitoring = true;
+							switchPerspective = true;
+						}
+					} else {
+						if (!monitor.isActive()) {
+							final Boolean[] result = new Boolean[1];
+							Display.getDefault().syncExec(new Runnable() {
+								@Override
+								public void run() {
+									result[0] = MessageDialog.openQuestion(
+											RMLaunchPlugin.getActiveWorkbenchShell(),
+											"Monitoring Setup",
+											"This launch type allows monitoring of system and job information. Do you want to start monitoring (will switch to System Monitoring perspective if necessary)?");
+								}
+							});
+							if (result[0]) {
+								startMonitoring = true;
+								switchPerspective = true;
+							}
+						} else {
+							switchPerspective = true;
+							askToSwitch = true;
+						}
+					}
+
+					if (startMonitoring) {
+						monitor.start(subMon.newChild(10));
+					}
+					if (switchPerspective) {
+						switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode), askToSwitch);
+					}
+				}
+			}
+
+			String jobId = control.submitJob(configuration, mode, subMon.newChild(10));
+			if (control.getJobStatus(jobId, subMon.newChild(10)).equals(IJobStatus.UNDETERMINED)) {
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus));
 			}
@@ -413,8 +645,49 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			}
 			jobSub.schedule();
 		} finally {
-			if (monitor != null) {
-				monitor.done();
+			if (progress != null) {
+				progress.done();
+			}
+		}
+	}
+
+	/**
+	 * Used to force switching to the supplied perspective
+	 * 
+	 * @param perspectiveID
+	 */
+	protected void switchPerspective(final String perspectiveId, final boolean ask) {
+		if (perspectiveId != null) {
+			final Display display = Display.getDefault();
+			if (display != null && !display.isDisposed()) {
+				display.syncExec(new Runnable() {
+					@Override
+					public void run() {
+						IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+						if (window != null) {
+							IWorkbenchPage page = window.getActivePage();
+							if (page != null) {
+								if (page.getPerspective().getId().equals(perspectiveId)) {
+									return;
+								}
+
+								boolean doSwitch = true;
+
+								if (ask) {
+									doSwitch = MessageDialog.openQuestion(display.getActiveShell(), "Monitoring Setup",
+											"This launch type allows monitoring of system and job information. Do you want to switch to the System Monitoring perspective now?");
+								}
+
+								if (doSwitch) {
+									try {
+										PlatformUI.getWorkbench().showPerspective(perspectiveId, window);
+									} catch (WorkbenchException e) {
+									}
+								}
+							}
+						}
+					}
+				});
 			}
 		}
 	}
@@ -545,9 +818,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @since 5.0
 	 */
 	protected IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		IRemoteFileManager fileManager = RMLaunchUtils.getRemoteFileManager(configuration, monitor);
-		if (monitor.isCanceled() || fileManager == null) {
+		IRemoteFileManager fileManager = getRemoteFileManager(configuration, monitor);
+		if (monitor.isCanceled()) {
 			return null;
+		}
+		if (fileManager == null) {
+			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
+					"Unable to obtain remote connection information from launch configuration"));
 		}
 		if (!fileManager.getResource(path).fetchInfo().exists()) {
 			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(), NLS.bind(

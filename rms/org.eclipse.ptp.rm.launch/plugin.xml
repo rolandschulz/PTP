@@ -31,7 +31,8 @@
 			id="org.eclipse.ptp.rm.launch.parallelLaunchConfigurationTabGroup">
     	    <launchMode
                description="%ParallelLaunch.run"
-               mode="run">
+               mode="run"
+               perspective="org.eclipse.ptp.rm.lml.ui.systemMonitoringPerspective">
          	</launchMode>
 		</launchConfigurationTabGroup>
     <launchConfigurationTabGroup

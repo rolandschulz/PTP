@@ -12,9 +12,9 @@ package org.eclipse.ptp.rm.jaxb.ui.util;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
+import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
@@ -43,14 +44,15 @@ import org.osgi.framework.Bundle;
  * 
  */
 public class JAXBExtensionUtils {
-	private static Map<String, URL> fPluginConfigurations = new HashMap<String, URL>();
-	private static Map<String, URL> fExternalConfigurations = new HashMap<String, URL>();
+	private static Map<String, URL> fPluginConfigurations = new TreeMap<String, URL>();
+	private static Map<String, URL> fExternalConfigurations = new TreeMap<String, URL>();
 	private static Set<String> fMonitorTypes = new TreeSet<String>();
 
 	public static String[] getConfiguationNames() {
 		loadExtensions(true);
-		Set<Map.Entry<String, URL>> set = fPluginConfigurations.entrySet();
-		set.addAll(fExternalConfigurations.entrySet());
+		Set<String> set = new TreeSet<String>();
+		set.addAll(fPluginConfigurations.keySet());
+		set.addAll(fExternalConfigurations.keySet());
 		return set.toArray(new String[0]);
 	}
 
@@ -70,7 +72,7 @@ public class JAXBExtensionUtils {
 
 	public static Map<String, URL> getPluginConfiguations() {
 		loadExtensions(true);
-		Map<String, URL> map = new HashMap<String, URL>();
+		Map<String, URL> map = new TreeMap<String, URL>();
 		map.putAll(fPluginConfigurations);
 		map.putAll(fExternalConfigurations);
 		return map;
@@ -104,8 +106,9 @@ public class JAXBExtensionUtils {
 	private static void loadExternal(boolean showError) {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBUIConstants.RESOURCE_MANAGERS);
 		StringBuffer invalid = new StringBuffer();
-		if (project != null) {
+		if (project.exists()) {
 			try {
+				fExternalConfigurations.clear();
 				IResource[] resources = project.members();
 				for (IResource resource : resources) {
 					if (resource instanceof IFile) {
@@ -123,7 +126,8 @@ public class JAXBExtensionUtils {
 									continue;
 								}
 								fExternalConfigurations.put(data.getName(), url);
-								if (data.getMonitorData() != null) {
+								MonitorType monitorType = data.getMonitorData();
+								if (monitorType != null && monitorType.getSchedulerType() != null) {
 									fMonitorTypes.add(data.getMonitorData().getSchedulerType());
 								}
 							} catch (MalformedURLException t) {

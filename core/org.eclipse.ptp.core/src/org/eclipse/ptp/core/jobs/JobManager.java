@@ -23,7 +23,7 @@ import org.eclipse.ptp.internal.core.events.JobChangedEvent;
  * @since 6.0
  */
 public class JobManager {
-
+	private static final String ALL_JOBS = "ALL_JOBS"; //$NON-NLS-1$
 	private static final JobManager fInstance = new JobManager();
 
 	public static JobManager getInstance() {
@@ -40,6 +40,15 @@ public class JobManager {
 		if (listeners == null) {
 			listeners = new ListenerList();
 			fJobListeners.put(qualifier, listeners);
+		}
+		listeners.add(listener);
+	}
+
+	public void addListener(IJobListener listener) {
+		ListenerList listeners = fJobListeners.get(ALL_JOBS);
+		if (listeners == null) {
+			listeners = new ListenerList();
+			fJobListeners.put(ALL_JOBS, listeners);
 		}
 		listeners.add(listener);
 	}
@@ -61,6 +70,12 @@ public class JobManager {
 				((IJobListener) listener).handleEvent(e);
 			}
 		}
+		listeners = fJobListeners.get(ALL_JOBS);
+		if (listeners != null) {
+			for (Object listener : listeners.getListeners()) {
+				((IJobListener) listener).handleEvent(e);
+			}
+		}
 	}
 
 	/**
@@ -73,6 +88,12 @@ public class JobManager {
 	public void fireJobChanged(IJobStatus jobStatus) {
 		IJobChangedEvent e = new JobChangedEvent(jobStatus);
 		ListenerList listeners = fJobListeners.get(jobStatus.getControlId());
+		if (listeners != null) {
+			for (Object listener : listeners.getListeners()) {
+				((IJobListener) listener).handleEvent(e);
+			}
+		}
+		listeners = fJobListeners.get(ALL_JOBS);
 		if (listeners != null) {
 			for (Object listener : listeners.getListeners()) {
 				((IJobListener) listener).handleEvent(e);

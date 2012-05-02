@@ -21,26 +21,24 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.jobs.IJobControl;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
-import org.eclipse.ptp.launch.LaunchUtils;
 import org.eclipse.ptp.rm.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.WorkbenchException;
 
 /**
  * A launch configuration delegate for launching jobs via the PTP resource manager mechanism.
@@ -75,8 +73,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				String cwd = LaunchUtils.getWorkingDirectory(fLaunch.getLaunchConfiguration());
 				String[] args = LaunchUtils.getProgramArguments(fLaunch.getLaunchConfiguration());
 
-				switchPerspective(DebugUITools.getLaunchPerspective(fLaunch.getLaunchConfiguration().getType(),
-						fLaunch.getLaunchMode()));
+				// switchPerspective(DebugUITools.getLaunchPerspective(fLaunch.getLaunchConfiguration().getType(),
+				// fLaunch.getLaunchMode()));
 
 				session.connectToDebugger(subMon.newChild(8), app, path, cwd, args);
 			} catch (CoreException e) {
@@ -156,7 +154,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			}
 
 			// All copy pre-"job submission" occurs here
-			LaunchUtils.copyExecutable(configuration, progress.newChild(10));
+			copyExecutable(configuration, progress.newChild(10));
 			if (progress.isCanceled()) {
 				return;
 			}
@@ -181,15 +179,12 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					 * via the submitJob() command.
 					 */
 
-					IPDebugConfiguration debugConfig = LaunchUtils.getDebugConfig(configuration);
+					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 					debugger = debugConfig.getDebugger();
 					debugger.initialize(configuration, progress.newChild(10));
 					if (progress.isCanceled()) {
 						return;
 					}
-				} else {
-					// switch perspective
-					switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
 				}
 
 				progress.worked(10);
@@ -238,14 +233,13 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	protected void doCleanupLaunch(IPLaunch launch) {
 		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
 			try {
-				IPDebugConfiguration debugConfig = LaunchUtils.getDebugConfig(launch.getLaunchConfiguration());
+				IPDebugConfiguration debugConfig = getDebugConfig(launch.getLaunchConfiguration());
 				IPDebugger debugger = debugConfig.getDebugger();
 				debugger.cleanup(launch);
 			} catch (CoreException e) {
 				RMLaunchPlugin.log(e);
 			}
 		}
-		IJobControl control = launch.getJobControl();
 	}
 
 	/*
@@ -335,38 +329,4 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		}
 	}
 
-	/**
-	 * Used to force switching to the PTP Debug perspective
-	 * 
-	 * @param perspectiveID
-	 */
-	protected void switchPerspective(final String perspectiveID) {
-		if (perspectiveID != null) {
-			Display display = Display.getCurrent();
-			if (display == null) {
-				display = Display.getDefault();
-			}
-			if (display != null && !display.isDisposed()) {
-				display.syncExec(new Runnable() {
-					@Override
-					public void run() {
-						IWorkbenchWindow window = RMLaunchPlugin.getActiveWorkbenchWindow();
-						if (window != null) {
-							IWorkbenchPage page = window.getActivePage();
-							if (page != null) {
-								if (page.getPerspective().getId().equals(perspectiveID)) {
-									return;
-								}
-
-								try {
-									window.getWorkbench().showPerspective(perspectiveID, window);
-								} catch (WorkbenchException e) {
-								}
-							}
-						}
-					}
-				});
-			}
-		}
-	}
 }

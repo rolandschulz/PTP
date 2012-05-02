@@ -769,7 +769,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
-		ICommandJob job = new CommandJob(uuid, command, jobMode, this, launchMode);
+		ICommandJob job = new CommandJob(uuid, command, jobMode, this, configuration, launchMode);
 		((Job) job).setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 		job.schedule();
 		if (join) {

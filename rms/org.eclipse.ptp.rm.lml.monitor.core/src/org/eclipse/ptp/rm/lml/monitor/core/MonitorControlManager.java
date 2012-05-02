@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -29,37 +30,17 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
 import org.eclipse.ptp.rm.lml.monitor.core.listeners.IMonitorChangedListener;
 import org.eclipse.ptp.rm.lml.monitor.core.listeners.IMonitorRefreshListener;
-import org.eclipse.ptp.rm.lml.monitor.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.progress.UIJob;
 
 public class MonitorControlManager {
-	/**
-	 * Job for updating the UI when a resource manager is selected. This is done in a job since the update is a long running
-	 * operation.
-	 */
-	private static class MonitorSelectionJob extends UIJob {
-		private final String fMonitorId;
-
-		public MonitorSelectionJob(String monitorId) {
-			super(Messages.LMLResourceManagerMonitor_RMSelectionJob);
-			setSystem(true);
-			fMonitorId = monitorId;
-		}
-
-		@Override
-		public IStatus runInUIThread(IProgressMonitor monitor) {
-			LMLManager.getInstance().selectLgui(fMonitorId);
-			return Status.OK_STATUS;
-		}
-	}
-
 	private static final MonitorControlManager fInstance = new MonitorControlManager();
 	private static final ListenerList fMonitorChangedListeners = new ListenerList();
 	private static final ListenerList fSelectionChangedListeners = new ListenerList();
@@ -70,6 +51,11 @@ public class MonitorControlManager {
 
 	public static MonitorControlManager getInstance() {
 		return fInstance;
+	}
+
+	public static String generateMonitorId(String remoteServicesId, String connectionName, String monitorType) {
+		String bytes = remoteServicesId + "." + connectionName + "." + monitorType; //$NON-NLS-1$//$NON-NLS-2$
+		return UUID.nameUUIDFromBytes(bytes.getBytes()).toString();
 	}
 
 	private final Map<String, IMonitorControl> fMonitorControls = Collections
@@ -92,7 +78,7 @@ public class MonitorControlManager {
 	}
 
 	public IMonitorControl createMonitorControl(String type, String remoteServicesId, String connectionName) {
-		IMonitorControl monitor = new MonitorControl();
+		IMonitorControl monitor = new MonitorControl(generateMonitorId(remoteServicesId, connectionName, type));
 		monitor.setRemoteServicesId(remoteServicesId);
 		monitor.setConnectionName(connectionName);
 		monitor.setSystemType(type);
@@ -183,8 +169,12 @@ public class MonitorControlManager {
 		job.schedule();
 	}
 
-	public IMonitorControl getMonitorControl(String monitorId) {
-		return fMonitorControls.get(monitorId);
+	public IMonitorControl getMonitorControl(IRemoteConnection connection, String monitorType) {
+		return fMonitorControls.get(generateMonitorId(connection.getRemoteServices().getId(), connection.getName(), monitorType));
+	}
+
+	public IMonitorControl getMonitorControl(String remoteServicesId, String connectionName, String monitorType) {
+		return fMonitorControls.get(generateMonitorId(remoteServicesId, connectionName, monitorType));
 	}
 
 	public Collection<IMonitorControl> getMonitorControls() {
@@ -237,7 +227,7 @@ public class MonitorControlManager {
 			IMemento memento = XMLMemento.createReadRoot(reader);
 			IMemento[] monitorsMemento = memento.getChildren(MONITOR_ID_ATTR);
 			for (IMemento monitorMemento : monitorsMemento) {
-				IMonitorControl monitor = new MonitorControl();
+				IMonitorControl monitor = new MonitorControl(monitorMemento.getID());
 				if (monitor.load(monitorMemento)) {
 					fMonitorControlsToStart.add(monitor);
 				}

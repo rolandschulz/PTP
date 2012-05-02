@@ -29,6 +29,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.ModelManager;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
@@ -190,7 +191,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		super.initializeFrom(configuration);
 
-		resourceManager = getResourceManager(configuration);
+		resourceManager = LaunchUtils.getResourceManager(configuration);
 		setResourceManagerComboSelection(resourceManager);
 
 		/*
@@ -253,10 +254,10 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		if (resourceManager != null) {
-			setDebuggerNeedsLaunchHelp(configuration, resourceManager.getConfiguration().needsDebuggerLaunchHelp());
-			setConnectionName(configuration, resourceManager.getControlConfiguration().getConnectionName());
-			setRemoteServicesId(configuration, resourceManager.getControlConfiguration().getRemoteServicesId());
-			setResourceManagerUniqueName(configuration, resourceManager.getUniqueName());
+			LaunchUtils.setDebuggerNeedsLaunchHelp(configuration, resourceManager.getConfiguration().needsDebuggerLaunchHelp());
+			LaunchUtils.setConnectionName(configuration, resourceManager.getControlConfiguration().getConnectionName());
+			LaunchUtils.setRemoteServicesId(configuration, resourceManager.getControlConfiguration().getRemoteServicesId());
+			LaunchUtils.setResourceManagerUniqueName(configuration, resourceManager.getUniqueName());
 			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(resourceManager);
 			if (rmDynamicTab == null) {
 				setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { resourceManager.getName() }));
@@ -282,10 +283,10 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setErrorMessage(Messages.ResourcesTab_No_Resource_Manager);
 			return;
 		}
-		setDebuggerNeedsLaunchHelp(configuration, rm.getConfiguration().needsDebuggerLaunchHelp());
-		setConnectionName(configuration, rm.getControlConfiguration().getConnectionName());
-		setRemoteServicesId(configuration, rm.getControlConfiguration().getRemoteServicesId());
-		setResourceManagerUniqueName(configuration, rm.getUniqueName());
+		LaunchUtils.setDebuggerNeedsLaunchHelp(configuration, rm.getConfiguration().needsDebuggerLaunchHelp());
+		LaunchUtils.setConnectionName(configuration, rm.getControlConfiguration().getConnectionName());
+		LaunchUtils.setRemoteServicesId(configuration, rm.getControlConfiguration().getRemoteServicesId());
+		LaunchUtils.setResourceManagerUniqueName(configuration, rm.getUniqueName());
 
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
 		if (rmDynamicTab == null) {

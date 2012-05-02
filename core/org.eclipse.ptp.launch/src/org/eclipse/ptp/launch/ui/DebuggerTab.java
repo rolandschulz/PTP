@@ -20,6 +20,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.launch.messages.Messages;
@@ -91,7 +92,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 			 * Only set default debugger if there is a remote connection.
 			 */
 			String id = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, EMPTY_STRING);
-			loadDebuggerComboBox(config, id, getRemoteServicesId(config) == null);
+			loadDebuggerComboBox(config, id, LaunchUtils.getRemoteServicesId(config) == null);
 			initializeCommonControls(config);
 		} catch (CoreException e) {
 		}
@@ -112,7 +113,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 			 * Only set default debugger if there is a resource manager selected.
 			 */
 			String id = workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, EMPTY_STRING);
-			loadDebuggerComboBox(workingCopy, id, getRemoteServicesId(workingCopy) == null);
+			loadDebuggerComboBox(workingCopy, id, LaunchUtils.getRemoteServicesId(workingCopy) == null);
 			initializeCommonControls(workingCopy);
 		} catch (CoreException e) {
 		}

@@ -48,17 +48,11 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		return fSystemType;
 	}
 
-	public String getMonitorId() {
-		String id = null;
-		if (fRemoteConnection != null) {
-			id = fRemoteConnection.getRemoteServices().getId() + "_" + fRemoteConnection.getName() + "_" + getSystemType(); //$NON-NLS-1$//$NON-NLS-2$
-		}
-		return id;
-	}
-
 	private void updateEnablement() {
-		String id = getMonitorId();
-		Boolean valid = (id != null && MonitorControlManager.getInstance().getMonitorControl(id) == null);
+		Boolean valid = false;
+		if (fRemoteConnection != null) {
+			valid = (MonitorControlManager.getInstance().getMonitorControl(fRemoteConnection, getSystemType()) == null);
+		}
 		fRemoteConnectionWidget.setEnabled(fSystemTypeCombo.getSelectionIndex() > 0);
 		Button button = getButton(IDialogConstants.OK_ID);
 		if (button != null) {

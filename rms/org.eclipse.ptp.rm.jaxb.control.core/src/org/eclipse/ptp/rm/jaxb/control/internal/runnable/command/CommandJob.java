@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
@@ -206,6 +207,7 @@ public class CommandJob extends Job implements ICommandJob {
 	private final boolean waitForId;
 	private final JobMode jobMode;
 	private final boolean keepOpen;
+	private final ILaunchConfiguration launchConfiguration;
 	private final String launchMode;
 	private final List<Job> cmdJobs = new ArrayList<Job>();
 
@@ -235,11 +237,13 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public CommandJob(String jobUUID, CommandType command, JobMode jobMode, IJobController control, String launchMode) {
+	public CommandJob(String jobUUID, CommandType command, JobMode jobMode, IJobController control,
+			ILaunchConfiguration configuration, String launchMode) {
 		super(command.getName() + JAXBControlConstants.CO + JAXBControlConstants.SP
 				+ (jobUUID == null ? control.getConnectionName() : jobUUID));
 		this.command = command;
 		this.jobMode = jobMode;
+		this.launchConfiguration = configuration;
 		this.launchMode = launchMode;
 		this.control = control;
 		this.rmVarMap = control.getEnvironment();
@@ -949,6 +953,7 @@ public class CommandJob extends Job implements ICommandJob {
 					jobStatus.setProcess(process);
 				}
 				jobStatus.setProxy(getProxy());
+				jobStatus.setLaunchConfig(launchConfiguration);
 				try {
 					jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap(), progress.newChild(20));
 				} catch (CoreException failed) {
@@ -981,6 +986,7 @@ public class CommandJob extends Job implements ICommandJob {
 					jobStatus.setProcess(process);
 				}
 				jobStatus.setProxy(getProxy());
+				jobStatus.setLaunchConfig(launchConfiguration);
 			}
 
 			if (progress.isCanceled()) {

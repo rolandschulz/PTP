@@ -27,11 +27,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
@@ -86,19 +83,6 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 		gridLayout.marginHeight = mh;
 		gridLayout.marginWidth = mw;
 		return gridLayout;
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	protected String getConnectionName(ILaunchConfiguration configuration) {
-		final String type;
-		try {
-			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
-		} catch (CoreException e) {
-			return null;
-		}
-		return type;
 	}
 
 	/**
@@ -165,19 +149,6 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	}
 
 	/**
-	 * @since 6.0
-	 */
-	protected String getRemoteServicesId(ILaunchConfiguration configuration) {
-		final String type;
-		try {
-			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, EMPTY_STRING);
-		} catch (CoreException e) {
-			return null;
-		}
-		return type;
-	}
-
-	/**
 	 * Returns the selected workspace resource, or <code>null</code>
 	 * 
 	 * @param workspaceDir
@@ -188,95 +159,10 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	}
 
 	/**
-	 * Given a launch configuration, find the resource manager that was been selected.
-	 * 
-	 * @param configuration
-	 * @return resource manager
-	 * @throws CoreException
-	 * @since 5.0
-	 */
-	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) {
-		final String rmUniqueName;
-		try {
-			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
-					EMPTY_STRING);
-		} catch (CoreException e) {
-			return null;
-		}
-		return ModelManager.getInstance().getResourceManagerFromUniqueName(rmUniqueName);
-	}
-
-	/**
-	 * Given a launch configuration, find the resource manager type that was been selected.
-	 * 
-	 * @param configuration
-	 * @return resource manager type
-	 * @throws CoreException
-	 * @since 6.0
-	 */
-	protected String getResourceManagerType(ILaunchConfiguration configuration) {
-		final String type;
-		try {
-			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_TYPE, EMPTY_STRING);
-		} catch (CoreException e) {
-			return null;
-		}
-		return type;
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	protected String getResourceManagerUniqueName(ILaunchConfiguration configuration) {
-		final String type;
-		try {
-			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String) null);
-		} catch (CoreException e) {
-			return null;
-		}
-		return type;
-	}
-
-	/**
 	 * @return
 	 */
 	protected IWorkspaceRoot getWorkspaceRoot() {
 		return ResourcesPlugin.getWorkspace().getRoot();
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	protected void setConnectionName(ILaunchConfigurationWorkingCopy configuration, String name) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, name);
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	protected void setDebuggerNeedsLaunchHelp(ILaunchConfigurationWorkingCopy configuration, boolean flag) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_NEEDS_LAUNCH_HELP, flag);
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	protected void setRemoteServicesId(ILaunchConfigurationWorkingCopy configuration, String id) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, id);
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	protected void setResourceManagerType(ILaunchConfigurationWorkingCopy configuration, String type) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_TYPE, type);
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	protected void setResourceManagerUniqueName(ILaunchConfigurationWorkingCopy configuration, String name) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, name);
 	}
 
 	/**

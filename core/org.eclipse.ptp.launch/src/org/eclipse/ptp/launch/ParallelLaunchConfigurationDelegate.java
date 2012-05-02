@@ -39,6 +39,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.IPSession;
@@ -163,7 +164,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			verifyLaunchAttributes(configuration, mode, progress.newChild(10));
 
 			// All copy pre-"job submission" occurs here
-			LaunchUtils.copyExecutable(configuration, progress.newChild(10));
+			copyExecutable(configuration, progress.newChild(10));
 			doPreLaunchSynchronization(configuration, progress.newChild(10));
 
 			IPDebugger debugger = null;
@@ -181,7 +182,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					 * via the submitJob() command.
 					 */
 
-					IPDebugConfiguration debugConfig = LaunchUtils.getDebugConfig(configuration);
+					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 					debugger = debugConfig.getDebugger();
 					debugger.initialize(configuration, progress.newChild(10));
 					if (progress.isCanceled()) {
@@ -241,7 +242,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	protected void doCleanupLaunch(IPLaunch launch) {
 		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
 			try {
-				IPDebugConfiguration debugConfig = LaunchUtils.getDebugConfig(launch.getLaunchConfiguration());
+				IPDebugConfiguration debugConfig = getDebugConfig(launch.getLaunchConfiguration());
 				IPDebugger debugger = debugConfig.getDebugger();
 				debugger.cleanup(launch);
 			} catch (CoreException e) {

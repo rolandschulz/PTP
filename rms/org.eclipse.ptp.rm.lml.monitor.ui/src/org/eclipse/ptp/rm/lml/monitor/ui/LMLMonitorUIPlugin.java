@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
-import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -45,7 +44,6 @@ public class LMLMonitorUIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		MonitorControlManager.getInstance().start();
 	}
 
 	/*
@@ -55,7 +53,6 @@ public class LMLMonitorUIPlugin extends AbstractUIPlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		MonitorControlManager.getInstance().stop();
 		plugin = null;
 		super.stop(context);
 	}

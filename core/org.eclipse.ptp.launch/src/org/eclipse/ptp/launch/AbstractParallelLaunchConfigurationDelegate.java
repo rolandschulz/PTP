@@ -28,6 +28,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -51,7 +53,10 @@ import org.eclipse.ptp.core.jobs.IJobChangedEvent;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
+import org.eclipse.ptp.core.util.LaunchUtils;
+import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
@@ -60,7 +65,13 @@ import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 import org.eclipse.ptp.launch.rulesengine.RuleActionFactory;
 import org.eclipse.ptp.launch.rulesengine.RuleFactory;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
@@ -69,6 +80,15 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 public abstract class AbstractParallelLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 	private final class JobListener implements IJobListener {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
+		 */
+		public void handleEvent(IJobAddedEvent e) {
+			// nothing to do
+		}
+
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -82,15 +102,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			if (jobSub != null) {
 				jobSub.statusChanged();
 			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
-		 */
-		public void handleEvent(IJobAddedEvent e) {
-			// nothing to do
 		}
 	}
 
@@ -216,6 +227,44 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		}
 	}
 
+	/**
+	 * @since 5.0
+	 */
+	public static IRemoteFileManager getLocalFileManager(ILaunchConfiguration configuration) throws CoreException {
+		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
+		assert (localServices != null);
+		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
+		assert (lconnMgr != null);
+		IRemoteConnection lconn = lconnMgr.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
+		assert (lconn != null);
+		IRemoteFileManager localFileManager = localServices.getFileManager(lconn);
+		assert (localFileManager != null);
+		return localFileManager;
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public static IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
+			throws CoreException {
+		IResourceManager rm = LaunchUtils.getResourceManager(configuration);
+		if (rm != null) {
+			IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
+			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault()
+					.getRemoteServices(conf.getRemoteServicesId(), monitor);
+			if (remoteServices != null) {
+				IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
+				if (rconnMgr != null) {
+					IRemoteConnection rconn = rconnMgr.getConnection(conf.getConnectionName());
+					if (rconn != null && rconn.isOpen()) {
+						return remoteServices.getFileManager(rconn);
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 	/*
 	 * Model listeners
 	 */
@@ -241,6 +290,114 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	@Override
 	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
 		return new PLaunch(configuration, mode, null);
+	}
+
+	/**
+	 * Check if the copy local file is enabled. If it is, copy the executable file from the local host to the remote host.
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 * @throws CoreException
+	 *             if the copy fails or is cancelled
+	 */
+	protected void copyExecutable(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+		boolean copyExecutable = LaunchUtils.getCopyExecutable(configuration);
+
+		if (copyExecutable) {
+			// Get remote and local paths
+			String remotePath = LaunchUtils.getExecutablePath(configuration);
+			String localPath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_LOCAL_EXECUTABLE_PATH,
+					(String) null);
+
+			// Check if local path is valid
+			if (localPath == null) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_1));
+			}
+
+			// Copy data
+			copyFileToRemoteHost(localPath, remotePath, configuration, monitor);
+		}
+	}
+
+	/**
+	 * Copy a data from a path (can be a file or directory) from the remote host to the local host.
+	 * 
+	 * @param remotePath
+	 * @param localPath
+	 * @param configuration
+	 * @throws CoreException
+	 */
+	protected void copyFileFromRemoteHost(String remotePath, String localPath, ILaunchConfiguration configuration,
+			IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 15);
+		try {
+			IRemoteFileManager localFileManager = getLocalFileManager(configuration);
+			IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration, progress.newChild(5));
+			if (progress.isCanceled()) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
+			}
+			if (remoteFileManager == null) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_0));
+			}
+
+			IFileStore rres = remoteFileManager.getResource(remotePath);
+			if (!rres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
+				// Local file not found!
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist));
+			}
+			IFileStore lres = localFileManager.getResource(localPath);
+
+			// Copy file
+			rres.copy(lres, EFS.OVERWRITE, progress.newChild(5));
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	/**
+	 * Copy a data from a path (can be a file or directory) from the local host to the remote host.
+	 * 
+	 * @param localPath
+	 * @param remotePath
+	 * @param configuration
+	 * @throws CoreException
+	 */
+	protected void copyFileToRemoteHost(String localPath, String remotePath, ILaunchConfiguration configuration,
+			IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 15);
+		try {
+			IRemoteFileManager localFileManager = getLocalFileManager(configuration);
+			IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration, progress.newChild(5));
+			if (progress.isCanceled()) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
+			}
+			if (remoteFileManager == null) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_0));
+			}
+
+			IFileStore lres = localFileManager.getResource(localPath);
+			if (!lres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
+				// Local file not found!
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist));
+			}
+			IFileStore rres = remoteFileManager.getResource(remotePath);
+
+			// Copy file
+			lres.copy(rres, EFS.OVERWRITE, progress.newChild(5));
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
 	}
 
 	/**
@@ -321,38 +478,16 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * @since 5.0
+	 * Get the debugger configuration
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 * @return debugger configuration
+	 * @throws CoreException
+	 * @since 6.0
 	 */
-	protected void verifyLaunchAttributes(final ILaunchConfiguration configuration, String mode, final IProgressMonitor monitor)
-			throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 30);
-
-		try {
-			/*
-			 * Verify executable path
-			 */
-			verifyExecutablePath(configuration, progress.newChild(10));
-
-			/*
-			 * Verify working directory. Use the executable path if no working directory has been set.
-			 */
-			String workPath = LaunchUtils.getWorkingDirectory(configuration);
-			if (workPath != null) {
-				verifyResource(workPath, configuration, monitor);
-			}
-			if (progress.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
-			}
-
-			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				verifyDebuggerPath(configuration, progress.newChild(10));
-			}
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
+	protected IPDebugConfiguration getDebugConfig(ILaunchConfiguration config) throws CoreException {
+		return PTPDebugCorePlugin.getDefault().getDebugConfiguration(LaunchUtils.getDebuggerID(config));
 	}
 
 	/**
@@ -494,6 +629,41 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
 						new FileNotFoundException(e.getLocalizedMessage())));
+			}
+		}
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	protected void verifyLaunchAttributes(final ILaunchConfiguration configuration, String mode, final IProgressMonitor monitor)
+			throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 30);
+
+		try {
+			/*
+			 * Verify executable path
+			 */
+			verifyExecutablePath(configuration, progress.newChild(10));
+
+			/*
+			 * Verify working directory. Use the executable path if no working directory has been set.
+			 */
+			String workPath = LaunchUtils.getWorkingDirectory(configuration);
+			if (workPath != null) {
+				verifyResource(workPath, configuration, monitor);
+			}
+			if (progress.isCanceled()) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
+			}
+
+			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				verifyDebuggerPath(configuration, progress.newChild(10));
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
 			}
 		}
 	}

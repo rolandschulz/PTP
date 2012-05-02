@@ -67,11 +67,18 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String ATTR_CONNECTION_NAME = PTP_LAUNCH_ID + ".CONNECTION_NAME"; //$NON-NLS-1$
 
 	/**
-	 * Launch configuration attribute key. The values is the selected resource manager type.
+	 * Launch configuration attribute key. The values is the selected configuration template name.
 	 * 
 	 * @since 6.0
 	 */
-	public static final String ATTR_RESOURCE_MANAGER_TYPE = PTP_LAUNCH_ID + ".RESOURCE_MANAGER_TYPE"; //$NON-NLS-1$
+	public static final String ATTR_TEMPLATE_NAME = PTP_LAUNCH_ID + ".TEMPLATE_NAME"; //$NON-NLS-1$
+
+	/**
+	 * Launch configuration attribute key. The values is the selected system type.
+	 * 
+	 * @since 6.0
+	 */
+	public static final String ATTR_SYSTEM_TYPE = PTP_LAUNCH_ID + ".SYSTEM_TYPE"; //$NON-NLS-1$
 
 	/**
 	 * Launch configuration attribute key. The value is the project name.

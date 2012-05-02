@@ -50,7 +50,7 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringSetAttribute;
 import org.eclipse.ptp.core.attributes.StringSetAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.launch.LaunchUtils;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
