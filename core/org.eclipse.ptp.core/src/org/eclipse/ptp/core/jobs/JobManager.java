@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.ptp.internal.core.events.JobAddedEvent;
-import org.eclipse.ptp.internal.core.events.JobChangedEvent;
 
 /**
  * Job manager for resource manager framework.
@@ -63,17 +61,16 @@ public class JobManager {
 	 * @since 5.0
 	 */
 	public void fireJobAdded(IJobStatus jobStatus) {
-		IJobAddedEvent e = new JobAddedEvent(jobStatus);
 		ListenerList listeners = fJobListeners.get(jobStatus.getControlId());
 		if (listeners != null) {
 			for (Object listener : listeners.getListeners()) {
-				((IJobListener) listener).handleEvent(e);
+				((IJobListener) listener).jobAdded(jobStatus);
 			}
 		}
 		listeners = fJobListeners.get(ALL_JOBS);
 		if (listeners != null) {
 			for (Object listener : listeners.getListeners()) {
-				((IJobListener) listener).handleEvent(e);
+				((IJobListener) listener).jobAdded(jobStatus);
 			}
 		}
 	}
@@ -86,17 +83,16 @@ public class JobManager {
 	 * @since 5.0
 	 */
 	public void fireJobChanged(IJobStatus jobStatus) {
-		IJobChangedEvent e = new JobChangedEvent(jobStatus);
 		ListenerList listeners = fJobListeners.get(jobStatus.getControlId());
 		if (listeners != null) {
 			for (Object listener : listeners.getListeners()) {
-				((IJobListener) listener).handleEvent(e);
+				((IJobListener) listener).jobChanged(jobStatus);
 			}
 		}
 		listeners = fJobListeners.get(ALL_JOBS);
 		if (listeners != null) {
 			for (Object listener : listeners.getListeners()) {
-				((IJobListener) listener).handleEvent(e);
+				((IJobListener) listener).jobChanged(jobStatus);
 			}
 		}
 	}

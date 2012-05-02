@@ -48,8 +48,6 @@ import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.jobs.IJobAddedEvent;
-import org.eclipse.ptp.core.jobs.IJobChangedEvent;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
@@ -80,24 +78,14 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 public abstract class AbstractParallelLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 	private final class JobListener implements IJobListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
-		 */
-		public void handleEvent(IJobAddedEvent e) {
-			// nothing to do
+		public void jobAdded(IJobStatus status) {
+			// Nothing to do
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse .ptp.core.events.IJobChangeEvent)
-		 */
-		public void handleEvent(IJobChangedEvent e) {
+		public void jobChanged(IJobStatus status) {
 			JobSubmission jobSub;
 			synchronized (jobSubmissions) {
-				jobSub = jobSubmissions.get(e.getJobStatus().getJobId());
+				jobSub = jobSubmissions.get(status.getJobId());
 			}
 			if (jobSub != null) {
 				jobSub.statusChanged();

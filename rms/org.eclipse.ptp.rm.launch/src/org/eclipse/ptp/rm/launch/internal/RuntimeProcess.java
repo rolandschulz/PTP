@@ -13,8 +13,6 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
-import org.eclipse.ptp.core.jobs.IJobAddedEvent;
-import org.eclipse.ptp.core.jobs.IJobChangedEvent;
 import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
@@ -132,22 +130,21 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
+	 * @see org.eclipse.ptp.core.jobs.IJobListener#jobAdded(org.eclipse.ptp.core.jobs.IJobStatus)
 	 */
 	@Override
-	public void handleEvent(IJobAddedEvent e) {
+	public void jobAdded(IJobStatus status) {
 		// nothing to do
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp .core.events.IJobChangeEvent)
+	 * @see org.eclipse.ptp.core.jobs.IJobListener#jobChanged(org.eclipse.ptp.core.jobs.IJobStatus)
 	 */
 	@Override
-	public void handleEvent(IJobChangedEvent e) {
+	public void jobChanged(IJobStatus status) {
 		if (!isTerminated()) {
-			IJobStatus status = e.getJobStatus();
 			if (status.getState().equals(IJobStatus.COMPLETED)) {
 				terminated();
 			}

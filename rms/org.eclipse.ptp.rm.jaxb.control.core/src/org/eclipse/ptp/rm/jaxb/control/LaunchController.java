@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 University of Illinois.  All rights reserved.
+ * Copyright (c) 2011, 2012 University of Illinois and others.  All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html 
@@ -7,6 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  * 	Jeff Overbey - Environment Manager support
+ *  Greg Watson - adapted to new framework
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control;
 
@@ -160,7 +161,7 @@ public class LaunchController implements ILaunchController {
 	 */
 	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 		if (!resourceManagerIsActive()) {
-			throw CoreExceptionUtils.newException("Resource manager has not been started", null);
+			throw CoreExceptionUtils.newException(Messages.LaunchController_resourceManagerNotStarted, null);
 		}
 
 		if (jobId == null) {
@@ -285,7 +286,7 @@ public class LaunchController implements ILaunchController {
 	 */
 	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) throws CoreException {
 		if (!resourceManagerIsActive()) {
-			throw CoreExceptionUtils.newException("Resource manager has not been started", null);
+			throw CoreExceptionUtils.newException(Messages.LaunchController_resourceManagerNotStarted, null);
 		}
 
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
@@ -503,7 +504,7 @@ public class LaunchController implements ILaunchController {
 	 */
 	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException {
 		if (!resourceManagerIsActive()) {
-			throw CoreExceptionUtils.newException("Resource manager has not been started", null);
+			throw CoreExceptionUtils.newException(Messages.LaunchController_resourceManagerNotStarted, null);
 		}
 
 		updatePropertyValues(configuration, null);
@@ -668,7 +669,7 @@ public class LaunchController implements ILaunchController {
 		String uuid = UUID.randomUUID().toString();
 
 		if (!resourceManagerIsActive()) {
-			throw CoreExceptionUtils.newException("Resource manager has not been started", null);
+			throw CoreExceptionUtils.newException(Messages.LaunchController_resourceManagerNotStarted, null);
 		}
 
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
@@ -1133,12 +1134,12 @@ public class LaunchController implements ILaunchController {
 					configData = null;
 				} catch (Throwable t) {
 					if (xml != null) {
-						new UIJob("Using Cached Definition") {
+						new UIJob(Messages.LaunchController_usingCachedDefinition) {
 							@Override
 							public IStatus runInUIThread(IProgressMonitor monitor) {
 								MessageDialog
-										.openWarning(Display.getDefault().getActiveShell(), "Using Cached Definition",
-												"The URL for the definition file for this resource manager is either missing or invalid; using cached definition.");
+										.openWarning(Display.getDefault().getActiveShell(), Messages.LaunchController_usingCachedDefinition,
+												Messages.LaunchController_missingURL);
 								return Status.OK_STATUS;
 							}
 						}.schedule();
@@ -1147,7 +1148,7 @@ public class LaunchController implements ILaunchController {
 			}
 		}
 		if (xml == null) {
-			throw CoreExceptionUtils.newException("Unable to load configuration data", null);
+			throw CoreExceptionUtils.newException(Messages.LaunchController_unableToLoad, null);
 		}
 		try {
 			configData = JAXBInitializationUtils.initializeRMData(xml);

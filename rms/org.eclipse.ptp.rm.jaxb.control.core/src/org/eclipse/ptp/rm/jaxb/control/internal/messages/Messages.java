@@ -69,6 +69,11 @@ public class Messages extends NLS {
 	public static String MatchImpl_5;
 	public static String BadEntryIndex;
 
+	public static String LaunchController_missingURL;
+	public static String LaunchController_resourceManagerNotStarted;
+	public static String LaunchController_unableToLoad;
+	public static String LaunchController_usingCachedDefinition;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

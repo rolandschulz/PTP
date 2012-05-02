@@ -69,9 +69,8 @@ import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
-import org.eclipse.ptp.core.jobs.IJobAddedEvent;
-import org.eclipse.ptp.core.jobs.IJobChangedEvent;
 import org.eclipse.ptp.core.jobs.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.internal.ui.actions.JobFocusAction;
@@ -180,23 +179,12 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	}
 
 	private final class JobListener implements IJobListener {
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse .ptp.core.events.IJobChangeEvent)
-		 */
-		public void handleEvent(IJobChangedEvent e) {
-			refreshJobView();
+		public void jobAdded(IJobStatus status) {
+			// nothing to do
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
-		 */
-		public void handleEvent(IJobAddedEvent e) {
-			// nothing to do
+		public void jobChanged(IJobStatus status) {
+			refreshJobView();
 		}
 	}
 

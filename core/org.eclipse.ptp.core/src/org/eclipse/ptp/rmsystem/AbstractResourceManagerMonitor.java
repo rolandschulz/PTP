@@ -22,8 +22,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.jobs.IJobAddedEvent;
-import org.eclipse.ptp.core.jobs.IJobChangedEvent;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
@@ -34,15 +32,13 @@ import org.eclipse.ptp.core.jobs.JobManager;
  */
 public abstract class AbstractResourceManagerMonitor implements IResourceManagerMonitor {
 	private class JobListener implements IJobListener {
-
-		public void handleEvent(IJobAddedEvent e) {
-			doAddJob(e.getJobStatus());
+		public void jobAdded(IJobStatus status) {
+			doAddJob(status);
 		}
 
-		public void handleEvent(IJobChangedEvent e) {
-			doUpdateJob(e.getJobStatus());
+		public void jobChanged(IJobStatus status) {
+			doUpdateJob(status);
 		}
-
 	}
 
 	private final JobListener fJobListener = new JobListener();

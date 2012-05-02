@@ -52,9 +52,8 @@ import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
-import org.eclipse.ptp.core.jobs.IJobAddedEvent;
-import org.eclipse.ptp.core.jobs.IJobChangedEvent;
 import org.eclipse.ptp.core.jobs.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.internal.ui.actions.TerminateJobFromListAction;
@@ -75,16 +74,15 @@ import org.eclipse.ui.part.ViewPart;
 
 public class JobsListView extends ViewPart {
 	private final class JobListener implements IJobListener {
+		public void jobAdded(IJobStatus status) {
+			// TODO Auto-generated method stub
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse .ptp.core.events.IJobChangeEvent)
-		 */
-		public void handleEvent(IJobChangedEvent e) {
-			IPResourceManager rm = ModelManager.getInstance().getUniverse().getResourceManager(e.getJobStatus().getControlId());
+		}
+
+		public void jobChanged(IJobStatus status) {
+			IPResourceManager rm = ModelManager.getInstance().getUniverse().getResourceManager(status.getControlId());
 			if (rm != null) {
-				IPJob job = rm.getJobById(e.getJobStatus().getJobId());
+				IPJob job = rm.getJobById(status.getJobId());
 				if (job != null) {
 					update(rm.getJobs());
 				}
@@ -97,18 +95,7 @@ public class JobsListView extends ViewPart {
 					terminateAllAction.updateTerminateJobState();
 				}
 			});
-
 		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
-		 */
-		public void handleEvent(IJobAddedEvent e) {
-			// nothing to do
-		}
-
 	}
 
 	private final class ResourceManagerListener implements IResourceManagerListener {

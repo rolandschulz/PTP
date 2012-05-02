@@ -42,8 +42,6 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.jobs.IJobAddedEvent;
-import org.eclipse.ptp.core.jobs.IJobChangedEvent;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
@@ -80,27 +78,16 @@ import org.eclipse.ui.WorkbenchException;
 public abstract class AbstractParallelLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 	private final class JobListener implements IJobListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.events.IJobAddedEvent)
-		 */
 		@Override
-		public void handleEvent(IJobAddedEvent e) {
-			// TODO Auto-generated method stub
-
+		public void jobAdded(IJobStatus status) {
+			// Nothing to do
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IJobListener#handleEvent(org.eclipse .ptp.core.events.IJobChangeEvent)
-		 */
 		@Override
-		public void handleEvent(IJobChangedEvent e) {
+		public void jobChanged(IJobStatus status) {
 			JobSubmission jobSub;
 			synchronized (jobSubmissions) {
-				jobSub = jobSubmissions.get(e.getJobStatus().getJobId());
+				jobSub = jobSubmissions.get(status.getJobId());
 			}
 			if (jobSub != null) {
 				jobSub.statusChanged();
@@ -623,7 +610,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						}
 					}
 
-					if (startMonitoring) {
+					if (monitor != null && startMonitoring) {
 						monitor.start(subMon.newChild(10));
 					}
 					if (switchPerspective) {
