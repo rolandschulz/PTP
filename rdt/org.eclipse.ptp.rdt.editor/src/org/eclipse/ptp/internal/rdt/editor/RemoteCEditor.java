@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.editor.SemanticHighlightings;
@@ -340,11 +341,11 @@ public class RemoteCEditor extends CEditor implements HelpListener {
 	}
 
 	@Override
-	public ICElement getInputCElement() {
+	public IWorkingCopy getInputCElement() {
 		if (provider != null) {
 			ICElement result = provider.getInputCElement();
 			if (result != null)
-				return result;
+				return (IWorkingCopy) result;
 		}
 		return super.getInputCElement();
 	}
