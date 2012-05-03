@@ -80,6 +80,10 @@
             monitorType="TORQUE"
             name="Torque-Generic-Interactive">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/remote-generic-interactive.xml"
+            name="Remote-Generic-Interactive">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>
