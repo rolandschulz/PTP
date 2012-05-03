@@ -553,9 +553,10 @@ public class SyncManager  {
 				if (isBlocking) {
 					try {
 						if (!resolveAsLocal) {
-							provider.synchronize(delta, getFileFilter(project), monitor, syncFlags);
+							provider.synchronize(project, buildScenario, delta, getFileFilter(project), monitor, syncFlags);
 						} else {
-							provider.synchronizeResolveAsLocal(delta, getFileFilter(project), monitor, syncFlags);
+							provider.synchronizeResolveAsLocal(project, buildScenario, delta, getFileFilter(project), monitor,
+									syncFlags);
 						}
 					} catch (CoreException e) {
 						if (!useExceptionHandler) {
