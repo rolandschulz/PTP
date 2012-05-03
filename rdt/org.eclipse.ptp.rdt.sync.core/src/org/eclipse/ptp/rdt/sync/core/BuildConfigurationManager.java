@@ -503,6 +503,18 @@ public class BuildConfigurationManager {
 	}
 	
 	/**
+	 * Return the build scenario for the passed project (actually for the project's current active or "default" configuration)
+	 *
+	 * @param project - cannot be null
+	 * @return build scenario or null if there are problems accessing configuration's information
+	 */
+	public BuildScenario getBuildScenarioForProject(IProject project) {
+		checkProject(project);
+		IConfiguration bconf = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
+		return this.getBuildScenarioForBuildConfigurationInternal(bconf).bs;
+	}
+
+	/**
 	 * Return the build scenario for the passed configuration. Any newly created configurations should be recorded by the call to
 	 * "updateConfigurations." For configurations still unknown (perhaps newly created configurations not yet recorded in CDT),
 	 *  return the build scenario for the closest known ancestor.

@@ -82,15 +82,15 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * @throws CoreException
 	 *             if synchronization fails
 	 */
-	public void synchronizeResolveAsLocal(IResourceDelta delta, SyncFileFilter filter, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags)
-			throws CoreException;
+	public void synchronizeResolveAsLocal(IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncFileFilter filter,
+			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
 	/**
 	 * Get the current list of merge-conflicted files
 	 * @return set of files as project-relative IPaths. This may be an empty set but never null.
 	 * @throws CoreException
 	 *              for system-level problems retrieving merge information
 	 */
-	public Set<IPath> getMergeConflictFiles() throws CoreException;
+	public Set<IPath> getMergeConflictFiles(IProject project, BuildScenario buildScenario) throws CoreException;
 	
 	/**
 	 * Get the three parts of the merge-conflicted file (left, right, and ancestor, respectively)
@@ -100,7 +100,7 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * @throws CoreException
 	 * 				for system-level problems retrieving merge information
 	 */
-	public String[] getMergeConflictParts(IFile file) throws CoreException;
+	public String[] getMergeConflictParts(IProject project, BuildScenario buildScenario, IFile file) throws CoreException;
 	
     /**
      * Close any resources (files, sockets) that were open by the sync provider. Resources not open by the provider should not be

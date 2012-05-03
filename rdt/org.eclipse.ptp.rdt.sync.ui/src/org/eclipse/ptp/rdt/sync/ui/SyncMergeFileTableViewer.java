@@ -38,6 +38,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.ptp.internal.rdt.sync.ui.SyncPluginImages;
+import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.ISyncListener;
 import org.eclipse.ptp.rdt.sync.core.SyncEvent;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
@@ -272,8 +274,9 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		mergeConflictedFiles = new HashSet<IPath>();
 		if (project != null) {
 			ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
+			BuildScenario buildScenario = BuildConfigurationManager.getInstance().getBuildScenarioForProject(project);
 			try {
-				mergeConflictedFiles = provider.getMergeConflictFiles();
+				mergeConflictedFiles = provider.getMergeConflictFiles(project, buildScenario);
 			} catch (CoreException e) {
 				RDTSyncUIPlugin.log(e);
 			}

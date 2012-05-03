@@ -22,9 +22,12 @@ import org.eclipse.compare.structuremergeviewer.DiffNode;
 import org.eclipse.compare.structuremergeviewer.Differencer;
 import org.eclipse.compare.structuremergeviewer.ICompareInput;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
@@ -72,12 +75,14 @@ public class SyncMergeEditor {
 		}
 
 		protected ICompareInput prepareCompareInput(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-			ISyncServiceProvider provider = SyncManager.getSyncProvider(file.getProject());
+			IProject project = file.getProject();
+			ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
+			BuildScenario buildScenario = BuildConfigurationManager.getInstance().getBuildScenarioForProject(project);
 			String[] mergeParts = null;
 
 			if (provider != null) {
 				try {
-					mergeParts = provider.getMergeConflictParts(file);
+					mergeParts = provider.getMergeConflictParts(project, buildScenario, file);
 				} catch (CoreException e) {
 					RDTSyncUIPlugin.log(e);
 					return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(Messages.SyncMergeEditor_1),

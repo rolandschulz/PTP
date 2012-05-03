@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -52,6 +53,7 @@ public class SyncManager  {
 		ACTIVE, ALL, NONE, UNAVAILABLE
 	};
 
+	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String instanceScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String SYNC_MODE_KEY = "sync-mode"; //$NON-NLS-1$
 	private static final String SYNC_AUTO_KEY = "sync-auto"; //$NON-NLS-1$
@@ -82,7 +84,7 @@ public class SyncManager  {
 		private final ISyncExceptionHandler fSyncExceptionHandler;
 
 		public SynchronizeJob(IProject project, BuildScenario buildScenario, IResourceDelta delta, ISyncServiceProvider provider,
-				boolean resolveAsLocal, ISyncExceptionHandler seHandler) {
+				boolean resolveAsLocal, EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
 			fProject = project;
 			fBuildScenario = buildScenario;
@@ -238,11 +240,6 @@ public class SyncManager  {
 		}
 		if (!(fProjectToResolvedFilesMap.containsKey(project))) {
 			fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
-			try {
-				saveConfigurationData();
-			} catch (IOException e) {
-				RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
-			}
 		}
 		return fProjectToResolvedFilesMap.get(project).contains(path);
 	}
@@ -262,11 +259,6 @@ public class SyncManager  {
 		}
 		if (!(fProjectToResolvedFilesMap.containsKey(project))) {
 			fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
-			try {
-				saveConfigurationData();
-			} catch (IOException e) {
-				RDTSyncCorePlugin.log(Messages.SyncManager_2, e);
-			}
 		}
 		return fProjectToResolvedFilesMap.get(project).containsAll(paths);
 	}
@@ -551,7 +543,7 @@ public class SyncManager  {
 	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor
 	private static Job[] scheduleSyncJobs(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags,
 			IConfiguration[] buildConfigurations, boolean isBlocking, boolean resolveAsLocal, boolean useExceptionHandler,
-			ISyncExceptionHandler seHandler, IProgressMonitor monitor)
+			ISyncExceptionHandler seHandler, IProgressMonitor monitor) throws CoreException {
 		int jobNum = 0;
 		Job[] syncJobs = new Job[buildConfigurations.length];
 		for (IConfiguration buildConfig : buildConfigurations) {
@@ -577,7 +569,7 @@ public class SyncManager  {
 						}
 					}
 				} else {
-					job = new SynchronizeJob(project, buildScenario, delta, provider, syncFlags, resolveAsLocal, seHandler);
+					job = new SynchronizeJob(project, buildScenario, delta, provider, resolveAsLocal, syncFlags, seHandler);
 					job.schedule();
 				}
 			}
