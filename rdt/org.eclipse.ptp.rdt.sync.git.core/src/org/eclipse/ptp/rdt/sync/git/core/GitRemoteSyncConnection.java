@@ -915,7 +915,7 @@ public class GitRemoteSyncConnection {
 				if (!FileToMergePartsMap.isEmpty()) {
 					final ResetCommand resetCommand = git.reset().setMode(ResetType.HARD); // jgit does not yet support merge reset.
 					resetCommand.call();
-					throw new RemoteSyncMergeConflictException(Messages.GitRemoteSyncConnection_1);
+					throw new RemoteSyncMergeConflictException(Messages.GitRemoteSyncConnection_2);
 					// Even if we later decide not to throw an exception, it is important not to proceed after a merge conflict.
 					// return;
 				}
