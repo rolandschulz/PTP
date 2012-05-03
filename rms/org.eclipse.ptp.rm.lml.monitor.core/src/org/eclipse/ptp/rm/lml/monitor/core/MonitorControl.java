@@ -36,7 +36,6 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.server.RemoteServerManager;
-import org.eclipse.ptp.rm.jaxb.control.LaunchController;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.model.IPattern;
@@ -52,7 +51,7 @@ import org.eclipse.ui.IMemento;
  * LML JAXB resource manager monitor
  */
 @SuppressWarnings("restriction")
-public class MonitorControl extends LaunchController implements IMonitorControl {
+public class MonitorControl implements IMonitorControl {
 	private class JobListener implements IJobListener {
 		public void jobAdded(IJobStatus status) {
 			addJob(status);
@@ -131,6 +130,8 @@ public class MonitorControl extends LaunchController implements IMonitorControl 
 	private Map<String, List<IPattern>> fSavedPattern;
 	private String fSystemType;
 	private boolean fActive;
+	private String fRemoteServicesId;
+	private String fConnectionName;
 
 	private static final String JOBS_ATTR = "jobs";//$NON-NLS-1$ 
 	private static final String LAYOUT_ATTR = "layout";//$NON-NLS-1$
@@ -167,10 +168,28 @@ public class MonitorControl extends LaunchController implements IMonitorControl 
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getConnectionName()
+	 */
+	public String getConnectionName() {
+		return fConnectionName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getMonitorId()
 	 */
 	public String getMonitorId() {
 		return fMonitorId;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getRemoteServicesId()
+	 */
+	public String getRemoteServicesId() {
+		return fRemoteServicesId;
 	}
 
 	/*
@@ -261,6 +280,24 @@ public class MonitorControl extends LaunchController implements IMonitorControl 
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setConnectionName(java.lang.String)
+	 */
+	public void setConnectionName(String connName) {
+		fConnectionName = connName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setRemoteServicesId(java.lang.String)
+	 */
+	public void setRemoteServicesId(String id) {
+		fRemoteServicesId = id;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setSystemType(java.lang.String)
 	 */
 	public void setSystemType(String type) {
@@ -272,7 +309,6 @@ public class MonitorControl extends LaunchController implements IMonitorControl 
 	 * 
 	 * @see org.eclipse.ptp.core.monitors.IMonitorControl#start(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void start(IProgressMonitor monitor) throws CoreException {
 		if (!isActive()) {
 			SubMonitor progress = SubMonitor.convert(monitor, 30);
@@ -330,7 +366,6 @@ public class MonitorControl extends LaunchController implements IMonitorControl 
 	 * 
 	 * @see org.eclipse.ptp.core.monitors.IMonitorControl#stop()
 	 */
-	@Override
 	public void stop() throws CoreException {
 		if (isActive()) {
 			JobManager.getInstance().removeListener(fJobListener);

@@ -35,6 +35,7 @@ import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
 import org.eclipse.ptp.rm.lml.monitor.core.listeners.IMonitorChangedListener;
 import org.eclipse.ptp.rm.lml.monitor.core.listeners.IMonitorRefreshListener;
+import org.eclipse.ptp.rm.lml.monitor.core.messages.Messages;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
@@ -87,7 +88,7 @@ public class MonitorControlManager {
 	}
 
 	public void fireMonitorAdded(final IMonitorControl[] monitors) {
-		UIJob job = new UIJob("Monitor Added Job") {
+		UIJob job = new UIJob(Messages.MonitorControlManager_monitorAddedJobName) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -102,7 +103,7 @@ public class MonitorControlManager {
 	}
 
 	public void fireMonitorRefresh(final IMonitorControl[] monitors) {
-		UIJob job = new UIJob("Monitor Refresh Job") {
+		UIJob job = new UIJob(Messages.MonitorControlManager_monitoRefreshJobName) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -117,7 +118,7 @@ public class MonitorControlManager {
 	}
 
 	public void fireMonitorRemoved(final IMonitorControl[] monitors) {
-		UIJob job = new UIJob("Monitor Removed Job") {
+		UIJob job = new UIJob(Messages.MonitorControlManager_monitorRemovedJobName) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -132,7 +133,7 @@ public class MonitorControlManager {
 	}
 
 	public void fireMonitorUpdated(final IMonitorControl[] monitors) {
-		UIJob job = new UIJob("Monitor Updated Job") {
+		UIJob job = new UIJob(Messages.MonitorControlManager_monitorUpdatedJobName) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor progress) {
@@ -147,7 +148,7 @@ public class MonitorControlManager {
 	}
 
 	public void fireSelectionChanged(final SelectionChangedEvent event) {
-		UIJob job = new UIJob("Monitor Selection Changed Job") {
+		UIJob job = new UIJob(Messages.MonitorControlManager_monitorSelectionChangedJobName) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
