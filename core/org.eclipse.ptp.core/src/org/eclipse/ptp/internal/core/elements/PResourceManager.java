@@ -98,6 +98,7 @@ public class PResourceManager extends Parent implements IPResourceManager {
 
 	private final ListenerList childListeners = new ListenerList();
 	private final String fControlId;
+	private final String fName;
 
 	private final ListenerList listeners = new ListenerList();
 	private final IMachineChildListener machineNodeListener;
@@ -110,9 +111,10 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/**
 	 * @since 5.0
 	 */
-	public PResourceManager(IPUniverse universe, String controlId) {
+	public PResourceManager(IPUniverse universe, String name, String controlId) {
 		super(universe.getNextResourceManagerId(), universe, getDefaultAttributes(controlId));
 		fControlId = controlId;
+		fName = name;
 
 		machineNodeListener = new IMachineChildListener() {
 			public void handleEvent(IChangedNodeEvent e) {
@@ -328,7 +330,11 @@ public class PResourceManager extends Parent implements IPResourceManager {
 			return getResourceManager();
 		}
 		if (adapter == IResourceManagerConfiguration.class) {
-			return getResourceManager().getConfiguration();
+			IResourceManager rm = getResourceManager();
+			if (rm != null) {
+				return rm.getConfiguration();
+			}
+			return null;
 		}
 		return super.getAdapter(adapter);
 	}
@@ -414,7 +420,11 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	 */
 	@Override
 	public String getName() {
-		return getResourceManager().getConfiguration().getName();
+		IResourceManager rm = getResourceManager();
+		if (rm != null) {
+			return rm.getConfiguration().getName();
+		}
+		return fName;
 	}
 
 	/*
@@ -597,13 +607,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 		removeJobs(terminatedJobs);
 	}
 
-	/**
-	 * @param state
-	 */
-	public synchronized void setState(ResourceManagerAttributes.State state) {
-		getResourceManager().setState(state.name());
-	}
-
 	private IResourceManager getResourceManager() {
 		return ModelManager.getInstance().getResourceManagerFromUniqueName(fControlId);
 	}
@@ -619,8 +622,9 @@ public class PResourceManager extends Parent implements IPResourceManager {
 		 * The resource manager name is stored in the configuration so that it persists. Map name attributes to the configuration.
 		 */
 		StringAttribute nameAttr = attrs.getAttribute(ElementAttributes.getNameAttributeDefinition());
-		if (nameAttr != null) {
-			getResourceManager().getConfiguration().setName(nameAttr.getValue());
+		IResourceManager rm = getResourceManager();
+		if (nameAttr != null && rm != null) {
+			rm.getConfiguration().setName(nameAttr.getValue());
 		}
 	}
 

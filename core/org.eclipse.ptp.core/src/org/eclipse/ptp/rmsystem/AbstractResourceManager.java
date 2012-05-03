@@ -59,7 +59,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 		fConfig = config;
 		fResourceManagerControl = control;
 		fResourceManagerMonitor = monitor;
-		fPResourceManager = ModelManager.getInstance().getUniverse().addResourceManager(this.getUniqueName());
+		fPResourceManager = ModelManager.getInstance().getUniverse().addResourceManager(config.getName(), this.getUniqueName());
 		fState = STOPPED_STATE;
 	}
 

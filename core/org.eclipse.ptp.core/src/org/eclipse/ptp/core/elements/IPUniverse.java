@@ -34,7 +34,7 @@ public interface IPUniverse extends IPElement {
 	 *            of controller
 	 * @since 6.0
 	 */
-	public IPResourceManager addResourceManager(String controlId);
+	public IPResourceManager addResourceManager(String name, String controlId);
 
 	/**
 	 * @since 6.0

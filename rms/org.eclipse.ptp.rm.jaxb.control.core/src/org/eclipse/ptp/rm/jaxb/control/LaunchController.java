@@ -144,13 +144,13 @@ public class LaunchController implements ILaunchController {
 	 * @param jaxbServiceProvider
 	 *            the configuration object containing resource manager specifics
 	 */
-	public LaunchController() {
-		this(UUID.randomUUID().toString());
+	public LaunchController(String name) {
+		this(name, UUID.randomUUID().toString());
 	}
 
-	public LaunchController(String controlId) {
+	public LaunchController(String name, String controlId) {
 		fControlId = controlId;
-		ModelManager.getInstance().getUniverse().addResourceManager(controlId);
+		ModelManager.getInstance().getUniverse().addResourceManager(name, controlId);
 	}
 
 	/*
@@ -1137,9 +1137,8 @@ public class LaunchController implements ILaunchController {
 						new UIJob(Messages.LaunchController_usingCachedDefinition) {
 							@Override
 							public IStatus runInUIThread(IProgressMonitor monitor) {
-								MessageDialog
-										.openWarning(Display.getDefault().getActiveShell(), Messages.LaunchController_usingCachedDefinition,
-												Messages.LaunchController_missingURL);
+								MessageDialog.openWarning(Display.getDefault().getActiveShell(),
+										Messages.LaunchController_usingCachedDefinition, Messages.LaunchController_missingURL);
 								return Status.OK_STATUS;
 							}
 						}.schedule();

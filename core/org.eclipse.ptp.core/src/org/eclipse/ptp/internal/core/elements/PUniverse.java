@@ -56,10 +56,10 @@ public class PUniverse extends Parent implements IPUniverse {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IPUniverse#addResourceManager(java.lang.String)
+	 * @see org.eclipse.ptp.core.elements.IPUniverse#addResourceManager(java.lang.String, java.lang.String)
 	 */
-	public IPResourceManager addResourceManager(String controlId) {
-		IPResourceManager rm = new PResourceManager(ModelManager.getInstance().getUniverse(), controlId);
+	public IPResourceManager addResourceManager(String name, String controlId) {
+		IPResourceManager rm = new PResourceManager(ModelManager.getInstance().getUniverse(), name, controlId);
 		resourceManagers.put(controlId, rm);
 		return rm;
 	}

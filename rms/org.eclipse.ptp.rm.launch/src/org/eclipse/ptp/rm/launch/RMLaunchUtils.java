@@ -60,9 +60,9 @@ public class RMLaunchUtils {
 	public static ILaunchController getLaunchControl(String name, String controlId) {
 		ILaunchController control;
 		if (controlId == null) {
-			control = new LaunchController();
+			control = new LaunchController(name);
 		} else {
-			control = new LaunchController(controlId);
+			control = new LaunchController(name, controlId);
 		}
 		control.setRMConfigurationURL(JAXBExtensionUtils.getConfigurationURL(name));
 		return control;
