@@ -75,7 +75,7 @@ public class SyncManager  {
 		private final SyncExceptionHandler fSyncExceptionHandler;
 
 		public SynchronizeJob(IProject project, BuildScenario buildScenario, IResourceDelta delta, ISyncServiceProvider provider,
-				boolean resolveAsLocal, SyncExceptionHandler seHandler) {
+				EnumSet<SyncFlag> syncFlags, boolean resolveAsLocal, SyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
 			fProject = project;
 			fBuildScenario = buildScenario;
@@ -96,9 +96,11 @@ public class SyncManager  {
 			SubMonitor progress = SubMonitor.convert(monitor, 100);
 			try {
 				if (!fResolveAsLocal) {
-					fSyncProvider.synchronize(fDelta, getFileFilter(fProject), progress.newChild(100), fSyncFlags);
+					fSyncProvider.synchronize(fProject, fBuildScenario, fDelta, getFileFilter(fProject), progress.newChild(100),
+							fSyncFlags);
 				} else {
-					fSyncProvider.synchronizeResolveAsLocal(fDelta, getFileFilter(fProject), progress.newChild(100), fSyncFlags);
+					fSyncProvider.synchronizeResolveAsLocal(fProject, fBuildScenario, fDelta, getFileFilter(fProject),
+							progress.newChild(100), fSyncFlags);
 				}
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
@@ -482,8 +484,7 @@ public class SyncManager  {
 	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor
 	private static Job[] scheduleSyncJobs(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags,
 			IConfiguration[] buildConfigurations, boolean isBlocking, boolean resolveAsLocal, SyncExceptionHandler seHandler,
-			IProgressMonitor monitor)
-			throws CoreException {
+			IProgressMonitor monitor) throws CoreException {
 		int jobNum = 0;
 		Job[] syncJobs = new Job[buildConfigurations.length];
 		for (IConfiguration buildConfig : buildConfigurations) {
@@ -493,11 +494,13 @@ public class SyncManager  {
 			if (provider != null) {
 				if (isBlocking) {
 					if (!resolveAsLocal) {
+						provider.synchronize(project, buildScenario, delta, getFileFilter(project), monitor, syncFlags);
 					} else {
-						provider.synchronizeResolveAsLocal(delta, getFileFilter(project), monitor, syncFlags);
+						provider.synchronizeResolveAsLocal(project, buildScenario, delta, getFileFilter(project), monitor,
+								syncFlags);
 					}
 				} else {
-						job = new SynchronizeJob(delta, project, provider, syncFlags, resolveAsLocal, seHandler);
+					job = new SynchronizeJob(project, buildScenario, delta, provider, syncFlags, resolveAsLocal, seHandler);
 					job.schedule();
 				}
 			}
