@@ -10,8 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
@@ -19,6 +22,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -208,7 +212,7 @@ public class SyncManager  {
 	}
 	
 	/**
-	 * Set sync mode for a project
+	 * Is the given path for the given project resolved?
 	 *
 	 * @param project
 	 * @param path
@@ -230,7 +234,8 @@ public class SyncManager  {
 	}
 
 	/**
-	 * 
+	 * Set sync mode for a project
+	 *
 	 * @param project
 	 * @param mode
 	 */
@@ -315,14 +320,19 @@ public class SyncManager  {
 		if (project == null || filter == null) {
 			throw new NullPointerException();
 		}
-		
+
 		IScopeContext context = new ProjectScope(project);
 		Preferences node = context.getNode(projectScopeSyncNode);
 		if (node == null) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_3);
 			return;
+		}
+
+		filter.saveFilter(node);
+
+		BuildConfigurationManager.flushNode(node);
 	}
-	
+
 	/**
 	 * Set the given path as resolved for the given project
 	 *
@@ -337,11 +347,6 @@ public class SyncManager  {
 			fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
 		}
 		fProjectToResolvedFilesMap.get(project).add(path);
-		}
-
-		filter.saveFilter(node);
-
-		BuildConfigurationManager.flushNode(node);
 	}
 
 	/**
