@@ -33,11 +33,6 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
-import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
-import org.eclipse.ptp.services.core.IService;
-import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceModelManager;
-import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.osgi.service.prefs.Preferences;
 
 public class SyncManager  {
@@ -78,18 +73,18 @@ public class SyncManager  {
 		private final IProject fProject;
 		private final BuildScenario fBuildScenario;
 		private final IResourceDelta fDelta;
-		private final ISyncServiceProvider fSyncProvider;
+		private final SyncRunner fSyncRunner;
 		private final EnumSet<SyncFlag> fSyncFlags;
 		private final boolean fResolveAsLocal;
 		private final ISyncExceptionHandler fSyncExceptionHandler;
 
-		public SynchronizeJob(IProject project, BuildScenario buildScenario, IResourceDelta delta, ISyncServiceProvider provider,
+		public SynchronizeJob(IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncRunner runner,
 				boolean resolveAsLocal, EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
 			fProject = project;
 			fBuildScenario = buildScenario;
 			fDelta = delta;
-			fSyncProvider = provider;
+			fSyncRunner = runner;
 			fSyncFlags = syncFlags;
 			fResolveAsLocal = resolveAsLocal;
 			fSyncExceptionHandler = seHandler;
@@ -105,10 +100,10 @@ public class SyncManager  {
 			SubMonitor progress = SubMonitor.convert(monitor, 100);
 			try {
 				if (!fResolveAsLocal) {
-					fSyncProvider.synchronize(fProject, fBuildScenario, fDelta, getFileFilter(fProject), progress.newChild(100),
+					fSyncRunner.synchronize(fProject, fBuildScenario, fDelta, getFileFilter(fProject), progress.newChild(100),
 							fSyncFlags);
 				} else {
-					fSyncProvider.synchronizeResolveAsLocal(fProject, fBuildScenario, fDelta, getFileFilter(fProject),
+					fSyncRunner.synchronizeResolveAsLocal(fProject, fBuildScenario, fDelta, getFileFilter(fProject),
 							progress.newChild(100), fSyncFlags);
 				}
 			} catch (CoreException e) {
@@ -548,15 +543,16 @@ public class SyncManager  {
 		Job[] syncJobs = new Job[buildConfigurations.length];
 		for (IConfiguration buildConfig : buildConfigurations) {
 			SynchronizeJob job = null;
-			BuildScenario buildScenario = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(buildConfig);
-			ISyncServiceProvider provider = (ISyncServiceProvider) SyncManager.getSyncProvider(buildConfig);
-			if (provider != null) {
+			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+			BuildScenario buildScenario = bcm.getBuildScenarioForBuildConfiguration(buildConfig);
+			SyncRunner syncRunner = bcm.getSyncRunnerForBuildConfiguration(buildConfig);
+			if (syncRunner != null) {
 				if (isBlocking) {
 					try {
 						if (!resolveAsLocal) {
-							provider.synchronize(project, buildScenario, delta, getFileFilter(project), monitor, syncFlags);
+							syncRunner.synchronize(project, buildScenario, delta, getFileFilter(project), monitor, syncFlags);
 						} else {
-							provider.synchronizeResolveAsLocal(project, buildScenario, delta, getFileFilter(project), monitor,
+							syncRunner.synchronizeResolveAsLocal(project, buildScenario, delta, getFileFilter(project), monitor,
 									syncFlags);
 						}
 					} catch (CoreException e) {
@@ -569,7 +565,7 @@ public class SyncManager  {
 						}
 					}
 				} else {
-					job = new SynchronizeJob(project, buildScenario, delta, provider, resolveAsLocal, syncFlags, seHandler);
+					job = new SynchronizeJob(project, buildScenario, delta, syncRunner, resolveAsLocal, syncFlags, seHandler);
 					job.schedule();
 				}
 			}
@@ -581,37 +577,7 @@ public class SyncManager  {
 
 		return syncJobs;
 	}
-	
-	/**
-	 * Get the sync service provider for the given project's current active configuration. 
-	 *
-	 * @param project
-	 * @return sync service provider or null if provider cannot be found. (Logs error message in that case.)
-	 */
-	public static ISyncServiceProvider getSyncProvider(IProject project) {
-		IConfiguration config = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
-		return SyncManager.getSyncProvider(config);
-	}
-	
-	/**
-	 * Get the sync service provider for the given build configuration.
-	 *
-	 * @param config
-	 * @return sync service provider or null if provider cannot be found. (Logs error message in that case.)
-	 */
-	public static ISyncServiceProvider getSyncProvider(IConfiguration config) {
-		ISyncServiceProvider provider = null;
-		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-		IServiceConfiguration serviceConfig = bcm.getConfigurationForBuildConfiguration(config);
-		if (serviceConfig != null) {
-			IServiceModelManager serviceModel = ServiceModelManager.getInstance();
-			IService syncService = serviceModel.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-			provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
-		}
-		
-		return provider;
-	}
-	
+
 	/**
 	 * Get the current default sync exception handler
 	 * @return default sync exception handler
