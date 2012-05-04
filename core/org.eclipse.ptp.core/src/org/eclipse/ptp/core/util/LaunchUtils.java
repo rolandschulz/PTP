@@ -248,6 +248,11 @@ public class LaunchUtils {
 	}
 
 	/**
+	 * Given a launch configuration, find the system type that was been selected.
+	 * 
+	 * @param configuration
+	 * @return resource manager type
+	 * @throws CoreException
 	 * @since 6.0
 	 */
 	public static String getSystemType(ILaunchConfiguration configuration) {
@@ -271,7 +276,7 @@ public class LaunchUtils {
 	public static String getTemplateName(ILaunchConfiguration configuration) {
 		final String type;
 		try {
-			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_TEMPLATE_NAME, (String) null);
+			type = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONFIGURATION_NAME, (String) null);
 		} catch (CoreException e) {
 			return null;
 		}
@@ -337,8 +342,8 @@ public class LaunchUtils {
 	/**
 	 * @since 6.0
 	 */
-	public static void setTemplateName(ILaunchConfigurationWorkingCopy configuration, String name) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_TEMPLATE_NAME, name);
+	public static void setConfigurationName(ILaunchConfigurationWorkingCopy configuration, String name) {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_CONFIGURATION_NAME, name);
 	}
 
 	/**

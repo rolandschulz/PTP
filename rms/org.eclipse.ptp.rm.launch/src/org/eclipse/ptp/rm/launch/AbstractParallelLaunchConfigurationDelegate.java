@@ -39,7 +39,9 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.debug.ui.DebugUITools;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.jobs.IJobListener;
@@ -560,7 +562,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
 			}
 			control.start(subMon.newChild(10));
-			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
 
 			if (!mode.equals(ILaunchManager.DEBUG_MODE)) {
 				boolean switchPerspective = false;
@@ -572,37 +573,55 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 					IMonitorControl monitor = MonitorControlManager.getInstance().getMonitorControl(control.getRemoteServicesId(),
 							control.getConnectionName(), monitorType);
 					if (monitor == null) {
-						final Boolean[] result = new Boolean[1];
+						final int[] result = new int[1];
 						Display.getDefault().syncExec(new Runnable() {
 							@Override
 							public void run() {
-								result[0] = MessageDialog.openQuestion(
+								MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoCancelQuestion(
 										RMLaunchPlugin.getActiveWorkbenchShell(),
 										"Monitoring Setup",
-										"This launch type allows monitoring of system and job information. Do you want to configure and start monitoring (will switch to System Monitoring perspective if necessary)?");
+										"This launch type allows monitoring of system and job information. Do you want to configure and start monitoring (will switch to System Monitoring perspective if necessary)?",
+										null, false, null, null);
+								result[0] = dialog.getReturnCode();
 							}
 						});
-						if (result[0]) {
+						switch (result[0]) {
+						case IDialogConstants.YES_ID:
 							monitor = MonitorControlManager.getInstance().createMonitorControl(monitorType,
 									control.getRemoteServicesId(), control.getConnectionName());
 							startMonitoring = true;
 							switchPerspective = true;
+							break;
+						case IDialogConstants.CANCEL_ID:
+							control.stop();
+							return;
+						default:
+							break;
 						}
 					} else {
 						if (!monitor.isActive()) {
-							final Boolean[] result = new Boolean[1];
+							final int[] result = new int[1];
 							Display.getDefault().syncExec(new Runnable() {
 								@Override
 								public void run() {
-									result[0] = MessageDialog.openQuestion(
+									MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoCancelQuestion(
 											RMLaunchPlugin.getActiveWorkbenchShell(),
 											"Monitoring Setup",
-											"This launch type allows monitoring of system and job information. Do you want to start monitoring (will switch to System Monitoring perspective if necessary)?");
+											"This launch type allows monitoring of system and job information. Do you want to start monitoring (will switch to System Monitoring perspective if necessary)?",
+											null, false, null, null);
+									result[0] = dialog.getReturnCode();
 								}
 							});
-							if (result[0]) {
+							switch (result[0]) {
+							case IDialogConstants.YES_ID:
 								startMonitoring = true;
 								switchPerspective = true;
+								break;
+							case IDialogConstants.CANCEL_ID:
+								control.stop();
+								return;
+							default:
+								break;
 							}
 						} else {
 							switchPerspective = true;
@@ -619,8 +638,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				}
 			}
 
+			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
+
 			String jobId = control.submitJob(configuration, mode, subMon.newChild(10));
 			if (control.getJobStatus(jobId, subMon.newChild(10)).equals(IJobStatus.UNDETERMINED)) {
+				control.stop();
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus));
 			}

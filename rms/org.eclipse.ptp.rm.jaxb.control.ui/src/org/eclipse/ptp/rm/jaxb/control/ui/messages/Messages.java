@@ -17,6 +17,10 @@ public class Messages extends NLS {
 
 	public static String JAXBUIPlugin_Exception_InternalError;
 	public static String JAXBConnectionWizardPage_Description;
+
+	public static String JAXBControllerLaunchConfigurationTab_unableToObtainConfigurationInfo;
+
+	public static String JAXBControllerLaunchConfigurationTab_unableToObtainConnectionInfo;
 	public static String JAXBRMControlConfigurationWizardPage_Title;
 	public static String JAXBRMConfigurationSelectionWizardPage_1;
 	public static String ClearScript;

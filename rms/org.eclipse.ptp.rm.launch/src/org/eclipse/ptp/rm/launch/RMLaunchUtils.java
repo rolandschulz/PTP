@@ -53,17 +53,25 @@ public class RMLaunchUtils {
 	}
 
 	/**
-	 * @param provider
-	 * @param configuration
-	 * @return
+	 * @param name
+	 *            configuration name
+	 * @return launch controller
+	 */
+	public static ILaunchController getLaunchControl(String name) {
+		ILaunchController control = new LaunchController(name);
+		control.setRMConfigurationURL(JAXBExtensionUtils.getConfigurationURL(name));
+		return control;
+	}
+
+	/**
+	 * @param name
+	 *            configuration name
+	 * @param controlId
+	 *            ID of controller
+	 * @return launch controller
 	 */
 	public static ILaunchController getLaunchControl(String name, String controlId) {
-		ILaunchController control;
-		if (controlId == null) {
-			control = new LaunchController(name);
-		} else {
-			control = new LaunchController(name, controlId);
-		}
+		ILaunchController control = new LaunchController(name, controlId);
 		control.setRMConfigurationURL(JAXBExtensionUtils.getConfigurationURL(name));
 		return control;
 	}

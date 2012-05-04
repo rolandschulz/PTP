@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ptp.ems.core.EnvManagerConfigString;
+import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
@@ -99,7 +100,13 @@ public class ArgImpl {
 		}
 		String dereferenced = map.getString(uuid, arg.getContent());
 		if (EnvManagerConfigString.isEnvMgmtConfigString(dereferenced)) {
-			dereferenced = map.convertEngMgmtConfigString(dereferenced);
+			IEnvManager mgr = map.getEnvManager();
+			if (mgr != null) {
+				dereferenced = mgr.getBashConcatenation("\n", false, new EnvManagerConfigString(dereferenced), //$NON-NLS-1$
+						null);
+			} else {
+				dereferenced = ""; //$NON-NLS-1$
+			}
 		}
 		String undefined = arg.getIsUndefinedIfMatches();
 		if (undefined != null && dereferenced != null) {
@@ -113,32 +120,7 @@ public class ArgImpl {
 		return dereferenced;
 	}
 
-	private final String uuid;
-
-	private final ArgType arg;
-
-	private final IVariableMap map;
-
-	/**
-	 * @param uuid
-	 *            unique id associated with this resource manager operation (can be <code>null</code>).
-	 * @param arg
-	 *            JAXB data element.
-	 * @param map
-	 *            environment in which to resolve content of the arg
-	 */
-	public ArgImpl(String uuid, ArgType arg, IVariableMap map) {
-		this.uuid = uuid;
-		this.arg = arg;
-		this.map = map;
+	private ArgImpl() {
 	}
 
-	/**
-	 * Will not return <code>null</code>.
-	 * 
-	 * @return argument resolved in the provided environment
-	 */
-	public String getResolved() {
-		return getResolved(uuid, arg, map);
-	}
 }

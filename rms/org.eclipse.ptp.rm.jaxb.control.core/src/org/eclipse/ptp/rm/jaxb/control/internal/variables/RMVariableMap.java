@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
@@ -123,18 +122,28 @@ public class RMVariableMap implements IVariableMap {
 				|| name.equals(JAXBControlConstants.STDERR_REMOTE_FILE) || name.equals(JAXBControlConstants.PTP_DIRECTORY);
 	}
 
-	private IEnvManager envManager;
-
 	private final Map<String, Object> variables;
-
 	private final Map<String, Object> discovered;
 	private boolean initialized;
+	private IEnvManager envManager;
 
 	public RMVariableMap() {
-		this.envManager = null;
 		this.variables = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.discovered = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.initialized = false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getEnvManager()
+	 */
+	public IEnvManager getEnvManager() {
+		return envManager;
+	}
+
+	public void setEnvManager(IEnvManager mgr) {
+		this.envManager = mgr;
 	}
 
 	/*
@@ -146,20 +155,6 @@ public class RMVariableMap implements IVariableMap {
 		variables.clear();
 		discovered.clear();
 		initialized = false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#convertEngMgmtConfigString(java.lang.String)
-	 */
-	public String convertEngMgmtConfigString(String string) {
-		assert EnvManagerConfigString.isEnvMgmtConfigString(string);
-		if (envManager == null) {
-			return ""; //$NON-NLS-1$
-		} else {
-			return envManager.getBashConcatenation("\n", false, new EnvManagerConfigString(string), null); //$NON-NLS-1$
-		}
 	}
 
 	/*
@@ -340,15 +335,6 @@ public class RMVariableMap implements IVariableMap {
 	public void setDefault(String name, String defaultValue) {
 		// TODO Auto-generated method stub
 
-	}
-
-	/**
-	 * Sets the {@link IEnvManager} which will be used to generate Bash commands from environment manager configuration strings.
-	 * 
-	 * @param envManager
-	 */
-	public void setEnvManager(IEnvManager envManager) {
-		this.envManager = envManager;
 	}
 
 	/*

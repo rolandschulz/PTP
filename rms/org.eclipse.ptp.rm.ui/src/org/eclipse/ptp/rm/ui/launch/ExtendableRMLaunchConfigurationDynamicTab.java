@@ -16,7 +16,6 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
@@ -40,10 +39,9 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	private Composite control;
 
 	/**
-	 * @since 2.0
+	 * @since 3.0
 	 */
-	public ExtendableRMLaunchConfigurationDynamicTab(ILaunchConfigurationDialog dialog) {
-		super(dialog);
+	public ExtendableRMLaunchConfigurationDynamicTab() {
 	}
 
 	/*

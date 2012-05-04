@@ -13,7 +13,6 @@ package org.eclipse.ptp.rm.ui.launch;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.swt.graphics.Image;
@@ -28,10 +27,9 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	private final RMLaunchConfigurationDynamicTabWidgetListener widgetListener = createListener();
 
 	/**
-	 * @since 2.0
+	 * @since 3.0
 	 */
-	public BaseRMLaunchConfigurationDynamicTab(ILaunchConfigurationDialog dialog) {
-		super(dialog);
+	public BaseRMLaunchConfigurationDynamicTab() {
 	}
 
 	/*

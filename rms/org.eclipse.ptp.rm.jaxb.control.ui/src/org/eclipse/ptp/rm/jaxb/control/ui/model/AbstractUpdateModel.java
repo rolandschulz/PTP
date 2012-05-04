@@ -41,6 +41,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	protected class ValidateJob extends UIJob {
 		public ValidateJob() {
 			super(JAXBControlUIConstants.VALIDATE);
+			setSystem(true);
 		}
 
 		@Override

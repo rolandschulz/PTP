@@ -17,11 +17,9 @@ import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 
 /**
- * Base class for special model type which can be read-only. In the latter case,
- * it has a list of args which must be resolved using the refreshed environment,
- * but it does not store a value. If it is instead provided with a
- * name/reference, it acts in the default manner, refreshing and storing the
- * value entered.
+ * Base class for special model type which can be read-only. In the latter case, it has a list of args which must be resolved using
+ * the refreshed environment, but it does not store a value. If it is instead provided with a name/reference, it acts in the default
+ * manner, refreshing and storing the value entered.
  * 
  * @author arossi
  * 
@@ -34,11 +32,9 @@ public abstract class DynamicControlUpdateModel extends AbstractUpdateModel {
 	 * Constructor for read-only widget.
 	 * 
 	 * @param dynamic
-	 *            arguments which need to be resolved using the refreshed
-	 *            environment.
+	 *            arguments which need to be resolved using the refreshed environment.
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 */
 	protected DynamicControlUpdateModel(List<ArgType> dynamic, ValueUpdateHandler handler) {
 		super(JAXBControlUIConstants.ZEROSTR, handler);
@@ -49,11 +45,10 @@ public abstract class DynamicControlUpdateModel extends AbstractUpdateModel {
 	 * Default constructor for editable widget.
 	 * 
 	 * @param name
-	 *            name of the model, which will correspond to the name of a
-	 *            Property or Attribute if the widget value is to be saved.
+	 *            name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be
+	 *            saved.
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 */
 	protected DynamicControlUpdateModel(String name, ValueUpdateHandler handler) {
 		super(name, handler);

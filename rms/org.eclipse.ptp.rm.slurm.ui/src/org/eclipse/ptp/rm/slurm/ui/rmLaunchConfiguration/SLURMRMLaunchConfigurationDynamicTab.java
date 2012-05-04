@@ -15,7 +15,6 @@ package org.eclipse.ptp.rm.slurm.ui.rmLaunchConfiguration;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
@@ -26,7 +25,6 @@ import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.slurm.core.SLURMJobAttributes;
 import org.eclipse.ptp.rm.slurm.core.SLURMLaunchConfiguration;
 import org.eclipse.ptp.rm.slurm.ui.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -72,10 +70,6 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	private static final RMLaunchValidation success = new RMLaunchValidation(true, ""); //$NON-NLS-1$
 
 	private Composite control;
-
-	public SLURMRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
-		super(dialog);
-	}
 
 	/*
 	 * (non-Javadoc)

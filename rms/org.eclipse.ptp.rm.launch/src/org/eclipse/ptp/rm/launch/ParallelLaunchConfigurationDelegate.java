@@ -108,48 +108,10 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				return;
 			}
 
-			/*
-			 * Allow user to start resource manager if not running.
-			 */
-			// final IResourceManager rm = getResourceManager(configuration);
-			// if (rm == null) {
-			// throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-			// Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
-			// }
-			// if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
-			// if (!Preferences.getBoolean(RMLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START)) {
-			// Display.getDefault().syncExec(new Runnable() {
-			// @Override
-			// public void run() {
-			// MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(Display.getDefault()
-			// .getActiveShell(), Messages.ParallelLaunchConfigurationDelegate_Confirm_start, NLS.bind(
-			// Messages.ParallelLaunchConfigurationDelegate_RM_currently_stopped, configuration.getName()),
-			// Messages.ParallelLaunchConfigurationDelegate_Always_start, false, null, null);
-			// if (dialog.getReturnCode() == IDialogConstants.OK_ID) {
-			// startRM(rm);
-			// }
-			// if (dialog.getToggleState()) {
-			// Preferences.setBoolean(RMLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START,
-			// dialog.getReturnCode() == IDialogConstants.OK_ID);
-			// }
-			// }
-			//
-			// });
-			// } else {
-			// startRM(rm);
-			// }
-			// if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
-			// return;
-			// }
-			// }
-
 			progress.worked(10);
 			progress.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
 
-			if (!verifyLaunchAttributes(configuration, mode, progress.newChild(10))) {
-				return;
-			}
-			if (progress.isCanceled()) {
+			if (!verifyLaunchAttributes(configuration, mode, progress.newChild(10)) || progress.isCanceled()) {
 				return;
 			}
 

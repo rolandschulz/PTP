@@ -47,7 +47,7 @@ public interface IJobController extends IJobControl {
 	public String getConnectionName();
 
 	/**
-	 * @return resource manager environment
+	 * @return variable resolver environment
 	 */
 	public IVariableMap getEnvironment();
 

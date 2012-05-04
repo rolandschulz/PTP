@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.util.Map;
 
-import org.eclipse.ptp.ems.core.EnvManagerConfigString;
+import org.eclipse.ptp.ems.core.IEnvManager;
 
 /**
  * High-level interface for resolver environments.
@@ -33,17 +33,6 @@ public interface IVariableMap {
 	public void clear();
 
 	/**
-	 * Given an environment manager configuration string, returns the corresponding sequence of Bash commands.
-	 * <p>
-	 * It is a precondition that <code>string</code> satisfies {@link EnvManagerConfigString#isEnvMgmtConfigString(String)}.
-	 * 
-	 * @param string
-	 *            non-<code>null</code>
-	 * @return non-<code>null</code>
-	 */
-	public String convertEngMgmtConfigString(String string);
-
-	/**
 	 * Search for a property or attribute.
 	 * 
 	 * @param name
@@ -53,11 +42,26 @@ public interface IVariableMap {
 	public Object get(String name);
 
 	/**
+	 * Get the default value of the attribute
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public String getDefault(String name);
+
+	/**
 	 * Get the map of Properties and Attributes discovered at runtime.
 	 * 
 	 * @return the map containing any variables added through discovery processes, or <code>null</code> if unsupported
 	 */
 	public Map<String, Object> getDiscovered();
+
+	/**
+	 * Get the environment manager associated with this map.
+	 * 
+	 * @return environment manager
+	 */
+	public IEnvManager getEnvManager();
 
 	/**
 	 * Get the string representation of an expression.
@@ -67,14 +71,6 @@ public interface IVariableMap {
 	 * @return resolved expression
 	 */
 	public String getString(String value);
-
-	/**
-	 * Get the default value of the attribute
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public String getDefault(String name);
 
 	/**
 	 * Get the string representation of an expression. Substitutes any occurrences of {@link JAXBControlConstants#JOB_ID_TAG} with

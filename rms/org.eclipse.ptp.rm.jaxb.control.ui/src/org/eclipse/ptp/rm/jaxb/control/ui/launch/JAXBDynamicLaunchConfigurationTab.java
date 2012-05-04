@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
@@ -106,9 +105,10 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	public JAXBDynamicLaunchConfigurationTab(IJobController control, ILaunchConfigurationDialog dialog,
-			TabControllerType controller, IJAXBParentLaunchConfigurationTab parentTab) {
-		this(control, dialog, parentTab);
+	public JAXBDynamicLaunchConfigurationTab(IJobController control, TabControllerType controller,
+			IJAXBParentLaunchConfigurationTab parentTab, IProgressMonitor monitor) {
+		this(control, parentTab);
+		setProgressMonitor(monitor);
 		String title = controller.getTitle();
 		if (title != null) {
 			this.title = title;
@@ -131,9 +131,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	protected JAXBDynamicLaunchConfigurationTab(IJobController control, ILaunchConfigurationDialog dialog,
-			IJAXBParentLaunchConfigurationTab parentTab) {
-		super(parentTab, dialog);
+	protected JAXBDynamicLaunchConfigurationTab(IJobController control, IJAXBParentLaunchConfigurationTab parentTab) {
+		super(parentTab);
 		fControl = control;
 		sharedModels = new ArrayList<IUpdateModel>();
 		updateHandler = parentTab.getUpdateHandler();

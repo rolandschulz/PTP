@@ -30,7 +30,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * 
 	 * @param launchContentsChangedListener
 	 */
-	public abstract void addContentsChangedListener(IRMLaunchConfigurationContentsChangedListener launchContentsChangedListener);
+	public void addContentsChangedListener(IRMLaunchConfigurationContentsChangedListener launchContentsChangedListener);
 
 	/**
 	 * Returns whether this tab is in a state that allows the launch configuration whose values this tab is showing to be saved.
@@ -47,7 +47,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @return whether this tab is in a state that allows the current launch configuration to be saved
 	 * @since 6.0
 	 */
-	public abstract RMLaunchValidation canSave(Control control);
+	public RMLaunchValidation canSave(Control control);
 
 	/**
 	 * Creates the top level control for the dynamic part of the parallel launch configuration tab under the given parent composite.
@@ -63,7 +63,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @throws CoreException
 	 * @since 6.0
 	 */
-	public abstract void createControl(Composite parent, String id) throws CoreException;
+	public void createControl(Composite parent, String id) throws CoreException;
 
 	/**
 	 * Returns the top level control for the dynamic portion of the parallel tab.
@@ -87,7 +87,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @return
 	 * @since 6.0
 	 */
-	public abstract RMLaunchValidation initializeFrom(ILaunchConfiguration configuration);
+	public RMLaunchValidation initializeFrom(ILaunchConfiguration configuration);
 
 	/**
 	 * Returns whether this tab is in a valid state in the context of the specified launch configuration.
@@ -101,7 +101,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @return whether this tab is in a valid state
 	 * @since 6.0
 	 */
-	public abstract RMLaunchValidation isValid(ILaunchConfiguration launchConfig);
+	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig);
 
 	/**
 	 * Copies values from this tab into the given launch configuration.
@@ -111,12 +111,12 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @return
 	 * @since 6.0
 	 */
-	public abstract RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration);
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration);
 
 	/**
 	 * @param launchContentsChangedListener
 	 */
-	public abstract void removeContentsChangedListener(IRMLaunchConfigurationContentsChangedListener launchContentsChangedListener);
+	public void removeContentsChangedListener(IRMLaunchConfigurationContentsChangedListener launchContentsChangedListener);
 
 	/**
 	 * Initializes the given launch configuration with default values for this tab. This method is called when a new launch
@@ -128,6 +128,6 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @return
 	 * @since 6.0
 	 */
-	public abstract RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration);
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration);
 
 }

@@ -15,7 +15,6 @@ import java.util.TreeSet;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
@@ -53,8 +52,7 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 	 * @param tabIndex
 	 *            child index for the parent
 	 */
-	protected AbstractJAXBLaunchConfigurationTab(IJAXBParentLaunchConfigurationTab parentTab, ILaunchConfigurationDialog dialog) {
-		super(dialog);
+	protected AbstractJAXBLaunchConfigurationTab(IJAXBParentLaunchConfigurationTab parentTab) {
 		this.parentTab = parentTab;
 		this.title = Messages.DefaultDynamicTab_title;
 		visibleList = new TreeSet<String>();

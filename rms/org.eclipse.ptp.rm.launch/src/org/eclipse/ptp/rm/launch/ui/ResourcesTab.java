@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -110,7 +111,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setErrorMessage(Messages.ResourcesTab_No_Resource_Manager);
 			return false;
 		}
-		IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl);
+		IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl, null);
 		final Composite launchComp = getLaunchAttrsScrollComposite();
 		if (dynamicTab == null || launchComp == null) {
 			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { fLaunchControl
@@ -141,12 +142,12 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		comp.setLayoutData(gd);
 
-		new Label(comp, SWT.NONE).setText("Target System Template:");
+		new Label(comp, SWT.NONE).setText("Target System Configuration:");
 
 		fSystemTypeCombo = new Combo(comp, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		fSystemTypeCombo.setLayoutData(gd);
-		fSystemTypeCombo.add("Please select a target system template");
+		fSystemTypeCombo.add("Please select a target system configuration");
 		for (ProviderInfo provider : ProviderInfo.getProviders()) {
 			fSystemTypeCombo.add(provider.getName());
 			fProviders.add(provider.getName());
@@ -160,7 +161,17 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			public void widgetSelected(SelectionEvent e) {
 				rmTypeSelectionChanged();
 				updateEnablement();
-				updateLaunchAttributeControls(null, getLaunchConfiguration());
+				try {
+					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+						@Override
+						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+							SubMonitor progress = SubMonitor.convert(monitor, 1);
+							updateLaunchAttributeControls(null, getLaunchConfiguration(), progress.newChild(1));
+						}
+					});
+				} catch (InvocationTargetException e1) {
+				} catch (InterruptedException e1) {
+				}
 				updateLaunchConfigurationDialog();
 			}
 		});
@@ -169,34 +180,39 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		fRemoteConnectionWidget = new RemoteConnectionWidget(comp, SWT.NONE, null, getLaunchConfigurationDialog());
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 		fRemoteConnectionWidget.addSelectionListener(new SelectionListener() {
-			private boolean enabled = true;
-
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (enabled) {
-					IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
-					if (conn == null) {
-						fLaunchControl = null;
-						fRemoteConnection = conn;
-						updateLaunchAttributeControls(null, getLaunchConfiguration());
-						updateLaunchConfigurationDialog();
-					} else if (connectionChanged(fSelectedLaunchControl)) {
-						fLaunchControl = fSelectedLaunchControl;
-						fRemoteConnection = conn;
-						updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration());
-						updateLaunchConfigurationDialog();
-					} else {
-						/*
-						 * Failed to change connection, reset back to the previous one
-						 */
-						enabled = false;
-						fRemoteConnectionWidget.setConnection(fRemoteConnection);
-						enabled = true;
-					}
+				try {
+					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+						@Override
+						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+							SubMonitor progress = SubMonitor.convert(monitor, 20);
+							IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
+							if (conn == null) {
+								fLaunchControl = null;
+								fRemoteConnection = null;
+								updateLaunchAttributeControls(null, getLaunchConfiguration(), progress.newChild(10));
+								updateLaunchConfigurationDialog();
+							} else if (connectionChanged(fSelectedLaunchControl, progress.newChild(10))) {
+								fLaunchControl = fSelectedLaunchControl;
+								fRemoteConnection = conn;
+								updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), progress.newChild(10));
+								updateLaunchConfigurationDialog();
+							} else {
+								/*
+								 * Failed to change connection, reset back to the previous one
+								 */
+								fRemoteConnectionWidget.setConnection(fRemoteConnection);
+							}
+						}
+
+					});
+				} catch (InvocationTargetException e1) {
+				} catch (InterruptedException e1) {
 				}
 			}
 		});
@@ -263,6 +279,26 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				String remName = LaunchUtils.getConnectionName(configuration);
 				if (remId != null && remName != null) {
 					fRemoteConnectionWidget.setConnection(remId, remName);
+					/*
+					 * Update UI
+					 */
+					try {
+						getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+							@Override
+							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+								SubMonitor progress = SubMonitor.convert(monitor, 20);
+								if (connectionChanged(fSelectedLaunchControl, progress.newChild(10))) {
+									fLaunchControl = fSelectedLaunchControl;
+									fRemoteConnection = fRemoteConnectionWidget.getConnection();
+									updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), progress.newChild(10));
+									updateLaunchConfigurationDialog();
+								}
+							}
+
+						});
+					} catch (InvocationTargetException e1) {
+					} catch (InterruptedException e1) {
+					}
 					fDefaultConnection = false;
 				}
 			}
@@ -282,7 +318,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setErrorMessage(Messages.ResourcesTab_No_Resource_Manager);
 			return false;
 		}
-		IRMLaunchConfigurationDynamicTab rmDynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl);
+		IRMLaunchConfigurationDynamicTab rmDynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl, null);
 		if (rmDynamicTab == null) {
 			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { fLaunchControl
 					.getConfiguration().getName() }));
@@ -307,7 +343,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		int index = fSystemTypeCombo.getSelectionIndex();
 		if (fLaunchControl != null && index > 0) {
 			ProviderInfo provider = ProviderInfo.getProviders().get(index - 1);
-			LaunchUtils.setTemplateName(configuration, provider.getName());
+			LaunchUtils.setConfigurationName(configuration, provider.getName());
 			LaunchUtils.setResourceManagerUniqueName(configuration, fLaunchControl.getControlId());
 			LaunchUtils.setConnectionName(configuration, fLaunchControl.getConnectionName());
 			LaunchUtils.setRemoteServicesId(configuration, fLaunchControl.getRemoteServicesId());
@@ -315,7 +351,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			if (monitorData != null) {
 				LaunchUtils.setSystemType(configuration, monitorData.getSchedulerType());
 			}
-			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl);
+			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl, null);
 			if (dynamicTab == null) {
 				setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { fLaunchControl
 						.getConfiguration().getName() }));
@@ -368,10 +404,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	private void rmTypeSelectionChanged() {
 		int i = fSystemTypeCombo.getSelectionIndex();
 		if (i > 0) {
-			String controlId = LaunchUtils.getResourceManagerUniqueName(getLaunchConfiguration());
-			if (fSelectedLaunchControl == null || !fSelectedLaunchControl.getControlId().equals(controlId)) {
-				ProviderInfo provider = ProviderInfo.getProviders().get(i - 1);
-				final ILaunchController control = RMLaunchUtils.getLaunchControl(provider.getName(), controlId);
+			ProviderInfo provider = ProviderInfo.getProviders().get(i - 1);
+			if (fSelectedLaunchControl == null || !fSelectedLaunchControl.getConfiguration().getName().equals(provider.getName())) {
+				ILaunchController control = RMLaunchUtils.getLaunchControl(provider.getName());
 				if (control != null) {
 					if (fDefaultConnection) {
 						fRemoteConnectionWidget.setConnection(control.getRemoteServicesId(), control.getConnectionName());
@@ -397,7 +432,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 	}
 
-	private boolean connectionChanged(final ILaunchController control) {
+	private boolean connectionChanged(final ILaunchController control, IProgressMonitor monitor) {
 		IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
 		if (conn != null) {
 			try {
@@ -420,22 +455,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				}
 			}
 			try {
-				getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
-					@Override
-					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-						try {
-							System.out.println("before start");
-							control.start(monitor);
-							System.out.println("after start");
-						} catch (CoreException e) {
-							throw new InvocationTargetException(e);
-						}
-					}
-				});
+				control.start(monitor);
 				return true;
-			} catch (InvocationTargetException e) {
-				RMLaunchPlugin.errorDialog(e.getCause().getLocalizedMessage(), e.getCause());
-			} catch (InterruptedException e) {
+			} catch (CoreException e) {
 				RMLaunchPlugin.errorDialog(e.getCause().getLocalizedMessage(), e.getCause());
 			}
 		}
@@ -456,18 +478,33 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param rm
 	 * @return
 	 */
-	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final IJobController control) {
+	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final IJobController control, IProgressMonitor monitor) {
 		if (!fDynamicTabs.containsKey(control)) {
-			try {
-				IRMLaunchConfigurationDynamicTab dynamicTab = new JAXBControllerLaunchConfigurationTab(control,
-						getLaunchConfigurationDialog());
-				dynamicTab.addContentsChangedListener(launchContentsChangedListener);
-				fDynamicTabs.put(control, dynamicTab);
-				return dynamicTab;
-			} catch (Throwable e) {
-				setErrorMessage(e.getMessage());
-				RMLaunchPlugin.errorDialog(e.getMessage(), e);
-				return null;
+			if (monitor != null) {
+				try {
+					IRMLaunchConfigurationDynamicTab dynamicTab = new JAXBControllerLaunchConfigurationTab(control, monitor);
+					dynamicTab.addContentsChangedListener(launchContentsChangedListener);
+					fDynamicTabs.put(control, dynamicTab);
+					return dynamicTab;
+				} catch (Throwable e) {
+					setErrorMessage(e.getMessage());
+					RMLaunchPlugin.errorDialog(e.getMessage(), e);
+					return null;
+				}
+			} else {
+				final IRMLaunchConfigurationDynamicTab[] dynamicTab = new IRMLaunchConfigurationDynamicTab[1];
+				try {
+					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+						@Override
+						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+							SubMonitor progress = SubMonitor.convert(monitor, 1);
+							dynamicTab[0] = getLaunchConfigurationDynamicTab(control, progress.newChild(1));
+						}
+					});
+				} catch (InvocationTargetException e) {
+				} catch (InterruptedException e) {
+				}
+				return dynamicTab[0];
 			}
 		}
 		return fDynamicTabs.get(control);
@@ -481,14 +518,15 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param queue
 	 * @param launchConfiguration
 	 */
-	private void updateLaunchAttributeControls(IJobController control, ILaunchConfiguration launchConfiguration) {
+	private void updateLaunchAttributeControls(IJobController control, ILaunchConfiguration launchConfiguration,
+			IProgressMonitor monitor) {
 		final ScrolledComposite launchAttrsScrollComp = getLaunchAttrsScrollComposite();
 		launchAttrsScrollComp.setContent(null);
 		for (Control child : launchAttrsScrollComp.getChildren()) {
 			child.dispose();
 		}
 		if (control != null) {
-			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(control);
+			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(control, monitor);
 			if (dynamicTab != null) {
 				try {
 					dynamicTab.createControl(launchAttrsScrollComp, control.getControlId());

@@ -17,7 +17,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
@@ -61,10 +60,9 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	private Composite control;
 
 	/**
-	 * @param dialog
+	 * @param context
 	 */
-	protected ExtensibleJAXBControllerTab(ILaunchConfigurationDialog dialog) {
-		super(dialog);
+	protected ExtensibleJAXBControllerTab() {
 		voidRMConfig = false;
 		initialized = false;
 		lastIndex = 0;

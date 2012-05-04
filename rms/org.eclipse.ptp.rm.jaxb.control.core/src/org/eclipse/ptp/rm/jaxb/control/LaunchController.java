@@ -120,15 +120,13 @@ public class LaunchController implements ILaunchController {
 	}
 
 	private final ConnectionChangeListener connectionListener = new ConnectionChangeListener();
-
 	private final Map<String, String> launchEnv = new TreeMap<String, String>();
-
 	private final JobIdPinTable pinTable = new JobIdPinTable();
+	private final String fControlId;
+
 	private ICommandJob interactiveJob;
 	private ICommandJobStatusMap jobStatusMap;
-
 	private RMVariableMap rmVarMap;
-	protected ResourceManagerData configData;
 	private ControlType controlData;
 	private String servicesId;
 	private String connectionName;
@@ -138,19 +136,15 @@ public class LaunchController implements ILaunchController {
 	private String configURL;
 	private String configXML;
 	private RemoteServicesDelegate fRemoteServicesDelegate;
-	private final String fControlId;
+	private ResourceManagerData configData;
 
-	/**
-	 * @param jaxbServiceProvider
-	 *            the configuration object containing resource manager specifics
-	 */
-	public LaunchController(String name) {
-		this(name, UUID.randomUUID().toString());
+	public LaunchController(String configurationName) {
+		this(configurationName, UUID.randomUUID().toString());
 	}
 
-	public LaunchController(String name, String controlId) {
+	public LaunchController(String configurationName, String controlId) {
 		fControlId = controlId;
-		ModelManager.getInstance().getUniverse().addResourceManager(name, controlId);
+		ModelManager.getInstance().getUniverse().addResourceManager(configurationName, controlId);
 	}
 
 	/*
@@ -554,18 +548,29 @@ public class LaunchController implements ILaunchController {
 		return changedValue;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.ILaunchController#setConnectionName(java.lang.String)
+	 */
 	public void setConnectionName(String connName) {
 		connectionName = connName;
 	}
 
-	/**
-	 * @param interactiveJob
-	 *            open remote process
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.IJobController#setInteractiveJob(org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob)
 	 */
 	public synchronized void setInteractiveJob(ICommandJob interactiveJob) {
 		this.interactiveJob = interactiveJob;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.ILaunchController#setRemoteServicesId(java.lang.String)
+	 */
 	public void setRemoteServicesId(String id) {
 		servicesId = id;
 	}

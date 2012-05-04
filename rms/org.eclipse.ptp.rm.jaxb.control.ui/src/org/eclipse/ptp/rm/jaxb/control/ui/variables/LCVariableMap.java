@@ -25,7 +25,6 @@ import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
@@ -114,7 +113,7 @@ public class LCVariableMap implements IVariableMap {
 		}
 	}
 
-	private final IEnvManager envManager;
+	private IEnvManager envManager;
 	private final Map<String, Object> linkedTo;
 	private final Map<String, Object> excluded;
 	private final Map<String, Object> values;
@@ -125,8 +124,7 @@ public class LCVariableMap implements IVariableMap {
 
 	private String rmPrefix;
 
-	public LCVariableMap(IEnvManager envManager) {
-		this.envManager = envManager;
+	public LCVariableMap() {
 		this.values = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.excluded = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.defaultValues = Collections.synchronizedMap(new TreeMap<String, String>());
@@ -230,6 +228,24 @@ public class LCVariableMap implements IVariableMap {
 	 */
 	public Map<String, Object> getDiscovered() {
 		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getEnvironmentManager()
+	 */
+	public IEnvManager getEnvironmentManager() {
+		return envManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getEnvManager()
+	 */
+	public IEnvManager getEnvManager() {
+		return envManager;
 	}
 
 	/**
@@ -411,6 +427,15 @@ public class LCVariableMap implements IVariableMap {
 		}
 	}
 
+	/**
+	 * Sets the {@link IEnvManager} which will be used to generate Bash commands from environment manager configuration strings.
+	 * 
+	 * @param envManager
+	 */
+	public void setEnvManager(IEnvManager envManager) {
+		this.envManager = envManager;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -555,15 +580,5 @@ public class LCVariableMap implements IVariableMap {
 				put(name, o);
 			}
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#convertEngMgmtConfigString(java.lang.String)
-	 */
-	public String convertEngMgmtConfigString(String string) {
-		assert EnvManagerConfigString.isEnvMgmtConfigString(string);
-		return envManager.getBashConcatenation("\n", false, new EnvManagerConfigString(string), null); //$NON-NLS-1$
 	}
 }

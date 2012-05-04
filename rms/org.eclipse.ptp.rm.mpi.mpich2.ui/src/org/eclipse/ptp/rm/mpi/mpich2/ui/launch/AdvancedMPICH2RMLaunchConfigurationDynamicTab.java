@@ -12,7 +12,6 @@ package org.eclipse.ptp.rm.mpi.mpich2.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
@@ -130,13 +129,6 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	 * @since 2.0
 	 */
 	protected Text argsText;
-
-	/**
-	 * @since 2.0
-	 */
-	public AdvancedMPICH2RMLaunchConfigurationDynamicTab(ILaunchConfigurationDialog dialog) {
-		super(dialog);
-	}
 
 	/**
 	 * @since 2.0

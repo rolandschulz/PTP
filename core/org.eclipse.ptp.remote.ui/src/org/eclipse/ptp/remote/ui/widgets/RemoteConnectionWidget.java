@@ -113,6 +113,8 @@ public class RemoteConnectionWidget extends Composite {
 	private IRemoteServices[] fRemoteServices;
 	private IRemoteConnection fSelectedConnection;
 	private IRemoteServices fSelectedServices;
+	private boolean fSelectionListernersEnabled = true;
+
 	private final IRunnableContext fContext;
 
 	private String[] fAttrHints;
@@ -267,8 +269,10 @@ public class RemoteConnectionWidget extends Composite {
 	 *            connection to select
 	 */
 	public void setConnection(IRemoteConnection connection) {
+		fSelectionListernersEnabled = false;
 		handleRemoteServiceSelected(connection);
 		handleConnectionSelected();
+		fSelectionListernersEnabled = true;
 	}
 
 	/**
@@ -285,8 +289,7 @@ public class RemoteConnectionWidget extends Composite {
 		if (services != null) {
 			IRemoteConnection connection = getRemoteConnection(services, name);
 			if (connection != null) {
-				handleRemoteServiceSelected(connection);
-				handleConnectionSelected();
+				setConnection(connection);
 			}
 		}
 	}
@@ -324,8 +327,10 @@ public class RemoteConnectionWidget extends Composite {
 	}
 
 	private void notifyListeners(SelectionEvent e) {
-		for (Object listener : fSelectionListeners.getListeners()) {
-			((SelectionListener) listener).widgetSelected(e);
+		if (fSelectionListernersEnabled) {
+			for (Object listener : fSelectionListeners.getListeners()) {
+				((SelectionListener) listener).widgetSelected(e);
+			}
 		}
 	}
 
@@ -370,8 +375,8 @@ public class RemoteConnectionWidget extends Composite {
 			Event evt = new Event();
 			evt.widget = this;
 			notifyListeners(new SelectionEvent(evt));
-			fWidgetListener.setEnabled(enabled);
 		}
+		fWidgetListener.setEnabled(enabled);
 	}
 
 	/**

@@ -67,11 +67,11 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String ATTR_CONNECTION_NAME = PTP_LAUNCH_ID + ".CONNECTION_NAME"; //$NON-NLS-1$
 
 	/**
-	 * Launch configuration attribute key. The values is the selected configuration template name.
+	 * Launch configuration attribute key. The values is the selected configuration name.
 	 * 
 	 * @since 6.0
 	 */
-	public static final String ATTR_TEMPLATE_NAME = PTP_LAUNCH_ID + ".TEMPLATE_NAME"; //$NON-NLS-1$
+	public static final String ATTR_CONFIGURATION_NAME = PTP_LAUNCH_ID + ".CONFIGURATION_NAME"; //$NON-NLS-1$
 
 	/**
 	 * Launch configuration attribute key. The values is the selected system type.
