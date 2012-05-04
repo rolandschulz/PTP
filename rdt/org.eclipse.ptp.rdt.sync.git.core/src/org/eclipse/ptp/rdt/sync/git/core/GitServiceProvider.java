@@ -14,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +32,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
-import org.eclipse.ptp.rdt.sync.core.ISyncListener;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -62,8 +60,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private Integer fWaitingThreadsCount = 0;
 	private Integer syncTaskId = -1; // ID for most recent synchronization task, functions as a time-stamp
 	private int finishedSyncTaskId = -1; // all synchronizations up to this ID (including it) have finished
-	
-	private final Set<ISyncListener> syncListenerSet = new HashSet<ISyncListener>();
 	
 	// Simple pair class for bundling a project and build scenario.
 	// Since we use this as a key, equality testing is important.
@@ -313,12 +309,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				return;
 			}
 			
-			// If there are merge conflicts, do not sync unless we are told to resolve the conflicts or this is a forced sync.
-			// The latter is useful to update any changes that occurred remotely.
+			// Do not sync if there are merge conflicts, and we are not told to resolve them.
 			// Note: This is not just for efficiency but to prevent infinite sync loops, which can occur because we reset the
 			// repo after a merge conflict, which triggers another sync, which causes a conflict, which causes another reset...
-			if (!(this.getMergeConflictFiles(project, buildScenario).isEmpty())) {
-				if (!resolveAsLocal && syncFlags == SyncFlag.NO_FORCE)
+			if (!resolveAsLocal && !(this.getMergeConflictFiles(project, buildScenario).isEmpty())) {
 				return;
 			}
 
