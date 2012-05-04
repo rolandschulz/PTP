@@ -84,7 +84,10 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	public void synchronizeResolveAsLocal(IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncFileFilter filter,
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
 	/**
-	 * Get the current list of merge-conflicted files
+	 * Get the current list of merge-conflicted files for the passed project and build scenario
+	 * 
+	 * @param project
+	 * @param buildScenario
 	 * @return set of files as project-relative IPaths. This may be an empty set but never null.
 	 * @throws CoreException
 	 *              for system-level problems retrieving merge information
@@ -93,7 +96,9 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	
 	/**
 	 * Get the three parts of the merge-conflicted file (left, right, and ancestor, respectively)
-	 * 
+	 *
+	 * @param project
+	 * @param buildScenario
 	 * @param file
 	 * @return the three parts as strings. Either three strings (some may be empty) or null if file is not merge-conflicted.
 	 * @throws CoreException

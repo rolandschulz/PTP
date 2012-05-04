@@ -76,24 +76,19 @@ public class SyncMergeEditor {
 
 		protected ICompareInput prepareCompareInput(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 			IProject project = file.getProject();
-			ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
-			BuildScenario buildScenario = BuildConfigurationManager.getInstance().getBuildScenarioForProject(project);
+			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+			BuildScenario buildScenario = bcm.getBuildScenarioForProject(project);
 			String[] mergeParts = null;
 
-			if (provider != null) {
-				try {
-					mergeParts = provider.getMergeConflictParts(project, buildScenario, file);
-				} catch (CoreException e) {
-					RDTSyncUIPlugin.log(e);
-					return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(Messages.SyncMergeEditor_1),
-							new SyncMergeItem(Messages.SyncMergeEditor_1), new SyncMergeItem(Messages.SyncMergeEditor_1));
-				}
-			}
-			
-			if (provider == null) {
+			try {
+				mergeParts = bcm.getMergeConflictParts(project, buildScenario, file);
+			} catch (CoreException e) {
+				RDTSyncUIPlugin.log(e);
 				return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(Messages.SyncMergeEditor_1),
 						new SyncMergeItem(Messages.SyncMergeEditor_1), new SyncMergeItem(Messages.SyncMergeEditor_1));
-			} else if (mergeParts == null) {
+			}
+			
+			if (mergeParts == null) {
 				return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(Messages.SyncMergeEditor_2),
 						new SyncMergeItem(Messages.SyncMergeEditor_2), new SyncMergeItem(Messages.SyncMergeEditor_2));
 			} else {

@@ -13,7 +13,9 @@ package org.eclipse.ptp.rdt.sync.core;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.cdt.core.model.CoreModel;
@@ -27,6 +29,7 @@ import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
 import org.eclipse.cdt.managedbuilder.internal.core.ManagedProject;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -831,5 +834,43 @@ public class BuildConfigurationManager {
 			}
 		}, "Save project CDT data thread"); //$NON-NLS-1$
 		flushThread.start();
+	}
+
+	/**
+	 * Get the current list of merge-conflicted files for the passed project and build scenario
+	 * 
+	 * @param project
+	 * @param buildScenario
+	 * @return set of files as project-relative IPaths. This may be an empty set but never null.
+	 * @throws CoreException
+	 *              for system-level problems retrieving merge information
+	 */
+	public Set<IPath> getMergeConflictFiles(IProject project, BuildScenario buildScenario) throws CoreException {
+		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
+		if (provider == null) { // Error handled in call
+			return new HashSet<IPath>();
+		} else {
+			return provider.getMergeConflictFiles(project, buildScenario);
+		}
+	}
+
+	/**
+	 * Get the three parts of the merge-conflicted file (left, right, and ancestor, respectively)
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param file
+	 * @return the three parts as strings. Either three strings (some may be empty) or null if file is not merge-conflicted or
+	 *         on some problems retrieving the sync provider.
+	 * @throws CoreException
+	 * 				for system-level problems retrieving merge information
+	 */
+	public String[] getMergeConflictParts(IProject project, BuildScenario buildScenario, IFile file) throws CoreException {
+		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
+		if (provider == null) { // Error handled in call
+			return null;
+		} else {
+			return provider.getMergeConflictParts(project, buildScenario, file);
+		}
 	}
 }

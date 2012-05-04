@@ -270,10 +270,10 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	private void update() {
 		mergeConflictedFiles = new HashSet<IPath>();
 		if (project != null) {
-			ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
-			BuildScenario buildScenario = BuildConfigurationManager.getInstance().getBuildScenarioForProject(project);
+			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+			BuildScenario buildScenario = bcm.getBuildScenarioForProject(project);
 			try {
-				mergeConflictedFiles = provider.getMergeConflictFiles(project, buildScenario);
+				mergeConflictedFiles = bcm.getMergeConflictFiles(project, buildScenario);
 			} catch (CoreException e) {
 				RDTSyncUIPlugin.log(e);
 			}
