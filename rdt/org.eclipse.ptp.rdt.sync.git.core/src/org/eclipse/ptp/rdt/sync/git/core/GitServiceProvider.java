@@ -384,7 +384,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 						fSyncConnection.sync(progress.newChild(40), true);
 					}
 				// Unlike other exceptions, we need to do some post-sync activities after a merge exception.
-				// Notify listeners if there is a merge conflict and refresh workspace.
 				// TODO: Refactor code to get rid of duplication of post-sync activities.
 				} catch (RemoteSyncMergeConflictException e) {
 					project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(20));
