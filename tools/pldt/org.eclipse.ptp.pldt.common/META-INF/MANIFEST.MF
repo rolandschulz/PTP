@@ -24,7 +24,6 @@ Export-Package: org.eclipse.ptp.pldt.common,
  org.eclipse.ptp.pldt.common.messages;x-internal:=true,
  org.eclipse.ptp.pldt.common.prefs;
   x-friends:="org.eclipse.ptp.pldt.mpi.core,
-   org.eclipse.ptp.pldt.lapi,
    org.eclipse.ptp.pldt.mpi.analysis,
    org.eclipse.ptp.pldt.mpi.analysis.cdt,
    org.eclipse.ptp.pldt.openmp.analysis,

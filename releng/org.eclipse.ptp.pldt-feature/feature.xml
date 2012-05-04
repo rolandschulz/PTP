@@ -3,9 +3,8 @@
       id="org.eclipse.ptp.pldt"
       label="%featureName"
       version="6.0.0.qualifier"
-      plugin="org.eclipse.ptp.pldt.common"
       provider-name="%providerName"
-      >
+      plugin="org.eclipse.ptp.pldt.common">
 
    <description>
       %description
@@ -104,6 +103,20 @@
 
    <plugin
          id="org.eclipse.ptp.pldt.mpi.analysis.cdt"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.pldt.openacc"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.pldt.openshmem"
          download-size="0"
          install-size="0"
          version="0.0.0"
