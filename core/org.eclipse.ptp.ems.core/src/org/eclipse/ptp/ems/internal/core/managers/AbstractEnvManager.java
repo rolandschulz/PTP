@@ -195,6 +195,27 @@ public abstract class AbstractEnvManager implements IEnvManager {
 		in.close();
 	}
 
+	/**
+	 * Runs the given command on the remote machine that has been configured by {@link #configure(IRemoteConnection)}
+	 * using <tt>bash --login -c </tt><i>command</i>.
+	 * <p>
+	 * This is a convenience method equivalent to <tt>runCommand(pm, true, "bash", "--login", "-c", command)</tt>.
+	 * 
+	 * @param command
+	 *            command (including arguments) to be executed on the remote machine
+	 * 
+	 * @return combined output and error (non-<code>null</code>). Each list element corresponds to one line from the process's
+	 *         standard output or standard error.
+	 * 
+	 * @throws NullPointerException
+	 *             if {@link #configure(IRemoteConnection)} has not been called
+	 * @throws RemoteConnectionException
+	 * @throws IOException
+	 */
+	protected final List<String> runCommandInBashLoginShell(IProgressMonitor pm, String command) throws RemoteConnectionException, IOException {
+		return runCommand(pm, true, "bash", "--login", "-c", command); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
