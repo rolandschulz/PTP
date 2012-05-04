@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -80,6 +79,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	private IRemoteConnection fRemoteConnection;
 	private Bundle fBundle;
 	private boolean fContinuous = true;
+	private IStatus fStatus;
 
 	public AbstractRemoteServerRunner(String name) {
 		super(name);
@@ -93,12 +93,10 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Get the error stream of the remote process. This should only be used for
-	 * non-continuous processes and is only valid for servers in the RUNNING
-	 * state.
+	 * Get the error stream of the remote process. This should only be used for non-continuous processes and is only valid for
+	 * servers in the RUNNING state.
 	 * 
-	 * @return InputStream error stream or null if the server has not been
-	 *         started
+	 * @return InputStream error stream or null if the server has not been started
 	 */
 	public InputStream getErrorStream() {
 		if (fRemoteProcess != null) {
@@ -108,12 +106,10 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Get the input stream of the remote process. This should only be used for
-	 * non-continuous processes and is only valid for servers in the RUNNING
-	 * state.
+	 * Get the input stream of the remote process. This should only be used for non-continuous processes and is only valid for
+	 * servers in the RUNNING state.
 	 * 
-	 * @return InputStream input stream or null if the server has not been
-	 *         started
+	 * @return InputStream input stream or null if the server has not been started
 	 */
 	public InputStream getInputStream() {
 		if (fRemoteProcess != null) {
@@ -132,11 +128,9 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Get the output stream of the remote process. This should only be used for
-	 * non-continuous processes.
+	 * Get the output stream of the remote process. This should only be used for non-continuous processes.
 	 * 
-	 * @return OutputStream output stream or null if the server has not been
-	 *         started
+	 * @return OutputStream output stream or null if the server has not been started
 	 */
 	public OutputStream getOutputStream() {
 		if (fRemoteProcess != null) {
@@ -146,8 +140,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Get the payload. The payload is copied to the remote system using the
-	 * supplied connection if it doesn't exist.
+	 * Get the payload. The payload is copied to the remote system using the supplied connection if it doesn't exist.
 	 * 
 	 * @return
 	 */
@@ -407,8 +400,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Set the working directory. This is the location of the payload on the
-	 * remote system.
+	 * Set the working directory. This is the location of the payload on the remote system.
 	 * 
 	 * @param workDir
 	 *            working directory
@@ -418,9 +410,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Start the server launch. Clients should check the server status with
-	 * {@link #getServerState()} or use {@link #waitForServerStart} to determine
-	 * when the server has actually started.
+	 * Start the server launch. Clients should check the server status with {@link #getServerState()} or use
+	 * {@link #waitForServerStart} to determine when the server has actually started.
 	 * 
 	 * @param monitor
 	 *            progress monitor that can be used to cancel the launch
@@ -477,6 +468,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 					throw new IOException(Messages.AbstractRemoteServerRunner_cannotRunUnpack);
 				}
 
+				fStatus = Status.OK_STATUS;
+
 				if (!subMon.isCanceled()) {
 					schedule();
 				}
@@ -489,14 +482,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Wait for the server to finished. Will do nothing if the server is
-	 * stopped.
+	 * Wait for the server to finished. Will do nothing if the server is stopped.
 	 * 
 	 * @param monitor
 	 *            progress monitor to cancel waiting
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public void waitForServerFinish(IProgressMonitor monitor) {
+	public IStatus waitForServerFinish(IProgressMonitor monitor) {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
 			while (getServerState() != ServerState.STOPPED && !subMon.isCanceled()) {
@@ -507,6 +499,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 					}
 				}
 			}
+			return fStatus;
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -515,12 +508,10 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Wait for the server to start up for at most "timeout" ms. Will do nothing
-	 * if the server is stopped.
+	 * Wait for the server to start up for at most "timeout" ms. Will do nothing if the server is stopped.
 	 * 
 	 * @param timeout
-	 *            time (in ms) to wait for server startup. A timeout of 0 means
-	 *            wait forever.
+	 *            time (in ms) to wait for server startup. A timeout of 0 means wait forever.
 	 * @since 5.0
 	 */
 	public void waitForServerStart(int timeout) {
@@ -538,8 +529,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Wait for the server to start up. Will do nothing if the server is
-	 * stopped.
+	 * Wait for the server to start up. Will do nothing if the server is stopped.
 	 * 
 	 * @param monitor
 	 *            progress monitor to cancel waiting
@@ -564,8 +554,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Check if the payload exists on the remote machine, and if not, or if it
-	 * has changed then upload a copy.
+	 * Check if the payload exists on the remote machine, and if not, or if it has changed then upload a copy.
 	 * 
 	 * @param conn
 	 *            remote connection
@@ -608,8 +597,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Checks if the command is valid. It uses a pattern which is define in the
-	 * "plugin.xml" file to match with the output
+	 * Checks if the command is valid. It uses a pattern which is define in the "plugin.xml" file to match with the output
 	 * 
 	 * @param monitor
 	 *            monitor object
@@ -639,10 +627,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				}
 			} catch (IOException e) {
 				/*
-				 * For some reason we're sometimes seeing a "write end dead"
-				 * message here even though the correct result is returned.
-				 * Ignore this exception for now, though the root cause needs to
-				 * be ascertained.
+				 * For some reason we're sometimes seeing a "write end dead" message here even though the correct result is
+				 * returned. Ignore this exception for now, though the root cause needs to be ascertained.
 				 */
 				PTPRemoteCorePlugin.log(e);
 			}
@@ -654,8 +640,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Launch the server use the supplied remote connection. The server file is
-	 * cached on the remote machine prior to the first launch.
+	 * Launch the server use the supplied remote connection. The server file is cached on the remote machine prior to the first
+	 * launch.
 	 * 
 	 * @param conn
 	 *            connection to remote machine for launch
@@ -668,15 +654,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
 			/*
-			 * First check if the remote file exists or is a different size to
-			 * the local version and copy over if required.
+			 * First check if the remote file exists or is a different size to the local version and copy over if required.
 			 */
 			IRemoteFileManager fileManager = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection);
 			IFileStore directory = fileManager.getResource(getWorkingDir());
 			/*
-			 * Create the directory if it doesn't exist (has no effect if the
-			 * directory already exists). Also, check if a file of this name
-			 * exists and generate exception if it does.
+			 * Create the directory if it doesn't exist (has no effect if the directory already exists). Also, check if a file of
+			 * this name exists and generate exception if it does.
 			 */
 			directory.mkdir(EFS.NONE, subMon.newChild(10));
 
@@ -783,8 +767,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	protected abstract boolean doServerStarting(IProgressMonitor monitor);
 
 	/**
-	 * Called with each line of stderr from the server. Implementers can use
-	 * this to determine when the server has successfully started.
+	 * Called with each line of stderr from the server. Implementers can use this to determine when the server has successfully
+	 * started.
 	 * 
 	 * @param output
 	 *            line of stderr output from server
@@ -795,8 +779,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * Called with each line of stdout from the server. Implementers can use
-	 * this to determine when the server has successfully started.
+	 * Called with each line of stdout from the server. Implementers can use this to determine when the server has successfully
+	 * started.
 	 * 
 	 * @param output
 	 *            line of stdout output from server
@@ -809,8 +793,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
-	 * IProgressMonitor)
+	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime. IProgressMonitor)
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
@@ -832,6 +815,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			if (fContinuous) {
 				final BufferedReader stdout = new BufferedReader(new InputStreamReader(fRemoteProcess.getInputStream()));
 				new Thread(new Runnable() {
+					@Override
 					public void run() {
 						try {
 							while (getServerState() != ServerState.STOPPED) {
@@ -857,6 +841,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 
 				final BufferedReader stderr = new BufferedReader(new InputStreamReader(fRemoteProcess.getErrorStream()));
 				new Thread(new Runnable() {
+					@Override
 					public void run() {
 						try {
 							while (getServerState() != ServerState.STOPPED) {
@@ -885,6 +870,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				if (DebugUtil.SERVER_TRACING) {
 					final BufferedReader stderr = new BufferedReader(new InputStreamReader(fRemoteProcess.getErrorStream()));
 					new Thread(new Runnable() {
+						@Override
 						public void run() {
 							try {
 								while (getServerState() != ServerState.STOPPED) {
@@ -932,20 +918,19 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				// Do nothing
 			}
 
+			fStatus = subMon.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
+
 			/*
 			 * Check if process terminated successfully (if not canceled).
 			 */
 			if (fRemoteProcess.exitValue() != 0) {
 				if (!subMon.isCanceled()) {
-					throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), NLS.bind(
-							Messages.AbstractRemoteServerRunner_3, fRemoteProcess.exitValue())));
+					fStatus = new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), NLS.bind(
+							Messages.AbstractRemoteServerRunner_3, fRemoteProcess.exitValue()));
 				}
 			}
-			return subMon.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
-		} catch (CoreException e) {
-			return e.getStatus();
 		} catch (IOException e) {
-			return new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), e.getMessage(), null);
+			fStatus = new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), e.getMessage(), null);
 		} finally {
 			doServerFinished(subMon.newChild(1));
 			setServerState(ServerState.STOPPED);
@@ -953,6 +938,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				monitor.done();
 			}
 		}
+		return fStatus;
 	}
 
 	/**

@@ -40,6 +40,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -485,7 +486,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			}
 		}
 
-		IResourceManager rm = getResourceManager(getLaunchConfiguration());
+		IResourceManager rm = LaunchUtils.getResourceManager(getLaunchConfiguration());
 		if (rm != null) {
 			IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
 			IRemoteServices remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),

@@ -5,6 +5,7 @@
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
             configurationFile="data/com.ibm.pe.aix.xml"
+            monitorType="PE"
             name="IBM Parallel Environment for AIX">
       </JAXBResourceManagerConfiguration>
    </extension>
@@ -12,6 +13,7 @@
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
             configurationFile="data/com.ibm.pe.linux.xml"
+            monitorType="PE"
             name="IBM Parallel Environment for Linux">
       </JAXBResourceManagerConfiguration>
    </extension>
@@ -19,6 +21,7 @@
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
             configurationFile="data/com.ibm.ll.pe.aix.xml"
+            monitorType="PE"
             name="IBM Parallel Environment with LoadLeveler for AIX">
       </JAXBResourceManagerConfiguration>
    </extension>
@@ -26,6 +29,7 @@
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
             configurationFile="data/com.ibm.ll.pe.linux.xml"
+            monitorType="PE"
             name="IBM Parallel Environment with LoadLeveler for Linux">
       </JAXBResourceManagerConfiguration>
    </extension>
@@ -33,6 +37,7 @@
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
             configurationFile="data/com.ibm.pe.advanced.xml"
+            monitorType="PE"
             name="IBM Parallel Environment Advanced Mode">
       </JAXBResourceManagerConfiguration>
    </extension>

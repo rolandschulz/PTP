@@ -14,6 +14,9 @@ import java.io.BufferedOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -41,136 +44,6 @@ public class RemoteServicesDelegate {
 	private static final String COSP = ": ";//$NON-NLS-1$ 
 	private static final int UNDEFINED = -1;
 	private static final int COPY_BUFFER_SIZE = 64 * 1024;
-
-	private final String remoteServicesId;
-	private final String remoteConnectionName;
-	private IRemoteServices remoteServices;
-	private IRemoteServices localServices;
-	private IRemoteConnectionManager remoteConnectionManager;
-	private IRemoteConnectionManager localConnectionManager;
-	private IRemoteConnection remoteConnection;
-	private IRemoteConnection localConnection;
-	private IRemoteFileManager remoteFileManager;
-	private IRemoteFileManager localFileManager;
-
-	/**
-	 * @param remoteServicesId
-	 *            e.g., "local", "remotetools", "rse"
-	 * @param remoteConnectionName
-	 *            e.g., "ember.ncsa.illinois.edu"
-	 */
-	public RemoteServicesDelegate(String remoteServicesId, String remoteConnectionName) {
-		this.remoteServicesId = remoteServicesId;
-		this.remoteConnectionName = remoteConnectionName;
-	}
-
-	public IRemoteConnection getLocalConnection() {
-		return localConnection;
-	}
-
-	public IRemoteConnectionManager getLocalConnectionManager() {
-		return localConnectionManager;
-	}
-
-	public IRemoteFileManager getLocalFileManager() {
-		return localFileManager;
-	}
-
-	public URI getLocalHome() {
-		if (localFileManager != null) {
-			return localFileManager.toURI(localConnection.getWorkingDirectory());
-		}
-		return null;
-	}
-
-	public IRemoteServices getLocalServices() {
-		return localServices;
-	}
-
-	public IRemoteConnection getRemoteConnection() {
-		return remoteConnection;
-	}
-
-	public IRemoteConnectionManager getRemoteConnectionManager() {
-		return remoteConnectionManager;
-	}
-
-	public IRemoteFileManager getRemoteFileManager() {
-		return remoteFileManager;
-	}
-
-	public URI getRemoteHome() {
-		if (remoteFileManager != null) {
-			return remoteFileManager.toURI(remoteConnection.getWorkingDirectory());
-		}
-		return null;
-	}
-
-	public IRemoteServices getRemoteServices() {
-		return remoteServices;
-	}
-
-	/**
-	 * On the basis of the passed in identifiers, constructs the local and remote services, connection manager, connection, file
-	 * manager and home URIs.
-	 * 
-	 * @param monitor
-	 * @throws CoreException
-	 */
-	public void initialize(IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 2);
-
-		/*
-		 * could happen on shutdown
-		 */
-		if (PTPRemoteCorePlugin.getDefault() == null) {
-			return;
-		}
-		try {
-			localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
-			if (localServices != null) {
-				localConnectionManager = localServices.getConnectionManager();
-				if (localConnectionManager != null) {
-					localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
-				}
-				if (localConnection != null) {
-					localFileManager = localServices.getFileManager(localConnection);
-				}
-			}
-
-			if (remoteServicesId != null) {
-				remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, progress.newChild(1));
-				if (remoteServices != null) {
-					remoteConnectionManager = remoteServices.getConnectionManager();
-					if (remoteConnectionManager != null) {
-						remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
-						if (remoteConnection != null) {
-							remoteFileManager = remoteServices.getFileManager(remoteConnection);
-						}
-					}
-				}
-			} else {
-				remoteServices = localServices;
-				remoteConnectionManager = localConnectionManager;
-				remoteConnection = localConnection;
-				remoteFileManager = localFileManager;
-			}
-			/*
-			 * Bug 370775 - need to open connection before obtaining working directory otherwise root ("/") will always be returned.
-			 * This might cause problems if the connection to the target machine can't be opened, however there is a progress
-			 * monitor that the user can cancel if this happens.
-			 */
-			if (!remoteConnection.isOpen()) {
-				remoteConnection.open(progress.newChild(1));
-			}
-		} catch (Throwable t) {
-			throw newException("RemoteServicesDelegate.initialize " + remoteServicesId + COSP + remoteConnection, t); //$NON-NLS-1$
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
-	}
 
 	/**
 	 * @param from
@@ -379,5 +252,152 @@ public class RemoteServicesDelegate {
 	 */
 	private static CoreException newException(String message, Throwable t) {
 		return new CoreException(getErrorStatus(message, t));
+	}
+
+	private final String remoteServicesId;
+	private final String remoteConnectionName;
+	private IRemoteServices remoteServices;
+	private IRemoteServices localServices;
+	private IRemoteConnectionManager remoteConnectionManager;
+	private IRemoteConnectionManager localConnectionManager;
+	private IRemoteConnection remoteConnection;
+	private IRemoteConnection localConnection;
+	private IRemoteFileManager remoteFileManager;
+	private IRemoteFileManager localFileManager;
+
+	private static Map<String, RemoteServicesDelegate> fDelegates = Collections
+			.synchronizedMap(new HashMap<String, RemoteServicesDelegate>());
+
+	/**
+	 * @since 6.0
+	 */
+	public static RemoteServicesDelegate getDelegate(String remoteServicesId, String remoteConnectionName, IProgressMonitor monitor)
+			throws CoreException {
+		RemoteServicesDelegate delegate = fDelegates.get(remoteServicesId + "." + remoteConnectionName); //$NON-NLS-1$
+		if (delegate == null) {
+			delegate = new RemoteServicesDelegate(remoteServicesId, remoteConnectionName);
+			fDelegates.put(remoteServicesId + "." + remoteConnectionName, delegate); //$NON-NLS-1$
+		}
+		delegate.initialize(monitor);
+		return delegate;
+	}
+
+	/**
+	 * @param remoteServicesId
+	 *            e.g., "local", "remotetools", "rse"
+	 * @param remoteConnectionName
+	 *            e.g., "ember.ncsa.illinois.edu"
+	 */
+	public RemoteServicesDelegate(String remoteServicesId, String remoteConnectionName) {
+		this.remoteServicesId = remoteServicesId;
+		this.remoteConnectionName = remoteConnectionName;
+	}
+
+	public IRemoteConnection getLocalConnection() {
+		return localConnection;
+	}
+
+	public IRemoteConnectionManager getLocalConnectionManager() {
+		return localConnectionManager;
+	}
+
+	public IRemoteFileManager getLocalFileManager() {
+		return localFileManager;
+	}
+
+	public URI getLocalHome() {
+		if (localFileManager != null) {
+			return localFileManager.toURI(localConnection.getWorkingDirectory());
+		}
+		return null;
+	}
+
+	public IRemoteServices getLocalServices() {
+		return localServices;
+	}
+
+	public IRemoteConnection getRemoteConnection() {
+		return remoteConnection;
+	}
+
+	public IRemoteConnectionManager getRemoteConnectionManager() {
+		return remoteConnectionManager;
+	}
+
+	public IRemoteFileManager getRemoteFileManager() {
+		return remoteFileManager;
+	}
+
+	public URI getRemoteHome() {
+		if (remoteFileManager != null) {
+			return remoteFileManager.toURI(remoteConnection.getWorkingDirectory());
+		}
+		return null;
+	}
+
+	public IRemoteServices getRemoteServices() {
+		return remoteServices;
+	}
+
+	/**
+	 * On the basis of the passed in identifiers, constructs the local and remote services, connection manager, connection, file
+	 * manager and home URIs.
+	 * 
+	 * @param monitor
+	 * @throws CoreException
+	 */
+	public void initialize(IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 2);
+
+		/*
+		 * could happen on shutdown
+		 */
+		if (PTPRemoteCorePlugin.getDefault() == null) {
+			return;
+		}
+		try {
+			localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
+			if (localServices != null) {
+				localConnectionManager = localServices.getConnectionManager();
+				if (localConnectionManager != null) {
+					localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
+				}
+				if (localConnection != null) {
+					localFileManager = localServices.getFileManager(localConnection);
+				}
+			}
+
+			if (remoteServicesId != null) {
+				remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, progress.newChild(1));
+				if (remoteServices != null) {
+					remoteConnectionManager = remoteServices.getConnectionManager();
+					if (remoteConnectionManager != null) {
+						remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
+						if (remoteConnection != null) {
+							remoteFileManager = remoteServices.getFileManager(remoteConnection);
+						}
+					}
+				}
+			} else {
+				remoteServices = localServices;
+				remoteConnectionManager = localConnectionManager;
+				remoteConnection = localConnection;
+				remoteFileManager = localFileManager;
+			}
+			/*
+			 * Bug 370775 - need to open connection before obtaining working directory otherwise root ("/") will always be returned.
+			 * This might cause problems if the connection to the target machine can't be opened, however there is a progress
+			 * monitor that the user can cancel if this happens.
+			 */
+			if (!remoteConnection.isOpen()) {
+				remoteConnection.open(progress.newChild(1));
+			}
+		} catch (Throwable t) {
+			throw newException("RemoteServicesDelegate.initialize " + remoteServicesId + COSP + remoteConnection, t); //$NON-NLS-1$
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
 	}
 }

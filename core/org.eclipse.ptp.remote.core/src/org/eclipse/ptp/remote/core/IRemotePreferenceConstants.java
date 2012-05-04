@@ -11,8 +11,16 @@
 package org.eclipse.ptp.remote.core;
 
 /**
- * @since 5.0
+ * @since 6.0
  */
-public interface PreferenceConstants {
-	public static final String DEFAULT_REMOTE_SERVICES_ID = "remoteServicesId"; //$NON-NLS-1$
+public interface IRemotePreferenceConstants {
+	public static final String PREF_REMOTE_SERVICES_ID = "remoteServicesId"; //$NON-NLS-1$
+	/**
+	 * @since 6.0
+	 */
+	public static final String REMOTE_TOOLS_REMOTE_SERVICES_ID = "org.eclipse.ptp.remote.RemoteTools"; //$NON-NLS-1$
+	/**
+	 * @since 6.0
+	 */
+	public static final String RSE_REMOTE_SERVICES_ID = "org.eclipse.ptp.remote.RSERemoteServices"; //$NON-NLS-1$
 }

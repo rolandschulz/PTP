@@ -22,8 +22,29 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
  * @since 5.0
  */
 public interface ILaunchProcessCallback {
+	/**
+	 * Get a file manager for handling local files
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 * @return local file manager
+	 * @throws CoreException
+	 *             if no local file manager can ge obtained
+	 */
 	public IRemoteFileManager getLocalFileManager(ILaunchConfiguration configuration) throws CoreException;
 
+	/**
+	 * Get a file manager for handling remote files. The connection used to manipulate the files will be obtained from the launch
+	 * configuration. User's can cancel the progress monitor, in which case null will be returned.
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 * @param monitor
+	 *            progress monitor
+	 * @return remote file manager or null if progress monitor is cancelled
+	 * @throws CoreException
+	 *             if a remote file manager can't be obtained
+	 */
 	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
 			throws CoreException;
 

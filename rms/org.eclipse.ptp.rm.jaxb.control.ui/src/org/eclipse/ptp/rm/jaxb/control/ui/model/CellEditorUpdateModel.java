@@ -14,13 +14,12 @@ import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.cell.SpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
-import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.graphics.Color;
@@ -73,11 +72,9 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 
 	/**
 	 * @param name
-	 *            of the model, which will correspond to the name of a Property
-	 *            or Attribute the value is to be saved to
+	 *            of the model, which will correspond to the name of a Property or Attribute the value is to be saved to
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 * @param editor
 	 *            the cell editor for the value cell
 	 * @param items
@@ -109,9 +106,8 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	}
 
 	/*
-	 * The combo cell editor does not allow write-ins. So effectively the only
-	 * widget which can be "read-only" is a text box. We must allow edit on the
-	 * others for them to appear. (non-Javadoc)
+	 * The combo cell editor does not allow write-ins. So effectively the only widget which can be "read-only" is a text box. We
+	 * must allow edit on the others for them to appear. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#canEdit()
 	 */
@@ -122,9 +118,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	/*
 	 * Return the background color for the column, if set. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ITableColorProvider#getBackground(java.lang
-	 * .Object, int)
+	 * @see org.eclipse.jface.viewers.ITableColorProvider#getBackground(java.lang .Object, int)
 	 */
 	public Color getBackground(Object element, int columnIndex) {
 		if (background == null) {
@@ -159,8 +153,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	/*
 	 * Returns the description string. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport#getDescription()
+	 * @see org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport#getDescription()
 	 */
 	public String getDescription() {
 		return description;
@@ -169,9 +162,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	/*
 	 * Return the font for the column, if set. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ITableFontProvider#getFont(java.lang.Object,
-	 * int)
+	 * @see org.eclipse.jface.viewers.ITableFontProvider#getFont(java.lang.Object, int)
 	 */
 	public Font getFont(Object element, int columnIndex) {
 		if (font == null) {
@@ -183,9 +174,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	/*
 	 * Return the foreground color for the column, if set. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ITableFontProvider#getFont(java.lang.Object,
-	 * int)
+	 * @see org.eclipse.jface.viewers.ITableFontProvider#getFont(java.lang.Object, int)
 	 */
 	public Color getForeground(Object element, int columnIndex) {
 		if (foreground == null) {
@@ -197,20 +186,16 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel#getParent()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel#getParent()
 	 */
 	public Viewer getParent() {
 		return (Viewer) viewer.getControl();
 	}
 
 	/*
-	 * For generating a templated string using all the names and values in the
-	 * viewer rows. Skips non-checked items. (non-Javadoc)
+	 * For generating a templated string using all the names and values in the viewer rows. Skips non-checked items. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#getReplacedValue(java
-	 * .lang.String)
+	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#getReplacedValue(java .lang.String)
 	 */
 	public String getReplacedValue(String pattern) {
 		if (!isChecked()) {
@@ -246,11 +231,10 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	}
 
 	/*
-	 * The editor needs the selection index for a combo box; otherwise the value
-	 * is of the same type as the stored value. (non-Javadoc)
+	 * The editor needs the selection index for a combo box; otherwise the value is of the same type as the stored value.
+	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#getValueForEditor()
+	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#getValueForEditor()
 	 */
 	public Object getValueForEditor() {
 		if (editor instanceof TextCellEditor) {
@@ -266,8 +250,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	}
 
 	/*
-	 * The most recent update on the map value (@see #setValueFromEditor)
-	 * (non-Javadoc)
+	 * The most recent update on the map value (@see #setValueFromEditor) (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#getValueFromControl()
 	 */
@@ -276,16 +259,12 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	}
 
 	/*
-	 * possibly calls {@link
-	 * WidgetActionUtils#getItemsFrom(org.eclipse.ptp.rm.jaxb.core.IVariableMap,
-	 * String)} (non-Javadoc)
+	 * possibly calls {@link WidgetActionUtils#getItemsFrom(org.eclipse.ptp.rm.jaxb.core.IVariableMap, String)} (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.model.AbstractUpdateModel#initialize(org.eclipse
-	 * .ptp.rm.jaxb.core.variables.LCVariableMap)
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.AbstractUpdateModel#initialize(org.eclipse .ptp.rm.jaxb.core.variables.LCVariableMap)
 	 */
 	@Override
-	public void initialize(RMVariableMap rmMap, LCVariableMap lcMap) {
+	public void initialize(IVariableMap rmMap, IVariableMap lcMap) {
 		this.lcMap = lcMap;
 		if (editor instanceof ComboBoxCellEditor) {
 			if (itemsFrom != null) {
@@ -310,9 +289,8 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	}
 
 	/*
-	 * Casts or converts the map value to the proper type to set it to the
-	 * correct internal field. For combo box editors both the string value of
-	 * the selection and the index are maintained.(non-Javadoc)
+	 * Casts or converts the map value to the proper type to set it to the correct internal field. For combo box editors both the
+	 * string value of the selection and the index are maintained.(non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#refreshValueFromMap()
 	 */
@@ -373,9 +351,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#setBackground(org.eclipse
-	 * .swt.graphics.Color[])
+	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#setBackground(org.eclipse .swt.graphics.Color[])
 	 */
 	public void setBackground(Color[] background) {
 		this.background = background;
@@ -392,9 +368,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#setFont(org.eclipse
-	 * .swt.graphics.Font[])
+	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#setFont(org.eclipse .swt.graphics.Font[])
 	 */
 	public void setFont(Font[] font) {
 		this.font = font;
@@ -403,24 +377,18 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#setForeground(org.eclipse
-	 * .swt.graphics.Color[])
+	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#setForeground(org.eclipse .swt.graphics.Color[])
 	 */
 	public void setForeground(Color[] foreground) {
 		this.foreground = foreground;
 	}
 
 	/*
-	 * Casts the value to its appropriate field. For combo boxes, also sets the
-	 * selection string from the index. Calls store value on the current cell
-	 * value. Finishes with calls to storeValue on the viewer to update the
-	 * viewer template string; this in turn calls #getReplacedValue on all its
-	 * cell models. (non-Javadoc)
+	 * Casts the value to its appropriate field. For combo boxes, also sets the selection string from the index. Calls store value
+	 * on the current cell value. Finishes with calls to storeValue on the viewer to update the viewer template string; this in turn
+	 * calls #getReplacedValue on all its cell models. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#setValueFromEditor(
-	 * java.lang.Object)
+	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#setValueFromEditor( java.lang.Object)
 	 */
 	public void setValueFromEditor(Object value) {
 		if (editor instanceof TextCellEditor) {
@@ -471,9 +439,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#setViewer(org.eclipse
-	 * .ptp.rm.jaxb.ui.model.ViewerUpdateModel)
+	 * @see org.eclipse.ptp.rm.jaxb.ui.ICellEditorUpdateModel#setViewer(org.eclipse .ptp.rm.jaxb.ui.model.ViewerUpdateModel)
 	 */
 	public void setViewer(ViewerUpdateModel viewer) {
 		this.viewer = viewer;

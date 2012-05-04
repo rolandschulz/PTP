@@ -5,16 +5,16 @@ import java.util.Iterator;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.ISourceLocator;
+import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * @since 5.0
  */
 public class PLaunch extends Launch implements IPLaunch {
 	private String fJobId;
-	private IResourceManager fResourceManager;
+	private IJobControl fJobControl;
 
 	public PLaunch(ILaunchConfiguration launchConfiguration, String mode, ISourceLocator locator) {
 		super(launchConfiguration, mode, locator);
@@ -56,6 +56,18 @@ public class PLaunch extends Launch implements IPLaunch {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.debug.core.launch.IPLaunch#getJobControl()
+	 */
+	/**
+	 * @since 6.0
+	 */
+	public IJobControl getJobControl() {
+		return fJobControl;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.launch.IPLaunch#getJobId()
 	 */
 	/**
@@ -68,13 +80,13 @@ public class PLaunch extends Launch implements IPLaunch {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.core.launch.IPLaunch#getResourceManager()
+	 * @see org.eclipse.ptp.debug.core.launch.IPLaunch#setJobControl(org.eclipse.ptp.core.jobs.IJobControl)
 	 */
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public IResourceManager getResourceManager() {
-		return fResourceManager;
+	public void setJobControl(IJobControl control) {
+		fJobControl = control;
 	}
 
 	/*
@@ -87,17 +99,5 @@ public class PLaunch extends Launch implements IPLaunch {
 	 */
 	public void setJobId(String jobId) {
 		fJobId = jobId;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.launch.IPLaunch#setResourceManager(org.eclipse .ptp.rmsystem.IResourceManager)
-	 */
-	/**
-	 * @since 5.0
-	 */
-	public void setResourceManager(IResourceManager rm) {
-		fResourceManager = rm;
 	}
 }

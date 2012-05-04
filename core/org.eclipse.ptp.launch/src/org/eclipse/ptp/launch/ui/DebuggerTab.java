@@ -20,6 +20,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.launch.messages.Messages;
@@ -51,9 +52,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#createControl(
-	 * org.eclipse.swt.widgets.Composite)
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#createControl( org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
 	public void createControl(Composite parent) {
@@ -82,9 +81,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#initializeFrom
-	 * (org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#initializeFrom (org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public void initializeFrom(ILaunchConfiguration config) {
@@ -92,11 +89,10 @@ public class DebuggerTab extends AbstractDebuggerTab {
 		super.initializeFrom(config);
 		try {
 			/*
-			 * Only set default debugger if there is a resource manager
-			 * selected.
+			 * Only set default debugger if there is a remote connection.
 			 */
 			String id = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, EMPTY_STRING);
-			loadDebuggerComboBox(config, id, getResourceManager(config) == null);
+			loadDebuggerComboBox(config, id, LaunchUtils.getRemoteServicesId(config) == null);
 			initializeCommonControls(config);
 		} catch (CoreException e) {
 		}
@@ -106,9 +102,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.AbstractDebuggerTab#activated(org.eclipse.debug
-	 * .core.ILaunchConfigurationWorkingCopy)
+	 * @see org.eclipse.ptp.launch.ui.AbstractDebuggerTab#activated(org.eclipse.debug .core.ILaunchConfigurationWorkingCopy)
 	 */
 	@Override
 	public void activated(ILaunchConfigurationWorkingCopy workingCopy) {
@@ -116,11 +110,10 @@ public class DebuggerTab extends AbstractDebuggerTab {
 		super.activated(workingCopy);
 		try {
 			/*
-			 * Only set default debugger if there is a resource manager
-			 * selected.
+			 * Only set default debugger if there is a resource manager selected.
 			 */
 			String id = workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, EMPTY_STRING);
-			loadDebuggerComboBox(workingCopy, id, getResourceManager(workingCopy) == null);
+			loadDebuggerComboBox(workingCopy, id, LaunchUtils.getRemoteServicesId(workingCopy) == null);
 			initializeCommonControls(workingCopy);
 		} catch (CoreException e) {
 		}
@@ -130,9 +123,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#isValid(org.eclipse
-	 * .debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#isValid(org.eclipse .debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration config) {
@@ -155,8 +146,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#performApply(org
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#performApply(org
 	 * .eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	@Override
@@ -175,8 +165,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#setDefaults(org
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#setDefaults(org
 	 * .eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	@Override
@@ -279,8 +268,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#
-	 * updateComboFromSelection()
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab# updateComboFromSelection()
 	 */
 	@Override
 	protected void updateComboFromSelection() {
@@ -306,9 +294,8 @@ public class DebuggerTab extends AbstractDebuggerTab {
 	/**
 	 * Check that the selected debugger can be used for this launch
 	 * 
-	 * FIXME: This needs to check the debugger supports the platform being
-	 * managed by the resource manager. The RM will need to provide an interface
-	 * to get this information.
+	 * FIXME: This needs to check the debugger supports the platform being managed by the resource manager. The RM will need to
+	 * provide an interface to get this information.
 	 * 
 	 * @param config
 	 * @param debugConfig

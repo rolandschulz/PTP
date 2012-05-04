@@ -35,8 +35,7 @@ public class RemoveJob extends AbstractStatusAction {
 			for (Row row : selected) {
 				JobStatusData status = row.status;
 				data.add(status);
-				String rmId = status.getRmId();
-				LMLManager.getInstance().removeUserJob(rmId, status.getJobId());
+				LMLManager.getInstance().removeUserJob(status.getControlId(), status.getJobId());
 			}
 			view.refresh();
 			ActionUtils.removeFiles(data);
@@ -46,9 +45,7 @@ public class RemoveJob extends AbstractStatusAction {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.actions.AbstractStatusAction#validate(org.
-	 * eclipse.jface.action.IAction,
+	 * @see org.eclipse.ptp.rm.jaxb.ui.actions.AbstractStatusAction#validate(org. eclipse.jface.action.IAction,
 	 * org.eclipse.ptp.rm.jaxb.ui.data.PersistentCommandJobStatus)
 	 */
 	@Override

@@ -53,10 +53,11 @@ import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
+import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
@@ -110,9 +111,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.debug.core.model.IStreamMonitor#addListener(org.eclipse
-		 * .debug.core.IStreamListener)
+		 * @see org.eclipse.debug.core.model.IStreamMonitor#addListener(org.eclipse .debug.core.IStreamListener)
 		 */
 		public synchronized void addListener(IStreamListener listener) {
 			fListeners.add(listener);
@@ -130,8 +129,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
 		 */
 		public void handleEvent(IChangedProcessEvent e) {
@@ -156,8 +154,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.INewProcessEvent)
 		 */
 		public void handleEvent(INewProcessEvent e) {
@@ -166,8 +163,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
 		 */
 		public void handleEvent(IRemoveProcessEvent e) {
@@ -176,9 +172,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.debug.core.model.IStreamMonitor#removeListener(org.eclipse
-		 * .debug.core.IStreamListener)
+		 * @see org.eclipse.debug.core.model.IStreamMonitor#removeListener(org.eclipse .debug.core.IStreamListener)
 		 */
 		public synchronized void removeListener(IStreamListener listener) {
 			fListeners.remove(listener);
@@ -209,8 +203,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.debug.core.model.IStreamsProxy#getErrorStreamMonitor()
+		 * @see org.eclipse.debug.core.model.IStreamsProxy#getErrorStreamMonitor()
 		 */
 		public IStreamMonitor getErrorStreamMonitor() {
 			return fErrorStreamMonitor;
@@ -219,8 +212,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.debug.core.model.IStreamsProxy#getOutputStreamMonitor()
+		 * @see org.eclipse.debug.core.model.IStreamsProxy#getOutputStreamMonitor()
 		 */
 		public IStreamMonitor getOutputStreamMonitor() {
 			return fOutputStreamMonitor;
@@ -229,8 +221,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.debug.core.model.IStreamsProxy#write(java.lang.String)
+		 * @see org.eclipse.debug.core.model.IStreamsProxy#write(java.lang.String)
 		 */
 		public void write(String input) throws IOException {
 			// Not supported yet
@@ -250,48 +241,31 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doAddJob(java
-	 * .lang.String, org.eclipse.ptp.rmsystem.IJobStatus)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doAddJob( org.eclipse.ptp.rmsystem.IJobStatus)
 	 */
 	@Override
-	public void doAddJob(String jobId, IJobStatus status) {
+	public void doAddJob(IJobStatus status) {
 		// All jobs are special
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doRemoveJob(java
-	 * .lang.String)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doUpdateJob( org.eclipse.ptp.rmsystem.IJobStatus)
 	 */
 	@Override
-	public void doRemoveJob(String jobId) {
-		// All jobs are special
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#doUpdateJob(java
-	 * .lang.String, org.eclipse.ptp.rmsystem.IJobStatus)
-	 */
-	@Override
-	public void doUpdateJob(String jobId, IJobStatus status) {
+	public void doUpdateJob(IJobStatus status) {
 		// No need to update
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
 	 * .ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent)
 	 * 
-	 * Note: this allows redefinition of attribute definitions. This is ok as
-	 * long as they are only allowed during the initialization phase.
+	 * Note: this allows redefinition of attribute definitions. This is ok as long as they are only allowed during the
+	 * initialization phase.
 	 */
 	public void handleEvent(IRuntimeAttributeDefinitionEvent e) {
 		for (IAttributeDefinition<?, ?, ?> attr : e.getDefinitions()) {
@@ -302,9 +276,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeConnectedStateEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeConnectedStateEvent)
 	 */
 	public void handleEvent(IRuntimeConnectedStateEvent e) {
 		// Ignore
@@ -313,9 +285,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeErrorStateEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeErrorStateEvent)
 	 */
 	public void handleEvent(IRuntimeErrorStateEvent e) {
 		getResourceManager().fireResourceManagerError(Messages.AbstractRuntimeResourceManager_6);
@@ -324,9 +294,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeJobChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeJobChangeEvent)
 	 */
 	public void handleEvent(IRuntimeJobChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
@@ -353,9 +321,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeMachineChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeMachineChangeEvent)
 	 */
 	public void handleEvent(IRuntimeMachineChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
@@ -382,9 +348,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeErrorEvent)
 	 */
 	public void handleEvent(IRuntimeMessageEvent e) {
 		// MessageAttributes.Level level = e.getLevel();
@@ -401,6 +365,9 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 			break;
 		case WARNING:
 			severity = IStatus.WARNING;
+			break;
+		default:
+			severity = IStatus.ERROR;
 		}
 		StatusManager.getManager().handle(new Status(severity, PTPCorePlugin.PLUGIN_ID, e.getText()),
 				(severity == IStatus.ERROR) ? StatusManager.SHOW : StatusManager.LOG);
@@ -409,9 +376,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeNewJobEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeNewJobEvent)
 	 */
 	public void handleEvent(IRuntimeNewJobEvent e) {
 		IPQueue queue = getPResourceManager().getQueueById(e.getParentId());
@@ -442,9 +407,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeNewMachineEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeNewMachineEvent)
 	 */
 	public void handleEvent(IRuntimeNewMachineEvent e) {
 		ElementAttributeManager mgr = e.getElementAttributeManager();
@@ -471,9 +434,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeNewNodeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeNewNodeEvent)
 	 */
 	public void handleEvent(IRuntimeNewNodeEvent e) {
 		IPMachine machine = getPResourceManager().getMachineById(e.getParentId());
@@ -506,9 +467,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeNewProcessEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeNewProcessEvent)
 	 */
 	public void handleEvent(IRuntimeNewProcessEvent e) {
 		final String jobId = e.getParentId();
@@ -532,9 +491,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeNewQueueEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeNewQueueEvent)
 	 */
 	public void handleEvent(IRuntimeNewQueueEvent e) {
 		ElementAttributeManager mgr = e.getElementAttributeManager();
@@ -561,9 +518,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeNodeChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeNodeChangeEvent)
 	 */
 	public void handleEvent(IRuntimeNodeChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
@@ -600,9 +555,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeProcessChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeProcessChangeEvent)
 	 */
 	public void handleEvent(IRuntimeProcessChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
@@ -624,9 +577,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeQueueChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeQueueChangeEvent)
 	 */
 	public void handleEvent(IRuntimeQueueChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
@@ -653,9 +604,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRemoveAllEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRemoveAllEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveAllEvent e) {
 		removeAll();
@@ -664,9 +613,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRemoveJobEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRemoveJobEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveJobEvent e) {
 		Set<IPJob> removedJobs = new HashSet<IPJob>();
@@ -684,9 +631,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRemoveMachineEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRemoveMachineEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveMachineEvent e) {
 		List<IPMachine> machines = new ArrayList<IPMachine>();
@@ -702,9 +647,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRemoveNodeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRemoveNodeEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveNodeEvent e) {
 		Map<IPMachine, List<IPNode>> map = new HashMap<IPMachine, List<IPNode>>();
@@ -730,9 +673,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRemoveProcessEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRemoveProcessEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveProcessEvent e) {
 		final RangeSet jobRanks = e.getProcessJobRanks();
@@ -746,9 +687,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRemoveQueueEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRemoveQueueEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveQueueEvent e) {
 		List<IPQueue> queues = new ArrayList<IPQueue>();
@@ -764,9 +703,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRMChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRMChangeEvent)
 	 */
 	public void handleEvent(IRuntimeRMChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
@@ -787,9 +724,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRunningStateEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRunningStateEvent)
 	 */
 	public void handleEvent(IRuntimeRunningStateEvent e) {
 		try {
@@ -804,9 +739,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeShutdownStateEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeShutdownStateEvent)
 	 */
 	public void handleEvent(IRuntimeShutdownStateEvent e) {
 		getResourceManager().fireResourceManagerStopped();
@@ -815,9 +748,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeStartupErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeStartupErrorEvent)
 	 */
 	public void handleEvent(IRuntimeStartupErrorEvent e) {
 		getResourceManager().fireResourceManagerError(e.getErrorMessage());
@@ -826,9 +757,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent)
 	 */
 	public void handleEvent(IRuntimeSubmitJobErrorEvent e) {
 		// Handled by control side
@@ -837,8 +766,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
 	 * .ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent)
 	 */
 	public void handleEvent(IRuntimeTerminateJobErrorEvent e) {
@@ -852,8 +780,8 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	}
 
 	/**
-	 * Update attributes on a collection of processes. If the nodeId attribute
-	 * is specified then the processes will be moved to the new node.
+	 * Update attributes on a collection of processes. If the nodeId attribute is specified then the processes will be moved to the
+	 * new node.
 	 * 
 	 * @param job
 	 *            parent of processes
@@ -966,9 +894,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse
-	 * .core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse .core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
@@ -983,9 +909,13 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	 * @return changes were made
 	 */
 	protected void doUpdateJobs(Collection<IPJob> jobs, AttributeManager attrs) {
+		AbstractRuntimeResourceManagerControl control = (AbstractRuntimeResourceManagerControl) getResourceManager().getControl();
 		getPResourceManager().addJobAttributes(jobs, attrs.getAttributes());
 		for (IPJob job : jobs) {
-			getResourceManager().fireJobChanged(job.getID());
+			IJobStatus status = control.getJobStatus(job.getID(), null);
+			if (status != null) {
+				JobManager.getInstance().fireJobChanged(status);
+			}
 		}
 
 	}
@@ -1061,8 +991,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	}
 
 	/**
-	 * Get the streams proxy associated with the job. Only valid when the job
-	 * has started running, otherwise returns null.
+	 * Get the streams proxy associated with the job. Only valid when the job has started running, otherwise returns null.
 	 * 
 	 * @param jobId
 	 * @return streams proxy for the job, or null if the job is not running
@@ -1074,9 +1003,7 @@ public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#getResourceManager
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerMonitor#getResourceManager ()
 	 */
 	@Override
 	protected AbstractRuntimeResourceManager getResourceManager() {

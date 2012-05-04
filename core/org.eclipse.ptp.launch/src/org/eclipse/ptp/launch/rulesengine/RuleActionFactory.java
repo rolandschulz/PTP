@@ -29,13 +29,14 @@ import org.eclipse.ptp.launch.internal.rulesengine.UploadRuleAction;
  */
 public class RuleActionFactory {
 
-	private final ILaunchProcessCallback process;
 	private final ILaunchConfiguration configuration;
 	private final IProgressMonitor monitor;
 
-	public RuleActionFactory(ILaunchConfiguration configuration, ILaunchProcessCallback process, IProgressMonitor monitor) {
+	/**
+	 * @since 6.0
+	 */
+	public RuleActionFactory(ILaunchConfiguration configuration, IProgressMonitor monitor) {
 		super();
-		this.process = process;
 		this.configuration = configuration;
 		this.monitor = monitor;
 	}
@@ -43,15 +44,15 @@ public class RuleActionFactory {
 	public IRuleAction getAction(ISynchronizationRule rule) throws CoreException {
 		if (rule instanceof DownloadRule) {
 			DownloadRule downloadRule = (DownloadRule) rule;
-			DownloadRuleAction action = new DownloadRuleAction(process, configuration, downloadRule, monitor);
+			DownloadRuleAction action = new DownloadRuleAction(configuration, downloadRule, monitor);
 			return action;
 		} else if (rule instanceof UploadRule) {
 			UploadRule uploadRule = (UploadRule) rule;
-			UploadRuleAction action = new UploadRuleAction(process, configuration, uploadRule, monitor);
+			UploadRuleAction action = new UploadRuleAction(configuration, uploadRule, monitor);
 			return action;
 		} else if (rule instanceof DownloadBackRule) {
 			DownloadBackRule uploadRule = (DownloadBackRule) rule;
-			DownloadBackAction action = new DownloadBackAction(process, configuration, uploadRule, monitor);
+			DownloadBackAction action = new DownloadBackAction(configuration, uploadRule, monitor);
 			return action;
 		} else {
 			Assert.isLegal(false);

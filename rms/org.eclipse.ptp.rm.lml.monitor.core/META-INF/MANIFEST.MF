@@ -20,4 +20,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.rm.lml.monitor.core;x-friends:="org.eclipse.ptp.rm.jaxb.tests"
+Export-Package: org.eclipse.ptp.rm.lml.monitor.core;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.lml.monitor.ui,org.eclipse.ptp.rm.launch",
+ org.eclipse.ptp.rm.lml.monitor.core.listeners;x-internal:=true

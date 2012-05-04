@@ -23,9 +23,8 @@ import org.eclipse.core.runtime.IAdaptable;
 public interface IResourceManagerConfiguration extends IAdaptable {
 
 	/**
-	 * Get the auto start flag for this resource manager. If the auto start flag
-	 * is set to true, an attempt will be made to start the resource manager
-	 * when Eclipse is launched.
+	 * Get the auto start flag for this resource manager. If the auto start flag is set to true, an attempt will be made to start
+	 * the resource manager when Eclipse is launched.
 	 * 
 	 * @return state of the auto start flag
 	 */
@@ -53,8 +52,7 @@ public interface IResourceManagerConfiguration extends IAdaptable {
 	public String getResourceManagerId();
 
 	/**
-	 * Returns the type of the resource manager. This is the name of the
-	 * resource manager factory.
+	 * Returns the type of the resource manager. This is the name of the resource manager factory.
 	 * 
 	 * @return the type of the resource manager
 	 */
@@ -68,18 +66,16 @@ public interface IResourceManagerConfiguration extends IAdaptable {
 	public String getUniqueName();
 
 	/**
-	 * This resource manager needs the debugger to help with a debug launch.
-	 * What this means depends on the type of the debugger. See the debugger
-	 * implementation for details.
+	 * This resource manager needs the debugger to help with a debug launch. What this means depends on the type of the debugger.
+	 * See the debugger implementation for details.
 	 * 
 	 * @return true if help is required
 	 */
 	public boolean needsDebuggerLaunchHelp();
 
 	/**
-	 * Set the auto start flag for this resource manager. If the auto start flag
-	 * is set to true, an attempt will be made to start the resource manager
-	 * when Eclipse is launched.
+	 * Set the auto start flag for this resource manager. If the auto start flag is set to true, an attempt will be made to start
+	 * the resource manager when Eclipse is launched.
 	 * 
 	 * @param flag
 	 *            auto start flag
@@ -104,5 +100,14 @@ public interface IResourceManagerConfiguration extends IAdaptable {
 	 * @param name
 	 */
 	public void setName(String name);
+
+	/**
+	 * Set a unique name for this resource manager.
+	 * 
+	 * @param name
+	 *            unique name
+	 * @since 6.0
+	 */
+	public void setUniqueName(String name);
 
 }

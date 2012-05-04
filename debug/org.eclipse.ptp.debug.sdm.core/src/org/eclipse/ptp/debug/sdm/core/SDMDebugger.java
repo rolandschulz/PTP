@@ -40,11 +40,10 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
@@ -60,12 +59,9 @@ import org.eclipse.ptp.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.debug.sdm.core.pdi.PDIDebugger;
 import org.eclipse.ptp.debug.sdm.core.utils.DebugUtil;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.ptp.utils.core.BitSetIterable;
 
 /**
@@ -88,9 +84,7 @@ public class SDMDebugger implements IPDebugger {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.IPDebugger#cleanup(org.eclipse.ptp.debug.core
-	 * .launch.IPLaunch)
+	 * @see org.eclipse.ptp.debug.core.IPDebugger#cleanup(org.eclipse.ptp.debug.core .launch.IPLaunch)
 	 */
 	public synchronized void cleanup(IPLaunch launch) {
 		if (fSdmRunner != null) {
@@ -128,8 +122,7 @@ public class SDMDebugger implements IPDebugger {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.core.IPDebugger#createDebugSession(long,
-	 * org.eclipse.ptp.debug.core.launch.IPLaunch,
+	 * @see org.eclipse.ptp.debug.core.IPDebugger#createDebugSession(long, org.eclipse.ptp.debug.core.launch.IPLaunch,
 	 * org.eclipse.core.runtime.IPath)
 	 */
 	/**
@@ -154,11 +147,10 @@ public class SDMDebugger implements IPDebugger {
 			writeRoutingFile(launch, monitor);
 
 			/*
-			 * Delay starting the master SDM (aka SDM client), to wait until SDM
-			 * servers have started and until the sessions are listening on the
-			 * debugger socket.
+			 * Delay starting the master SDM (aka SDM client), to wait until SDM servers have started and until the sessions are
+			 * listening on the debugger socket.
 			 */
-			fSdmRunner.setJob(launch.getJobId());
+			fSdmRunner.setLaunch(launch);
 			fSdmRunner.schedule();
 		}
 
@@ -168,15 +160,14 @@ public class SDMDebugger implements IPDebugger {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.IPDebugger#initialize(org.eclipse.debug.core
-	 * .ILaunchConfiguration, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.debug.core.IPDebugger#initialize(org.eclipse.debug.core .ILaunchConfiguration,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	/**
 	 * @since 5.0
 	 */
 	public synchronized void initialize(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 30);
+		SubMonitor progress = SubMonitor.convert(monitor, 40);
 		try {
 			if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED)) {
 				int level = Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(),
@@ -235,28 +226,30 @@ public class SDMDebugger implements IPDebugger {
 			/*
 			 * Prepare the Master SDM controller thread if required by the RM.
 			 */
-			IResourceManager rm = getResourceManager(configuration);
 
-			if (rm.getConfiguration().needsDebuggerLaunchHelp()) {
-				/*
-				 * Store information to create routing file later.
-				 */
-				prepareRoutingFile(configuration, progress.newChild(10));
+			if (needsDebuggerLaunchHelp(configuration)) {
+				IRemoteConnection conn = getRemoteConnection(configuration, progress.newChild(10));
+				if (conn != null && !progress.isCanceled()) {
+					/*
+					 * Store information to create routing file later.
+					 */
+					prepareRoutingFile(configuration, progress.newChild(10));
 
-				/*
-				 * Create SDM master thread
-				 */
-				fSdmRunner = new SDMRunner(rm);
+					/*
+					 * Create SDM master thread
+					 */
+					fSdmRunner = new SDMRunner(conn);
 
-				/*
-				 * Set SDM command line.
-				 */
-				List<String> sdmCommand = new ArrayList<String>();
-				sdmCommand.add(dbgExePath);
-				sdmCommand.add("--master"); //$NON-NLS-1$
-				sdmCommand.addAll(dbgArgs);
-				fSdmRunner.setCommand(sdmCommand);
-				fSdmRunner.setWorkDir(getWorkingDirectory(configuration));
+					/*
+					 * Set SDM command line.
+					 */
+					List<String> sdmCommand = new ArrayList<String>();
+					sdmCommand.add(dbgExePath);
+					sdmCommand.add("--master"); //$NON-NLS-1$
+					sdmCommand.addAll(dbgArgs);
+					fSdmRunner.setCommand(sdmCommand);
+					fSdmRunner.setWorkDir(getWorkingDirectory(configuration));
+				}
 			}
 
 			workingCopy.doSave();
@@ -269,8 +262,7 @@ public class SDMDebugger implements IPDebugger {
 	}
 
 	/**
-	 * Work out the expected number of processes in the job. If it hasn't been
-	 * specified, assume one.
+	 * Work out the expected number of processes in the job. If it hasn't been specified, assume one.
 	 * 
 	 * @param launch
 	 *            job that was launched
@@ -278,37 +270,35 @@ public class SDMDebugger implements IPDebugger {
 	 */
 	private int getJobSize(IPLaunch launch) {
 		int nprocs = 1;
-		IResourceManager rmc = launch.getResourceManager();
-		if (rmc != null) {
-			IPResourceManager rm = (IPResourceManager) rmc.getAdapter(IPResourceManager.class);
-			if (rm != null) {
-				IPJob job = rm.getJobById(launch.getJobId());
-				if (job != null) {
-					nprocs = job.getProcessJobRanks().cardinality();
-					if (nprocs == 0) {
-						nprocs = 1;
-					}
-				}
+		IPJob job = ModelManager.getInstance().getUniverse().getJob(launch.getJobControl(), launch.getJobId());
+		if (job != null) {
+			nprocs = job.getProcessJobRanks().cardinality();
+			if (nprocs == 0) {
+				nprocs = 1;
 			}
 		}
 		return nprocs;
 	}
 
 	/**
-	 * Helper method to locate the resource manager used by the launch
-	 * configuration
+	 * Helper method to locate the remote connection used by the launch configuration
 	 * 
 	 * @param configuration
 	 *            launch configuration
-	 * @return resource manager or null if none specified
+	 * @return remote connection or null if none specified
 	 * @throws CoreException
 	 */
-	private IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
-		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
-				(String) null);
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
-		if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
-			return rm;
+	private IRemoteConnection getRemoteConnection(ILaunchConfiguration configuration, IProgressMonitor monitor)
+			throws CoreException {
+		String remId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, (String) null);
+		if (remId != null) {
+			IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(remId, monitor);
+			if (services != null) {
+				String name = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
+				if (name != null) {
+					return services.getConnectionManager().getConnection(name);
+				}
+			}
 		}
 		return null;
 	}
@@ -326,6 +316,10 @@ public class SDMDebugger implements IPDebugger {
 			}
 		}
 		return wd;
+	}
+
+	private boolean needsDebuggerLaunchHelp(ILaunchConfiguration configuration) throws CoreException {
+		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_NEEDS_LAUNCH_HELP, false);
 	}
 
 	/**
@@ -355,16 +349,11 @@ public class SDMDebugger implements IPDebugger {
 			IPath routingFilePath = new Path(getWorkingDirectory(configuration));
 			routingFilePath = routingFilePath.append("routing_file"); //$NON-NLS-1$
 
-			IResourceManager rm = getResourceManager(configuration);
-			IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
-			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),
-					progress.newChild(5));
+			IRemoteConnection rconn = getRemoteConnection(configuration, progress.newChild(5));
 			if (progress.isCanceled()) {
 				throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
 			}
-			IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
-			IRemoteConnection rconn = rconnMgr.getConnection(conf.getConnectionName());
-			IRemoteFileManager remoteFileManager = remoteServices.getFileManager(rconn);
+			IRemoteFileManager remoteFileManager = rconn.getRemoteServices().getFileManager(rconn);
 
 			fRoutingFileStore = remoteFileManager.getResource(routingFilePath.toString());
 
@@ -401,8 +390,7 @@ public class SDMDebugger implements IPDebugger {
 	}
 
 	/**
-	 * Verify that the resource "path" actually exists. This just checks that
-	 * the path references something real.
+	 * Verify that the resource "path" actually exists. This just checks that the path references something real.
 	 * 
 	 * @param path
 	 *            path to verify
@@ -410,32 +398,18 @@ public class SDMDebugger implements IPDebugger {
 	 *            launch configuration
 	 * @return IPath representing the path
 	 * @throws CoreException
-	 *             is thrown if the verification fails or the user cancels the
-	 *             progress monitor
+	 *             is thrown if the verification fails or the user cancels the progress monitor
 	 * @since 5.0
 	 */
 	private IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		IResourceManager rm = getResourceManager(configuration);
-		if (rm == null) {
-			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_4));
-		}
-		IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), monitor);
+		IRemoteConnection conn = getRemoteConnection(configuration, monitor);
 		if (monitor.isCanceled()) {
 			throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
 		}
-		if (remoteServices == null) {
-			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_0));
-		}
-		IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-		if (connMgr == null) {
-			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_1));
-		}
-		IRemoteConnection conn = connMgr.getConnection(conf.getConnectionName());
 		if (conn == null) {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_2));
 		}
-		IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
+		IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
 		if (fileManager == null) {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_3));
 		}
@@ -449,9 +423,8 @@ public class SDMDebugger implements IPDebugger {
 	/**
 	 * Generate the routing file once the debugger has launched.
 	 * 
-	 * NOTE: This currently assumes a shared filesystem that all debugger
-	 * processes have access to. The plan is to replace this with a routing
-	 * distribution operation in the debugger.
+	 * NOTE: This currently assumes a shared filesystem that all debugger processes have access to. The plan is to replace this with
+	 * a routing distribution operation in the debugger.
 	 * 
 	 * @param launch
 	 *            launch configuration
@@ -469,10 +442,8 @@ public class SDMDebugger implements IPDebugger {
 			}
 			progress.subTask(Messages.SDMDebugger_6);
 			PrintWriter pw = new PrintWriter(os);
-			final String jobId = launch.getJobId();
-			final IPResourceManager rm = (IPResourceManager) launch.getResourceManager().getAdapter(IPResourceManager.class);
-			if (rm != null) {
-				final IPJob pJob = rm.getJobById(jobId);
+			final IPJob pJob = ModelManager.getInstance().getUniverse().getJob(launch.getJobControl(), launch.getJobId());
+			if (pJob != null) {
 				BitSet processJobRanks = pJob.getProcessJobRanks();
 				pw.format("%d\n", processJobRanks.cardinality()); //$NON-NLS-1$
 				int base = 50000;
@@ -495,7 +466,7 @@ public class SDMDebugger implements IPDebugger {
 					if (progress.isCanceled()) {
 						throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
 					}
-					IPNode node = rm.getNodeById(nodeId);
+					IPNode node = ModelManager.getInstance().getUniverse().getNode(launch.getJobControl(), nodeId);
 					if (node == null) {
 						throw newCoreException(Messages.SDMDebugger_15);
 					}
@@ -505,8 +476,8 @@ public class SDMDebugger implements IPDebugger {
 					progress.setWorkRemaining(60);
 					progress.worked(10);
 				}
-				pw.close();
 			}
+			pw.close();
 			try {
 				os.close();
 			} catch (IOException e) {

@@ -68,7 +68,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 */
 	private void initializeProcesses() {
 		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
-		IPResourceManager rm = (IPResourceManager) rtSystem.getResourceManager().getAdapter(IPResourceManager.class);
+		IPResourceManager rm = rtSystem.getPResourceManager();
 		final IPJob ipJob = rm.getJobById(getJobID());
 		IntegerAttribute numProcsAttr = ipJob.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
 		getRtSystem().createProcesses(getJobID(), numProcsAttr.getValue().intValue());
@@ -84,7 +84,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 */
 	private void terminateProcesses() {
 		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
-		IPResourceManager rm = (IPResourceManager) rtSystem.getResourceManager().getAdapter(IPResourceManager.class);
+		IPResourceManager rm = rtSystem.getPResourceManager();
 		final IPJob ipJob = rm.getJobById(getJobID());
 
 		/*
@@ -135,8 +135,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 	@Override
 	protected void doExecutionStarted(IProgressMonitor monitor) throws CoreException {
-		IPResourceManager rm = (IPResourceManager) getRtSystem().getResourceManager().getAdapter(IPResourceManager.class);
-		final IPJob ipJob = rm.getJobById(getJobID());
+		final IPJob ipJob = getRtSystem().getPResourceManager().getJobById(getJobID());
 
 		initializeProcesses();
 
@@ -282,8 +281,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		List<IAttribute<?, ?, ?>> newAttributes = new ArrayList<IAttribute<?, ?, ?>>();
 
 		/*
-		 * An MPICH2 specific attribute. Attribute that contains a list of names
-		 * of environment variables.
+		 * An MPICH2 specific attribute. Attribute that contains a list of names of environment variables.
 		 */
 		int p = 0;
 		String keys[] = new String[environment.size()];
@@ -293,14 +291,12 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		newAttributes.add(MPICH2LaunchAttributes.getEnvironmentKeysAttributeDefinition().create(keys));
 
 		/*
-		 * An MPICH2 specific attribute. A shortcut that generates arguments for
-		 * the MPICH2 run command.
+		 * An MPICH2 specific attribute. A shortcut that generates arguments for the MPICH2 run command.
 		 */
 		newAttributes.add(MPICH2LaunchAttributes.getEnvironmentArgsAttributeDefinition().create());
 
 		/*
-		 * The jobid is used to alias the MPICH2 job so that it can be matched
-		 * later.
+		 * The jobid is used to alias the MPICH2 job so that it can be matched later.
 		 */
 		newAttributes.add(MPICH2JobAttributes.getJobIdAttributeDefinition().create(getJobID()));
 
@@ -321,8 +317,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	@Override
 	protected void doWaitExecution(IProgressMonitor monitor) throws CoreException {
 		/*
-		 * Wait until both stdout and stderr stop because stream are closed.
-		 * This means that the process has finished.
+		 * Wait until both stdout and stderr stop because stream are closed. This means that the process has finished.
 		 */
 		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", getJobID()); //$NON-NLS-1$
 		try {
@@ -339,8 +334,7 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		}
 
 		/*
-		 * Still experience has shown that remote process might not have yet
-		 * terminated, although stdout and stderr is closed.
+		 * Still experience has shown that remote process might not have yet terminated, although stdout and stderr is closed.
 		 */
 		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting mpi process to finish completely", getJobID()); //$NON-NLS-1$
 		try {

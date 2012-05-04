@@ -32,6 +32,7 @@ import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.AbstractJobSubmission;
 import org.eclipse.ptp.core.AbstractJobSubmission.JobSubStatus;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.StringAttribute;
@@ -39,10 +40,10 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
@@ -86,6 +87,15 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		public JobStatus(String jobId, ILaunchConfiguration config) {
 			fJobId = jobId;
 			fConfig = config;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.core.jobs.IJobStatus#getControlId()
+		 */
+		public String getControlId() {
+			return getControlConfiguration().getUniqueName();
 		}
 
 		/*
@@ -145,16 +155,6 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * 
-		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getRmUniqueName()
-		 */
-		public String getRmUniqueName() {
-			return getResourceManager().getUniqueName();
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
 		 * @see org.eclipse.ptp.rmsystem.IJobStatus#getState()
 		 */
 		public String getState() {
@@ -169,6 +169,8 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 					return IJobStatus.SUBMITTED;
 				case SUSPENDED:
 					return IJobStatus.SUSPENDED;
+				default:
+					return IJobStatus.UNDETERMINED;
 				}
 			}
 			return IJobStatus.UNDETERMINED;
@@ -259,12 +261,11 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
 	 * .ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent)
 	 * 
-	 * Note: this allows redefinition of attribute definitions. This is ok as
-	 * long as they are only allowed during the initialization phase.
+	 * Note: this allows redefinition of attribute definitions. This is ok as long as they are only allowed during the
+	 * initialization phase.
 	 */
 	public void handleEvent(IRuntimeAttributeDefinitionEvent e) {
 		// Handled by monitor
@@ -273,9 +274,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeConnectedStateEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeConnectedStateEvent)
 	 */
 	public void handleEvent(IRuntimeConnectedStateEvent e) {
 		// Ignore
@@ -284,14 +283,11 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeErrorStateEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeErrorStateEvent)
 	 */
 	public void handleEvent(IRuntimeErrorStateEvent e) {
 		/*
-		 * Fatal error in the runtime system. Cancel any pending job submissions
-		 * and inform upper levels of the problem.
+		 * Fatal error in the runtime system. Cancel any pending job submissions and inform upper levels of the problem.
 		 */
 		synchronized (jobSubmissions) {
 			for (JobSubmission sub : jobSubmissions.values()) {
@@ -304,9 +300,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeJobChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeJobChangeEvent)
 	 */
 	public void handleEvent(IRuntimeJobChangeEvent e) {
 		// Handled by monitor
@@ -315,9 +309,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeMachineChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeMachineChangeEvent)
 	 */
 	public void handleEvent(IRuntimeMachineChangeEvent e) {
 		// Handled by monitor
@@ -326,9 +318,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeErrorEvent)
 	 */
 	public void handleEvent(IRuntimeMessageEvent e) {
 		// Handled by monitor
@@ -337,9 +327,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeNewJobEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeNewJobEvent)
 	 */
 	public void handleEvent(IRuntimeNewJobEvent e) {
 		ElementAttributeManager mgr = e.getElementAttributeManager();
@@ -350,8 +338,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 				StringAttribute jobSubAttr = jobAttrs.getAttribute(JobAttributes.getSubIdAttributeDefinition());
 				if (jobSubAttr != null) {
 					/*
-					 * Notify any submitJob() calls that the job has been
-					 * created
+					 * Notify any submitJob() calls that the job has been created
 					 */
 
 					JobSubmission sub;
@@ -371,9 +358,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeNewMachineEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeNewMachineEvent)
 	 */
 	public void handleEvent(IRuntimeNewMachineEvent e) {
 		// Handled by monitor
@@ -382,9 +367,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeNewNodeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeNewNodeEvent)
 	 */
 	public void handleEvent(IRuntimeNewNodeEvent e) {
 		// Handled by monitor
@@ -393,9 +376,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeNewProcessEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeNewProcessEvent)
 	 */
 	public void handleEvent(IRuntimeNewProcessEvent e) {
 		// Handled by monitor
@@ -404,9 +385,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeNewQueueEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeNewQueueEvent)
 	 */
 	public void handleEvent(IRuntimeNewQueueEvent e) {
 		// Handled by monitor
@@ -415,9 +394,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeNodeChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeNodeChangeEvent)
 	 */
 	public void handleEvent(IRuntimeNodeChangeEvent e) {
 		// Handled by monitor
@@ -426,9 +403,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeProcessChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeProcessChangeEvent)
 	 */
 	public void handleEvent(IRuntimeProcessChangeEvent e) {
 		// Handled by monitor
@@ -437,9 +412,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeQueueChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeQueueChangeEvent)
 	 */
 	public void handleEvent(IRuntimeQueueChangeEvent e) {
 		// Handled by monitor
@@ -448,9 +421,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRemoveAllEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRemoveAllEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveAllEvent e) {
 		cleanUp();
@@ -459,9 +430,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRemoveJobEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRemoveJobEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveJobEvent e) {
 		// Handled by monitor
@@ -470,9 +439,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRemoveMachineEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRemoveMachineEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveMachineEvent e) {
 		// Handled by monitor
@@ -481,9 +448,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRemoveNodeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRemoveNodeEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveNodeEvent e) {
 		// Handled by monitor
@@ -492,9 +457,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRemoveProcessEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRemoveProcessEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveProcessEvent e) {
 		// Handled by monitor
@@ -503,9 +466,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRemoveQueueEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRemoveQueueEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveQueueEvent e) {
 		// Handled by monitor
@@ -518,9 +479,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeRunningStateEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeRunningStateEvent)
 	 */
 	public void handleEvent(IRuntimeRunningStateEvent e) {
 		// Handled by monitor
@@ -529,9 +488,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeShutdownStateEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeShutdownStateEvent)
 	 */
 	public void handleEvent(IRuntimeShutdownStateEvent e) {
 		cleanUp();
@@ -540,9 +497,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeStartupErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeStartupErrorEvent)
 	 */
 	public void handleEvent(IRuntimeStartupErrorEvent e) {
 		// Handled by monitor
@@ -551,9 +506,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
-	 * .ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse .ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent)
 	 */
 	public void handleEvent(IRuntimeSubmitJobErrorEvent e) {
 		if (e.getJobSubID() != null) {
@@ -570,8 +523,7 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
 	 * .ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent)
 	 */
 	public void handleEvent(IRuntimeTerminateJobErrorEvent e) {
@@ -584,12 +536,30 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 				NLS.bind(Messages.AbstractRuntimeResourceManager_4, new Object[] { name, e.getErrorMessage() }));
 	}
 
+	private void cleanUp() {
+		/*
+		 * Cancel any pending job submissions.
+		 */
+		synchronized (jobSubmissions) {
+			for (JobSubmission sub : jobSubmissions.values()) {
+				sub.setStatus(JobSubStatus.CANCELLED);
+			}
+			jobSubmissions.clear();
+		}
+		synchronized (fJobStatus) {
+			fJobStatus.clear();
+		}
+	}
+
+	private IPResourceManager getPResourceManager() {
+		return ModelManager.getInstance().getUniverse().getResourceManager(getResourceManager().getUniqueName());
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doControlJob(java.lang
-	 * .String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doControlJob(java.lang .String, java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void doControlJob(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
@@ -608,15 +578,14 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	 */
 	@Override
 	protected void doDispose() {
-	}
+	};
 
 	/*
 	 * 
 	 * 'Force' is ignored because there is no throttling here. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doGetJobStatus
-	 * (java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#doGetJobStatus (java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected IJobStatus doGetJobStatus(String jobId, boolean force, IProgressMonitor monitor) throws CoreException {
@@ -634,14 +603,12 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	protected void doShutdown() throws CoreException {
 		getRuntimeSystem().removeRuntimeEventListener(this);
 		cleanUp();
-	};
+	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse
-	 * .core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse .core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
@@ -651,11 +618,8 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(org.eclipse
-	 * .debug.core.ILaunchConfiguration,
-	 * org.eclipse.ptp.core.attributes.AttributeManager,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(org.eclipse .debug.core.ILaunchConfiguration,
+	 * org.eclipse.ptp.core.attributes.AttributeManager, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
@@ -679,9 +643,8 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 			switch (state) {
 			case CANCELLED:
 				/*
-				 * Once a job has been sent to the RM, it can't be canceled, so
-				 * this will just cause the submitJob command to throw an
-				 * exception. The job will still eventually get created.
+				 * Once a job has been sent to the RM, it can't be canceled, so this will just cause the submitJob command to throw
+				 * an exception. The job will still eventually get created.
 				 */
 				synchronized (jobSubmissions) {
 					jobSubmissions.remove(sub.getId());
@@ -698,6 +661,9 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 
 			case ERROR:
 				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), sub.getError()));
+
+			default:
+				assert false;
 			}
 		} finally {
 			monitor.done();
@@ -706,16 +672,10 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 		return jobStatus;
 	}
 
-	protected IPResourceManager getPResourceManager() {
-		return (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#getResourceManager
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerControl#getResourceManager ()
 	 */
 	@Override
 	protected AbstractRuntimeResourceManager getResourceManager() {
@@ -724,20 +684,5 @@ public abstract class AbstractRuntimeResourceManagerControl extends AbstractReso
 
 	protected IRuntimeSystem getRuntimeSystem() {
 		return getResourceManager().getRuntimeSystem();
-	}
-
-	private void cleanUp() {
-		/*
-		 * Cancel any pending job submissions.
-		 */
-		synchronized (jobSubmissions) {
-			for (JobSubmission sub : jobSubmissions.values()) {
-				sub.setStatus(JobSubStatus.CANCELLED);
-			}
-			jobSubmissions.clear();
-		}
-		synchronized (fJobStatus) {
-			fJobStatus.clear();
-		}
 	}
 }

@@ -9,7 +9,7 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.rm.core.rtsystem;
+package org.eclipse.ptp.rm.core.proxy;
 
 import java.io.IOException;
 
@@ -20,6 +20,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem;
 
+/**
+ * @since 4.0
+ */
 public abstract class AbstractRemoteProxyRuntimeSystem extends AbstractProxyRuntimeSystem {
 	private final AbstractRemoteProxyRuntimeClient fRemoteProxy;
 
@@ -49,9 +52,7 @@ public abstract class AbstractRemoteProxyRuntimeSystem extends AbstractProxyRunt
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem#startup(org.eclipse
-	 * .core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rtsystem.AbstractProxyRuntimeSystem#startup(org.eclipse .core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void startup(IProgressMonitor monitor) throws CoreException {

@@ -46,7 +46,7 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 */
 	private void terminateProcesses() {
 		final GenericRMRuntimeSystem rtSystem = (GenericRMRuntimeSystem) getRtSystem();
-		final IPResourceManager rm = (IPResourceManager) rtSystem.getResourceManager().getAdapter(IPResourceManager.class);
+		final IPResourceManager rm = rtSystem.getPResourceManager();
 		if (rm != null) {
 			final IPJob ipJob = rm.getJobById(getJobID());
 			if (ipJob != null) {
@@ -84,8 +84,7 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#
-	 * doBeforeExecution(org.eclipse.core.runtime.IProgressMonitor,
-	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder)
+	 * doBeforeExecution(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.ptp.remote.core.IRemoteProcessBuilder)
 	 */
 	@Override
 	protected void doBeforeExecution(IProgressMonitor monitor, IRemoteProcessBuilder builder) throws CoreException {
@@ -149,13 +148,12 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		/*
 		 * Create processes for the job.
 		 */
-		final IPResourceManager rm = (IPResourceManager) getRtSystem().getResourceManager().getAdapter(IPResourceManager.class);
+		final IPResourceManager rm = getRtSystem().getPResourceManager();
 		final IPJob job = rm.getJobById(getJobID());
 		addProcess(job);
 
 		/*
-		 * We only require procZero if we're using OMPI 1.2.x or 1.3.[0-3].
-		 * Other versions use XML for stdout and stderr.
+		 * We only require procZero if we're using OMPI 1.2.x or 1.3.[0-3]. Other versions use XML for stdout and stderr.
 		 */
 		final BitSet procZero = new BitSet();
 		if (job.hasProcessByJobRank(0)) {
@@ -235,8 +233,7 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#
-	 * doRetrieveToolBaseSubstitutionAttributes()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob# doRetrieveToolBaseSubstitutionAttributes()
 	 */
 	@Override
 	protected IAttribute<?, ?, ?>[] doRetrieveToolBaseSubstitutionAttributes() throws CoreException {
@@ -248,10 +245,8 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#
-	 * doRetrieveToolCommandSubstitutionAttributes
-	 * (org.eclipse.ptp.core.attributes.AttributeManager, java.lang.String,
-	 * java.util.Map)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob# doRetrieveToolCommandSubstitutionAttributes
+	 * (org.eclipse.ptp.core.attributes.AttributeManager, java.lang.String, java.util.Map)
 	 */
 	@Override
 	protected IAttribute<?, ?, ?>[] doRetrieveToolCommandSubstitutionAttributes(AttributeManager baseSubstitutionAttributeManager,
@@ -269,9 +264,7 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doTerminateJob
-	 * ()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doTerminateJob ()
 	 */
 	@Override
 	protected void doTerminateJob() {
@@ -281,15 +274,13 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doWaitExecution
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doWaitExecution
 	 * (org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void doWaitExecution(IProgressMonitor monitor) throws CoreException {
 		/*
-		 * Wait until both stdout and stderr stop because stream are closed.
-		 * This means that the process has finished.
+		 * Wait until both stdout and stderr stop because stream are closed. This means that the process has finished.
 		 */
 		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", getJobID()); //$NON-NLS-1$
 		try {
@@ -306,8 +297,7 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		}
 
 		/*
-		 * Still experience has shown that remote process might not have yet
-		 * terminated, although stdout and stderr is closed.
+		 * Still experience has shown that remote process might not have yet terminated, although stdout and stderr is closed.
 		 */
 		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting mpi process to finish completely", getJobID()); //$NON-NLS-1$
 		try {

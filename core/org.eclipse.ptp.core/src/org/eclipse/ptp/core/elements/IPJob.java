@@ -27,14 +27,11 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
- * A Job can be a parallel or sequential job, consisting of one or more
- * processes which are residing on Nodes. Jobs may span Machines, though this
- * may not be very common in reality, but the model allows for this. Finally, a
- * Job may or may not belong to the current user, it just means that if it is
- * visible then this user can see the Job in his or her Universe. This may have
+ * A Job can be a parallel or sequential job, consisting of one or more processes which are residing on Nodes. Jobs may span
+ * Machines, though this may not be very common in reality, but the model allows for this. Finally, a Job may or may not belong to
+ * the current user, it just means that if it is visible then this user can see the Job in his or her Universe. This may have
  * ramifications on what the user can do to the Job if it is not owned by them.
  * 
  * @author Nathan DeBardeleben
@@ -66,8 +63,14 @@ public interface IPJob extends IPElement {
 	public void addProcessesByJobRanks(BitSet jobRanks, AttributeManager attrs);
 
 	/**
-	 * Retrieve the attribute associated with the given attribute definition for
-	 * one of the job's processes.
+	 * Get the resource manager controlling this job
+	 * 
+	 * @since 6.0
+	 */
+	public String getControlId();
+
+	/**
+	 * Retrieve the attribute associated with the given attribute definition for one of the job's processes.
 	 * 
 	 * @param attributeDefinition
 	 *            the attribute returned is defined for this definition
@@ -80,53 +83,44 @@ public interface IPJob extends IPElement {
 			int processJobRank);
 
 	/**
-	 * Retrieve the attribute associated with the id for an attribute definition
-	 * for one of the job's processes.
+	 * Retrieve the attribute associated with the id for an attribute definition for one of the job's processes.
 	 * 
 	 * @param attrDefId
-	 *            the id associated with the attribute definition used to
-	 *            determine which attribute is returned
+	 *            the id associated with the attribute definition used to determine which attribute is returned
 	 * @param processJobRank
 	 *            the process in question
-	 * @return the process' attribute associated with this attribute definition
-	 *         id
+	 * @return the process' attribute associated with this attribute definition id
 	 * @since 4.0
 	 */
 	public IAttribute<?, ?, ?> getProcessAttribute(String attrDefId, int processJobRank);
 
 	/**
-	 * Return all the attribute definitions that are known by the specified
-	 * processes.
+	 * Return all the attribute definitions that are known by the specified processes.
 	 * 
 	 * @param processJobRanks
-	 *            the set of processes from which the attribute definitions are
-	 *            returned
+	 *            the set of processes from which the attribute definitions are returned
 	 * @return set of IAttributeDefinition keys
 	 * @since 4.0
 	 */
 	public Set<IAttributeDefinition<?, ?, ?>> getProcessAttributeKeys(BitSet processJobRanks);
 
 	/**
-	 * Return all of the attributes from all of the specified processes owned by
-	 * this job.
+	 * Return all of the attributes from all of the specified processes owned by this job.
 	 * 
 	 * @param processJobRanks
-	 *            limit the returned attributes to this subset of process job
-	 *            ranks
+	 *            limit the returned attributes to this subset of process job ranks
 	 * @return the set of all attributes possessed by the specified processes
 	 * @since 4.0
 	 */
 	public Set<IAttribute<?, ?, ?>> getProcessAttributes(BitSet processJobRanks);
 
 	/**
-	 * Return the set of all attributes for this attribute definition from the
-	 * specified set of this job's child processes
+	 * Return the set of all attributes for this attribute definition from the specified set of this job's child processes
 	 * 
 	 * @param attributeDefinition
 	 *            the attributes returned are all defined for this definition
 	 * @param processJobRanks
-	 *            limit the returned attributes to this subset of process job
-	 *            ranks
+	 *            limit the returned attributes to this subset of process job ranks
 	 * @return
 	 * @since 4.0
 	 */
@@ -134,15 +128,13 @@ public interface IPJob extends IPElement {
 			D attributeDefinition, BitSet processJobRanks);
 
 	/**
-	 * Return the set of all attributes specified by this attribute definition
-	 * id from the specified set of this job's child processes
+	 * Return the set of all attributes specified by this attribute definition id from the specified set of this job's child
+	 * processes
 	 * 
 	 * @param attrDefId
-	 *            the attributes returned are all defined for the definition
-	 *            with this id
+	 *            the attributes returned are all defined for the definition with this id
 	 * @param processJobRanks
-	 *            limit the returned attributes to this subset of process job
-	 *            ranks
+	 *            limit the returned attributes to this subset of process job ranks
 	 * @return
 	 * @since 4.0
 	 */
@@ -157,8 +149,7 @@ public interface IPJob extends IPElement {
 	public BitSet getProcessJobRanks();
 
 	/**
-	 * Get the jobRanks for all the processes known by this job with attribute
-	 * value equal to {@code attribute}
+	 * Get the jobRanks for all the processes known by this job with attribute value equal to {@code attribute}
 	 * 
 	 * @param attribute
 	 * @return
@@ -186,13 +177,6 @@ public interface IPJob extends IPElement {
 	 * @since 4.0
 	 */
 	public ProcessAttributes.State getProcessState(int processJobRank);
-
-	/**
-	 * Get the resource manager controlling this job
-	 * 
-	 * @since 5.0
-	 */
-	public IResourceManager getResourceManager();
 
 	/**
 	 * @param processJobRank

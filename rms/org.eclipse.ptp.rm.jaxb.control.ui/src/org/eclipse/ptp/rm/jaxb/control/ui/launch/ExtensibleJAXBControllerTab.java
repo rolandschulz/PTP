@@ -17,8 +17,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
@@ -26,7 +24,6 @@ import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -55,6 +52,7 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	protected boolean initialized;
 	protected TabFolder tabFolder;
 	protected int lastIndex;
+	protected String controlId;
 
 	private final LinkedList<AbstractJAXBLaunchConfigurationTab> tabControllers = new LinkedList<AbstractJAXBLaunchConfigurationTab>();
 
@@ -62,10 +60,9 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	private Composite control;
 
 	/**
-	 * @param dialog
+	 * @param context
 	 */
-	protected ExtensibleJAXBControllerTab(ILaunchConfigurationDialog dialog) {
-		super(dialog);
+	protected ExtensibleJAXBControllerTab() {
 		voidRMConfig = false;
 		initialized = false;
 		lastIndex = 0;
@@ -74,12 +71,11 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	/*
 	 * calls canSave on children (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.elements.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation canSave(Control control) {
 		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.canSave(control, rm, queue);
+			RMLaunchValidation validation = tabControl.canSave(control);
 			if (!validation.isSuccess()) {
 				return validation;
 			}
@@ -88,12 +84,12 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	}
 
 	/*
-	 * Builds the tab folder containing child tabs. (non-Javadoc)
+	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.elements.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * java.lang.String)
 	 */
-	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
+	public void createControl(Composite parent, String id) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		if (!voidRMConfig) {
 			GridLayout layout = new GridLayout();
@@ -104,13 +100,14 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 
 			for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
 				final TabItem simpleTabItem = new TabItem(tabFolder, SWT.NONE);
-				tabControl.createControl(tabFolder, rm, queue);
+				tabControl.createControl(tabFolder, id);
 				simpleTabItem.setText(tabControl.getText());
 				simpleTabItem.setImage(tabControl.getImage());
 				simpleTabItem.setControl(tabControl.getControl());
 			}
 		}
 		control.layout(true, true);
+		controlId = id;
 	}
 
 	/*
@@ -145,17 +142,16 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	/*
 	 * Calls initializeFrom on child tabs, then sets the shared environment. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.elements.IPQueue,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(ILaunchConfiguration configuration) {
 		String lastTab = null;
 		String key = null;
 		try {
-			key = rm.getUniqueName() + JAXBUIConstants.DOT + JAXBUIConstants.INITIALIZED;
+			key = controlId + JAXBUIConstants.DOT + JAXBUIConstants.INITIALIZED;
 			initialized = configuration.getAttribute(key, false);
-			key = rm.getUniqueName() + JAXBUIConstants.DOT + JAXBUIConstants.CURRENT_CONTROLLER;
+			key = controlId + JAXBUIConstants.DOT + JAXBUIConstants.CURRENT_CONTROLLER;
 			lastTab = configuration.getAttribute(key, JAXBUIConstants.ZEROSTR);
 		} catch (CoreException t1) {
 			JAXBUIPlugin.log(t1);
@@ -167,7 +163,7 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 			if (tabControl.getControllerTag().equals(lastTab)) {
 				lastIndex = i;
 			}
-			RMLaunchValidation validation = tabControl.initializeFrom(control, rm, queue, configuration);
+			RMLaunchValidation validation = tabControl.initializeFrom(configuration);
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
 			}
@@ -192,7 +188,7 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 			}
 			try {
 				ILaunchConfigurationWorkingCopy wc = configuration.getWorkingCopy();
-				wc.setAttribute(rm.getUniqueName() + JAXBUIConstants.DOT + JAXBUIConstants.INITIALIZED, true);
+				wc.setAttribute(controlId + JAXBUIConstants.DOT + JAXBUIConstants.INITIALIZED, true);
 				wc.doSave();
 			} catch (CoreException t) {
 				JAXBUIPlugin.log(t);
@@ -212,12 +208,11 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 * Calls isValid on child tabs. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig) {
 		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.isValid(launchConfig, rm, queue);
+			RMLaunchValidation validation = tabControl.isValid(launchConfig);
 			if (!validation.isSuccess()) {
 				return validation;
 			}
@@ -229,18 +224,17 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 * Calls performApply on child tabs. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration) {
 		try {
-			LCVariableMap.normalizeStandardProperties(rm.getUniqueName() + JAXBUIConstants.DOT, configuration);
+			LCVariableMap.normalizeStandardProperties(controlId + JAXBUIConstants.DOT, configuration);
 		} catch (CoreException ce) {
 			return new RMLaunchValidation(false, ce.getLocalizedMessage());
 		}
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.performApply(configuration, rm, queue);
+			RMLaunchValidation validation = tabControl.performApply(configuration);
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
 			}
@@ -252,13 +246,12 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	 * Calls setDefaults on child tabs. (non-Javadoc) (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.setDefaults(configuration, rm, queue);
+			RMLaunchValidation validation = tabControl.setDefaults(configuration);
 			if (!validation.isSuccess()) {
 				resultValidation = validation;
 			}

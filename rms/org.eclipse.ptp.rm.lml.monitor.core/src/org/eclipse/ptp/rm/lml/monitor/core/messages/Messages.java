@@ -7,6 +7,12 @@ public class Messages extends NLS {
 	public static String LMLResourceManagerMonitor_LMLMonitorJob;
 	public static String LMLResourceManagerMonitor_RMSelectionJob;
 	public static String LMLResourceManagerMonitor_unableToOpenConnection;
+	public static String MonitorControl_unableToOpenRemoteConnection;
+	public static String MonitorControlManager_monitorAddedJobName;
+	public static String MonitorControlManager_monitorRemovedJobName;
+	public static String MonitorControlManager_monitorSelectionChangedJobName;
+	public static String MonitorControlManager_monitorUpdatedJobName;
+	public static String MonitorControlManager_monitoRefreshJobName;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

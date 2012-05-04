@@ -64,8 +64,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * createRuntimeSystemJob(java.lang.String,
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem# createRuntimeSystemJob(java.lang.String,
 	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
@@ -76,15 +75,14 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#getAttributes
-	 * (org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#getAttributes (org.eclipse.debug.core.ILaunchConfiguration,
+	 * java.lang.String)
 	 */
 	@Override
 	public List<IAttribute<?, ?, ?>> getAttributes(ILaunchConfiguration configuration, String mode) throws CoreException {
 		List<IAttribute<?, ?, ?>> attrs = super.getAttributes(configuration, mode);
 
-		IPResourceManager rm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		IPResourceManager rm = getPResourceManager();
 		if (rm != null) {
 			IPQueue[] queues = rm.getQueues();
 			if (queues.length != 1) {
@@ -116,8 +114,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * retrieveEffectiveToolRmConfiguration()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem# retrieveEffectiveToolRmConfiguration()
 	 */
 	@Override
 	public AbstractEffectiveToolRMConfiguration retrieveEffectiveToolRmConfiguration() {
@@ -135,8 +132,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * createContinuousMonitorJob()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem# createContinuousMonitorJob()
 	 */
 	@Override
 	protected Job createContinuousMonitorJob() {
@@ -146,9 +142,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#createDiscoverJob
-	 * ()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#createDiscoverJob ()
 	 */
 	@Override
 	protected Job createDiscoverJob() {
@@ -165,8 +159,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * createPeriodicMonitorJob()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem# createPeriodicMonitorJob()
 	 */
 	@Override
 	protected Job createPeriodicMonitorJob() {
@@ -183,10 +176,8 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doFilterEvents
-	 * (org.eclipse.ptp.core.elements.IPElement, boolean,
-	 * org.eclipse.ptp.core.attributes.AttributeManager)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doFilterEvents (org.eclipse.ptp.core.elements.IPElement,
+	 * boolean, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
 	protected void doFilterEvents(IPElement element, boolean filterChildren, AttributeManager filterAttributes)
@@ -197,8 +188,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doShutdown()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doShutdown()
 	 */
 	@Override
 	protected void doShutdown() throws CoreException {
@@ -208,9 +198,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStartEvents
-	 * ()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStartEvents ()
 	 */
 	@Override
 	protected void doStartEvents() throws CoreException {
@@ -220,9 +208,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStartup(
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStartup( org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
@@ -233,8 +219,7 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStopEvents()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStopEvents()
 	 */
 	@Override
 	protected void doStopEvents() throws CoreException {
@@ -251,15 +236,13 @@ public class MPICH2RuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * notifyMonitorFailed
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem# notifyMonitorFailed
 	 * (org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob)
 	 */
 	@Override
 	protected void notifyMonitorFailed(AbstractRemoteCommandJob job, Exception exception) {
 		/*
-		 * Show message of all other exceptions and change machine status to
-		 * error.
+		 * Show message of all other exceptions and change machine status to error.
 		 */
 		AttributeManager attrManager = new AttributeManager();
 		attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));

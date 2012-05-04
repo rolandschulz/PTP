@@ -25,6 +25,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
@@ -42,36 +43,44 @@ public class StopResourceManagersObjectActionDelegate extends AbstractResourceMa
 				continue;
 			}
 
-			/*
-			 * Only ask if we are really shutting down the RM
-			 */
-			if (rmManager.getResourceManager().getState().equals(IResourceManager.STARTED_STATE)) {
-				boolean shutdown = MessageDialog.openConfirm(getTargetShell(), Messages.StopResourceManagersObjectActionDelegate_0,
-						NLS.bind(Messages.StopResourceManagersObjectActionDelegate_1, rmManager.getName()));
-				if (!shutdown) {
-					return;
-				}
-			}
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(rmManager.getControlId());
+			if (rm != null) {
 
-			try {
-				rmManager.getResourceManager().stop();
-			} catch (CoreException e) {
-				final String message = NLS.bind(Messages.StopResourceManagersObjectActionDelegate_2, rmManager.getName());
-				Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1, message, e);
-				ErrorDialog dlg = new ErrorDialog(getTargetShell(), Messages.StopResourceManagersObjectActionDelegate_3, message,
-						status, IStatus.ERROR);
-				dlg.open();
-				PTPUIPlugin.log(status);
+				/*
+				 * Only ask if we are really shutting down the RM
+				 */
+				if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
+					boolean shutdown = MessageDialog.openConfirm(getTargetShell(),
+							Messages.StopResourceManagersObjectActionDelegate_0,
+							NLS.bind(Messages.StopResourceManagersObjectActionDelegate_1, rmManager.getName()));
+					if (!shutdown) {
+						return;
+					}
+				}
+
+				try {
+					rm.stop();
+				} catch (CoreException e) {
+					final String message = NLS.bind(Messages.StopResourceManagersObjectActionDelegate_2, rmManager.getName());
+					Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1, message, e);
+					ErrorDialog dlg = new ErrorDialog(getTargetShell(), Messages.StopResourceManagersObjectActionDelegate_3,
+							message, status, IStatus.ERROR);
+					dlg.open();
+					PTPUIPlugin.log(status);
+				}
 			}
 		}
 	}
 
 	@Override
 	protected boolean isEnabledFor(IPResourceManager rmManager) {
-		String state = rmManager.getResourceManager().getState();
-		if (state.equals(IResourceManager.STARTING_STATE) || state.equals(IResourceManager.STARTED_STATE)
-				|| state.equals(IResourceManager.ERROR_STATE)) {
-			return true;
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(rmManager.getControlId());
+		if (rm != null) {
+			String state = rm.getState();
+			if (state.equals(IResourceManager.STARTING_STATE) || state.equals(IResourceManager.STARTED_STATE)
+					|| state.equals(IResourceManager.ERROR_STATE)) {
+				return true;
+			}
 		}
 		return false;
 	}

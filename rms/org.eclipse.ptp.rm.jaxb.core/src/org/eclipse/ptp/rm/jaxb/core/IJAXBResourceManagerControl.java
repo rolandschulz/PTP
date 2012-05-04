@@ -14,8 +14,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
@@ -25,10 +25,8 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
  * 
  */
 public interface IJAXBResourceManagerControl extends IResourceManagerControl {
-
 	/**
-	 * @return whether the launch environment should be appended to (or replace)
-	 *         the environment for a given command execution.
+	 * @return whether the launch environment should be appended to (or replace) the environment for a given command execution.
 	 */
 	public boolean getAppendEnv();
 
@@ -74,4 +72,6 @@ public interface IJAXBResourceManagerControl extends IResourceManagerControl {
 	 * 
 	 */
 	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException;
+
+	public void initialize(IProgressMonitor monitor) throws CoreException;
 }

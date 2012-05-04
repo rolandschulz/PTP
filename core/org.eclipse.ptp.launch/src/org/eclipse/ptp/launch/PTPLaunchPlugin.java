@@ -41,7 +41,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.launch.messages.Messages;
@@ -86,8 +86,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Convenience method to create an error dialog given a message and
-	 * Throwable.
+	 * Convenience method to create an error dialog given a message and Throwable.
 	 * 
 	 * @param message
 	 * @param t
@@ -144,8 +143,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path.
+	 * Returns an image descriptor for the image file at the given plug-in relative path.
 	 * 
 	 * @param path
 	 *            the path
@@ -156,8 +154,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns the string from the plugin's resource bundle, or 'key' if not
-	 * found.
+	 * Returns the string from the plugin's resource bundle, or 'key' if not found.
 	 */
 	public static String getResourceString(String key) {
 		ResourceBundle bundle = PTPLaunchPlugin.getDefault().getResourceBundle();
@@ -257,8 +254,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Find the resource manager that corresponds to the unique name specified
-	 * in the configuration
+	 * Find the resource manager that corresponds to the unique name specified in the configuration
 	 * 
 	 * @param configuration
 	 *            launch configuration
@@ -269,7 +265,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	public IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 				(String) null);
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(rmUniqueName);
 		if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
 			return rm;
 		}
@@ -338,8 +334,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Verify that the resource "path" actually exists. This just checks that
-	 * the path references something real.
+	 * Verify that the resource "path" actually exists. This just checks that the path references something real.
 	 * 
 	 * @param path
 	 *            path to check
@@ -386,8 +381,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Find all launch configuration factory extensions that have been
-	 * registered
+	 * Find all launch configuration factory extensions that have been registered
 	 */
 	private void retrieveRMLaunchConfigurationFactories() {
 		rmLaunchConfigurationFactories.clear();

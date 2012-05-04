@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.jaxb.tests;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -49,8 +50,7 @@ public class JAXBTestsPlugin extends Plugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
@@ -77,8 +77,7 @@ public class JAXBTestsPlugin extends Plugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
@@ -131,7 +130,8 @@ public class JAXBTestsPlugin extends Plugin {
 			Bundle bundle = getDefault().getBundle();
 			url = FileLocator.find(bundle, new Path(JAXBCoreConstants.PATH_SEP + resource), null);
 		} else {
-			url = new File(resource).toURL();
+			URI uri = new File(resource).toURI();
+			url = uri.toURL();
 		}
 		return url;
 	}
@@ -153,7 +153,8 @@ public class JAXBTestsPlugin extends Plugin {
 		if (instance == null) {
 			File f = new File(name);
 			if (f.exists() && f.isFile()) {
-				instance = f.toURL();
+				URI uri = f.toURI();
+				instance = uri.toURL();
 			} else {
 				throw new FileNotFoundException(name);
 			}

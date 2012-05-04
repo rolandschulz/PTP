@@ -15,9 +15,8 @@ import java.util.UUID;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
 /**
- * Base service provider for all resource manager configurations that use the
- * service provider framework. A resource manager must declare a service
- * provider extension and point the extension at this class.
+ * Base service provider for all resource manager configurations that use the service provider framework. A resource manager must
+ * declare a service provider extension and point the extension at this class.
  * 
  * @since 5.0
  */
@@ -25,11 +24,10 @@ public class ResourceManagerServiceProvider extends ServiceProvider {
 
 	private static final String TAG_UNIQUE_NAME = "uniqName"; //$NON-NLS-1$
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the unique name for this RM. If no name exists, one will be assigned.
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerServiceProvider#getUniqueName()
+	 * @return unique name
 	 */
 	public String getUniqueName() {
 		String name = getString(TAG_UNIQUE_NAME, null);
@@ -47,5 +45,14 @@ public class ResourceManagerServiceProvider extends ServiceProvider {
 	 */
 	public boolean isConfigured() {
 		return false;
+	}
+
+	/**
+	 * Set the unique name for this RM
+	 * 
+	 * @since 6.0
+	 */
+	public void setUniqueName(String name) {
+		putString(TAG_UNIQUE_NAME, name);
 	}
 }

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.ibm.pe.core.rtsystem;
 
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -21,12 +22,10 @@ public class PERuntimeSystemFactory implements IRuntimeSystemFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeSystemFactory#create(org.eclipse.ptp
-	 * .rmsystem.IResourceManager)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystemFactory#create(org.eclipse.ptp .rmsystem.IResourceManager)
 	 */
 	public IRuntimeSystem create(IResourceManager rm) {
-		IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
+		IPResourceManager prm = ModelManager.getInstance().getUniverse().getResourceManager(rm.getUniqueName());
 		int baseId = 0;
 		try {
 			baseId = Integer.parseInt(prm.getID());

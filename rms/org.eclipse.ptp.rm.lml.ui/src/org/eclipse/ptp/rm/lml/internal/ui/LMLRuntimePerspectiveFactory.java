@@ -34,7 +34,7 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 		final IFolderLayout miscFolder = layout.createFolder("miscFolder", IPageLayout.BOTTOM, (float) 0.5, "jobsFolder"); //$NON-NLS-1$//$NON-NLS-2$
 		final IFolderLayout machinesFolder = layout.createFolder("machinesFolder", IPageLayout.BOTTOM, 0, editorArea); //$NON-NLS-1$
 
-		mainFolder.addView("org.eclipse.ptp.ui.views.resourceManagerView"); //$NON-NLS-1$
+		mainFolder.addView("org.eclipse.ptp.rm.ui.views.monitorView"); //$NON-NLS-1$
 
 		jobsFolder.addView(ILMLUIConstants.VIEW_TABLE_1);
 		jobsFolder.addView(ILMLUIConstants.VIEW_TABLE_2);

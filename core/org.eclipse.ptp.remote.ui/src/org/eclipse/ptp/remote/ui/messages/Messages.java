@@ -28,6 +28,12 @@ public class Messages extends NLS {
 
 	public static String RemoteConnectionWidget_remoteServiceProvider;
 
+	public static String RemoteConnectionWidget_selectConnection;
+
+	public static String RemoteConnectionWidget_selectRemoteProvider;
+
+	public static String RemoteDevelopmentPreferencePage_defaultRemoteServicesProvider;
+
 	public static String RemoteDirectoryWidget_0;
 	public static String RemoteDirectoryWidget_1;
 	public static String RemoteDirectoryWidget_2;

@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.lml_jaxb.actions;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
@@ -21,8 +21,7 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
- * Base class for actions on the job status object which read remote file output
- * to a console.
+ * Base class for actions on the job status object which read remote file output to a console.
  * 
  * @author arossi
  * 
@@ -41,16 +40,18 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 	public void run(IAction action) {
 		if (status != null) {
 			String path = error ? status.getErrorPath() : status.getOutputPath();
-			ActionUtils.readRemoteFile(status.getRmId(), path);
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(status.getControlId());
+			if (rm != null) {
+				ActionUtils.readRemoteFile(rm.getControlConfiguration().getRemoteServicesId(), rm.getControlConfiguration()
+						.getConnectionName(), path);
+			}
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
-	 * .IAction, org.eclipse.jface.viewers.ISelection)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action .IAction, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		if (selection.isEmpty()) {
@@ -67,7 +68,7 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 			action.setEnabled(false);
 			return;
 		}
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(status.getRmId());
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(status.getControlId());
 		if (rm == null || !IResourceManager.STARTED_STATE.equals(rm.getState())) {
 			action.setEnabled(false);
 		} else if (getReady()) {
@@ -80,9 +81,7 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.
-	 * action.IAction, org.eclipse.ui.IWorkbenchPart)
+	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface. action.IAction, org.eclipse.ui.IWorkbenchPart)
 	 */
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		view = (TableView) targetPart;

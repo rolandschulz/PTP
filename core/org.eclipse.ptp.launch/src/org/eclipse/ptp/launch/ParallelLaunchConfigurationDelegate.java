@@ -36,8 +36,10 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.IPSession;
@@ -83,10 +85,10 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				/*
 				 * NOTE: we assume these have already been verified prior to launch
 				 */
-				String app = getProgramName(fLaunch.getLaunchConfiguration());
-				String path = getProgramPath(fLaunch.getLaunchConfiguration());
-				String cwd = getWorkingDirectory(fLaunch.getLaunchConfiguration());
-				String[] args = getProgramArguments(fLaunch.getLaunchConfiguration());
+				String app = LaunchUtils.getProgramName(fLaunch.getLaunchConfiguration());
+				String path = LaunchUtils.getProgramPath(fLaunch.getLaunchConfiguration());
+				String cwd = LaunchUtils.getWorkingDirectory(fLaunch.getLaunchConfiguration());
+				String[] args = LaunchUtils.getProgramArguments(fLaunch.getLaunchConfiguration());
 
 				switchPerspective(DebugUITools.getLaunchPerspective(fLaunch.getLaunchConfiguration().getType(),
 						fLaunch.getLaunchMode()));
@@ -125,7 +127,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			/*
 			 * Allow user to start resource manager if not running.
 			 */
-			final IResourceManager rm = getResourceManager(configuration);
+			final IResourceManager rm = LaunchUtils.getResourceManager(configuration);
 			if (rm == null) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
@@ -218,12 +220,15 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	 * @param job
 	 *            job to terminate
 	 */
-	private void terminateJob(final IResourceManagerControl rm, final String jobId) {
-		try {
-			rm.control(jobId, IResourceManagerControl.TERMINATE_OPERATION, null);
-		} catch (CoreException e1) {
-			// Ignore, but log
-			PTPLaunchPlugin.log(e1);
+	private void terminateJob(IPLaunch launch) {
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(launch.getJobControl().getControlId());
+		if (rm != null) {
+			try {
+				rm.control(launch.getJobId(), IResourceManagerControl.TERMINATE_OPERATION, null);
+			} catch (CoreException e1) {
+				// Ignore, but log
+				PTPLaunchPlugin.log(e1);
+			}
 		}
 	}
 
@@ -255,7 +260,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	@Override
 	protected void doCompleteJobLaunch(final IPLaunch launch, final IPDebugger debugger) {
 		final String jobId = launch.getJobId();
-		final IResourceManager rm = launch.getResourceManager();
 		final ILaunchConfiguration configuration = launch.getLaunchConfiguration();
 
 		/*
@@ -267,7 +271,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		 * Create process that is used by the DebugPlugin for handling console output. This process gets added to the debug session
 		 * so that it is also displayed in the Debug View as the system process.
 		 */
-		new RuntimeProcess(launch, rm, jobId, null);
+		new RuntimeProcess(launch, null);
 
 		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
 			try {
@@ -280,11 +284,11 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 						try {
 							new ProgressMonitorDialog(PTPLaunchPlugin.getActiveWorkbenchShell()).run(true, true, session);
 						} catch (InterruptedException e) {
-							terminateJob(rm, jobId);
+							terminateJob(launch);
 						} catch (InvocationTargetException e) {
 							PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_0, e.getTargetException());
 							PTPLaunchPlugin.log(e.getCause());
-							terminateJob(rm, jobId);
+							terminateJob(launch);
 						}
 					}
 				});
@@ -296,7 +300,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					public void run() {
 						PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_1, e.getStatus());
 						PTPLaunchPlugin.log(e);
-						terminateJob(rm, jobId);
+						terminateJob(launch);
 					}
 				});
 			}

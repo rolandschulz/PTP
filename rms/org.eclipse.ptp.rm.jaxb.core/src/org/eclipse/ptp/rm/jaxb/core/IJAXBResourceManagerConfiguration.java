@@ -11,6 +11,7 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.net.URL;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
@@ -22,29 +23,25 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
  */
 public interface IJAXBResourceManagerConfiguration extends IRemoteResourceManagerConfiguration {
 	/**
-	 * Resets internal (in-memory) data objects.
-	 * 
-	 * @param all
-	 *            if false, clears only the data tree and map, not the
-	 *            connections.
-	 * 
-	 * @since 5.0
-	 */
-	public void clearReferences(boolean all);
-
-	/**
 	 * @return the JAXB resource manager data element tree.
 	 * 
 	 * @since 5.0
 	 */
-	public ResourceManagerData getResourceManagerData() throws Throwable;
+	public ResourceManagerData getResourceManagerData();
 
 	/**
 	 * @return the JAXB resource manager environment map.
 	 * 
 	 * @since 5.0
 	 */
-	public IVariableMap getRMVariableMap() throws Throwable;
+	public IVariableMap getRMVariableMap();
+
+	/**
+	 * Initialize the configuration. Must be called prior to using the configuration
+	 * 
+	 * @throws CoreException
+	 */
+	public void initialize() throws CoreException;
 
 	/**
 	 * @param url

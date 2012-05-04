@@ -8,7 +8,7 @@
 
 package org.eclipse.ptp.rm.ibm.ll.core.rtsystem;
 
-import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteProxyRuntimeClient;
+import org.eclipse.ptp.rm.core.proxy.AbstractRemoteProxyRuntimeClient;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
 
 public class IBMLLProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
