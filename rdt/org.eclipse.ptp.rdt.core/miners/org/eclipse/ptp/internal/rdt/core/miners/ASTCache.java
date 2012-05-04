@@ -110,7 +110,7 @@ public class ASTCache {
 				return null;
 			}
 			
-			FileContent fileContent =  new InternalFileContent(absolutePath, chars);
+			FileContent fileContent =  new InternalFileContent(absolutePath, chars, file.lastModified(), file.length());
 			
 			try {
 				index.acquireReadLock();
