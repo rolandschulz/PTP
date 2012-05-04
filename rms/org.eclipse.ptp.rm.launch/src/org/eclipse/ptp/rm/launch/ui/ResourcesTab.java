@@ -142,12 +142,12 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		comp.setLayoutData(gd);
 
-		new Label(comp, SWT.NONE).setText("Target System Configuration:");
+		new Label(comp, SWT.NONE).setText(Messages.ResourcesTab_targetSystemConfiguration);
 
 		fSystemTypeCombo = new Combo(comp, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		fSystemTypeCombo.setLayoutData(gd);
-		fSystemTypeCombo.add("Please select a target system configuration");
+		fSystemTypeCombo.add(Messages.ResourcesTab_pleaseSelectTargetSystem);
 		for (ProviderInfo provider : ProviderInfo.getProviders()) {
 			fSystemTypeCombo.add(provider.getName());
 			fProviders.add(provider.getName());
@@ -446,10 +446,10 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				boolean result = MessageDialog
 						.openQuestion(
 								getShell(),
-								"Open Connection",
-								"No information about the target system '"
-										+ fRemoteConnectionWidget.getConnection().getName()
-										+ "' can be obtained because the connection is not open. Would you like to open the connection now?");
+								Messages.ResourcesTab_openConnection,
+								NLS.bind(
+										Messages.ResourcesTab_noInformation,
+										fRemoteConnectionWidget.getConnection().getName()));
 				if (!result) {
 					return false;
 				}

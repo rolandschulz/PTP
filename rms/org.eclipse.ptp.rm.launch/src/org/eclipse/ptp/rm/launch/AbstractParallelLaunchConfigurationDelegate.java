@@ -579,8 +579,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 							public void run() {
 								MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoCancelQuestion(
 										RMLaunchPlugin.getActiveWorkbenchShell(),
-										"Monitoring Setup",
-										"This launch type allows monitoring of system and job information. Do you want to configure and start monitoring (will switch to System Monitoring perspective if necessary)?",
+										Messages.AbstractParallelLaunchConfigurationDelegate_monitoringSetup,
+										Messages.AbstractParallelLaunchConfigurationDelegate_launchType1,
 										null, false, null, null);
 								result[0] = dialog.getReturnCode();
 							}
@@ -606,8 +606,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 								public void run() {
 									MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoCancelQuestion(
 											RMLaunchPlugin.getActiveWorkbenchShell(),
-											"Monitoring Setup",
-											"This launch type allows monitoring of system and job information. Do you want to start monitoring (will switch to System Monitoring perspective if necessary)?",
+											Messages.AbstractParallelLaunchConfigurationDelegate_monitoringSetup,
+											Messages.AbstractParallelLaunchConfigurationDelegate_launchType2,
 											null, false, null, null);
 									result[0] = dialog.getReturnCode();
 								}
@@ -683,8 +683,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 								boolean doSwitch = true;
 
 								if (ask) {
-									doSwitch = MessageDialog.openQuestion(display.getActiveShell(), "Monitoring Setup",
-											"This launch type allows monitoring of system and job information. Do you want to switch to the System Monitoring perspective now?");
+									doSwitch = MessageDialog.openQuestion(display.getActiveShell(), Messages.AbstractParallelLaunchConfigurationDelegate_monitoringSetup,
+											Messages.AbstractParallelLaunchConfigurationDelegate_launchType3);
 								}
 
 								if (doSwitch) {
@@ -833,7 +833,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		}
 		if (fileManager == null) {
 			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
-					"Unable to obtain remote connection information from launch configuration"));
+					Messages.AbstractParallelLaunchConfigurationDelegate_unableToObtainConnectionInfo));
 		}
 		if (!fileManager.getResource(path).fetchInfo().exists()) {
 			throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(), NLS.bind(

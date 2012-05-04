@@ -23,8 +23,16 @@ public class Messages extends NLS {
 	public static String ResourcesTab_Resources;
 	public static String ResourcesTab_No_Resource_Manager;
 	public static String ResourcesTab_No_Launch_Configuration;
+
+	public static String ResourcesTab_noInformation;
+
+	public static String ResourcesTab_openConnection;
 	public static String ResourcesTab_pleaseSelectRM;
+
+	public static String ResourcesTab_pleaseSelectTargetSystem;
 	public static String ResourcesTab_Resource_Manager_Not_Started;
+
+	public static String ResourcesTab_targetSystemConfiguration;
 
 	public static String AbstractParallelLaunchConfigurationDelegate_0;
 	public static String AbstractParallelLaunchConfigurationDelegate_1;
@@ -38,6 +46,14 @@ public class Messages extends NLS {
 	public static String AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist;
 	public static String AbstractParallelLaunchConfigurationDelegate_debuggerPathNotSpecified;
 	public static String AbstractParallelLaunchConfigurationDelegate_Error_converting_rules;
+
+	public static String AbstractParallelLaunchConfigurationDelegate_launchType1;
+
+	public static String AbstractParallelLaunchConfigurationDelegate_launchType2;
+
+	public static String AbstractParallelLaunchConfigurationDelegate_launchType3;
+
+	public static String AbstractParallelLaunchConfigurationDelegate_monitoringSetup;
 	public static String AbstractParallelLaunchConfigurationDelegate_Parallel_launcher_does_not_support;
 	public static String AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus;
 	public static String AbstractParallelLaunchConfigurationDelegate_Unknown_remote_services;
@@ -46,6 +62,8 @@ public class Messages extends NLS {
 	public static String AbstractParallelLaunchConfigurationDelegate_No_file_manager_available;
 	public static String AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found;
 	public static String AbstractParallelLaunchConfigurationDelegate_Path_not_found;
+
+	public static String AbstractParallelLaunchConfigurationDelegate_unableToObtainConnectionInfo;
 
 	public static String ApplicationTab_Application;
 
