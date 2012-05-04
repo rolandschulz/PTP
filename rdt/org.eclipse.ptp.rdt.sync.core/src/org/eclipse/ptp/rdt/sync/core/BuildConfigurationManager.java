@@ -281,7 +281,7 @@ public class BuildConfigurationManager {
 	 * @param project
 	 * @return the service provider
 	 */
-	public ISyncServiceProvider getProjectSyncServiceProvider(IProject project) {
+	private ISyncServiceProvider getProjectSyncServiceProvider(IProject project) {
 		checkProject(project);
 		String serviceConfigId = getTemplateServiceConfigurationId(project);
 		IServiceConfiguration serviceConfig = ServiceModelManager.getInstance().getConfiguration(serviceConfigId);
