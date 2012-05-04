@@ -174,15 +174,16 @@ public class BuildConfigurationManager {
 
 	/**
 	 * Returns the service configuration set for the given build configuration, or null if it is unavailable.
-	 * As of 6.0.0, the service configuration for every build configuration of a project is the same - the project's template.
-	 * However, it still has to be copied and modified when given to clients (see note below).
 	 * 
 	 * @param bconf
 	 *            The build configuration - cannot be null
 	 * @return service configuration for the build configuration or null on problems retrieving the configuration.
-	 * @deprecated This method is inefficient and unnecessary. It is inefficient because it requires a copy of the project's
-	 * 				template service configuration. It is unnecessary because it is only used for information that is more easily
-	 *              obtained from the build scenario. Thus, {@link #getBuildScenarioForBuildConfiguration} should be used instead.
+	 * @deprecated This method is inefficient and can easily be used incorrectly. It is inefficient because it requires a copy of
+	 * 				the project's template service configuration. Also, sync'ing with the contained provider precludes optimizations
+	 * 				done by the true provider in the template. Finally, changing data on this copy has no effect, except for the
+	 * 				data stored in the copy. Instead, use {@link #getBuildScenarioForBuildConfiguration} when you need data about
+	 * 				the configuration and use {@link #getSyncRunnerForBuildConfiguration(IConfiguration)} when you need to use the
+	 * 				contained sync provider for sync'ing.
 	 * 				
 	 */
 	public IServiceConfiguration getConfigurationForBuildConfiguration(IConfiguration bconf) {
@@ -198,6 +199,24 @@ public class BuildConfigurationManager {
         IServiceConfiguration sconf = copyTemplateServiceConfiguration(project);
         this.modifyServiceConfigurationForBuildScenario(sconf, project, bs);
 		return sconf;
+	}
+	
+	/**
+	 * Get a SyncRunner object that can be used to do sync'ing.
+	 *
+	 * @param bconf
+	 * @return SyncRunner
+	 */
+	public SyncRunner getSyncRunnerForBuildConfiguration(IConfiguration bconf) {
+		IProject project = bconf.getOwner().getProject();
+		checkProject(project);
+
+		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
+		if (provider == null) { // Error handled in call
+			return null;
+		} else {
+			return new SyncRunner(provider);
+		}
 	}
 	
     // Does the low-level work of creating a copy of a service configuration
