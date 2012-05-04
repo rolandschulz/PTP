@@ -35,4 +35,9 @@ public class SyncRunner {
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		provider.synchronize(project, buildScenario, delta, filter, monitor, syncFlags);
 	}
+	
+	public void synchronizeResolveAsLocal(IProject project, BuildScenario buildScenario, IResourceDelta delta,
+			SyncFileFilter filter, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
+		provider.synchronizeResolveAsLocal(project, buildScenario, delta, filter, monitor, syncFlags);
+	}
 }
