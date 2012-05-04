@@ -36,8 +36,6 @@ import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand;
-import org.eclipse.jgit.api.ResetCommand;
-import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
@@ -69,7 +67,6 @@ import org.eclipse.jgit.util.QuotedString;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
-import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
@@ -922,13 +919,6 @@ public class GitRemoteSyncConnection {
 
 				// Handle merge conflict. Read in data needed to resolve the conflict, and then reset the repo.
 				readMergeConflictFiles();
-				if (!FileToMergePartsMap.isEmpty()) {
-					final ResetCommand resetCommand = git.reset().setMode(ResetType.HARD); // jgit does not yet support merge reset.
-					resetCommand.call();
-					throw new RemoteSyncMergeConflictException(Messages.GitRemoteSyncConnection_2);
-					// Even if we later decide not to throw an exception, it is important not to proceed after a merge conflict.
-					// return;
-				}
 			} catch (TransportException e) {
 				if (e.getMessage().startsWith("Remote does not have ")) { //$NON-NLS-1$
 					// Means that the remote branch isn't set up yet (and thus nothing to fetch). Can be ignored and local to
