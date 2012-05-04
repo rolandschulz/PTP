@@ -12,8 +12,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui;
 
-import java.io.IOException;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -21,16 +19,12 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.SyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SYNC_MODE;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
-import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
-import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.widgets.Display;
 
 public class ResourceChangeListener {
@@ -97,10 +91,6 @@ public class ResourceChangeListener {
 					return;
 				}
 				SyncManager.setSyncMode(project, SYNC_MODE.UNAVAILABLE);
-				ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
-				if (provider != null) {
-					provider.close();
-				}
 				return;
 			}
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
