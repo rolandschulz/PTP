@@ -31,6 +31,37 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
  */
 public final class ModulesEnvManager extends AbstractEnvManager {
 
+	/** Command used by {@link #getDescription(IProgressMonitor)}.  Output must match {@value #MODULES_SIGNATURE}. */
+	private static final String CMD_MODULE_HELP = "module help"; //$NON-NLS-1$
+
+	/** Command used by {@link #determineDefaultElements(IProgressMonitor)} */
+	private static final String CMD_MODULE_LIST = "module list -t"; //$NON-NLS-1$
+
+	/** Command used by {@link #determineAvailableElements(IProgressMonitor)} */
+	private static final String CMD_MODULE_AVAIL = "module avail -t"; //$NON-NLS-1$
+
+	/** Command used to unload all loaded modules. */
+	private static final String CMD_MODULE_PURGE = "module purge >/dev/null 2>&1"; //$NON-NLS-1$
+	// In my experience, some Modules installations do not handle "module purge" correctly,
+	// so individually unload all loaded modules instead
+	// "for MODULE in `module -t list 2>&1 | grep -E -v ':$|^[ ]*$'`; do echo module unload \"$MODULE\"; module unload \"$MODULE\" >/dev/null 2>&1; done"; //$NON-NLS-1$
+
+	/** Format string for the command to load a particular module. */
+	private static final String CMDFMT_MODULE_LOAD = "module load %s"; //$NON-NLS-1$
+
+	/** Format string for a command to echo a line of output. */
+	private static final String CMDFMT_ECHO = "echo '%s'"; //$NON-NLS-1$
+
+	/**
+	 * Pattern that must be matched by (at least) one line of the output of {@link #CMD_MODULE_HELP} in order for the environment
+	 * management system to be detected.  The version number will be extracted from capture group
+	 * {@value #MODULES_SIGNATURE_VERSION_CAPTURE_GROUP}.
+	 */
+	private static final Pattern MODULES_SIGNATURE = Pattern.compile("^(  Modules Release|Modules Release) ((Tcl )?[^ \t\r\n]+).*"); //$NON-NLS-1$
+
+	/** Capture group for the version number in {@link #MODULES_SIGNATURE}. */
+	private static final int MODULES_SIGNATURE_VERSION_CAPTURE_GROUP = 2;
+
 	/**
 	 * Pattern that all module names must match.
 	 * <p>
@@ -53,15 +84,14 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 
 	@Override
 	public String getDescription(IProgressMonitor pm) throws RemoteConnectionException, IOException {
-		final Pattern pattern = Pattern.compile("^  Modules Release ([^ \t\r\n]+).*"); //$NON-NLS-1$
-		final List<String> output = runCommand(pm, true, "bash", "--login", "-c", "module help"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final List<String> output = runCommandInBashLoginShell(pm, CMD_MODULE_HELP);
 		if (output == null) {
 			return null;
 		} else {
 			for (final String line : output) {
-				final Matcher matcher = pattern.matcher(line);
+				final Matcher matcher = MODULES_SIGNATURE.matcher(line);
 				if (matcher.find()) {
-					return "Modules " + matcher.group(1); //$NON-NLS-1$
+					return "Modules " + matcher.group(MODULES_SIGNATURE_VERSION_CAPTURE_GROUP); //$NON-NLS-1$
 				}
 			}
 			return null;
@@ -75,7 +105,7 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 
 	@Override
 	public Set<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
-		final List<String> output = runCommand(pm, true, "bash", "--login", "-c", "module -t avail"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final List<String> output = runCommandInBashLoginShell(pm, CMD_MODULE_AVAIL);
 		if (output == null) {
 			return Collections.<String> emptySet();
 		} else {
@@ -123,7 +153,7 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 		 */
 		final Set<String> result = new TreeSet<String>(MODULE_NAME_COMPARATOR);
 		for (final String line : output) {
-			if (!line.equals("") && !line.endsWith(":")) { // Ignore blank lines and lines describing module locations //$NON-NLS-1$ //$NON-NLS-2$
+			if (!shouldIgnore(line)) {
 				String moduleName = line;
 				if (moduleName.endsWith("(default)")) { //$NON-NLS-1$
 					moduleName = removeSuffix(moduleName, "(default)"); //$NON-NLS-1$
@@ -141,6 +171,13 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 		return result;
 	}
 
+	private boolean shouldIgnore(final String line) {
+		return line.equals("")          // Ignore blank lines //$NON-NLS-1$
+			|| line.endsWith(":")       // Ignore lines describing module locations //$NON-NLS-1$
+			|| line.startsWith("-----") // Ignore lines describing module locations (Tcl) //$NON-NLS-1$
+			|| line.equals("No Modulefiles Currently Loaded."); //$NON-NLS-1$
+	}
+
 	private String removeSuffix(String string, String suffix) {
 		assert string != null && suffix != null && string.endsWith(suffix);
 		return string.substring(0, string.length() - suffix.length());
@@ -148,7 +185,7 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 
 	@Override
 	public Set<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
-		final List<String> output = runCommand(pm, true, "bash", "--login", "-c", "module -t list"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final List<String> output = runCommandInBashLoginShell(pm, CMD_MODULE_LIST);
 		if (output == null) {
 			return Collections.<String> emptySet();
 		} else {
@@ -158,24 +195,23 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 
 	@Override
 	protected List<String> getInitialBashCommands(boolean echo) {
-		// In my experience, some Modules installations do not handle "module purge" correctly,
-		// so individually unload all loaded modules instead
+		final String purgeCommand = CMD_MODULE_PURGE;
+		final String echoCommand = String.format(CMDFMT_ECHO, purgeCommand);
 		if (echo) {
-			return Arrays.asList("for MODULE in `module -t list 2>&1 | grep -E -v ':$|^[ ]*$'`; do echo module unload \"$MODULE\"; module unload \"$MODULE\"; done"); //$NON-NLS-1$
+			return Arrays.asList(echoCommand, purgeCommand);
 		} else {
-			return Arrays.asList("for MODULE in `module -t list 2>&1 | grep -E -v ':$|^[ ]*$'`; do module unload \"$MODULE\"; done"); //$NON-NLS-1$
+			return Arrays.asList(purgeCommand);
 		}
 	}
 
 	@Override
 	protected List<String> getBashCommand(boolean echo, String moduleName) {
+		final String loadCommand = String.format(CMDFMT_MODULE_LOAD, moduleName);
+		final String echoCommand = String.format(CMDFMT_ECHO, loadCommand);
 		if (echo) {
-			return Arrays.asList(
-					String.format("echo 'module load %s'", moduleName), //$NON-NLS-1$
-					String.format("module load %s", moduleName)); //$NON-NLS-1$);
+			return Arrays.asList(echoCommand, loadCommand);
 		} else {
-			return Arrays.asList(
-					String.format("module load %s", moduleName)); //$NON-NLS-1$);
+			return Arrays.asList(loadCommand);
 		}
 	}
 }
