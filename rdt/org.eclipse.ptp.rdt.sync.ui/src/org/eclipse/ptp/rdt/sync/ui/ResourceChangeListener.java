@@ -19,14 +19,11 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.ptp.rdt.sync.core.ISyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SYNC_MODE;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
-import org.eclipse.swt.widgets.Display;
 
 public class ResourceChangeListener {
 	private ResourceChangeListener() {

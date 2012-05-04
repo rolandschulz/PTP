@@ -28,8 +28,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
-import org.eclipse.ptp.rdt.sync.core.SyncManager;
-import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;

@@ -18,5 +18,5 @@ import org.eclipse.core.runtime.CoreException;
  * packages, particularly the ui, so that the caller can specify how to handle errors.
  */
 public interface ISyncExceptionHandler {
-	public void handle(IProject project, CoreException e);
+	public void handle(final IProject project, final CoreException e);
 }
