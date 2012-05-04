@@ -32,11 +32,9 @@ import java.util.TimeZone;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.ModelManager;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
@@ -51,47 +49,24 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.swt.widgets.Shell;
 
 public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
-
-	/**
-	 * Given a launch configuration, find the resource manager that was been selected.
-	 * 
-	 * @param configuration
-	 * @return resource manager
-	 * @throws CoreException
-	 * @since 5.0
-	 */
-	public static IResourceManager getResourceManager(ILaunchConfiguration configuration) {
-		final String rmUniqueName;
-		try {
-			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, "");
-		} catch (CoreException e) {
-			return null;
-		}
-		return ModelManager.getInstance().getResourceManagerFromUniqueName(rmUniqueName);
-	}
-
 	Shell selshell = null;
-	IResourceManager rm = null;
+	ILaunchConfiguration config;
 	IRemoteConnection conn = null;
-	IResourceManagerComponentConfiguration conf = null;
 	IRemoteServices remoteServices = null;
 	IRemoteUIServices remoteUIServices = null;
 	IRemoteConnectionManager connMgr = null;
 	IRemoteUIFileManager fileManagerUI = null;
 	IRemoteFileManager fileManager = null;
 
-	public RemoteBuildLaunchUtils(IResourceManager rm) {
-		this.rm = rm;
-		conf = rm.getControlConfiguration();
-		remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), null);// ,getLaunchConfigurationDialog()
+	public RemoteBuildLaunchUtils(ILaunchConfiguration config) {
+		this.config = config;
+		remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(LaunchUtils.getRemoteServicesId(config), null);// ,getLaunchConfigurationDialog()
 		remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 		connMgr = remoteServices.getConnectionManager();
-		conn = connMgr.getConnection(conf.getConnectionName());
+		conn = connMgr.getConnection(LaunchUtils.getConnectionName(config));
 		fileManagerUI = remoteUIServices.getUIFileManager();
 		fileManager = remoteServices.getFileManager(conn);
 
@@ -99,10 +74,6 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	}
 
 	public String getWorkingDirectory() {
-		String jaxbtest = rm.getResourceManagerId();
-		if (!jaxbtest.equals("org.eclipse.ptp.rm.lml_jaxb")) {
-			return null;
-		}
 		return conn.getWorkingDirectory();
 	}
 
@@ -171,7 +142,8 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	 */
 	public String getToolPath(String toolID) {
 		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
-		String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + toolID + "." + rm.getUniqueName(); //$NON-NLS-1$
+		String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID
+				+ "." + toolID + "." + LaunchUtils.getResourceManagerUniqueName(config); //$NON-NLS-1$//$NON-NLS-2$
 		String path = pstore.getString(toolBinID);
 		if (path != null) {
 			return path;
@@ -201,11 +173,12 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 				me = eIt.next();
 				entry = me.getKey();
 
-				if (entry.equals("internal")) {
+				if (entry.equals("internal")) { //$NON-NLS-1$
 					continue;
 				}
 
-				String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry + "." + rm.getUniqueName(); //$NON-NLS-1$
+				String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID
+						+ "." + entry + "." + LaunchUtils.getResourceManagerUniqueName(config); //$NON-NLS-1$ //$NON-NLS-2$
 				if (force || pstore.getString(toolBinID).equals("")) //$NON-NLS-1$
 				{
 					pstore.setValue(toolBinID, findToolBinPath(me.getValue(), null, entry));// findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
@@ -227,11 +200,12 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			me = eIt.next();
 			entry = me.getKey();
 
-			if (entry.equals("internal")) {
+			if (entry.equals("internal")) { //$NON-NLS-1$
 				continue;
 			}
 
-			String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry + "." + rm.getUniqueName(); //$NON-NLS-1$
+			String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID
+					+ "." + entry + "." + LaunchUtils.getResourceManagerUniqueName(config); //$NON-NLS-1$ //$NON-NLS-2$
 			if (force || pstore.getString(toolBinID).equals("")) //$NON-NLS-1$
 			{
 				pstore.setValue(toolBinID, findToolBinPath(me.getValue(), null, entry));// findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
@@ -253,11 +227,12 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			me = eIt.next();
 			entry = me.getKey();
 
-			if (entry.equals("internal")) {
+			if (entry.equals("internal")) { //$NON-NLS-1$
 				continue;
 			}
 
-			toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry + "." + rm.getUniqueName(); //$NON-NLS-1$
+			toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID
+					+ "." + entry + "." + LaunchUtils.getResourceManagerUniqueName(config); //$NON-NLS-1$ //$NON-NLS-2$
 			curTool = pstore.getString(toolBinID);
 
 			IFileStore ttool = fileManager.getResource(curTool);
@@ -284,13 +259,13 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	 * 
 	 */
 	public String checkToolEnvPath(String toolname) {
-		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0) {
+		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0) {//$NON-NLS-1$
 			return null;
 		}
 		String pPath = null;
 		try {
 			IRemoteProcessBuilder rpb = remoteServices.getProcessBuilder(conn);
-			rpb.command("which", toolname);
+			rpb.command("which", toolname);//$NON-NLS-1$
 			// rpb.
 			IRemoteProcess p = rpb.start();
 			//Process p = new ProcessBuilder("which", toolname).start();//Runtime.getRuntime().exec("which "+toolname); //$NON-NLS-1$

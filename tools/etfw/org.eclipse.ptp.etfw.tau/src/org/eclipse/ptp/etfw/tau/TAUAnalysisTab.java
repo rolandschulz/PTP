@@ -44,8 +44,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.ModelManager;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
@@ -61,7 +60,6 @@ import org.eclipse.ptp.etfw.toolopts.ToolPane;
 import org.eclipse.ptp.etfw.toolopts.ToolPaneListener;
 import org.eclipse.ptp.etfw.toolopts.ToolsOptionsConstants;
 import org.eclipse.ptp.etfw.ui.AbstractToolConfigurationTab;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
@@ -281,7 +279,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 
 	// TODO: This isn't generic. We need to get this pane explicitly
 	protected final ToolPane tauOpts = Activator.getTool("TAU").getFirstBuilder(null).getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0]; //$NON-NLS-1$
-	protected final ToolPane tauEnv = Activator.getTool("TAU").getNthRunner(null, 2).global.toolPanes[0];
+	protected final ToolPane tauEnv = Activator.getTool("TAU").getNthRunner(null, 2).global.toolPanes[0]; //$NON-NLS-1$
 	// protected ToolPane custOpts=null;
 
 	// private static File tauToolXML= null;
@@ -298,7 +296,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	// e.printStackTrace();
 	// }
 	// }
-	private final static String UNIX_SLASH = "/";
+	private final static String UNIX_SLASH = "/"; //$NON-NLS-1$
 
 	/**
 	 * Listen for activity in the TAU makefile combo-box, CheckItem widgets or other options
@@ -497,7 +495,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		String binpath = blt.getToolPath("tau");//pstore.getString(ITAULaunchConfigurationConstants.TAU_ARCH_PATH); //$NON-NLS-1$
 		IFileStore bindir = null;
 		if (binpath == null || binpath.length() == 0) {
-			binpath = blt.checkToolEnvPath("pprof");
+			binpath = blt.checkToolEnvPath("pprof"); //$NON-NLS-1$
 			if (binpath != null && binpath.length() > 0) {
 				bindir = blt.getFile(binpath);
 				// archpath=pprof.getParent().toURI().getPath();
@@ -538,7 +536,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		allopts.remove("Makefile.tau"); //$NON-NLS-1$
 	}
 
-	private static final String TAU_MAKEFILE_PREFIX = "Makefile.tau";
+	private static final String TAU_MAKEFILE_PREFIX = "Makefile.tau"; //$NON-NLS-1$
 
 	/**
 	 * Given a directory (presumably a tau arch directory) this looks in the lib subdirectory and returns a list of all
@@ -566,7 +564,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		// IFileStore taumain=blt.getFile(binpath);
 		// IFileStore taumain=bindir.getParent();
 		//tlpath = binpath.substring(0,lastSlash) + File.separator + "lib"; //$NON-NLS-1$
-		taulib = bindir.getParent().getChild("lib"); // blt.getFile(tlpath);// new File(tlpath);
+		taulib = bindir.getParent().getChild("lib"); // blt.getFile(tlpath);// new File(tlpath); //$NON-NLS-1$
 		// IFileStore[] mfiles = null;
 		IFileStore[] mfiles = null;
 		ArrayList<IFileStore> tmfiles = null;
@@ -1049,22 +1047,6 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	ToolOption compOpt = null;// tauOpts.getOption("-optCompInst");
 	ToolOption selectOpt = null;
 
-	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) {
-		final String rmUniqueName;
-		try {
-			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
-					EMPTY_STRING);
-		} catch (CoreException e) {
-			return null;
-		}
-		if (rmUniqueName.length() == 0) {
-			return null;
-		}
-		return ModelManager.getInstance().getResourceManagerFromUniqueName(rmUniqueName);
-	}
-
-	private static final String EMPTY_STRING = "";
-
 	/**
 	 * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
 	 */
@@ -1072,9 +1054,8 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
 
-			IResourceManager rm = getResourceManager(configuration);
-			if (rm != null) {
-				blt = new RemoteBuildLaunchUtils(rm);
+			if (LaunchUtils.getRemoteServicesId(configuration) != null) {
+				blt = new RemoteBuildLaunchUtils(configuration);
 			} else {
 				blt = new BuildLaunchUtils();
 			}
@@ -1443,7 +1424,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			BufferedReader readmake = new BufferedReader(new InputStreamReader(papimakefile.openInputStream(EFS.NONE, null)));
 			papiline = readmake.readLine();
 			while (papiline != null) {
-				if (papiline.indexOf(PAPIDIR) == 0) { //$NON-NLS-1$
+				if (papiline.indexOf(PAPIDIR) == 0) {
 					found = true;
 					break;
 				}
@@ -1487,14 +1468,14 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		return papibin.getParent();
 	}
 
-	private static final String BIN = "bin";
-	private static final String EQ = "=";
-	private static final String PAPI = "papi";
-	private static final String PAPI_EVENT_CHOOSER = "papi_event_chooser";
-	private static final String PAPIDIR = "PAPIDIR=";
-	private static final String UTILS = "utils";
-	private static final String SHARE = "share";
-	private static final String PAPI_XML_BIN = "papi_xml_event_info";
+	private static final String BIN = "bin"; //$NON-NLS-1$
+	private static final String EQ = "="; //$NON-NLS-1$
+	private static final String PAPI = "papi"; //$NON-NLS-1$
+	private static final String PAPI_EVENT_CHOOSER = "papi_event_chooser"; //$NON-NLS-1$
+	private static final String PAPIDIR = "PAPIDIR="; //$NON-NLS-1$
+	private static final String UTILS = "utils"; //$NON-NLS-1$
+	private static final String SHARE = "share"; //$NON-NLS-1$
+	private static final String PAPI_XML_BIN = "papi_xml_event_info"; //$NON-NLS-1$
 
 	/**
 	 * Handles launching of the PAPI counter selection dialog. Places values returned by the dialog in the launch environment
@@ -1510,7 +1491,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			if (pdir == null || !pdir.fetchInfo().exists() || !pdir.fetchInfo().isDirectory()) {
 				return;
 			}
-			IFileStore pcxi = pdir.getChild(PAPI_XML_BIN);//new File(papiBin+File.separator+"papi_xml_event_info"); //$NON-NLS-1$
+			IFileStore pcxi = pdir.getChild(PAPI_XML_BIN);// new File(papiBin+File.separator+"papi_xml_event_info");
 
 			if (pcxi.fetchInfo().exists())// papiCountRadios[2].getSelection())
 			{

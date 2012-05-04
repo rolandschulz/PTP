@@ -12,21 +12,18 @@ package org.eclipse.ptp.debug.internal.ui.sourcelookup;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.ui.sourcelookup.AbstractSourceContainerBrowser;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.ModelManager;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceContainer;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -96,23 +93,13 @@ public class ResourceMappingSourceContainerBrowser extends AbstractSourceContain
 	}
 
 	private IRemoteConnection getRemoteConnection(ILaunchConfiguration configuration) {
-		String rmName = null;
-		try {
-			rmName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String) null);
-		} catch (CoreException e) {
-		}
-		if (rmName != null) {
-			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(rmName);
-			if (rm != null) {
-				String remId = rm.getControlConfiguration().getRemoteServicesId();
-				String connName = rm.getControlConfiguration().getConnectionName();
-				IRemoteServices rsrv = PTPRemoteUIPlugin.getDefault().getRemoteServices(remId, null);
-				if (rsrv != null) {
-					IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
-					if (connMgr != null) {
-						return connMgr.getConnection(connName);
-					}
-				}
+		String remId = LaunchUtils.getRemoteServicesId(configuration);
+		String connName = LaunchUtils.getConnectionName(configuration);
+		IRemoteServices rsrv = PTPRemoteUIPlugin.getDefault().getRemoteServices(remId, null);
+		if (rsrv != null) {
+			IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
+			if (connMgr != null) {
+				return connMgr.getConnection(connName);
 			}
 		}
 		return null;
