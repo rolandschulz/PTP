@@ -31,8 +31,8 @@ import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.internal.ILaunchFactory;
 import org.eclipse.ptp.etfw.internal.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.etfw.internal.ToolLaunchManager;
-import org.eclipse.ptp.launch.ParallelLaunchConfigurationDelegate;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rm.launch.ParallelLaunchConfigurationDelegate;
 
 /**
  * Launches parallel C/C++ (or Fortran) applications after rebuilding them with performance instrumentation
