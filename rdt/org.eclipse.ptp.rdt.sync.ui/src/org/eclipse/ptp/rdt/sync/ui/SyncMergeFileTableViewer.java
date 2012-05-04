@@ -98,8 +98,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 			selectionService.removePostSelectionListener(selectionListener);
 		}
 		if (project != null) {
-			ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
-			provider.removePostSyncListener(syncListener);
+			SyncManager.removePostSyncListener(project, syncListener);
 		}
 	}
 
@@ -258,12 +257,10 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	private void switchProject(IProject newProject) {
 		// Move sync listener from old project to new project
 		if (project != null) {
-			ISyncServiceProvider oldProvider = SyncManager.getSyncProvider(project);
-			oldProvider.removePostSyncListener(syncListener);
+			SyncManager.removePostSyncListener(project, syncListener);
 		}
 		if (newProject != null) {
-			ISyncServiceProvider newProvider = SyncManager.getSyncProvider(newProject);
-			newProvider.addPostSyncListener(syncListener);
+			SyncManager.addPostSyncListener(newProject, syncListener);
 		}
 		project = newProject;
 		update();

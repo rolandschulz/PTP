@@ -36,7 +36,6 @@ import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.ISyncListener;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
-import org.eclipse.ptp.rdt.sync.core.SyncEvent;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
@@ -388,12 +387,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				// Notify listeners if there is a merge conflict and refresh workspace.
 				// TODO: Refactor code to get rid of duplication of post-sync activities.
 				} catch (RemoteSyncMergeConflictException e) {
-					this.notifySyncListeners();
 					project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(20));
 					throw e;
 				}
 				finishedSyncTaskId = willFinishTaskId;
-				this.notifySyncListeners();
 				// TODO: review exception handling
 			} catch (RemoteConnectionException e) {
 				throw new RemoteSyncException(e);
@@ -516,30 +513,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	public void close() {
 		for (GitRemoteSyncConnection conn : syncConnectionMap.values()) {
 			conn.close();
-		}
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#addPostSyncListener(org.eclipse.ptp.rdt.sync.core.ISyncListener)
-	 */
-	@Override
-	public void addPostSyncListener(ISyncListener listener) {
-		syncListenerSet.add(listener);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#removePostSyncListener(org.eclipse.ptp.rdt.sync.core.ISyncListener)
-	 */
-	@Override
-	public void removePostSyncListener(ISyncListener listener) {
-		syncListenerSet.remove(listener);
-	}
-	
-	private void notifySyncListeners() {
-		for (ISyncListener listener: syncListenerSet) {
-			listener.handleSyncEvent(new SyncEvent());
 		}
 	}
 }

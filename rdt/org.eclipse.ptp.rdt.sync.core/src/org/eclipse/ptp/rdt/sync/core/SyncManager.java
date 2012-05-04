@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.osgi.service.prefs.Preferences;
 
 public class SyncManager  {
@@ -63,6 +61,8 @@ public class SyncManager  {
 
 	private static final Map<IProject, Set<IPath>> fProjectToResolvedFilesMap = Collections
 			.synchronizedMap(new HashMap<IProject, Set<IPath>>());
+	private static final Map<IProject, Set<ISyncListener>> fProjectToSyncListenersMap = Collections
+			.synchronizedMap(new HashMap<IProject, Set<ISyncListener>>());
 	
 	// Sync unavailable by default. Wizards should explicitly set the sync mode once the project is ready.
 	private static final SYNC_MODE DEFAULT_SYNC_MODE = SYNC_MODE.UNAVAILABLE;
@@ -114,6 +114,7 @@ public class SyncManager  {
 				}
 			} finally {
 				monitor.done();
+				SyncManager.notifySyncListeners(fProject);
 			}
 			return Status.OK_STATUS;
 		}
@@ -563,6 +564,8 @@ public class SyncManager  {
 						} else {
 							seHandler.handle(project, e);
 						}
+					} finally {
+						SyncManager.notifySyncListeners(project);
 					}
 				} else {
 					job = new SynchronizeJob(project, buildScenario, delta, syncRunner, resolveAsLocal, syncFlags, seHandler);
@@ -592,5 +595,44 @@ public class SyncManager  {
 	 */
 	public static void setDefaultSyncExceptionHandler(ISyncExceptionHandler handler) {
 		defaultSyncExceptionHandler = handler;
+	}
+	
+	/**
+	 * Add a listener for sync events on a certain project
+	 *
+	 * @param project
+	 * @param listener
+	 */
+	public static void addPostSyncListener(IProject project, ISyncListener listener) {
+		Set<ISyncListener> listenerSet = fProjectToSyncListenersMap.get(project);
+		if (listenerSet == null) {
+			listenerSet = new HashSet<ISyncListener>();
+			fProjectToSyncListenersMap.put(project, listenerSet);
+		}
+		listenerSet.add(listener);
+	}
+	
+	/**
+	 * Remove a listener for sync events on a certain project
+	 *
+	 * @param project
+	 * @param listener
+	 */
+	public static void removePostSyncListener(IProject project, ISyncListener listener) {
+		Set<ISyncListener> listenerSet = fProjectToSyncListenersMap.get(project);
+		if (listenerSet != null) {
+			listenerSet.remove(listener);
+		}
+	}
+	
+	private static void notifySyncListeners(IProject project) {
+		Set<ISyncListener> listenerSet = fProjectToSyncListenersMap.get(project);
+		if (listenerSet == null) {
+			return;
+		}
+
+		for (ISyncListener listener : listenerSet) {
+			listener.handleSyncEvent(new SyncEvent());
+		}
 	}
 }
