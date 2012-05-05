@@ -155,6 +155,7 @@
 		<module>rms/org.eclipse.ptp.rm.jaxb.pbs</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.pbs.doc.user</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.ui</module>
+		<module>rms/org.eclipse.ptp.rm.launch</module>
 		<module>rms/org.eclipse.ptp.rm.lml.core</module>
 		<module>rms/org.eclipse.ptp.rm.lml.da</module>
 		<module>rms/org.eclipse.ptp.rm.lml.da.server</module>
