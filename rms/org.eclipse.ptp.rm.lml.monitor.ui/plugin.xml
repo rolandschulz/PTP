@@ -82,8 +82,7 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
-            locationURI="toolbar:org.eclipse.ptp.rm.ui.views.monitorView"
-            sibling_order="&lt;command&#x0A;               commandId=&quot;org.eclipse.ptp.rm.lml.monitor.ui.removeMonitor&quot;&#x0A;               icon=&quot;icons/eview16/rem_monitor.gif&quot;&#x0A;               style=&quot;push&quot;&gt;&#x0A;         &lt;/command&gt;">
+            locationURI="toolbar:org.eclipse.ptp.rm.ui.views.monitorView">
          <command
                commandId="org.eclipse.ptp.rm.lml.monitor.ui.startMonitor"
                icon="icons/eview16/start.gif"
