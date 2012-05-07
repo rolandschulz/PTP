@@ -8,14 +8,10 @@
       schema="schema/org.eclipse.ptp.ems.core.envmanager.exsd"/>
 
    <!-- Environment manager contributions for Modules and SoftEnv -->
-   <extension
-         point="org.eclipse.ptp.ems.core.envmanager">
-      <envManager
-            class="org.eclipse.ptp.ems.internal.core.managers.ModulesEnvManager">
-      </envManager>
-      <envManager
-            class="org.eclipse.ptp.ems.internal.core.managers.SoftEnvManager">
-      </envManager>
+   <extension point="org.eclipse.ptp.ems.core.envmanager">
+      <envManager class="org.eclipse.ptp.ems.internal.core.managers.ModulesEnvManager" />
+      <envManager class="org.eclipse.ptp.ems.internal.core.managers.LmodEnvManager" />
+      <envManager class="org.eclipse.ptp.ems.internal.core.managers.SoftEnvManager" />
    </extension>
 
 </plugin>
