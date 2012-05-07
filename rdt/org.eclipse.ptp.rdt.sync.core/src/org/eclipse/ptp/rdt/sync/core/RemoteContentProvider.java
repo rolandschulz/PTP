@@ -188,7 +188,7 @@ public class RemoteContentProvider implements ITreeContentProvider {
 		BuildScenario bs = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(bconf);
 		if (bs != null) {
 			IRemoteFileManager fileManager = bs.getRemoteConnection().getRemoteServices().getFileManager(bs.getRemoteConnection());
-			IPath remotePath = new Path(bs.getLocation()).addTrailingSeparator().append(file.getProjectRelativePath());
+			IPath remotePath = new Path(bs.getLocation(project)).addTrailingSeparator().append(file.getProjectRelativePath());
 			IFileStore fileStore = fileManager.getResource(remotePath.toString()); // Assumes "/" separator on remote
 			InputStream fileInput = fileStore.openInputStream(EFS.NONE, null);
 			if (fileInput != null) {

@@ -12,10 +12,12 @@ package org.eclipse.ptp.rdt.sync.core.serviceproviders;
 
 import java.util.EnumSet;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -40,12 +42,14 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	public IRemoteConnection getRemoteConnection();
 
 	/**
-	 * Performs synchronization.
-	 * 
+	 * Perform synchronization
+	 *
+	 * @param project
+	 * 			  project to sync
 	 * @param delta
 	 *            resources requiring synchronization
 	 * @param monitor
-	 *            progress monitor for monitoring or canceling synch
+	 *            progress monitor for monitoring or canceling sync
 	 * @param syncFlags
 	 *            Various flags for the sync call. For example, the sync can be
 	 *            forced, either to local (from remote) or to remote (from
@@ -54,8 +58,8 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * @throws CoreException
 	 *             if synchronization fails
 	 */
-	public void synchronize(IResourceDelta delta, SyncFileFilter filter, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags)
-			throws CoreException;
+	public void synchronize(IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncFileFilter filter,
+			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
 	
 	/**
 	 * Close any resources (files, sockets) that were open by the sync provider. Resources not open by the provider should not be

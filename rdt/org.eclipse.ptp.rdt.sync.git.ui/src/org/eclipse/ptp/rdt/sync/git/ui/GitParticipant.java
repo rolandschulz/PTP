@@ -275,8 +275,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#getProvider(org.eclipse
-	 * .core.resources.IProject)
+	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#getProvider(org.eclipse.core.resources.IProject)
 	 */
 	public ISyncServiceProvider getProvider(IProject project) {
 		ServiceModelManager smm = ServiceModelManager.getInstance();
@@ -286,7 +285,6 @@ public class GitParticipant implements ISynchronizeParticipant {
 		provider.setLocation(fLocationText.getText());
 		provider.setRemoteConnection(fSelectedConnection);
 		provider.setRemoteServices(fSelectedProvider);
-		provider.setProject(project);
 		return provider;
 	}
 

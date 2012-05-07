@@ -19,14 +19,12 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SYNC_MODE;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
-import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.swt.widgets.Display;
 
 public class ResourceChangeListener {
@@ -91,11 +89,7 @@ public class ResourceChangeListener {
 				if (!RemoteSyncNature.hasNature(project)) {
 					return;
 				}
-				SyncManager.setSyncMode(project, SYNC_MODE.NONE);
-				ISyncServiceProvider provider = SyncManager.getSyncProvider(project);
-				if (provider != null) {
-					provider.close();
-				}
+				SyncManager.setSyncMode(project, SYNC_MODE.UNAVAILABLE);
 				return;
 			}
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
@@ -105,15 +99,15 @@ public class ResourceChangeListener {
 				}
 				if (RemoteSyncNature.hasNature(project)) {
 					SYNC_MODE syncMode = SyncManager.getSyncMode(project);
-					boolean syncEnabled = true;
+					boolean syncOn = true;
 					if (!(SyncManager.getSyncAuto()) || syncMode == SYNC_MODE.NONE) {
-						syncEnabled = false;
+						syncOn = false;
 					}
 					try {
 						// Post-build event
 						// Force a sync in order to download any new remote files but no need to sync if sync'ing is disabled.
 						if (event.getType() == IResourceChangeEvent.POST_BUILD ) {
-							if (!syncEnabled) {
+							if (!syncOn || syncMode == SYNC_MODE.UNAVAILABLE) {
 								continue;
 							} else if (syncMode == SYNC_MODE.ALL) {
 								SyncManager.syncAll(null, project, SyncFlag.FORCE, new SyncRCLExceptionHandler(project));
@@ -122,10 +116,13 @@ public class ResourceChangeListener {
 							}
 						}
 						// Post-change event
-						// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user has
-						// disabled it. This allows for some bookkeeping but no files are transferred.
-						else {
-							if (!syncEnabled) {
+						// Sync on all CHANGED events
+						else if (delta.getKind() == IResourceDelta.CHANGED) {
+							// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user has
+							// turned it off. This allows for some bookkeeping but no files are transferred.
+							if (syncMode == SYNC_MODE.UNAVAILABLE) {
+								continue;
+							} else if (!syncOn) {
 								SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
 							} else if (syncMode == SYNC_MODE.ALL) {
 								SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new SyncRCLExceptionHandler(project));
@@ -135,7 +132,7 @@ public class ResourceChangeListener {
 						}
 					} catch (CoreException e){
 						// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
-						RDTSyncCorePlugin.log(Messages.ResourceChangeListener_0);
+						RDTSyncUIPlugin.log(Messages.ResourceChangeListener_0, e);
 					}
 				}
 			}

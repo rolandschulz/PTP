@@ -10,10 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.util.Map;
+
+import org.eclipse.core.resources.IPathVariableManager;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.osgi.service.prefs.Preferences;
 
 /**
  * Class for build information that will be mapped to a specific service configuration. Utility methods for reading and writing
@@ -62,39 +65,89 @@ public class BuildScenario {
 
 	/**
 	 * Get location (directory)
+	 * 
 	 * @return location (directory)
+	 * @deprecated as of 6.0.0, replaced by {@link #getLocation(IProject)}
+	 *   The new function supports the use of path variables, such as the project location, useful for project relocation
+	 *   (see bug 371507). Such support is not possible, though, without project information.
 	 */
-	public String getLocation() {
+	@Deprecated public String getLocation() {
 		return location;
 	}
 	
 	/**
-	 * Store scenario in a given preference node 
+	 * Get location (directory), resolved in terms of the passed project
 	 *
-	 * @param preference node
+	 * @param project
+	 * @return location
 	 */
-	public void saveScenario(Preferences prefRootNode) {
-		if (syncProvider != null) {
-			prefRootNode.put(ATTR_SYNC_PROVIDER, syncProvider);
-		}
-		prefRootNode.put(ATTR_REMOTE_CONNECTION_ID, remoteConnection.getName());
-		prefRootNode.put(ATTR_LOCATION, location);
-		prefRootNode.put(ATTR_REMOTE_SERVICES_ID, remoteConnection.getRemoteServices().getId());
+	public String getLocation(IProject project) {
+		return resolveString(project, location);
 	}
 	
 	/**
-	 * Load data from a preference node into a new build scenario.
+	 * Utility function to resolve a string based on path variables for a certain project. Unless string is in the form:
+	 * ${path_variable:/remainder}, where "path_variable" is a path variable defined for the project, the original string
+	 * is returned unchanged.
 	 *
-	 * @param preference node
+	 * The Eclipse platform should provide a standard mechanism for doing this, but various combinations of URIUtil and
+	 * PathVariableManager methods failed.
+	 *
+	 * @param project
+	 * @param path
+	 * @return resolved string
+	 */
+	public static String resolveString(IProject project, String path) {
+		// Check basic syntax
+		if (!path.startsWith("${") || !path.endsWith("}")) { //$NON-NLS-1$ //$NON-NLS-2$
+			return path;
+		}
+
+		String newPath = path.substring(2, path.length()-1);
+		
+		// Extract variable's value
+		String variable = newPath.split(":")[0]; //$NON-NLS-1$
+		IPathVariableManager pvm = project.getPathVariableManager();
+		String value = pvm.getURIValue(variable.toUpperCase()).toString();
+		if (value == null) {
+			return path;
+		}
+		
+		// Build and return new path
+		value = value.replaceFirst("file:", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		if (value.endsWith("/") || value.endsWith("\\")) { //$NON-NLS-1$ //$NON-NLS-2$
+			value = value.substring(0, path.length()-1);
+		}
+		return newPath.replaceFirst(variable + ":*", value); //$NON-NLS-1$
+	}
+	
+	/**
+	 * Store scenario in the given map
+	 *
+	 * @param map
+	 */
+	public void saveScenario(Map<String, String> map) {
+		if (syncProvider != null) {
+			map.put(ATTR_SYNC_PROVIDER, syncProvider);
+		}
+		map.put(ATTR_REMOTE_CONNECTION_ID, remoteConnection.getName());
+		map.put(ATTR_LOCATION, location);
+		map.put(ATTR_REMOTE_SERVICES_ID, remoteConnection.getRemoteServices().getId());
+	}
+	
+	/**
+	 * Load data from a map into a new build scenario.
+	 *
+	 * @param map
 	 * @return a new build scenario or null if one of the values is not found or if something goes wrong while trying to find the
 	 * specified IRemoteConnection.
 	 */
-	public static BuildScenario loadScenario(Preferences prefRootNode) {
-		String sp = prefRootNode.get(ATTR_SYNC_PROVIDER, null);
-		String rc = prefRootNode.get(ATTR_REMOTE_CONNECTION_ID, null);
-		String l = prefRootNode.get(ATTR_LOCATION, null);
-		String rs = prefRootNode.get(ATTR_REMOTE_SERVICES_ID, null);
-		if (rc == null || l == null || rs == null) {
+	public static BuildScenario loadScenario(Map<String, String> map) {
+		String sp = map.get(ATTR_SYNC_PROVIDER);
+		String rc = map.get(ATTR_REMOTE_CONNECTION_ID);
+		String l = map.get(ATTR_LOCATION);
+		String rs = map.get(ATTR_REMOTE_SERVICES_ID);
+		if (rc == null || l == null || rs == null) { // null is okay for sync provider
 			return null;
 		}
 		
@@ -109,5 +162,46 @@ public class BuildScenario {
 		}
 
 		return new BuildScenario(sp, remoteConnection, l);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((location == null) ? 0 : location.hashCode());
+		result = prime
+				* result
+				+ ((remoteConnection == null) ? 0 : remoteConnection.hashCode());
+		result = prime * result
+				+ ((syncProvider == null) ? 0 : syncProvider.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BuildScenario other = (BuildScenario) obj;
+		if (location == null) {
+			if (other.location != null)
+				return false;
+		} else if (!location.equals(other.location))
+			return false;
+		if (remoteConnection == null) {
+			if (other.remoteConnection != null)
+				return false;
+		} else if (!remoteConnection.equals(other.remoteConnection))
+			return false;
+		if (syncProvider == null) {
+			if (other.syncProvider != null)
+				return false;
+		} else if (!syncProvider.equals(other.syncProvider))
+			return false;
+		return true;
 	}
 }
