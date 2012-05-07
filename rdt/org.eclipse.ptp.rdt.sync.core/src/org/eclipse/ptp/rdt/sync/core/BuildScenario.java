@@ -67,7 +67,6 @@ public class BuildScenario {
 	 * Get location (directory)
 	 * 
 	 * @return location (directory)
-	 * 
 	 * @deprecated as of 6.0.0, replaced by {@link #getLocation(IProject)}
 	 *   The new function supports the use of path variables, such as the project location, useful for project relocation
 	 *   (see bug 371507). Such support is not possible, though, without project information.
@@ -80,7 +79,7 @@ public class BuildScenario {
 	 * Get location (directory), resolved in terms of the passed project
 	 *
 	 * @param project
-	 * @return
+	 * @return location
 	 */
 	public String getLocation(IProject project) {
 		return resolveString(project, location);
@@ -95,6 +94,7 @@ public class BuildScenario {
 	 * PathVariableManager methods failed.
 	 *
 	 * @param project
+	 * @param path
 	 * @return resolved string
 	 */
 	public static String resolveString(IProject project, String path) {
