@@ -30,6 +30,7 @@ import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfodataType;
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
+import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -116,7 +117,7 @@ public class InfoView extends ViewPart {
 		parent.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
 		viewMenuManager = getViewSite().getActionBars().getMenuManager();
-		final IAction showMessageOfTheDayAction = new Action("Show Message of the Day") {
+		final IAction showMessageOfTheDayAction = new Action(Messages.InfoView_Show_message_of_the_day) {
 
 			@Override
 			public void run() {
@@ -191,7 +192,7 @@ public class InfoView extends ViewPart {
 		} else if (type.equals(ILMLUIConstants.INFO_NODE)) {
 			content = new Text(parent, SWT.LEFT | SWT.MULTI | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL);
 			((Text) content).setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-			((Text) content).append("Node");
+			((Text) content).append(Messages.InfoView_Node);
 		}
 
 		showMessageOfTheDayActionItem.getAction().setEnabled(true);

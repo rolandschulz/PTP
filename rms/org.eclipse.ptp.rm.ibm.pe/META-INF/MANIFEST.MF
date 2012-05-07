@@ -7,3 +7,4 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: org.eclipse.ptp.rm.ibm.pe_1.0.0.201108031201.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Bundle-Localization: plugin

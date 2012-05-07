@@ -35,11 +35,11 @@ public interface ILMLUIConstants extends ILMLCoreConstants {
 	public static final String COLUMN_STATUS = "status";//$NON-NLS-1$
 	public static final String VIEW_INFO = "info"; //$NON-NLS-1$
 
-	public static final String INFO_JOB = "job"; // $NON-NLS-1$
-	public static final String INFO_NODE = "node"; // $NON-NLS-1$
-	public static final String INFO_MOTD = "motd"; // $NON-NLS-1$
-	public static final String INFO_ERROR = "error"; // $NON-NLS-1$
-	public static final String INFO_KEY = "Key"; // $NON-NLS-1$
-	public static final String INFO_VALUES = "Value"; // $NON-NLS-1$
+	public static final String INFO_JOB = "job"; //$NON-NLS-1$
+	public static final String INFO_NODE = "node"; //$NON-NLS-1$
+	public static final String INFO_MOTD = "motd"; //$NON-NLS-1$
+	public static final String INFO_ERROR = "error"; //$NON-NLS-1$
+	public static final String INFO_KEY = "Key"; //$NON-NLS-1$
+	public static final String INFO_VALUES = "Value"; //$NON-NLS-1$
 
 }

@@ -22,7 +22,6 @@ import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public interface IPQueue extends IPElement {
 	/**
@@ -42,19 +41,19 @@ public interface IPQueue extends IPElement {
 	public void addJobs(Collection<IPJob> jobs);
 
 	/**
+	 * Get the resource manager that controls this queue.
+	 * 
+	 * @return control id
+	 * @since 6.0
+	 */
+	public String getControlId();
+
+	/**
 	 * Get the jobs in this queue. Returns an empty array if there are no jobs
 	 * 
 	 * @return array of jobs in this queue
 	 */
 	public IPJob[] getJobs();
-
-	/**
-	 * Get the resource manager that controls this queue.
-	 * 
-	 * @return IResourceManagerControl
-	 * @since 5.0
-	 */
-	public IResourceManager getResourceManager();
 
 	/**
 	 * Get the internal state of the process.

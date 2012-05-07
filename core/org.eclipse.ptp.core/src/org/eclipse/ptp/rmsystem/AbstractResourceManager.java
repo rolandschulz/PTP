@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
@@ -34,9 +33,10 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.core.listeners.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobListener;
+import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.messages.Messages;
-import org.eclipse.ptp.internal.core.elements.PResourceManager;
 
 /**
  * @author rsqrd
@@ -44,10 +44,9 @@ import org.eclipse.ptp.internal.core.elements.PResourceManager;
  * 
  */
 public abstract class AbstractResourceManager implements IResourceManager {
-	private final PResourceManager fPResourceManager;
+	private final IPResourceManager fPResourceManager;
 	private final AbstractResourceManagerControl fResourceManagerControl;
 	private final AbstractResourceManagerMonitor fResourceManagerMonitor;
-	private final ModelManager fModelManager = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
 
 	private AbstractResourceManagerConfiguration fConfig;
 	private String fState;
@@ -60,45 +59,39 @@ public abstract class AbstractResourceManager implements IResourceManager {
 		fConfig = config;
 		fResourceManagerControl = control;
 		fResourceManagerMonitor = monitor;
-		fPResourceManager = new PResourceManager(fModelManager.getUniverse(), this);
-		fModelManager.getUniverse().addResourceManager(fPResourceManager);
+		fPResourceManager = ModelManager.getInstance().getUniverse().addResourceManager(config.getName(), this.getUniqueName());
 		fState = STOPPED_STATE;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#addJob(java.lang.String,
-	 * org.eclipse.ptp.rmsystem.IJobStatus)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#addJob(org.eclipse.ptp.rmsystem.IJobStatus)
 	 */
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public void addJob(String jobId, IJobStatus status) {
-		fResourceManagerMonitor.addJob(jobId, status);
+	public void addJob(IJobStatus status) {
+		JobManager.getInstance().fireJobAdded(status);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#addJobListener(org.eclipse
-	 * .ptp.core.listeners.IJobListener)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#addJobListener(org.eclipse .ptp.core.listeners.IJobListener)
 	 */
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public void addJobListener(IJobListener listener) {
-		fResourceManagerMonitor.addJobListener(listener);
+		JobManager.getInstance().addListener(fConfig.getUniqueName(), listener);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#control(java.lang.String
-	 * , java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#control(java.lang.String , java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	/**
 	 * @since 5.0
@@ -114,7 +107,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 */
 	public void dispose() {
 		doDispose();
-		fModelManager.getUniverse().removeResourceManager(fPResourceManager);
+		ModelManager.getInstance().getUniverse().removeResourceManager(fPResourceManager.getControlId());
 	}
 
 	/*
@@ -163,15 +156,25 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration ()
 	 */
 	/**
 	 * @since 5.0
 	 */
 	public IResourceManagerComponentConfiguration getControlConfiguration() {
 		return fResourceManagerControl.getControlConfiguration();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IJobControl#getControlId()
+	 */
+	/**
+	 * @since 6.0
+	 */
+	public String getControlId() {
+		return getConfiguration().getUniqueName();
 	}
 
 	/*
@@ -191,12 +194,11 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
-	 * .String, boolean, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang .String, boolean,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) {
 		return fResourceManagerControl.getJobStatus(jobId, force, monitor);
@@ -205,12 +207,11 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
-	 * .String, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang .String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor) {
 		return fResourceManagerControl.getJobStatus(jobId, monitor);
@@ -231,9 +232,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#getMonitorConfiguration
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#getMonitorConfiguration ()
 	 */
 	/**
 	 * @since 5.0
@@ -278,41 +277,24 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getUniqueName()
 	 */
 	public String getUniqueName() {
-		return getConfiguration().getUniqueName();
+		return getControlId();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJob(java.lang.
-	 * String)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJobListener(org .eclipse.ptp.core.listeners.IJobListener)
 	 */
 	/**
-	 * @since 5.0
-	 */
-	public void removeJob(String jobId) {
-		fResourceManagerMonitor.removeJob(jobId);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#removeJobListener(org
-	 * .eclipse.ptp.core.listeners.IJobListener)
-	 */
-	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public void removeJobListener(IJobListener listener) {
-		fResourceManagerMonitor.addJobListener(listener);
+		JobManager.getInstance().removeListener(fConfig.getUniqueName(), listener);
 	}
 
 	/**
-	 * Set the configuration for this resource manager. This will replace the
-	 * existing configuration with a new configuration. The method is
-	 * responsible for dealing with any saved state that needs to be cleaned up.
+	 * Set the configuration for this resource manager. This will replace the existing configuration with a new configuration. The
+	 * method is responsible for dealing with any saved state that needs to be cleaned up.
 	 * 
 	 * @param config
 	 *            the new configuration
@@ -356,9 +338,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#setState(java.lang.String
-	 * )
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#setState(java.lang.String )
 	 */
 	public synchronized void setState(String state) {
 		fState = state;
@@ -371,8 +351,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#start(org.eclipse.core
-	 * .runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#start(org.eclipse.core .runtime.IProgressMonitor)
 	 */
 	public void start(IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
@@ -418,10 +397,8 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#submitJob(org.eclipse
-	 * .debug.core.ILaunchConfiguration, java.lang.String,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#submitJob(org.eclipse .debug.core.ILaunchConfiguration,
+	 * java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
 		return fResourceManagerControl.submitJob(configuration, mode, monitor);
@@ -430,15 +407,13 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerMonitor#updateJob(java.lang.
-	 * String, org.eclipse.ptp.rmsystem.IJobStatus)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerMonitor#updateJob(org.eclipse.ptp.rmsystem.IJobStatus)
 	 */
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public void updateJob(String jobId, IJobStatus status) {
-		fResourceManagerMonitor.updateJob(jobId, status);
+	public void updateJob(IJobStatus status) {
+		JobManager.getInstance().fireJobChanged(status);
 	}
 
 	/**
@@ -450,14 +425,12 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	}
 
 	/**
-	 * Stop the resource manager control and monitor subsystems. This should
-	 * only be overridden if the implementor is providing different control and
-	 * monitor implementations.
+	 * Stop the resource manager control and monitor subsystems. This should only be overridden if the implementor is providing
+	 * different control and monitor implementations.
 	 * 
 	 * @throws CoreException
-	 *             this exception should be thrown if the shutdown encountered
-	 *             an error for any reason. This will not halt shutdown of the
-	 *             resource manager, but may produce a message to the user.
+	 *             this exception should be thrown if the shutdown encountered an error for any reason. This will not halt shutdown
+	 *             of the resource manager, but may produce a message to the user.
 	 */
 	protected void doShutdown() throws CoreException {
 		CoreException exception = null;
@@ -474,17 +447,14 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	}
 
 	/**
-	 * Start the resource manager control and monitor subsystems. This should
-	 * only be overridden if the implementor is providing different control and
-	 * monitor implementations.
+	 * Start the resource manager control and monitor subsystems. This should only be overridden if the implementor is providing
+	 * different control and monitor implementations.
 	 * 
 	 * @param monitor
-	 *            progress monitor indicating startup progress and for
-	 *            cancelling startup
+	 *            progress monitor indicating startup progress and for cancelling startup
 	 * @throws CoreException
-	 *             this exception should be thrown if the startup encountered an
-	 *             error for any reason. This will halt shutdown of the resource
-	 *             manager, and may produce a message to the user.
+	 *             this exception should be thrown if the startup encountered an error for any reason. This will halt shutdown of
+	 *             the resource manager, and may produce a message to the user.
 	 */
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
@@ -500,23 +470,12 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	}
 
 	/**
-	 * Notify listeners when a job has changed.
-	 * 
-	 * @param jobId
-	 *            ID of job that has changed
-	 * @since 5.0
-	 */
-	protected void fireJobChanged(String jobId) {
-		fResourceManagerMonitor.fireJobChanged(jobId);
-	}
-
-	/**
 	 * Fire an event to notify that the resource manager has changed state
 	 * 
 	 * @since 5.0
 	 */
 	protected void fireResourceManagerChanged() {
-		fModelManager.fireResourceManagerChanged(this);
+		ModelManager.getInstance().fireResourceManagerChanged(this);
 	}
 
 	/**
@@ -527,7 +486,7 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 */
 	protected void fireResourceManagerError(String message) {
 		setState(ERROR_STATE);
-		fModelManager.fireResourceManagerError(this, message);
+		ModelManager.getInstance().fireResourceManagerError(this, message);
 	}
 
 	/**

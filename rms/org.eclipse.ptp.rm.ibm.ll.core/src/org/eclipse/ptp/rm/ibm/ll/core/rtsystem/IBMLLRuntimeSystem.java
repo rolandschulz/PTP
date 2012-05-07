@@ -34,7 +34,7 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
-import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteProxyRuntimeSystem;
+import org.eclipse.ptp.rm.core.proxy.AbstractRemoteProxyRuntimeSystem;
 
 public class IBMLLRuntimeSystem extends AbstractRemoteProxyRuntimeSystem {
 	public IBMLLRuntimeSystem(IBMLLProxyRuntimeClient proxy) {

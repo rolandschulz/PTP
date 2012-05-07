@@ -11,7 +11,7 @@
 <!-- *     Jeff Overbey - Adapted to Grid Engine                                     -->
 <!-- ******************************************************************************* -->
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="edu.utexas.tacc.lonestar.sge.batch.xml">
+	xsi:schemaLocation="resource_manager_type.xsd" name="Grid Engine-Generic-Batch">
 	<control-data>
 		<!-- ========== -->
 		<!-- PROPERTIES -->

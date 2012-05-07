@@ -34,23 +34,19 @@ public class PERMLaunchConfigurationFactory extends AbstractRMLaunchConfiguratio
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
-	 * #doCreate(org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.debug.ui.ILaunchConfigurationDialog)
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
+	 * #doCreate(org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.debug.ui.ILaunchConfigurationDialog)
 	 */
 	@Override
 	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
-		return new PERMLaunchConfigurationDynamicTab(rm, dialog);
+		return new PERMLaunchConfigurationDynamicTab(rm);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
-	 * #getResourceManagerClass()
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory #getResourceManagerClass()
 	 */
 	@Override
 	public Class<? extends IResourceManager> getResourceManagerClass() {

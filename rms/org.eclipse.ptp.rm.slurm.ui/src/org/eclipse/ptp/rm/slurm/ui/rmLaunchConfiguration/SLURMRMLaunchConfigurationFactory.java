@@ -24,23 +24,19 @@ public class SLURMRMLaunchConfigurationFactory extends AbstractRMLaunchConfigura
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
-	 * #doCreate(org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.debug.ui.ILaunchConfigurationDialog)
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
+	 * #doCreate(org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.debug.ui.ILaunchConfigurationDialog)
 	 */
 	@Override
 	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
-		return new SLURMRMLaunchConfigurationDynamicTab(rm, dialog);
+		return new SLURMRMLaunchConfigurationDynamicTab();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
-	 * #getResourceManagerClass()
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory #getResourceManagerClass()
 	 */
 	@Override
 	public Class<? extends IResourceManager> getResourceManagerClass() {

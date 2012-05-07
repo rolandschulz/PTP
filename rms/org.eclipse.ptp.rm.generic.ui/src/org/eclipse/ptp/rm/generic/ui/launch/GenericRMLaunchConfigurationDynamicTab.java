@@ -10,13 +10,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.generic.ui.launch;
 
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class GenericRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfigurationDynamicTab {
-
-	public GenericRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
-		super(dialog);
-	}
+	// Nothing required
 }

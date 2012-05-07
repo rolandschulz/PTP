@@ -22,7 +22,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
@@ -51,7 +51,7 @@ public class RemoveResourceManagersAction extends Action {
 				Messages.RemoveResourceManagersAction_1 + rmNames);
 
 		if (remove) {
-			PTPCorePlugin.getDefault().getModelManager().removeResourceManagers(fSelectedRMs);
+			ModelManager.getInstance().removeResourceManagers(fSelectedRMs);
 		}
 	}
 

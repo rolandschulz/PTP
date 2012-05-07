@@ -19,7 +19,9 @@
 package org.eclipse.ptp.internal.ui.adapters;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.utils.ui.ImageImageDescriptor;
@@ -27,7 +29,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.WorkbenchAdapter;
 
 public class PQueueWorkbenchAdapter extends WorkbenchAdapter {
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getChildren(java.lang.Object)
 	 */
 	@Override
@@ -36,33 +40,45 @@ public class PQueueWorkbenchAdapter extends WorkbenchAdapter {
 		return queue.getJobs();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object)
 	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
 		IPQueue queue = (IPQueue) object;
-		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(queue.getResourceManager().getResourceManagerId());
-		if (presentation != null) {
-			final Image image = presentation.getImage(object);
-			if (image != null) {
-				return new ImageImageDescriptor(image);
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(queue.getControlId());
+		if (rm != null) {
+			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+					rm.getResourceManagerId());
+			if (presentation != null) {
+				final Image image = presentation.getImage(object);
+				if (image != null) {
+					return new ImageImageDescriptor(image);
+				}
 			}
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getLabel(java.lang.Object)
 	 */
 	@Override
 	public String getLabel(Object object) {
 		IPQueue queue = (IPQueue) object;
-		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(queue.getResourceManager().getResourceManagerId());
-		if (presentation != null) {
-			final String label = presentation.getText(object);
-			if (label != null) {
-				return label;
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(queue.getControlId());
+		if (rm != null) {
+			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+					rm.getResourceManagerId());
+			if (presentation != null) {
+				final String label = presentation.getText(object);
+				if (label != null) {
+					return label;
+				}
 			}
 		}
 		return queue.getName();

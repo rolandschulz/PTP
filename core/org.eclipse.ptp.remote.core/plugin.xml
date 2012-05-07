@@ -39,5 +39,11 @@
          </adapter>
       </factory>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.remote.core.PreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>

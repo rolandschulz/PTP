@@ -12,6 +12,7 @@
    <anchor id="ptpPLDTopenmp"/>
    <topic label="MPI Barrier Analysis"  href="html/barrier.html"/> 
    <topic label="UPC tools" href="html/upc.html" />
+   <topic label="Running PTP OpenACC tools"  href="html/runOpenACC.html"/> 
    <!-- insertion point for other docs -->
    <anchor id="ptpPLDTother"/>
    <topic label="New and Noteworthy" href="html/whatsnew.html" />

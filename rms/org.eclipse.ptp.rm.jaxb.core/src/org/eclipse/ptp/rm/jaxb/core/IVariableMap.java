@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.util.Map;
 
-import org.eclipse.ptp.ems.core.EnvManagerConfigString;
+import org.eclipse.ptp.ems.core.IEnvManager;
 
 /**
  * High-level interface for resolver environments.
@@ -42,11 +42,26 @@ public interface IVariableMap {
 	public Object get(String name);
 
 	/**
+	 * Get the default value of the attribute
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public String getDefault(String name);
+
+	/**
 	 * Get the map of Properties and Attributes discovered at runtime.
 	 * 
 	 * @return the map containing any variables added through discovery processes, or <code>null</code> if unsupported
 	 */
 	public Map<String, Object> getDiscovered();
+
+	/**
+	 * Get the environment manager associated with this map.
+	 * 
+	 * @return environment manager
+	 */
+	public IEnvManager getEnvManager();
 
 	/**
 	 * Get the string representation of an expression.
@@ -97,21 +112,20 @@ public interface IVariableMap {
 	public Object remove(String name);
 
 	/**
+	 * Sets the default value of the attribute.
+	 * 
+	 * @param name
+	 *            of variable
+	 * @param defaultValue
+	 *            of variable
+	 */
+	public void setDefault(String name, String defaultValue);
+
+	/**
 	 * Set a flag to indicate the map has been initialized
 	 * 
 	 * @param initialized
 	 *            indicates the map has already been initialized
 	 */
 	public void setInitialized(boolean initialized);
-
-	/**
-	 * Given an environment manager configuration string, returns the corresponding sequence of Bash commands.
-	 * <p>
-	 * It is a precondition that <code>string</code> satisfies {@link EnvManagerConfigString#isEnvMgmtConfigString(String)}.
-	 * 
-	 * @param string
-	 *            non-<code>null</code>
-	 * @return non-<code>null</code>
-	 */
-	public String convertEngMgmtConfigString(String string);
 }

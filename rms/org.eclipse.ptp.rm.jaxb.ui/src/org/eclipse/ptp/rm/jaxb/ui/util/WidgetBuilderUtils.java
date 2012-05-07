@@ -19,10 +19,6 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.ptp.ems.ui.EnvManagerConfigButton;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
@@ -173,14 +169,14 @@ public class WidgetBuilderUtils {
 	}
 
 	public static EnvManagerConfigButton createEnvConfig(Composite parent, Integer style, Object layoutData, String initialValue,
-			String label, String tooltip, Object listener, IJAXBResourceManager resourceManager) {
+			String label, String tooltip, Object listener, IRemoteConnection conn) {
 		if (label != null) {
 			Label buttonLabel = createLabel(parent, label, SWT.RIGHT, 1);
 			if (tooltip != null) {
 				buttonLabel.setToolTipText(tooltip);
 			}
 		}
-		final EnvManagerConfigButton button = new EnvManagerConfigButton(parent, getConnection(resourceManager));
+		final EnvManagerConfigButton button = new EnvManagerConfigButton(parent, conn);
 		if (label != null) {
 			button.setText(label);
 		}
@@ -189,25 +185,6 @@ public class WidgetBuilderUtils {
 			button.setConfiguration(initialValue);
 		}
 		return button;
-	}
-
-	private static IRemoteConnection getConnection(IJAXBResourceManager rm) {
-		if (rm == null) {
-			return null;
-		} else {
-			final String connName = rm.getControlConfiguration().getConnectionName();
-			final IRemoteServices rsrv = PTPRemoteCorePlugin.getDefault().getRemoteServices(rm.getControlConfiguration().getRemoteServicesId(), null);
-			if (rsrv == null) {
-				return null;
-			} else {
-				IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
-				if (connMgr == null) {
-					return null;
-				} else {
-					return connMgr.getConnection(connName);
-				}
-			}
-		}
 	}
 
 	/**
@@ -450,8 +427,7 @@ public class WidgetBuilderUtils {
 	}
 
 	/**
-	 * Sets style to GridData.FILL_BOTH, grabExcessHorizontal and
-	 * grabExcessVertical both to true.
+	 * Sets style to GridData.FILL_BOTH, grabExcessHorizontal and grabExcessVertical both to true.
 	 * 
 	 * @param widthHint
 	 * @param heightHint
@@ -951,8 +927,7 @@ public class WidgetBuilderUtils {
 	}
 
 	/**
-	 * Translates the string representation of OR'd style values into SWT int
-	 * code.
+	 * Translates the string representation of OR'd style values into SWT int code.
 	 * 
 	 * Calls {@link #getStyle(String[])}.
 	 * 
@@ -968,9 +943,8 @@ public class WidgetBuilderUtils {
 	}
 
 	/**
-	 * For consistency in treating <code>null</code> or undefined defaults on
-	 * loading, this method ensures the first element of the combo is a
-	 * JAXBRMUIConstants.ZEROSTR. It also removes blank items.
+	 * For consistency in treating <code>null</code> or undefined defaults on loading, this method ensures the first element of the
+	 * combo is a JAXBRMUIConstants.ZEROSTR. It also removes blank items.
 	 * 
 	 * @param items
 	 * @return adjusted array of combo items
@@ -1025,8 +999,7 @@ public class WidgetBuilderUtils {
 	}
 
 	/**
-	 * Translates each array item into the integer code, using a cumulative
-	 * logical OR.
+	 * Translates each array item into the integer code, using a cumulative logical OR.
 	 * 
 	 * @param style
 	 *            array of string from split on '|'

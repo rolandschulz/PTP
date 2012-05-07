@@ -19,31 +19,49 @@
 
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.jobs.IJobControl;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 
 /**
- * A Universe represents a user's view of the world. It is comprised of a set of
- * Resource Managers.
+ * A Universe represents a user's view of the world. It is comprised of a set of Resource Managers.
  * 
  * @author Nathan DeBardeleben
  * @see IPResourceManager
  */
 public interface IPUniverse extends IPElement {
 	/**
-	 * @param addedManager
-	 * @since 5.0
+	 * @param id
+	 *            of controller
+	 * @since 6.0
 	 */
-	public void addResourceManager(IPResourceManager addedManager);
+	public IPResourceManager addResourceManager(String name, String controlId);
 
 	/**
-	 * @param addedManagers
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public void addResourceManagers(IPResourceManager[] addedManagers);
+	public IPJob getJob(IJobControl control, String jobId);
+
+	/**
+	 * @since 6.0
+	 */
+	public IPJob getJob(IJobStatus status);
 
 	/**
 	 * @since 5.0
 	 */
 	public String getNextResourceManagerId();
+
+	/**
+	 * @since 6.0
+	 */
+	public IPNode getNode(IJobControl control, String nodeId);
+
+	/**
+	 * @param controlId
+	 * @return
+	 * @since 6.0
+	 */
+	public IPResourceManager getResourceManager(String controlId);
 
 	/**
 	 * @return IPResourceManager[]
@@ -52,7 +70,8 @@ public interface IPUniverse extends IPElement {
 	public IPResourceManager[] getResourceManagers();
 
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public void removeResourceManager(IPResourceManager removedManager);
+	public void removeResourceManager(String controlId);
+
 }

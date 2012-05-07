@@ -51,8 +51,7 @@ public class PTPCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Returns the string from the plugin's resource bundle, or 'key' if not
-	 * found.
+	 * Returns the string from the plugin's resource bundle, or 'key' if not found.
 	 */
 	public static String getResourceString(String key) {
 		ResourceBundle bundle = PTPCorePlugin.getDefault().getResourceBundle();
@@ -127,24 +126,6 @@ public class PTPCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Get the model manager
-	 * 
-	 * @return the model manager
-	 */
-	public IModelManager getModelManager() {
-		return ModelManager.getInstance();
-	}
-
-	/**
-	 * Get the presentation manager. This is now the model manager.
-	 * 
-	 * @return the presentation manager
-	 */
-	public IModelPresentation getModelPresentation() {
-		return getModelManager();
-	}
-
-	/**
 	 * Returns the plugin's resource bundle,
 	 */
 	public ResourceBundle getResourceBundle() {
@@ -152,9 +133,8 @@ public class PTPCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Locate the fragment for our architecture. This should really be phased
-	 * out, since there is now no guarantee that there will be local executables
-	 * for the proxy server or debugger.
+	 * Locate the fragment for our architecture. This should really be phased out, since there is now no guarantee that there will
+	 * be local executables for the proxy server or debugger.
 	 * 
 	 * @param fragment
 	 * @param file
@@ -176,15 +156,13 @@ public class PTPCorePlugin extends Plugin {
 					String str_path = local_path.getPath();
 
 					/*
-					 * Check each fragment that matches our os and arch for a
-					 * bin directory.
+					 * Check each fragment that matches our os and arch for a bin directory.
 					 */
 
 					int idx = str_path.indexOf(frag_os_arch);
 					if (idx > 0) {
 						/*
-						 * found it! This is the right fragment for our OS &
-						 * arch
+						 * found it! This is the right fragment for our OS & arch
 						 */
 						String file_path = str_path + "bin/" + file; //$NON-NLS-1$
 						File f = new File(file_path);

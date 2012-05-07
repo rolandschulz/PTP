@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.slurm.core.rtsystem;
 
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.rm.slurm.core.SLURMJobAttributes;
@@ -24,14 +25,12 @@ public class SLURMRuntimeSystemFactory implements IRuntimeSystemFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeSystemFactory#create(org.eclipse.ptp
-	 * .rmsystem.IResourceManager)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystemFactory#create(org.eclipse.ptp .rmsystem.IResourceManager)
 	 */
 	public IRuntimeSystem create(IResourceManager rm) {
 		IRuntimeSystem slurmRMS;
 		ISLURMResourceManagerConfiguration config = (ISLURMResourceManagerConfiguration) rm.getConfiguration();
-		IPResourceManager prm = (IPResourceManager) rm.getAdapter(IPResourceManager.class);
+		IPResourceManager prm = ModelManager.getInstance().getUniverse().getResourceManager(rm.getControlId());
 		int baseId = 0;
 		try {
 			baseId = Integer.parseInt(prm.getID());

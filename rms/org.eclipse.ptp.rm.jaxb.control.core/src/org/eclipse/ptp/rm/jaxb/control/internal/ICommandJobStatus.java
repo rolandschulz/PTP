@@ -12,14 +12,13 @@ package org.eclipse.ptp.rm.jaxb.control.internal;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 
 /**
  * CommandJob-specific extension to IJobStatus.
  * 
- * @see org.eclipse.ptp.rmsystem.IJobStatus
+ * @see org.eclipse.ptp.core.jobs.IJobStatus
  * @author arossi
  * 
  */
@@ -42,11 +41,6 @@ public interface ICommandJobStatus extends IJobStatus {
 	public void cancelWait();
 
 	/**
-	 * @return the current control
-	 */
-	public IJAXBResourceManagerControl getControl();
-
-	/**
 	 * timestamp of last update request issued to remote resource
 	 * 
 	 * @return update in milliseconds
@@ -59,11 +53,10 @@ public interface ICommandJobStatus extends IJobStatus {
 	 * @param jobId
 	 *            for the associated job
 	 */
-	public void initialize(String jobId);
+	public void initialize(String jobId) throws CoreException;
 
 	/**
-	 * If there are remote output files, runs the check and joins on those
-	 * threads.
+	 * If there are remote output files, runs the check and joins on those threads.
 	 * 
 	 * @param blockForSecs
 	 *            will continue trying for this long before returning
@@ -109,8 +102,7 @@ public interface ICommandJobStatus extends IJobStatus {
 
 	/**
 	 * @param time
-	 *            in milliseconds of last update request issued to remote
-	 *            resource
+	 *            in milliseconds of last update request issued to remote resource
 	 */
 	public void setUpdateRequestTime(long update);
 

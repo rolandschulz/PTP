@@ -16,24 +16,22 @@ import java.io.FileReader;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -49,13 +47,11 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Specialized Launch Tab for displaying (read only) custom batch scripts. To
- * edit scripts, they should be imported into the workspace. The selection of a
- * pre-existent file sets the SCRIPT_PATH variable in the environment which
- * overrides any SCRIPT content that may have been previously set.<br>
+ * Specialized Launch Tab for displaying (read only) custom batch scripts. To edit scripts, they should be imported into the
+ * workspace. The selection of a pre-existent file sets the SCRIPT_PATH variable in the environment which overrides any SCRIPT
+ * content that may have been previously set.<br>
  * <br>
- * The configuration provides for the exporting of the environment for the
- * purpose of overriding settings.
+ * The configuration provides for the exporting of the environment for the purpose of overriding settings.
  * 
  * @author arossi
  * 
@@ -73,8 +69,8 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	private String selected;
 
 	/**
-	 * @param rm
-	 *            the resource manager
+	 * @param control
+	 *            the job controller
 	 * @param dialog
 	 *            the ancestor main launch dialog
 	 * @param importTab
@@ -82,43 +78,36 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	public JAXBImportedScriptLaunchConfigurationTab(IJAXBResourceManager rm, ILaunchConfigurationDialog dialog,
-			LaunchTabType.Import importTab, JAXBControllerLaunchConfigurationTab parentTab) {
-		super(rm, dialog, parentTab);
+	public JAXBImportedScriptLaunchConfigurationTab(IJobController control, LaunchTabType.Import importTab,
+			IJAXBParentLaunchConfigurationTab parentTab, IProgressMonitor monitor) {
+		super(control, parentTab);
+		setProgressMonitor(monitor);
 		this.title = importTab.getTitle();
 		this.viewerType = importTab.getExportForOverride();
 		shared = new String[0];
-		rmPrefix = rm.getConfiguration().getUniqueName() + JAXBUIConstants.DOT;
+		rmPrefix = control.getControlId() + JAXBUIConstants.DOT;
 		contents = new StringBuffer();
 	}
 
 	/*
 	 * Nothing to validate here. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #canSave(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control)
 	 */
 	@Override
-	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
-		return super.canSave(control, rm, queue);
+	public RMLaunchValidation canSave(Control control) {
+		return super.canSave(control);
 	}
 
 	/*
-	 * Fixed construction of read-only text field and browse button for the
-	 * selection, a clear button to clear the choice, and a large text area for
-	 * displaying the script. Attribute viewer is configurable. (non-Javadoc)
+	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * java.lang.String)
 	 */
 	@Override
-	public void createControl(final Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
+	public void createControl(final Composite parent, String id) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(WidgetBuilderUtils.createGridLayout(1, false));
 
@@ -200,20 +189,15 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	}
 
 	/*
-	 * If there is a script path in the configuration, display that script.
-	 * (non-Javadoc)
+	 * If there is a script path in the configuration, display that script. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			RMLaunchValidation validation = super.initializeFrom(control, rm, queue, configuration);
+			RMLaunchValidation validation = super.initializeFrom(configuration);
 			if (!validation.isSuccess()) {
 				return validation;
 			}
@@ -233,37 +217,29 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	/*
 	 * Nothing to do here. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
-	 * org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
-	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
-		return super.isValid(launchConfig, rm, queue);
+	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig) {
+		return super.isValid(launchConfig);
 	}
 
 	/*
 	 * Nothing to do here. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
-	 * org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	@Override
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		return super.setDefaults(configuration, rm, queue);
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+		return super.setDefaults(configuration);
 	}
 
 	/*
 	 * Tab acts as listener for browse, clear and path buttons (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
-	 * .events.SelectionEvent)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt .events.SelectionEvent)
 	 */
 	@Override
 	public void widgetSelected(SelectionEvent e) {
@@ -287,24 +263,19 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	/*
 	 * Store SCRIPT_PATH. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab#
-	 * doRefreshLocal()
+	 * @see org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab# doRefreshLocal()
 	 */
 	@Override
 	protected void doRefreshLocal() {
 		super.doRefreshLocal();
-		LCVariableMap lcMap = parentTab.getLCMap();
+		LCVariableMap lcMap = parentTab.getVariableMap();
 		lcMap.put(JAXBControlUIConstants.SCRIPT_PATH, selected);
 	}
 
 	/*
-	 * Let the writeLocalProperties determine validity of script, excluded by
-	 * all other controllers. (non-Javadoc)
+	 * Let the writeLocalProperties determine validity of script, excluded by all other controllers. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab
-	 * #getLocalInvalid()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab #getLocalInvalid()
 	 */
 	@Override
 	protected Set<String> getLocalInvalid() {
@@ -316,9 +287,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
-	 * #writeLocalProperties()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab #writeLocalProperties()
 	 */
 	@Override
 	protected void writeLocalProperties() {
@@ -329,8 +298,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	}
 
 	/**
-	 * Adds the View Script and Restore Defaults buttons to the bottom of the
-	 * control pane.
+	 * Adds the View Script and Restore Defaults buttons to the bottom of the control pane.
 	 * 
 	 * @param control
 	 */
@@ -369,8 +337,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	}
 
 	/*
-	 * Reads in the script if the selected path is set, then notifies the
-	 * ResourcesTab of the change.
+	 * Reads in the script if the selected path is set, then notifies the ResourcesTab of the change.
 	 */
 	private void updateContents() throws Throwable {
 		uploadScript();
@@ -378,8 +345,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	}
 
 	/*
-	 * Display the selected path and the script if they are set; enable the
-	 * clear button if script is non-empty.
+	 * Display the selected path and the script if they are set; enable the clear button if script is non-empty.
 	 */
 	private void updateControls() {
 		if (selected != null) {
@@ -396,8 +362,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	}
 
 	/*
-	 * If selected is set, read in the contents of the file with that path.
-	 * Calls #updateControls().
+	 * If selected is set, read in the contents of the file with that path. Calls #updateControls().
 	 */
 	private void uploadScript() throws Throwable {
 		contents.setLength(0);
@@ -414,6 +379,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 					break;
 				}
 			}
+			br.close();
 		}
 		updateControls();
 	}

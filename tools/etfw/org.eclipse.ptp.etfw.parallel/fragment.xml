@@ -6,7 +6,7 @@
       <launchConfigurationTabGroup
             class="org.eclipse.ptp.etfw.parallel.ParallelToolLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
-            type="org.eclipse.ptp.launch.parallelLaunch">
+            type="org.eclipse.ptp.rm.launch.parallelLaunch">
          <launchMode
                description="Build C, C++ or Fortran applications with performance analysis tools.  Launch parallel programs from within Eclipse via the PTP."
                mode="profile"/>
@@ -19,13 +19,13 @@
             id="org.eclipse.ptp.etfw.parallelLaunch"
             modes="profile"
             name="Profile Parallel Application"
-            type="org.eclipse.ptp.launch.parallelLaunch">
+            type="org.eclipse.ptp.rm.launch.parallelLaunch">
       </launchDelegate>
    </extension>
       <extension
          point="org.eclipse.debug.ui.launchConfigurationTabs">
       <tab
-            class="org.eclipse.ptp.launch.ui.ResourcesTab"
+            class="org.eclipse.ptp.rm.launch.ui.ResourcesTab"
             group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.resourcesTab"
             name="%ResourcesLaunchTab.name">

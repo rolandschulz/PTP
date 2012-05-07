@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.attributes.ArrayAttribute;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
@@ -768,7 +769,8 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 		} finally {
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: cleanup", getJobID()); //$NON-NLS-1$
-			final IPResourceManager rm = (IPResourceManager) getRtSystem().getResourceManager().getAdapter(IPResourceManager.class);
+			final IPResourceManager rm = ModelManager.getInstance().getUniverse()
+					.getResourceManager(getRtSystem().getResourceManager().getUniqueName());
 			if (rm != null) {
 				final IPJob ipJob = rm.getJobById(getJobID());
 				if (ipJob != null) {

@@ -25,7 +25,6 @@ import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
@@ -114,7 +113,7 @@ public class LCVariableMap implements IVariableMap {
 		}
 	}
 
-	private final IEnvManager envManager;
+	private IEnvManager envManager;
 	private final Map<String, Object> linkedTo;
 	private final Map<String, Object> excluded;
 	private final Map<String, Object> values;
@@ -125,8 +124,7 @@ public class LCVariableMap implements IVariableMap {
 
 	private String rmPrefix;
 
-	public LCVariableMap(IEnvManager envManager) {
-		this.envManager = envManager;
+	public LCVariableMap() {
 		this.values = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.excluded = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.defaultValues = Collections.synchronizedMap(new TreeMap<String, String>());
@@ -212,15 +210,6 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * @param viewerName
-	 *            of viewer for which to find checked rows
-	 * @return set of checked row model names
-	 */
-	public Set<String> getChecked(String viewerName) {
-		return forControlState(viewerName, JAXBControlUIConstants.CHECKED_ATTRIBUTES);
-	}
-
-	/**
 	 * @param name
 	 *            of widget, bound to a Property or Attribute
 	 * @return default value of the Property or Attribute, or <code>null</code> if none
@@ -239,6 +228,24 @@ public class LCVariableMap implements IVariableMap {
 	 */
 	public Map<String, Object> getDiscovered() {
 		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getEnvironmentManager()
+	 */
+	public IEnvManager getEnvironmentManager() {
+		return envManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getEnvManager()
+	 */
+	public IEnvManager getEnvManager() {
+		return envManager;
 	}
 
 	/**
@@ -303,7 +310,11 @@ public class LCVariableMap implements IVariableMap {
 	 */
 	public void initialize(IVariableMap rmVars, String rmId) throws Throwable {
 		clear();
-		this.rmPrefix = rmId + JAXBUIConstants.DOT;
+		if (rmId != null) {
+			rmPrefix = rmId + JAXBUIConstants.DOT;
+		} else {
+			rmPrefix = JAXBControlConstants.ZEROSTR;
+		}
 		for (String s : rmVars.getVariables().keySet()) {
 			loadValues(s, rmVars.getVariables().get(s), false);
 		}
@@ -335,10 +346,12 @@ public class LCVariableMap implements IVariableMap {
 	 * @throws CoreException
 	 */
 	public void relinkConfigurationProperties(ILaunchConfiguration configuration) throws CoreException {
-		for (Iterator<String> key = values.keySet().iterator(); key.hasNext();) {
-			String name = key.next();
-			if (!name.startsWith(rmPrefix)) {
-				key.remove();
+		if (!rmPrefix.equals(JAXBControlConstants.ZEROSTR)) {
+			for (Iterator<String> key = values.keySet().iterator(); key.hasNext();) {
+				String name = key.next();
+				if (!name.startsWith(rmPrefix)) {
+					key.remove();
+				}
 			}
 		}
 
@@ -414,6 +427,15 @@ public class LCVariableMap implements IVariableMap {
 		}
 	}
 
+	/**
+	 * Sets the {@link IEnvManager} which will be used to generate Bash commands from environment manager configuration strings.
+	 * 
+	 * @param envManager
+	 */
+	public void setEnvManager(IEnvManager envManager) {
+		this.envManager = envManager;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -436,7 +458,7 @@ public class LCVariableMap implements IVariableMap {
 				continue;
 			}
 			if (var != null) {
-				if (var.startsWith(rmPrefix)) {
+				if (!rmPrefix.equals(JAXBControlConstants.ZEROSTR) && var.startsWith(rmPrefix)) {
 					var = var.substring(rmPrefix.length());
 					if (valid.contains(var) || RMVariableMap.isFixedValid(var)) {
 						put(var, value);
@@ -457,7 +479,7 @@ public class LCVariableMap implements IVariableMap {
 	public void updateFromConfiguration(ILaunchConfiguration configuration) throws CoreException {
 		Map<String, Object> attr = configuration.getAttributes();
 		for (String key : attr.keySet()) {
-			if (key.startsWith(rmPrefix) || RMVariableMap.isExternal(key)) {
+			if ((!rmPrefix.equals(JAXBControlConstants.ZEROSTR) && key.startsWith(rmPrefix)) || RMVariableMap.isExternal(key)) {
 				values.put(key, attr.get(key));
 			}
 		}
@@ -558,13 +580,5 @@ public class LCVariableMap implements IVariableMap {
 				put(name, o);
 			}
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#convertEngMgmtConfigString(java.lang.String)
-	 */
-	public String convertEngMgmtConfigString(String string) {
-		assert EnvManagerConfigString.isEnvMgmtConfigString(string);
-		return envManager.getBashConcatenation("\n", false, new EnvManagerConfigString(string), null); //$NON-NLS-1$
 	}
 }

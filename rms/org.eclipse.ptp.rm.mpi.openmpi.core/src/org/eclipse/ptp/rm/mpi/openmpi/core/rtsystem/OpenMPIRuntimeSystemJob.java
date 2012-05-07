@@ -48,27 +48,21 @@ import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfi
 import org.eclipse.ptp.rm.mpi.openmpi.core.rtsystem.OpenMPIProcessMap.Process;
 
 /**
- * Master job that implements the Open MPI runtime system. This job must
- * implement each of the various phases of the runtime system:
+ * Master job that implements the Open MPI runtime system. This job must implement each of the various phases of the runtime system:
  * 
- * doPrepareExecution = do any debugger startup actions doBeforeExecution -
- * merge streams if necessary doExecutionStarted - parse output from the mpirun
- * command doWaitExectuion - wait until execution has completed
- * doExecutionFinished - deal with any issues from program termination
- * doExecutionCleanup - cleanup after execution
+ * doPrepareExecution = do any debugger startup actions doBeforeExecution - merge streams if necessary doExecutionStarted - parse
+ * output from the mpirun command doWaitExectuion - wait until execution has completed doExecutionFinished - deal with any issues
+ * from program termination doExecutionCleanup - cleanup after execution
  * 
- * The type/format of output depends on a range of factors, including the OMPI
- * version and the capabilities of the remote service provider being used.
+ * The type/format of output depends on a range of factors, including the OMPI version and the capabilities of the remote service
+ * provider being used.
  * 
- * OMPI 1.2 generates map data in textual form that must be parsed to extract
- * the relevant information. Map information is sent to stderr, but RSE does not
- * separate stdout/stderr so this must be handled as a special case.
+ * OMPI 1.2 generates map data in textual form that must be parsed to extract the relevant information. Map information is sent to
+ * stderr, but RSE does not separate stdout/stderr so this must be handled as a special case.
  * 
- * OMPI 1.3.x generates map data in (malformed) XML format so we use an XML
- * parser to extract information.
+ * OMPI 1.3.x generates map data in (malformed) XML format so we use an XML parser to extract information.
  * 
- * OMPI 1.3.[1,2] wrap stdout and stderr from the program in XML tags, but they
- * are sill sent to the respective streams.
+ * OMPI 1.3.[1,2] wrap stdout and stderr from the program in XML tags, but they are sill sent to the respective streams.
  * 
  * OMPI 1.3 does not wrap stdout and stderr from the program in XML tags.
  * 
@@ -114,7 +108,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 */
 	private void terminateProcesses() {
 		final OpenMPIRuntimeSystem rtSystem = (OpenMPIRuntimeSystem) getRtSystem();
-		IPResourceManager rm = (IPResourceManager) rtSystem.getResourceManager().getAdapter(IPResourceManager.class);
+		IPResourceManager rm = rtSystem.getPResourceManager();
 		if (rm != null) {
 			final IPJob ipJob = rm.getJobById(getJobID());
 			if (ipJob != null) {
@@ -217,11 +211,8 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 						OpenMPIProcessMapXml13Parser.parse(is, new IOpenMPIProcessMapParserListener() {
 							public void finish() {
 								/*
-								 * Turn off listener that generates input for
-								 * parser when parsing finishes. If not done,
-								 * the parser will close the piped inputstream,
-								 * making the listener get IOExceptions for
-								 * closed stream.
+								 * Turn off listener that generates input for parser when parsing finishes. If not done, the parser
+								 * will close the piped inputstream, making the listener get IOExceptions for closed stream.
 								 */
 								getParserListener().disable();
 							}
@@ -296,17 +287,15 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#
-	 * doBeforeExecution(org.eclipse.core.runtime.IProgressMonitor,
-	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder)
+	 * doBeforeExecution(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.ptp.remote.core.IRemoteProcessBuilder)
 	 */
 	@Override
 	protected void doBeforeExecution(IProgressMonitor monitor, IRemoteProcessBuilder builder) throws CoreException {
 		final IOpenMPIResourceManagerConfiguration configuration = (IOpenMPIResourceManagerConfiguration) getRtSystem()
 				.getRmConfiguration();
 		/*
-		 * Merge stdout and stderr streams for OMPI 1.3.[1,2] since the streams
-		 * are wrapped in the appropriate XML tags, but are still sent
-		 * separately.
+		 * Merge stdout and stderr streams for OMPI 1.3.[1,2] since the streams are wrapped in the appropriate XML tags, but are
+		 * still sent separately.
 		 */
 		if ((configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_13) && (configuration
 				.getServiceVersion() > 0 && configuration.getServiceVersion() < 3))) {
@@ -378,15 +367,14 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 */
 		final IOpenMPIResourceManagerConfiguration configuration = (IOpenMPIResourceManagerConfiguration) getRtSystem()
 				.getRmConfiguration();
-		IPResourceManager rm = (IPResourceManager) getRtSystem().getResourceManager().getAdapter(IPResourceManager.class);
+		IPResourceManager rm = getRtSystem().getPResourceManager();
 		final IPJob ipJob = rm.getJobById(getJobID());
 		IntegerAttribute numProcsAttr = ipJob.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
 		assert numProcsAttr != null;
 		getRtSystem().createProcesses(getJobID(), numProcsAttr.getValue().intValue());
 
 		/*
-		 * We only require procZero if we're using OMPI 1.2.x or 1.3.[0-3].
-		 * Other versions use XML for stdout and stderr.
+		 * We only require procZero if we're using OMPI 1.2.x or 1.3.[0-3]. Other versions use XML for stdout and stderr.
 		 */
 		final BitSet procZero = new BitSet();
 		if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)
@@ -497,8 +485,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			}
 
 			/*
-			 * Wait until both stdout and stderr stop because stream are closed.
-			 * Error messages may be still queued in the stream.
+			 * Wait until both stdout and stderr stop because stream are closed. Error messages may be still queued in the stream.
 			 */
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", getJobID()); //$NON-NLS-1$
 			try {
@@ -533,8 +520,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#
-	 * doRetrieveToolBaseSubstitutionAttributes()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob# doRetrieveToolBaseSubstitutionAttributes()
 	 */
 	@Override
 	protected IAttribute<?, ?, ?>[] doRetrieveToolBaseSubstitutionAttributes() throws CoreException {
@@ -546,10 +532,8 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#
-	 * doRetrieveToolCommandSubstitutionAttributes
-	 * (org.eclipse.ptp.core.attributes.AttributeManager, java.lang.String,
-	 * java.util.Map)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob# doRetrieveToolCommandSubstitutionAttributes
+	 * (org.eclipse.ptp.core.attributes.AttributeManager, java.lang.String, java.util.Map)
 	 */
 	@Override
 	protected IAttribute<?, ?, ?>[] doRetrieveToolCommandSubstitutionAttributes(AttributeManager baseSubstitutionAttributeManager,
@@ -558,8 +542,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		List<IAttribute<?, ?, ?>> newAttributes = new ArrayList<IAttribute<?, ?, ?>>();
 
 		/*
-		 * An OpenMPI specific attribute. Attribute that contains a list of
-		 * names of environment variables.
+		 * An OpenMPI specific attribute. Attribute that contains a list of names of environment variables.
 		 */
 		int p = 0;
 		String keys[] = new String[environment.size()];
@@ -569,8 +552,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		newAttributes.add(OpenMPILaunchAttributes.getEnvironmentKeysAttributeDefinition().create(keys));
 
 		/*
-		 * An OpenMPI specific attribute. A shortcut that generates arguments
-		 * for the OpenMPI run command.
+		 * An OpenMPI specific attribute. A shortcut that generates arguments for the OpenMPI run command.
 		 */
 		newAttributes.add(OpenMPILaunchAttributes.getEnvironmentArgsAttributeDefinition().create());
 		return newAttributes.toArray(new IAttribute<?, ?, ?>[newAttributes.size()]);
@@ -585,9 +567,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doTerminateJob
-	 * ()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doTerminateJob ()
 	 */
 	@Override
 	protected void doTerminateJob() {
@@ -597,8 +577,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doWaitExecution
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doWaitExecution
 	 * (org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
@@ -612,8 +591,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		}
 
 		/*
-		 * Wait until both stdout and stderr stop because stream are closed.
-		 * This means that the process has finished.
+		 * Wait until both stdout and stderr stop because stream are closed. This means that the process has finished.
 		 */
 		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting stderr thread to finish", getJobID()); //$NON-NLS-1$
 		try {
@@ -635,8 +613,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		}
 
 		/*
-		 * Still experience has shown that remote process might not have yet
-		 * terminated, although stdout and stderr is closed.
+		 * Still experience has shown that remote process might not have yet terminated, although stdout and stderr is closed.
 		 */
 		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: waiting mpi process to finish completely", getJobID()); //$NON-NLS-1$
 		try {

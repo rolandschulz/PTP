@@ -29,8 +29,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
@@ -42,6 +40,32 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private ILaunchConfiguration launchConfiguration = null;
+
+	/**
+	 * @return the launchConfiguration
+	 */
+	public ILaunchConfiguration getLaunchConfiguration() {
+		return launchConfiguration;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse .debug.core.ILaunchConfiguration)
+	 */
+	public void initializeFrom(ILaunchConfiguration configuration) {
+		// cache the launch configuration for updates
+		setLaunchConfiguration(configuration);
+	}
+
+	/**
+	 * Cache the launch configuration
+	 * 
+	 * @param configuration
+	 */
+	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
+		launchConfiguration = configuration;
+	}
 
 	/**
 	 * Utility routine to create a grid layout
@@ -134,28 +158,11 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 		return getWorkspaceRoot().findMember(new Path(workspaceDir));
 	}
 
+	/**
+	 * @return
+	 */
 	protected IWorkspaceRoot getWorkspaceRoot() {
 		return ResourcesPlugin.getWorkspace().getRoot();
-	}
-
-	/**
-	 * Given a launch configuration, find the resource manager that was been
-	 * selected.
-	 * 
-	 * @param configuration
-	 * @return resource manager
-	 * @throws CoreException
-	 * @since 5.0
-	 */
-	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) {
-		final String rmUniqueName;
-		try {
-			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
-					EMPTY_STRING);
-		} catch (CoreException e) {
-			return null;
-		}
-		return PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
 	}
 
 	/**
@@ -174,33 +181,5 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 		}
 		gd.horizontalSpan = space;
 		return gd;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse
-	 * .debug.core.ILaunchConfiguration)
-	 */
-	public void initializeFrom(ILaunchConfiguration configuration) {
-		// cache the launch configuration for updates
-		setLaunchConfiguration(configuration);
-	}
-
-	/**
-	 * Cache the launch configuration
-	 * 
-	 * @param configuration
-	 */
-	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
-		launchConfiguration = configuration;
-	}
-
-	/**
-	 * @return the launchConfiguration
-	 */
-	public ILaunchConfiguration getLaunchConfiguration() {
-		return launchConfiguration;
 	}
 }

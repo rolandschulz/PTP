@@ -27,7 +27,7 @@ public class OpenMPIRMLaunchConfigurationFactory extends AbstractRMLaunchConfigu
 	@Override
 	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
-		return new NewOpenMPIRMLaunchConfigurationDynamicTab(rm, dialog);
+		return new NewOpenMPIRMLaunchConfigurationDynamicTab(rm);
 	}
 
 	@Override

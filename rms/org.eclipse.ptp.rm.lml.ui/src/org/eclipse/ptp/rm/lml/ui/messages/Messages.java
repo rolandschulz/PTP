@@ -14,6 +14,8 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.lml.ui.messages.messages"; //$NON-NLS-1$
+	public static String InfoView_Node;
+	public static String InfoView_Show_message_of_the_day;
 	public static String UIUtils_1;
 	public static String UIUtils_2;
 	public static String UIUtils_3;
@@ -23,6 +25,11 @@ public class Messages extends NLS {
 	public static String UsagebarPainter_CPUText;
 
 	public static String TableUpdate;
+
+	public static String TableView_Alpha;
+	public static String TableView_Filters;
+	public static String TableView_Owner;
+	public static String TableView_Show_only_my_jobs;
 
 	static {
 		// initialize resource bundle

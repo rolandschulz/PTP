@@ -458,7 +458,7 @@ public class TableView extends ViewPart {
 
 		// ViewMenuManager
 		viewMenuManager = getViewSite().getActionBars().getMenuManager();
-		final IAction filterOwnJobsAction = new Action("Show only my jobs", IAction.AS_CHECK_BOX) {
+		final IAction filterOwnJobsAction = new Action(Messages.TableView_Show_only_my_jobs, IAction.AS_CHECK_BOX) {
 
 			@Override
 			public void run() {
@@ -466,13 +466,14 @@ public class TableView extends ViewPart {
 				final List<IPattern> filterValuesOld = fLguiItem.getPattern(gid);
 
 				for (final IPattern filterValue : filterValuesOld) {
-					if (!filterValue.getColumnTitle().equals("owner")) {
+					if (!filterValue.getColumnTitle().equals(Messages.TableView_Owner)) {
 						filterValuesNew.add(filterValue);
 					}
 				}
 
 				if (isChecked()) {
-					filterValuesNew.add((new Pattern("owner", "alpha")).setRelation("=", fLguiItem.getUsername()));
+					filterValuesNew.add((new Pattern(Messages.TableView_Owner, Messages.TableView_Alpha)).setRelation(
+							"=", fLguiItem.getUsername())); //$NON-NLS-1$
 				}
 				// TODO After decision about new structure of LML and server side
 				fLguiItem.setPattern(gid, filterValuesNew);
@@ -480,7 +481,7 @@ public class TableView extends ViewPart {
 			}
 
 		};
-		final IAction filterAction = new Action("Filters...") {
+		final IAction filterAction = new Action(Messages.TableView_Filters) {
 
 			@Override
 			public void run() {
@@ -647,7 +648,7 @@ public class TableView extends ViewPart {
 				}
 			}
 			if (isFiltered) {
-				treeColumnI.setText(tableColumnLayouts[i].getTitle() + " #");
+				treeColumnI.setText(tableColumnLayouts[i].getTitle() + " #"); //$NON-NLS-1$
 			} else {
 				treeColumnI.setText(tableColumnLayouts[i].getTitle());
 			}

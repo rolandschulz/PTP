@@ -35,7 +35,8 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -49,7 +50,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.lml.monitor.core.LMLResourceManagerMonitor;
 import org.eclipse.ptp.rm.lml_jaxb.core.LMLJAXBResourceManager;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider;
 
 public class RMLaunchTest extends TestCase {
@@ -225,10 +225,8 @@ public class RMLaunchTest extends TestCase {
 	@Override
 	public void setUp() {
 		/*
-		 * You will need to copy all the executables in the
-		 * org.eclipse.ptp.rm.jaxb.tests/data directory to you home; it seems
-		 * the JUnit plugin runner does not actually execute in the directory
-		 * indicated by the Run Configuration.
+		 * You will need to copy all the executables in the org.eclipse.ptp.rm.jaxb.tests/data directory to you home; it seems the
+		 * JUnit plugin runner does not actually execute in the directory indicated by the Run Configuration.
 		 */
 	}
 
@@ -244,7 +242,7 @@ public class RMLaunchTest extends TestCase {
 					emulateConfigureWizard();
 					rm = new LMLJAXBResourceManager(rmConfig, new JAXBResourceManagerControl(rmConfig),
 							new LMLResourceManagerMonitor(rmConfig));
-					PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm);
+					ModelManager.getInstance().addResourceManager(rm);
 					rm.start(monitor);
 					try {
 						Thread.sleep(2000);

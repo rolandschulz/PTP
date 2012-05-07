@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.Preferences;
+import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.osgi.framework.BundleContext;
 
 public class LMLMonitorCorePlugin extends Plugin {
@@ -96,22 +97,22 @@ public class LMLMonitorCorePlugin extends Plugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		MonitorControlManager.getInstance().start();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		MonitorControlManager.getInstance().stop();
 		try {
 			Preferences.savePreferences(getUniqueIdentifier());
 		} finally {

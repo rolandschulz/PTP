@@ -138,4 +138,8 @@ public class DummyFile implements IIndexFile, Serializable {
 		return false;
 	}
 
+	public String toDebugString() {
+		return null;
+	}
+
 }

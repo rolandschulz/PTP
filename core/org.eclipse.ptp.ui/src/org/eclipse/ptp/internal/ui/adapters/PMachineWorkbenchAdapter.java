@@ -19,8 +19,10 @@
 package org.eclipse.ptp.internal.ui.adapters;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.utils.ui.ImageImageDescriptor;
@@ -29,7 +31,9 @@ import org.eclipse.ui.model.WorkbenchAdapter;
 
 public class PMachineWorkbenchAdapter extends WorkbenchAdapter {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getChildren(java.lang.Object)
 	 */
 	@Override
@@ -38,33 +42,45 @@ public class PMachineWorkbenchAdapter extends WorkbenchAdapter {
 		return machine.getNodes();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object)
 	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
 		IPMachine machine = (IPMachine) object;
-		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(machine.getResourceManager().getResourceManagerId());
-		if (presentation != null) {
-			final Image image = presentation.getImage(object);
-			if (image != null) {
-				return new ImageImageDescriptor(image);
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(machine.getControlId());
+		if (rm != null) {
+			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+					rm.getResourceManagerId());
+			if (presentation != null) {
+				final Image image = presentation.getImage(object);
+				if (image != null) {
+					return new ImageImageDescriptor(image);
+				}
 			}
 		}
 		return new ImageImageDescriptor(ParallelImages.machineImages[machine.getState().ordinal()]);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getLabel(java.lang.Object)
 	 */
 	@Override
 	public String getLabel(Object object) {
 		IPMachine machine = (IPMachine) object;
-		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(machine.getResourceManager().getResourceManagerId());
-		if (presentation != null) {
-			final String label = presentation.getText(object);
-			if (label != null) {
-				return label;
+		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(machine.getControlId());
+		if (rm != null) {
+			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+					rm.getResourceManagerId());
+			if (presentation != null) {
+				final String label = presentation.getText(object);
+				if (label != null) {
+					return label;
+				}
 			}
 		}
 		return machine.getName();

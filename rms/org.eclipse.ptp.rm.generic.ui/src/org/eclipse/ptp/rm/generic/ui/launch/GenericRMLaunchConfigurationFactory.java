@@ -22,15 +22,13 @@ public class GenericRMLaunchConfigurationFactory extends AbstractRMLaunchConfigu
 	@Override
 	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
-		return new GenericRMLaunchConfigurationDynamicTab(rm, dialog);
+		return new GenericRMLaunchConfigurationDynamicTab();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
-	 * #getResourceManagerClass()
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory #getResourceManagerClass()
 	 */
 	@Override
 	public Class<? extends IResourceManager> getResourceManagerClass() {

@@ -21,8 +21,7 @@ public class LineImpl {
 
 	/**
 	 * @param uuid
-	 *            unique id associated with this resource manager operation (can
-	 *            be <code>null</code>).
+	 *            unique id associated with this resource manager operation (can be <code>null</code>).
 	 * @param line
 	 *            JAXB data element
 	 * @param map

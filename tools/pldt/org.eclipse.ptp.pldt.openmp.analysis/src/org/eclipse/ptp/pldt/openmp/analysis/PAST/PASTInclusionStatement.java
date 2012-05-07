@@ -118,11 +118,6 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 	}
 
 	@Override
-	public long getContentsHash() {
-		return incl_.getContentsHash();
-	}
-
-	@Override
 	public boolean createsAST() {
 		return incl_.createsAST();
 	}
@@ -135,6 +130,26 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 	@Override
 	public IASTNode getOriginalNode() {
 		return incl_.getOriginalNode();
+	}
+
+	@Override
+	public long getIncludedFileTimestamp() {
+		return incl_.getIncludedFileTimestamp();
+	}
+
+	@Override
+	public long getIncludedFileSize() {
+		return incl_.getIncludedFileSize();
+	}
+
+	@Override
+	public long getIncludedFileContentsHash() {
+		return incl_.getIncludedFileContentsHash();
+	}
+
+	@Override
+	public boolean isErrorInIncludedFile() {
+		return incl_.isErrorInIncludedFile();
 	}
 
 }

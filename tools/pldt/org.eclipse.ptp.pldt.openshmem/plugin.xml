@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.cdt.ui.CHelpProvider">
+      <provider
+            class="org.eclipse.ptp.pldt.openshmem.editorHelp.OpenshmemCHelpInfoProvider"
+            id="org.eclipse.ptp.pldt.openshmem.editorHelp.OpenshmemCHelpInfoProvider">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
+            class="org.eclipse.ptp.pldt.openshmem.prefs.OpenSHMEMPreferencePage"
+            id="org.eclipse.ptp.pldt.openshmem.page1"
+            name="%openshmem.page.name">
+      </page>
+   </extension>
+   
+   <!-- OpenSHMEM markers -->
+   <extension point="org.eclipse.core.resources.markers"
+         id="openshmemMarker"
+         name="%openshmem.artifactMarker.extension.name">
+      <super type="org.eclipse.core.resources.textmarker"/>
+   </extension>
+   <!-- this changes the marker image in the editor marker bar  -->
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerType="org.eclipse.ptp.pldt.openshmem.openshmemMarker"
+            name="org.eclipse.ptp.pldt.openshmem.openshmemMarkerAnnotation">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.eclipse.ptp.pldt.openshmem.openshmemMarkerAnnotation"
+            icon="icons/openshmem.gif" 
+            
+            presentationLayer="3"
+            label="%openshmem.annotMarker.specification.label"
+            
+            textPreferenceKey="openshmemIndication"
+            textPreferenceValue="true"
+            highlightPreferenceKey="artifactHighlighting"
+            highlightPreferenceValue="false"
+            colorPreferenceKey="artifactIndicationColor"
+            colorPreferenceValue="128,128,192"
+            verticalRulerPreferenceKey="artifactIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="true"
+			showInNextPrevDropdownToolbarActionKey="showInNextPrevDropdownToolbarAction"
+            showInNextPrevDropdownToolbarAction="false"
+            overviewRulerPreferenceKey="artifactIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            
+            includeOnPreferencePage="true"
+            isGoToPreviousNavigationTargetKey="isGoToPreviousNavigationTarget"
+
+            isGoToNextNavigationTargetKey="isRecordGoToNextNavigationTarget"
+            >
+      </specification>  
+   </extension>
+   <!-- end marker info -->
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="org.eclipse.ptp.ui.views"
+            class="org.eclipse.ptp.pldt.openshmem.views.OpenSHMEMArtifactView"
+            icon="icons/openshmem.gif"
+            id="org.eclipse.ptp.pldt.openshmem.views.openshmemArtifactView"
+            name="%view.name"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.ptp.pldt.openshmem.actions.RunAnalyseOpenSHMEMcommandHandler"
+            id="org.eclipse.ptp.pldt.openshmem.command2"
+            name="%find.openshmem.artifacts.command.name">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1 ">
+             <command
+               commandId="org.eclipse.ptp.pldt.openshmem.command2"
+               icon="icons/openshmem.gif"
+               label="%show.openshmem.artifacts.command.label">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.pldt.openshmem.prefs.OpenSHMEMPreferenceInitializer">
+      </initializer>
+   </extension>
+
+</plugin>
