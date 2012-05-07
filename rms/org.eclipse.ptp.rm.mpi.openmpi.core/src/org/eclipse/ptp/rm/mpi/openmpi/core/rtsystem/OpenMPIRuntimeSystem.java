@@ -72,8 +72,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * createRuntimeSystemJob(java.lang.String,
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem# createRuntimeSystemJob(java.lang.String,
 	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
@@ -84,15 +83,14 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#getAttributes
-	 * (org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#getAttributes (org.eclipse.debug.core.ILaunchConfiguration,
+	 * java.lang.String)
 	 */
 	@Override
 	public List<IAttribute<?, ?, ?>> getAttributes(ILaunchConfiguration configuration, String mode) throws CoreException {
 		List<IAttribute<?, ?, ?>> attrs = super.getAttributes(configuration, mode);
 
-		IPResourceManager rm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		IPResourceManager rm = getPResourceManager();
 		if (rm != null) {
 			IPQueue[] queues = rm.getQueues();
 			if (queues.length != 1) {
@@ -149,8 +147,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * createContinuousMonitorJob()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem# createContinuousMonitorJob()
 	 */
 	@Override
 	protected Job createContinuousMonitorJob() {
@@ -160,9 +157,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#createDiscoverJob
-	 * ()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#createDiscoverJob ()
 	 */
 	@Override
 	protected Job createDiscoverJob() {
@@ -179,8 +174,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * createPeriodicMonitorJob()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem# createPeriodicMonitorJob()
 	 */
 	@Override
 	protected Job createPeriodicMonitorJob() {
@@ -190,10 +184,8 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doFilterEvents
-	 * (org.eclipse.ptp.core.elements.IPElement, boolean,
-	 * org.eclipse.ptp.core.attributes.AttributeManager)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doFilterEvents (org.eclipse.ptp.core.elements.IPElement,
+	 * boolean, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
 	protected void doFilterEvents(IPElement element, boolean filterChildren, AttributeManager filterAttributes)
@@ -204,8 +196,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doShutdown()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doShutdown()
 	 */
 	@Override
 	protected void doShutdown() throws CoreException {
@@ -215,9 +206,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStartEvents
-	 * ()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStartEvents ()
 	 */
 	@Override
 	protected void doStartEvents() throws CoreException {
@@ -227,9 +216,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStartup(
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStartup( org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
@@ -240,8 +227,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStopEvents()
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#doStopEvents()
 	 */
 	@Override
 	protected void doStopEvents() throws CoreException {
@@ -251,10 +237,8 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem#
-	 * notifyMonitorFailed
-	 * (org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob,
-	 * java.lang.Exception)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystem# notifyMonitorFailed
+	 * (org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob, java.lang.Exception)
 	 */
 	@Override
 	protected void notifyMonitorFailed(AbstractRemoteCommandJob job, Exception exception) {
@@ -266,7 +250,7 @@ public class OpenMPIRuntimeSystem extends AbstractToolRuntimeSystem {
 		attrManager.addAttribute(OpenMPIMachineAttributes.getStatusMessageAttributeDefinition().create(
 				NLS.bind(Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandInternalError, exception.getMessage())));
 		changeMachine(machineID, attrManager);
-		IPResourceManager rm = (IPResourceManager) getResourceManager().getAdapter(IPResourceManager.class);
+		IPResourceManager rm = getPResourceManager();
 		if (rm != null) {
 			rm.addAttribute(ResourceManagerAttributes.getStateAttributeDefinition().create(ResourceManagerAttributes.State.ERROR));
 		}

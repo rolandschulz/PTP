@@ -102,6 +102,9 @@ public class LMLManager {
 		synchronized (LGUIS) {
 			item = LGUIS.get(name);
 			if (item != null) {
+				if (fLguiItem == item) {
+					selectLgui(null);
+				}
 				LGUIS.remove(name);
 			}
 		}
@@ -180,7 +183,7 @@ public class LMLManager {
 	 *            Array of earlier started jobs
 	 * @param pattern
 	 */
-	public void openLgui(String name, String username, RequestType request, StringBuilder layout, JobStatusData[] jobs,
+	public void openLgui(String name, String username, RequestType request, String layout, JobStatusData[] jobs,
 			Map<String, List<IPattern>> pattern) {
 		synchronized (LGUIS) {
 			ILguiItem item = LGUIS.get(name);

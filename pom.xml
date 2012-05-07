@@ -90,7 +90,6 @@
 		<module>rdt/org.eclipse.ptp.rdt.xlc</module>
 		<module>releng/org.eclipse.ptp</module>
 		<module>releng/org.eclipse.ptp.aix.ppc</module>
-		<module>releng/org.eclipse.ptp.cdt.compilers-feature</module>
 		<module>releng/org.eclipse.ptp.core-feature</module>
 		<module>releng/org.eclipse.ptp.etfw-feature</module>
 		<module>releng/org.eclipse.ptp.etfw.ppw-feature</module>
@@ -106,8 +105,6 @@
 		<module>releng/org.eclipse.ptp.macosx.x86</module>
 		<module>releng/org.eclipse.ptp.pldt-feature</module>
 		<module>releng/org.eclipse.ptp.pldt.fortran-feature</module>
-		<module>releng/org.eclipse.ptp.pldt.lapi-feature</module>
-		<module>releng/org.eclipse.ptp.pldt.openacc-feature</module>
 		<module>releng/org.eclipse.ptp.pldt.upc-feature</module>
 		<module>releng/org.eclipse.ptp.rdt-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.editor-feature</module>
@@ -157,6 +154,7 @@
 		<module>rms/org.eclipse.ptp.rm.jaxb.pbs</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.pbs.doc.user</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.ui</module>
+		<module>rms/org.eclipse.ptp.rm.launch</module>
 		<module>rms/org.eclipse.ptp.rm.lml.core</module>
 		<module>rms/org.eclipse.ptp.rm.lml.da</module>
 		<module>rms/org.eclipse.ptp.rm.lml.da.server</module>
@@ -189,7 +187,6 @@
 		<module>tools/gem/org.eclipse.ptp.gem.help</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.common</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.doc.user</module>
-		<module>tools/pldt/org.eclipse.ptp.pldt.lapi</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.mpi.analysis</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.mpi.analysis.cdt</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.mpi.core</module>
@@ -200,6 +197,7 @@
 		<module>tools/pldt/org.eclipse.ptp.pldt.openmp.core</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.openmp.fortran</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.openmp.ui.pv</module>
+		<module>tools/pldt/org.eclipse.ptp.pldt.openshmem</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.upc</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.wizards</module>
 		<module>tools/ppw/org.eclipse.ptp.etfw.ppw</module>

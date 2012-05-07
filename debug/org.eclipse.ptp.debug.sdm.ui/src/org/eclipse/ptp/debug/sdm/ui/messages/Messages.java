@@ -16,6 +16,8 @@ public class Messages extends NLS {
 	public static String SDMPage_9;
 	public static String SDMPage_10;
 	public static String SDMPage_11;
+	public static String SDMPage_Session_address;
+	public static String SDMPage_Use_default_session_address;
 	
 	public static String SDMPreferencePage_0;
 	public static String SDMPreferencePage_1;

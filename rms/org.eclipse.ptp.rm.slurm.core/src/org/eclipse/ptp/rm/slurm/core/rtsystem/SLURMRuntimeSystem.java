@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
-import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteProxyRuntimeSystem;
+import org.eclipse.ptp.rm.core.proxy.AbstractRemoteProxyRuntimeSystem;
 import org.eclipse.ptp.rm.slurm.core.SLURMJobAttributes;
 import org.eclipse.ptp.rm.slurm.core.SLURMLaunchConfiguration;
 

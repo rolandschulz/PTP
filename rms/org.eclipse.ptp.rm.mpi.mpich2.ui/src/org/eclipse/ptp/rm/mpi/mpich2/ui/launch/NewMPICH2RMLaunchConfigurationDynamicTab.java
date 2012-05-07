@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.mpich2.ui.launch;
 
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 /**
  * 
@@ -24,9 +22,8 @@ public class NewMPICH2RMLaunchConfigurationDynamicTab extends ExtendableRMLaunch
 	/**
 	 * @since 2.0
 	 */
-	public NewMPICH2RMLaunchConfigurationDynamicTab(IResourceManagerControl rm, ILaunchConfigurationDialog dialog) {
-		super(dialog);
-		addDynamicTab(new BasicMPICH2RMLaunchConfigurationDynamicTab(dialog));
-		addDynamicTab(new AdvancedMPICH2RMLaunchConfigurationDynamicTab(dialog));
+	public NewMPICH2RMLaunchConfigurationDynamicTab() {
+		addDynamicTab(new BasicMPICH2RMLaunchConfigurationDynamicTab());
+		addDynamicTab(new AdvancedMPICH2RMLaunchConfigurationDynamicTab());
 	}
 }

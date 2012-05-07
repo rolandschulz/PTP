@@ -262,7 +262,7 @@ public class StreamParserTest extends TestCase {
 				}
 			} catch (Throwable t) {
 				t.printStackTrace();
-				assert (t != null);
+				fail(t.getMessage());
 			}
 		}
 	}

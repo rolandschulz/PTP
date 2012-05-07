@@ -14,8 +14,8 @@ package org.eclipse.ptp.rm.slurm.core;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.rm.core.RMPreferenceConstants;
+import org.eclipse.ptp.rm.core.proxy.IRemoteProxyOptions;
 
 public class SLURMPreferenceManager extends AbstractPreferenceInitializer {
 	// private static final String PROXY_EXECUTABLE_NAME = "ptp_slurm_proxy.py";

@@ -208,7 +208,8 @@ public class BuildConfigurationManager {
 	 * Get a SyncRunner object that can be used to do sync'ing.
 	 *
 	 * @param bconf
-	 * @return SyncRunner
+	 * @return SyncRunner - can be null if this configuration does not require sync'ing, such as a local configuration, or if there
+	 * are problems retrieving the sync provider or information.
 	 */
 	public SyncRunner getSyncRunnerForBuildConfiguration(IConfiguration bconf) {
 		IProject project = bconf.getOwner().getProject();
@@ -216,6 +217,15 @@ public class BuildConfigurationManager {
 
 		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
 		if (provider == null) { // Error handled in call
+			return null;
+		}
+		
+		BuildScenario buildScenario = this.getBuildScenarioForBuildConfigurationInternal(bconf).bs;
+		if (buildScenario == null) { // Error handled in call
+			return null;
+		}
+
+		if (buildScenario.getSyncProvider() == null) {
 			return null;
 		} else {
 			return new SyncRunner(provider);

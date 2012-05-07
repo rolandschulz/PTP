@@ -29,8 +29,8 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 
 /**
- * Extension of the Job runnable to handle the generation of the script by
- * resolving the Script object contents against the active environment.
+ * Extension of the Job runnable to handle the generation of the script by resolving the Script object contents against the active
+ * environment.
  * 
  * @author arossi
  * 
@@ -51,8 +51,7 @@ public class ScriptHandler extends Job {
 	 * @param map
 	 *            the active resource manager or launch tab environment map
 	 * @param launchEnv
-	 *            any special application environment variables set by the user
-	 *            in the Launch Tab
+	 *            any special application environment variables set by the user in the Launch Tab
 	 * @param convert
 	 *            to "${ptp_lc:}" tags.
 	 */
@@ -75,9 +74,8 @@ public class ScriptHandler extends Job {
 	}
 
 	/**
-	 * Composes script. If the variable map is the resource manager's
-	 * environment, then the SCRIPT property is added to it, with it value set
-	 * to the script string that has been generated.
+	 * Composes script. If the variable map is the resource manager's environment, then the SCRIPT property is added to it, with it
+	 * value set to the script string that has been generated.
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
@@ -94,12 +92,11 @@ public class ScriptHandler extends Job {
 	}
 
 	/**
-	 * Reads from the data object line by line, resolving its arguments and
-	 * eliminating lines whose resolved arguments qualify as undefined.<br>
+	 * Reads from the data object line by line, resolving its arguments and eliminating lines whose resolved arguments qualify as
+	 * undefined.<br>
 	 * <br>
-	 * The <code>envBegin</code> and <code>envEnd</code> tell the script
-	 * generator between which lines to insert the special environment variables
-	 * passed in as the <code>launchEnv</code> if there are any.
+	 * The <code>envBegin</code> and <code>envEnd</code> tell the script generator between which lines to insert the special
+	 * environment variables passed in as the <code>launchEnv</code> if there are any.
 	 * 
 	 * @param monitor
 	 * @return the generated script string
@@ -143,9 +140,8 @@ public class ScriptHandler extends Job {
 	}
 
 	/**
-	 * An auxiliary used in the case of the LaunchTab calling this handler. A
-	 * temporary replacement Script is created, with the resolver tags changed
-	 * from ${ptp_rm:...} to ${ptp_lc:...} (the user never sees the latter).
+	 * An auxiliary used in the case of the LaunchTab calling this handler. A temporary replacement Script is created, with the
+	 * resolver tags changed from ${ptp_rm:...} to ${ptp_lc:...} (the user never sees the latter).
 	 */
 	private void convertScript() {
 		ScriptType ltScript = new ScriptType();

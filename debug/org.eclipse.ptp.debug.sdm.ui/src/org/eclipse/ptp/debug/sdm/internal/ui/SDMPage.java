@@ -10,28 +10,26 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.internal.ui;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
 import org.eclipse.ptp.debug.sdm.core.SDMLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
 import org.eclipse.ptp.debug.sdm.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -51,34 +49,15 @@ import org.eclipse.swt.widgets.Text;
  */
 public class SDMPage extends AbstractLaunchConfigurationTab {
 	protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
+	protected static final String LOCALHOST = "localhost"; //$NON-NLS-1$
 
-	private IResourceManager resourceManager = null;
+	private IRemoteConnection fRemoteConnection = null;
 
 	protected Combo fSDMBackendCombo = null;
 	protected Text fRMDebuggerPathText = null;
-	protected Text fRMDebuggerAddressText = null;
+	protected Text fSessionAddressText = null;
 	protected Button fRMDebuggerBrowseButton = null;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#activated(org.eclipse .debug.core.ILaunchConfigurationWorkingCopy)
-	 */
-	@Override
-	public void activated(ILaunchConfigurationWorkingCopy workingCopy) {
-		/*
-		 * Debugger tab is selected from within an existing page...
-		 */
-		try {
-			fSDMBackendCombo.setText(workingCopy.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
-					Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
-							SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)));
-			fRMDebuggerAddressText.setText(getAddress(workingCopy));
-			fRMDebuggerPathText.setText(workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
-					EMPTY_STRING));
-		} catch (CoreException e) {
-		}
-	}
+	protected Button fDefaultSessionAddressButton;
 
 	/*
 	 * (non-Javadoc)
@@ -129,15 +108,26 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			}
 		});
 
+		fDefaultSessionAddressButton = createCheckButton(comp, Messages.SDMPage_Use_default_session_address);
+		fDefaultSessionAddressButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				updateEnablement();
+			}
+		});
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		gd.horizontalSpan = 2;
+		fDefaultSessionAddressButton.setLayoutData(gd);
+
 		label = new Label(comp, SWT.NONE);
-		label.setText(Messages.SDMPage_2);
+		label.setText(Messages.SDMPage_Session_address);
 		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
 
-		fRMDebuggerAddressText = new Text(comp, SWT.SINGLE | SWT.BORDER);
-		fRMDebuggerAddressText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-		fRMDebuggerAddressText.addModifyListener(new ModifyListener() {
+		fSessionAddressText = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		fSessionAddressText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		fSessionAddressText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				updateLaunchConfigurationDialog();
 			}
@@ -165,18 +155,22 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		 * Launch configuration is selected or we have just selected SDM as the debugger...
 		 */
 		try {
-			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
-					EMPTY_STRING);
-			resourceManager = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
 			fSDMBackendCombo.setText(configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
 					Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
 							SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)));
-			fRMDebuggerAddressText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST,
-					EMPTY_STRING));
+			fSessionAddressText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, LOCALHOST));
 			fRMDebuggerPathText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
 					EMPTY_STRING));
+			fRemoteConnection = getRemoteConnection(configuration);
+			fDefaultSessionAddressButton.setSelection(fRemoteConnection == null
+					|| (fRemoteConnection.supportsTCPPortForwarding() && fSessionAddressText.getText().equals(LOCALHOST)));
+			updateEnablement();
 		} catch (CoreException e) {
 		}
+	}
+
+	private void updateEnablement() {
+		fSessionAddressText.setEnabled(!fDefaultSessionAddressButton.getSelection());
 	}
 
 	/*
@@ -187,7 +181,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
 		setErrorMessage(null);
-		if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
+		if (getFieldContent(fSessionAddressText.getText()) == null) {
 			setErrorMessage(Messages.SDMPage_4);
 		} else if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
 			setErrorMessage(Messages.SDMPage_5);
@@ -203,7 +197,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	@Override
 	public boolean canSave() {
 		setErrorMessage(null);
-		if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
+		if (getFieldContent(fSessionAddressText.getText()) == null) {
 			setErrorMessage(Messages.SDMPage_7);
 		} else if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
 			setErrorMessage(Messages.SDMPage_8);
@@ -228,7 +222,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
 					getFieldContent(fRMDebuggerPathText.getText()));
 			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST,
-					getFieldContent(fRMDebuggerAddressText.getText()));
+					getFieldContent(fSessionAddressText.getText()));
 		}
 	}
 
@@ -244,146 +238,63 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
 				Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE));
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING);
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getAddress(configuration));
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, LOCALHOST);
 	}
 
 	/**
-	 * Browse for a file. If remoteServices is not null, then the currently select resource manager supports remote browsing.
+	 * Browse for a file.
 	 * 
 	 * @return path to file selected in browser
 	 */
 	private String browseFile() {
-		IRemoteUIServices remoteUISrv = getRemoteUIServices(resourceManager);
-		if (remoteUISrv != null) {
-			IRemoteUIFileManager fileManager = remoteUISrv.getUIFileManager();
-			if (fileManager != null) {
-				fileManager.setConnection(getRemoteConnection(resourceManager));
-				return fileManager.browseFile(getShell(), Messages.SDMPage_10, fRMDebuggerPathText.getText(), 0);
+		if (fRemoteConnection != null) {
+			IRemoteUIServices remoteUISrv = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(
+					fRemoteConnection.getRemoteServices());
+			if (remoteUISrv != null) {
+				IRemoteUIFileManager fileManager = remoteUISrv.getUIFileManager();
+				if (fileManager != null) {
+					fileManager.setConnection(fRemoteConnection);
+					return fileManager.browseFile(getShell(), Messages.SDMPage_10, fRMDebuggerPathText.getText(), 0);
+				}
 			}
-		} else {
-			FileDialog dialog = new FileDialog(getShell());
-			dialog.setText(Messages.SDMPage_10);
-			dialog.setFileName(fRMDebuggerPathText.getText());
-			return dialog.open();
 		}
-		return null;
+
+		FileDialog dialog = new FileDialog(getShell());
+		dialog.setText(Messages.SDMPage_10);
+		dialog.setFileName(fRMDebuggerPathText.getText());
+		return dialog.open();
 	}
 
 	/**
-	 * Work out the address to supply as argument to the debug server. There are currently two cases:
-	 * 
-	 * 1. If port forwarding is enabled, then the address needs to be the localhost address of the host where the tunnel begins.
-	 * Note this is different to previous versions where the debug server machine was possibly on a local network (e.g. a node in a
-	 * cluster) but not necessarily on the same machine as the tunnel.
-	 * 
-	 * 2. If port forwarding is not enabled, then the address will be the address of the host running Eclipse). NOTE: this assumes
-	 * that the machine running the debug server can contact the local host directly. In the case of the SDM, the "master" debug
-	 * server process can potentially run on any node in the cluster. In many environments, compute nodes cannot communicate outside
-	 * their local network.
+	 * Helper method to locate the remote connection used by the launch configuration
 	 * 
 	 * @param configuration
-	 * @return
+	 *            launch configuration
+	 * @throws CoreException
 	 */
-	private String getAddress(ILaunchConfigurationWorkingCopy configuration) {
-		String address;
-		String rmId;
+	private IRemoteConnection getRemoteConnection(ILaunchConfiguration configuration) {
 		try {
-			address = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, EMPTY_STRING);
-			rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
-		} catch (CoreException e) {
-			return EMPTY_STRING;
-		}
-
-		IResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
-		if (rm != null) {
-			/*
-			 * If the resource manager has been changed and this is a remote resource manager, then update the host field
-			 */
-			if (resourceManager != rm) {
-				resourceManager = rm;
-				IRemoteResourceManagerConfiguration config = getRemoteResourceManagerConfiguration();
-				if (config != null) {
-					if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
-						return "localhost"; //$NON-NLS-1$
-						// return getRemoteConnection(rm).getAddress();
-					} else {
-						return config.getLocalAddress();
-					}
-				} else {
-					return "localhost"; //$NON-NLS-1$
-				}
-			}
-		}
-		return address;
-	}
-
-	/**
-	 * Get the RM configuration information
-	 * 
-	 * @return AbstractRemoteResourceManagerConfiguration
-	 */
-	private IRemoteResourceManagerConfiguration getRemoteResourceManagerConfiguration() {
-		if (resourceManager != null) {
-			IResourceManagerComponentConfiguration rmConfig = resourceManager.getControlConfiguration();
-			if (rmConfig instanceof IRemoteResourceManagerConfiguration) {
-				return (IRemoteResourceManagerConfiguration) rmConfig;
-			}
-		}
-		return null;
-
-	}
-
-	/**
-	 * Return remote services
-	 * 
-	 * @return remote services
-	 */
-	private IRemoteServices getRemoteServices(IResourceManager rm) {
-		if (rm != null) {
-			IResourceManagerComponentConfiguration rmConfig = rm.getControlConfiguration();
-			return PTPRemoteUIPlugin.getDefault().getRemoteServices(rmConfig.getRemoteServicesId(), getLaunchConfigurationDialog());
-		}
-		return null;
-	}
-
-	/**
-	 * Look up remote UI services
-	 * 
-	 * @return IRemoteUIServices
-	 */
-	private IRemoteUIServices getRemoteUIServices(IResourceManager rm) {
-		IRemoteServices rsrv = getRemoteServices(rm);
-		if (rsrv != null) {
-			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(rsrv);
-		}
-		return null;
-	}
-
-	/**
-	 * Get the current remote connection selected in the RM. Will open the connection if it is closed.
-	 * 
-	 * @return IRemoteConnection
-	 */
-	private IRemoteConnection getRemoteConnection(IResourceManager rm) {
-		IRemoteServices rsrv = getRemoteServices(rm);
-		if (rsrv != null) {
-			String connName = rm.getControlConfiguration().getConnectionName();
-			if (connName != null) {
-				IRemoteConnectionManager mgr = rsrv.getConnectionManager();
-				if (mgr != null) {
-					IRemoteConnection conn = mgr.getConnection(connName);
-					if (conn != null && !conn.isOpen()) {
-						IRemoteUIServices uiServices = getRemoteUIServices(rm);
-						if (uiServices != null) {
-							IRemoteUIConnectionManager connMgr = uiServices.getUIConnectionManager();
-							if (connMgr != null) {
-								connMgr.openConnectionWithProgress(getShell(), null, conn);
-							}
+			final String remId = configuration
+					.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, (String) null);
+			if (remId != null) {
+				final IRemoteServices[] services = new IRemoteServices[1];
+				try {
+					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+							services[0] = PTPRemoteCorePlugin.getDefault().getRemoteServices(remId, monitor);
 						}
+					});
+				} catch (InvocationTargetException e) {
+				} catch (InterruptedException e) {
+				}
+				if (services[0] != null) {
+					String name = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
+					if (name != null) {
+						return services[0].getConnectionManager().getConnection(name);
 					}
-					return conn;
 				}
 			}
+		} catch (CoreException e) {
 		}
 		return null;
 	}

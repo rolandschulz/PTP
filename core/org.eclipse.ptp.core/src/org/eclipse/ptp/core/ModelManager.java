@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -40,6 +41,7 @@ import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
+import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
@@ -170,6 +172,10 @@ public class ModelManager implements IModelManager {
 	private static String CLASS_ATTRIBUTE = "class"; //$NON-NLS-1$
 	private static String EXTENSION_POINT = "org.eclipse.ptp.core.resourceManagers"; //$NON-NLS-1$
 
+	public static ModelManager getInstance() {
+		return fInstance;
+	}
+
 	private final IServiceModelEventListener fServiceEventListener = new IServiceModelEventListener() {
 
 		public void handleEvent(IServiceModelEvent event) {
@@ -235,21 +241,34 @@ public class ModelManager implements IModelManager {
 	private static final ModelManager fInstance = new ModelManager();
 
 	private final ListenerList fResourceManagerListeners = new ListenerList();
-
 	private final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
-	private final Map<String, IResourceManager> fResourceManagers = new HashMap<String, IResourceManager>();
+	private final Map<String, IResourceManager> fResourceManagers = new ConcurrentHashMap<String, IResourceManager>();
+	private final Map<String, IJobControl> fJobControllers = new ConcurrentHashMap<String, IJobControl>();
 	private final IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
+
 	private final IPUniverse fUniverse = new PUniverse();
 
 	private Map<String, RMFactory> fResourceManagerFactories = null;
-
 	private Map<String, IResourceManagerControlFactory> fResourceManagerControlFactories = null;
+
 	private Map<String, IResourceManagerMonitorFactory> fResourceManagerMonitorFactories = null;
 
 	public ModelManager() {
 		fServiceManager.addEventListener(fServiceEventListener, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED
 				| IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED | IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED
 				| IServiceModelEvent.SERVICE_PROVIDER_CHANGED);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.IModelManager#addJobControl(org.eclipse.ptp.core.jobs.IJobControl)
+	 */
+	/**
+	 * @since 6.0
+	 */
+	public void addJobControl(IJobControl control) {
+		fJobControllers.put(control.getControlId(), control);
 	}
 
 	/*
@@ -281,6 +300,19 @@ public class ModelManager implements IModelManager {
 	public void addResourceManagers(IResourceManager[] rms) {
 		for (IResourceManager rm : rms) {
 			addResourceManager(rm);
+		}
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	public void changeResourceManagerUniqueName(String oldName, String newName) {
+		IResourceManager rm = getResourceManagerFromUniqueName(oldName);
+		if (rm != null) {
+			synchronized (fResourceManagers) {
+				fResourceManagers.put(oldName, null);
+				fResourceManagers.put(newName, rm);
+			}
 		}
 	}
 
@@ -374,6 +406,26 @@ public class ModelManager implements IModelManager {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.IModelManager#getJobControl(java.lang.String)
+	 */
+	/**
+	 * @since 6.0
+	 */
+	public IJobControl getJobControl(String id) {
+		IJobControl control = fJobControllers.get(id);
+		if (control == null) {
+			control = fResourceManagers.get(id);
+		}
+		return control;
+	}
+
+	/**
+	 * @param rmId
+	 * @return
+	 */
 	public String getMonitorFactoryId(String rmId) {
 		RMFactory factory = getResourceManagerFactory(rmId);
 		if (factory != null) {
@@ -447,6 +499,18 @@ public class ModelManager implements IModelManager {
 		if (Preferences.getBoolean(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START_RMS)) {
 			startResourceManagers(rmsNeedStarting.toArray(new IResourceManager[0]));
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.IModelManager#removeJobControl(org.eclipse.ptp.core.jobs.IJobControl)
+	 */
+	/**
+	 * @since 6.0
+	 */
+	public void removeJobControl(IJobControl control) {
+		fJobControllers.remove(control.getControlId());
 	}
 
 	/*
@@ -683,10 +747,6 @@ public class ModelManager implements IModelManager {
 	private void startResourceManagers(IResourceManager[] rmsNeedStarting) throws CoreException {
 		Job job = new RMStartupJob(rmsNeedStarting);
 		job.schedule();
-	}
-
-	public static ModelManager getInstance() {
-		return fInstance;
 	}
 
 }

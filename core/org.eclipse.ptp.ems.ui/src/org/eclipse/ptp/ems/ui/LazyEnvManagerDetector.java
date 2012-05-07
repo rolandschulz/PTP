@@ -16,7 +16,7 @@ import java.util.Comparator;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
@@ -24,13 +24,13 @@ import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.ems.internal.ui.EMSUIPlugin;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * An implementation of {@link IEnvManager} which avoids connecting to the remote machine until it is actually
  * necessary, then displays a progress dialog while the connection is established and subsequently forwards all
- * method calls to the {@link IEnvManager} returned by {@link EnvManagerRegistry#getEnvManager(IProgressMonitor, IRemoteConnection)}.
+ * method calls to the {@link IEnvManager} returned by {@link EnvManagerRegistry#getEnvManager(IProgressMonitor, IRemoteConnection)}
+ * .
  * <p>
  * When it becomes necessary to connect to the remote machine, a modal progress dialog is displayed while the connection is
  * established. Then, {@link EnvManagerRegistry#getEnvManager(IProgressMonitor, IRemoteConnection)} is invoked to detects the
@@ -46,105 +46,164 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class LazyEnvManagerDetector implements IEnvManager {
 
-	private final Shell shell;
-	private final IRemoteConnection remoteConnection;
-	
-	private IEnvManager envManager = null;
-
-	/**
-	 * Constructor.
-	 * 
-	 * @param shell
-	 *            the parent shell, or <code>null</code> to create the progress dialog as a top-level shell
-	 * @param remoteConnection
-	 *            {@link IRemoteConnection} used to access files and execute shell commands on the remote machine (non-
-	 *            <code>null</code>)
-	 */
-	public LazyEnvManagerDetector(final Shell shell, final IRemoteConnection remoteConnection) {
-		this.shell = shell;
-		this.remoteConnection = remoteConnection;
-	}
-
-	private IEnvManager ensureEnvManagerDetected() {
-		if (envManager == null) {
-			final GetEnvManagerRunnable runnable = new GetEnvManagerRunnable();
-			Display.getDefault().syncExec(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						new ProgressMonitorDialog(shell).run(true, true, runnable);
-					} catch (InvocationTargetException e) {
-						EMSUIPlugin.log(e);
-					} catch (InterruptedException e) {
-					}
-				}
-			});
-			envManager = runnable.getResult();
-		}
-		return envManager;
-	}
-
 	private class GetEnvManagerRunnable implements IRunnableWithProgress {
 		private IEnvManager envManager = EnvManagerRegistry.getNullEnvManager();
+
+		public IEnvManager getResult() {
+			return this.envManager;
+		}
 
 		@Override
 		public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 			this.envManager = EnvManagerRegistry.getEnvManager(monitor, remoteConnection);
 		}
-
-		public IEnvManager getResult() {
-			return this.envManager;
-		}
 	}
 
-	@Override
-	public String getName() {
-		return ensureEnvManagerDetected().getName();
+	private final IRemoteConnection remoteConnection;
+	private IProgressMonitor fMonitor;
+
+	private IEnvManager envManager = null;
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param remoteConnection
+	 *            {@link IRemoteConnection} used to access files and execute shell commands on the remote machine (non-
+	 *            <code>null</code>)
+	 */
+	public LazyEnvManagerDetector(final IRemoteConnection remoteConnection) {
+		this.remoteConnection = remoteConnection;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#checkForCompatibleInstallation(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
-	public String getInstructions() {
-		return ensureEnvManagerDetected().getInstructions();
+	public boolean checkForCompatibleInstallation(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+		return ensureEnvManagerDetected().checkForCompatibleInstallation(pm);
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#configure(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 */
 	@Override
-	public String getDescription(IProgressMonitor pm) throws RemoteConnectionException, IOException {
-		return ensureEnvManagerDetected().getDescription(pm);
+	public void configure(IRemoteConnection remoteConnection) {
+		ensureEnvManagerDetected().configure(remoteConnection);
 	}
-	
-	@Override
-	public Comparator<String> getComparator() {
-		return ensureEnvManagerDetected().getComparator();
-	}
-	
-	@Override
-	public String getBashConcatenation(String separator, boolean echo, IEnvManagerConfig config, String commandToExecuteAfterward) {
-		return ensureEnvManagerDetected().getBashConcatenation(separator, echo, config, commandToExecuteAfterward);
-	}
-	
-	@Override
-	public Set<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
-		return ensureEnvManagerDetected().determineDefaultElements(pm);
-	}
-	
-	@Override
-	public Set<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
-		return ensureEnvManagerDetected().determineAvailableElements(pm);
-	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#createBashScript(org.eclipse.core.runtime.IProgressMonitor, boolean,
+	 * org.eclipse.ptp.ems.core.IEnvManagerConfig, java.lang.String)
+	 */
 	@Override
 	public String createBashScript(IProgressMonitor pm, boolean echo, IEnvManagerConfig config, String commandToExecuteAfterward)
 			throws RemoteConnectionException, IOException {
 		return ensureEnvManagerDetected().createBashScript(pm, echo, config, commandToExecuteAfterward);
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#determineAvailableElements(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
-	public void configure(IRemoteConnection remoteConnection) {
-		ensureEnvManagerDetected().configure(remoteConnection);
+	public Set<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+		return ensureEnvManagerDetected().determineAvailableElements(pm);
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#determineDefaultElements(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
-	public boolean checkForCompatibleInstallation(IProgressMonitor pm) throws RemoteConnectionException, IOException {
-		return ensureEnvManagerDetected().checkForCompatibleInstallation(pm);
+	public Set<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+		return ensureEnvManagerDetected().determineDefaultElements(pm);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#getBashConcatenation(java.lang.String, boolean,
+	 * org.eclipse.ptp.ems.core.IEnvManagerConfig, java.lang.String)
+	 */
+	@Override
+	public String getBashConcatenation(String separator, boolean echo, IEnvManagerConfig config, String commandToExecuteAfterward) {
+		return ensureEnvManagerDetected().getBashConcatenation(separator, echo, config, commandToExecuteAfterward);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#getComparator()
+	 */
+	@Override
+	public Comparator<String> getComparator() {
+		return ensureEnvManagerDetected().getComparator();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#getDescription(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public String getDescription(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+		return ensureEnvManagerDetected().getDescription(pm);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#getInstructions()
+	 */
+	@Override
+	public String getInstructions() {
+		return ensureEnvManagerDetected().getInstructions();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#getName()
+	 */
+	@Override
+	public String getName() {
+		return ensureEnvManagerDetected().getName();
+	}
+
+	/**
+	 * Set a progress monitor to use for long running operations. If no progress monitor is set, the workbench progress service will
+	 * be used
+	 * 
+	 * @param monitor
+	 *            progress monitor
+	 */
+	public void setProgressMonitor(IProgressMonitor monitor) {
+		fMonitor = monitor;
+	}
+
+	private IEnvManager ensureEnvManagerDetected() {
+		if (envManager == null) {
+			GetEnvManagerRunnable runnable = new GetEnvManagerRunnable();
+			try {
+				if (fMonitor != null) {
+					runnable.run(SubMonitor.convert(fMonitor));
+				} else {
+					PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
+				}
+			} catch (InvocationTargetException e) {
+				EMSUIPlugin.log(e);
+			} catch (InterruptedException e) {
+			}
+			envManager = runnable.getResult();
+		}
+		return envManager;
 	}
 }

@@ -12,10 +12,8 @@ package org.eclipse.ptp.rm.mpi.mpich2.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.mpi.mpich2.core.launch.MPICH2LaunchConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.core.launch.MPICH2LaunchConfigurationDefaults;
@@ -24,7 +22,6 @@ import org.eclipse.ptp.rm.mpi.mpich2.ui.messages.Messages;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabWidgetListener;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -136,23 +133,13 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	/**
 	 * @since 2.0
 	 */
-	public AdvancedMPICH2RMLaunchConfigurationDynamicTab(ILaunchConfigurationDialog dialog) {
-		super(dialog);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #createControl(org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * java.lang.String)
 	 */
-	/**
-	 * @since 2.0
-	 */
-	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
+	public void createControl(Composite parent, String id) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout());
 
@@ -181,9 +168,7 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #getControl()
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #getControl()
 	 */
 	public Control getControl() {
 		return control;
@@ -192,9 +177,7 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#getImage
-	 * ()
+	 * @see org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#getImage ()
 	 */
 	@Override
 	public Image getImage() {
@@ -204,9 +187,7 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#getText
-	 * ()
+	 * @see org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#getText ()
 	 */
 	/**
 	 * @since 2.0
@@ -219,16 +200,13 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
-	 * org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.ptp.core.elements.IPQueue)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy, org.eclipse.ptp.rmsystem.IResourceManager)
 	 */
 	/**
 	 * @since 2.0
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(MPICH2LaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
 				MPICH2LaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS);
 		configuration.setAttribute(MPICH2LaunchConfiguration.ATTR_ARGUMENTS, MPICH2LaunchConfigurationDefaults.ATTR_ARGUMENTS);
@@ -238,8 +216,7 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#
-	 * updateControls()
+	 * @see org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab# updateControls()
 	 */
 	@Override
 	public void updateControls() {
@@ -262,8 +239,7 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#
-	 * createDataSource()
+	 * @see org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab# createDataSource()
 	 */
 	@Override
 	protected RMLaunchConfigurationDynamicTabDataSource createDataSource() {
@@ -273,8 +249,7 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#
-	 * createListener()
+	 * @see org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab# createListener()
 	 */
 	@Override
 	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {

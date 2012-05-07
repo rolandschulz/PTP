@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.lml_jaxb.actions;
 
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
-import org.eclipse.ptp.rmsystem.IJobStatus;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**

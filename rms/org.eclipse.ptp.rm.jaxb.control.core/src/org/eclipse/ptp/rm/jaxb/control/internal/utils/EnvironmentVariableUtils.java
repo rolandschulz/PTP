@@ -22,8 +22,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 
 /**
- * Convenience methods for handling name-value pair objects (the JAXB
- * NameValuePair).
+ * Convenience methods for handling name-value pair objects (the JAXB NameValuePair).
  * 
  * @author arossi
  * 
@@ -31,8 +30,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 public class EnvironmentVariableUtils {
 
 	/**
-	 * Add variable to env after resolving against the resource-manager
-	 * environment (used by the CommandJob).
+	 * Add variable to env after resolving against the resource-manager environment (used by the CommandJob).
 	 * 
 	 * @param uuid
 	 *            an internal or resource-specific job id.
@@ -60,8 +58,7 @@ public class EnvironmentVariableUtils {
 	}
 
 	/**
-	 * Add variable to buffer after resolving against the resource-manager
-	 * environment (used by the ScriptHandler).
+	 * Add variable to buffer after resolving against the resource-manager environment (used by the ScriptHandler).
 	 * 
 	 * @param name
 	 *            name of variable
@@ -122,8 +119,7 @@ public class EnvironmentVariableUtils {
 	}
 
 	/**
-	 * Determines what syntax to use for script environment variable definition
-	 * based on the first line of the script.
+	 * Determines what syntax to use for script environment variable definition based on the first line of the script.
 	 * 
 	 * @param directive
 	 *            first line of shell script

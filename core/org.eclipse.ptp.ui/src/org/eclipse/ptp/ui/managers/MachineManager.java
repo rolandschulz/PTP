@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
@@ -59,9 +60,7 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IMachineManager#addMachine(org.eclipse.ptp.core.elements
-	 * .IPMachine)
+	 * @see org.eclipse.ptp.ui.IMachineManager#addMachine(org.eclipse.ptp.core.elements .IPMachine)
 	 */
 	public void addMachine(IPMachine mac) {
 		if (mac != null && !machineList.containsKey(mac.getID())) {
@@ -82,9 +81,7 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IMachineManager#addNode(org.eclipse.ptp.core.elements
-	 * .IPNode)
+	 * @see org.eclipse.ptp.ui.IMachineManager#addNode(org.eclipse.ptp.core.elements .IPNode)
 	 */
 	public void addNode(IPNode node) {
 		addMachine(node.getMachine());
@@ -141,9 +138,7 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IElementManager#getFullyQualifiedName(java.lang.String
-	 * )
+	 * @see org.eclipse.ptp.ui.IElementManager#getFullyQualifiedName(java.lang.String )
 	 */
 	public String getFullyQualifiedName(String id) {
 		if (id.equals(EMPTY_ID)) {
@@ -153,7 +148,7 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 		// cur_machine?
 		IPMachine machine = getCurrentMachine();
 		if (machine != null) {
-			IResourceManager rm = machine.getResourceManager();
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(machine.getControlId());
 			if (rm != null) {
 				return rm.getName() + ": " + machine.getName(); //$NON-NLS-1$
 			}
@@ -185,15 +180,12 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	/**
 	 * Get node status.
 	 * 
-	 * Currently the node status is determined as follows: - if the node is up:
-	 * - if there are *any* running processes on the node: NODE_RUNNING - if
-	 * there are no running processes, but one or more exited processes on the
-	 * node: NODE_EXITED - if the node is down: NODE_DOWN - if the node is
-	 * error: NODE_ERROR
+	 * Currently the node status is determined as follows: - if the node is up: - if there are *any* running processes on the node:
+	 * NODE_RUNNING - if there are no running processes, but one or more exited processes on the node: NODE_EXITED - if the node is
+	 * down: NODE_DOWN - if the node is error: NODE_ERROR
 	 * 
-	 * TODO: in the future, the machine view should be linked to the jobs view.
-	 * The node state should only be shown as NODE_RUNNING if any processes
-	 * belonging to the current job are running.
+	 * TODO: in the future, the machine view should be linked to the jobs view. The node state should only be shown as NODE_RUNNING
+	 * if any processes belonging to the current job are running.
 	 * 
 	 * @param node
 	 * @return
@@ -225,21 +217,21 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.managers.AbstractElementManager#getImage(org.eclipse
-	 * .ptp.ui.model.IElement)
+	 * @see org.eclipse.ptp.ui.managers.AbstractElementManager#getImage(org.eclipse .ptp.ui.model.IElement)
 	 */
 	@Override
 	public Image getImage(IElement element) {
 		IPMachine machine = getCurrentMachine();
 		if (machine != null) {
-			IResourceManager rm = machine.getResourceManager();
-			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
-					rm.getResourceManagerId());
-			if (presentation != null) {
-				final Image image = presentation.getImage(element);
-				if (image != null) {
-					return image;
+			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(machine.getControlId());
+			if (rm != null) {
+				final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+						rm.getResourceManagerId());
+				if (presentation != null) {
+					final Image image = presentation.getImage(element);
+					if (image != null) {
+						return image;
+					}
 				}
 			}
 			IPNode node = machine.getNodeById(element.getID());
@@ -267,9 +259,7 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IMachineManager#removeMachine(org.eclipse.ptp.core
-	 * .elements.IPMachine)
+	 * @see org.eclipse.ptp.ui.IMachineManager#removeMachine(org.eclipse.ptp.core .elements.IPMachine)
 	 */
 	public void removeMachine(IPMachine machine) {
 		machineList.remove(machine.getID());
@@ -292,9 +282,7 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IMachineManager#removeNode(org.eclipse.ptp.core.elements
-	 * .IPNode)
+	 * @see org.eclipse.ptp.ui.IMachineManager#removeNode(org.eclipse.ptp.core.elements .IPNode)
 	 */
 	public void removeNode(IPNode node) {
 		IElementHandler elementHandler = getElementHandler(node.getMachine().getID());
@@ -319,9 +307,7 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.IMachineManager#setMachine(org.eclipse.ptp.core.elements
-	 * .IPMachine)
+	 * @see org.eclipse.ptp.ui.IMachineManager#setMachine(org.eclipse.ptp.core.elements .IPMachine)
 	 */
 	public void setMachine(IPMachine machine) {
 		if (machine != cur_machine) {

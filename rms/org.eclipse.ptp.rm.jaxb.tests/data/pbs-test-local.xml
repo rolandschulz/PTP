@@ -255,6 +255,12 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 		<attribute name="Variable_List" type="string">
 			<description>This is the list of environment variables passed with the Queue Job batch request.</description>
 		</attribute>
+		<managed-files>
+			<file-staging-location>.eclipsesettings</file-staging-location>
+			<file name="menu.input">
+				<path>${ptp_rm:local.input.file#value}</path>
+			</file>
+		</managed-files>
 		<script insertEnvironmentAfter="35">
 			<line>
 				<arg>#!/bin/bash</arg>

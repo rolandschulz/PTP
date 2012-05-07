@@ -27,23 +27,19 @@ public class MPICH2RMLaunchConfigurationFactory extends AbstractRMLaunchConfigur
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
-	 * #doCreate(org.eclipse.ptp.rmsystem.IResourceManager,
-	 * org.eclipse.debug.ui.ILaunchConfigurationDialog)
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
+	 * #doCreate(org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.debug.ui.ILaunchConfigurationDialog)
 	 */
 	@Override
 	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
-		return new NewMPICH2RMLaunchConfigurationDynamicTab(rm, dialog);
+		return new NewMPICH2RMLaunchConfigurationDynamicTab();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
-	 * #getResourceManagerClass()
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory #getResourceManagerClass()
 	 */
 	@Override
 	public Class<? extends IResourceManager> getResourceManagerClass() {

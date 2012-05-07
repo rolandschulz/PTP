@@ -11,9 +11,11 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.views.JobsListView;
@@ -25,7 +27,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class TerminateJobFromListAction extends Action {
 
-	private JobsListView view;
+	private final JobsListView view;
 
 	/**
 	 * 
@@ -47,9 +49,9 @@ public class TerminateJobFromListAction extends Action {
 				if (event.getSelection() instanceof IStructuredSelection) {
 					IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 
-					if (sel.isEmpty())
+					if (sel.isEmpty()) {
 						setEnabled(false);
-					else {
+					} else {
 						Object[] selJobs = sel.toArray();
 
 						// Only enables if at least one is running
@@ -57,14 +59,16 @@ public class TerminateJobFromListAction extends Action {
 						for (int i = 0; i < selJobs.length; i++) {
 							IPJob job = (IPJob) selJobs[i];
 
-							if (job.getState() != JobAttributes.State.COMPLETED)
+							if (job.getState() != JobAttributes.State.COMPLETED) {
 								running = true;
+							}
 						}
 
-						if (running)
+						if (running) {
 							setEnabled(true);
-						else
+						} else {
 							setEnabled(false);
+						}
 
 					}
 
@@ -78,9 +82,9 @@ public class TerminateJobFromListAction extends Action {
 		if (view.getViewer().getSelection() instanceof IStructuredSelection) {
 			IStructuredSelection sel = (IStructuredSelection) view.getViewer().getSelection();
 
-			if (sel.isEmpty())
+			if (sel.isEmpty()) {
 				setEnabled(false);
-			else {
+			} else {
 				Object[] selJobs = sel.toArray();
 
 				// Only enables if at least one is running
@@ -88,14 +92,16 @@ public class TerminateJobFromListAction extends Action {
 				for (int i = 0; i < selJobs.length; i++) {
 					IPJob job = (IPJob) selJobs[i];
 
-					if (job.getState() != JobAttributes.State.COMPLETED)
+					if (job.getState() != JobAttributes.State.COMPLETED) {
 						running = true;
+					}
 				}
 
-				if (running)
+				if (running) {
 					setEnabled(true);
-				else
+				} else {
 					setEnabled(false);
+				}
 			}
 		}
 
@@ -119,8 +125,9 @@ public class TerminateJobFromListAction extends Action {
 			IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
 
 			// Must select at least one item
-			if (sel.size() == 0)
+			if (sel.size() == 0) {
 				return;
+			}
 
 			Object[] selJobs = sel.toArray();
 
@@ -128,10 +135,11 @@ public class TerminateJobFromListAction extends Action {
 			for (int i = 0; i < selJobs.length; i++) {
 				try {
 					IPJob job = (IPJob) selJobs[i];
-
-					IResourceManagerControl rm = job.getResourceManager();
 					if (job.getState() != JobAttributes.State.COMPLETED) {
-						rm.control(job.getID(), IResourceManagerControl.TERMINATE_OPERATION, null);
+						IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
+						if (rm != null) {
+							rm.control(job.getID(), IResourceManagerControl.TERMINATE_OPERATION, null);
+						}
 					}
 					// TODO: Look for job change event to wait for jobs to be
 					// finished.

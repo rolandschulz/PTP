@@ -13,6 +13,7 @@ package org.eclipse.ptp.internal.rdt.core.miners;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -197,9 +198,21 @@ public class RemoteFoldingRegionsHandler  {
 					IASTStatement switchstmt = ((IASTSwitchStatement)statement).getBody();
 					if (switchstmt instanceof IASTCompoundStatement) {
 						IASTStatement[] stmts = ((IASTCompoundStatement)switchstmt).getStatements();
+						
+						List<IASTStatement> list = new ArrayList<IASTStatement>();
+						for (IASTStatement s : stmts) {
+							if (s instanceof IASTCompoundStatement) {
+								IASTStatement[] ss = ((IASTCompoundStatement)s).getStatements();
+								for (IASTStatement t : ss)
+									list.add(t);
+							} else 
+								list.add(s);
+						}
+						
 						boolean pushedMR = false;
-						for (IASTStatement tmpstmt : stmts) {
+						for (IASTStatement tmpstmt : list) {
 							StatementRegion tmpmr;
+								
 							if (!(tmpstmt instanceof IASTCaseStatement || tmpstmt instanceof IASTDefaultStatement)) {
 								if (!pushedMR) return PROCESS_SKIP;
 								IASTFileLocation tmpfl = tmpstmt.getFileLocation();
@@ -212,6 +225,9 @@ public class RemoteFoldingRegionsHandler  {
 							tmpmr = createRegion();
 							tmpmr.level= fLevel+1;
 							tmpmr.inclusive = true;
+							
+							
+							
 							if (tmpstmt instanceof IASTCaseStatement) {
 								IASTCaseStatement casestmt = (IASTCaseStatement) tmpstmt;
 								tmpfl = casestmt.getExpression().getFileLocation();

@@ -820,6 +820,7 @@
      <extension
            point="org.eclipse.ui.preferencePages">
         <page
+              category="org.eclipse.ptp.remote.ui.RemoteDevelopmentPreferencePage"
               class="org.eclipse.ptp.rdt.ui.preferences.RemoteDevelopmentPreferencePage"
               id="org.eclipse.ptp.rdt.ui.RemoteDevPreferencePage"
               name="%RemoteDevPrefPage.name">

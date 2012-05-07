@@ -26,7 +26,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 
 /**
  * @since 5.0
@@ -34,7 +35,6 @@ import org.eclipse.ptp.core.PTPCorePlugin;
  */
 public abstract class AbstractResourceManagerControl implements IResourceManagerControl {
 	private final AbstractResourceManagerConfiguration fConfig;
-	private final ModelManager fModelManager = (ModelManager) PTPCorePlugin.getDefault().getModelManager();
 	private IResourceManager fResourceManager = null;
 
 	public AbstractResourceManagerControl(AbstractResourceManagerConfiguration config) {
@@ -44,9 +44,8 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#control(java.lang.String
-	 * , java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#control(java.lang.String , java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 		doControlJob(jobId, operation, monitor);
@@ -64,9 +63,7 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration
-	 * ()
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration ()
 	 */
 	public IResourceManagerComponentConfiguration getControlConfiguration() {
 		return fConfig;
@@ -75,9 +72,22 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
-	 * .String)
+	 * @see org.eclipse.ptp.core.jobs.IJobControl#getControlId()
+	 */
+	/**
+	 * @since 6.0
+	 */
+	public String getControlId() {
+		return fConfig.getUniqueName();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang .String)
+	 */
+	/**
+	 * @since 6.0
 	 */
 	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) {
 		IJobStatus status = null;
@@ -87,6 +97,10 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 		}
 		if (status == null) {
 			status = new IJobStatus() {
+				public String getControlId() {
+					return fConfig.getUniqueName();
+				}
+
 				public String getErrorPath() {
 					return null;
 				}
@@ -111,10 +125,6 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 					return null;
 				}
 
-				public String getRmUniqueName() {
-					return getResourceManager().getUniqueName();
-				}
-
 				public String getState() {
 					return UNDETERMINED;
 				}
@@ -136,12 +146,13 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	}
 
 	/*
-	 * Equivalent to the two-parameter call (force is not implemented).
-	 * (non-Javadoc)
+	 * Equivalent to the two-parameter call (force is not implemented). (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang
-	 * .String, boolean, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang .String, boolean,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	/**
+	 * @since 6.0
 	 */
 	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor) {
 		return getJobStatus(jobId, false, monitor);
@@ -150,9 +161,7 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#start(org.eclipse.core
-	 * .runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#start(org.eclipse.core .runtime.IProgressMonitor)
 	 */
 	public void start(IProgressMonitor monitor) throws CoreException {
 		doStartup(monitor);
@@ -170,16 +179,13 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManagerControl#submitJob(org.eclipse
-	 * .debug.core.ILaunchConfiguration, java.lang.String,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#submitJob(org.eclipse .debug.core.ILaunchConfiguration,
+	 * java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
 		IJobStatus status = doSubmitJob(configuration, mode, monitor);
-		String jobId = status.getJobId();
-		getResourceManager().fireJobChanged(jobId);
-		return jobId;
+		JobManager.getInstance().fireJobChanged(status);
+		return status.getJobId();
 	}
 
 	/**
@@ -204,49 +210,40 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 * Get the status of a job.
 	 * 
 	 * @throws CoreException
+	 * @since 6.0
 	 */
 	protected abstract IJobStatus doGetJobStatus(String jobId, boolean force, IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Stop the resource manager subsystem. This must be callable at any time
-	 * (including if the resource manager is not started). It should take any
-	 * actions necessary to shut down the subsystem. Implementations should not
-	 * modify the resource manager state, this will be handled by the main
-	 * resource manager class.
+	 * Stop the resource manager subsystem. This must be callable at any time (including if the resource manager is not started). It
+	 * should take any actions necessary to shut down the subsystem. Implementations should not modify the resource manager state,
+	 * this will be handled by the main resource manager class.
 	 * 
 	 * @throws CoreException
-	 *             this exception should be thrown if the shutdown encountered
-	 *             an error for any reason. This will not halt shutdown of the
-	 *             resource manager, but may produce a message to the user.
+	 *             this exception should be thrown if the shutdown encountered an error for any reason. This will not halt shutdown
+	 *             of the resource manager, but may produce a message to the user.
 	 */
 	protected abstract void doShutdown() throws CoreException;
 
 	/**
-	 * Start the resource manager subsystem. This should perform any actions
-	 * necessary to start the subsystem. Implementations should not modify the
-	 * resource manager state, this will be handled by the main resource manager
-	 * class. If the subsystem fails to start, implementations should throw a
-	 * CoreException with a description of what went wrong.
+	 * Start the resource manager subsystem. This should perform any actions necessary to start the subsystem. Implementations
+	 * should not modify the resource manager state, this will be handled by the main resource manager class. If the subsystem fails
+	 * to start, implementations should throw a CoreException with a description of what went wrong.
 	 * 
-	 * The progress monitor is primarily for indicating startup status to the
-	 * user. If the user cancels the progress monitor, the implementation should
-	 * assume the resource manager has not started and {@link #doShutdown()}
-	 * will be called soon after.
+	 * The progress monitor is primarily for indicating startup status to the user. If the user cancels the progress monitor, the
+	 * implementation should assume the resource manager has not started and {@link #doShutdown()} will be called soon after.
 	 * 
 	 * @param monitor
-	 *            progress monitor indicating startup progress and for
-	 *            cancelling startup
+	 *            progress monitor indicating startup progress and for cancelling startup
 	 * @throws CoreException
-	 *             this exception should be thrown if the startup encountered an
-	 *             error for any reason. This will halt shutdown of the resource
-	 *             manager, and may produce a message to the user.
+	 *             this exception should be thrown if the startup encountered an error for any reason. This will halt shutdown of
+	 *             the resource manager, and may produce a message to the user.
 	 */
 	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Submit a job to the resource manager. Returns a job ID that represents
-	 * the submitted job. Throws a core exception if there was an error
-	 * submitting the job or if the progress monitor was canceled.
+	 * Submit a job to the resource manager. Returns a job ID that represents the submitted job. Throws a core exception if there
+	 * was an error submitting the job or if the progress monitor was canceled.
 	 * 
 	 * @param configuration
 	 *            launch configuration
@@ -256,6 +253,7 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 	 *            progress monitor
 	 * @return job status representing the status of the submitted job
 	 * @throws CoreException
+	 * @since 6.0
 	 */
 	protected abstract IJobStatus doSubmitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException;
@@ -264,13 +262,9 @@ public abstract class AbstractResourceManagerControl implements IResourceManager
 		getResourceManager().fireResourceManagerError(message);
 	}
 
-	protected ModelManager getModelManager() {
-		return fModelManager;
-	}
-
 	protected AbstractResourceManager getResourceManager() {
 		if (fResourceManager == null) {
-			fResourceManager = fModelManager.getResourceManagerFromUniqueName(fConfig.getUniqueName());
+			fResourceManager = ModelManager.getInstance().getResourceManagerFromUniqueName(fConfig.getUniqueName());
 		}
 		return (AbstractResourceManager) fResourceManager;
 	}

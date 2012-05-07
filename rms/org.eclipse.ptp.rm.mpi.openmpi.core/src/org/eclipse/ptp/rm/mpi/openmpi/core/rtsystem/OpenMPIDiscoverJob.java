@@ -63,9 +63,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob#parse(java.
-	 * io.BufferedReader)
+	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob#parse(java. io.BufferedReader)
 	 */
 	@Override
 	protected void parse(BufferedReader output) throws CoreException {
@@ -81,19 +79,18 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		IOpenMPIResourceManagerConfiguration rmConfiguration = (IOpenMPIResourceManagerConfiguration) rts.getRmConfiguration();
 		assert fileMgr != null;
 
-		IPResourceManager rm = (IPResourceManager) rts.getResourceManager().getAdapter(IPResourceManager.class);
+		IPResourceManager rm = rts.getPResourceManager();
 		IPMachine machine = rm.getMachineById(rts.getMachineID());
 		assert machine != null;
 
 		/*
-		 * STEP 1: Parse output of command. TODO: validate lines and write to
-		 * log if invalid lines were found.
+		 * STEP 1: Parse output of command. TODO: validate lines and write to log if invalid lines were found.
 		 */
 		parseOmpiInfo(output, info);
 
 		/*
-		 * Check and/or set the OMPI version in the configuration. NOTE that
-		 * this may change any subsequent commands that are queried!
+		 * Check and/or set the OMPI version in the configuration. NOTE that this may change any subsequent commands that are
+		 * queried!
 		 */
 		String version = info.get("ompi:version:full"); //$NON-NLS-1$
 		if (version != null) {
@@ -107,13 +104,10 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		}
 
 		/*
-		 * STEP 2: Read file that describes machine geography. If no nodes are
-		 * given, then we assume MPI default when host are not configured: there
-		 * is only one node on the machine. This part is a bit tricky. OpenMPI
-		 * 1.2 has a RDS (resource discovery system) that knows the default
-		 * hostfile as rds_hostfile_path parameter. But the RDS was dropped by
-		 * version 1.3. Then the orte_default_hostfile parameter might be used
-		 * instead, as long as it was defined in the system wide MCA parameters.
+		 * STEP 2: Read file that describes machine geography. If no nodes are given, then we assume MPI default when host are not
+		 * configured: there is only one node on the machine. This part is a bit tricky. OpenMPI 1.2 has a RDS (resource discovery
+		 * system) that knows the default hostfile as rds_hostfile_path parameter. But the RDS was dropped by version 1.3. Then the
+		 * orte_default_hostfile parameter might be used instead, as long as it was defined in the system wide MCA parameters.
 		 */
 		OpenMPIHostMap hostMap;
 		try {
@@ -183,9 +177,8 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			OmpiInfo info, IOpenMPIResourceManagerConfiguration rmConfiguration) throws CoreException, IOException {
 
 		/*
-		 * OpenMpi 1.2 uses rds_hostfile_path. Open 1.3 uses
-		 * orte_default_hostfile. For 1.2, path must not be empty. For 1.3 it
-		 * may be empty and default host is assumed.
+		 * OpenMpi 1.2 uses rds_hostfile_path. Open 1.3 uses orte_default_hostfile. For 1.2, path must not be empty. For 1.3 it may
+		 * be empty and default host is assumed.
 		 */
 		OpenMPIHostMap hostMap = null;
 		String hostFileName = null;
@@ -268,8 +261,8 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		}
 
 		/*
-		 * If no host information was found in the hostfile, add default. Only
-		 * for Open MPI 1.2. On 1.3, there is no default host file assumed.
+		 * If no host information was found in the hostfile, add default. Only for Open MPI 1.2. On 1.3, there is no default host
+		 * file assumed.
 		 */
 		if (hostMap.count() == 0) {
 			if (rmConfiguration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
@@ -344,8 +337,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 						int pos = line.indexOf(":", nameStart); //$NON-NLS-1$
 						if (pos >= 0) {
 							/*
-							 * If parameter is already in list, then update,
-							 * otherwise add.
+							 * If parameter is already in list, then update, otherwise add.
 							 */
 							String name = line.substring(nameStart, pos);
 							Parameters.Parameter param = info.getParameter(name);

@@ -15,6 +15,15 @@ package org.eclipse.ptp.rmsystem;
  */
 public interface IResourceManagerComponentConfiguration {
 	/**
+	 * Get the connection name. This is a string used by the remote service provider to identify a particular connection. A resource
+	 * manager only supports a single connection at time. If the resource manager is purely local, then this will be the name of the
+	 * local connection.
+	 * 
+	 * @return connection name
+	 */
+	public String getConnectionName();
+
+	/**
 	 * Returns the name of the resource manager.
 	 * 
 	 * @return the name of the resource manager
@@ -22,27 +31,24 @@ public interface IResourceManagerComponentConfiguration {
 	public String getName();
 
 	/**
-	 * Get the connection name. This is a string used by the remote service
-	 * provider to identify a particular connection. A resource manager only
-	 * supports a single connection at time. If the resource manager is purely
-	 * local, then this will be the name of the local connection.
-	 * 
-	 * @return connection name
-	 */
-	public String getConnectionName();
-
-	/**
-	 * Get the ID of the remote service provider used by this resource manager.
-	 * If the resource manager is local only, then this will be the ID of the
-	 * local service provider.
+	 * Get the ID of the remote service provider used by this resource manager. If the resource manager is local only, then this
+	 * will be the ID of the local service provider.
 	 * 
 	 * @return remote service provider ID
 	 */
 	public String getRemoteServicesId();
 
 	/**
-	 * Set the name of the connection used by this resource manager. The
-	 * connection name is unique to a particular remote service provider.
+	 * Get a unique name for this resource manager.
+	 * 
+	 * @return unique name
+	 * @since 6.0
+	 */
+	public String getUniqueName();
+
+	/**
+	 * Set the name of the connection used by this resource manager. The connection name is unique to a particular remote service
+	 * provider.
 	 * 
 	 * @param connectionName
 	 *            name of connection used by the resource manager
@@ -56,4 +62,13 @@ public interface IResourceManagerComponentConfiguration {
 	 *            remote service provider extension ID
 	 */
 	public void setRemoteServicesId(String id);
+
+	/**
+	 * Set a unique name for this resource manager.
+	 * 
+	 * @param name
+	 *            unique name
+	 * @since 6.0
+	 */
+	public void setUniqueName(String name);
 }

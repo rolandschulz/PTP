@@ -10,5 +10,13 @@
             name="Local">
       </remoteUIServices>
    </extension>
+     <extension
+           point="org.eclipse.ui.preferencePages">
+        <page
+              class="org.eclipse.ptp.remote.ui.preferences.RemoteDevelopmentPreferencePage"
+              id="org.eclipse.ptp.remote.ui.RemoteDevelopmentPreferencePage"
+              name="%RemoteDevPrefPage.name">
+        </page>
+     </extension> 
 
 </plugin>

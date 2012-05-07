@@ -56,6 +56,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="monitorType" type="string">
+            <annotation>
+               <documentation>
+                  Name of the monitoring system supported by this resource manager.
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="configurationFile" type="string" use="required">
             <annotation>
                <documentation>

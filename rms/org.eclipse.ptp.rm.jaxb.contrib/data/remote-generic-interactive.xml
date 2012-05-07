@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011 IBM Corporation. All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- ****************************************************************************** -->
+<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="resource_manager_type.xsd" name="Remote-Generic-Interactive">
+	<control-data>
+		<submit-interactive name="submit-interactive" directory="${ptp_rm:directory#value}" waitForId="false" keepOpen="true">
+			<arg>${ptp_rm:executablePath#value}</arg>
+			<arg>${ptp_rm:progArgs#value}</arg>
+		</submit-interactive>
+		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" waitForId="false" keepOpen="true">
+			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</arg>
+			<arg>-np 1</arg>
+			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
+			<arg>${ptp_rm:debuggerArgs#value}</arg>
+			<pre-launch-cmd name="Cleanup" exec="rm -f routing_file" wait="true"/>
+			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
+		</submit-interactive-debug>		
+	</control-data>
+</resource-manager-builder>

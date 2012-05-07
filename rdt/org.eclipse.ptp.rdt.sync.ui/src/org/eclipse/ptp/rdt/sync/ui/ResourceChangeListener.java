@@ -40,7 +40,6 @@ public class ResourceChangeListener {
 
 	private static IResourceChangeListener resourceListener = new IResourceChangeListener() {
 		public void resourceChanged(IResourceChangeEvent event) {
-			// RDTSyncCorePlugin.log("Event type of " + event.getType()); //$NON-NLS-1$
 			// Turn off sync'ing for a project before deleting it and close repository - see bug 360170
 			// Note that event.getDelta() returns null, so this event cannot be handled inside the loop below.
 			if (event.getType() == IResourceChangeEvent.PRE_DELETE) {

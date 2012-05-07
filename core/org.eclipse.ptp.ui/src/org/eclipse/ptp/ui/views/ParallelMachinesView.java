@@ -46,7 +46,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
@@ -120,8 +120,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent)
 		 */
 		public void handleEvent(final IChangedNodeEvent e) {
@@ -131,8 +130,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent)
 		 */
 		public void handleEvent(final INewNodeEvent e) {
@@ -143,8 +141,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 					for (IPNode node : e.getNodes()) {
 						if (isCurrent) {
 							/*
-							 * Add node child listener so that we get notified
-							 * when new processes are added to the node and can
+							 * Add node child listener so that we get notified when new processes are added to the node and can
 							 * update the node icons.
 							 */
 							node.addChildListener(nodeListener);
@@ -164,8 +161,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent)
 		 */
 		public void handleEvent(final IRemoveNodeEvent e) {
@@ -176,8 +172,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 					for (IPNode node : e.getNodes()) {
 						if (isCurrent) {
 							/*
-							 * Remove node child listener when node is removed
-							 * (if ever)
+							 * Remove node child listener when node is removed (if ever)
 							 */
 							node.removeChildListener(nodeListener);
 
@@ -201,8 +196,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.INodeChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.INodeChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
 		 */
 		public void handleEvent(final IChangedProcessEvent e) {
@@ -224,8 +218,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.INodeProcessListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.INodeProcessListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.INodeNewProcessEvent)
 		 */
 		public void handleEvent(final INewProcessEvent e) {
@@ -247,8 +240,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.INodeChildListener#handleEvent
+		 * @see org.eclipse.ptp.core.elements.listeners.INodeChildListener#handleEvent
 		 * (org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
 		 */
 		public void handleEvent(final IRemoveProcessEvent e) {
@@ -273,10 +265,8 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerChangedMachineEvent)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events. IResourceManagerChangedMachineEvent)
 		 */
 		public void handleEvent(IChangedMachineEvent e) {
 			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
@@ -291,10 +281,8 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerChangedQueueEvent)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events. IResourceManagerChangedQueueEvent)
 		 */
 		public void handleEvent(IChangedQueueEvent e) {
 			// Can safely ignore
@@ -303,8 +291,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
 		 */
 		public void handleEvent(INewJobEvent e) {
@@ -313,10 +300,8 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerNewMachineEvent)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events. IResourceManagerNewMachineEvent)
 		 */
 		public void handleEvent(final INewMachineEvent e) {
 			for (IPMachine machine : e.getMachines()) {
@@ -335,8 +320,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
 		 */
 		public void handleEvent(INewQueueEvent e) {
@@ -346,8 +330,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
 		 */
 		public void handleEvent(IRemoveJobEvent e) {
@@ -356,10 +339,8 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerRemoveMachineEvent)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events. IResourceManagerRemoveMachineEvent)
 		 */
 		public void handleEvent(final IRemoveMachineEvent e) {
 			/*
@@ -387,10 +368,8 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerRemoveQueueEvent)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events. IResourceManagerRemoveQueueEvent)
 		 */
 		public void handleEvent(IRemoveQueueEvent e) {
 			// Can safely ignore
@@ -406,18 +385,17 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		 */
 		public void handleEvent(IResourceManagerAddedEvent e) {
 			/*
-			 * Add resource manager child listener so we get notified when new
-			 * machines are added to the model.
+			 * Add resource manager child listener so we get notified when new machines are added to the model.
 			 */
-			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			final IPResourceManager rm = ModelManager.getInstance().getUniverse()
+					.getResourceManager(e.getResourceManager().getControlId());
 			rm.addChildListener(resourceManagerChildListener);
 		}
 
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * @see org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
 		 * (org.eclipse.ptp.core.events.IResourceManagerChangedEvent)
 		 */
 		public void handleEvent(IResourceManagerChangedEvent e) {
@@ -426,8 +404,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
+		 * @see org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
 		 * (org.eclipse.ptp.core.events.IResourceManagerErrorEvent)
 		 */
 		public void handleEvent(IResourceManagerErrorEvent e) {
@@ -441,10 +418,10 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		 */
 		public void handleEvent(IResourceManagerRemovedEvent e) {
 			/*
-			 * Removed resource manager child listener when resource manager is
-			 * removed.
+			 * Removed resource manager child listener when resource manager is removed.
 			 */
-			final IPResourceManager rm = (IPResourceManager) e.getResourceManager().getAdapter(IPResourceManager.class);
+			final IPResourceManager rm = ModelManager.getInstance().getUniverse()
+					.getResourceManager(e.getResourceManager().getControlId());
 			rm.removeChildListener(resourceManagerChildListener);
 		}
 	}
@@ -495,8 +472,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener
 	 * (org.eclipse.jface.viewers.ISelectionChangedListener)
 	 */
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
@@ -563,9 +539,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.
-	 * eclipse.ptp.ui.model.IElement)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org. eclipse.ptp.ui.model.IElement)
 	 */
 	@Override
 	public void doubleClick(IElement element) {
@@ -577,8 +551,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		unregister();
 
 		/*
-		 * Register the new element only if we're not trying to register the
-		 * same one.
+		 * Register the new element only if we're not trying to register the same one.
 		 */
 		if (!isElementRegistered) {
 			/*
@@ -629,9 +602,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.IContentProvider#getRulerIndex(java.lang.Object,
-	 * int)
+	 * @see org.eclipse.ptp.ui.views.IContentProvider#getRulerIndex(java.lang.Object, int)
 	 */
 	@Override
 	public String getRulerIndex(Object obj, int index) {
@@ -660,26 +631,27 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java
-	 * .lang.Object)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java .lang.Object)
 	 */
 	@Override
 	public String[] getToolTipText(Object obj) {
 		IElementHandler setManager = getCurrentElementHandler();
-		if (obj == null || !(obj instanceof IPNode) || setManager == null || cur_element_set == null)
+		if (obj == null || !(obj instanceof IPNode) || setManager == null || cur_element_set == null) {
 			return IToolTipProvider.NO_TOOLTIP;
+		}
 
 		IPNode node = (IPNode) obj;
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(node.getName());
 		IElementSet[] sets = setManager.getSetsWithElement(node.getID());
-		if (sets.length > 1)
+		if (sets.length > 1) {
 			buffer.append(Messages.ParallelMachinesView_0);
+		}
 		for (int i = 1; i < sets.length; i++) {
 			buffer.append(sets[i].getID());
-			if (i < sets.length - 1)
+			if (i < sets.length - 1) {
 				buffer.append(","); //$NON-NLS-1$
+			}
 		}
 		// buffer.append("\nStatus: " +
 		// getMachineManager().getNodeStatusText(node));
@@ -689,8 +661,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener
 	 * (org.eclipse.jface.viewers.ISelectionChangedListener)
 	 */
 	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
@@ -700,9 +671,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java.
-	 * lang.Object)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java. lang.Object)
 	 */
 	@Override
 	public void repaint(boolean all) {
@@ -718,9 +687,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(
-	 * org.eclipse.jface.viewers.SelectionChangedEvent)
+	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged( org.eclipse.jface.viewers.SelectionChangedEvent)
 	 */
 	public void selectionChanged(SelectionChangedEvent event) {
 		// Selection change could come from either the machineTableViewer of the
@@ -746,9 +713,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse
-	 * .jface.viewers.ISelection)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse .jface.viewers.ISelection)
 	 */
 	public void setSelection(ISelection selection) {
 		final SelectionChangedEvent e = new SelectionChangedEvent(this, selection);
@@ -800,11 +765,13 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	private IPNode getRegisteredNode() {
 		cur_selected_element_id = ""; //$NON-NLS-1$
 		IElementHandler elementHandler = getCurrentElementHandler();
-		if (elementHandler == null || cur_element_set == null || elementHandler.totalRegistered() == 0)
+		if (elementHandler == null || cur_element_set == null || elementHandler.totalRegistered() == 0) {
 			return null;
+		}
 		String firstRegisteredElementID = elementHandler.getRegistered()[0].getID();
-		if (!cur_element_set.contains(firstRegisteredElementID))
+		if (!cur_element_set.contains(firstRegisteredElementID)) {
 			return null;
+		}
 		cur_selected_element_id = firstRegisteredElementID;
 		return getMachineManager().findNode(cur_selected_element_id);
 	}
@@ -822,14 +789,13 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#convertElementObject
-	 * (org.eclipse.ptp.ui.model.IElement)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#convertElementObject (org.eclipse.ptp.ui.model.IElement)
 	 */
 	@Override
 	protected Object convertElementObject(IElement element) {
-		if (element == null)
+		if (element == null) {
 			return null;
+		}
 
 		return getMachineManager().findNode(element.getID());
 	}
@@ -1082,9 +1048,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions
-	 * (org.eclipse.jface.action.IToolBarManager)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions (org.eclipse.jface.action.IToolBarManager)
 	 */
 	@Override
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
@@ -1094,9 +1058,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#createView(org.eclipse
-	 * .swt.widgets.Composite)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#createView(org.eclipse .swt.widgets.Composite)
 	 */
 	@Override
 	protected void createView(Composite parent) {
@@ -1135,8 +1097,9 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 			}
 
 			public Object[] getElements(Object inputElement) {
-				if (inputElement instanceof IMachineManager)
+				if (inputElement instanceof IMachineManager) {
 					return ((IMachineManager) inputElement).getMachines();
+				}
 				return new Object[0];
 			}
 
@@ -1191,13 +1154,12 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * Wait until the view has been created before registering for events
 		 */
-		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
+		IModelManager mm = ModelManager.getInstance();
 
 		synchronized (mm) {
 			/*
-			 * Add us to any existing RM's. I guess it's possible we could miss
-			 * a RM if a new event arrives while we're doing this, but is it a
-			 * problem?
+			 * Add us to any existing RM's. I guess it's possible we could miss a RM if a new event arrives while we're doing this,
+			 * but is it a problem?
 			 */
 			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 				rm.addChildListener(resourceManagerChildListener);
@@ -1218,12 +1180,11 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.views.AbstractParallelElementView#initialElement()
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialElement()
 	 */
 	@Override
 	protected void initialElement() {
-		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
+		IPUniverse universe = ModelManager.getInstance().getUniverse();
 
 		/*
 		 * Add us as a child listener to any existing machines

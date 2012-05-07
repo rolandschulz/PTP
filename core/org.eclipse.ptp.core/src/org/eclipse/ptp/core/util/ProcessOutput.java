@@ -33,7 +33,7 @@ public class ProcessOutput {
 		/*
 		 * Derive a unique name for the output file
 		 */
-		String name = job.getResourceManager().getName() + "_" + job.getName(); //$NON-NLS-1$
+		String name = job.getControlId() + "_" + job.getName(); //$NON-NLS-1$
 
 		outputFile = new OutputTextFile(name, ProcessAttributes.getStdoutAttributeDefinition().getId(), outputDirPath, storeLines);
 

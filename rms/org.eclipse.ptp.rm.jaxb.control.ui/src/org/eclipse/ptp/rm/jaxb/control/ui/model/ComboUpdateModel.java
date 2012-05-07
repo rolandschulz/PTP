@@ -9,11 +9,10 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.model;
 
-import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
-import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -34,13 +33,12 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 
 	/**
 	 * @param name
-	 *            name of the model, which will correspond to the name of a
-	 *            Property or Attribute if the widget value is to be saved.
+	 *            name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be
+	 *            saved.
 	 * @param itemsFrom
 	 *            property or attribute having combo items
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 * @param combo
 	 *            the widget to which this model corresponds
 	 */
@@ -69,12 +67,10 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	/*
 	 * calls {@link #refreshItemsFrom(RMVariableMap)} (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.model.AbstractUpdateModel#initialize(org.eclipse
-	 * .ptp.rm.jaxb.core.variables.LCVariableMap)
+	 * @see org.eclipse.ptp.rm.jaxb.ui.model.AbstractUpdateModel#initialize(org.eclipse .ptp.rm.jaxb.core.variables.LCVariableMap)
 	 */
 	@Override
-	public void initialize(RMVariableMap rmMap, LCVariableMap lcMap) {
+	public void initialize(IVariableMap rmMap, IVariableMap lcMap) {
 		if (itemsFrom != null) {
 			String[] items = WidgetActionUtils.getItemsFrom(rmMap, itemsFrom);
 			if (items.length == 0) {
@@ -87,13 +83,10 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	}
 
 	/*
-	 * Model serves as widget modify listener; uses the ValidateJob to delay
-	 * processing of text. Sets refreshing flag to block further updates being
-	 * triggered during the refresh. (non-Javadoc)
+	 * Model serves as widget modify listener; uses the ValidateJob to delay processing of text. Sets refreshing flag to block
+	 * further updates being triggered during the refresh. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events
-	 * .ModifyEvent)
+	 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events .ModifyEvent)
 	 */
 	public void modifyText(ModifyEvent e) {
 		if (refreshing) {
@@ -104,8 +97,8 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	}
 
 	/*
-	 * Sets the map value one the combo. Sets refreshing flag to block further
-	 * updates being triggered during the refresh. (non-Javadoc)
+	 * Sets the map value one the combo. Sets refreshing flag to block further updates being triggered during the refresh.
+	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#refreshValueFromMap()
 	 */
@@ -121,26 +114,20 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	}
 
 	/*
-	 * Model serves as widget selection listener; calls {@link #storeValue()}
-	 * Sets refreshing flag to block further updates being triggered during the
-	 * refresh. (non-Javadoc)
+	 * Model serves as widget selection listener; calls {@link #storeValue()} Sets refreshing flag to block further updates being
+	 * triggered during the refresh. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
-	 * .swt.events.SelectionEvent)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse .swt.events.SelectionEvent)
 	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
 		widgetSelected(e);
 	}
 
 	/*
-	 * Model serves as widget selection listener; calls {@link #storeValue()}
-	 * Sets refreshing flag to block further updates being triggered during the
-	 * refresh. (non-Javadoc)
+	 * Model serves as widget selection listener; calls {@link #storeValue()} Sets refreshing flag to block further updates being
+	 * triggered during the refresh. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
-	 * .swt.events.SelectionEvent)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse .swt.events.SelectionEvent)
 	 */
 	public void widgetSelected(SelectionEvent e) {
 		if (refreshing) {

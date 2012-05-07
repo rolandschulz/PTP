@@ -17,15 +17,15 @@
 package org.eclipse.ptp.launch.ui.extensions;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 
 /**
- * Abstract class that is the extension point for contributing
- * ConfigurationWizardPages to this plug-in.
+ * Abstract class that is the extension point for contributing ConfigurationWizardPages to this plug-in.
  * 
  * @author rsqrd
  * 
@@ -42,52 +42,53 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 		return new CoreException(status);
 	}
 
-	private final ILaunchConfigurationDialog fLaunchDialog;
+	private IProgressMonitor fMonitor;
 
 	private final ListenerList listenerList = new ListenerList();
 
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public AbstractRMLaunchConfigurationDynamicTab(ILaunchConfigurationDialog dialog) {
-		fLaunchDialog = dialog;
+	public AbstractRMLaunchConfigurationDynamicTab() {
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #addContentsChangedListener(org.eclipse.ptp.launch.ui.extensions.
-	 * IRMLaunchConfigurationContentsChangedListener)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #addContentsChangedListener(org.eclipse.ptp.launch.ui.extensions. IRMLaunchConfigurationContentsChangedListener)
 	 */
 	public void addContentsChangedListener(IRMLaunchConfigurationContentsChangedListener listener) {
 		listenerList.add(listener);
 	}
 
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
-	public ILaunchConfigurationDialog getLaunchConfigurationDialog() {
-		return fLaunchDialog;
+	public IProgressMonitor getProgressMonitor() {
+		return SubMonitor.convert(fMonitor);
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	public void setProgressMonitor(IProgressMonitor monitor) {
+		fMonitor = monitor;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #removeContentsChangedListener(org.eclipse.ptp.launch.ui.extensions.
-	 * IRMLaunchConfigurationContentsChangedListener)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #removeContentsChangedListener(org.eclipse.ptp.launch.ui.extensions. IRMLaunchConfigurationContentsChangedListener)
 	 */
 	public void removeContentsChangedListener(IRMLaunchConfigurationContentsChangedListener listener) {
 		listenerList.remove(listener);
 	}
 
 	/**
-	 * This should be called when GUI elements are modified by the user, e.g. a
-	 * Text widget should have its ModifyListener's modifyText method set up to
-	 * notify all of the contents changed listeners.
+	 * This should be called when GUI elements are modified by the user, e.g. a Text widget should have its ModifyListener's
+	 * modifyText method set up to notify all of the contents changed listeners.
 	 */
 	protected void fireContentsChanged() {
 		Object[] listeners = listenerList.getListeners();

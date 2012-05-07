@@ -37,7 +37,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
  */
 public class RMVariableResolver implements IDynamicVariableResolver {
 
-	private static RMVariableMap active;
+	private static RMVariableMap fActive;
 
 	/*
 	 * (non-Javadoc)
@@ -46,9 +46,9 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 	 * java.lang.String)
 	 */
 	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
-		if (active != null && argument != null) {
+		if (fActive != null && argument != null) {
 			String[] parts = argument.split(JAXBControlConstants.PDRX);
-			Object value = active.get(parts[0]);
+			Object value = fActive.get(parts[0]);
 			if (value != null) {
 				if (parts.length == 2) {
 					try {
@@ -57,8 +57,14 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 						throw CoreExceptionUtils.newException(Messages.RMVariableResolver_derefError, t);
 					}
 				} else {
-					if (value instanceof String && EnvManagerConfigString.isEnvMgmtConfigString((String)value)) {
-						return active.convertEngMgmtConfigString((String) value);
+					if (value instanceof String && EnvManagerConfigString.isEnvMgmtConfigString((String) value)) {
+						if (fActive.getEnvManager() != null) {
+							return fActive.getEnvManager().getBashConcatenation(
+									"\n", false, new EnvManagerConfigString((String) value), //$NON-NLS-1$
+									null);
+						} else {
+							return ""; //$NON-NLS-1$
+						}
 					} else {
 						return String.valueOf(value);
 					}
@@ -73,7 +79,7 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 	 *            current instance of the map
 	 */
 	public static void setActive(RMVariableMap active) {
-		RMVariableResolver.active = active;
+		fActive = active;
 	}
 
 	/**
