@@ -35,6 +35,6 @@
    <feature url="features/org.eclipse.ptp.rdt.sync.fortran_0.0.0.jar" id="org.eclipse.ptp.rdt.sync.fortran" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rdt.remotetools_0.0.0.jar" id="org.eclipse.ptp.rdt.remotetools" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rm.jaxb.openmpi_0.0.0.jar" id="org.eclipse.ptp.rm.jaxb.openmpi" version="0.0.0"/>
+   <feature url="features/org.eclipse.ptp.rm.jaxb.contrib_0.0.0.jar" id="org.eclipse.ptp.rm.jaxb.contrib" version="0.0.0"/>  
    <feature url="features/org.eclipse.ptp.rdt.editor_0.0.0.jar" id="org.eclipse.ptp.rdt.editor" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.cdt.compilers_0.0.0.jar" id="org.eclipse.ptp.cdt.compilers" version="0.0.0"/>
 </site>
