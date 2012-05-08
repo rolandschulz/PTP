@@ -67,6 +67,7 @@ import org.eclipse.jgit.util.QuotedString;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
@@ -919,6 +920,11 @@ public class GitRemoteSyncConnection {
 
 				// Handle merge conflict. Read in data needed to resolve the conflict, and then reset the repo.
 				readMergeConflictFiles(remoteHeadRef);
+				if (!FileToMergePartsMap.isEmpty()) {
+					throw new RemoteSyncMergeConflictException(Messages.GitRemoteSyncConnection_2);
+					// Even if we later decide not to throw an exception, it is important not to proceed after a merge conflict.
+					// return;
+				}
 			} catch (TransportException e) {
 				if (e.getMessage().startsWith("Remote does not have ")) { //$NON-NLS-1$
 					// Means that the remote branch isn't set up yet (and thus nothing to fetch). Can be ignored and local to
