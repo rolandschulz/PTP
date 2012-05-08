@@ -65,25 +65,6 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
 	
 	/**
-	 * Perform Synchronization but resolve all merge conflicts by selecting the local version.
-	 * Note: This is a dangerous operation! Remote file changes are lost. It is up to the client to ensure that local files
-	 * reflect the user's wishes before calling this function.
-	 *
-	 * @param delta
-	 *            resources requiring synchronization
-	 * @param monitor
-	 *            progress monitor for monitoring or canceling synch
-	 * @param syncFlags
-	 *            Various flags for the sync call. For example, the sync can be
-	 *            forced, either to local (from remote) or to remote (from
-	 *            local). If forced, it is guaranteed to happen before
-	 *            returning. Otherwise, it may happen at any time.
-	 * @throws CoreException
-	 *             if synchronization fails
-	 */
-	public void synchronizeResolveAsLocal(IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncFileFilter filter,
-			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
-	/**
 	 * Get the current list of merge-conflicted files for the passed project and build scenario
 	 * 
 	 * @param project

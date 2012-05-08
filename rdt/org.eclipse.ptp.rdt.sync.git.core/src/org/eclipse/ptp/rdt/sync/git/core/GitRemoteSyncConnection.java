@@ -887,35 +887,24 @@ public class GitRemoteSyncConnection {
 	 *             exceptions, embedded in a RemoteSyncException.
 	 */
 	public void sync(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
-		this.syncInternal(monitor, includeUntrackedFiles, false);
-	}
-
-	private void syncInternal(IProgressMonitor monitor, boolean includeUntrackedFiles, boolean resolveAsLocal)
-			throws RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 25);
 		subMon.subTask(Messages.GitRemoteSyncConnection_1);
-		
+
 		try {
 			// Commit local and remote changes
 			doCommit();
-			if (!resolveAsLocal) {
-				if (prepareRemoteForCommit(subMon.newChild(5),includeUntrackedFiles)) {
-					commitRemoteFiles(subMon.newChild(5));
-				}
-            }
-			
+			if (prepareRemoteForCommit(subMon.newChild(5),includeUntrackedFiles)) {
+				commitRemoteFiles(subMon.newChild(5));
+			}
+
 			try {
 				// Fetch the remote repository
-				if (!resolveAsLocal) {
-					transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
-				}
+				transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
 
 				// Merge it with local
 				Ref remoteHeadRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
 				final MergeCommand mergeCommand = git.merge().include(remoteHeadRef);
-				if (resolveAsLocal) {
-					mergeCommand.setStrategy(MergeStrategy.OURS);
-				}
+				mergeCommand.setStrategy(MergeStrategy.OURS);
 				mergeCommand.call();
 
 				// Handle merge conflict. Read in data needed to resolve the conflict, and then reset the repo.
@@ -965,26 +954,7 @@ public class GitRemoteSyncConnection {
 			}
 		}
 	}
-	
-	/**
-	 * Do a "resolve sync" instead of a full sync. This sync completes a merge conflict by resolving differences in favor of the
-	 * local copy. No committing or fetching of the remote side is done. 
-	 *
-	 * @param monitor
-	 * @param includeUntrackedFiles
-	 * 				Should currently untracked remote files be added to the repository?
-	 * @throws RemoteSyncException
-	 *             for various problems sync'ing. The specific exception is
-	 *             nested within the RemoteSyncException. Many of the listed
-	 *             exceptions appear to be unrecoverable, caused by errors in
-	 *             the initial setup. It is vital, though, that failed syncs are
-	 *             reported and handled. So all exceptions are checked
-	 *             exceptions, embedded in a RemoteSyncException.
-	 */
-	public void syncResolveAsLocal(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
-		this.syncInternal(monitor, includeUntrackedFiles, true);
-	}
-	
+
 	/**
 	 * Get the merge-conflicted files
 	 * 
@@ -993,7 +963,7 @@ public class GitRemoteSyncConnection {
 	public Set<IPath> getMergeConflictFiles() {
 		return FileToMergePartsMap.keySet();
 	}
-	
+
 	/**
 	 * Return three strings representing the three parts of the given merge-conflicted file (local, remote, and ancestor, respectively)
 	 * or null if the given file is not in a merge conflict.

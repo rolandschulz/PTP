@@ -210,12 +210,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void synchronize(final IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncFileFilter fileFilter,
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		this.synchronizeInternal(project, buildScenario, delta, fileFilter, monitor, syncFlags, false);
-	}
-	
-	private void synchronizeInternal(final IProject project, BuildScenario buildScenario, IResourceDelta delta,
-			SyncFileFilter fileFilter, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags, boolean resolveAsLocal)
-					throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
 		
 		// On first sync, place .gitignore in directories. This is useful for folders that are already present and thus are never
@@ -309,10 +303,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				return;
 			}
 			
-			// Do not sync if there are merge conflicts, and we are not told to resolve them.
-			// Note: This is not just for efficiency but to prevent infinite sync loops, which can occur because we reset the
-			// repo after a merge conflict, which triggers another sync, which causes a conflict, which causes another reset...
-			if (!resolveAsLocal && !(this.getMergeConflictFiles(project, buildScenario).isEmpty())) {
+			// Do not sync if there are merge conflicts.
+			if (!(this.getMergeConflictFiles(project, buildScenario).isEmpty())) {
 				return;
 			}
 
@@ -372,11 +364,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				}
 				
 				try {
-					if (resolveAsLocal) {
-						fSyncConnection.syncResolveAsLocal(progress.newChild(40), true);
-					} else {
-						fSyncConnection.sync(progress.newChild(40), true);
-					}
+					fSyncConnection.sync(progress.newChild(40), true);
 				// Unlike other exceptions, we need to do some post-sync activities after a merge exception.
 				// TODO: Refactor code to get rid of duplication of post-sync activities.
 				} catch (RemoteSyncMergeConflictException e) {
@@ -402,18 +390,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				monitor.done();
 			}
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#synchronizeResolveAsLocal
-	 * (org.eclipse.core.resources.IResourceDelta, org.eclipse.ptp.rdt.sync.core.SyncFileFilter,
-	 * org.eclipse.core.runtime.IProgressMonitor, java.util.EnumSet)
-	 */
-	@Override
-	public void synchronizeResolveAsLocal(IProject project, BuildScenario buildScenario, IResourceDelta delta,
-			SyncFileFilter fileFilter, IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		this.synchronizeInternal(project, buildScenario, delta, fileFilter, monitor, syncFlags, true);
 	}
 	
 	// Return appropriate sync connection, creating a new one if necessary. This function must properly maintain the map of

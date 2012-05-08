@@ -36,7 +36,6 @@ import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.ISyncListener;
 import org.eclipse.ptp.rdt.sync.core.SyncEvent;
-import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.swt.SWT;
@@ -187,12 +186,14 @@ public class SyncMergeFileTableViewer extends ViewPart {
 								Messages.SyncMergeFileTableViewer_3);
 						if (shouldProceed) {
 							SyncManager.clearResolved(project);
-							SyncManager.syncResolveAsLocal(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+							// Fix: no more resolve as local
+							// SyncManager.syncResolveAsLocal(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
 						}
-					} catch (CoreException e) {
-						// This should never happen because only a blocking sync can throw a core exception.
-						RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMergeFileTableViewer_1);
-					}
+						// Fix: should reappear when sync invoked correctly - remove empty finally block
+//					} catch (CoreException e) {
+//						// This should never happen because only a blocking sync can throw a core exception.
+//						RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMergeFileTableViewer_1);
+					} finally {}
 				}
 			};
 			getViewSite().getActionBars().getToolBarManager().add(syncResolveAsLocalAction);
