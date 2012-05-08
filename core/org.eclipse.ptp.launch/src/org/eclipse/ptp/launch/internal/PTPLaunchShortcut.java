@@ -44,8 +44,8 @@ import org.eclipse.ui.IEditorPart;
  * TODO: NEEDS TO BE DOCUMENTED
  */
 public class PTPLaunchShortcut implements ILaunchShortcut {
-    public static final String LauncherGroupID = "org.eclipse.debug.ui.launchGroup.run"; //$NON-NLS-1$
-    
+	public static final String LauncherGroupID = "org.eclipse.debug.ui.launchGroup.run"; //$NON-NLS-1$
+
 	/**
 	 * @see ILaunchShortcut#launch(IEditorPart, String)
 	 */
@@ -54,58 +54,60 @@ public class PTPLaunchShortcut implements ILaunchShortcut {
 		IProject element = (IProject) input.getAdapter(IProject.class);
 		launch(element, mode);
 	}
-	
+
 	/**
 	 * @see ILaunchShortcut#launch(ISelection, String)
 	 */
 	public void launch(ISelection selection, String mode) {
 		if (selection instanceof IStructuredSelection) {
-		    launch(((IStructuredSelection)selection).getFirstElement(), mode);
-		} 		
+			launch(((IStructuredSelection) selection).getFirstElement(), mode);
+		}
 	}
-	
+
 	public void launch(Object element, String mode) {
-	    if (!(element instanceof IFile)) {
-	        MessageDialog.openInformation(PTPLaunchPlugin.getActiveWorkbenchShell(), Messages.PTPLaunchShortcut_0, Messages.PTPLaunchShortcut_1);
-	        return;
-	    }
-	        
-	    IFile file = (IFile)element;
-	        
-	    ILaunchConfiguration config = getILaunchConfigure(file);
-	    IStructuredSelection selection = null;
-	    if (config == null)
-	        selection  = new StructuredSelection();
-	    else 
-	        selection = new StructuredSelection(config);
-	        
-	    ILaunchGroup group = DebugUITools.getLaunchGroup(config, mode);
+		if (!(element instanceof IFile)) {
+			MessageDialog.openInformation(PTPLaunchPlugin.getActiveWorkbenchShell(), Messages.PTPLaunchShortcut_0,
+					Messages.PTPLaunchShortcut_1);
+			return;
+		}
+
+		IFile file = (IFile) element;
+
+		ILaunchConfiguration config = getILaunchConfigure(file);
+		IStructuredSelection selection = null;
+		if (config == null) {
+			selection = new StructuredSelection();
+		} else {
+			selection = new StructuredSelection(config);
+		}
+
+		ILaunchGroup group = DebugUITools.getLaunchGroup(config, mode);
 		DebugUITools.openLaunchConfigurationDialogOnGroup(PTPDebugUIPlugin.getShell(), selection, group.getIdentifier());
 	}
-	
-	public ILaunchConfiguration getILaunchConfigure(IFile file) {
-	    String projectName = file.getProject().getName();
-	    ILaunchManager lm = getLaunchManager();
-	    ILaunchConfigurationType configType = lm.getLaunchConfigurationType(IPTPLaunchConfigurationConstants.PTP_LAUNCHCONFIGURETYPE_ID);
-		try {
-		    ILaunchConfiguration[] configs = lm.getLaunchConfigurations(configType);
-		    for (int i=0; i<configs.length; i++) {
-		        if (configs[i].getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, "").equals(projectName)) //$NON-NLS-1$
-		            return configs[i];
-		    }
-		    ILaunchConfigurationWorkingCopy wc = configType.newInstance(file.getProject(), projectName);		    
-		    wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, projectName);
-		    wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, file.getName());
-	        //wc.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, IPTPLaunchConfigurationConstants.DEF_NETWORK_TYPE);
 
-		    return wc.doSave();
+	public ILaunchConfiguration getILaunchConfigure(IFile file) {
+		String projectName = file.getProject().getName();
+		ILaunchManager lm = getLaunchManager();
+		ILaunchConfigurationType configType = lm.getLaunchConfigurationType(IPTPLaunchConfigurationConstants.LAUNCH_APP_TYPE_ID);
+		try {
+			ILaunchConfiguration[] configs = lm.getLaunchConfigurations(configType);
+			for (int i = 0; i < configs.length; i++) {
+				if (configs[i].getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, "").equals(projectName)) {
+					return configs[i];
+				}
+			}
+			ILaunchConfigurationWorkingCopy wc = configType.newInstance(file.getProject(), projectName);
+			wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, projectName);
+			wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, file.getName());
+			// wc.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, IPTPLaunchConfigurationConstants.DEF_NETWORK_TYPE);
+
+			return wc.doSave();
 		} catch (CoreException e) {
 		}
 		return null;
 	}
-	
-	
+
 	private ILaunchManager getLaunchManager() {
-	    return DebugPlugin.getDefault().getLaunchManager();
+		return DebugPlugin.getDefault().getLaunchManager();
 	}
 }
