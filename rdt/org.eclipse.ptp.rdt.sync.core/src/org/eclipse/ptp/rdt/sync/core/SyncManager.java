@@ -215,42 +215,6 @@ public class SyncManager  {
 		}
 		return node.getBoolean(SHOW_ERROR_KEY, DEFAULT_SHOW_ERROR_SETTING);
 	}
-	
-	/**
-	 * Is the given path for the given project resolved?
-	 *
-	 * @param project
-	 * @param path
-	 * @return whether path is resolved
-	 */
-	public static boolean getResolved(IProject project, IPath path) {
-		if (project == null || path == null) {
-			throw new NullPointerException();
-		}
-		if (!(fProjectToResolvedFilesMap.containsKey(project))) {
-			fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
-		}
-		return fProjectToResolvedFilesMap.get(project).contains(path);
-	}
-
-	/**
-	 * Are the given paths for the given project resolved?
-	 *
-	 * @param project
-	 * @param set of paths
-	 * @return whether paths are resolved
-	 * @param seHandler
-	 *            sync exception handler
-	 */
-	public static boolean getResolved(IProject project, Set<IPath> paths) {
-		if (project == null || paths == null) {
-			throw new NullPointerException();
-		}
-		if (!(fProjectToResolvedFilesMap.containsKey(project))) {
-			fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
-		}
-		return fProjectToResolvedFilesMap.get(project).containsAll(paths);
-	}
 
 	/**
 	 * Set sync mode for a project
@@ -350,35 +314,6 @@ public class SyncManager  {
 		filter.saveFilter(node);
 
 		BuildConfigurationManager.flushNode(node);
-	}
-
-	/**
-	 * Set the given path as resolved or unresolved for the given project
-	 *
-	 * @param project
-	 * @param path
-	 */
-	public static void setResolved(IProject project, IPath path, boolean isResolved) {
-		if (project == null || path == null) {
-			throw new NullPointerException();
-		}
-		if (!(fProjectToResolvedFilesMap.containsKey(project))) {
-			fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
-		}
-		if (isResolved) {
-			fProjectToResolvedFilesMap.get(project).add(path);
-		} else {
-			fProjectToResolvedFilesMap.get(project).remove(path);
-		}
-	}
-
-	/**
-	 * Clear the list of resolved files for the given project.
-	 *
-	 * @param project
-	 */
-	public static void clearResolved(IProject project) {
-		fProjectToResolvedFilesMap.put(project, new HashSet<IPath>());
 	}
 	
 	/**
