@@ -657,7 +657,7 @@ public class GitRemoteSyncConnection {
 	}
 	
 	// Get the list of merge-conflicted files from jgit and parse each one, storing result in the cache.
-	private void readMergeConflictFiles() throws RemoteSyncException {
+	private void readMergeConflictFiles(Ref remoteHeadRef) throws RemoteSyncException {
 		String repoPath = git.getRepository().getWorkTree().getAbsolutePath();
 		if (!repoPath.endsWith(java.io.File.separator)) { // The documentation does not say if the separator is added...
 			repoPath += java.io.File.separator;
@@ -677,9 +677,9 @@ public class GitRemoteSyncConnection {
 			// Get the head, merge head, and merge base commits
 			walk.setRevFilter(RevFilter.MERGE_BASE);
 			ObjectId headSHA = git.getRepository().resolve("HEAD"); //$NON-NLS-1$
-			ObjectId mergeHeadSHA = git.getRepository().resolve("MERGE_HEAD"); //$NON-NLS-1$
+			ObjectId remoteHeadSHA = git.getRepository().resolve(remoteHeadRef.getName());
 			RevCommit head = walk.parseCommit(headSHA);
-			RevCommit mergeHead = walk.parseCommit(mergeHeadSHA);
+			RevCommit mergeHead = walk.parseCommit(remoteHeadSHA);
 			walk.markStart(head);
 			walk.markStart(mergeHead);
 			RevCommit mergeBase = walk.next();
@@ -910,15 +910,15 @@ public class GitRemoteSyncConnection {
 				}
 
 				// Merge it with local
-				Ref masterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
-				final MergeCommand mergeCommand = git.merge().include(masterRef);
+				Ref remoteHeadRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
+				final MergeCommand mergeCommand = git.merge().include(remoteHeadRef);
 				if (resolveAsLocal) {
 					mergeCommand.setStrategy(MergeStrategy.OURS);
 				}
 				mergeCommand.call();
 
 				// Handle merge conflict. Read in data needed to resolve the conflict, and then reset the repo.
-				readMergeConflictFiles();
+				readMergeConflictFiles(remoteHeadRef);
 			} catch (TransportException e) {
 				if (e.getMessage().startsWith("Remote does not have ")) { //$NON-NLS-1$
 					// Means that the remote branch isn't set up yet (and thus nothing to fetch). Can be ignored and local to
