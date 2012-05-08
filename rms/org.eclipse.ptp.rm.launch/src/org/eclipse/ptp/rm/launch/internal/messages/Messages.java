@@ -19,9 +19,11 @@ public class Messages extends NLS {
 	public static String Launch_common_DebuggerColon;
 	public static String Launch_common_Error;
 
+	public static String ResourcesTab_No_Connection_name;
+
 	public static String ResourcesTab_No_Resource_Manager_Available;
 	public static String ResourcesTab_Resources;
-	public static String ResourcesTab_No_Resource_Manager;
+	public static String ResourcesTab_No_Target_Configuration;
 	public static String ResourcesTab_No_Launch_Configuration;
 
 	public static String ResourcesTab_noInformation;
