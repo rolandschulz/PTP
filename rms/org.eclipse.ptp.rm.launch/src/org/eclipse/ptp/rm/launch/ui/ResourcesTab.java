@@ -442,14 +442,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			control.setConnectionName(conn.getName());
 			control.setRemoteServicesId(conn.getRemoteServices().getId());
 
-			if (!fRemoteConnectionWidget.getConnection().isOpen()) {
-				boolean result = MessageDialog
-						.openQuestion(
-								getShell(),
-								Messages.ResourcesTab_openConnection,
-								NLS.bind(
-										Messages.ResourcesTab_noInformation,
-										fRemoteConnectionWidget.getConnection().getName()));
+			if (!conn.isOpen()) {
+				boolean result = MessageDialog.openQuestion(getShell(), Messages.ResourcesTab_openConnection,
+						NLS.bind(Messages.ResourcesTab_noInformation, conn.getName()));
 				if (!result) {
 					return false;
 				}
