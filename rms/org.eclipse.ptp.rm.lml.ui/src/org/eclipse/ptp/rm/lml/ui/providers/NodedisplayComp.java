@@ -106,6 +106,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		 * 
 		 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
 		 */
+		@Override
 		public void mouseDoubleClick(MouseEvent e) {
 		}
 
@@ -114,12 +115,13 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		 * 
 		 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
 		 */
+		@Override
 		public void mouseDown(MouseEvent e) {
 			// Use the last coordinates from the mouseMove action
 			final Node<LMLNodeData> focussed = rectanglePaintListener.getNodeAtPos(
 					lastX, lastY);
 
-			if (rectanglePaintListener.isUsagebarConnectedToNode(focussed)) {
+			if (rectanglePaintListener.getUsagebarConnectedToNode(focussed) != null) {
 				mouseInteraction.mouseDownAction(rectanglePaintListener.getJobAtPos(focussed, lastX));
 			}
 			else {
@@ -132,12 +134,13 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		 * 
 		 * @see org.eclipse.swt.events.MouseMoveListener#mouseMove(org.eclipse.swt.events.MouseEvent)
 		 */
+		@Override
 		public void mouseMove(MouseEvent e) {
 			lastX = e.x;
 			lastY = e.y;
 			final Node<LMLNodeData> focussed = rectanglePaintListener.getNodeAtPos(lastX, lastY);
 
-			if (rectanglePaintListener.isUsagebarConnectedToNode(focussed)) {
+			if (rectanglePaintListener.getUsagebarConnectedToNode(focussed) != null) {
 				mouseInteraction.mouseMoveAction(rectanglePaintListener.getJobAtPos(focussed, lastX));
 			}
 			else {
@@ -150,11 +153,12 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		 * 
 		 * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
 		 */
+		@Override
 		public void mouseUp(MouseEvent e) {
 			// Use the last coordinates from the mouseMove action
 			final Node<LMLNodeData> focussed = rectanglePaintListener.getNodeAtPos(lastX, lastY);
 
-			if (rectanglePaintListener.isUsagebarConnectedToNode(focussed)) {
+			if (rectanglePaintListener.getUsagebarConnectedToNode(focussed) != null) {
 				mouseInteraction.mouseUpAction(rectanglePaintListener.getJobAtPos(focussed, lastX));
 			}
 			else {
@@ -355,6 +359,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 				maxLevel = layout.getMaxlevel().intValue();
 			}
 			TreeExpansion.expandLMLNode(node, maxLevel);
+			TreeExpansion.generateUsagebarsForAllLeaves(node);
 		}
 
 		init(node, layout);
@@ -617,6 +622,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * updateStatus(org.eclipse.ptp.rm.lml.internal.core.elements
 	 * .ObjectType, boolean, boolean)
 	 */
+	@Override
 	public void updateStatus(ObjectType object, boolean mouseOver, boolean mouseDown) {
 
 		if (parentNodedisplayComp == null) {
@@ -659,6 +665,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	private void addDisposeAction() {
 		this.addDisposeListener(new DisposeListener() {
 
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				removeUpdatable();
 
@@ -684,6 +691,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseMoveListener#mouseMove(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseMove(MouseEvent e) {
 				mouseInteraction.mouseMoveAction(node);
 			}
@@ -696,6 +704,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 			}
 
@@ -704,6 +713,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseDown(MouseEvent e) {
 				mouseInteraction.mouseDownAction(node);
 			}
@@ -713,6 +723,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseUp(MouseEvent e) {
 				if (e.x >= 0 && e.x <= getSize().x && e.y >= 0 && e.y <= getSize().y) {
 					mouseInteraction.mouseUpAction(node);
@@ -727,6 +738,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 			 */
+			@Override
 			public void handleEvent(Event event) {
 				mouseInteraction.mouseExitAction();
 			}
@@ -762,6 +774,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 			 */
+			@Override
 			public void handleEvent(Event event) {
 				mouseInteraction.mouseExitAction();
 			}
@@ -785,6 +798,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 			}
 
@@ -793,6 +807,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseDown(MouseEvent e) {
 
 				titleLabel.setBackground(titleBackgroundColor);
@@ -814,12 +829,14 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseUp(MouseEvent e) {
 			}
 		});
 		// Show different background if titlelabel is covered by the mouse
 		titleLabel.addMouseMoveListener(new MouseMoveListener() {
 
+			@Override
 			public void mouseMove(MouseEvent e) {
 				titleLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 			}
@@ -827,6 +844,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 		titleLabel.addListener(SWT.MouseExit, new Listener() {
 
+			@Override
 			public void handleEvent(Event event) {
 				titleLabel.setBackground(titleBackgroundColor);
 			}
@@ -882,6 +900,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 			 */
+			@Override
 			public void handleEvent(Event event) {
 				pictureComp.layout(true);
 			}

@@ -16,11 +16,14 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.ptp.rm.lml.core.messages.Messages;
+import org.eclipse.ptp.rm.lml.core.util.JAXBUtil;
 import org.eclipse.ptp.rm.lml.internal.core.elements.DataElement;
 import org.eclipse.ptp.rm.lml.internal.core.elements.DataType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.JobType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.UsageType;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLCheck.SchemeAndData;
 
 /**
@@ -31,6 +34,39 @@ import org.eclipse.ptp.rm.lml.internal.core.model.LMLCheck.SchemeAndData;
  * 
  */
 public class LMLNodeData {
+
+	/**
+	 * Jobname for the special empty job.
+	 * This name is needed for creating usage tags.
+	 */
+	private static final String emptyJobName = "empty"; //$NON-NLS-1$
+
+	/**
+	 * Collects all jobs defined in a usage-tag and puts them in a
+	 * hashmap. The map contains the amount of CPU used by each job
+	 * within the usage tag.
+	 * 
+	 * @param usage
+	 *            the converted usage tag.
+	 * @return map of jobnames to their used cpus
+	 */
+	private static HashMap<String, Integer> convertUsageIntoJobMap(UsageType usage) {
+		final HashMap<String, Integer> usageJobMap = new HashMap<String, Integer>();
+		int cpuSum = 0;
+		for (final JobType job : usage.getJob()) {
+			usageJobMap.put(job.getOid(), job.getCpucount().intValue());
+			cpuSum += job.getCpucount().intValue();
+		}
+		// Add additional empty job for missing cpus
+		int emptyCount = usage.getCpucount().intValue() - cpuSum;
+		if (emptyCount > 0) {
+			if (usageJobMap.containsKey(emptyJobName)) {
+				emptyCount += usageJobMap.get(emptyJobName);
+			}
+			usageJobMap.put(emptyJobName, emptyCount);
+		}
+		return usageJobMap;
+	}
 
 	/**
 	 * This is a helping function for getLowerNodes.
@@ -76,6 +112,68 @@ public class LMLNodeData {
 			}
 		}
 
+	}
+
+	/**
+	 * Merges the <code>toMerge</code> job map into the <code>jobMap</code>.
+	 * Both contain mappings between jobNames and the amount of lowest level elements
+	 * used by each job. The jobMap represents an incomplete mapping based on
+	 * a higher level cut of the LML tree. The toMerge jobmap is a map of a lower
+	 * level element and usually generated from a child node of the node associated with jobMap.
+	 * The node associated with jobMap references the rootJobName by its oid-attribute. The
+	 * rootJob's cpu amount will be decreased by the amounts of inserted jobs from the toMerge jobmap.
+	 * 
+	 * Example:
+	 * 
+	 * *
+	 * 
+	 * <pre>
+	 * {@code
+	 * <nodedisplay title="example" id="2">
+	 * 
+	 * 			<scheme>
+	 * 				<el1 tagname="Rack" min="1" max="4" mask="R%02d">
+	 * 					<el2 tagname="Nodecard" min="1" max="3" mask="-%02d" />
+	 * 				</el1>
+	 * 			</scheme>
+	 * 			
+	 * 			<data>
+	 * 				<el1 min="1" max="2" oid="job1">
+	 * 					<el2 min="3" oid="job2"/>
+	 * 				</el1>
+	 * 				<el1 min="3" max="4" oid="job2"/>
+	 * 			</data>
+	 * 			
+	 * </nodedisplay>
+	 * }
+	 * 
+	 * Assume you are generating a jobMap for R01.
+	 * The jobMap would be at first
+	 * job1 -> 3
+	 * 
+	 * The toMerge jobmap generated from R01-03 for example is
+	 * job2 -> 1
+	 * 
+	 * After calling mergeJobMaps("job1", jobMap, toMerge) the jobMap will be
+	 * job1 -> 2
+	 * job2 -> 1
+	 *  
+	 *  
+	 * @param rootJobName the name of the job referenced by the node, which is associated to jobMap
+	 * @param jobMap the output map, to which the contents of toMerge are added
+	 * @param toMerge the jobMap of a child of the node connected to jobMap
+	 */
+	private static void mergeJobMaps(String rootJobName, HashMap<String, Integer> jobMap, HashMap<String, Integer> toMerge) {
+		for (final String jobName : toMerge.keySet()) {
+			int cpuCount = toMerge.get(jobName);
+			// Reduce parent cpucount by current's job cpu count
+			jobMap.put(rootJobName, jobMap.get(rootJobName) - cpuCount);
+			// add new job or increase existing value for this job
+			if (jobMap.containsKey(jobName)) {
+				cpuCount += jobMap.get(jobName);
+			}
+			jobMap.put(jobName, cpuCount);
+		}
 	}
 
 	/**
@@ -219,6 +317,21 @@ public class LMLNodeData {
 	}
 
 	/**
+	 * Generate an usage-instance collecting all jobs running on this node
+	 * and its children. The usage-tag can be visualized by a usagebar.
+	 * 
+	 * @return Usagetag for this node as a collection of jobs running on this node
+	 */
+	public UsageType generateUsage() {
+		final HashMap<String, Integer> jobMap = getJobMap();
+
+		final int totalCPUCount = getLowestElementsCount();
+
+		return JAXBUtil.createUsageType(totalCPUCount, jobMap);
+	}
+
+	/**
+	 * 
 	 * @return LML-date-element from nodedisplay-data-tree or DataType
 	 */
 	public Object getData() {
@@ -341,6 +454,28 @@ public class LMLNodeData {
 	}
 
 	/**
+	 * Accumulate the amount of lowest elements defined by this.scheme.
+	 * Traverses the scheme-tree to its leaves and calculates the sum
+	 * of defined lowest level elements.
+	 * 
+	 * @return amount of lowest level elements defined by this.scheme
+	 */
+	public int getLowestElementsCount() {
+		final List<? extends SchemeElement> schemeElements = LMLCheck.getLowerSchemeElements(this.scheme);
+		int lowerCPUCount = 0;
+		if (schemeElements.size() > 0) {
+			for (final SchemeElement lowerEl : schemeElements) {
+				lowerCPUCount += getLowestElementsCount(lowerEl);
+			}
+		}
+		else {
+			lowerCPUCount = 1;
+		}
+		return lowerCPUCount;
+	}
+
+	/**
+	 * 
 	 * @return LML-scheme-element from nodedisplay-scheme-tree, or SchemeType for root-element
 	 */
 	public Object getScheme() {
@@ -370,7 +505,8 @@ public class LMLNodeData {
 		final DataElement data = getDataElement();
 
 		if (data == null) {
-			return false;
+			// For the root node this is true, because the root node has the correct data-tag associated
+			return true;
 		}
 
 		return levelList.size() == LMLCheck.getDataLevel(data);
@@ -381,6 +517,139 @@ public class LMLNodeData {
 	 */
 	public boolean isRootNode() {
 		return getSchemeElement() == null;
+	}
+
+	/**
+	 * Create a job list mapping a job's oid to the amount of lowest
+	 * level elements covered by the job. The job list will contain
+	 * all jobs defined within this.data and its children.
+	 * 
+	 * Example
+	 * *
+	 * 
+	 * <pre>
+	 * {@code
+	 * <nodedisplay title="example" id="nodedisplay1">
+	 * 
+	 * <scheme>
+	 * 	<el1 tagname="Rack" min="1" max="4" mask="R%02d">
+	 * 		<el2 tagname="Nodecard" min="1" max="3" mask="-%02d" />
+	 * 	</el1>
+	 * </scheme>
+	 * 
+	 * <data>
+	 * 	<el1 min="1" max="2" oid="job1">
+	 * 		<el2 min="3" oid="job2" />
+	 * 	</el1>
+	 * 	<el1 min="3" max="4" oid="job2" />
+	 * </data>
+	 * 
+	 * </nodedisplay>
+	 * }
+	 * </pre>
+	 * 
+	 * Assume you have a the LMLNodeData for R01.
+	 * This function will return the following map:
+	 * job1 -> 2
+	 * job2 -> 1
+	 * 
+	 * The map for R02 is identical. The returned maps for R03 and
+	 * R04 would be:
+	 * job2 -> 3
+	 * 
+	 * 
+	 * @return jobname to amount of lowest elements count map of all jobs within this data-tag
+	 */
+	private HashMap<String, Integer> getJobMap() {
+		final HashMap<String, Integer> jobMap = new HashMap<String, Integer>();
+		// Insert the root job
+		String rootJob = emptyJobName;
+		if (getDataElement() != null) {
+			rootJob = getDataElement().getOid();
+		}
+		jobMap.put(rootJob, getLowestElementsCount());
+		// Generate a map with all jobs directly found in all children of this node
+		final HashMap<String, Integer> directChildMap = new HashMap<String, Integer>();
+		final List<LMLNodeData> lowerNodes = getLowerNodes();
+		for (final LMLNodeData node : lowerNodes) {
+			// Insert root node job of all lower nodes
+			final String jobName = node.getDataElement().getOid();
+			int cpuCount = node.getLowestElementsCount();
+			if (directChildMap.containsKey(jobName)) {
+				cpuCount += directChildMap.get(jobName);
+			}
+			directChildMap.put(jobName, cpuCount);
+		}
+
+		mergeJobMaps(rootJob, jobMap, directChildMap);
+
+		// Do recursive merging of the jobMaps of each child
+		for (final LMLNodeData node : lowerNodes) {
+			// Merge the child map into the output map jobMap
+			mergeJobMaps(node.getDataElement().getOid(), jobMap, node.getJobMap());
+		}
+
+		// If this node's data-tag is a leave, check if it has a usagetag.
+		// The jobs within the pregenerated usagetag have to be merged into the
+		// jobMap, too. Use the usagebar only of the data-element is not a reference
+		// to a higher level data-tag.
+		if (getDataElement() != null && isDataElementOnNodeLevel()) {
+			// Are there data-tags as children of this node's data-tag
+			if (LMLCheck.getLowerDataElements(getDataElement()).size() == 0) {
+				if (getDataElement().getUsage() != null) {
+					// Convert usage-tag into jobmap
+					// This jobmap should contain all information about hte current node
+					return convertUsageIntoJobMap(getDataElement().getUsage());
+				}
+			}
+		}
+
+		// Remove the empty job entry, if it is not needed anymore
+		if (jobMap.containsKey(emptyJobName)) {
+			if (jobMap.get(emptyJobName) == 0) {
+				jobMap.remove(emptyJobName);
+			}
+		}
+
+		return jobMap;
+	}
+
+	/**
+	 * Count lowest elements defined by this scheme.
+	 * For a parallel system the lowest element is usually core.
+	 * In this case this function will count the cores defined by
+	 * the passed SchemeElement.
+	 * 
+	 * @param scheme
+	 *            the scheme defining parts of a system's architecture
+	 * @return amount of lowest level elements defined by this scheme
+	 */
+	private int getLowestElementsCount(SchemeElement scheme) {
+		int currentCount = 0;
+		if (scheme.getMin() != null) {
+			if (scheme.getMax() == null) {
+				currentCount = 1;
+			}
+			else {
+				currentCount = scheme.getMax().intValue() - scheme.getMin().intValue() + 1;
+			}
+		}
+		else {
+			currentCount = scheme.getList().split(",").length; //$NON-NLS-1$
+		}
+		// Traverse lower scheme elements and sum up all defined elements
+		final List<? extends SchemeElement> schemeElements = LMLCheck.getLowerSchemeElements(scheme);
+		int lowerCPUCount = 0;
+		if (schemeElements.size() == 0) { // Is this scheme element a leave?
+			lowerCPUCount = 1;
+		}
+		else {
+			lowerCPUCount = 0;
+			for (final SchemeElement lowerEl : schemeElements) {
+				lowerCPUCount += getLowestElementsCount(lowerEl);
+			}
+		}
+		return currentCount * lowerCPUCount;
 	}
 
 	/**
