@@ -17,8 +17,6 @@
 		<tycho-version>0.13.0</tycho-version>
 		<platform-version>4.2milestones</platform-version>
 		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
-		<!--orbit-version>R20110523182458</orbit-version>
-		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</orbit-site-->
 		<tm-version>3.3</tm-version>
 		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
 		<cdt-version>juno</cdt-version>
@@ -218,11 +216,6 @@
 			<url>${platform-site}</url>
 			<layout>p2</layout>
 		</repository>
-		<!-- repository>
-			<id>orbit-${orbit-version}</id>
-			<url>${orbit-site}</url>
-			<layout>p2</layout>
-		</repository-->
 		<repository>
 			<id>tm-${tm-version}</id>
 			<url>${tm-site}</url>
