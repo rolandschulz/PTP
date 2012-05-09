@@ -34,17 +34,15 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 		final IFolderLayout miscFolder = layout.createFolder("miscFolder", IPageLayout.BOTTOM, (float) 0.5, "jobsFolder"); //$NON-NLS-1$//$NON-NLS-2$
 		final IFolderLayout machinesFolder = layout.createFolder("machinesFolder", IPageLayout.BOTTOM, 0, editorArea); //$NON-NLS-1$
 
-		mainFolder.addView("org.eclipse.ptp.rm.ui.views.monitorView"); //$NON-NLS-1$
+		mainFolder.addView("org.eclipse.ptp.rm.ui.views.MonitorView"); //$NON-NLS-1$
 
-		jobsFolder.addView(ILMLUIConstants.VIEW_TABLE_1);
-		jobsFolder.addView(ILMLUIConstants.VIEW_TABLE_2);
+		jobsFolder.addView(ILMLUIConstants.ID_ACTIVE_JOBS_VIEW);
+		jobsFolder.addView(ILMLUIConstants.ID_INACTIVE_JOBS_VIEW);
 
-		machinesFolder.addView(ILMLUIConstants.VIEW_PARALLELNODES);
+		machinesFolder.addView(ILMLUIConstants.ID_SYSTEM_MONITOR_VIEW);
 
-		miscFolder.addView(ILMLUIConstants.VIEW_INFO);
+		miscFolder.addView(ILMLUIConstants.ID_INFO_VIEW);
 		miscFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
-		miscFolder.addView(IPageLayout.ID_PROP_SHEET);
-		miscFolder.addView(IPageLayout.ID_PROBLEM_VIEW);
-		miscFolder.addView(IPageLayout.ID_TASK_LIST);
+		miscFolder.addView("org.eclipse.ptp.remotetools.environment.ui.views.RemoteEnvironmentsView"); //$NON-NLS-1$
 	}
 }

@@ -12,7 +12,7 @@
          point="org.eclipse.ui.views">
       <view
             class="org.eclipse.ptp.rm.lml.monitor.ui.views.MonitorView"
-            id="org.eclipse.ptp.rm.ui.views.monitorView"
+            id="org.eclipse.ptp.rm.ui.views.MonitorView"
             name="%MonitorView.name"
             restorable="true">
       </view>
@@ -82,7 +82,7 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
-            locationURI="toolbar:org.eclipse.ptp.rm.ui.views.monitorView">
+            locationURI="toolbar:org.eclipse.ptp.rm.ui.views.MonitorView">
          <command
                commandId="org.eclipse.ptp.rm.lml.monitor.ui.startMonitor"
                icon="icons/eview16/start.gif"
