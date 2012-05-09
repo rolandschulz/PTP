@@ -22,7 +22,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -59,8 +58,6 @@ public class SyncManager  {
 		}
 	};
 
-	private static final Map<IProject, Set<IPath>> fProjectToResolvedFilesMap = Collections
-			.synchronizedMap(new HashMap<IProject, Set<IPath>>());
 	private static final Map<IProject, Set<ISyncListener>> fProjectToSyncListenersMap = Collections
 			.synchronizedMap(new HashMap<IProject, Set<ISyncListener>>());
 	
