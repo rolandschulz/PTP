@@ -440,11 +440,12 @@ public class NodedisplayView extends AbstractNodedisplayView {
 			lastShown = root.getShownImpName();
 		}
 
-		final ILguiItem oldLguiItem = lguiItem;
-		final Nodedisplay oldNodedisplay = nodedisplay;
+		final ILguiItem oldLguiItem = this.lguiItem;
+		final Nodedisplay oldNodedisplay = this.nodedisplay;
 
 		setLguiItem(lguiItem);
 		this.nodedisplay = nodedisplay;
+
 		// Restart zooming if another resource is monitored now
 		if (isNodedisplayChanged(oldLguiItem, oldNodedisplay, lguiItem, nodedisplay)) {
 			restartZoom();
@@ -589,7 +590,12 @@ public class NodedisplayView extends AbstractNodedisplayView {
 	 * @return a nodedisplay displaying the passed node
 	 */
 	private NodedisplayComp createNodedisplayFromImpName(String impName) {
-		final LMLNodeData nodeData = new LMLNodeData(impName, nodedisplay);
+		LMLNodeData nodeData = null;
+		try {
+			nodeData = new LMLNodeData(impName, nodedisplay);
+		} catch (final IllegalArgumentException er) {
+			nodeData = new LMLNodeData("", nodedisplay); //$NON-NLS-1$
+		}
 		final Node<LMLNodeData> newNode = new Node<LMLNodeData>(nodeData);
 
 		// Search for nodedisplayelement
