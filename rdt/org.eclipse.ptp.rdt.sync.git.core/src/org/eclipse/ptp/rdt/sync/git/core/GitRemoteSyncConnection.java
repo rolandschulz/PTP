@@ -972,4 +972,20 @@ public class GitRemoteSyncConnection {
 	public String[] getMergeConflictParts(IFile localFile) {
 		return FileToMergePartsMap.get(localFile.getFullPath().removeFirstSegments(1));
 	}
+	
+	/**
+	 * Add the path to the repository, resolving the merge conflict (if any)
+	 * @param path
+	 */
+	public void setMergeAsResolved(IPath path) {
+		
+	}
+	
+	/**
+	 * Reset the path and store it as a merge conflict
+	 * @param path
+	 */
+	public void setMergeAsNotResolved(IPath path) {
+		
+	}
 }

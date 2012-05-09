@@ -87,6 +87,28 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 */
 	public String[] getMergeConflictParts(IProject project, BuildScenario buildScenario, IFile file) throws CoreException;
 	
+	/**
+	 * Set the given file path as resolved (merge conflict does not exist)
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param path
+	 * @throws CoreException
+	 * 				for system-level problems setting the state
+	 */
+	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath path) throws CoreException;
+	
+	/**
+	 * Set the given file path as unresolved (merge conflict exists)
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param path
+	 * @throws CoreException
+	 * 				for system-level problems setting the state
+	 */
+	public void setMergeAsNotResolved(IProject project, BuildScenario buildScenario, IPath path) throws CoreException;
+
     /**
      * Close any resources (files, sockets) that were open by the sync provider. Resources not open by the provider should not be
      * touched. This is called, for example, when a project is about to be deleted.

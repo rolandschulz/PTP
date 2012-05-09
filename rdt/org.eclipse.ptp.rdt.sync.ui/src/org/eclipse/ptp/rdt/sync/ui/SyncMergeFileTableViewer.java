@@ -283,6 +283,16 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		if (project == null || path == null) {
 			throw new NullPointerException();
 		}
+		
+		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+		BuildScenario buildScenario = bcm.getBuildScenarioForProject(project);
+		try {
+			bcm.setMergeAsResolved(project, buildScenario, path);
+		} catch (CoreException e) {
+			RDTSyncUIPlugin.log(e);
+			return;
+		}
+		
 		fProjectToResolvedPathsMap.get(project).add(path);
 	}
 	
@@ -290,6 +300,16 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		if (project == null || path == null) {
 			throw new NullPointerException();
 		}
+		
+		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+		BuildScenario buildScenario = bcm.getBuildScenarioForProject(project);
+		try {
+			bcm.setMergeAsNotResolved(project, buildScenario, path);
+		} catch (CoreException e) {
+			RDTSyncUIPlugin.log(e);
+			return;
+		}
+		
 		fProjectToResolvedPathsMap.get(project).remove(path);
 	}
 

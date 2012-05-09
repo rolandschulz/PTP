@@ -411,6 +411,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#getMergeConflictFiles()
 	 */
+	@Override
 	public Set<IPath> getMergeConflictFiles(IProject project, BuildScenario buildScenario) throws RemoteSyncException {
 		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
 				SyncManager.getDefaultFileFilter(), null);
@@ -421,6 +422,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#getMergeConflictParts(org.eclipse.core.resources.IFile)
 	 */
+	@Override
 	public String[] getMergeConflictParts(IProject project, BuildScenario buildScenario, IFile file) throws RemoteSyncException {
 		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
 				SyncManager.getDefaultFileFilter(), null);
@@ -483,5 +485,27 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		for (GitRemoteSyncConnection conn : syncConnectionMap.values()) {
 			conn.close();
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#setResolved(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.sync.core.BuildScenario, org.eclipse.core.runtime.IPath)
+	 */
+	@Override
+	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
+				SyncManager.getDefaultFileFilter(), null);
+		fSyncConnection.setMergeAsResolved(path);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#setUnResolved(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.sync.core.BuildScenario, org.eclipse.core.runtime.IPath)
+	 */
+	@Override
+	public void setMergeAsNotResolved(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
+				SyncManager.getDefaultFileFilter(), null);
+		fSyncConnection.setMergeAsNotResolved(path);
 	}
 }
