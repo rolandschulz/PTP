@@ -48,7 +48,6 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
-import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.revwalk.filter.RevFilter;
@@ -904,7 +903,6 @@ public class GitRemoteSyncConnection {
 				// Merge it with local
 				Ref remoteHeadRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
 				final MergeCommand mergeCommand = git.merge().include(remoteHeadRef);
-				mergeCommand.setStrategy(MergeStrategy.OURS);
 				mergeCommand.call();
 
 				// Handle merge conflict. Read in data needed to resolve the conflict, and then reset the repo.
