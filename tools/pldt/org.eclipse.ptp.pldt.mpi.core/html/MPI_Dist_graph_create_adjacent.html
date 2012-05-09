@@ -1,0 +1,294 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Dist_graph_create_adjacent</title>
+
+</head>
+<body>
+
+<h1 align=center>MPI_Dist_graph_create_adjacent</h1>
+
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Dist_graph_create_adjacent</b>
+&minus; Makes a new communicator to which distributed graph topology
+information has been attached.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Dist_graph_create_adjacent(MPI_Comm <i>comm_old</i>, int
+<i>indegree</i>, int <i>sources</i>[],</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+<p valign="top">int <i>sourceweights</i>[], int <i>outdegree</i>, int <i>destinations</i>[], int <i>destweights</i>[],</p></td>
+</tr>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+<p valign="top">MPI_Info <i>info</i>, int <i>reorder</i>[], MPI_Comm <i>*comm_dist_graph</i>[])</p></td>
+</tr>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_DIST_GRAPH_CREATE_ADJACENT(<i>COMM_OLD, INDEGREE, SOURCES, SOURCEWEIGHTS,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+<p valign="top"><i>OUTDEGREE, DESTINATIONS, DESTWEIGHTS,</i></p></td>
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+<p valign="top"><i>INFO, REORDER, COMM_DIST_GRAPH, IERROR</i>)</p></td>
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">&nbsp;</td>
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+<p valign="top"><i>COMM_OLD, INDEGREE, SOURCES(*), SOURCEWEIGHTS(*),</i></p> </td>
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+<p valign="top"><i>OUTDEGREE, DESTINATIONS(*), DESTWEIGHTS(*),</i></p></td>
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+<p valign="top"><i>INFO, COMM_DIST_GRAPH, IERROR</i></p></td>
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+<p valign="top">LOGICAL</p></td>
+<td width="8%"></td>
+<td width="69%">
+<i>REORDER</i>
+</td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+Distgraphcomm Intracomm::Dist_graph_create_adjacent(int <i>indegree</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="31%"></td>
+<td width="69%">
+<p valign="top">const int <i>sources</i>[],
+const int <i>sourceweights</i>[],
+int <i>outdegree</i>,</p></td>
+
+<tr valign="top" align="left">
+<td width="31%"></td>
+<td width="69%">
+<p valign="top">const int <i>destinations</i>[],
+const int <i>destweights</i>[],
+const Info& <i>info</i>,</p></td>
+
+<tr valign="top" align="left">
+<td width="31%"></td>
+<td width="69%">
+<p valign="top">bool <i>reorder</i>) const</p></td>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">Distgraphcomm Intracomm::Dist_graph_create_adjacent(int <i>indegree</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="31%"></td>
+<td width="69%">
+<p valign="top">const int <i>sources</i>[],
+int <i>outdegree</i>,</p></td>
+
+<tr valign="top" align="left">
+<td width="31%"></td>
+<td width="69%">
+<p valign="top">const int <i>destinations</i>[],
+const Info& <i>info</i>,
+bool <i>reorder</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">comm_old</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Input communicator (handle).</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">indegree</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Size of <i>sources</i> and <i>sourceweights</i> arrays (integer).</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">sources</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Process ranks for which this process is a destination.</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">sourceweights</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Weights of the edges into this process.</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">outdegree</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Size of <i>destinations</i> and <i>destweights</i> arrays.</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">destinations</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Process ranks for which this process is a source.</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">destweights</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Weights of the edges out of this process.</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">info</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Hints for
+interpreting and optimizing weights (handle).</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">reorder</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Ranking may be
+reordered (true) or not (false) (logical).</p></td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+<p style="margin-top: 1em" valign="top">comm_dist_graph</p>
+</td>
+<td width="6%"></td>
+<td width="57%">
+<p style="margin-top: 1em" valign="top">Communicator with distributed graph
+topology (handle).</p></td>
+<td width="17%">
+</td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<h2>FOR MORE INFORMATION</h2>
+
+For more information, see page 252 of the
+ <a target="_blank" href="http://www.mpi-forum.org/docs/mpi-2.2/mpi22-report.pdf">MPI 2.2 standard</a>.
+
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>
