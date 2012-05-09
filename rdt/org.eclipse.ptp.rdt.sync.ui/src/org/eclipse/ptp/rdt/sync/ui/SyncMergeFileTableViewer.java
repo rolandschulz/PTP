@@ -19,8 +19,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -56,7 +54,6 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	private IProject project;
 	private TableViewer fileTableViewer;
 	private Set<IPath> mergeConflictedFiles;
-	private Action syncResolveAsLocalAction;
 	private ISelectionListener selectionListener;
 	private ISyncListener syncListener;
 	
@@ -123,7 +120,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 				@Override
 				public Image getImage(Object element) {
 					assert(element instanceof IPath);
-					if (SyncManager.getResolved(project, (IPath) element)) {
+					if (getResolved(project, (IPath) element)) {
 						return CHECKED;
 					} else {
 						return UNCHECKED;
@@ -138,7 +135,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 				public String getText(Object element) {
 					assert(element instanceof IPath);
 					// Return appropriate text only if images are unavailable
-					if (SyncManager.getResolved(project, (IPath) element)) {
+					if (getResolved(project, (IPath) element)) {
 						if (CHECKED == null) {
 							return "Yes"; //$NON-NLS-1$
 						} else {
@@ -177,26 +174,6 @@ public class SyncMergeFileTableViewer extends ViewPart {
 					}
 				}
 			});
-			
-			// Add sync button to toolbar
-			syncResolveAsLocalAction = new Action(Messages.SyncMergeFileTableViewer_0) {
-				public void run() {
-					try {
-						boolean shouldProceed = MessageDialog.openConfirm(parent.getShell(), Messages.SyncMergeFileTableViewer_2,
-								Messages.SyncMergeFileTableViewer_3);
-						if (shouldProceed) {
-							SyncManager.clearResolved(project);
-							// Fix: no more resolve as local
-							// SyncManager.syncResolveAsLocal(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
-						}
-						// Fix: should reappear when sync invoked correctly - remove empty finally block
-//					} catch (CoreException e) {
-//						// This should never happen because only a blocking sync can throw a core exception.
-//						RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMergeFileTableViewer_1);
-					} finally {}
-				}
-			};
-			getViewSite().getActionBars().getToolBarManager().add(syncResolveAsLocalAction);
 
 			// Allow user to toggle whether file is resolved
 			fileTableViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -204,11 +181,10 @@ public class SyncMergeFileTableViewer extends ViewPart {
 				public void doubleClick(DoubleClickEvent event) {
 					Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
 					assert(selection instanceof IPath);
-					SyncManager.setResolved(project, (IPath) selection, !(SyncManager.getResolved(project, (IPath) selection)));
-					if (SyncManager.getResolved(project, mergeConflictedFiles)) {
-						syncResolveAsLocalAction.setEnabled(true);
+					if (!getResolved(project, (IPath) selection)) {
+						setResolved(project, (IPath) selection);
 					} else {
-						syncResolveAsLocalAction.setEnabled(false);
+						setUnResolved(project, (IPath) selection);
 					}
 					fileTableViewer.refresh();
 				}
@@ -272,11 +248,6 @@ public class SyncMergeFileTableViewer extends ViewPart {
 			}
 		}
 		fileTableViewer.setInput(mergeConflictedFiles);
-		if (project != null && SyncManager.getResolved(project, mergeConflictedFiles)) {
-			syncResolveAsLocalAction.setEnabled(true);
-		} else {
-			syncResolveAsLocalAction.setEnabled(false);
-		}
 		fileTableViewer.refresh();
 	}
 
@@ -287,6 +258,18 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	@Override
 	public void setFocus() {
 		fileTableViewer.getControl().setFocus();
+	}
+
+	private boolean getResolved(IProject project, IPath path) {
+		return true;
+	}
+	
+	private void setResolved(IProject project, IPath path) {
+		
+	}
+	
+	private void setUnResolved(IProject project, IPath path) {
+		
 	}
 
 	/*
