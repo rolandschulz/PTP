@@ -26,8 +26,6 @@ import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
 public interface ILMLUIConstants extends ILMLCoreConstants {
 	public static final String ID_SYSTEM_MONITOR_VIEW = "org.eclipse.ptp.rm.lml.ui.SystemMonitorView"; //$NON-NLS-1$
 	public static final String ID_INFO_VIEW = "org.eclipse.ptp.rm.lml.ui.InfoView"; //$NON-NLS-1$
-	public static final String ID_ACTIVE_JOBS_VIEW = "org.eclipse.ptp.rm.lml.ui.ActiveJobsView"; //$NON-NLS-1$
-	public static final String ID_INACTIVE_JOBS_VIEW = "org.eclipse.ptp.rm.lml.ui.InactiveJobsView"; //$NON-NLS-1$
 
 	public static final int INTERNAL_ERROR = 150;
 	public static final String COLUMN_STATUS = "status";//$NON-NLS-1$

@@ -123,7 +123,7 @@ public class TableHandler extends LguiHandler {
 				}
 				if (columnLayout.getKey().equals(ILguiItem.JOB_STATUS)) {
 					column.setType(ITableColumnLayout.COLUMN_TYPE_MANDATORY);
-					if (gid.equals(ILguiItem.ACTIVE_JOB_TABLE)) {
+					if (gid.equals(ILMLCoreConstants.ID_ACTIVE_JOBS_VIEW)) {
 						generateDefaultPattern(JobStatusData.RUNNING, column);
 					} else {
 						generateDefaultPattern(JobStatusData.SUBMITTED, column);

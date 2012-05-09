@@ -731,11 +731,11 @@ public class LguiItem implements ILguiItem {
 
 	private void checkTables(TableHandler handler) {
 		if (handler != null) {
-			if (handler.getTable(ACTIVE_JOB_TABLE) == null) {
-				handler.generateDefaultTable(ACTIVE_JOB_TABLE);
+			if (handler.getTable(ILMLCoreConstants.ID_ACTIVE_JOBS_VIEW) == null) {
+				handler.generateDefaultTable(ILMLCoreConstants.ID_ACTIVE_JOBS_VIEW);
 			}
-			if (handler.getTable(INACTIVE_JOB_TABLE) == null) {
-				handler.generateDefaultTable(INACTIVE_JOB_TABLE);
+			if (handler.getTable(ILMLCoreConstants.ID_INACTIVE_JOBS_VIEW) == null) {
+				handler.generateDefaultTable(ILMLCoreConstants.ID_INACTIVE_JOBS_VIEW);
 			}
 		}
 	}
@@ -801,9 +801,9 @@ public class LguiItem implements ILguiItem {
 
 	private String getGidFromJobStatus(String status) {
 		if (status.equals(JobStatusData.RUNNING)) {
-			return ACTIVE_JOB_TABLE;
+			return ILMLCoreConstants.ID_ACTIVE_JOBS_VIEW;
 		}
-		return INACTIVE_JOB_TABLE;
+		return ILMLCoreConstants.ID_INACTIVE_JOBS_VIEW;
 	}
 
 	private void setCid() {
@@ -882,9 +882,9 @@ public class LguiItem implements ILguiItem {
 			 * Next find any jobs that are no longer in any of the tables. We need to create a "fake" entry in the jobslistwait
 			 * table for these. Note that these jobs are now considered "COMPLETED".
 			 */
-			TableType table = getTableHandler().getTable(INACTIVE_JOB_TABLE);
+			TableType table = getTableHandler().getTable(ILMLCoreConstants.ID_INACTIVE_JOBS_VIEW);
 			if (table == null) {
-				table = getTableHandler().generateDefaultTable(INACTIVE_JOB_TABLE);
+				table = getTableHandler().generateDefaultTable(ILMLCoreConstants.ID_INACTIVE_JOBS_VIEW);
 			}
 
 			synchronized (fJobMap) {
