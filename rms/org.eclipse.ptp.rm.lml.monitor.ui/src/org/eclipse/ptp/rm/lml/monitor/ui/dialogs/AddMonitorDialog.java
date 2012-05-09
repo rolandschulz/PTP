@@ -35,7 +35,6 @@ public class AddMonitorDialog extends TitleAreaDialog {
 	private Combo fSystemTypeCombo;
 	private RemoteConnectionWidget fRemoteConnectionWidget;
 	private String fSystemType;
-	private IRemoteConnection fRemoteConnection;
 
 	public AddMonitorDialog(Shell parentShell) {
 		super(parentShell);
@@ -47,7 +46,10 @@ public class AddMonitorDialog extends TitleAreaDialog {
 	 * @return remote connection, or null
 	 */
 	public IRemoteConnection getRemoteConnection() {
-		return fRemoteConnection;
+		if (fRemoteConnectionWidget != null && !fRemoteConnectionWidget.isDisposed()) {
+			return fRemoteConnectionWidget.getConnection();
+		}
+		return null;
 	}
 
 	/**
@@ -61,8 +63,9 @@ public class AddMonitorDialog extends TitleAreaDialog {
 
 	private void updateEnablement() {
 		Boolean valid = false;
-		if (fRemoteConnection != null) {
-			valid = (MonitorControlManager.getInstance().getMonitorControl(fRemoteConnection, getSystemType()) == null);
+		IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
+		if (conn != null) {
+			valid = (MonitorControlManager.getInstance().getMonitorControl(conn, getSystemType()) == null);
 		}
 		fRemoteConnectionWidget.setEnabled(fSystemTypeCombo.getSelectionIndex() > 0);
 		Button button = getButton(IDialogConstants.OK_ID);
@@ -128,7 +131,6 @@ public class AddMonitorDialog extends TitleAreaDialog {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
-				fRemoteConnection = fRemoteConnectionWidget.getConnection();
 				updateEnablement();
 			}
 		});
