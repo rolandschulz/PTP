@@ -60,13 +60,16 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	
 	// Simple pair class for bundling a project and build scenario.
 	// Since we use this as a key, equality testing is important.
+	// Note that we use the project location in equality testing, as this can change even though the project object stays the same.
 	private static class ProjectAndScenario {
 		private IProject project;
 		private BuildScenario scenario;
+		private String projectLocation;
 
 		ProjectAndScenario(IProject p, BuildScenario bs) {
 			project = p;
 			scenario = bs;
+			projectLocation = p.getLocation().toString();
 		}
 
 		@Override
@@ -75,6 +78,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			int result = 1;
 			result = prime * result
 					+ ((project == null) ? 0 : project.hashCode());
+			result = prime
+					* result
+					+ ((projectLocation == null) ? 0 : projectLocation
+							.hashCode());
 			result = prime * result
 					+ ((scenario == null) ? 0 : scenario.hashCode());
 			return result;
@@ -94,6 +101,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					return false;
 			} else if (!project.equals(other.project))
 				return false;
+			if (projectLocation == null) {
+				if (other.projectLocation != null)
+					return false;
+			} else if (!projectLocation.equals(other.projectLocation))
+				return false;
 			if (scenario == null) {
 				if (other.scenario != null)
 					return false;
@@ -101,6 +113,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				return false;
 			return true;
 		}
+
 	}
 	private Map<ProjectAndScenario, GitRemoteSyncConnection> syncConnectionMap = Collections.synchronizedMap(
 			new HashMap<ProjectAndScenario, GitRemoteSyncConnection>());

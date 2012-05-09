@@ -134,7 +134,7 @@ public class MonitorView extends ViewPart {
 		composite.setLayout(fTableColumnLayout);
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		fViewer = new TableViewer(composite, SWT.SINGLE);
+		fViewer = new TableViewer(composite, SWT.SINGLE | SWT.FULL_SELECTION);
 		fViewer.setContentProvider(ArrayContentProvider.getInstance());
 		fViewer.setComparator(new SystemsViewSorter());
 		fViewer.setUseHashlookup(true);

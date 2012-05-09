@@ -1,12 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
- * and the accompanying materials are made available under the terms of the
- * Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html 
- * 	
- * Contributors: 
- * 	Albert L. Rossi - design and implementation
- ******************************************************************************/
+ * Copyright (c) 2012 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rm.lml.monitor.ui.wizards;
 
 import java.net.URI;
@@ -24,10 +25,7 @@ import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Generic Wizard for the JAXB Resource Manager Control. Provides connection
- * configuration.
- * 
- * @author arossi
+ * Generic Wizard for the JAXB Resource Manager Control. Provides connection configuration.
  * 
  */
 public final class LMLRMMonitorConfigurationWizardPage extends AbstractRemoteResourceManagerConfigurationWizardPage {
@@ -44,11 +42,9 @@ public final class LMLRMMonitorConfigurationWizardPage extends AbstractRemoteRes
 	}
 
 	/*
-	 * Exports as default remote connection information whatever is set in the
-	 * Site subtree of the JAXB data tree. (non-Javadoc)
+	 * Exports as default remote connection information whatever is set in the Site subtree of the JAXB data tree. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.ui.wizards.
-	 * AbstractRemoteResourceManagerConfigurationWizardPage
+	 * @see org.eclipse.ptp.rm.ui.wizards. AbstractRemoteResourceManagerConfigurationWizardPage
 	 * #doCreateContents(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
@@ -60,8 +56,7 @@ public final class LMLRMMonitorConfigurationWizardPage extends AbstractRemoteRes
 				SiteType site = getBaseConfiguration().getResourceManagerData().getSiteData();
 				if (site != null && site.getMonitorConnection() != null && getConfiguration().getRemoteServicesId() == null) {
 					/*
-					 * Configuration has not be initialized, so initialize now
-					 * with values from XML
+					 * Configuration has not be initialized, so initialize now with values from XML
 					 */
 					URI uri = new URI(site.getMonitorConnection());
 					IRemoteServices services = PTPRemoteUIPlugin.getDefault().getRemoteServices(uri, getWizard().getContainer());
@@ -104,8 +99,7 @@ public final class LMLRMMonitorConfigurationWizardPage extends AbstractRemoteRes
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#getConfiguration()
+	 * @see org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#getConfiguration()
 	 */
 	@Override
 	protected IJAXBResourceManagerConfiguration getConfiguration() {

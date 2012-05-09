@@ -485,13 +485,8 @@ public class RemoteConnectionWidget extends Composite {
 
 			if (connections.length > 0) {
 				fConnectionCombo.select(selected);
+				handleConnectionSelected();
 			}
-
-			/*
-			 * A connection is always going to be selected when a remote service provider is selected, so make sure the handlers get
-			 * notified
-			 */
-			// handleConnectionSelected();
 
 			/*
 			 * Enable 'new' button if new connections are supported

@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2012 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rm.lml.monitor.ui.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -7,6 +17,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.ptp.rm.jaxb.ui.util.JAXBExtensionUtils;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
+import org.eclipse.ptp.rm.lml.monitor.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -50,6 +61,7 @@ public class AddMonitorDialog extends TitleAreaDialog {
 
 	private void updateEnablement() {
 		Boolean valid = false;
+		fRemoteConnection = fRemoteConnectionWidget.getConnection();
 		if (fRemoteConnection != null) {
 			valid = (MonitorControlManager.getInstance().getMonitorControl(fRemoteConnection, getSystemType()) == null);
 		}
@@ -79,9 +91,9 @@ public class AddMonitorDialog extends TitleAreaDialog {
 	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		getShell().setText("Add Monitor");
-		setTitle("Select a new monitor type to add");
-		setMessage("Choose a monitor type, then select the connection to use for the monitor.");
+		getShell().setText(Messages.AddMonitorDialog_Add_Monitor);
+		setTitle(Messages.AddMonitorDialog_Select_new_monitor);
+		setMessage(Messages.AddMonitorDialog_Choose_a_monitor_type);
 
 		Composite composite = new Composite(parent, SWT.NULL);
 		GridData gd = new GridData(GridData.FILL_BOTH);
@@ -90,13 +102,13 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		composite.setLayout(topLayout);
 		composite.setLayoutData(gd);
 
-		new Label(composite, SWT.NONE).setText("Monitor Type:");
+		new Label(composite, SWT.NONE).setText(Messages.AddMonitorDialog_Monitor_Type);
 
 		fSystemTypeCombo = new Combo(composite, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		fSystemTypeCombo.setLayoutData(gd);
 		fSystemTypeCombo.setItems(JAXBExtensionUtils.getMonitorTypes());
-		fSystemTypeCombo.add("Please select a monitor type", 0);
+		fSystemTypeCombo.add(Messages.AddMonitorDialog_Please_select_a_monitor_type, 0);
 		fSystemTypeCombo.select(0);
 		fSystemTypeCombo.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -117,7 +129,6 @@ public class AddMonitorDialog extends TitleAreaDialog {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
-				fRemoteConnection = fRemoteConnectionWidget.getConnection();
 				updateEnablement();
 			}
 		});
