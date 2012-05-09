@@ -10,7 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -53,9 +56,13 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	private Image UNCHECKED;
 	private IProject project;
 	private TableViewer fileTableViewer;
-	private Set<IPath> mergeConflictedFiles;
 	private ISelectionListener selectionListener;
 	private ISyncListener syncListener;
+	
+	private static final Map<IProject, Set<IPath>> fProjectToAllPathsMap = Collections.
+			synchronizedMap(new HashMap<IProject, Set<IPath>>());
+	private static final Map<IProject, Set<IPath>> fProjectToResolvedPathsMap = Collections.
+			synchronizedMap(new HashMap<IProject, Set<IPath>>());
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.ViewPart#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String,
@@ -237,17 +244,22 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	
 	// Update the viewer based on the current project set in the "project" variable. 
 	private void update() {
-		mergeConflictedFiles = new HashSet<IPath>();
-		if (project != null) {
-			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-			BuildScenario buildScenario = bcm.getBuildScenarioForProject(project);
-			try {
-				mergeConflictedFiles = bcm.getMergeConflictFiles(project, buildScenario);
-			} catch (CoreException e) {
-				RDTSyncUIPlugin.log(e);
-			}
+		if (project == null) {
+			return;
 		}
-		fileTableViewer.setInput(mergeConflictedFiles);
+
+		Set<IPath> mergeConflictFiles;
+		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+		BuildScenario buildScenario = bcm.getBuildScenarioForProject(project);
+		try {
+			mergeConflictFiles = bcm.getMergeConflictFiles(project, buildScenario);
+			fProjectToAllPathsMap.put(project, mergeConflictFiles);
+		} catch (CoreException e) {
+			fProjectToAllPathsMap.put(project, new HashSet<IPath>());
+			RDTSyncUIPlugin.log(e);
+		}
+		fProjectToResolvedPathsMap.put(project, new HashSet<IPath>());
+		fileTableViewer.setInput(fProjectToAllPathsMap.get(project));
 		fileTableViewer.refresh();
 	}
 
@@ -261,15 +273,24 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	}
 
 	private boolean getResolved(IProject project, IPath path) {
-		return true;
+		if (project == null || path == null) {
+			throw new NullPointerException();
+		}
+		return fProjectToResolvedPathsMap.get(project).contains(path);
 	}
-	
+
 	private void setResolved(IProject project, IPath path) {
-		
+		if (project == null || path == null) {
+			throw new NullPointerException();
+		}
+		fProjectToResolvedPathsMap.get(project).add(path);
 	}
 	
 	private void setUnResolved(IProject project, IPath path) {
-		
+		if (project == null || path == null) {
+			throw new NullPointerException();
+		}
+		fProjectToResolvedPathsMap.get(project).remove(path);
 	}
 
 	/*
