@@ -35,9 +35,6 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.ptp.internal.rdt.sync.ui.SyncPluginImages;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
-import org.eclipse.ptp.rdt.sync.core.ISyncListener;
-import org.eclipse.ptp.rdt.sync.core.SyncEvent;
-import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -57,7 +54,6 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	private IProject project;
 	private TableViewer fileTableViewer;
 	private ISelectionListener selectionListener;
-	private ISyncListener syncListener;
 	
 	private static final Map<IProject, Set<IPath>> fProjectToAllPathsMap = Collections.
 			synchronizedMap(new HashMap<IProject, Set<IPath>>());
@@ -91,9 +87,6 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		if (selectionListener != null) {
 			ISelectionService selectionService = (ISelectionService) getSite().getService(ISelectionService.class);
 			selectionService.removePostSelectionListener(selectionListener);
-		}
-		if (project != null) {
-			SyncManager.removePostSyncListener(project, syncListener);
 		}
 	}
 
@@ -209,18 +202,6 @@ public class SyncMergeFileTableViewer extends ViewPart {
 				}
 			};
 			selectionService.addPostSelectionListener(selectionListener);
-			
-			// Create a sync listener, which will be registered with the correct project
-			syncListener = new ISyncListener() {
-				@Override
-				public void handleSyncEvent(SyncEvent event) {
-					RDTSyncUIPlugin.getStandardDisplay().syncExec(new Runnable() {
-						public void run(){
-							SyncMergeFileTableViewer.this.update();
-						}
-					});
-				}
-			};
 
 			// Set contents
 			fileTableViewer.setContentProvider(ArrayContentProvider.getInstance());
@@ -232,14 +213,10 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	// checking as to whether the switch is necessary.
 	private void switchProject(IProject newProject) {
 		// Move sync listener from old project to new project
-		if (project != null) {
-			SyncManager.removePostSyncListener(project, syncListener);
-		}
-		if (newProject != null) {
-			SyncManager.addPostSyncListener(newProject, syncListener);
-		}
 		project = newProject;
-		update();
+		if (!fProjectToAllPathsMap.containsKey(project)) {
+			update();
+		}
 	}
 	
 	// Update the viewer based on the current project set in the "project" variable. 
