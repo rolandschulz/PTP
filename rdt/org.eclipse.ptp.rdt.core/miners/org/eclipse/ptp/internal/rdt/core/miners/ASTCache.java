@@ -109,8 +109,8 @@ public class ASTCache {
 				e.printStackTrace();
 				return null;
 			}
-			
-			FileContent fileContent =  new InternalFileContent(absolutePath, chars, file.lastModified(), file.length());
+			long fileReadTime = System.currentTimeMillis();
+			FileContent fileContent =  new InternalFileContent(absolutePath, chars, file.lastModified(), file.length(), fileReadTime);
 			
 			try {
 				index.acquireReadLock();
