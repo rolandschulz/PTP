@@ -40,6 +40,7 @@ import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoFilepatternException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.NotSupportedException;
 import org.eclipse.jgit.errors.TransportException;
@@ -977,8 +978,15 @@ public class GitRemoteSyncConnection {
 	 * Add the path to the repository, resolving the merge conflict (if any)
 	 * @param path
 	 */
-	public void setMergeAsResolved(IPath path) {
-		
+	public void setMergeAsResolved(IPath path) throws RemoteSyncException {
+		AddCommand addCommand = git.add();
+		addCommand.addFilepattern(path.toOSString());
+		try {
+			addCommand.call();
+		} catch (NoFilepatternException e) {
+			throw new RemoteSyncException(e);
+		}
+		FileToMergePartsMap.remove(path);
 	}
 	
 	/**
