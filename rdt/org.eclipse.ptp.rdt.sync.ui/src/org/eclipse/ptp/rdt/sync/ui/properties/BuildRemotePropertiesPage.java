@@ -443,7 +443,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		PageSettings settings = new PageSettings();
 		settings.remoteProvider = buildScenario.getRemoteConnection().getRemoteServices();
 		settings.connection = buildScenario.getRemoteConnection();
-		settings.rootLocation = buildScenario.getLocation();
+		IProject project = config.getOwner().getProject();
+		settings.rootLocation = buildScenario.getLocation(project);
 
 		return settings;
 	}

@@ -17,6 +17,7 @@ import org.eclipse.ptp.rm.lml.core.model.IPattern;
 import org.eclipse.ptp.rm.lml.core.model.ITableColumnLayout;
 import org.eclipse.ptp.rm.lml.internal.core.model.Pattern;
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
+import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -62,6 +63,11 @@ public class FilterDialog extends Dialog {
 			date = comparisonButton.getText();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+		 */
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			final Shell dialog = new Shell(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -78,34 +84,34 @@ public class FilterDialog extends Dialog {
 			time.setLayoutData(new GridData());
 
 			final Button ok = new Button(dialog, SWT.PUSH);
-			ok.setText("OK");
+			ok.setText(Messages.FilterDialog_OK);
 			ok.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			ok.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					final NumberFormat formatter = new DecimalFormat("00");
-					button.setText(calendar.getYear() + "-" + formatter.format(calendar.getMonth() + 1) + "-"
-							+ formatter.format(calendar.getDay()) + " " + formatter.format(time.getHours()) + ":"
-							+ formatter.format(time.getMinutes()) + ":" + formatter.format(time.getSeconds()));
+					final NumberFormat formatter = new DecimalFormat("00"); //$NON-NLS-1$
+					button.setText(calendar.getYear() + "-" + formatter.format(calendar.getMonth() + 1) + "-" //$NON-NLS-1$ //$NON-NLS-2$
+							+ formatter.format(calendar.getDay()) + " " + formatter.format(time.getHours()) + ":" //$NON-NLS-1$ //$NON-NLS-2$
+							+ formatter.format(time.getMinutes()) + ":" + formatter.format(time.getSeconds())); //$NON-NLS-1$
 					date = button.getText();
 					dialog.close();
 				}
 			});
 
 			final Button delete = new Button(dialog, SWT.PUSH);
-			delete.setText("Delete");
+			delete.setText(Messages.FilterDialog_Delete);
 			delete.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			delete.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					button.setText("");
+					button.setText(""); //$NON-NLS-1$
 					date = new String();
 					dialog.close();
 				}
 			});
 
 			final Button cancel = new Button(dialog, SWT.PUSH);
-			cancel.setText("Cancel");
+			cancel.setText(Messages.FilterDialog_Cancel);
 			cancel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			cancel.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -155,6 +161,11 @@ public class FilterDialog extends Dialog {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
+	 */
 	@Override
 	protected void buttonPressed(int buttonId) {
 
@@ -172,35 +183,35 @@ public class FilterDialog extends Dialog {
 			if (!row.isCheckboxSet()) {
 				continue;
 			}
-			if (row.getType().equals("alpha")) {
-				if (row.getRelationValueTextAlpha().getText().equals("")) {
+			if (row.getType().equals("alpha")) { //$NON-NLS-1$
+				if (row.getRelationValueTextAlpha().getText().equals("")) { //$NON-NLS-1$
 					error = true;
 					break;
 				}
 			} else {
 				if (row.getRadioButtonRelation().getSelection()) {
-					if (row.getType().equals("numeric")) {
-						if (row.getRelationValueTextNumeric().getText().equals("")) {
+					if (row.getType().equals("numeric")) { //$NON-NLS-1$
+						if (row.getRelationValueTextNumeric().getText().equals("")) { //$NON-NLS-1$
 							error = true;
 							break;
 						}
-					} else if (row.getType().equals("date")) {
-						if (row.getRelationValueButtonDate().getText().equals("")) {
+					} else if (row.getType().equals("date")) { //$NON-NLS-1$
+						if (row.getRelationValueButtonDate().getText().equals("")) { //$NON-NLS-1$
 							error = true;
 							break;
 						}
 					}
 				} else if (row.getRadioButtonRange().getSelection()) {
-					if (row.getType().equals("numeric")) {
-						if (row.getMinValueTextNumeric().getText().equals("")
-								|| row.getMaxValueTextNumeric().equals("")
+					if (row.getType().equals("numeric")) { //$NON-NLS-1$
+						if (row.getMinValueTextNumeric().getText().equals("") //$NON-NLS-1$
+								|| row.getMaxValueTextNumeric().equals("") //$NON-NLS-1$
 								|| (Integer.parseInt(row.getMinValueTextNumeric().getText()) >= Integer.parseInt(row
 										.getMaxValueTextNumeric().getText()))) {
 							error = true;
 							break;
 						}
-					} else if (row.getType().equals("date")) {
-						if (row.getMinValueButtonDate().getText().equals("") || row.getMaxValueButtonDate().equals("")
+					} else if (row.getType().equals("date")) { //$NON-NLS-1$
+						if (row.getMinValueButtonDate().getText().equals("") || row.getMaxValueButtonDate().equals("") //$NON-NLS-1$ //$NON-NLS-2$
 								|| (row.getMinValueButtonDate().getText().compareTo(row.getMaxValueButtonDate().getText()) >= 0)) {
 							error = true;
 							break;
@@ -211,17 +222,10 @@ public class FilterDialog extends Dialog {
 		}
 
 		if (error) {
-			final Status status = new Status(
-					IStatus.ERROR,
-					"Missing/wrong arguments",
-					0,
-					"- there is/are one/more requested value(s) missing\n- or the minimal value of a range is bigger than the maximal value.",
-					null);
-			final ErrorDialog dialog = new ErrorDialog(
-					shell,
-					"Missing/wrong arguments",
-					"An error occured!",
-					status, IStatus.ERROR);
+			final Status status = new Status(IStatus.ERROR, Messages.FilterDialog_Missing_arguments, 0,
+					Messages.FilterDialog_Missing_arguments_message, null);
+			final ErrorDialog dialog = new ErrorDialog(shell, Messages.FilterDialog_Missing_arguments,
+					Messages.FilterDialog_An_error_occurred, status, IStatus.ERROR);
 			dialog.open();
 			return;
 		}
@@ -234,24 +238,24 @@ public class FilterDialog extends Dialog {
 				continue;
 			}
 			final IPattern pattern = new Pattern(row.getTitle(), row.getType());
-			if (row.getType().equals("alpha")) {
+			if (row.getType().equals("alpha")) { //$NON-NLS-1$
 				pattern.setRelation(row.getRelationComboAlpha().getText(), row.getRelationValueTextAlpha().getText());
 				complete = true;
 			} else {
 				if (row.getRadioButtonRelation().getSelection()) {
-					if (row.getType().equals("numeric")) {
+					if (row.getType().equals("numeric")) { //$NON-NLS-1$
 						pattern.setRelation(row.getRelationComboNumericDate().getText(), row.getRelationValueTextNumeric()
 								.getText());
 						complete = true;
-					} else if (row.getType().equals("date")) {
+					} else if (row.getType().equals("date")) { //$NON-NLS-1$
 						pattern.setRelation(row.getRelationComboNumericDate().getText(), row.getRelationValueButtonDate().getText());
 						complete = true;
 					}
 				} else if (row.getRadioButtonRange().getSelection()) {
-					if (row.getType().equals("numeric")) {
+					if (row.getType().equals("numeric")) { //$NON-NLS-1$
 						pattern.setRange(row.getMinValueTextNumeric().getText(), row.getMaxValueTextNumeric().getText());
 						complete = true;
-					} else if (row.getType().equals("date")) {
+					} else if (row.getType().equals("date")) { //$NON-NLS-1$
 						pattern.setRange(row.getMinValueButtonDate().getText(), row.getMaxValueButtonDate().getText());
 						complete = true;
 					}
@@ -272,20 +276,35 @@ public class FilterDialog extends Dialog {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		shell.setText("Filters");
+		shell.setText(Messages.FilterDialog_Filters);
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
-		createButton(parent, 5, "Apply", false);
+		createButton(parent, 5, Messages.FilterDialog_Apply, false);
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 
@@ -306,14 +325,13 @@ public class FilterDialog extends Dialog {
 		}
 		if (error) {
 			final Label errorLabel = new Label(composite, SWT.NONE);
-			errorLabel.setText("An error occured!");
+			errorLabel.setText(Messages.FilterDialog_An_error_occurred);
 			filterData = new FilterDataRow[0];
 			return composite;
 		}
 
 		int length = columnLayouts.length;
-		if (gid.equals(ILMLUIConstants.VIEW_TABLE_1)
-				&& includeStatus(columnLayouts)) {
+		if (gid.equals(ILMLUIConstants.ID_ACTIVE_JOBS_VIEW) && includeStatus(columnLayouts)) {
 			length = length - 1;
 		}
 
@@ -324,7 +342,7 @@ public class FilterDialog extends Dialog {
 			@Override
 			public void verifyText(VerifyEvent e) {
 				final String s = ((Text) e.widget).getText() + e.text;
-				e.doit = s.matches("0|([1-9][0-9]*)");
+				e.doit = s.matches("0|([1-9][0-9]*)"); //$NON-NLS-1$
 			}
 		};
 
@@ -333,7 +351,7 @@ public class FilterDialog extends Dialog {
 			@Override
 			public void verifyText(VerifyEvent e) {
 				final String s = ((Text) e.widget).getText() + e.text;
-				e.doit = s.matches(".+");
+				e.doit = s.matches(".+"); //$NON-NLS-1$
 			}
 		};
 
@@ -341,7 +359,8 @@ public class FilterDialog extends Dialog {
 
 		int dif = 0;
 		for (int i = 0; i < columnLayouts.length; i++) {
-			if (gid.equals(ILMLUIConstants.VIEW_TABLE_1) && columnLayouts[i].getTitle().equals(ILMLUIConstants.COLUMN_STATUS)) {
+			if (gid.equals(ILMLUIConstants.ID_ACTIVE_JOBS_VIEW)
+					&& columnLayouts[i].getTitle().equals(ILMLUIConstants.COLUMN_STATUS)) {
 				dif = 1;
 				continue;
 			}
@@ -355,12 +374,12 @@ public class FilterDialog extends Dialog {
 
 			final FilterDataRow row = new FilterDataRow(type, checkbox);
 
-			if (type == "alpha") {
+			if (type == "alpha") { //$NON-NLS-1$
 				// Input in text elements with choosing a relation operator before
 				final Composite compositeText = new Composite(composite, SWT.NONE);
 				compositeText.setLayout(new GridLayout(2, false));
 				final Combo relationCombo = new Combo(compositeText, SWT.READ_ONLY);
-				relationCombo.setItems(new String[] { "=", "!=", "=~", "!~" });
+				relationCombo.setItems(new String[] { "=", "!=", "=~", "!~" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				relationCombo.select(0);
 				relationCombo.setLayoutData(new GridData());
 				relationCombo.setEnabled(false);
@@ -388,15 +407,14 @@ public class FilterDialog extends Dialog {
 				final Composite compositeRelation = new Composite(compositeRadio, SWT.NONE);
 				compositeRelation.setLayout(new GridLayout(2, false));
 				final Combo relations = new Combo(compositeRelation, SWT.READ_ONLY);
-				relations.setItems(new String[] { "=", "<", "<=", ">", ">=",
-						"!=" });
+				relations.setItems(new String[] { "=", "<", "<=", ">", ">=", "!=" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 				relations.select(0);
 
 				relations.setEnabled(false);
 				relations.setLayoutData(new GridData(GridData.FILL));
 				row.addRelationComboNumericDate(relations);
 
-				if (type == "numeric") {
+				if (type == "numeric") { //$NON-NLS-1$
 					final Text relationValueText = new Text(compositeRelation, SWT.SINGLE | SWT.TRAIL);
 					relationValueText.addVerifyListener(numericListener);
 					relationValueText.setEnabled(false);
@@ -442,7 +460,7 @@ public class FilterDialog extends Dialog {
 
 				final Composite compositeRange = new Composite(compositeRadio, SWT.NONE);
 				compositeRange.setLayout(new GridLayout(3, false));
-				if (type == "numeric") {
+				if (type == "numeric") { //$NON-NLS-1$
 					final Text textValueMin = new Text(compositeRange, SWT.SINGLE | SWT.TRAIL);
 					textValueMin.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 					textValueMin.setEnabled(false);
@@ -450,7 +468,7 @@ public class FilterDialog extends Dialog {
 
 					// TODO replace with another combo box
 					final Label labelMinus = new Label(compositeRange, SWT.NONE);
-					labelMinus.setText(" - ");
+					labelMinus.setText(" - "); //$NON-NLS-1$
 					labelMinus.setLayoutData(new GridData(GridData.FILL));
 
 					final Text textValueMax = new Text(compositeRange, SWT.SINGLE | SWT.TRAIL);
@@ -466,7 +484,7 @@ public class FilterDialog extends Dialog {
 					buttonValueMin.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 					final Label labelMinus = new Label(compositeRange, SWT.NONE);
-					labelMinus.setText(" - ");
+					labelMinus.setText(" - "); //$NON-NLS-1$
 					labelMinus.setLayoutData(new GridData(GridData.FILL));
 
 					final Button buttonValueMax = new Button(compositeRange, SWT.NONE);
@@ -489,13 +507,11 @@ public class FilterDialog extends Dialog {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
 						final boolean selected = radioButtonRange.getSelection();
-						if (row.getMinValueTextNumeric() != null
-								&& row.getMaxValueTextNumeric() != null) {
+						if (row.getMinValueTextNumeric() != null && row.getMaxValueTextNumeric() != null) {
 							row.getMinValueTextNumeric().setEnabled(selected);
 							row.getMaxValueTextNumeric().setEnabled(selected);
 						}
-						if (row.getMinValueButtonDate() != null
-								&& row.getMaxValueButtonDate() != null) {
+						if (row.getMinValueButtonDate() != null && row.getMaxValueButtonDate() != null) {
 							row.getMinValueButtonDate().setEnabled(selected);
 							row.getMaxValueButtonDate().setEnabled(selected);
 						}
@@ -533,8 +549,7 @@ public class FilterDialog extends Dialog {
 								row.getRelationValueTextNumeric().setEnabled(selected);
 							}
 							if (row.getRelationValueButtonDate() != null) {
-								row.getRelationValueButtonDate().setEnabled(
-										selected);
+								row.getRelationValueButtonDate().setEnabled(selected);
 							}
 						} else {
 							if (row.getMinValueTextNumeric() != null && row.getMaxValueTextNumeric() != null) {
@@ -557,7 +572,7 @@ public class FilterDialog extends Dialog {
 						continue;
 					}
 					row.getCheckbox().setSelection(true);
-					if (filter.getType().equals("alpha")) {
+					if (filter.getType().equals("alpha")) { //$NON-NLS-1$
 						row.getRelationValueTextAlpha().setText(filter.getRelationValue());
 						row.getRelationValueTextAlpha().setEnabled(true);
 						final String[] items = row.getRelationComboAlpha().getItems();
@@ -573,7 +588,7 @@ public class FilterDialog extends Dialog {
 						if (filter.isRange()) {
 							row.getRadioButtonRange().setSelection(true);
 							row.getRadioButtonRelation().setSelection(false);
-							if (filter.getType().equals("numeric")) {
+							if (filter.getType().equals("numeric")) { //$NON-NLS-1$
 								row.getMinValueTextNumeric().setText(filter.getMinValueRange());
 								row.getMaxValueTextNumeric().setText(filter.getMaxValueRange());
 								row.getMinValueTextNumeric().setEnabled(true);
@@ -593,7 +608,7 @@ public class FilterDialog extends Dialog {
 									row.getRelationComboNumericDate().select(j);
 								}
 							}
-							if (filter.getType().equals("numeric")) {
+							if (filter.getType().equals("numeric")) { //$NON-NLS-1$
 								row.getRelationValueTextNumeric().setText(filter.getRelationValue());
 								row.getRelationValueTextNumeric().setEnabled(true);
 							} else {

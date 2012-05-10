@@ -26,11 +26,6 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
-import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
-import org.eclipse.ptp.services.core.IService;
-import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceModelManager;
-import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.osgi.service.prefs.Preferences;
 
 public class SyncManager  {
@@ -38,8 +33,12 @@ public class SyncManager  {
 	private SyncManager() {
 	}
 
+	// ACTIVE: Sync with current active configuration
+	// ALL: Sync with all configurations
+	// NONE: Do not transfer files but still call sync and do bookkeeping
+	// UNAVAILABLE: Do not call sync. (Used internally during project creation and deletion.)
 	public static enum SYNC_MODE {
-		ACTIVE, ALL, NONE
+		ACTIVE, ALL, NONE, UNAVAILABLE
 	};
 
 	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
@@ -48,23 +47,26 @@ public class SyncManager  {
 	private static final String SYNC_AUTO_KEY = "sync-auto"; //$NON-NLS-1$
 	private static final String SHOW_ERROR_KEY = "show-error"; //$NON-NLS-1$
 	
-	private static final SYNC_MODE DEFAULT_SYNC_MODE = SYNC_MODE.ACTIVE;
+	// Sync unavailable by default. Wizards should explicitly set the sync mode once the project is ready.
+	private static final SYNC_MODE DEFAULT_SYNC_MODE = SYNC_MODE.UNAVAILABLE;
 	private static final boolean DEFAULT_SYNC_AUTO_SETTING = true;
 	private static final boolean DEFAULT_SHOW_ERROR_SETTING = true;
 
 	private static class SynchronizeJob extends Job {
-		private final IResourceDelta fDelta;
 		private final IProject fProject;
-		private final ISyncServiceProvider fSyncProvider;
+		private final BuildScenario fBuildScenario;
+		private final IResourceDelta fDelta;
+		private final SyncRunner fSyncRunner;
 		private final EnumSet<SyncFlag> fSyncFlags;
 		private final SyncExceptionHandler fSyncExceptionHandler;
 
-		public SynchronizeJob(IResourceDelta delta, IProject project, ISyncServiceProvider provider, EnumSet<SyncFlag> syncFlags,
-				SyncExceptionHandler seHandler) {
+		public SynchronizeJob(IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncRunner runner,
+				EnumSet<SyncFlag> syncFlags, SyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
-			fDelta = delta;
 			fProject = project;
-			fSyncProvider = provider;
+			fBuildScenario = buildScenario;
+			fDelta = delta;
+			fSyncRunner = runner;
 			fSyncFlags = syncFlags;
 			fSyncExceptionHandler = seHandler;
 		}
@@ -78,7 +80,8 @@ public class SyncManager  {
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor progress = SubMonitor.convert(monitor, 100);
 			try {
-				fSyncProvider.synchronize(fDelta, getFileFilter(fProject), progress.newChild(100), fSyncFlags);
+				fSyncRunner.synchronize(fProject, fBuildScenario, fDelta, getFileFilter(fProject), progress.newChild(100),
+						fSyncFlags);
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
 					System.out.println(Messages.SyncManager_8 + e.getLocalizedMessage());
@@ -402,12 +405,14 @@ public class SyncManager  {
 		Job[] syncJobs = new Job[buildConfigurations.length];
 		for (IConfiguration buildConfig : buildConfigurations) {
 			SynchronizeJob job = null;
-			ISyncServiceProvider provider = (ISyncServiceProvider) SyncManager.getSyncProvider(buildConfig);
-			if (provider != null) {
+			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+			BuildScenario buildScenario = bcm.getBuildScenarioForBuildConfiguration(buildConfig);
+			SyncRunner syncRunner = bcm.getSyncRunnerForBuildConfiguration(buildConfig);
+			if (syncRunner != null) {
 				if (isBlocking) {
-						provider.synchronize(delta, getFileFilter(project), monitor, syncFlags);
+						syncRunner.synchronize(project, buildScenario, delta, getFileFilter(project), monitor, syncFlags);
 				} else {
-						job = new SynchronizeJob(delta, project, provider, syncFlags, seHandler);
+						job = new SynchronizeJob(project, buildScenario, delta, syncRunner, syncFlags, seHandler);
 					job.schedule();
 				}
 			}
@@ -418,35 +423,5 @@ public class SyncManager  {
 		}
 
 		return syncJobs;
-	}
-	
-	/**
-	 * Get the sync service provider for the given project's current active configuration. 
-	 *
-	 * @param project
-	 * @return sync service provider or null if provider cannot be found. (Logs error message in that case.)
-	 */
-	public static ISyncServiceProvider getSyncProvider(IProject project) {
-		IConfiguration config = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
-		return SyncManager.getSyncProvider(config);
-	}
-	
-	/**
-	 * Get the sync service provider for the given build configuration.
-	 *
-	 * @param config
-	 * @return sync service provider or null if provider cannot be found. (Logs error message in that case.)
-	 */
-	public static ISyncServiceProvider getSyncProvider(IConfiguration config) {
-		ISyncServiceProvider provider = null;
-		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-		IServiceConfiguration serviceConfig = bcm.getConfigurationForBuildConfiguration(config);
-		if (serviceConfig != null) {
-			IServiceModelManager serviceModel = ServiceModelManager.getInstance();
-			IService syncService = serviceModel.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-			provider = (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
-		}
-		
-		return provider;
 	}
 }

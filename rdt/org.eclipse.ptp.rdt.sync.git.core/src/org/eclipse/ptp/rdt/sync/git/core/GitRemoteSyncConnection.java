@@ -643,6 +643,13 @@ public class GitRemoteSyncConnection {
 	}
 
 	/**
+	 * @return the project
+	 */
+	public IProject getProject() {
+		return project;
+	}
+
+	/**
 	 * @return the connection (IRemoteConnection)
 	 */
 	public IRemoteConnection getConnection() {

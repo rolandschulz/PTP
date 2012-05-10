@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2012 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rm.lml.monitor.ui.handlers;
 
 import java.util.ArrayList;
@@ -20,6 +30,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.ptp.rm.lml.monitor.ui.LMLMonitorUIPlugin;
+import org.eclipse.ptp.rm.lml.monitor.ui.messages.Messages;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class StopMonitorHandler extends AbstractHandler implements IHandler, ISelectionChangedListener {
@@ -74,8 +85,9 @@ public class StopMonitorHandler extends AbstractHandler implements IHandler, ISe
 						monitor.stop();
 					}
 				} catch (CoreException e) {
-					ErrorDialog.openError(HandlerUtil.getActiveShell(event), "Stop Monitors", "Unable to stop monitor", new Status(
-							IStatus.WARNING, LMLMonitorUIPlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
+					ErrorDialog.openError(HandlerUtil.getActiveShell(event), Messages.StopMonitorHandler_Stop_Monitors,
+							Messages.StopMonitorHandler_Unable_to_stop_monitor,
+							new Status(IStatus.WARNING, LMLMonitorUIPlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
 				}
 			}
 		}

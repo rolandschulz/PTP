@@ -40,9 +40,15 @@ public class NodedisplayCompMinSize extends NodedisplayComp implements IMinSizeN
 	}
 
 	/**
+	 * Default size of rectangles is pixel.
+	 * Defines width and height of rectangles.
+	 */
+	public static final int defaultMinSize = 7;
+
+	/**
 	 * contains minimum size of a lowest level rectangle
 	 */
-	protected int minRectangleWidth = 5, minRectangleHeight = 5;
+	protected int minRectangleWidth = defaultMinSize, minRectangleHeight = defaultMinSize;
 
 	/**
 	 * Call this constructor for start, maxlevel is chosen from nodedisplaylayout.

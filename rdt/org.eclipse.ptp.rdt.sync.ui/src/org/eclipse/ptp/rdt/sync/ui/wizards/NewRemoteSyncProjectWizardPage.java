@@ -49,10 +49,8 @@ import org.eclipse.swt.widgets.Label;
 
 /**
  * 
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
- * of a work in progress. There is no guarantee that this API will work or that
- * it will remain the same. Please do not use this API without consulting with
- * the RDT team.
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part of a work in progress. There is no guarantee that
+ * this API will work or that it will remain the same. Please do not use this API without consulting with the RDT team.
  * 
  * 
  */
@@ -102,9 +100,7 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets
-	 * .Composite)
+	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets .Composite)
 	 */
 	public void createControl(final Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
@@ -151,11 +147,12 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 
 		fProviderCombo.select(0);
 		handleProviderSelected();
-		
+
 		final Button filterButton = new Button(comp, SWT.PUSH);
 		filterButton.setText(Messages.NewRemoteSyncProjectWizardPage_0);
 		filterButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 3, 1));
 		filterButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				SyncFileFilter tmpFilter;
 				if (customFilter == null) {
@@ -184,8 +181,7 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	/**
 	 * Find available remote services and service providers for a given project
 	 * 
-	 * If project is null, the C and C++ natures are used to determine which
-	 * services are available
+	 * If project is null, the C and C++ natures are used to determine which services are available
 	 */
 	protected Set<IService> getContributedServices() {
 		ServiceModelManager smm = ServiceModelManager.getInstance();
@@ -226,10 +222,11 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	 * @see org.eclipse.jface.dialogs.IDialogPage#getErrorMessage()
 	 */
 	public String getErrorMessage() {
-		if (fSelectedProvider==null)
-			return Messages.ConvertToSyncProjectWizardPage_0; 
-		else 
+		if (fSelectedProvider == null) {
+			return Messages.ConvertToSyncProjectWizardPage_0;
+		} else {
 			return fSelectedProvider.getParticipant().getErrorMessage();
+		}
 	}
 
 	/*
@@ -285,10 +282,12 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	 */
 	private void handleProviderSelected() {
 		int index = fProviderCombo.getSelectionIndex();
-		fProviderStack.topControl = fProviderControls.get(index);
-		fSelectedProvider = fComboIndexToDescriptorMap.get(index);
-		fProviderArea.layout();
-		update();
+		if (index >= 0) {
+			fProviderStack.topControl = fProviderControls.get(index);
+			fSelectedProvider = fComboIndexToDescriptorMap.get(index);
+			fProviderArea.layout();
+			update();
+		}
 		if (fSelectedProvider != null) {
 			MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID, SERVICE_PROVIDER_PROPERTY,
 					fSelectedProvider.getParticipant());
@@ -300,13 +299,11 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage#isCustomPageComplete
-	 * ()
+	 * @see org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage#isCustomPageComplete ()
 	 */
 	@Override
 	protected boolean isCustomPageComplete() {
-		return fbVisited  && getErrorMessage()==null && fSelectedProvider.getParticipant().isConfigComplete();
+		return fbVisited && getErrorMessage() == null && fSelectedProvider.getParticipant().isConfigComplete();
 	}
 
 	/*
@@ -322,8 +319,7 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.IDialogPage#setDescription(java.lang.String)
+	 * @see org.eclipse.jface.dialogs.IDialogPage#setDescription(java.lang.String)
 	 */
 	public void setDescription(String description) {
 		fDescription = description;
@@ -332,9 +328,7 @@ public class NewRemoteSyncProjectWizardPage extends MBSCustomPage {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.IDialogPage#setImageDescriptor(org.eclipse.
-	 * jface.resource.ImageDescriptor)
+	 * @see org.eclipse.jface.dialogs.IDialogPage#setImageDescriptor(org.eclipse. jface.resource.ImageDescriptor)
 	 */
 	public void setImageDescriptor(ImageDescriptor image) {
 		fImageDescriptor = image;

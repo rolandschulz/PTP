@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescription;
+import org.eclipse.cdt.core.settings.model.ICStorageElement;
 import org.eclipse.cdt.core.settings.model.WriteAccessException;
 import org.eclipse.cdt.core.settings.model.extension.CConfigurationData;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
@@ -48,7 +49,6 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceProvider;
 import org.eclipse.ui.XMLMemento;
@@ -64,10 +64,9 @@ import org.osgi.service.prefs.Preferences;
  */
 public class BuildConfigurationManager {
 	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
-	private static final String CONFIG_NODE_NAME = "config"; //$NON-NLS-1$
-	private static final String TEMPLATE_KEY = "template"; //$NON-NLS-1$
-	private final Map<String, IServiceConfiguration> fBConfigIdToSConfigMap = Collections
-			.synchronizedMap(new HashMap<String, IServiceConfiguration>());
+	private static final String configSyncDataStorageName = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
+	private static final String TEMPLATE_KEY = "template-service-configuration"; //$NON-NLS-1$
+	private static final String projectLocationPathVariable = "${project_loc}"; //$NON-NLS-1$
 	
 	// Setup as a singleton
 	private BuildConfigurationManager() {
@@ -102,7 +101,7 @@ public class BuildConfigurationManager {
 		if (localService != null) {
 			IRemoteConnection localConnection = localService.getConnectionManager().getConnection("Local"); //$NON-NLS-1$
 			if (localConnection != null) {
-				return new BuildScenario(null, localConnection, project.getLocation().toString());
+				return new BuildScenario(null, localConnection, projectLocationPathVariable);
 			} else {
 				throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.sync.core", //$NON-NLS-1$
 						Messages.BCM_LocalConnectionError));
@@ -178,25 +177,116 @@ public class BuildConfigurationManager {
 	 * 
 	 * @param bconf
 	 *            The build configuration - cannot be null
-	 * @return service configuration for the build configuration
+	 * @return service configuration for the build configuration or null on problems retrieving the configuration.
+	 * @deprecated This method is inefficient and can easily be used incorrectly. It is inefficient because it requires a copy of
+	 * 				the project's template service configuration. Also, sync'ing with the contained provider precludes optimizations
+	 * 				done by the true provider in the template. Finally, changing data on this copy has no effect, except for the
+	 * 				data stored in the copy. Instead, use {@link #getBuildScenarioForBuildConfiguration} when you need data about
+	 * 				the configuration and use {@link #getSyncRunnerForBuildConfiguration(IConfiguration)} when you need to use the
+	 * 				contained sync provider for sync'ing.
+	 * 				
 	 */
 	public IServiceConfiguration getConfigurationForBuildConfiguration(IConfiguration bconf) {
 		IProject project = bconf.getOwner().getProject();
 		checkProject(project);
-		IServiceConfiguration sconf = fBConfigIdToSConfigMap.get(bconf.getId());
-		if (sconf == null) {
-			BuildScenario bs = this.getBuildScenarioForBuildConfiguration(bconf);
-			// Should never happen, but if it does do not continue. (Function call should have invoked error handling.)
-			if (bs == null) {
-				return null;
-			}
-            sconf = copyTemplateServiceConfiguration(project);
-            modifyServiceConfigurationForBuildScenario(sconf, bs);
-            fBConfigIdToSConfigMap.put(bconf.getId(), sconf);
+
+		BuildScenario bs = this.getBuildScenarioForBuildConfiguration(bconf);
+		// Should never happen, but if it does do not continue. (Function call should have invoked error handling.)
+		if (bs == null) {
+			return null;
 		}
 		
+        IServiceConfiguration sconf = copyTemplateServiceConfiguration(project);
+        this.modifyServiceConfigurationForBuildScenario(sconf, project, bs);
 		return sconf;
 	}
+	
+	/**
+	 * Get a SyncRunner object that can be used to do sync'ing.
+	 *
+	 * @param bconf
+	 * @return SyncRunner - can be null if this configuration does not require sync'ing, such as a local configuration, or if there
+	 * are problems retrieving the sync provider or information.
+	 */
+	public SyncRunner getSyncRunnerForBuildConfiguration(IConfiguration bconf) {
+		IProject project = bconf.getOwner().getProject();
+		checkProject(project);
+
+		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
+		if (provider == null) { // Error handled in call
+			return null;
+		}
+		
+		BuildScenario buildScenario = this.getBuildScenarioForBuildConfigurationInternal(bconf).bs;
+		if (buildScenario == null) { // Error handled in call
+			return null;
+		}
+
+		if (buildScenario.getSyncProvider() == null) {
+			return null;
+		} else {
+			return new SyncRunner(provider);
+		}
+	}
+	
+    // Does the low-level work of creating a copy of a service configuration
+    // Returned configuration is never null.
+    // This method supports deprecated code and can be removed once {@link #getConfigurationForBuildConfiguration} is removed.
+    private IServiceConfiguration copyTemplateServiceConfiguration(IProject project) {
+            IServiceConfiguration newConfig = ServiceModelManager.getInstance().newServiceConfiguration(""); //$NON-NLS-1$
+            if (newConfig == null) {
+                    throw new RuntimeException(Messages.BuildConfigurationManager_15);
+            }
+            String oldConfigId = getTemplateServiceConfigurationId(project);
+            IServiceConfiguration oldConfig = ServiceModelManager.getInstance().getConfiguration(oldConfigId);
+            if (oldConfig == null) {
+                    RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_10 + oldConfigId + Messages.BuildConfigurationManager_11 + project.getName());
+                    return null;
+            }
+
+            for (IService service : oldConfig.getServices()) {
+                    ServiceProvider oldProvider = (ServiceProvider) oldConfig.getServiceProvider(service);
+                    try {
+                            // The memento creation methods seem the most robust way to copy state. It is more robust than
+                    	    // getProperties() and setProperties(), which saveState() and restoreState() use by default but which
+                    	    // can be overriden by subclasses.
+                            ServiceProvider newProvider = oldProvider.getClass().newInstance();
+                            XMLMemento oldProviderState = XMLMemento.createWriteRoot("provider"); //$NON-NLS-1$
+                            oldProvider.saveState(oldProviderState);
+                            newProvider.restoreState(oldProviderState);
+                            newConfig.setServiceProvider(service, newProvider);
+                    } catch (InstantiationException e) {
+                            throw new RuntimeException(Messages.BCM_ProviderError + oldProvider.getClass());
+                    } catch (IllegalAccessException e) {
+                            throw new RuntimeException(Messages.BCM_ProviderError + oldProvider.getClass());
+                    }
+            }
+
+            return newConfig;
+    }
+
+    // Does the low-level work of changing a service configuration for a new build scenario.
+    // This method supports deprecated code and can be removed once {@link #getConfigurationForBuildConfiguration} is removed.
+	private void modifyServiceConfigurationForBuildScenario(IServiceConfiguration sConfig, IProject project, BuildScenario bs) {
+		IService syncService = null; // Only set if sync service should be disabled
+		for (IService service : sConfig.getServices()) {
+			ServiceProvider provider = (ServiceProvider) sConfig.getServiceProvider(service);
+			if (provider instanceof IRemoteExecutionServiceProvider) {
+				// For local configuration, for example, that does not need to sync
+				if (provider instanceof ISyncServiceProvider && bs.getSyncProvider() == null) {
+					syncService = service;
+				} else {
+					((IRemoteExecutionServiceProvider) provider).setRemoteToolsConnection(bs.getRemoteConnection());
+					((IRemoteExecutionServiceProvider) provider).setConfigLocation(bs.getLocation(project));
+
+				}
+			}
+		}
+		if (syncService != null) {
+			sConfig.disable(syncService);
+		}
+	}
+
 
 	/**
 	 * Return the name of the sync provider for this project, as stored in the project's template service configuration.
@@ -205,6 +295,22 @@ public class BuildConfigurationManager {
 	 * @return sync provider name or null if provider cannot be loaded (should not normally happen)
 	 */
 	public String getProjectSyncProvider(IProject project) {
+		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
+		if (provider == null) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_13 + project.getName());
+			return null;
+		}
+
+		return provider.getName();
+	}
+	
+	/**
+	 * Return the sync service provider for this project, as stored in the project's template service configuration
+	 *
+	 * @param project
+	 * @return the service provider
+	 */
+	private ISyncServiceProvider getProjectSyncServiceProvider(IProject project) {
 		checkProject(project);
 		String serviceConfigId = getTemplateServiceConfigurationId(project);
 		IServiceConfiguration serviceConfig = ServiceModelManager.getInstance().getConfiguration(serviceConfigId);
@@ -219,13 +325,7 @@ public class BuildConfigurationManager {
 			return null;
 		}
 		
-		IServiceProvider provider = serviceConfig.getServiceProvider(syncService);
-		if (provider == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_13 + project.getName());
-			return null;
-		}
-
-		return provider.getName();
+		return (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
 	}
 
 	/**
@@ -269,6 +369,15 @@ public class BuildConfigurationManager {
 			throw new NullPointerException();
 		}
 		
+		// Store configuration independently of project, which can be useful if the project is deleted.
+		ServiceModelManager smm = ServiceModelManager.getInstance();
+		smm.addConfiguration(sc);
+		try {
+			smm.saveModelConfiguration();
+		} catch (IOException e) {
+			RDTSyncCorePlugin.log(e.toString(), e);
+		}
+
 		// Cannot call "checkProject" because project not yet initialized
 		try {
 			if (!project.hasNature(RemoteSyncNature.NATURE_ID)) {
@@ -296,6 +405,23 @@ public class BuildConfigurationManager {
 			setBuildScenarioForBuildConfigurationInternal(bs, config);
 		}
 	}
+	
+	/**
+	 * Set the template service configuration for the given project to the given configuration
+	 * 
+	 * @param project
+	 * @param sc
+	 */
+	public void setTemplateServiceConfiguration(IProject project, IServiceConfiguration sc) {
+		checkProject(project);
+		IScopeContext context = new ProjectScope(project);
+		Preferences node = context.getNode(projectScopeSyncNode);
+		if (node == null) {
+			throw new RuntimeException(Messages.BuildConfigurationManager_0);
+		}
+		node.put(TEMPLATE_KEY, sc.getId());
+		flushNode(node);
+	}
 
 	/**
 	 * Indicate if the project has yet been initialized.
@@ -312,40 +438,6 @@ public class BuildConfigurationManager {
 		} else {
 			return true;
 		}
-	}
-
-	// Does the low-level work of creating a copy of a service configuration
-	// Returned configuration is never null
-	private IServiceConfiguration copyTemplateServiceConfiguration(IProject project) {
-		IServiceConfiguration newConfig = ServiceModelManager.getInstance().newServiceConfiguration(""); //$NON-NLS-1$
-		if (newConfig == null) {
-			throw new RuntimeException(Messages.BuildConfigurationManager_15);
-		}
-		String oldConfigId = getTemplateServiceConfigurationId(project);
-		IServiceConfiguration oldConfig = ServiceModelManager.getInstance().getConfiguration(oldConfigId);
-		if (oldConfig == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_10 + oldConfigId + Messages.BuildConfigurationManager_11 + project.getName());
-			return null;
-		}
-
-		for (IService service : oldConfig.getServices()) {
-			ServiceProvider oldProvider = (ServiceProvider) oldConfig.getServiceProvider(service);
-			try {
-				// The memento creation methods seem the most robust way to copy state. It is more robust than getProperties() and
-				// setProperties(), which saveState() and restoreState() use by default but which can be overriden by subclasses.
-				ServiceProvider newProvider = oldProvider.getClass().newInstance();
-				XMLMemento oldProviderState = XMLMemento.createWriteRoot("provider"); //$NON-NLS-1$
-				oldProvider.saveState(oldProviderState);
-				newProvider.restoreState(oldProviderState);
-				newConfig.setServiceProvider(service, newProvider);
-			} catch (InstantiationException e) {
-				throw new RuntimeException(Messages.BCM_ProviderError + oldProvider.getClass());
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(Messages.BCM_ProviderError + oldProvider.getClass());
-			}
-		}
-
-		return newConfig;
 	}
 
 	private IConfiguration createConfiguration(IProject project, BuildScenario buildScenario, String configName, String configDesc) {
@@ -375,22 +467,12 @@ public class BuildConfigurationManager {
 		}
 
 		if (configDes != null) {
+			configAdded = true;
 			config.setConfigurationDescription(configDes);
 			configDes.setName(configName);
 			configDes.setDescription(configDesc);
-			config.getToolChain().getBuilder().setBuildPath(project.getLocation().toString());
-			configAdded = true;
-			try {
-				CoreModel.getDefault().setProjectDescription(project, projectDes, true, null);
-			} catch (CoreException e) {
-				projectDes.removeConfiguration(configDes);
-				configAdded = false;
-				creationException = e;
-				creationError = Messages.BCM_SetConfigDescriptionError;
-			}
-			if (configAdded) {
-				this.setBuildScenarioForBuildConfigurationInternal(buildScenario, config);
-			}
+			setProjectDescription(project, projectDes);
+			this.setBuildScenarioForBuildConfigurationInternal(buildScenario, config);
 		} else {
 			creationError = Messages.BCM_CreateConfigError;
 		}
@@ -431,27 +513,6 @@ public class BuildConfigurationManager {
 			}
 		}
 	}
-
-	// Does the low-level work of changing a service configuration for a new build scenario.
-	private void modifyServiceConfigurationForBuildScenario(IServiceConfiguration sConfig, BuildScenario bs) {
-		IService syncService = null; // Only set if sync service should be disabled
-		for (IService service : sConfig.getServices()) {
-			ServiceProvider provider = (ServiceProvider) sConfig.getServiceProvider(service);
-			if (provider instanceof IRemoteExecutionServiceProvider) {
-				// For local configuration, for example, that does not need to sync
-				if (provider instanceof ISyncServiceProvider && bs.getSyncProvider() == null) {
-					syncService = service;
-				} else {
-					((IRemoteExecutionServiceProvider) provider).setRemoteToolsConnection(bs.getRemoteConnection());
-					((IRemoteExecutionServiceProvider) provider).setConfigLocation(bs.getLocation());
-
-				}
-			}
-		}
-		if (syncService != null) {
-			sConfig.disable(syncService);
-		}
-	}
 	
 	// Return ID of the project's template service configuration, or null if not found (project not initialized)
 	// Returned value is never null
@@ -481,7 +542,6 @@ public class BuildConfigurationManager {
 	public BuildScenario getBuildScenarioForBuildConfiguration(IConfiguration bconf) {
 		IProject project = bconf.getOwner().getProject();
 		checkProject(project);
-		updateConfigurations(project);
 		return this.getBuildScenarioForBuildConfigurationInternal(bconf).bs;
 	}
 	
@@ -500,26 +560,26 @@ public class BuildConfigurationManager {
 	// Return null if not found.
 	private BuildScenarioAndConfiguration getBuildScenarioForBuildConfigurationInternal(IConfiguration bconf) {
 		IProject project = bconf.getOwner().getProject();
-		IScopeContext context = new ProjectScope(project);
-		Preferences prefRootNode = context.getNode(projectScopeSyncNode);
-		if (prefRootNode == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_0);
-			return null;
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+		if (buildInfo == null) {
+			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
 		}
 
 		try {
-			if (!prefRootNode.nodeExists(CONFIG_NODE_NAME)) {
-				throw new RuntimeException(Messages.BuildConfigurationManager_0);
-			}
-			
-			String configId = bconf.getId();
-			Preferences prefGeneralConfigNode = prefRootNode.node(CONFIG_NODE_NAME);
-			while (configId != null && !prefGeneralConfigNode.nodeExists(configId)) {
+			IConfiguration config = bconf;
+			String configId = config.getId();
+			Map<String, String> scenarioData = this.getConfigData((Configuration) config, configSyncDataStorageName);
+			while (scenarioData == null) {
 				configId = getParentId(configId);
+				if (configId == null) {
+					break;
+				}
+				config = buildInfo.getManagedProject().getConfiguration(configId);
+				scenarioData = this.getConfigData((Configuration) config, configSyncDataStorageName);
 			}
 			
 			if (configId != null) {
-				BuildScenario bs = BuildScenario.loadScenario(prefGeneralConfigNode.node(configId));
+				BuildScenario bs = BuildScenario.loadScenario(scenarioData);
 				if (bs == null) {
 					RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_14 + configId + Messages.BuildConfigurationManager_11
 							+ project.getName());
@@ -530,8 +590,8 @@ public class BuildConfigurationManager {
 			} else {
 				return null;
 			}
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_2, e);
+		} catch (CoreException e) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_19, e);
 			return null;
 		}
 	}
@@ -568,22 +628,70 @@ public class BuildConfigurationManager {
 	}
 	
 	private void setBuildScenarioForBuildConfigurationInternal(BuildScenario bs, IConfiguration bconf) {
-		IProject project = bconf.getOwner().getProject();
-
-		IScopeContext context = new ProjectScope(project);
-		Preferences prefRootNode = context.getNode(projectScopeSyncNode);
-		if (prefRootNode == null) {
-			throw new RuntimeException(Messages.BuildConfigurationManager_0);
+		Map<String, String> map = new HashMap<String, String>();
+		bs.saveScenario(map);
+		try {
+			this.setConfigData((Configuration) bconf, map, configSyncDataStorageName);
+		} catch (CoreException e) {
+			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_20, e);
+			return;
 		}
-
-		Preferences prefConfigNode = prefRootNode.node(CONFIG_NODE_NAME + "/" + bconf.getId()); //$NON-NLS-1$
-		bs.saveScenario(prefConfigNode);
-		flushNode(prefRootNode);
+	}
+	
+	// The below two functions give us an easy mechanism to store build scenario data inside build configurations
+	/**
+	 * Get simple java map of configuration data
+	 * 
+	 * @param config
+	 * @param storageName - name of storage module
+	 *
+	 * @return values in named storage location or null if the storage location does not exist.
+	 * @throws CoreException on problems retrieving data
+	 */ 
+	private Map<String, String> getConfigData(Configuration config, String storageName) throws CoreException {
+		ICConfigurationDescription configDesc = config.getConfigurationDescription();
+		if (configDesc == null) {
+			// Should never happen
+			throw new RuntimeException(Messages.BuildConfigurationManager_18);
+		}
 		
-		IServiceConfiguration sconf = fBConfigIdToSConfigMap.get(bconf.getId());
-		if (sconf != null) {
-			modifyServiceConfigurationForBuildScenario(sconf, bs);
+		Map<String, String> m = new HashMap<String, String>();
+		ICStorageElement storage = configDesc.getStorage(storageName, false);
+		if (storage == null) {
+			return null;
 		}
+		for (String attr : storage.getAttributeNames()) {
+			m.put(attr, storage.getAttribute(attr));
+		}
+		
+		return m;
+	}
+	
+	/**
+	 * Store a simple java map as data in a configuration.
+	 * 
+	 * @param config
+	 * @param map
+	 * @param storageName - name of storage module
+	 *
+	 * @throws CoreException on problems retrieving data
+	 */
+	private void setConfigData(Configuration config, Map<String, String> map, String storageName) throws CoreException {
+		// The commented code gets a read-only description.
+		// ICConfigurationDescription configDesc = config.getConfigurationDescription();
+		ICProjectDescription projectDesc = CoreModel.getDefault().getProjectDescription(config.getOwner().getProject());
+		ICConfigurationDescription configDesc = projectDesc.getConfigurationById(config.getId());
+		if (configDesc == null) {
+			// Should never happen
+			throw new RuntimeException(Messages.BuildConfigurationManager_18);
+		}
+		
+		ICStorageElement storage = configDesc.getStorage(storageName, true);
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			storage.setAttribute(entry.getKey(), entry.getValue());
+		}
+		config.setDirty(true); // Fixes case where "Workspace" configuration does not compile after project rename.
+		setProjectDescription(config.getOwner().getProject(), projectDesc);
 	}
 	
 	// Run standard checks on project and throw the appropriate exception if it is not valid
@@ -610,6 +718,7 @@ public class BuildConfigurationManager {
 	 */
 
 	public static void flushNode(final Preferences prefNode) {
+		Throwable firstException = null;
 		final IWorkspace ws = ResourcesPlugin.getWorkspace();
 		// Avoid creating a thread if possible. 
 		try {
@@ -619,12 +728,18 @@ public class BuildConfigurationManager {
 			}
 		} catch (BackingStoreException e) {
 			// Proceed to create thread
+			firstException = e;
+		} catch (IllegalStateException e) {
+			// Can occur if the project has been moved or deleted, so the preference node no longer exists.
+			firstException = e;
+			return;
 		}
 
+		final Throwable currentException = firstException;
 		Thread flushThread = new Thread(new Runnable() {
 			public void run() {
 				int sleepCount = 0;
-				Throwable lastException = null;
+				Throwable lastException = currentException;
 				while (true) {
 					try {
 						Thread.sleep(1000);
@@ -647,10 +762,72 @@ public class BuildConfigurationManager {
 					} catch (BackingStoreException e) {
 						// This can happen in the rare case that the lock is locked between the check and the flush.
 						lastException = e;
+					} catch (IllegalStateException e) {
+						// Can occur if the project has been moved or deleted, so the preference node no longer exists.
+						return;
 					}
 				}
 			}
 		}, "Flush project data thread"); //$NON-NLS-1$
+		flushThread.start();
+	}
+	
+	/**
+	 * Writing to the .cproject file fails if the workspace is locked. So calling CoreModel.getDefault().setProjectDescription() is
+	 * not enough. Instead, spawn a thread that calls this function once the workspace is unlocked.
+	 * The overall logic for this function and "nodeFlush" is the same.
+	 *
+	 * @param project
+	 * @param desc
+	 */
+	public static void setProjectDescription(final IProject project, final ICProjectDescription desc) {
+		Throwable firstException = null;
+		final IWorkspace ws = ResourcesPlugin.getWorkspace();
+		// Avoid creating a thread if possible. 
+		try {
+			if (!ws.isTreeLocked()) {
+				CoreModel.getDefault().setProjectDescription(project, desc, true, null);
+				return;
+			}
+		} catch (CoreException e) {
+			// This can happen in the rare case that the lock is locked between the check and the flush but also for other reasons.
+			// Be optimistic and proceed to create thread.
+			firstException = e;
+		}
+
+		final Throwable currentException = firstException;
+		Thread flushThread = new Thread(new Runnable() {
+			public void run() {
+				int sleepCount = 0;
+				Throwable lastException = currentException;
+				while (true) {
+					try {
+						Thread.sleep(1000);
+						// Give up after 30 sleeps - this should never happen
+						sleepCount++;
+						if (sleepCount > 30) {
+							if (lastException != null) {
+								RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_24, lastException);
+							} else {
+								RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_24);
+							}
+							break;
+						}
+						if (!ws.isTreeLocked()) {
+							CoreModel.getDefault().setProjectDescription(project, desc, true, null);
+							break;
+						}
+					} catch(InterruptedException e) {
+						lastException = e;
+					} catch (CoreException e) {
+						// This can happen in the rare case that the lock is locked between the check and the flush but also for
+						// other reasons.
+						// Be optimistic and try again.
+						lastException = e;
+					}
+				}
+			}
+		}, "Save project CDT data thread"); //$NON-NLS-1$
 		flushThread.start();
 	}
 }

@@ -128,6 +128,9 @@ public class RemoteSyncWizardPageOperation implements IRunnableWithProgress {
 			SyncManager.saveFileFilter(project, customFilter);
 		}
 		monitor.done();
+		
+		// Enable sync'ing
+		SyncManager.setSyncMode(project, SyncManager.SYNC_MODE.ACTIVE);
 	}
 
 	private static Object getMBSProperty(String propertyId) {

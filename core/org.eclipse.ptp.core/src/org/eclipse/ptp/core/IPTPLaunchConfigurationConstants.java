@@ -23,9 +23,25 @@ package org.eclipse.ptp.core;
  */
 public interface IPTPLaunchConfigurationConstants {
 	/**
-	 * Plugin ID
+	 * Parallel application launch type ID
+	 * 
+	 * @since 6.0
 	 */
-	public static final String PTP_LAUNCHCONFIGURETYPE_ID = "org.eclipse.ptp.launch.parallelLaunch"; //$NON-NLS-1$
+	public static final String LAUNCH_APP_TYPE_ID = "org.eclipse.ptp.launch.parallelLaunch"; //$NON-NLS-1$
+
+	/**
+	 * The default launch delegate for normal launches
+	 * 
+	 * @since 6.0
+	 */
+	public static final String PREFERRED_RUN_LAUNCH_DELEGATE = "org.eclipse.ptp.rm.launch.parallelLaunch"; //$NON-NLS-1$
+
+	/**
+	 * The default launch delegate for debug launches
+	 * 
+	 * @since 6.0
+	 */
+	public static final String PREFERRED_DEBUG_LAUNCH_DELEGATE = "org.eclipse.ptp.rm.launch.parallelLaunch"; //$NON-NLS-1$
 
 	/**
 	 * Unique string for launch attributes

@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Dist_graph_neighbors</title>
+
+</head>
+<body>
+
+<h1 align=center>MPI_Dist_graph_neighbors</h1>
+
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Dist_graph_neighbors</b>
+&minus; Provides information about adjacency in a distributed graph topology.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Dist_graph_neighbors(MPI_Comm <i>comm</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+<p valign="top">int <i>maxindegree</i>, int <i>sources</i>[], int <i>sourceweights</i>[],</p></td>
+</tr>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+<p valign="top">int <i>maxoutdegree</i>, int <i>destinations</i>[], int <i>destweights</i>[])</p></td>
+</tr>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_DIST_GRAPH_NEIGHBORS(<i>COMM, MAXINDEGREE, SOURCES, SOURCEWEIGHTS,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+<p valign="top"><i>MAXOUTDEGREE, DESTINATIONS, DESTWEIGHTS, IERROR</i>)</p></td>
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">&nbsp;</td>
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+<p valign="top"><i>COMM, MAXINDEGREE, SOURCES(*), SOURCEWEIGHTS(*),</i></p> </td>
+
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%"></td>
+<td width="8%"></td>
+<td width="69%">
+<p valign="top"><i>MAXOUTDEGREE, DESTINATIONS(*), DESTWEIGHTS(*), IERROR</i></p></td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void Distgraphcomm::Get_dist_neighbors(int <i>maxindegree</i>, int <i>sources</i>[], int <i>sourceweights</i>[],</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="31%"></td>
+<td width="69%">
+<p valign="top">int maxoutdegree, int <i>destinations</i>[], int <i>destweights</i>[])</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">comm_old</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Communicator with distributed graph topology (handle).</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">maxindegree</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Size of <i>sources</i> and <i>sourceweights</i> arrays (non-negative integer).</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">maxoutdegree</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Size of <i>destinations</i> and <i>destweights</i> arrays (non-negative integer).</p></td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0"><tr valign="top" align="left">
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">sources</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Process ranks for which this process is a destination.</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">sourceweights</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Weights of the edges into this process.</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">destinations</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Process ranks for which this process is a source.</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+<p style="margin-top: 1em" valign="top">destweights</p></td>
+<td width="3%"></td>
+<td width="74%">
+<p style="margin-top: 1em" valign="top">Weights of the edges out of this process.</p></td>
+
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<h2>FOR MORE INFORMATION</h2>
+
+For more information, see page 264 of the
+ <a target="_blank" href="http://www.mpi-forum.org/docs/mpi-2.2/mpi22-report.pdf">MPI 2.2 standard</a>.
+
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

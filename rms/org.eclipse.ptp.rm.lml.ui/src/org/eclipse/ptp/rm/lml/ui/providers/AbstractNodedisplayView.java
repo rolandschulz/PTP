@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Composite;
  * An AbstractNodedisplayView implements zoom-listeners,
  * which are called by subclasses every time a new node
  * was set as root-node.
-
  */
 public abstract class AbstractNodedisplayView extends LguiWidget {
 
@@ -45,6 +44,13 @@ public abstract class AbstractNodedisplayView extends LguiWidget {
 	 * All listeners interested in rectangle minimum size changes
 	 */
 	private final List<IRectangleSizeChangeListener> rectangleListeners;
+
+	/**
+	 * If this attribute is set to a positive value, layout definitions will be
+	 * overridden for the nodedisplay. The amount of nested tree levels
+	 * is then set to this value.
+	 */
+	private int fixedLevel = -1;
 
 	/**
 	 * Creates an abstract nodedisplay view with a data-handler lgui
@@ -98,6 +104,23 @@ public abstract class AbstractNodedisplayView extends LguiWidget {
 	}
 
 	/**
+	 * @return level of expansion of this nodedisplay or a negative value, if the layout definition is used currently
+	 */
+	public int getFixedLevel() {
+		return fixedLevel;
+	}
+
+	/**
+	 * Calculates the maximum depth of the wrapped nodedisplay.
+	 * For example a nodedisplay with the two levels nodes and cores
+	 * will return 2.
+	 * 
+	 * 
+	 * @return the maximum depth of the nodedisplay's LML tree defined by its scheme
+	 */
+	public abstract int getMaximumNodedisplayDepth();
+
+	/**
 	 * @return minimal size of painted rectangles
 	 */
 	public abstract int getMinimalRectangleSize();
@@ -106,6 +129,11 @@ public abstract class AbstractNodedisplayView extends LguiWidget {
 	 * @return currently shown nodedisplaycomp
 	 */
 	public abstract NodedisplayComp getRootNodedisplay();
+
+	/**
+	 * @return currently used maximum amount of nested levels in this nodedisplay.
+	 */
+	public abstract int getShownMaxLevel();
 
 	/**
 	 * Set node with impname as implicit name as root-node within this nodedisplay-panel.
@@ -142,6 +170,16 @@ public abstract class AbstractNodedisplayView extends LguiWidget {
 	 * The stack which saves the last zoom-levels is restarted
 	 */
 	public abstract void restartZoom();
+
+	/**
+	 * Set the level of expansion to this value.
+	 * 
+	 * @param level
+	 *            level of expansion for this nodedisplay
+	 */
+	public void setFixedLevel(int level) {
+		fixedLevel = level;
+	}
 
 	/**
 	 * Define the minimum size of rectangles painted

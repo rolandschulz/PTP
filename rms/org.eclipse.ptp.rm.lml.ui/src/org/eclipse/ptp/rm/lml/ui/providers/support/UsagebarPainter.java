@@ -21,7 +21,6 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.UsageType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarlayoutType;
-import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
 import org.eclipse.ptp.rm.lml.internal.core.model.OIDToObject;
 import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus;
 import org.eclipse.ptp.rm.lml.internal.core.model.UsageAdapter;
@@ -399,7 +398,7 @@ public class UsagebarPainter implements PaintListener {
 			final ObjectType jobObject = oidToObject.getObjectById(job.getOid());
 
 			if (!objectStatus.isMouseDown(jobObject) && objectStatus.isAnyMouseDown()) {
-				jobColor = ColorConversion.getColor(new LMLColor(null));
+				jobColor = ColorConversion.getColor(oidToObject.getColorById(null));
 			}
 
 			gc.setBackground(event.display.getSystemColor(SWT.COLOR_BLACK));
@@ -413,6 +412,13 @@ public class UsagebarPainter implements PaintListener {
 			gc.fillRectangle(x + paintArea.x, 0 + paintArea.y, aWidth, barHeight);
 
 			gc.setBackground(jobColor);
+			// avoid negative widths and heights
+			if (aWidth - 2 * frame < 0) {
+				frame = 1;
+			}
+			if (barHeight - 2 * frame < 0) {
+				frame = 1;
+			}
 
 			gc.fillRectangle(x + frame + paintArea.x, frame + paintArea.y, aWidth - 2 * frame, barHeight - 2 * frame);
 
@@ -428,7 +434,13 @@ public class UsagebarPainter implements PaintListener {
 			gc.setBackground(event.display.getSystemColor(SWT.COLOR_BLACK));
 			gc.fillRectangle(x + paintArea.x, 0 + paintArea.y, width - x, barHeight);
 
-			gc.setBackground(ColorConversion.getColor(oidToObject.getColorById("empty"))); //$NON-NLS-1$
+			Color jobColor = ColorConversion.getColor(oidToObject.getColorById("empty")); //$NON-NLS-1$
+
+			if (!objectStatus.isMouseDown(oidToObject.getObjectById("empty")) && objectStatus.isAnyMouseDown()) { //$NON-NLS-1$
+				jobColor = ColorConversion.getColor(oidToObject.getColorById(null));
+			}
+
+			gc.setBackground(jobColor);
 
 			gc.fillRectangle(x + standardFrame + paintArea.x, standardFrame + paintArea.y, width - x - 2 * standardFrame, barHeight
 					- 2 * standardFrame);

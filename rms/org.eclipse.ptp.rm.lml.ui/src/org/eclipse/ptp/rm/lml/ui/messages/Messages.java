@@ -14,6 +14,21 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.lml.ui.messages.messages"; //$NON-NLS-1$
+	public static String FilterDialog_An_error_occurred;
+	public static String FilterDialog_Apply;
+	public static String FilterDialog_Cancel;
+	public static String FilterDialog_Delete;
+	public static String FilterDialog_Filters;
+	public static String FilterDialog_Missing_arguments;
+	public static String FilterDialog_Missing_arguments_message;
+	public static String FilterDialog_OK;
+	public static String NodedisplayViewMaxlevelAdjust_0;
+	public static String NodedisplayViewMaxlevelAdjust_1;
+	public static String NodedisplayViewMaxlevelAdjust_2;
+	public static String NodesView_0;
+	public static String NodesView_1;
+	public static String NodesView_2;
+	public static String NodesView_3;
 	public static String InfoView_Node;
 	public static String InfoView_Show_message_of_the_day;
 	public static String UIUtils_1;

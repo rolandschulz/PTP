@@ -32,6 +32,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
@@ -221,8 +223,20 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab#getRemoteConnection()
 	 */
+	// Based on org.eclipse.ptp.rm.launch.RMLaunchUtils#getRemoteConnection(ILaunchConfiguration, IProgressMonitor)
 	public IRemoteConnection getRemoteConnection() {
-		return getParent().getRemoteServicesDelegate().getRemoteConnection();
+		final IJobController jobControl = getParent().getJobControl();
+		final String remoteServicesID = jobControl.getRemoteServicesId();
+		final String connectionName = jobControl.getConnectionName();
+
+		if (remoteServicesID != null && connectionName != null) {
+			final PTPRemoteCorePlugin corePlugin = PTPRemoteCorePlugin.getDefault();
+			final IRemoteServices services = corePlugin.getRemoteServices(remoteServicesID, getProgressMonitor());
+			if (services != null) {
+				return services.getConnectionManager().getConnection(connectionName);
+			}
+		}
+		return null;
 	}
 
 	/**

@@ -65,6 +65,7 @@ public class MouseInteraction {
 		toolTip.setText(null);
 		toolTip.setShift(new Point(20, 20));
 		toolTip.setHideOnMouseDown(false);
+		toolTip.deactivate();
 	}
 
 	/**
@@ -79,7 +80,7 @@ public class MouseInteraction {
 			lguiItem.getObjectStatus().mouseDown(lguiItem.getOIDToObject().getObjectByLMLNode(focussed.getData()));
 		}
 
-		toolTip.setText(getToolTipText(focussed));
+		setToolTipText(getToolTipText(focussed));
 	}
 
 	/**
@@ -93,7 +94,8 @@ public class MouseInteraction {
 		if (focussed != null && !isEmptyJob(focussed) && lguiItem.getObjectStatus() != null) {
 			lguiItem.getObjectStatus().mouseDown(focussed);
 		}
-		toolTip.setText(getToolTipText(focussed));
+
+		setToolTipText(getToolTipText(focussed));
 	}
 
 	/**
@@ -104,7 +106,7 @@ public class MouseInteraction {
 			lguiItem.getObjectStatus().mouseExitLast();
 		}
 
-		toolTip.setText(getToolTipText((Node<LMLNodeData>) null));
+		setToolTipText(getToolTipText((Node<LMLNodeData>) null));
 	}
 
 	/**
@@ -121,7 +123,7 @@ public class MouseInteraction {
 				lguiItem.getObjectStatus().mouseExitLast();
 			}
 		}
-		toolTip.setText(getToolTipText(focussed));
+		setToolTipText(getToolTipText(focussed));
 	}
 
 	/**
@@ -139,7 +141,7 @@ public class MouseInteraction {
 				lguiItem.getObjectStatus().mouseExitLast();
 			}
 		}
-		toolTip.setText(getToolTipText(focussed));
+		setToolTipText(getToolTipText(focussed));
 	}
 
 	/**
@@ -153,7 +155,7 @@ public class MouseInteraction {
 		if (focussed != null && !isNodeEmpty(focussed) && lguiItem.getObjectStatus() != null) {
 			lguiItem.getObjectStatus().mouseUp(lguiItem.getOIDToObject().getObjectByLMLNode(focussed.getData()));
 		}
-		toolTip.setText(getToolTipText(focussed));
+		setToolTipText(getToolTipText(focussed));
 	}
 
 	/**
@@ -167,7 +169,7 @@ public class MouseInteraction {
 		if (focussed != null && !isEmptyJob(focussed) && lguiItem.getObjectStatus() != null) {
 			lguiItem.getObjectStatus().mouseUp(focussed);
 		}
-		toolTip.setText(getToolTipText(focussed));
+		setToolTipText(getToolTipText(focussed));
 	}
 
 	/**
@@ -247,6 +249,25 @@ public class MouseInteraction {
 		}
 		// Get connected object for the focussed node
 		return isEmptyJob(lguiItem.getOIDToObject().getObjectByLMLNode(node.getData()));
+	}
+
+	/**
+	 * Checks if text is null. In this case the toolTip is deactivated.
+	 * Otherwise the tooltip is activated again. The given text is always
+	 * set as tooltip text.
+	 * 
+	 * @param text
+	 *            the tooltip, which should be shown for the control
+	 */
+	private void setToolTipText(String text) {
+		if (text == null) {
+			toolTip.deactivate();
+		}
+		else {
+			toolTip.activate();
+		}
+
+		toolTip.setText(text);
 	}
 
 }

@@ -10,13 +10,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.fortran.analysis;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTNameNode;
 import org.eclipse.photran.internal.core.parser.ASTVarOrFnRefNode;
 import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.ptp.pldt.common.Artifact;
-import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
+import org.eclipse.ptp.pldt.openmp.core.OpenMPScanReturn;
 
 /**
  * This visitor collects OpenMP related constructs (currently function calls and constants), and
@@ -29,10 +31,14 @@ import org.eclipse.ptp.pldt.common.util.SourceInfo;
 public class OpenMPFortranASTVisitor extends GenericASTVisitor {
 	private static final String PREFIX = "OMP_"; //$NON-NLS-1$
 
-	private ScanReturn scanReturn;
+	private static final Pattern END_DIRECTIVE = Pattern.compile("^end", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+
+	private static final boolean shouldIgnoreEndDirectives = false; // TODO: Make this a user preference
+
+	private OpenMPScanReturn scanReturn;
 	private String fileName;
 
-	public OpenMPFortranASTVisitor(String fileName, ScanReturn scanReturn) {
+	public OpenMPFortranASTVisitor(String fileName, OpenMPScanReturn scanReturn) {
 		this.scanReturn = scanReturn;
 		this.fileName = fileName;
 	}
@@ -47,8 +53,19 @@ public class OpenMPFortranASTVisitor extends GenericASTVisitor {
 		 * the preceding OpenMP directives.
 		 */
 		for (Token ompDirective : node.getOpenMPComments()) {
-			addArtifact(ompDirective, Artifact.PRAGMA);
+			if (!shouldIgnore(ompDirective)) {
+				addArtifact(ompDirective, Artifact.PRAGMA);
+			}
 		}
+	}
+
+	@SuppressWarnings("unused")
+	private boolean shouldIgnore(Token ompDirective) {
+		return shouldIgnoreEndDirectives && isOpenMPEndDirective(ompDirective);
+	}
+
+	private boolean isOpenMPEndDirective(Token ompDirective) {
+		return END_DIRECTIVE.matcher(ompDirective.getText()).find();
 	}
 
 	@Override

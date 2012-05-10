@@ -1,0 +1,599 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:21 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Comm_spawn_multiple</title>
+
+</head>
+<body>
+
+<h1 align=center>MPI_Comm_spawn_multiple</h1>
+
+
+
+<a name="NAME"></a>
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Comm_spawn_multiple</b>
+&minus; Spawns multiple binaries, or the same binary with
+multiple sets of arguments.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<a name="C Syntax"></a>
+<h2>C Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+int MPI_Comm_spawn_multiple(int <i>count</i>, char
+*<i>array_of_commands</i>[],</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">char **<i>array_of_argv</i>[], int
+<i>array_of_maxprocs</i>[], MPI_Info</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top"><i>array_of_info</i>[], int <i>root</i>,
+MPI_Comm <i>comm</i>, MPI_Comm *<i>intercomm</i>,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">int <i>array_of_errcodes</i>[])</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_COMM_SPAWN_MULTIPLE(<i>COUNT, ARRAY_OF_COMMANDS,
+ARRAY_OF_ARGV,</i></p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top"><i>ARRAY_OF_MAXPROCS, ARRAY_OF_INFO, ROOT,
+COMM, INTERCOMM,</i></p></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top"><i>ARRAY_OF_ERRCODES, IERROR</i>)</p></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="69%">
+
+
+<p valign="top"><i>COUNT, ARRAY_OF_INFO(*),
+ARRAY_OF_MAXPROCS(*), ROOT,</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%">
+
+
+<p valign="top"><i>COMM, INTERCOMM, ARRAY_OF_ERRCODES(*),
+IERROR</i></p> </td>
+<td width="69%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">CHARACTER*(*) <i>ARRAY_OF_COMMANDS</i>(*),
+<i>ARRAY_OF_ARGV</i>(<i>COUNT</i>, *)</p></td>
+<td width="8%"></td>
+<td width="69%">
+</td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+MPI::Intercomm MPI::Intracomm::Spawn_multiple(int
+<i>count</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const char* <i>array_of_commands</i>[],
+const char** <i>array_of_argv</i>[],</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const int <i>array_of_maxprocs</i>[], const
+MPI::Info <i>array_of_info</i>[],</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int <i>root</i>, int
+<i>array_of_errcodes</i>[])</p> </td>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">MPI::Intercomm
+MPI::Intracomm::Spawn_multiple(int <i>count</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const char* <i>array_of_commands</i>[],
+const char** <i>array_of_argv</i>[],</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">const int <i>array_of_maxprocs</i>[], const
+MPI::Info <i>array_of_info</i>[],</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">int <i>root</i>)</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="7%">
+
+
+<p style="margin-top: 1em" valign="top">count</p></td>
+<td width="8%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Number of commands
+(positive integer, significant to MPI only at <i>root</i> --
+see NOTES).</p></td>
+</table>
+
+<p style="margin-left:11%;">array_of_commands</p>
+
+<p style="margin-left:26%;">Programs to be executed (array
+of strings, significant only at <i>root</i>).</p>
+
+<p style="margin-left:11%;">array_of_argv</p>
+
+<p style="margin-left:26%;">Arguments for <i>commands</i>
+(array of array of strings, significant only at
+<i>root</i>).</p>
+
+<p style="margin-left:11%;">array_of_maxprocs</p>
+
+<p style="margin-left:26%;">Maximum number of processes to
+start for each command (array of integers, significant only
+at <i>root</i>).</p>
+
+<p style="margin-left:11%;">array_of_info</p>
+
+<p style="margin-left:26%;">Info objects telling the
+runtime system where and how to start processes (array of
+handles, significant only at <i>root</i>).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em" valign="top">root</p></td>
+<td width="9%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Rank of process in
+which previous arguments are examined (integer).</p></td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em" valign="top">comm</p></td>
+<td width="9%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Intracommunicator
+containing group of spawning processes (handle).</p></td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p style="margin-top: 1em" valign="top">intercomm</p></td>
+<td width="1%"></td>
+<td width="74%">
+
+
+<p style="margin-top: 1em" valign="top">Intercommunicator
+between original group and the newly spawned group
+(handle).</p> </td>
+</table>
+
+<p style="margin-left:11%;">array_of_errcodes</p>
+
+<p style="margin-left:26%;">One code per process (array of
+integers).</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Comm_spawn_multiple
+is identical to MPI_Comm_spawn(3) except that it can specify
+multiple executables. The first argument, <i>count</i>,
+indicates the number of executables. The next three
+arguments are arrays of the corresponding arguments in
+MPI_Comm_spawn(3). The next argument, <i>array_of_info</i>,
+is an array of <i>info</i> arguments; however, only the
+first argument in that array is used. Any subsequent
+arguments in the array are ignored because an <i>info</i>
+argument applies to the entire job that is spawned, and
+cannot be different for each executable in the job. See the
+INFO ARGUMENTS section for more information.</p>
+
+<p style="margin-left:11%; margin-top: 1em">For the Fortran
+version of <i>array_of_argv</i>, the element
+<i>array_of_argv</i>(i,j) is the jth argument to command
+number i.</p>
+
+<p style="margin-left:11%; margin-top: 1em">In any
+language, an application may use the constant MPI_ARGVS_NULL
+(which is likely to be (char ***)0 in C) to specify that no
+arguments should be passed to any commands. The effect of
+setting individual elements of <i>array_of_argv</i> to
+MPI_ARGV_NULL is not defined. To specify arguments for some
+commands but not others, the commands without arguments
+should have a corresponding <i>argv</i> whose first element
+is null ((char *)0 in C and empty string in Fortran).</p>
+
+<p style="margin-left:11%; margin-top: 1em">All of the
+spawned processes have the same MPI_COMM_WORLD. Their ranks
+in MPI_COMM_WORLD correspond directly to the order in which
+the commands are specified in MPI_Comm_spawn_multiple.
+Assume that m1 processes are generated by the first command,
+m2 by the second, etc. The processes corresponding to the
+first command have ranks 0, 1,..., m1-1. The processes in
+the second command have ranks m1, m1+1, ..., m1+m2-1. The
+processes in the third have ranks m1+m2, m1+m2+1, ...,
+m1+m2+m3-1, etc.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+<i>array_of_errcodes</i> argument is 1-dimensional array of
+size</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">_ count</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">\ n ,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">/_ i=1 i</p></td>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">where i is the
+ith element of <i>array_of_maxprocs</i>. Command number
+<i>i</i> corresponds to the i contiguous slots in this array
+from element</p>
+
+<p style="margin-left:11%; margin-top: 1em">_ _</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">_ <i>i</i>-1 | _ <i>i</i> |</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">\ n , to | \ n | -1</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">/_ <i>j</i>=1 i | /_ <i>j</i>=1 j |</p></td>
+</table>
+
+<p style="margin-left:11%;">|_ _|</p>
+
+<p style="margin-left:11%; margin-top: 1em">Error codes are
+treated as for MPI_Comm_spawn(3).</p>
+
+<a name="INFO ARGUMENTS"></a>
+<h2>INFO ARGUMENTS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The following
+keys for <i>info</i> are recognized in &quot;Open MPI&quot;.
+(The reserved values mentioned in Section 5.3.4 of the MPI-2
+standard are not implemented.)</p>
+
+<p style="margin-left:11%; margin-top: 1em">Key Type
+Description <br>
+--- ---- -----------</p>
+
+<p style="margin-left:11%; margin-top: 1em">host char *
+Host on which the process should be spawned. <br>
+See the <i>orte_host</i> man page for an <br>
+explanation of how this will be used. <br>
+hostfile char * Hostfile containing the hosts on which <br>
+the processes are to be spawned. See <br>
+the <i>orte_hostfile</i> man page for an <br>
+explanation of how this will be used. <br>
+add-host char * Add the specified host to the list of <br>
+hosts known to this job and use it <br>
+for the associated processes. This will <br>
+be used similarly to the -host option. <br>
+add-hostfile char * Hostfile containing hosts to be added
+<br>
+to the list of hosts known to this job and <br>
+use it for the associated processes. This will <br>
+be used similarly to the -hostfile option. <br>
+wdir char * Directory where the executable is located. If
+<br>
+files are to be pre-positioned, then this <br>
+location is the desired working directory <br>
+at time of execution - if not specified, <br>
+then it will automatically be set to <i><br>
+ompi_preload_files_dest_dir</i>. <br>
+ompi_prefix char * Same as the --prefix command line
+argument <br>
+to mpirun. <br>
+ompi_local_slave bool If set to true, launch the specified
+process <br>
+as a local <i>slave</i> to the calling process. <br>
+The new process will only be known to the caller, <br>
+and will only be able to communicate with the caller. <br>
+ompi_preload_binary bool If set to true, pre-position the
+specified <br>
+executable onto the remote host. A destination <br>
+directory must also be provided. <br>
+ompi_preload_files_dest_dir char * Target directory where
+pre-positioned files <br>
+are to be placed. <br>
+ompi_preload_files char * A comma-separated list of files
+that are to <br>
+be pre-positioned in addition to the executable. <br>
+Note that this option does not depend upon <i><br>
+ompi_preload_binary</i> - files can be moved <br>
+to the target even if an executable is not moved. <br>
+ompi_preload_files_src_dir char * Source directory where
+files and executables <br>
+that are to be pre-positioned can be found. If <br>
+not specified, the current working directory <br>
+will be used. <br>
+ompi_non_mpi bool If set to true, launching a non-MPI <br>
+application; the returned communicator <br>
+will be MPI_COMM_NULL. Failure to set <br>
+this flag when launching a non-MPI <br>
+application will cause both the child <br>
+and parent jobs to &quot;hang&quot;. <br>
+ompi_param char * Pass an OMPI MCA parameter to the child
+job. <br>
+If that parameter already exists in the <br>
+environment, the value will be overwritten <br>
+by the provided value. <br>
+map_bynode bool If set to true, the processes are mapped
+bynode. <br>
+If set to false, the processes are mapped byslot. <br>
+By default, mapping is determined by the default <br>
+mapping policy set when the job was started.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><i>bool</i>
+info keys are actually strings but are evaluated as follows:
+if the string value is a number, it is converted to an
+integer and cast to a boolean (meaning that zero integers
+are false and non-zero values are true). If the string value
+is (case-insensitive) &quot;yes&quot; or &quot;true&quot;,
+the boolean is true. If the string value is
+(case-insensitive) &quot;no&quot; or &quot;false&quot;, the
+boolean is false. All other string values are unrecognized,
+and therefore false.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Note that if
+any of the info handles have <i>ompi_non_mpi</i> set to
+true, then all info handles must have it set to true. If
+some are set to true, but others are set to false (or are
+unset), MPI_ERR_INFO will be returned.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Note that in
+&quot;Open MPI&quot;, the first array location in
+<i>array_of_info</i> is applied to all the commands in
+<i>array_of_commands</i>.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The argument
+<i>count</i> is interpreted by MPI only at the root, as is
+<i>array_of_argv</i>. Since the leading dimension of
+<i>array_of_argv</i> is <i>count</i>, a nonpositive value of
+<i>count</i> at a nonroot node could theoretically cause a
+runtime bounds check error, even though <i>array_of_argv</i>
+should be ignored by the subroutine. If this happens, you
+should explicitly supply a reasonable value of <i>count</i>
+on the nonroot nodes.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Similar to
+MPI_Comm_spawn(3), it is the application&rsquo;s
+responsibility to terminate each individual set of argv in
+the <i>array_of_argv</i> argument. In C, each argv array is
+terminated by a NULL pointer. In Fortran, each argv array is
+terminated by an empty string (note that compilers will not
+automatically insert this blank string; the application must
+ensure to have enough space for an empty string entry as the
+last element of the array).</p>
+
+<p style="margin-left:11%; margin-top: 1em">Other
+restrictions apply to the <i>array_of_argv</i> parameter;
+see MPI_Comm_spawn(3)&rsquo;s description of the <i>argv</i>
+parameter for more details.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Calling
+MPI_Comm_spawn(3) many times would create many sets of
+children with different MPI_COMM_WORLDs, whereas
+MPI_Comm_spawn_multiple creates children with a single
+MPI_COMM_WORLD, so the two methods are not completely
+equivalent. Also if you need to spawn multiple executables,
+you may get better performance by using
+MPI_Comm_spawn_multiple instead of calling MPI_Comm_spawn(3)
+several times.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. By default, this error handler aborts the MPI job,
+except for I/O function errors. The error handler may be
+changed with MPI_Comm_set_errhandler; the predefined error
+handler MPI_ERRORS_RETURN may be used to cause error values
+to be returned. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><a href="MPI_Comm_spawn.html">MPI_Comm_spawn</a>(3)
+<br>
+<a href="MPI_Comm_get_parent.html">MPI_Comm_get_parent</a>(3) <br>
+ mpirun(1)</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

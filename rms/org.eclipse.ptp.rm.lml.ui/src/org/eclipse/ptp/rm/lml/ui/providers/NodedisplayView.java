@@ -59,6 +59,7 @@ public class NodedisplayView extends AbstractNodedisplayView {
 			reset();
 		}
 
+		@Override
 		public void handleEvent(Event event) {
 			if (paintCount < adjustCount) {
 				adjustScrollPaneSize();
@@ -90,6 +91,7 @@ public class NodedisplayView extends AbstractNodedisplayView {
 		 * @see org.eclipse.ptp.rm.lml.core.listeners.INodedisplayZoomListener#handleEvent(org.eclipse.ptp.rm.lml.core.events.
 		 * INodedisplayZoomEvent)
 		 */
+		@Override
 		public void handleEvent(INodedisplayZoomEvent event) {
 			switch (event.getZoomType()) {
 			case TREEZOOMIN:
@@ -164,7 +166,12 @@ public class NodedisplayView extends AbstractNodedisplayView {
 	 * Minimal size of width and height of painted rectangles
 	 * Is only used, if minSizeRectangles is true
 	 */
-	private int minRectangleSize = 5;
+	private int minRectangleSize = NodedisplayCompMinSize.defaultMinSize;
+
+	/**
+	 * Saves the currently shown maximum level in the nodedisplay
+	 */
+	private int shownLevel;
 
 	/**
 	 * Simple constructor, which defines on its own if minimum sized
@@ -227,6 +234,17 @@ public class NodedisplayView extends AbstractNodedisplayView {
 		checkEmptyScreen();
 	}
 
+	@Override
+	public int getMaximumNodedisplayDepth() {
+		if (nodedisplay == null) {
+			return 0;
+		}
+		if (nodedisplay.getScheme() == null) {
+			return 0;
+		}
+		return LMLCheck.getDeepestSchemeLevel(nodedisplay.getScheme());
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -256,6 +274,11 @@ public class NodedisplayView extends AbstractNodedisplayView {
 	 */
 	public ScrolledComposite getScrollComp() {
 		return scrollComp;
+	}
+
+	@Override
+	public int getShownMaxLevel() {
+		return shownLevel;
 	}
 
 	/**
@@ -319,20 +342,7 @@ public class NodedisplayView extends AbstractNodedisplayView {
 		}
 
 		if (impName != null) {
-			final LMLNodeData nodeData = new LMLNodeData(impName, nodedisplay);
-			final Node<LMLNodeData> newNode = new Node<LMLNodeData>(nodeData);
-
-			// Search for nodedisplayelement
-			final Nodedisplayelement layout = findLayout(nodeData);
-
-			// Expand the newnode
-			int maxLevel = 10;
-			if (layout.getMaxlevel() != null) {
-				maxLevel = layout.getMaxlevel().intValue();
-			}
-			TreeExpansion.expandLMLNode(newNode, maxLevel);
-
-			newNodedisplayComp = createChildNodedisplay(newNode, layout);
+			newNodedisplayComp = createNodedisplayFromImpName(impName);
 		} else {
 			/*
 			 * if impname is null => go up to root-level
@@ -355,6 +365,25 @@ public class NodedisplayView extends AbstractNodedisplayView {
 	@Override
 	public void restartZoom() {
 		zoomStack = new Stack<String>();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.ui.providers.AbstractNodedisplayView#setFixedLevel(int)
+	 */
+	@Override
+	public void setFixedLevel(int level) {
+		// Make sure that level is not greater then the deepest level defined in the nodedisplay's scheme
+		if (nodedisplay != null) {
+			if (nodedisplay.getScheme() != null) {
+				if (LMLCheck.getDeepestSchemeLevel(nodedisplay.getScheme()) < level) {
+					level = LMLCheck.getDeepestSchemeLevel(nodedisplay.getScheme());
+				}
+			}
+		}
+
+		super.setFixedLevel(level);
 	}
 
 	/*
@@ -411,11 +440,12 @@ public class NodedisplayView extends AbstractNodedisplayView {
 			lastShown = root.getShownImpName();
 		}
 
-		final ILguiItem oldLguiItem = lguiItem;
-		final Nodedisplay oldNodedisplay = nodedisplay;
+		final ILguiItem oldLguiItem = this.lguiItem;
+		final Nodedisplay oldNodedisplay = this.nodedisplay;
 
 		setLguiItem(lguiItem);
 		this.nodedisplay = nodedisplay;
+
 		// Restart zooming if another resource is monitored now
 		if (isNodedisplayChanged(oldLguiItem, oldNodedisplay, lguiItem, nodedisplay)) {
 			restartZoom();
@@ -476,6 +506,10 @@ public class NodedisplayView extends AbstractNodedisplayView {
 			// Switch view to node with impname
 			goToImpName(impName);
 		}
+		else {
+			// If zoom-stack is empty go to root level view
+			goToImpName(null);
+		}
 
 		this.setCursor(defaultCursor);
 	}
@@ -487,9 +521,11 @@ public class NodedisplayView extends AbstractNodedisplayView {
 
 		scrollComp.addControlListener(new ControlListener() {
 
+			@Override
 			public void controlMoved(ControlEvent e) {
 			}
 
+			@Override
 			public void controlResized(ControlEvent e) {
 				adjustScrollBarIncrements();
 				// After resize it might happen, that the nodedisplay minsize depends
@@ -542,6 +578,52 @@ public class NodedisplayView extends AbstractNodedisplayView {
 		} else {
 			scrollComp.setVisible(false);
 		}
+	}
+
+	/**
+	 * Pass an implicit name to this function.
+	 * This name is used for the creation of LMLNodeData, which
+	 * represents the data model for the created nodedisplay.
+	 * 
+	 * @param impName
+	 *            implicit name of a physical element within the nodedisplay, which is model for this nodedisplayview
+	 * @return a nodedisplay displaying the passed node
+	 */
+	private NodedisplayComp createNodedisplayFromImpName(String impName) {
+		LMLNodeData nodeData = null;
+		try {
+			nodeData = new LMLNodeData(impName, nodedisplay);
+		} catch (final IllegalArgumentException er) {
+			nodeData = new LMLNodeData("", nodedisplay); //$NON-NLS-1$
+		}
+		final Node<LMLNodeData> newNode = new Node<LMLNodeData>(nodeData);
+
+		// Search for nodedisplayelement
+		final Nodedisplayelement layout = findLayout(nodeData);
+
+		// Expand the newnode
+		int maxLevel = 10;
+		if (layout.getMaxlevel() != null) {
+			maxLevel = layout.getMaxlevel().intValue();
+		}
+		if (getFixedLevel() > 0) {
+			maxLevel = getFixedLevel();
+		}
+		// Make sure that maxLevel is not bigger than maximum level withint the nodedisplay's scheme
+		if (nodedisplay != null) {
+			if (nodedisplay.getScheme() != null) {
+				final int deepest = LMLCheck.getDeepestSchemeLevel(nodedisplay.getScheme());
+				if (deepest < maxLevel) {
+					maxLevel = deepest;
+				}
+			}
+		}
+
+		TreeExpansion.expandLMLNode(newNode, maxLevel);
+		TreeExpansion.generateUsagebarsForAllLeaves(newNode);
+		shownLevel = maxLevel;
+
+		return createChildNodedisplay(newNode, layout);
 	}
 
 	/**
@@ -683,12 +765,8 @@ public class NodedisplayView extends AbstractNodedisplayView {
 	 * @return a nodedisplay comp displaying the root node
 	 */
 	protected NodedisplayComp createRootNodedisplay() {
-		if (minSizeRectangles) {
-			return new NodedisplayCompMinSize(lguiItem, nodedisplay, scrollComp, SWT.None);
-		}
-		else {
-			return new NodedisplayComp(lguiItem, nodedisplay, scrollComp, SWT.None);
-		}
+		shownLevel = nodedisplayLayout.getEl0().getMaxlevel().intValue();
+		return createNodedisplayFromImpName(""); //$NON-NLS-1$
 	}
 
 	/**

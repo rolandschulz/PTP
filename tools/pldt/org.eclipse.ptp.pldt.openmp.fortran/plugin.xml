@@ -9,4 +9,9 @@
             class="org.eclipse.ptp.pldt.openmp.fortran.analysis.OpenMPFortranArtifactAnalysis" />
    </extension>
 
+   <!-- OpenMP Fortran code templates -->
+   <extension point="org.eclipse.ui.editors.templates">
+      <include file="templates/openmp_templates.xml" />
+   </extension>
+
 </plugin>

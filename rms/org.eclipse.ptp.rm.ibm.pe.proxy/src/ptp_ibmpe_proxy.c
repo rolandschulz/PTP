@@ -1357,11 +1357,6 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             for (i = 0; i < debug_arg_count; i++)
             	debugger_args[a++] = debug_args[i];
             
-            //for (i = 0; i < nargs; i++) {
-            //    if (strncmp(args[i], PTP_JOB_DEBUG_ARGS_ATTR, strlen(PTP_JOB_DEBUG_ARGS_ATTR)) == 0) {
-            //        debugger_args[a++] = strchr(args[i], '=') + 1;
-            //    }
-            //}
             debugger_args[a] = NULL;
 
             snprintf(pe_debugger_id, sizeof pe_debugger_id, "PE_DEBUGGER_ID=%d", getpid());
@@ -3527,7 +3522,6 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
      * No other environment variables are passed to the application.
      */
     int i;
-    int has_mp_procs = 0;
     int has_mp_hostfile = 0;
     pid_t debugger_pid = 0;
 
@@ -3538,25 +3532,10 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
     for (i = 0; args[i] != NULL; i++) {
         if (strncmp(args[i], "MP_", 3) == 0) {
 #ifdef PE_SCI_DEBUG
-            if (is_debugger && strncmp(args[i], "MP_PROCS=", 9) == 0) {
-                int nprocs = atoi(args[i] + 9);
-                char procs_str[128];
-
-                snprintf(procs_str, sizeof(procs_str), "MP_PROCS=%d", nprocs);
-                add_environment_variable(procs_str);
-                has_mp_procs = 1;
-            }
-            else if (is_debugger && strncmp(args[i], "MP_MSG_API=", 11) == 0) {
-                /* Strip this out and replace with PE_DEBUG_MSG_API (see below) */;
-            }
-            else {
-            	if (strncmp(args[i], "MP_HOSTFILE=", 12) == 0)
-            		has_mp_hostfile = 1;
-                add_environment_variable(args[i]);
-            }
-#else
-            add_environment_variable(args[i]);
+        	if (strncmp(args[i], "MP_HOSTFILE=", 12) == 0)
+        		has_mp_hostfile = 1;
 #endif
+            add_environment_variable(args[i]);
         }
         else {
             if (strncmp(args[i], "env=", 4) == 0) {
@@ -3564,10 +3543,6 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
             }
         }
     }
-#ifdef PE_SCI_DEBUG
-    if (is_debugger && !has_mp_procs)
-    	add_environment_variable("MP_PROCS=1");
-#endif
 
     if (split_io == 1) {
         add_environment_variable("MP_LABELIO=yes");
@@ -3578,19 +3553,6 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
     if (mp_rdma_count && mp_rdma_count[0] != '\0') {
         add_environment_variable(mp_rdma_count);
     }
-#ifdef PE_SCI_DEBUG
-    if (debugger_id && debugger_id[0] != '\0') {
-        add_environment_variable(debugger_id);
-        if (!has_mp_hostfile) {
-            char hostfile[128];
-            char* id = strchr(debugger_id, '=') + 1;
-            debugger_pid = atoi(id);
-
-            snprintf(hostfile, sizeof(hostfile), "MP_SAVEHOSTFILE=/tmp/.ppe.savehostfile.%d", debugger_pid);
-            add_environment_variable(hostfile);
-        }
-    }
-#endif
     if (use_load_leveler) {
         add_environment_variable("MP_RESD=yes");
         print_message(TRACE_DETAIL_MESSAGE, "PE Job uses LoadLeveler resource management\n");
@@ -3642,6 +3604,7 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
                     *endp = '\0';
                     if (strcmp(bufp, "MP_HOSTFILE") == NULL) {
                         update_nodes(endp + 1);
+                        has_mp_hostfile = 1;
                     }
                 }
                 bufp = fgets(env_data, sizeof env_data, env_sh);
@@ -3649,6 +3612,19 @@ create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_
         }
         fclose(env_sh);
     }
+#ifdef PE_SCI_DEBUG
+    if (debugger_id && debugger_id[0] != '\0') {
+        add_environment_variable(debugger_id);
+        if (!has_mp_hostfile) {
+            char hostfile[128];
+            char* id = strchr(debugger_id, '=') + 1;
+            debugger_pid = atoi(id);
+
+            snprintf(hostfile, sizeof(hostfile), "MP_SAVEHOSTFILE=/tmp/.ppe.savehostfile.%d", debugger_pid);
+            add_environment_variable(hostfile);
+        }
+    }
+#endif
     add_environment_variable(NULL);
     TRACE_EXIT;
     return env_array;

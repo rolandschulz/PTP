@@ -1,3 +1,13 @@
+/**
+ * Copyright (c) 2012 Forschungszentrum Juelich GmbH
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ * 		Claudia Knobloch, Carsten Karbach, FZ Juelich
+ */
 package org.eclipse.ptp.rm.lml.core.util;
 
 import java.io.IOException;
@@ -8,6 +18,7 @@ import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -36,6 +47,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.DataType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfoboxType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.JobType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
@@ -49,6 +61,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.SplitlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TablelayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TextboxType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.UsageType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarType;
 import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
 import org.xml.sax.SAXException;
@@ -71,6 +84,33 @@ public class JAXBUtil {
 	private static String SCHEMA_DIRECTORY = "http://www.llview.de";//$NON-NLS-1$
 
 	private static Validator validator;
+
+	/**
+	 * Create an UsageType instance from given parameters.
+	 * Set the total amount of cpus and add job-tags for each
+	 * job to amount mapping within the jobMap.
+	 * 
+	 * @param totalCPUCount
+	 *            total amount of cpus
+	 * @param jobMap
+	 *            mapping of jobnames to cpu amounts covered by these jobs
+	 * @return usagetag to insert into a nodedisplay
+	 */
+	public static UsageType createUsageType(int totalCPUCount, HashMap<String, Integer> jobMap) {
+		final ObjectFactory objectFactory = new ObjectFactory();
+		final UsageType result = objectFactory.createUsageType();
+
+		result.setCpucount(BigInteger.valueOf(totalCPUCount));
+
+		for (final String jobName : jobMap.keySet()) {
+			final JobType job = objectFactory.createJobType();
+			job.setCpucount(BigInteger.valueOf(jobMap.get(jobName)));
+			job.setOid(jobName);
+
+			result.getJob().add(job);
+		}
+		return result;
+	}
 
 	public static JAXBUtil getInstance() {
 		if (jaxbUtil == null) {

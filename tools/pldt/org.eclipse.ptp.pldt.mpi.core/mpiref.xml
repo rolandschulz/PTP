@@ -404,6 +404,45 @@
 </function>
 
 <function>
+<cname>MPI_Close_port</cname>
+<cppname>MPI::Close_port</cppname>
+<fname>MPI_CLOSE_PORT</fname>
+<namespace></namespace>
+<description>Releases the specified network address.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Close_port</name>
+<arguments>char *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_accept</cname>
+<cppname>MPI::Intracomm::Accept</cppname>
+<fname>MPI_COMM_ACCEPT</fname>
+<namespace></namespace>
+<description>Establishes communication with a client.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_accept</name>
+<arguments>char *, MPI_Info, int, MPI_Comm, MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_connect</cname>
+<cppname>MPI::Intracomm::Connect</cppname>
+<fname>MPI_COMM_CONNECT</fname>
+<namespace></namespace>
+<description>Establishes communication with a server.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_connect</name>
+<arguments>char *, MPI_Info, int, MPI_Comm, MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
 <cname>MPI_Comm_c2f</cname>
 <cppname>(none)</cppname>
 <fname>(none)</fname>
@@ -491,6 +530,19 @@
 <returnType>int</returnType>
 <name>MPI_Comm_delete_attr</name>
 <arguments>MPI_Comm, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_disconnect</cname>
+<cppname>MPI::Comm::Disconnect</cppname>
+<fname>MPI_COMM_DISCONNECT</fname>
+<namespace></namespace>
+<description>Deallocates communicator object and sets handle to MPI_COMM_NULL.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_disconnect</name>
+<arguments>MPI_Comm *</arguments>
 </prototype>
 </function>
 
@@ -586,6 +638,19 @@
 </function>
 
 <function>
+<cname>MPI_Comm_get_parent</cname>
+<cppname>MPI::Comm::Get_parent</cppname>
+<fname>MPI_COMM_GET_PARENT</fname>
+<namespace></namespace>
+<description>Returns the parent intercommunicator of current spawned process.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_get_parent</name>
+<arguments>MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
 <cname>MPI_Comm_group</cname>
 <cppname>MPI::Comm::Get_group</cppname>
 <fname>MPI_COMM_GROUP</fname>
@@ -595,6 +660,19 @@
 <returnType>int</returnType>
 <name>MPI_Comm_group</name>
 <arguments>MPI_Comm, MPI_Group *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_join</cname>
+<cppname>MPI::Comm::Join</cppname>
+<fname>MPI_COMM_JOIN</fname>
+<namespace></namespace>
+<description>Establishes communication between MPI jobs.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_join</name>
+<arguments>int, MPI_Comm *</arguments>
 </prototype>
 </function>
 
@@ -690,11 +768,37 @@
 </function>
 
 <function>
+<cname>MPI_Comm_spawn</cname>
+<cppname>MPI::Intracomm::Spawn,</cppname>
+<fname>MPI_COMM_SPAWN</fname>
+<namespace></namespace>
+<description>Spawns a number of identical binaries.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_spawn</name>
+<arguments>char *, char **, int, MPI_Info, int, MPI_Comm, MPI_Comm *, int[]</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_spawn_multiple</cname>
+<cppname>MPI::Intracomm::Spawn_multiple</cppname>
+<fname>MPI_COMM_SPAWN_MULTIPLE</fname>
+<namespace></namespace>
+<description>Spawns multiple binaries, or the same binary with multiple sets of arguments.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_spawn_multiple</name>
+<arguments>int, char *[], char **[], int[], MPI_Info[], int, MPI_Comm, MPI_Comm *, int[]</arguments>
+</prototype>
+</function>
+
+<function>
 <cname>MPI_Comm_split</cname>
 <cppname>MPI::Intercomm::Split,</cppname>
-<fname>MPI::Intracomm::Split</fname>
+<fname>MPI_COMM_SPLIT</fname>
 <namespace></namespace>
-<description>Splits a communicator into multiple communicators based on color andkey.</description>
+<description>Splits a communicator into multiple communicators based on color and key.</description>
 <prototype>
 <returnType>int</returnType>
 <name>MPI_Comm_split</name>
@@ -729,6 +833,71 @@
 </function>
 
 <function>
+<cname>MPI_Dist_graph_create</cname>
+<cppname>MPI::Intracomm::Dist_graph_create</cppname>
+<fname>MPI_DIST_GRAPH_CREATE</fname>
+<namespace></namespace>
+<description>Makes a new communicator to which distributed graph topology information has been attached.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Dist_graph_create</name>
+<arguments>MPI_Comm, int, int[], int[], int[], int[], MPI_Info, int, MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Dist_graph_create_adjacent</cname>
+<cppname>MPI::Intracomm::Dist_graph_create_adjacent</cppname>
+<fname>MPI_DIST_GRAPH_CREATE_ADJACENT</fname>
+<namespace></namespace>
+<description>Makes a new communicator to which distributed graph topology information has been attached.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Dist_graph_create_adjacent</name>
+<arguments>MPI_Comm, int, int[], int[], int, int[], int[], MPI_Info, int, MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Dist_graph_neighbors</cname>
+<cppname>MPI::Distgraphcomm::Get_dist_neighbors</cppname>
+<fname>MPI_DIST_GRAPH_NEIGHBORS</fname>
+<namespace></namespace>
+<description>Provides information about adjacency in a distributed graph topology.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Dist_graph_neighbors</name>
+<arguments>MPI_Comm, int, int[], int[], int, int[], int[]</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Dist_graph_neighbors_count</cname>
+<cppname>MPI::Distgraphcomm::Get_dist_neighbors_count</cppname>
+<fname>MPI_DIST_GRAPH_NEIGHBORS_COUNT</fname>
+<namespace></namespace>
+<description>Provides information about adjacency in a distributed graph topology.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Dist_graph_neighbors_count</name>
+<arguments>MPI_Comm, int *, int *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Errhandler_c2f</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Translates a C error handler into a FORTRAN error handler.</description>
+<prototype>
+<returnType>MPI_Fint</returnType>
+<name>MPI_Errhandler_c2f</name>
+<arguments>MPI_Errhandler</arguments>
+</prototype>
+</function>
+
+<function>
 <cname>MPI_Errhandler_create</cname>
 <cppname>(none)</cppname>
 <fname>MPI_ERRHANDLER_CREATE</fname>
@@ -738,6 +907,19 @@
 <returnType>int</returnType>
 <name>MPI_Errhandler_create</name>
 <arguments>MPI_Handler_function *, MPI_Errhandler *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Errhandler_f2c</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Translates a FORTRAN error handler into a C error handler.</description>
+<prototype>
+<returnType>MPI_Errhandler</returnType>
+<name>MPI_Errhandler_f2c</name>
+<arguments>MPI_Fint</arguments>
 </prototype>
 </function>
 
@@ -1288,6 +1470,19 @@
 </function>
 
 <function>
+<cname>MPI_Group_translate_ranks</cname>
+<cppname>MPI::Group::Translate_ranks</cppname>
+<fname>MPI_GROUP_TRANSLATE_RANKS</fname>
+<namespace></namespace>
+<description>Translates the ranks of one group into those of another group.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Group_translate_ranks</name>
+<arguments>MPI_Group, int, int *, MPI_Group, int *</arguments>
+</prototype>
+</function>
+
+<function>
 <cname>MPI_Group_size</cname>
 <cppname>MPI::Group::Get_size</cppname>
 <fname>MPI_GROUP_SIZE</fname>
@@ -1639,6 +1834,19 @@
 </function>
 
 <function>
+<cname>MPI_Lookup_name</cname>
+<cppname>MPI::Lookup_name</cppname>
+<fname>MPI_LOOKUP_NAME</fname>
+<namespace></namespace>
+<description>Finds the port associated with a service name.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Lookup_name</name>
+<arguments>char *, MPI_Info, char *</arguments>
+</prototype>
+</function>
+
+<function>
 <cname>MPI_Op_c2f</cname>
 <cppname>(none)</cppname>
 <fname>(none)</fname>
@@ -1648,6 +1856,19 @@
 <returnType>MPI_Fint</returnType>
 <name>MPI_Op_c2f</name>
 <arguments>MPI_Op</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Op_commutative</cname>
+<cppname>MPI::Op::Is_commutative</cppname>
+<fname>MPI_OP_COMMUTATIVE</fname>
+<namespace></namespace>
+<description>Queries a reduction operation for its commutativity.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Op_commutative</name>
+<arguments>MPI_Op, int *</arguments>
 </prototype>
 </function>
 
@@ -1687,6 +1908,19 @@
 <returnType>int</returnType>
 <name>MPI_Op_free</name>
 <arguments> MPI_Op *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Open_port</cname>
+<cppname>MPI::Open_port</cppname>
+<fname>MPI_OPEN_PORT</fname>
+<namespace></namespace>
+<description>Establishes a network address for a server to accept connections from clients.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Open_port</name>
+<arguments>MPI_Info, char *</arguments>
 </prototype>
 </function>
 
@@ -1769,6 +2003,19 @@
 </function>
 
 <function>
+<cname>MPI_Publish_name</cname>
+<cppname>MPI::Publish_name</cppname>
+<fname>MPI_PUBLISH_NAME</fname>
+<namespace></namespace>
+<description>Publishes a service name associated with a port.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Publish_name</name>
+<arguments>char *, MPI_Info, char *</arguments>
+</prototype>
+</function>
+
+<function>
 <cname>MPI_Put</cname>
 <cppname>MPI::Win::Put</cppname>
 <fname>MPI_PUT</fname>
@@ -1834,6 +2081,19 @@
 </function>
 
 <function>
+<cname>MPI_Reduce_local</cname>
+<cppname>MPI::Op::Reduce_local</cppname>
+<fname>MPI_REDUCE_LOCAL</fname>
+<namespace></namespace>
+<description>Applies a reduction operation to local arguments.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Reduce_local</name>
+<arguments>void* , void*, int, MPI_Datatype, MPI_Op, int</arguments>
+</prototype>
+</function>
+
+<function>
 <cname>MPI_Reduce_scatter</cname>
 <cppname>MPI::Comm::Reduce_scatter</cppname>
 <fname>MPI_REDUCE_SCATTER</fname>
@@ -1843,6 +2103,19 @@
 <returnType>int</returnType>
 <name>MPI_Reduce_scatter</name>
 <arguments>void* , void*, int *, MPI_Datatype, MPI_Op, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Reduce_scatter_block</cname>
+<cppname>MPI::Comm::Reduce_scatter_block</cppname>
+<fname>MPI_REDUCE_SCATTER_BLOCK</fname>
+<namespace></namespace>
+<description>Applies a reduction operation and scatters the result in equal-sized blocks.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Reduce_scatter_block</name>
+<arguments>void* , void*, int, MPI_Datatype, MPI_Op, MPI_Comm</arguments>
 </prototype>
 </function>
 
@@ -2701,6 +2974,19 @@
 <returnType>int</returnType>
 <name>MPI_Unpack_external</name>
 <arguments>char *, void *, MPI_Aint, MPI_Aint *, void *, int, MPI_Datatype</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Unpublish_name</cname>
+<cppname>MPI::Unpublish_name</cppname>
+<fname>MPI_UNPUBLISH_NAME</fname>
+<namespace></namespace>
+<description>Publishes a service name.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Unpublish_name</name>
+<arguments>char *, MPI_Info, char *</arguments>
 </prototype>
 </function>
 
