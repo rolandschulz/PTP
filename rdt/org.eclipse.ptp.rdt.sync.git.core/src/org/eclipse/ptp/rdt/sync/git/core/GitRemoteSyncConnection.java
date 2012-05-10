@@ -495,7 +495,7 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Use "git status" to obtain a list of files that need to be added or deleted from the git index.
 	 */
-	private void getFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, boolean includeUntrackedFiles)
+	private Status getFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, boolean includeUntrackedFiles)
 			throws RemoteSyncException {
 		StatusCommand statusCommand = git.status();
 		Status status;
@@ -519,6 +519,8 @@ public class GitRemoteSyncConnection {
 			}
 		}
 		filesToAdd.removeAll(filesToBeIgnored);
+		
+		return status;
 	}
 
 	// Subclass JGit's generic RemoteSession to set up running of remote
@@ -623,7 +625,8 @@ public class GitRemoteSyncConnection {
 	private boolean doCommit() throws RemoteSyncException {
 		Set<String> filesToAdd = new HashSet<String>();
 		Set<String> filesToRemove = new HashSet<String>();
-		this.getFileStatus(filesToAdd, filesToRemove, true);
+		Status status = this.getFileStatus(filesToAdd, filesToRemove, true);
+		boolean addedOrRemovedFiles = false;
 
 		try {
 			if (!filesToAdd.isEmpty()) {
@@ -632,6 +635,7 @@ public class GitRemoteSyncConnection {
 					addCommand.addFilepattern(fileName);
 				}
 				addCommand.call();
+				addedOrRemovedFiles = true;
 			}
 
 			if (!filesToRemove.isEmpty()) {
@@ -640,8 +644,16 @@ public class GitRemoteSyncConnection {
 					rmCommand.addFilepattern(fileName);
 				}
 				rmCommand.call();
+				addedOrRemovedFiles = true;
 			}
-			if (!filesToAdd.isEmpty() || !filesToRemove.isEmpty()) {
+			
+			// Check if a commit is required.
+			// Note that we need the "addedOrRemovedFiles" boolean too because the status object reflects the repository state
+			// before files were added or removed.
+			boolean indexHasNewFiles = !status.getAdded().isEmpty();
+			boolean indexHasModifiedFiles = !status.getChanged().isEmpty();
+			boolean indexHasDeletedFiles = !status.getRemoved().isEmpty();
+			if (addedOrRemovedFiles || indexHasNewFiles || indexHasModifiedFiles || indexHasDeletedFiles) {
 				final CommitCommand commitCommand = git.commit();
 				commitCommand.setMessage(commitMessage);
 				commitCommand.call();
