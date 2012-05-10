@@ -1313,7 +1313,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.exe.debug"
-                natureFilter="cnature"
+                natureFilter="both"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.base">
              <option
                    id="ptp.rdt.gnu.c.compiler.exe.debug.option.optimization.level"
@@ -1378,7 +1378,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.exe.release"
-                natureFilter="cnature"
+                natureFilter="both"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.base">
              <option
                    id="ptp.rdt.gnu.c.compiler.exe.release.option.optimization.level"
@@ -1448,7 +1448,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.so.debug"
-                natureFilter="cnature"
+                natureFilter="both"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.base">
              <option
                    id="ptp.rdt.gnu.c.compiler.so.debug.option.optimization.level"
@@ -1524,7 +1524,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.so.release"
-                natureFilter="cnature"
+                natureFilter="both"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.base">
              <option
                    id="ptp.rdt.gnu.c.compiler.so.release.option.optimization.level"
@@ -1608,7 +1608,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.lib.debug"
-                natureFilter="cnature"
+                natureFilter="both"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.base">
              <option
                    id="ptp.rdt.gnu.c.compiler.lib.debug.option.optimization.level"
@@ -1664,7 +1664,7 @@
           </tool>
           <tool
                 id="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.lib.release"
-                natureFilter="cnature"
+                natureFilter="both"
                 superClass="org.eclipse.ptp.rdt.managedbuild.tool.gnu.c.compiler.base">
              <option
                    id="ptp.rdt.gnu.c.compiler.lib.release.option.optimization.level"
