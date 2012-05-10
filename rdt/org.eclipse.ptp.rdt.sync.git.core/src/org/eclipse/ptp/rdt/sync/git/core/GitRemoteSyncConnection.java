@@ -501,7 +501,6 @@ public class GitRemoteSyncConnection {
 		Status status;
 		try {
 			status = statusCommand.call();
-			filesToAdd.addAll(status.getAdded());
 			filesToAdd.addAll(status.getModified());
 			if (includeUntrackedFiles) {
 				filesToAdd.addAll(status.getUntracked());
