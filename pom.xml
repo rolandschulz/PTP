@@ -119,7 +119,6 @@
 		<module>releng/org.eclipse.ptp.rm.ibm.pe-feature</module>
 		<module>releng/org.eclipse.ptp.rm.jaxb-feature</module>
 		<module>releng/org.eclipse.ptp.rm.jaxb.contrib-feature</module>
-		<module>releng/org.eclipse.ptp.rm.jaxb.openmpi-feature</module>
 		<module>releng/org.eclipse.ptp.rm.jaxb.pbs-feature</module>
 		<module>releng/org.eclipse.ptp.rm.lml-feature</module>
 		<module>releng/org.eclipse.ptp.rm.lml_jaxb-feature</module>
