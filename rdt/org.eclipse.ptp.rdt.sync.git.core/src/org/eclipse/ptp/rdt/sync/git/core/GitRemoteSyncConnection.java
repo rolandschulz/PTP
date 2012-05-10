@@ -669,7 +669,7 @@ public class GitRemoteSyncConnection {
 	}
 	
 	// Get the list of merge-conflicted files from jgit and parse each one, storing result in the cache.
-	private void readMergeConflictFiles(Ref remoteHeadRef) throws RemoteSyncException {
+	private void readMergeConflictFiles() throws RemoteSyncException {
 		String repoPath = git.getRepository().getWorkTree().getAbsolutePath();
 		if (!repoPath.endsWith(java.io.File.separator)) { // The documentation does not say if the separator is added...
 			repoPath += java.io.File.separator;
@@ -689,9 +689,9 @@ public class GitRemoteSyncConnection {
 			// Get the head, merge head, and merge base commits
 			walk.setRevFilter(RevFilter.MERGE_BASE);
 			ObjectId headSHA = git.getRepository().resolve("HEAD"); //$NON-NLS-1$
-			ObjectId remoteHeadSHA = git.getRepository().resolve(remoteHeadRef.getName());
+			ObjectId mergeHeadSHA = git.getRepository().resolve("MERGE_HEAD"); //$NON-NLS-1$
 			RevCommit head = walk.parseCommit(headSHA);
-			RevCommit mergeHead = walk.parseCommit(remoteHeadSHA);
+			RevCommit mergeHead = walk.parseCommit(mergeHeadSHA);
 			walk.markStart(head);
 			walk.markStart(mergeHead);
 			RevCommit mergeBase = walk.next();
@@ -845,9 +845,9 @@ public class GitRemoteSyncConnection {
 			transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
 
 			// Now merge. Before merging we set the head for merging to master.
-			Ref masterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
+			Ref remoteMasterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
 
-			final MergeCommand mergeCommand = git.merge().include(masterRef);
+			final MergeCommand mergeCommand = git.merge().include(remoteMasterRef);
 
 			mergeCommand.call();
 		} catch (TransportException e) {
@@ -913,12 +913,12 @@ public class GitRemoteSyncConnection {
 				transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
 
 				// Merge it with local
-				Ref remoteHeadRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
-				final MergeCommand mergeCommand = git.merge().include(remoteHeadRef);
+				Ref remoteMasterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
+				final MergeCommand mergeCommand = git.merge().include(remoteMasterRef);
 				mergeCommand.call();
 
 				// Handle merge conflict. Read in data needed to resolve the conflict, and then reset the repo.
-				readMergeConflictFiles(remoteHeadRef);
+				readMergeConflictFiles();
 				if (!FileToMergePartsMap.isEmpty()) {
 					throw new RemoteSyncMergeConflictException(Messages.GitRemoteSyncConnection_2);
 					// Even if we later decide not to throw an exception, it is important not to proceed after a merge conflict.
