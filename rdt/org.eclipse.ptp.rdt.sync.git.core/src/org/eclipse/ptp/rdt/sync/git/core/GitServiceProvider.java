@@ -302,11 +302,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			if ((syncFlags == SyncFlag.NO_FORCE) && (!(hasRelevantChangedResources))) {
 				return;
 			}
-			
-			// Do not sync if there are merge conflicts.
-			if (!(this.getMergeConflictFiles(project, buildScenario).isEmpty())) {
-				return;
-			}
 
 			int mySyncTaskId;
 			synchronized (syncTaskId) {
@@ -339,6 +334,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			}
 
 			try {
+				// Do not sync if there are merge conflicts.
+				// This check must be done after acquiring the sync lock. Otherwise, the merge may trigger a sync that sees no
+				// conflicting files and proceeds to sync again - depending on how quickly the first sync records the data.
+				if (!(this.getMergeConflictFiles(project, buildScenario).isEmpty())) {
+					return;
+				}
+
 				if (mySyncTaskId <= finishedSyncTaskId) { // some other thread has already done the work for us
 					return;
 				}
