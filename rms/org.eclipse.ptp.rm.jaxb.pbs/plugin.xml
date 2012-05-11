@@ -52,6 +52,11 @@
             configurationFile="data/remote-generic-interactive.xml"
             name="Remote-Generic-Interactive">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/com.ibm.pe.xml"
+            monitorType="PE"
+            name="IBM Parallel Environment">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>
