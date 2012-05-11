@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -115,13 +115,39 @@ public class OpenIncludeAction extends
 					}
 				}
 				if (filesFound.isEmpty()) {
-					//remote: get host information and try again
+					//remote: get remote information and try again
 					URI locationURI = include.getLocationURI(); //the location of the innermost file enclosing this include
+					
+					// Bug 379298 - Open include file from Outline view throws errors for remote project
+					if (EFSExtensionManager.getDefault().isVirtual(locationURI)) {  //this is pointing to another underlying URI
+						// get the underlying URI
+						locationURI = EFSExtensionManager.getDefault().getLinkedURI(locationURI);
+					}
+					
 					URI includeURI = replacePath(locationURI, fullFileName);
-
+					
 					IFileStore fileStore = EFS.getStore(includeURI);
 					if (!fileStore.fetchInfo().isDirectory() && fileStore.fetchInfo().exists()) {
 						filesFound.add(includeURI);
+						
+					} 
+					else {
+						URI projectURI = include.getCProject().getProject().getLocationURI();						
+						//get the full project path on the server
+						String projectPath = EFSExtensionManager.getDefault().getPathFromURI(projectURI);
+						
+						if (!fullFileName.startsWith(projectPath)) {
+							//this include is not in the project - check if the EFS store 
+							//represented by locationURI is linked to another URI and try again
+							
+							URI linkedURI = EFSExtensionManager.getDefault().getLinkedURI(locationURI);
+							includeURI = replacePath(linkedURI, fullFileName);
+							
+							fileStore = EFS.getStore(includeURI);
+							if (!fileStore.fetchInfo().isDirectory() && fileStore.fetchInfo().exists()) {
+								filesFound.add(includeURI);
+							}
+						} // since this include is in the project, the code below will try to find it within the project
 					}
 				}
 			}			
