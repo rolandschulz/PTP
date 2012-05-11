@@ -67,6 +67,7 @@ public class NodedisplayViewDecorator extends AbstractNodedisplayView {
 			 * @see org.eclipse.ptp.rm.lml.core.listeners.INodedisplayZoomListener#handleEvent(org.eclipse.ptp.rm.lml.core.events.
 			 * INodedisplayZoomEvent)
 			 */
+			@Override
 			public void handleEvent(INodedisplayZoomEvent event) {
 				notifyZoom(event);
 			}
@@ -87,6 +88,21 @@ public class NodedisplayViewDecorator extends AbstractNodedisplayView {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.rm.lml.ui.providers.AbstractNodedisplayView#getFixedLevel()
+	 */
+	@Override
+	public int getFixedLevel() {
+		return nodedisplayView.getFixedLevel();
+	}
+
+	@Override
+	public int getMaximumNodedisplayDepth() {
+		return nodedisplayView.getMaximumNodedisplayDepth();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rm.lml.ui.providers.AbstractNodedisplayView#getMinimalRectangleSize()
 	 */
 	@Override
@@ -102,6 +118,16 @@ public class NodedisplayViewDecorator extends AbstractNodedisplayView {
 	@Override
 	public NodedisplayComp getRootNodedisplay() {
 		return nodedisplayView.getRootNodedisplay();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.ui.providers.AbstractNodedisplayView#getShownMaxLevel()
+	 */
+	@Override
+	public int getShownMaxLevel() {
+		return nodedisplayView.getShownMaxLevel();
 	}
 
 	/*
@@ -132,6 +158,16 @@ public class NodedisplayViewDecorator extends AbstractNodedisplayView {
 	@Override
 	public void restartZoom() {
 		nodedisplayView.restartZoom();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.ui.providers.AbstractNodedisplayView#setFixedLevel(int)
+	 */
+	@Override
+	public void setFixedLevel(int level) {
+		nodedisplayView.setFixedLevel(level);
 	}
 
 	/*
@@ -204,4 +240,5 @@ public class NodedisplayViewDecorator extends AbstractNodedisplayView {
 	public void zoomOut() {
 		nodedisplayView.zoomOut();
 	}
+
 }

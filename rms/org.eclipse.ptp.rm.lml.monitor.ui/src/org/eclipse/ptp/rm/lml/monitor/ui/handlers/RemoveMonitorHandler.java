@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2012 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rm.lml.monitor.ui.handlers;
 
 import java.util.ArrayList;
@@ -16,6 +26,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
+import org.eclipse.ptp.rm.lml.monitor.ui.messages.Messages;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class RemoveMonitorHandler extends AbstractHandler implements IHandler, ISelectionChangedListener {
@@ -57,9 +68,9 @@ public class RemoveMonitorHandler extends AbstractHandler implements IHandler, I
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
-			String msg = ((IStructuredSelection) selection).size() > 1 ? "Are you sure you want to remove these monitors?"
-					: "Are you sure you want to remove this monitor?";
-			boolean confirm = MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Remove Monitor", msg);
+			String msg = ((IStructuredSelection) selection).size() > 1 ? Messages.RemoveMonitorHandler_Are_you_sure_1
+					: Messages.RemoveMonitorHandler_Are_you_sure_2;
+			boolean confirm = MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), Messages.RemoveMonitorHandler_Remove_Monitor, msg);
 			if (confirm) {
 				List<IMonitorControl> monitors = new ArrayList<IMonitorControl>();
 				for (Iterator<?> itr = ((IStructuredSelection) selection).iterator(); itr.hasNext();) {

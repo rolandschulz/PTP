@@ -15,10 +15,8 @@
 
 	<properties>
 		<tycho-version>0.13.0</tycho-version>
-		<platform-version>S-4.2M4-201112092100</platform-version>
-		<platform-site>http://download.eclipse.org/eclipse/updates/4.2milestones/${platform-version}</platform-site>
-		<orbit-version>R20110523182458</orbit-version>
-		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</orbit-site>
+		<platform-version>4.2milestones</platform-version>
+		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
 		<tm-version>3.3</tm-version>
 		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
 		<cdt-version>juno</cdt-version>
@@ -121,8 +119,6 @@
 		<module>releng/org.eclipse.ptp.rm.ibm.pe-feature</module>
 		<module>releng/org.eclipse.ptp.rm.jaxb-feature</module>
 		<module>releng/org.eclipse.ptp.rm.jaxb.contrib-feature</module>
-		<module>releng/org.eclipse.ptp.rm.jaxb.openmpi-feature</module>
-		<module>releng/org.eclipse.ptp.rm.jaxb.pbs-feature</module>
 		<module>releng/org.eclipse.ptp.rm.lml-feature</module>
 		<module>releng/org.eclipse.ptp.rm.lml_jaxb-feature</module>
 		<module>releng/org.eclipse.ptp.rm.mpich2-feature</module>
@@ -145,14 +141,13 @@
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.help</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.proxy</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.ui</module>
+		<module>rms/org.eclipse.ptp.rm.jaxb.configs</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.contrib</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.control.core</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.control.ui</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.core</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.doc.isv</module>
-		<module>rms/org.eclipse.ptp.rm.jaxb.openmpi</module>
-		<module>rms/org.eclipse.ptp.rm.jaxb.pbs</module>
-		<module>rms/org.eclipse.ptp.rm.jaxb.pbs.doc.user</module>
+		<module>rms/org.eclipse.ptp.rm.jaxb.doc.user</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.ui</module>
 		<module>rms/org.eclipse.ptp.rm.launch</module>
 		<module>rms/org.eclipse.ptp.rm.lml.core</module>
@@ -216,11 +211,6 @@
 		<repository>
 			<id>platform-${platform-version}</id>
 			<url>${platform-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>orbit-${orbit-version}</id>
-			<url>${orbit-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>

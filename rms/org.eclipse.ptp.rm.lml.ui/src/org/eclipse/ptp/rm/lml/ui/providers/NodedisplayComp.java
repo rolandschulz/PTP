@@ -69,32 +69,24 @@ import org.eclipse.swt.widgets.Listener;
  * 
  * Inner composites are NodedisplayComp again (recursive).
  * 
- * A NodedisplayComp represents one physical element within the nodedisplay-tag.
- * This might be a row, midplane, node or cpu. This composite visualizes a {@code Node<LMLNodeData>}.
- * It takes this node and paints it in exactly the way the tree --given by the
- * Node-- is expanded.
- * Every visible component in the tree passed to this instance is shown by a
- * NodedisplayComp.
+ * A NodedisplayComp represents one physical element within the nodedisplay-tag. This might be a row, midplane, node or cpu. This
+ * composite visualizes a {@code Node<LMLNodeData>}. It takes this node and paints it in exactly the way the tree --given by the
+ * Node-- is expanded. Every visible component in the tree passed to this instance is shown by a NodedisplayComp.
  * 
- * The look of the nodedisplay is defined by the lml-Nodedisplay-Layout.
- * For a non-root nodedisplay lower elements within the nodedisplay-layout are
- * searched.
+ * The look of the nodedisplay is defined by the lml-Nodedisplay-Layout. For a non-root nodedisplay lower elements within the
+ * nodedisplay-layout are searched.
  * 
  */
 public class NodedisplayComp extends LguiWidget implements Updatable {
 
 	/**
-	 * This class is a workaround for a SWT-bug.
-	 * The mouselistener callbacks receive negative coordinates
-	 * as cursor positions, if the window is too large. This seems
-	 * to be the result of an integer overflow. Thus this listener
-	 * will use the last coordinates passed to the mousemove function
-	 * as coordinates in the mousedown function.
+	 * This class is a workaround for a SWT-bug. The mouselistener callbacks receive negative coordinates as cursor positions, if
+	 * the window is too large. This seems to be the result of an integer overflow. Thus this listener will use the last coordinates
+	 * passed to the mousemove function as coordinates in the mousedown function.
 	 * 
 	 * 
 	 */
-	private class MouseMoveAndDownListener implements MouseListener,
-			MouseMoveListener {
+	private class MouseMoveAndDownListener implements MouseListener, MouseMoveListener {
 
 		/**
 		 * Saves the last coordinates passed to the mouseMove-function.
@@ -106,6 +98,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		 * 
 		 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
 		 */
+		@Override
 		public void mouseDoubleClick(MouseEvent e) {
 		}
 
@@ -114,15 +107,14 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		 * 
 		 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
 		 */
+		@Override
 		public void mouseDown(MouseEvent e) {
 			// Use the last coordinates from the mouseMove action
-			final Node<LMLNodeData> focussed = rectanglePaintListener.getNodeAtPos(
-					lastX, lastY);
+			final Node<LMLNodeData> focussed = rectanglePaintListener.getNodeAtPos(lastX, lastY);
 
-			if (rectanglePaintListener.isUsagebarConnectedToNode(focussed)) {
+			if (rectanglePaintListener.getUsagebarConnectedToNode(focussed) != null) {
 				mouseInteraction.mouseDownAction(rectanglePaintListener.getJobAtPos(focussed, lastX));
-			}
-			else {
+			} else {
 				mouseInteraction.mouseDownAction(focussed);
 			}
 		}
@@ -132,15 +124,15 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		 * 
 		 * @see org.eclipse.swt.events.MouseMoveListener#mouseMove(org.eclipse.swt.events.MouseEvent)
 		 */
+		@Override
 		public void mouseMove(MouseEvent e) {
 			lastX = e.x;
 			lastY = e.y;
 			final Node<LMLNodeData> focussed = rectanglePaintListener.getNodeAtPos(lastX, lastY);
 
-			if (rectanglePaintListener.isUsagebarConnectedToNode(focussed)) {
+			if (rectanglePaintListener.getUsagebarConnectedToNode(focussed) != null) {
 				mouseInteraction.mouseMoveAction(rectanglePaintListener.getJobAtPos(focussed, lastX));
-			}
-			else {
+			} else {
 				mouseInteraction.mouseMoveAction(focussed);
 			}
 		}
@@ -150,14 +142,14 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		 * 
 		 * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
 		 */
+		@Override
 		public void mouseUp(MouseEvent e) {
 			// Use the last coordinates from the mouseMove action
 			final Node<LMLNodeData> focussed = rectanglePaintListener.getNodeAtPos(lastX, lastY);
 
-			if (rectanglePaintListener.isUsagebarConnectedToNode(focussed)) {
+			if (rectanglePaintListener.getUsagebarConnectedToNode(focussed) != null) {
 				mouseInteraction.mouseUpAction(rectanglePaintListener.getJobAtPos(focussed, lastX));
-			}
-			else {
+			} else {
 				mouseInteraction.mouseUpAction(focussed);
 			}
 		}
@@ -167,19 +159,16 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	/**
 	 * Creates a new GridData-instance every time this function is called.
 	 * 
-	 * @return default GridData instance, which simulates Swing-behaviour of
-	 *         gridlayout
+	 * @return default GridData instance, which simulates Swing-behaviour of gridlayout
 	 */
 	public static GridData getDefaultGridData() {
 		return new GridData(GridData.FILL, GridData.FILL, true, true);
 	}
 
 	/**
-	 * Generates the bounds of the inner composite
-	 * relative to the surrounding nodedisplay.
+	 * Generates the bounds of the inner composite relative to the surrounding nodedisplay.
 	 * 
-	 * @return bounds of the inner composite relative to surrounding
-	 *         nodedisplaycomp
+	 * @return bounds of the inner composite relative to surrounding nodedisplaycomp
 	 */
 	public static Rectangle getNextNodedisplayBounds(Composite innerComp) {
 
@@ -201,9 +190,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	// TODO insert levelsPaintedByPaintListener into LML nodedisplaylayout
 	// This will allow individual performance configuration
 	/**
-	 * Holds the amount of tree levels, which
-	 * are painted in fast way, but less configurable.
-	 * This fast painting is done by the rectpaintlistener.
+	 * Holds the amount of tree levels, which are painted in fast way, but less configurable. This fast painting is done by the
+	 * rectpaintlistener.
 	 */
 	private int levelsPaintedByPaintListener = 2;
 
@@ -218,9 +206,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	private Color jobColor;
 
 	/**
-	 * Stores the current font used in title label and
-	 * later used in other UI-elements, which contain
-	 * characters
+	 * Stores the current font used in title label and later used in other UI-elements, which contain characters
 	 */
 	private Font fontObject;
 
@@ -230,8 +216,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	private Node<LMLNodeData> node;
 
 	/**
-	 * this panel contains pictures as direct
-	 * children and the mainPanel in center
+	 * this panel contains pictures as direct children and the mainPanel in center
 	 */
 	private Composite pictureComp;
 
@@ -246,14 +231,12 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	protected Composite innerComp = null;
 
 	/**
-	 * Holds a usagebar-composite, if this nodedisplay is the lowest level
-	 * composite and a usage-tag is provided by the nodedisplay.
+	 * Holds a usagebar-composite, if this nodedisplay is the lowest level composite and a usage-tag is provided by the nodedisplay.
 	 */
 	protected Usagebar usagebar;
 
 	/**
-	 * Instance handling all types of mouse actions.
-	 * Creates tooltip.
+	 * Instance handling all types of mouse actions. Creates tooltip.
 	 */
 	protected MouseInteraction mouseInteraction;
 
@@ -262,8 +245,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 */
 	private Label titleLabel;
 	/**
-	 * Settings for lower level provided by the corresponding
-	 * layout.
+	 * Settings for lower level provided by the corresponding layout.
 	 */
 	private Nodedisplayelement nodedisplayLayout;
 
@@ -278,9 +260,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	private Color titleBackgroundColor;
 
 	/**
-	 * The only frame which has a border,
-	 * borderwidth changes when mouse
-	 * touches the panel
+	 * The only frame which has a border, borderwidth changes when mouse touches the panel
 	 */
 	private BorderComposite borderComp;
 
@@ -295,8 +275,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	private Image centerPicture;
 
 	/**
-	 * Save created inner NodedisplayComp-instances
-	 * for disposing them afterwards
+	 * Save created inner NodedisplayComp-instances for disposing them afterwards
 	 */
 	protected List<NodedisplayComp> innerCompsList;
 
@@ -311,8 +290,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	protected int x = 0, y = 0;
 
 	/**
-	 * Saves rectpaintlistener, which is needed for fast painting of inner
-	 * rectangles.
+	 * Saves rectpaintlistener, which is needed for fast painting of inner rectangles.
 	 */
 	protected RectanglePaintListener rectanglePaintListener = null;
 
@@ -322,21 +300,16 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	private final List<INodedisplayZoomListener> zoomListeners = new ArrayList<INodedisplayZoomListener>();
 
 	/**
-	 * Call this constructor for start, maxlevel is chosen from
-	 * nodedisplaylayout.
-	 * The pnode has to be expanded as much as desired. The nodedisplay does not
-	 * expand non-root nodes.
+	 * Call this constructor for start, maxlevel is chosen from nodedisplaylayout. The pnode has to be expanded as much as desired.
+	 * The nodedisplay does not expand non-root nodes.
 	 * 
-	 * This constructor is designed for non-root nodes, which should appear
-	 * as the root-node in the display. One could call this constructor for
-	 * showing one rack of a supercomputer.
+	 * This constructor is designed for non-root nodes, which should appear as the root-node in the display. One could call this
+	 * constructor for showing one rack of a supercomputer.
 	 * 
 	 * @param lguiItem
-	 *            wrapper instance around LguiType-instance -- provides easy
-	 *            access to lml-information
+	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
 	 * @param node
-	 *            current node, which is root-data-element of this
-	 *            NodedisplayComp
+	 *            current node, which is root-data-element of this NodedisplayComp
 	 * @param layout
 	 *            layout definition for this nodedisplay part
 	 * @param parent
@@ -355,6 +328,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 				maxLevel = layout.getMaxlevel().intValue();
 			}
 			TreeExpansion.expandLMLNode(node, maxLevel);
+			TreeExpansion.generateUsagebarsForAllLeaves(node);
 		}
 
 		init(node, layout);
@@ -364,11 +338,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * This is an easy to use constructor for a nodedisplay as root-node.
 	 * 
 	 * @param lguiItem
-	 *            wrapper instance around LguiType-instance -- provides easy
-	 *            access to lml-information
+	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
 	 * @param nodedisplay
-	 *            lml-model for the nodedisplay, which should be shown in this
-	 *            panel
+	 *            lml-model for the nodedisplay, which should be shown in this panel
 	 * @param parent
 	 *            parameter for calling super constructor
 	 * @param style
@@ -383,23 +355,17 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Call this constructor for inner or lower elements. It is not allowed
-	 * to call this constructor from outside.
+	 * Call this constructor for inner or lower elements. It is not allowed to call this constructor from outside.
 	 * 
 	 * @param lguiItem
-	 *            wrapper instance around LguiType-instance -- provides easy
-	 *            access to lml-information
+	 *            wrapper instance around LguiType-instance -- provides easy access to lml-information
 	 * @param node
-	 *            current node, which is root-data-element of this
-	 *            NodedisplayComp
+	 *            current node, which is root-data-element of this NodedisplayComp
 	 * @param layout
 	 *            nodedisplay-layout part for this nodedisplay
 	 * @param levelsPaintedByPaintListener
-	 *            Holds the amount of tree levels, which
-	 *            are painted in fast way, but less configurable.
-	 *            This fast painting is done by the rectpaintlistener.
-	 *            This parameter is currently only forwarded from the
-	 *            root node to all of its children.
+	 *            Holds the amount of tree levels, which are painted in fast way, but less configurable. This fast painting is done
+	 *            by the rectpaintlistener. This parameter is currently only forwarded from the root node to all of its children.
 	 * @param parentNodedisplay
 	 *            father of this nodedisplay
 	 * @param x
@@ -407,9 +373,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * @param y
 	 *            horizontal position of this nodedisplay in surrounding grid
 	 * @param parent
-	 *            parent composite for SWT constructor, differs from
-	 *            pparentNodedisplay, because
-	 *            parent is the innerPanel of pparentNodedisplay
+	 *            parent composite for SWT constructor, differs from pparentNodedisplay, because parent is the innerPanel of
+	 *            pparentNodedisplay
 	 * @param style
 	 *            SWT-style of this nodedisplay
 	 */
@@ -432,8 +397,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Add a reference, which is informed about every zoom event
-	 * within this nodedisplay.
+	 * Add a reference, which is informed about every zoom event within this nodedisplay.
 	 * 
 	 * @param listener
 	 *            the new listener
@@ -443,13 +407,11 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Search a layout-section for a lower node <code>nodeData</code>.
-	 * This lower node must be a child of this instance.
+	 * Search a layout-section for a lower node <code>nodeData</code>. This lower node must be a child of this instance.
 	 * 
 	 * @param nodeData
 	 *            a child of this nodedisplay's node, for which a layout is searched.
-	 * @return lml-Nodedisplay-layout-section for this node, or
-	 *         default-layout if no layout is defined
+	 * @return lml-Nodedisplay-layout-section for this node, or default-layout if no layout is defined
 	 */
 	public Nodedisplayelement findLayout(LMLNodeData nodeData) {
 
@@ -514,8 +476,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * @return implicit name of node within nodedisplay, which is shown by this
-	 *         NodedisplayPanel
+	 * @return implicit name of node within nodedisplay, which is shown by this NodedisplayPanel
 	 */
 	public String getShownImpName() {
 		if (node == null) {
@@ -526,16 +487,14 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * @return x-directed position of this nodedisplay in the parent's
-	 *         gridlayout
+	 * @return x-directed position of this nodedisplay in the parent's gridlayout
 	 */
 	public int getXPosition() {
 		return x;
 	}
 
 	/**
-	 * @return y-directed position of this nodedisplay in the parent's
-	 *         gridlayout
+	 * @return y-directed position of this nodedisplay in the parent's gridlayout
 	 */
 	public int getYPosition() {
 		return y;
@@ -550,8 +509,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Check if a rectangle within this nodedisplay is visible for the
-	 * user on the gui.
+	 * Check if a rectangle within this nodedisplay is visible for the user on the gui.
 	 * 
 	 * @param area
 	 *            a rectangle with relative coordinates to this nodedisplay
@@ -581,8 +539,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 				return false;
 			}
 			return true;
-		}
-		else {
+		} else {
 			final Rectangle bounds = getNextNodedisplayBounds(this);
 
 			area.x += bounds.x;
@@ -612,11 +569,10 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable#
-	 * updateStatus(org.eclipse.ptp.rm.lml.internal.core.elements
-	 * .ObjectType, boolean, boolean)
+	 * @see org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable#
+	 * updateStatus(org.eclipse.ptp.rm.lml.internal.core.elements .ObjectType, boolean, boolean)
 	 */
+	@Override
 	public void updateStatus(ObjectType object, boolean mouseOver, boolean mouseDown) {
 
 		if (parentNodedisplayComp == null) {
@@ -653,12 +609,12 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Adds a dispose-listener, which removes this nodedisplay and its children
-	 * from <code>ObjectStatus</code>.
+	 * Adds a dispose-listener, which removes this nodedisplay and its children from <code>ObjectStatus</code>.
 	 */
 	private void addDisposeAction() {
 		this.addDisposeListener(new DisposeListener() {
 
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				removeUpdatable();
 
@@ -671,10 +627,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Add listener, which reacts when user focuses this panel.
-	 * This method is not needed, if elements on the lowest level are painted
-	 * with rectangles instead of painting composites. These listeners are used for
-	 * nodedisplay composites, which represent only one node.
+	 * Add listener, which reacts when user focuses this panel. This method is not needed, if elements on the lowest level are
+	 * painted with rectangles instead of painting composites. These listeners are used for nodedisplay composites, which represent
+	 * only one node.
 	 */
 	private void addLowestLevelListeners() {
 
@@ -684,6 +639,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseMoveListener#mouseMove(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseMove(MouseEvent e) {
 				mouseInteraction.mouseMoveAction(node);
 			}
@@ -696,6 +652,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 			}
 
@@ -704,6 +661,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseDown(MouseEvent e) {
 				mouseInteraction.mouseDownAction(node);
 			}
@@ -713,6 +671,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseUp(MouseEvent e) {
 				if (e.x >= 0 && e.x <= getSize().x && e.y >= 0 && e.y <= getSize().y) {
 					mouseInteraction.mouseUpAction(node);
@@ -727,6 +686,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 			 */
+			@Override
 			public void handleEvent(Event event) {
 				mouseInteraction.mouseExitAction();
 			}
@@ -743,11 +703,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Adds listeners to innerPanel, which react to user interaction on lowest
-	 * level rectangles. Generates tooltips and forwards mouse actions to the
-	 * object status.
-	 * These listeners are used for nodedisplay composites, which paint
-	 * lower nodes by using the paintlistener.
+	 * Adds listeners to innerPanel, which react to user interaction on lowest level rectangles. Generates tooltips and forwards
+	 * mouse actions to the object status. These listeners are used for nodedisplay composites, which paint lower nodes by using the
+	 * paintlistener.
 	 */
 	private void addMouseListenerToInnerPanelWithRectPaintListener() {
 		// Create a listener for both: mouse moving and mouse clicks
@@ -762,6 +720,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 			 */
+			@Override
 			public void handleEvent(Event event) {
 				mouseInteraction.mouseExitAction();
 			}
@@ -771,8 +730,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Add Listener to titlelabel, which allows to zoom in and zoom out
-	 * These action only inform zoom-listeners. They have to take
+	 * Add Listener to titlelabel, which allows to zoom in and zoom out These action only inform zoom-listeners. They have to take
 	 * care that zooming is really invoked.
 	 */
 	private void addZoomFunction() {
@@ -785,6 +743,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 			}
 
@@ -793,6 +752,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseDown(MouseEvent e) {
 
 				titleLabel.setBackground(titleBackgroundColor);
@@ -801,8 +761,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 				// Is this nodedisplay the root-display?
 				if (parentNodedisplayComp == null) {
 					event = new NodedisplayZoomEvent(null, false);
-				}
-				else {
+				} else {
 					event = new NodedisplayZoomEvent(node.getData().getFullImpName(), true);
 				}
 				notifyZoomListeners(event);
@@ -814,12 +773,14 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseUp(MouseEvent e) {
 			}
 		});
 		// Show different background if titlelabel is covered by the mouse
 		titleLabel.addMouseMoveListener(new MouseMoveListener() {
 
+			@Override
 			public void mouseMove(MouseEvent e) {
 				titleLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 			}
@@ -827,6 +788,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 		titleLabel.addListener(SWT.MouseExit, new Listener() {
 
+			@Override
 			public void handleEvent(Event event) {
 				titleLabel.setBackground(titleBackgroundColor);
 			}
@@ -855,8 +817,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 
 		if (node.getLowerLevelCount() == 0) {
 			innerComp.setBackground(jobColor);
-		}
-		else {
+		} else {
 			innerComp.setBackground(backgroundColor);
 			// Do not set the central picture on lowest level nodedisplays
 			if (centerPicture != null) {
@@ -867,8 +828,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Initializes the surrounding pictureFrame and inserts pictures for this
-	 * nodedisplay-level.
+	 * Initializes the surrounding pictureFrame and inserts pictures for this nodedisplay-level.
 	 */
 	private void createPictureFrame() {
 
@@ -882,6 +842,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			 * 
 			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 			 */
+			@Override
 			public void handleEvent(Event event) {
 				pictureComp.layout(true);
 			}
@@ -909,11 +870,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * This is a helper-function for inserting pictures.
-	 * It checks if the given URL is trying to access a bundle-file.
-	 * Therefor the protocol of the URL has to be equal to "bundleentry".
-	 * If the bundle cannot be accessed or there is no file available
-	 * this function will return null.
+	 * This is a helper-function for inserting pictures. It checks if the given URL is trying to access a bundle-file. Therefor the
+	 * protocol of the URL has to be equal to "bundleentry". If the bundle cannot be accessed or there is no file available this
+	 * function will return null.
 	 * 
 	 * @param urlString
 	 *            any url, a working example is "bundleentry:/images/img1.png", if this entry exists in this bundle
@@ -941,9 +900,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Part of constructor, which is equal in two constructors therefore
-	 * outsourced. Initializes and creates all inner composites. Invokes
-	 * lower level nodedisplay creation.
+	 * Part of constructor, which is equal in two constructors therefore outsourced. Initializes and creates all inner composites.
+	 * Invokes lower level nodedisplay creation.
 	 * 
 	 * @param currentNode
 	 *            the node, which is shown by this nodedisplay
@@ -1013,9 +971,9 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			return;
 		}
 
-		final List<Node<LMLNodeData>> reorderedChildren = (new RowColumnSorter<Node<LMLNodeData>>(
-				node.getChildren())).reorder(nodedisplayLayout.isHighestrowfirst(), nodedisplayLayout.isHighestcolfirst(),
-				nodedisplayLayout.getCols().intValue());
+		final List<Node<LMLNodeData>> reorderedChildren = (new RowColumnSorter<Node<LMLNodeData>>(node.getChildren())).reorder(
+				nodedisplayLayout.isHighestrowfirst(), nodedisplayLayout.isHighestcolfirst(), nodedisplayLayout.getCols()
+						.intValue());
 
 		// Paint rects instead of use composites for lowest-level-rectangles
 		if (node.getLowerLevelCount() <= levelsPaintedByPaintListener) {
@@ -1051,8 +1009,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Search for pictures in layout-definition and add them at appropriate
-	 * position.
+	 * Search for pictures in layout-definition and add them at appropriate position.
 	 */
 	private void insertPictures() {
 
@@ -1100,6 +1057,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 			case SOUTH:
 				imageComp.setLayoutData(new BorderData(BorderLayout.SFIELD));
 				break;
+			default:
+				break;
 			}
 
 			// Add borderpics to pictures and save center-pic in
@@ -1132,9 +1091,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Insert a usagebar composite inside the inner panel.
-	 * This usagebar uses the given usage-information from
-	 * the nodedisplay tag.
+	 * Insert a usagebar composite inside the inner panel. This usagebar uses the given usage-information from the nodedisplay tag.
 	 * 
 	 * @return true, if usagebar was inserted, false otherwise
 	 */
@@ -1163,8 +1120,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Remove recursively this component and all inner NodedisplayComp-instances
-	 * from ObjectStatus. Call this function before this Composite is disposed
+	 * Remove recursively this component and all inner NodedisplayComp-instances from ObjectStatus. Call this function before this
+	 * Composite is disposed
 	 */
 	private void removeUpdatable() {
 
@@ -1178,14 +1135,10 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Generate a new NodedisplayComp with all parameters.
-	 * This function must be overridden by all subclasses.
-	 * It implements the factory-method pattern. The factory for
-	 * NodedisplayComp-instances is the specific class itself by
-	 * providing this method.
+	 * Generate a new NodedisplayComp with all parameters. This function must be overridden by all subclasses. It implements the
+	 * factory-method pattern. The factory for NodedisplayComp-instances is the specific class itself by providing this method.
 	 * 
-	 * @return generated MinSizeNodedisplayComp, which can be exchanged by
-	 *         instances of sub-class
+	 * @return generated MinSizeNodedisplayComp, which can be exchanged by instances of sub-class
 	 */
 	protected NodedisplayComp createNodedisplayComp(ILguiItem lguiItem, Node<LMLNodeData> node, Nodedisplayelement layout,
 			int levelsPaintedByPaintListener, NodedisplayComp parentNodedisplay, int x, int y, Composite parent, int style) {
@@ -1205,8 +1158,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	}
 
 	/**
-	 * Inform all listeners and parent listeners about
-	 * a new zooming event.
+	 * Inform all listeners and parent listeners about a new zooming event.
 	 * 
 	 * @param event
 	 *            the corresponding event describing what happened

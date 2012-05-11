@@ -14,8 +14,22 @@ package org.eclipse.ptp.launch.ui;
  * @since 4.0
  */
 public class ApplicationDebuggerTab extends DebuggerTab {
+	/**
+	 * @since 6.0
+	 */
+	public static final String TAB_ID = "org.eclipse.ptp.launch.applicationLaunch.debuggerTab"; //$NON-NLS-1$
 
 	public ApplicationDebuggerTab() {
 		super(false);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.ui.DebuggerTab#getId()
+	 */
+	@Override
+	public String getId() {
+		return TAB_ID;
 	}
 }

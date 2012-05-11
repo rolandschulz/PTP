@@ -48,6 +48,7 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
+
 	/**
 	 * @return
 	 */
@@ -124,14 +125,11 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Get all the remote service providers and ensure that they are
-	 * initialized. The method will use the supplied container's progress
-	 * service, or, if null, the platform progress service, in order to allow
-	 * the initialization to be canceled.
+	 * Get all the remote service providers and ensure that they are initialized. The method will use the supplied container's
+	 * progress service, or, if null, the platform progress service, in order to allow the initialization to be canceled.
 	 * 
 	 * @param context
-	 *            context with progress service, or null to use the platform
-	 *            progress service
+	 *            context with progress service, or null to use the platform progress service
 	 * @return array containing initialized services
 	 * @since 5.0
 	 */
@@ -149,8 +147,7 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 			};
 			try {
 				/*
-				 * See if the services have already been initialized. If any
-				 * haven't, then initialize them all.
+				 * See if the services have already been initialized. If any haven't, then initialize them all.
 				 */
 				fInitializedServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
 				for (IRemoteServices services : fInitializedServices) {
@@ -174,18 +171,14 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Look up a remote service provider and ensure it is initialized. The
-	 * method will use the supplied container's progress service, or, if null,
-	 * the platform progress service, in order to allow the initialization to be
-	 * canceled.
+	 * Look up a remote service provider and ensure it is initialized. The method will use the supplied container's progress
+	 * service, or, if null, the platform progress service, in order to allow the initialization to be canceled.
 	 * 
 	 * @param id
 	 *            id of service to locate
 	 * @param context
-	 *            context with progress service, or null to use the platform
-	 *            progress service
-	 * @return initialized remote services or null if the service can't be
-	 *         located or the progress monitor was canceled
+	 *            context with progress service, or null to use the platform progress service
+	 * @return initialized remote services or null if the service can't be located or the progress monitor was canceled
 	 * @since 5.0
 	 */
 	public synchronized IRemoteServices getRemoteServices(final String id, IRunnableContext context) {
@@ -201,7 +194,7 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 		};
 		try {
 			fRemoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(id);
-			if (!fRemoteService.isInitialized()) {
+			if (fRemoteService != null && !fRemoteService.isInitialized()) {
 				if (context != null) {
 					context.run(true, false, runnable);
 				} else {
@@ -218,18 +211,15 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Look up a remote service provider from the supplied URI and ensure it is
-	 * initialized. The method will use the supplied container's progress
-	 * service, or, if null, the platform progress service, in order to allow
-	 * the initialization to be canceled.
+	 * Look up a remote service provider from the supplied URI and ensure it is initialized. The method will use the supplied
+	 * container's progress service, or, if null, the platform progress service, in order to allow the initialization to be
+	 * canceled.
 	 * 
 	 * @param uri
 	 *            uri specifying service to locate
 	 * @param context
-	 *            context with progress service, or null to use the platform
-	 *            progress service
-	 * @return initialized remote services or null if the service can't be
-	 *         located or the progress monitor was canceled
+	 *            context with progress service, or null to use the platform progress service
+	 * @return initialized remote services or null if the service can't be located or the progress monitor was canceled
 	 * @since 5.0
 	 */
 	public synchronized IRemoteServices getRemoteServices(final URI uri, IRunnableContext context) {
@@ -262,8 +252,7 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Helper method to find UI services that correspond to a particular remote
-	 * services implementation
+	 * Helper method to find UI services that correspond to a particular remote services implementation
 	 * 
 	 * @param services
 	 * @return remote UI services
@@ -286,9 +275,7 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
@@ -299,9 +286,7 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {

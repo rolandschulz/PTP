@@ -20,6 +20,7 @@ package org.eclipse.ptp.core;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -32,6 +33,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunchConfigurationType;
+import org.eclipse.debug.core.ILaunchDelegate;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.core.util.DebugUtil;
 import org.osgi.framework.Bundle;
@@ -186,6 +191,7 @@ public class PTPCorePlugin extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		setDefaultLaunchDelegates();
 		DebugUtil.configurePluginDebugOptions();
 		ResourcesPlugin.getWorkspace().addSaveParticipant(getUniqueIdentifier(), new ISaveParticipant() {
 			public void saving(ISaveContext saveContext) throws CoreException {
@@ -219,4 +225,41 @@ public class PTPCorePlugin extends Plugin {
 		}
 	}
 
+	private void setDefaultLaunchDelegates() {
+		ILaunchManager launchMgr = DebugPlugin.getDefault().getLaunchManager();
+
+		HashSet<String> debugSet = new HashSet<String>();
+		debugSet.add(ILaunchManager.DEBUG_MODE);
+
+		ILaunchConfigurationType localCfg = launchMgr
+				.getLaunchConfigurationType(IPTPLaunchConfigurationConstants.LAUNCH_APP_TYPE_ID);
+		try {
+			if (localCfg.getPreferredDelegate(debugSet) == null) {
+				ILaunchDelegate[] delegates = localCfg.getDelegates(debugSet);
+				for (ILaunchDelegate delegate : delegates) {
+					if (IPTPLaunchConfigurationConstants.PREFERRED_DEBUG_LAUNCH_DELEGATE.equals(delegate.getId())) {
+						localCfg.setPreferredDelegate(debugSet, delegate);
+						break;
+					}
+				}
+			}
+		} catch (CoreException e) {
+		}
+
+		HashSet<String> runSet = new HashSet<String>();
+		runSet.add(ILaunchManager.RUN_MODE);
+
+		try {
+			if (localCfg.getPreferredDelegate(runSet) == null) {
+				ILaunchDelegate[] delegates = localCfg.getDelegates(runSet);
+				for (ILaunchDelegate delegate : delegates) {
+					if (IPTPLaunchConfigurationConstants.PREFERRED_RUN_LAUNCH_DELEGATE.equals(delegate.getId())) {
+						localCfg.setPreferredDelegate(runSet, delegate);
+						break;
+					}
+				}
+			}
+		} catch (CoreException e) {
+		}
+	}
 }

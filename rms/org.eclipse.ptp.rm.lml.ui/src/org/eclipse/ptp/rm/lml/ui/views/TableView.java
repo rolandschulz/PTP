@@ -35,6 +35,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
@@ -733,7 +734,7 @@ public class TableView extends ViewPart {
 			col.addListener(SWT.Selection, sortListener);
 		}
 		// Mouse action (in combination with nodedisplay)
-		if (gid.equals(ILguiItem.ACTIVE_JOB_TABLE)) {
+		if (gid.equals(ILMLCoreConstants.ID_ACTIVE_JOBS_VIEW)) {
 			tree.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseDown(MouseEvent e) {
@@ -1017,7 +1018,7 @@ public class TableView extends ViewPart {
 		if (!isMouseDown) {
 			Row[] input = new Row[0];
 			if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
-				input = fLguiItem.getTableHandler().getTableDataWithColor(gid, gid.equals(ILguiItem.ACTIVE_JOB_TABLE));
+				input = fLguiItem.getTableHandler().getTableDataWithColor(gid, gid.equals(ILMLCoreConstants.ID_ACTIVE_JOBS_VIEW));
 			}
 			if (!composite.isDisposed()) {
 				viewer.setInput(input);
@@ -1036,8 +1037,8 @@ public class TableView extends ViewPart {
 		if (!isMouseDown) {
 			Row[] input = new Row[0];
 			if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
-				input = fLguiItem.getTableHandler()
-						.getTableDataWithColor(gid, gid.equals(ILguiItem.ACTIVE_JOB_TABLE), filterValues);
+				input = fLguiItem.getTableHandler().getTableDataWithColor(gid, gid.equals(ILMLCoreConstants.ID_ACTIVE_JOBS_VIEW),
+						filterValues);
 			}
 			if (!composite.isDisposed()) {
 				viewer.setInput(input);

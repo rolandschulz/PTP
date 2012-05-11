@@ -22,6 +22,7 @@ import org.eclipse.ptp.rm.lml.internal.core.model.OIDToObject;
 import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus;
 import org.eclipse.ptp.rm.lml.internal.core.model.RowColumnSorter;
 import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayComp;
+import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayCompMinSize;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -80,11 +81,11 @@ public class RectanglePaintListener implements PaintListener {
 	/**
 	 * Minimal width of drawn rectangles
 	 */
-	public int minRectanleWidth = 5;
+	public int minRectangleWidth = NodedisplayCompMinSize.defaultMinSize;
 	/**
 	 * Minimal height of drawn rectangles
 	 */
-	public int minRectangleHeight = 5;
+	public int minRectangleHeight = NodedisplayCompMinSize.defaultMinSize;
 
 	/**
 	 * Parameters, which are changed when painting, they can be used by getNodeAtPos
@@ -241,9 +242,10 @@ public class RectanglePaintListener implements PaintListener {
 			return null;
 		}
 
-		if (isUsagebarConnectedToNode(node)) {
-			final UsagebarPainter usagebar = usagebarsMap.get(node);
-			return usagebar.getJobAtPosition(x);
+		final UsagebarPainter usage = getUsagebarConnectedToNode(node);
+		// Is there a usagebar for this node?
+		if (usage != null) {
+			return usage.getJobAtPosition(x);
 		}
 		else {
 			return nodedisplayComp.getLguiItem().getOIDToObject().getObjectByLMLNode(node.getData());
@@ -257,7 +259,7 @@ public class RectanglePaintListener implements PaintListener {
 		final int horizontalSpacing = layout.getHgap().intValue();
 		final int verticalSpacing = layout.getVgap().intValue();
 
-		int rectWidth = minRectanleWidth;
+		int rectWidth = minRectangleWidth;
 		int rectHeight = minRectangleHeight;
 		// Calculate inner sizes, search for biggest inner rectangle
 		// set rectWidth and rectHeight to maximum, thus each rectangle
@@ -329,13 +331,28 @@ public class RectanglePaintListener implements PaintListener {
 
 	/**
 	 * Checks if there is a usagebar for the given node within this paintlistener.
+	 * Returns the corresponding usagebar painter. This painter can be managed directly
+	 * within this RectanglePaintListener or its children.
 	 * 
 	 * @param node
-	 *            the investigated node within this listener
-	 * @return true, if there is a usagebar for the given node
+	 *            the investigated node within this listener or nested
+	 *            listeners
+	 * @return the usagebarpainter connected to the node or null, if there is no usagebar connected
 	 */
-	public boolean isUsagebarConnectedToNode(Node<LMLNodeData> node) {
-		return usagebarsMap.containsKey(node);
+	public UsagebarPainter getUsagebarConnectedToNode(Node<LMLNodeData> node) {
+		// Is this node directly painted by this listener
+		if (nodes.contains(node)) {
+			return usagebarsMap.get(node);
+		}
+		else { // Search for the node in inner listeners
+			for (final RectanglePaintListener currentListener : innerListener.values()) {
+				final UsagebarPainter usagebar = currentListener.getUsagebarConnectedToNode(node);
+				if (usagebar != null) {
+					return usagebar;
+				}
+			}
+			return null;
+		}
 	}
 
 	/*
@@ -390,7 +407,7 @@ public class RectanglePaintListener implements PaintListener {
 	 *            minimum width of lowest level rectangles in pixels
 	 */
 	public void setMinimumRectangleWidth(int width) {
-		minRectanleWidth = width;
+		minRectangleWidth = width;
 
 		for (final RectanglePaintListener inner : innerListener.values()) {
 			inner.setMinimumRectangleWidth(width);
@@ -653,6 +670,13 @@ public class RectanglePaintListener implements PaintListener {
 		width = size.x - marginWidth * 2;
 		height = size.y - marginHeight * 2;
 
+		if (width < 0) {
+			width = 0;
+		}
+		if (height < 0) {
+			height = 0;
+		}
+
 		if (columnCount <= 0) {
 			columnCount = 1;
 		}
@@ -670,13 +694,6 @@ public class RectanglePaintListener implements PaintListener {
 		rectangleWidth = width / columnCount;
 
 		rectangleHeight = height / rowCount;
-
-		if (rectangleWidth < minRectanleWidth) {
-			rectangleWidth = minRectanleWidth;
-		}
-		if (rectangleHeight < minRectangleHeight) {
-			rectangleHeight = minRectangleHeight;
-		}
 	}
 
 }

@@ -46,12 +46,6 @@ public interface ILguiItem {
 	public static String JOB_TOTAL_CORES = "totalcores"; //$NON-NLS-1$
 
 	/*
-	 * Table types
-	 */
-	public static String ACTIVE_JOB_TABLE = "joblistrun"; //$NON-NLS-1$
-	public static String INACTIVE_JOB_TABLE = "joblistwait"; //$NON-NLS-1$
-
-	/*
 	 * Table content types
 	 */
 	public static String CONTENT_CLASSES = "classes"; //$NON-NLS-1$

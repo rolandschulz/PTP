@@ -8,7 +8,7 @@
             category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.NodesView"
             icon="icons/nodes_view.gif"
-            id="__dummy_nd__1__"
+            id="org.eclipse.ptp.rm.lml.ui.SystemMonitorView"
             name="%NodediesplayView.name">
       </view>
       <view
@@ -16,7 +16,7 @@
             category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.TableView"
             icon="icons/active_jobs_view.gif"
-            id="joblistrun"
+            id="org.eclipse.ptp.rm.lml.ui.ActiveJobsView"
             name="%TableView1.name">
       </view>
       <view
@@ -24,14 +24,14 @@
             category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.TableView"
             icon="icons/inactive_jobs_view.gif"
-            id="joblistwait"
+            id="org.eclipse.ptp.rm.lml.ui.InactiveJobsView"
             name="%TableView2.name">
       </view>
       <view
             allowMultiple="false"
             category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.rm.lml.ui.views.InfoView"
-            id="info"
+            id="org.eclipse.ptp.rm.lml.ui.InfoView"
             name="%InfoView.name">
       </view>
    </extension>
@@ -40,7 +40,7 @@
       <perspective
             class="org.eclipse.ptp.rm.lml.internal.ui.LMLRuntimePerspectiveFactory"
             icon="icons/system_monitoring_perspective.gif"
-            id="org.eclipse.ptp.rm.lml.ui.systemMonitoringPerspective"
+            id="org.eclipse.ptp.rm.lml.ui.SystemMonitoringPerspective"
             name="%Perspective.name">
       </perspective>
    </extension>
@@ -49,17 +49,17 @@
 		<perspectiveExtension
 			targetID="org.eclipse.debug.ui.DebugPerspective">
 			<perspectiveShortcut
-				id="org.eclipse.ptp.rm.lml.ui.systemMonitoringPerspective">
+				id="org.eclipse.ptp.rm.lml.ui.SystemMonitoringPerspective">
 			</perspectiveShortcut>
 		</perspectiveExtension>
 		<perspectiveExtension
 			targetID="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
 			<perspectiveShortcut
-				id="org.eclipse.ptp.rm.lml.ui.systemMonitoringPerspective">
+				id="org.eclipse.ptp.rm.lml.ui.SystemMonitoringPerspective">
 			</perspectiveShortcut>
 		</perspectiveExtension>
 		<perspectiveExtension
-			targetID="org.eclipse.ptp.rm.lml.ui.systemMonitoringPerspective">
+			targetID="org.eclipse.ptp.rm.lml.ui.SystemMonitoringPerspective">
 			<perspectiveShortcut
 				id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
 			</perspectiveShortcut>

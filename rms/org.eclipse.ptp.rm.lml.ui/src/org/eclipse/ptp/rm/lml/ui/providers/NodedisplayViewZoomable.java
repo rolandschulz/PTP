@@ -48,7 +48,7 @@ public abstract class NodedisplayViewZoomable extends NodedisplayViewDecorator {
 
 		super(nodedisplay, parent);
 
-		rectangleSize = 5;
+		rectangleSize = NodedisplayCompMinSize.defaultMinSize;
 
 		addZoomListener();
 

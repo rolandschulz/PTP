@@ -16,6 +16,9 @@ public interface ILMLCoreConstants {
 	public static final String PLUGIN_ID = LMLCorePlugin.getUniqueIdentifier();
 	public static final String PREFIX = PLUGIN_ID + "."; //$NON-NLS-1$
 
+	public static final String ID_ACTIVE_JOBS_VIEW = "org.eclipse.ptp.rm.lml.ui.ActiveJobsView"; //$NON-NLS-1$
+	public static final String ID_INACTIVE_JOBS_VIEW = "org.eclipse.ptp.rm.lml.ui.InactiveJobsView"; //$NON-NLS-1$
+
 	public static final int UNDEFINED = -1;
 
 	public static final int COPY_BUFFER_SIZE = 64 * 1024;

@@ -107,8 +107,12 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	@Override
 	public boolean canSave() {
 		setErrorMessage(null);
+		if (fSelectedLaunchControl == null) {
+			setErrorMessage(Messages.ResourcesTab_No_Target_Configuration);
+			return false;
+		}
 		if (fLaunchControl == null) {
-			setErrorMessage(Messages.ResourcesTab_No_Resource_Manager);
+			setErrorMessage(Messages.ResourcesTab_No_Connection_name);
 			return false;
 		}
 		IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl, null);
@@ -161,18 +165,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			public void widgetSelected(SelectionEvent e) {
 				rmTypeSelectionChanged();
 				updateEnablement();
-				try {
-					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
-						@Override
-						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-							SubMonitor progress = SubMonitor.convert(monitor, 1);
-							updateLaunchAttributeControls(null, getLaunchConfiguration(), progress.newChild(1));
-						}
-					});
-				} catch (InvocationTargetException e1) {
-				} catch (InterruptedException e1) {
-				}
-				updateLaunchConfigurationDialog();
+				handleConnectionChanged();
 			}
 		});
 		fSystemTypeCombo.deselectAll();
@@ -186,34 +179,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				try {
-					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
-						@Override
-						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-							SubMonitor progress = SubMonitor.convert(monitor, 20);
-							IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
-							if (conn == null) {
-								fLaunchControl = null;
-								fRemoteConnection = null;
-								updateLaunchAttributeControls(null, getLaunchConfiguration(), progress.newChild(10));
-								updateLaunchConfigurationDialog();
-							} else if (connectionChanged(fSelectedLaunchControl, progress.newChild(10))) {
-								fLaunchControl = fSelectedLaunchControl;
-								fRemoteConnection = conn;
-								updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), progress.newChild(10));
-								updateLaunchConfigurationDialog();
-							} else {
-								/*
-								 * Failed to change connection, reset back to the previous one
-								 */
-								fRemoteConnectionWidget.setConnection(fRemoteConnection);
-							}
-						}
-
-					});
-				} catch (InvocationTargetException e1) {
-				} catch (InterruptedException e1) {
-				}
+				handleConnectionChanged();
 			}
 		});
 		fRemoteConnectionWidget.setEnabled(false);
@@ -314,8 +280,12 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	public boolean isValid(ILaunchConfiguration configuration) {
 		setErrorMessage(null);
 		setMessage(null);
+		if (fSelectedLaunchControl == null) {
+			setErrorMessage(Messages.ResourcesTab_No_Target_Configuration);
+			return false;
+		}
 		if (fLaunchControl == null) {
-			setErrorMessage(Messages.ResourcesTab_No_Resource_Manager);
+			setErrorMessage(Messages.ResourcesTab_No_Connection_name);
 			return false;
 		}
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl, null);
@@ -376,6 +346,33 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		fDefaultConnection = true;
 	}
 
+	private boolean connectionChanged(final ILaunchController control, IProgressMonitor monitor) {
+		IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
+		if (conn != null) {
+			try {
+				control.stop();
+			} catch (CoreException e) {
+			}
+			control.setConnectionName(conn.getName());
+			control.setRemoteServicesId(conn.getRemoteServices().getId());
+
+			if (!conn.isOpen()) {
+				boolean result = MessageDialog.openQuestion(getShell(), Messages.ResourcesTab_openConnection,
+						NLS.bind(Messages.ResourcesTab_noInformation, conn.getName()));
+				if (!result) {
+					return false;
+				}
+			}
+			try {
+				control.start(monitor);
+				return true;
+			} catch (CoreException e) {
+				RMLaunchPlugin.errorDialog(e.getCause().getLocalizedMessage(), e.getCause());
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * @param parent
 	 * @param colspan
@@ -396,79 +393,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 */
 	private ScrolledComposite getLaunchAttrsScrollComposite() {
 		return launchAttrsScrollComposite;
-	}
-
-	/**
-	 * Handle selection of a resource manager type
-	 */
-	private void rmTypeSelectionChanged() {
-		int i = fSystemTypeCombo.getSelectionIndex();
-		if (i > 0) {
-			ProviderInfo provider = ProviderInfo.getProviders().get(i - 1);
-			if (fSelectedLaunchControl == null || !fSelectedLaunchControl.getConfiguration().getName().equals(provider.getName())) {
-				ILaunchController control = RMLaunchUtils.getLaunchControl(provider.getName());
-				if (control != null) {
-					if (fDefaultConnection) {
-						fRemoteConnectionWidget.setConnection(control.getRemoteServicesId(), control.getConnectionName());
-					}
-					if (fSelectedLaunchControl != null) {
-						try {
-							fSelectedLaunchControl.stop();
-						} catch (CoreException e) {
-						}
-					}
-					fSelectedLaunchControl = control;
-				}
-			}
-		}
-	}
-
-	private void updateEnablement() {
-		if (fSystemTypeCombo.getSelectionIndex() > 0) {
-			fRemoteConnectionWidget.setEnabled(true);
-			fRemoteConnectionWidget.setConnection(null);
-		} else {
-			fRemoteConnectionWidget.setEnabled(false);
-		}
-	}
-
-	private boolean connectionChanged(final ILaunchController control, IProgressMonitor monitor) {
-		IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
-		if (conn != null) {
-			try {
-				control.stop();
-			} catch (CoreException e) {
-			}
-			control.setConnectionName(conn.getName());
-			control.setRemoteServicesId(conn.getRemoteServices().getId());
-
-			if (!fRemoteConnectionWidget.getConnection().isOpen()) {
-				boolean result = MessageDialog
-						.openQuestion(
-								getShell(),
-								Messages.ResourcesTab_openConnection,
-								NLS.bind(
-										Messages.ResourcesTab_noInformation,
-										fRemoteConnectionWidget.getConnection().getName()));
-				if (!result) {
-					return false;
-				}
-			}
-			try {
-				control.start(monitor);
-				return true;
-			} catch (CoreException e) {
-				RMLaunchPlugin.errorDialog(e.getCause().getLocalizedMessage(), e.getCause());
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * @param comp
-	 */
-	private void setLaunchAttrsScrollComposite(ScrolledComposite comp) {
-		this.launchAttrsScrollComposite = comp;
 	}
 
 	/**
@@ -508,6 +432,81 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			}
 		}
 		return fDynamicTabs.get(control);
+	}
+
+	private void handleConnectionChanged() {
+		try {
+			getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+				@Override
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					SubMonitor progress = SubMonitor.convert(monitor, 20);
+					IRemoteConnection conn = null;
+					if (fRemoteConnectionWidget.isEnabled()) {
+						conn = fRemoteConnectionWidget.getConnection();
+					}
+					if (conn == null) {
+						fLaunchControl = null;
+						fRemoteConnection = null;
+						updateLaunchAttributeControls(null, getLaunchConfiguration(), progress.newChild(10));
+						updateLaunchConfigurationDialog();
+					} else if (connectionChanged(fSelectedLaunchControl, progress.newChild(10))) {
+						fLaunchControl = fSelectedLaunchControl;
+						fRemoteConnection = conn;
+						updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), progress.newChild(10));
+						updateLaunchConfigurationDialog();
+					} else {
+						/*
+						 * Failed to change connection, reset back to the previous one
+						 */
+						fRemoteConnectionWidget.setConnection(fRemoteConnection);
+					}
+				}
+
+			});
+		} catch (InvocationTargetException e1) {
+		} catch (InterruptedException e1) {
+		}
+	}
+
+	/**
+	 * Handle selection of a resource manager type
+	 */
+	private void rmTypeSelectionChanged() {
+		int i = fSystemTypeCombo.getSelectionIndex();
+		if (i > 0) {
+			ProviderInfo provider = ProviderInfo.getProviders().get(i - 1);
+			if (fSelectedLaunchControl == null || !fSelectedLaunchControl.getConfiguration().getName().equals(provider.getName())) {
+				ILaunchController control = RMLaunchUtils.getLaunchControl(provider.getName());
+				if (control != null) {
+					if (fDefaultConnection) {
+						fRemoteConnectionWidget.setConnection(control.getRemoteServicesId(), control.getConnectionName());
+					}
+					if (fSelectedLaunchControl != null) {
+						try {
+							fSelectedLaunchControl.stop();
+						} catch (CoreException e) {
+						}
+					}
+					fSelectedLaunchControl = control;
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param comp
+	 */
+	private void setLaunchAttrsScrollComposite(ScrolledComposite comp) {
+		this.launchAttrsScrollComposite = comp;
+	}
+
+	private void updateEnablement() {
+		if (fSystemTypeCombo.getSelectionIndex() > 0) {
+			fRemoteConnectionWidget.setEnabled(true);
+			fRemoteConnectionWidget.setConnection(null);
+		} else {
+			fRemoteConnectionWidget.setEnabled(false);
+		}
 	}
 
 	/**

@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openacc.internal.fortran.analysis;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTCallStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTNameNode;
@@ -32,6 +34,10 @@ import org.eclipse.ptp.pldt.common.util.SourceInfo;
 @SuppressWarnings("restriction")
 public class OpenACCFortranASTVisitor extends GenericASTVisitor {
 	private static final String PREFIX = "ACC_"; //$NON-NLS-1$
+
+	private static final Pattern END_DIRECTIVE = Pattern.compile("^end", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+
+	private static final boolean shouldIgnoreEndDirectives = false; // TODO: Make this a user preference
 
 	@SuppressWarnings("unused")
 	private static final boolean traceOn = false;
@@ -55,8 +61,19 @@ public class OpenACCFortranASTVisitor extends GenericASTVisitor {
 		 * the preceding OpenMP directives.
 		 */
 		for (Token accDirective : node.getOpenACCComments()) {
-			addArtifact(accDirective, Artifact.PRAGMA);
+			if (!shouldIgnore(accDirective)) {
+				addArtifact(accDirective, Artifact.PRAGMA);
+			}
 		}
+	}
+
+	@SuppressWarnings("unused")
+	private boolean shouldIgnore(Token accDirective) {
+		return shouldIgnoreEndDirectives && isOpenACCEndDirective(accDirective);
+	}
+
+	private boolean isOpenACCEndDirective(Token ompDirective) {
+		return END_DIRECTIVE.matcher(ompDirective.getText()).find();
 	}
 
 	@Override

@@ -142,4 +142,9 @@ public class DummyFile implements IIndexFile, Serializable {
 		return null;
 	}
 
+	public long getSourceReadTime() throws CoreException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

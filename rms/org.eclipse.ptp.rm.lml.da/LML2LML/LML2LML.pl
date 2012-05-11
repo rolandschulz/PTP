@@ -186,7 +186,7 @@ foreach $nid (keys(%{$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}})) {
     $nschemeref=undef;
     if(exists($filehandler_layout->{DATA}->{NODEDISPLAY})) {
 	if(exists($filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid})) {
-	    if($nlayoutref_gid!~/__dummy_nd__/) {
+	    if($nlayoutref_gid ne "org.eclipse.ptp.rm.lml.ui.SystemMonitorView") {
 		# check if el1 with attribute min is available
 		if($el1=$filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid}->{schemeroot}->get_child({ _name => "el1" })) {
 		    if(exists($el1->{ATTR}->{min})) {

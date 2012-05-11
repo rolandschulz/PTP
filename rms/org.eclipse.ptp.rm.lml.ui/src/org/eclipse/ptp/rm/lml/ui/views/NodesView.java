@@ -11,6 +11,9 @@
 
 package org.eclipse.ptp.rm.lml.ui.views;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
@@ -27,10 +30,14 @@ import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
+import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayView;
+import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayViewMaxlevelAdjust;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -39,13 +46,16 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class NodesView extends ViewPart {
 	private final class LguiListener implements ILMLListener {
+		@Override
 		public void handleEvent(ILguiAddedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					fLguiItem = lmlManager.getSelectedLguiItem();
 					if (!nodedisplayView.isDisposed()) {
 						nodedisplayView.update(fLguiItem);
 						nodedisplayView.setVisible(true);
+						checkActionStates();
 					}
 					if (fLguiItem != null
 							&& fLguiItem.getNodedisplayAccess() != null) {
@@ -57,8 +67,10 @@ public class NodesView extends ViewPart {
 
 		}
 
+		@Override
 		public void handleEvent(ILguiRemovedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					if (!nodedisplayView.isDisposed()) {
 						nodedisplayView.setVisible(false);
@@ -69,32 +81,38 @@ public class NodesView extends ViewPart {
 			});
 		}
 
+		@Override
 		public void handleEvent(IMarkObjectEvent event) {
 			if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
 				fLguiItem.getObjectStatus().mouseDown(event.getOid());
 			}
 		}
 
+		@Override
 		public void handleEvent(ISelectObjectEvent event) {
 			if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
 				fLguiItem.getObjectStatus().mouseOver(event.getOid());
 			}
 		}
 
+		@Override
 		public void handleEvent(ITableFilterEvent event) {
 			// TODO Auto-generated method stub
 
 		}
 
+		@Override
 		public void handleEvent(ITableSortedEvent e) {
 		}
 
+		@Override
 		public void handleEvent(IUnmarkObjectEvent event) {
 			if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
 				fLguiItem.getObjectStatus().mouseUp(event.getOid());
 			}
 		}
 
+		@Override
 		public void handleEvent(IUnselectedObjectEvent event) {
 			if (fLguiItem != null && fLguiItem.getOIDToObject() != null
 					&& fLguiItem.getObjectStatus() != null) {
@@ -105,13 +123,16 @@ public class NodesView extends ViewPart {
 
 		}
 
+		@Override
 		public void handleEvent(IViewUpdateEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					fLguiItem = lmlManager.getSelectedLguiItem();
 					if (!nodedisplayView.isDisposed()) {
 						nodedisplayView.update(fLguiItem);
 						nodedisplayView.setVisible(true);
+						checkActionStates();
 					}
 					if (fLguiItem != null
 							&& fLguiItem.getNodedisplayAccess() != null) {
@@ -124,12 +145,21 @@ public class NodesView extends ViewPart {
 	}
 
 	private Composite composite = null;
-	private NodedisplayView nodedisplayView = null;
+	private NodedisplayViewMaxlevelAdjust nodedisplayView = null;
 	public Viewer viewer;
 	public ILguiItem fLguiItem = null;
 	private final ILMLListener lguiListener = new LguiListener();
 	private final LMLManager lmlManager = LMLManager.getInstance();
 	private String gid = null;
+
+	/**
+	 * Actions for changing the level of detail shown by the nodedisplay.
+	 * incAction = increases level of detail
+	 * decAction = decreases level of detail
+	 */
+	private Action incAction;
+
+	private Action decAction;
 
 	/**
 	 * 
@@ -149,10 +179,13 @@ public class NodesView extends ViewPart {
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		lmlManager.addListener(lguiListener, this.getClass().getName());
 
-		nodedisplayView = new NodedisplayView(null, null, composite);
+		nodedisplayView = new NodedisplayViewMaxlevelAdjust(new NodedisplayView(null, null, composite), false, composite);
 		if (fLguiItem != null) {
 			nodedisplayView.update(fLguiItem);
 		}
+
+		createToolbar();
+
 		composite.layout();
 	}
 
@@ -170,4 +203,62 @@ public class NodesView extends ViewPart {
 	public void setFocus() {
 	}
 
+	/**
+	 * Checks if the action buttons for changing the detail level
+	 * have to be enabled or disabled.
+	 */
+	protected void checkActionStates() {
+
+		if (nodedisplayView == null) {
+			decAction.setEnabled(false);
+			incAction.setEnabled(false);
+		}
+
+		decAction.setEnabled(nodedisplayView.getShownMaxLevel() > 1);
+
+		incAction.setEnabled(nodedisplayView.getShownMaxLevel() < nodedisplayView.getMaximumNodedisplayDepth());
+	}
+
+	/**
+	 * Creates additional buttons for changing the maximum shown depth
+	 * in the nodedisplay.
+	 */
+	protected void createToolbar() {
+		incAction = new Action(Messages.NodesView_0) {
+			@Override
+			public void run() {
+				if (nodedisplayView != null) {
+					nodedisplayView.increaseMaximumLevel();
+				}
+				checkActionStates();
+			}
+		};
+
+		decAction = new Action(Messages.NodesView_1) {
+			@Override
+			public void run() {
+				if (nodedisplayView != null) {
+					nodedisplayView.decreaseMaximumLevel();
+				}
+				checkActionStates();
+			}
+		};
+
+		// Set icons
+		final ImageDescriptor zoomIn = PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_TOOL_FORWARD);
+		final ImageDescriptor zoomOut = PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_TOOL_BACK);
+		incAction.setImageDescriptor(zoomIn);
+		decAction.setImageDescriptor(zoomOut);
+
+		incAction.setToolTipText(Messages.NodesView_2);
+		decAction.setToolTipText(Messages.NodesView_3);
+
+		final IToolBarManager toolbarManager = getViewSite().getActionBars().getToolBarManager();
+		toolbarManager.add(decAction);
+		toolbarManager.add(incAction);
+
+		checkActionStates();
+	}
 }

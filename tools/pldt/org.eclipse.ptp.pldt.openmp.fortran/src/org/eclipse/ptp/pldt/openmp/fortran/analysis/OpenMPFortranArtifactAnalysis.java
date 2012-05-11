@@ -21,6 +21,7 @@ import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.ptp.pldt.common.IArtifactAnalysis;
 import org.eclipse.ptp.pldt.common.ScanReturn;
+import org.eclipse.ptp.pldt.openmp.core.OpenMPScanReturn;
 import org.eclipse.ptp.pldt.openmp.fortran.OpenMPFortranPlugin;
 
 /**
@@ -33,7 +34,7 @@ import org.eclipse.ptp.pldt.openmp.fortran.OpenMPFortranPlugin;
 @SuppressWarnings("restriction")
 public class OpenMPFortranArtifactAnalysis implements IArtifactAnalysis {
 	public ScanReturn runArtifactAnalysis(String languageID, ITranslationUnit tu, List<String> includes, boolean allowPrefixOnlyMatch) {
-		final ScanReturn msr = new ScanReturn();
+		final OpenMPScanReturn msr = new OpenMPScanReturn();
 		if (languageID.equals(FortranLanguage.LANGUAGE_ID)) {
 			IResource res = tu.getUnderlyingResource();
 			if (!(res instanceof IFile))

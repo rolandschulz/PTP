@@ -24,16 +24,11 @@ package org.eclipse.ptp.rm.lml.ui;
 import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
 
 public interface ILMLUIConstants extends ILMLCoreConstants {
-	public static final String PLUGIN_ID = LMLUIPlugin.getUniqueIdentifier();
-	public static final String PREFIX = PLUGIN_ID + "."; //$NON-NLS-1$
-
-	public static final String VIEW_PARALLELNODES = "__dummy_nd__1__"; //$NON-NLS-1$
-	public static final String VIEW_TABLE_1 = "joblistrun"; //$NON-NLS-1$
-	public static final String VIEW_TABLE_2 = "joblistwait"; //$NON-NLS-1$
+	public static final String ID_SYSTEM_MONITOR_VIEW = "org.eclipse.ptp.rm.lml.ui.SystemMonitorView"; //$NON-NLS-1$
+	public static final String ID_INFO_VIEW = "org.eclipse.ptp.rm.lml.ui.InfoView"; //$NON-NLS-1$
 
 	public static final int INTERNAL_ERROR = 150;
 	public static final String COLUMN_STATUS = "status";//$NON-NLS-1$
-	public static final String VIEW_INFO = "info"; //$NON-NLS-1$
 
 	public static final String INFO_JOB = "job"; //$NON-NLS-1$
 	public static final String INFO_NODE = "node"; //$NON-NLS-1$

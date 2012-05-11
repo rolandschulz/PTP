@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<templates>
+
+	<!-- OpenMP directives EXCLUDING "end" directives, in alphabetical order -->
+
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.atomic"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP atomic directive" enabled="true"
+		name="!$omp atomic">!$$omp atomic${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.barrier"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP barrier directive" enabled="true"
+		name="!$omp barrier">!$$omp barrier${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.critical"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP critical directive" enabled="true"
+		name="!$omp critical">!$$omp critical${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.do"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP do directive" enabled="true"
+		name="!$omp do">!$$omp do${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.flush"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP flush directive" enabled="true"
+		name="!$omp flush">!$$omp flush${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.master"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP master directive" enabled="true"
+		name="!$omp master">!$$omp master${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.ordered"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP ordered directive" enabled="true"
+		name="!$omp ordered">!$$omp ordered${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.parallel"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP parallel directive" enabled="true"
+		name="!$omp parallel">!$$omp parallel${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.parallel_do"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP parallel do directive" enabled="true"
+		name="!$omp parallel do">!$$omp parallel do${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.parallel_sections"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP parallel sections directive" enabled="true"
+		name="!$omp parallel sections">!$$omp parallel sections${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.parallel_task"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP parallel task directive" enabled="true"
+		name="!$omp parallel task">!$$omp parallel task${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.parallel_workshare"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP parallel workshare directive" enabled="true"
+		name="!$omp parallel workshare">!$$omp parallel workshare${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.section"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP section directive" enabled="true"
+		name="!$omp section">!$$omp section${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.sections"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP sections directive" enabled="true"
+		name="!$omp sections">!$$omp sections${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.single"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP single directive" enabled="true"
+		name="!$omp single">!$$omp single${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.taskwait"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP taskwait directive" enabled="true"
+		name="!$omp taskwait">!$$omp taskwait${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.taskyield"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP taskyield directive" enabled="true"
+		name="!$omp taskyield">!$$omp taskyield${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.threadprivate"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP threadprivate directive" enabled="true"
+		name="!$omp threadprivate">!$$omp threadprivate${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.workshare"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP workshare directive" enabled="true"
+		name="!$omp workshare">!$$omp workshare${cursor}</template>
+
+	<!-- OpenMP "end" directives, in alphabetical order -->
+
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_atomic"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end atomic directive" enabled="true"
+		name="!$omp end atomic">!$$omp end atomic${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_critical"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end critical directive" enabled="true"
+		name="!$omp end critical">!$$omp end critical${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_do"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end do directive" enabled="true"
+		name="!$omp end do">!$$omp end do${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_master"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end master directive" enabled="true"
+		name="!$omp end master">!$$omp end master${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_ordered"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end ordered directive" enabled="true"
+		name="!$omp end ordered">!$$omp end ordered${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_parallel"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end parallel directive" enabled="true"
+		name="!$omp end parallel">!$$omp end parallel${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_parallel_do"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end parallel do directive" enabled="true"
+		name="!$omp end parallel do">!$$omp end parallel do${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_parallel_sections"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end parallel sections directive" enabled="true"
+		name="!$omp end parallel sections">!$$omp end parallel sections${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_parallel_task"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end parallel task directive" enabled="true"
+		name="!$omp end parallel task">!$$omp end parallel task${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_parallel_workshare"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end parallel workshare directive" enabled="true"
+		name="!$omp end parallel workshare">!$$omp end parallel workshare${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_sections"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end sections directive" enabled="true"
+		name="!$omp end sections">!$$omp end sections${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_single"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end single directive" enabled="true"
+		name="!$omp end single">!$$omp end single${cursor}</template>
+	<template id="org.eclipse.ptp.pldt.openmp.fortran.end_workshare"
+		autoinsert="true" context="org.eclipse.photran.ui.template.context"
+		deleted="false" description="OpenMP end workshare directive" enabled="true"
+		name="!$omp end workshare">!$$omp end workshare${cursor}</template>
+</templates>

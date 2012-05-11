@@ -16,17 +16,17 @@
 <objects>
 <object color="#FFFFFF" id="empty" name="Empty job" type="job"/>
 </objects>
-<nodedisplay title="default" id="__dummy_nd__1__">
+<nodedisplay title="default" id="org.eclipse.ptp.rm.lml.ui.SystemMonitorView">
   <scheme><el1 min="0" tagname="__empty__"></el1></scheme>
   <data><el1 min="0" oid="empty"></el1></data>
 </nodedisplay>
 
-<nodedisplaylayout id="nodedisplay" gid="__dummy_nd__1__">
+<nodedisplaylayout id="nodedisplay" gid="org.eclipse.ptp.rm.lml.ui.SystemMonitorView">
   <el0 rows="0" cols="0">
   </el0>
 </nodedisplaylayout>
 
-<tablelayout id="tl_Run" gid="joblistrun" active="true">
+<tablelayout id="tl_Run" gid="org.eclipse.ptp.rm.lml.ui.ActiveJobsView" active="true">
 <column cid="1" pos="0" width="0.1" active="true" key="step"/>
 <column cid="2" pos="1" width="0.1" active="true" key="owner"/>
 <column cid="3" pos="2" width="0.1" active="true" key="queue"/>
@@ -37,7 +37,7 @@
 <column cid="8" pos="7" width="0.3" active="true" key="status"/>
 </tablelayout>
 
-<table title="Running Jobs" id="joblistrun"  contenttype="jobs" description="This is the table showing all running jobs">
+<table title="Running Jobs" id="org.eclipse.ptp.rm.lml.ui.ActiveJobsView"  contenttype="jobs" description="This is the table showing all running jobs">
 <column id="1" name="step"/>
 <column id="2" name="owner">  <pattern>    <include regexp=".*"/>  </pattern></column>
 <column id="3" name="queue"/>
@@ -48,7 +48,7 @@
 <column id="8" name="status" type="mandatory">  <pattern>    <include regexp="RUNNING"/>  </pattern> </column>
 </table>
 
-<tablelayout id="tl_WAIT" gid="joblistwait" active="true">
+<tablelayout id="tl_WAIT" gid="org.eclipse.ptp.rm.lml.ui.InactiveJobsView" active="true">
 <column cid="1" pos="0" width="0.1" active="true" key="step"/>
 <column cid="2" pos="1" width="0.1" active="true" key="owner"/>
 <column cid="3" pos="2" width="0.1" active="true" key="queue"/>
@@ -59,7 +59,7 @@
 <column cid="8" pos="7" width="0.3" active="true" key="status"/>
 </tablelayout>
 
-<table title="Waiting Jobs" id="joblistwait"  contenttype="jobs" description="This is the table showing all waiting jobs">
+<table title="Waiting Jobs" id="org.eclipse.ptp.rm.lml.ui.InactiveJobsView"  contenttype="jobs" description="This is the table showing all waiting jobs">
 <column id="1" name="step"/>
 <column id="2" name="owner">  <pattern>    <include regexp=".*"/>  </pattern></column>
 <column id="3" name="queue"/>

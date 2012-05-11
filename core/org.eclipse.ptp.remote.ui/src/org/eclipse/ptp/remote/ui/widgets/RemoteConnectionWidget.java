@@ -114,6 +114,7 @@ public class RemoteConnectionWidget extends Composite {
 	private IRemoteConnection fSelectedConnection;
 	private IRemoteServices fSelectedServices;
 	private boolean fSelectionListernersEnabled = true;
+	private boolean fEnabled = true;
 
 	private final IRunnableContext fContext;
 
@@ -252,6 +253,16 @@ public class RemoteConnectionWidget extends Composite {
 		return fSelectedConnection;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Control#isEnabled()
+	 */
+	@Override
+	public boolean isEnabled() {
+		return fEnabled;
+	}
+
 	/**
 	 * Remove a listener that will be notified when one of the widget's controls are selected
 	 * 
@@ -306,6 +317,7 @@ public class RemoteConnectionWidget extends Composite {
 		}
 		fConnectionCombo.setEnabled(enabled && fSelectedServices != null);
 		fNewConnectionButton.setEnabled(enabled && fSelectedServices != null && fSelectedServices.canCreateConnections());
+		fEnabled = enabled;
 	}
 
 	/**
@@ -365,7 +377,7 @@ public class RemoteConnectionWidget extends Composite {
 		fSelectedConnection = null;
 		int currentSelection = fConnectionCombo.getSelectionIndex();
 		IRemoteConnection selectedConnection = null;
-		if (currentSelection > 0 && fSelectedServices != null) {
+		if (currentSelection >= 0 && fSelectedServices != null) {
 			String connectionName = fConnectionCombo.getItem(currentSelection);
 			selectedConnection = getRemoteConnection(fSelectedServices, connectionName);
 		}
@@ -473,13 +485,8 @@ public class RemoteConnectionWidget extends Composite {
 
 			if (connections.length > 0) {
 				fConnectionCombo.select(selected);
+				handleConnectionSelected();
 			}
-
-			/*
-			 * A connection is always going to be selected when a remote service provider is selected, so make sure the handlers get
-			 * notified
-			 */
-			// handleConnectionSelected();
 
 			/*
 			 * Enable 'new' button if new connections are supported
