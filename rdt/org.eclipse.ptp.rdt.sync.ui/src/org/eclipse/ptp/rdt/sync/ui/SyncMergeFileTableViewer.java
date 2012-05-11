@@ -22,6 +22,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -53,6 +55,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	private Image UNCHECKED;
 	private IProject project;
 	private TableViewer fileTableViewer;
+	private Action refreshAction;
 	private ISelectionListener selectionListener;
 	
 	private static final Map<IProject, Set<IPath>> fProjectToAllPathsMap = Collections.
@@ -174,6 +177,15 @@ public class SyncMergeFileTableViewer extends ViewPart {
 					}
 				}
 			});
+			
+			// Add refresh button to toolbar
+			refreshAction = new Action(Messages.SyncMergeFileTableViewer_4) {
+				public void run() {
+					update();
+				}
+			};
+			getViewSite().getActionBars().getToolBarManager().add(refreshAction);
+
 
 			// Allow user to toggle whether file is resolved
 			fileTableViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -216,6 +228,9 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		project = newProject;
 		if (!fProjectToAllPathsMap.containsKey(project)) {
 			update();
+		} else {
+			fileTableViewer.setInput(fProjectToAllPathsMap.get(project));
+			fileTableViewer.refresh();
 		}
 	}
 	
