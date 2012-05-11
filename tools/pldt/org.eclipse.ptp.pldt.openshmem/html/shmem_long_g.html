@@ -1,0 +1,60 @@
+<html>
+<head>
+<title>shmem_long_g</title>
+</head>
+<h2 id="top">shmem_long_g</h2>
+<h4>Purpose</h4>
+
+
+<p>Transfers one data item from a remote Processing Element (PE).
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+long shmem_long_g(long *addr, int pe);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+
+</dd>
+<dt class="bold ">addr</dt>
+<dd>The remotely accessible data object which will receive the data on the remote PE.
+</dd>
+<dt class="bold">pe</dt>
+<dd>Processing element number of the remote PE.
+
+</dd>
+</dl>
+<h4>Description</h4>
+
+<div class="ledi">
+<p>This routine provides a very low latency remote read write capability for single elements
+of most basic types</p>
+<p>The function shmem_long_g() transfers a long data item from a remote PE.</p>
+
+
+<h4>IBM NOTES</h4>
+<div class="ledi">
+<dl>
+<p>Please refer to Atomicity and Coherency section for atomicity and coherence model in the OpenSHMEM documentation</p>
+</dd>
+</dl>
+
+<h4>C examples</h4>
+<pre>
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_get, shmem_iget
+</p>
+</html>

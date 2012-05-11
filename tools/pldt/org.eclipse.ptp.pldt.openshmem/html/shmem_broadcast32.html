@@ -1,0 +1,213 @@
+<html>
+<head>
+<title>shmem_broadcast32</title>
+</head>
+<h2 id="top">shmem_broadcast32</h2>
+<h4>Purpose</h4>
+
+
+<p>Broadcasts a block of data from one processing element (PE) to one or more target PEs.
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_broadcast32(void *target, const void *source, size_t nlong, int PE_root, int PE_start, int logPE_stride, int PE_size, long *pSync);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+</dd>
+<dt class="bold ">target</dt>
+<dd>A symmetric data object used to receive the data broadcasted by the processing element specified by PE_start. For shmem_broadcast
+and shmem_broadcast64 the data type of target can be any type that has an element size of 64 bits.
+</dd>
+<dt class="bold ">source</dt>
+<dd>A symmetric data object that can be of any data type that is permissible for the target argument.
+</dd>
+<dt class="bold ">nlong</dt>
+<dd>The number of elements in source. For shmem_broadcast and shmem_broadcast64, this is the number of 64-bit words. For
+shmem_broadcast32 this is the number of 32-bit halfwords.
+</dd>
+<dt class="bold ">PE_root</dt>
+<dd>Zero-based ordinal of the PE, with respect to the active set, from which the data is copied. Must be greater than or equal to 0 and less than PE_size.
+</dd>
+<dt class="bold ">PE_start</dt>
+<dd>The lowest virtual PE number of the active set of PEs.
+</dd>
+<dt class="bold ">logPE_stride</dt>
+<dd>The log (base 2) of the stride between consecutive virtual PE numbers in the active set.
+</dd>
+<dt class="bold ">PE_size</dt>
+<dd>The number of PEs in the active set.
+</dd>
+<dt class="bold ">pSync</dt>
+<dd>A symmetric work array. In C/C++, pSync must be of type long and size _SHMEM_REDUCE_SYNC_SIZE. Every element of this array must be initialized with the value _SHMEM_SYNC_VALUE before any of the PEs in the active set enter the reduction routine
+</dd>
+</dl>
+
+<h4>Description</h4>
+
+<div class="ledi">
+<p>The shmem_broadcast32 routine is a collective routine. They copy data object source on the processor specified by PE_root and store the values at target on the
+other PEs specified by the triplet PE_start, logPE_stride, PE_size. The data is not copied to the target area on the root PE. The values of arguments PE_root,
+PE_start, logPE_stride, and PE_size must be equal on all PEs in the active set. The same target and source data objects and the same pSync work array must be
+passed to all PEs in the active set.</p>
+<p>Before any PE calls the broadcast functions, users have to ensure the following conditions exist:</p>
+<p>The pSync arrays on all PEs in the active set is not still in use from a prior call to a broadcast function.</p>
+<p>The target array on all PEs in the active set is ready to accept the broadcast data.</p>
+
+<p>Upon returning from the broadcast function, the following conditions are true:</p>
+<p>If the current PE is not the root PE, the target data array is updated.</p>
+<p>The values in the pSync array are restored to the original values.</p>
+
+<p>Each of these functions assumes that only PEs in the active set call the function.  If a PE not in the active set calls the collective function, the behavior is undefined.  On all PEs in the active set, the values of nlong, PE_root, PE_start, logPE_stride, and PE_size must be equal.  And the same source, target, and pSync objects must be used on all PEs in the active set.</p>
+
+
+<h4>C examples</h4>
+<pre>
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;assert.h&gt;
+#include &lt;unistd.h&gt;
+
+#define PSYNC_NUM 100
+#define ARRAY_SIZE 100
+#define BCAST_VAL 1234
+
+#include &lt;shmem.h&gt;
+
+int main (int argc, char* argv[])
+{
+    int total_tasks = -1;
+    int my_task = -1;
+
+    start_pes(0);
+
+    total_tasks = _num_pes();
+
+    if (total_tasks <= 0) {
+        printf("FAILED\n");
+        exit(1);
+    } else {
+        printf("number of pes is %d\n", total_tasks);
+    }
+
+    if (total_tasks < 2 || total_tasks % 2) {
+        printf("FAILED: The number of pes should be an even number. (at least 2)\n");
+        exit(1);
+    }
+
+    my_task = _my_pe();
+
+    if (my_task < 0){
+        printf("FAILED\n");
+        exit(1);
+    } else {
+        printf("my pe id is %d\n", my_task);
+    }
+
+    printf("my pid is %d\n", getpid());
+
+    long *array = (long *)shmalloc(sizeof(long)*ARRAY_SIZE);
+    // initialize array
+    for (int i=0; i&lt;ARRAY_SIZE; i++) {
+        array[i] = -1;
+    }
+
+    long *syncList = (long *)shmalloc(sizeof(long)*PSYNC_NUM*_SHMEM_BCAST_SYNC_SIZE);
+    long *pSync1, *pSync2;
+
+    // Every element of this array must be initialized with the
+    // value _SHMEM_SYNC_VALUE (in C/C++) or SHMEM_SYNC_VALUE (in
+    // Fortran) before any of the PEs in the active set enter
+    // shmem_barrier().
+    pSync1 = &syncList[0];
+    pSync2 = &syncList[_SHMEM_BCAST_SYNC_SIZE];
+    for (int i=0; i < _SHMEM_BCAST_SYNC_SIZE; i++) {
+        pSync1[i] = _SHMEM_SYNC_VALUE;
+        pSync2[i] = _SHMEM_SYNC_VALUE;
+    }
+    shmem_barrier_all(); /* Wait for all PEs to initialize pSync */
+
+    if (my_task == 0) {
+        for (int i=0; i&lt;ARRAY_SIZE; i++) {
+            array[i] = BCAST_VAL;
+        }
+    }
+
+    if (sizeof(long) == 4) {
+        shmem_broadcast32(array, array, ARRAY_SIZE, 0, 0, 0, total_tasks, pSync1);
+    } else if (sizeof(long) == 8) {
+        shmem_broadcast64(array, array, ARRAY_SIZE, 0, 0, 0, total_tasks, pSync1);
+    } else {
+        assert(!"Should not be here");
+    }
+
+    if (my_task != 0) {
+        for (int i=0; i&lt;ARRAY_SIZE; i++) {
+            if (array[i] != BCAST_VAL) {
+                printf("Broadcast value does not match.\n");
+                exit(1);
+            }
+        }
+    }
+
+    // reinitialize array
+    for (int i=0; i&lt;ARRAY_SIZE; i++) {
+        array[i] = -1;
+    }
+
+    printf("World geometry bcast test finished.\n");
+    
+    shmem_barrier_all();
+
+    if ((my_task==0) || (my_task==1)) {
+        for (int i=0; i&lt;ARRAY_SIZE; i++) {
+            array[i] = BCAST_VAL;
+        }
+    }
+
+    int PE_root, PE_start;
+    PE_root = PE_start = my_task%2;
+    if (sizeof(long) == 4) {
+        shmem_broadcast32(array, array, ARRAY_SIZE, PE_root, PE_start, 1, 
+            total_tasks/2, pSync2);
+    } else if (sizeof(long) == 8) {
+        shmem_broadcast64(array, array, ARRAY_SIZE, PE_root, PE_start, 1, 
+            total_tasks/2, pSync2);
+    } else {
+        assert(!"Should not be here");
+    }
+
+    if ((my_task!=0) || (my_task!=1)) {
+        for (int i=0; i&lt;ARRAY_SIZE; i++) {
+            if (array[i] != BCAST_VAL) {
+                printf("Broadcast value does not match.\n");
+                exit(1);
+            }
+        }
+    }
+
+    printf("Sub geometry bcast test finished.\n");
+
+    shmem_barrier_all();
+    
+    printf("PASSED\n");
+    return 0;
+}
+
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_barrier, shmem_barrier_all
+</p>
+</html>

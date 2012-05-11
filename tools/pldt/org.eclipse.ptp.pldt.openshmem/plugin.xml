@@ -36,7 +36,7 @@
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
             annotationType="org.eclipse.ptp.pldt.openshmem.openshmemMarkerAnnotation"
-            icon="icons/openshmem.gif" 
+            icon="icons/openshmem.png" 
             
             presentationLayer="3"
             label="%openshmem.annotMarker.specification.label"
@@ -67,7 +67,7 @@
       <view
             category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.pldt.openshmem.views.OpenSHMEMArtifactView"
-            icon="icons/openshmem.gif"
+            icon="icons/openshmem.png"
             id="org.eclipse.ptp.pldt.openshmem.views.openshmemArtifactView"
             name="%view.name"
             restorable="true">
@@ -80,6 +80,16 @@
             id="org.eclipse.ptp.pldt.openshmem.command2"
             name="%find.openshmem.artifacts.command.name">
       </command>
+      <command
+            defaultHandler="org.eclipse.ptp.pldt.openshmem.actions.RunAnalyseOpenSHMEMcommandHandler"
+            id="org.eclipse.ptp.pldt.openshmem.command4"
+            name="%find.openshmem.artifacts.command.name">
+      </command>
+      <command
+            defaultHandler="org.eclipse.ptp.pldt.openshmem.actions.RunAnalyseOpenSHMEMcommandHandler"
+            id="org.eclipse.ptp.pldt.openshmem.command4"
+            name="%find.openshmem.artifacts.command.name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -87,7 +97,7 @@
             locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1 ">
              <command
                commandId="org.eclipse.ptp.pldt.openshmem.command2"
-               icon="icons/openshmem.gif"
+               icon="icons/openshmem.png"
                label="%show.openshmem.artifacts.command.label">
          </command>
       </menuContribution>

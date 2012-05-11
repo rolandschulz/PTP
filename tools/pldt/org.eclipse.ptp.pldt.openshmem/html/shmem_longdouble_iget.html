@@ -1,0 +1,73 @@
+<html>
+<head>
+<title>shmem_longdouble_iget</title>
+</head>
+<h2 id="top">shmem_longdouble_iget</h2>
+<h4>Purpose</h4>
+
+
+<p>Transfers strided data from a specified processing element (PE).
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_longdouble_iget(long double *target, const long double *source, ptrdiff_t tst, ptrdiff_t sst, size_t len, int pe);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+
+</dd>
+<dt class="bold ">target</dt>
+<dd>Local strided array to be updated.
+</dd>
+<dt class="bold ">source</dt>
+<dd>Remotely accessible strided array on the remote PE that contains the data to be copied.
+</dd>
+<dt class="bold">tst</dt>
+<dd>The stride between consecutive elements of the target array.  The stride is scaled by the element size of the target array. A value of 1 indicates contiguous data.
+</dd>
+<dt class="bold ">sst</dt>
+<dd>The stride between consecutive elements of the source array.  The stride is scaled by the element size of the source array. A value of 1 indicates contiguous data.
+</dd>
+<dt class="bold ">len</dt>
+<dd>Number of elements in the target and source arrays.
+</dd>
+<dt class="bold ">pe</dt>
+<dd>Processing element number of the remote PE</dd>
+</dl>
+<h4>Description</h4>
+
+<div class="ledi">
+<p>This input routine provides a high-performance method for copying a 
+strided array from a remote PE to a local strided array</p>
+<p>The routine returns when the data has been copied into the local target array.</p>
+<p>The function shmem_longdouble_iget() reads strided array of type long double from the
+remote PE.</p>
+
+
+<h4>IBM NOTES</h4>
+<div class="ledi">
+<dl>
+<p>Please refer to Atomicity and Coherency section for atomicity and coherence model in the OpenSHMEM documentation</p>
+</dd>
+</dl>
+
+<h4>C examples</h4>
+<pre>
+</pre>
+
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_longdouble_g, shmem_get
+</p>
+</html>

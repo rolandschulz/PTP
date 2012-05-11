@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>shmem_init</title>
+</head>
+<h2 id="top">shmem_init</h2>
+<h4>Purpose</h4>
+
+
+<p>Called at the beginning of a program to enable the use of IBM openshmem library.
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_init(void);
+ 
+</pre>
+
+<h4>Description</h4>
+
+<div class="ledi">
+<p>The function shmem_init initialises the Shmem library. </p>
+<p>The shmem_init call must me made before any other Shmem library calls. The function shmem_init should only
+be called once for each process.</p>
+
+
+<h4>C examples</h4>
+<pre>
+#include &lt;shmem.h&gt;
+
+int main(int argc, char *argv[])
+{
+  shmem_init(void);
+}
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: num_pes, my_pe
+</p>
+</html>

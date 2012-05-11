@@ -1,0 +1,116 @@
+<html>
+<head>
+<title>shfree</title>
+</head>
+<h2 id="top">shfree</h2>
+<h4>Purpose</h4>
+
+
+<p>Frees the memory space of a symmetric object that was allocated by shmalloc, shmemalign, or shrealloc.
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shfree(void *ptr);
+
+extern long malloc_error;
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+</dd>
+<dt class="bold ">ptr</dt>
+<dd>pointer to a symmetric object that needs to be deallocated.
+</dd>
+</dl>
+
+<h4>Description</h4>
+
+<div class="ledi">
+<p>The shfree function deallocates the memory region that was allocated by shmalloc, shmemalign, or shrealloc.  It returns the memory block to the symmetric heap and makes it available for later allocation.  If ptr is a null pointer, the shfree function does nothing.  Otherwise, if ptr is not a pointer earlier returned by a symmetric heap function, or if the space has already been deallocated, the malloc_error variable is set to indicate the error and shfree returns.</p>
+<p>It is required that all PEs must participate in the memory allocation and with the identical parameter.  Internally, shmem_barrier_all is called before returning from the function, thus the allocated object can be used right away on all PEs.  User has to ensure the same size parameter is used on all PEs when calling the function; otherwise, subsequent calls to the symmetric object allocation functions may not return the same address.</p>
+
+<h4>C examples</h4>
+<pre>
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;strings.h&gt;
+
+#include &lt;shmem.h&gt;
+
+int main (int argc, char* argv[])
+{
+    int total_tasks = -1;
+    int my_task = -1;
+
+    start_pes(0);
+
+    total_tasks = _num_pes();
+
+    if (total_tasks <= 0) {
+        printf("FAILED\n");
+        return 0;
+    } else {
+        printf("number of pes is %d\n", total_tasks);
+    }
+
+    my_task = _my_pe();
+
+    if (my_task < 0){
+        printf("FAILED\n");
+        return 0;
+    } else {
+        printf("my pe id is %d\n", my_task);
+    }
+
+    int *addrs[10];
+    for (int i=0; i<10; i++) {
+        addrs[i] = (int *) shmalloc(sizeof(int)*1024);
+        printf("addrs[%d] is %p after malloc\n", i, addrs[i]);
+        bzero(addrs[i], sizeof(int)*1024);
+        for (int j=0; j<1024; j++) {
+            addrs[i][j] = j;
+        }
+    }
+
+    for (int i=0; i<10; i++) {
+        shfree(addrs[i]);
+    }
+
+    int *addr = NULL;
+    addr = (int *) shmalloc(sizeof(int)*1024);
+    printf("addr is %p after malloc\n", addr);
+
+    addr = (int *) shrealloc(addr, sizeof(int)*1024);
+    printf("addr is %p after realloc\n", addr);
+
+    shfree(addr);
+
+    for (int i=0; i<10; i++) {
+        addrs[i] = (int *) shmemalign(0x2000, sizeof(int)*1024);
+        printf("addrs[%d] is %p after memalign\n", i, addrs[i]);
+    }
+
+    for (int i=0; i<10; i++) {
+        shfree(addrs[i]);
+    }
+
+    printf("PASSED\n");
+    return 0;
+}
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmemallign, shmalloc, shrealloc
+
+</p>
+</html>

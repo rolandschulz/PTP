@@ -1,0 +1,113 @@
+<html>
+<head>
+<title>shmem_barrier</title>
+</head>
+<h2 id="top">shmem_barrier</h2>
+<h4>Purpose</h4>
+
+
+<p>Performs a barrier operation on a subset of processing elements (PEs).
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_barrier(int PE_start, int logPE_stride, int PE_size, long *pSync);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold ">PE_start</dt>
+<dd>The lowest virtual PE number of the active set of PEs. PE_start must be of type integer. If you are using Fortran, it must be a
+default integer value.
+</dd>
+<dt class="bold ">logPE_stride</dt>
+<dd>The log (base 2) of the stride between consecutive virtual PE
+numbers in the active set.
+</dd>
+<dt class="bold">PE_size</dt>
+<dd>The number of PEs in the active set.
+</dd>
+<dt class="bold">pSync</dt>
+<dd>A symmetric work array.  pSync must be of type int and size _SHMEM_BARRIER_SYNC_SIZE.  Every element of this array must be initialized to 0 before any of the PEs in the active set enters shmem_barrier the first time.
+</dd>
+</dl>
+<h4>Description</h4>
+
+<div class="ledi">
+<p>shmem_barrier is a collective synchronization routine.  Control returns from shmem_barrier after all PEs in the active set (specified by PE_start, logPE_stride, and PE_size) have called shmem_barrier</p>
+<p>As with all SHMEM collective routines, each of these routines assumes that only PEs in the active set call the routine.  If a PE not in the active set calls a SHMEM collective routine, undefined behavior results. The values of arguments PE_start, logPE_stride, and PE_size must be equal on all PEs in the active set.  And, the same work array, pSync, must be passed in to all PEs in the active set.</p>
+<p>shmem_barrier also ensures all the previously issued local stores and remote updates done by any of the PE in the active set are finished before returning from the function. The same pSync array can be reused on consecutive shmem_barrier calls if they have the same active set.</p>
+
+<h4>C examples</h4>
+<pre>
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+
+#include &lt;shmem.h&gt;
+
+int main (int argc, char* argv[])
+{
+    int total_tasks = -1;
+    int my_task = -1;
+
+    start_pes(0);
+
+    total_tasks = _num_pes();
+
+    if (total_tasks <= 0) {
+        printf("FAILED\n");
+        exit(1);
+    } else {
+        printf("number of pes is %d\n", total_tasks);
+    }
+
+    if (total_tasks < 2 || total_tasks % 2) {
+        printf("FAILED: The number of pes should be an even number. (at least 2)\n");
+        exit(1);
+    }
+
+    my_task = _my_pe();
+
+    if (my_task < 0){
+        printf("FAILED\n");
+        exit(1);
+    } else {
+        printf("my pe id is %d\n", my_task);
+    }
+
+    printf("my pid is %d\n", getpid());
+
+    // Every element of pSync must be initialized to 0 before any of the PEs in the active 
+    // set enter shmem_barrier the first time
+    long pSync[_SHMEM_BARRIER_SYNC_SIZE];
+    pSync[0] = 0;
+
+    if (my_task%2 == 0) {
+        // even tasks call shmem_barrier
+        shmem_barrier(0, 1, total_tasks/2, pSync);
+    } else {
+        // odd tasks call shmem_barrier
+        shmem_barrier(1, 1, total_tasks/2, pSync);
+    }
+    
+    shmem_barrier_all();
+    
+    printf("PASSED\n");
+    return 0;
+}
+
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_barrier_all
+
+</p>
+</html>

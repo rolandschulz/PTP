@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>shmem_longlong_or_to_all</title>
+</head>
+<h2 id="top">shmem_longlong_or_to_all</h2>
+<h4>Purpose</h4>
+
+
+<p>Performs a logical OR function across a set of processing elements (PEs).
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_longlong_or_to_all(long long *target, long long *source, int nreduce, int PE_start, int logPE_stride, int PE_size, long long *pWrk, long *pSync);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+</dd>
+<dt class="bold ">target</dt>
+<dd>A symmetric data object array which will receive the result of the reduction operation.
+</dd>
+<dt class="bold ">source</dt>
+<dd>A symmetric data object array of length nreduce elements which is the same type as the target.
+</dd>
+<dt class="bold ">nreduce</dt>
+<dd>Number of elements in the target and source arrays.
+</dd>
+<dt class="bold ">PE_start</dt>
+<dd>The lowest virtual PE number of the active set of PEs.
+</dd>
+<dt class="bold ">logPE_stride</dt>
+<dd>The log (base 2) of the stride between consecutive virtual PE numbers in the active set.
+</dd>
+<dt class="bold ">PE_size</dt>
+<dd>The number of PEs in the active set.
+</dd>
+<dt class="bold ">pWrk</dt>
+<dd>A symmetric work array.  The pWrk argument must have the same data type as target.  The size of the array must be max(nreduce/2+1,_SHMEM_REDUCE_MIN_WRKDATA_SIZE).
+</dd>
+<dt class="bold ">pSync</dt>
+<dd>A symmetric work array. In C/C++, pSync must be of type long and size _SHMEM_REDUCE_SYNC_SIZE. Every element of this array must be initialized with the value _SHMEM_SYNC_VALUE before any of the PEs in the active set enters the reduction routine the first time. 
+</dd>
+</dl>
+
+<h4>Description</h4>
+
+<div class="ledi">
+<p>The reduction routines compute one or more reductions across symmetric arrays on multiple processing elements (PEs).  A reduction performs an associative binary operation across a set of values.  The nreduce argument determines the number of separate reductions to perform.  The source array on all PEs in the active set provides one element for each reduction.  The results of the reductions are placed in the target array on all PEs in the active set that is defined by the PE_start, logPE_stride, PE_size.</p>
+<p>The source and target arrays may be the same array, but they may not be overlapping arrays.
+Each of these functions assumes that only PEs in the active set call the function.  If a PE not in the active set calls the collective function, the behavior is undefined.</p>
+<p>The function shmem_longlong_or_to_all performs a reduction applying the logical OR
+operator on long long values distributed across the PEs.</p>
+<p>Before any PE calls the reduction functions, users have to ensure the following conditions exist:</p>
+<p>The pWrk and pSync arrays on all PEs in the active set are not still in use from a prior call to a reduction function.</p>
+<p>The target array on all PEs in the active set is ready to accept the results of the
+reduction.</p>
+
+<p>Upon returning from the colletcive function, the following conditions are true:</p>
+<p>The target data array is updated.</p>
+<p>The values in the pSync array are restored to the original values.</p>
+
+<p>Each of these functions assumes that only PEs in the active set call the function.  If a PE not in the active set calls the collective function, the behavior is undefined.</p>
+
+
+<h4>C examples</h4>
+<pre>
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_barrier, shmem_broadcast, shmem_collect, shmem_max, shmem_min, shmem_or, shmem_prod, shmem_sum, shmem_xor
+
+</p>
+</html>

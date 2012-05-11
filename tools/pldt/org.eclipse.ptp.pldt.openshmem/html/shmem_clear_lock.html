@@ -1,0 +1,111 @@
+<html>
+<head>
+<title>shmem_clear_lock</title>
+</head>
+<h2 id="top">shmem_clear_lock</h2>
+<h4>Purpose</h4>
+
+
+<p>Releases a mutual exclusion memory lock.
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_clear_lock(long *lock);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+</dd>
+<dt class="bold ">lock</dt>
+<dd>A scalar symmetric data object.  This variable must be initialized to 0 on all PEs prior to the first use.
+
+</dd>
+</dl>
+
+<h4>Description</h4>
+
+<div class="ledi">
+<p>The shmem_clear_lock routine clears a mutual exclusive memory lock previously set by shmem_set_lock function. </p>
+
+<h4>IBM NOTES</h4>
+<div class="ledi">
+<dl>
+<p>This mutual exclusive memory lock is used to protect a critical region being updated simultaneously by multiple PEs.  It does not protect the critical region being accessed concurrently by multiple threads in the PE.  Moreover, this lock is not a recursive lock.  If a PE has already held the lock, the following calls to shmem_set_lock or shmem_test_lock on the same PE will behave like the lock being held by other PE
+</p>
+</dd>
+</dl>
+<h4>C examples</h4>
+<pre>
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+
+#include &lt;shmem.h&gt;
+
+int main (int argc, char* argv[])
+{
+    int total_tasks = -1;
+    int my_task = -1;
+
+    start_pes(0);
+
+    total_tasks = _num_pes();
+
+    if (total_tasks <= 0) {
+        printf("FAILED\n");
+        exit(1);
+    } else {
+        printf("number of pes is %d\n", total_tasks);
+    }
+
+    if (total_tasks < 2 || total_tasks % 2) {
+        printf("FAILED: The number of pes should be an even number. (at least 2)\n");
+        exit(1);
+    }
+
+    my_task = _my_pe();
+
+    if (my_task < 0){
+        printf("FAILED\n");
+        exit(1);
+    } else {
+        printf("my pe id is %d\n", my_task);
+    }
+
+    long *lock = (long *) shmalloc(sizeof(long));
+
+    printf("remote lock operations using set_lock ...\n");
+    shmem_set_lock(lock);
+    printf("pe %d got the lock\n", my_task);
+    shmem_clear_lock(lock);
+    printf("pe %d released the lock\n", my_task);
+
+    shmem_barrier_all();
+
+    printf("remote lock operations using test_lock ...\n");
+    while (shmem_test_lock(lock)) {
+    }
+    printf("pe %d got the lock\n", my_task);
+    shmem_clear_lock(lock);
+    printf("pe %d released the lock\n", my_task);
+
+    shmem_barrier_all();
+    
+    printf("PASSED\n");
+    return 0;
+}
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_set_lock, shmem_test_lock
+</p>
+</html>

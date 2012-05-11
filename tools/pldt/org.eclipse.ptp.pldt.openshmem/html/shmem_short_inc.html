@@ -1,0 +1,60 @@
+<html>
+<head>
+<title>shmem_short_inc</title>
+</head>
+<h2 id="top">shmem_short_inc</h2>
+<h4>Purpose</h4>
+
+
+<p>Performs an atomic increment operation on a symmetric data object.
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_short_inc(short *target, int pe);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+
+</dd>
+<dt class="bold ">target</dt>
+<dd>The remotely accessible integer data object to be updated on the PE.
+</dd>
+<dt class="bold ">pe</dt>
+<dd>An integer indicating the PE number on which target is to be
+updated.
+</dd>
+</dl>
+
+<h4>Description</h4>
+
+<div class="ledi">
+<p>The shmem_short_inc routine performs an atomic increment on a remote variable pointed by target
+on PE specified by pe. </p>
+<p>The atomic accessing of the shared variable is guaranteed only when that variable is updated solely using IBM openshmem functions.</p>
+
+<h4>IBM NOTES</h4>
+<div class="ledi">
+<dl>
+<p>To utilize the hardware atomic operations support of the PERCS system, the variables of these operations should be aligned with their natural byte alignments.  For example, an int variable should be 4-byte aligned; a long long variable should be 8-byte aligned.  If the participating variables are not aligned, the operation is done in software with sub-optimal performance</p>
+</dd>
+</dl>
+<h4>C examples</h4>
+<pre>
+
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_short_swap, shmem_short_finc, shmem_short_fadd, shmem_finc
+</p>
+</html>

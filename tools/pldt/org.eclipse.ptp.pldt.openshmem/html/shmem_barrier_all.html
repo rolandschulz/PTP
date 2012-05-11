@@ -1,0 +1,105 @@
+<html>
+<head>
+<title>shmem_barrier_all</title>
+</head>
+<h2 id="top">shmem_barrier_all</h2>
+<h4>Purpose</h4>
+
+
+<p>Registers the arrival of a processing element (PE) at a barrier and suspends PE execution until all other PEs arrive at the barrier.
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_barrier_all(void);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+</dl>
+<h4>Description</h4>
+
+<div class="ledi">
+<p>Barriers are a fast way to synchronize all PEs</p>
+<p>shmem_barrier_all function registers the arrival of the calling PE at a barrier.  It also causes the PE to suspend execution until all PEs have arrived shmem_barrier_all.</p>
+<p>Before returning from shmem_barrier_all, all previously issued local memory stores and remote memory updates issued via IBM openshmem calls such as shmem_put, are ensured finished.</p>
+
+
+<h4>IBM NOTES</h4>
+<div class="ledi">
+<dl>
+<p>Please refer to Atomicity and Coherency section for atomicity and coherence model in the OpenSHMEM documentation</p>
+</dd>
+</dl>
+
+<h4>C examples</h4>
+<pre>
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+
+#include &lt;shmem.h&gt;
+
+#define GLOBAL_ARRAY_SIZE     20
+#define SOURCE_STRIDE         3
+#define TARGET_STRIDE         4
+#define NUM_OF_TRANS_ELEM     5
+
+static int gIntArray[GLOBAL_ARRAY_SIZE] = {0};
+
+int main (int argc, char* argv[])
+{
+    int total_tasks = -1;
+    int my_task = -1;
+
+    start_pes(0);
+
+    total_tasks = _num_pes();
+
+    if (total_tasks <= 0) {
+        printf("FAILED\n");
+        exit(1);
+    } else {
+        printf("number of pes is %d\n", total_tasks);
+    }
+
+    if (total_tasks < 2 || total_tasks % 2) {
+        printf("FAILED: The number of pes should be an even number. (at least 2)\n");
+        exit(1);
+    }
+
+    my_task = _my_pe();
+
+    if (my_task < 0){
+        printf("FAILED\n");
+        exit(1);
+    } else {
+        printf("my pe id is %d\n", my_task);
+    }
+
+    printf("The address of gIntArray is %p\n", gIntArray);
+
+    // even tasks put value to odd tasks
+    if (my_task%2 == 0) {
+        int tgt_task = my_task + 1;
+   
+        printf("The Source Stride is: %d, the following data will be put.\n", SOURCE_STRIDE);
+
+        }
+        shmem_int_iput(gIntArray, gIntArray, TARGET_STRIDE, SOURCE_STRIDE, NUM_OF_TRANS_ELEM, tgt_task);
+    }
+
+    shmem_barrier_all();
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_barrier, shmem_init
+
+</p>
+</html>
