@@ -97,7 +97,9 @@ public class GitRemoteSyncConnection {
 	private TransportGitSsh transport;
 	private final IProject project;
 	
+	private boolean mergeMapInitialized = false; // Call "readMergeConflictFiles" at least once before using the map.
 	private Map<IPath, String[]> FileToMergePartsMap = new HashMap<IPath, String[]>();
+
 
 	/**
 	 * Create a remote sync connection using git. Assumes that the local
@@ -668,6 +670,7 @@ public class GitRemoteSyncConnection {
 		}
 	}
 	
+	
 	// Get the list of merge-conflicted files from jgit and parse each one, storing result in the cache.
 	private void readMergeConflictFiles() throws RemoteSyncException {
 		String repoPath = git.getRepository().getWorkTree().getAbsolutePath();
@@ -676,6 +679,7 @@ public class GitRemoteSyncConnection {
 		}
 
 		FileToMergePartsMap.clear();
+		mergeMapInitialized = true;
 
 		RevWalk walk = null;
 		try {
@@ -969,8 +973,12 @@ public class GitRemoteSyncConnection {
 	 * Get the merge-conflicted files
 	 * 
 	 * @return set of project-relative paths of merge-conflicted files.
+	 * @throws RemoteSyncException on problems accessing repository
 	 */
-	public Set<IPath> getMergeConflictFiles() {
+	public Set<IPath> getMergeConflictFiles() throws RemoteSyncException {
+		if (!mergeMapInitialized) {
+			this.readMergeConflictFiles();
+		}
 		return FileToMergePartsMap.keySet();
 	}
 
@@ -980,8 +988,12 @@ public class GitRemoteSyncConnection {
 	 *
 	 * @param localFile
 	 * @return the three parts or null
+	 * @throws RemoteSyncException on problems accessing repository
 	 */
-	public String[] getMergeConflictParts(IFile localFile) {
+	public String[] getMergeConflictParts(IFile localFile) throws RemoteSyncException {
+		if (!mergeMapInitialized) {
+			this.readMergeConflictFiles();
+		}
 		return FileToMergePartsMap.get(localFile.getFullPath().removeFirstSegments(1));
 	}
 	
