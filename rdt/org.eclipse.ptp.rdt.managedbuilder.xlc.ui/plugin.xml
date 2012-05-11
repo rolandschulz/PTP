@@ -271,7 +271,7 @@
                   id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.so.debug"
                   isAbstract="false"
                   superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.exe.debug"
-                  natureFilter="cnature">
+                  natureFilter="both">
             </tool>
             <tool
                   id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.compiler.so.debug"
@@ -332,7 +332,7 @@
                   id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.so.release"
                   isAbstract="false"
                   superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.exe.release"
-                  natureFilter="cnature">
+                  natureFilter="both">
                   
             </tool>
             <tool
@@ -402,7 +402,7 @@
                   id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.lib.debug"
                   isAbstract="false"
                   superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.exe.debug"
-                  natureFilter="cnature">
+                  natureFilter="both">
             </tool>
             <tool
                   id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.compiler.lib.debug"
@@ -461,7 +461,7 @@
                   id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.lib.release"
                   isAbstract="false"
                   superClass="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.compiler.exe.release"
-                  natureFilter="cnature">
+                  natureFilter="both">
             </tool>
             <tool
                   id="org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.compiler.lib.release"

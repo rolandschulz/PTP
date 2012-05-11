@@ -1,3 +1,0 @@
-Do not use or extend this project.
-This project, org.eclipse.ptp.rm.jaxb.help, has been replaced with
-org.eclipse.ptp.rm.jaxb.doc.isv.
