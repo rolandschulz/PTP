@@ -351,7 +351,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				// This check must be done after acquiring the sync lock. Otherwise, the merge may trigger a sync that sees no
 				// conflicting files and proceeds to sync again - depending on how quickly the first sync records the data.
 				if (!(this.getMergeConflictFiles(project, buildScenario).isEmpty())) {
-					return;
+					throw new RemoteSyncMergeConflictException(Messages.GitServiceProvider_4);
 				}
 
 				if (mySyncTaskId <= finishedSyncTaskId) { // some other thread has already done the work for us

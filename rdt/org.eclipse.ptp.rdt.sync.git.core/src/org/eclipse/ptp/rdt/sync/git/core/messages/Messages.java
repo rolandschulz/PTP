@@ -41,6 +41,7 @@ public class Messages extends NLS {
 	public static String GitServiceProvider_1;
 	public static String GitServiceProvider_2;
 	public static String GitServiceProvider_3;
+	public static String GitServiceProvider_4;
 
 	static {
 		// initialize resource bundle
