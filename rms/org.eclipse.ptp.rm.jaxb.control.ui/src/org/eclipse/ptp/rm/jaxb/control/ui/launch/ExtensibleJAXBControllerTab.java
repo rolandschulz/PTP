@@ -21,6 +21,7 @@ import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamic
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.rm.jaxb.control.ui.utils.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
@@ -97,6 +98,8 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 
 			tabFolder = new TabFolder(control, SWT.NONE);
 			tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+			LaunchTabBuilder.initialize();
 
 			for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
 				final TabItem simpleTabItem = new TabItem(tabFolder, SWT.NONE);

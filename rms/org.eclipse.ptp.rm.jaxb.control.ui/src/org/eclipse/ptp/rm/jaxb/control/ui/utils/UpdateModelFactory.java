@@ -56,7 +56,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.PushButtonType;
-import org.eclipse.ptp.rm.jaxb.core.data.TemplateType;
 import org.eclipse.ptp.rm.jaxb.core.data.WidgetType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
@@ -393,15 +392,15 @@ public class UpdateModelFactory {
 				fixedText = rmMap.getString(fixedText);
 			}
 
-			String s = null;
+			String attr = null;
 			if (widget instanceof WidgetType) {
-				s = ((WidgetType) widget).getSaveValueTo();
+				attr = ((WidgetType) widget).getAttribute();
 			} else if (widget instanceof BrowseType) {
-				s = ((BrowseType) widget).getSaveValueTo();
+				attr = ((BrowseType) widget).getAttribute();
 			}
 
-			if (s != null) {
-				Object data = rmMap.get(s);
+			if (attr != null) {
+				Object data = rmMap.get(attr);
 				if (data != null) {
 					setData(data);
 				}
@@ -445,9 +444,7 @@ public class UpdateModelFactory {
 				targets.put(cst, control);
 			}
 		}
-		String name = bGroupDescriptor.getSaveValueTo();
-		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
-		return new ButtonGroupUpdateModel(name, handler, bGroup, buttons);
+		return new ButtonGroupUpdateModel(bGroupDescriptor.getAttribute(), tab.getParent().getUpdateHandler(), bGroup, buttons);
 	}
 
 	/**
@@ -465,10 +462,8 @@ public class UpdateModelFactory {
 	 * @return
 	 */
 	public static ViewerUpdateModel createModel(ColumnViewer viewer, AttributeViewerType descriptor, IJAXBLaunchConfigurationTab tab) {
-		String name = descriptor.getName();
-		TemplateType template = descriptor.getValue();
-		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
-		return new ViewerUpdateModel(name, descriptor.isInitialAllChecked(), handler, (ICheckable) viewer, template);
+		return new ViewerUpdateModel(descriptor.getName(), descriptor.isInitialAllChecked(), tab.getParent().getUpdateHandler(),
+				(ICheckable) viewer, descriptor.getValue());
 	}
 
 	/**
@@ -494,17 +489,17 @@ public class UpdateModelFactory {
 
 		Control control = createBrowse(parent, browse, cd, tab, targets);
 
-		String name = browse.getSaveValueTo();
+		String attr = browse.getAttribute();
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		IUpdateModel model = null;
 		if (control instanceof Text) {
-			if (name != null && !JAXBControlUIConstants.ZEROSTR.equals(name)) {
-				model = new TextUpdateModel(name, handler, (Text) control);
+			if (attr != null && !JAXBControlUIConstants.ZEROSTR.equals(attr)) {
+				model = new TextUpdateModel(attr, handler, (Text) control);
 			}
 		}
 
-		if (name != null && !JAXBUIConstants.ZEROSTR.equals(name)) {
-			maybeAddValidator(model, rmVarMap.get(name), tab.getParent());
+		if (attr != null && !JAXBUIConstants.ZEROSTR.equals(attr)) {
+			maybeAddValidator(model, rmVarMap.get(attr), tab.getParent());
 		}
 		return model;
 	}
@@ -546,7 +541,7 @@ public class UpdateModelFactory {
 			return null;
 		}
 
-		String name = widget.getSaveValueTo();
+		String attr = widget.getAttribute();
 		List<ArgType> dynamic = null;
 
 		WidgetType.DynamicText dt = widget.getDynamicText();
@@ -557,24 +552,24 @@ public class UpdateModelFactory {
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		IUpdateModel model = null;
 		if (control instanceof Text) {
-			if (name != null && !JAXBControlUIConstants.ZEROSTR.equals(name)) {
-				model = new TextUpdateModel(name, handler, (Text) control);
+			if (attr != null && !JAXBControlUIConstants.ZEROSTR.equals(attr)) {
+				model = new TextUpdateModel(attr, handler, (Text) control);
 			}
 			if (dynamic != null) {
 				model = new TextUpdateModel(dynamic, handler, (Text) control);
 			}
 		} else if (control instanceof Combo) {
-			model = new ComboUpdateModel(name, cd.itemsFrom, handler, (Combo) control);
+			model = new ComboUpdateModel(attr, cd.itemsFrom, handler, (Combo) control);
 		} else if (control instanceof Spinner) {
-			model = new SpinnerUpdateModel(name, handler, (Spinner) control);
+			model = new SpinnerUpdateModel(attr, handler, (Spinner) control);
 		} else if (control instanceof Button) {
-			model = new ButtonUpdateModel(name, handler, (Button) control, cd.translateBooleanAs);
+			model = new ButtonUpdateModel(attr, handler, (Button) control, cd.translateBooleanAs);
 		} else if (control instanceof EnvManagerConfigButton) {
-			model = new EnvConfigButtonUpdateModel(name, handler, (EnvManagerConfigButton) control);
+			model = new EnvConfigButtonUpdateModel(attr, handler, (EnvManagerConfigButton) control);
 		}
 
-		if (name != null && !JAXBUIConstants.ZEROSTR.equals(name)) {
-			maybeAddValidator(model, rmVarMap.get(name), tab.getParent());
+		if (attr != null && !JAXBUIConstants.ZEROSTR.equals(attr)) {
+			maybeAddValidator(model, rmVarMap.get(attr), tab.getParent());
 		}
 		return model;
 	}

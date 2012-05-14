@@ -454,7 +454,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 							<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 							<fixed-text>Queue: </fixed-text>
 						</widget>
-						<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+						<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
 							<layout-data>
 								<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
 							</layout-data>
@@ -501,7 +501,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<!-- <tooltip>${ptp_rm:remote_path_tooltip#default}</tooltip> -->
 						<!-- <fixed-text>Remote Output Path:</fixed-text> -->
 						<!-- </widget> -->
-						<!-- <widget type="text" style="SWT.BORDER" saveValueTo="stdout_remote_path"> -->
+						<!-- <widget type="text" style="SWT.BORDER" attribute="stdout_remote_path"> -->
 						<!-- <layout-data> -->
 						<!-- <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="100"/> -->
 						<!-- </layout-data> -->
@@ -513,7 +513,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<!-- <tooltip>${ptp_rm:remote_path_tooltip#default}</tooltip> -->
 						<!-- <fixed-text>Remote Error Path:</fixed-text> -->
 						<!-- </widget> -->
-						<!-- <widget type="text" style="SWT.BORDER" saveValueTo="stderr_remote_path"> -->
+						<!-- <widget type="text" style="SWT.BORDER" attribute="stderr_remote_path"> -->
 						<!-- <layout-data> -->
 						<!-- <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="100"/> -->
 						<!-- </layout-data> -->

@@ -709,7 +709,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
                         <tooltip>${ptp_rm:job_name#tooltip}</tooltip>
                         <fixed-text>Job Name: </fixed-text>
                     </widget>
-                    <widget type="text" style="SWT.BORDER" saveValueTo="job_name">
+                    <widget type="text" style="SWT.BORDER" attribute="job_name">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
                         </layout-data>
@@ -728,7 +728,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
                         <tooltip>${ptp_rm:partition#tooltip}</tooltip>
                         <fixed-text>Queue: </fixed-text>
                     </widget>
-                    <widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="partition">
+                    <widget type="combo" style="SWT.BORDER" readOnly="true" attribute="partition">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
                         </layout-data>
@@ -748,7 +748,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
                         <tooltip>${ptp_rm:workdir#tooltip}</tooltip>
                         <fixed-text>Working Directory: </fixed-text>
                     </widget>
-                    <browse title="Browse" textStyle="SWT.BORDER" saveValueTo="workdir" readOnly="true" directory="true">
+                    <browse title="Browse" textStyle="SWT.BORDER" attribute="workdir" readOnly="true" directory="true">
                         <text-layout-data>
                             <grid-data horizontalAlign="SWT.FILL"
                                 horizontalSpan="1" grabExcessHorizontal="true"
@@ -762,7 +762,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
                         <tooltip>Clear text box if "Browse" button does not work.</tooltip>
                     </browse>
                     <!-- <widget type="text" style="SWT.BORDER"
-                        saveValueTo="workdir">
+                        attribute="workdir">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL"
                                 horizontalSpan="2" grabExcessHorizontal="false"
@@ -783,7 +783,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
                         <tooltip>${ptp_rm:nodes#tooltip}</tooltip>
                         <fixed-text>Number of nodes: </fixed-text>
                     </widget>
-                    <widget type="text" style="SWT.BORDER" saveValueTo="nodes">
+                    <widget type="text" style="SWT.BORDER" attribute="nodes">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
                         </layout-data>
@@ -802,7 +802,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
                         <tooltip>${ptp_rm:time#tooltip}</tooltip>
                         <fixed-text>Wallclock Time: </fixed-text>
                     </widget>
-                    <widget type="text" style="SWT.BORDER" saveValueTo="time">
+                    <widget type="text" style="SWT.BORDER" attribute="time">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
                         </layout-data>
@@ -820,7 +820,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
                         </layout-data>
                         <fixed-text>MPI Command: </fixed-text>
                     </widget>
-                    <widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="mpirun.command">
+                    <widget type="combo" style="SWT.BORDER" readOnly="true" attribute="mpirun.command">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
                         </layout-data>
@@ -838,7 +838,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
                         </layout-data>
                         <fixed-text>MPI Number of Tasks:</fixed-text>
                     </widget>
-                    <widget type="text" style="SWT.BORDER" saveValueTo="mpirun.np">
+                    <widget type="text" style="SWT.BORDER" attribute="mpirun.np">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
                         </layout-data>
@@ -858,7 +858,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
                         <fixed-text>MPI Mode:</fixed-text>
                     </widget>
                     <widget type="combo" style="SWT.BORDER"
-                        saveValueTo="mpirun.mode" readOnly="true">
+                        attribute="mpirun.mode" readOnly="true">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL"
                                 horizontalSpan="2" grabExcessHorizontal="false" />
@@ -886,7 +886,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
                         <tooltip>${ptp_rm:partition#tooltip}</tooltip>
                         <fixed-text>Queue: </fixed-text>
                     </widget>
-                    <widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="partition">
+                    <widget type="combo" style="SWT.BORDER" readOnly="true" attribute="partition">
                         <layout-data>
                             <grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
                         </layout-data>

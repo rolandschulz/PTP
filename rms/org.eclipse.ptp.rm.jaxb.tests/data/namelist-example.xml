@@ -549,7 +549,7 @@
 							</layout-data>
 							<fixed-text>Job Name: </fixed-text>
 						</widget>
-						<widget type="text" style="SWT.BORDER" saveValueTo="Job_Name">
+						<widget type="text" style="SWT.BORDER" attribute="Job_Name">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 							</layout-data>
@@ -561,7 +561,7 @@
 							</layout-data>
 							<fixed-text>Queue: </fixed-text>
 						</widget>
-						<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+						<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 							</layout-data>
@@ -574,7 +574,7 @@
 							</layout-data>
 							<fixed-text>Wallclock Time: </fixed-text>
 						</widget>
-						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
+						<widget type="text" style="SWT.BORDER" attribute="Resource_List.walltime">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 							</layout-data>
@@ -586,7 +586,7 @@
 							</layout-data>
 							<fixed-text>Number of nodes: </fixed-text>
 						</widget>
-						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.nodes">
+						<widget type="text" style="SWT.BORDER" attribute="Resource_List.nodes">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 							</layout-data>
@@ -598,7 +598,7 @@
 							</layout-data>
 							<fixed-text>Total Memory Needed: </fixed-text>
 						</widget>
-						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
+						<widget type="text" style="SWT.BORDER" attribute="Resource_List.mem">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 							</layout-data>
@@ -615,7 +615,7 @@
 							</layout-data>
 							<fixed-text>MPI Command: </fixed-text>
 						</widget>
-						<button-group saveValueTo="mpiCommand" group="true">
+						<button-group attribute="mpiCommand" group="true">
 							<layout>
 								<row-layout type="SWT.HORIZONTAL" center="true" fill="true" justify="true"/>
 							</layout>
@@ -630,7 +630,7 @@
 							</layout-data>
 							<fixed-text>MPI Number of Cores: </fixed-text>
 						</widget>
-						<widget type="spinner" readOnly="true" saveValueTo="mpiCores">
+						<widget type="spinner" readOnly="true" attribute="mpiCores">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="1" grabExcessHorizontal="false" widthHint="100"/>
 							</layout-data>
@@ -654,7 +654,7 @@
 						</layout-data>
 						<fixed-text>runname:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="runname">
+					<widget type="text" style="SWT.BORDER" attribute="runname">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -671,7 +671,7 @@
 						</layout-data>
 						<fixed-text>runlabel:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="runlabel">
+					<widget type="text" style="SWT.BORDER" attribute="runlabel">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -688,7 +688,7 @@
 						</layout-data>
 						<fixed-text>simtime:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="simtime">
+					<widget type="text" style="SWT.BORDER" attribute="simtime">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -705,7 +705,7 @@
 						</layout-data>
 						<fixed-text>dt:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="dt">
+					<widget type="text" style="SWT.BORDER" attribute="dt">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -722,7 +722,7 @@
 						</layout-data>
 						<fixed-text>nsmall:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="nsmall">
+					<widget type="text" style="SWT.BORDER" attribute="nsmall">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -739,7 +739,7 @@
 						</layout-data>
 						<fixed-text>nx:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="nx">
+					<widget type="text" style="SWT.BORDER" attribute="nx">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -756,7 +756,7 @@
 						</layout-data>
 						<fixed-text>nz:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="nz">
+					<widget type="text" style="SWT.BORDER" attribute="nz">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -773,7 +773,7 @@
 						</layout-data>
 						<fixed-text>xdomain:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="xdomain">
+					<widget type="text" style="SWT.BORDER" attribute="xdomain">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -790,7 +790,7 @@
 						</layout-data>
 						<fixed-text>zdomain:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="zdomain">
+					<widget type="text" style="SWT.BORDER" attribute="zdomain">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -807,7 +807,7 @@
 						</layout-data>
 						<fixed-text>ugrid:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="ugrid">
+					<widget type="text" style="SWT.BORDER" attribute="ugrid">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -830,7 +830,7 @@
 						</layout-data>
 						<fixed-text>tprint:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="tprint">
+					<widget type="text" style="SWT.BORDER" attribute="tprint">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -847,7 +847,7 @@
 						</layout-data>
 						<fixed-text>tplot:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="tplot">
+					<widget type="text" style="SWT.BORDER" attribute="tplot">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -864,7 +864,7 @@
 						</layout-data>
 						<fixed-text>tsave:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="tsave">
+					<widget type="text" style="SWT.BORDER" attribute="tsave">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -887,7 +887,7 @@
 						</layout-data>
 						<fixed-text>tbble:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="tbble">
+					<widget type="text" style="SWT.BORDER" attribute="tbble">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -904,7 +904,7 @@
 						</layout-data>
 						<fixed-text>xcntr:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="xcntr">
+					<widget type="text" style="SWT.BORDER" attribute="xcntr">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -921,7 +921,7 @@
 						</layout-data>
 						<fixed-text>zcntr:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="zcntr">
+					<widget type="text" style="SWT.BORDER" attribute="zcntr">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -938,7 +938,7 @@
 						</layout-data>
 						<fixed-text>xrad:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="xrad">
+					<widget type="text" style="SWT.BORDER" attribute="xrad">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -955,7 +955,7 @@
 						</layout-data>
 						<fixed-text>zrad:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="zrad">
+					<widget type="text" style="SWT.BORDER" attribute="zrad">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -972,7 +972,7 @@
 						</layout-data>
 						<fixed-text>sndtype:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="sndtype">
+					<widget type="text" style="SWT.BORDER" attribute="sndtype">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -989,7 +989,7 @@
 						</layout-data>
 						<fixed-text>inittype:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="inittype">
+					<widget type="text" style="SWT.BORDER" attribute="inittype">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>

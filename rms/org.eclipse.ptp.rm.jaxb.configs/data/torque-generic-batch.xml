@@ -584,7 +584,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:Job_Name#tooltip}</tooltip>
 						<fixed-text>Job Name: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Job_Name">
+					<widget type="text" style="SWT.BORDER" attribute="Job_Name">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -603,7 +603,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                   <tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
                   <fixed-text>Account: </fixed-text>
                </widget>
-               <widget type="text" style="SWT.BORDER" saveValueTo="Account_Name">
+               <widget type="text" style="SWT.BORDER" attribute="Account_Name">
                   <layout-data>
                      <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
                   </layout-data>
@@ -622,7 +622,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 						<fixed-text>Queue: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
@@ -642,7 +642,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:Resource_List.nodes#tooltip}</tooltip>
 						<fixed-text>Number of nodes: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.nodes">
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.nodes">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -661,7 +661,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
 						<fixed-text>Total Memory Needed: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.mem">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -680,7 +680,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
 						<fixed-text>Wallclock Time: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.walltime">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -698,7 +698,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>MPI Command: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCommand">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="mpiCommand">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
@@ -716,7 +716,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>MPI Number of Cores: </fixed-text>
 					</widget>
-					<widget type="spinner" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCores">
+					<widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="mpiCores">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
 						</layout-data>
@@ -735,7 +735,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:export_all#tooltip}</tooltip>
 						<fixed-text>Export Environment: </fixed-text>
 					</widget>
-					<widget type="checkbox" style="SWT.BORDER" saveValueTo="export_all">
+					<widget type="checkbox" style="SWT.BORDER" attribute="export_all">
                   <layout-data>
                      <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
                   </layout-data>
@@ -762,7 +762,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 						<fixed-text>Queue: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
 						<layout-data>
 							<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
 						</layout-data>

@@ -247,14 +247,17 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		return title;
 	}
 
-	/*
-	 * Resets the configuation then re-initializes all widgets: 1. clears viewers and repopulate that list. 2. repopulates the
-	 * handler with local widgets. 3. initializes the (new) widgets from the map. 4. initializes the checked state on any checkbox
-	 * viewers and then refreshes them; sets enabled and visible on non-viewer widgets, and then sets state only the control state
-	 * listeners.(non-Javadoc)
+	/*-
+	 * Resets the configuation then re-initializes all widgets: 
+	 * 1. clears viewers and repopulate that list. 
+	 * 2. repopulates the handler with local widgets. 
+	 * 3. initializes the (new) widgets from the map. 
+	 * 4. initializes the checked state on any checkbox viewers and then refreshes them; 
+	 *    sets enabled and visible on non-viewer widgets, and then sets state only the 
+	 *    control state listeners
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
-	 * #initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	 *      #initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public RMLaunchValidation initializeFrom(ILaunchConfiguration configuration) {
 		listenerConfiguration = configuration;
@@ -666,6 +669,9 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/**
 	 * Calls {@link #refresh(IUpdateModel, LCVariableMap)} for each entry in the local widgets map.
 	 * 
+	 * Calls {@link ControlStateListener#setState()} on all control state listeners to update any widget state that is based on an
+	 * attribute value rather than a button ID.
+	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab# doRefreshLocal()
 	 */
 	@Override
@@ -673,6 +679,9 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		LCVariableMap lcMap = parentTab.getVariableMap();
 		for (IUpdateModel m : localWidgets.values()) {
 			refresh(m, lcMap);
+		}
+		for (ControlStateListener l : listeners) {
+			l.setState();
 		}
 	}
 

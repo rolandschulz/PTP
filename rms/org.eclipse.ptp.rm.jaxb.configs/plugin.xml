@@ -57,6 +57,10 @@
             monitorType="PE"
             name="IBM Parallel Environment">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/test.xml"
+            name="AAA">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>

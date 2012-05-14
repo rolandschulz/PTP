@@ -326,7 +326,7 @@
 							</layout-data>
 							<fixed-text>Job Name: </fixed-text>
 						</widget>
-						<widget type="text" style="SWT.BORDER" saveValueTo="Job_Name">
+						<widget type="text" style="SWT.BORDER" attribute="Job_Name">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 							</layout-data>
@@ -338,7 +338,7 @@
 							</layout-data>
 							<fixed-text>Queue: </fixed-text>
 						</widget>
-						<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+						<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 							</layout-data>
@@ -351,7 +351,7 @@
 							</layout-data>
 							<fixed-text>Wallclock Time: </fixed-text>
 						</widget>
-						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
+						<widget type="text" style="SWT.BORDER" attribute="Resource_List.walltime">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 							</layout-data>
@@ -363,7 +363,7 @@
 							</layout-data>
 							<fixed-text>Number of nodes: </fixed-text>
 						</widget>
-						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.nodes">
+						<widget type="text" style="SWT.BORDER" attribute="Resource_List.nodes">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 							</layout-data>
@@ -375,7 +375,7 @@
 							</layout-data>
 							<fixed-text>Total Memory Needed: </fixed-text>
 						</widget>
-						<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
+						<widget type="text" style="SWT.BORDER" attribute="Resource_List.mem">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 							</layout-data>
@@ -392,7 +392,7 @@
 							</layout-data>
 							<fixed-text>MPI Command: </fixed-text>
 						</widget>
-						<button-group saveValueTo="mpiCommand" group="true">
+						<button-group attribute="mpiCommand" group="true">
 							<layout>
 								<row-layout type="SWT.HORIZONTAL" center="true" fill="true" justify="true"/>
 							</layout>
@@ -407,7 +407,7 @@
 							</layout-data>
 							<fixed-text>MPI Number of Cores: </fixed-text>
 						</widget>
-						<widget type="spinner" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCores">
+						<widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="mpiCores">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="1" grabExcessHorizontal="false" widthHint="100"/>
 							</layout-data>
@@ -425,7 +425,7 @@
 						</layout-data>
 						<fixed-text>Remote Input File: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="remote.input.file">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="remote.input.file">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
@@ -445,7 +445,7 @@
 						</layout-data>
 						<fixed-text>Local Input File: </fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" localOnly="true" title="Browse" saveValueTo="local.input.file">
+					<browse textStyle="SWT.BORDER" localOnly="true" title="Browse" attribute="local.input.file">
 						<text-layout-data>
 							<grid-data horizontalAlign="SWT.FILL" widthHint="200" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</text-layout-data>

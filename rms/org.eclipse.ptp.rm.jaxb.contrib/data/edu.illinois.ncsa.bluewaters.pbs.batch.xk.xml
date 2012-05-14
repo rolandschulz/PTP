@@ -372,7 +372,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>Width: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Width">
+					<widget type="text" style="SWT.BORDER" attribute="Width">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								horizontalSpan="2" grabExcessHorizontal="false" widthHint="100" />
@@ -394,7 +394,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<tooltip>${ptp_rm:Job_Name#tooltip}</tooltip>
 						<fixed-text>Job Name: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Job_Name">
+					<widget type="text" style="SWT.BORDER" attribute="Job_Name">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2"
 								grabExcessHorizontal="false" widthHint="150" />
@@ -416,7 +416,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
 						<fixed-text>Account: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Account_Name">
+					<widget type="text" style="SWT.BORDER" attribute="Account_Name">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2"
 								grabExcessHorizontal="false" widthHint="150" />
@@ -439,7 +439,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<fixed-text>Queue: </fixed-text>
 					</widget>
 					<widget type="combo" style="SWT.BORDER" readOnly="true"
-						saveValueTo="destination">
+						attribute="destination">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2"
 								grabExcessHorizontal="false" />
@@ -462,7 +462,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
 						<fixed-text>Total Memory Needed: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.mem">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2"
 								grabExcessHorizontal="false" widthHint="150" />
@@ -484,7 +484,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
 						<fixed-text>Wallclock Time: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.walltime">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2"
 								grabExcessHorizontal="false" widthHint="150" />
@@ -506,7 +506,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<tooltip>${ptp_rm:Mail_Users#tooltip}</tooltip>
 						<fixed-text>Send E-mail To: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Mail_Users">
+					<widget type="text" style="SWT.BORDER" attribute="Mail_Users">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="150"/>
 						</layout-data>
@@ -525,7 +525,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<tooltip>${ptp_rm:Mail_Options#tooltip}</tooltip>
 						<fixed-text>When to Send E-mail: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="Mail_Options">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="Mail_Options">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="150"/>
 						</layout-data>
@@ -544,7 +544,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<tooltip>${ptp_rm:Join_Path#tooltip}</tooltip>
 						<fixed-text>Combine stdout and stderr: </fixed-text>
 					</widget>
-					<widget type="checkbox" style="SWT.NONE" saveValueTo="Join_Path">
+					<widget type="checkbox" style="SWT.NONE" attribute="Join_Path">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
@@ -564,7 +564,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<tooltip>${ptp_rm:export_all#tooltip}</tooltip>
 						<fixed-text>Export Environment: </fixed-text>
 					</widget>
-					<widget type="checkbox" style="SWT.NONE" saveValueTo="export_all">
+					<widget type="checkbox" style="SWT.NONE" attribute="export_all">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2"
 								grabExcessHorizontal="false" />
@@ -586,7 +586,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<tooltip>${ptp_rm:modules#tooltip}</tooltip>
 						<fixed-text>Modules to Load: </fixed-text>
 					</widget>
-					<widget type="envconfig" style="SWT.NONE" saveValueTo="modules">
+					<widget type="envconfig" style="SWT.NONE" attribute="modules">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.TOP"
 								horizontalSpan="2" grabExcessHorizontal="false" />
