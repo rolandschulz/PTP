@@ -1,0 +1,392 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:44 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_Register_datarep</title>
+
+</head>
+<body>
+
+<h1 align=center>MPI_Register_datarep</h1>
+
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_Register_datarep</b>
+&minus; Defines data representation.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">C Syntax <br>
+#include &lt;mpi.h&gt; <br>
+int MPI_Register_datarep(char <i>*datarep</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Datarep_conversion_function
+<i>*read_conversion_fn</i>,</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Datarep_conversion_function
+<i>*write_conversion_fn</i>,</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Datarep_extent_function
+<i>*dtype_file_extent_fn</i>,</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">void <i>*extra_state</i>)</p></td>
+</table>
+
+<a name="Fortran Syntax"></a>
+<h2>Fortran Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_REGISTER_DATAREP(<i>DATAREP</i>,
+<i>READ_CONVERSION_FN</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top"><i>WRITE_CONVERSION_FN</i>,
+<i>DTYPE_FILE_EXTENT_FN</i>,</p> </td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top"><i>EXTRA_STATE</i>, <i>IERROR</i>)</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">CHARACTER*(*) <i>DATAREP</i></p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">EXTERNAL <i>READ_CONVERSION_FN,
+WRITE_CONVERSION_FN,</i></p> </td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top"><i>DTYPE_FILE_EXTENT_FN</i></p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+
+
+<p valign="top">INTEGER</p></td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+
+
+<p valign="top"><i>IERROR</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%">
+</td>
+<td width="8%">
+</td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="8%">
+
+
+<p valign="top">INTEGER(KIND=MPI_ADDRESS_KIND)
+<i>EXTRA_STATE</i></p> </td>
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="62%">
+</td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void MPI::Register_datarep(const char* <i>datarep</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">MPI::Datarep_conversion_function*
+<i>read_conversion_fn</i>,</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">MPI::Datarep_conversion_function*
+<i>write_conversion_fn</i>,</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">MPI::Datarep_extent_function*
+<i>dtype_file_extent_fn</i>,</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">void* <i>extra_state</i>)</p></td>
+</table>
+
+<a name="INPUT PARAMETERS"></a>
+<h2>INPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p style="margin-top: 1em" valign="top">datarep</p></td>
+<td width="4%"></td>
+<td width="62%">
+
+
+<p style="margin-top: 1em" valign="top">Data representation
+identifier (string).</p></td>
+<td width="12%">
+</td>
+</table>
+
+<p style="margin-left:11%;">read_conversion_fn</p>
+
+<p style="margin-left:26%;">Function invoked to convert
+from file representation to native representation
+(function).</p>
+
+<p style="margin-left:11%;">write_conversion_fn</p>
+
+<p style="margin-left:26%;">Function invoked to convert
+from native representation to file representation
+(function).</p>
+
+<p style="margin-left:11%;">dtype_file_extent_fn</p>
+
+<p style="margin-left:26%;">Function invoked to get the
+extent of a data type as represented in the file
+(function).</p>
+
+<p style="margin-left:11%;">extra_state</p>
+
+<p style="margin-left:26%;">Extra state.</p>
+
+<a name="OUTPUT PARAMETER"></a>
+<h2>OUTPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="6%"></td>
+<td width="57%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="17%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em">MPI_Register_datarep
+defines a data representation. It associates the data
+representation&rsquo;s identifier (a string) with the
+functions that convert from file representation to the
+native representation and vice versa, with the function that
+gets the extent of a data type as represented in the file,
+as well as with &quot;extra state,&quot; which is used for
+passing arguments. Once a data representation has been
+registered using this routine, you may specify its
+identifier as an argument to MPI_File_set_view, causing
+subsequent data-access operations to call the specified
+conversion functions.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The call
+associates <i>read_conversion_fn</i>,
+<i>write_conversion_fn</i>, and <i>dtype_file_extent_fn</i>
+with the data representation identifier <i>datarep</i>.
+<i>datarep</i> can then be used as an argument to
+MPI_File_set_view, causing subsequent data access operations
+to call the conversion functions to convert all data items
+accessed between file data representation and native
+representation. MPI_Register_datarep is a local operation
+and only registers the data representation for the calling
+MPI process. If <i>datarep</i> is already defined, an error
+in the error class MPI_ERR_DUP_DATAREP is raised using the
+default file error handler. The length of a data
+representation string is limited to the value of
+MPI_MAX_DATAREP_STRING. MPI_MAX_DATAREP_STRING must have a
+value of at least 64. No routines are provided to delete
+data representations and free the associated resources; it
+is not expected that an application will generate them in
+significant numbers.</p>
+
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The Fortran
+version of each MPI I/O routine includes a final argument,
+IERROR, which is not defined in the PARAMETERS sections.
+This argument is used to return the error status of the
+routine in the manner typical for Fortran library
+routines.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The C version
+of each routine returns an error status as an integer return
+value.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Error classes
+are found in mpi.h (for C), mpif.h (for Fortran), and
+mpi++.h (for C++).</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. For MPI I/O function errors, the default error
+handler is set to MPI_ERRORS_RETURN. The error handler may
+be changed with MPI_File_set_errhandler; the predefined
+error handler MPI_ERRORS_ARE_FATAL may be used to make I/O
+errors fatal. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>

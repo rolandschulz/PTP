@@ -1,0 +1,271 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Aug 26 10:45:25 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title>MPI_File_get_view</title>
+
+</head>
+<body>
+
+<h1 align=center>MPI_File_get_view</h1>
+
+<h2>NAME</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>MPI_File_get_view</b>
+&minus; Returns the process&rsquo;s view of data in the
+file.</p>
+
+<a name="SYNTAX"></a>
+<h2>SYNTAX</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">C Syntax <br>
+#include &lt;mpi.h&gt; <br>
+int MPI_File_get_view(MPI_File <i>fh</i>, MPI_Offset
+<i>*disp</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="7%"></td>
+<td width="85%">
+
+
+<p valign="top">MPI_Datatype <i>*etype</i>, MPI_Datatype
+<i>*filetype</i>,</p> </td>
+</table>
+
+<p style="margin-left:11%;">char <i>*datarep</i>)</p>
+
+<a name="Fortran Syntax (see FORTRAN 77 NOTES)"></a>
+<h2>Fortran Syntax (see FORTRAN 77 NOTES)</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">INCLUDE
+&rsquo;mpif.h&rsquo; <br>
+MPI_FILE_GET_VIEW(<i>FH</i>, <i>DISP</i>, <i>ETYPE</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top"><i>FILETYPE</i>, <i>DATAREP</i>,
+<i>IERROR</i>)</p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">INTEGER <i>FH, ETYPE, FILETYPE,
+IERROR</i></p> </td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">CHARACTER*(*) <i>DATAREP</i></p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">INTEGER(KIND=MPI_OFFSET_KIND)
+<i>DISP</i></p> </td>
+</table>
+
+<a name="C++ Syntax"></a>
+<h2>C++ Syntax</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">#include
+&lt;mpi.h&gt; <br>
+void MPI::File::Get_view(MPI::Offset&amp; <i>disp</i>,</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">MPI::Datatype&amp; <i>etype</i>,</p></td>
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p valign="top">MPI::Datatype&amp; <i>filetype</i>, char*
+<i>datarep</i>) const</p></td>
+</table>
+
+<a name="INPUT PARAMETER"></a>
+<h2>INPUT PARAMETER</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p style="margin-top: 1em" valign="top">fh</p></td>
+<td width="12%"></td>
+<td width="32%">
+
+
+<p style="margin-top: 1em" valign="top">File handle
+(handle).</p> </td>
+<td width="42%">
+</td>
+</table>
+
+<a name="OUTPUT PARAMETERS"></a>
+<h2>OUTPUT PARAMETERS</h2>
+
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">disp</p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em" valign="top">Displacement
+(integer).</p> </td>
+<td width="6%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">etype</p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em" valign="top">Elementary data
+type (handle).</p></td>
+<td width="6%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">filetype</p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em" valign="top">File type (handle).
+See Restrictions, below.</p></td>
+<td width="6%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">datarep</p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em" valign="top">Data representation
+(string).</p> </td>
+<td width="6%">
+</td>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="12%">
+
+
+<p style="margin-top: 1em" valign="top">IERROR</p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em" valign="top">Fortran only: Error
+status (integer).</p></td>
+<td width="6%">
+</td>
+</table>
+
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The
+MPI_File_get_view routine returns the process&rsquo;s view
+of the data in the file. The current values of the
+displacement, etype, and filetype are returned in <i>disp,
+etype,</i> and <i>filetype,</i> respectively.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The
+MPI_File_get_view interface allows the user to pass a
+data-representation string via the <i>datarep</i>
+argument.</p>
+
+<a name="FORTRAN 77 NOTES"></a>
+<h2>FORTRAN 77 NOTES</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The MPI
+standard prescribes portable Fortran syntax for the
+<i>DISP</i> argument only for Fortran 90. FORTRAN 77 users
+may use the non-portable syntax.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em">INTEGER*MPI_OFFSET_KIND
+<i>DISP</i></p>
+
+<p style="margin-left:11%; margin-top: 1em">where
+MPI_OFFSET_KIND is a constant defined in mpif.h and gives
+the length of the declared integer in bytes.</p>
+
+<a name="ERRORS"></a>
+<h2>ERRORS</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Almost all MPI
+routines return an error value; C routines as the value of
+the function and Fortran routines in the last argument. C++
+functions do not return errors. If the default error handler
+is set to MPI::ERRORS_THROW_EXCEPTIONS, then on error the
+C++ exception mechanism will be used to throw an
+MPI:Exception object.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before the
+error value is returned, the current MPI error handler is
+called. For MPI I/O function errors, the default error
+handler is set to MPI_ERRORS_RETURN. The error handler may
+be changed with MPI_File_set_errhandler; the predefined
+error handler MPI_ERRORS_ARE_FATAL may be used to make I/O
+errors fatal. Note that MPI does not guarantee that an MPI
+program can continue past an error.</p>
+<hr>
+<a href="allindex.html">MPI API Index</a></body>
+</html>
