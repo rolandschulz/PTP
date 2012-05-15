@@ -436,6 +436,16 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 	private void handleConnectionChanged() {
 		try {
+			/*
+			 * LaunchConfigurationsDialog#run() tries to preserve the focus control. However, updateLaunchAttributeControls() will
+			 * dispose of all the controls on the dynamic tab, leading to a widget disposed exception. The easy solution is to
+			 * remove focus from the dynamic controls first.
+			 */
+			fRemoteConnectionWidget.setFocus();
+
+			/*
+			 * Now update the dialog.
+			 */
 			getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
 				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -519,18 +529,18 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param queue
 	 * @param launchConfiguration
 	 */
-	private void updateLaunchAttributeControls(IJobController control, ILaunchConfiguration launchConfiguration,
+	private void updateLaunchAttributeControls(IJobController controller, ILaunchConfiguration launchConfiguration,
 			IProgressMonitor monitor) {
 		final ScrolledComposite launchAttrsScrollComp = getLaunchAttrsScrollComposite();
 		launchAttrsScrollComp.setContent(null);
 		for (Control child : launchAttrsScrollComp.getChildren()) {
 			child.dispose();
 		}
-		if (control != null) {
-			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(control, monitor);
+		if (controller != null) {
+			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(controller, monitor);
 			if (dynamicTab != null) {
 				try {
-					dynamicTab.createControl(launchAttrsScrollComp, control.getControlId());
+					dynamicTab.createControl(launchAttrsScrollComp, controller.getControlId());
 					final Control dynControl = dynamicTab.getControl();
 					launchAttrsScrollComp.setContent(dynControl);
 					Point size = dynControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
