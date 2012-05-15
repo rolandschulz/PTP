@@ -161,19 +161,22 @@ public class LCVariableMap implements IVariableMap {
 	@SuppressWarnings("rawtypes")
 	public void flush(ILaunchConfigurationWorkingCopy configuration) throws CoreException {
 		for (String name : values.keySet()) {
-			Object value = values.get(name);
-			if (value instanceof Boolean) {
-				configuration.setAttribute(name, (Boolean) value);
-			} else if (value instanceof Integer) {
-				configuration.setAttribute(name, (Integer) value);
-			} else if (value instanceof List) {
-				configuration.setAttribute(name, (List) value);
-			} else if (value instanceof Set) {
-				configuration.setAttribute(name, (Set) value);
-			} else if (value instanceof Map) {
-				configuration.setAttribute(name, (Map) value);
-			} else {
-				configuration.setAttribute(name, (String) value);
+			if (!rmPrefix.equals(JAXBControlConstants.ZEROSTR)
+					&& !RMVariableMap.isDynamic(name.replace(rmPrefix, JAXBControlConstants.ZEROSTR))) {
+				Object value = values.get(name);
+				if (value instanceof Boolean) {
+					configuration.setAttribute(name, (Boolean) value);
+				} else if (value instanceof Integer) {
+					configuration.setAttribute(name, (Integer) value);
+				} else if (value instanceof List) {
+					configuration.setAttribute(name, (List) value);
+				} else if (value instanceof Set) {
+					configuration.setAttribute(name, (Set) value);
+				} else if (value instanceof Map) {
+					configuration.setAttribute(name, (Map) value);
+				} else {
+					configuration.setAttribute(name, (String) value);
+				}
 			}
 		}
 	}
