@@ -38,6 +38,7 @@
 		<attribute name="destination" type="string">
 			<description>Designation of the queue to which to submit the job.</description>
 			<tooltip>Format: queue[@server].</tooltip>
+			<default>batch</default>
 		</attribute>
 		<attribute name="Error_Path" type="string">
 			<description>The final path name for the file containing the job's standard error stream.</description>
@@ -102,6 +103,10 @@ the base name of the job script or STDIN.]]></tooltip>
 			<choice>,2,4,8,16,32</choice>
 			<default></default>
 		</attribute>
+		<attribute name="debugPriority" type="boolean" translateBooleanAs="debug, ">
+			<description><![CDATA[]]></description>
+			<default></default>
+		</attribute>
 		<attribute name="dualStreamMode" type="boolean" translateBooleanAs="1,0">
 			<description><![CDATA[]]></description>
 			<default>1</default>
@@ -130,7 +135,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				<error-message>format must be hh:mm:ss</error-message>
 			</validator>
 		</attribute>
-		<script insertEnvironmentAfter="14">
+		<script insertEnvironmentAfter="18">
 			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 			<line>
 				<arg>#!/bin/bash</arg>
@@ -138,9 +143,9 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<line>
 				<arg isUndefinedIfMatches="#PBS -A">#PBS -A ${ptp_rm:Account_Name#value}</arg>
 			</line>
-			<line>
+			<!--line>
 				<arg isUndefinedIfMatches="#PBS -q">#PBS -q ${ptp_rm:destination#value}</arg>
-			</line>
+			</line-->
 			<line>
 				<arg isUndefinedIfMatches="#PBS -e">#PBS -e ${ptp_rm:Error_Path#value}</arg>
 			</line>
@@ -160,6 +165,9 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				<arg isUndefinedIfMatches="#PBS -o">#PBS -o ${ptp_rm:Output_Path#value}</arg>
 			</line>
 			<line>
+				<arg>#PBS -l feature=xe</arg>
+			</line>
+			<line>
 				<arg isUndefinedIfMatches="#PBS -l mem=">#PBS -l mem=${ptp_rm:Resource_List.mem#value}</arg>
 			</line>
 			<line>
@@ -173,6 +181,9 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#PBS -l mppdepth=">#PBS -l mppdepth=${ptp_rm:numberOfThreadsPerProcess#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#PBS -l qos=">#PBS -l qos=${ptp_rm:debugPriority#value}</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#PBS">#PBS ${ptp_rm:export_all#value}</arg>
@@ -231,21 +242,21 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			</line>
 			<line><arg resolve="false">fi</arg></line>
 		</script>
-		<start-up-command name="get-queues">
+		<!--start-up-command name="get-queues">
 			<arg>${ptp_rm:bindir#value}qstat</arg>
 			<arg>-Q</arg>
 			<arg>-f</arg>
 			<stdout-parser delim="\n">
 				<target ref="queues">
 					<match>
-						<expression>Queue: (xe[\w\d]*)</expression>
+						<expression>Queue: ([\w\d]+)</expression>
 						<add field="value">
 							<entry valueGroup="1"/>
 						</add>
 					</match>
 				</target>
 			</stdout-parser>
-		</start-up-command>
+		</start-up-command-->
 		<submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true">
 			<arg>${ptp_rm:bindir#value}qsub</arg>
 			<arg>${ptp_rm:managed_file_for_script#value}</arg>
@@ -582,7 +593,7 @@ unit.</fixed-text>
 						<fixed-text>${ptp_rm:Account_Name#description}</fixed-text>
 					</widget>
 					<!-- row 7 -->
-					<widget type="label" style="SWT.LEFT">
+					<!--widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" />
@@ -604,6 +615,25 @@ unit.</fixed-text>
 								grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>${ptp_rm:destination#description}</fixed-text>
+					</widget-->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:debugPriority#tooltip}</tooltip>
+						<fixed-text>Debug Priority: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.NONE" attribute="debugPriority">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Jobs with debug priority must be &lt;30 minutes.
+Only one job is eligible at a time.</fixed-text>
 					</widget>
 					<!-- row 8 -->
 					<widget type="label" style="SWT.LEFT">
