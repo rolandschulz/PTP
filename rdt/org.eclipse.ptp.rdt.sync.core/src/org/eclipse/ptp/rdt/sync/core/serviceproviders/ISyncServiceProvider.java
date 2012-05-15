@@ -108,6 +108,16 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * 				for system-level problems setting the state
 	 */
 	public void setMergeAsNotResolved(IProject project, BuildScenario buildScenario, IPath path) throws CoreException;
+	
+	/**
+	 * Replace the current contents of the given path with the previous version in the repository
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param path
+	 * @throws CoreException
+	 */
+	public void checkout(IProject project, BuildScenario buildScenario, IPath path)  throws CoreException;
 
     /**
      * Close any resources (files, sockets) that were open by the sync provider. Resources not open by the provider should not be

@@ -297,6 +297,19 @@
             </command>
          </menu>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer">
+         <command
+               commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+               label="Reset to version before merge"
+               style="push">
+            <parameter
+                  name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                  value="checkout">
+            </parameter>
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.decorators">

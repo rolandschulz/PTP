@@ -523,4 +523,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				SyncManager.getDefaultFileFilter(), null);
 		fSyncConnection.setMergeAsNotResolved(path);
 	}
+	
+	@Override
+	public void checkout(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
+				SyncManager.getDefaultFileFilter(), null);
+		fSyncConnection.checkout(path);
+	}
 }

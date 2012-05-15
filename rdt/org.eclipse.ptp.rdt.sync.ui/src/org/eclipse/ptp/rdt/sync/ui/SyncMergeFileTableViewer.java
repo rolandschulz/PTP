@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -43,6 +44,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchPage;
@@ -221,6 +223,13 @@ public class SyncMergeFileTableViewer extends ViewPart {
 					});
 				}
 			};
+			
+			// Create a menu manager for the context menu
+			MenuManager menuManager = new MenuManager();
+			Menu menu = menuManager.createContextMenu(fileTableViewer.getTable());
+			fileTableViewer.getTable().setMenu(menu);
+			getSite().registerContextMenu(menuManager, fileTableViewer);
+			getSite().setSelectionProvider(fileTableViewer);
 
 			// Set contents
 			fileTableViewer.setContentProvider(ArrayContentProvider.getInstance());

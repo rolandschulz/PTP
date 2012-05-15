@@ -917,4 +917,12 @@ public class BuildConfigurationManager {
 		}
 		provider.setMergeAsNotResolved(project, buildScenario, path);
 	}
+	
+	public void checkout(IProject project, BuildScenario buildScenario, IPath path) throws CoreException {
+		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
+		if (provider == null) { // Error handled in call
+			return;
+		}
+		provider.checkout(project, buildScenario, path);
+	}
 }

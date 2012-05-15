@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jgit.api.AddCommand;
+import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand;
@@ -40,7 +41,11 @@ import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRefNameException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
+import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
+import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.NotSupportedException;
 import org.eclipse.jgit.errors.TransportException;
@@ -1018,5 +1023,21 @@ public class GitRemoteSyncConnection {
 	 */
 	public void setMergeAsNotResolved(IPath path) {
 		
+	}
+	
+	public void checkout(IPath path) throws RemoteSyncException {
+		CheckoutCommand checkoutCommand = git.checkout();
+		checkoutCommand.addPath(path.toOSString());
+		try {
+			checkoutCommand.call();
+		} catch (JGitInternalException e) {
+			throw new RemoteSyncException(e);
+		} catch (RefAlreadyExistsException e) {
+			throw new RemoteSyncException(e);
+		} catch (RefNotFoundException e) {
+			throw new RemoteSyncException(e);
+		} catch (InvalidRefNameException e) {
+			throw new RemoteSyncException(e);
+		}
 	}
 }

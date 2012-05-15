@@ -21,6 +21,8 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.ISyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.core.PathResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -48,6 +50,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String syncDefaultFileList = "sync_default_file_list"; //$NON-NLS-1$
 	private static final String syncExcludeCommand = "sync_exclude"; //$NON-NLS-1$
 	private static final String syncIncludeCommand = "sync_include"; //$NON-NLS-1$
+	private static final String checkoutCommand = "checkout"; //$NON-NLS-1$
 	private static final ISyncExceptionHandler syncExceptionHandler = new CommonSyncExceptionHandler(false, true);
 
 	public Object execute(ExecutionEvent event) {
@@ -110,6 +113,23 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				SyncFileFilterPage.open(project, null);
 			} else if (command.equals(syncDefaultFileList)) {
 				SyncFileFilterPage.open(null, null);
+			} else if (command.equals(checkoutCommand)) {
+				IStructuredSelection sel = this.getSelectedElements();
+				for (Object element : sel.toArray()) {
+					IResource selection;
+					if (element instanceof IResource) {
+						selection = (IResource) element;
+					} else if (element instanceof IAdaptable) {
+						selection = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+					} else {
+						RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_6);
+						continue;
+					}
+					IPath path = selection.getProjectRelativePath();
+					BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+					BuildScenario buildScenario = bcm.getBuildScenarioForProject(project);
+					bcm.checkout(project, buildScenario, path);
+				}
 			}
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
