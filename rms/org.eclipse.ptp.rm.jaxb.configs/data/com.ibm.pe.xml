@@ -105,6 +105,13 @@
                         <choice>,STDERR</choice>
                 </attribute>
 
+				<attribute name="MP_COREFILE_SIGTERM_ATTR" type="boolean" translateBooleanAs="yes,no">
+					<description>Corefile on SIGTERM:</description>
+					<tooltip>Select to create corefile if application gets SIGTERM {MP_COREFILE_SIGTERM}
+					</tooltip>
+					<choice>yes,no,debug,minimum</choice>
+				</attribute>
+		
                 <attribute name="MP_COSCHEDULER_VERSION_ATTR" type="boolean"
                         translateBooleanAs="runqueue,''">
                         <description>Use runqueue co-scheduler:</description>
@@ -718,17 +725,18 @@
                                 </error-message>
                         </validator>
                 </attribute>
-
-                <attribute name="MP_RM_TIMEOUT_ATTR" type="integer">
-                        <description>Resource mgr connect timeout:</description>
-                        <tooltip>"Specify resource manager connection timeout (&lt;0: wait indefinitely, 0:     no wait, &gt;0, wait specified interval) (Default: 30) {MP_RM_TIMEOUT}"
-                        </tooltip>
-                        <validator>
-                                <regex expression=" *|-?[0-9]*" /> <!-- Blank or signed numeric -->
-                                <error-message>Resource manager connection timeout must be numeric
-                                </error-message>
-                        </validator>
-                </attribute>
+                
+ 				<attribute name="MP_TIMEOUT_ATTR" type="integer">
+					<description>Connection timeout:</description>
+					<tooltip>Specify timeout limit for connecting to remote nodes
+						(Default: 150) {MP_TIMEOUT}
+					</tooltip>
+					<validator>
+						<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+						<error-message>Connection timeout must be numeric
+						</error-message>
+					</validator>
+				</attribute>
 
                 <attribute name="MP_TLP_REQUIRED_ATTR" type="string">
                         <description>Large pages required:</description>
@@ -1024,7 +1032,7 @@
 			<arg>${ptp_rm:@jobId#name}</arg>
 		</terminate-job>
 
-		<!-- Launch tab definition -->
+		<!-- Tasks Tab -->
 		<launch-tab>
 			<dynamic
 				includeWidgetValuesFrom="I/O,Diagnostic,Debug,System,Nodes,Performance 1,Performance2,Miscellaneous,Advanced">
@@ -1048,7 +1056,7 @@
 					<widget type="checkbox" buttonId="useLL" attribute="RM_USE_LOAD_LEVELER" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
-								grabExcessHorizontal="false"/>
+								grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
 						<tooltip>${ptp_rm:RM_USE_LOAD_LEVELER#tooltip}</tooltip>
 					</widget>
@@ -1156,6 +1164,7 @@
 				</composite>
 			</dynamic>
 
+			<!-- I/O Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,Diagnostic,Debug,System,Nodes,Performance 1,Performance2,Miscellaneous,Advanced">
 				<title>I/O</title>
@@ -1244,7 +1253,7 @@
 				</composite>
 			</dynamic>
 
-
+			<!-- Diagnostic Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Debug,System,Nodes,Performance 1,Performance2,Miscellaneous,Advanced">
 				<title>Diagnostic</title>
@@ -1378,7 +1387,7 @@
 				</composite>
 			</dynamic>
 
-
+			<!-- Debug Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,System,Nodes,Performance 1,Performance2,Miscellaneous,Advanced">
 				<title>Debug</title>
@@ -1434,7 +1443,7 @@
 						<fixed-text>${ptp_rm:MP_COREFILE_FORMAT_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 					<widget style="SWT.BORDER" readOnly="false"
@@ -1444,7 +1453,7 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_COREFILE_FORMAT_ATTR#tooltip}</tooltip>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 
@@ -1472,7 +1481,7 @@
 						<fixed-text>${ptp_rm:MP_COREFILE_SIGTERM_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 					<widget type="checkbox" attribute="MP_COREFILE_SIGTERM_ATTR"
@@ -1483,14 +1492,14 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_COREFILE_SIGTERM_ATTR#tooltip}</tooltip>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 				</composite>
 
 			</dynamic>
 
-
+			<!-- System Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,Nodes,Performance 1,Performance2,Miscellaneous,Advanced">
 				<title>System</title>
@@ -1717,7 +1726,7 @@
 				</composite>
 			</dynamic>
 
-
+			<!-- Nodes Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Performance 1,Performance2,Miscellaneous,Advanced">
 				<title>Nodes</title>
@@ -1782,7 +1791,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_REMOTEDIR_ATTR#description}</fixed-text>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="MP_REMOTEDIR_ATTR"
@@ -1795,10 +1804,10 @@
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_REMOTEDIR_ATTR#tooltip}</tooltip>
 						<text-control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</text-control-state>
 						<button-control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</button-control-state>
 					</browse>
 
@@ -2329,7 +2338,7 @@
 						<fixed-text>${ptp_rm:MP_RMA_PENDING_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<enable-if button="isAIX" selected="false"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 					<widget style="SWT.BORDER" attribute="MP_RMA_PENDING_ATTR"
@@ -2340,7 +2349,7 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_RMA_PENDING_ATTR#tooltip}</tooltip>
 						<control-state>
-							<enable-if button="isAIX" selected="false"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 					
@@ -2369,7 +2378,7 @@
 						<fixed-text>${ptp_rm:MP_SHMEM_PT2PT_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 					<widget type="checkbox" attribute="MP_SHMEM_PT2PT_ATTR"
@@ -2380,7 +2389,7 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_SHMEM_PT2PT_ATTR#tooltip}</tooltip>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 
@@ -2437,7 +2446,7 @@
 						<fixed-text>${ptp_rm:MP_TLP_REQUIRED_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 					<widget style="SWT.BORDER" readOnly="true" attribute="MP_TLP_REQUIRED_ATTR"
@@ -2447,7 +2456,7 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_TLP_REQUIRED_ATTR#tooltip}</tooltip>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 
@@ -2472,7 +2481,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_MPILIB_ATTR#description}</fixed-text>
 						<control-state>
-							<enable-if button="isAIX" selected="false"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 					<widget style="SWT.LEFT" attribute="MP_MPILIB_ATTR" type="combo"
@@ -2482,7 +2491,7 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_MPILIB_ATTR#tooltip}</tooltip>
 						<control-state>
-							<enable-if button="isAIX" selected="false"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 					
@@ -2696,7 +2705,7 @@
 						<fixed-text>${ptp_rm:MP_PRIORITY_NTP_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 					<widget type="checkbox" attribute="MP_PRIORITY_NTP_ATTR"
@@ -2707,7 +2716,7 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_PRIORITY_NTP_ATTR#tooltip}</tooltip>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 
@@ -2719,7 +2728,7 @@
 						<fixed-text>${ptp_rm:MP_COSCHEDULER_VERSION_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 					<widget type="checkbox" attribute="MP_COSCHEDULER_VERSION_ATTR"
@@ -2730,7 +2739,7 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_COSCHEDULER_VERSION_ATTR#tooltip}</tooltip>
 						<control-state>
-							<enable-if attribute="os.arch" value="AIX"/>
+							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
 				</composite>
