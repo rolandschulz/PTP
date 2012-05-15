@@ -532,10 +532,10 @@
                         </validator>
                 </attribute>
 
-		<attribute name="MP_RESD_ATTR" type="string">
-			<description>Use resource manager:</description>
-			<tooltip>Use resource manager to handle resource allocations {MP_RESD}</tooltip>
-		</attribute>
+				<attribute name="MP_RESD_ATTR" type="string">
+					<description>Use resource manager:</description>
+					<tooltip>Use resource manager to handle resource allocations {MP_RESD}</tooltip>
+				</attribute>
 
                 <attribute name="MP_RETRANSMIT_INTERVAL_ATTR" type="integer">
                         <description>MPI retransmit interval:</description>
@@ -1915,7 +1915,7 @@
 				</composite>
 			</dynamic>
 
-
+			<!-- Performance 1 Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Nodes,Performance2,Miscellaneous,Advanced">
 				<title>Performance 1</title>
@@ -2147,7 +2147,7 @@
 				</composite>
 			</dynamic>
 
-
+			<!-- Performance 2 Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Nodes,Performance 1,Miscellaneous,Advanced">
 				<title>Performance 2</title>
@@ -2396,6 +2396,7 @@
 				</composite>
 			</dynamic>
 
+			<!-- Miscellaneous Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Nodes,Performance 1,Performance2,Advanced">
 				<title>Miscellaneous</title>
@@ -2744,6 +2745,8 @@
 					</widget>
 				</composite>
 			</dynamic>
+			
+			<!-- Advanced Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Nodes,Performance 1,Performance2,Miscellaneous">
 				<title>Advanced</title>
