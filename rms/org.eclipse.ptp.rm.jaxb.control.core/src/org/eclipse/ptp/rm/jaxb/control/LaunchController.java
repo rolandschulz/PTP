@@ -608,6 +608,8 @@ public class LaunchController implements ILaunchController {
 				conn.addConnectionChangeListener(connectionListener);
 			}
 
+			addConnectionPropertyAttributes(conn);
+
 			appendLaunchEnv = true;
 
 			/*
@@ -771,6 +773,47 @@ public class LaunchController implements ILaunchController {
 			if (monitor != null) {
 				monitor.done();
 			}
+		}
+	}
+
+	/**
+	 * Helper to add a read-only attribute
+	 * 
+	 * @param name
+	 * @param value
+	 */
+	private void addAttribute(String name, String value) {
+		Object attrObj = getEnvironment().get(name);
+		AttributeType attr = null;
+		if (attrObj != null && attrObj instanceof AttributeType) {
+			attr = (AttributeType) attrObj;
+		} else {
+			attr = new AttributeType();
+			attr.setName(name);
+			attr.setVisible(true);
+			attr.setReadOnly(true);
+			getEnvironment().put(name, attr);
+		}
+		attr.setValue(value);
+	}
+
+	/**
+	 * Add connection properties to the attribute map.
+	 * 
+	 * @param conn
+	 */
+	private void addConnectionPropertyAttributes(IRemoteConnection conn) {
+		String property = conn.getProperty(IRemoteConnection.OS_ARCH_PROPERTY);
+		if (property != null) {
+			addAttribute(IRemoteConnection.OS_ARCH_PROPERTY, property);
+		}
+		property = conn.getProperty(IRemoteConnection.OS_NAME_PROPERTY);
+		if (property != null) {
+			addAttribute(IRemoteConnection.OS_NAME_PROPERTY, property);
+		}
+		property = conn.getProperty(IRemoteConnection.OS_VERSION_PROPERTY);
+		if (property != null) {
+			addAttribute(IRemoteConnection.OS_VERSION_PROPERTY, property);
 		}
 	}
 

@@ -22,6 +22,7 @@ import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.ems.core.IEnvManager;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
@@ -99,6 +100,19 @@ public class RMVariableMap implements IVariableMap {
 	}
 
 	/**
+	 * Dynamic variables are not saved or loaded from the launch configuration. They are created when the controller is started and
+	 * are fixed while the controller is running.
+	 * 
+	 * @param name
+	 *            of attribute
+	 * @return true if it is dynamic
+	 */
+	public static boolean isDynamic(String name) {
+		return name.equals(IRemoteConnection.OS_ARCH_PROPERTY) || name.equals(IRemoteConnection.OS_NAME_PROPERTY)
+				|| name.equals(IRemoteConnection.OS_VERSION_PROPERTY);
+	}
+
+	/**
 	 * @param name
 	 *            or property or attribute
 	 * @return whether it is a ptp or debug
@@ -131,19 +145,6 @@ public class RMVariableMap implements IVariableMap {
 		this.variables = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.discovered = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.initialized = false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getEnvManager()
-	 */
-	public IEnvManager getEnvManager() {
-		return envManager;
-	}
-
-	public void setEnvManager(IEnvManager mgr) {
-		this.envManager = mgr;
 	}
 
 	/*
@@ -190,6 +191,15 @@ public class RMVariableMap implements IVariableMap {
 	 */
 	public Map<String, Object> getDiscovered() {
 		return discovered;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getEnvManager()
+	 */
+	public IEnvManager getEnvManager() {
+		return envManager;
 	}
 
 	/*
@@ -335,6 +345,10 @@ public class RMVariableMap implements IVariableMap {
 	public void setDefault(String name, String defaultValue) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void setEnvManager(IEnvManager mgr) {
+		this.envManager = mgr;
 	}
 
 	/*

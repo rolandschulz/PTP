@@ -512,8 +512,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * This routine is called when the resource manager has been changed via the combo boxes. It's job is to regenerate the dynamic
-	 * ui components, dependent on the resource manager choice.
+	 * This routine is called when the configuration has been changed via the combo boxes. It's job is to regenerate the dynamic ui
+	 * components, dependent on the configuration choice.
 	 * 
 	 * @param rm
 	 * @param queue

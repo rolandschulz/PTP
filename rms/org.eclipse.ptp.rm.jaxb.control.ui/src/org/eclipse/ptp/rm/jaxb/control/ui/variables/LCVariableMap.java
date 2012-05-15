@@ -479,7 +479,8 @@ public class LCVariableMap implements IVariableMap {
 	public void updateFromConfiguration(ILaunchConfiguration configuration) throws CoreException {
 		Map<String, Object> attr = configuration.getAttributes();
 		for (String key : attr.keySet()) {
-			if ((!rmPrefix.equals(JAXBControlConstants.ZEROSTR) && key.startsWith(rmPrefix)) || RMVariableMap.isExternal(key)) {
+			if ((!rmPrefix.equals(JAXBControlConstants.ZEROSTR) && key.startsWith(rmPrefix) && !RMVariableMap.isDynamic(key
+					.replace(rmPrefix, JAXBControlConstants.ZEROSTR))) || RMVariableMap.isExternal(key)) {
 				values.put(key, attr.get(key));
 			}
 		}
