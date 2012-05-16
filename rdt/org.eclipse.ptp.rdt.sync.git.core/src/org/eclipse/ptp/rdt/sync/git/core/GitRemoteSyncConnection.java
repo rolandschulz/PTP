@@ -212,20 +212,7 @@ public class GitRemoteSyncConnection {
 				doCommit();
 			}
 			
-			// Refresh the workspace after creating new local files
-			// Bug 374409 - run refresh in a separate thread to avoid possible deadlock from locking both the sync lock and the
-			// workspace lock.
-			Thread refreshWorkspaceThread = new Thread(new Runnable() {
-				public void run() {
-					try {
-						project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(5));
-					} catch (CoreException e) {
-						RDTSyncCorePlugin.log(Messages.GitRemoteSyncConnection_0, e);
-					}
-				}
-			}, "Refresh workspace thread"); //$NON-NLS-1$
-			refreshWorkspaceThread.start();
-
+			this.doRefresh(subMon.newChild(5));
 
 			// Create remote directory if necessary.
 			try {
@@ -999,7 +986,7 @@ public class GitRemoteSyncConnection {
 		if (!mergeMapInitialized) {
 			this.readMergeConflictFiles();
 		}
-		return FileToMergePartsMap.get(localFile.getFullPath().removeFirstSegments(1));
+		return FileToMergePartsMap.get(localFile.getProjectRelativePath());
 	}
 	
 	/**
@@ -1039,5 +1026,23 @@ public class GitRemoteSyncConnection {
 		} catch (InvalidRefNameException e) {
 			throw new RemoteSyncException(e);
 		}
+		
+		this.doRefresh(null);
+	}
+	
+	// Refresh the workspace after creating new local files
+	// Bug 374409 - run refresh in a separate thread to avoid possible deadlock from locking both the sync lock and the
+	// workspace lock.
+	private void doRefresh(final SubMonitor subMon) {
+		Thread refreshWorkspaceThread = new Thread(new Runnable() {
+			public void run() {
+				try {
+					project.refreshLocal(IResource.DEPTH_INFINITE, subMon);
+				} catch (CoreException e) {
+					RDTSyncCorePlugin.log(Messages.GitRemoteSyncConnection_0, e);
+				}
+			}
+		}, "Refresh workspace thread"); //$NON-NLS-1$
+		refreshWorkspaceThread.start();
 	}
 }
