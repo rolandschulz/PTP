@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui;
 
+import java.util.Date;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -32,6 +34,8 @@ public class CommonSyncExceptionHandler implements ISyncExceptionHandler {
 	private static final String SYNC_MERGE_FILE_VIEW = "org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer"; //$NON-NLS-1$
 	private final boolean showErrorMessageToggle;
 	private final boolean alwaysShowDialog;
+	private static long lastMergeConflictDialogTimeStamp = 0;
+	private static final long timeBetweenMergeConflicts = 5000; // 5 seconds
 	
 	public CommonSyncExceptionHandler(boolean showToggle, boolean alwaysShow) {
 		showErrorMessageToggle = showToggle;
@@ -60,6 +64,11 @@ public class CommonSyncExceptionHandler implements ISyncExceptionHandler {
 			public void run() {
 				String[] buttonLabels;
 				if (e instanceof RemoteSyncMergeConflictException) {
+					// Avoid flooding the display with merge conflict dialogs.
+					if (System.currentTimeMillis() - lastMergeConflictDialogTimeStamp <= timeBetweenMergeConflicts) {
+						return;
+					}
+					lastMergeConflictDialogTimeStamp = System.currentTimeMillis();
 					buttonLabels = new String[2];
 					buttonLabels[0] = IDialogConstants.OK_LABEL;
 					buttonLabels[1] = Messages.CommonSyncExceptionHandler_1; // Custom button
