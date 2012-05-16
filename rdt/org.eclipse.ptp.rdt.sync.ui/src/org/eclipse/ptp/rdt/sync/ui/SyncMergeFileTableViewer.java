@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -111,8 +112,8 @@ public class SyncMergeFileTableViewer extends ViewPart {
 			fileColumn.setLabelProvider(new ColumnLabelProvider() {
 				@Override
 				public String getText(Object element) {
-					assert(element instanceof IPath);
-					return ((IPath) element).toString();
+					assert(element instanceof IFile);
+					return ((IFile) element).getProjectRelativePath().toOSString();
 				}
 			});
 			
@@ -128,8 +129,8 @@ public class SyncMergeFileTableViewer extends ViewPart {
 				 */
 				@Override
 				public Image getImage(Object element) {
-					assert(element instanceof IPath);
-					if (getResolved(project, (IPath) element)) {
+					assert(element instanceof IFile);
+					if (getResolved(project, ((IFile) element).getProjectRelativePath())) {
 						return CHECKED;
 					} else {
 						return UNCHECKED;
@@ -142,9 +143,9 @@ public class SyncMergeFileTableViewer extends ViewPart {
 				 */
 				@Override
 				public String getText(Object element) {
-					assert(element instanceof IPath);
+					assert(element instanceof IFile);
 					// Return appropriate text only if images are unavailable
-					if (getResolved(project, (IPath) element)) {
+					if (getResolved(project, ((IFile) element).getProjectRelativePath())) {
 						if (CHECKED == null) {
 							return "Yes"; //$NON-NLS-1$
 						} else {
@@ -178,8 +179,8 @@ public class SyncMergeFileTableViewer extends ViewPart {
 				public void selectionChanged(SelectionChangedEvent event) {
 					Object selection = ((IStructuredSelection)event.getSelection()).getFirstElement();
 					if (selection != null) {
-						assert(selection instanceof IPath);
-						SyncMergeEditor.open(project.getFile((IPath) selection));
+						assert(selection instanceof IFile);
+						SyncMergeEditor.open((IFile) selection);
 					}
 				}
 			});
@@ -189,11 +190,12 @@ public class SyncMergeFileTableViewer extends ViewPart {
 				@Override
 				public void doubleClick(DoubleClickEvent event) {
 					Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
-					assert(selection instanceof IPath);
-					if (!getResolved(project, (IPath) selection)) {
-						setResolved(project, (IPath) selection);
+					assert(selection instanceof IFile);
+					IPath path = ((IFile) selection).getProjectRelativePath();
+					if (!getResolved(project, path)) {
+						setResolved(project, path);
 					} else {
-						setUnResolved(project, (IPath) selection);
+						setUnResolved(project, path);
 					}
 					fileTableViewer.refresh();
 				}
@@ -251,8 +253,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		if (!fProjectToAllPathsMap.containsKey(project)) {
 			update();
 		} else {
-			fileTableViewer.setInput(fProjectToAllPathsMap.get(project));
-			fileTableViewer.refresh();
+			this.setViewerInput(project);
 		}
 	}
 	
@@ -273,7 +274,15 @@ public class SyncMergeFileTableViewer extends ViewPart {
 			RDTSyncUIPlugin.log(e);
 		}
 		fProjectToResolvedPathsMap.put(project, new HashSet<IPath>());
-		fileTableViewer.setInput(fProjectToAllPathsMap.get(project));
+		this.setViewerInput(project);
+	}
+	
+	private void setViewerInput(IProject project) {
+		Set<IFile> fileSet = new HashSet<IFile>();
+		for (IPath path : fProjectToAllPathsMap.get(project)) {
+			fileSet.add(project.getFile(path));
+		}
+		fileTableViewer.setInput(fileSet);
 		fileTableViewer.refresh();
 	}
 
