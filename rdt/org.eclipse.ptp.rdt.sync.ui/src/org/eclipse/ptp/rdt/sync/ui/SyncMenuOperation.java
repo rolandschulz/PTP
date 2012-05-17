@@ -136,6 +136,10 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 						bcm.checkout(project, buildScenario, path);
 					} else if (command.equals(resolveMergeCommand)) {
 						bcm.setMergeAsResolved(project, buildScenario, path);
+						SyncMergeFileTableViewer viewer = SyncMergeFileTableViewer.getActiveInstance();
+						if (viewer != null) {
+							viewer.update(null);
+						}
 					}
 				}
 			}

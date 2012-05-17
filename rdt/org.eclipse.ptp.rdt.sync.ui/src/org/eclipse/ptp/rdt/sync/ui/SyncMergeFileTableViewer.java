@@ -51,6 +51,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	private TableViewer fileTableViewer;
 	private ISelectionListener selectionListener;
 	private ISyncListener syncListener;
+	private static SyncMergeFileTableViewer activeViewerInstance = null;
 
 	/*
 	 * (non-Javadoc)
@@ -67,9 +68,22 @@ public class SyncMergeFileTableViewer extends ViewPart {
 			SyncManager.removePostSyncListener(project, syncListener);
 		}
 	}
+	
+	/**
+	 * Return the currently active instance of this view. The purpose of this function is to allow communication with the viewer
+	 * from external classes, such as for updating the viewer. Changes may be needed to the implementation if we ever decide to
+	 * actually allow more than one instance.
+	 * Note that this function does not create the viewer instance, unlike "getInstance()" in the common Java singleton pattern.
+	 *
+	 * @return instance - may be null if viewer not instantiated.
+	 */
+	public static SyncMergeFileTableViewer getActiveInstance() {
+		return activeViewerInstance;
+	}
 
 	public void createPartControl(final Composite parent) {
 		synchronized(this) {
+			activeViewerInstance = this;
 			fileTableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 			
 			// Create file column
@@ -148,7 +162,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	}
 	
 	// Update viewer and also switch to the passed project if it is not null
-	private void update(IProject newProject) {
+	public void update(IProject newProject) {
 		// Switch projects if needed
 		if (newProject != null) {
 			if (project != null) {
