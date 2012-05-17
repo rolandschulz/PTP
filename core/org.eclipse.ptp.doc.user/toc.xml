@@ -8,6 +8,7 @@
       <topic label="Local vs. Remote Projects"  href="html/localVsRemote.html"/>
       <topic label="Creating an MPI Project" href="html/01buildMPIprog.html"/> 
       <topic label="Synchronized Projects" href="html/sync.html"/>
+      <topic label="Recognizing Compiler Errors: Cray, PGI, and Open64" href="html/errorParsers.html"/>
       <topic label="Resource Managers">
       	<topic label="Configuring Resource Managers" href="html/02resMgrSetup.html"/>
       	<topic label="Running IBM LoadLeveler Batch Jobs">
