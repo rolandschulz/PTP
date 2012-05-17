@@ -10,6 +10,26 @@
 	<h1>The JAXB Configurable Resource Manager</h1>
 
 	<h3>
+		<a name="PTP600">PTP 6.0.0 Changes</a>
+	</h3>
+
+	<p>A number of new
+		features and changes have been included in the 6.0.0 release.</p>
+	<ol>
+		<li>The <code>property</code> element has been removed completely. Since properties and attributes
+			were essentially identical, removing the <code>property</code> element reduces confusion as to when they should be
+			used.</li>
+		<li>The <code>buttonId</code> attribute on a <a href="#Widget"><code>widget</code></a> is now global. In the previous version
+                       button IDs were local to each tab. This allows a button on one tab to change the state
+                       of a control on a different tab;</li>
+		<li>The <a href="#ControlState"><code>control-state</code></a> element now supports obtaining state by comparing
+                       an <a href="#AttributeType"><code>attribute</code></a> value to a string;</li>
+		<li>The <code>saveValueTo</code> attribute on a <a href="#Widget">widget</a> has been renamed to simply
+                       <code>attribute</code>. This is to reflect the fact that an widget can read from and
+                       save to an <a href="#AttributeType"><code>attribute</code></a>.</li>
+	</ol>
+	
+	<h3>
 		<a name="PTP501">PTP 5.0.1 Changes</a>
 	</h3>
 
@@ -25,7 +45,7 @@
 		<li><a href="#ControlState"><code>control-state</code> </a>
 			elements have been added to all UI control descriptors;</li>
 		<li>The launch tab <a href="#LaunchTab"><code>import</code> </a>
-			controller type has been modified (largely for maintaining unformity
+			controller type has been modified (largely for maintaining uniformity
 			of implementation) to subclass the <code>dynamic</code> controller;</li>
 		<li>Ability to inspect invisible discovered (excluded) properties
 			and attributes via a "View" button (see <a href="#TabController">note</a>)
@@ -162,7 +182,7 @@
 		<a name="ResourceManagerData">The Resource Manager Data Type</a>
 	</h3>
 
-	<img alt="ResourceManagerData" src="images/01rm-data.jpeg" />
+	<img alt="ResourceManagerData" src="images/01rm-data.png" />
 
 	<p>
 		The top-level of the definition tree consists of three elements: <b>site-</b>,
@@ -190,7 +210,7 @@
 	<p>
 		The principal section of the schema is devoted to defining the
 		resource manager's <b>control</b> part. The top-level control elements
-		include properties and attributes, files to be staged, job script to
+		include attributes, files to be staged, job script to
 		be generated (if any), commands specific to the resource manager, and
 		the layout of the Launch Tab.
 	</p>
@@ -200,21 +220,21 @@
 	</h4>
 	<p>
 		The resource manager implementation constructs a variable map from the
-		defined properties and attributes which serves as the resource manager
+		defined attributes which serves as the resource manager
 		"environment". Some elements directly reference these by name; a
-		text/string representation of property or attribute fields can be
+		text/string representation of attribute fields can be
 		obtained via the Eclipse variable resolver syntax, with the namespace
 		prefix set to <i>ptp_rm</i>:
 		<code>
 			${ptp_rm:name#<i>fieldName</i>}
 		</code>, e.g.,
 		<code>${ptp_rm:queues#value}</code>
-		(see further <a href="#PropertyAttributeType">below</a> on the
-		specific fields for properties and attributes).
+		(see further <a href="#AttributeType">below</a> on the
+		specific fields for attributes).
 	</p>
 	<p>
-		All properties and attributes defined in the configuration are mapped.
-		The following hard-coded properties are also added at runtime: <br>
+		All attributes defined in the configuration are mapped.
+		The following hard-coded attributes are also added at runtime: <br>
 		<br>
 		<code>control.user.name</code>
 		<br>
@@ -227,8 +247,8 @@
 		<code>progArgs</code>
 		<br>
 		<code>directory</code>
-		<br> <br> In addition, these properties may be linked (see <a
-			href="#PropertyAttributeType">below</a>) to other attributes to
+		<br> <br> In addition, these attributes may be linked (see <a
+			href="#AttributeType">below</a>) to other attributes to
 		furnish the resource manager with an implementation-independent
 		variable for the queue and for any remote output files produced in
 		connection with the job submission. <br> <br>
@@ -293,40 +313,31 @@
 	<p>We will look at these each in turn.</p>
 
 	<h4>
-		<a name="PropertyAttributeType">1. Property and Attribute Types</a>
+		<a name="AttributeType">1. Attribute Types</a>
 	</h4>
 	<p>
-		A property is any variable necessary for the functioning of the
-		resource manager. Properties often (but not necessarily) are not
-		visible. The value for properties can be any primitive type, or lists
+		An attribute is any variable necessary for the functioning of the
+		resource manager. Attributes are often (but not necessarily)
+		visible. The value for attributes can be any primitive type, or lists
 		or maps of strings. If
 		<code>stdout</code>
 		and
 		<code>stderr</code>
-		from a scheduled job is to be delivered to the client, the properties
+		from a scheduled job is to be delivered to the client, the attributes
 		<i>stdout_remote_path</i> and <i>stderr_remote_path</i> should be
-		included in the resource manager property set. Simarly, the native
+		included in the resource manager attribute set. Similarly, the native
 		designation for the selected queue, if used, should be linked to <i>control.queue.name</i>.
 	</p>
-
-	<p>The distinction between attribute and property is not hard and
-		fast, but the intention is to provide a way of differentiating between
-		external, system-determined variables (attributes) and variables only
-		required by the PTP implementation itself. There are several other
-		elements and fields on the attribute, e.g., for type-specific defaults
-		(min/max, choice). Generally, if the variable is exposed to the user,
-		who should also be provided with a description or instructions for
-		use, then it should be defined as an attribute.</p>
 
 	<img alt="Attribute" src="images/040attribute.jpeg" />
 
 	<p>
-		The <i>visible</i> attribute is a way of indicating to the resource
+		The <i>visible</i> property is a way of indicating to the resource
 		manager that the user will not be directly changing the value of the
-		property or attribute via the user interface. Certain widgets (such as
+		attribute via the user interface. Certain widgets (such as
 		the
 		<code>attribute viewer</code>
-		) check this to see if the property or attribute should be included
+		) check this to see if the attribute should be included
 		automatically in its list.
 	</p>
 
@@ -335,11 +346,11 @@
 		<a name="Note1">BEST PRACTICE: VISIBLE vs INVISIBLE</a>
 	</h5>
 	<p>
-		Always mark properties or attributes which are the targets of <i>attribute</i>
+		Always mark attributes which are the targets of <i>attribute</i>
 		(see <a href="#Widget">below</a>) as <i>visible</i>="true"; if this
-		value is false, this variable will <i>always</i> be passed to the
+		value is false, the attribute will <i>always</i> be passed to the
 		configuration/environment of the resource manager; selection/exclusion
-		of sets of properties or attributes pertains only to those marked
+		of sets ofattributes pertains only to those marked
 		visible.
 	</p>
 	<hr>
@@ -348,7 +359,7 @@
 		attribute at runtime or for a particular installation, if such
 		information is made available by the system. The <i>readOnly</i>
 		property can be defined here, but more often will be enforced directly
-		on the widget which is connected to the property or attribute. <i>min</i>
+		on the widget which is connected to the attribute. <i>min</i>
 		and <i>max</i> give the boundaries for integer values, usually
 		represented by spinner widgets. <i>translateBooleanAs</i> applies to
 		boolean values which should be represented as strings other than
@@ -367,32 +378,32 @@
 		is a predetermined, fixed set of values to choose from; these are
 		comma-delimited and will appear as the items of a combo-box.
 		<code>items-from</code>
-		instead links the combo items (choice) to another property or
+		instead links the combo items (choice) to another
 		attribute value (whose type must be
 		<code>java.util.Collection</code>
 		).
 	</p>
 
 	<h4 align="center">
-		<a name="PAValueLink"> Property and Attribute Values </a>
+		<a name="PAValueLink">Attribute Values</a>
 	</h4>
 
 	<p>
 		The untyped
 		<code>value</code>
-		element on properties and attributes is for internal use only; to give
+		element on attributes is for internal use only; to give
 		a predefined (primitive) value, use the
 		<code>default</code>
-		element along with the <i>type</i> attribute.
+		element along with the <i>type</i> property.
 	</p>
 
 	<p>
 		<code>link-value-to</code>
-		works as follows: the property or attribute gets its value from the
-		property or attribute linked to, unless that property or attribute has
+		works as follows: the attribute gets its value from the
+		attribute linked to, unless that attribute has
 		an undefined (empty) value; in the latter case, any default defined on
-		the present property or attribute will be used. This feature is
-		primarily intended for defining dependent properties or attributes
+		the present attribute will be used. This feature is
+		primarily intended for defining dependent attributes
 		whose values are not directly modified by the user.
 	</p>
 
@@ -519,19 +530,19 @@
 	<ol>
 		<li>If it is an external file or one edited perhaps through the
 			workspace, one can use the <code>path</code> element to indicate
-			location; this can be either a hard-coded path or a reference to a
-			property or attribute value.</li>
+			location; this can be either a hard-coded path or a reference to an 
+			attribute value.</li>
 		<li>The <code>contents</code> element is a string which literally
 			represents the file contents. The <i>resolveContents</i> attribute in
 			this case is used to indicate whether to pass this string through the
-			variable resolver, substituting any references to property or
+			variable resolver, substituting any references to 
 			attribute values it may contain. However, caution should be exercised
 			here in that this string should not contain "${...}" sequences which
 			do not actually refer to Eclipse variables (such as batch script
 			variables), or the resolution will fail. If <i>resolveContents</i> is
 			set to false, you can still provide this text element with a single
-			reference to a property or attribute, in which case the value of that
-			property or attribute will be used <i>as is</i>, without further
+			reference to an attribute, in which case the value of that
+			attribute will be used <i>as is</i>, without further
 			dereferencing.</li>
 		<li>The preferred, and most flexible way to represent the
 			contents of a file to be generated, however, is to use the <code>line</code>
@@ -550,7 +561,7 @@
 		<li>If the <code>content</code> or <code>line</code> elements are
 			used, the target path becomes <i>staging directory/
 				[uniqueIdPrefix]managed-file-name</i>);</li>
-		<li>A property is placed in the environment whose <i>name</i> is
+		<li>An attribute is placed in the environment whose <i>name</i> is
 			the managed-file <i>name</i> and whose <i>value</i> is this target
 			path.</li>
 	</ul>
@@ -581,7 +592,7 @@
 		<code>managed-file</code> <i>deleteAfterSubmit</i> indicates that the script target should not
 		be retained (this is the default behavior); unlike the
 		<code>managed-file</code>, however, the local copy of the generated script is always deleted. A
-		reserved property,
+		reserved attribute,
 		<code>managed_file_for_script</code>, should be used to reference the script's path on the target
 		resource; for instance, in the PBS submit command:
 	</p>
@@ -645,7 +656,7 @@
 		<code>null</code>
 		or zero-length). <i>isUndefinedIfMatches</i> affords more nuanced
 		control over whether an argument should be so eliminated. If the
-		argument references property or attribute values, but also has
+		argument references attribute values, but also has
 		text-literal segments, a regex can be provided to define what an
 		"empty" argument would be in this case. For instance, if an argument
 		flag should not appear when the value it precedes is an empty string,
@@ -666,7 +677,7 @@
 	</h4>
 
 	<p>
-		<i>@jobId</i> is a special property name designating the runtime id
+		<i>@jobId</i> is a special attribute name designating the runtime id
 		for a job instance. In the lifecycle of the run/launch (submit) call,
 		this value begins as an internally generated unique id which then is
 		swapped for the id returned by the scheduler or runtime system.
@@ -697,7 +708,7 @@
 		essentially involves defining a variable in the submission command's
 		environment, with a reference to the
 		<code>managed-file</code>
-		path property as its value, and then using this environment variable
+		path attribute as its value, and then using this environment variable
 		inside the
 		<code>script</code>
 		.
@@ -730,7 +741,7 @@
 		element which bear detailed discussion here. <i>directory</i> of
 		course refers to where the command will be executed; <b>this
 			defaults to the "home" or working directory of the remote control
-			connection (the <code>control.working.dir</code> property)</b>; also as
+			connection (the <code>control.working.dir</code> attribute)</b>; also as
 		expected, <i>redirectStderr</i> means that both output and error
 		streams are sent back on
 		<code>stdout</code>
@@ -756,8 +767,8 @@
 	<p>
 		Two crucial fields for command control are <i>waitForId</i> and <i>keepOpen</i>.
 		The former indicates to the resource manager that the output stream
-		for the command is being parsed for an id which will appear as a
-		property in the environment during the command execution, and that the
+		for the command is being parsed for an id which will appear as an
+		attribute in the environment during the command execution, and that the
 		execution should not return until it sees this id. Very often the
 		submit commands will have these semantics. The latter field indicates
 		that the command should be held open for potentially repeated
@@ -876,7 +887,7 @@
 		output and error streams of any
 		<code>command</code>
 		in order to capture information and use it to side-effect existing
-		properties or attributes, or to generate new ones on the fly. While
+		attributes, or to generate new ones on the fly. While
 		the parser is not completely general, it is capable of a wide range of
 		tasks which would typically be required in the handling of output from
 		batch and runtime systems. We here explain the main elements (
@@ -886,7 +897,7 @@
 		various usage scenarios.
 	</p>
 
-	<img alt="TokenizerType" src="images/090tokenizer.jpeg" />
+	<img alt="TokenizerType" src="images/090tokenizer.png" />
 
 	<p>
 		The
@@ -953,7 +964,7 @@
 		<a name="TargetType">TARGET</a>
 	</h5>
 
-	<img alt="TargetType" src="images/091target.jpeg" />
+	<img alt="TargetType" src="images/091target.png" />
 
 	<p>
 		A tokenizer may be given any number of
@@ -974,14 +985,7 @@
 
 	<p>
 		The target object is either to be constructed at match time, or it
-		pre-exists in the environment. If constructed, the <i>type</i> field
-		is used to indicate whether the object is a
-		<code>property</code>
-		or an
-		<code>attribute</code>
-		type; otherwise, <i>ref</i> points to the name of the
-		<code>property</code>
-		or
+		pre-exists in the environment. If not constructed, <i>ref</i> points to the name of the
 		<code>attribute</code>
 		in the environment (recall that for the runtime job identifier, <i>@jobId</i>
 		is used).
@@ -1046,8 +1050,8 @@
 		<li>The <i>moveToTop</i> field on the <code>match-type</code>
 			element indicates to the tokenizer that the matched target be
 			promoted to first position in the list of targets. This is useful
-			when there is an ordering which expects types of attributes or
-			properties to be grouped in sequence on the stream (see ex. 4 in <a
+			when there is an ordering which expects types of attributes
+			to be grouped in sequence on the stream (see ex. 4 in <a
 			href="#TokenizerExamples">tokenizer examples</a>).</li>
 	</ol>
 
@@ -1109,7 +1113,7 @@
 
 	<p>
 		This value-abstraction allows one to set <i>key</i> (for maps) and <i>value</i>
-		as literals or references to other properties or attributes to be
+		as literals or references to other attributes to be
 		resolved in the current environment; to reference the matched segment
 		parts one sets <i>keyIndex</i> and <i>valueIndex</i> if the regex was
 		used to split the segment; otherwise, <i>keyGroup</i> and <i>valueGroup</i>
@@ -1203,7 +1207,7 @@
 		<tr>
 			<td>1</td>
 			<td>output is a list of line-separated queue names to be
-				assigned to the known property "available-queues"</td>
+				assigned to the known attribute "available-queues"</td>
 		</tr>
 		<tr>
 			<td>2</td>
@@ -1233,7 +1237,7 @@
 		</tr>
 		<tr>
 			<td>7</td>
-			<td>indeterminate number of property definitions, but on single
+			<td>indeterminate number of attribute definitions, but on single
 				line</td>
 		</tr>
 		<tr>
@@ -1380,16 +1384,16 @@
 		<code>title</code>
 		values for other controllers. In this case, the configuration for the
 		job, when the "Run" button is pressed with this controller being the
-		visible one, will also include <i>all the properties or attributes
+		visible one, will also include <i>all the attributes
 			valid for the listed but currently invisible controllers</i>.
 	</p>
 	<hr>
 	<h5>
-		<a name="Note3">PROPERTY/ATTRIBUTE NAMES vs VALUES</a>
+		<a name="Note3">ATTRIBUTE NAMES vs VALUES</a>
 	</h5>
 
 	<p>While this field controls the inclusion or exclusion of
-		attribute and property names in the configuration, their values are
+		attribute names in the configuration, their values are
 		always shared across the controllers (there is only one environment);
 		thus if a variable value is changed on one controller, and this
 		variable is also exposed on another, the value for that variable will
@@ -1405,7 +1409,7 @@
 		only the valid values local to Tab2. <b>Note</b> also, that if there
 		are names which intersect with strictly local widget targets, the
 		local settings (visibility, selection, enablement) still determine
-		whether they belong in the set of valid property/attribute names.
+		whether they belong in the set of valid attribute names.
 	</p>
 	<hr>
 	<p>
@@ -1418,10 +1422,10 @@
 		up a scrolling dialog which allows you to inspect the current
 		configuration (that is, the one relevant to the visible controller). <i>showViewExcluded</i>
 		is by default false, and should only be set if the resource manager
-		processes attributes or properties discovered by a command at run
+		processes attributes discovered by a command at run
 		time; this dialog allows you to see which ones have been marked
-		invisible; <b>unlike invisible predefined properties or attributes</b>,
-		which are always <i>included</i>, invisible discovered properties or
+		invisible; <b>unlike invisible predefined attributes</b>,
+		which are always <i>included</i>, invisible discovered
 		attributes are always <i>excluded</i> from the configuration and thus
 		do not persist across resource manager sessions.
 	</p>
@@ -1670,22 +1674,22 @@
 		<tr>
 			<td><i>attribute</i></td>
 			<td>applies to all widgets except <code>label</code>; the name
-				of the property or attribute whose value should be set on the basis
+				of the attribute whose value should be set on the basis
 				of the widget's "selected" value or text.<br> <b>Note:</b> use
 				of this attribute is mutually exclusive with the <code>fixed-</code>
 				and <code>dynamic-text</code> elements.</td>
 		</tr>
 		<tr>
 			<td><code>items-from</code></td>
-			<td>applies to the <code>combo</code> widget; indicates a
-				property or attribute <i>value</i> (of type <code>java.util.Collection</code>)
+			<td>applies to the <code>combo</code> widget; indicates an
+				attribute <i>value</i> (of type <code>java.util.Collection</code>)
 				to use to populate the items.<br> <b>Note:</b> if a combo
 				widget saves its value to an attribute and the present element on
 				the widget descriptor is not set, the attribute will be checked for
 				non-empty <code>choice</code> or <code>items-from</code> values,
 				which then will be used to populate the combo items; the <code>items-from</code>
 				field on the widget is for added flexibility (for instance, linking
-				up a target property with another property providing the list of
+				up a target attribute with another attribute providing the list of
 				choices).</td>
 		</tr>
 		<tr>
@@ -1716,7 +1720,7 @@
 	<p>
 		The button group provides an explicit selection of a single value
 		based on a mutually exclusive set of button labels. Just as with the
-		<code>widget</code>, one uses <i>attribute</i> to indicate what property or attribute
+		<code>widget</code>, one uses <i>attribute</i> to indicate what attribute
 		value to set. The
 		<code>button</code>
 		elements, which can be arranged horizontally or vertically using the <i>style</i>
@@ -1727,7 +1731,7 @@
 		attribute on the individual button will be ignored. Radio buttons are
 		"sticky" in the sense that once they are selected, they cannot be
 		"unchecked" until a different button in the group is selected. It is
-		thus advisable always to provide a default value for the property or
+		thus advisable always to provide a default value for the 
 		attribute associated with the group value if radio buttons are used.
 		If check boxes are used, they can be individually checked on and off
 		(one at a time), thus allowing for the value of the group to be
@@ -1820,9 +1824,9 @@
 
 	<p>
 		The last of the widget types, the
-		<code>attribute-viewer</code>, displays visible properties and attributes in a table or tree
+		<code>attribute-viewer</code>, displays visible attributes in a table or tree
 		viewer, with the value columns as editable widgets. The type of cell
-		editor is determined implicitly here by the type of the property or
+		editor is determined implicitly here by the type of the
 		attribute; the presence of a combo editor is determined by an
 		attribute whose
 		<code>choice</code>
@@ -1844,9 +1848,9 @@
 	<p>
 		The viewer <i>type</i> can be either "table" or "tree"; in the case of
 		the tree, the type, default, status and description fields of the
-		attribute or property are displayed as collapsible child rows hanging
+		attribute are displayed as collapsible child rows hanging
 		off the main name entry. Either table or tree can have up to <b>six</b>
-		columns whose names/types are based on the following property and
+		columns whose names/types are based on the following
 		attribute fields:
 	</p>
 
@@ -1933,22 +1937,22 @@
 	<p>
 		Control over the actual contents of the viewer is achieved through the
 		<code>viewer-items-type</code>
-		; one can here explicitly list properties or attributes for inclusion
+		; one can here explicitly list attributes for inclusion
 		using the
 		<code>include</code>
 		element, or one can set one or both of the <i>all</i> attributes; in
-		the latter case, attributes and properties can be excluded from the
+		the latter case, attributes can be excluded from the
 		set using
 		<code>exclude</code>
 		. The <i>initialCheckAll</i> field, which defaults to true, indicates
-		that if the attribute or property is new or undefined from a previous
+		that if the attribute is new or undefined from a previous
 		session, it will appear as checked; turn this off if you want new
-		attributes or properties to appear at first as unchecked.
+		attributes to appear at first as unchecked.
 	</p>
 
 	<p>
-		A property bearing the name given to this widget is written to the
-		environment at each update/refresh; the value of the property is a
+		An attribute bearing the name given to this widget is written to the
+		environment at each update/refresh; the value of the attribute is a
 		string formed from the selected (checked) rows of the table using the
 		<code>template-type</code>
 		(the
@@ -1980,7 +1984,7 @@
 	<img alt="MonitorType" src="images/24monitor.jpeg" />
 
 	<p>
-		This component can be furnished with its own set of properties
+		This component can be furnished with its own set of attributes
 		(currently unused). What is necessary to set at present is only the <i>schedulerType</i>
 		attribute (e.g., "PBS"). <i>refreshFrequencyInSeconds</i> defaults to
 		60, but this can be changed according to the needs of the user. Be
