@@ -11,10 +11,10 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="resource_manager_type.xsd" name="browse-example">
    <control-data>
-      <property name="path1" visible="true"/>
-      <property name="path2" visible="true"/>
-      <property name="path3" visible="true"/>
-      <property name="path4" visible="true"/>
+      <attribute name="path1" visible="true"/>
+      <attribute name="path2" visible="true"/>
+      <attribute name="path3" visible="true"/>
+      <attribute name="path4" visible="true"/>
       <submit-interactive name="submit-interactive">
          <arg>echo</arg>
          <arg>$VAR_1</arg>

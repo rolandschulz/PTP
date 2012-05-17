@@ -11,30 +11,30 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="miscellaneous-example">
 	<control-data>
-		<property name="a1" visible="true" translateBooleanAs="1,0"/>
-		<property name="a2" visible="true" translateBooleanAs="1,0"/>
-		<property name="a3" visible="true" translateBooleanAs="1,0"/>
-		<property name="a4" visible="true" translateBooleanAs="1,0"/>
-		<property name="b1" visible="true" translateBooleanAs="1,0"/>
-		<property name="b2" visible="true" translateBooleanAs="1,0"/>
-		<property name="b3" visible="true" translateBooleanAs="1,0"/>
-		<property name="b4" visible="true" translateBooleanAs="1,0"/>
-		<property name="c1" visible="true" translateBooleanAs="1,0"/>
-		<property name="c2" visible="true" translateBooleanAs="1,0"/>
-		<property name="c3" visible="true" translateBooleanAs="1,0"/>
-		<property name="c4" visible="true" translateBooleanAs="1,0"/>
-		<property name="d1" visible="true" translateBooleanAs="1,0"/>
-		<property name="d2" visible="true" translateBooleanAs="1,0"/>
-		<property name="d3" visible="true" translateBooleanAs="1,0"/>
-		<property name="d4" visible="true" translateBooleanAs="1,0"/>
-		<property name="e1" visible="true" translateBooleanAs="1,0"/>
-		<property name="e2" visible="true" translateBooleanAs="1,0"/>
-		<property name="e3" visible="true" translateBooleanAs="1,0"/>
-		<property name="e4" visible="true" translateBooleanAs="1,0"/>
-		<property name="f1" visible="true" translateBooleanAs="1,0"/>
-		<property name="f2" visible="true" translateBooleanAs="1,0"/>
-		<property name="f3" visible="true" translateBooleanAs="1,0"/>
-		<property name="f4" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="a1" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="a2" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="a3" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="a4" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="b1" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="b2" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="b3" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="b4" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="c1" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="c2" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="c3" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="c4" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="d1" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="d2" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="d3" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="d4" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="e1" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="e2" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="e3" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="e4" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="f1" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="f2" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="f3" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="f4" visible="true" translateBooleanAs="1,0"/>
 		<script>
 			<line>
 				<arg isUndefinedIfMatches="a1=">a1=${ptp_rm:a1#value}</arg>
@@ -160,7 +160,7 @@
 			<environment name="VAR_f3" value="${ptp_rm:f3#value}"/>
 			<environment name="VAR_f4" value="${ptp_rm:f4#value}"/>
 			<stdout-parser delim="\n">
-            <target type="property">
+            <target>
                <match>
                   <expression>(${ptp_rm:a1#value}).*</expression>
                   <set field="name">

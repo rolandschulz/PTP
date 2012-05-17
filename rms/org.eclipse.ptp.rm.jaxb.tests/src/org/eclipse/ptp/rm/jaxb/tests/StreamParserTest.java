@@ -30,7 +30,6 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 
@@ -274,11 +273,11 @@ public class StreamParserTest extends TestCase {
 
 	public void test00ParseQstat() {
 		target = "queues"; //$NON-NLS-1$
-		PropertyType p = new PropertyType();
+		AttributeType p = new AttributeType();
 		p.setName(target);
-		rmVarMap.getVariables().put(target, p);
+		rmVarMap.getAttributes().put(target, p);
 		runTokenizer(startup.get(0).getStdoutParser(), getQstatOut());
-		p = (PropertyType) rmVarMap.getVariables().get(target);
+		p = rmVarMap.getAttributes().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -289,12 +288,12 @@ public class StreamParserTest extends TestCase {
 	public void test01JobId() {
 		uuid = UUID.randomUUID().toString();
 		target = uuid;
-		PropertyType p = new PropertyType();
+		AttributeType p = new AttributeType();
 		p.setName(target);
 		p.setValue(target);
-		rmVarMap.getVariables().put(target, p);
+		rmVarMap.getAttributes().put(target, p);
 		runTokenizer(startup.get(1).getStdoutParser(), getNoiseBeforeJobId());
-		p = (PropertyType) rmVarMap.getVariables().get(target);
+		p = rmVarMap.getAttributes().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -305,9 +304,8 @@ public class StreamParserTest extends TestCase {
 	public void test02OpenMPI() {
 		target = JAXBControlConstants.ATTRIBUTE;
 		runTokenizer(startup.get(2).getStdoutParser(), getOpenMPIOut());
-		Map<String, Object> d = rmVarMap.getDiscovered();
-		for (Object o : d.values()) {
-			AttributeType ja = (AttributeType) o;
+		Map<String, AttributeType> d = rmVarMap.getDiscovered();
+		for (AttributeType ja : d.values()) {
 			if (verbose) {
 				System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
 				System.out.println("name " + ja.getName()); //$NON-NLS-1$
@@ -322,24 +320,13 @@ public class StreamParserTest extends TestCase {
 
 	public void test03ImplicitWithTags() {
 		runTokenizer(startup.get(3).getStdoutParser(), getImplicitWithTags());
-		Map<String, Object> d = rmVarMap.getDiscovered();
-		for (Object o : d.values()) {
-			if (o instanceof PropertyType) {
-				PropertyType p = (PropertyType) o;
-				if (verbose) {
-					System.out.println("DISCOVERED JAXBRMConstants.PROPERTY:"); //$NON-NLS-1$
-					System.out.println("name " + p.getName()); //$NON-NLS-1$
-					System.out.println("value " + p.getValue()); //$NON-NLS-1$
-					System.out.println("*********************************"); //$NON-NLS-1$
-				}
-			} else if (o instanceof AttributeType) {
-				AttributeType ja = (AttributeType) o;
-				if (verbose) {
-					System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
-					System.out.println("name " + ja.getName()); //$NON-NLS-1$
-					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
-					System.out.println("*********************************"); //$NON-NLS-1$
-				}
+		Map<String, AttributeType> d = rmVarMap.getDiscovered();
+		for (AttributeType ja : d.values()) {
+			if (verbose) {
+				System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
+				System.out.println("name " + ja.getName()); //$NON-NLS-1$
+				System.out.println("value " + ja.getValue()); //$NON-NLS-1$
+				System.out.println("*********************************"); //$NON-NLS-1$
 			}
 		}
 	}
@@ -347,9 +334,8 @@ public class StreamParserTest extends TestCase {
 	public void test04ImplicitOrdering() {
 		target = JAXBControlConstants.ATTRIBUTE;
 		runTokenizer(startup.get(4).getStdoutParser(), getImplicitOrdering());
-		Map<String, Object> d = rmVarMap.getDiscovered();
-		for (Object o : d.values()) {
-			AttributeType ja = (AttributeType) o;
+		Map<String, AttributeType> d = rmVarMap.getDiscovered();
+		for (AttributeType ja : d.values()) {
 			if (verbose) {
 				System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
 				System.out.println("name " + ja.getName()); //$NON-NLS-1$
@@ -364,24 +350,13 @@ public class StreamParserTest extends TestCase {
 
 	public void test05ImplicitWithTagsDotall() {
 		runTokenizer(startup.get(5).getStdoutParser(), getImplicitWithTags());
-		Map<String, Object> d = rmVarMap.getDiscovered();
-		for (Object o : d.values()) {
-			if (o instanceof PropertyType) {
-				PropertyType p = (PropertyType) o;
-				if (verbose) {
-					System.out.println("DISCOVERED JAXBRMConstants.PROPERTY:"); //$NON-NLS-1$
-					System.out.println("name " + p.getName()); //$NON-NLS-1$
-					System.out.println("value " + p.getValue()); //$NON-NLS-1$
-					System.out.println("*********************************"); //$NON-NLS-1$
-				}
-			} else if (o instanceof AttributeType) {
-				AttributeType ja = (AttributeType) o;
-				if (verbose) {
-					System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
-					System.out.println("name " + ja.getName()); //$NON-NLS-1$
-					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
-					System.out.println("*********************************"); //$NON-NLS-1$
-				}
+		Map<String, AttributeType> d = rmVarMap.getDiscovered();
+		for (AttributeType ja : d.values()) {
+			if (verbose) {
+				System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
+				System.out.println("name " + ja.getName()); //$NON-NLS-1$
+				System.out.println("value " + ja.getValue()); //$NON-NLS-1$
+				System.out.println("*********************************"); //$NON-NLS-1$
 			}
 		}
 	}
@@ -389,9 +364,8 @@ public class StreamParserTest extends TestCase {
 	public void test06PropertyDefsSingleLine() {
 		target = JAXBControlConstants.PROPERTY;
 		runTokenizer(startup.get(6).getStdoutParser(), getPropertyDefs());
-		Map<String, Object> d = rmVarMap.getDiscovered();
-		for (Object o : d.values()) {
-			PropertyType p = (PropertyType) o;
+		Map<String, AttributeType> d = rmVarMap.getDiscovered();
+		for (AttributeType p : d.values()) {
 			if (verbose) {
 				System.out.println("DISCOVERED JAXBRMConstants.PROPERTY:"); //$NON-NLS-1$
 				System.out.println("name " + p.getName()); //$NON-NLS-1$
@@ -403,11 +377,11 @@ public class StreamParserTest extends TestCase {
 
 	public void test07JobStates() {
 		target = "jobStates"; //$NON-NLS-1$
-		PropertyType p = new PropertyType();
+		AttributeType p = new AttributeType();
 		p.setName(target);
-		rmVarMap.getVariables().put(target, p);
+		rmVarMap.getAttributes().put(target, p);
 		runTokenizer(startup.get(7).getStdoutParser(), getJobStates());
-		p = (PropertyType) rmVarMap.getVariables().get(target);
+		p = rmVarMap.getAttributes().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -417,24 +391,13 @@ public class StreamParserTest extends TestCase {
 
 	public void test08Staggered() {
 		runTokenizer(startup.get(8).getStdoutParser(), getStaggered());
-		Map<String, Object> d = rmVarMap.getDiscovered();
-		for (Object o : d.values()) {
-			if (o instanceof PropertyType) {
-				PropertyType p = (PropertyType) o;
-				if (verbose) {
-					System.out.println("DISCOVERED JAXBRMConstants.PROPERTY:"); //$NON-NLS-1$
-					System.out.println("name " + p.getName()); //$NON-NLS-1$
-					System.out.println("value " + p.getValue()); //$NON-NLS-1$
-					System.out.println("*********************************"); //$NON-NLS-1$
-				}
-			} else if (o instanceof AttributeType) {
-				AttributeType ja = (AttributeType) o;
-				if (verbose) {
-					System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
-					System.out.println("name " + ja.getName()); //$NON-NLS-1$
-					System.out.println("value " + ja.getValue()); //$NON-NLS-1$
-					System.out.println("*********************************"); //$NON-NLS-1$
-				}
+		Map<String, AttributeType> d = rmVarMap.getDiscovered();
+		for (AttributeType ja : d.values()) {
+			if (verbose) {
+				System.out.println("DISCOVERED JAXBRMConstants.ATTRIBUTE:"); //$NON-NLS-1$
+				System.out.println("name " + ja.getName()); //$NON-NLS-1$
+				System.out.println("value " + ja.getValue()); //$NON-NLS-1$
+				System.out.println("*********************************"); //$NON-NLS-1$
 			}
 		}
 	}
@@ -442,9 +405,8 @@ public class StreamParserTest extends TestCase {
 	public void test09Merged() {
 		target = JAXBControlConstants.PROPERTY;
 		runTokenizer(startup.get(9).getStdoutParser(), getMergedOrdering());
-		Map<String, Object> d = rmVarMap.getDiscovered();
-		for (Object o : d.values()) {
-			PropertyType p = (PropertyType) o;
+		Map<String, AttributeType> d = rmVarMap.getDiscovered();
+		for (AttributeType p : d.values()) {
 			if (verbose) {
 				System.out.println("DISCOVERED JAXBRMConstants.PROPERTY:"); //$NON-NLS-1$
 				System.out.println("name " + p.getName()); //$NON-NLS-1$
@@ -457,11 +419,11 @@ public class StreamParserTest extends TestCase {
 
 	public void test10ExitOn() {
 		target = "jobStates"; //$NON-NLS-1$
-		PropertyType p = new PropertyType();
+		AttributeType p = new AttributeType();
 		p.setName(target);
-		rmVarMap.getVariables().put(target, p);
+		rmVarMap.getAttributes().put(target, p);
 		runTokenizer(startup.get(10).getStdoutParser(), getJobStates());
-		p = (PropertyType) rmVarMap.getVariables().get(target);
+		p = rmVarMap.getAttributes().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -471,11 +433,11 @@ public class StreamParserTest extends TestCase {
 
 	public void test11ExitAfter() {
 		target = "jobStates"; //$NON-NLS-1$
-		PropertyType p = new PropertyType();
+		AttributeType p = new AttributeType();
 		p.setName(target);
-		rmVarMap.getVariables().put(target, p);
+		rmVarMap.getAttributes().put(target, p);
 		runTokenizer(startup.get(11).getStdoutParser(), getJobStates());
-		p = (PropertyType) rmVarMap.getVariables().get(target);
+		p = rmVarMap.getAttributes().get(target);
 		assertNotNull(p);
 		assertNotNull(p.getValue());
 		if (verbose) {
@@ -486,11 +448,11 @@ public class StreamParserTest extends TestCase {
 	public void test12GetStatus() {
 		target = "42226";//$NON-NLS-1$
 		uuid = target;
-		PropertyType p = new PropertyType();
+		AttributeType p = new AttributeType();
 		p.setName(target);
-		rmVarMap.getVariables().put(target, p);
+		rmVarMap.getAttributes().put(target, p);
 		runTokenizer(getStatus.getStdoutParser(), getQstat());
-		p = (PropertyType) rmVarMap.getVariables().get(this.target);
+		p = rmVarMap.getAttributes().get(this.target);
 		assertNotNull(p);
 		System.out.println(p.getName() + JAXBControlConstants.CM + JAXBControlConstants.SP + p.getValue());
 	}

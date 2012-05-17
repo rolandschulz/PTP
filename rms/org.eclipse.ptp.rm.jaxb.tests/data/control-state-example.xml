@@ -11,11 +11,11 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="control-state-example">
 	<control-data>
-		<property name="checked00" visible="false"/>
-		<property name="checked01" visible="false"/>
-		<property name="checked10" visible="false"/>
-		<property name="checked11" visible="false"/>
-		<property name="saved" visible="true"/>
+		<attribute name="checked00" visible="false"/>
+		<attribute name="checked01" visible="false"/>
+		<attribute name="checked10" visible="false"/>
+		<attribute name="checked11" visible="false"/>
+		<attribute name="saved" visible="true"/>
 		<launch-tab>
 			<dynamic>
 				<title>Basic 0</title>
