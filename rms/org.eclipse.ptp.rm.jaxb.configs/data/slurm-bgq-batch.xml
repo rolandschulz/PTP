@@ -11,22 +11,22 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="resource_manager_type.xsd" name="SLURM-BGQ-Batch">
     <control-data>
-        <!-- this is a necessary property for the functioning of LML; link it to the batch-specific variable name -->
-        <property name="control.queue.name" visible="false">
+        <!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
+        <attribute name="control.queue.name" visible="false">
             <link-value-to>partition</link-value-to>
-        </property>
+        </attribute>
         <!-- we set this to invisible because the values are not really modifiable -->
-        <property name="queues" visible="false"/>
+        <attribute name="queues" visible="false"/>
         <!-- needed by RM internals for fetch; name is fixed by convention -->
-        <property name="stdout_remote_path" visible="false">
+        <attribute name="stdout_remote_path" visible="false">
             <default>${ptp_rm:workdir#value}/slurm-${ptp_rm:@jobId#default}.out</default>
             <link-value-to>output</link-value-to>
-        </property>
+        </attribute>
         <!-- needed by RM internals for fetch; name is fixed by convention -->
-        <property name="stderr_remote_path" visible="false">
+        <attribute name="stderr_remote_path" visible="false">
             <default>${ptp_rm:workdir#value}/slurm-${ptp_rm:@jobId#default}.out</default>
             <link-value-to>error</link-value-to>
-        </property>
+        </attribute>
 
         <attribute name="account" type="string">
             <description>Charge resources used by this job to specified account.</description>

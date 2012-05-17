@@ -13,6 +13,7 @@ package org.eclipse.ptp.rm.jaxb.core;
 import java.util.Map;
 
 import org.eclipse.ptp.ems.core.IEnvManager;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 
 /**
  * High-level interface for resolver environments.
@@ -33,13 +34,13 @@ public interface IVariableMap {
 	public void clear();
 
 	/**
-	 * Search for a property or attribute.
+	 * Search for an attribute.
 	 * 
 	 * @param name
-	 *            of Property or Attribute to find.
-	 * @return the found Property or Attribute
+	 *            of attribute to find.
+	 * @return the found attribute
 	 */
-	public Object get(String name);
+	public AttributeType get(String name);
 
 	/**
 	 * Get the default value of the attribute
@@ -50,11 +51,11 @@ public interface IVariableMap {
 	public String getDefault(String name);
 
 	/**
-	 * Get the map of Properties and Attributes discovered at runtime.
+	 * Get the map of attributes discovered at runtime.
 	 * 
 	 * @return the map containing any variables added through discovery processes, or <code>null</code> if unsupported
 	 */
-	public Map<String, Object> getDiscovered();
+	public Map<String, AttributeType> getDiscovered();
 
 	/**
 	 * Get the environment manager associated with this map.
@@ -89,27 +90,27 @@ public interface IVariableMap {
 	 * 
 	 * @return map containing the variables
 	 */
-	public Map<String, Object> getVariables();
+	public Map<String, AttributeType> getAttributes();
 
 	/**
-	 * Places a Property or Attribute directly in the environment.
+	 * Places a attribute directly in the environment.
 	 * 
 	 * @param name
 	 *            of variable
 	 * @param value
 	 *            of variable
 	 */
-	public void put(String name, Object value);
+	public void put(String name, AttributeType value);
 
 	/**
-	 * Removes a Property or Attribute. Checks first in the predefined values map, and if it does not exist there, removes from the
-	 * runtime values map.
+	 * Removes an attribute. Checks first in the predefined values map, and if it does not exist there, removes from the runtime
+	 * values map.
 	 * 
 	 * @param name
-	 *            of variable
+	 *            of attribute
 	 * @return value of removed variable
 	 */
-	public Object remove(String name);
+	public AttributeType remove(String name);
 
 	/**
 	 * Sets the default value of the attribute.

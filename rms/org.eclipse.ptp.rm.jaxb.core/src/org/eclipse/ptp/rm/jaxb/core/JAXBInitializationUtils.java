@@ -34,7 +34,6 @@ import javax.xml.validation.Validator;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.messages.Messages;
 import org.xml.sax.SAXException;
@@ -91,8 +90,7 @@ public class JAXBInitializationUtils {
 	public static void initializeMap(ResourceManagerData rmData, IVariableMap instance) {
 		ControlType control = rmData.getControlData();
 		instance.clear();
-		Map<String, Object> env = instance.getVariables();
-		addProperties(env, control);
+		Map<String, AttributeType> env = instance.getAttributes();
 		addAttributes(env, control);
 		instance.setInitialized(true);
 	}
@@ -175,7 +173,7 @@ public class JAXBInitializationUtils {
 	 * @param control
 	 *            JAXB data subtree for control part of resource manager
 	 */
-	private static void addAttributes(Map<String, Object> env, ControlType control) {
+	private static void addAttributes(Map<String, AttributeType> env, ControlType control) {
 		if (control == null) {
 			return;
 		}
@@ -184,27 +182,6 @@ public class JAXBInitializationUtils {
 			env.put(jobAttribute.getName(), jobAttribute);
 			if (jobAttribute.getValue() == null) {
 				jobAttribute.setValue(jobAttribute.getDefault());
-			}
-		}
-	}
-
-	/**
-	 * Adds the properties. If the property value is <code>null</code>, overwrites it with the default.
-	 * 
-	 * @param env
-	 *            the active instance of the resource manager environment map
-	 * @param control
-	 *            JAXB data subtree for control part of resource manager
-	 */
-	private static void addProperties(Map<String, Object> env, ControlType control) {
-		if (control == null) {
-			return;
-		}
-		List<PropertyType> properties = control.getProperty();
-		for (PropertyType property : properties) {
-			env.put(property.getName(), property);
-			if (property.getValue() == null) {
-				property.setValue(property.getDefault());
 			}
 		}
 	}

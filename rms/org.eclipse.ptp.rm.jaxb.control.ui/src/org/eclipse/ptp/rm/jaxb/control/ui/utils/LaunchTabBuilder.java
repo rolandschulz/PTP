@@ -46,7 +46,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.GridDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.GridLayoutType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.PushButtonType;
 import org.eclipse.ptp.rm.jaxb.core.data.RowDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.RowLayoutType;
@@ -130,20 +129,6 @@ public class LaunchTabBuilder {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * @param data
-	 *            Attribute or Property
-	 * @return whether it is visible to the user (and thus used to generate a widget and update model)
-	 */
-	private static boolean isVisible(Object data) {
-		if (data instanceof AttributeType) {
-			return ((AttributeType) data).isVisible();
-		} else if (data instanceof PropertyType) {
-			return ((PropertyType) data).isVisible();
-		}
-		return false;
 	}
 
 	/**
@@ -569,43 +554,39 @@ public class LaunchTabBuilder {
 		List<ColumnDataType> columnData = descriptor.getColumnData();
 		ICellEditorUpdateModel model = null;
 		Map<String, ICellEditorUpdateModel> hash = new TreeMap<String, ICellEditorUpdateModel>();
-		Map<String, Object> vars = null;
+		Map<String, AttributeType> vars = null;
 		if (items.isAllPredefined()) {
-			vars = rmVarMap.getVariables();
+			vars = rmVarMap.getAttributes();
 			for (String key : vars.keySet()) {
-				Object o = vars.get(key);
-				if (!isVisible(o)) {
+				AttributeType a = vars.get(key);
+				if (!a.isVisible()) {
 					continue;
 				}
-				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
+				model = UpdateModelFactory.createModel(a, viewer, columnData, tab);
 				hash.put(key, model);
 			}
 		}
 		if (items.isAllDiscovered()) {
 			vars = rmVarMap.getDiscovered();
 			for (String key : vars.keySet()) {
-				Object o = vars.get(key);
-				if (!isVisible(o)) {
+				AttributeType a = vars.get(key);
+				if (!a.isVisible()) {
 					continue;
 				}
-				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
+				model = UpdateModelFactory.createModel(a, viewer, columnData, tab);
 				hash.put(key, model);
 			}
 		}
 		for (String key : items.getInclude()) {
-			if (hash.containsKey(key)) {
-				continue;
-			}
-			Object o = rmVarMap.getVariables().get(key);
-			if (!isVisible(o)) {
-				continue;
-			}
-			if (o == null) {
-				o = rmVarMap.getDiscovered().get(key);
-			}
-			if (o != null) {
-				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
-				hash.put(key, model);
+			if (!hash.containsKey(key)) {
+				AttributeType a = rmVarMap.getAttributes().get(key);
+				if (a == null) {
+					a = rmVarMap.getDiscovered().get(key);
+				}
+				if (a != null && a.isVisible()) {
+					model = UpdateModelFactory.createModel(a, viewer, columnData, tab);
+					hash.put(key, model);
+				}
 			}
 		}
 		for (String key : items.getExclude()) {

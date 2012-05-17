@@ -207,8 +207,7 @@
 		prefix set to <i>ptp_rm</i>:
 		<code>
 			${ptp_rm:name#<i>fieldName</i>}
-		</code>
-		, e.g.,
+		</code>, e.g.,
 		<code>${ptp_rm:queues#value}</code>
 		(see further <a href="#PropertyAttributeType">below</a> on the
 		specific fields for properties and attributes).
@@ -336,7 +335,7 @@
 		<a name="Note1">BEST PRACTICE: VISIBLE vs INVISIBLE</a>
 	</h5>
 	<p>
-		Always mark properties or attributes which are the targets of <i>saveValueTo</i>
+		Always mark properties or attributes which are the targets of <i>attribute</i>
 		(see <a href="#Widget">below</a>) as <i>visible</i>="true"; if this
 		value is false, this variable will <i>always</i> be passed to the
 		configuration/environment of the resource manager; selection/exclusion
@@ -579,14 +578,11 @@
 		under the
 		<code>managed-files</code>
 		element. As with the
-		<code>managed-file</code>
-		, <i>deleteAfterSubmit</i> indicates that the script target should not
+		<code>managed-file</code> <i>deleteAfterSubmit</i> indicates that the script target should not
 		be retained (this is the default behavior); unlike the
-		<code>managed-file</code>
-		, however, the local copy of the generated script is always deleted. A
+		<code>managed-file</code>, however, the local copy of the generated script is always deleted. A
 		reserved property,
-		<code>managed_file_for_script</code>
-		, should be used to reference the script's path on the target
+		<code>managed_file_for_script</code>, should be used to reference the script's path on the target
 		resource; for instance, in the PBS submit command:
 	</p>
 
@@ -901,8 +897,8 @@
 		<code>org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer</code>
 		extension point, in which case this element should be set to its
 		extension id. Note that the extension requires the class to implement
-		<code>org.eclipse.ptp.rm.jaxb.control.internal.IStreamParserTokenizer</code>
-		, which is a Runnable interface with an initialize method which passes
+		<code>org.eclipse.ptp.rm.jaxb.control.internal.IStreamParserTokenizer</code>, 
+		which is a Runnable interface with an initialize method which passes
 		in any job id plus the current environment map; the details of such a
 		parser's implementation are not, however, configured from the XML
 		document.
@@ -1355,8 +1351,7 @@
 		The
 		<code>dynamic</code>
 		controllers belong to the
-		<code>tab-controller-type</code>
-		, which contains an arbitrary number of
+		<code>tab-controller-type</code>, which contains an arbitrary number of
 		<code>tab-folder,</code>
 		<code>composite,</code>
 		<code>widget,</code>
@@ -1370,8 +1365,7 @@
 		widgets in the usual manner. For all intents and purposes, the
 		<code>tab-controller-type</code>
 		is the same as a
-		<code>composite</code>
-		, but without the <i>group</i> attribute and with the extra field for
+		<code>composite</code>, but without the <i>group</i> attribute and with the extra field for
 		controlling shared widgets.
 	</p>
 
@@ -1510,55 +1504,62 @@
 		children.
 	</p>
 
-	<img alt="Composite" src="images/22control-state.jpeg" />
+	<img alt="Composite" src="images/22control-state.png" />
 	<br>
 
 	<p>
 		The purpose of these elements is to provide an optional way of setting
 		the <b>enabled</b> and/or <b>visible</b> states of the control on the
-		basis of the state of button (checkbox/radio) selection. One can
+		basis of the state of button (checkbox/radio) selection or the value of an attribute. One can
 		define two such elements per control, using one of the show/hide or
 		enable/disable pairs. Each of these is associated with a
 		<code>control-state-rule:</code>
 	</p>
 
-	<img alt="Composite" src="images/23control-state-rule.jpeg" />
+	<img alt="Composite" src="images/23control-state-rule.png" />
 	<br>
 
-	<p>The basic rule is defined by its attributes:</p>
+	<p>The basic rule is defined by its attributes. Rules can specify either:</p>
 
-	<ol>
-		<li>the id of the button control to check;</li>
-		<li>whether its selected state should be true or false.</li>
-	</ol>
+	<ul>
+		<li>the id of the button control to check (<i>button</i>)</li>
+		<li>whether its selected state should be true or false (<i>selected</i>)</li>
+	</ul>
+	
+	<p>or</p>
 
-	<p>Rules can be nested to an arbitrary depth to form clauses
+	<ul>
+		<li>the name of an attribute (<i>attribute</i>)</li>
+		<li>the value of the attribute (<i>value</i>).</li>
+	</ul>
+
+	<p>Only one combination of <i>button</i> and <i>selected</i> or <i>attribute</i> and <i>value</i> can be
+	specified in a rule. Rules can be nested to an arbitrary depth to form clauses
 		governed by the logical operators.</p>
 
 	<p>
-		A
+		When using a rule containing <i>button</i> and <i>selected</i>, the
+		"trigger" button control must have an id unique to the resource
+		manager configuration. This will be assigned via the <i>buttonId</i>
+		attribute on the
+		<code>widget</code>
+		corresponding to the button (true also for the buttons nested in a
+		<code>button-group</code>
+		). For these rules, a
 		<code>SelectionListener</code>
 		is created for this target which subscribes to all the controls in the
 		rule; when it receives an event, it evaluates the rule, and if the
 		result is true, takes the associated action on this target.
 	</p>
-
-	<p>
-		When one wishes to wire two or more such controls in this way, the
-		"trigger" button control must have an id unique to the resource
-		manager configuration. This will be assigned via the <i>buttonId</i>
-		element on the
-		<code>widget</code>
-		corresponding to the button (true also for the buttons nested in a
-		<code>button-group</code>
-		).
-	</p>
+	
+	<p>For rules that spectify <i>attribute</i> and <i>value</i>, the attribute value will be checked 
+	when the attribute or any control is updated.</p>
 
 	<p>Here is an example which sets the enabled and visible properties
 		of both a text field and a related checkbox:</p>
 
 	<pre>
-               &lt;widget type="checkbox" buttonId="002" title="Host list:" saveValueTo="checked002"&gt;
+               &lt;widget type="checkbox" buttonId="002" title="Host list:" attribute="checked002"&gt;
                   &lt;layout-data&gt;
                      &lt;grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.TOP"/&gt;
                   &lt;/layout-data&gt;
@@ -1566,7 +1567,7 @@
                      &lt;show-if button="001" selected="true"/&gt;
                   &lt;/control-state&gt;
                &lt;/widget&gt;
-               &lt;widget type="text" style="SWT.V_SCROLL | SWT.BORDER" saveValueTo="host_list"&gt;
+               &lt;widget type="text" style="SWT.V_SCROLL | SWT.BORDER" attribute="host_list"&gt;
                   &lt;layout-data&gt;
                      &lt;grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"
                         grabExcessVertical="true"/&gt;
@@ -1606,9 +1607,11 @@
 	<p>
 		We now come to the five non-container widget elements with functional
 		characteristics. The first of these is the
-		<code>widget</code>
-		, which comprises a number of simple widget types.
+		<code>widget</code>, which comprises a number of simple widget types.
 	<p>
+
+	<img alt="Widget" src="images/19widget.png" />
+
 	<p>
 		The <i>type</i> of the widget can be one of the following:
 	</p>
@@ -1665,7 +1668,7 @@
 				widgets; the text area in this case is not editable.</td>
 		</tr>
 		<tr>
-			<td><i>saveValueTo</i></td>
+			<td><i>attribute</i></td>
 			<td>applies to all widgets except <code>label</code>; the name
 				of the property or attribute whose value should be set on the basis
 				of the widget's "selected" value or text.<br> <b>Note:</b> use
@@ -1708,20 +1711,19 @@
 		<a name="ButtonGroup">Button Group</a>
 	</h4>
 
-	<img alt="ButtonGroup" src="images/20button-group.jpeg" />
+	<img alt="ButtonGroup" src="images/20button-group.png" />
 
 	<p>
 		The button group provides an explicit selection of a single value
 		based on a mutually exclusive set of button labels. Just as with the
-		<code>widget</code>
-		, one uses <i>saveValueTo</i> to indicate what property or attribute
+		<code>widget</code>, one uses <i>attribute</i> to indicate what property or attribute
 		value to set. The
 		<code>button</code>
 		elements, which can be arranged horizontally or vertically using the <i>style</i>
 		attribute (SWT.HORIZONTAL, SWT.VERTICAL), will be
 		<code>widget</code>
 		elements whose type is either <i>checkbox</i> or <i>radiobutton</i>
-		(if a different widget type is given, an error will occur); the <i>saveValueTo</i>
+		(if a different widget type is given, an error will occur); the <i>attribute</i>
 		attribute on the individual button will be ignored. Radio buttons are
 		"sticky" in the sense that once they are selected, they cannot be
 		"unchecked" until a different button in the group is selected. It is
@@ -1743,7 +1745,7 @@
 		<a name="Browse">Browse</a>
 	</h4>
 
-	<img alt="BrowseType" src="images/190browse.jpeg" />
+	<img alt="BrowseType" src="images/190browse.png" />
 
 	<p>
 		A special widget-pair -- a text widget followed by a push button --
@@ -1818,8 +1820,7 @@
 
 	<p>
 		The last of the widget types, the
-		<code>attribute-viewer</code>
-		, displays visible properties and attributes in a table or tree
+		<code>attribute-viewer</code>, displays visible properties and attributes in a table or tree
 		viewer, with the value columns as editable widgets. The type of cell
 		editor is determined implicitly here by the type of the property or
 		attribute; the presence of a combo editor is determined by an
@@ -1997,10 +1998,8 @@
 		over the necessary driver scripts to the <i>.eclipsesettings</i>
 		directory in the user's home, is overridden by connecting to a
 		pre-existent installation. This can be specified either using the
-		<code>url</code>
-		, or a combination of the
-		<code>name</code>
-		,
+		<code>url</code>, or a combination of the
+		<code>name</code>,
 		<code>path</code>
 		and
 		<code>args</code>

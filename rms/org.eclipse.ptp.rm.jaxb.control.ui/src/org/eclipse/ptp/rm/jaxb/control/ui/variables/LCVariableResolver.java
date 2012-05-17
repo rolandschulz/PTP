@@ -45,7 +45,7 @@ public class LCVariableResolver implements IDynamicVariableResolver {
 					argument = split[0];
 				}
 			}
-			Object value = active.get(argument);
+			Object value = active.getValue(argument);
 			if (value != null) {
 				if (value instanceof String && EnvManagerConfigString.isEnvMgmtConfigString((String) value)) {
 					IEnvManager envMgr = active.getEnvironmentManager();

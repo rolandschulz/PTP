@@ -31,11 +31,10 @@ public class EnvConfigButtonUpdateModel extends AbstractUpdateModel implements M
 	 * Constructor.
 	 * 
 	 * @param name
-	 *            name of the model, which will correspond to the name of a
-	 *            Property or Attribute if the widget value is to be saved.
+	 *            name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be
+	 *            saved.
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 * @param button
 	 *            the widget to which this model corresponds
 	 */
@@ -60,12 +59,9 @@ public class EnvConfigButtonUpdateModel extends AbstractUpdateModel implements M
 	}
 
 	/*
-	 * Model serves as widget modify listener; calls {@link #storeValue()}
-	 * (non-Javadoc)
+	 * Model serves as widget modify listener; calls {@link #storeValue()} (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events
-	 * .ModifyEvent)
+	 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events .ModifyEvent)
 	 */
 	public void modifyText(ModifyEvent e) {
 		if (refreshing) {
@@ -79,15 +75,14 @@ public class EnvConfigButtonUpdateModel extends AbstractUpdateModel implements M
 	}
 
 	/*
-	 * Sets the value on the text, either by resolving the arguments for
-	 * read-only, or by retrieving the value. Turns on the refreshing flag so as
-	 * not to trigger further updates from the listener. (non-Javadoc)
+	 * Sets the value on the text, either by resolving the arguments for read-only, or by retrieving the value. Turns on the
+	 * refreshing flag so as not to trigger further updates from the listener. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#refreshValueFromMap()
 	 */
 	public void refreshValueFromMap() {
 		refreshing = true;
-		mapValue = lcMap.get(name);
+		mapValue = lcMap.getValue(name);
 		if (JAXBUIConstants.ZEROSTR.equals(mapValue)) {
 			mapValue = null;
 		}

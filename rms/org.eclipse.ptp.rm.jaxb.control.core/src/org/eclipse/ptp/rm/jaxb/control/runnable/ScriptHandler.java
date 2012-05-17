@@ -24,8 +24,8 @@ import org.eclipse.ptp.rm.jaxb.control.internal.utils.EnvironmentVariableUtils;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.LineType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 
 /**
@@ -74,7 +74,7 @@ public class ScriptHandler extends Job {
 	}
 
 	/**
-	 * Composes script. If the variable map is the resource manager's environment, then the SCRIPT property is added to it, with it
+	 * Composes script. If the variable map is the resource manager's environment, then the SCRIPT attribute is added to it, with it
 	 * value set to the script string that has been generated.
 	 */
 	@Override
@@ -82,11 +82,11 @@ public class ScriptHandler extends Job {
 		scriptValue = composeScript(monitor);
 		if (map instanceof RMVariableMap) {
 			RMVariableMap rmMap = (RMVariableMap) map;
-			PropertyType p = new PropertyType();
-			p.setName(JAXBControlConstants.SCRIPT);
-			p.setValue(scriptValue);
-			p.setVisible(false);
-			rmMap.put(JAXBControlConstants.SCRIPT, p);
+			AttributeType a = new AttributeType();
+			a.setName(JAXBControlConstants.SCRIPT);
+			a.setValue(scriptValue);
+			a.setVisible(false);
+			rmMap.put(JAXBControlConstants.SCRIPT, a);
 		}
 		return Status.OK_STATUS;
 	}

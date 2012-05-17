@@ -59,7 +59,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.SiteType;
@@ -355,15 +354,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		updatePropertyValues(configuration, null);
 
-		Object changedValue = null;
+		AttributeType changedValue = null;
 
 		if (resetValue != null) {
 			changedValue = getVarMap().get(resetValue);
-			if (changedValue instanceof PropertyType) {
-				((PropertyType) changedValue).setValue(null);
-			} else if (changedValue instanceof AttributeType) {
-				((AttributeType) changedValue).setValue(null);
-			}
+			changedValue.setValue(null);
 		}
 
 		CommandType command = null;
@@ -602,8 +597,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			}
 		}
 
-		PropertyType scriptVar = (PropertyType) getVarMap().get(JAXBControlConstants.SCRIPT);
-		PropertyType scriptPathVar = (PropertyType) getVarMap().get(JAXBControlConstants.SCRIPT_PATH);
+		AttributeType scriptVar = getVarMap().get(JAXBControlConstants.SCRIPT);
+		AttributeType scriptPathVar = getVarMap().get(JAXBControlConstants.SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
 				files = new ManagedFilesType();
@@ -674,8 +669,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 * @return whether the script target should be deleted
 	 */
 	private boolean maybeHandleScript(String uuid, ScriptType script, IProgressMonitor monitor) {
-		PropertyType p = (PropertyType) getVarMap().get(JAXBControlConstants.SCRIPT_PATH);
-		if (p != null && p.getValue() != null) {
+		AttributeType a = getVarMap().get(JAXBControlConstants.SCRIPT_PATH);
+		if (a != null && a.getValue() != null) {
 			return false;
 		}
 		if (script == null) {
@@ -807,9 +802,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	private void setFixedConfigurationProperties(IProgressMonitor monitor) throws CoreException {
 		IRemoteConnection rc = getRemoteServicesDelegate(monitor).getRemoteConnection();
 		if (rc != null) {
-			getVarMap().maybeAddProperty(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
-			getVarMap().maybeAddProperty(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
-			getVarMap().maybeAddProperty(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
+			getVarMap().maybeAddAttribute(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
+			getVarMap().maybeAddAttribute(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
+			getVarMap().maybeAddAttribute(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
 		}
 	}
 
@@ -820,22 +815,18 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 	 *            passed in from Launch Tab when the "run" command is chosen.
 	 * @throws CoreException
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	private void updatePropertyValues(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 40);
 
 		setFixedConfigurationProperties(progress.newChild(10));
 
-		Map lcattr = RMVariableMap.getValidAttributes(configuration);
-		for (Object key : lcattr.keySet()) {
+		Map<String, Object> lcattr = RMVariableMap.getValidAttributes(configuration);
+		for (String key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
-			Object target = getVarMap().get(key.toString());
-			if (target instanceof PropertyType) {
-				PropertyType p = (PropertyType) target;
-				p.setValue(value);
-			} else if (target instanceof AttributeType) {
-				AttributeType ja = (AttributeType) target;
-				ja.setValue(value);
+			AttributeType target = getVarMap().get(key.toString());
+			if (target != null) {
+				target.setValue(value);
 			}
 		}
 
@@ -845,19 +836,11 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * The non-selected variables have been excluded from the valid attributes of the configuration; but we need to null out the
 		 * superset values here that are undefined.
 		 */
-		for (String key : getVarMap().getVariables().keySet()) {
+		for (String key : getVarMap().getAttributes().keySet()) {
 			if (!lcattr.containsKey(key)) {
-				Object target = getVarMap().get(key.toString());
-				if (target instanceof PropertyType) {
-					PropertyType p = (PropertyType) target;
-					if (p.isVisible()) {
-						p.setValue(null);
-					}
-				} else if (target instanceof AttributeType) {
-					AttributeType ja = (AttributeType) target;
-					if (ja.isVisible()) {
-						ja.setValue(null);
-					}
+				AttributeType target = getVarMap().get(key.toString());
+				if (target.isVisible()) {
+					target.setValue(null);
 				}
 			}
 		}
@@ -880,12 +863,12 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 */
 		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, (String) null);
 		if (attr != null) {
-			PropertyType p = (PropertyType) getVarMap().get(JAXBControlConstants.DEBUGGER_ARGS);
-			if (p == null) {
-				p = new PropertyType();
-				getVarMap().put(JAXBControlConstants.DEBUGGER_ARGS, p);
+			AttributeType a = getVarMap().get(JAXBControlConstants.DEBUGGER_ARGS);
+			if (a == null) {
+				a = new AttributeType();
+				getVarMap().put(JAXBControlConstants.DEBUGGER_ARGS, a);
 			}
-			p.setValue(attr);
+			a.setValue(attr);
 		}
 
 		launchEnv.clear();
@@ -935,10 +918,10 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		try {
 			pinTable.pin(jobId);
-			PropertyType p = new PropertyType();
-			p.setVisible(false);
-			p.setName(jobId);
-			getVarMap().put(jobId, p);
+			AttributeType a = new AttributeType();
+			a.setVisible(false);
+			a.setName(jobId);
+			getVarMap().put(jobId, a);
 			worked(progress, 30);
 			doControlCommand(jobId, operation);
 			getVarMap().remove(jobId);
@@ -1013,21 +996,21 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			String state = status == null ? IJobStatus.UNDETERMINED : status.getStateDetail();
 
 			try {
-				PropertyType p = (PropertyType) getVarMap().get(jobId);
+				AttributeType a = getVarMap().get(jobId);
 
 				CommandType job = getConfiguration().getControlData().getGetJobStatus();
 				if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
 					pinTable.pin(jobId);
-					p = new PropertyType();
-					p.setVisible(false);
-					p.setName(jobId);
-					getVarMap().put(jobId, p);
+					a = new AttributeType();
+					a.setVisible(false);
+					a.setName(jobId);
+					getVarMap().put(jobId, a);
 					runCommand(jobId, job, CommandJob.JobMode.STATUS, null, ILaunchManager.RUN_MODE, true);
-					p = (PropertyType) getVarMap().remove(jobId);
+					a = getVarMap().remove(jobId);
 				}
 
-				if (p != null) {
-					state = String.valueOf(p.getValue());
+				if (a != null) {
+					state = String.valueOf(a.getValue());
 				}
 			} finally {
 				pinTable.release(jobId);
@@ -1138,9 +1121,9 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 
 		String jobId = null;
 
-		PropertyType p = new PropertyType();
-		p.setVisible(false);
-		getVarMap().put(uuid, p);
+		AttributeType a = new AttributeType();
+		a.setVisible(false);
+		getVarMap().put(uuid, a);
 
 		/*
 		 * Overwrite property/attribute values based on user choices. Note that the launch can also modify attributes.
@@ -1200,7 +1183,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		 * resolve proxy-specific info
 		 */
 		getVarMap().remove(uuid);
-		jobId = p.getName();
+		jobId = a.getName();
 
 		/*
 		 * job was cancelled during waitForId

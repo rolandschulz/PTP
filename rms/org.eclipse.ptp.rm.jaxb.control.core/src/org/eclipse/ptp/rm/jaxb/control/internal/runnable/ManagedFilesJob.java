@@ -38,7 +38,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.LineType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 
 /**
  * A managed file is a client-side file which needs to be moved to the resource to which the job will be submitted. This class wraps
@@ -188,15 +187,15 @@ public class ManagedFilesJob extends Job {
 			if (m.isCanceled()) {
 				break;
 			}
-			PropertyType p = new PropertyType();
-			p.setName(file.getName());
+			AttributeType a = new AttributeType();
+			a.setName(file.getName());
 			if (localTarget) {
-				p.setValue(new File(System.getProperty(JAXBControlConstants.JAVA_USER_HOME), target).getAbsolutePath());
+				a.setValue(new File(System.getProperty(JAXBControlConstants.JAVA_USER_HOME), target).getAbsolutePath());
 			} else {
-				p.setValue(target);
+				a.setValue(target);
 			}
-			p.setVisible(false);
-			rmVarMap.put(p.getName(), p);
+			a.setVisible(false);
+			rmVarMap.put(a.getName(), a);
 			progress.worked(5);
 		}
 	}
@@ -216,8 +215,8 @@ public class ManagedFilesJob extends Job {
 				progress.worked(15);
 				continue;
 			}
-			PropertyType p = (PropertyType) rmVarMap.get(file.getName());
-			IFileStore store = delegate.getRemoteFileManager().getResource(String.valueOf(p.getValue()));
+			AttributeType a = rmVarMap.get(file.getName());
+			IFileStore store = delegate.getRemoteFileManager().getResource(String.valueOf(a.getValue()));
 			try {
 				if (store.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
 					store.delete(EFS.NONE, progress.newChild(10));
@@ -285,12 +284,7 @@ public class ManagedFilesJob extends Job {
 						end = contents.indexOf(JAXBControlConstants.CLOSV);
 					}
 					String key = contents.substring(start, end);
-					Object o = rmVarMap.get(key);
-					if (o instanceof PropertyType) {
-						contents = String.valueOf(((PropertyType) o).getValue());
-					} else if (o instanceof AttributeType) {
-						contents = String.valueOf(((AttributeType) o).getValue());
-					}
+					contents = String.valueOf(rmVarMap.get(key).getValue());
 				}
 			}
 			fw = new FileWriter(localFile, false);

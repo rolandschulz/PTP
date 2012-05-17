@@ -19,7 +19,6 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 
 /**
  * Convenience methods for handling name-value pair objects (the JAXB NameValuePair).
@@ -89,14 +88,8 @@ public class EnvironmentVariableUtils {
 	 */
 	public static String toString(IVariableMap map) {
 		StringBuffer b = new StringBuffer();
-		for (Object o : map.getVariables().values()) {
-			if (o instanceof PropertyType) {
-				PropertyType p = (PropertyType) o;
-				b.append(p.getName()).append(JAXBControlConstants.EQ).append(p.getValue()).append(JAXBControlConstants.LINE_SEP);
-			} else if (o instanceof AttributeType) {
-				AttributeType a = (AttributeType) o;
-				b.append(a.getName()).append(JAXBControlConstants.EQ).append(a.getValue()).append(JAXBControlConstants.LINE_SEP);
-			}
+		for (AttributeType a : map.getAttributes().values()) {
+			b.append(a.getName()).append(JAXBControlConstants.EQ).append(a.getValue()).append(JAXBControlConstants.LINE_SEP);
 		}
 
 		return b.toString();

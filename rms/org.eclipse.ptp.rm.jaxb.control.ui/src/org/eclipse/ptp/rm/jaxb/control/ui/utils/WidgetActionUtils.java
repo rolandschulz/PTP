@@ -41,7 +41,6 @@ import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.FileMatchType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.RangeType;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
@@ -99,8 +98,7 @@ public class WidgetActionUtils {
 	}
 
 	/**
-	 * Get Combo items from a reference to another Attribute or Property with a
-	 * Collection as its value.
+	 * Get Combo items from a reference to another Attribute or Property with a Collection as its value.
 	 * 
 	 * @param map
 	 *            resource manager environment
@@ -112,25 +110,15 @@ public class WidgetActionUtils {
 		if (itemsFrom == null) {
 			return new String[0];
 		}
-		Object data = map.get(itemsFrom);
+		AttributeType data = map.get(itemsFrom);
 		if (data == null) {
 			return new String[0];
 		}
 		Collection<String> values = null;
-		if (data instanceof AttributeType) {
-			AttributeType a = (AttributeType) data;
-			Object value = a.getValue();
-			if (value instanceof Collection<?>) {
-				values = (Collection<String>) value;
-			}
-		} else if (data instanceof PropertyType) {
-			PropertyType p = (PropertyType) data;
-			Object value = p.getValue();
-			if (value instanceof Collection<?>) {
-				values = (Collection<String>) value;
-			}
-		} else if (data instanceof Collection<?>) {
-			values = (Collection<String>) data;
+
+		Object value = data.getValue();
+		if (value instanceof Collection<?>) {
+			values = (Collection<String>) value;
 		}
 
 		if (values != null) {
@@ -144,8 +132,7 @@ public class WidgetActionUtils {
 	 * Get the selected item from the combo.
 	 * 
 	 * @param combo
-	 * @return if there are no items or the selection index is not set, return
-	 *         the text field; else the indexed item
+	 * @return if there are no items or the selection index is not set, return the text field; else the indexed item
 	 */
 	public static String getSelected(Combo combo) {
 		if (combo.isDisposed()) {
@@ -180,10 +167,8 @@ public class WidgetActionUtils {
 	}
 
 	/**
-	 * Searches for the text among the choices; if not found, and the Combo is
-	 * editable, it adds the new text to the choices and selects it; if
-	 * read-only, the empty string is returned. Otherwise the corresponding item
-	 * is selected in the Combo.
+	 * Searches for the text among the choices; if not found, and the Combo is editable, it adds the new text to the choices and
+	 * selects it; if read-only, the empty string is returned. Otherwise the corresponding item is selected in the Combo.
 	 * 
 	 * @param combo
 	 * @param text
@@ -233,11 +218,9 @@ public class WidgetActionUtils {
 	 * @param value
 	 *            to be validated
 	 * @param validator
-	 *            JAXB data element describing the validator (either a regex or
-	 *            EFS file validator).
+	 *            JAXB data element describing the validator (either a regex or EFS file validator).
 	 * @param fileManager
-	 *            local or remote manager from the remote services delegate of
-	 *            resource manager
+	 *            local or remote manager from the remote services delegate of resource manager
 	 * @throws Exception
 	 *             if validation fails
 	 */
@@ -279,8 +262,7 @@ public class WidgetActionUtils {
 	}
 
 	/**
-	 * Converts string representation of OR'd EFS attributes into the Java int
-	 * value.
+	 * Converts string representation of OR'd EFS attributes into the Java int value.
 	 * 
 	 * @param efsAttrStr
 	 *            string representation of OR'd values.
@@ -382,8 +364,7 @@ public class WidgetActionUtils {
 	}
 
 	/**
-	 * Checks EFS attributes of returned file info. Calls
-	 * {@link #getEfsAttributeValue(String)}.
+	 * Checks EFS attributes of returned file info. Calls {@link #getEfsAttributeValue(String)}.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.FileMatch
 	 * @see org.eclipse.core.filesystem.IFileStore
@@ -394,8 +375,7 @@ public class WidgetActionUtils {
 	 * @param value
 	 *            the file path
 	 * @param fileManager
-	 *            local or remote manager from the remote services delegate of
-	 *            resource manager
+	 *            local or remote manager from the remote services delegate of resource manager
 	 * @return whether validation succeeded
 	 * @throws CoreException
 	 */

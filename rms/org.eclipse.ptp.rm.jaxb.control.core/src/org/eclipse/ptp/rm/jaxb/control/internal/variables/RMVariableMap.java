@@ -28,7 +28,6 @@ import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 
 /**
  * Abstraction representing all the Property and Attribute definitions associated with a resource manager configuration. This
@@ -53,19 +52,19 @@ public class RMVariableMap implements IVariableMap {
 	 * @return currently valid variables
 	 */
 	@SuppressWarnings("unchecked")
-	public static Map<Object, Object> getValidAttributes(ILaunchConfiguration config) throws CoreException {
+	public static Map<String, Object> getValidAttributes(ILaunchConfiguration config) throws CoreException {
 		String rmId = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 				JAXBControlConstants.TEMP);
 		rmId += JAXBControlConstants.DOT;
 		int len = rmId.length();
 
-		Map<String, Object> attr = config.getAttributes();
-		Map<Object, Object> current = new TreeMap<Object, Object>();
+		Map<String, Object> attrs = config.getAttributes();
+		Map<String, Object> current = new TreeMap<String, Object>();
 		Map<String, Object> rmAttr = new HashMap<String, Object>();
 		Set<String> include = new HashSet<String>();
 
-		for (String name : attr.keySet()) {
-			Object value = attr.get(name);
+		for (String name : attrs.keySet()) {
+			Object value = attrs.get(name);
 			if (value == null || JAXBControlConstants.ZEROSTR.equals(value)) {
 				continue;
 			}
@@ -90,7 +89,7 @@ public class RMVariableMap implements IVariableMap {
 			}
 		}
 
-		for (Object var : rmAttr.keySet()) {
+		for (String var : rmAttr.keySet()) {
 			Object value = rmAttr.get(var);
 			if (include.contains(var)) {
 				current.put(var, value);
@@ -136,14 +135,14 @@ public class RMVariableMap implements IVariableMap {
 				|| name.equals(JAXBControlConstants.STDERR_REMOTE_FILE) || name.equals(JAXBControlConstants.PTP_DIRECTORY);
 	}
 
-	private final Map<String, Object> variables;
-	private final Map<String, Object> discovered;
+	private final Map<String, AttributeType> variables;
+	private final Map<String, AttributeType> discovered;
 	private boolean initialized;
 	private IEnvManager envManager;
 
 	public RMVariableMap() {
-		this.variables = Collections.synchronizedMap(new TreeMap<String, Object>());
-		this.discovered = Collections.synchronizedMap(new TreeMap<String, Object>());
+		this.variables = Collections.synchronizedMap(new TreeMap<String, AttributeType>());
+		this.discovered = Collections.synchronizedMap(new TreeMap<String, AttributeType>());
 		this.initialized = false;
 	}
 
@@ -163,15 +162,15 @@ public class RMVariableMap implements IVariableMap {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#get(java.lang.String)
 	 */
-	public Object get(String name) {
+	public AttributeType get(String name) {
 		if (name == null) {
 			return null;
 		}
-		Object o = variables.get(name);
-		if (o == null) {
-			o = discovered.get(name);
+		AttributeType a = variables.get(name);
+		if (a == null) {
+			a = discovered.get(name);
 		}
-		return o;
+		return a;
 	}
 
 	/*
@@ -189,7 +188,7 @@ public class RMVariableMap implements IVariableMap {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getDiscovered()
 	 */
-	public Map<String, Object> getDiscovered() {
+	public Map<String, AttributeType> getDiscovered() {
 		return discovered;
 	}
 
@@ -231,9 +230,9 @@ public class RMVariableMap implements IVariableMap {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getVariables()
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getAttributes()
 	 */
-	public Map<String, Object> getVariables() {
+	public Map<String, AttributeType> getAttributes() {
 		return variables;
 	}
 
@@ -245,68 +244,53 @@ public class RMVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * Only creates property and adds it if value is not <code>null</code>.
+	 * Only creates an attribute and adds it if value is not <code>null</code>.
 	 * 
 	 * @param name
-	 *            of property to add
+	 *            of attribute to add
 	 * @param value
-	 *            of property to add
+	 *            of attribute to add
 	 * @param visible
-	 *            whether this property is to be made available through the user interface (Launch Tab)
+	 *            whether this attribute is to be made available through the user interface (Launch Tab)
 	 */
-	public void maybeAddProperty(String name, Object value, boolean visible) {
+	public void maybeAddAttribute(String name, Object value, boolean visible) {
 		if (name == null) {
 			return;
 		}
 
-		Object o = get(name);
-		PropertyType p = null;
-		AttributeType a = null;
-		if (o == null && value != null) {
-			p = new PropertyType();
-			variables.put(name, p);
-		} else if (o instanceof PropertyType) {
-			if (value != null) {
-				p = (PropertyType) o;
-			} else {
-				remove(name);
-			}
-		} else if (o instanceof AttributeType) {
-			if (value != null) {
-				a = (AttributeType) o;
-			} else {
-				remove(name);
-			}
+		AttributeType a = get(name);
+		if (a == null) {
+			a = new AttributeType();
+			a.setName(name);
+			variables.put(name, a);
 		}
 
-		if (p != null) {
-			p.setName(name);
-			p.setValue(value);
-			p.setVisible(visible);
-		} else if (a != null) {
-			a.setName(name);
+		if (value != null) {
 			a.setValue(value);
 			a.setVisible(visible);
 		}
 	}
 
 	/**
-	 * Looks for property in the configuration and uses it to create a Property in the current environment. If the property is
-	 * undefined or has a <code>null</code> value in the configuration, this will not overwrite a currently defined property in the
-	 * environment. <br>
+	 * Looks for an attribute in the configuration and uses it to create an attribute in the current environment. If the attribute
+	 * is undefined or has a <code>null</code> value in the configuration, this will not overwrite a currently defined attribute in
+	 * the environment. <br>
 	 * <br>
-	 * Delegates to {@link #maybeAddProperty(String, Object, boolean)}
+	 * Delegates to {@link #maybeAddAttribute(String, AttributeType, boolean)}
 	 * 
 	 * @param key1
-	 *            to map the property to in the environemnt
+	 *            to map the attribute to in the environment
 	 * @param key2
-	 *            to search for the property in the configuration
+	 *            to search for the attribute in the configuration
 	 * @param map
 	 *            to search
 	 * @throws CoreException
 	 */
 	public void overwrite(String key1, String key2, Map<String, Object> map) throws CoreException {
-		maybeAddProperty(key1, map.get(key2), false);
+		Object value = map.get(key2);
+		if (value != null) {
+			maybeAddAttribute(key1, value, false);
+		}
 	}
 
 	/*
@@ -314,7 +298,7 @@ public class RMVariableMap implements IVariableMap {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#put(java.lang.String, java.lang.Object)
 	 */
-	public void put(String name, Object value) {
+	public void put(String name, AttributeType value) {
 		if (name == null) {
 			return;
 		}
@@ -326,11 +310,11 @@ public class RMVariableMap implements IVariableMap {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#remove(java.lang.String)
 	 */
-	public Object remove(String name) {
+	public AttributeType remove(String name) {
 		if (name == null) {
 			return null;
 		}
-		Object o = variables.remove(name);
+		AttributeType o = variables.remove(name);
 		if (o == null) {
 			o = discovered.remove(name);
 		}

@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType;
 import org.eclipse.swt.widgets.Button;
 
@@ -121,7 +122,7 @@ public class ControlStateRule {
 			return false;
 		}
 		if (attribute != null) {
-			Object attrVal = varMap.get(attribute);
+			AttributeType attrVal = varMap.get(attribute);
 			return (attrVal != null) && value.equals(attrVal.toString());
 		}
 		return selected == button.getSelection();

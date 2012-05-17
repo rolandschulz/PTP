@@ -9,14 +9,14 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="Open MPI-Generic-Interactive">
 	<control-data>
-		<!-- this is a necessary property for the functioning of LML; link it to the batch-specific variable name -->
-		<property name="control.queue.name" visible="false">
+		<!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
+		<attribute name="control.queue.name" visible="false">
 			<link-value-to>destination</link-value-to>
-		</property>
-		<property name="ompi_minor_version" visible="false" type="integer"/>
-		<property name="local_prefix" visible="false" type="string">
+		</attribute>
+		<attribute name="ompi_minor_version" visible="false" type="integer"/>
+		<attribute name="local_prefix" visible="false" type="string">
 			<default></default>
-		</property>
+		</attribute>
 		<attribute name="mpiNumberOfProcesses" min="1" type="integer"/>
 		<attribute name="byNodeOption" type="boolean"/>
 		<attribute name="bySlotOption" type="boolean"/>
@@ -29,7 +29,7 @@
 			<arg>-a</arg>
 			<arg>--parseable</arg>
 			<stdout-parser delim="\n">
-				<!--target type="attribute" allowOverwrites="true">
+				<!--target allowOverwrites="true">
 					<match>
 						<expression>mca:.*:param:([^:]*):value:(.*)</expression>
 						<set field="name">
@@ -73,7 +73,7 @@
 						</else>
 					</test>
 				</target-->
-				<target type="attribute">
+				<target>
 					<match>
 						<expression>ompi:version:full:[\d]+\.([\d]+).*</expression>
 						<set field="name">

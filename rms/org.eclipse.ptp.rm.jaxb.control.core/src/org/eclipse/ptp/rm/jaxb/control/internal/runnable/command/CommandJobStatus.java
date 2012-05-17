@@ -35,7 +35,6 @@ import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 
 /**
  * Extension of the IJobStatus class to handle resource manager command jobs. Also handles availability notification for remote
@@ -337,24 +336,16 @@ public class CommandJobStatus implements ICommandJobStatus {
 		String path = null;
 		remoteOutputPath = null;
 		remoteErrorPath = null;
-		Object o = varMap.get(JAXBControlConstants.STDOUT_REMOTE_FILE);
-		if (o != null) {
-			if (o instanceof PropertyType) {
-				path = (String) ((PropertyType) o).getValue();
-			} else if (o instanceof AttributeType) {
-				path = (String) ((PropertyType) o).getValue();
-			}
+		AttributeType a = varMap.get(JAXBControlConstants.STDOUT_REMOTE_FILE);
+		if (a != null) {
+			path = (String) a.getValue();
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
 				remoteOutputPath = varMap.getString(jobId, path);
 			}
 		}
-		o = varMap.get(JAXBControlConstants.STDERR_REMOTE_FILE);
-		if (o != null) {
-			if (o instanceof PropertyType) {
-				path = (String) ((PropertyType) o).getValue();
-			} else if (o instanceof AttributeType) {
-				path = (String) ((AttributeType) o).getValue();
-			}
+		a = varMap.get(JAXBControlConstants.STDERR_REMOTE_FILE);
+		if (a != null) {
+			path = (String) a.getValue();
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
 				remoteErrorPath = varMap.getString(jobId, path);
 			}
@@ -597,13 +588,13 @@ public class CommandJobStatus implements ICommandJobStatus {
 				}
 			}
 
-			PropertyType p = (PropertyType) env.get(uuid);
-			if (p == null) {
+			AttributeType a = env.get(uuid);
+			if (a == null) {
 				continue;
 			}
 
-			jobId = p.getName();
-			String v = (String) p.getValue();
+			jobId = a.getName();
+			String v = (String) a.getValue();
 			if (v != null) {
 				setState(v);
 			}
@@ -623,7 +614,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 			/*
 			 * guarantee the presence of intermediate state in the environment
 			 */
-			env.put(jobId, p);
+			env.put(jobId, a);
 			if (!map.addJobStatus(jobId, this)) {
 				control.jobStateChanged(jobId, this);
 			}

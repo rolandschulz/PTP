@@ -67,7 +67,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.SiteType;
@@ -171,10 +170,10 @@ public class LaunchController implements ILaunchController {
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		try {
 			pinTable.pin(jobId);
-			PropertyType p = new PropertyType();
-			p.setVisible(false);
-			p.setName(jobId);
-			rmVarMap.put(jobId, p);
+			AttributeType a = new AttributeType();
+			a.setVisible(false);
+			a.setName(jobId);
+			rmVarMap.put(jobId, a);
 			worked(progress, 30);
 			doControlCommand(jobId, operation);
 			rmVarMap.remove(jobId);
@@ -320,21 +319,21 @@ public class LaunchController implements ILaunchController {
 			String state = status == null ? IJobStatus.UNDETERMINED : status.getStateDetail();
 
 			try {
-				PropertyType p = (PropertyType) rmVarMap.get(jobId);
+				AttributeType a = rmVarMap.get(jobId);
 
 				CommandType job = controlData.getGetJobStatus();
 				if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
 					pinTable.pin(jobId);
-					p = new PropertyType();
-					p.setVisible(false);
-					p.setName(jobId);
-					rmVarMap.put(jobId, p);
+					a = new AttributeType();
+					a.setVisible(false);
+					a.setName(jobId);
+					rmVarMap.put(jobId, a);
 					runCommand(jobId, job, CommandJob.JobMode.STATUS, null, ILaunchManager.RUN_MODE, true);
-					p = (PropertyType) rmVarMap.remove(jobId);
+					a = rmVarMap.remove(jobId);
 				}
 
-				if (p != null) {
-					state = String.valueOf(p.getValue());
+				if (a != null) {
+					state = String.valueOf(a.getValue());
 				}
 			} finally {
 				pinTable.release(jobId);
@@ -501,17 +500,13 @@ public class LaunchController implements ILaunchController {
 			throw CoreExceptionUtils.newException(Messages.LaunchController_resourceManagerNotStarted, null);
 		}
 
-		updatePropertyValues(configuration, null);
+		updateAttributeValues(configuration, null);
 
-		Object changedValue = null;
+		AttributeType changedValue = null;
 
 		if (resetValue != null) {
 			changedValue = rmVarMap.get(resetValue);
-			if (changedValue instanceof PropertyType) {
-				((PropertyType) changedValue).setValue(null);
-			} else if (changedValue instanceof AttributeType) {
-				((AttributeType) changedValue).setValue(null);
-			}
+			changedValue.setValue(null);
 		}
 
 		CommandType command = null;
@@ -683,14 +678,14 @@ public class LaunchController implements ILaunchController {
 		try {
 			String jobId = null;
 
-			PropertyType p = new PropertyType();
-			p.setVisible(false);
-			rmVarMap.put(uuid, p);
+			AttributeType a = new AttributeType();
+			a.setVisible(false);
+			rmVarMap.put(uuid, a);
 
 			/*
-			 * Overwrite property/attribute values based on user choices. Note that the launch can also modify attributes.
+			 * Overwrite attribute values based on user choices. Note that the launch can also modify attributes.
 			 */
-			updatePropertyValues(configuration, progress.newChild(5));
+			updateAttributeValues(configuration, progress.newChild(5));
 
 			/*
 			 * process script
@@ -745,7 +740,7 @@ public class LaunchController implements ILaunchController {
 			 * resolve proxy-specific info
 			 */
 			rmVarMap.remove(uuid);
-			jobId = p.getName();
+			jobId = a.getName();
 
 			/*
 			 * job was cancelled during waitForId
@@ -783,11 +778,8 @@ public class LaunchController implements ILaunchController {
 	 * @param value
 	 */
 	private void addAttribute(String name, String value) {
-		Object attrObj = getEnvironment().get(name);
-		AttributeType attr = null;
-		if (attrObj != null && attrObj instanceof AttributeType) {
-			attr = (AttributeType) attrObj;
-		} else {
+		AttributeType attr = getEnvironment().get(name);
+		if (attr == null) {
 			attr = new AttributeType();
 			attr.setName(name);
 			attr.setVisible(true);
@@ -1011,8 +1003,8 @@ public class LaunchController implements ILaunchController {
 			}
 		}
 
-		PropertyType scriptVar = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT);
-		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
+		AttributeType scriptVar = rmVarMap.get(JAXBControlConstants.SCRIPT);
+		AttributeType scriptPathVar = rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
 				files = new ManagedFilesType();
@@ -1085,8 +1077,8 @@ public class LaunchController implements ILaunchController {
 	private boolean maybeHandleScript(String uuid, ScriptType script, IProgressMonitor monitor) {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			PropertyType p = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
-			if (p != null && p.getValue() != null) {
+			AttributeType a = rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
+			if (a != null && a.getValue() != null) {
 				return false;
 			}
 			if (script == null) {
@@ -1269,9 +1261,9 @@ public class LaunchController implements ILaunchController {
 	private void setFixedConfigurationProperties(IProgressMonitor monitor) throws CoreException {
 		IRemoteConnection rc = getRemoteServicesDelegate(monitor).getRemoteConnection();
 		if (rc != null) {
-			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
-			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
-			rmVarMap.maybeAddProperty(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
+			rmVarMap.maybeAddAttribute(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
+			rmVarMap.maybeAddAttribute(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
+			rmVarMap.maybeAddAttribute(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
 		}
 	}
 
@@ -1282,22 +1274,18 @@ public class LaunchController implements ILaunchController {
 	 *            passed in from Launch Tab when the "run" command is chosen.
 	 * @throws CoreException
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void updatePropertyValues(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+	@SuppressWarnings({ "unchecked" })
+	private void updateAttributeValues(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 40);
 
 		setFixedConfigurationProperties(progress.newChild(10));
 
-		Map lcattr = RMVariableMap.getValidAttributes(configuration);
-		for (Object key : lcattr.keySet()) {
+		Map<String, Object> lcattr = RMVariableMap.getValidAttributes(configuration);
+		for (String key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
-			Object target = rmVarMap.get(key.toString());
-			if (target instanceof PropertyType) {
-				PropertyType p = (PropertyType) target;
-				p.setValue(value);
-			} else if (target instanceof AttributeType) {
-				AttributeType ja = (AttributeType) target;
-				ja.setValue(value);
+			AttributeType target = rmVarMap.get(key.toString());
+			if (target != null) {
+				target.setValue(value);
 			}
 		}
 
@@ -1307,19 +1295,11 @@ public class LaunchController implements ILaunchController {
 		 * The non-selected variables have been excluded from the valid attributes of the configuration; but we need to null out the
 		 * superset values here that are undefined.
 		 */
-		for (String key : rmVarMap.getVariables().keySet()) {
+		for (String key : rmVarMap.getAttributes().keySet()) {
 			if (!lcattr.containsKey(key)) {
-				Object target = rmVarMap.get(key.toString());
-				if (target instanceof PropertyType) {
-					PropertyType p = (PropertyType) target;
-					if (p.isVisible()) {
-						p.setValue(null);
-					}
-				} else if (target instanceof AttributeType) {
-					AttributeType ja = (AttributeType) target;
-					if (ja.isVisible()) {
-						ja.setValue(null);
-					}
+				AttributeType target = rmVarMap.get(key.toString());
+				if (target.isVisible()) {
+					target.setValue(null);
 				}
 			}
 		}
@@ -1338,16 +1318,16 @@ public class LaunchController implements ILaunchController {
 		rmVarMap.overwrite(JAXBControlConstants.PTP_DIRECTORY, JAXBControlConstants.PTP_DIRECTORY, lcattr);
 
 		/*
-		 * update the dynamic properties
+		 * update the dynamic attributes
 		 */
 		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, (String) null);
 		if (attr != null) {
-			PropertyType p = (PropertyType) getEnvironment().get(JAXBControlConstants.DEBUGGER_ARGS);
-			if (p == null) {
-				p = new PropertyType();
-				getEnvironment().put(JAXBControlConstants.DEBUGGER_ARGS, p);
+			AttributeType a = getEnvironment().get(JAXBControlConstants.DEBUGGER_ARGS);
+			if (a == null) {
+				a = new AttributeType();
+				getEnvironment().put(JAXBControlConstants.DEBUGGER_ARGS, a);
 			}
-			p.setValue(attr);
+			a.setValue(attr);
 		}
 
 		launchEnv.clear();

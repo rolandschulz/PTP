@@ -274,7 +274,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				handler.addUpdateModelEntry(key, e.getValue());
 			}
 
-			IVariableMap lcMap = parentTab.getVariableMap();
+			LCVariableMap lcMap = parentTab.getVariableMap();
 			IVariableMap rmMap = fControl.getEnvironment();
 
 			for (IUpdateModel m : localWidgets.values()) {
@@ -513,8 +513,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
-					Map<Object, Object> validCurrent = RMVariableMap.getValidAttributes(config);
-					for (Map.Entry<Object, Object> e : validCurrent.entrySet()) {
+					Map<String, Object> validCurrent = RMVariableMap.getValidAttributes(config);
+					for (Map.Entry<String, Object> e : validCurrent.entrySet()) {
 						Object v = e.getValue();
 						buffer.append(e.getKey()).append(JAXBControlUIConstants.EQ).append(v)
 								.append(JAXBControlUIConstants.LINE_SEP);
@@ -571,7 +571,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		Set<String> sharedInvalid = new HashSet<String>();
 		LCVariableMap lcMap = parentTab.getVariableMap();
 		for (String title : shared) {
-			String invalid = (String) lcMap.get(JAXBUIConstants.INVALID + title);
+			String invalid = (String) lcMap.getValue(JAXBUIConstants.INVALID + title);
 			if (invalid != null) {
 				String[] names = invalid.split(JAXBUIConstants.SP);
 				for (String name : names) {
@@ -648,7 +648,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 
 		if (model.isWritable() && selected) {
 			value = model.getValueFromControl();
-			lcMap.put(name, value);
+			lcMap.putValue(name, value);
 		}
 
 		boolean visible = c == null ? false : (!getParent().isInitialized() || c.isVisible());
@@ -735,26 +735,26 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	protected void writeLocalProperties() {
 		LCVariableMap lcMap = parentTab.getVariableMap();
 		String id = getControllerTag();
-		lcMap.put(JAXBUIConstants.CURRENT_CONTROLLER, id);
+		lcMap.putValue(JAXBUIConstants.CURRENT_CONTROLLER, id);
 
 		StringBuffer list = new StringBuffer();
 		for (String var : visibleList) {
 			list.append(var).append(JAXBUIConstants.SP);
 		}
-		lcMap.put(JAXBUIConstants.VISIBLE + id, list.toString().trim());
+		lcMap.putValue(JAXBUIConstants.VISIBLE + id, list.toString().trim());
 
 		list.setLength(0);
 		for (String var : enabledList) {
 			list.append(var).append(JAXBUIConstants.SP);
 		}
-		lcMap.put(JAXBUIConstants.ENABLED + id, list.toString().trim());
+		lcMap.putValue(JAXBUIConstants.ENABLED + id, list.toString().trim());
 
 		Set<String> set = getLocalInvalid();
 		list.setLength(0);
 		for (String var : set) {
 			list.append(var).append(JAXBUIConstants.SP);
 		}
-		lcMap.put(JAXBUIConstants.INVALID + id, list.toString().trim());
+		lcMap.putValue(JAXBUIConstants.INVALID + id, list.toString().trim());
 
 		set = getSharedValid(set);
 		set.addAll(validSet);
@@ -769,6 +769,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		for (String var : set) {
 			list.append(var).append(JAXBUIConstants.SP);
 		}
-		lcMap.put(JAXBUIConstants.VALID + id, list.toString().trim());
+		lcMap.putValue(JAXBUIConstants.VALID + id, list.toString().trim());
 	}
 }

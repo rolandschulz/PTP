@@ -11,16 +11,16 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="Torque-Generic-Interactive">
 	<control-data>
-		<!-- Set the default value of this property if PBS is installed in a non-standard location -->
-		<property name="bindir" visible="false"/>
-		<!-- This is a necessary property for the functioning of LML; link it to the batch-specific variable name -->
-		<property name="control.queue.name" visible="false">
+		<!-- Set the default value of this attribute if PBS is installed in a non-standard location -->
+		<attribute name="bindir" visible="false"/>
+		<!-- This is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
+		<attribute name="control.queue.name" visible="false">
 			<link-value-to>destination</link-value-to>
-		</property>
-		<property name="queues" visible="false"/>
-		<property name="mpiPrefix" visible="false">
+		</attribute>
+		<attribute name="queues" visible="false"/>
+		<attribute name="mpiPrefix" visible="false">
 			<default>${ptp_rm:mpiCommand#value} -np ${ptp_rm:mpiCores#value}</default>
-		</property>
+		</attribute>
 		<attribute name="Account_Name" type="string">
 			<description>Account to which to charge this job.</description>
 			<tooltip>Format: string</tooltip>

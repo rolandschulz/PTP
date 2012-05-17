@@ -29,11 +29,9 @@ import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
-import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 
 /**
@@ -71,8 +69,8 @@ public class LCVariableMap implements IVariableMap {
 		String cdir = configuration.getAttribute(rmPrefix + JAXBControlConstants.CONTROL_WORKING_DIR_VAR,
 				JAXBControlConstants.ZEROSTR);
 		String dir = configuration.getAttribute(rmPrefix + JAXBControlConstants.DIRECTORY, JAXBControlConstants.ZEROSTR);
-		if (dir == null || JAXBControlConstants.ZEROSTR.equals(dir)) {
-			dir = (cdir == null ? JAXBControlConstants.ZEROSTR : cdir);
+		if (JAXBControlConstants.ZEROSTR.equals(dir)) {
+			dir = cdir;
 		}
 
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DIRECTORY);
@@ -114,22 +112,22 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	private IEnvManager envManager;
-	private final Map<String, Object> linkedTo;
+	private final Map<String, AttributeType> linkedTo;
 	private final Map<String, Object> excluded;
-	private final Map<String, Object> values;
+	private final Map<String, AttributeType> values;
 	private final Map<String, String> defaultValues;
-	private final Map<String, Object> temp;
+	private final Map<String, AttributeType> temp;
 
 	private final Set<String> hidden;
 
 	private String rmPrefix;
 
 	public LCVariableMap() {
-		this.values = Collections.synchronizedMap(new TreeMap<String, Object>());
+		this.values = Collections.synchronizedMap(new TreeMap<String, AttributeType>());
 		this.excluded = Collections.synchronizedMap(new TreeMap<String, Object>());
 		this.defaultValues = Collections.synchronizedMap(new TreeMap<String, String>());
-		this.linkedTo = Collections.synchronizedMap(new TreeMap<String, Object>());
-		this.temp = Collections.synchronizedMap(new TreeMap<String, Object>());
+		this.linkedTo = Collections.synchronizedMap(new TreeMap<String, AttributeType>());
+		this.temp = Collections.synchronizedMap(new TreeMap<String, AttributeType>());
 		this.hidden = new HashSet<String>();
 	}
 
@@ -163,7 +161,7 @@ public class LCVariableMap implements IVariableMap {
 		for (String name : values.keySet()) {
 			if (!rmPrefix.equals(JAXBControlConstants.ZEROSTR)
 					&& !RMVariableMap.isDynamic(name.replace(rmPrefix, JAXBControlConstants.ZEROSTR))) {
-				Object value = values.get(name);
+				Object value = getValueFromAttribute(name);
 				if (value instanceof Boolean) {
 					configuration.setAttribute(name, (Boolean) value);
 				} else if (value instanceof Integer) {
@@ -190,7 +188,7 @@ public class LCVariableMap implements IVariableMap {
 	 */
 	public Set<String> forControlState(String name, String statePrefix) {
 		Set<String> set = new TreeSet<String>();
-		String state = (String) get(statePrefix + name);
+		String state = (String) getValue(statePrefix + name);
 		if (state != null) {
 			String[] split = state.split(JAXBControlUIConstants.SP);
 			for (String s : split) {
@@ -205,11 +203,20 @@ public class LCVariableMap implements IVariableMap {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#get(java.lang.String)
 	 */
-	public Object get(String name) {
+	public AttributeType get(String name) {
 		if (name == null) {
 			return null;
 		}
 		return values.get(rmPrefix + name);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getVariables()
+	 */
+	public Map<String, AttributeType> getAttributes() {
+		return values;
 	}
 
 	/**
@@ -229,7 +236,7 @@ public class LCVariableMap implements IVariableMap {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getDiscovered()
 	 */
-	public Map<String, Object> getDiscovered() {
+	public Map<String, AttributeType> getDiscovered() {
 		return null;
 	}
 
@@ -293,12 +300,22 @@ public class LCVariableMap implements IVariableMap {
 		return getString(value);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the attribute value directly
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getVariables()
+	 * @param name
+	 *            attribute name
+	 * @return attribute value or null
 	 */
-	public Map<String, Object> getVariables() {
+	public Object getValue(String name) {
+		return getValueFromAttribute(rmPrefix + name);
+	}
+
+	private Object getValueFromAttribute(String name) {
+		AttributeType a = values.get(name);
+		if (a != null) {
+			return a.getValue();
+		}
 		return null;
 	}
 
@@ -318,8 +335,8 @@ public class LCVariableMap implements IVariableMap {
 		} else {
 			rmPrefix = JAXBControlConstants.ZEROSTR;
 		}
-		for (String s : rmVars.getVariables().keySet()) {
-			loadValues(s, rmVars.getVariables().get(s), false);
+		for (String s : rmVars.getAttributes().keySet()) {
+			loadValues(s, rmVars.getAttributes().get(s), false);
 		}
 		for (String s : rmVars.getDiscovered().keySet()) {
 			loadValues(s, rmVars.getDiscovered().get(s), true);
@@ -329,14 +346,40 @@ public class LCVariableMap implements IVariableMap {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#put(java.lang.String, java.lang.Object)
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#put(java.lang.String, org.eclipse.ptp.rm.jaxb.core.data.AttributeType)
 	 */
-	public void put(String name, Object value) {
+	public void put(String name, AttributeType attr) {
 		if (name == null || JAXBUIConstants.ZEROSTR.equals(name)) {
 			return;
 		}
+		values.put(rmPrefix + name, attr);
+	}
+
+	/**
+	 * Put object directly in map
+	 * 
+	 * @param name
+	 *            variable name
+	 * @param value
+	 *            object to store in map
+	 */
+	public void putValue(String name, Object value) {
+		if (name == null || JAXBUIConstants.ZEROSTR.equals(name)) {
+			return;
+		}
+		putValueToAttribute(rmPrefix + name, value);
+	}
+
+	private void putValueToAttribute(String name, Object value) {
 		if (value != null) {
-			values.put(rmPrefix + name, value);
+			AttributeType a = values.get(name);
+			if (a == null) {
+				a = new AttributeType();
+				a.setName(name);
+				a.setValue(value);
+				values.put(name, a);
+			}
+			a.setValue(value);
 		}
 	}
 
@@ -362,7 +405,7 @@ public class LCVariableMap implements IVariableMap {
 		for (Object o : attributes.keySet()) {
 			String key = (String) o;
 			if (RMVariableMap.isExternal(key)) {
-				values.put(key, attributes.get(key));
+				putValueToAttribute(key, attributes.get(key));
 			}
 		}
 	}
@@ -376,18 +419,12 @@ public class LCVariableMap implements IVariableMap {
 		Set<String> valid = forControlState(controller, JAXBUIConstants.VALID);
 		for (String name : linkedTo.keySet()) {
 			Object value = null;
-			Object o = linkedTo.get(name);
+			AttributeType a = linkedTo.get(name);
 			String link = null;
-			if (o instanceof PropertyType) {
-				PropertyType p = (PropertyType) o;
-				link = p.getLinkValueTo();
-			} else if (o instanceof AttributeType) {
-				AttributeType a = (AttributeType) o;
-				link = a.getLinkValueTo();
-			}
+			link = a.getLinkValueTo();
 			if (link != null) {
 				if (valid.contains(link) || RMVariableMap.isExternal(link) || RMVariableMap.isFixedValid(link)) {
-					value = get(link);
+					value = getValue(link);
 				}
 			}
 			if (value == null || JAXBUIConstants.ZEROSTR.equals(value)) {
@@ -396,14 +433,14 @@ public class LCVariableMap implements IVariableMap {
 			if (value == null) {
 				value = JAXBUIConstants.ZEROSTR;
 			}
-			put(name, value);
+			putValue(name, value);
 		}
 	}
 
 	/**
 	 * Not allowed on the LCVariableMap
 	 */
-	public Object remove(String name) {
+	public AttributeType remove(String name) {
 		return null;
 	}
 
@@ -426,7 +463,7 @@ public class LCVariableMap implements IVariableMap {
 		if (defaultv == null) {
 			values.remove(rmPrefix + name);
 		} else {
-			put(name, defaultv);
+			putValue(name, defaultv);
 		}
 	}
 
@@ -456,19 +493,17 @@ public class LCVariableMap implements IVariableMap {
 		temp.putAll(values);
 		values.clear();
 		for (String var : temp.keySet()) {
-			Object value = temp.get(var);
-			if (JAXBUIConstants.ZEROSTR.equals(value)) {
+			AttributeType a = temp.get(var);
+			if (JAXBUIConstants.ZEROSTR.equals(a.getValue())) {
 				continue;
 			}
-			if (var != null) {
-				if (!rmPrefix.equals(JAXBControlConstants.ZEROSTR) && var.startsWith(rmPrefix)) {
-					var = var.substring(rmPrefix.length());
-					if (valid.contains(var) || RMVariableMap.isFixedValid(var)) {
-						put(var, value);
-					}
-				} else if (RMVariableMap.isExternal(var)) {
-					values.put(var, value);
+			if (!rmPrefix.equals(JAXBControlConstants.ZEROSTR) && var.startsWith(rmPrefix)) {
+				var = var.substring(rmPrefix.length());
+				if (valid.contains(var) || RMVariableMap.isFixedValid(var)) {
+					putValue(var, a.getValue());
 				}
+			} else if (RMVariableMap.isExternal(var)) {
+				putValueToAttribute(var, a.getValue());
 			}
 		}
 	}
@@ -478,13 +513,16 @@ public class LCVariableMap implements IVariableMap {
 	 * 
 	 * @throws CoreException
 	 */
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public void updateFromConfiguration(ILaunchConfiguration configuration) throws CoreException {
-		Map<String, Object> attr = configuration.getAttributes();
-		for (String key : attr.keySet()) {
-			if ((!rmPrefix.equals(JAXBControlConstants.ZEROSTR) && key.startsWith(rmPrefix) && !RMVariableMap.isDynamic(key
-					.replace(rmPrefix, JAXBControlConstants.ZEROSTR))) || RMVariableMap.isExternal(key)) {
-				values.put(key, attr.get(key));
+		Map attr = configuration.getAttributes();
+		for (Object keyObj : attr.keySet()) {
+			if (keyObj instanceof String) {
+				String key = (String) keyObj;
+				if ((!rmPrefix.equals(JAXBControlConstants.ZEROSTR) && key.startsWith(rmPrefix) && !RMVariableMap.isDynamic(key
+						.replace(rmPrefix, JAXBControlConstants.ZEROSTR))) || RMVariableMap.isExternal(key)) {
+					putValueToAttribute(key, attr.get(key));
+				}
 			}
 		}
 	}
@@ -509,62 +547,38 @@ public class LCVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * If the value of the Property or Attribute is <code>null</code> and it has a defined default, the value is set to the default.
+	 * If the value of the attribute is <code>null</code> and it has a defined default, the value is set to the default.
 	 * 
 	 * @param key
 	 *            from the original RMVariableMap
-	 * @param value
-	 *            the Property or Attribute
+	 * @param attr
+	 *            the attribute
 	 * @param discovered
-	 *            property was discovered at run time
+	 *            attribute was discovered at run time
 	 * @throws Throwable
 	 */
-	private void loadValues(String key, Object value, boolean discovered) throws Throwable {
+	private void loadValues(String key, AttributeType attr, boolean discovered) throws Throwable {
 		String name = null;
 		String defVal = null;
 		boolean linked = false;
 		boolean visible = true;
 		Object o = null;
-		if (value instanceof PropertyType) {
-			PropertyType p = (PropertyType) value;
-			name = p.getName();
-			if (name == null) {
-				return;
-			}
-			defVal = p.getDefault();
-			visible = p.isVisible();
-			if (!visible) {
-				hidden.add(name);
-				if (p.getLinkValueTo() != null) {
-					linked = true;
-					linkedTo.put(name, p);
-				} else {
-					o = p.getValue();
-				}
+		name = attr.getName();
+		if (name == null) {
+			return;
+		}
+		defVal = attr.getDefault();
+		visible = attr.isVisible();
+		if (!visible) {
+			hidden.add(name);
+			if (attr.getLinkValueTo() != null) {
+				linked = true;
+				linkedTo.put(name, attr);
 			} else {
-				o = p.getValue();
-			}
-		} else if (value instanceof AttributeType) {
-			AttributeType ja = (AttributeType) value;
-			name = ja.getName();
-			if (name == null) {
-				return;
-			}
-			defVal = ja.getDefault();
-			visible = ja.isVisible();
-			if (!visible) {
-				hidden.add(name);
-				if (ja.getLinkValueTo() != null) {
-					linked = true;
-					linkedTo.put(name, ja);
-				} else {
-					o = ja.getValue();
-				}
-			} else {
-				o = ja.getValue();
+				o = attr.getValue();
 			}
 		} else {
-			throw new ArrayStoreException(Messages.IllegalVariableValueType + value);
+			o = attr.getValue();
 		}
 
 		if (!discovered) {
@@ -573,7 +587,7 @@ public class LCVariableMap implements IVariableMap {
 				if (o == null) {
 					setDefault(name, defVal);
 				} else {
-					put(name, o);
+					putValue(name, o);
 				}
 			}
 		} else {
@@ -581,7 +595,7 @@ public class LCVariableMap implements IVariableMap {
 				hidden.add(name);
 				excluded.put(name, o);
 			} else {
-				put(name, o);
+				putValue(name, o);
 			}
 		}
 	}
