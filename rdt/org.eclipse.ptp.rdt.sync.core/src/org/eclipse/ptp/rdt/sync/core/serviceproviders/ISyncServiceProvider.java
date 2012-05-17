@@ -97,18 +97,7 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * 				for system-level problems setting the state
 	 */
 	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath path) throws CoreException;
-	
-	/**
-	 * Set the given file path as unresolved (merge conflict exists)
-	 *
-	 * @param project
-	 * @param buildScenario
-	 * @param path
-	 * @throws CoreException
-	 * 				for system-level problems setting the state
-	 */
-	public void setMergeAsNotResolved(IProject project, BuildScenario buildScenario, IPath path) throws CoreException;
-	
+
 	/**
 	 * Replace the current contents of the given path with the previous version in the repository
 	 *

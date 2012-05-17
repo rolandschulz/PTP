@@ -1003,15 +1003,7 @@ public class GitRemoteSyncConnection {
 		}
 		FileToMergePartsMap.remove(path);
 	}
-	
-	/**
-	 * Reset the path and store it as a merge conflict
-	 * @param path
-	 */
-	public void setMergeAsNotResolved(IPath path) {
-		
-	}
-	
+
 	public void checkout(IPath path) throws RemoteSyncException {
 		CheckoutCommand checkoutCommand = git.checkout();
 		checkoutCommand.addPath(path.toOSString());

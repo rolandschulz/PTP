@@ -51,6 +51,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String syncExcludeCommand = "sync_exclude"; //$NON-NLS-1$
 	private static final String syncIncludeCommand = "sync_include"; //$NON-NLS-1$
 	private static final String checkoutCommand = "checkout"; //$NON-NLS-1$
+	private static final String resolveMergeCommand = "resolve"; //$NON-NLS-1$
 	private static final ISyncExceptionHandler syncExceptionHandler = new CommonSyncExceptionHandler(false, true);
 
 	public Object execute(ExecutionEvent event) {
@@ -105,6 +106,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 						RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_6);
 						continue;
 					}
+
 					IPath path = selection.getProjectRelativePath();
 					sff.addPattern(new PathResourceMatcher(path), type);
 				}
@@ -113,8 +115,11 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				SyncFileFilterPage.open(project, null);
 			} else if (command.equals(syncDefaultFileList)) {
 				SyncFileFilterPage.open(null, null);
-			} else if (command.equals(checkoutCommand)) {
+			} else if (command.equals(checkoutCommand) || command.equals(resolveMergeCommand)) {
+				BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+				BuildScenario buildScenario = bcm.getBuildScenarioForProject(project);
 				IStructuredSelection sel = this.getSelectedElements();
+
 				for (Object element : sel.toArray()) {
 					IResource selection;
 					if (element instanceof IResource) {
@@ -125,10 +130,13 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 						RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_6);
 						continue;
 					}
+
 					IPath path = selection.getProjectRelativePath();
-					BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-					BuildScenario buildScenario = bcm.getBuildScenarioForProject(project);
-					bcm.checkout(project, buildScenario, path);
+					if (command.equals(checkoutCommand)) {
+						bcm.checkout(project, buildScenario, path);
+					} else if (command.equals(resolveMergeCommand)) {
+						bcm.setMergeAsResolved(project, buildScenario, path);
+					}
 				}
 			}
 		} catch (CoreException e) {

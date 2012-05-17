@@ -309,6 +309,15 @@
                   value="checkout">
             </parameter>
          </command>
+         <command
+               commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+               label="Mark as resolved"
+               style="push">
+            <parameter
+                  name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                  value="resolve">
+            </parameter>
+         </command>
       </menuContribution>
    </extension>
    <extension

@@ -513,17 +513,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		fSyncConnection.setMergeAsResolved(path);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#setUnResolved(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.sync.core.BuildScenario, org.eclipse.core.runtime.IPath)
-	 */
-	@Override
-	public void setMergeAsNotResolved(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
-		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
-				SyncManager.getDefaultFileFilter(), null);
-		fSyncConnection.setMergeAsNotResolved(path);
-	}
-	
 	@Override
 	public void checkout(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
 		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,

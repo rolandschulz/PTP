@@ -901,23 +901,6 @@ public class BuildConfigurationManager {
 		provider.setMergeAsResolved(project, buildScenario, path);
 	}
 	
-	/**
-	 * Set the given path as unresolved (merge conflict)
-	 *
-	 * @param project
-	 * @param buildScenario
-	 * @param path
-	 * @throws CoreException
-	 * 				for system-level problems setting the state
-	 */
-	public void setMergeAsNotResolved(IProject project, BuildScenario buildScenario, IPath path) throws CoreException {
-		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
-		if (provider == null) { // Error handled in call
-			return;
-		}
-		provider.setMergeAsNotResolved(project, buildScenario, path);
-	}
-	
 	public void checkout(IProject project, BuildScenario buildScenario, IPath path) throws CoreException {
 		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
 		if (provider == null) { // Error handled in call
