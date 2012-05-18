@@ -852,10 +852,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		}
 	}
 	
-	// No defaults yet
 	@Override
 	public boolean useDefaults() {
-		return false;
+		return defaultLocationButton.getSelection();
 	}
 
 	/**
