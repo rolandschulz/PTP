@@ -230,12 +230,6 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 					// EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_mb_confgDes);
 				}
 			}
-			
-			// Save the result
-			BuildConfigurationManager.getInstance().saveConfigurationData();
-		} catch (IOException e) {
-			StatusManager.getManager().handle(new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, e.getMessage(), e),
-					StatusManager.SHOW);
 		} catch (CoreException e) {
 			StatusManager.getManager().handle(new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, e.getMessage(), e),
 					StatusManager.SHOW);
