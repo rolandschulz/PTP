@@ -33,6 +33,7 @@ import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import org.eclipse.ptp.launch.PreferenceConstants;
 import org.eclipse.ptp.rm.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 import org.eclipse.swt.widgets.Display;
@@ -73,8 +74,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				String cwd = LaunchUtils.getWorkingDirectory(fLaunch.getLaunchConfiguration());
 				String[] args = LaunchUtils.getProgramArguments(fLaunch.getLaunchConfiguration());
 
-				// switchPerspective(DebugUITools.getLaunchPerspective(fLaunch.getLaunchConfiguration().getType(),
-				// fLaunch.getLaunchMode()));
+				switchPerspective(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG,
+						Messages.ParallelLaunchConfigurationDelegate_OpenDebugPerspective,
+						PreferenceConstants.PREF_SWITCH_TO_DEBUG_PERSPECTIVE);
 
 				session.connectToDebugger(subMon.newChild(8), app, path, cwd, args);
 			} catch (CoreException e) {

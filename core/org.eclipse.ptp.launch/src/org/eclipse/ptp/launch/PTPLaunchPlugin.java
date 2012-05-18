@@ -63,7 +63,10 @@ import org.osgi.framework.BundleContext;
  * The main plugin class to be used in the desktop.
  */
 public class PTPLaunchPlugin extends AbstractUIPlugin {
-	private static final String PLUGIN_ID = "org.eclipse.ptp.launch"; //$NON-NLS-1$
+	/**
+	 * @since 6.0
+	 */
+	public static final String PLUGIN_ID = "org.eclipse.ptp.launch"; //$NON-NLS-1$
 
 	public static final String EXTENSION_POINT_ID = "rmLaunchConfigurations"; //$NON-NLS-1$
 	public static final String RESOURCE_BUNDLE = PLUGIN_ID + ".LaunchPluginResources"; //$NON-NLS-1$

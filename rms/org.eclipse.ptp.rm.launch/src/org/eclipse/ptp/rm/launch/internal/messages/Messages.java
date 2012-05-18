@@ -48,14 +48,10 @@ public class Messages extends NLS {
 	public static String AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist;
 	public static String AbstractParallelLaunchConfigurationDelegate_debuggerPathNotSpecified;
 	public static String AbstractParallelLaunchConfigurationDelegate_Error_converting_rules;
-
 	public static String AbstractParallelLaunchConfigurationDelegate_launchType1;
-
 	public static String AbstractParallelLaunchConfigurationDelegate_launchType2;
-
 	public static String AbstractParallelLaunchConfigurationDelegate_launchType3;
-
-	public static String AbstractParallelLaunchConfigurationDelegate_monitoringSetup;
+	public static String AbstractParallelLaunchConfigurationDelegate_ConfirmActions;
 	public static String AbstractParallelLaunchConfigurationDelegate_Parallel_launcher_does_not_support;
 	public static String AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus;
 	public static String AbstractParallelLaunchConfigurationDelegate_Unknown_remote_services;
@@ -136,6 +132,8 @@ public class Messages extends NLS {
 	public static String ParallelLaunchConfigurationDelegate_Confirm_start;
 	public static String ParallelLaunchConfigurationDelegate_Failed_to_start;
 	public static String ParallelLaunchConfigurationDelegate_Invalid_launch_object;
+
+	public static String ParallelLaunchConfigurationDelegate_OpenDebugPerspective;
 	public static String ParallelLaunchConfigurationDelegate_RM_currently_stopped;
 	public static String ParallelLaunchConfigurationDelegate_Start_rm;
 

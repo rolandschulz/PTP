@@ -38,12 +38,12 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.PreferencesAdapter;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
@@ -55,6 +55,7 @@ import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
+import org.eclipse.ptp.launch.PreferenceConstants;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 import org.eclipse.ptp.launch.rulesengine.RuleActionFactory;
@@ -68,6 +69,7 @@ import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 import org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
+import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -564,76 +566,32 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			control.start(subMon.newChild(10));
 
 			if (!mode.equals(ILaunchManager.DEBUG_MODE)) {
-				boolean switchPerspective = false;
-				boolean startMonitoring = false;
-				boolean askToSwitch = false;
-
 				String monitorType = control.getConfiguration().getMonitorData().getSchedulerType();
 				if (monitorType != null) {
 					IMonitorControl monitor = MonitorControlManager.getInstance().getMonitorControl(control.getRemoteServicesId(),
 							control.getConnectionName(), monitorType);
 					if (monitor == null) {
-						final int[] result = new int[1];
-						Display.getDefault().syncExec(new Runnable() {
-							@Override
-							public void run() {
-								MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoCancelQuestion(
-										RMLaunchPlugin.getActiveWorkbenchShell(),
-										Messages.AbstractParallelLaunchConfigurationDelegate_monitoringSetup,
-										Messages.AbstractParallelLaunchConfigurationDelegate_launchType1,
-										null, false, null, null);
-								result[0] = dialog.getReturnCode();
-							}
-						});
-						switch (result[0]) {
-						case IDialogConstants.YES_ID:
+						if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
+								Messages.AbstractParallelLaunchConfigurationDelegate_launchType1,
+								PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE)) {
+
 							monitor = MonitorControlManager.getInstance().createMonitorControl(monitorType,
 									control.getRemoteServicesId(), control.getConnectionName());
-							startMonitoring = true;
-							switchPerspective = true;
-							break;
-						case IDialogConstants.CANCEL_ID:
-							control.stop();
-							return;
-						default:
-							break;
+							monitor.start(subMon.newChild(10));
 						}
 					} else {
 						if (!monitor.isActive()) {
-							final int[] result = new int[1];
-							Display.getDefault().syncExec(new Runnable() {
-								@Override
-								public void run() {
-									MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoCancelQuestion(
-											RMLaunchPlugin.getActiveWorkbenchShell(),
-											Messages.AbstractParallelLaunchConfigurationDelegate_monitoringSetup,
-											Messages.AbstractParallelLaunchConfigurationDelegate_launchType2,
-											null, false, null, null);
-									result[0] = dialog.getReturnCode();
-								}
-							});
-							switch (result[0]) {
-							case IDialogConstants.YES_ID:
-								startMonitoring = true;
-								switchPerspective = true;
-								break;
-							case IDialogConstants.CANCEL_ID:
-								control.stop();
-								return;
-							default:
-								break;
+							if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
+									Messages.AbstractParallelLaunchConfigurationDelegate_launchType2,
+									PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE)) {
+
+								monitor.start(subMon.newChild(10));
 							}
 						} else {
-							switchPerspective = true;
-							askToSwitch = true;
+							switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
+									Messages.AbstractParallelLaunchConfigurationDelegate_launchType3,
+									PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE);
 						}
-					}
-
-					if (monitor != null && startMonitoring) {
-						monitor.start(subMon.newChild(10));
-					}
-					if (switchPerspective) {
-						switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode), askToSwitch);
 					}
 				}
 			}
@@ -665,7 +623,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * 
 	 * @param perspectiveID
 	 */
-	protected void switchPerspective(final String perspectiveId, final boolean ask) {
+	protected boolean switchPerspective(final String perspectiveId, final String message, final String preferenceKey) {
+		final boolean[] result = new boolean[1];
+		result[0] = false;
 		if (perspectiveId != null) {
 			final Display display = Display.getDefault();
 			if (display != null && !display.isDisposed()) {
@@ -680,14 +640,19 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 									return;
 								}
 
-								boolean doSwitch = true;
-
-								if (ask) {
-									doSwitch = MessageDialog.openQuestion(display.getActiveShell(), Messages.AbstractParallelLaunchConfigurationDelegate_monitoringSetup,
-											Messages.AbstractParallelLaunchConfigurationDelegate_launchType3);
+								IPreferenceStore store = new PreferencesAdapter(PTPLaunchPlugin.getUniqueIdentifier());
+								result[0] = !store.getString(PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE).equals(
+										MessageDialogWithToggle.NEVER);
+								if (store.getString(PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE).equals(
+										MessageDialogWithToggle.PROMPT)) {
+									MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(
+											display.getActiveShell(),
+											Messages.AbstractParallelLaunchConfigurationDelegate_ConfirmActions, message, null,
+											false, store, preferenceKey);
+									result[0] = (dialog.getReturnCode() == IDialogConstants.YES_ID);
 								}
 
-								if (doSwitch) {
+								if (result[0]) {
 									try {
 										PlatformUI.getWorkbench().showPerspective(perspectiveId, window);
 									} catch (WorkbenchException e) {
@@ -699,6 +664,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				});
 			}
 		}
+		return result[0];
 	}
 
 	/**
