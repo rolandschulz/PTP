@@ -84,12 +84,7 @@ public class NewFortranSyncProjectWizard extends FortranProjectWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		boolean success = super.performFinish();
-		if (success) {
-			BuildConfigurationManager.getInstance().createLocalConfiguration(this.getProject(true));
-		}
-
-		return success;
+		return super.performFinish();
 	}
 
 	/*
