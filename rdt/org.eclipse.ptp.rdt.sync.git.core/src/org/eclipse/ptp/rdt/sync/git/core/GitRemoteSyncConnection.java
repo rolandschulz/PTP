@@ -1007,6 +1007,7 @@ public class GitRemoteSyncConnection {
 	public void checkout(IPath path) throws RemoteSyncException {
 		CheckoutCommand checkoutCommand = git.checkout();
 		checkoutCommand.addPath(path.toOSString());
+		checkoutCommand.setStartPoint("HEAD"); //$NON-NLS-1$
 		try {
 			checkoutCommand.call();
 		} catch (JGitInternalException e) {
