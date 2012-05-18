@@ -1,0 +1,44 @@
+<html>
+<head>
+<title>shmem_fence</title>
+</head>
+<h2 id="top">shmem_fence</h2>
+<h4>Purpose</h4>
+
+
+<p>Assures ordered delivery of puts.
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_fence(void);
+ 
+</pre>
+
+<h4>Description</h4>
+
+<div class="ledi">
+<p>This function ensures ordering of remote write operations</p>
+<p>All remote write operations issued to a particular remote processing element (PE) prior to the call to shmem_fence are guaranteed to be delivered before any subsequent remote write operations to the same PE which follows the call to shmem_fence.</p>
+<p>The shmem_quiet function should be called if ordering of remote writes is desired when multiple remote PEs are involved.
+</p>
+
+<h4>IBM NOTES</h4>
+<div class="ledi">
+<dl>
+<p>IBM's current implementation of this function is the same as shmem_quiet.  The ability of per destination fence will be added later</p>
+</dd>
+</dl>
+
+<h4>C examples</h4>
+<pre>
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_put
+</p>
+</html>

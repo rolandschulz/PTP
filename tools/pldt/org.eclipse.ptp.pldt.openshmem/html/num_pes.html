@@ -1,0 +1,74 @@
+<html>
+<head>
+<title>num_pes</title>
+</head>
+<h2 id="top">num_pes</h2>
+<h4>Purpose</h4>
+
+
+<p>Returns the number of processing elements (PEs) running in the job.
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+int num_pes(void);
+ 
+</pre>
+
+<h4>Description</h4>
+
+<div class="ledi">
+<p>The num_pes function returns the number of PEs running in an application. </p>
+
+<h4>IBM NOTES</h4>
+<div class="ledi">
+<dl>
+<p>For current implementation, this value is equal to the MP_PROCS environment variable.</p>
+</dd>
+</dl>
+
+<h4>C examples</h4>
+<pre>
+#include &lt;shmem.h&gt;
+#include &lt;stdio.h&gt;
+
+
+int main (int argc, char* argv[])
+{
+    int total_tasks = -1;
+    int my_task = -1;
+
+    start_pes(0);
+
+    total_tasks = _num_pes();
+
+    if (total_tasks <= 0) {
+        printf("FAILED\n");
+        return 0;
+    } else {
+        printf("number of pes is %d\n", total_tasks);
+    }
+
+    my_task = _my_pe();
+
+    if (my_task < 0){
+        printf("FAILED\n");
+        return 0;
+    } else {
+        printf("my pe id is %d\n", my_task);
+    }
+
+    printf("PASSED\n");
+    return 0;
+}
+
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_init, start_pes, my_pe
+</p>
+</html>

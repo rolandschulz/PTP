@@ -1,0 +1,65 @@
+<html>
+<head>
+<title>shmem_double_p</title>
+</head>
+<h2 id="top">shmem_double_p</h2>
+<h4>Purpose</h4>
+
+
+<p>Transfers one data item to a remote Processing Element (PE).
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_double_p(double *addr, double value, int pe);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+
+</dd>
+<dt class="bold ">addr</dt>
+<dd>The remotely accessible data object which will receive the data on the remote PE.
+</dd>
+<dt class="bold ">value</dt>
+<dd>The value to be transferred to addr on the remote PE.
+</dd>
+<dt class="bold">pe</dt>
+<dd>Processing element number of the remote PE.
+
+</dd>
+</dl>
+<h4>Description</h4>
+
+<div class="ledi">
+<p>This routine provides a very low latency remote read write capability for single elements
+of most basic types</p>
+<p>This function starts the remote transfer and may return before
+the data is delivered to the remote PE. To enforce the ordering/completion of the put routines, the use of shmem_fence, shmem_quiet, shmem_barrier or shmem_barrier_all is needed.</p>
+<p>The function shmem_double_p() transfers a double data item to the remote PE.</p>
+
+
+<h4>IBM NOTES</h4>
+<div class="ledi">
+<dl>
+<p>Please refer to Atomicity and Coherency section for atomicity and coherence model in the OpenSHMEM documentation</p>
+</dd>
+</dl>
+
+<h4>C examples</h4>
+<pre>
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_get, shmem_iget
+</p>
+</html>

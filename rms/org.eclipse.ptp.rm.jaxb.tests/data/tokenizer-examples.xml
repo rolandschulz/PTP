@@ -3,7 +3,7 @@
 	xsi:schemaLocation="resource_manager_type.xsd" name="test-parsers">
 	<control-data>
 		<!-- EXAMPLE 1: output is a list of line-separated queue names to be assigned
-			to the known property "available-queues" -->
+			to the known attribute "available-queues" -->
 		<start-up-command name="test01ParseQstat">
 			<arg/>
 			<stdout-parser delim="\n">
@@ -74,7 +74,7 @@
 		<start-up-command name="test03OpenMPI">
 			<arg/>
 			<stdout-parser delim="\n">
-				<target type="attribute">
+				<target>
 					<match>
 						<expression>mca:.*:param:([^:]*):value:(.*)</expression>
 						<set field="name">
@@ -112,7 +112,7 @@
 						</else>
 					</test>
 				</target>
-				<target type="attribute">
+				<target>
 					<match>
 						<expression>ompi:version:full:([\d]+)[.]([\d]+).*</expression>
 						<set field="name">
@@ -152,7 +152,7 @@
 						<throw message="Only supports Open MPI 1.7 and later"/>
 					</test>
 				</target>
-				<target type="attribute">
+				<target>
 					<match>
 						<expression>(.*):([^:]*)</expression>
 						<set field="name">
@@ -177,24 +177,7 @@
 		<start-up-command name="test04ImplicitWithTags">
 			<arg/>
 			<stdout-parser delim="\n">
-				<target type="property">
-					<match moveToTop="true">
-						<expression>PROPERTY</expression>
-					</match>
-					<match>
-						<expression>name:(.*)</expression>
-						<set field="name">
-							<entry valueGroup="1"/>
-						</set>
-					</match>
-					<match>
-						<expression>value:(.*)</expression>
-						<set field="value">
-							<entry valueGroup="1"/>
-						</set>
-					</match>
-				</target>
-				<target type="attribute">
+				<target>
 					<match moveToTop="true">
 						<expression>ATTRIBUTE</expression>
 					</match>
@@ -217,7 +200,7 @@
 		<start-up-command name="test05ImplicitOrdering">
 			<arg/>
 			<stdout-parser delim="\n">
-				<target type="attribute" matchAll="true">
+				<target matchAll="true">
 					<match>
 						<expression>.+</expression>
 						<set field="name">
@@ -255,29 +238,7 @@
 		<start-up-command name="test06ImplicitWithTagsDotall">
 			<arg/>
 			<stdout-parser maxMatchLen="32" applyToAll="true">
-				<target type="property">
-					<match>
-						<expression flags="DOTALL | UNIX_LINES">.*PROPERTY[\n]name:(\w*)[\n]value:([\d.-]*).*</expression>
-						<set field="name">
-							<entry valueGroup="1"/>
-						</set>
-						<set field="value">
-							<entry valueGroup="2"/>
-						</set>
-					</match>
-				</target>
-				<target type="property">
-					<match>
-						<expression flags="DOTALL | UNIX_LINES">.*PROPERTY[\n]value:([\d.-]*)[\n]name:(\w*).*</expression>
-						<set field="name">
-							<entry valueGroup="2"/>
-						</set>
-						<set field="value">
-							<entry valueGroup="1"/>
-						</set>
-					</match>
-				</target>
-				<target type="attribute">
+				<target>
 					<match>
 						<expression flags="DOTALL | UNIX_LINES">.*ATTRIBUTE[\n]name:(\w*)[\n]value:([\d.-]*).*</expression>
 						<set field="name">
@@ -288,7 +249,7 @@
 						</set>
 					</match>
 				</target>
-				<target type="attribute">
+				<target>
 					<match>
 						<expression flags="DOTALL | UNIX_LINES">.*ATTRIBUTE[\n]value:([\d.-]*)[\n]name:(\w*).*</expression>
 						<set field="name">
@@ -301,11 +262,11 @@
 				</target>
 			</stdout-parser>
 		</start-up-command>
-		<!-- EXAMPLE 7: indeterminate number of property definitions, but on single line -->
+		<!-- EXAMPLE 7: indeterminate number of attribute definitions, but on single line -->
 		<start-up-command name="test07PropertyDefsSingleLine">
 			<arg/>
 			<stdout-parser delim="\n">
-				<target type="property">
+				<target>
 					<match>
 						<expression expression="&lt;name&gt;(.*)&lt;/name&gt;&lt;value&gt;(.*)&lt;/value&gt;"/>
 						<set field="name">
@@ -337,7 +298,7 @@
 		<start-up-command name="test09Staggered">
 			<arg/>
 			<stdout-parser delim="\n">
-				<target type="property">
+				<target>
 					<match>
 						<expression>name:(.*)</expression>
 						<set field="name">
@@ -357,7 +318,7 @@
 		<start-up-command name="test10Merged">
 			<arg/>
 			<stdout-parser delim="\n">
-				<target type="property">
+				<target>
 					<match>
 						<expression>name:(.+);value:(.+)</expression>
 						<set field="name">

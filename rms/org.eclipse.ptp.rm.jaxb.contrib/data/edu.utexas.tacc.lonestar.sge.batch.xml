@@ -13,33 +13,27 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="edu.utexas.tacc.lonestar.sge.batch.xml">
 	<control-data>
-		<!-- ========== -->
-		<!-- PROPERTIES -->
-		<!-- ========== -->
-		<!-- (Required) This property is required by LML.  Link it to the batch-specific variable name. -->
-		<property name="control.queue.name" visible="false">
+		<!-- (Required) This attribute is required by LML.  Link it to the batch-specific variable name. -->
+		<attribute name="control.queue.name" visible="false">
 			<link-value-to>destination</link-value-to>
-		</property>
+		</attribute>
 		<!-- (Required) Used by RM internals for fetch.  Name is fixed by convention -->
-		<property name="stdout_remote_path" visible="false">
+		<attribute name="stdout_remote_path" visible="false">
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o${ptp_rm:@jobId#default}</default>
 			<link-value-to>Output_Path</link-value-to>
-		</property>
+		</attribute>
 		<!-- (Required) Useded by RM internals for fetch.  Name is fixed by convention -->
-		<property name="stderr_remote_path" visible="false">
+		<attribute name="stderr_remote_path" visible="false">
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
 			<link-value-to>Error_Path</link-value-to>
-		</property>
+		</attribute>
 		<!-- This is prepended to qconf, qsub, qdel, and showq below.
-		     Set the default value of this property if Grid Engine is not in the user's PATH. -->
-		<property name="bindir" visible="false"/>
+		     Set the default value of this attribute if Grid Engine is not in the user's PATH. -->
+		<attribute name="bindir" visible="false"/>
 		<!-- List of queues.  Set by <start-up-command> below.  Invisible since the values are not modifiable. -->
-		<property name="queues" visible="false"/>
+		<attribute name="queues" visible="false"/>
 
-		<!-- ========== -->
-		<!-- ATTRIBUTES -->
-		<!-- ========== -->
-		<attribute name="Output_Path" type="string"><!-- Linked to stdout_remote_path property above --><!-- Not in UI -->
+		<attribute name="Output_Path" type="string"><!-- Linked to stdout_remote_path attribute above --><!-- Not in UI -->
 			<description>The final path name for the file containing the job's standard output stream.</description>
 			<tooltip><![CDATA[Format: "[hostname:]pathname". If the option
 is not specified, the default file name for the standard error stream 
@@ -48,7 +42,7 @@ where job_name is the name of the job, see -N option, and Seq_num
 is the job number assigned when the job is submitted; 
 default value: (job_name).o(job_number).]]></tooltip>
 		</attribute>
-		<attribute name="Error_Path" type="string"><!-- Linked to stderr_remote_path property above --><!-- Not in UI -->
+		<attribute name="Error_Path" type="string"><!-- Linked to stderr_remote_path attribute above --><!-- Not in UI -->
 			<description>The final path name for the file containing the job's standard error stream.</description>
 			<tooltip><![CDATA[Format: "[hostname:]pathname". If 
 the option is not specified, the default file name for the 
@@ -58,7 +52,7 @@ the name of the job, see -N option, and Seq_num
 is the job number assigned when the job is submitted; 
 default value: (job_name).e(job_number).]]></tooltip>
 		</attribute>
-		<attribute name="destination" type="string"><!-- Linked to control.queue.name property above -->
+		<attribute name="destination" type="string"><!-- Linked to control.queue.name attribute above -->
 			<description>Designation of the queue to which to submit the job.</description>
 			<tooltip>Format: queue[@server].</tooltip>
 			<default>normal</default>
@@ -448,7 +442,7 @@ be a positive multiple of 12.)]]></tooltip>
 						<tooltip>${ptp_rm:Job_Name#tooltip}</tooltip>
 						<fixed-text>Job Name: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Job_Name">
+					<widget type="text" style="SWT.BORDER" attribute="Job_Name">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -467,7 +461,7 @@ be a positive multiple of 12.)]]></tooltip>
 						<tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
 						<fixed-text>Account: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Account_Name">
+					<widget type="text" style="SWT.BORDER" attribute="Account_Name">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -486,7 +480,7 @@ be a positive multiple of 12.)]]></tooltip>
 						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 						<fixed-text>Queue: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
@@ -506,7 +500,7 @@ be a positive multiple of 12.)]]></tooltip>
 						<tooltip>${ptp_rm:Resource_List.pe#tooltip}</tooltip>
 						<fixed-text>Parallel environment: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="false" saveValueTo="Resource_List.pe">
+					<widget type="combo" style="SWT.BORDER" readOnly="false" attribute="Resource_List.pe">
 						<layout-data>
 							<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
 						</layout-data>
@@ -525,7 +519,7 @@ be a positive multiple of 12.)]]></tooltip>
 						<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
 						<fixed-text>Total Memory Needed: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.mem">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -544,7 +538,7 @@ be a positive multiple of 12.)]]></tooltip>
 						<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
 						<fixed-text>Wallclock Time: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.walltime">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -562,7 +556,7 @@ be a positive multiple of 12.)]]></tooltip>
 						</layout-data>
 						<fixed-text>MPI Launch Command: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="false" saveValueTo="mpiCommand">
+					<widget type="combo" style="SWT.BORDER" readOnly="false" attribute="mpiCommand">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
@@ -581,7 +575,7 @@ be a positive multiple of 12.)]]></tooltip>
 						<tooltip>${ptp_rm:Mail_Users#tooltip}</tooltip>
 						<fixed-text>Send E-mail To: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Mail_Users">
+					<widget type="text" style="SWT.BORDER" attribute="Mail_Users">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="150"/>
 						</layout-data>
@@ -600,7 +594,7 @@ be a positive multiple of 12.)]]></tooltip>
 						<tooltip>${ptp_rm:Join_Path#tooltip}</tooltip>
 						<fixed-text>Combine stdout and stderr: </fixed-text>
 					</widget>
-					<widget type="checkbox" style="SWT.BORDER" saveValueTo="Join_Path">
+					<widget type="checkbox" style="SWT.BORDER" attribute="Join_Path">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
@@ -619,7 +613,7 @@ be a positive multiple of 12.)]]></tooltip>
 						<tooltip>${ptp_rm:export_all#tooltip}</tooltip>
 						<fixed-text>Export Environment: </fixed-text>
 					</widget>
-					<widget type="checkbox" style="SWT.BORDER" saveValueTo="export_all">
+					<widget type="checkbox" style="SWT.BORDER" attribute="export_all">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>

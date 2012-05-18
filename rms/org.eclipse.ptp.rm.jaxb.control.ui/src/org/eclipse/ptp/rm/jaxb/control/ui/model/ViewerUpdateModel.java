@@ -198,7 +198,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 			}
 		}
 
-		Boolean b = (Boolean) lcMap.get(JAXBControlUIConstants.SHOW_ONLY_CHECKED + name);
+		Boolean b = (Boolean) lcMap.getValue(JAXBControlUIConstants.SHOW_ONLY_CHECKED + name);
 		if (b == null) {
 			b = false;
 		}
@@ -211,7 +211,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 
 	private Set<String> getChecked() {
 		Set<String> set = new TreeSet<String>();
-		String state = (String) lcMap.get(JAXBControlUIConstants.CHECKED_ATTRIBUTES + name);
+		String state = (String) lcMap.getValue(JAXBControlUIConstants.CHECKED_ATTRIBUTES + name);
 		if (state != null) {
 			String[] split = state.split(JAXBControlUIConstants.SP);
 			for (String s : split) {
@@ -241,8 +241,8 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 				}
 			}
 		}
-		lcMap.put(JAXBControlUIConstants.CHECKED_ATTRIBUTES + name, checked.toString().trim());
-		lcMap.put(JAXBControlUIConstants.SHOW_ONLY_CHECKED + name, showOnlySelected.getSelection());
+		lcMap.putValue(JAXBControlUIConstants.CHECKED_ATTRIBUTES + name, checked.toString().trim());
+		lcMap.putValue(JAXBControlUIConstants.SHOW_ONLY_CHECKED + name, showOnlySelected.getSelection());
 	}
 
 	/*
@@ -291,7 +291,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 		if (!JAXBControlUIConstants.ZEROSTR.equals(t)) {
 			t = lcMap.getString(t);
 		}
-		lcMap.put(name, t);
+		lcMap.putValue(name, t);
 		mapValue = t;
 		return t;
 	}

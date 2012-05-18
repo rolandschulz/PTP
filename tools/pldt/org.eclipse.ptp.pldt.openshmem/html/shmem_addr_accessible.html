@@ -1,0 +1,53 @@
+<html>
+<head>
+<title>shmem_addr_accessible</title>
+</head>
+<h2 id="top">shmem_addr_accessible</h2>
+<h4>Purpose</h4>
+
+
+<p>Determines whether an address is accessible via IBM openshmem data transfers operations from the specified processing element (PE).
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+int shmem_addr_accessible(void *addr, int pe);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+</dd>
+<dt class="bold ">addr</dt>
+<dd>The local address to be queried.
+</dd>
+<dt class="bold ">pe</dt>
+<dd>The processing element number of the PE that will access the local address.
+</dd>
+</dl>
+
+<h4>Description</h4>
+
+<div class="ledi">
+<p>The shmem_addr_accessible function returns 1 if the specified addr is a symmetric data object; otherwise it returns 0.</p>
+<p>Symmetric data objects, also known as remotely accessible objects, are arrays or variables that exist with the same size, type, and effective address on all PEs.  The following data objects are remotely accessible:</p>
+<p>The variables allocated by shmalloc, shmemalign, or shrealloc functions.</p>
+<p>Non-stack C and C++ variables, if the same executable file is used for all PEs</p>
+
+<h4>C examples</h4>
+<pre>
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_pe_accessible
+
+</p>
+</html>

@@ -1,0 +1,77 @@
+<html>
+<head>
+<title>shmem_put</title>
+</head>
+<h2 id="top">shmem_put</h2>
+<h4>Purpose</h4>
+
+
+<p>Transfers data to a specified processing element(PE).
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_put(void *target, const void *source, size_t len, int pe);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+
+</dd>
+<dt class="bold ">target</dt>
+<dd>Data object to be updated on the remote PE.  This data object must be remotely accessible.
+</dd>
+<dt class="bold ">source</dt>
+<dd>Data object containing the data to be copied.
+</dd>
+<dt class="bold">len</dt>
+<dd>Number of elements in the target and source arrays.
+</dd>
+<dt class="bold">pe</dt>
+<dd>Processing element number of the remote PE.
+</dd>
+</dl>
+<h4>Description</h4>
+
+<div class="ledi">
+<p>This routine provides a high-performance method for copying a contiguous data object from the local PE to a contiguous data object on a different PE</p>
+<p>This routine returns when the data has been copied out of the source array on the local PE, but not necessarily before the data has been delivered to the remote data object. To enforce the ordering/completion of the put routines, the use of shmem_fence, shmem_quiet, shmem_barrier or shmem_barrier_all is needed.</p>
+<p>The function shmem_put() writes any non character type that has a storage size
+equal to 64 bits to the remote PE.</p>
+
+
+<h4>IBM NOTES</h4>
+<div class="ledi">
+<dl>
+<p>Please refer to Atomicity and Coherency section for atomicity and coherence model in the OpenSHMEM documentation</p>
+</dd>
+</dl>
+
+<h4>C examples</h4>
+<pre>
+#include &lt;shmem.h&gt;
+
+int main(int argc, char *argv[])
+{
+  void *target;
+  const void *source;
+  size_t len; 
+  int pe;
+
+  shmem_put(void *target, void long *source, size_t len, int pe);
+}
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_barrier, shmem_put, shmem_fence, shmem_iput, shmem_quiet
+</p>
+</html>

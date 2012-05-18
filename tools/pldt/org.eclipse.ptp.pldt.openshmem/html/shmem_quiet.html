@@ -1,0 +1,40 @@
+<html>
+<head>
+<title>shmem_fence</title>
+</head>
+<h2 id="top">shmem_fence</h2>
+<h4>Purpose</h4>
+
+
+<p>Waits for completion of all outstanding remote writes issued by the calling processing element (PE).
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_quiet(void);
+ 
+</pre>
+
+<h4>Description</h4>
+
+<div class="ledi">
+<p>This function waits for completion of all outstanding remote writes initiated from the
+calling PE</p>
+<p>Remote writes are issued by calls to shmem_put() and related put routines.</p>
+<p>When controls returns from shmem_put(), the data is delivered to the
+communication circuitry but has not yet arrived to the remote PE. The shmem_quiet
+function does not return until all the data is delivered to the remote PE's memory.
+</p>
+
+<h4>C examples</h4>
+<pre>
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_put, shmem_fence, shmem_barrier, shmem_wait
+</p>
+</html>

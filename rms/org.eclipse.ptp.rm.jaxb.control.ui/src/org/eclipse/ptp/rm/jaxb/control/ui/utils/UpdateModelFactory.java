@@ -54,9 +54,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlStateType;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.PushButtonType;
-import org.eclipse.ptp.rm.jaxb.core.data.TemplateType;
 import org.eclipse.ptp.rm.jaxb.core.data.WidgetType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
@@ -89,15 +87,15 @@ public class UpdateModelFactory {
 	 * 
 	 */
 	private static class CellDescriptor {
-		private String name;
+		private final String name;
 		private String tooltip;
 		private String description;
 		private String choice;
-		private String itemsFrom;
-		private String translateBooleanAs;
-		private Integer min;
-		private Integer max;
-		private boolean readOnly;
+		private final String itemsFrom;
+		private final String translateBooleanAs;
+		private final Integer min;
+		private final Integer max;
+		private final boolean readOnly;
 		private final CellEditorType type;
 		private String[] items;
 		protected Color[] foreground;
@@ -106,34 +104,26 @@ public class UpdateModelFactory {
 
 		/**
 		 * @param data
-		 *            Property or Attribute
+		 *            Attribute
 		 * @param columnData
 		 *            list of JAXB data elements describing the viewer columns
 		 */
-		private CellDescriptor(Object data, List<ColumnDataType> columnData) {
+		private CellDescriptor(AttributeType data, List<ColumnDataType> columnData) {
 			type = CellEditorType.getType(data);
-			if (data instanceof AttributeType) {
-				AttributeType a = (AttributeType) data;
-				name = a.getName();
-				choice = a.getChoice();
-				itemsFrom = a.getItemsFrom();
-				translateBooleanAs = a.getTranslateBooleanAs();
-				min = a.getMin();
-				max = a.getMax();
-				readOnly = a.isReadOnly();
-				tooltip = a.getTooltip();
-				if (tooltip == null) {
-					tooltip = JAXBControlUIConstants.ZEROSTR;
-				} else {
-					tooltip = WidgetBuilderUtils.removeTabOrLineBreak(tooltip);
-				}
-				description = a.getDescription();
-			} else if (data instanceof PropertyType) {
-				PropertyType p = (PropertyType) data;
-				name = p.getName();
-				translateBooleanAs = p.getTranslateBooleanAs();
-				readOnly = p.isReadOnly();
+			name = data.getName();
+			choice = data.getChoice();
+			itemsFrom = data.getItemsFrom();
+			translateBooleanAs = data.getTranslateBooleanAs();
+			min = data.getMin();
+			max = data.getMax();
+			readOnly = data.isReadOnly();
+			tooltip = data.getTooltip();
+			if (tooltip == null) {
+				tooltip = JAXBControlUIConstants.ZEROSTR;
+			} else {
+				tooltip = WidgetBuilderUtils.removeTabOrLineBreak(tooltip);
 			}
+			description = data.getDescription();
 			if (description == null) {
 				description = JAXBControlUIConstants.ZEROSTR;
 			}
@@ -184,20 +174,7 @@ public class UpdateModelFactory {
 		 * @return enum value for editor
 		 */
 		public static CellEditorType getType(Object object) {
-			if (object instanceof PropertyType) {
-				PropertyType p = (PropertyType) object;
-				if (p.getTranslateBooleanAs() != null) {
-					return CHECK;
-				}
-				Object value = p.getValue();
-				String clzz = p.getType();
-				if (clzz != null) {
-					return getTypeFromClass(clzz);
-				}
-				if (value != null) {
-					return getType(value);
-				}
-			} else if (object instanceof AttributeType) {
+			if (object instanceof AttributeType) {
 				AttributeType a = (AttributeType) object;
 				if (a.getTranslateBooleanAs() != null) {
 					return CHECK;
@@ -359,19 +336,15 @@ public class UpdateModelFactory {
 		 * Get the choice (Combo), min and max (Spinner) settings.
 		 * 
 		 * @param data
-		 *            Attribute or Property
+		 *            or Property
 		 */
-		private void setData(Object data) {
-			if (data instanceof AttributeType) {
-				AttributeType a = (AttributeType) data;
-				choice = a.getChoice();
-				itemsFrom = a.getItemsFrom();
-				min = a.getMin();
-				max = a.getMax();
-				translateBooleanAs = a.getTranslateBooleanAs();
-			} else if (data instanceof PropertyType) {
-				translateBooleanAs = ((PropertyType) data).getTranslateBooleanAs();
-			}
+		private void setData(AttributeType data) {
+			AttributeType a = data;
+			choice = a.getChoice();
+			itemsFrom = a.getItemsFrom();
+			min = a.getMin();
+			max = a.getMax();
+			translateBooleanAs = a.getTranslateBooleanAs();
 		}
 
 		/**
@@ -393,15 +366,15 @@ public class UpdateModelFactory {
 				fixedText = rmMap.getString(fixedText);
 			}
 
-			String s = null;
+			String attr = null;
 			if (widget instanceof WidgetType) {
-				s = ((WidgetType) widget).getSaveValueTo();
+				attr = ((WidgetType) widget).getAttribute();
 			} else if (widget instanceof BrowseType) {
-				s = ((BrowseType) widget).getSaveValueTo();
+				attr = ((BrowseType) widget).getAttribute();
 			}
 
-			if (s != null) {
-				Object data = rmMap.get(s);
+			if (attr != null) {
+				AttributeType data = rmMap.get(attr);
 				if (data != null) {
 					setData(data);
 				}
@@ -445,9 +418,7 @@ public class UpdateModelFactory {
 				targets.put(cst, control);
 			}
 		}
-		String name = bGroupDescriptor.getSaveValueTo();
-		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
-		return new ButtonGroupUpdateModel(name, handler, bGroup, buttons);
+		return new ButtonGroupUpdateModel(bGroupDescriptor.getAttribute(), tab.getParent().getUpdateHandler(), bGroup, buttons);
 	}
 
 	/**
@@ -465,10 +436,8 @@ public class UpdateModelFactory {
 	 * @return
 	 */
 	public static ViewerUpdateModel createModel(ColumnViewer viewer, AttributeViewerType descriptor, IJAXBLaunchConfigurationTab tab) {
-		String name = descriptor.getName();
-		TemplateType template = descriptor.getValue();
-		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
-		return new ViewerUpdateModel(name, descriptor.isInitialAllChecked(), handler, (ICheckable) viewer, template);
+		return new ViewerUpdateModel(descriptor.getName(), descriptor.isInitialAllChecked(), tab.getParent().getUpdateHandler(),
+				(ICheckable) viewer, descriptor.getValue());
 	}
 
 	/**
@@ -494,17 +463,17 @@ public class UpdateModelFactory {
 
 		Control control = createBrowse(parent, browse, cd, tab, targets);
 
-		String name = browse.getSaveValueTo();
+		String attr = browse.getAttribute();
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		IUpdateModel model = null;
 		if (control instanceof Text) {
-			if (name != null && !JAXBControlUIConstants.ZEROSTR.equals(name)) {
-				model = new TextUpdateModel(name, handler, (Text) control);
+			if (attr != null && !JAXBControlUIConstants.ZEROSTR.equals(attr)) {
+				model = new TextUpdateModel(attr, handler, (Text) control);
 			}
 		}
 
-		if (name != null && !JAXBUIConstants.ZEROSTR.equals(name)) {
-			maybeAddValidator(model, rmVarMap.get(name), tab.getParent());
+		if (attr != null && !JAXBUIConstants.ZEROSTR.equals(attr)) {
+			maybeAddValidator(model, rmVarMap.get(attr), tab.getParent());
 		}
 		return model;
 	}
@@ -546,7 +515,7 @@ public class UpdateModelFactory {
 			return null;
 		}
 
-		String name = widget.getSaveValueTo();
+		String attr = widget.getAttribute();
 		List<ArgType> dynamic = null;
 
 		WidgetType.DynamicText dt = widget.getDynamicText();
@@ -557,24 +526,24 @@ public class UpdateModelFactory {
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		IUpdateModel model = null;
 		if (control instanceof Text) {
-			if (name != null && !JAXBControlUIConstants.ZEROSTR.equals(name)) {
-				model = new TextUpdateModel(name, handler, (Text) control);
+			if (attr != null && !JAXBControlUIConstants.ZEROSTR.equals(attr)) {
+				model = new TextUpdateModel(attr, handler, (Text) control);
 			}
 			if (dynamic != null) {
 				model = new TextUpdateModel(dynamic, handler, (Text) control);
 			}
 		} else if (control instanceof Combo) {
-			model = new ComboUpdateModel(name, cd.itemsFrom, handler, (Combo) control);
+			model = new ComboUpdateModel(attr, cd.itemsFrom, handler, (Combo) control);
 		} else if (control instanceof Spinner) {
-			model = new SpinnerUpdateModel(name, handler, (Spinner) control);
+			model = new SpinnerUpdateModel(attr, handler, (Spinner) control);
 		} else if (control instanceof Button) {
-			model = new ButtonUpdateModel(name, handler, (Button) control, cd.translateBooleanAs);
+			model = new ButtonUpdateModel(attr, handler, (Button) control, cd.translateBooleanAs);
 		} else if (control instanceof EnvManagerConfigButton) {
-			model = new EnvConfigButtonUpdateModel(name, handler, (EnvManagerConfigButton) control);
+			model = new EnvConfigButtonUpdateModel(attr, handler, (EnvManagerConfigButton) control);
 		}
 
-		if (name != null && !JAXBUIConstants.ZEROSTR.equals(name)) {
-			maybeAddValidator(model, rmVarMap.get(name), tab.getParent());
+		if (attr != null && !JAXBUIConstants.ZEROSTR.equals(attr)) {
+			maybeAddValidator(model, rmVarMap.get(attr), tab.getParent());
 		}
 		return model;
 	}
@@ -592,7 +561,7 @@ public class UpdateModelFactory {
 	 *            launch tab being built
 	 * @return
 	 */
-	public static ICellEditorUpdateModel createModel(Object data, ColumnViewer viewer, List<ColumnDataType> columnData,
+	public static ICellEditorUpdateModel createModel(AttributeType data, ColumnViewer viewer, List<ColumnDataType> columnData,
 			IJAXBLaunchConfigurationTab tab) {
 		ICellEditorUpdateModel model = null;
 		if (viewer instanceof TableViewer) {
@@ -907,18 +876,13 @@ public class UpdateModelFactory {
 	 *            launch tab being built
 	 * @return the cell editor update model, which contains a reference to the CellEditor
 	 */
-	private static ICellEditorUpdateModel createModel(Object data, TableViewer viewer, List<ColumnDataType> columnData,
+	private static ICellEditorUpdateModel createModel(AttributeType data, TableViewer viewer, List<ColumnDataType> columnData,
 			IJAXBLaunchConfigurationTab tab) {
 		CellDescriptor cd = new CellDescriptor(data, columnData);
 		CellEditor editor = createEditor(cd, data, viewer.getTable());
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
-		ICellEditorUpdateModel model = null;
-		if (data instanceof AttributeType) {
-			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.translateBooleanAs, cd.readOnly,
-					(AttributeType) data);
-		} else if (data instanceof PropertyType) {
-			model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.translateBooleanAs, cd.readOnly);
-		}
+		ICellEditorUpdateModel model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom,
+				cd.translateBooleanAs, cd.readOnly, data);
 		if (model != null) {
 			model.setBackground(cd.background);
 			model.setFont(cd.font);
@@ -943,21 +907,15 @@ public class UpdateModelFactory {
 	 *            launch tab being built
 	 * @return the cell editor update model, which contains a reference to the CellEditor
 	 */
-	private static ICellEditorUpdateModel createModel(Object data, TreeViewer viewer, List<ColumnDataType> columnData,
+	private static ICellEditorUpdateModel createModel(AttributeType data, TreeViewer viewer, List<ColumnDataType> columnData,
 			IJAXBLaunchConfigurationTab tab) {
 		CellDescriptor cd = new CellDescriptor(data, columnData);
 		CellEditor editor = createEditor(cd, data, viewer.getTree());
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
-		ICellEditorUpdateModel model = null;
 		Object[] properties = viewer.getColumnProperties();
 		boolean inValueCol = properties.length == 2;
-		if (data instanceof AttributeType) {
-			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.translateBooleanAs,
-					cd.readOnly, inValueCol, (AttributeType) data);
-		} else if (data instanceof PropertyType) {
-			model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom, cd.translateBooleanAs,
-					cd.readOnly, inValueCol);
-		}
+		ICellEditorUpdateModel model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom,
+				cd.translateBooleanAs, cd.readOnly, inValueCol, data);
 		if (model != null) {
 			model.setBackground(cd.background);
 			model.setFont(cd.font);
@@ -989,9 +947,9 @@ public class UpdateModelFactory {
 	 * @param tab
 	 *            launch tab being built
 	 */
-	private static void maybeAddValidator(IUpdateModel model, Object data, IJAXBParentLaunchConfigurationTab tab) {
-		if (data != null && data instanceof AttributeType) {
-			model.setValidator(((AttributeType) data).getValidator(), tab);
+	private static void maybeAddValidator(IUpdateModel model, AttributeType data, IJAXBParentLaunchConfigurationTab tab) {
+		if (data != null) {
+			model.setValidator(data.getValidator(), tab);
 		}
 	}
 }

@@ -18,6 +18,9 @@
 
 package org.eclipse.ptp.internal.rdt.ui.includebrowser;
 
+import java.net.URI;
+
+import org.eclipse.cdt.core.EFSExtensionProvider;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.index.IndexLocationFactory;
 import org.eclipse.cdt.core.model.CoreModelUtil;
@@ -29,13 +32,22 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.ui.includebrowser.IBMessages;
 import org.eclipse.cdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.cdt.ui.CUIPlugin;
+import org.eclipse.cdt.utils.EFSExtensionManager;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IncludeBrowserServiceFactory;
+import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
+import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
+import org.eclipse.ptp.services.core.IService;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceModelManager;
+import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -85,7 +97,9 @@ public class IncludeBrowserUI {
 			if (include != null) {
 				IIndexFileLocation loc= include.getIncludesLocation();
 				if (loc != null) {
-					return CoreModelUtil.findTranslationUnitForLocation(loc, project);
+					final URI uri = replacePath(project.getProject(), input.getLocationURI(), loc.getURI().getPath());
+					if(uri != null)
+						return CoreModelUtil.findTranslationUnitForLocation(uri, project);
 				}
 			}
 		}
@@ -109,6 +123,30 @@ public class IncludeBrowserUI {
 
 					return (service != null) ? service.isIndexed(location, project, monitor) : false;
 				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Replaces the path portion of the given URI.
+	 */
+	private static URI replacePath(IProject project, URI u, String path) {
+		if (isLocalServiceConfiguration(project))
+			return new EFSExtensionProvider(){}.createNewURIFromPath(u, path);
+		return EFSExtensionManager.getDefault().createNewURIFromPath(u, path);
+	}
+	
+	private static boolean isLocalServiceConfiguration (IProject project) {
+		IServiceModelManager smm = ServiceModelManager.getInstance();
+		
+		if(smm.isConfigured(project)) {
+			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
+			IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
+			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
+	
+			if (serviceProvider instanceof IIndexServiceProvider) {
+				return !((IIndexServiceProvider)serviceProvider).isRemote();
 			}
 		}
 		return false;

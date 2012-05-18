@@ -1,0 +1,82 @@
+<html>
+<head>
+<title>shmem_broadcast</title>
+</head>
+<h2 id="top">shmem_broadcast</h2>
+<h4>Purpose</h4>
+
+
+<p>Broadcasts a block of data from one processing element (PE) to one or more target PEs.
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_broadcast(void *target, const void *source, size_t nlong, int PE_root, int PE_start, int logPE_stride, int PE_size, long *pSync);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+</dd>
+<dt class="bold ">target</dt>
+<dd>A symmetric data object used to receive the data broadcasted by the processing element specified by PE_start. For shmem_broadcast
+and shmem_broadcast64 the data type of target can be any type that has an element size of 64 bits.
+</dd>
+<dt class="bold ">source</dt>
+<dd>A symmetric data object that can be of any data type that is permissible for the target argument.
+</dd>
+<dt class="bold ">nlong</dt>
+<dd>The number of elements in source. For shmem_broadcast and shmem_broadcast64, this is the number of 64-bit words. For
+shmem_broadcast32 this is the number of 32-bit halfwords.
+</dd>
+<dt class="bold ">PE_root</dt>
+<dd>Zero-based ordinal of the PE, with respect to the active set, from which the data is copied. Must be greater than or equal to 0 and less than PE_size.
+</dd>
+<dt class="bold ">PE_start</dt>
+<dd>The lowest virtual PE number of the active set of PEs.
+</dd>
+<dt class="bold ">logPE_stride</dt>
+<dd>The log (base 2) of the stride between consecutive virtual PE numbers in the active set.
+</dd>
+<dt class="bold ">PE_size</dt>
+<dd>The number of PEs in the active set.
+</dd>
+<dt class="bold ">pSync</dt>
+<dd>A symmetric work array. In C/C++, pSync must be of type long and size _SHMEM_REDUCE_SYNC_SIZE. Every element of this array must be initialized with the value _SHMEM_SYNC_VALUE before any of the PEs in the active set enter the reduction routine
+</dd>
+</dl>
+
+<h4>Description</h4>
+
+<div class="ledi">
+<p>The shmem_broadcast routine is a collective routine. They copy data object source on the processor specified by PE_root and store the values at target on the
+other PEs specified by the triplet PE_start, logPE_stride, PE_size. The data is not copied to the target area on the root PE. The values of arguments PE_root,
+PE_start, logPE_stride, and PE_size must be equal on all PEs in the active set. The same target and source data objects and the same pSync work array must be
+passed to all PEs in the active set.</p>
+<p>Before any PE calls the broadcast functions, users have to ensure the following conditions exist:</p>
+<p>The pSync arrays on all PEs in the active set is not still in use from a prior call to a broadcast function.</p>
+<p>The target array on all PEs in the active set is ready to accept the broadcast data.</p>
+
+<p>Upon returning from the broadcast function, the following conditions are true:</p>
+<p>If the current PE is not the root PE, the target data array is updated.</p>
+<p>The values in the pSync array are restored to the original values.</p>
+
+<p>Each of these functions assumes that only PEs in the active set call the function.  If a PE not in the active set calls the collective function, the behavior is undefined.  On all PEs in the active set, the values of nlong, PE_root, PE_start, logPE_stride, and PE_size must be equal.  And the same source, target, and pSync objects must be used on all PEs in the active set.</p>
+
+
+<h4>C examples</h4>
+<pre>
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_barrier, shmem_barrier_all
+</p>
+</html>

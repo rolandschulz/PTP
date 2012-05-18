@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2012 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,11 +26,11 @@ import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.CoreModel;
-import org.eclipse.cdt.core.model.CoreModelUtil;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.IWorkingCopy;
+import org.eclipse.cdt.internal.core.model.ExternalTranslationUnit;
 import org.eclipse.cdt.internal.ui.CPluginImages;
 import org.eclipse.cdt.internal.ui.includebrowser.IBConversions;
 import org.eclipse.cdt.internal.ui.includebrowser.IBFile;
@@ -769,20 +769,21 @@ public class IBViewPart extends ViewPart
                 ofa.selectionChanged(selection);
                 m.add(ofa);
 
-                // show in
-                IMenuManager submenu= new MenuManager(IBMessages.IBViewPart_ShowInMenu_label);
-                submenu.add(ContributionItemFactory.VIEWS_SHOW_IN.create(getSite().getWorkbenchWindow()));
-                m.add(submenu);
-            	if (node.getParent() != null) {
-                    m.add(new Separator());
-            		m.add(new Action(Messages.format(IBMessages.IBViewPart_FocusOn_label, tu.getPath().lastSegment())) {
-            			@Override
-						public void run() {
-            				setInput(tu);
-            			}
-            		});
-            	}
-
+                if (!(tu instanceof ExternalTranslationUnit)) {
+	                // show in
+	                IMenuManager submenu= new MenuManager(IBMessages.IBViewPart_ShowInMenu_label);
+	                submenu.add(ContributionItemFactory.VIEWS_SHOW_IN.create(getSite().getWorkbenchWindow()));
+	                m.add(submenu);
+	            	if (node.getParent() != null) {
+	                    m.add(new Separator());
+	            		m.add(new Action(Messages.format(IBMessages.IBViewPart_FocusOn_label, tu.getPath().lastSegment())) {
+	            			@Override
+							public void run() {
+	            				setInput(tu);
+	            			}
+	            		});
+	            	}
+                }
             }
         }
         m.add(new Separator(IContextMenuConstants.GROUP_ADDITIONS));

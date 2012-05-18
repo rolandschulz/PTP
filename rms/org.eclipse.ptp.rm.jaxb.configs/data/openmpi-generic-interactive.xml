@@ -9,14 +9,14 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="Open MPI-Generic-Interactive">
 	<control-data>
-		<!-- this is a necessary property for the functioning of LML; link it to the batch-specific variable name -->
-		<property name="control.queue.name" visible="false">
+		<!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
+		<attribute name="control.queue.name" visible="false">
 			<link-value-to>destination</link-value-to>
-		</property>
-		<property name="ompi_minor_version" visible="false" type="integer"/>
-		<property name="local_prefix" visible="false" type="string">
+		</attribute>
+		<attribute name="ompi_minor_version" visible="false" type="integer"/>
+		<attribute name="local_prefix" visible="false" type="string">
 			<default></default>
-		</property>
+		</attribute>
 		<attribute name="mpiNumberOfProcesses" min="1" type="integer"/>
 		<attribute name="byNodeOption" type="boolean"/>
 		<attribute name="bySlotOption" type="boolean"/>
@@ -29,7 +29,7 @@
 			<arg>-a</arg>
 			<arg>--parseable</arg>
 			<stdout-parser delim="\n">
-				<!--target type="attribute" allowOverwrites="true">
+				<!--target allowOverwrites="true">
 					<match>
 						<expression>mca:.*:param:([^:]*):value:(.*)</expression>
 						<set field="name">
@@ -73,7 +73,7 @@
 						</else>
 					</test>
 				</target-->
-				<target type="attribute">
+				<target>
 					<match>
 						<expression>ompi:version:full:[\d]+\.([\d]+).*</expression>
 						<set field="name">
@@ -174,7 +174,7 @@
 					<widget type="label" style="SWT.LEFT">
 						<fixed-text>Number of processes:</fixed-text>
 					</widget>
-					<widget type="spinner" style="SWT.BORDER" readOnly="false" saveValueTo="mpiNumberOfProcesses">
+					<widget type="spinner" style="SWT.BORDER" readOnly="false" attribute="mpiNumberOfProcesses">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.CENTER"
 								grabExcessHorizontal="false" grabExcessVertical="false"/>
@@ -190,12 +190,12 @@
 						<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
 					</layout-data>
 					<title>Options</title>
-					<widget type="checkbox" title="By node" saveValueTo="byNodeOption"/>
-					<widget type="checkbox" title="By slot" saveValueTo="bySlotOption"/>
-					<widget type="checkbox" title="No oversubscribe" saveValueTo="noOversubscribeOption"/>
-					<widget type="checkbox" title="No local" saveValueTo="noLocalOption"/>
-					<widget type="checkbox" title="Prefix:" buttonId="prefixButton" saveValueTo="prefixOption"/>
-					<widget type="text" style="SWT.BORDER" saveValueTo="prefix">
+					<widget type="checkbox" title="By node" attribute="byNodeOption"/>
+					<widget type="checkbox" title="By slot" attribute="bySlotOption"/>
+					<widget type="checkbox" title="No oversubscribe" attribute="noOversubscribeOption"/>
+					<widget type="checkbox" title="No local" attribute="noLocalOption"/>
+					<widget type="checkbox" title="Prefix:" buttonId="prefixButton" attribute="prefixOption"/>
+					<widget type="text" style="SWT.BORDER" attribute="prefix">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="3" grabExcessHorizontal="true"/>
 						</layout-data>
@@ -212,7 +212,7 @@
 						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL"  grabExcessHorizontal="true" grabExcessVertical="true"/>
 					</layout-data>
 					<title>Hosts</title>
-					<widget type="checkbox" title="Host file:" buttonId="hostFileButton" saveValueTo="useHostFile"/>
+					<widget type="checkbox" title="Host file:" buttonId="hostFileButton" attribute="useHostFile"/>
 					<browse textStyle="SWT.BORDER" title="Browse">
 						<text-layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
@@ -227,12 +227,12 @@
 							<enable-if button="hostFileButton" selected="true"/>
 						</button-control-state>
 					</browse>					
-					<widget type="checkbox" title="Host list:" buttonId="hostListButton" saveValueTo="useHostList">
+					<widget type="checkbox" title="Host list:" buttonId="hostListButton" attribute="useHostList">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.TOP"/>
 						</layout-data>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="host_list">
+					<widget type="text" style="SWT.BORDER" attribute="host_list">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" horizontalSpan="2" 
 								grabExcessHorizontal="true" grabExcessVertical="true"/>
@@ -264,7 +264,7 @@
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="false"/>
 						</layout-data>
 						<title>Launch Arguments</title>
-						<widget type="checkbox" title="Use default arguments" saveValueTo="useDefaultAguments">
+						<widget type="checkbox" title="Use default arguments" attribute="useDefaultAguments">
 							<layout-data>
 								<grid-data horizontalSpan="2"/>
 							</layout-data>

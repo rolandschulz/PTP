@@ -1,0 +1,154 @@
+<html>
+<head>
+<title>shmem_int_iput</title>
+</head>
+<h2 id="top">shmem_int_iput</h2>
+<h4>Purpose</h4>
+
+
+<p>Transfers strided data to a specified processing element (PE).
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_int_iput(int *target, const int *source, ptrdiff_t tst, ptrdiff_t sst, size_t len, int pe);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+
+</dd>
+<dt class="bold ">target</dt>
+<dd>Remotely accessible strided array on the remote PE that receives the data.
+</dd>
+<dt class="bold ">source</dt>
+<dd>The strided array on the local PE that contains the data to be transferred.
+</dd>
+<dt class="bold">tst</dt>
+<dd>The stride between consecutive elements of the target array.  The stride is scaled by the element size of the target array. A value of 1 indicates contiguous data.
+</dd>
+<dt class="bold">sst</dt>
+<dd>The stride between consecutive elements of the source array.  The stride is scaled by the element size of the source array. A value of 1 indicates contiguous data.
+</dd>
+<dt class="bold">len</dt>
+<dd>Number of elements in the target and source arrays.
+</dd>
+<dt class="bold">pe</dt>
+<dd>Processing element number of the remote PE.
+</dd>
+</dl>
+<h4>Description</h4>
+
+<div class="ledi">
+<p>This routine provides a high-performance method for copying a strided array from the local PE to a contiguous data object on a different PE</p>
+<p>This routine returns when the data has been copied out of the source array on the local PE, but not necessarily before the data has been delivered to the remote data object. To enforce the ordering/completion of the iput routines, the use of shmem_fence, shmem_quiet, shmem_barrier or shmem_barrier_all is needed.</p>
+<p>The function shmem_int_iput() writes strided array of type integer to the
+remote PE.</p>
+
+
+<h4>IBM NOTES</h4>
+<div class="ledi">
+<dl>
+<p>Please refer to Atomicity and Coherency section for atomicity and coherence model in the OpenSHMEM documentation</p>
+</dd>
+</dl>
+
+<h4>C examples</h4>
+<pre>
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+
+#include &lt;shmem.h&gt;
+
+#define GLOBAL_ARRAY_SIZE     20
+#define SOURCE_STRIDE         3
+#define TARGET_STRIDE         4
+#define NUM_OF_TRANS_ELEM     5
+
+static int gIntArray[GLOBAL_ARRAY_SIZE] = {0};
+
+int main (int argc, char* argv[])
+{
+    int total_tasks = -1;
+    int my_task = -1;
+
+    start_pes(0);
+
+    total_tasks = _num_pes();
+
+    if (total_tasks <= 0) {
+        printf("FAILED\n");
+        exit(1);
+    } else {
+        printf("number of pes is %d\n", total_tasks);
+    }
+
+    if (total_tasks < 2 || total_tasks % 2) {
+        printf("FAILED: The number of pes should be an even number. (at least 2)\n");
+        exit(1);
+    }
+
+    my_task = _my_pe();
+
+    if (my_task < 0){
+        printf("FAILED\n");
+        exit(1);
+    } else {
+        printf("my pe id is %d\n", my_task);
+    }
+
+    printf("The address of gIntArray is %p\n", gIntArray);
+
+    // even tasks put value to odd tasks
+    if (my_task%2 == 0) {
+        int tgt_task = my_task + 1;
+   
+        //for int
+        for (int i=0; i&lt;GLOBAL_ARRAY_SIZE; i++) {
+            gIntArray[i] = i;
+        }
+        printf("The Source Stride is: %d, the following data will be put.\n", SOURCE_STRIDE);
+        for (int i=0; i&lt;SOURCE_STRIDE*NUM_OF_TRANS_ELEM; i=i+SOURCE_STRIDE) {
+            printf("array[%d] is: %d\n", i, gIntArray[i]);  
+        }
+        shmem_int_iput(gIntArray, gIntArray, TARGET_STRIDE, SOURCE_STRIDE, NUM_OF_TRANS_ELEM, tgt_task);
+    }
+
+    shmem_barrier_all();
+
+    // odd tasks check value
+    if (my_task%2 == 1) {
+        //for int
+        printf("The Targe Stride is: %d, the following data have been received.\n", TARGET_STRIDE);
+        for (int i=0; i&lt;TARGET_STRIDE*NUM_OF_TRANS_ELEM; i=i+TARGET_STRIDE) {
+            printf("array[%d] is: %d\n", i, gIntArray[i]);  
+        }
+        
+        for (int i=0; i&lt;TARGET_STRIDE*NUM_OF_TRANS_ELEM; i=i+TARGET_STRIDE) {
+            if (gIntArray[i] != i*SOURCE_STRIDE/TARGET_STRIDE) {
+                printf("FAILED, array[%d] should be %d instead of %d\n", i, i*SOURCE_STRIDE/TARGET_STRIDE, gIntArray[i]);
+                exit(1);
+            }              
+        }
+    }
+
+    shmem_barrier_all();
+
+    printf("PASSED\n");
+    return 0;
+}
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_barrier, shmem_put, shmem_fence, shmem_iput, shmem_quiet
+</p>
+</html>

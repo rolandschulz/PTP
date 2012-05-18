@@ -54,7 +54,7 @@
 						</layout-data>
 						<fixed-text>Log results: </fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="logResults" style="SWT.LEFT">
+					<widget type="checkbox" attribute="logResults" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -66,7 +66,7 @@
 						</layout-data>
 						<fixed-text>MPI Number of Cores: </fixed-text>
 					</widget>
-					<button-group saveValueTo="numCores" group="true">
+					<button-group attribute="numCores" group="true">
 						<layout>
 							<row-layout type="SWT.VERTICAL" center="true" fill="true" justify="true"/>
 						</layout>

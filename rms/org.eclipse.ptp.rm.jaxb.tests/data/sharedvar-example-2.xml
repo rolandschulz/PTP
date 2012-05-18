@@ -11,30 +11,30 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="miscellaneous-example">
 	<control-data>
-		<property name="a1" visible="true" translateBooleanAs="1,0"/>
-		<property name="a2" visible="true" translateBooleanAs="1,0"/>
-		<property name="a3" visible="true" translateBooleanAs="1,0"/>
-		<property name="a4" visible="true" translateBooleanAs="1,0"/>
-		<property name="b1" visible="true" translateBooleanAs="1,0"/>
-		<property name="b2" visible="true" translateBooleanAs="1,0"/>
-		<property name="b3" visible="true" translateBooleanAs="1,0"/>
-		<property name="b4" visible="true" translateBooleanAs="1,0"/>
-		<property name="c1" visible="true" translateBooleanAs="1,0"/>
-		<property name="c2" visible="true" translateBooleanAs="1,0"/>
-		<property name="c3" visible="true" translateBooleanAs="1,0"/>
-		<property name="c4" visible="true" translateBooleanAs="1,0"/>
-		<property name="d1" visible="true" translateBooleanAs="1,0"/>
-		<property name="d2" visible="true" translateBooleanAs="1,0"/>
-		<property name="d3" visible="true" translateBooleanAs="1,0"/>
-		<property name="d4" visible="true" translateBooleanAs="1,0"/>
-		<property name="e1" visible="true" translateBooleanAs="1,0"/>
-		<property name="e2" visible="true" translateBooleanAs="1,0"/>
-		<property name="e3" visible="true" translateBooleanAs="1,0"/>
-		<property name="e4" visible="true" translateBooleanAs="1,0"/>
-		<property name="f1" visible="true" translateBooleanAs="1,0"/>
-		<property name="f2" visible="true" translateBooleanAs="1,0"/>
-		<property name="f3" visible="true" translateBooleanAs="1,0"/>
-		<property name="f4" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="a1" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="a2" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="a3" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="a4" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="b1" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="b2" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="b3" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="b4" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="c1" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="c2" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="c3" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="c4" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="d1" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="d2" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="d3" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="d4" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="e1" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="e2" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="e3" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="e4" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="f1" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="f2" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="f3" visible="true" translateBooleanAs="1,0"/>
+		<attribute name="f4" visible="true" translateBooleanAs="1,0"/>
 		<script>
 			<line>
 				<arg isUndefinedIfMatches="a1=">a1=${ptp_rm:a1#value}</arg>
@@ -160,7 +160,7 @@
 			<environment name="VAR_f3" value="${ptp_rm:f3#value}"/>
 			<environment name="VAR_f4" value="${ptp_rm:f4#value}"/>
 			<stdout-parser delim="\n">
-            <target type="property">
+            <target>
                <match>
                   <expression>(${ptp_rm:a1#value}).*</expression>
                   <set field="name">
@@ -198,7 +198,7 @@
 						</layout-data>
 						<fixed-text>a1:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="a1" style="SWT.LEFT">
+					<widget type="checkbox" attribute="a1" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -209,7 +209,7 @@
 						</layout-data>
 						<fixed-text>a2:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="a2" style="SWT.LEFT">
+					<widget type="checkbox" attribute="a2" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -220,7 +220,7 @@
 						</layout-data>
 						<fixed-text>a3:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="a3" style="SWT.LEFT">
+					<widget type="checkbox" attribute="a3" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -231,7 +231,7 @@
 						</layout-data>
 						<fixed-text>a4:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="a4" style="SWT.LEFT">
+					<widget type="checkbox" attribute="a4" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -265,7 +265,7 @@
 						</layout-data>
 						<fixed-text>b1:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="b1" style="SWT.LEFT">
+					<widget type="checkbox" attribute="b1" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -276,7 +276,7 @@
 						</layout-data>
 						<fixed-text>b2:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="b2" style="SWT.LEFT">
+					<widget type="checkbox" attribute="b2" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -287,7 +287,7 @@
 						</layout-data>
 						<fixed-text>b3:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="b3" style="SWT.LEFT">
+					<widget type="checkbox" attribute="b3" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -298,7 +298,7 @@
 						</layout-data>
 						<fixed-text>b4:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="b4" style="SWT.LEFT">
+					<widget type="checkbox" attribute="b4" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -332,7 +332,7 @@
 						</layout-data>
 						<fixed-text>c1:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="c1" style="SWT.LEFT">
+					<widget type="checkbox" attribute="c1" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -343,7 +343,7 @@
 						</layout-data>
 						<fixed-text>c2:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="c2" style="SWT.LEFT">
+					<widget type="checkbox" attribute="c2" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -354,7 +354,7 @@
 						</layout-data>
 						<fixed-text>c3:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="c3" style="SWT.LEFT">
+					<widget type="checkbox" attribute="c3" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -365,7 +365,7 @@
 						</layout-data>
 						<fixed-text>c4:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="c4" style="SWT.LEFT">
+					<widget type="checkbox" attribute="c4" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -399,7 +399,7 @@
 						</layout-data>
 						<fixed-text>d1:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="d1" style="SWT.LEFT">
+					<widget type="checkbox" attribute="d1" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -410,7 +410,7 @@
 						</layout-data>
 						<fixed-text>d2:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="d2" style="SWT.LEFT">
+					<widget type="checkbox" attribute="d2" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -421,7 +421,7 @@
 						</layout-data>
 						<fixed-text>d3:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="d3" style="SWT.LEFT">
+					<widget type="checkbox" attribute="d3" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -432,7 +432,7 @@
 						</layout-data>
 						<fixed-text>d4:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="d4" style="SWT.LEFT">
+					<widget type="checkbox" attribute="d4" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -466,7 +466,7 @@
 						</layout-data>
 						<fixed-text>e1:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="e1" style="SWT.LEFT">
+					<widget type="checkbox" attribute="e1" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -477,7 +477,7 @@
 						</layout-data>
 						<fixed-text>e2:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="e2" style="SWT.LEFT">
+					<widget type="checkbox" attribute="e2" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -488,7 +488,7 @@
 						</layout-data>
 						<fixed-text>e3:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="e3" style="SWT.LEFT">
+					<widget type="checkbox" attribute="e3" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -499,7 +499,7 @@
 						</layout-data>
 						<fixed-text>e4:</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="e4" style="SWT.LEFT">
+					<widget type="checkbox" attribute="e4" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
@@ -533,7 +533,7 @@
                   </layout-data>
                   <fixed-text>f1:</fixed-text>
                </widget>
-               <widget type="checkbox" saveValueTo="f1" style="SWT.LEFT">
+               <widget type="checkbox" attribute="f1" style="SWT.LEFT">
                   <layout-data>
                      <grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
                   </layout-data>
@@ -544,7 +544,7 @@
                   </layout-data>
                   <fixed-text>f2:</fixed-text>
                </widget>
-               <widget type="checkbox" saveValueTo="f2" style="SWT.LEFT">
+               <widget type="checkbox" attribute="f2" style="SWT.LEFT">
                   <layout-data>
                      <grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
                   </layout-data>
@@ -555,7 +555,7 @@
                   </layout-data>
                   <fixed-text>f3:</fixed-text>
                </widget>
-               <widget type="checkbox" saveValueTo="f3" style="SWT.LEFT">
+               <widget type="checkbox" attribute="f3" style="SWT.LEFT">
                   <layout-data>
                      <grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
                   </layout-data>
@@ -566,7 +566,7 @@
                   </layout-data>
                   <fixed-text>f4:</fixed-text>
                </widget>
-               <widget type="checkbox" saveValueTo="f4" style="SWT.LEFT">
+               <widget type="checkbox" attribute="f4" style="SWT.LEFT">
                   <layout-data>
                      <grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2"/>
                   </layout-data>

@@ -46,7 +46,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.GridDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.GridLayoutType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.PushButtonType;
 import org.eclipse.ptp.rm.jaxb.core.data.RowDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.RowLayoutType;
@@ -133,28 +132,25 @@ public class LaunchTabBuilder {
 	}
 
 	/**
-	 * @param data
-	 *            Attribute or Property
-	 * @return whether it is visible to the user (and thus used to generate a widget and update model)
+	 * Initialize global state. Must be called prior to building any tabs.
 	 */
-	private static boolean isVisible(Object data) {
-		if (data instanceof AttributeType) {
-			return ((AttributeType) data).isVisible();
-		} else if (data instanceof PropertyType) {
-			return ((PropertyType) data).isVisible();
-		}
-		return false;
+	public static void initialize() {
+		sources.clear();
+		targets.clear();
 	}
 
 	private final IJAXBLaunchConfigurationTab tab;
 	private final IVariableMap rmVarMap;
-	private final Map<Object, IUpdateModel> localWidgets;
 
 	/*
-	 * temporary maps for wiring the widgets
+	 * Temporary maps for wiring the widgets. Sources contains buttons that have buttonId specified. Targets contain controls that
+	 * have their state updated by a button.
+	 * 
+	 * NOTE: button ID's are global across all tabs. This allows the button on one tab to update the state of controls on other
+	 * tabs.
 	 */
-	private final Map<String, Button> sources;
-	private final Map<ControlStateType, Control> targets;
+	private static final Map<String, Button> sources = new HashMap<String, Button>();
+	private static final Map<ControlStateType, Control> targets = new HashMap<ControlStateType, Control>();
 
 	/**
 	 * @param tab
@@ -162,10 +158,7 @@ public class LaunchTabBuilder {
 	 */
 	public LaunchTabBuilder(IJAXBLaunchConfigurationTab tab) throws Throwable {
 		this.tab = tab;
-		this.localWidgets = tab.getLocalWidgets();
 		this.rmVarMap = tab.getParent().getJobControl().getEnvironment();
-		sources = new HashMap<String, Button>();
-		targets = new HashMap<ControlStateType, Control>();
 	}
 
 	/**
@@ -204,7 +197,7 @@ public class LaunchTabBuilder {
 			viewer.setInput(rows);
 			showHide.addSelectionListener(model);
 			model.setShowAll(showHide);
-			localWidgets.put(viewer, model);
+			tab.getLocalWidgets().put(viewer, model);
 
 			ControlStateType cst = descriptor.getControlState();
 			if (cst != null) {
@@ -230,7 +223,7 @@ public class LaunchTabBuilder {
 	 * @throws Throwable
 	 */
 	public Composite build(Composite parent) throws Throwable {
-		localWidgets.clear();
+		tab.getLocalWidgets().clear();
 		TabControllerType top = tab.getController();
 		Layout layout = createLayout(top.getLayout());
 		Object data = createLayoutData(top.getLayoutData());
@@ -265,7 +258,7 @@ public class LaunchTabBuilder {
 	private void addBrowse(BrowseType browse, Composite control) {
 		IUpdateModel model = UpdateModelFactory.createModel(control, browse, tab, rmVarMap, targets);
 		if (model != null) {
-			localWidgets.put(model.getControl(), model);
+			tab.getLocalWidgets().put(model.getControl(), model);
 		}
 	}
 
@@ -294,7 +287,7 @@ public class LaunchTabBuilder {
 		}
 		IUpdateModel model = UpdateModelFactory.createModel(descriptor, control, tab, rmVarMap, sources, targets);
 		if (model != null) {
-			localWidgets.put(control, model);
+			tab.getLocalWidgets().put(control, model);
 		}
 
 		ControlStateType cst = descriptor.getControlState();
@@ -561,50 +554,46 @@ public class LaunchTabBuilder {
 		List<ColumnDataType> columnData = descriptor.getColumnData();
 		ICellEditorUpdateModel model = null;
 		Map<String, ICellEditorUpdateModel> hash = new TreeMap<String, ICellEditorUpdateModel>();
-		Map<String, Object> vars = null;
+		Map<String, AttributeType> vars = null;
 		if (items.isAllPredefined()) {
-			vars = rmVarMap.getVariables();
+			vars = rmVarMap.getAttributes();
 			for (String key : vars.keySet()) {
-				Object o = vars.get(key);
-				if (!isVisible(o)) {
+				AttributeType a = vars.get(key);
+				if (!a.isVisible()) {
 					continue;
 				}
-				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
+				model = UpdateModelFactory.createModel(a, viewer, columnData, tab);
 				hash.put(key, model);
 			}
 		}
 		if (items.isAllDiscovered()) {
 			vars = rmVarMap.getDiscovered();
 			for (String key : vars.keySet()) {
-				Object o = vars.get(key);
-				if (!isVisible(o)) {
+				AttributeType a = vars.get(key);
+				if (!a.isVisible()) {
 					continue;
 				}
-				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
+				model = UpdateModelFactory.createModel(a, viewer, columnData, tab);
 				hash.put(key, model);
 			}
 		}
 		for (String key : items.getInclude()) {
-			if (hash.containsKey(key)) {
-				continue;
-			}
-			Object o = rmVarMap.getVariables().get(key);
-			if (!isVisible(o)) {
-				continue;
-			}
-			if (o == null) {
-				o = rmVarMap.getDiscovered().get(key);
-			}
-			if (o != null) {
-				model = UpdateModelFactory.createModel(o, viewer, columnData, tab);
-				hash.put(key, model);
+			if (!hash.containsKey(key)) {
+				AttributeType a = rmVarMap.getAttributes().get(key);
+				if (a == null) {
+					a = rmVarMap.getDiscovered().get(key);
+				}
+				if (a != null && a.isVisible()) {
+					model = UpdateModelFactory.createModel(a, viewer, columnData, tab);
+					hash.put(key, model);
+				}
 			}
 		}
 		for (String key : items.getExclude()) {
 			hash.remove(key);
 		}
 		for (ICellEditorUpdateModel m : hash.values()) {
-			localWidgets.put(m.getControl(), m);
+			tab.getLocalWidgets().put(m.getControl(), m);
 		}
 		return hash.values();
 	}
@@ -624,7 +613,7 @@ public class LaunchTabBuilder {
 		 * Label models are not returned, since they cannot be updated
 		 */
 		if (model != null) {
-			localWidgets.put(model.getControl(), model);
+			tab.getLocalWidgets().put(model.getControl(), model);
 		}
 	}
 
@@ -679,21 +668,25 @@ public class LaunchTabBuilder {
 			Control target = targets.get(cst);
 			ControlStateRuleType rule = cst.getEnableIf();
 			if (rule != null) {
-				listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.ENABLE, sources));
+				listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.ENABLE, sources, tab.getParent()
+						.getVariableMap()));
 			} else {
 				rule = cst.getDisableIf();
 				if (rule != null) {
-					listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.DISABLE, sources));
+					listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.DISABLE, sources, tab
+							.getParent().getVariableMap()));
 				}
 			}
 
 			rule = cst.getHideIf();
 			if (rule != null) {
-				listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.HIDE, sources));
+				listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.HIDE, sources, tab.getParent()
+						.getVariableMap()));
 			} else {
 				rule = cst.getShowIf();
 				if (rule != null) {
-					listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.SHOW, sources));
+					listeners.add(new ControlStateListener(target, rule, ControlStateListener.Action.SHOW, sources, tab.getParent()
+							.getVariableMap()));
 				}
 			}
 		}

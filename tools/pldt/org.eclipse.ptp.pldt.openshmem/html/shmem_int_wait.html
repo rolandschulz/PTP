@@ -1,0 +1,52 @@
+<html>
+<head>
+<title>shmem_int_wait</title>
+</head>
+<h2 id="top">shmem_int_wait</h2>
+<h4>Purpose</h4>
+
+
+<p>Waits for a variable on the local processing element (PE) to change.
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_int_wait(int *ivar, int value);
+ 
+</pre>
+
+<h4>Parameters</h4>
+
+
+<dl>
+<dt class="bold">INPUT</dt>
+<dd>
+
+</dd>
+<dt class="bold ">ivar</dt>
+<dd>A remotely accessible integer variable that is being updated by a remote PE.
+</dd>
+<dt class="bold ">value</dt>
+<dd>The right operand of the compare operator cond.
+The left one is the value pointed by var.
+</dd>
+</dl>
+<h4>Description</h4>
+
+<div class="ledi">
+<p>This function is used for point-to-point synchronization. It suspends the execution of the calling PE until the value of the symmetric variable var is changed</p>
+<p>The function shmem_int_wait() blocks the calling PE until some remote PE writes
+an integer value, not equal to value, into var on the waiting PE.</p>
+
+<h4>C examples</h4>
+<pre>
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: shmem_put
+</p>
+</html>

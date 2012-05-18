@@ -70,7 +70,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 import org.eclipse.ptp.utils.core.ArgumentParser;
@@ -541,7 +540,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @return value of the attribute, or null if not found
 	 */
 	private Object getAttributeValue(IVariableMap vars, String name) {
-		AttributeType attr = (AttributeType) vars.get(name);
+		AttributeType attr = vars.get(name);
 		if (attr != null) {
 			String link = attr.getLinkValueTo();
 			if (link != null) {
@@ -972,13 +971,13 @@ public class CommandJob extends Job implements ICommandJob {
 						return CoreExceptionUtils.getErrorStatus(e.getMessage(), e);
 					}
 				}
-				PropertyType p = (PropertyType) rmVarMap.get(uuid);
-				String state = (String) p.getValue();
+				AttributeType a = rmVarMap.get(uuid);
+				String state = (String) a.getValue();
 				if (state == null) {
 					state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
-					p.setValue(state);
+					a.setValue(state);
 				}
-				p.setName(uuid);
+				a.setName(uuid);
 				jobStatus = new CommandJobStatus(uuid, state, parent, control);
 				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
 				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));

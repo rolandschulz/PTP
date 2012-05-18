@@ -99,7 +99,7 @@ public class TextUpdateModel extends DynamicControlUpdateModel implements Modify
 		if (!canSave) {
 			mapValue = getResolvedDynamic();
 		} else {
-			mapValue = lcMap.get(name);
+			mapValue = lcMap.getValue(name);
 		}
 		String s = JAXBControlUIConstants.ZEROSTR;
 		if (mapValue != null) {

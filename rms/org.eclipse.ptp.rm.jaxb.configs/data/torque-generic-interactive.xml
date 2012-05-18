@@ -11,16 +11,16 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="Torque-Generic-Interactive">
 	<control-data>
-		<!-- Set the default value of this property if PBS is installed in a non-standard location -->
-		<property name="bindir" visible="false"/>
-		<!-- This is a necessary property for the functioning of LML; link it to the batch-specific variable name -->
-		<property name="control.queue.name" visible="false">
+		<!-- Set the default value of this attribute if PBS is installed in a non-standard location -->
+		<attribute name="bindir" visible="false"/>
+		<!-- This is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
+		<attribute name="control.queue.name" visible="false">
 			<link-value-to>destination</link-value-to>
-		</property>
-		<property name="queues" visible="false"/>
-		<property name="mpiPrefix" visible="false">
+		</attribute>
+		<attribute name="queues" visible="false"/>
+		<attribute name="mpiPrefix" visible="false">
 			<default>${ptp_rm:mpiCommand#value} -np ${ptp_rm:mpiCores#value}</default>
-		</property>
+		</attribute>
 		<attribute name="Account_Name" type="string">
 			<description>Account to which to charge this job.</description>
 			<tooltip>Format: string</tooltip>
@@ -208,7 +208,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 						<fixed-text>Queue: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
 						<layout-data>
 							<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
 						</layout-data>
@@ -248,7 +248,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
                   <tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
                   <fixed-text>Account: </fixed-text>
                </widget>
-               <widget type="text" style="SWT.BORDER" saveValueTo="Account_Name">
+               <widget type="text" style="SWT.BORDER" attribute="Account_Name">
                   <layout-data>
                      <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
                   </layout-data>
@@ -267,7 +267,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
 						<fixed-text>Total Memory Needed: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.mem">
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.mem">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -286,7 +286,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
 						<fixed-text>Wallclock Time: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.walltime">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -304,7 +304,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>MPI Command: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCommand">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="mpiCommand">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
@@ -322,7 +322,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>MPI Number of Cores: </fixed-text>
 					</widget>
-					<widget type="spinner" style="SWT.BORDER" readOnly="true" saveValueTo="mpiCores">
+					<widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="mpiCores">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
 						</layout-data>

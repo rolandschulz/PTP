@@ -20,6 +20,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
+import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
@@ -59,7 +60,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 
 	protected boolean canSave;
 	protected String name;
-	protected IVariableMap lcMap;
+	protected LCVariableMap lcMap;
 	protected ValueUpdateHandler handler;
 	protected boolean refreshing;
 	protected ValidatorType validator;
@@ -99,7 +100,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	 * refreshed from the map, and if the value is <code>null</code>, the default value is restored to the map and another refresh
 	 * is called on the actual value.
 	 */
-	public void initialize(IVariableMap rmMap, IVariableMap lcMap) {
+	public void initialize(IVariableMap rmMap, LCVariableMap lcMap) {
 		this.lcMap = lcMap;
 		if (name != null) {
 			defaultValue = lcMap.getDefault(name);
@@ -213,7 +214,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	 */
 	protected Object storeValue() throws Exception {
 		Object value = validate();
-		lcMap.put(name, value);
+		lcMap.putValue(name, value);
 		return value;
 	}
 

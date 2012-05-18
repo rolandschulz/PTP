@@ -5,7 +5,7 @@
 	and is available at http://www.eclipse.org/legal/epl-v10.html -->
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="ibm_pe">
+	xsi:schemaLocation="resource_manager_type.xsd" name="IBM Parallel Environment">
 	<!-- Make sure XML editor line length is set long enough (160) to avoid wrapping text so messages don't get wrapped when reformatting -->
 	<control-data>
 		<!-- Required for debugger to determine number of processes to display -->
@@ -19,7 +19,7 @@
                         </tooltip>
                         <validator>
                                 <regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
-                                <error-message>Acknowledgment threshold must be numeric
+                                <error-message>Acknowledgement threshold must be numeric
                                 </error-message>
                         </validator>
                 </attribute>
@@ -105,6 +105,13 @@
                         <choice>,STDERR</choice>
                 </attribute>
 
+				<attribute name="MP_COREFILE_SIGTERM_ATTR" type="boolean" translateBooleanAs="yes,no">
+					<description>Corefile on SIGTERM:</description>
+					<tooltip>Select to create corefile if application gets SIGTERM {MP_COREFILE_SIGTERM}
+					</tooltip>
+					<choice>yes,no,debug,minimum</choice>
+				</attribute>
+		
                 <attribute name="MP_COSCHEDULER_VERSION_ATTR" type="boolean"
                         translateBooleanAs="runqueue,''">
                         <description>Use runqueue co-scheduler:</description>
@@ -525,10 +532,10 @@
                         </validator>
                 </attribute>
 
-		<attribute name="MP_RESD_ATTR" type="string">
-			<description>Use resource manager:</description>
-			<tooltip>Use resource manager to handle resource allocations {MP_RESD}</tooltip>
-		</attribute>
+				<attribute name="MP_RESD_ATTR" type="string">
+					<description>Use resource manager:</description>
+					<tooltip>Use resource manager to handle resource allocations {MP_RESD}</tooltip>
+				</attribute>
 
                 <attribute name="MP_RETRANSMIT_INTERVAL_ATTR" type="integer">
                         <description>MPI retransmit interval:</description>
@@ -718,17 +725,18 @@
                                 </error-message>
                         </validator>
                 </attribute>
-
-                <attribute name="MP_RM_TIMEOUT_ATTR" type="integer">
-                        <description>Resource mgr connect timeout:</description>
-                        <tooltip>"Specify resource manager connection timeout (&lt;0: wait indefinitely, 0:     no wait, &gt;0, wait specified interval) (Default: 30) {MP_RM_TIMEOUT}"
-                        </tooltip>
-                        <validator>
-                                <regex expression=" *|-?[0-9]*" /> <!-- Blank or signed numeric -->
-                                <error-message>Resource manager connection timeout must be numeric
-                                </error-message>
-                        </validator>
-                </attribute>
+                
+ 				<attribute name="MP_TIMEOUT_ATTR" type="integer">
+					<description>Connection timeout:</description>
+					<tooltip>Specify timeout limit for connecting to remote nodes
+						(Default: 150) {MP_TIMEOUT}
+					</tooltip>
+					<validator>
+						<regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+						<error-message>Connection timeout must be numeric
+						</error-message>
+					</validator>
+				</attribute>
 
                 <attribute name="MP_TLP_REQUIRED_ATTR" type="string">
                         <description>Large pages required:</description>
@@ -777,7 +785,7 @@
 
                <attribute name="RM_USE_LOAD_LEVELER" type="boolean"
                         translateBooleanAs="yes,no">
-                        <description>Use LoadLeveler:</description>
+                        <description>Use LoadLeveler for node allocation:</description>
                         <tooltip>Use LoadLeveler as node and system resource allocator
                         </tooltip>
                 </attribute>
@@ -799,96 +807,96 @@
 			<arg>perl</arg>
 			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app.pl</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
-			<arg>${ptp_rm:progArgs#value}</arg>
-			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH#value}" />
-			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE#value}" />
-			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC#value}" />
-			<environment name="MP_BULK_MIN_MSG_SIZE" value="${ptp_rm:MP_BULK_MIN_MSG_SIZE#value}" />
-			<environment name="MP_CC_SCRATCH_BUF" value="${ptp_rm:MP_SCRATCH_BUF#value}" />
-			<environment name="MP_CLOCK_SOURCE" value="${ptp_rm:MP_CLOCK_SOURCE#value}" />
-			<environment name="MP_CMDFILE" value="${ptp_rm:MP_CMDFILE#value}" />
-			<environment name="MP_COLLECTIVE_GROUPS" value="${ptp_rm:MP_COLLECTIVE_GROUPS#value}" />
-			<environment name="MP_CONFIG" value="${ptp_rm:MP_CONFIG#value}" />
-			<environment name="MP_COREDIR" value="${ptp_rm:MP_COREDIR#value}" />
-			<environment name="MP_COREFILE_FORMAT" value="${ptp_rm:MP_COREFILE_FORMAT#value}" />
-			<environment name="MP_COREFILE_SIGTERM" value="${ptp_rm:MP_COREFILE_SIGTERM#value}" />
-			<environment name="MP_COSCHEDULER_VERSION" value="${ptp_rm:MP_COSCHEDULER_VERSION#value}" />
-			<environment name="MP_CPU_USE" value="${ptp_rm:MP_CPU_USE#value}" />
-			<environment name="MP_CSS_INTERRUPT" value="${ptp_rm:MP_CSS_INTERRUPT#value}" />
-			<environment name="MP_DEVTYPE" value="${ptp_rm:MP_DEVTYPE#value}" />
-			<environment name="MP_EAGER_LIMIT" value="${ptp_rm:MP_EAGER_LIMIT#value}" />
-			<environment name="MP_EUIDEVELOP" value="${ptp_rm:MP_EUIDEVELOP#value}" />
-			<environment name="MP_EUIDEVICE" value="${ptp_rm:MP_EUIDEVICE#value}" />
-			<environment name="MP_EUILIB" value="${ptp_rm:MP_EUILIB#value}" />
-			<environment name="MP_EUILIBPATH" value="${ptp_rm:MP_EUILIBPATH#value}" />
-			<environment name="MP_FIFO_ROUTE_MODE" value="${ptp_rm:MP_FIFO_ROUTE_MODE#value}" />
-			<environment name="MP_FORCED_INTERRUPTS_ENABLED" value="${ptp_rm:MP_FORCED_INTERRUPTS_ENABLED#value}" />
-			<environment name="MP_HINTS_FILTERED" value="${ptp_rm:MP_HINTS_FILTERED#value}" />
-			<environment name="MP_HOSTFILE" value="${ptp_rm:MP_HOSTFILE#value}" />
-			<environment name="MP_IMM_SEND_BUFFERS" value="${ptp_rm:MP_IMM_SEND_BUFFERS#value}" />
-			<environment name="MP_INFOLEVEL" value="${ptp_rm:MP_INFOLEVEL#value}" />
-			<environment name="MP_INSTANCES" value="${ptp_rm:MP_INSTANCES#value}" />
-			<environment name="MP_IOAGENT_CNT" value="${ptp_rm:MP_IOAGENT_CNT#value}" />
-			<environment name="MP_IONODEFILE" value="${ptp_rm:MP_IONODEFILE#value}" />
-			<environment name="MP_IOTASKLIST" value="${ptp_rm:MP_IOTASKLIST#value}" />
-			<environment name="MP_IO_BUFFER_SIZE" value="${ptp_rm:MP_IO_BUFFER_SIZE#value}" />
-			<environment name="MP_IO_ERRLOG" value="${ptp_rm:MP_IO_ERRLOG#value}" />
-			<environment name="MP_LABELIO" value="${ptp_rm:MP_LABELIO#value}" />
-			<environment name="MP_MC_INET_ADDR_LEN" value="${ptp_rm:MP_MC_INET_ADDR_LEN#value}" />
-			<environment name="MP_MC_INET_BASE_ADDR" value="${ptp_rm:MP_MC_INET_BASE_ADDR#value}" />
-			<environment name="MP_MC_INET_PORT" value="${ptp_rm:MP_MC_INET_PORT#value}" />
-			<environment name="MP_MPILIB" value="${ptp_rm:MP_MPILIB#value}" />
-			<environment name="MP_MSG_API" value="${ptp_rm:MP_MSG_API#value}" />
-			<environment name="MP_MSG_ENVELOPE_BUF" value="${ptp_rm:MP_MSG_ENVELOPE_BUF#value}" />
-			<environment name="MP_NEWJOB" value="${ptp_rm:MP_NEWJOB#value}" />
-			<environment name="MP_NODES" value="${ptp_rm:MP_NODES#value}" />
-			<environment name="MP_PGMMODEL" value="${ptp_rm:MP_PGMMODEL#value}" />
-			<environment name="MP_PMDLOG" value="${ptp_rm:MP_PMDLOG#value}" />
-			<environment name="MP_PMDLOG_DIR" value="${ptp_rm:MP_PMDLOG_DIR#value}" />
-			<environment name="MP_PMDSUFFIX" value="${ptp_rm:MP_PMDSUFFIX#value}" />
-			<environment name="MP_POLLING_INTERVAL" value="${ptp_rm:MP_POLLING_INTERVAL#value}" />
-			<environment name="MP_PRINTENV" value="${ptp_rm:MP_PRINTENV#value}" />
-			<environment name="MP_PRIORITY" value="${ptp_rm:MP_PRIORITY#value}" />
-			<environment name="MP_PRIORITY_LOG" value="${ptp_rm:MP_PRIORITY_LOG#value}" />
-			<environment name="MP_PRIORITY_LOG_DIR" value="${ptp_rm:MP_PRIORITY_LOG_DIR#value}" />
-			<environment name="MP_PRIORITY_LOG_NAME" value="${ptp_rm:MP_PRIORITY_LOG_NAME#value}" />
-			<environment name="MP_PRIORITY_NTP" value="${ptp_rm:MP_PRIORITY_NTP#value}" />
-			<environment name="MP_PROCS" value="${ptp_rm:MP_PROCS#value}" />
-			<environment name="MP_PROFDIR" value="${ptp_rm:MP_PROFDIR#value}" />
-			<environment name="MP_PULSE" value="${ptp_rm:MP_PULSE#value}" />
-			<environment name="MP_RC_MAX_QP" value="${ptp_rm:MP_RC_MAX_QP#value}" />
-			<environment name="MP_RC_USE_LMC" value="${ptp_rm:MP_RC_USE_LMC#value}" />
-			<environment name="MP_RDMA_ROUTE_MODE" value="${ptp_rm:MP_RDMA_ROUTE_MODE#value}" />
-			<environment name="MP_REMOTEDIR" value="${ptp_rm:MP_REMOTEDIR#value}" />
-			<environment name="MP_RESD" value="${ptp_rm:MP_RESD#value}" />
-			<environment name="MP_RETRANSMIT_INTERVAL" value="${ptp_rm:MP_RETRANSMIT_INTERVAL#value}" />
-			<environment name="MP_RETRY" value="${ptp_rm:MP_RETRY#value}" />
-			<environment name="MP_REXMIT_BUF_CNT" value="${ptp_rm:MP_REXMIT_BUF_CNT#value}" />
-			<environment name="MP_REXMIT_BUF_SIZE" value="${ptp_rm:MP_REXMIT_BUF_SIZE#value}" />
-			<environment name="MP_RMA_PENDING" value="${ptp_rm:MP_RMA_PENDING#value}" />
-			<environment name="MP_RMFILE" value="${ptp_rm:MP_RMFILE#value}" />
-			<environment name="MP_RMPOOL" value="${ptp_rm:MP_RMPOOL#value}" />
-			<environment name="MP_RM_TIMEOUT" value="${ptp_rm:MP_RM_TIMEOUT#value}" />
-			<environment name="MP_SAVEHOSTFILE" value="${ptp_rm:MP_SAVEHOSTFILE#value}" />
-			<environment name="MP_SAVE_RMFILE" value="${ptp_rm:MP_SAVE_RMFILE#value}" />
-			<environment name="MP_SHARED_MEMORY" value="${ptp_rm:MP_SHARED_MEMORY#value}" />
-			<environment name="MP_SHMCC_EXCLUDE_LIST" value="${ptp_rm:MP_SHMCC_EXCLUDE_LIST#value}" />
-			<environment name="MP_SHMEM_PT2PT" value="${ptp_rm:MP_SHMEM_PT2PT#value}" />
-			<environment name="MP_SINGLE_THREAD" value="${ptp_rm:MP_SINGLE_THREAD#value}" />
-			<environment name="MP_STATISTICS" value="${ptp_rm:MP_STATISTICS#value}" />
-			<environment name="MP_STDINMODE" value="${ptp_rm:MP_STDINMODE#value}" />
-			<environment name="MP_STDOUTMODE" value="${ptp_rm:MP_STDOUTMODE#value}" />
-			<environment name="MP_TASKS_PER_NODE" value="${ptp_rm:MP_TASKS_PER_NODE#value}" />
-			<environment name="MP_TASK_AFFINITY" value="${ptp_rm:MP_TASK_AFFINITY#value}" />
-			<environment name="MP_THREAD_STACKSIZE" value="${ptp_rm:MP_THREAD_STACKSIZE#value}" />
-			<environment name="MP_TIMEOUT" value="${ptp_rm:MP_TIMEOUT#value}" />
-			<environment name="MP_TLP_REQUIRED" value="${ptp_rm:MP_TLP_REQUIRED#value}" />
-			<environment name="MP_UDP_PACKET_SIZE" value="${ptp_rm:MP_UDP_PACKET_SIZE#value}" />
-			<environment name="MP_USE_BULK_XFER" value="${ptp_rm:MP_USE_BULK_XFER#value}" />
-			<environment name="MP_USE_MC" value="${ptp_rm:MP_USE_MC#value}" />
-			<environment name="MP_WAIT_MODE" value="${ptp_rm:MP_WAIT_MODE#value}" />
-			<environment name="MP_WORLD_SIZES" value="${ptp_rm:MP_WORLD_SIZES#value}" />
-			<environment name="SCI_DEBUG_FANOUT" value="${ptp_rm:SCI_DEBUG_FANOUT#value}" />
+			<arg>${ptp_rm:progArgs_ATTR#value}</arg>
+			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH_ATTR#value}" />
+			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE_ATTR#value}" />
+			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC_ATTR#value}" />
+			<environment name="MP_BULK_MIN_MSG_SIZE" value="${ptp_rm:MP_BULK_MIN_MSG_SIZE_ATTR#value}" />
+			<environment name="MP_CC_SCRATCH_BUF" value="${ptp_rm:MP_SCRATCH_BUF_ATTR#value}" />
+			<environment name="MP_CLOCK_SOURCE" value="${ptp_rm:MP_CLOCK_SOURCE_ATTR#value}" />
+			<environment name="MP_CMDFILE" value="${ptp_rm:MP_CMDFILE_ATTR#value}" />
+			<environment name="MP_COLLECTIVE_GROUPS" value="${ptp_rm:MP_COLLECTIVE_GROUPS_ATTR#value}" />
+			<environment name="MP_CONFIG" value="${ptp_rm:MP_CONFIG_ATTR#value}" />
+			<environment name="MP_COREDIR" value="${ptp_rm:MP_COREDIR_ATTR#value}" />
+			<environment name="MP_COREFILE_FORMAT" value="${ptp_rm:MP_COREFILE_FORMAT_ATTR#value}" />
+			<environment name="MP_COREFILE_SIGTERM" value="${ptp_rm:MP_COREFILE_SIGTERM_ATTR#value}" />
+			<environment name="MP_COSCHEDULER_VERSION" value="${ptp_rm:MP_COSCHEDULER_VERSION_ATTR#value}" />
+			<environment name="MP_CPU_USE" value="${ptp_rm:MP_CPU_USE_ATTR#value}" />
+			<environment name="MP_CSS_INTERRUPT" value="${ptp_rm:MP_CSS_INTERRUPT_ATTR#value}" />
+			<environment name="MP_DEVTYPE" value="${ptp_rm:MP_DEVTYPE_ATTR#value}" />
+			<environment name="MP_EAGER_LIMIT" value="${ptp_rm:MP_EAGER_LIMIT_ATTR#value}" />
+			<environment name="MP_EUIDEVELOP" value="${ptp_rm:MP_EUIDEVELOP_ATTR#value}" />
+			<environment name="MP_EUIDEVICE" value="${ptp_rm:MP_EUIDEVICE_ATTR#value}" />
+			<environment name="MP_EUILIB" value="${ptp_rm:MP_EUILIB_ATTR#value}" />
+			<environment name="MP_EUILIBPATH" value="${ptp_rm:MP_EUILIBPATH_ATTR#value}" />
+			<environment name="MP_FIFO_ROUTE_MODE" value="${ptp_rm:MP_FIFO_ROUTE_MODE_ATTR#value}" />
+			<environment name="MP_FORCED_INTERRUPTS_ENABLED" value="${ptp_rm:MP_FORCED_INTERRUPTS_ENABLED_ATTR#value}" />
+			<environment name="MP_HINTS_FILTERED" value="${ptp_rm:MP_HINTS_FILTERED_ATTR#value}" />
+			<environment name="MP_HOSTFILE" value="${ptp_rm:MP_HOSTFILE_ATTR#value}" />
+			<environment name="MP_IMM_SEND_BUFFERS" value="${ptp_rm:MP_IMM_SEND_BUFFERS_ATTR#value}" />
+			<environment name="MP_INFOLEVEL" value="${ptp_rm:MP_INFOLEVEL_ATTR#value}" />
+			<environment name="MP_INSTANCES" value="${ptp_rm:MP_INSTANCES_ATTR#value}" />
+			<environment name="MP_IOAGENT_CNT" value="${ptp_rm:MP_IOAGENT_CNT_ATTR#value}" />
+			<environment name="MP_IONODEFILE" value="${ptp_rm:MP_IONODEFILE_ATTR#value}" />
+			<environment name="MP_IOTASKLIST" value="${ptp_rm:MP_IOTASKLIST_ATTR#value}" />
+			<environment name="MP_IO_BUFFER_SIZE" value="${ptp_rm:MP_IO_BUFFER_SIZE_ATTR#value}" />
+			<environment name="MP_IO_ERRLOG" value="${ptp_rm:MP_IO_ERRLOG_ATTR#value}" />
+			<environment name="MP_LABELIO" value="${ptp_rm:MP_LABELIO_ATTR#value}" />
+			<environment name="MP_MC_INET_ADDR_LEN" value="${ptp_rm:MP_MC_INET_ADDR_LEN_ATTR#value}" />
+			<environment name="MP_MC_INET_BASE_ADDR" value="${ptp_rm:MP_MC_INET_BASE_ADDR_ATTR#value}" />
+			<environment name="MP_MC_INET_PORT" value="${ptp_rm:MP_MC_INET_PORT_ATTR#value}" />
+			<environment name="MP_MPILIB" value="${ptp_rm:MP_MPILIB_ATTR#value}" />
+			<environment name="MP_MSG_API" value="${ptp_rm:MP_MSG_API_ATTR#value}" />
+			<environment name="MP_MSG_ENVELOPE_BUF" value="${ptp_rm:MP_MSG_ENVELOPE_BUF_ATTR#value}" />
+			<environment name="MP_NEWJOB" value="${ptp_rm:MP_NEWJOB_ATTR#value}" />
+			<environment name="MP_NODES" value="${ptp_rm:MP_NODES_ATTR#value}" />
+			<environment name="MP_PGMMODEL" value="${ptp_rm:MP_PGMMODEL_ATTR#value}" />
+			<environment name="MP_PMDLOG" value="${ptp_rm:MP_PMDLOG_ATTR#value}" />
+			<environment name="MP_PMDLOG_DIR" value="${ptp_rm:MP_PMDLOG_DIR_ATTR#value}" />
+			<environment name="MP_PMDSUFFIX" value="${ptp_rm:MP_PMDSUFFIX_ATTR#value}" />
+			<environment name="MP_POLLING_INTERVAL" value="${ptp_rm:MP_POLLING_INTERVAL_ATTR#value}" />
+			<environment name="MP_PRINTENV" value="${ptp_rm:MP_PRINTENV_ATTR#value}" />
+			<environment name="MP_PRIORITY" value="${ptp_rm:MP_PRIORITY_ATTR#value}" />
+			<environment name="MP_PRIORITY_LOG" value="${ptp_rm:MP_PRIORITY_LOG_ATTR#value}" />
+			<environment name="MP_PRIORITY_LOG_DIR" value="${ptp_rm:MP_PRIORITY_LOG_DIR_ATTR#value}" />
+			<environment name="MP_PRIORITY_LOG_NAME" value="${ptp_rm:MP_PRIORITY_LOG_NAME_ATTR#value}" />
+			<environment name="MP_PRIORITY_NTP" value="${ptp_rm:MP_PRIORITY_NTP_ATTR#value}" />
+			<environment name="MP_PROCS" value="${ptp_rm:MP_PROCS_ATTR#value}" />
+			<environment name="MP_PROFDIR" value="${ptp_rm:MP_PROFDIR_ATTR#value}" />
+			<environment name="MP_PULSE" value="${ptp_rm:MP_PULSE_ATTR#value}" />
+			<environment name="MP_RC_MAX_QP" value="${ptp_rm:MP_RC_MAX_QP_ATTR#value}" />
+			<environment name="MP_RC_USE_LMC" value="${ptp_rm:MP_RC_USE_LMC_ATTR#value}" />
+			<environment name="MP_RDMA_ROUTE_MODE" value="${ptp_rm:MP_RDMA_ROUTE_MODE_ATTR#value}" />
+			<environment name="MP_REMOTEDIR" value="${ptp_rm:MP_REMOTEDIR_ATTR#value}" />
+			<environment name="MP_RESD" value="${ptp_rm:MP_RESD_ATTR#value}" />
+			<environment name="MP_RETRANSMIT_INTERVAL" value="${ptp_rm:MP_RETRANSMIT_INTERVAL_ATTR#value}" />
+			<environment name="MP_RETRY" value="${ptp_rm:MP_RETRY_ATTR#value}" />
+			<environment name="MP_REXMIT_BUF_CNT" value="${ptp_rm:MP_REXMIT_BUF_CNT_ATTR#value}" />
+			<environment name="MP_REXMIT_BUF_SIZE" value="${ptp_rm:MP_REXMIT_BUF_SIZE_ATTR#value}" />
+			<environment name="MP_RMA_PENDING" value="${ptp_rm:MP_RMA_PENDING_ATTR#value}" />
+			<environment name="MP_RMFILE" value="${ptp_rm:MP_RMFILE_ATTR#value}" />
+			<environment name="MP_RMPOOL" value="${ptp_rm:MP_RMPOOL_ATTR#value}" />
+			<environment name="MP_RM_TIMEOUT" value="${ptp_rm:MP_RM_TIMEOUT_ATTR#value}" />
+			<environment name="MP_SAVEHOSTFILE" value="${ptp_rm:MP_SAVEHOSTFILE_ATTR#value}" />
+			<environment name="MP_SAVE_RMFILE" value="${ptp_rm:MP_SAVE_RMFILE_ATTR#value}" />
+			<environment name="MP_SHARED_MEMORY" value="${ptp_rm:MP_SHARED_MEMORY_ATTR#value}" />
+			<environment name="MP_SHMCC_EXCLUDE_LIST" value="${ptp_rm:MP_SHMCC_EXCLUDE_LIST_ATTR#value}" />
+			<environment name="MP_SHMEM_PT2PT" value="${ptp_rm:MP_SHMEM_PT2PT_ATTR#value}" />
+			<environment name="MP_SINGLE_THREAD" value="${ptp_rm:MP_SINGLE_THREAD_ATTR#value}" />
+			<environment name="MP_STATISTICS" value="${ptp_rm:MP_STATISTICS_ATTR#value}" />
+			<environment name="MP_STDINMODE" value="${ptp_rm:MP_STDINMODE_ATTR#value}" />
+			<environment name="MP_STDOUTMODE" value="${ptp_rm:MP_STDOUTMODE_ATTR#value}" />
+			<environment name="MP_TASKS_PER_NODE" value="${ptp_rm:MP_TASKS_PER_NODE_ATTR#value}" />
+			<environment name="MP_TASK_AFFINITY" value="${ptp_rm:MP_TASK_AFFINITY_ATTR#value}" />
+			<environment name="MP_THREAD_STACKSIZE" value="${ptp_rm:MP_THREAD_STACKSIZE_ATTR#value}" />
+			<environment name="MP_TIMEOUT" value="${ptp_rm:MP_TIMEOUT_ATTR#value}" />
+			<environment name="MP_TLP_REQUIRED" value="${ptp_rm:MP_TLP_REQUIRED_ATTR#value}" />
+			<environment name="MP_UDP_PACKET_SIZE" value="${ptp_rm:MP_UDP_PACKET_SIZE_ATTR#value}" />
+			<environment name="MP_USE_BULK_XFER" value="${ptp_rm:MP_USE_BULK_XFER_ATTR#value}" />
+			<environment name="MP_USE_MC" value="${ptp_rm:MP_USE_MC_ATTR#value}" />
+			<environment name="MP_WAIT_MODE" value="${ptp_rm:MP_WAIT_MODE_ATTR#value}" />
+			<environment name="MP_WORLD_SIZES" value="${ptp_rm:MP_WORLD_SIZES_ATTR#value}" />
+			<environment name="SCI_DEBUG_FANOUT" value="${ptp_rm:SCI_DEBUG_FANOUT_ATTR#value}" />
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
@@ -910,96 +918,96 @@
 			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app_debug.pl</arg>
 			<arg>poe</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
-			<arg>${ptp_rm:debuggerArgs#value}</arg>
-			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH#value}" />
-			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE#value}" />
-			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC#value}" />
-			<environment name="MP_BULK_MIN_MSG_SIZE" value="${ptp_rm:MP_BULK_MIN_MSG_SIZE#value}" />
-			<environment name="MP_CC_SCRATCH_BUF" value="${ptp_rm:MP_SCRATCH_BUF#value}" />
-			<environment name="MP_CLOCK_SOURCE" value="${ptp_rm:MP_CLOCK_SOURCE#value}" />
-			<environment name="MP_CMDFILE" value="${ptp_rm:MP_CMDFILE#value}" />
-			<environment name="MP_COLLECTIVE_GROUPS" value="${ptp_rm:MP_COLLECTIVE_GROUPS#value}" />
-			<environment name="MP_CONFIG" value="${ptp_rm:MP_CONFIG#value}" />
-			<environment name="MP_COREDIR" value="${ptp_rm:MP_COREDIR#value}" />
-			<environment name="MP_COREFILE_FORMAT" value="${ptp_rm:MP_COREFILE_FORMAT#value}" />
-			<environment name="MP_COREFILE_SIGTERM" value="${ptp_rm:MP_COREFILE_SIGTERM#value}" />
-			<environment name="MP_COSCHEDULER_VERSION" value="${ptp_rm:MP_COSCHEDULER_VERSION#value}" />
-			<environment name="MP_CPU_USE" value="${ptp_rm:MP_CPU_USE#value}" />
-			<environment name="MP_CSS_INTERRUPT" value="${ptp_rm:MP_CSS_INTERRUPT#value}" />
-			<environment name="MP_DEVTYPE" value="${ptp_rm:MP_DEVTYPE#value}" />
-			<environment name="MP_EAGER_LIMIT" value="${ptp_rm:MP_EAGER_LIMIT#value}" />
-			<environment name="MP_EUIDEVELOP" value="${ptp_rm:MP_EUIDEVELOP#value}" />
-			<environment name="MP_EUIDEVICE" value="${ptp_rm:MP_EUIDEVICE#value}" />
-			<environment name="MP_EUILIB" value="${ptp_rm:MP_EUILIB#value}" />
-			<environment name="MP_EUILIBPATH" value="${ptp_rm:MP_EUILIBPATH#value}" />
-			<environment name="MP_FIFO_ROUTE_MODE" value="${ptp_rm:MP_FIFO_ROUTE_MODE#value}" />
-			<environment name="MP_FORCED_INTERRUPTS_ENABLED" value="${ptp_rm:MP_FORCED_INTERRUPTS_ENABLED#value}" />
-			<environment name="MP_HINTS_FILTERED" value="${ptp_rm:MP_HINTS_FILTERED#value}" />
-			<environment name="MP_HOSTFILE" value="${ptp_rm:MP_HOSTFILE#value}" />
-			<environment name="MP_IMM_SEND_BUFFERS" value="${ptp_rm:MP_IMM_SEND_BUFFERS#value}" />
-			<environment name="MP_INFOLEVEL" value="${ptp_rm:MP_INFOLEVEL#value}" />
-			<environment name="MP_INSTANCES" value="${ptp_rm:MP_INSTANCES#value}" />
-			<environment name="MP_IOAGENT_CNT" value="${ptp_rm:MP_IOAGENT_CNT#value}" />
-			<environment name="MP_IONODEFILE" value="${ptp_rm:MP_IONODEFILE#value}" />
-			<environment name="MP_IOTASKLIST" value="${ptp_rm:MP_IOTASKLIST#value}" />
-			<environment name="MP_IO_BUFFER_SIZE" value="${ptp_rm:MP_IO_BUFFER_SIZE#value}" />
-			<environment name="MP_IO_ERRLOG" value="${ptp_rm:MP_IO_ERRLOG#value}" />
-			<environment name="MP_LABELIO" value="${ptp_rm:MP_LABELIO#value}" />
-			<environment name="MP_MC_INET_ADDR_LEN" value="${ptp_rm:MP_MC_INET_ADDR_LEN#value}" />
-			<environment name="MP_MC_INET_BASE_ADDR" value="${ptp_rm:MP_MC_INET_BASE_ADDR#value}" />
-			<environment name="MP_MC_INET_PORT" value="${ptp_rm:MP_MC_INET_PORT#value}" />
-			<environment name="MP_MPILIB" value="${ptp_rm:MP_MPILIB#value}" />
-			<environment name="MP_MSG_API" value="${ptp_rm:MP_MSG_API#value}" />
-			<environment name="MP_MSG_ENVELOPE_BUF" value="${ptp_rm:MP_MSG_ENVELOPE_BUF#value}" />
-			<environment name="MP_NEWJOB" value="${ptp_rm:MP_NEWJOB#value}" />
-			<environment name="MP_NODES" value="${ptp_rm:MP_NODES#value}" />
-			<environment name="MP_PGMMODEL" value="${ptp_rm:MP_PGMMODEL#value}" />
-			<environment name="MP_PMDLOG" value="${ptp_rm:MP_PMDLOG#value}" />
-			<environment name="MP_PMDLOG_DIR" value="${ptp_rm:MP_PMDLOG_DIR#value}" />
-			<environment name="MP_PMDSUFFIX" value="${ptp_rm:MP_PMDSUFFIX#value}" />
-			<environment name="MP_POLLING_INTERVAL" value="${ptp_rm:MP_POLLING_INTERVAL#value}" />
-			<environment name="MP_PRINTENV" value="${ptp_rm:MP_PRINTENV#value}" />
-			<environment name="MP_PRIORITY" value="${ptp_rm:MP_PRIORITY#value}" />
-			<environment name="MP_PRIORITY_LOG" value="${ptp_rm:MP_PRIORITY_LOG#value}" />
-			<environment name="MP_PRIORITY_LOG_DIR" value="${ptp_rm:MP_PRIORITY_LOG_DIR#value}" />
-			<environment name="MP_PRIORITY_LOG_NAME" value="${ptp_rm:MP_PRIORITY_LOG_NAME#value}" />
-			<environment name="MP_PRIORITY_NTP" value="${ptp_rm:MP_PRIORITY_NTP#value}" />
-			<environment name="MP_PROCS" value="${ptp_rm:MP_PROCS#value}" />
-			<environment name="MP_PROFDIR" value="${ptp_rm:MP_PROFDIR#value}" />
-			<environment name="MP_PULSE" value="${ptp_rm:MP_PULSE#value}" />
-			<environment name="MP_RC_MAX_QP" value="${ptp_rm:MP_RC_MAX_QP#value}" />
-			<environment name="MP_RC_USE_LMC" value="${ptp_rm:MP_RC_USE_LMC#value}" />
-			<environment name="MP_RDMA_ROUTE_MODE" value="${ptp_rm:MP_RDMA_ROUTE_MODE#value}" />
-			<environment name="MP_REMOTEDIR" value="${ptp_rm:MP_REMOTEDIR#value}" />
-			<environment name="MP_RESD" value="${ptp_rm:MP_RESD#value}" />
-			<environment name="MP_RETRANSMIT_INTERVAL" value="${ptp_rm:MP_RETRANSMIT_INTERVAL#value}" />
-			<environment name="MP_RETRY" value="${ptp_rm:MP_RETRY#value}" />
-			<environment name="MP_REXMIT_BUF_CNT" value="${ptp_rm:MP_REXMIT_BUF_CNT#value}" />
-			<environment name="MP_REXMIT_BUF_SIZE" value="${ptp_rm:MP_REXMIT_BUF_SIZE#value}" />
-			<environment name="MP_RMA_PENDING" value="${ptp_rm:MP_RMA_PENDING#value}" />
-			<environment name="MP_RMFILE" value="${ptp_rm:MP_RMFILE#value}" />
-			<environment name="MP_RMPOOL" value="${ptp_rm:MP_RMPOOL#value}" />
-			<environment name="MP_RM_TIMEOUT" value="${ptp_rm:MP_RM_TIMEOUT#value}" />
-			<environment name="MP_SAVEHOSTFILE" value="${ptp_rm:MP_SAVEHOSTFILE#value}" />
-			<environment name="MP_SAVE_RMFILE" value="${ptp_rm:MP_SAVE_RMFILE#value}" />
-			<environment name="MP_SHARED_MEMORY" value="${ptp_rm:MP_SHARED_MEMORY#value}" />
-			<environment name="MP_SHMCC_EXCLUDE_LIST" value="${ptp_rm:MP_SHMCC_EXCLUDE_LIST#value}" />
-			<environment name="MP_SHMEM_PT2PT" value="${ptp_rm:MP_SHMEM_PT2PT#value}" />
-			<environment name="MP_SINGLE_THREAD" value="${ptp_rm:MP_SINGLE_THREAD#value}" />
-			<environment name="MP_STATISTICS" value="${ptp_rm:MP_STATISTICS#value}" />
-			<environment name="MP_STDINMODE" value="${ptp_rm:MP_STDINMODE#value}" />
-			<environment name="MP_STDOUTMODE" value="${ptp_rm:MP_STDOUTMODE#value}" />
-			<environment name="MP_TASKS_PER_NODE" value="${ptp_rm:MP_TASKS_PER_NODE#value}" />
-			<environment name="MP_TASK_AFFINITY" value="${ptp_rm:MP_TASK_AFFINITY#value}" />
-			<environment name="MP_THREAD_STACKSIZE" value="${ptp_rm:MP_THREAD_STACKSIZE#value}" />
-			<environment name="MP_TIMEOUT" value="${ptp_rm:MP_TIMEOUT#value}" />
-			<environment name="MP_TLP_REQUIRED" value="${ptp_rm:MP_TLP_REQUIRED#value}" />
-			<environment name="MP_UDP_PACKET_SIZE" value="${ptp_rm:MP_UDP_PACKET_SIZE#value}" />
-			<environment name="MP_USE_BULK_XFER" value="${ptp_rm:MP_USE_BULK_XFER#value}" />
-			<environment name="MP_USE_MC" value="${ptp_rm:MP_USE_MC#value}" />
-			<environment name="MP_WAIT_MODE" value="${ptp_rm:MP_WAIT_MODE#value}" />
-			<environment name="MP_WORLD_SIZES" value="${ptp_rm:MP_WORLD_SIZES#value}" />
-			<environment name="SCI_DEBUG_FANOUT" value="${ptp_rm:SCI_DEBUG_FANOUT#value}" />
+			<arg>${ptp_rm:debuggerArgs_ATTR#value}</arg>
+			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH_ATTR#value}" />
+			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE_ATTR#value}" />
+			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC_ATTR#value}" />
+			<environment name="MP_BULK_MIN_MSG_SIZE" value="${ptp_rm:MP_BULK_MIN_MSG_SIZE_ATTR#value}" />
+			<environment name="MP_CC_SCRATCH_BUF" value="${ptp_rm:MP_SCRATCH_BUF_ATTR#value}" />
+			<environment name="MP_CLOCK_SOURCE" value="${ptp_rm:MP_CLOCK_SOURCE_ATTR#value}" />
+			<environment name="MP_CMDFILE" value="${ptp_rm:MP_CMDFILE_ATTR#value}" />
+			<environment name="MP_COLLECTIVE_GROUPS" value="${ptp_rm:MP_COLLECTIVE_GROUPS_ATTR#value}" />
+			<environment name="MP_CONFIG" value="${ptp_rm:MP_CONFIG_ATTR#value}" />
+			<environment name="MP_COREDIR" value="${ptp_rm:MP_COREDIR_ATTR#value}" />
+			<environment name="MP_COREFILE_FORMAT" value="${ptp_rm:MP_COREFILE_FORMAT_ATTR#value}" />
+			<environment name="MP_COREFILE_SIGTERM" value="${ptp_rm:MP_COREFILE_SIGTERM_ATTR#value}" />
+			<environment name="MP_COSCHEDULER_VERSION" value="${ptp_rm:MP_COSCHEDULER_VERSION_ATTR#value}" />
+			<environment name="MP_CPU_USE" value="${ptp_rm:MP_CPU_USE_ATTR#value}" />
+			<environment name="MP_CSS_INTERRUPT" value="${ptp_rm:MP_CSS_INTERRUPT_ATTR#value}" />
+			<environment name="MP_DEVTYPE" value="${ptp_rm:MP_DEVTYPE_ATTR#value}" />
+			<environment name="MP_EAGER_LIMIT" value="${ptp_rm:MP_EAGER_LIMIT_ATTR#value}" />
+			<environment name="MP_EUIDEVELOP" value="${ptp_rm:MP_EUIDEVELOP_ATTR#value}" />
+			<environment name="MP_EUIDEVICE" value="${ptp_rm:MP_EUIDEVICE_ATTR#value}" />
+			<environment name="MP_EUILIB" value="${ptp_rm:MP_EUILIB_ATTR#value}" />
+			<environment name="MP_EUILIBPATH" value="${ptp_rm:MP_EUILIBPATH_ATTR#value}" />
+			<environment name="MP_FIFO_ROUTE_MODE" value="${ptp_rm:MP_FIFO_ROUTE_MODE_ATTR#value}" />
+			<environment name="MP_FORCED_INTERRUPTS_ENABLED" value="${ptp_rm:MP_FORCED_INTERRUPTS_ENABLED_ATTR#value}" />
+			<environment name="MP_HINTS_FILTERED" value="${ptp_rm:MP_HINTS_FILTERED_ATTR#value}" />
+			<environment name="MP_HOSTFILE" value="${ptp_rm:MP_HOSTFILE_ATTR#value}" />
+			<environment name="MP_IMM_SEND_BUFFERS" value="${ptp_rm:MP_IMM_SEND_BUFFERS_ATTR#value}" />
+			<environment name="MP_INFOLEVEL" value="${ptp_rm:MP_INFOLEVEL_ATTR#value}" />
+			<environment name="MP_INSTANCES" value="${ptp_rm:MP_INSTANCES_ATTR#value}" />
+			<environment name="MP_IOAGENT_CNT" value="${ptp_rm:MP_IOAGENT_CNT_ATTR#value}" />
+			<environment name="MP_IONODEFILE" value="${ptp_rm:MP_IONODEFILE_ATTR#value}" />
+			<environment name="MP_IOTASKLIST" value="${ptp_rm:MP_IOTASKLIST_ATTR#value}" />
+			<environment name="MP_IO_BUFFER_SIZE" value="${ptp_rm:MP_IO_BUFFER_SIZE_ATTR#value}" />
+			<environment name="MP_IO_ERRLOG" value="${ptp_rm:MP_IO_ERRLOG_ATTR#value}" />
+			<environment name="MP_LABELIO" value="${ptp_rm:MP_LABELIO_ATTR#value}" />
+			<environment name="MP_MC_INET_ADDR_LEN" value="${ptp_rm:MP_MC_INET_ADDR_LEN_ATTR#value}" />
+			<environment name="MP_MC_INET_BASE_ADDR" value="${ptp_rm:MP_MC_INET_BASE_ADDR_ATTR#value}" />
+			<environment name="MP_MC_INET_PORT" value="${ptp_rm:MP_MC_INET_PORT_ATTR#value}" />
+			<environment name="MP_MPILIB" value="${ptp_rm:MP_MPILIB_ATTR#value}" />
+			<environment name="MP_MSG_API" value="${ptp_rm:MP_MSG_API_ATTR#value}" />
+			<environment name="MP_MSG_ENVELOPE_BUF" value="${ptp_rm:MP_MSG_ENVELOPE_BUF_ATTR#value}" />
+			<environment name="MP_NEWJOB" value="${ptp_rm:MP_NEWJOB_ATTR#value}" />
+			<environment name="MP_NODES" value="${ptp_rm:MP_NODES_ATTR#value}" />
+			<environment name="MP_PGMMODEL" value="${ptp_rm:MP_PGMMODEL_ATTR#value}" />
+			<environment name="MP_PMDLOG" value="${ptp_rm:MP_PMDLOG_ATTR#value}" />
+			<environment name="MP_PMDLOG_DIR" value="${ptp_rm:MP_PMDLOG_DIR_ATTR#value}" />
+			<environment name="MP_PMDSUFFIX" value="${ptp_rm:MP_PMDSUFFIX_ATTR#value}" />
+			<environment name="MP_POLLING_INTERVAL" value="${ptp_rm:MP_POLLING_INTERVAL_ATTR#value}" />
+			<environment name="MP_PRINTENV" value="${ptp_rm:MP_PRINTENV_ATTR#value}" />
+			<environment name="MP_PRIORITY" value="${ptp_rm:MP_PRIORITY_ATTR#value}" />
+			<environment name="MP_PRIORITY_LOG" value="${ptp_rm:MP_PRIORITY_LOG_ATTR#value}" />
+			<environment name="MP_PRIORITY_LOG_DIR" value="${ptp_rm:MP_PRIORITY_LOG_DIR_ATTR#value}" />
+			<environment name="MP_PRIORITY_LOG_NAME" value="${ptp_rm:MP_PRIORITY_LOG_NAME_ATTR#value}" />
+			<environment name="MP_PRIORITY_NTP" value="${ptp_rm:MP_PRIORITY_NTP_ATTR#value}" />
+			<environment name="MP_PROCS" value="${ptp_rm:MP_PROCS_ATTR#value}" />
+			<environment name="MP_PROFDIR" value="${ptp_rm:MP_PROFDIR_ATTR#value}" />
+			<environment name="MP_PULSE" value="${ptp_rm:MP_PULSE_ATTR#value}" />
+			<environment name="MP_RC_MAX_QP" value="${ptp_rm:MP_RC_MAX_QP_ATTR#value}" />
+			<environment name="MP_RC_USE_LMC" value="${ptp_rm:MP_RC_USE_LMC_ATTR#value}" />
+			<environment name="MP_RDMA_ROUTE_MODE" value="${ptp_rm:MP_RDMA_ROUTE_MODE_ATTR#value}" />
+			<environment name="MP_REMOTEDIR" value="${ptp_rm:MP_REMOTEDIR_ATTR#value}" />
+			<environment name="MP_RESD" value="${ptp_rm:MP_RESD_ATTR#value}" />
+			<environment name="MP_RETRANSMIT_INTERVAL" value="${ptp_rm:MP_RETRANSMIT_INTERVAL_ATTR#value}" />
+			<environment name="MP_RETRY" value="${ptp_rm:MP_RETRY_ATTR#value}" />
+			<environment name="MP_REXMIT_BUF_CNT" value="${ptp_rm:MP_REXMIT_BUF_CNT_ATTR#value}" />
+			<environment name="MP_REXMIT_BUF_SIZE" value="${ptp_rm:MP_REXMIT_BUF_SIZE_ATTR#value}" />
+			<environment name="MP_RMA_PENDING" value="${ptp_rm:MP_RMA_PENDING_ATTR#value}" />
+			<environment name="MP_RMFILE" value="${ptp_rm:MP_RMFILE_ATTR#value}" />
+			<environment name="MP_RMPOOL" value="${ptp_rm:MP_RMPOOL_ATTR#value}" />
+			<environment name="MP_RM_TIMEOUT" value="${ptp_rm:MP_RM_TIMEOUT_ATTR#value}" />
+			<environment name="MP_SAVEHOSTFILE" value="${ptp_rm:MP_SAVEHOSTFILE_ATTR#value}" />
+			<environment name="MP_SAVE_RMFILE" value="${ptp_rm:MP_SAVE_RMFILE_ATTR#value}" />
+			<environment name="MP_SHARED_MEMORY" value="${ptp_rm:MP_SHARED_MEMORY_ATTR#value}" />
+			<environment name="MP_SHMCC_EXCLUDE_LIST" value="${ptp_rm:MP_SHMCC_EXCLUDE_LIST_ATTR#value}" />
+			<environment name="MP_SHMEM_PT2PT" value="${ptp_rm:MP_SHMEM_PT2PT_ATTR#value}" />
+			<environment name="MP_SINGLE_THREAD" value="${ptp_rm:MP_SINGLE_THREAD_ATTR#value}" />
+			<environment name="MP_STATISTICS" value="${ptp_rm:MP_STATISTICS_ATTR#value}" />
+			<environment name="MP_STDINMODE" value="${ptp_rm:MP_STDINMODE_ATTR#value}" />
+			<environment name="MP_STDOUTMODE" value="${ptp_rm:MP_STDOUTMODE_ATTR#value}" />
+			<environment name="MP_TASKS_PER_NODE" value="${ptp_rm:MP_TASKS_PER_NODE_ATTR#value}" />
+			<environment name="MP_TASK_AFFINITY" value="${ptp_rm:MP_TASK_AFFINITY_ATTR#value}" />
+			<environment name="MP_THREAD_STACKSIZE" value="${ptp_rm:MP_THREAD_STACKSIZE_ATTR#value}" />
+			<environment name="MP_TIMEOUT" value="${ptp_rm:MP_TIMEOUT_ATTR#value}" />
+			<environment name="MP_TLP_REQUIRED" value="${ptp_rm:MP_TLP_REQUIRED_ATTR#value}" />
+			<environment name="MP_UDP_PACKET_SIZE" value="${ptp_rm:MP_UDP_PACKET_SIZE_ATTR#value}" />
+			<environment name="MP_USE_BULK_XFER" value="${ptp_rm:MP_USE_BULK_XFER_ATTR#value}" />
+			<environment name="MP_USE_MC" value="${ptp_rm:MP_USE_MC_ATTR#value}" />
+			<environment name="MP_WAIT_MODE" value="${ptp_rm:MP_WAIT_MODE_ATTR#value}" />
+			<environment name="MP_WORLD_SIZES" value="${ptp_rm:MP_WORLD_SIZES_ATTR#value}" />
+			<environment name="SCI_DEBUG_FANOUT" value="${ptp_rm:SCI_DEBUG_FANOUT_ATTR#value}" />
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
@@ -1024,7 +1032,7 @@
 			<arg>${ptp_rm:@jobId#name}</arg>
 		</terminate-job>
 
-		<!-- Launch tab definition -->
+		<!-- Tasks Tab -->
 		<launch-tab>
 			<dynamic
 				includeWidgetValuesFrom="I/O,Diagnostic,Debug,System,Nodes,Performance 1,Performance2,Miscellaneous,Advanced">
@@ -1045,7 +1053,7 @@
 						<fixed-text>${ptp_rm:RM_USE_LOAD_LEVELER#description}</fixed-text>
 					</widget>
 				
-					<widget type="checkbox" saveValueTo="RM_USE_LOAD_LEVELER" style="SWT.LEFT">
+					<widget type="checkbox" buttonId="useLL" attribute="RM_USE_LOAD_LEVELER" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
 								grabExcessHorizontal="false" horizontalSpan="2"/>
@@ -1060,7 +1068,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_HOSTFILE_ATTR#description}</fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" saveValueTo="MP_HOSTFILE_ATTR"
+					<browse textStyle="SWT.BORDER" attribute="MP_HOSTFILE_ATTR"
 						title="Browse">
 						<text-layout-data>
 							<grid-data widthHint="200" />
@@ -1078,35 +1086,20 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_NEWJOB_ATTR#description}</fixed-text>
 						<control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</control-state>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_NEWJOB_ATTR"
+					<widget style="SWT.BORDER" readOnly="true" attribute="MP_NEWJOB_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_NEWJOB_ATTR#tooltip}</tooltip>
 						<control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</control-state>
 					</widget>
 
-					<!--MP_NEWJOB: Keep partition for multiple job steps -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_NEWJOB_ATTR#description}</fixed-text>
-					</widget>
-					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_NEWJOB_ATTR"
-						type="combo">
-						<layout-data>
-							<grid-data widthHint="200" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_NEWJOB_ATTR#tooltip}</tooltip>
-					</widget>
-					
 					<!--MP_WORLD_SIZES: Specifies MPI world sizes -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
@@ -1114,7 +1107,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_WORLD_SIZES_ATTR#description}</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_WORLD_SIZES_ATTR" style="SWT.BORDER">
+					<widget type="text" attribute="MP_WORLD_SIZES_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
@@ -1129,7 +1122,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_PROCS_ATTR#description}</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_PROCS_ATTR" style="SWT.BORDER">
+					<widget type="text" attribute="MP_PROCS_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
@@ -1144,7 +1137,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_NODES_ATTR#description}</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_NODES_ATTR" style="SWT.BORDER">
+					<widget type="text" attribute="MP_NODES_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
@@ -1160,7 +1153,7 @@
 						<fixed-text>${ptp_rm:MP_TASKS_PER_NODE_ATTR#description}:
 						</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_TASKS_PER_NODE_ATTR"
+					<widget type="text" attribute="MP_TASKS_PER_NODE_ATTR"
 						style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -1171,6 +1164,7 @@
 				</composite>
 			</dynamic>
 
+			<!-- I/O Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,Diagnostic,Debug,System,Nodes,Performance 1,Performance2,Miscellaneous,Advanced">
 				<title>I/O</title>
@@ -1189,7 +1183,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_STDINMODE_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="false" saveValueTo="MP_STDINMODE_ATTR"
+					<widget style="SWT.BORDER" readOnly="false" attribute="MP_STDINMODE_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" />
@@ -1204,7 +1198,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_STDOUTMODE_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="false" saveValueTo="MP_STDOUTMODE_ATTR"
+					<widget style="SWT.BORDER" readOnly="false" attribute="MP_STDOUTMODE_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" />
@@ -1219,7 +1213,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_IOAGENT_CNT_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="false" saveValueTo="MP_IOAGENT_CNT_ATTR"
+					<widget style="SWT.BORDER" readOnly="false" attribute="MP_IOAGENT_CNT_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" />
@@ -1234,7 +1228,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_IOTASKLIST_ATTR#description}</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_IOTASKLIST_ATTR" style="SWT.BORDER">
+					<widget type="text" attribute="MP_IOTASKLIST_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="100" />
@@ -1249,7 +1243,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_LABELIO_ATTR#description}</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_LABELIO_ATTR" style="SWT.LEFT">
+					<widget type="checkbox" attribute="MP_LABELIO_ATTR" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
 								grabExcessHorizontal="false" />
@@ -1259,7 +1253,7 @@
 				</composite>
 			</dynamic>
 
-
+			<!-- Diagnostic Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Debug,System,Nodes,Performance 1,Performance2,Miscellaneous,Advanced">
 				<title>Diagnostic</title>
@@ -1277,7 +1271,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_PMDLOG_DIR_ATTR#description}</fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" saveValueTo="MP_PMDLOG_DIR_ATTR" title="Browse" directory="true">
+					<browse textStyle="SWT.BORDER" attribute="MP_PMDLOG_DIR_ATTR" title="Browse" directory="true">
 						<text-layout-data>
 							<grid-data widthHint="200" />
 						</text-layout-data>
@@ -1295,7 +1289,7 @@
 						<fixed-text>${ptp_rm:MP_PRIORITY_LOG_DIR_ATTR#description}
 						</fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" saveValueTo="MP_PRIORITY_LOG_DIR_ATTR" title="Browse" directory="true">
+					<browse textStyle="SWT.BORDER" attribute="MP_PRIORITY_LOG_DIR_ATTR" title="Browse" directory="true">
 						<text-layout-data>
 							<grid-data widthHint="200" />
 						</text-layout-data>
@@ -1312,7 +1306,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_PRINTENV_ATTR#description}</fixed-text>
 					</widget>
-					<widget type="combo" readOnly="false" saveValueTo="MP_PRINTENV_ATTR" style="SWT.LEFT">
+					<widget type="combo" readOnly="false" attribute="MP_PRINTENV_ATTR" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
 						</layout-data>
@@ -1326,7 +1320,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_INFOLEVEL_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_INFOLEVEL_ATTR" type="combo">
+					<widget style="SWT.BORDER" readOnly="true" attribute="MP_INFOLEVEL_ATTR" type="combo">
 						<layout-data>
 							<grid-data widthHint="200" horizontalSpan="2" />
 						</layout-data>
@@ -1340,7 +1334,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_STATISTICS_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_STATISTICS_ATTR" type="combo">
+					<widget style="SWT.BORDER" readOnly="true" attribute="MP_STATISTICS_ATTR" type="combo">
 						<layout-data>
 							<grid-data widthHint="200" horizontalSpan="2" />
 						</layout-data>
@@ -1355,7 +1349,7 @@
 						<fixed-text>${ptp_rm:MP_PRIORITY_LOG_NAME_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_PRIORITY_LOG_NAME_ATTR" style="SWT.BORDER">
+					<widget type="text" attribute="MP_PRIORITY_LOG_NAME_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
 						</layout-data>
@@ -1369,7 +1363,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_PMDLOG_ATTR#description}</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_PMDLOG_ATTR" style="SWT.LEFT">
+					<widget type="checkbox" attribute="MP_PMDLOG_ATTR" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
 						</layout-data>
@@ -1384,7 +1378,7 @@
 						<fixed-text>${ptp_rm:MP_PRIORITY_LOG_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_PRIORITY_LOG_ATTR" style="SWT.LEFT">
+					<widget type="checkbox" attribute="MP_PRIORITY_LOG_ATTR" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
 						</layout-data>
@@ -1393,7 +1387,7 @@
 				</composite>
 			</dynamic>
 
-
+			<!-- Debug Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,System,Nodes,Performance 1,Performance2,Miscellaneous,Advanced">
 				<title>Debug</title>
@@ -1412,7 +1406,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_COREDIR_ATTR#description}</fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" saveValueTo="MP_COREDIR_ATTR"
+					<browse textStyle="SWT.BORDER" attribute="MP_COREDIR_ATTR"
 						title="Browse" directory="true">
 						<text-layout-data>
 							<grid-data widthHint="200" />
@@ -1430,7 +1424,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_PROFDIR_ATTR#description}</fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" saveValueTo="MP_PROFDIR_ATTR"
+					<browse textStyle="SWT.BORDER" attribute="MP_PROFDIR_ATTR"
 						title="Browse" directory="true">
 						<text-layout-data>
 							<grid-data widthHint="200" />
@@ -1448,19 +1442,19 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_COREFILE_FORMAT_ATTR#description}
 						</fixed-text>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
 					<widget style="SWT.BORDER" readOnly="false"
-						saveValueTo="MP_COREFILE_FORMAT_ATTR" type="combo">
+						attribute="MP_COREFILE_FORMAT_ATTR" type="combo">
 						<layout-data>
 							<grid-data widthHint="200" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_COREFILE_FORMAT_ATTR#tooltip}</tooltip>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
 
 					<!--MP_EUIDEVELOP: Specifies MPI parameter checking level -->
@@ -1470,7 +1464,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_EUIDEVELOP_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_EUIDEVELOP_ATTR"
+					<widget style="SWT.BORDER" readOnly="true" attribute="MP_EUIDEVELOP_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" horizontalSpan="2" />
@@ -1486,26 +1480,26 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_COREFILE_SIGTERM_ATTR#description}
 						</fixed-text>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_COREFILE_SIGTERM_ATTR"
+					<widget type="checkbox" attribute="MP_COREFILE_SIGTERM_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
 								grabExcessHorizontal="false" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_COREFILE_SIGTERM_ATTR#tooltip}</tooltip>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
 				</composite>
 
 			</dynamic>
 
-
+			<!-- System Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,Nodes,Performance 1,Performance2,Miscellaneous,Advanced">
 				<title>System</title>
@@ -1524,7 +1518,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_EUIDEVICE_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="false" saveValueTo="MP_EUIDEVICE_ATTR"
+					<widget style="SWT.BORDER" readOnly="false" attribute="MP_EUIDEVICE_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" />
@@ -1539,7 +1533,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_EUILIB_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_EUILIB_ATTR"
+					<widget style="SWT.BORDER" readOnly="true" attribute="MP_EUILIB_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" />
@@ -1555,7 +1549,7 @@
 						<fixed-text>${ptp_rm:MP_TASK_AFFINITY_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="false" saveValueTo="MP_TASK_AFFINITY_ATTR"
+					<widget style="SWT.BORDER" readOnly="false" attribute="MP_TASK_AFFINITY_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" />
@@ -1572,7 +1566,7 @@
 						</fixed-text>
 					</widget>
 					<widget style="SWT.BORDER" readOnly="true"
-						saveValueTo="MP_FIFO_ROUTE_MODE_ATTR" type="combo">
+						attribute="MP_FIFO_ROUTE_MODE_ATTR" type="combo">
 						<layout-data>
 							<grid-data widthHint="200" />
 						</layout-data>
@@ -1588,7 +1582,7 @@
 						</fixed-text>
 					</widget>
 					<widget style="SWT.BORDER" readOnly="true"
-						saveValueTo="MP_RDMA_ROUTE_MODE_ATTR" type="combo">
+						attribute="MP_RDMA_ROUTE_MODE_ATTR" type="combo">
 						<layout-data>
 							<grid-data widthHint="200" />
 						</layout-data>
@@ -1602,7 +1596,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_INSTANCES_ATTR#description}</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_INSTANCES_ATTR" style="SWT.BORDER">
+					<widget type="text" attribute="MP_INSTANCES_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="100" />
@@ -1618,7 +1612,7 @@
 						<fixed-text>${ptp_rm:MP_MC_INET_BASE_ADDR_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_MC_INET_BASE_ADDR_ATTR"
+					<widget type="text" attribute="MP_MC_INET_BASE_ADDR_ATTR"
 						style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -1635,7 +1629,7 @@
 						<fixed-text>${ptp_rm:MP_MC_INET_ADDR_LEN_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_MC_INET_ADDR_LEN_ATTR"
+					<widget type="text" attribute="MP_MC_INET_ADDR_LEN_ATTR"
 						style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -1652,7 +1646,7 @@
 						<fixed-text>${ptp_rm:MP_MC_INET_PORT_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_MC_INET_PORT_ATTR"
+					<widget type="text" attribute="MP_MC_INET_PORT_ATTR"
 						style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -1669,7 +1663,7 @@
 						<fixed-text>${ptp_rm:MP_ADAPTER_USE_ATTR#description}</fixed-text>
 					</widget>
 
-					<button-group saveValueTo="MP_ADAPTER_USE_ATTR" group="true">
+					<button-group attribute="MP_ADAPTER_USE_ATTR" group="true">
 						<layout>
 							<row-layout type="SWT.HORIZONTAL" center="true" fill="true"
 								justify="true" />
@@ -1686,7 +1680,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_CPU_USE_ATTR#description}</fixed-text>
 					</widget>
-					<button-group saveValueTo="MP_CPU_USE_ATTR" group="true">
+					<button-group attribute="MP_CPU_USE_ATTR" group="true">
 						<layout>
 							<row-layout type="SWT.HORIZONTAL" center="true" fill="true"
 								justify="true" />
@@ -1704,7 +1698,7 @@
 						<fixed-text>${ptp_rm:MP_BINDPROC_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_BINDPROC_ATTR"
+					<widget type="checkbox" attribute="MP_BINDPROC_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -1722,7 +1716,7 @@
 						<fixed-text>${ptp_rm:MP_USE_MC_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_USE_MC_ATTR" style="SWT.LEFT">
+					<widget type="checkbox" attribute="MP_USE_MC_ATTR" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
 								grabExcessHorizontal="false" />
@@ -1732,7 +1726,7 @@
 				</composite>
 			</dynamic>
 
-
+			<!-- Nodes Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Performance 1,Performance2,Miscellaneous,Advanced">
 				<title>Nodes</title>
@@ -1752,7 +1746,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_CMDFILE_ATTR#description}</fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" saveValueTo="MP_CMDFILE_ATTR"
+					<browse textStyle="SWT.BORDER" attribute="MP_CMDFILE_ATTR"
 						title="Browse">
 						<text-layout-data>
 							<grid-data widthHint="200" />
@@ -1770,10 +1764,10 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_RMFILE_ATTR#description}</fixed-text>
 						<control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</control-state>
 					</widget>
-					<browse textStyle="SWT.BORDER" saveValueTo="MP_RMFILE_ATTR"
+					<browse textStyle="SWT.BORDER" attribute="MP_RMFILE_ATTR"
 						title="Browse">
 						<text-layout-data>
 							<grid-data widthHint="200" />
@@ -1783,10 +1777,10 @@
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_RMFILE_ATTR#tooltip}</tooltip>
 						<text-control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</text-control-state>
 						<button-control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</button-control-state>
 					</browse>
 
@@ -1796,11 +1790,11 @@
 							<grid-data horizontalAlign="SWT.BEGINNING" />
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_REMOTEDIR_ATTR#description}</fixed-text>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
-					<browse textStyle="SWT.BORDER" saveValueTo="MP_REMOTEDIR_ATTR"
+					<browse textStyle="SWT.BORDER" attribute="MP_REMOTEDIR_ATTR"
 						title="Browse">
 						<text-layout-data>
 							<grid-data widthHint="200" />
@@ -1809,12 +1803,12 @@
 							<grid-data widthHint="200" />
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_REMOTEDIR_ATTR#tooltip}</tooltip>
-						<!--text-control-state>
-							<show-if button="isAIX" selected="true"/>
-						</text-control-state-->
-						<!--button-control-state>
-							<show-if button="isAIX" selected="true"/>
-						</button-control-state-->
+						<text-control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</text-control-state>
+						<button-control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</button-control-state>
 					</browse>
 
 					<!-- MP_PGMMODEL: Specifies programming model, SPMD or MPMD -->
@@ -1824,7 +1818,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_PGMMODEL_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_PGMMODEL_ATTR"
+					<widget style="SWT.BORDER" readOnly="true" attribute="MP_PGMMODEL_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" horizontalSpan="2" />
@@ -1841,7 +1835,7 @@
 						<fixed-text>${ptp_rm:MP_TIMEOUT_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_TIMEOUT_ATTR" style="SWT.BORDER">
+					<widget type="text" attribute="MP_TIMEOUT_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
@@ -1858,17 +1852,17 @@
 						<fixed-text>${ptp_rm:MP_RETRY_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</control-state>
 					</widget>
-					<widget type="text" saveValueTo="MP_RETRY_ATTR" style="SWT.BORDER">
+					<widget type="text" attribute="MP_RETRY_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_RETRY_ATTR#tooltip}</tooltip>
 						<control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</control-state>
 					</widget>
 
@@ -1881,17 +1875,17 @@
 						<fixed-text>${ptp_rm:MP_RM_TIMEOUT_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</control-state>
 					</widget>
-					<widget type="text" saveValueTo="MP_RM_TIMEOUT_ATTR" style="SWT.BORDER">
+					<widget type="text" attribute="MP_RM_TIMEOUT_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_RM_TIMEOUT_ATTR#tooltip}</tooltip>
 						<control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</control-state>
 					</widget>
 
@@ -1904,24 +1898,24 @@
 						<fixed-text>${ptp_rm:MP_RMPOOL_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</control-state>
 					</widget>
-					<widget type="text" saveValueTo="MP_RMPOOL_ATTR" style="SWT.BORDER">
+					<widget type="text" attribute="MP_RMPOOL_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_RMPOOL_ATTR#tooltip}</tooltip>
 						<control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</control-state>
 					</widget>
 
 				</composite>
 			</dynamic>
 
-
+			<!-- Performance 1 Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Nodes,Performance2,Miscellaneous,Advanced">
 				<title>Performance 1</title>
@@ -1940,7 +1934,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_ACK_THRESH_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_ACK_THRESH_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_ACK_THRESH_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -1957,7 +1951,7 @@
 						<fixed-text>${ptp_rm:MP_POLLING_INTERVAL_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_POLLING_INTERVAL_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_POLLING_INTERVAL_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -1974,7 +1968,7 @@
 						<fixed-text>${ptp_rm:MP_UDP_PACKET_SIZE_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_UDP_PACKET_SIZE_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_UDP_PACKET_SIZE_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -1990,7 +1984,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_WAIT_MODE_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_WAIT_MODE_ATTR"
+					<widget style="SWT.BORDER" readOnly="true" attribute="MP_WAIT_MODE_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" horizontalSpan="2" />
@@ -2006,7 +2000,7 @@
 						<fixed-text>${ptp_rm:MP_BULK_MIN_MSG_SIZE_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_BULK_MIN_MSG_SIZE_ATTR"
+					<widget type="text" attribute="MP_BULK_MIN_MSG_SIZE_ATTR"
 						style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -2023,7 +2017,7 @@
 						<fixed-text>${ptp_rm:MP_RC_MAX_QP_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_RC_MAX_QP_ATTR" style="SWT.BORDER">
+					<widget type="text" attribute="MP_RC_MAX_QP_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
 								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
@@ -2039,7 +2033,7 @@
 						<fixed-text>${ptp_rm:MP_IMM_SEND_BUFFERS_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_IMM_SEND_BUFFERS_ATTR"
+					<widget type="text" attribute="MP_IMM_SEND_BUFFERS_ATTR"
 						style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -2056,7 +2050,7 @@
 						<fixed-text>${ptp_rm:MP_COLLECTIVE_GROUPS_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="text" saveValueTo="MP_COLLECTIVE_GROUPS_ATTR"
+					<widget type="text" attribute="MP_COLLECTIVE_GROUPS_ATTR"
 						style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -2073,7 +2067,7 @@
 						<fixed-text>${ptp_rm:MP_CC_SCRATCH_BUF_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_CC_SCRATCH_BUF_ATTR"
+					<widget type="checkbox" attribute="MP_CC_SCRATCH_BUF_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -2090,7 +2084,7 @@
 						<fixed-text>${ptp_rm:MP_CSS_INTERRUPT_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_CSS_INTERRUPT_ATTR"
+					<widget type="checkbox" attribute="MP_CSS_INTERRUPT_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -2107,7 +2101,7 @@
 						<fixed-text>${ptp_rm:MP_USE_BULK_XFER_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_USE_BULK_XFER_ATTR"
+					<widget type="checkbox" attribute="MP_USE_BULK_XFER_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -2124,7 +2118,7 @@
 						<fixed-text>${ptp_rm:MP_RC_USE_LMC_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_RC_USE_LMC_ATTR"
+					<widget type="checkbox" attribute="MP_RC_USE_LMC_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -2141,7 +2135,7 @@
 						<fixed-text>${ptp_rm:MP_FORCED_INTERRUPTS_ENABLED_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_FORCED_INTERRUPTS_ENABLED_ATTR"
+					<widget type="checkbox" attribute="MP_FORCED_INTERRUPTS_ENABLED_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -2153,7 +2147,7 @@
 				</composite>
 			</dynamic>
 
-
+			<!-- Performance 2 Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Nodes,Performance 1,Miscellaneous,Advanced">
 				<title>Performance 2</title>
@@ -2173,7 +2167,7 @@
 						<fixed-text>${ptp_rm:MP_SINGLE_THREAD_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="combo" saveValueTo="MP_SINGLE_THREAD_ATTR"
+					<widget type="combo" attribute="MP_SINGLE_THREAD_ATTR"
 						readOnly="true" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -2190,7 +2184,7 @@
 						<fixed-text>${ptp_rm:MP_MSG_ENVELOPE_BUF_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_MSG_ENVELOPE_BUF_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_MSG_ENVELOPE_BUF_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2207,7 +2201,7 @@
 						<fixed-text>${ptp_rm:MP_IO_BUFFER_SIZE_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_IO_BUFFER_SIZE_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_IO_BUFFER_SIZE_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2224,7 +2218,7 @@
 						<fixed-text>${ptp_rm:MP_EAGER_LIMIT_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_EAGER_LIMIT_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_EAGER_LIMIT_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2241,7 +2235,7 @@
 						<fixed-text>${ptp_rm:MP_RETRANSMIT_INTERVAL_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_RETRANSMIT_INTERVAL_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_RETRANSMIT_INTERVAL_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2258,7 +2252,7 @@
 						<fixed-text>${ptp_rm:MP_REXMIT_BUF_CNT_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_REXMIT_BUF_CNT_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_REXMIT_BUF_CNT_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2275,7 +2269,7 @@
 						<fixed-text>${ptp_rm:MP_REXMIT_BUF_SIZE_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_REXMIT_BUF_SIZE_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_REXMIT_BUF_SIZE_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2292,7 +2286,7 @@
 						<fixed-text>${ptp_rm:MP_PRIORITY_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_PRIORITY_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_PRIORITY_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2309,7 +2303,7 @@
 						<fixed-text>${ptp_rm:SCI_DEBUG_FANOUT_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="SCI_DEBUG_FANOUT_ATTR"
+					<widget style="SWT.BORDER" attribute="SCI_DEBUG_FANOUT_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2327,7 +2321,7 @@
 						<fixed-text>${ptp_rm:MP_SHMCC_EXCLUDE_LIST_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_SHMCC_EXCLUDE_LIST_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_SHMCC_EXCLUDE_LIST_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2343,20 +2337,20 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_RMA_PENDING_ATTR#description}
 						</fixed-text>
-						<!--control-state>
-							<show-if button="isAIX" selected="false"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_RMA_PENDING_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_RMA_PENDING_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_RMA_PENDING_ATTR#tooltip}</tooltip>
-						<!--control-state>
-							<show-if button="isAIX" selected="false"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
 					
 					<!-- MP_SHARED_MEMORY: Use shared memory -->
@@ -2367,7 +2361,7 @@
 						<fixed-text>${ptp_rm:MP_SHARED_MEMORY_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_SHARED_MEMORY_ATTR"
+					<widget type="checkbox" attribute="MP_SHARED_MEMORY_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -2383,25 +2377,26 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_SHMEM_PT2PT_ATTR#description}
 						</fixed-text>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_SHMEM_PT2PT_ATTR"
+					<widget type="checkbox" attribute="MP_SHMEM_PT2PT_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
 								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_SHMEM_PT2PT_ATTR#tooltip}</tooltip>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
 
 				</composite>
 			</dynamic>
 
+			<!-- Miscellaneous Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Nodes,Performance 1,Performance2,Advanced">
 				<title>Miscellaneous</title>
@@ -2421,7 +2416,7 @@
 						<fixed-text>${ptp_rm:MP_CLOCK_SOURCE_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_CLOCK_SOURCE_ATTR"
+					<widget style="SWT.BORDER" readOnly="true" attribute="MP_CLOCK_SOURCE_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" horizontalSpan="2" />
@@ -2436,7 +2431,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_MSG_API_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="false" saveValueTo="MP_MSG_API_ATTR"
+					<widget style="SWT.BORDER" readOnly="false" attribute="MP_MSG_API_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" horizontalSpan="2" />
@@ -2451,19 +2446,19 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_TLP_REQUIRED_ATTR#description}
 						</fixed-text>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="true" saveValueTo="MP_TLP_REQUIRED_ATTR"
+					<widget style="SWT.BORDER" readOnly="true" attribute="MP_TLP_REQUIRED_ATTR"
 						type="combo">
 						<layout-data>
 							<grid-data widthHint="200" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_TLP_REQUIRED_ATTR#tooltip}</tooltip>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
 
 					<!-- MP_DEVTYPE: Device type class -->
@@ -2473,7 +2468,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_DEVTYPE_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.LEFT" saveValueTo="MP_DEVTYPE_ATTR" type="combo" readOnly="true">
+					<widget style="SWT.LEFT" attribute="MP_DEVTYPE_ATTR" type="combo" readOnly="true">
 						<layout-data>
 							<grid-data widthHint="200" horizontalSpan="2" />
 						</layout-data>
@@ -2486,19 +2481,19 @@
 							<grid-data horizontalAlign="SWT.BEGINNING" />
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_MPILIB_ATTR#description}</fixed-text>
-						<!--control-state>
-							<show-if button="isAIX" selected="false"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
-					<widget style="SWT.LEFT" saveValueTo="MP_MPILIB_ATTR" type="combo"
+					<widget style="SWT.LEFT" attribute="MP_MPILIB_ATTR" type="combo"
 						readOnly="true">
 						<layout-data>
 							<grid-data widthHint="200" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_MPILIB_ATTR#tooltip}</tooltip>
-						<!--control-state>
-							<show-if button="isAIX" selected="false"/>
-						</control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
 					
 					<!-- MP_EUILIBPATH: Specify alternate communication and protocol library 
@@ -2509,7 +2504,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_EUILIBPATH_ATTR#description}</fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" saveValueTo="MP_EUILIBPATH_ATTR"
+					<browse textStyle="SWT.BORDER" attribute="MP_EUILIBPATH_ATTR"
 						title="Browse" directory="true">
 						<text-layout-data>
 							<grid-data widthHint="200" />
@@ -2528,7 +2523,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_IONODEFILE_ATTR#description}</fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" saveValueTo="MP_IONODEFILE_ATTR"
+					<browse textStyle="SWT.BORDER" attribute="MP_IONODEFILE_ATTR"
 						title="Browse">
 						<text-layout-data>
 							<grid-data widthHint="200" />
@@ -2547,10 +2542,10 @@
 						<fixed-text>${ptp_rm:MP_SAVEHOSTFILE_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</control-state>
 					</widget>
-					<browse textStyle="SWT.BORDER" saveValueTo="MP_SAVEHOSTFILE_ATTR"
+					<browse textStyle="SWT.BORDER" attribute="MP_SAVEHOSTFILE_ATTR"
 						title="Browse">
 						<text-layout-data>
 							<grid-data widthHint="200" />
@@ -2560,10 +2555,10 @@
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_SAVEHOSTFILE_ATTR#tooltip}</tooltip>
 						<text-control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</text-control-state>
 						<button-control-state>
-							<show-if attribute="RM_USE_LOAD_LEVELER" value="true"/>
+							<enable-if button="useLL" selected="true"/>
 						</button-control-state>
 					</browse>
 
@@ -2574,7 +2569,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_SAVE_RMFILE_ATTR#description}</fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" saveValueTo="MP_SAVE_RMFILE_ATTR"
+					<browse textStyle="SWT.BORDER" attribute="MP_SAVE_RMFILE_ATTR"
 						title="Browse">
 						<text-layout-data>
 							<grid-data widthHint="200" />
@@ -2593,7 +2588,7 @@
 						<fixed-text>${ptp_rm:MP_PULSE_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_PULSE_ATTR" type="text">
+					<widget style="SWT.BORDER" attribute="MP_PULSE_ATTR" type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
@@ -2609,7 +2604,7 @@
 						<fixed-text>${ptp_rm:MP_THREAD_STACKSIZE_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_THREAD_STACKSIZE_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_THREAD_STACKSIZE_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2626,7 +2621,7 @@
 						<fixed-text>${ptp_rm:MP_TIMEOUT_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_TIMEOUT_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_TIMEOUT_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2643,7 +2638,7 @@
 						<fixed-text>${ptp_rm:MP_CONFIG_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_CONFIG_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_CONFIG_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2660,7 +2655,7 @@
 						<fixed-text>${ptp_rm:MP_PMDSUFFIX_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" saveValueTo="MP_PMDSUFFIX_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_PMDSUFFIX_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -2677,7 +2672,7 @@
 						<fixed-text>${ptp_rm:MP_HINTS_FILTERED_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_HINTS_FILTERED_ATTR"
+					<widget type="checkbox" attribute="MP_HINTS_FILTERED_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -2694,7 +2689,7 @@
 						<fixed-text>${ptp_rm:MP_IO_ERRLOG_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_IO_ERRLOG_ATTR"
+					<widget type="checkbox" attribute="MP_IO_ERRLOG_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
@@ -2710,20 +2705,20 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_PRIORITY_NTP_ATTR#description}
 						</fixed-text>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_PRIORITY_NTP_ATTR"
+					<widget type="checkbox" attribute="MP_PRIORITY_NTP_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
 								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_PRIORITY_NTP_ATTR#tooltip}</tooltip>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
 
 					<!-- MP_COSCHEDULER_VERSION: Use runqueue co-scheduler -->
@@ -2733,23 +2728,25 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_COSCHEDULER_VERSION_ATTR#description}
 						</fixed-text>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
-					<widget type="checkbox" saveValueTo="MP_COSCHEDULER_VERSION_ATTR"
+					<widget type="checkbox" attribute="MP_COSCHEDULER_VERSION_ATTR"
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
 								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_COSCHEDULER_VERSION_ATTR#tooltip}</tooltip>
-						<!--control-state>
-							<show-if button="isAIX" selected="true"/>
-						<control-state-->
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
 				</composite>
 			</dynamic>
+			
+			<!-- Advanced Tab -->
 			<dynamic
 				includeWidgetValuesFrom="Tasks,I/O,Diagnostic,Debug,System,Nodes,Performance 1,Performance2,Miscellaneous">
 				<title>Advanced</title>

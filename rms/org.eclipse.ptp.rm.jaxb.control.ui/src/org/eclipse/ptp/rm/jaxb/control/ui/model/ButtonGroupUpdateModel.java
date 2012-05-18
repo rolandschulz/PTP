@@ -21,8 +21,7 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * Update model for the entire button group. <br>
  * <br>
- * The group control is used to map the entire group; the group itself updates a
- * single property or attribute value.
+ * The group control is used to map the entire group; the group itself updates a single property or attribute value.
  * 
  * @author arossi
  * 
@@ -36,14 +35,12 @@ public class ButtonGroupUpdateModel extends AbstractUpdateModel implements Selec
 
 	/**
 	 * @param name
-	 *            name of the model, which will correspond to the name of a
-	 *            Property or Attribute if the widget value is to be saved.
+	 *            name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be
+	 *            saved.
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 * @param control
-	 *            the control object to which this model is mapped in the
-	 *            handler
+	 *            the control object to which this model is mapped in the handler
 	 * @param button
 	 *            the button widgets to which this model corresponds
 	 */
@@ -66,25 +63,21 @@ public class ButtonGroupUpdateModel extends AbstractUpdateModel implements Selec
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel#getValueFromControl()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel#getValueFromControl()
 	 */
 	public Object getValueFromControl() {
 		return selectedLabel;
 	}
 
 	/*
-	 * Sets the selection on the button corresponding to the selected label,
-	 * after translating the value from the current environment. Turns on the
-	 * refreshing flag so as not to trigger further updates from the listener.
-	 * (non-Javadoc)
+	 * Sets the selection on the button corresponding to the selected label, after translating the value from the current
+	 * environment. Turns on the refreshing flag so as not to trigger further updates from the listener. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel#refreshValueFromMap()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel#refreshValueFromMap()
 	 */
 	public void refreshValueFromMap() {
 		refreshing = true;
-		mapValue = lcMap.get(name);
+		mapValue = lcMap.getValue(name);
 		if (mapValue != null && !JAXBUIConstants.ZEROSTR.equals(mapValue)) {
 			selectedLabel = String.valueOf(mapValue);
 		} else {
@@ -101,24 +94,18 @@ public class ButtonGroupUpdateModel extends AbstractUpdateModel implements Selec
 	}
 
 	/*
-	 * Model serves as widget selection listener: calls {@link #storeValue()}
-	 * (non-Javadoc)
+	 * Model serves as widget selection listener: calls {@link #storeValue()} (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
-	 * .swt.events.SelectionEvent)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse .swt.events.SelectionEvent)
 	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
 		widgetSelected(e);
 	}
 
 	/*
-	 * Model serves as widget selection listener: calls {@link #storeValue()}
-	 * (non-Javadoc)
+	 * Model serves as widget selection listener: calls {@link #storeValue()} (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
-	 * .events.SelectionEvent)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt .events.SelectionEvent)
 	 */
 	public void widgetSelected(SelectionEvent e) {
 		if (refreshing) {

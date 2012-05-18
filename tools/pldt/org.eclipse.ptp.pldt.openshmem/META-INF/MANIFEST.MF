@@ -7,6 +7,12 @@ Bundle-Activator: org.eclipse.ptp.pldt.openshmem.Activator
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.cdt.core,
+ org.eclipse.cdt.ui,
+ org.eclipse.ptp.pldt.common,
+ org.eclipse.help,
+ org.eclipse.cdt.doc.user
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

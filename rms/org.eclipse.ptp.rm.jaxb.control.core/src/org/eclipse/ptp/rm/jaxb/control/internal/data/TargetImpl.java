@@ -30,7 +30,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.AddType;
 import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.PutType;
 import org.eclipse.ptp.rm.jaxb.core.data.SetType;
 import org.eclipse.ptp.rm.jaxb.core.data.TargetType;
@@ -38,19 +37,15 @@ import org.eclipse.ptp.rm.jaxb.core.data.TestType;
 import org.eclipse.ptp.rm.jaxb.core.data.ThrowType;
 
 /**
- * Wrapper implementation. A target contains any number of matches, with their
- * associated actions, along with tests for conditional actions based on values
- * of the target fields. <br>
+ * Wrapper implementation. A target contains any number of matches, with their associated actions, along with tests for conditional
+ * actions based on values of the target fields. <br>
  * <br>
- * There are two modes to matching. The default is to treat the matches as
- * logically OR'd (like a SAT; <code>matchAll</code> = false). When the latter
- * is set to true, the matches are taken as logically ANDed.<br>
+ * There are two modes to matching. The default is to treat the matches as logically OR'd (like a SAT; <code>matchAll</code> =
+ * false). When the latter is set to true, the matches are taken as logically ANDed.<br>
  * <br>
- * The target can be a reference to a pre-existent Property or Attribute in the
- * resource manager environment, or can be constructed when the match occurs.
- * Dynamically constructed targets are added to a list during the tokenization,
- * and then upon termination are merged according to property or attribute name,
- * which is treated as a unique identifier. <br>
+ * The target can be a reference to a pre-existent Property or Attribute in the resource manager environment, or can be constructed
+ * when the match occurs. Dynamically constructed targets are added to a list during the tokenization, and then upon termination are
+ * merged according to property or attribute name, which is treated as a unique identifier. <br>
  * <br>
  * Tests are applied at the end of the tokenization. <br>
  * 
@@ -62,22 +57,20 @@ public class TargetImpl implements IMatchable {
 	private final IVariableMap rmVarMap;
 	private final String uuid;
 	private final String ref;
-	private final String type;
 	private final List<MatchImpl> matches;
 	private final List<TestImpl> tests;
-	private final List<Object> targets;
+	private final List<AttributeType> targets;
 	private final boolean matchAll;
 	private final boolean allowOverwrites;
 	private IAssign defaultAction;
-	private Object refTarget;
+	private AttributeType refTarget;
 	private boolean selected;
 
 	/**
 	 * Wraps the Property or Attribute to be acted upon.
 	 * 
 	 * @param uuid
-	 *            unique id associated with this resource manager operation (can
-	 *            be <code>null</code>).
+	 *            unique id associated with this resource manager operation (can be <code>null</code>).
 	 * @param target
 	 *            JAXB data element
 	 * @param rmVarMap
@@ -87,7 +80,6 @@ public class TargetImpl implements IMatchable {
 		this.rmVarMap = rmVarMap;
 		this.uuid = uuid;
 		ref = target.getRef();
-		type = target.getType();
 		matchAll = target.isMatchAll();
 		allowOverwrites = target.isAllowOverwrites();
 		matches = new ArrayList<MatchImpl>();
@@ -120,17 +112,15 @@ public class TargetImpl implements IMatchable {
 				defaultAction = new ThrowImpl(uuid, toThrow, rmVarMap);
 			}
 		}
-		targets = new ArrayList<Object>();
+		targets = new ArrayList<AttributeType>();
 		selected = false;
 	}
 
 	/**
-	 * Applies the matches in order. If <code>matchAll</code> is in effect,
-	 * already matched expressions are skipped until they are reset; the first
-	 * match causes a return of this method.<br>
+	 * Applies the matches in order. If <code>matchAll</code> is in effect, already matched expressions are skipped until they are
+	 * reset; the first match causes a return of this method.<br>
 	 * <br>
-	 * Upon match, the head of the segment up to the last character of the match
-	 * is deleted.
+	 * Upon match, the head of the segment up to the last character of the match is deleted.
 	 * 
 	 * @param segment
 	 *            the current part of the stream to match
@@ -167,25 +157,22 @@ public class TargetImpl implements IMatchable {
 	/**
 	 * Get the target object for the given assign task.<br>
 	 * <br>
-	 * This method is called by the Match on its target parent. If the target is
-	 * a reference to an existing object in the environment, this is then
-	 * returned; else, the index counter for the assign task is retrieved,
-	 * indicating where in the list of constructed targets it last was (the
-	 * assumption is that an assign action is applied once to any given Property
-	 * or Attribute), and this object is returned if it exists; in the case that
-	 * the index is equal to or greater than the size of the list, a new target
-	 * object is constructed and added to the list.
+	 * This method is called by the Match on its target parent. If the target is a reference to an existing object in the
+	 * environment, this is then returned; else, the index counter for the assign task is retrieved, indicating where in the list of
+	 * constructed targets it last was (the assumption is that an assign action is applied once to any given Property or Attribute),
+	 * and this object is returned if it exists; in the case that the index is equal to or greater than the size of the list, a new
+	 * target object is constructed and added to the list.
 	 * 
 	 * @param assign
 	 *            action to be applied to target
 	 * @return the appropriate target for this action
 	 * @throws CoreException
 	 */
-	public Object getTarget(IAssign assign) throws CoreException {
+	public AttributeType getTarget(IAssign assign) throws CoreException {
 		if (refTarget != null) {
 			return refTarget;
 		}
-		Object target = null;
+		AttributeType target = null;
 		if (ref != null) {
 			String name = rmVarMap.getString(uuid, ref);
 			target = rmVarMap.get(name);
@@ -199,17 +186,8 @@ public class TargetImpl implements IMatchable {
 				target = targets.get(i);
 			}
 			if (target == null) {
-				if (JAXBControlConstants.PROPERTY.equals(type)) {
-					PropertyType p = new PropertyType();
-					target = p;
-					targets.add(target);
-				} else if (JAXBControlConstants.ATTRIBUTE.equals(type)) {
-					AttributeType ja = new AttributeType();
-					target = ja;
-					targets.add(target);
-				} else {
-					throw CoreExceptionUtils.newException(Messages.StreamParserMissingTargetType + ref, null);
-				}
+				target = new AttributeType();
+				targets.add(target);
 			}
 		}
 
@@ -217,8 +195,7 @@ public class TargetImpl implements IMatchable {
 	}
 
 	/**
-	 * @return whether this target has been selected for promotion to the head
-	 *         of the list
+	 * @return whether this target has been selected for promotion to the head of the list
 	 */
 	public boolean isSelected() {
 		return selected;
@@ -227,35 +204,22 @@ public class TargetImpl implements IMatchable {
 	/**
 	 * Called upon completion of tokenization.<br>
 	 * <br>
-	 * First merges any constructed targets, then applies the tests to all
-	 * targets.
+	 * First merges any constructed targets, then applies the tests to all targets.
 	 * 
 	 * @throws Throwable
 	 */
 	public synchronized void postProcess() throws Throwable {
 		if (refTarget == null) {
-			if (JAXBControlConstants.PROPERTY.equals(type)) {
-				DebuggingLogger.getLogger().logPropertyInfo(Messages.TargetImpl_0 + targets.size() + Messages.TargetImpl_1);
-				mergeProperties(targets);
-			} else if (JAXBControlConstants.ATTRIBUTE.equals(type)) {
-				DebuggingLogger.getLogger().logPropertyInfo(Messages.TargetImpl_2 + targets.size() + Messages.TargetImpl_3);
-				mergeAttributes(targets);
-			}
+			DebuggingLogger.getLogger().logPropertyInfo(Messages.TargetImpl_2 + targets.size() + Messages.TargetImpl_3);
+			mergeAttributes(targets);
 			if (rmVarMap instanceof RMVariableMap) {
-				Map<String, Object> dmap = ((RMVariableMap) rmVarMap).getDiscovered();
-				for (Object t : targets) {
+				Map<String, AttributeType> dmap = ((RMVariableMap) rmVarMap).getDiscovered();
+				for (AttributeType t : targets) {
 					runTests(t);
-					if (JAXBControlConstants.PROPERTY.equals(type)) {
-						PropertyType p = (PropertyType) t;
-						DebuggingLogger.getLogger().logPropertyInfo(
-								Messages.TargetImpl_4 + p.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP + p.getValue());
-						dmap.put(p.getName(), p);
-					} else if (JAXBControlConstants.ATTRIBUTE.equals(type)) {
-						AttributeType a = (AttributeType) t;
-						DebuggingLogger.getLogger().logPropertyInfo(
-								Messages.TargetImpl_6 + a.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP + a.getValue());
-						dmap.put(a.getName(), a);
-					}
+					AttributeType a = t;
+					DebuggingLogger.getLogger().logPropertyInfo(
+							Messages.TargetImpl_6 + a.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP + a.getValue());
+					dmap.put(a.getName(), a);
 				}
 			}
 			targets.clear();
@@ -274,10 +238,9 @@ public class TargetImpl implements IMatchable {
 	}
 
 	/**
-	 * Takes two attributes with the same name and merges the rest of their
-	 * fields, such that non-<code>null</code> values replace <code>null</code>.
-	 * An attempt to merge two non-<code>null</code> fields implies that there
-	 * was an error in the tokenization logic, and an exception is thrown.
+	 * Takes two attributes with the same name and merges the rest of their fields, such that non-<code>null</code> values replace
+	 * <code>null</code>. An attempt to merge two non-<code>null</code> fields implies that there was an error in the tokenization
+	 * logic, and an exception is thrown.
 	 * 
 	 * @param previous
 	 *            Attribute
@@ -300,38 +263,17 @@ public class TargetImpl implements IMatchable {
 	}
 
 	/**
-	 * Takes two properties with the same name and merges the rest of their
-	 * fields, such that non-<code>null</code> values replace <code>null</code>.
-	 * An attempt to merge two non-<code>null</code> fields implies that there
-	 * was an error in the tokenization logic, and an exception is thrown.
-	 * 
-	 * @param previous
-	 *            Property
-	 * @param current
-	 *            Property
-	 * @throws Throwable
-	 */
-	private void merge(PropertyType previous, PropertyType current) throws Throwable {
-		previous.setValue(mergeObject(previous.getValue(), current.getValue()));
-		previous.setDefault(mergeString(previous.getDefault(), current.getDefault()));
-		previous.setType(mergeString(previous.getType(), current.getType()));
-		previous.setReadOnly(mergeBoolean(previous.isReadOnly(), current.isReadOnly()));
-		previous.setVisible(mergeBoolean(previous.isVisible(), current.isVisible()));
-	}
-
-	/**
-	 * Attributes are hashed against their name; attributes with the same name
-	 * are merged into a single object. Nameless attributes may occur from an
-	 * empty line at the end of the stream, and are simply discarded.
+	 * Attributes are hashed against their name; attributes with the same name are merged into a single object. Nameless attributes
+	 * may occur from an empty line at the end of the stream, and are simply discarded.
 	 * 
 	 * @param targets
 	 *            list of targets constructed during tokenization
 	 * @throws Throwable
 	 */
-	private void mergeAttributes(List<Object> targets) throws Throwable {
+	private void mergeAttributes(List<AttributeType> targets) throws Throwable {
 		Map<String, AttributeType> hash = new HashMap<String, AttributeType>();
-		for (Iterator<Object> i = targets.iterator(); i.hasNext();) {
-			AttributeType current = (AttributeType) i.next();
+		for (Iterator<AttributeType> i = targets.iterator(); i.hasNext();) {
+			AttributeType current = i.next();
 			String name = current.getName();
 			if (current.getName() == null) {
 				/*
@@ -390,8 +332,7 @@ public class TargetImpl implements IMatchable {
 	}
 
 	/**
-	 * Checks if overwrites are allowed. If object is <code>Collection</code> or
-	 * <code>Map</code>, the merge will proceed anyway.
+	 * Checks if overwrites are allowed. If object is <code>Collection</code> or <code>Map</code>, the merge will proceed anyway.
 	 * 
 	 * @param v0
 	 * @param v1
@@ -418,37 +359,6 @@ public class TargetImpl implements IMatchable {
 	}
 
 	/**
-	 * Properties are hashed against their name; properties with the same name
-	 * are merged into a single object. Nameless properties may occur from an
-	 * empty line at the end of the stream, and are simply discarded.
-	 * 
-	 * @param targets
-	 *            list of targets constructed during tokenization
-	 * @throws Throwable
-	 */
-	private void mergeProperties(List<Object> targets) throws Throwable {
-		Map<String, PropertyType> hash = new HashMap<String, PropertyType>();
-		for (Iterator<Object> i = targets.iterator(); i.hasNext();) {
-			PropertyType current = (PropertyType) i.next();
-			String name = current.getName();
-			if (current.getName() == null) {
-				/*
-				 * may be an artifact of end-of-stream; just throw it out
-				 */
-				i.remove();
-				continue;
-			}
-			PropertyType previous = hash.get(name);
-			if (previous != null) {
-				merge(previous, current);
-				i.remove();
-			} else {
-				hash.put(name, current);
-			}
-		}
-	}
-
-	/**
 	 * Checks if overwrites are allowed.
 	 * 
 	 * @param s0
@@ -471,8 +381,7 @@ public class TargetImpl implements IMatchable {
 	}
 
 	/**
-	 * Runs all the tests on the given target. If none succeed, and the default
-	 * action is defined, the latter is applied.
+	 * Runs all the tests on the given target. If none succeed, and the default action is defined, the latter is applied.
 	 * 
 	 * @param target
 	 * @throws Throwable
@@ -488,8 +397,7 @@ public class TargetImpl implements IMatchable {
 		if (!any && defaultAction != null) {
 			defaultAction.setTarget(target);
 			/*
-			 * These will be using only preassigned values, so the tokens[]
-			 * param is null
+			 * These will be using only preassigned values, so the tokens[] param is null
 			 */
 			defaultAction.assign(null);
 		}

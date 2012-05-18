@@ -19,6 +19,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.cell.SpinnerCellEditor;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
+import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
@@ -264,7 +265,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 * @see org.eclipse.ptp.rm.jaxb.ui.model.AbstractUpdateModel#initialize(org.eclipse .ptp.rm.jaxb.core.variables.LCVariableMap)
 	 */
 	@Override
-	public void initialize(IVariableMap rmMap, IVariableMap lcMap) {
+	public void initialize(IVariableMap rmMap, LCVariableMap lcMap) {
 		this.lcMap = lcMap;
 		if (editor instanceof ComboBoxCellEditor) {
 			if (itemsFrom != null) {
@@ -296,7 +297,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 */
 	public void refreshValueFromMap() {
 		refreshing = true;
-		mapValue = lcMap.get(name);
+		mapValue = lcMap.getValue(name);
 		if (editor instanceof TextCellEditor) {
 			stringValue = JAXBControlUIConstants.ZEROSTR;
 			if (mapValue != null) {

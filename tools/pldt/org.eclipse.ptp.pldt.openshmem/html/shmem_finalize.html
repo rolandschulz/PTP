@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>shmem_finalize</title>
+</head>
+<h2 id="top">shmem_finalize</h2>
+<h4>Purpose</h4>
+
+
+<p>Cleans up the resources that used by IBM openshmem library.
+</p>
+
+<h4>C syntax</h4>
+
+<pre>
+#include &lt;shmem.h&gt;
+ 
+void shmem_finalize(void);
+ 
+</pre>
+
+<h4>Description</h4>
+
+<div class="ledi">
+<p>The shmem_finalize function cleans up the resources used by IBM openshmem library. </p>
+<p>This function should be call only once at the end of main function.  It is a blocking collective call.  Internally, a shmem_barrier_all is called to ensure all communications prior the call are finished.</p>
+
+<h4>IBM NOTES</h4>
+<div class="ledi">
+<dl>
+<p>The calling of this function is optional.  After the call to shmem_finalize, any IBM openshmem function call will not be valid, and the buffers allocated using shmalloc (or shrealloc) cannot be used anymore.</p>
+</dd>
+</dl>
+
+
+<h4>C examples</h4>
+<pre>
+</pre>
+
+<h4>Related information</h4>
+
+<p>Subroutines: num_pes, my_pe, start_pes
+</p>
+</html>

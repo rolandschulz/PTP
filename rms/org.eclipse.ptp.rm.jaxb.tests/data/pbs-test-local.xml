@@ -11,24 +11,24 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-test-local">
 	<control-data>
-		<property name="queues" visible="false"/>
+		<attribute name="queues" visible="false"/>
 		<!-- needed by RM internals for fetch; name is fixed by convention -->
-		<property name="stdout_remote_path" visible="true">
+		<attribute name="stdout_remote_path" visible="true">
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o@jobId</default>
 			<link-value-to>Output_Path</link-value-to>
-		</property>
+		</attribute>
 		<!-- needed by RM internals for fetch; name is fixed by convention -->
-		<property name="stderr_remote_path" visible="true">
+		<attribute name="stderr_remote_path" visible="true">
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e@jobId</default>
 			<link-value-to>Error_Path</link-value-to>
-		</property>
-		<property name="remote_path_tooltip" visible="false">
+		</attribute>
+		<attribute name="remote_path_tooltip" visible="false">
 			<default><![CDATA[Not the same as the PBS attribute for stdout or stderr; 
 used internally by the resource manager and should correspond
 to whatever path the scheduler will copy the output to at the 
 end of execution; the job id can be included in this path 
 using '@jobId'.]]></default>
-		</property>
+		</attribute>
 		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
@@ -454,7 +454,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 							<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 							<fixed-text>Queue: </fixed-text>
 						</widget>
-						<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+						<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
 							<layout-data>
 								<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
 							</layout-data>
@@ -501,7 +501,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<!-- <tooltip>${ptp_rm:remote_path_tooltip#default}</tooltip> -->
 						<!-- <fixed-text>Remote Output Path:</fixed-text> -->
 						<!-- </widget> -->
-						<!-- <widget type="text" style="SWT.BORDER" saveValueTo="stdout_remote_path"> -->
+						<!-- <widget type="text" style="SWT.BORDER" attribute="stdout_remote_path"> -->
 						<!-- <layout-data> -->
 						<!-- <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="100"/> -->
 						<!-- </layout-data> -->
@@ -513,7 +513,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<!-- <tooltip>${ptp_rm:remote_path_tooltip#default}</tooltip> -->
 						<!-- <fixed-text>Remote Error Path:</fixed-text> -->
 						<!-- </widget> -->
-						<!-- <widget type="text" style="SWT.BORDER" saveValueTo="stderr_remote_path"> -->
+						<!-- <widget type="text" style="SWT.BORDER" attribute="stderr_remote_path"> -->
 						<!-- <layout-data> -->
 						<!-- <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true" widthHint="100"/> -->
 						<!-- </layout-data> -->

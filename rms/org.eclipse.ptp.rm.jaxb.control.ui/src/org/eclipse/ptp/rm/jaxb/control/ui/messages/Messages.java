@@ -63,6 +63,10 @@ public class Messages extends NLS {
 	public static String ControlStateListener_0;
 	public static String ControlStateListener_1;
 	public static String ControlStateRule_0;
+
+	public static String ControlStateRule_1;
+
+	public static String ControlStateRule_2;
 	public static String ViewExcluded;
 	public static String ViewConfigTooltip;
 	public static String ViewExcludedTooltip;
