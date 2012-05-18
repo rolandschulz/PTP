@@ -172,8 +172,6 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 			// monitor.done();
 			return;
 		}
-		
-		IToolChain remoteToolChain = ((SyncMainWizardPage) fMainPage).getRemoteToolChain();
 
 		// Build the service configuration
 		ServiceModelManager smm = ServiceModelManager.getInstance();
@@ -198,44 +196,41 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 		}
 
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();	
-		try {
-			// Initialize project, using a default local build scenario for all current configurations.
-			bcm.initProject(project, serviceConfig, bcm.createLocalBuildScenario(project));
-
-			// Create build scenario based on initial remote location information
-			ISyncServiceProvider provider = participant.getProvider(project);
-			BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
-					provider.getLocation());
-
-			// For each original configuration make a corresponding remote configuration that uses the selected remote toolchain,
-			// the sync builder, and the remote build scenario.
-			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-			if (buildInfo == null) {
-				throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
+		// Create build scenario based on initial remote location information
+		ISyncServiceProvider provider = participant.getProvider(project);
+		BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
+				provider.getLocation());
+		
+		// Initialize project with this build scenario, which will be applied to all current configurations.
+		bcm.initProject(project, serviceConfig, remoteBuildScenario);
+		
+		// For each original configuration do the following:
+		// 1) Create a corresponding local configuration
+		// 2) Change its toolchain to the remote toolchain
+		// 2) Set builder to the sync builder
+		// 3) Append environment variables
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+		if (buildInfo == null) {
+			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
+		}
+		IConfiguration[] allRemoteConfigs = buildInfo.getManagedProject().getConfigurations();
+		IToolChain remoteToolChain = ((SyncMainWizardPage) fMainPage).getRemoteToolChain();
+		for (IConfiguration remoteConfig : allRemoteConfigs) {
+			BuildConfigurationManager.getInstance().createLocalConfiguration(project, remoteConfig.getName() + "-local"); //$NON-NLS-1$
+			if (remoteToolChain != null) {
+				remoteConfig.createToolChain(remoteToolChain, ManagedBuildManager.calculateChildId(remoteToolChain.getId(), null),
+						remoteToolChain.getId(), false);
 			}
-			IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
-			for (IConfiguration config : allConfigs) {
-				IConfiguration remoteConfig = BuildConfigurationManager.getInstance().createRemoteConfiguration(project,
-						remoteBuildScenario, config.getName() + "-remote", config.getDescription()); //$NON-NLS-1$
-				if (remoteToolChain != null) {
-					remoteConfig.createToolChain(remoteToolChain, ManagedBuildManager.calculateChildId(remoteToolChain.getId(), null),
-							remoteToolChain.getId(), false);
-				}
-				IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
-				remoteConfig.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
-				// turn off append contributed(local) environment variables for the build configuration of the remote project
-				ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(remoteConfig);
-				if (c_mb_confgDes != null) {
-					EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
-					// EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_mb_confgDes);
-				}
+			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
+			remoteConfig.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
+			// turn off append contributed(local) environment variables for the build configuration of the remote project
+			ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(remoteConfig);
+			if (c_mb_confgDes != null) {
+				EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+				// EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_mb_confgDes);
 			}
-		} catch (CoreException e) {
-			StatusManager.getManager().handle(new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, e.getMessage(), e),
-					StatusManager.SHOW);
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
-
 
 		// monitor.done();
 	}

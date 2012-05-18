@@ -123,13 +123,12 @@ public class BuildConfigurationManager {
 	 *            The project needing a local configuration - cannot be null
 	 * @return the new configuration - can be null on problems during creation
 	 */
-	public IConfiguration createLocalConfiguration(IProject project) {
+	public IConfiguration createLocalConfiguration(IProject project, String configName) {
 		checkProject(project);
 		try {
 			BuildScenario localBuildScenario = this.createLocalBuildScenario(project);
 			if (localBuildScenario != null) {
-				return this.createConfiguration(project, localBuildScenario, Messages.WorkspaceConfigName,
-						Messages.BCM_WorkspaceConfigDes);
+				return this.createConfiguration(project, localBuildScenario, configName, Messages.BCM_WorkspaceConfigDes);
 			}
 		} catch (CoreException e) {
 			RDTSyncCorePlugin.log(Messages.BCM_CreateConfigFailure + e.getMessage(), e);
