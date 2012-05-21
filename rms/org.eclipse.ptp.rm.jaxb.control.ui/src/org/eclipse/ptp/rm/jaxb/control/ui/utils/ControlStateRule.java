@@ -122,8 +122,12 @@ public class ControlStateRule {
 			return false;
 		}
 		if (attribute != null) {
-			AttributeType attrVal = varMap.get(attribute);
-			return (attrVal != null) && value.equals(attrVal.toString());
+			AttributeType attr = varMap.get(attribute);
+			String attrVal = null;
+			if (attr != null && attr.getValue() != null) {
+				attrVal = attr.getValue().toString();
+			}
+			return value.equals(attrVal);
 		}
 		return selected == button.getSelection();
 	}
