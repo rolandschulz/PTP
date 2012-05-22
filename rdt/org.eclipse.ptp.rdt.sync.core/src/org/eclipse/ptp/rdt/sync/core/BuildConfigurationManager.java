@@ -442,7 +442,33 @@ public class BuildConfigurationManager {
 		}
 	}
 
-	private IConfiguration createConfiguration(IProject project, BuildScenario buildScenario, String configName, String configDesc) {
+	/**
+	 * Create a configuration for the given project with the given build scenario, name, and description using the project's
+	 * default build configuration as parent.
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param configName
+	 * @param configDesc
+	 * @return the new configuration
+	 */
+	public IConfiguration createConfiguration(IProject project, BuildScenario buildScenario, String configName, String configDesc) {
+		return this.createConfiguration(project, null, buildScenario, configName, configDesc);
+	}
+
+	/**
+	 * Create a configuration for the given project with the given build scenario, name, and description using the given build
+	 * configuration as parent.
+	 *
+	 * @param project
+	 * @param configParent
+	 * @param buildScenario
+	 * @param configName
+	 * @param configDesc
+	 * @return the new configuration
+	 */
+	public IConfiguration createConfiguration(IProject project, Configuration configParent, BuildScenario buildScenario,
+			String configName, String configDesc) {
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
 			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
@@ -454,7 +480,9 @@ public class BuildConfigurationManager {
 		boolean configAdded = false;
 
 		ManagedProject managedProject = (ManagedProject) buildInfo.getManagedProject();
-		Configuration configParent = (Configuration) buildInfo.getDefaultConfiguration();
+		if (configParent == null) {
+			configParent = (Configuration) buildInfo.getDefaultConfiguration();
+		}
 		String configId = ManagedBuildManager.calculateChildId(configParent.getId(), null);
 		Configuration config = new Configuration(managedProject, configParent, configId, true, false);
 		CConfigurationData configData = config.getConfigurationData();
