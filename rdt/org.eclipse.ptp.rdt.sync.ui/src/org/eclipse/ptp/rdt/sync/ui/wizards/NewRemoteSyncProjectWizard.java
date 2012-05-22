@@ -26,6 +26,7 @@ import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard;
@@ -113,6 +114,7 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	 */
 	@Override
 	public boolean performFinish() {
+		((SyncMainWizardPage) fMainPage).prepareForSubmission();
 		boolean success = super.performFinish();
 		if (success) {
 			IProject project = this.getProject(true);
@@ -202,32 +204,50 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 				provider.getLocation());
 		
 		// Initialize project with this build scenario, which will be applied to all current configurations.
+		// Note then that we initially assume all configs are remote.
 		bcm.initProject(project, serviceConfig, remoteBuildScenario);
 		
-		// For each original configuration do the following:
-		// 1) Create a corresponding local configuration
-		// 2) Change its toolchain to the remote toolchain
-		// 2) Set builder to the sync builder
-		// 3) Append environment variables
+
+		// Create a local build scenario
+		BuildScenario localBuildScenario = null;
+		try {
+			localBuildScenario = bcm.createLocalBuildScenario(project);
+		} catch (CoreException e) {
+			// TODO: What to do here?
+		}
+		
+		// Iterate through all configurations, modifying them as needed as indicated based on their type.
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
 			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 		}
-		IConfiguration[] allRemoteConfigs = buildInfo.getManagedProject().getConfigurations();
-		IToolChain remoteToolChain = ((SyncMainWizardPage) fMainPage).getLocalToolChain();
-		for (IConfiguration remoteConfig : allRemoteConfigs) {
-			BuildConfigurationManager.getInstance().createLocalConfiguration(project, remoteConfig.getName() + "-local"); //$NON-NLS-1$
-			if (remoteToolChain != null) {
-				remoteConfig.createToolChain(remoteToolChain, ManagedBuildManager.calculateChildId(remoteToolChain.getId(), null),
-						remoteToolChain.getId(), false);
+		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
+		for (IConfiguration config : allConfigs) {
+			SyncMainWizardPage.ConfigType configType = ((SyncMainWizardPage) fMainPage).getConfigType(config);
+			assert(configType != null);
+			
+			// If type is both, then only one config was created. Thus, we let the existing config be the remote and create a new
+			// local config based on the remote config.
+			if (configType == SyncMainWizardPage.ConfigType.BOTH) {
+				bcm.createConfiguration(project, (Configuration) config, localBuildScenario, config.getName() + "-local", null); //$NON-NLS-1$
 			}
-			IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
-			remoteConfig.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
-			// turn off append contributed(local) environment variables for the build configuration of the remote project
-			ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(remoteConfig);
-			if (c_mb_confgDes != null) {
-				EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
-				// EnvironmentVariableManager.fUserSupplier.setAppendEnvironment(false, c_mb_confgDes);
+			
+			// If type is local, change its build scenario to the local build scenario
+			if (configType == SyncMainWizardPage.ConfigType.LOCAL) {
+				bcm.setBuildScenarioForBuildConfiguration(localBuildScenario, config);
+				config.setName(config.getName() + "-local"); //$NON-NLS-1$
+			}
+			
+			// If type is remote or both, then the config is a remote config. Change its builder to the sync builder and set
+			// environment variable support to the proper value.
+			if (configType == SyncMainWizardPage.ConfigType.REMOTE || configType == SyncMainWizardPage.ConfigType.BOTH) {
+				IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
+				config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
+				// turn off append contributed(local) environment variables for the build configuration of the remote project
+				ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
+				if (c_mb_confgDes != null) {
+					EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+				}
 			}
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
