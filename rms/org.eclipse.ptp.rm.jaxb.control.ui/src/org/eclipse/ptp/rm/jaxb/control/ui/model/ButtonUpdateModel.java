@@ -27,16 +27,15 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 
 	/**
 	 * @param name
-	 *            name of the model, which will correspond to the name of a
-	 *            Property or Attribute if the widget value is to be saved.
+	 *            name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be
+	 *            saved.
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 * @param button
 	 *            the widget to which this model corresponds
 	 * @param translateBooleanAs
-	 *            a comma-delimite pair of strings corresponding to T,F to use
-	 *            as the value instead of the boolean (can be <code>null</code>)
+	 *            a comma-delimite pair of strings corresponding to T,F to use as the value instead of the boolean (can be
+	 *            <code>null</code>)
 	 */
 	public ButtonUpdateModel(String name, ValueUpdateHandler handler, Button button, String translateBooleanAs) {
 		super(name, handler);
@@ -60,15 +59,14 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 	}
 
 	/*
-	 * Sets the selection on the button after translating the value from the
-	 * current environment. Turns on the refreshing flag so as not to trigger
-	 * further updates from the listener. (non-Javadoc)
+	 * Sets the selection on the button after translating the value from the current environment. Turns on the refreshing flag so as
+	 * not to trigger further updates from the listener. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#refreshValueFromMap()
 	 */
 	public void refreshValueFromMap() {
 		refreshing = true;
-		mapValue = lcMap.get(name);
+		mapValue = lcMap.getValue(name);
 		boolean b = false;
 		if (JAXBUIConstants.ZEROSTR.equals(mapValue)) {
 			mapValue = null;
@@ -79,24 +77,18 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 	}
 
 	/*
-	 * Model serves as widget selection listener: calls {@link #storeValue()}
-	 * (non-Javadoc)
+	 * Model serves as widget selection listener: calls {@link #storeValue()} (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
-	 * .swt.events.SelectionEvent)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse .swt.events.SelectionEvent)
 	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
 		widgetSelected(e);
 	}
 
 	/*
-	 * Model serves as widget selection listener: calls {@link #storeValue()}
-	 * (non-Javadoc)
+	 * Model serves as widget selection listener: calls {@link #storeValue()} (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
-	 * .events.SelectionEvent)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt .events.SelectionEvent)
 	 */
 	public void widgetSelected(SelectionEvent e) {
 		if (refreshing) {

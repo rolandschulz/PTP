@@ -27,11 +27,10 @@ public class SpinnerUpdateModel extends AbstractUpdateModel implements ModifyLis
 
 	/**
 	 * @param name
-	 *            name of the model, which will correspond to the name of a
-	 *            Property or Attribute if the widget value is to be saved.
+	 *            name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be
+	 *            saved.
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 * @param spinner
 	 *            the widget to which this model corresponds
 	 */
@@ -56,12 +55,9 @@ public class SpinnerUpdateModel extends AbstractUpdateModel implements ModifyLis
 	}
 
 	/*
-	 * Model serves as widget modify listener; calls {@link #storeValue()}
-	 * (non-Javadoc)
+	 * Model serves as widget modify listener; calls {@link #storeValue()} (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events
-	 * .ModifyEvent)
+	 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events .ModifyEvent)
 	 */
 	public void modifyText(ModifyEvent e) {
 		if (refreshing) {
@@ -75,16 +71,14 @@ public class SpinnerUpdateModel extends AbstractUpdateModel implements ModifyLis
 	}
 
 	/*
-	 * Sets the value on the spinner after translating from the current
-	 * environment. If <code>null</code>, resets spinner to minimum value. Turns
-	 * on the refreshing flag so as not to trigger further updates from the
-	 * listener. (non-Javadoc)
+	 * Sets the value on the spinner after translating from the current environment. If <code>null</code>, resets spinner to minimum
+	 * value. Turns on the refreshing flag so as not to trigger further updates from the listener. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#refreshValueFromMap()
 	 */
 	public void refreshValueFromMap() {
 		refreshing = true;
-		mapValue = lcMap.get(name);
+		mapValue = lcMap.getValue(name);
 		if (JAXBUIConstants.ZEROSTR.equals(mapValue)) {
 			mapValue = null;
 		}

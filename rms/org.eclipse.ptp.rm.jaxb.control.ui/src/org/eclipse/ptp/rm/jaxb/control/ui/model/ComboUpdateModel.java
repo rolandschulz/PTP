@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.jaxb.control.ui.model;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
+import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.events.ModifyEvent;
@@ -70,7 +71,7 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	 * @see org.eclipse.ptp.rm.jaxb.ui.model.AbstractUpdateModel#initialize(org.eclipse .ptp.rm.jaxb.core.variables.LCVariableMap)
 	 */
 	@Override
-	public void initialize(IVariableMap rmMap, IVariableMap lcMap) {
+	public void initialize(IVariableMap rmMap, LCVariableMap lcMap) {
 		if (itemsFrom != null) {
 			String[] items = WidgetActionUtils.getItemsFrom(rmMap, itemsFrom);
 			if (items.length == 0) {
@@ -104,7 +105,7 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	 */
 	public void refreshValueFromMap() {
 		refreshing = true;
-		mapValue = lcMap.get(name);
+		mapValue = lcMap.getValue(name);
 		String s = JAXBControlUIConstants.ZEROSTR;
 		if (mapValue != null) {
 			s = (String) mapValue;

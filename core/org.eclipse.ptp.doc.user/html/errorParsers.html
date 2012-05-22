@@ -1,0 +1,65 @@
+<html>
+<head>
+<title>Recognizing Compiler Errors: Cray, PGI, and Open64</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+<script type="text/javascript" src="thumb.js"> </script>
+</head> 
+<body>
+<h1 id="top">Recognizing Compiler Errors: Cray, PGI, and Open64</h1>
+<p>
+<ul>
+<li><a href="#configure">Configuring Error Parsers</a></li>
+<li><a href="#cray">Recognizing Cray Compiler Optimization/Loopmark Information</a></li>
+</ul>
+
+<p>When you build a C/C++ or Fortran application, the output from the compiler (including any error messages)
+is displayed in the Console view. However, CDT/Photran can "recognize" the error and warning messages from many
+popular compilers, placing the problem description in the Problems view and marking the corresponding line in the
+source file with an icon.</p>
+
+<p>CDT does not, by default, recognize error or warning messages from the Cray, PGI, or Open64 C/C++ compilers.
+However, this is possible when PTP is installed.</p>
+
+<h2 id=configure>Configuring Error Parsers</h2>
+
+<p>To recognize errors and warnings from the Cray, PGI, or Open64 C/C++ compilers:</p>
+<ol>
+<li>In the Project Explorer view, right-click on a C/C++ or Fortran project.</li>
+<li>In the context menu, select Properties.  This will open the Project Properties dialog.</li>
+<li>In the tree on the left, navigate to <b>C/C++ Build &gt; Settings</b>.</li>
+<li>In the right site of the dialog, select the Error Parsers tab.
+    Note that the list includes these entries:
+    <ul>
+        <li>CDT Cray C/C++ Error Parser</li>
+        <li>CDT PGI C/C++ Error Parser</li>
+        <li>CDT Open64 C/C++ Error Parser</li>
+    </ul></li>
+<li>Select the error parsers corresponding to the all of the C/C++ and Fortran compilers you use, or might use in the future, to compile the project.</li>
+<li>Click the <b>OK</b> button to close the Project Properties dialog.</li>
+</ol>
+
+<p align="center"><img src="images/errorParsersProperties.png"></p><p><br/></p>
+
+<h2 id=cray>Recognizing Cray Compiler Optimization/Loopmark Information</h2>
+
+<p>The Cray C/C++ and Fortran compilers can produce informational messages about what compiler optimizations
+were, or were not, performed.  When the Cray error parsers are enabled (see
+<a href="#configure">Configuring Error Parsers</a> above), Eclipse will also recognize these informational
+messages, marking the corresponding source lines.</p>
+
+<p>To instruct the Cray C/C++ or Fortran compiler to produce informational messages, change your Makefile as follows:</p>
+<ul>
+<li>Compile using the <tt>-h msgs</tt> or <tt>-h negmsgs</tt> option.  For example:<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;<tt>cc -O3 -h nsgmsgs my_program.c</tt>
+<li>OR, compile using <tt>-h list=m</tt> and <tt>cat</tt> the resulting <i>.lst</i> file.  For example:<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;<tt>cc -O3 -h list=m my_program.c && cat my_program.lst</tt>
+</ul>
+
+<p align="center"><img src="images/errorParsersCrayLoopmark.png"></p><p><br/></p>
+
+<p>&nbsp;</p>
+
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+</body>
+
+</html>

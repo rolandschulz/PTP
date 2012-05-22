@@ -10,6 +10,7 @@
 package org.eclipse.ptp.rm.jaxb.control.ui;
 
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
+import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 
@@ -44,7 +45,7 @@ public interface IUpdateModel {
 	 * @param lcMap
 	 *            Launch Tab environment
 	 */
-	public void initialize(IVariableMap rmMap, IVariableMap lcMap);
+	public void initialize(IVariableMap rmMap, LCVariableMap lcMap);
 
 	/**
 	 * Whether the value of the associated control can be written to the environment.

@@ -26,6 +26,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -685,14 +686,16 @@ public class TableView extends ViewPart {
 				savedColumnWidths[i + 1] = 0;
 				treeColumnLayout.setColumnData(treeColumnI, new ColumnPixelData(0, resizable));
 			}
-			treeColumnI.addControlListener(new ControlAdapter() {
-				@Override
-				public void controlResized(ControlEvent e) {
-					if (treeColumnI.getWidth() < 10) {
-						treeColumnI.setWidth(10);
+			if (Util.isLinux()) {
+				treeColumnI.addControlListener(new ControlAdapter() {
+					@Override
+					public void controlResized(ControlEvent e) {
+						if (treeColumnI.getWidth() < 10) {
+							treeColumnI.setWidth(10);
+						}
 					}
-				}
-			});
+				});
+			}
 			treeColumns[i] = treeColumnI;
 		}
 

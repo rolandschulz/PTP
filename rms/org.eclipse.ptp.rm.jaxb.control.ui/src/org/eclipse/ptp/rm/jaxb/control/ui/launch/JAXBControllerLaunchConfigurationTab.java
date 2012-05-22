@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.ui.LazyEnvManagerDetector;
@@ -114,8 +115,9 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	}
 
 	private IEnvManager getEnvManager(IJobController control, IProgressMonitor monitor) {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		LazyEnvManagerDetector envMgr = new LazyEnvManagerDetector(getConnection(control));
-		envMgr.setProgressMonitor(monitor);
+		envMgr.setProgressMonitor(progress.newChild(10));
 		return envMgr;
 	}
 

@@ -35,7 +35,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
@@ -44,7 +43,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 
 	private static final String xml = JAXBControlConstants.DATA + "pbs-test-local.xml"; //$NON-NLS-1$
 	private static ControlType controlData;
-	private static Map<String, Object> env;
+	private static Map<String, AttributeType> env;
 	private static Map<String, String> live;
 	private static boolean verbose = false;
 	private RMVariableMap rmVarMap;
@@ -55,6 +54,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#control(java.lang.String , java.lang.String,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 	}
 
@@ -63,6 +63,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#dispose()
 	 */
+	@Override
 	public void dispose() {
 	}
 
@@ -77,6 +78,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getAppendEnv()
 	 */
+	@Override
 	public boolean getAppendEnv() {
 		return false;
 	}
@@ -86,6 +88,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 		return null;
 	}
 
+	@Override
 	public String getConnectionName() {
 		// TODO Auto-generated method stub
 		return null;
@@ -96,6 +99,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration ()
 	 */
+	@Override
 	public IResourceManagerComponentConfiguration getControlConfiguration() {
 		return null;
 	}
@@ -105,10 +109,12 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getEnvironment()
 	 */
+	@Override
 	public IVariableMap getEnvironment() {
 		return rmVarMap;
 	}
 
+	@Override
 	public ICommandJob getInteractiveJob() {
 		// TODO Auto-generated method stub
 		return null;
@@ -120,6 +126,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang .String, boolean,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) {
 		return null;
 	}
@@ -130,6 +137,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getJobStatus(java.lang .String,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor) {
 		return null;
 	}
@@ -139,6 +147,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getLaunchEnv()
 	 */
+	@Override
 	public Map<String, String> getLaunchEnv() {
 		return null;
 	}
@@ -149,12 +158,14 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#
 	 * getRemoteServicesDelegate(org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
 		RemoteServicesDelegate d = new RemoteServicesDelegate(null, null);
 		d.initialize(monitor);
 		return d;
 	}
 
+	@Override
 	public String getRemoteServicesId() {
 		// TODO Auto-generated method stub
 		return null;
@@ -165,15 +176,18 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getState()
 	 */
+	@Override
 	public String getState() {
 		return null;
 	}
 
+	@Override
 	public ICommandJobStatusMap getStatusMap() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public void initialize(IProgressMonitor monitor) throws CoreException {
 		// TODO Auto-generated method stub
 
@@ -185,6 +199,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged (java.lang.String,
 	 * org.eclipse.ptp.rmsystem.IJobStatus)
 	 */
+	@Override
 	public void jobStateChanged(String jobId, IJobStatus status) {
 	}
 
@@ -194,10 +209,12 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#runActionCommand (java.lang.String, java.lang.String,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
+	@Override
 	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException {
 		return null;
 	}
 
+	@Override
 	public void setInteractiveJob(ICommandJob interactiveJob) {
 		// TODO Auto-generated method stub
 
@@ -211,7 +228,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 			controlData = rmdata.getControlData();
 			rmVarMap = new RMVariableMap();
 			JAXBInitializationUtils.initializeMap(rmdata, rmVarMap);
-			env = rmVarMap.getVariables();
+			env = rmVarMap.getAttributes();
 			System.out.println(env);
 			live = new HashMap<String, String>();
 			live.put("FOO_VAR_1", "FOO_VALUE_1"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -229,6 +246,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#start(org.eclipse.core .runtime.IProgressMonitor)
 	 */
+	@Override
 	public void start(IProgressMonitor monitor) throws CoreException {
 	}
 
@@ -237,6 +255,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#stop()
 	 */
+	@Override
 	public void stop() throws CoreException {
 	}
 
@@ -246,6 +265,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#submitJob(org.eclipse .debug.core.ILaunchConfiguration,
 	 * java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
 		return null;
 	}
@@ -258,7 +278,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	public void testManagedFiles() {
 		composeScript();
 		if (verbose) {
-			PropertyType contents = (PropertyType) env.get(JAXBControlConstants.SCRIPT);
+			AttributeType contents = env.get(JAXBControlConstants.SCRIPT);
 			if (contents != null) {
 				System.out.println(contents.getValue());
 			}
@@ -308,13 +328,13 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 			t.printStackTrace();
 		}
 
-		PropertyType contents = (PropertyType) env.get(JAXBControlConstants.SCRIPT);
+		AttributeType contents = env.get(JAXBControlConstants.SCRIPT);
 		assertNotNull(contents);
 	}
 
 	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files) {
-		PropertyType scriptVar = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT);
-		PropertyType scriptPathVar = (PropertyType) rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
+		AttributeType scriptVar = rmVarMap.get(JAXBControlConstants.SCRIPT);
+		AttributeType scriptPathVar = rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
 				files = new ManagedFilesType();
@@ -350,7 +370,7 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	}
 
 	private void putValue(String name, String value) {
-		PropertyType p = new PropertyType();
+		AttributeType p = new AttributeType();
 		p.setName(name);
 		p.setValue(value);
 		env.put(name, p);
@@ -358,13 +378,9 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 
 	private void setTestValues() {
 		for (String key : env.keySet()) {
-			Object target = env.get(key);
+			AttributeType target = env.get(key);
 			String value = key + "_TEST_VALUE"; //$NON-NLS-1$
-			if (target instanceof PropertyType) {
-				((PropertyType) target).setValue(value);
-			} else if (target instanceof AttributeType) {
-				((AttributeType) target).setValue(value);
-			}
+			target.setValue(value);
 		}
 		putValue(JAXBControlConstants.CONTROL_USER_VAR, "fooUser"); //$NON-NLS-1$
 		putValue(JAXBControlConstants.CONTROL_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
@@ -377,10 +393,12 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 		}
 	}
 
+	@Override
 	public String getControlId() {
 		return null;
 	}
 
+	@Override
 	public ResourceManagerData getConfiguration() {
 		// TODO Auto-generated method stub
 		return null;

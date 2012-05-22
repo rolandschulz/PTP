@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.ControlStateRule;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -25,8 +26,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TypedListener;
 
 /**
- * The listener is constructed on the basis of an event rule; it is added to the
- * buttons on which the composed rule depends for its state.<br>
+ * The listener is constructed on the basis of an event rule; it is added to the buttons on which the composed rule depends for its
+ * state.<br>
  * 
  * @author arossi
  * 
@@ -34,7 +35,11 @@ import org.eclipse.swt.widgets.TypedListener;
 public class ControlStateListener implements SelectionListener {
 
 	public enum Action {
-		ENABLE, DISABLE, SHOW, HIDE, NONE;
+		ENABLE,
+		DISABLE,
+		SHOW,
+		HIDE,
+		NONE;
 	};
 
 	private final ControlStateRule rule;
@@ -51,20 +56,20 @@ public class ControlStateListener implements SelectionListener {
 	 * @param map
 	 *            control id to control
 	 */
-	public ControlStateListener(Control target, ControlStateRuleType rule, Action action, Map<String, Button> map) throws Throwable {
+	public ControlStateListener(Control target, ControlStateRuleType rule, Action action, Map<String, Button> map,
+			IVariableMap varMap) throws Throwable {
 		this.target = target;
 		this.action = action;
 		Set<Button> sources = new HashSet<Button>();
-		this.rule = new ControlStateRule(rule, map, sources);
+		this.rule = new ControlStateRule(rule, map, sources, varMap);
 		for (Button b : sources) {
 			b.addSelectionListener(this);
 		}
 	}
 
 	/**
-	 * Checks for cyclical dependencies by looking at the targets getting their
-	 * listeners. The check is only done for listeners associated with buttons
-	 * as targets.
+	 * Checks for cyclical dependencies by looking at the targets getting their listeners. The check is only done for listeners
+	 * associated with buttons as targets.
 	 */
 	public void findCyclicalDependecies(Set<Button> buttons) throws Throwable {
 		if (target instanceof Button) {
@@ -86,8 +91,7 @@ public class ControlStateListener implements SelectionListener {
 	}
 
 	/**
-	 * State of the controls in the rule is reevaluated and the state of the
-	 * target is set accordingly.
+	 * State of the controls in the rule is reevaluated and the state of the target is set accordingly.
 	 */
 	public void setState() {
 		synchronized (ControlStateListener.class) {
@@ -105,6 +109,8 @@ public class ControlStateListener implements SelectionListener {
 				case HIDE:
 					target.setVisible(false);
 					break;
+				default:
+					break;
 				}
 			} else {
 				switch (action) {
@@ -120,6 +126,8 @@ public class ControlStateListener implements SelectionListener {
 				case HIDE:
 					target.setVisible(true);
 					break;
+				default:
+					break;
 				}
 			}
 		}
@@ -128,9 +136,7 @@ public class ControlStateListener implements SelectionListener {
 	/*
 	 * Upon receipt of the event, calls {@link #setState()} (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
-	 * .swt.events.SelectionEvent)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse .swt.events.SelectionEvent)
 	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
 		setState();
@@ -139,9 +145,7 @@ public class ControlStateListener implements SelectionListener {
 	/*
 	 * Upon receipt of the event, calls {@link #setState()} (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
-	 * .events.SelectionEvent)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt .events.SelectionEvent)
 	 */
 	public void widgetSelected(SelectionEvent e) {
 		setState();

@@ -94,15 +94,11 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp.rm.jaxb.openmpi"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.ptp.rm.jaxb.pbs"
-         version="0.0.0"/>
-
-   <includes
          id="org.eclipse.ptp.rm.lml_jaxb"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.rdt.sync"
          version="0.0.0"/>
 
    <plugin

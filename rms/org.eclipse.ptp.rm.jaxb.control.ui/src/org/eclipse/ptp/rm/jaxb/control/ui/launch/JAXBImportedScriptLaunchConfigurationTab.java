@@ -269,7 +269,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	protected void doRefreshLocal() {
 		super.doRefreshLocal();
 		LCVariableMap lcMap = parentTab.getVariableMap();
-		lcMap.put(JAXBControlUIConstants.SCRIPT_PATH, selected);
+		lcMap.putValue(JAXBControlUIConstants.SCRIPT_PATH, selected);
 	}
 
 	/*

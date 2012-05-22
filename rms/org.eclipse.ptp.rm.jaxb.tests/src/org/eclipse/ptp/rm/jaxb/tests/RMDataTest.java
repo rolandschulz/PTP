@@ -21,7 +21,6 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
 public class RMDataTest extends TestCase {
@@ -75,26 +74,15 @@ public class RMDataTest extends TestCase {
 
 	static void print(RMVariableMap map) {
 		StringBuffer buffer = new StringBuffer();
-		for (Iterator<Map.Entry<String, Object>> i = map.getVariables().entrySet().iterator(); i.hasNext();) {
-			Map.Entry<String, Object> e = i.next();
-			Object o = e.getValue();
-			if (o instanceof AttributeType) {
-				AttributeType ja = (AttributeType) o;
-				buffer.append(JAXBCoreConstants.LT).append(ja.getName()).append(JAXBCoreConstants.GTLT).append(ja.getType())
-						.append(JAXBCoreConstants.GTLT).append(ja.getDefault()).append(JAXBCoreConstants.GTLT)
-						.append(ja.getChoice()).append(JAXBCoreConstants.GTLT).append(ja.getMax()).append(JAXBCoreConstants.GTLT)
-						.append(ja.getMin()).append(JAXBCoreConstants.GTLT).append(ja.getValidator())
-						.append(JAXBCoreConstants.GTLT).append(ja.getDescription()).append(JAXBCoreConstants.GTLT)
-						.append(ja.getTooltip()).append(ja.getValue()).append(JAXBCoreConstants.GT)
-						.append(JAXBCoreConstants.LINE_SEP);
-			} else if (o instanceof PropertyType) {
-				PropertyType p = (PropertyType) o;
-				buffer.append(JAXBCoreConstants.LT).append(p.getName()).append(JAXBCoreConstants.GTLT).append(p.getValue())
-						.append(JAXBCoreConstants.GT).append(JAXBCoreConstants.LINE_SEP);
-			} else {
-				buffer.append(JAXBCoreConstants.LT).append(e.getKey()).append(JAXBCoreConstants.GTLT).append(e.getValue())
-						.append(JAXBCoreConstants.GT).append(JAXBCoreConstants.LINE_SEP);
-			}
+		for (Iterator<Map.Entry<String, AttributeType>> i = map.getAttributes().entrySet().iterator(); i.hasNext();) {
+			Map.Entry<String, AttributeType> e = i.next();
+			AttributeType a = e.getValue();
+			buffer.append(JAXBCoreConstants.LT).append(a.getName()).append(JAXBCoreConstants.GTLT).append(a.getType())
+					.append(JAXBCoreConstants.GTLT).append(a.getDefault()).append(JAXBCoreConstants.GTLT).append(a.getChoice())
+					.append(JAXBCoreConstants.GTLT).append(a.getMax()).append(JAXBCoreConstants.GTLT).append(a.getMin())
+					.append(JAXBCoreConstants.GTLT).append(a.getValidator()).append(JAXBCoreConstants.GTLT)
+					.append(a.getDescription()).append(JAXBCoreConstants.GTLT).append(a.getTooltip()).append(a.getValue())
+					.append(JAXBCoreConstants.GT).append(JAXBCoreConstants.LINE_SEP);
 		}
 		System.out.println(buffer);
 	}

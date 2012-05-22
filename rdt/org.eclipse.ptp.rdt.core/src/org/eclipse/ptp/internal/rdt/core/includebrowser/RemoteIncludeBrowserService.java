@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.core.includebrowser;
 
+import java.net.URI;
+
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IInclude;
 import org.eclipse.cdt.core.model.ISourceRange;
+import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.miners.RemoteIndexFileLocation;
@@ -37,11 +40,12 @@ public class RemoteIncludeBrowserService extends AbstractRemoteService implement
 	{
 		if (include != null) 
 		{
+			URI locationURI = getRemoteLocationURI(include.getLocationURI());
 			
 			//String projectLocation = include.getCProject().getProject().getLocationURI().getPath();
 			//if(include.getLocationURI().getPath().startsWith(projectLocation)) {
 				// internal files use the URI field
-				IIndexFileLocation location = new RemoteIndexFileLocation(include.getParent().getPath().toString(), include.getLocationURI());
+				IIndexFileLocation location = new RemoteIndexFileLocation(null, locationURI);
 			//}
 			
 			//else {
@@ -70,8 +74,9 @@ public class RemoteIncludeBrowserService extends AbstractRemoteService implement
 			ICIndexSubsystem subsystem = getSubSystem();
 			subsystem.checkProject(project.getProject(), monitor);
 			
-			//location = new RemoteIndexFileLocation(location.getURI().getPath(), null);
-			location = new RemoteIndexFileLocation(location);
+			URI locationURI = getRemoteLocationURI(location.getURI());
+			
+			location = new RemoteIndexFileLocation(null, locationURI);
 			
 			return subsystem.findIncludedBy(Scope.WORKSPACE_ROOT_SCOPE, location, monitor);
 		}
@@ -86,8 +91,9 @@ public class RemoteIncludeBrowserService extends AbstractRemoteService implement
 			ICIndexSubsystem subsystem = getSubSystem();
 			subsystem.checkProject(project.getProject(), monitor);
 			
-			//location = new RemoteIndexFileLocation(location.getURI().getPath(), null);
-			 location = new RemoteIndexFileLocation(location);
+			URI locationURI = getRemoteLocationURI(location.getURI());
+			
+			location = new RemoteIndexFileLocation(null, locationURI);
 			
 			return subsystem.findIncludesTo(Scope.WORKSPACE_ROOT_SCOPE, location, monitor);
 		}
@@ -102,13 +108,23 @@ public class RemoteIncludeBrowserService extends AbstractRemoteService implement
 			ICIndexSubsystem subsystem = getSubSystem();
 			subsystem.checkProject(project.getProject(), monitor);
 			
-			//location = new RemoteIndexFileLocation(location.getURI().getPath(), null);
-			 location = new RemoteIndexFileLocation(location);
+			URI locationURI = getRemoteLocationURI(location.getURI());
+			
+			location = new RemoteIndexFileLocation(null, locationURI);
 			
 			return subsystem.isIndexed(Scope.WORKSPACE_ROOT_SCOPE, location, monitor);
 		}
 		
 		return false;
+	}
+	
+	private URI getRemoteLocationURI (URI localLocationURI) {
+		URI locationURI = localLocationURI;
+		if (EFSExtensionManager.getDefault().isVirtual(localLocationURI)) {
+			locationURI = EFSExtensionManager.getDefault().getLinkedURI(localLocationURI);
+		}
+		locationURI = EFSExtensionManager.getDefault().getLinkedURI(locationURI);
+		return locationURI;
 	}
 
 }

@@ -24,6 +24,7 @@ package org.eclipse.ptp.rm.lml.ui;
 import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
 
 public interface ILMLUIConstants extends ILMLCoreConstants {
+	public static final String ID_SYSTEM_MONITORING_PERSPECTIVE = "org.eclipse.ptp.rm.lml.ui.SystemMonitoringPerspective"; //$NON-NLS-1$
 	public static final String ID_SYSTEM_MONITOR_VIEW = "org.eclipse.ptp.rm.lml.ui.SystemMonitorView"; //$NON-NLS-1$
 	public static final String ID_INFO_VIEW = "org.eclipse.ptp.rm.lml.ui.InfoView"; //$NON-NLS-1$
 

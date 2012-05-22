@@ -46,7 +46,7 @@ import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerConfiguration;
 import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
-import org.eclipse.ptp.rm.jaxb.core.data.PropertyType;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.lml.monitor.core.LMLResourceManagerMonitor;
 import org.eclipse.ptp.rm.lml_jaxb.core.LMLJAXBResourceManager;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
@@ -58,26 +58,32 @@ public class RMLaunchTest extends TestCase {
 
 		private final Map<String, Object> store = new TreeMap<String, Object>();
 
+		@Override
 		public boolean contentsEqual(ILaunchConfiguration configuration) {
 			return false;
 		}
 
+		@Override
 		public ILaunchConfigurationWorkingCopy copy(String name) throws CoreException {
 			return null;
 		}
 
+		@Override
 		public void delete() throws CoreException {
 		}
 
+		@Override
 		public boolean exists() {
 			return false;
 		}
 
+		@Override
 		@SuppressWarnings("rawtypes")
 		public Object getAdapter(Class adapter) {
 			return null;
 		}
 
+		@Override
 		public boolean getAttribute(String attributeName, boolean defaultValue) throws CoreException {
 			Boolean value = (Boolean) store.get(attributeName);
 			if (value == null) {
@@ -86,6 +92,7 @@ public class RMLaunchTest extends TestCase {
 			return value;
 		}
 
+		@Override
 		public int getAttribute(String attributeName, int defaultValue) throws CoreException {
 			Integer value = (Integer) store.get(attributeName);
 			if (value == null) {
@@ -94,6 +101,7 @@ public class RMLaunchTest extends TestCase {
 			return value;
 		}
 
+		@Override
 		@SuppressWarnings("rawtypes")
 		public List getAttribute(String attributeName, List defaultValue) throws CoreException {
 			List value = (List) store.get(attributeName);
@@ -103,6 +111,7 @@ public class RMLaunchTest extends TestCase {
 			return value;
 		}
 
+		@Override
 		@SuppressWarnings("rawtypes")
 		public Map getAttribute(String attributeName, Map defaultValue) throws CoreException {
 			Map value = (Map) store.get(attributeName);
@@ -112,6 +121,7 @@ public class RMLaunchTest extends TestCase {
 			return value;
 		}
 
+		@Override
 		@SuppressWarnings("rawtypes")
 		public Set getAttribute(String attributeName, Set defaultValue) throws CoreException {
 			Set value = (Set) store.get(attributeName);
@@ -121,6 +131,7 @@ public class RMLaunchTest extends TestCase {
 			return value;
 		}
 
+		@Override
 		public String getAttribute(String attributeName, String defaultValue) throws CoreException {
 			String value = (String) store.get(attributeName);
 			if (value == null) {
@@ -129,89 +140,110 @@ public class RMLaunchTest extends TestCase {
 			return value;
 		}
 
+		@Override
 		@SuppressWarnings("rawtypes")
 		public Map getAttributes() throws CoreException {
 			return store;
 		}
 
+		@Override
 		public String getCategory() throws CoreException {
 			return null;
 		}
 
+		@Override
 		public IFile getFile() {
 			return null;
 		}
 
+		@Override
 		public IPath getLocation() {
 			return null;
 		}
 
+		@Override
 		public IResource[] getMappedResources() throws CoreException {
 			return null;
 		}
 
+		@Override
 		public String getMemento() throws CoreException {
 			return null;
 		}
 
+		@Override
 		@SuppressWarnings("rawtypes")
 		public Set getModes() throws CoreException {
 			return null;
 		}
 
+		@Override
 		public String getName() {
 			return null;
 		}
 
+		@Override
 		@SuppressWarnings("rawtypes")
 		public ILaunchDelegate getPreferredDelegate(Set modes) throws CoreException {
 			return null;
 		}
 
+		@Override
 		public ILaunchConfigurationType getType() throws CoreException {
 			return null;
 		}
 
+		@Override
 		public ILaunchConfigurationWorkingCopy getWorkingCopy() throws CoreException {
 			return null;
 		}
 
+		@Override
 		public boolean hasAttribute(String attributeName) throws CoreException {
 			return false;
 		}
 
+		@Override
 		public boolean isLocal() {
 			return false;
 		}
 
+		@Override
 		public boolean isMigrationCandidate() throws CoreException {
 			return false;
 		}
 
+		@Override
 		public boolean isReadOnly() {
 			return false;
 		}
 
+		@Override
 		public boolean isWorkingCopy() {
 			return false;
 		}
 
+		@Override
 		public ILaunch launch(String mode, IProgressMonitor monitor) throws CoreException {
 			return null;
 		}
 
+		@Override
 		public ILaunch launch(String mode, IProgressMonitor monitor, boolean build) throws CoreException {
 			return null;
 		}
 
+		@Override
 		public ILaunch launch(String mode, IProgressMonitor monitor, boolean build, boolean register) throws CoreException {
 			return null;
 		}
 
+		@Override
 		public void migrate() throws CoreException {
 
 		}
 
+		@Override
 		public boolean supportsMode(String mode) throws CoreException {
 			return false;
 		}
@@ -255,6 +287,7 @@ public class RMLaunchTest extends TestCase {
 					System.out.println("STATUS: " + status.getState()); //$NON-NLS-1$
 					if (status != null) {
 						status.getStreamsProxy().getOutputStreamMonitor().addListener(new IStreamListener() {
+							@Override
 							public void streamAppended(String text, IStreamMonitor monitor) {
 								System.out.println(text);
 							}
@@ -316,7 +349,7 @@ public class RMLaunchTest extends TestCase {
 		env.put(JAXBControlConstants.MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
 		env.put(JAXBControlConstants.MPI_ARGS, "-machinefile $PBS_NODEFILE -np 8"); //$NON-NLS-1$ 
 		IVariableMap rmVarMap = rm.getJAXBConfiguration().getRMVariableMap();
-		PropertyType queues = (PropertyType) rmVarMap.getVariables().get("available_queues"); //$NON-NLS-1$ 
+		AttributeType queues = (AttributeType) rmVarMap.getAttributes().get("available_queues"); //$NON-NLS-1$ 
 		if (queues != null) {
 			List<String> q = (List<String>) queues.getValue();
 			env.put("destination", q.get(0)); //$NON-NLS-1$

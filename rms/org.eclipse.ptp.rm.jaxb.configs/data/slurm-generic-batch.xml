@@ -11,22 +11,22 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="resource_manager_type.xsd" name="SLURM-Generic-Batch">
     <control-data>
-        <!-- this is a necessary property for the functioning of LML; link it to the batch-specific variable name -->
-        <property name="control.queue.name" visible="false">
+        <!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
+        <attribute name="control.queue.name" visible="false">
             <link-value-to>partition</link-value-to>
-        </property>
+        </attribute>
         <!-- we set this to invisible because the values are not really modifiable -->
-        <property name="queues" visible="false"/>
+        <attribute name="queues" visible="false"/>
         <!-- needed by RM internals for fetch; name is fixed by convention -->
-        <property name="stdout_remote_path" visible="false">
+        <attribute name="stdout_remote_path" visible="false">
             <default>${ptp_rm:workdir#value}/slurm-${ptp_rm:@jobId#default}.out</default>
             <link-value-to>output</link-value-to>
-        </property>
+        </attribute>
         <!-- needed by RM internals for fetch; name is fixed by convention -->
-        <property name="stderr_remote_path" visible="false">
+        <attribute name="stderr_remote_path" visible="false">
             <default>${ptp_rm:workdir#value}/slurm-${ptp_rm:@jobId#default}.out</default>
             <link-value-to>error</link-value-to>
-        </property>
+        </attribute>
 
         <attribute name="account" type="string">
             <description>Charge resources used by this job to specified account.</description>
@@ -649,7 +649,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <tooltip>${ptp_rm:job_name#tooltip}</tooltip>
                         <fixed-text>Job Name: </fixed-text>
                     </widget>
-                    <widget type="text" style="SWT.BORDER" saveValueTo="job_name">
+                    <widget type="text" style="SWT.BORDER" attribute="job_name">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
                         </layout-data>
@@ -668,7 +668,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <tooltip>${ptp_rm:partition#tooltip}</tooltip>
                         <fixed-text>Queue: </fixed-text>
                     </widget>
-                    <widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="partition">
+                    <widget type="combo" style="SWT.BORDER" readOnly="true" attribute="partition">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
                         </layout-data>
@@ -688,7 +688,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <tooltip>${ptp_rm:workdir#tooltip}</tooltip>
                         <fixed-text>Working Directory: </fixed-text>
                     </widget>
-                    <browse title="Browse" textStyle="SWT.BORDER" saveValueTo="workdir" readOnly="true" directory="true">
+                    <browse title="Browse" textStyle="SWT.BORDER" attribute="workdir" readOnly="true" directory="true">
                         <text-layout-data>
                             <grid-data horizontalAlign="SWT.FILL"
                                 horizontalSpan="1" grabExcessHorizontal="true"
@@ -702,7 +702,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <tooltip>Clear text box if "Browse" button does not work.</tooltip>
                     </browse>
                     <!-- <widget type="text" style="SWT.BORDER"
-                        saveValueTo="workdir">
+                        attribute="workdir">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL"
                                 horizontalSpan="2" grabExcessHorizontal="false"
@@ -723,7 +723,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <tooltip>${ptp_rm:nodes#tooltip}</tooltip>
                         <fixed-text>Number of nodes: </fixed-text>
                     </widget>
-                    <widget type="text" style="SWT.BORDER" saveValueTo="nodes">
+                    <widget type="text" style="SWT.BORDER" attribute="nodes">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
                         </layout-data>
@@ -742,7 +742,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <tooltip>${ptp_rm:time#tooltip}</tooltip>
                         <fixed-text>Wallclock Time: </fixed-text>
                     </widget>
-                    <widget type="text" style="SWT.BORDER" saveValueTo="time">
+                    <widget type="text" style="SWT.BORDER" attribute="time">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
                         </layout-data>
@@ -760,7 +760,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         </layout-data>
                         <fixed-text>MPI Command: </fixed-text>
                     </widget>
-                    <widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="srun.command">
+                    <widget type="combo" style="SWT.BORDER" readOnly="true" attribute="srun.command">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
                         </layout-data>
@@ -778,7 +778,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         </layout-data>
                         <fixed-text>MPI Number of Tasks:</fixed-text>
                     </widget>
-                    <widget type="text" style="SWT.BORDER" saveValueTo="srun.ntasks">
+                    <widget type="text" style="SWT.BORDER" attribute="srun.ntasks">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
                         </layout-data>
@@ -798,7 +798,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <fixed-text>MPI Ranks per Node:</fixed-text>
                     </widget>
                     <widget type="combo" style="SWT.BORDER"
-                        saveValueTo="srun.ntasks_per_node" readOnly="true">
+                        attribute="srun.ntasks_per_node" readOnly="true">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL"
                                 horizontalSpan="2" grabExcessHorizontal="false" />
@@ -826,7 +826,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <tooltip>${ptp_rm:partition#tooltip}</tooltip>
                         <fixed-text>Queue: </fixed-text>
                     </widget>
-                    <widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="partition">
+                    <widget type="combo" style="SWT.BORDER" readOnly="true" attribute="partition">
                         <layout-data>
                             <grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
                         </layout-data>
