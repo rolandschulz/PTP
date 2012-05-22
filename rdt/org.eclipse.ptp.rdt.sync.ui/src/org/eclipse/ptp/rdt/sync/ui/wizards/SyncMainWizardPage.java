@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 import org.eclipse.core.filesystem.EFS;
@@ -108,15 +109,15 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private Button defaultLocationButton;
 	private Text projectLocationField;
 	private Button browseButton;
-	private Tree localTree;
-	private Composite localToolChain;
+	private Tree projectTypeTree;
 	private Composite remoteToolChain;
-	private Table remoteToolChainTable;
+	private Composite localToolChain;
+	private Table localToolChainTable;
 	private Button showSupportedOnlyButton;
-	private Label projectLocalOptionsLabel;
 	private Label projectRemoteOptionsLabel;
-	private Label categorySelectedForLocalLabel;
+	private Label projectLocalOptionsLabel;
 	private Label categorySelectedForRemoteLabel;
+	private Label categorySelectedForLocalLabel;
 
 	private SortedMap<String, IToolChain> toolChainMap;
 	private ISynchronizeParticipant fSelectedParticipant = null;
@@ -151,7 +152,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		createProjectBasicInfoGroup(composite);
 		createProjectRemoteInfoGroup(composite);
 		createProjectDetailedInfoGroup(composite); 
-		this.switchTo(this.updateData(localTree, localToolChain, false, SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
+		this.switchTo(this.updateData(projectTypeTree, remoteToolChain, false, SyncMainWizardPage.this, getWizard()), getDescriptor(projectTypeTree));
 
 		setPageComplete(false);
 		errorMessage = null;
@@ -170,28 +171,28 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		left_label.setFont(parent.getFont());
 		left_label.setLayoutData(new GridData(GridData.BEGINNING));
 
-		projectLocalOptionsLabel = new Label(c, SWT.NONE);
-		projectLocalOptionsLabel.setFont(parent.getFont());
-		projectLocalOptionsLabel.setLayoutData(new GridData(GridData.BEGINNING));
-		projectLocalOptionsLabel.setText(Messages.SyncMainWizardPage_1);
+		projectRemoteOptionsLabel = new Label(c, SWT.NONE);
+		projectRemoteOptionsLabel.setFont(parent.getFont());
+		projectRemoteOptionsLabel.setLayoutData(new GridData(GridData.BEGINNING));
+		projectRemoteOptionsLabel.setText(Messages.SyncMainWizardPage_1);
 
-		localTree = new Tree(c, SWT.SINGLE | SWT.BORDER);
-		localTree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
-		localTree.addSelectionListener(new SelectionAdapter() {
+		projectTypeTree = new Tree(c, SWT.SINGLE | SWT.BORDER);
+		projectTypeTree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
+		projectTypeTree.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				TreeItem[] tis = localTree.getSelection();
+				TreeItem[] tis = projectTypeTree.getSelection();
 				if (tis == null || tis.length == 0) return;
 				switchTo((CWizardHandler)tis[0].getData(), (EntryDescriptor)tis[0].getData(DESC));
 				setPageComplete(validatePage());
 				getWizard().getContainer().updateMessage();
 			}});
-		localTree.getAccessible().addAccessibleListener(
+		projectTypeTree.getAccessible().addAccessibleListener(
 				new AccessibleAdapter() {                       
 					@Override
 					public void getName(AccessibleEvent e) {
-						for (int i = 0; i < localTree.getItemCount(); i++) {
-							if (localTree.getItem(i).getText().equals(e.result))
+						for (int i = 0; i < projectTypeTree.getItemCount(); i++) {
+							if (projectTypeTree.getItem(i).getText().equals(e.result))
 								return;
 						}
 						e.result = Messages.SyncMainWizardPage_2;
@@ -199,20 +200,20 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 				}
 				);
 
-		localToolChain = new Composite(c, SWT.NONE);
-		localToolChain.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		localToolChain.setLayout(new PageLayout());
-
-		projectRemoteOptionsLabel = new Label(c, SWT.NONE);
-		projectRemoteOptionsLabel.setFont(parent.getFont());
-		projectRemoteOptionsLabel.setLayoutData(new GridData(GridData.BEGINNING));
-		projectRemoteOptionsLabel.setText(Messages.SyncMainWizardPage_3);
-
 		remoteToolChain = new Composite(c, SWT.NONE);
 		remoteToolChain.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		remoteToolChain.setLayout(new PageLayout());
-		remoteToolChainTable = new Table(remoteToolChain, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
-		remoteToolChainTable.setVisible(true);
+
+		projectLocalOptionsLabel = new Label(c, SWT.NONE);
+		projectLocalOptionsLabel.setFont(parent.getFont());
+		projectLocalOptionsLabel.setLayoutData(new GridData(GridData.BEGINNING));
+		projectLocalOptionsLabel.setText(Messages.SyncMainWizardPage_3);
+
+		localToolChain = new Composite(c, SWT.NONE);
+		localToolChain.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		localToolChain.setLayout(new PageLayout());
+		localToolChainTable = new Table(localToolChain, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
+		localToolChainTable.setVisible(true);
 
 
 		showSupportedOnlyButton = new Button(c, SWT.CHECK);
@@ -223,7 +224,8 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		showSupportedOnlyButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				switchTo(updateData(localTree, localToolChain, false, SyncMainWizardPage.this, getWizard()), getDescriptor(localTree));
+				switchTo(updateData(projectTypeTree, remoteToolChain, false, SyncMainWizardPage.this, getWizard()),
+						getDescriptor(projectTypeTree));
 			}} );
 		showSupportedOnlyButton.setSelection(false);
 	}
@@ -339,7 +341,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}
 
 	protected boolean validateProjectTypeSelection() {
-		if (localTree.getItemCount() == 0) {
+		if (projectTypeTree.getItemCount() == 0) {
 			errorMessage = Messages.SyncMainWizardPage_10;
 			return false;
 		}
@@ -588,54 +590,45 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		h_selected = h;
 		if (h == null) {
 			if (ed.isCategory()) {
-				if (categorySelectedForLocalLabel == null) {
-					categorySelectedForLocalLabel = new Label(localToolChain, SWT.WRAP);
-					categorySelectedForLocalLabel.setText(Messages.SyncMainWizardPage_13);
-					localToolChain.layout();
-				}
-
 				if (categorySelectedForRemoteLabel == null) {
 					categorySelectedForRemoteLabel = new Label(remoteToolChain, SWT.WRAP);
 					categorySelectedForRemoteLabel.setText(Messages.SyncMainWizardPage_13);
 					remoteToolChain.layout();
 				}
+
+				if (categorySelectedForLocalLabel == null) {
+					categorySelectedForLocalLabel = new Label(localToolChain, SWT.WRAP);
+					categorySelectedForLocalLabel.setText(Messages.SyncMainWizardPage_13);
+					localToolChain.layout();
+				}
 			}
 			return;
 		}
-		if (categorySelectedForLocalLabel != null)
-			categorySelectedForLocalLabel.setVisible(false);
 		if (categorySelectedForRemoteLabel != null)
 			categorySelectedForRemoteLabel.setVisible(false);
+		if (categorySelectedForLocalLabel != null)
+			categorySelectedForLocalLabel.setVisible(false);
 		h_selected.handleSelection();
 		h_selected.setSupportedOnly(false);
 
-		// Delete unsupported toolchains from local view if requested.
-		// Java makes this harder than it should be...
-		if (showSupportedOnlyButton.getSelection()) {
-			Table localToolChainTable = ((MBSWizardHandler) h_selected).getToolChainsTable();
-			ArrayList<Integer> unSupportedToolChains = new ArrayList<Integer>();
-			for (int i=0; i<localToolChainTable.getItemCount(); i++) {
-				IToolChain tc = (IToolChain) localToolChainTable.getItem(i).getData();
+		// Create local view
+		localToolChainTable.removeAll();
+		toolChainMap = ((MBSWizardHandler) h_selected).getToolChains();
+		boolean filterToolChains = showSupportedOnlyButton.getSelection();
+		for (Map.Entry<String, IToolChain> entry : toolChainMap.entrySet()) {
+			String name = entry.getKey();
+			IToolChain tc = entry.getValue();
+			
+			if (filterToolChains) {
 				if (tc != null && (!tc.isSupported() || !ManagedBuildManager.isPlatformOk(tc))) {
-					unSupportedToolChains.add(i);
+					continue;
 				}
 			}
-
-			int[] toolChainsToDelete = new int[unSupportedToolChains.size()];
-			for (int j=0; j<unSupportedToolChains.size(); j++) {
-				toolChainsToDelete[j] = unSupportedToolChains.get(j).intValue();
-			}
-			localToolChainTable.remove(toolChainsToDelete);
-		}
-
-		toolChainMap = ((MBSWizardHandler) h_selected).getToolChains();
-		remoteToolChainTable.removeAll();
-		for (String toolChainName : toolChainMap.keySet()) {
-			TableItem ti = new TableItem(remoteToolChainTable, SWT.NONE);
-			ti.setText(toolChainName);
+			TableItem ti = new TableItem(localToolChainTable, SWT.NONE);
+			ti.setText(name);
 		}
 		if (toolChainMap.keySet().size() > 0) {
-			remoteToolChainTable.select(0);
+			localToolChainTable.select(0);
 		}
 	}
 
@@ -866,11 +859,11 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}
 
 	/**
-	 * Get the selected remote tool chain
+	 * Get the selected local tool chain
 	 * @return tool chain or null if either none selected or name does not map to a value (such as "Other Toolchain")
 	 */
-	public IToolChain getRemoteToolChain() {
-		TableItem[] selectedToolChains  = remoteToolChainTable.getSelection();
+	public IToolChain getLocalToolChain() {
+		TableItem[] selectedToolChains  = localToolChainTable.getSelection();
 		if (selectedToolChains.length < 1) {
 			return null;
 		} else {

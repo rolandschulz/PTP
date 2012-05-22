@@ -214,7 +214,7 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 		}
 		IConfiguration[] allRemoteConfigs = buildInfo.getManagedProject().getConfigurations();
-		IToolChain remoteToolChain = ((SyncMainWizardPage) fMainPage).getRemoteToolChain();
+		IToolChain remoteToolChain = ((SyncMainWizardPage) fMainPage).getLocalToolChain();
 		for (IConfiguration remoteConfig : allRemoteConfigs) {
 			BuildConfigurationManager.getInstance().createLocalConfiguration(project, remoteConfig.getName() + "-local"); //$NON-NLS-1$
 			if (remoteToolChain != null) {
