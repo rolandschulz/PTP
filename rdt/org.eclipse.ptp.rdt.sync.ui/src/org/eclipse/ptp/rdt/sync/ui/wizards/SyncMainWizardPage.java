@@ -14,10 +14,13 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 
 import org.eclipse.core.filesystem.EFS;
@@ -76,6 +79,7 @@ import org.eclipse.cdt.ui.wizards.CNewWizard;
 import org.eclipse.cdt.ui.wizards.CWizardHandler;
 import org.eclipse.cdt.ui.wizards.EntryDescriptor;
 import org.eclipse.cdt.ui.wizards.IWizardItemsListListener;
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
@@ -124,6 +128,10 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private String message = null;
 	private int messageType = IMessageProvider.NONE;
 	private String errorMessage = null;
+	public enum ConfigType {
+		LOCAL, REMOTE, BOTH
+	}
+	private Map<String, ConfigType> toolChainToConfigTypeMap = new HashMap<String, ConfigType>();
 
 	/**
 	 * Creates a new project creation wizard page.
@@ -879,5 +887,45 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	@Override
 	public IWorkingSet[] getSelectedWorkingSets() {
 		return null;
+	}
+	
+	/**
+	 * Prepare page for reading by CDT. Specifically, select the local toolchains in the remote toolchains window, so CDT will
+	 * create configurations for them. Also, record data to distinguish local and remote toolchains.
+	 */
+	public void prepareForSubmission() {
+		// Record all local toolchain names
+		Set<String> localToolNames = new HashSet<String>();
+		for (TableItem ti : localToolChainTable.getSelection()) {
+			localToolNames.add(ti.getText());
+		}
+
+		// Compare remotes and locals
+		Table remoteTable = ((MBSWizardHandler) h_selected).getToolChainsTable();
+		for (int i = 0; i < remoteTable.getItemCount(); i++) {
+			ConfigType configType = null;
+			String toolChainName = remoteTable.getItem(i).getText();
+			if (remoteTable.isSelected(i)) {
+				configType = ConfigType.REMOTE;
+			}
+
+			if (localToolNames.contains(toolChainName)) {
+				if (configType == null) {
+					configType = ConfigType.LOCAL;
+				} else {
+					configType = ConfigType.BOTH;
+				}
+				remoteTable.select(i);
+			}
+			
+			if (configType != null) {
+				toolChainToConfigTypeMap.put(toolChainName, configType);
+			}
+		}
+	}
+	
+	public ConfigType getConfigType(IConfiguration config) {
+		String toolChainName = config.getToolChain().getSuperClass().getName();
+		return toolChainToConfigTypeMap.get(toolChainName);
 	}
 }
