@@ -163,15 +163,15 @@ public class JAXBExtensionUtils {
 				for (IExtension ext : extensionPoint.getExtensions()) {
 					for (IConfigurationElement ce : ext.getConfigurationElements()) {
 						ce.getAttribute(JAXBUIConstants.ID);
-						String name = ce.getAttribute(JAXBUIConstants.NAME);
 						String monitorType = ce.getAttribute(JAXBUIConstants.MONITOR_TYPE);
 						if (monitorType != null) {
 							fMonitorTypes.add(monitorType);
 						}
+						String name = ce.getAttribute(JAXBUIConstants.NAME);
 						String configurationFile = ce.getAttribute(JAXBUIConstants.CONFIGURATION_FILE_ATTRIBUTE);
 						String bundleId = ce.getDeclaringExtension().getContributor().getName();
 						Bundle bundle = Platform.getBundle(bundleId);
-						if (bundle != null) {
+						if (name != null && bundle != null) {
 							URL url = bundle.getEntry(configurationFile);
 							if (url != null) {
 								fPluginConfigurations.put(name, url);

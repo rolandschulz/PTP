@@ -60,6 +60,9 @@
             configurationFile="data/mpich2-generic-interactive.xml"
             name="MPICH2-Generic-Interactive">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+      		monitorType="OPENMPI">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>
