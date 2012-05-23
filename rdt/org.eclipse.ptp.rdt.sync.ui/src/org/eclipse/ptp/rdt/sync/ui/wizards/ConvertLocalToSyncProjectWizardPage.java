@@ -28,14 +28,22 @@ import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.cdt.ui.newui.PageLayout;
 import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
@@ -58,12 +66,16 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 
 /**
  * Converts existing CDT projects to sync projects.
@@ -74,6 +86,8 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 	private Combo fProviderCombo;
 	private Composite fProviderArea;
 	private StackLayout fProviderStack;
+	private Composite fConfigArea;
+	private CheckboxTableViewer fConfigTable;
 	private final List<Composite> fProviderControls = new ArrayList<Composite>();
 	private ISynchronizeParticipantDescriptor fSelectedProvider;
 	private final Map<Integer, ISynchronizeParticipantDescriptor> fComboIndexToDescriptorMap = new HashMap<Integer, ISynchronizeParticipantDescriptor>();
@@ -151,6 +165,71 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 		this.tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
 				update();
+			}
+		});
+
+		// Label for configuration table
+		Label configTableLabel = new Label(comp, SWT.LEFT);
+		configTableLabel.setText(Messages.ConvertLocalToSyncProjectWizardPage_2);
+
+		// Configuration table
+		// Simple but requires lots of boilerplate code
+		fConfigArea = new Composite(comp, SWT.NONE);
+		fConfigArea.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+		fConfigArea.setLayout(new PageLayout());
+		fConfigTable = CheckboxTableViewer.newCheckList(fConfigArea, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
+		fConfigTable.setContentProvider(new IStructuredContentProvider() {
+			@Override
+			public void dispose() {
+				// nothing to do
+			}
+			@Override
+			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+				// nothing to do
+			}
+			@Override
+			public Object[] getElements(Object inputElement) {
+				if (inputElement == null) {
+					return new Object[0];
+				}
+				assert(inputElement instanceof IProject);
+				if (getCheckedElements().length != 1) {
+					return new Object[0];
+				}
+
+				IProject project = (IProject) inputElement;
+				IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+				if (buildInfo == null) {
+					return new Object[0];
+				}
+				return buildInfo.getManagedProject().getConfigurations();
+			}
+		});
+		fConfigTable.setLabelProvider(new ILabelProvider() {
+			@Override
+			public void addListener(ILabelProviderListener listener) {
+				// not implemented
+			}
+			@Override
+			public void dispose() {
+				// nothing to do
+			}
+			@Override
+			public boolean isLabelProperty(Object element, String property) {
+				return true; // safe option
+			}
+			@Override
+			public void removeListener(ILabelProviderListener listener) {
+				// not implemented
+			}
+			@Override
+			public Image getImage(Object element) {
+				return null;
+			}
+			@Override
+			public String getText(Object element) {
+				assert(element instanceof IConfiguration);
+				return ((IConfiguration) element).getName();
 			}
 		});
 		
@@ -381,9 +460,16 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 	private void update() {
 		getWizard().getContainer().updateMessage();
 		if (this.getCheckedElements().length == 1 && fSelectedProvider != null) {
-			String projectName = ((IProject) this.getCheckedElements()[0]).getName();
-			fSelectedProvider.getParticipant().setProjectName(projectName);
+			IProject project = (IProject) this.getCheckedElements()[0];
+			fSelectedProvider.getParticipant().setProjectName(project.getName());
+			if (fConfigTable != null) {
+				fConfigTable.setInput(project);
+				fConfigTable.setAllChecked(true);
+			}
+		} else {
+			if (fConfigTable != null) {
+				fConfigTable.setInput(null);
+			}
 		}
 	}
-
 }
