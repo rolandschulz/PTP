@@ -114,7 +114,6 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		((SyncMainWizardPage) fMainPage).prepareForSubmission();
 		boolean success = super.performFinish();
 		if (success) {
 			IProject project = this.getProject(true);
@@ -216,31 +215,30 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 			// TODO: What to do here?
 		}
 		
-		// Iterate through all configurations, modifying them as needed as indicated based on their type.
+		// Iterate through all configurations, modifying them as indicated based on their type.
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
 			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 		}
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allConfigs) {
-			SyncMainWizardPage.ConfigType configType = ((SyncMainWizardPage) fMainPage).getConfigType(config);
-			assert(configType != null);
+			boolean isRemote = ((SyncMainWizardPage) fMainPage).isRemoteConfig(config);
+			boolean isLocal = ((SyncMainWizardPage) fMainPage).isLocalConfig(config);
 			
-			// If type is both, then only one config was created. Thus, we let the existing config be the remote and create a new
-			// local config based on the remote config.
-			if (configType == SyncMainWizardPage.ConfigType.BOTH) {
+			// If config is both local and remote, then we need to create a config. Let the existing config be the remote and
+			// create a new local config based on the remote config.
+			if (isLocal && isRemote) {
 				bcm.createConfiguration(project, (Configuration) config, localBuildScenario, config.getName() + "-local", null); //$NON-NLS-1$
 			}
 			
-			// If type is local, change its build scenario to the local build scenario
-			if (configType == SyncMainWizardPage.ConfigType.LOCAL) {
+			// If local only, change its build scenario to the local build scenario.
+			if (isLocal && !isRemote) {
 				bcm.setBuildScenarioForBuildConfiguration(localBuildScenario, config);
 				config.setName(config.getName() + "-local"); //$NON-NLS-1$
 			}
 			
-			// If type is remote or both, then the config is a remote config. Change its builder to the sync builder and set
-			// environment variable support to the proper value.
-			if (configType == SyncMainWizardPage.ConfigType.REMOTE || configType == SyncMainWizardPage.ConfigType.BOTH) {
+			// If type is remote, change to the sync builder and set environment variable support.
+			if (isRemote) {
 				IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
 				config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
 				// turn off append contributed(local) environment variables for the build configuration of the remote project

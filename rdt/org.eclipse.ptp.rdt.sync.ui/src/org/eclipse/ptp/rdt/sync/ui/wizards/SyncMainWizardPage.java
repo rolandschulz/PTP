@@ -14,7 +14,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -53,6 +52,7 @@ import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -114,8 +114,10 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private Text projectLocationField;
 	private Button browseButton;
 	private Tree projectTypeTree;
+	private Composite allToolChainsHiddenComposite;
 	private Composite remoteToolChain;
 	private Composite localToolChain;
+	private Table remoteToolChainTable;
 	private Table localToolChainTable;
 	private Button showSupportedOnlyButton;
 	private Label projectRemoteOptionsLabel;
@@ -128,10 +130,6 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private String message = null;
 	private int messageType = IMessageProvider.NONE;
 	private String errorMessage = null;
-	public enum ConfigType {
-		LOCAL, REMOTE, BOTH
-	}
-	private Map<String, ConfigType> toolChainToConfigTypeMap = new HashMap<String, ConfigType>();
 
 	/**
 	 * Creates a new project creation wizard page.
@@ -160,7 +158,8 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		createProjectBasicInfoGroup(composite);
 		createProjectRemoteInfoGroup(composite);
 		createProjectDetailedInfoGroup(composite); 
-		this.switchTo(this.updateData(projectTypeTree, remoteToolChain, false, SyncMainWizardPage.this, getWizard()), getDescriptor(projectTypeTree));
+		this.switchTo(this.updateData(projectTypeTree, allToolChainsHiddenComposite, false, SyncMainWizardPage.this, getWizard()),
+				getDescriptor(projectTypeTree));
 
 		setPageComplete(false);
 		errorMessage = null;
@@ -208,9 +207,25 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 				}
 				);
 
+		allToolChainsHiddenComposite = new Composite(c.getParent(), SWT.NONE);
+		allToolChainsHiddenComposite.setVisible(false);
+		
 		remoteToolChain = new Composite(c, SWT.NONE);
 		remoteToolChain.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		remoteToolChain.setLayout(new PageLayout());
+		remoteToolChainTable = new Table(remoteToolChain, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
+		remoteToolChainTable.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				updateHiddenToolChainList();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				updateHiddenToolChainList();
+			}
+		});
+		remoteToolChainTable.setVisible(true);
 
 		projectLocalOptionsLabel = new Label(c, SWT.NONE);
 		projectLocalOptionsLabel.setFont(parent.getFont());
@@ -221,6 +236,17 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		localToolChain.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		localToolChain.setLayout(new PageLayout());
 		localToolChainTable = new Table(localToolChain, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
+		localToolChainTable.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				updateHiddenToolChainList();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				updateHiddenToolChainList();
+			}
+		});
 		localToolChainTable.setVisible(true);
 
 
@@ -232,7 +258,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		showSupportedOnlyButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				switchTo(updateData(projectTypeTree, remoteToolChain, false, SyncMainWizardPage.this, getWizard()),
+				switchTo(updateData(projectTypeTree, allToolChainsHiddenComposite, false, SyncMainWizardPage.this, getWizard()),
 						getDescriptor(projectTypeTree));
 			}} );
 		showSupportedOnlyButton.setSelection(false);
@@ -619,6 +645,17 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		h_selected.handleSelection();
 		h_selected.setSupportedOnly(false);
 
+		// Create remote view
+		remoteToolChainTable.removeAll();
+		toolChainMap = ((MBSWizardHandler) h_selected).getToolChains();
+		for (String name : toolChainMap.keySet()) {
+			TableItem ti = new TableItem(remoteToolChainTable, SWT.NONE);
+			ti.setText(name);
+		}
+		if (toolChainMap.keySet().size() > 0) {
+			remoteToolChainTable.select(0);
+		}
+
 		// Create local view
 		localToolChainTable.removeAll();
 		toolChainMap = ((MBSWizardHandler) h_selected).getToolChains();
@@ -889,43 +926,55 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		return null;
 	}
 	
-	/**
-	 * Prepare page for reading by CDT. Specifically, select the local toolchains in the remote toolchains window, so CDT will
-	 * create configurations for them. Also, record data to distinguish local and remote toolchains.
-	 */
-	public void prepareForSubmission() {
-		// Record all local toolchain names
-		Set<String> localToolNames = new HashSet<String>();
+	// Select toolchains in the hidden table that are selected in the visible remote and local tables
+	private void updateHiddenToolChainList() {
+		Set<String> currentSelections = new HashSet<String>();
+		for (TableItem ti : remoteToolChainTable.getSelection()) {
+			currentSelections.add(ti.getText());
+		}
 		for (TableItem ti : localToolChainTable.getSelection()) {
-			localToolNames.add(ti.getText());
+			currentSelections.add(ti.getText());
 		}
 
-		// Compare remotes and locals
-		Table remoteTable = ((MBSWizardHandler) h_selected).getToolChainsTable();
-		for (int i = 0; i < remoteTable.getItemCount(); i++) {
-			ConfigType configType = null;
-			String toolChainName = remoteTable.getItem(i).getText();
-			if (remoteTable.isSelected(i)) {
-				configType = ConfigType.REMOTE;
-			}
-
-			if (localToolNames.contains(toolChainName)) {
-				if (configType == null) {
-					configType = ConfigType.LOCAL;
-				} else {
-					configType = ConfigType.BOTH;
-				}
-				remoteTable.select(i);
-			}
-			
-			if (configType != null) {
-				toolChainToConfigTypeMap.put(toolChainName, configType);
+		Table hiddenTable = ((MBSWizardHandler) h_selected).getToolChainsTable();
+		hiddenTable.deselectAll();
+		for (int i = 0; i < hiddenTable.getItemCount(); i++) {
+			String toolChainName = hiddenTable.getItem(i).getText();
+			if (currentSelections.contains(toolChainName)) {
+				hiddenTable.select(i);
 			}
 		}
 	}
 	
-	public ConfigType getConfigType(IConfiguration config) {
+	/**
+	 * Return whether the passed config is remote
+	 *
+	 * @param config
+	 * @return whether passed config is remote
+	 */
+	public boolean isRemoteConfig(IConfiguration config) {
 		String toolChainName = config.getToolChain().getSuperClass().getName();
-		return toolChainToConfigTypeMap.get(toolChainName);
+		for (TableItem ti : remoteToolChainTable.getSelection()) {
+			if (ti.getText().equals(toolChainName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Return whether the passed config is local
+	 *
+	 * @param config
+	 * @return whether passed config is local
+	 */
+	public boolean isLocalConfig(IConfiguration config) {
+		String toolChainName = config.getToolChain().getSuperClass().getName();
+		for (TableItem ti : localToolChainTable.getSelection()) {
+			if (ti.getText().equals(toolChainName)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
