@@ -763,6 +763,7 @@
                         <description>Use shared memory:</description>
                         <tooltip>Specify if shared memory is used for communication (Default: yes) {MP_SHARED_MEMORY}
                         </tooltip>
+                        <default>yes</default>
                 </attribute>
 
                 <attribute name="MP_SHMCC_EXCLUDE_LIST_ATTR" type="string">
