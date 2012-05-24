@@ -63,6 +63,8 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		});
 
 		this.ui.setUseEMSCheckbox(isEnvConfigSupportEnabled());
+		this.ui.setManualConfigCheckbox(isManualConfigEnabled());
+		this.ui.setManualConfigText(getManualConfigText());
 		this.ui.configurationChanged(getSyncURI(), remoteConnection, computeSelectedItems());
 	}
 
@@ -98,11 +100,35 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 
 	private boolean isEnvConfigSupportEnabled() {
 		try {
-			return new EnvManagerProjectProperties(getProject()).isEnvMgmtEnabled();
+			return getProjectProperties().isEnvMgmtEnabled();
+		} catch (final Error e) {
+			return false;
+		}
+	}
+
+	private EnvManagerProjectProperties getProjectProperties() {
+		try {
+			return new EnvManagerProjectProperties(getProject());
 		} catch (final Error e) {
 			setErrorMessage(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage()); //$NON-NLS-1$
 			RDTSyncUIPlugin.log(e);
+			throw e;
+		}
+	}
+
+	private boolean isManualConfigEnabled() {
+		try {
+			return getProjectProperties().isManualConfigEnabled();
+		} catch (final Error e) {
 			return false;
+		}
+	}
+
+	private String getManualConfigText() {
+		try {
+			return getProjectProperties().getManualConfigText();
+		} catch (final Error e) {
+			return ""; //$NON-NLS-1$
 		}
 	}
 

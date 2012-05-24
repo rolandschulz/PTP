@@ -31,11 +31,19 @@ public final class EnvManagerConfigString implements IEnvManagerConfig {
 	/** All valid environment management configuration strings start with this prefix. */
 	private static final String MAGIC = "#%PTP_EMS_v1%#"; //$NON-NLS-1$
 
-	/**
-	 * Separator character used to separate key-value pairs. Individual keys and values (and module names) must not contain this
-	 * character.
+	/*
+	 * Interesting Unicode characters:<br>
+	 * U+001C file separator<br>
+	 * U+001D group separator<br>
+	 * U+001E record separator<br>
+	 * U+001F unit separator
 	 */
-	private static final String KV_SEPARATOR = "\r"; //$NON-NLS-1$
+
+	/**
+	 * Separator used to separate key-value pairs. Individual keys and values (and module names) must not contain this
+	 * separator, and it must also serve as a regular expression for itself (suitable for use by {@link String#split(String)}).
+	 */
+	private static final String KV_SEPARATOR = "~#%#~"; //$NON-NLS-1$
 
 	/** Separator character used to create a list of module names. Individual module names must not contain this character. */
 	private static final String SEPARATOR = ";"; //$NON-NLS-1$
@@ -97,6 +105,10 @@ public final class EnvManagerConfigString implements IEnvManagerConfig {
 						key = kvPair.substring(0, index);
 						value = kvPair.substring(index + 1);
 					}
+
+					// Ensure that the key is valid
+					// assert new EnvManagerConfigString().settings.containsKey(key);
+
 					settings.put(key, value);
 				}
 			}
@@ -174,7 +186,7 @@ public final class EnvManagerConfigString implements IEnvManagerConfig {
 	 */
 	@Override
 	public void setManualConfigText(String manualConfigText) {
-		settings.put(ENVCONFIG_MANUAL_CONFIG_TEXT_PROPERTY_KEY, manualConfigText.replace('\n', '\r'));
+		settings.put(ENVCONFIG_MANUAL_CONFIG_TEXT_PROPERTY_KEY, manualConfigText.replace("\r\n", "\r").replace('\n', '\r')); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/*
