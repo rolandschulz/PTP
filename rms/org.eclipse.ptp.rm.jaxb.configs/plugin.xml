@@ -57,6 +57,11 @@
             name="IBM Parallel Environment">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
+            configurationFile="data/com.ibm.ll.xml"
+            monitorType="LL"
+            name="IBM LoadLeveler">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
             configurationFile="data/mpich2-generic-interactive.xml"
             name="MPICH2-Generic-Interactive">
       </JAXBResourceManagerConfiguration>
@@ -64,5 +69,4 @@
       		monitorType="OPENMPI">
       </JAXBResourceManagerConfiguration>
    </extension>
-
 </plugin>
