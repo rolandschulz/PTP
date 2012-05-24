@@ -763,8 +763,7 @@
                         <description>Use shared memory:</description>
                         <tooltip>Specify if shared memory is used for communication (Default: yes) {MP_SHARED_MEMORY}
                         </tooltip>
-                        <default>yes</default>
-                </attribute>
+               </attribute>
 
                 <attribute name="MP_SHMCC_EXCLUDE_LIST_ATTR" type="string">
                         <description>Shared memory exclusions:</description>
@@ -777,6 +776,7 @@
                         <description>Optimized shared memory:</description>
                         <tooltip>Determines if intranode point-to-point communication will use the optimized shared memory protocols. (Default yes) {MP_SHMEM_PT2PT}
                         </tooltip>
+                         <default>yes</default>
                 </attribute>
 
                 <attribute name="MP_SINGLE_THREAD_ATTR" type="string">
