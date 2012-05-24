@@ -14,6 +14,7 @@ package org.eclipse.ptp.rdt.sync.ui.wizards;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
 import org.eclipse.cdt.ui.newui.PageLayout;
 import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
 import org.eclipse.core.resources.IProject;
@@ -36,8 +38,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.IBaseLabelProvider;
-import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -66,7 +66,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -74,8 +73,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableItem;
 
 /**
  * Converts existing CDT projects to sync projects.
@@ -190,17 +187,17 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			@Override
 			public Object[] getElements(Object inputElement) {
 				if (inputElement == null) {
-					return new Object[0];
+					return new IConfiguration[0];
 				}
 				assert(inputElement instanceof IProject);
 				if (getCheckedElements().length != 1) {
-					return new Object[0];
+					return new IConfiguration[0];
 				}
 
 				IProject project = (IProject) inputElement;
 				IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 				if (buildInfo == null) {
-					return new Object[0];
+					return new IConfiguration[0];
 				}
 				return buildInfo.getManagedProject().getConfigurations();
 			}
@@ -274,38 +271,45 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 				RDTSyncUIPlugin.log(e.toString(), e);
 			}
 
-			// Initialize all current configurations with a local build scenario. Do this last, except for making remote
-			// configuration, so project is not flagged as initialized prematurely.
 			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-			BuildScenario localBuildScenario = bcm.createLocalBuildScenario(project);
-			bcm.initProject(project, serviceConfig, localBuildScenario);
-			
-			// Create a remote configuration
+
+			// Initialize project with a local build scenario, which is applied to all configurations
+			bcm.initProject(project, serviceConfig, bcm.createLocalBuildScenario(project));
+
+			// Create a remote build scenario
 			ISyncServiceProvider provider = participant.getProvider(project);
 			BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
 					provider.getLocation());
-			IConfiguration remoteConfig = bcm.createRemoteConfiguration(project, remoteBuildScenario,
-					Messages.ConvertFromCToSyncProjectWizardPage_0, Messages.ConvertFromCToSyncProjectWizardPage_1);
 
-			// Change environment variable handling
-			ICConfigurationDescription remoteConfigDesc = ManagedBuildManager.getDescriptionForConfiguration(remoteConfig);
-			if(remoteConfigDesc!=null){
-				EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, remoteConfigDesc);
-			}
-			
-			// Set all configurations to use the sync builder
+			Object[] selectedConfigs = fConfigTable.getCheckedElements();
+			Set<Object> selectedConfigsSet = new HashSet<Object>(Arrays.asList(selectedConfigs));
 			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 			if (buildInfo == null) {
-				throw new RuntimeException(Messages.ConvertLocalToSyncProjectWizardPage_0 + project.getName());
+				throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 			}
+			
+			// Iterate through all configs
 			IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 			for (IConfiguration config : allConfigs) {
-				IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
-				config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
+				// For selected configs, create a new remote config and modify it to use the sync builder and to handle environment
+				// variables properly.
+				if (selectedConfigsSet.contains(config)) {
+					IConfiguration remoteConfig = bcm.createConfiguration(project, (Configuration) config, remoteBuildScenario,
+							config.getName() + "_remote", null); //$NON-NLS-1$
+					IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
+					remoteConfig.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
+
+					// turn off append contributed(local) environment variables for the build configuration of the remote project
+					ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(remoteConfig);
+					if (c_mb_confgDes != null) {
+						EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+					}
+				}
+				
+				// For all previously existing configs, append "(local)" to the name.
+				config.setName(config.getName() + "_local"); //$NON-NLS-1$
 			}
 			ManagedBuildManager.saveBuildInfo(project, true);
-
-			monitor.done();
 		} finally {
 			monitor.done();
 		}
