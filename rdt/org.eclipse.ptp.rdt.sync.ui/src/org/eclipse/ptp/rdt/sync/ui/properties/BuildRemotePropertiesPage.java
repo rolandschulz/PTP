@@ -40,6 +40,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -57,11 +58,15 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 
 	// Container for all information that appears on a page
 	private static class PageSettings {
+		String syncProvider;
 		IRemoteConnection connection;
 		IRemoteServices remoteProvider;
 		String rootLocation;
 		
 		public boolean equals(PageSettings otherSettings) {
+			if (this.syncProvider != otherSettings.syncProvider) {
+				return false;
+			}
 			if (this.connection != otherSettings.connection) {
 				return false;
 			}
@@ -84,6 +89,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	// Cache of page settings for each configuration accessed.
 	private final Map<String, PageSettings> fConfigToPageSettings = new HashMap<String, PageSettings>();
 
+	private Button fSyncToggleButton;
 	private Button fBrowseButton;
 	private Button fNewConnectionButton;
 	private Combo fProviderCombo;
@@ -111,6 +117,21 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		composite.setLayout(layout);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		composite.setLayoutData(gd);
+
+		// Sync toggle
+		fSyncToggleButton = new Button(composite, SWT.CHECK);
+		fSyncToggleButton.setText(Messages.BuildRemotePropertiesPage_0);
+		fSyncToggleButton.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false, 3, 1));
+		fSyncToggleButton.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setEnabledForAllWidgets(fSyncToggleButton.getSelection());
+			}
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				setEnabledForAllWidgets(fSyncToggleButton.getSelection());
+			}
+		});
 
 		// Label for "Provider:"
 		Label providerLabel = new Label(composite, SWT.LEFT);
@@ -327,8 +348,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
         // Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
         // the BuildConfigurationManager relies on the data being up-to-date.
         BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-        String syncProvider = bcm.getProjectSyncProvider(project);
-        BuildScenario buildScenario = new BuildScenario(syncProvider, settings.connection, settings.rootLocation);
+        BuildScenario buildScenario = new BuildScenario(settings.syncProvider, settings.connection, settings.rootLocation);
         bcm.setBuildScenarioForBuildConfiguration(buildScenario, config);
 	}
 	
@@ -357,9 +377,10 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		if (config instanceof IMultiConfiguration) {
 			composite.setEnabled(false);
 			return;
+		} else {
+			composite.setEnabled(true);
 		}
 
-		composite.setEnabled(true);
 		populateRemoteProviderCombo(fProviderCombo);
 		PageSettings settings = fConfigToPageSettings.get(getCfg().getId());
 		if (settings == null) {
@@ -368,6 +389,14 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 				return; // Is logged inside loadSettings
 			}
 			fConfigToPageSettings.put(getCfg().getId(), settings);
+		}
+
+		if (settings.syncProvider != null) {
+			fSyncToggleButton.setSelection(true);
+			this.setEnabledForAllWidgets(true);
+		} else {
+			fSyncToggleButton.setSelection(false);
+			this.setEnabledForAllWidgets(false);
 		}
 
 		// Note that provider selection populates the local connection map variables as well as the connection combo. Thus, the
@@ -382,6 +411,12 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 		handleConnectionSelected();
 		fRootLocationText.setText(settings.rootLocation);
+	}
+
+	private void setEnabledForAllWidgets(boolean shouldBeEnabled) {
+		fProviderCombo.setEnabled(shouldBeEnabled);
+		fConnectionCombo.setEnabled(shouldBeEnabled);
+		fRootLocationText.setEnabled(shouldBeEnabled);
 	}
 
 	/**
@@ -428,6 +463,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			return null;
 		}
 		PageSettings settings = new PageSettings();
+		settings.syncProvider = buildScenario.getSyncProvider();
 		settings.remoteProvider = buildScenario.getRemoteConnection().getRemoteServices();
 		settings.connection = buildScenario.getRemoteConnection();
 		IProject project = config.getOwner().getProject();
@@ -446,10 +482,16 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		if (config == null || config instanceof MultiConfiguration) {
 			return;
 		}
+		IProject project = config.getOwner().getProject();
 
 		PageSettings settings = new PageSettings();
 		Integer remoteServicesIndex = fProviderCombo.getSelectionIndex();
 		Integer connectionIndex = fConnectionCombo.getSelectionIndex();
+		if (fSyncToggleButton.getSelection()) {
+			settings.syncProvider = BuildConfigurationManager.getInstance().getProjectSyncProvider(project);
+		} else {
+			settings.syncProvider = null;
+		}
 		settings.remoteProvider = fComboIndexToRemoteServicesProviderMap.get(remoteServicesIndex);
 		settings.connection = fComboIndexToRemoteConnectionMap.get(connectionIndex);
 		settings.rootLocation = fRootLocationText.getText();
