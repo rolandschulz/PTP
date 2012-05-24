@@ -22,6 +22,7 @@ import org.eclipse.cdt.managedbuilder.internal.core.MultiConfiguration;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractSingleBuildPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
@@ -30,6 +31,7 @@ import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
@@ -126,10 +128,12 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setEnabledForAllWidgets(fSyncToggleButton.getSelection());
+				update();
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				setEnabledForAllWidgets(fSyncToggleButton.getSelection());
+				update();
 			}
 		});
 
@@ -537,7 +541,38 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		if ( fileManager.toURI(fRootLocationText.getText()) == null) 
 			return Messages.GitParticipant_3;
 		// should we check permissions of: fileManager.getResource(fLocationText.getText()).getParent() ?
+		if (fSyncToggleButton.getSelection() && locationIsInWorkspace())
+			return Messages.BuildRemotePropertiesPage_1;
 		return null;
+	}
+	
+	// Test whether the sync location is inside the local Eclipse workspace
+	private boolean locationIsInWorkspace() {
+		// Check if connection is the local connection. Only continue if we know this is the local workspace. (Give user the
+		// benefit of the doubt.)
+		IRemoteServices localService = PTPRemoteCorePlugin.getDefault().getRemoteServices(
+				"org.eclipse.ptp.remote.LocalServices", null); //$NON-NLS-1$
+		if (localService != null) {
+			IRemoteConnection localConnection = localService.getConnectionManager().getConnection("Local"); //$NON-NLS-1$
+			if (localConnection != null) {
+				if (fSelectedConnection != localConnection) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+
+		// Check path
+		IProject project = getCfg().getOwner().getProject();
+		Path locationPath = new Path(fRootLocationText.getText());
+		if (project.getLocation().isPrefixOf(locationPath)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public boolean isValid() {
