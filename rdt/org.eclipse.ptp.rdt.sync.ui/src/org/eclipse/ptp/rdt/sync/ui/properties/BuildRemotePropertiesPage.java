@@ -417,6 +417,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		fProviderCombo.setEnabled(shouldBeEnabled);
 		fConnectionCombo.setEnabled(shouldBeEnabled);
 		fRootLocationText.setEnabled(shouldBeEnabled);
+		fBrowseButton.setEnabled(shouldBeEnabled);
+		fNewConnectionButton.setEnabled(shouldBeEnabled);
 	}
 
 	/**
