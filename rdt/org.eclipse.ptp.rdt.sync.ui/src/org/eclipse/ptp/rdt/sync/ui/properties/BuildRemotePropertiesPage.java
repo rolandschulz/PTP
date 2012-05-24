@@ -359,13 +359,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			return;
 		}
 
-		// Disallow modifications to Workspace configuration and allow for all others
-		if (config.getName() != null && config.getName().equals(Messages.WorkspaceConfigName)) {
-			this.setEnabledForAllWidgets(false);
-		} else {
-			this.setEnabledForAllWidgets(true);
-		}
-
 		composite.setEnabled(true);
 		populateRemoteProviderCombo(fProviderCombo);
 		PageSettings settings = fConfigToPageSettings.get(getCfg().getId());
@@ -389,12 +382,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 		handleConnectionSelected();
 		fRootLocationText.setText(settings.rootLocation);
-	}
-	
-	private void setEnabledForAllWidgets(boolean shouldBeEnabled) {
-		fProviderCombo.setEnabled(shouldBeEnabled);
-		fConnectionCombo.setEnabled(shouldBeEnabled);
-		fRootLocationText.setEnabled(shouldBeEnabled);
 	}
 
 	/**
