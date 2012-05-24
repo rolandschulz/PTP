@@ -171,7 +171,7 @@ public class JAXBExtensionUtils {
 						String configurationFile = ce.getAttribute(JAXBUIConstants.CONFIGURATION_FILE_ATTRIBUTE);
 						String bundleId = ce.getDeclaringExtension().getContributor().getName();
 						Bundle bundle = Platform.getBundle(bundleId);
-						if (name != null && bundle != null) {
+						if (name != null && configurationFile != null && bundle != null) {
 							URL url = bundle.getEntry(configurationFile);
 							if (url != null) {
 								fPluginConfigurations.put(name, url);
