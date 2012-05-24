@@ -40,11 +40,15 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.TextProcessor;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
+import org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage;
 import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.swt.SWT;
@@ -127,6 +131,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	private SortedMap<String, IToolChain> toolChainMap;
 	private ISynchronizeParticipant fSelectedParticipant = null;
+	private SyncFileFilter customFilter = null;
 	private String message = null;
 	private int messageType = IMessageProvider.NONE;
 	private String errorMessage = null;
@@ -249,7 +254,6 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		});
 		localToolChainTable.setVisible(true);
 
-
 		showSupportedOnlyButton = new Button(c, SWT.CHECK);
 		showSupportedOnlyButton.setText(Messages.SyncMainWizardPage_4);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -262,6 +266,26 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 						getDescriptor(projectTypeTree));
 			}} );
 		showSupportedOnlyButton.setSelection(false);
+		
+		// File filter button
+        final Button filterButton = new Button(c, SWT.PUSH);
+        filterButton.setText(Messages.NewRemoteSyncProjectWizardPage_0);
+        filterButton.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 2, 1));
+        filterButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                        SyncFileFilter tmpFilter;
+                        if (customFilter == null) {
+                                tmpFilter = SyncManager.getDefaultFileFilter();
+                        } else {
+                                tmpFilter = new SyncFileFilter(customFilter);
+                        }
+                        int filterReturnCode = SyncFileFilterPage.openBlocking(tmpFilter, filterButton.getShell());
+                        if (filterReturnCode == Window.OK) {
+                                customFilter = tmpFilter;
+                        }
+                }
+        });
 	}
 
 	@Override
@@ -976,5 +1000,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			}
 		}
 		return false;
+	}
+	
+	public SyncFileFilter getCustomFileFilter() {
+		return customFilter;
 	}
 }

@@ -41,6 +41,8 @@ import org.eclipse.ptp.internal.rdt.sync.ui.SyncPluginImages;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
@@ -250,6 +252,11 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 			}
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
+		
+        SyncFileFilter customFilter = ((SyncMainWizardPage) fMainPage).getCustomFileFilter();
+        if (customFilter != null) {
+                SyncManager.saveFileFilter(project, customFilter);
+        }
 
 		// monitor.done();
 	}
