@@ -429,7 +429,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	@Override
 	public Set<IPath> getMergeConflictFiles(IProject project, BuildScenario buildScenario) throws RemoteSyncException {
 		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
-				SyncManager.getDefaultFileFilter(), null);
+				SyncManager.getFileFilter(project), null);
 		return fSyncConnection.getMergeConflictFiles();
 	}
 
@@ -440,7 +440,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	@Override
 	public String[] getMergeConflictParts(IProject project, BuildScenario buildScenario, IFile file) throws RemoteSyncException {
 		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
-				SyncManager.getDefaultFileFilter(), null);
+				SyncManager.getFileFilter(project), null);
 		return fSyncConnection.getMergeConflictParts(file);
 	}
 
@@ -509,14 +509,14 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	@Override
 	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
 		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
-				SyncManager.getDefaultFileFilter(), null);
+				SyncManager.getFileFilter(project), null);
 		fSyncConnection.setMergeAsResolved(path);
 	}
 
 	@Override
 	public void checkout(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
 		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
-				SyncManager.getDefaultFileFilter(), null);
+				SyncManager.getFileFilter(project), null);
 		fSyncConnection.checkout(path);
 	}
 }
