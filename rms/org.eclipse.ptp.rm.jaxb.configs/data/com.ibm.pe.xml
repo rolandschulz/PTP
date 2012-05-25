@@ -10,7 +10,7 @@
 	<control-data>
 		<!-- Required for debugger to determine number of processes to display -->
 		<attribute name="mpiNumberOfProcesses" type="integer">
-			<link-value-to>MP_PROCS</link-value-to>
+			<link-value-to>MP_PROCS_ATTR</link-value-to>
 		</attribute>
 	
                 <attribute name="MP_ACK_THRESH_ATTR" type="integer">
@@ -932,7 +932,7 @@
 			<arg>perl</arg>
 			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app.pl</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
-			<arg>${ptp_rm:progArgs_ATTR#value}</arg>
+			<arg>${ptp_rm:progArgs#value}</arg>
 			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH_ATTR#value}" />
 			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE_ATTR#value}" />
 			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC_ATTR#value}" />
@@ -1056,10 +1056,9 @@
 
 		<submit-interactive-debug name="POE command" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true">
 			<arg>perl</arg>
-			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app_debug.pl</arg>
-			<arg>poe</arg>
+			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app.pl</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
-			<arg>${ptp_rm:debuggerArgs_ATTR#value}</arg>
+			<arg>${ptp_rm:debuggerArgs#value}</arg>
 			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH_ATTR#value}" />
 			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE_ATTR#value}" />
 			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC_ATTR#value}" />
@@ -1165,6 +1164,8 @@
 			<environment name="MP_WAIT_MODE" value="${ptp_rm:MP_WAIT_MODE_ATTR#value}" />
 			<environment name="MP_WORLD_SIZES" value="${ptp_rm:MP_WORLD_SIZES_ATTR#value}" />
 			<environment name="SCI_DEBUG_FANOUT" value="${ptp_rm:SCI_DEBUG_FANOUT_ATTR#value}" />
+			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
+			<environment name="PTP_DEBUGGER_ID" value="${ptp_rm:debuggerId#value}" />
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
@@ -1178,9 +1179,6 @@
 					</match>
 				</target>
 			</stdout-parser>
-			<pre-launch-cmd name="Cleanup" exec="rm -f routing_file" wait="true"/>
-			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
-
 		</submit-interactive-debug>
 		
 		<terminate-job name="cancel">
