@@ -80,7 +80,9 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 	public static final String MPI_PROCESSES = "mpiNumberOfProcesses";//$NON-NLS-1$
 	public static final String DEBUGGER_EXEC_PATH = "debuggerExecutablePath";//$NON-NLS-1$
 	public static final String DEBUGGER_ARGS = "debuggerArgs";//$NON-NLS-1$
+	public static final String DEBUGGER_ID = "debuggerId";//$NON-NLS-1$
 	public static final String PTP_DIRECTORY = "ptpDirectory";//$NON-NLS-1$
+	public static final String LAUNCH_MODE = "launchMode";//$NON-NLS-1$
 
 	public static final String CASE_INSENSITIVE = "CASE_INSENSITIVE";//$NON-NLS-1$
 	public static final String MULTILINE = "MULTILINE";//$NON-NLS-1$
