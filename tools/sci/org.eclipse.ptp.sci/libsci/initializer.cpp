@@ -263,6 +263,7 @@ Stream * Initializer::initStream()
 
     stream->init(STDIN_FILENO);
     *stream >> token >> envStr >> sign >> endl;
+    setEnvStr(envStr);
     SSHFUNC->set_user_token(&token);
     rc = psec_verify_data(&sign, "%s", envStr.c_str());
     delete [] (char *)sign.iov_base;
@@ -275,24 +276,57 @@ Stream * Initializer::initStream()
 }
 
 int Initializer::parseEnvStr(string &envStr)
-{
-    char *envp;
-    int hndl = -1;
-    int jobkey;
-    string key, val;
-    char *st = (char *) envStr.c_str();
-    char *p = st + envStr.size();
-    while (p > st) {
-        p--;
-        if ((*p) == '=') {
-            *p = '\0';
-            val = (p+1);
-        } else if ((*p) == ';') {
-            *p = '\0';
-            key = (p+1);
-            ::setenv(key.c_str(), val.c_str(), 1);
+{  
+     char *envp;
+     int hndl = -1;
+     int jobkey;
+     
+     char *st = strdup(envStr.c_str());
+     int st_size=envStr.size();
+     char *key = NULL;
+     char *value = NULL;
+     char *delim=";";
+     char *saveptr=NULL;
+     key=strtok_r(st,delim,&saveptr);
+     if( (key != NULL) && (key < st + st_size))
+     {
+        value = strchr(key,'=');
+        if(value != NULL)
+        {
+            (*value) = '\0';
+            if((value != key)&&((value + 1) != NULL) && ((value+1) < (st + st_size)))
+            {
+              if((*(value+1)) == '\0')
+                 ::setenv(key,"",1);
+              else
+                 ::setenv(key,value+1,1);
+            }
         }
-    }
+        else{
+           ::setenv(key,"",1);
+        }
+
+        while(key = strtok_r(NULL,delim,&saveptr))
+        {
+            value = strchr(key,'=');
+            if(value != NULL)
+            {
+                (*value) = '\0';
+                if((value != key)&&((value + 1) != NULL) && ((value+1) < (st + st_size)))
+                {
+                  if((*(value+1)) == '\0')
+                     ::setenv(key,"",1);
+                  else
+                     ::setenv(key,value+1,1);
+                }
+            }
+            else{
+               ::setenv(key,"",1);
+            }
+        }
+     }
+   
+    free(st);
 
     envp = getenv("SCI_CLIENT_ID");
     assert(envp != NULL);
@@ -450,6 +484,7 @@ int Initializer::initExtBE(int hndl)
     stream << username.c_str() << usertok << sign << (int)mode << jobKey << hndl << endl;
     psec_free_signature(&sign);
     stream >> envStr >> token >> sign >> endl;
+    setEnvStr(envStr);
     stream.stop();
     sprintf(fmt, "%%s%%%ds", token.iov_len);
     rc = psec_verify_data(&sign, fmt, envStr.c_str(), token.iov_base);
@@ -461,4 +496,15 @@ int Initializer::initExtBE(int hndl)
     parseEnvStr(envStr);
     
     return 0;
+}
+
+void Initializer::setEnvStr(string env)
+{
+    initEnv = env;
+    return;
+}
+
+string Initializer::getEnvStr()
+{
+   return initEnv;
 }

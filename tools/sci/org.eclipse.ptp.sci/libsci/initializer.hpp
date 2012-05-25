@@ -49,6 +49,7 @@ class Initializer
         Listener    *listener;
         Stream      *inStream;
         int         handle;
+        string initEnv;
         
     public:
         ~Initializer();
@@ -59,10 +60,10 @@ class Initializer
         }
 
         int init();
-
         Listener * initListener();
         Listener * getListener();
         Stream * getInStream();
+        string getEnvStr();
 
     private:
         int initFE();
@@ -73,6 +74,7 @@ class Initializer
         int getIntToken();
         int parseEnvStr(string &envStr);
 		int connectBack();
+        void setEnvStr(string env);
 };
 
 #define gInitializer Initializer::getInstance()
