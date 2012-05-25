@@ -702,9 +702,12 @@ public class GitRemoteSyncConnection {
 				ObjectId remoteId = remoteTreeWalk.getObjectId(0);
 				String remoteContents = new String(git.getRepository().open(remoteId).getBytes());
 
-				TreeWalk ancestorTreeWalk = TreeWalk.forPath(git.getRepository(), s, mergeBase.getTree());
-				ObjectId ancestorId = ancestorTreeWalk.getObjectId(0);
-				String ancestorContents = new String(git.getRepository().open(ancestorId).getBytes());
+				String ancestorContents = ""; //$NON-NLS-1$
+				if (mergeBase != null) {
+					TreeWalk ancestorTreeWalk = TreeWalk.forPath(git.getRepository(), s, mergeBase.getTree());
+					ObjectId ancestorId = ancestorTreeWalk.getObjectId(0);
+					ancestorContents = new String(git.getRepository().open(ancestorId).getBytes());
+				}
 
 				String[] mergeParts = {localContents, remoteContents, ancestorContents};
 				FileToMergePartsMap.put(new Path(s), mergeParts);
