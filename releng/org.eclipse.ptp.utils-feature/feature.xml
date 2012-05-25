@@ -3,9 +3,8 @@
       id="org.eclipse.ptp.utils"
       label="%featureName"
       version="6.0.0.qualifier"
-      plugin="org.eclipse.ptp.utils.core"
       provider-name="%providerName"
-      >
+      plugin="org.eclipse.ptp.utils.core">
 
    <description>
       %description
@@ -18,10 +17,6 @@
    <license url="%licenseURL">
       %license
    </license>
-
-   <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
-   </url>
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
