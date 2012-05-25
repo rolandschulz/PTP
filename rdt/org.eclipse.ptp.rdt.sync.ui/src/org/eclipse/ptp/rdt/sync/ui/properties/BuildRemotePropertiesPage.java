@@ -243,7 +243,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private void handleConnectionSelected() {
 		int selectionIndex = fConnectionCombo.getSelectionIndex();
 		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
-		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		update();
 	}
 	
@@ -254,7 +253,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		int selectionIndex = fProviderCombo.getSelectionIndex();
 		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
 		populateConnectionCombo(fConnectionCombo);
-		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		update();
 	}
 
@@ -285,9 +283,13 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	/**
 	 * @param button
 	 */
-	private void updateNewConnectionButtonEnabled(Button button) {
+	private boolean isConnectionManagerAvailable() {
 		IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
-		button.setEnabled(connectionManager != null);
+		if (connectionManager == null) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	/**
@@ -365,6 +367,9 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	}
 	
 	private IRemoteUIConnectionManager getUIConnectionManager() {
+		if (fSelectedProvider == null) {
+			return null;
+		}
 		IRemoteUIConnectionManager connectionManager = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedProvider)
 				.getUIConnectionManager();
 		return connectionManager;
@@ -422,7 +427,11 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		fConnectionCombo.setEnabled(shouldBeEnabled);
 		fRootLocationText.setEnabled(shouldBeEnabled);
 		fBrowseButton.setEnabled(shouldBeEnabled);
-		fNewConnectionButton.setEnabled(shouldBeEnabled);
+		if (shouldBeEnabled && this.isConnectionManagerAvailable()) {
+			fNewConnectionButton.setEnabled(true);
+		} else {
+			fNewConnectionButton.setEnabled(false);
+		}
 	}
 
 	/**
