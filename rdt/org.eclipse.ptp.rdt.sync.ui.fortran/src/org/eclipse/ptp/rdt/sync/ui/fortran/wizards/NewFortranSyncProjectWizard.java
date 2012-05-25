@@ -15,16 +15,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.photran.internal.cdtinterface.ui.FortranProjectWizard;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.fortran.PluginImages;
 import org.eclipse.ptp.rdt.sync.ui.fortran.messages.Messages;
+import org.eclipse.ptp.rdt.sync.ui.wizards.NewRemoteSyncProjectWizardOperation;
 import org.eclipse.ptp.rdt.sync.ui.wizards.SyncMainWizardPage;
 
 /**
@@ -84,7 +81,20 @@ public class NewFortranSyncProjectWizard extends FortranProjectWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		return super.performFinish();
+		boolean success = super.performFinish();
+		if (success) {
+			IProject project = this.getProject(true);
+			// Uncomment try/catch statements if run is ever changed to spawn a thread.
+//			try {
+				NewRemoteSyncProjectWizardOperation.run(project, (SyncMainWizardPage) fMainPage, null);
+//			} catch (InvocationTargetException e) {
+//				success = false;
+//			} catch (InterruptedException e) {
+//				success = false;
+//			}
+		}
+
+		return success;
 	}
 
 	/*
@@ -95,11 +105,6 @@ public class NewFortranSyncProjectWizard extends FortranProjectWizard {
 	 */
 	@Override
 	protected IProject continueCreation(IProject prj) {
-		super.continueCreation(prj);
-		try {
-			RemoteSyncNature.addNature(prj, new NullProgressMonitor());
-		} catch (CoreException e) {
-		}
 		return prj;
 	}
 
