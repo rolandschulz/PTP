@@ -89,6 +89,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 */
 	private ILaunchController fLaunchControl;
 	private RemoteConnectionWidget fRemoteConnectionWidget;
+	/*
+	 * Keep current remote connection so we can revert back to it
+	 */
 	private IRemoteConnection fRemoteConnection;
 
 	/*
@@ -115,7 +118,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setErrorMessage(Messages.ResourcesTab_No_Connection_name);
 			return false;
 		}
-		IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl, null);
+		IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl);
 		final Composite launchComp = getLaunchAttrsScrollComposite();
 		if (dynamicTab == null || launchComp == null) {
 			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { fLaunchControl
@@ -248,23 +251,15 @@ public class ResourcesTab extends LaunchConfigurationTab {
 					/*
 					 * Update UI
 					 */
-					try {
-						getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
-							@Override
-							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-								SubMonitor progress = SubMonitor.convert(monitor, 20);
-								if (connectionChanged(fSelectedLaunchControl, progress.newChild(10))) {
-									fLaunchControl = fSelectedLaunchControl;
-									fRemoteConnection = fRemoteConnectionWidget.getConnection();
-									updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), progress.newChild(10));
-									updateLaunchConfigurationDialog();
-								}
-							}
-
-						});
-					} catch (InvocationTargetException e1) {
-					} catch (InterruptedException e1) {
+					if (connectionChanged(fSelectedLaunchControl)) {
+						fLaunchControl = fSelectedLaunchControl;
+						fRemoteConnection = fRemoteConnectionWidget.getConnection();
+					} else {
+						fLaunchControl = null;
+						fRemoteConnection = null;
 					}
+					updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
+					updateLaunchConfigurationDialog();
 					fDefaultConnection = false;
 				}
 			}
@@ -288,7 +283,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			setErrorMessage(Messages.ResourcesTab_No_Connection_name);
 			return false;
 		}
-		IRMLaunchConfigurationDynamicTab rmDynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl, null);
+		IRMLaunchConfigurationDynamicTab rmDynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl);
 		if (rmDynamicTab == null) {
 			setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { fLaunchControl
 					.getConfiguration().getName() }));
@@ -321,7 +316,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			if (monitorData != null) {
 				LaunchUtils.setSystemType(configuration, monitorData.getSchedulerType());
 			}
-			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl, null);
+			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl);
 			if (dynamicTab == null) {
 				setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { fLaunchControl
 						.getConfiguration().getName() }));
@@ -346,7 +341,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		fDefaultConnection = true;
 	}
 
-	private boolean connectionChanged(final ILaunchController control, IProgressMonitor monitor) {
+	private boolean connectionChanged(final ILaunchController control) {
 		IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
 		if (conn != null) {
 			try {
@@ -363,12 +358,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 					return false;
 				}
 			}
-			try {
-				control.start(monitor);
-				return true;
-			} catch (CoreException e) {
-				RMLaunchPlugin.errorDialog(e.getCause().getLocalizedMessage(), e.getCause());
-			}
+			return true;
 		}
 		return false;
 	}
@@ -399,82 +389,83 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * Returns a cached launch configuration dynamic tab. If it isn't in the cache then it creates a new one, and puts it in the
 	 * cache.
 	 * 
-	 * @param rm
+	 * @param controller
+	 *            launch controller
+	 * @param monitor
+	 *            progress monitor
 	 * @return
 	 */
-	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final IJobController control, IProgressMonitor monitor) {
-		if (!fDynamicTabs.containsKey(control)) {
-			if (monitor != null) {
-				try {
-					IRMLaunchConfigurationDynamicTab dynamicTab = new JAXBControllerLaunchConfigurationTab(control, monitor);
-					dynamicTab.addContentsChangedListener(launchContentsChangedListener);
-					fDynamicTabs.put(control, dynamicTab);
-					return dynamicTab;
-				} catch (Throwable e) {
-					setErrorMessage(e.getMessage());
-					RMLaunchPlugin.errorDialog(e.getMessage(), e);
-					return null;
-				}
-			} else {
-				final IRMLaunchConfigurationDynamicTab[] dynamicTab = new IRMLaunchConfigurationDynamicTab[1];
-				try {
-					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
-						@Override
-						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-							SubMonitor progress = SubMonitor.convert(monitor, 1);
-							dynamicTab[0] = getLaunchConfigurationDynamicTab(control, progress.newChild(1));
-						}
-					});
-				} catch (InvocationTargetException e) {
-				} catch (InterruptedException e) {
-				}
-				return dynamicTab[0];
+	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final IJobController controller,
+			IProgressMonitor monitor) {
+		if (!fDynamicTabs.containsKey(controller)) {
+			try {
+				IRMLaunchConfigurationDynamicTab dynamicTab = new JAXBControllerLaunchConfigurationTab(controller, monitor);
+				dynamicTab.addContentsChangedListener(launchContentsChangedListener);
+				fDynamicTabs.put(controller, dynamicTab);
+				return dynamicTab;
+			} catch (Throwable e) {
+				setErrorMessage(e.getMessage());
+				RMLaunchPlugin.errorDialog(e.getMessage(), e);
+				return null;
 			}
 		}
-		return fDynamicTabs.get(control);
+		return fDynamicTabs.get(controller);
+	}
+
+	/**
+	 * Returns a cached launch configuration dynamic tab. If it isn't in the cache then it creates a new one, and puts it in the
+	 * cache. Does not require a progress monitor.
+	 * 
+	 * @param controller
+	 *            launch controller
+	 * @return
+	 */
+	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final IJobController controller) {
+		if (!fDynamicTabs.containsKey(controller)) {
+			final IRMLaunchConfigurationDynamicTab[] dynamicTab = new IRMLaunchConfigurationDynamicTab[1];
+			try {
+				getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+					@Override
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+						SubMonitor progress = SubMonitor.convert(monitor, 1);
+						dynamicTab[0] = getLaunchConfigurationDynamicTab(controller, progress.newChild(1));
+					}
+				});
+			} catch (InvocationTargetException e) {
+			} catch (InterruptedException e) {
+			}
+			return dynamicTab[0];
+		}
+		return fDynamicTabs.get(controller);
 	}
 
 	private void handleConnectionChanged() {
-		try {
-			/*
-			 * LaunchConfigurationsDialog#run() tries to preserve the focus control. However, updateLaunchAttributeControls() will
-			 * dispose of all the controls on the dynamic tab, leading to a widget disposed exception. The easy solution is to
-			 * remove focus from the dynamic controls first.
-			 */
-			fRemoteConnectionWidget.setFocus();
+		/*
+		 * LaunchConfigurationsDialog#run() tries to preserve the focus control. However, updateLaunchAttributeControls() will
+		 * dispose of all the controls on the dynamic tab, leading to a widget disposed exception. The easy solution is to remove
+		 * focus from the dynamic controls first.
+		 */
+		fRemoteConnectionWidget.setFocus();
 
+		IRemoteConnection conn = null;
+		if (fRemoteConnectionWidget.isEnabled()) {
+			conn = fRemoteConnectionWidget.getConnection();
+		}
+		if (conn == null) {
+			fLaunchControl = null;
+			fRemoteConnection = null;
+			updateLaunchAttributeControls(null, getLaunchConfiguration(), false);
+			updateLaunchConfigurationDialog();
+		} else if (connectionChanged(fSelectedLaunchControl)) {
+			fLaunchControl = fSelectedLaunchControl;
+			fRemoteConnection = conn;
+			updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
+			updateLaunchConfigurationDialog();
+		} else {
 			/*
-			 * Now update the dialog.
+			 * Failed to change connection, reset back to the previous one
 			 */
-			getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
-				@Override
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					SubMonitor progress = SubMonitor.convert(monitor, 20);
-					IRemoteConnection conn = null;
-					if (fRemoteConnectionWidget.isEnabled()) {
-						conn = fRemoteConnectionWidget.getConnection();
-					}
-					if (conn == null) {
-						fLaunchControl = null;
-						fRemoteConnection = null;
-						updateLaunchAttributeControls(null, getLaunchConfiguration(), progress.newChild(10));
-						updateLaunchConfigurationDialog();
-					} else if (connectionChanged(fSelectedLaunchControl, progress.newChild(10))) {
-						fLaunchControl = fSelectedLaunchControl;
-						fRemoteConnection = conn;
-						updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), progress.newChild(10));
-						updateLaunchConfigurationDialog();
-					} else {
-						/*
-						 * Failed to change connection, reset back to the previous one
-						 */
-						fRemoteConnectionWidget.setConnection(fRemoteConnection);
-					}
-				}
-
-			});
-		} catch (InvocationTargetException e1) {
-		} catch (InterruptedException e1) {
+			fRemoteConnectionWidget.setConnection(fRemoteConnection);
 		}
 	}
 
@@ -529,23 +520,41 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param queue
 	 * @param launchConfiguration
 	 */
-	private void updateLaunchAttributeControls(IJobController controller, ILaunchConfiguration launchConfiguration,
-			IProgressMonitor monitor) {
+	private void updateLaunchAttributeControls(final IJobController controller, ILaunchConfiguration launchConfiguration,
+			final boolean startController) {
 		final ScrolledComposite launchAttrsScrollComp = getLaunchAttrsScrollComposite();
 		launchAttrsScrollComp.setContent(null);
 		for (Control child : launchAttrsScrollComp.getChildren()) {
 			child.dispose();
 		}
 		if (controller != null) {
-			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(controller, monitor);
-			if (dynamicTab != null) {
+			final IRMLaunchConfigurationDynamicTab[] dynamicTab = new IRMLaunchConfigurationDynamicTab[1];
+			try {
+				getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+					@Override
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+						SubMonitor progress = SubMonitor.convert(monitor, 20);
+						if (startController) {
+							try {
+								fSelectedLaunchControl.start(progress.newChild(10));
+							} catch (CoreException e) {
+								RMLaunchPlugin.errorDialog(e.getCause().getLocalizedMessage(), e.getCause());
+							}
+						}
+						dynamicTab[0] = getLaunchConfigurationDynamicTab(controller, progress.newChild(10));
+					}
+				});
+			} catch (InvocationTargetException e) {
+			} catch (InterruptedException e) {
+			}
+			if (dynamicTab[0] != null) {
 				try {
-					dynamicTab.createControl(launchAttrsScrollComp, controller.getControlId());
-					final Control dynControl = dynamicTab.getControl();
+					dynamicTab[0].createControl(launchAttrsScrollComp, controller.getControlId());
+					final Control dynControl = dynamicTab[0].getControl();
 					launchAttrsScrollComp.setContent(dynControl);
 					Point size = dynControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 					launchAttrsScrollComp.setMinSize(size);
-					dynamicTab.initializeFrom(launchConfiguration);
+					dynamicTab[0].initializeFrom(launchConfiguration);
 				} catch (CoreException e) {
 					setErrorMessage(e.getMessage());
 					Throwable t = e.getCause();

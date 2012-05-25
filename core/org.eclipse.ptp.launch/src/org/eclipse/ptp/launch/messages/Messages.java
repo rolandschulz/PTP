@@ -22,7 +22,17 @@ public class Messages extends NLS {
 	public static String Launch_common_DebuggerColon;
 	public static String Launch_common_Error;
 
+	public static String LaunchPreferencesPage_Always;
+
 	public static String LaunchPreferencesPage_Auto_start_RM;
+
+	public static String LaunchPreferencesPage_Never;
+
+	public static String LaunchPreferencesPage_OpenParallelDebugPerspective;
+
+	public static String LaunchPreferencesPage_OpenSystemMonitoringPerspective;
+
+	public static String LaunchPreferencesPage_Prompt;
 
 	public static String ApplicationTab_0;
 	public static String ApplicationTab_1;
