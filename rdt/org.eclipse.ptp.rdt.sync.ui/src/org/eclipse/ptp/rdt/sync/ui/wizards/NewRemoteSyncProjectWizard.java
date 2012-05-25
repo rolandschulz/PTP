@@ -257,8 +257,10 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
         if (customFilter != null) {
                 SyncManager.saveFileFilter(project, customFilter);
         }
-
 		// monitor.done();
+
+        // Enable sync'ing
+        SyncManager.setSyncMode(project, SyncManager.SYNC_MODE.ACTIVE);
 	}
 
 	/**
