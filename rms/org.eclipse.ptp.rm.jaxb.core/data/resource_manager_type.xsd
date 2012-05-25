@@ -210,6 +210,7 @@
 		<xs:attribute name="expression" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType mixed="true" name="arg-type">
+		<xs:attribute name="attribute" type="xs:string"/>
 		<xs:attribute name="isUndefinedIfMatches" type="xs:string"/>
 		<xs:attribute name="resolve" type="xs:boolean" default="true"/>
 	</xs:complexType>
