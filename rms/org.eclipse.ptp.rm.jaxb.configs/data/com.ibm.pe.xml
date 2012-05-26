@@ -25,7 +25,7 @@
                 </attribute>
 
                 <attribute name="MP_ADAPTER_USE_ATTR" type="string">
-                        <description>Exclusive adapter use:</description>
+                        <description>Exclusive adapter use (LoadLeveler):</description>
                         <tooltip>Specify how node's adapter should be used {MP_ADAPTER_USE}</tooltip>
                         <choice>dedicated,shared</choice>
                 </attribute>
@@ -35,13 +35,15 @@
                         <description>Bind tasks to first CPU:</description>
                         <tooltip>Bind tasks to first logical CPU. Use for OpenMP Only {MP_BINDPROC}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
                 
                 <attribute name="MP_BSR_BARRIER_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
-                        <description>Enable BSR:</description>
+                        <description>Enable BSR (AIX):</description>
                         <tooltip>Enable use of barrier synchronization register {MP_BSR_BARRIER}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
                 
                 <attribute name="MP_BUFFER_MEM_ATTR" type="integer">
@@ -72,13 +74,15 @@
                         <description>Fastest collectives:</description>
                         <tooltip>Specify if fastest collective algorithm is used {MP_CC_SCRATCH_BUF}
                         </tooltip>
+                        <default>yes</default>
                 </attribute>
                 
                 <attribute name="MP_CHECKPOINT_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
-                        <description>Job is checkpointable:</description>
+                        <description>Job is checkpointable (AIX):</description>
                         <tooltip>Specifies that the job is checkpointable {MP_CHECKPOINT}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_CLOCK_SOURCE_ATTR" type="string">
@@ -144,24 +148,25 @@
                 </attribute>
 
                 <attribute name="MP_COREFILE_FORMAT_ATTR" type="string">
-                        <description>Corefile format:</description>
+                        <description>Corefile format (AIX):</description>
                         <tooltip>Specify 'STDERR' to write core data to stderr, blank for standard core file or name of lightweight corefile {MP_COREFILE_FORMAT}
                         </tooltip>
                         <choice>,STDERR</choice>
                 </attribute>
 
 				<attribute name="MP_COREFILE_SIGTERM_ATTR" type="boolean" translateBooleanAs="yes,no">
-					<description>Corefile on SIGTERM:</description>
+					<description>Corefile on SIGTERM (AIX):</description>
 					<tooltip>Select to create corefile if application gets SIGTERM {MP_COREFILE_SIGTERM}
 					</tooltip>
-					<choice>yes,no</choice>
+					<default>no</default>
 				</attribute>
 		
                 <attribute name="MP_COSCHEDULER_VERSION_ATTR" type="boolean"
                         translateBooleanAs="runqueue,''">
-                        <description>Use runqueue co-scheduler:</description>
+                        <description>Use runqueue co-scheduler (AIX):</description>
                         <tooltip>Specifies if POE runqueue co-scheduler is used {MP_COSCHEDULER_VERSION}
                         </tooltip>
+                        <default> </default>
                 </attribute>
 
                 <attribute name="MP_CPU_USE_ATTR" type="string">
@@ -176,6 +181,7 @@
                         <description>Packets generate interrupts:</description>
                         <tooltip>Specify if arriving packets generate interrupts (Default: no) {MP_CSS_INTERRUPT}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_DBG_LAUNCH_ATTR" type="boolean"
@@ -183,6 +189,7 @@
                         <description>Debugger will attach:</description>
                         <tooltip>Specifies that the application will suspend so a debugger can attach to it {MP_DBG_LAUNCH} 
                         </tooltip>
+                        <default>no</default>
                 </attribute>
                                 
                 <attribute name="MP_DBG_LAUNCH_TIMEOUT_ATTR" type="string">
@@ -196,6 +203,7 @@
                         <description>Use task info socket:</description>
                         <tooltip>Specifies that a tool or debugger will obtain task and host information using a socket connection {MP_DBG_TASKINFO} 
                         </tooltip>
+                        <default>yes</default>
                 </attribute>
                 
                 <attribute name="MP_DEBUG_ATTACH_ATTR" type="boolean"
@@ -203,6 +211,7 @@
                         <description>Create debug attach file:</description>
                         <tooltip>Specifies that debugger attach file will be created {MP_DEBUG_ATTACH} 
                         </tooltip>
+                        <default>yes</default>
                 </attribute>
                                 
                 <attribute name="MP_DEBUG_ATTACH_DIR_ATTR" type="string">
@@ -220,9 +229,10 @@
                 
                 <attribute name="MP_DEBUG_NOTIMEOUT_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
-                        <description>Disable timeout:</description>
+                        <description>Disable timeout (AIX):</description>
                         <tooltip>Suppress timeout so debugger can attach without application timeout  {MP_DEBUG_NOTIMEOUT}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_DEVTYPE_ATTR" type="string">
@@ -300,6 +310,7 @@
                         <description>Use forced interrupts:</description>
                         <tooltip>Use forced interrupts for rondezvous message in RDMA transfer (Default: no) {MP_FORCED_INTERRUPTS_ENABLED}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_HINTS_FILTERED_ATTR" type="boolean"
@@ -307,6 +318,7 @@
                         <description>Hints filtered:</description>
                         <tooltip>Specify if MPI info objects reject hints (Default: no) {MP_HINTS_FILTERED}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_HOSTFILE_ATTR" type="string">
@@ -395,6 +407,7 @@
                         <description>Create I/O error log:</description>
                         <tooltip>Specify if I/O error logging is enabled (Default: no) {MP_IO_ERRLOG}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_LABELIO_ATTR" type="boolean"
@@ -402,13 +415,15 @@
                         <description>Label STDIO with task number:</description>
                         <tooltip>Prefix stdout and stderr for each task with task number. {MP_LABELIO}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
                 
                 <attribute name="MP_LOCKLESS_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
-                        <description>MPU runs lockless:</description>
+                        <description>MPU runs lockless (Linux):</description>
                         <tooltip>Specifies whether MPI runs in lockless mode {MP_LOCKLESS}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_MC_INET_ADDR_LEN_ATTR" type="integer">
@@ -445,7 +460,7 @@
                 </attribute>
 
                 <attribute name="MP_MPILIB_ATTR" type="string">
-                        <description>MPI library:</description>
+                        <description>MPI library (Linux):</description>
                         <tooltip>Specify MPI library (shim or mpich2) {MP_MPILIB}
                         </tooltip>
                         <choice>mpich2,shim</choice>
@@ -470,14 +485,14 @@
                 </attribute>
 
                 <attribute name="MP_NEWJOB_ATTR" type="string">
-                        <description>Keep job partition:</description>
+                        <description>Keep job partition (LoadLeveler):</description>
                         <tooltip>Specifies if partition manager maintains partition for multiple job steps {MP_NEWJOB}
                         </tooltip>
                         <choice>,yes,no,parallel</choice>
                 </attribute>
 
                 <attribute name="MP_NODES_ATTR" type="integer">
-                        <description>Number of nodes:</description>
+                        <description>Number of nodes (LoadLeveler):</description>
                         <tooltip>Specify the number of nodes to run application. {MP_NODES}
                         </tooltip>
                         <validator>
@@ -492,6 +507,7 @@
                         <description>PE sets affinity:</description>
                         <tooltip>Enamle PE to perform affinity setup {MP_PE_AFFINITY}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_PGMMODEL_ATTR" type="string">
@@ -506,6 +522,7 @@
                         <description>Generate PMD diagnostic log:</description>
                         <tooltip>Generate a PMD log for diagnostic purposes. (Default: no) {MP_PMDLOG}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_PMDLOG_DIR_ATTR" type="string">
@@ -529,9 +546,10 @@
                 
                 <attribute name="MP_POE_CONTINUE_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
-                        <description>Continue if subjob fails:</description>
+                        <description>Continue if subjob fails (LoadLeveler):</description>
                         <tooltip>Specify whether a parallel job continues if subjob fails {MP_POE_CONTINUE}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_POLLING_INTERVAL_ATTR" type="integer">
@@ -563,6 +581,7 @@
                         <description>Create co-scheduler log:</description>
                         <tooltip>Specify if co-scheduler log should be created (Default: no) {MP_PRIORITY_LOG}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_PRIORITY_LOG_DIR_ATTR" type="string">
@@ -587,9 +606,10 @@
 
                 <attribute name="MP_PRIORITY_NTP_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
-                        <description>Co-scheduler disables NTP:</description>
+                        <description>Co-scheduler disables NTP (AIX):</description>
                         <tooltip>Specify if PE co-scheduler disables NTP during adjustment period (Default: no) {MP_PRIORITY_NTP}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_PROCS_ATTR" type="integer">
@@ -604,7 +624,7 @@
                 </attribute>
 
                 <attribute name="MP_PROFDIR_ATTR" type="string">
-                        <description>GMON file directory:</description>
+                        <description>GMON file directory (Linux):</description>
                         <tooltip>Specify directory where GMON files are stored. {MP_PROFDIR}
                         </tooltip>
                 </attribute>
@@ -635,6 +655,7 @@
                         <description>Use LMC:</description>
                         <tooltip>Use lid mask control (LMC) (Default: no) {MP_RC_USE_LMC}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_RDMA_ROUTE_MODE_ATTR" type="string">
@@ -645,7 +666,7 @@
                 </attribute>
 
                 <attribute name="MP_REMOTEDIR_ATTR" type="string">
-                        <description>Remote directory script:</description>
+                        <description>Remote directory script (AIX):</description>
                         <tooltip>Specify script to echo name of current directory to be used on remote nodes {MP_REMOTEDIR}
                         </tooltip>
                         <validator>
@@ -656,9 +677,11 @@
                         </validator>
                 </attribute>
 
-				<attribute name="MP_RESD_ATTR" type="string">
+				<attribute name="MP_RESD_ATTR" type="boolean"
+					translateBooleanAs="yes,no">
 					<description>Use resource manager:</description>
 					<tooltip>Use resource manager to handle resource allocations {MP_RESD}</tooltip>
+					<default>no</default>
 				</attribute>
 
                 <attribute name="MP_RETRANSMIT_INTERVAL_ATTR" type="integer">
@@ -673,7 +696,7 @@
                 </attribute>
 
                 <attribute name="MP_RETRY_ATTR" type="integer">
-                        <description>Job submission timeout:</description>
+                        <description>Job submission timeout (LoadLeveler):</description>
                         <tooltip>"Specify job submission timeout ( &lt;0: wait indefinitely, 0: no wait, &gt;0, wait specified interval) (Default: 0) {MP_RETRY}"
                         </tooltip>
                         <validator>
@@ -707,7 +730,7 @@
                 </attribute>
 
                 <attribute name="MP_RMFILE_ATTR" type="string">
-                        <description>Node allocation file:</description>
+                        <description>Node allocation file (LoadLeveler):</description>
                         <tooltip>Specify resource manager command file for node allocation {MP_RMFILE}
                         </tooltip>
                         <validator>
@@ -719,13 +742,13 @@
                 </attribute>
 
                 <attribute name="MP_RMPOOL_ATTR" type="integer">
-                        <description>Node allocation pool:</description>
+                        <description>Node allocation pool (LoadLeveler):</description>
                         <tooltip>"Specify name of node allocation pool {MP_RMPOOL}"
                         </tooltip>
                 </attribute>
 
                 <attribute name="MP_RM_TIMEOUT_ATTR" type="integer">
-                        <description>Resource mgr connect timeout:</description>
+                        <description>Resource mgr connect timeout (LoadLeveler):</description>
                         <tooltip>"Specify resource manager connection timeout (&lt;0: wait indefinitely, 0:     no wait, &gt;0, wait specified interval) (Default: 30) {MP_RM_TIMEOUT}"
                         </tooltip>
                         <validator>
@@ -736,7 +759,7 @@
                 </attribute>
 
                 <attribute name="MP_RMA_PENDING_ATTR" type="integer">
-                        <description>Maximum RMA requests:</description>
+                        <description>Maximum RMA requests (Linux):</description>
                         <tooltip>Maximum outstanding RMA requests. Limits number of PAMI_Request objects allocated by MPI onesided operations. (default 1000) {MP_RMA_PENDING}
                         </tooltip>
                         <validator>
@@ -747,13 +770,13 @@
                 </attribute>
 
                 <attribute name="MP_SAVEHOSTFILE_ATTR" type="string">
-                        <description>Generated host file:</description>
+                        <description>Generated host file (LoadLeveler):</description>
                         <tooltip>Specify path to saved hostfile generated by partition manager {MP_SAVEHOSTFILE}
                         </tooltip>
                 </attribute>
 
                 <attribute name="MP_SAVE_RMFILE_ATTR" type="string">
-                        <description>Generated job command file:</description>
+                        <description>Generated job command file (LoadLeveler):</description>
                         <tooltip>Specify path to saved job command file generated by partition manager {MP_SAVE_RMFILE}
                         </tooltip>
                 </attribute>
@@ -763,6 +786,7 @@
                         <description>Use shared memory:</description>
                         <tooltip>Specify if shared memory is used for communication (Default: yes) {MP_SHARED_MEMORY}
                         </tooltip>
+                        <default>yes</default>
                </attribute>
 
                 <attribute name="MP_SHMCC_EXCLUDE_LIST_ATTR" type="string">
@@ -773,7 +797,7 @@
 
                 <attribute name="MP_SHMEM_PT2PT_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
-                        <description>Optimized shared memory:</description>
+                        <description>Optimized shared memory (Linux):</description>
                         <tooltip>Determines if intranode point-to-point communication will use the optimized shared memory protocols. (Default yes) {MP_SHMEM_PT2PT}
                         </tooltip>
                          <default>yes</default>
@@ -817,7 +841,7 @@
                 </attribute>
 
                 <attribute name="MP_TASKS_PER_NODE_ATTR" type="integer">
-                        <description>Number of tasks per node:</description>
+                        <description>Number of tasks per node (LoadLeveler):</description>
                         <tooltip>Specify the number application tasks per node. {MP_TASKS_PER_NODE}
                         </tooltip>
                         <validator>
@@ -864,7 +888,7 @@
 				</attribute>
 
                 <attribute name="MP_TLP_REQUIRED_ATTR" type="string">
-                        <description>Large pages required:</description>
+                        <description>Large pages required (AIX):</description>
                         <tooltip>Specifies if POE shuld check if application was compiled for large pages {MP_TLP_REQUIRED}
                         </tooltip>
                         <choice>,none,warn,kill</choice>
@@ -886,6 +910,7 @@
                         <description>Use bulk transfer:</description>
                         <tooltip>Use adapter bult data transfer mechanisms (Default: no) {MP_USE_BULK_XFER}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_USE_MC_ATTR" type="boolean"
@@ -893,6 +918,7 @@
                         <description>Use hardware multicast:</description>
                         <tooltip>Specifies if hardware multicast feature is used (Default: no) {MP_USE_MC}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_WAIT_MODE_ATTR" type="string">
@@ -913,6 +939,7 @@
                         <description>Use LoadLeveler for node allocation:</description>
                         <tooltip>Use LoadLeveler as node and system resource allocator
                         </tooltip>
+                        <default>no</default>
                 </attribute>
                 
                 <attribute name="SCI_DEBUG_FANOUT_ATTR" type="integer">
@@ -1205,15 +1232,15 @@
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								verticalAlign="SWT.CENTER" />
 						</layout-data>
-						<fixed-text>${ptp_rm:RM_USE_LOAD_LEVELER#description}</fixed-text>
+						<fixed-text>${ptp_rm:MP_RESD_ATTR#description}</fixed-text>
 					</widget>
 				
-					<widget type="checkbox" buttonId="useLL" attribute="RM_USE_LOAD_LEVELER" style="SWT.LEFT">
+					<widget type="checkbox" buttonId="useLL" attribute="MP_RESD_ATTR" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
 								grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
-						<tooltip>${ptp_rm:RM_USE_LOAD_LEVELER#tooltip}</tooltip>
+						<tooltip>${ptp_rm:MP_RESD_ATTR#tooltip}</tooltip>
 					</widget>
 
 					<!--MP_HOSTFILE: Specifies task to node mapping -->
@@ -1672,52 +1699,7 @@
 							<grid-data widthHint="200" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_EUIDEVELOP_ATTR#tooltip}</tooltip>
-					</widget>		
-
-					<!--MP_DEBUG_ATTACH: Generate debugger attach file -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_DEBUG_ATTACH_ATTR#description}
-						</fixed-text>
-					</widget>
-					<widget type="checkbox" attribute="MP_DEBUG_ATTACH_ATTR"
-						style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL"
-								grabExcessHorizontal="false" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_DEBUG_ATTACH_ATTR#tooltip}</tooltip>
-					</widget>			
-					
-					<!--MP_DEBUG_ATTACH_DIR: Specifies directory containing debug attach files -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_DEBUG_ATTACH_DIR_ATTR#description}</fixed-text>
-						<control-state>
-							<enable-if attribute="os.name" value="Linux"/>
-						</control-state>
-					</widget>
-					<browse textStyle="SWT.BORDER" attribute="MP_DEBUG_ATTACH_DIR_ATTR"
-						title="Browse" directory="true">
-						<text-layout-data>
-							<grid-data widthHint="200" />
-						</text-layout-data>
-						<button-layout-data>
-							<grid-data widthHint="200" />
-						</button-layout-data>
-						<tooltip>${ptp_rm:MP_DEBUG_ATTACH_DIR_ATTR#tooltip}</tooltip>
-						<text-control-state>
-							<enable-if attribute="os.name" value="Linux"/>
-						</text-control-state>
-						<button-control-state>
-							<enable-if attribute="os.name" value="Linux"/>
-						</button-control-state>
-					</browse>
+					</widget>	
 					
 					<!--MP_DEBUG_NOTIMEOUT: Suppress application timeout for debugger attach -->
 					<widget type="label" style="SWT.LEFT">
@@ -1742,57 +1724,6 @@
 							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
-					
-					<!--MP_DBG_LAUNCH: Debugger will attach to application -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_DBG_LAUNCH_ATTR#description}
-						</fixed-text>
-					</widget>
-					<widget type="checkbox" attribute="MP_DBG_TASKINFO_ATTR"
-						style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL"
-								grabExcessHorizontal="false" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_DBG_LAUNCH_ATTR#tooltip}</tooltip>
-					</widget>
-					
-					<!--MP_DBG_LAUNCH_TIMEOUT: Time to wait for debugger to attach -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data widthHint="200" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_DBG_LAUNCH_TIMEOUT_ATTR#description}
-						</fixed-text>
-					</widget>
-					<widget type="text" attribute="MP_DBG_LAUNCH_TIMEOUT_ATTR" style="SWT.BORDER">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_DBG_LAUNCH_TIMEOUT_ATTR#tooltip}</tooltip>
-					</widget>
-					
-					<!--MP_DBG_TASKINFO: Use poe task/host info socket -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_DBG_TASKINFO_ATTR#description}
-						</fixed-text>
-					</widget>
-					<widget type="checkbox" attribute="MP_DBG_TASKINFO_ATTR"
-						style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL"
-								grabExcessHorizontal="false" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_DBG_TASKINFO_ATTR#tooltip}</tooltip>
-					</widget>			
 					
 				</composite>
 
@@ -1914,6 +1845,9 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_CHECKPOINT_ATTR#description}
 						</fixed-text>
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
 					<widget type="checkbox" attribute="MP_CHECKPOINT_ATTR" style="SWT.LEFT">
 						<layout-data>
@@ -1921,6 +1855,9 @@
 								grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MP_CHECKPOINT_ATTR#tooltip}</tooltip>
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
 										
 					<!-- MP_CKPTDIR: Checkpoint directory-->
