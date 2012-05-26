@@ -679,8 +679,8 @@
 
 				<attribute name="MP_RESD_ATTR" type="boolean"
 					translateBooleanAs="yes,no">
-					<description>Use resource manager:</description>
-					<tooltip>Use resource manager to handle resource allocations {MP_RESD}</tooltip>
+					<description>Use LoadLeveler:</description>
+					<tooltip>Use LoadLeveler to handle resource allocations {MP_RESD}</tooltip>
 					<default>no</default>
 				</attribute>
 
