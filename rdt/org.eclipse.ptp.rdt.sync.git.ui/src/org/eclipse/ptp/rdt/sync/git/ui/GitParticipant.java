@@ -103,7 +103,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
 		configArea.setLayout(layout);
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		configArea.setLayoutData(gd);
 
 		if (showProviderCombo) {
