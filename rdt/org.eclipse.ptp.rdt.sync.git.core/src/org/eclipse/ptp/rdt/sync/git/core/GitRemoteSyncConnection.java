@@ -459,7 +459,7 @@ public class GitRemoteSyncConnection {
 				throw new RemoteExecutionException(e);
 			}
 			if (commandResults.getExitCode() != 0) {
-				throw new RemoteExecutionException(Messages.GRSC_GitLsFilesFailure + commandResults.getStdout());
+				throw new RemoteExecutionException(Messages.GRSC_GitLsFilesFailure + commandResults.getStderr());
 			}
 
 			BufferedReader statusReader = new BufferedReader(new StringReader(commandResults.getStdout()));
@@ -782,7 +782,7 @@ public class GitRemoteSyncConnection {
 	
 					if (mergeResults.getExitCode() != 0) {
 						throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
-								+ mergeResults.getStdout()));
+								+ mergeResults.getStderr()));
 					}
 				}
 			} catch (final IOException e) {
@@ -942,7 +942,7 @@ public class GitRemoteSyncConnection {
 
 				if (mergeResults.getExitCode() != 0) {
 					throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
-							+ mergeResults.getStdout()));
+							+ mergeResults.getStderr()));
 				}
 			}
 		} catch (final IOException e) {
