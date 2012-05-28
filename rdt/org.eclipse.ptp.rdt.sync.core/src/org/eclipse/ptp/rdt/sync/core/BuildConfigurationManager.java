@@ -729,6 +729,7 @@ public class BuildConfigurationManager {
 		}
 		
 		ICStorageElement storage = configDesc.getStorage(storageName, true);
+		storage.clear(); // Certain attributes can be intentionally unmapped, such as the sync provider for non-sync'ed configs.
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			storage.setAttribute(entry.getKey(), entry.getValue());
 		}
