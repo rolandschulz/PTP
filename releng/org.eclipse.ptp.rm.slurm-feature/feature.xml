@@ -3,9 +3,8 @@
       id="org.eclipse.ptp.rm.slurm"
       label="%featureName"
       version="6.0.0.qualifier"
-      plugin="org.eclipse.ptp.rm.slurm.core"
       provider-name="%providerName"
-      >
+      plugin="org.eclipse.ptp.rm.slurm.core">
 
    <description url="http://eclipse.org/ptp">
       %description
@@ -18,10 +17,6 @@
    <license url="%licenseURL">
       %license
    </license>
-
-   <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
-   </url>
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>

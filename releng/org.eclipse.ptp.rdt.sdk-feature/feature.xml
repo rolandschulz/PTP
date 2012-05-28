@@ -17,10 +17,6 @@
       %license
    </license>
 
-   <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/releases/galileo"/>
-   </url>
-
    <includes
          id="org.eclipse.ptp.rdt.source"
          version="0.0.0"/>
