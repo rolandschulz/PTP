@@ -33,6 +33,7 @@ import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.ISyncListener;
 import org.eclipse.ptp.rdt.sync.core.SyncEvent;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
+import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -164,7 +165,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	// Update viewer and also switch to the passed project if it is not null
 	public void update(IProject newProject) {
 		// Switch projects if needed
-		if (newProject != null) {
+		if ((newProject != null) && RemoteSyncNature.hasNature(newProject)) {
 			if (project != null) {
 				SyncManager.removePostSyncListener(project, syncListener);
 			}
