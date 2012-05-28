@@ -24,7 +24,8 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
  */
 public class RemoteServerManager {
 	private static final String REMOTE_SERVER_EXTENSION_POINT_ID = "remoteServer"; //$NON-NLS-1$
-	private static final String REMOTE_SERVER_OVERRIDE_EXTENSION_POINT_ID = "remoteServerOverride"; //$NON-NLS-1$
+	private static final String REMOTE_SERVER_EXTENSION_ID = "remoteServer"; //$NON-NLS-1$
+	private static final String REMOTE_SERVER_OVERRIDE_EXTENSION_ID = "remoteServerOverride"; //$NON-NLS-1$
 
 	private static final Map<String, AbstractRemoteServerRunner> fServerMap = new HashMap<String, AbstractRemoteServerRunner>();
 
@@ -60,7 +61,7 @@ public class RemoteServerManager {
 				final IConfigurationElement[] elements = ext.getConfigurationElements();
 
 				for (IConfigurationElement ce : elements) {
-					if (ce.getAttribute(ATTR_ID).equals(id)) {
+					if (ce.getName().equals(REMOTE_SERVER_EXTENSION_ID) && id.equals(ce.getAttribute(ATTR_ID))) {
 						try {
 							Object exec = ce.createExecutableExtension(ATTR_CLASS);
 							if (exec instanceof AbstractRemoteServerRunner) {
@@ -92,7 +93,7 @@ public class RemoteServerManager {
 	private static void checkForOverrides(String id, AbstractRemoteServerRunner server) {
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint(PTPRemoteCorePlugin.getUniqueIdentifier(),
-				REMOTE_SERVER_OVERRIDE_EXTENSION_POINT_ID);
+				REMOTE_SERVER_EXTENSION_POINT_ID);
 		if (extensionPoint != null) {
 			final IExtension[] extensions = extensionPoint.getExtensions();
 
@@ -100,7 +101,7 @@ public class RemoteServerManager {
 				final IConfigurationElement[] elements = ext.getConfigurationElements();
 
 				for (IConfigurationElement ce : elements) {
-					if (ce.getAttribute(ATTR_ID).equals(id)) {
+					if (ce.getName().equals(REMOTE_SERVER_OVERRIDE_EXTENSION_ID) && id.equals(ce.getAttribute(ATTR_ID))) {
 						String attr = ce.getAttribute(ATTR_LAUNCH_COMMAND);
 						if (attr != null) {
 							server.setLaunchCommand(attr);

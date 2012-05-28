@@ -10,7 +10,7 @@
 	<control-data>
 		<!-- Required for debugger to determine number of processes to display -->
 		<attribute name="mpiNumberOfProcesses" type="integer">
-			<link-value-to>MP_PROCS</link-value-to>
+			<link-value-to>MP_PROCS_ATTR</link-value-to>
 		</attribute>
 	
                 <attribute name="MP_ACK_THRESH_ATTR" type="integer">
@@ -25,15 +25,30 @@
                 </attribute>
 
                 <attribute name="MP_ADAPTER_USE_ATTR" type="string">
-                        <description>Exclusive adapter use:</description>
+                        <description>Exclusive adapter use (LoadLeveler):</description>
                         <tooltip>Specify how node's adapter should be used {MP_ADAPTER_USE}</tooltip>
-                        <choice>ip,us</choice>
+                        <choice>dedicated,shared</choice>
                 </attribute>
 
                 <attribute name="MP_BINDPROC_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
                         <description>Bind tasks to first CPU:</description>
                         <tooltip>Bind tasks to first logical CPU. Use for OpenMP Only {MP_BINDPROC}
+                        </tooltip>
+                        <default>no</default>
+                </attribute>
+                
+                <attribute name="MP_BSR_BARRIER_ATTR" type="boolean"
+                        translateBooleanAs="yes,no">
+                        <description>Enable BSR (AIX):</description>
+                        <tooltip>Enable use of barrier synchronization register {MP_BSR_BARRIER}
+                        </tooltip>
+                        <default>no</default>
+                </attribute>
+                
+                <attribute name="MP_BUFFER_MEM_ATTR" type="integer">
+                        <description>Point to point buffer size:</description>
+                        <tooltip>Size of early arrival message buffer for point to point communications {MP_BUFFER_MEM}
                         </tooltip>
                 </attribute>
 
@@ -47,12 +62,27 @@
                                 </error-message>
                         </validator>
                 </attribute>
+                
+                <attribute name="MP_CC_BUF_MEM_ATTR" type="integer">
+                        <description>Collective buffer size:</description>
+                        <tooltip>Size of early arrival message buffer for collective communications {MP_CC_BUF_MEM}
+                        </tooltip>
+                </attribute>
 
                 <attribute name="MP_CC_SCRATCH_BUF_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
                         <description>Fastest collectives:</description>
                         <tooltip>Specify if fastest collective algorithm is used {MP_CC_SCRATCH_BUF}
                         </tooltip>
+                        <default>yes</default>
+                </attribute>
+                
+                <attribute name="MP_CHECKPOINT_ATTR" type="boolean"
+                        translateBooleanAs="yes,no">
+                        <description>Job is checkpointable (AIX):</description>
+                        <tooltip>Specifies that the job is checkpointable {MP_CHECKPOINT}
+                        </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_CLOCK_SOURCE_ATTR" type="string">
@@ -60,7 +90,20 @@
                         <tooltip>Specify if high performance switch is clock source
                                 {MP_CLOCK_SOURCE}
                         </tooltip>
-                        <choice>,switch,ntp,aix</choice>
+                        <choice>,switch,ntp,aix,os</choice>
+                </attribute>
+                
+                <attribute name="MP_CKPTDIR_ATTR" type="string">
+                        <description>Checkpoint directory:</description>
+                        <tooltip>Specify directory where checkpoint files will reside {MP_CKPTDIR}
+                        </tooltip>
+                        <validator>
+                                <file-info
+                                        efsAttributes="ATTRIBUTE_OWNER_READ | ATTRIBUTE_OWNER_WRITE | ATTRIBUTE_OWNER_EXECUTE"
+                                        isDirectory="true" />
+                                <error-message>Library path must be writable directory
+                                </error-message>
+                        </validator>
                 </attribute>
 
                 <attribute name="MP_CMDFILE_ATTR" type="string">
@@ -85,6 +128,12 @@
                                 </error-message>
                         </validator>
                 </attribute>
+                
+                <attribute name="MP_COMMON_TASKS_ATTR" type="integer">
+                        <description>Common tasks on node:</description>
+                        <tooltip>Specify list of tasks common to this task on this PMD node {MP_COMMON_TASKS}
+                        </tooltip>
+                </attribute>
 
                 <attribute name="MP_CONFIG_ATTR" type="string">
                         <description>Use PE release level:</description>
@@ -99,31 +148,32 @@
                 </attribute>
 
                 <attribute name="MP_COREFILE_FORMAT_ATTR" type="string">
-                        <description>Corefile format:</description>
+                        <description>Corefile format (AIX):</description>
                         <tooltip>Specify 'STDERR' to write core data to stderr, blank for standard core file or name of lightweight corefile {MP_COREFILE_FORMAT}
                         </tooltip>
                         <choice>,STDERR</choice>
                 </attribute>
 
 				<attribute name="MP_COREFILE_SIGTERM_ATTR" type="boolean" translateBooleanAs="yes,no">
-					<description>Corefile on SIGTERM:</description>
+					<description>Corefile on SIGTERM (AIX):</description>
 					<tooltip>Select to create corefile if application gets SIGTERM {MP_COREFILE_SIGTERM}
 					</tooltip>
-					<choice>yes,no,debug,minimum</choice>
+					<default>no</default>
 				</attribute>
 		
                 <attribute name="MP_COSCHEDULER_VERSION_ATTR" type="boolean"
                         translateBooleanAs="runqueue,''">
-                        <description>Use runqueue co-scheduler:</description>
+                        <description>Use runqueue co-scheduler (AIX):</description>
                         <tooltip>Specifies if POE runqueue co-scheduler is used {MP_COSCHEDULER_VERSION}
                         </tooltip>
+                        <default> </default>
                 </attribute>
 
                 <attribute name="MP_CPU_USE_ATTR" type="string">
                         <description>Exclusive CPU use:</description>
                         <tooltip>Specify how node's CPU should be used {MP_CPU_USE}
                         </tooltip>
-                        <choice>ip,us</choice>
+                        <choice>unique,multiple</choice>
                 </attribute>
 
                 <attribute name="MP_CSS_INTERRUPT_ATTR" type="boolean"
@@ -131,13 +181,65 @@
                         <description>Packets generate interrupts:</description>
                         <tooltip>Specify if arriving packets generate interrupts (Default: no) {MP_CSS_INTERRUPT}
                         </tooltip>
+                        <default>no</default>
+                </attribute>
+
+                <attribute name="MP_DBG_LAUNCH_ATTR" type="boolean"
+                        translateBooleanAs="yes,no">
+                        <description>Debugger will attach:</description>
+                        <tooltip>Specifies that the application will suspend so a debugger can attach to it {MP_DBG_LAUNCH} 
+                        </tooltip>
+                        <default>no</default>
+                </attribute>
+                                
+                <attribute name="MP_DBG_LAUNCH_TIMEOUT_ATTR" type="string">
+                        <description>Debugger attach timeout:</description>
+                        <tooltip>Specifies how long application will suspend for debugger to attach {MP_DBG_LAUNCH_TIMEOUT} 
+                        </tooltip>
+                </attribute>
+                
+                <attribute name="MP_DBG_TASKINFO_ATTR" type="boolean"
+                        translateBooleanAs="yes,no">
+                        <description>Use task info socket:</description>
+                        <tooltip>Specifies that a tool or debugger will obtain task and host information using a socket connection {MP_DBG_TASKINFO} 
+                        </tooltip>
+                        <default>yes</default>
+                </attribute>
+                
+                <attribute name="MP_DEBUG_ATTACH_ATTR" type="boolean"
+                        translateBooleanAs="yes,no">
+                        <description>Create debug attach file:</description>
+                        <tooltip>Specifies that debugger attach file will be created {MP_DEBUG_ATTACH} 
+                        </tooltip>
+                        <default>yes</default>
+                </attribute>
+                                
+                <attribute name="MP_DEBUG_ATTACH_DIR_ATTR" type="string">
+                        <description>Directory for debug attach file:</description>
+                        <tooltip>Specify directory where debug attach file will be created {MP_DEBUG_ATTACH_DIR}
+                        </tooltip>
+                        <validator>
+                                <file-info
+                                        efsAttributes="ATTRIBUTE_OWNER_READ | ATTRIBUTE_OWNER_WRITE | ATTRIBUTE_OWNER_EXECUTE"
+                                        isDirectory="true" />
+                                <error-message>Directory must be writable directory
+                                </error-message>
+                        </validator>
+                </attribute>
+                
+                <attribute name="MP_DEBUG_NOTIMEOUT_ATTR" type="boolean"
+                        translateBooleanAs="yes,no">
+                        <description>Disable timeout (AIX):</description>
+                        <tooltip>Suppress timeout so debugger can attach without application timeout  {MP_DEBUG_NOTIMEOUT}
+                        </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_DEVTYPE_ATTR" type="string">
                         <description>Device type class:</description>
                         <tooltip>Select 'hfi' to use HFI device type, blank otherwise {MP_DEVTYPE}
                         </tooltip>
-                        <choice>,hfi</choice>
+                        <choice>,ib,hfi</choice>
                 </attribute>
 
                 <attribute name="MP_EAGER_LIMIT_ATTR" type="integer">
@@ -150,12 +252,23 @@
                                 </error-message>
                         </validator>
                 </attribute>
+                
+                <attribute name="MP_ENDPOINTS_ATTR" type="integer">
+                        <description>PAMI endpoints:</description>
+                        <tooltip>Specify the number of PAMI contexts (endpoints) per PAMI instance {MP_ENDPOINTS}
+                        </tooltip>
+                        <validator>
+                                <regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
+                                <error-message>Number of endpoints must be numeric
+                                </error-message>
+                        </validator>
+                </attribute>
 
                 <attribute name="MP_EUIDEVELOP_ATTR" type="string">
                         <description>MPI parameter checking:</description>
                         <tooltip>Specify level of MPI parameter checking.  (Default: no) {MP_EUIDEVELOP}
                         </tooltip>
-                        <choice>yes,no,deb,min</choice>
+                        <choice>yes,no,deb,min,trace,debug,full</choice>
                 </attribute>
 
                 <attribute name="MP_EUIDEVICE_ATTR" type="string">
@@ -197,6 +310,7 @@
                         <description>Use forced interrupts:</description>
                         <tooltip>Use forced interrupts for rondezvous message in RDMA transfer (Default: no) {MP_FORCED_INTERRUPTS_ENABLED}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_HINTS_FILTERED_ATTR" type="boolean"
@@ -204,6 +318,7 @@
                         <description>Hints filtered:</description>
                         <tooltip>Specify if MPI info objects reject hints (Default: no) {MP_HINTS_FILTERED}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_HOSTFILE_ATTR" type="string">
@@ -292,6 +407,7 @@
                         <description>Create I/O error log:</description>
                         <tooltip>Specify if I/O error logging is enabled (Default: no) {MP_IO_ERRLOG}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_LABELIO_ATTR" type="boolean"
@@ -299,6 +415,15 @@
                         <description>Label STDIO with task number:</description>
                         <tooltip>Prefix stdout and stderr for each task with task number. {MP_LABELIO}
                         </tooltip>
+                        <default>no</default>
+                </attribute>
+                
+                <attribute name="MP_LOCKLESS_ATTR" type="boolean"
+                        translateBooleanAs="yes,no">
+                        <description>MPU runs lockless (Linux):</description>
+                        <tooltip>Specifies whether MPI runs in lockless mode {MP_LOCKLESS}
+                        </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_MC_INET_ADDR_LEN_ATTR" type="integer">
@@ -335,7 +460,7 @@
                 </attribute>
 
                 <attribute name="MP_MPILIB_ATTR" type="string">
-                        <description>MPI library:</description>
+                        <description>MPI library (Linux):</description>
                         <tooltip>Specify MPI library (shim or mpich2) {MP_MPILIB}
                         </tooltip>
                         <choice>mpich2,shim</choice>
@@ -360,14 +485,14 @@
                 </attribute>
 
                 <attribute name="MP_NEWJOB_ATTR" type="string">
-                        <description>Keep job partition:</description>
+                        <description>Keep job partition (LoadLeveler):</description>
                         <tooltip>Specifies if partition manager maintains partition for multiple job steps {MP_NEWJOB}
                         </tooltip>
                         <choice>,yes,no,parallel</choice>
                 </attribute>
 
                 <attribute name="MP_NODES_ATTR" type="integer">
-                        <description>Number of nodes:</description>
+                        <description>Number of nodes (LoadLeveler):</description>
                         <tooltip>Specify the number of nodes to run application. {MP_NODES}
                         </tooltip>
                         <validator>
@@ -375,6 +500,14 @@
                                 <error-message>Number of nodes must be numeric
                                 </error-message>
                         </validator>
+                </attribute>
+
+                <attribute name="MP_PE_AFFINITY_ATTR" type="boolean"
+                        translateBooleanAs="yes,no">
+                        <description>PE sets affinity:</description>
+                        <tooltip>Enamle PE to perform affinity setup {MP_PE_AFFINITY}
+                        </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_PGMMODEL_ATTR" type="string">
@@ -389,6 +522,7 @@
                         <description>Generate PMD diagnostic log:</description>
                         <tooltip>Generate a PMD log for diagnostic purposes. (Default: no) {MP_PMDLOG}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_PMDLOG_DIR_ATTR" type="string">
@@ -408,6 +542,14 @@
                         <description>Alternate PMD service suffix:</description>
                         <tooltip>Specify the suffix for the PMD service name {MP_PMD_SUFFIX}
                         </tooltip>
+                </attribute>
+                
+                <attribute name="MP_POE_CONTINUE_ATTR" type="boolean"
+                        translateBooleanAs="yes,no">
+                        <description>Continue if subjob fails (LoadLeveler):</description>
+                        <tooltip>Specify whether a parallel job continues if subjob fails {MP_POE_CONTINUE}
+                        </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_POLLING_INTERVAL_ATTR" type="integer">
@@ -439,6 +581,7 @@
                         <description>Create co-scheduler log:</description>
                         <tooltip>Specify if co-scheduler log should be created (Default: no) {MP_PRIORITY_LOG}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_PRIORITY_LOG_DIR_ATTR" type="string">
@@ -463,9 +606,10 @@
 
                 <attribute name="MP_PRIORITY_NTP_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
-                        <description>Co-scheduler disables NTP:</description>
+                        <description>Co-scheduler disables NTP (AIX):</description>
                         <tooltip>Specify if PE co-scheduler disables NTP during adjustment period (Default: no) {MP_PRIORITY_NTP}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_PROCS_ATTR" type="integer">
@@ -480,7 +624,7 @@
                 </attribute>
 
                 <attribute name="MP_PROFDIR_ATTR" type="string">
-                        <description>GMON file directory:</description>
+                        <description>GMON file directory (Linux):</description>
                         <tooltip>Specify directory where GMON files are stored. {MP_PROFDIR}
                         </tooltip>
                 </attribute>
@@ -511,6 +655,7 @@
                         <description>Use LMC:</description>
                         <tooltip>Use lid mask control (LMC) (Default: no) {MP_RC_USE_LMC}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_RDMA_ROUTE_MODE_ATTR" type="string">
@@ -521,7 +666,7 @@
                 </attribute>
 
                 <attribute name="MP_REMOTEDIR_ATTR" type="string">
-                        <description>Remote directory script:</description>
+                        <description>Remote directory script (AIX):</description>
                         <tooltip>Specify script to echo name of current directory to be used on remote nodes {MP_REMOTEDIR}
                         </tooltip>
                         <validator>
@@ -532,9 +677,11 @@
                         </validator>
                 </attribute>
 
-				<attribute name="MP_RESD_ATTR" type="string">
+				<attribute name="MP_RESD_ATTR" type="boolean"
+					translateBooleanAs="yes,no">
 					<description>Use resource manager:</description>
 					<tooltip>Use resource manager to handle resource allocations {MP_RESD}</tooltip>
+					<default>no</default>
 				</attribute>
 
                 <attribute name="MP_RETRANSMIT_INTERVAL_ATTR" type="integer">
@@ -549,7 +696,7 @@
                 </attribute>
 
                 <attribute name="MP_RETRY_ATTR" type="integer">
-                        <description>Job submission timeout:</description>
+                        <description>Job submission timeout (LoadLeveler):</description>
                         <tooltip>"Specify job submission timeout ( &lt;0: wait indefinitely, 0: no wait, &gt;0, wait specified interval) (Default: 0) {MP_RETRY}"
                         </tooltip>
                         <validator>
@@ -583,25 +730,25 @@
                 </attribute>
 
                 <attribute name="MP_RMFILE_ATTR" type="string">
-                        <description>Node allocation file:</description>
+                        <description>Node allocation file (LoadLeveler):</description>
                         <tooltip>Specify resource manager command file for node allocation {MP_RMFILE}
                         </tooltip>
                         <validator>
                                 <file-info efsAttributes="ATTRIBUTE_OWNER_READ"
                                         isDirectory="false" />
-                                <error-message>Node allocation command file must be a readable file     on remote system
+                                <error-message>Node allocation command file must be a readable file on remote system
                                 </error-message>
                         </validator>
                 </attribute>
 
                 <attribute name="MP_RMPOOL_ATTR" type="integer">
-                        <description>Node allocation pool:</description>
+                        <description>Node allocation pool (LoadLeveler):</description>
                         <tooltip>"Specify name of node allocation pool {MP_RMPOOL}"
                         </tooltip>
                 </attribute>
 
                 <attribute name="MP_RM_TIMEOUT_ATTR" type="integer">
-                        <description>Resource mgr connect timeout:</description>
+                        <description>Resource mgr connect timeout (LoadLeveler):</description>
                         <tooltip>"Specify resource manager connection timeout (&lt;0: wait indefinitely, 0:     no wait, &gt;0, wait specified interval) (Default: 30) {MP_RM_TIMEOUT}"
                         </tooltip>
                         <validator>
@@ -612,7 +759,7 @@
                 </attribute>
 
                 <attribute name="MP_RMA_PENDING_ATTR" type="integer">
-                        <description>Maximum RMA requests:</description>
+                        <description>Maximum RMA requests (Linux):</description>
                         <tooltip>Maximum outstanding RMA requests. Limits number of PAMI_Request objects allocated by MPI onesided operations. (default 1000) {MP_RMA_PENDING}
                         </tooltip>
                         <validator>
@@ -623,13 +770,13 @@
                 </attribute>
 
                 <attribute name="MP_SAVEHOSTFILE_ATTR" type="string">
-                        <description>Generated host file:</description>
+                        <description>Generated host file (LoadLeveler):</description>
                         <tooltip>Specify path to saved hostfile generated by partition manager {MP_SAVEHOSTFILE}
                         </tooltip>
                 </attribute>
 
                 <attribute name="MP_SAVE_RMFILE_ATTR" type="string">
-                        <description>Generated job command file:</description>
+                        <description>Generated job command file (LoadLeveler):</description>
                         <tooltip>Specify path to saved job command file generated by partition manager {MP_SAVE_RMFILE}
                         </tooltip>
                 </attribute>
@@ -639,7 +786,8 @@
                         <description>Use shared memory:</description>
                         <tooltip>Specify if shared memory is used for communication (Default: yes) {MP_SHARED_MEMORY}
                         </tooltip>
-                </attribute>
+                        <default>yes</default>
+               </attribute>
 
                 <attribute name="MP_SHMCC_EXCLUDE_LIST_ATTR" type="string">
                         <description>Shared memory exclusions:</description>
@@ -649,9 +797,10 @@
 
                 <attribute name="MP_SHMEM_PT2PT_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
-                        <description>Optimized shared memory:</description>
+                        <description>Optimized shared memory (Linux):</description>
                         <tooltip>Determines if intranode point-to-point communication will use the optimized shared memory protocols. (Default yes) {MP_SHMEM_PT2PT}
                         </tooltip>
+                         <default>yes</default>
                 </attribute>
 
                 <attribute name="MP_SINGLE_THREAD_ATTR" type="string">
@@ -692,7 +841,7 @@
                 </attribute>
 
                 <attribute name="MP_TASKS_PER_NODE_ATTR" type="integer">
-                        <description>Number of tasks per node:</description>
+                        <description>Number of tasks per node (LoadLeveler):</description>
                         <tooltip>Specify the number application tasks per node. {MP_TASKS_PER_NODE}
                         </tooltip>
                         <validator>
@@ -739,7 +888,7 @@
 				</attribute>
 
                 <attribute name="MP_TLP_REQUIRED_ATTR" type="string">
-                        <description>Large pages required:</description>
+                        <description>Large pages required (AIX):</description>
                         <tooltip>Specifies if POE shuld check if application was compiled for large pages {MP_TLP_REQUIRED}
                         </tooltip>
                         <choice>,none,warn,kill</choice>
@@ -761,6 +910,7 @@
                         <description>Use bulk transfer:</description>
                         <tooltip>Use adapter bult data transfer mechanisms (Default: no) {MP_USE_BULK_XFER}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_USE_MC_ATTR" type="boolean"
@@ -768,6 +918,7 @@
                         <description>Use hardware multicast:</description>
                         <tooltip>Specifies if hardware multicast feature is used (Default: no) {MP_USE_MC}
                         </tooltip>
+                        <default>no</default>
                 </attribute>
 
                 <attribute name="MP_WAIT_MODE_ATTR" type="string">
@@ -788,6 +939,7 @@
                         <description>Use LoadLeveler for node allocation:</description>
                         <tooltip>Use LoadLeveler as node and system resource allocator
                         </tooltip>
+                        <default>no</default>
                 </attribute>
                 
                 <attribute name="SCI_DEBUG_FANOUT_ATTR" type="integer">
@@ -807,15 +959,21 @@
 			<arg>perl</arg>
 			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app.pl</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
-			<arg>${ptp_rm:progArgs_ATTR#value}</arg>
+			<arg>${ptp_rm:progArgs#value}</arg>
 			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH_ATTR#value}" />
 			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE_ATTR#value}" />
 			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC_ATTR#value}" />
+			<environment name="MP_BSR_BARRIER" value="${ptp_rm:MP_BSR_BARRIER_ATTR#value}" />
+			<environment name="MP_BUFFER_MEM" value="${ptp_rm:MP_BUFFER_MEM_ATTR#value}" />
 			<environment name="MP_BULK_MIN_MSG_SIZE" value="${ptp_rm:MP_BULK_MIN_MSG_SIZE_ATTR#value}" />
-			<environment name="MP_CC_SCRATCH_BUF" value="${ptp_rm:MP_SCRATCH_BUF_ATTR#value}" />
+			<environment name="MP_CC_BUF_MEM" value="${ptp_rm:MP_CC_BUF_MEM_ATTR#value}" />
+			<environment name="MP_CC_SCRATCH_BUF" value="${ptp_rm:MP_CC_SCRATCH_BUF_ATTR#value}" />
+			<environment name="MP_CHECKPOINT" value="${ptp_rm:MP_CHECKPOINT_ATTR#value}" />
 			<environment name="MP_CLOCK_SOURCE" value="${ptp_rm:MP_CLOCK_SOURCE_ATTR#value}" />
+			<environment name="MP_CKPTDIR" value="${ptp_rm:MP_CKPTDIR_ATTR#value}" />
 			<environment name="MP_CMDFILE" value="${ptp_rm:MP_CMDFILE_ATTR#value}" />
 			<environment name="MP_COLLECTIVE_GROUPS" value="${ptp_rm:MP_COLLECTIVE_GROUPS_ATTR#value}" />
+			<environment name="MP_COMMON_TASKS" value="${ptp_rm:MP_COMMON_TASKS_ATTR#value}" />
 			<environment name="MP_CONFIG" value="${ptp_rm:MP_CONFIG_ATTR#value}" />
 			<environment name="MP_COREDIR" value="${ptp_rm:MP_COREDIR_ATTR#value}" />
 			<environment name="MP_COREFILE_FORMAT" value="${ptp_rm:MP_COREFILE_FORMAT_ATTR#value}" />
@@ -823,8 +981,15 @@
 			<environment name="MP_COSCHEDULER_VERSION" value="${ptp_rm:MP_COSCHEDULER_VERSION_ATTR#value}" />
 			<environment name="MP_CPU_USE" value="${ptp_rm:MP_CPU_USE_ATTR#value}" />
 			<environment name="MP_CSS_INTERRUPT" value="${ptp_rm:MP_CSS_INTERRUPT_ATTR#value}" />
+			<environment name="MP_DBG_LAUNCH" value="${ptp_rm:MP_DBG_LAUNCH_ATTR#value}" />
+			<environment name="MP_DBG_LAUNCH_TIMEOUT" value="${ptp_rm:MP_DBG_LAUNCH_TIMEOUT_ATTR#value}" />
+			<environment name="MP_DBG_TASKINFO" value="${ptp_rm:MP_DBG_TASKINFO_ATTR#value}" />
+			<environment name="MP_DEBUG_ATTACH" value="${ptp_rm:MP_DEBUG_ATTACH_ATTR#value}" />
+			<environment name="MP_DEBUG_ATTACH_DIR" value="${ptp_rm:MP_DEBUG_ATTACH_DIR_ATTR#value}" />
+			<environment name="MP_DEBUG_NOTIMEOUT" value="${ptp_rm:MP_DEBUG_NOTIMEOUT_ATTR#value}" />
 			<environment name="MP_DEVTYPE" value="${ptp_rm:MP_DEVTYPE_ATTR#value}" />
 			<environment name="MP_EAGER_LIMIT" value="${ptp_rm:MP_EAGER_LIMIT_ATTR#value}" />
+			<environment name="MP_ENDPOINTS" value="${ptp_rm:MP_ENDPOINTS_ATTR#value}" />
 			<environment name="MP_EUIDEVELOP" value="${ptp_rm:MP_EUIDEVELOP_ATTR#value}" />
 			<environment name="MP_EUIDEVICE" value="${ptp_rm:MP_EUIDEVICE_ATTR#value}" />
 			<environment name="MP_EUILIB" value="${ptp_rm:MP_EUILIB_ATTR#value}" />
@@ -842,6 +1007,7 @@
 			<environment name="MP_IO_BUFFER_SIZE" value="${ptp_rm:MP_IO_BUFFER_SIZE_ATTR#value}" />
 			<environment name="MP_IO_ERRLOG" value="${ptp_rm:MP_IO_ERRLOG_ATTR#value}" />
 			<environment name="MP_LABELIO" value="${ptp_rm:MP_LABELIO_ATTR#value}" />
+			<environment name="MP_LOCKLESS" value="${ptp_rm:MP_LOCKLESS_ATTR#value}" />
 			<environment name="MP_MC_INET_ADDR_LEN" value="${ptp_rm:MP_MC_INET_ADDR_LEN_ATTR#value}" />
 			<environment name="MP_MC_INET_BASE_ADDR" value="${ptp_rm:MP_MC_INET_BASE_ADDR_ATTR#value}" />
 			<environment name="MP_MC_INET_PORT" value="${ptp_rm:MP_MC_INET_PORT_ATTR#value}" />
@@ -850,10 +1016,12 @@
 			<environment name="MP_MSG_ENVELOPE_BUF" value="${ptp_rm:MP_MSG_ENVELOPE_BUF_ATTR#value}" />
 			<environment name="MP_NEWJOB" value="${ptp_rm:MP_NEWJOB_ATTR#value}" />
 			<environment name="MP_NODES" value="${ptp_rm:MP_NODES_ATTR#value}" />
+			<environment name="MP_PE_AFFINITY" value="${ptp_rm:MP_PE_AFFINITY_ATTR#value}" />
 			<environment name="MP_PGMMODEL" value="${ptp_rm:MP_PGMMODEL_ATTR#value}" />
 			<environment name="MP_PMDLOG" value="${ptp_rm:MP_PMDLOG_ATTR#value}" />
 			<environment name="MP_PMDLOG_DIR" value="${ptp_rm:MP_PMDLOG_DIR_ATTR#value}" />
 			<environment name="MP_PMDSUFFIX" value="${ptp_rm:MP_PMDSUFFIX_ATTR#value}" />
+			<environment name="MP_POE_CONTINUE" value="${ptp_rm:MP_POE_CONTINUE_ATTR#value}" />
 			<environment name="MP_POLLING_INTERVAL" value="${ptp_rm:MP_POLLING_INTERVAL_ATTR#value}" />
 			<environment name="MP_PRINTENV" value="${ptp_rm:MP_PRINTENV_ATTR#value}" />
 			<environment name="MP_PRIORITY" value="${ptp_rm:MP_PRIORITY_ATTR#value}" />
@@ -915,18 +1083,23 @@
 
 		<submit-interactive-debug name="POE command" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true">
 			<arg>perl</arg>
-			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app_debug.pl</arg>
-			<arg>poe</arg>
+			<arg>${ptp_rm:ptpDirectory#value}/rms/PE/run_pe_app.pl</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
-			<arg>${ptp_rm:debuggerArgs_ATTR#value}</arg>
+			<arg>${ptp_rm:debuggerArgs#value}</arg>
 			<environment name="MP_ACK_THRESH" value="${ptp_rm:MP_ACK_THRESH_ATTR#value}" />
 			<environment name="MP_ADAPTER_USE" value="${ptp_rm:MP_ADAPTER_USE_ATTR#value}" />
 			<environment name="MP_BINDPROC" value="${ptp_rm:MP_BINDPROC_ATTR#value}" />
+			<environment name="MP_BSR_BARRIER" value="${ptp_rm:MP_BSR_BARRIER_ATTR#value}" />
+			<environment name="MP_BUFFER_MEM" value="${ptp_rm:MP_BUFFER_MEM_ATTR#value}" />
 			<environment name="MP_BULK_MIN_MSG_SIZE" value="${ptp_rm:MP_BULK_MIN_MSG_SIZE_ATTR#value}" />
-			<environment name="MP_CC_SCRATCH_BUF" value="${ptp_rm:MP_SCRATCH_BUF_ATTR#value}" />
+			<environment name="MP_CC_BUF_MEM" value="${ptp_rm:MP_CC_BUF_MEM_ATTR#value}" />
+			<environment name="MP_CC_SCRATCH_BUF" value="${ptp_rm:MP_CC_SCRATCH_BUF_ATTR#value}" />
+			<environment name="MP_CHECKPOINT" value="${ptp_rm:MP_CHECKPOINT_ATTR#value}" />
 			<environment name="MP_CLOCK_SOURCE" value="${ptp_rm:MP_CLOCK_SOURCE_ATTR#value}" />
+			<environment name="MP_CKPTDIR" value="${ptp_rm:MP_CKPTDIR_ATTR#value}" />
 			<environment name="MP_CMDFILE" value="${ptp_rm:MP_CMDFILE_ATTR#value}" />
 			<environment name="MP_COLLECTIVE_GROUPS" value="${ptp_rm:MP_COLLECTIVE_GROUPS_ATTR#value}" />
+			<environment name="MP_COMMON_TASKS" value="${ptp_rm:MP_COMMON_TASKS_ATTR#value}" />
 			<environment name="MP_CONFIG" value="${ptp_rm:MP_CONFIG_ATTR#value}" />
 			<environment name="MP_COREDIR" value="${ptp_rm:MP_COREDIR_ATTR#value}" />
 			<environment name="MP_COREFILE_FORMAT" value="${ptp_rm:MP_COREFILE_FORMAT_ATTR#value}" />
@@ -934,8 +1107,15 @@
 			<environment name="MP_COSCHEDULER_VERSION" value="${ptp_rm:MP_COSCHEDULER_VERSION_ATTR#value}" />
 			<environment name="MP_CPU_USE" value="${ptp_rm:MP_CPU_USE_ATTR#value}" />
 			<environment name="MP_CSS_INTERRUPT" value="${ptp_rm:MP_CSS_INTERRUPT_ATTR#value}" />
+			<environment name="MP_DBG_LAUNCH" value="${ptp_rm:MP_DBG_LAUNCH_ATTR#value}" />
+			<environment name="MP_DBG_LAUNCH_TIMEOUT" value="${ptp_rm:MP_DBG_LAUNCH_TIMEOUT_ATTR#value}" />
+			<environment name="MP_DBG_TASKINFO" value="${ptp_rm:MP_DBG_TASKINFO_ATTR#value}" />
+			<environment name="MP_DEBUG_ATTACH" value="${ptp_rm:MP_DEBUG_ATTACH_ATTR#value}" />
+			<environment name="MP_DEBUG_ATTACH_DIR" value="${ptp_rm:MP_DEBUG_ATTACH_DIR_ATTR#value}" />
+			<environment name="MP_DEBUG_NOTIMEOUT" value="${ptp_rm:MP_DEBUG_NOTIMEOUT_ATTR#value}" />
 			<environment name="MP_DEVTYPE" value="${ptp_rm:MP_DEVTYPE_ATTR#value}" />
 			<environment name="MP_EAGER_LIMIT" value="${ptp_rm:MP_EAGER_LIMIT_ATTR#value}" />
+			<environment name="MP_ENDPOINTS" value="${ptp_rm:MP_ENDPOINTS_ATTR#value}" />
 			<environment name="MP_EUIDEVELOP" value="${ptp_rm:MP_EUIDEVELOP_ATTR#value}" />
 			<environment name="MP_EUIDEVICE" value="${ptp_rm:MP_EUIDEVICE_ATTR#value}" />
 			<environment name="MP_EUILIB" value="${ptp_rm:MP_EUILIB_ATTR#value}" />
@@ -953,6 +1133,7 @@
 			<environment name="MP_IO_BUFFER_SIZE" value="${ptp_rm:MP_IO_BUFFER_SIZE_ATTR#value}" />
 			<environment name="MP_IO_ERRLOG" value="${ptp_rm:MP_IO_ERRLOG_ATTR#value}" />
 			<environment name="MP_LABELIO" value="${ptp_rm:MP_LABELIO_ATTR#value}" />
+			<environment name="MP_LOCKLESS" value="${ptp_rm:MP_LOCKLESS_ATTR#value}" />
 			<environment name="MP_MC_INET_ADDR_LEN" value="${ptp_rm:MP_MC_INET_ADDR_LEN_ATTR#value}" />
 			<environment name="MP_MC_INET_BASE_ADDR" value="${ptp_rm:MP_MC_INET_BASE_ADDR_ATTR#value}" />
 			<environment name="MP_MC_INET_PORT" value="${ptp_rm:MP_MC_INET_PORT_ATTR#value}" />
@@ -961,10 +1142,12 @@
 			<environment name="MP_MSG_ENVELOPE_BUF" value="${ptp_rm:MP_MSG_ENVELOPE_BUF_ATTR#value}" />
 			<environment name="MP_NEWJOB" value="${ptp_rm:MP_NEWJOB_ATTR#value}" />
 			<environment name="MP_NODES" value="${ptp_rm:MP_NODES_ATTR#value}" />
+			<environment name="MP_PE_AFFINITY" value="${ptp_rm:MP_PE_AFFINITY_ATTR#value}" />
 			<environment name="MP_PGMMODEL" value="${ptp_rm:MP_PGMMODEL_ATTR#value}" />
 			<environment name="MP_PMDLOG" value="${ptp_rm:MP_PMDLOG_ATTR#value}" />
 			<environment name="MP_PMDLOG_DIR" value="${ptp_rm:MP_PMDLOG_DIR_ATTR#value}" />
 			<environment name="MP_PMDSUFFIX" value="${ptp_rm:MP_PMDSUFFIX_ATTR#value}" />
+			<environment name="MP_POE_CONTINUE" value="${ptp_rm:MP_POE_CONTINUE_ATTR#value}" />
 			<environment name="MP_POLLING_INTERVAL" value="${ptp_rm:MP_POLLING_INTERVAL_ATTR#value}" />
 			<environment name="MP_PRINTENV" value="${ptp_rm:MP_PRINTENV_ATTR#value}" />
 			<environment name="MP_PRIORITY" value="${ptp_rm:MP_PRIORITY_ATTR#value}" />
@@ -1008,6 +1191,8 @@
 			<environment name="MP_WAIT_MODE" value="${ptp_rm:MP_WAIT_MODE_ATTR#value}" />
 			<environment name="MP_WORLD_SIZES" value="${ptp_rm:MP_WORLD_SIZES_ATTR#value}" />
 			<environment name="SCI_DEBUG_FANOUT" value="${ptp_rm:SCI_DEBUG_FANOUT_ATTR#value}" />
+			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
+			<environment name="PTP_DEBUGGER_ID" value="${ptp_rm:debuggerId#value}" />
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
@@ -1021,9 +1206,6 @@
 					</match>
 				</target>
 			</stdout-parser>
-			<pre-launch-cmd name="Cleanup" exec="rm -f routing_file" wait="true"/>
-			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
-
 		</submit-interactive-debug>
 		
 		<terminate-job name="cancel">
@@ -1050,15 +1232,15 @@
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								verticalAlign="SWT.CENTER" />
 						</layout-data>
-						<fixed-text>${ptp_rm:RM_USE_LOAD_LEVELER#description}</fixed-text>
+						<fixed-text>${ptp_rm:MP_RESD_ATTR#description}</fixed-text>
 					</widget>
 				
-					<widget type="checkbox" buttonId="useLL" attribute="RM_USE_LOAD_LEVELER" style="SWT.LEFT">
+					<widget type="checkbox" buttonId="useLL" attribute="MP_RESD_ATTR" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
 								grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
-						<tooltip>${ptp_rm:RM_USE_LOAD_LEVELER#tooltip}</tooltip>
+						<tooltip>${ptp_rm:MP_RESD_ATTR#tooltip}</tooltip>
 					</widget>
 
 					<!--MP_HOSTFILE: Specifies task to node mapping -->
@@ -1078,6 +1260,79 @@
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_HOSTFILE_ATTR#tooltip}</tooltip>
 					</browse>
+										<!--MP_PROCS: Specifies number of application tasks -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PROCS_ATTR#description}</fixed-text>
+					</widget>
+					<widget type="text" attribute="MP_PROCS_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PROCS_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!--MP_NODES: Number of nodes to allocate -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_NODES_ATTR#description}</fixed-text>
+						<control-state>
+							<enable-if button="useLL" selected="true"/>
+						</control-state>
+					</widget>
+					<widget type="text" attribute="MP_NODES_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_NODES_ATTR#tooltip}</tooltip>
+						<control-state>
+							<enable-if button="useLL" selected="true"/>
+						</control-state>
+					</widget>
+
+					<!--MP_TASKS_PER_NODE: Number of tasks to allocate per node -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_TASKS_PER_NODE_ATTR#description}
+						</fixed-text>
+						<control-state>
+							<enable-if button="useLL" selected="true"/>
+						</control-state>
+					</widget>
+					<widget type="text" attribute="MP_TASKS_PER_NODE_ATTR"
+						style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_TASKS_PER_NODE_ATTR#tooltip}</tooltip>
+						<control-state>
+							<enable-if button="useLL" selected="true"/>
+						</control-state>
+					</widget>
+
+					<!--MP_WORLD_SIZES: Specifies MPI world sizes -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_WORLD_SIZES_ATTR#description}</fixed-text>
+					</widget>
+					<widget type="text" attribute="MP_WORLD_SIZES_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_WORLD_SIZES_ATTR#tooltip}</tooltip>
+					</widget>
 
 					<!--MP_NEWJOB: Keep partition for multiple job steps -->
 					<widget type="label" style="SWT.LEFT">
@@ -1100,67 +1355,7 @@
 						</control-state>
 					</widget>
 
-					<!--MP_WORLD_SIZES: Specifies MPI world sizes -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data widthHint="200" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_WORLD_SIZES_ATTR#description}</fixed-text>
-					</widget>
-					<widget type="text" attribute="MP_WORLD_SIZES_ATTR" style="SWT.BORDER">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_WORLD_SIZES_ATTR#tooltip}</tooltip>
-					</widget>
 
-					<!--MP_PROCS: Specifies number of application tasks -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data widthHint="200" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_PROCS_ATTR#description}</fixed-text>
-					</widget>
-					<widget type="text" attribute="MP_PROCS_ATTR" style="SWT.BORDER">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_PROCS_ATTR#tooltip}</tooltip>
-					</widget>
-
-					<!--MP_NODES: Number of nodes to allocate -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_NODES_ATTR#description}</fixed-text>
-					</widget>
-					<widget type="text" attribute="MP_NODES_ATTR" style="SWT.BORDER">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_NODES_ATTR#tooltip}</tooltip>
-					</widget>
-
-					<!--MP_TASKS_PER_NODE: Number of tasks to allocate per node -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_TASKS_PER_NODE_ATTR#description}:
-						</fixed-text>
-					</widget>
-					<widget type="text" attribute="MP_TASKS_PER_NODE_ATTR"
-						style="SWT.BORDER">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_TASKS_PER_NODE_ATTR#tooltip}</tooltip>
-					</widget>
 				</composite>
 			</dynamic>
 
@@ -1264,6 +1459,21 @@
 					<layout>
 						<grid-layout numColumns="3" makeColumnsEqualWidth="false" />
 					</layout>
+					
+					<!--MP_PMDLOG: Specifies whether PMD log is generated -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PMDLOG_ATTR#description}</fixed-text>
+					</widget>
+					<widget type="checkbox" attribute="MP_PMDLOG_ATTR" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PMDLOG_ATTR#tooltip}</tooltip>
+					</widget>
+					
 					<!--MP_PMDLOG_DIR - specifies directory where PMD log is stored -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
@@ -1280,6 +1490,21 @@
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_PMDLOG_DIR_ATTR#tooltip}</tooltip>
 					</browse>
+
+					<!--MP_PRIORITY_LOG: Specifies if co-scheduler log is created -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PRIORITY_LOG_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" attribute="MP_PRIORITY_LOG_ATTR" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PRIORITY_LOG_ATTR#tooltip}</tooltip>
+					</widget>
 
 					<!--MP_PRIORITY_LOG_DIR - specifies directory where co-scheduler log is stored -->
 					<widget type="label" style="SWT.LEFT">
@@ -1298,6 +1523,21 @@
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_PRIORITY_LOG_DIR_ATTR#tooltip}</tooltip>
 					</browse>
+					
+					<!--MP_PRIORITY_LOG_NAME: Name of co-scheduler log -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data widthHint="200" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PRIORITY_LOG_NAME_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" attribute="MP_PRIORITY_LOG_NAME_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PRIORITY_LOG_NAME_ATTR#tooltip}</tooltip>
+					</widget>
 
 					<!--MP_PRINTENV - Print PE Environment variables -->
 					<widget type="label" style="SWT.LEFT">
@@ -1340,50 +1580,6 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_STATISTICS_ATTR#tooltip}</tooltip>
 					</widget>
-
-					<!--MP_PRIORITY_LOG_NAME: Name of co-scheduler log -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data widthHint="200" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_PRIORITY_LOG_NAME_ATTR#description}
-						</fixed-text>
-					</widget>
-					<widget type="text" attribute="MP_PRIORITY_LOG_NAME_ATTR" style="SWT.BORDER">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_PRIORITY_LOG_NAME_ATTR#tooltip}</tooltip>
-					</widget>
-					
-					<!--MP_PMDLOG: Specifies whether PMD log is generated -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_PMDLOG_ATTR#description}</fixed-text>
-					</widget>
-					<widget type="checkbox" attribute="MP_PMDLOG_ATTR" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_PMDLOG_ATTR#tooltip}</tooltip>
-					</widget>
-
-					<!--MP_PRIORITY_LOG: Specifies if co-scheduler log is created -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_PRIORITY_LOG_ATTR#description}
-						</fixed-text>
-					</widget>
-					<widget type="checkbox" attribute="MP_PRIORITY_LOG_ATTR" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_PRIORITY_LOG_ATTR#tooltip}</tooltip>
-					</widget>
 				</composite>
 			</dynamic>
 
@@ -1398,42 +1594,6 @@
 					<layout>
 						<grid-layout numColumns="3" makeColumnsEqualWidth="false" />
 					</layout>
-
-					<!--MP_COREDIR - specifies directory where core files are stored -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_COREDIR_ATTR#description}</fixed-text>
-					</widget>
-					<browse textStyle="SWT.BORDER" attribute="MP_COREDIR_ATTR"
-						title="Browse" directory="true">
-						<text-layout-data>
-							<grid-data widthHint="200" />
-						</text-layout-data>
-						<button-layout-data>
-							<grid-data widthHint="200" />
-						</button-layout-data>
-						<tooltip>${ptp_rm:MP_COREDIR_ATTR#tooltip}</tooltip>
-					</browse>
-
-					<!--MP_PROFDIR - specifies directory where gmon.out files are stored -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_PROFDIR_ATTR#description}</fixed-text>
-					</widget>
-					<browse textStyle="SWT.BORDER" attribute="MP_PROFDIR_ATTR"
-						title="Browse" directory="true">
-						<text-layout-data>
-							<grid-data widthHint="200" />
-						</text-layout-data>
-						<button-layout-data>
-							<grid-data widthHint="200" />
-						</button-layout-data>
-						<tooltip>${ptp_rm:MP_PROFDIR_ATTR#tooltip}</tooltip>
-					</browse>
 
 					<!--MP_COREFILE_FORMAT: core file format -->
 					<widget type="label" style="SWT.LEFT">
@@ -1457,20 +1617,23 @@
 						</control-state>
 					</widget>
 
-					<!--MP_EUIDEVELOP: Specifies MPI parameter checking level -->
+					<!--MP_COREDIR - specifies directory where core files are stored -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" />
 						</layout-data>
-						<fixed-text>${ptp_rm:MP_EUIDEVELOP_ATTR#description}</fixed-text>
+						<fixed-text>${ptp_rm:MP_COREDIR_ATTR#description}</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" readOnly="true" attribute="MP_EUIDEVELOP_ATTR"
-						type="combo">
-						<layout-data>
-							<grid-data widthHint="200" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_EUIDEVELOP_ATTR#tooltip}</tooltip>
-					</widget>
+					<browse textStyle="SWT.BORDER" attribute="MP_COREDIR_ATTR"
+						title="Browse" directory="true">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_COREDIR_ATTR#tooltip}</tooltip>
+					</browse>
 
 					<!--MP_COREFILE_SIGTERM: Create corefile on SIGTERM -->
 					<widget type="label" style="SWT.LEFT">
@@ -1495,6 +1658,73 @@
 							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
+
+					<!--MP_PROFDIR - specifies directory where gmon.out files are stored -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PROFDIR_ATTR#description}</fixed-text>
+						<control-state>
+							<enable-if attribute="os.name" value="Linux"/>
+						</control-state>
+					</widget>
+					<browse textStyle="SWT.BORDER" attribute="MP_PROFDIR_ATTR"
+						title="Browse" directory="true">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_PROFDIR_ATTR#tooltip}</tooltip>
+						<text-control-state>
+							<enable-if attribute="os.name" value="Linux"/>
+						</text-control-state>
+						<button-control-state>
+							<enable-if attribute="os.name" value="Linux"/>
+						</button-control-state>
+					</browse>	
+					
+					<!--MP_EUIDEVELOP: Specifies MPI parameter checking level -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_EUIDEVELOP_ATTR#description}</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" readOnly="true" attribute="MP_EUIDEVELOP_ATTR"
+						type="combo">
+						<layout-data>
+							<grid-data widthHint="200" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_EUIDEVELOP_ATTR#tooltip}</tooltip>
+					</widget>	
+					
+					<!--MP_DEBUG_NOTIMEOUT: Suppress application timeout for debugger attach -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_DEBUG_NOTIMEOUT_ATTR#description}
+						</fixed-text>
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
+					</widget>
+					<widget type="checkbox" attribute="MP_DEBUG_NOTIMEOUT_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_DEBUG_NOTIMEOUT_ATTR#tooltip}</tooltip>
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
+					</widget>
+					
 				</composite>
 
 			</dynamic>
@@ -1508,7 +1738,7 @@
 				</layout>
 				<composite>
 					<layout>
-						<grid-layout numColumns="2" makeColumnsEqualWidth="false" />
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" />
 					</layout>
 
 					<!-- MP_EUIDEVICE: specifies device to be used for communications -->
@@ -1519,9 +1749,9 @@
 						<fixed-text>${ptp_rm:MP_EUIDEVICE_ATTR#description}</fixed-text>
 					</widget>
 					<widget style="SWT.BORDER" readOnly="false" attribute="MP_EUIDEVICE_ATTR"
-						type="combo">
+						type="combo" >
 						<layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" horizontalSpan="2"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MP_EUIDEVICE_ATTR#tooltip}</tooltip>
 					</widget>
@@ -1536,9 +1766,27 @@
 					<widget style="SWT.BORDER" readOnly="true" attribute="MP_EUILIB_ATTR"
 						type="combo">
 						<layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" horizontalSpan="2"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MP_EUILIB_ATTR#tooltip}</tooltip>
+					</widget>
+					
+					<!-- MP_PE_AFFINITY: PE handles task affinity -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_PE_AFFINITY_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" attribute="MP_PE_AFFINITY_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+						<tooltip>${ptp_rm:MP_PE_AFFINITY_ATTR#tooltip}</tooltip>
 					</widget>
 
 					<!--MP_TASK_AFFINITY: Specifies task affinity -->
@@ -1552,7 +1800,7 @@
 					<widget style="SWT.BORDER" readOnly="false" attribute="MP_TASK_AFFINITY_ATTR"
 						type="combo">
 						<layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" horizontalSpan="2"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MP_TASK_AFFINITY_ATTR#tooltip}</tooltip>
 					</widget>
@@ -1568,7 +1816,7 @@
 					<widget style="SWT.BORDER" readOnly="true"
 						attribute="MP_FIFO_ROUTE_MODE_ATTR" type="combo">
 						<layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" horizontalSpan="2"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MP_FIFO_ROUTE_MODE_ATTR#tooltip}</tooltip>
 					</widget>
@@ -1584,10 +1832,51 @@
 					<widget style="SWT.BORDER" readOnly="true"
 						attribute="MP_RDMA_ROUTE_MODE_ATTR" type="combo">
 						<layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" horizontalSpan="2"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MP_RDMA_ROUTE_MODE_ATTR#tooltip}</tooltip>
 					</widget>
+					
+					<!-- MP_CHECKPOINT: Job is checkpointable -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_CHECKPOINT_ATTR#description}
+						</fixed-text>
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
+					</widget>
+					<widget type="checkbox" attribute="MP_CHECKPOINT_ATTR" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+						<tooltip>${ptp_rm:MP_CHECKPOINT_ATTR#tooltip}</tooltip>
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
+					</widget>
+										
+					<!-- MP_CKPTDIR: Checkpoint directory-->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_CKPTDIR_ATTR#description}</fixed-text>
+					</widget>
+					<browse textStyle="SWT.BORDER" attribute="MP_EUILIBPATH_ATTR"
+						title="Browse" directory="true">
+						<text-layout-data>
+							<grid-data widthHint="200" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="200" />
+						</button-layout-data>
+						<tooltip>${ptp_rm:MP_CKPTDIR_ATTR#tooltip}</tooltip>
+					</browse>
 
 					<!--MP_INSTANCES: Number of window/IP instances -->
 					<widget type="label" style="SWT.LEFT">
@@ -1599,10 +1888,44 @@
 					<widget type="text" attribute="MP_INSTANCES_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" widthHint="100" />
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MP_INSTANCES_ATTR#tooltip}</tooltip>
 					</widget>
+					
+					<!--MP_ENDPOINTS: Number of PAMI endpoints -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_ENDPOINTS_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="text" attribute="MP_ENDPOINTS_ATTR"
+						style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2"/>
+						</layout-data>
+						<tooltip>${ptp_rm:MP_ENDPOINTS_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- MP_USE_MC: Use hardware multicast -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_USE_MC_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" attribute="MP_USE_MC_ATTR" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+						<tooltip>${ptp_rm:MP_USE_MC_ATTR#tooltip}</tooltip>
+					</widget>					
 
 					<!--MP_MC_INET_BASE_ADDR: Mulitcast base addr -->
 					<widget type="label" style="SWT.LEFT">
@@ -1616,7 +1939,7 @@
 						style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" widthHint="100" />
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MP_MC_INET_BASE_ADDR_ATTR#tooltip}</tooltip>
 					</widget>
@@ -1633,7 +1956,7 @@
 						style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" widthHint="100" />
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MP_MC_INET_ADDR_LEN_ATTR#tooltip}</tooltip>
 					</widget>
@@ -1650,10 +1973,11 @@
 						style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" widthHint="100" />
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MP_MC_INET_PORT_ATTR#tooltip}</tooltip>
 					</widget>
+					
 					<!-- MP_ADAPTER_USE: Specifies whether communication adapter is shared -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
@@ -1661,6 +1985,9 @@
 								verticalAlign="SWT.CENTER" />
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_ADAPTER_USE_ATTR#description}</fixed-text>
+						<control-state>
+							<enable-if button="useLL" selected="true"/>
+						</control-state>
 					</widget>
 
 					<button-group attribute="MP_ADAPTER_USE_ATTR" group="true">
@@ -1668,9 +1995,27 @@
 							<row-layout type="SWT.HORIZONTAL" center="true" fill="true"
 								justify="true" />
 						</layout>
-						<button type="radiobutton" title="dedicated" />
-						<button type="radiobutton" title="shared" />
+						<button type="radiobutton" title="dedicated" >
+							<control-state>
+								<enable-if button="useLL" selected="true"/>
+							</control-state>
+						</button>
+						<button type="radiobutton" title="shared" >
+							<control-state>
+								<enable-if button="useLL" selected="true"/>
+							</control-state>
+						</button>
+						<control-state>
+							<enable-if button="useLL" selected="true"/>
+						</control-state>
 					</button-group>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" />
+						</layout-data>
+						<fixed-text></fixed-text>
+					</widget>
 
 					<!-- MP_CPU_USE: Specifies if CPU is shared -->
 					<widget type="label" style="SWT.LEFT">
@@ -1688,6 +2033,13 @@
 						<button type="radiobutton" title="multiple" />
 						<button type="radiobutton" title="unique" />
 					</button-group>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" />
+						</layout-data>
+						<fixed-text></fixed-text>
+					</widget>
 
 					<!-- MP_BINDPROC: Bind tasks to CPU -->
 					<widget type="label" style="SWT.LEFT">
@@ -1702,29 +2054,35 @@
 						style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
-								grabExcessHorizontal="false" />
+								grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MP_BINDPROC_ATTR#tooltip}</tooltip>
 					</widget>
-
-					<!-- MP_USE_MC: Use hardware multicast -->
+					
+					<!-- MP_BSR_BARRIER: Enable use of BSR -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" />
 						</layout-data>
-						<fixed-text>${ptp_rm:MP_USE_MC_ATTR#description}
+						<fixed-text>${ptp_rm:MP_BSR_BARRIER_ATTR#description}
 						</fixed-text>
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
-					<widget type="checkbox" attribute="MP_USE_MC_ATTR" style="SWT.LEFT">
+					<widget type="checkbox" attribute="MP_BSR_BARRIER_ATTR" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL"
-								grabExcessHorizontal="false" />
+								grabExcessHorizontal="false" horizontalSpan="2"/>
 						</layout-data>
-						<tooltip>${ptp_rm:MP_USE_MC_ATTR#tooltip}</tooltip>
+						<tooltip>${ptp_rm:MP_BSR_BARRIER_ATTR#tooltip}</tooltip>
+						<control-state>
+							<enable-if attribute="os.name" value="AIX"/>
+						</control-state>
 					</widget>
 				</composite>
-			</dynamic>
+			</dynamic>			
 
 			<!-- Nodes Tab -->
 			<dynamic
@@ -1738,6 +2096,29 @@
 						<grid-layout numColumns="3" makeColumnsEqualWidth="false" />
 					</layout>
 
+					<!-- MP_RMPOOL: Node allocation pool -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_RMPOOL_ATTR#description}
+						</fixed-text>
+						<control-state>
+							<enable-if button="useLL" selected="true"/>
+						</control-state>
+					</widget>
+					<widget type="text" attribute="MP_RMPOOL_ATTR" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_RMPOOL_ATTR#tooltip}</tooltip>
+						<control-state>
+							<enable-if button="useLL" selected="true"/>
+						</control-state>
+					</widget>
+					
 					<!-- MP_CMDFILE: Specifies path to command file used to load nodes in 
 						partition -->
 					<widget type="label" style="SWT.LEFT">
@@ -1888,28 +2269,22 @@
 							<enable-if button="useLL" selected="true"/>
 						</control-state>
 					</widget>
-
-					<!-- MP_RMPOOL: Node allocation pool -->
+					
+					<!-- MP_COMMON_TASKS: Common tasks on node -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" />
 						</layout-data>
-						<fixed-text>${ptp_rm:MP_RMPOOL_ATTR#description}
+						<fixed-text>${ptp_rm:MP_COMMON_TASKS_ATTR#description}
 						</fixed-text>
-						<control-state>
-							<enable-if button="useLL" selected="true"/>
-						</control-state>
 					</widget>
-					<widget type="text" attribute="MP_RMPOOL_ATTR" style="SWT.BORDER">
+					<widget type="text" attribute="MP_COMMON_TASKS_ATTR" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
 						</layout-data>
-						<tooltip>${ptp_rm:MP_RMPOOL_ATTR#tooltip}</tooltip>
-						<control-state>
-							<enable-if button="useLL" selected="true"/>
-						</control-state>
+						<tooltip>${ptp_rm:MP_COMMON_TASKS_ATTR#tooltip}</tooltip>
 					</widget>
 
 				</composite>
@@ -2294,24 +2669,6 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_PRIORITY_ATTR#tooltip}</tooltip>
 					</widget>
-
-					<!-- SCI_DEBUG_FANOUT: SCI agent tree fanout -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
-						</layout-data>
-						<fixed-text>${ptp_rm:SCI_DEBUG_FANOUT_ATTR#description}
-						</fixed-text>
-					</widget>
-					<widget style="SWT.BORDER" attribute="SCI_DEBUG_FANOUT_ATTR"
-						type="text">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:SCI_DEBUG_FANOUT_ATTR#tooltip}</tooltip>
-					</widget>
-
 					<!-- MP_SHMCC_EXCLUDE_LIST: Collective operations excluded from shared 
 						memory -->
 					<widget type="label" style="SWT.LEFT">
@@ -2338,7 +2695,7 @@
 						<fixed-text>${ptp_rm:MP_RMA_PENDING_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<enable-if attribute="os.name" value="AIX"/>
+							<enable-if attribute="os.name" value="Linux"/>
 						</control-state>
 					</widget>
 					<widget style="SWT.BORDER" attribute="MP_RMA_PENDING_ATTR"
@@ -2349,8 +2706,59 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_RMA_PENDING_ATTR#tooltip}</tooltip>
 						<control-state>
-							<enable-if attribute="os.name" value="AIX"/>
+							<enable-if attribute="os.name" value="Linux"/>
 						</control-state>
+					</widget>
+										
+					<!-- MP_BUFFER_MEM: Point to point early arrival message buffer size -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_BUFFER_MEM_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" attribute="MP_BUFFER_MEM_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_BUFFER_MEM_ATTR#tooltip}</tooltip>
+					</widget>
+														
+					<!-- MP_CC_BUF_MEM: Collective early arrival message buffer size -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_CC_BUF_MEM_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" attribute="MP_CC_BUF_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_CC_BUF_MEM_ATTR#tooltip}</tooltip>
+					</widget>
+
+					<!-- SCI_DEBUG_FANOUT: SCI agent tree fanout -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:SCI_DEBUG_FANOUT_ATTR#description}
+						</fixed-text>
+					</widget>
+					<widget style="SWT.BORDER" attribute="SCI_DEBUG_FANOUT_ATTR"
+						type="text">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:SCI_DEBUG_FANOUT_ATTR#tooltip}</tooltip>
 					</widget>
 					
 					<!-- MP_SHARED_MEMORY: Use shared memory -->
@@ -2378,7 +2786,7 @@
 						<fixed-text>${ptp_rm:MP_SHMEM_PT2PT_ATTR#description}
 						</fixed-text>
 						<control-state>
-							<enable-if attribute="os.name" value="AIX"/>
+							<enable-if attribute="os.name" value="Linux"/>
 						</control-state>
 					</widget>
 					<widget type="checkbox" attribute="MP_SHMEM_PT2PT_ATTR"
@@ -2389,7 +2797,30 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_SHMEM_PT2PT_ATTR#tooltip}</tooltip>
 						<control-state>
-							<enable-if attribute="os.name" value="AIX"/>
+							<enable-if attribute="os.name" value="Linux"/>
+						</control-state>
+					</widget>
+										
+					<!-- MP_LOCKLESS: MPI runs in lockless mode -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_LOCKLESS_ATTR#description}
+						</fixed-text>
+						<control-state>
+							<enable-if attribute="os.name" value="Linux"/>
+						</control-state>
+					</widget>
+					<widget type="checkbox" attribute="MP_LOCKLESS_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:MP_LOCKLESS_ATTR#tooltip}</tooltip>
+						<control-state>
+							<enable-if attribute="os.name" value="Linux"/>
 						</control-state>
 					</widget>
 
@@ -2482,7 +2913,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_MPILIB_ATTR#description}</fixed-text>
 						<control-state>
-							<enable-if attribute="os.name" value="AIX"/>
+							<enable-if attribute="os.name" value="Linux"/>
 						</control-state>
 					</widget>
 					<widget style="SWT.LEFT" attribute="MP_MPILIB_ATTR" type="combo"
@@ -2492,7 +2923,7 @@
 						</layout-data>
 						<tooltip>${ptp_rm:MP_MPILIB_ATTR#tooltip}</tooltip>
 						<control-state>
-							<enable-if attribute="os.name" value="AIX"/>
+							<enable-if attribute="os.name" value="Linux"/>
 						</control-state>
 					</widget>
 					
@@ -2578,6 +3009,12 @@
 							<grid-data widthHint="200" />
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_SAVE_RMFILE_ATTR#tooltip}</tooltip>
+						<text-control-state>
+							<enable-if button="useLL" selected="true"/>
+						</text-control-state>
+						<button-control-state>
+							<enable-if button="useLL" selected="true"/>
+						</button-control-state>
 					</browse>
 
 					<!-- MP_PULSE: interval PE checks remote nodes -->
@@ -2611,23 +3048,6 @@
 								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:MP_THREAD_STACKSIZE_ATTR#tooltip}</tooltip>
-					</widget>
-
-					<!-- MP_TIMEOUT: Connection timeout -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
-						</layout-data>
-						<fixed-text>${ptp_rm:MP_TIMEOUT_ATTR#description}
-						</fixed-text>
-					</widget>
-					<widget style="SWT.BORDER" attribute="MP_TIMEOUT_ATTR"
-						type="text">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" widthHint="100" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:MP_TIMEOUT_ATTR#tooltip}</tooltip>
 					</widget>
 
 					<!-- MP_CONFIG: PE Release level -->
@@ -2743,6 +3163,30 @@
 							<enable-if attribute="os.name" value="AIX"/>
 						</control-state>
 					</widget>
+										
+					<!-- MP_POE_CONTINUE: Continue if subjob fails -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:MP_POE_CONTINUE_ATTR#description}
+						</fixed-text>
+						<control-state>
+							<enable-if button="useLL" selected="true"/>
+						</control-state>
+					</widget>
+					<widget type="checkbox" attribute="MP_POE_CONTINUE_ATTR"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2" widthHint="200" />
+						</layout-data>
+						<tooltip>${ptp_rm:POE_CONTINUE_ATTR#tooltip}</tooltip>
+						<control-state>
+							<enable-if button="useLL" selected="true"/>
+						</control-state>
+					</widget>
+					
 				</composite>
 			</dynamic>
 			
@@ -2769,11 +3213,17 @@
 							<include>MP_ACK_THRESH_ATTR</include>
 							<include>MP_ADAPTER_USE_ATTR</include>
 							<include>MP_BINDPROC_ATTR</include>
+							<include>MP_BSR_BARRIER_ATTR</include>
+							<include>MP_BUFFER_MEM_ATTR</include>
 							<include>MP_BULK_MIN_MSG_SIZE_ATTR</include>
-							<include>MP_SCRATCH_BUF_ATTR_ATTR</include>
-							<include>MP_CLOCK_SOURCE_ATTR</include>
+							<include>MP_CC_BUF_MEM_ATTR</include>
+							<include>MP_CC_SCRATCH_BUF_ATTR</include>
 							<include>MP_CMDFILE_ATTR</include>
+							<include>MP_CHECKPOINT_ATTR</include>
+							<include>MP_CKPTDIR_ATTR</include>
+							<include>MP_CLOCK_SOURCE_ATTR</include>
 							<include>MP_COLLECTIVE_GROUPS_ATTR</include>
+							<include>MP_COMMON_TASKS_ATTR</include>
 							<include>MP_CONFIG_ATTR</include>
 							<include>MP_COREDIR_ATTR</include>
 							<include>MP_COREFILE_FORMAT_ATTR</include>
@@ -2781,8 +3231,15 @@
 							<include>MP_COSCHEDULER_VERSION_ATTR</include>
 							<include>MP_CPU_USE_ATTR</include>
 							<include>MP_CSS_INTERRUPT_ATTR</include>
+							<include>MP_DBG_LAUNCH_ATTR</include>
+							<include>MP_DBG_LAUNCH_TIMEOUTATTR</include>
+							<include>MP_DBG_TASKINFO_ATTR</include>
+							<include>MP_DEBUG_ATTACH_ATTR</include>
+							<include>MP_DEBUG_ATTACH_DIR_ATTR</include>
+							<include>MP_DEBUG_NOTIMEOUT_ATTR</include>
 							<include>MP_DEVTYPE_ATTR</include>
 							<include>MP_EAGER_LIMIT_ATTR</include>
+							<include>MP_ENDPOINTS_ATTR</include>
 							<include>MP_EUIDEVELOP_ATTR</include>
 							<include>MP_EUIDEVICE_ATTR</include>
 							<include>MP_EUILIB_ATTR</include>
@@ -2795,23 +3252,26 @@
 							<include>MP_INFOLEVEL_ATTR</include>
 							<include>MP_INSTANCES_ATTR</include>
 							<include>MP_IOAGENT_CNT_ATTR</include>
-							<include>MP_NODEFILE_ATTR</include>
+							<include>MP_IONODEFILE_ATTR</include>
 							<include>MP_IOTASKLIST_ATTR</include>
 							<include>MP_IO_BUFFER_SIZE_ATTR</include>
 							<include>MP_IO_ERRLOG_ATTR</include>
 							<include>MP_LABELIO_ATTR</include>
+							<include>MP_LOCKLESS_ATTR</include>
 							<include>MP_MC_INET_ADDR_LEN_ATTR</include>
 							<include>MP_MC_INET_BASE_ADDR_ATTR</include>
 							<include>MP_MC_INET_PORT_ATTR</include>
 							<include>MP_MPILIB_ATTR</include>
 							<include>MP_MSG_API_ATTR</include>
-							<include>MP_MSG_ENVELOPE_ATTR</include>
+							<include>MP_MSG_ENVELOPE_BUF_ATTR</include>
 							<include>MP_NEWJOB_ATTR</include>
 							<include>MP_NODES_ATTR</include>
+							<include>MP_PE_AFFINITY_ATTR</include>
 							<include>MP_PGMMODEL_ATTR</include>
 							<include>MP_PMDLOG_ATTR</include>
 							<include>MP_PMDLOG_DIR_ATTR</include>
 							<include>MP_PMDSUFFIX_ATTR</include>
+							<include>MP_POE_CONTINUE_ATTR</include>
 							<include>MP_POLLING_INTERVAL_ATTR</include>
 							<include>MP_PRINTENV_ATTR</include>
 							<include>MP_PRIORITY_ATTR</include>
@@ -2844,7 +3304,7 @@
 							<include>MP_STATISTICS_ATTR</include>
 							<include>MP_STDINMODE_ATTR</include>
 							<include>MP_STDOUTMODE_ATTR</include>
-							<include>MP_TASKS_PER_NODE_ATTR</include>
+							<include>MP_SAVEH_ATTR</include>
 							<include>MP_TASK_AFFINITY_ATTR</include>
 							<include>MP_THREAD_STACKSIZE_ATTR</include>
 							<include>MP_TIMEOUT_ATTR</include>

@@ -680,8 +680,10 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		for (IUpdateModel m : localWidgets.values()) {
 			refresh(m, lcMap);
 		}
-		for (ControlStateListener l : listeners) {
-			l.setState();
+		if (listeners != null) {
+			for (ControlStateListener l : listeners) {
+				l.setState();
+			}
 		}
 	}
 

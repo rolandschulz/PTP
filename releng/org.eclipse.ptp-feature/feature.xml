@@ -18,7 +18,7 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/juno"/>
    </url>
 
    <includes

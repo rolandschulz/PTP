@@ -23,7 +23,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.debug.ui,
  org.eclipse.ptp.utils.core,
  org.eclipse.ptp.rm.lml.core,
- org.eclipse.ptp.rm.lml.monitor.core
+ org.eclipse.ptp.rm.lml.monitor.core,
+ org.eclipse.ptp.rm.lml.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %pluginProvider

@@ -13,8 +13,11 @@ package org.eclipse.ptp.ems.core;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.ems.internal.core.EMSCorePlugin;
 
 /**
@@ -31,8 +34,25 @@ import org.eclipse.ptp.ems.internal.core.EMSCorePlugin;
  */
 public final class EnvManagerProjectProperties implements IEnvManagerConfig {
 
-	/** Key used to persist the environment configuration properties. */
-	private static final QualifiedName PROPERTY_KEY = new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig"); //$NON-NLS-1$
+	/**
+	 * Keys used to persist the environment configuration properties.
+	 * <p>
+	 * Since {@link IResource#setPersistentProperty(QualifiedName, String)} sets an upper limit on the number of characters that can
+	 * be stored in a property (and this may easily be exceeded in practice; see Bug 377986), the environment configuration string
+	 * is split into substrings of no more than {@link #MAX_PROJECT_PROPERTY_LENGTH} characters each, each of which is stored as a
+	 * separate project property.
+	 */
+	private static final QualifiedName[] PROPERTY_KEYS = new QualifiedName[]
+	{
+		new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig"), //$NON-NLS-1$
+		new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig2"), //$NON-NLS-1$
+		new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig3"), //$NON-NLS-1$
+		new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig4"), //$NON-NLS-1$
+		new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig5"), //$NON-NLS-1$
+	};
+
+	/** The maximum length of a string storable by {@link IResource#setPersistentProperty(QualifiedName, String)} */
+	private static final int MAX_PROJECT_PROPERTY_LENGTH = 2048;
 
 	/** Project with which the Modules project properties are associated. */
 	private final IProject project;
@@ -54,20 +74,67 @@ public final class EnvManagerProjectProperties implements IEnvManagerConfig {
 
 	private EnvManagerConfigString loadProperties() {
 		try {
-			return new EnvManagerConfigString(project.getPersistentProperty(PROPERTY_KEY));
+			return new EnvManagerConfigString(assembleStringFromProperties());
 		} catch (final CoreException e) {
 			EMSCorePlugin.log(e);
 			throw new Error(e);
 		}
 	}
 
+	/** Concatenates the values of the {@link #PROPERTY_KEYS} project properties into a single string. */
+	private String assembleStringFromProperties() throws CoreException {
+		final StringBuilder sb = new StringBuilder();
+		for (QualifiedName key : PROPERTY_KEYS) {
+			sb.append(emptyIfNull(project.getPersistentProperty(key)));
+		}
+		return sb.toString();
+	}
+
+	/** @return the empty string if <i>string</i> is <code>null</code>, or <i>string</i> otherwise */
+	private String emptyIfNull(String string) {
+		return string == null ? "" : string; //$NON-NLS-1$
+	}
+
 	private void save(EnvManagerConfigString properties) {
 		try {
-			project.setPersistentProperty(PROPERTY_KEY, properties.toString());
+			final String[] strings = splitString(properties.toString());
+			assert PROPERTY_KEYS.length == strings.length;
+			for (int i = 0; i < strings.length; i++) {
+				project.setPersistentProperty(PROPERTY_KEYS[i], strings[i]);
+			}
 		} catch (final CoreException e) {
 			EMSCorePlugin.log(e);
 			throw new Error(e);
 		}
+	}
+
+	/**
+	 * Splits a string into substrings of length <= {@value #MAX_PROJECT_PROPERTY_LENGTH}.
+	 * 
+	 * @throws CoreException if the number of substrings required is greater than {@link #PROPERTY_KEYS}.length
+	 */
+	private String[] splitString(String string) throws CoreException {
+		final String[] result = new String[PROPERTY_KEYS.length];
+		
+		final int maxLength = PROPERTY_KEYS.length * MAX_PROJECT_PROPERTY_LENGTH;
+		if (string.length() > maxLength) {
+			throw new CoreException(
+				new Status(IStatus.ERROR,
+					EMSCorePlugin.PLUGIN_ID,
+					"Environment configuration text cannot exceed " + maxLength + " characters")); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
+		for (int i = 0; i < result.length; i++) {
+			final int startIndex = i * MAX_PROJECT_PROPERTY_LENGTH;
+			if (startIndex < string.length()) {
+				final int endIndex = Math.min(startIndex + MAX_PROJECT_PROPERTY_LENGTH, string.length());
+				result[i] = string.substring(startIndex, endIndex);
+			} else {
+				result[i] = ""; //$NON-NLS-1$
+			}
+		}
+		
+		return result;
 	}
 
 	/*

@@ -46,7 +46,6 @@ import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
-import org.eclipse.ptp.launch.internal.PreferenceConstants;
 import org.eclipse.ptp.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManager;

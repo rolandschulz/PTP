@@ -451,7 +451,7 @@ public class LaunchController implements ILaunchController {
 					}
 				}
 			}
-			setFixedConfigurationProperties(progress.newChild(5));
+			setFixedConfigurationProperties(progress.newChild(10));
 			isInitialized = true;
 		} catch (Throwable t) {
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
@@ -500,7 +500,7 @@ public class LaunchController implements ILaunchController {
 			throw CoreExceptionUtils.newException(Messages.LaunchController_resourceManagerNotStarted, null);
 		}
 
-		updateAttributeValues(configuration, null);
+		updateAttributeValues(configuration, ILaunchManager.RUN_MODE, null);
 
 		AttributeType changedValue = null;
 
@@ -685,7 +685,7 @@ public class LaunchController implements ILaunchController {
 			/*
 			 * Overwrite attribute values based on user choices. Note that the launch can also modify attributes.
 			 */
-			updateAttributeValues(configuration, progress.newChild(5));
+			updateAttributeValues(configuration, mode, progress.newChild(5));
 
 			/*
 			 * process script
@@ -1254,7 +1254,7 @@ public class LaunchController implements ILaunchController {
 	}
 
 	/**
-	 * User name and service address. Set in case the script needs these variables.
+	 * Create attributes from constants that are fixed while the controller is initialized.
 	 * 
 	 * @throws CoreException
 	 */
@@ -1275,10 +1275,14 @@ public class LaunchController implements ILaunchController {
 	 * @throws CoreException
 	 */
 	@SuppressWarnings({ "unchecked" })
-	private void updateAttributeValues(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+	private void updateAttributeValues(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
+			throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 40);
 
-		setFixedConfigurationProperties(progress.newChild(10));
+		/*
+		 * Add launch mode attribute
+		 */
+		rmVarMap.maybeAddAttribute(JAXBControlConstants.LAUNCH_MODE, mode, false);
 
 		Map<String, Object> lcattr = RMVariableMap.getValidAttributes(configuration);
 		for (String key : lcattr.keySet()) {
@@ -1315,6 +1319,7 @@ public class LaunchController implements ILaunchController {
 		rmVarMap.overwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
+		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_ID, JAXBControlConstants.DEBUGGER_ID, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.PTP_DIRECTORY, JAXBControlConstants.PTP_DIRECTORY, lcattr);
 
 		/*

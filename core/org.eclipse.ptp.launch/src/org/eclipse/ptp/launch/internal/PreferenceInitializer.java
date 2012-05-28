@@ -8,8 +8,10 @@
 package org.eclipse.ptp.launch.internal;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
+import org.eclipse.ptp.launch.PreferenceConstants;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
@@ -22,5 +24,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 		Preferences.setDefaultBoolean(PTPLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START,
 				PreferenceConstants.DEFAULT_AUTO_START);
+		Preferences.setDefaultString(PTPLaunchPlugin.getUniqueIdentifier(),
+				PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, MessageDialogWithToggle.PROMPT);
+		Preferences.setDefaultString(PTPLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREF_SWITCH_TO_DEBUG_PERSPECTIVE,
+				MessageDialogWithToggle.PROMPT);
 	}
 }
