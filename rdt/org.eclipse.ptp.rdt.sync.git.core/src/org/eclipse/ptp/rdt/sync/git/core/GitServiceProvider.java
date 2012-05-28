@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -362,7 +363,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					throw new RuntimeException(Messages.GitServiceProvider_3 + project.getName());
 				}
 				GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario, fileFilter, progress);
-				
+				if (fSyncConnection == null) {
+					throw new RemoteSyncException(Messages.GitServiceProvider_5);
+				}
 				// Open remote connection if necessary
 				if (buildScenario.getRemoteConnection().isOpen() == false) {
 					buildScenario.getRemoteConnection().open(progress.newChild(10));
@@ -407,11 +410,15 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 	
-	// Return appropriate sync connection, creating a new one if necessary. This function must properly maintain the map of
-	// connections and also remember to set the file filter (always, not just for new connections).
+	// Return appropriate sync connection or null for scenarios with no sync provider. Creates a new connection if necessary.
+	// This function must properly maintain the map of connections and also remember to set the file filter (always, not just for
+	// new connections).
 	// TODO: Create progress monitor if passed monitor is null.
 	private GitRemoteSyncConnection getSyncConnection(IProject project, BuildScenario buildScenario, SyncFileFilter fileFilter,
 			SubMonitor progress) throws RemoteSyncException {
+		if (buildScenario.getSyncProvider() == null) {
+			return null;
+		}
 		ProjectAndScenario pas = new ProjectAndScenario(project, buildScenario);
 		if (!syncConnectionMap.containsKey(pas)) {
 			syncConnectionMap.put(pas, new GitRemoteSyncConnection(project, buildScenario.getRemoteConnection(),
@@ -430,7 +437,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	public Set<IPath> getMergeConflictFiles(IProject project, BuildScenario buildScenario) throws RemoteSyncException {
 		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
 				SyncManager.getFileFilter(project), null);
-		return fSyncConnection.getMergeConflictFiles();
+		if (fSyncConnection == null) {
+			return new HashSet<IPath>();
+		} else {
+			return fSyncConnection.getMergeConflictFiles();
+		}
 	}
 
 	/*
@@ -441,7 +452,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	public String[] getMergeConflictParts(IProject project, BuildScenario buildScenario, IFile file) throws RemoteSyncException {
 		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
 				SyncManager.getFileFilter(project), null);
-		return fSyncConnection.getMergeConflictParts(file);
+		if (fSyncConnection == null) {
+			return null;
+		} else {
+			return fSyncConnection.getMergeConflictParts(file);
+		}
 	}
 
 	// Paths that the Git sync provider can ignore.
@@ -510,13 +525,17 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
 		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
 				SyncManager.getFileFilter(project), null);
-		fSyncConnection.setMergeAsResolved(path);
+		if (fSyncConnection != null) {
+			fSyncConnection.setMergeAsResolved(path);
+		}
 	}
 
 	@Override
 	public void checkout(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
 		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
 				SyncManager.getFileFilter(project), null);
-		fSyncConnection.checkout(path);
+		if (fSyncConnection != null) {
+			fSyncConnection.checkout(path);
+		}
 	}
 }
