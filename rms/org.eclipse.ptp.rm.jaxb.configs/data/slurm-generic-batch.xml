@@ -850,7 +850,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                             <arg isUndefinedIfMatches="partition=''">partition='${ptp_rm:partition#value}'</arg>
                         </dynamic-text>
                     </widget>
-                    <viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="tree" initialAllChecked="false">
+                    <viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table" initialAllChecked="false">
                         <layout-data>
                             <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
                         </layout-data>
