@@ -17,10 +17,6 @@
       %license
    </license>
 
-   <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/helios"/>
-   </url>
-
    <plugin
          id="org.eclipse.ptp.rdt.editor"
          download-size="0"

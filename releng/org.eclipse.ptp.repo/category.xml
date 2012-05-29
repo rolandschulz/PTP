@@ -2,6 +2,7 @@
 <site>
    <feature url="features/org.eclipse.ptp_0.0.0.jar" id="org.eclipse.ptp" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.core_0.0.0.jar" id="org.eclipse.ptp.core" version="0.0.0"/>
+   <feature url="features/org.eclipse.ptp.fortran_0.0.0.jar" id="org.eclipse.ptp.fortran" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.debug.sdm_0.0.0.jar" id="org.eclipse.ptp.debug.sdm" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.etfw_0.0.0.jar" id="org.eclipse.ptp.etfw" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.external_0.0.0.jar" id="org.eclipse.ptp.external" version="0.0.0"/>
@@ -23,16 +24,13 @@
    <feature url="features/org.eclipse.ptp.gem_0.0.0.jar" id="org.eclipse.ptp.gem" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.remote.rse_0.0.0.jar" id="org.eclipse.ptp.remote.rse" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.pldt.upc_0.0.0.jar" id="org.eclipse.ptp.pldt.upc" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.pldt.fortran_0.0.0.jar" id="org.eclipse.ptp.pldt.fortran" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.etfw.tau_0.0.0.jar" id="org.eclipse.ptp.etfw.tau" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.etfw.tau.fortran_0.0.0.jar" id="org.eclipse.ptp.etfw.tau.fortran" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.etfw.ppw_0.0.0.jar" id="org.eclipse.ptp.etfw.ppw" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.sci_0.0.0.jar" id="org.eclipse.ptp.sci" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.sdk_0.0.0.jar" id="org.eclipse.ptp.sdk" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rdt_0.0.0.jar" id="org.eclipse.ptp.rdt" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rdt.xlc_0.0.0.jar" id="org.eclipse.ptp.rdt.xlc" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rdt.sync_0.0.0.jar" id="org.eclipse.ptp.rdt.sync" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.rdt.sync.fortran_0.0.0.jar" id="org.eclipse.ptp.rdt.sync.fortran" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rdt.remotetools_0.0.0.jar" id="org.eclipse.ptp.rdt.remotetools" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rdt.editor_0.0.0.jar" id="org.eclipse.ptp.rdt.editor" version="0.0.0"/>
 </site>

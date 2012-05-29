@@ -159,32 +159,79 @@ Launcher::Launcher(Topology &topo)
     }
 
     // add any tool specific environment variables
-    char **tool_envp = NULL;
     if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
+        char **tool_envp = NULL;
         tool_envp = gCtrlBlock->getEndInfo()->fe_info.beenvp;
-    } else {
-        // In <unistd.h>, the following variable:
-        //     extern char **environ;
-        // is initialized as a pointer to an array of character pointers 
-        // to the environment strings
-        tool_envp = environ;
-    }
-    if (tool_envp) {
-        while (*tool_envp) {
-            // filter out SCI_ and library path.
-            if (::strncmp(*tool_envp, "SCI_", 4) && 
-                ::strncmp(*tool_envp, library_path, ::strlen(library_path))) 
-            {
-                char *envstr = strdup(*tool_envp);
-                char *value = ::strchr(envstr, '=');
-                if (value) {
-                    *value = '\0';
-                    env.set(envstr, value+1);
+        if (tool_envp) {
+            while (*tool_envp) {
+                // filter out SCI_ and library path.
+                if (::strncmp(*tool_envp, "SCI_", 4) && 
+                        ::strncmp(*tool_envp, library_path, ::strlen(library_path))) 
+                {
+                    char *envstr = strdup(*tool_envp);
+                    char *value = ::strchr(envstr, '=');
+                    if (value) {
+                        *value = '\0';
+                        env.set(envstr, value+1);
+                    }
+                    free(envstr);
                 }
-                free(envstr);
+                tool_envp++;
             }
-            tool_envp++;
         }
+    } else{
+        string savedEnv = gInitializer->getEnvStr();
+        int size = savedEnv.size();
+        char *st =  strdup(savedEnv.c_str());
+        char *key = NULL;
+        char *value = NULL;
+        const char *delim = ";";
+        char *savePtr1 = NULL;
+        key=strtok_r(st,delim,&savePtr1);
+        if((key!= NULL) && (key < (st + size))) 
+        {
+            if (::strncmp(key, "SCI_", 4) && 
+                ::strncmp(key, library_path, ::strlen(library_path))) 
+            { 
+               value = strchr(key,'=');
+               if(value != NULL)
+               {
+                   (*value) = '\0';
+                   if((value!= key)&&((value + 1) != NULL) && ((value+1) < (st + size))) 
+                   {
+                     if((*(value+1)) == '\0')
+                        env.set(key,"");
+                     else
+                        env.set(key,value+1);
+                   }
+               }
+               else{
+                  env.set(key,"");
+               }
+           }
+           while(key = strtok_r(NULL,delim,&savePtr1)) 
+           {
+              if (::strncmp(key, "SCI_", 4) && 
+                  ::strncmp(key, library_path, ::strlen(library_path))) 
+              {
+                   value = strchr(key,'=');
+                   if(value != NULL)
+                   {
+                      (*value) = '\0';
+                      if((value != key)&&((value + 1) != NULL) && ((value+1) < (st + size))){
+                         if((*(value+1)) == '\0')
+                            env.set(key,"");
+                         else
+                            env.set(key,value+1);
+                      }
+                   }
+                   else{
+                       env.set(key,"");
+                   }
+              }
+           }
+        }
+        free(st);
     }
     log_debug("Launcher: env(%s)", env.getEnvString().c_str());
 }
