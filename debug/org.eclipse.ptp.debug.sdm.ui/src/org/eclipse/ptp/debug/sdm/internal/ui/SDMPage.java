@@ -13,7 +13,12 @@ package org.eclipse.ptp.debug.sdm.internal.ui;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
@@ -23,6 +28,7 @@ import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
 import org.eclipse.ptp.debug.sdm.core.SDMLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
+import org.eclipse.ptp.debug.sdm.ui.SDMDebugUIPlugin;
 import org.eclipse.ptp.debug.sdm.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -48,6 +54,9 @@ import org.eclipse.swt.widgets.Text;
  * The dynamic tab for SDM-based debugger implementations.
  */
 public class SDMPage extends AbstractLaunchConfigurationTab {
+	protected static final String EXTENSION_POINT_ID = "defaultPath"; //$NON-NLS-1$
+	protected static final String ATTR_PATH = "path"; //$NON-NLS-1$
+
 	protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	protected static final String LOCALHOST = "localhost"; //$NON-NLS-1$
 
@@ -91,6 +100,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		label.setLayoutData(gd);
 
 		fRMDebuggerPathText = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		fRMDebuggerPathText.setText(getSDMDefaultPath());
 		fRMDebuggerPathText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 		fRMDebuggerPathText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
@@ -312,4 +322,30 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		}
 		return text;
 	}
+
+	/**
+	 * Get SDM default path if it exists
+	 * 
+	 * @return sdm default path
+	 */
+
+	private String getSDMDefaultPath() {
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(SDMDebugUIPlugin.getUniqueIdentifier(), EXTENSION_POINT_ID);
+		if (extensionPoint != null) {
+			final IExtension[] extensions = extensionPoint.getExtensions();
+			IExtension ext = extensions[0];
+			final IConfigurationElement[] elements = ext.getConfigurationElements();
+			for (IConfigurationElement ce : elements) {
+				String attr = ce.getAttribute(ATTR_PATH);
+				if (attr != null) {
+					return attr;
+				}
+
+			}
+		}
+
+		return EMPTY_STRING;
+	}
+
 }
