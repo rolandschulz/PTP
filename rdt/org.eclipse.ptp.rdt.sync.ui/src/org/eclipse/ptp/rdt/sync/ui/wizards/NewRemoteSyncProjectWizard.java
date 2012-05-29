@@ -8,6 +8,7 @@
  * Contributors:
  * IBM - Initial API and implementation
  * Roland Schulz, University of Tennessee
+ * John Eblen, Oak Ridge National Laboratory
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui.wizards;
 
@@ -19,7 +20,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.internal.rdt.sync.ui.SyncPluginImages;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 
@@ -84,7 +84,15 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	public boolean performFinish() {
 		boolean success = super.performFinish();
 		if (success) {
-			BuildConfigurationManager.getInstance().createLocalConfiguration(this.getProject(true));
+			IProject project = this.getProject(true);
+			// Uncomment try/catch statements if run is ever changed to spawn a thread.
+//			try {
+				NewRemoteSyncProjectWizardOperation.run(project, (SyncMainWizardPage) fMainPage, null);
+//			} catch (InvocationTargetException e) {
+//				success = false;
+//			} catch (InterruptedException e) {
+//				success = false;
+//			}
 		}
 
 		return success;
@@ -102,8 +110,8 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 		try {
 			CProjectNature.addCNature(prj, new NullProgressMonitor());
 			CCProjectNature.addCCNature(prj, new NullProgressMonitor());
-			RemoteSyncNature.addNature(prj, new NullProgressMonitor());
 		} catch (CoreException e) {
+			// TODO: What to do here?
 		}
 		return prj;
 	}

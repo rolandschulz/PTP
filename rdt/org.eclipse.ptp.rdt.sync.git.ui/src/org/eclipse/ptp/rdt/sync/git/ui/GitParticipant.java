@@ -75,6 +75,9 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private Text fLocationText;
 
 	private IWizardContainer container;
+	
+	// If false, automatically select "Remote Tools" provider instead of letting the user select the provider.
+	private boolean showProviderCombo = false;
 
 	/**
 	 * Attempt to open a connection.
@@ -100,24 +103,26 @@ public class GitParticipant implements ISynchronizeParticipant {
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
 		configArea.setLayout(layout);
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		configArea.setLayoutData(gd);
 
-		// Label for "Provider:"
-		Label providerLabel = new Label(configArea, SWT.LEFT);
-		providerLabel.setText(Messages.GitParticipant_remoteProvider);
+		if (showProviderCombo) {
+			// Label for "Provider:"
+			Label providerLabel = new Label(configArea, SWT.LEFT);
+			providerLabel.setText(Messages.GitParticipant_remoteProvider);
 
-		// combo for providers
-		fProviderCombo = new Combo(configArea, SWT.DROP_DOWN | SWT.READ_ONLY);
-		gd = new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
-		gd.horizontalSpan = 2;
-		fProviderCombo.setLayoutData(gd);
-		fProviderCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleServicesSelected();
-			}
-		});
+			// combo for providers
+			fProviderCombo = new Combo(configArea, SWT.DROP_DOWN | SWT.READ_ONLY);
+			gd = new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
+			gd.horizontalSpan = 2;
+			fProviderCombo.setLayoutData(gd);
+			fProviderCombo.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					handleServicesSelected();
+				}
+			});
+		}
 
 		// attempt to restore settings from saved state
 		// IRemoteServices providerSelected = fProvider.getRemoteServices();
@@ -127,16 +132,18 @@ public class GitParticipant implements ISynchronizeParticipant {
 		int toSelect = 0;
 
 		for (int k = 0; k < providers.length; k++) {
-			fProviderCombo.add(providers[k].getName(), k);
+			if (showProviderCombo) {
+				fProviderCombo.add(providers[k].getName(), k);
+			}
 			if  (providers[k].getName().equals("Remote Tools")) { //$NON-NLS-1$
 				toSelect = k;
 			}
 			fComboIndexToRemoteServicesProviderMap.put(k, providers[k]);
 		}
 
-		// set selected host to be the first one if we're not restoring from
-		// settings
-		fProviderCombo.select(toSelect);
+		if (showProviderCombo) {
+			fProviderCombo.select(toSelect);
+		}
 		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(toSelect);
 
 		// connection combo
@@ -349,6 +356,10 @@ public class GitParticipant implements ISynchronizeParticipant {
 
 	private void update() {
 		container.updateMessage();
+		// updateButtons() may fail if current page is null. This can happen if update() is called during wizard/page creation. 
+		if (container.getCurrentPage() == null) {
+			return;
+		}
 		container.updateButtons();
 	}
 

@@ -297,7 +297,6 @@ public class GitRemoteSyncConnection {
 	 * 
 	 * @return whether there are changes to be committed.
 	 */
-
 	private boolean prepareRemoteForCommit(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
@@ -460,7 +459,7 @@ public class GitRemoteSyncConnection {
 				throw new RemoteExecutionException(e);
 			}
 			if (commandResults.getExitCode() != 0) {
-				throw new RemoteExecutionException(Messages.GRSC_GitLsFilesFailure + commandResults.getStdout());
+				throw new RemoteExecutionException(Messages.GRSC_GitLsFilesFailure + commandResults.getStderr());
 			}
 
 			BufferedReader statusReader = new BufferedReader(new StringReader(commandResults.getStdout()));
@@ -606,12 +605,9 @@ public class GitRemoteSyncConnection {
 	}
 
 	/**
-	 * Commits files in working directory. For now, we just commit all files. So
-	 * adding ".", handles all files, including newly created files, and setting
-	 * the all flag (-a) ensures that deleted files are updated. TODO: Figure
-	 * out how to do this more efficiently, as was done remotely (using git
-	 * ls-files)
-	 * 
+	 * Commit files in working directory. Get the files to be added or removed, call the add and remove commands, and then commit
+	 * if needed.
+	 *
 	 * @throws RemoteSyncException
 	 *             on problems committing.
 	 * @return whether any changes were committed
@@ -786,7 +782,7 @@ public class GitRemoteSyncConnection {
 	
 					if (mergeResults.getExitCode() != 0) {
 						throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
-								+ mergeResults.getStdout()));
+								+ mergeResults.getStderr()));
 					}
 				}
 			} catch (final IOException e) {
@@ -948,7 +944,7 @@ public class GitRemoteSyncConnection {
 
 				if (mergeResults.getExitCode() != 0) {
 					throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
-							+ mergeResults.getStdout()));
+							+ mergeResults.getStderr()));
 				}
 			}
 		} catch (final IOException e) {

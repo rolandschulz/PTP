@@ -123,13 +123,12 @@ public class BuildConfigurationManager {
 	 *            The project needing a local configuration - cannot be null
 	 * @return the new configuration - can be null on problems during creation
 	 */
-	public IConfiguration createLocalConfiguration(IProject project) {
+	public IConfiguration createLocalConfiguration(IProject project, String configName) {
 		checkProject(project);
 		try {
 			BuildScenario localBuildScenario = this.createLocalBuildScenario(project);
 			if (localBuildScenario != null) {
-				return this.createConfiguration(project, localBuildScenario, Messages.WorkspaceConfigName,
-						Messages.BCM_WorkspaceConfigDes);
+				return this.createConfiguration(project, localBuildScenario, configName, Messages.BCM_WorkspaceConfigDes);
 			}
 		} catch (CoreException e) {
 			RDTSyncCorePlugin.log(Messages.BCM_CreateConfigFailure + e.getMessage(), e);
@@ -443,7 +442,33 @@ public class BuildConfigurationManager {
 		}
 	}
 
-	private IConfiguration createConfiguration(IProject project, BuildScenario buildScenario, String configName, String configDesc) {
+	/**
+	 * Create a configuration for the given project with the given build scenario, name, and description using the project's
+	 * default build configuration as parent.
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param configName
+	 * @param configDesc
+	 * @return the new configuration
+	 */
+	public IConfiguration createConfiguration(IProject project, BuildScenario buildScenario, String configName, String configDesc) {
+		return this.createConfiguration(project, null, buildScenario, configName, configDesc);
+	}
+
+	/**
+	 * Create a configuration for the given project with the given build scenario, name, and description using the given build
+	 * configuration as parent.
+	 *
+	 * @param project
+	 * @param configParent
+	 * @param buildScenario
+	 * @param configName
+	 * @param configDesc
+	 * @return the new configuration
+	 */
+	public IConfiguration createConfiguration(IProject project, Configuration configParent, BuildScenario buildScenario,
+			String configName, String configDesc) {
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
 			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
@@ -455,7 +480,9 @@ public class BuildConfigurationManager {
 		boolean configAdded = false;
 
 		ManagedProject managedProject = (ManagedProject) buildInfo.getManagedProject();
-		Configuration configParent = (Configuration) buildInfo.getDefaultConfiguration();
+		if (configParent == null) {
+			configParent = (Configuration) buildInfo.getDefaultConfiguration();
+		}
 		String configId = ManagedBuildManager.calculateChildId(configParent.getId(), null);
 		Configuration config = new Configuration(managedProject, configParent, configId, true, false);
 		CConfigurationData configData = config.getConfigurationData();
@@ -702,6 +729,7 @@ public class BuildConfigurationManager {
 		}
 		
 		ICStorageElement storage = configDesc.getStorage(storageName, true);
+		storage.clear(); // Certain attributes can be intentionally unmapped, such as the sync provider for non-sync'ed configs.
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			storage.setAttribute(entry.getKey(), entry.getValue());
 		}
