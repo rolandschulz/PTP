@@ -40,6 +40,7 @@ import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
+import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
@@ -1018,6 +1019,8 @@ public class GitRemoteSyncConnection {
 		} catch (RefNotFoundException e) {
 			throw new RemoteSyncException(e);
 		} catch (InvalidRefNameException e) {
+			throw new RemoteSyncException(e);
+		} catch (CheckoutConflictException e) {
 			throw new RemoteSyncException(e);
 		}
 		
