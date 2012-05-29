@@ -27,9 +27,10 @@ public class Messages extends NLS {
 	public static String GSP_ChangeConnectionError;
 	public static String GSP_ChangeLocationError;
 	public static String GSP_ChangeProjectError;
-	public static String GSP_SyncErrorMessage;
 	public static String GSP_SyncTaskName;
 	public static String GitRemoteSyncConnection_0;
+	public static String GitRemoteSyncConnection_1;
+	public static String GitRemoteSyncConnection_2;
 	public static String GitRemoteSyncConnection_adding_files;
 	public static String GitRemoteSyncConnection_building_repo;
 	public static String GitRemoteSyncConnection_committing_remote;
@@ -40,6 +41,8 @@ public class Messages extends NLS {
 	public static String GitServiceProvider_1;
 	public static String GitServiceProvider_2;
 	public static String GitServiceProvider_3;
+	public static String GitServiceProvider_4;
+	public static String GitServiceProvider_5;
 
 	static {
 		// initialize resource bundle

@@ -297,6 +297,28 @@
             </command>
          </menu>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer">
+         <command
+               commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+               label="Reset to version before merge"
+               style="push">
+            <parameter
+                  name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                  value="checkout">
+            </parameter>
+         </command>
+         <command
+               commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+               label="Mark as resolved"
+               style="push">
+            <parameter
+                  name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                  value="resolve">
+            </parameter>
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.decorators">
@@ -328,5 +350,16 @@
             id="org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage"
             name="Synchronized Projects">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="org.eclipse.ptp.rdt.ui.views"
+            class="org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer"
+            id="org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer"
+            name="Synchronized Merge View"
+            restorable="false">
+      </view>
    </extension>
 </plugin>

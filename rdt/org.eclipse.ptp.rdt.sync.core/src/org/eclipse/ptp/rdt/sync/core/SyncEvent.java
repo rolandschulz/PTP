@@ -10,12 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
-import org.eclipse.core.runtime.CoreException;
-
 /**
- * Class for encapsulating logic to handle sync exceptions. The intent is to offer a bridge between the sync core and other
- * packages, particularly the ui, so that the caller can specify how to handle errors.
+ * Class to hold details about a sync event, to be used with ISyncListener
+ *
+ * Current clients only need to know that a sync event happened, so this class is empty. For future clients, though, details
+ * about the sync can be provided from this class.
  */
-public interface SyncExceptionHandler {
-	public void handle(CoreException e);
+public class SyncEvent {
 }

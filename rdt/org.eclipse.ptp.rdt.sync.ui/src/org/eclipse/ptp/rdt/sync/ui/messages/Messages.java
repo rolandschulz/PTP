@@ -20,6 +20,11 @@ public class Messages extends NLS {
 	public static String NewRemoteSyncProjectWizardPage_0;
 	public static String NewRemoteSyncProjectWizardPage_syncProvider;
 	public static String WizardProjectConversion_windowLabel;
+	public static String CommonSyncExceptionHandler_0;
+	public static String CommonSyncExceptionHandler_1;
+	public static String CommonSyncExceptionHandler_2;
+	public static String CommonSyncExceptionHandler_3;
+	public static String CommonSyncExceptionHandler_4;
 	public static String ConvertFromCToSyncProjectWizardPage_0;
 	public static String ConvertFromCToSyncProjectWizardPage_1;
 	public static String ConvertFromRemoteCToSyncProjectWizardPage_0;
@@ -64,6 +69,16 @@ public class Messages extends NLS {
 	public static String SyncMenuOperation_4;
 	public static String SyncMenuOperation_5;
 	public static String SyncMenuOperation_6;
+	public static String SyncMergeEditor_0;
+	public static String SyncMergeEditor_1;
+	public static String SyncMergeEditor_2;
+	public static String SyncMergeFileTableViewer_0;
+	public static String SyncMergeFileTableViewer_1;
+	public static String SyncMergeFileTableViewer_2;
+	public static String SyncMergeFileTableViewer_3;
+	public static String SyncMergeFileTableViewer_4;
+	public static String SyncMergeFileTreeViewer_0;
+	public static String SyncMergeFileTreeViewer_1;
 	public static String BRPPage_RemoteProviderLabel;
 	public static String BRPPage_ConnectionLabel;
 	public static String BRPPage_RootLocation;

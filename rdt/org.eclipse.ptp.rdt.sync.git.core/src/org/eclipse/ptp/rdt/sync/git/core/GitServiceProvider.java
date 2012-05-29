@@ -14,7 +14,9 @@ import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -25,11 +27,14 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
@@ -40,7 +45,6 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.ServiceProvider;
-import org.eclipse.ui.statushandlers.StatusManager;
 
 public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider {
 	public static final String ID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
@@ -344,6 +348,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			}
 
 			try {
+				// Do not sync if there are merge conflicts.
+				// This check must be done after acquiring the sync lock. Otherwise, the merge may trigger a sync that sees no
+				// conflicting files and proceeds to sync again - depending on how quickly the first sync records the data.
+				if (!(this.getMergeConflictFiles(project, buildScenario).isEmpty())) {
+					throw new RemoteSyncMergeConflictException(Messages.GitServiceProvider_4);
+				}
+
 				if (mySyncTaskId <= finishedSyncTaskId) { // some other thread has already done the work for us
 					return;
 				}
@@ -351,14 +362,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				if (buildScenario == null) {
 					throw new RuntimeException(Messages.GitServiceProvider_3 + project.getName());
 				}
-				ProjectAndScenario pas = new ProjectAndScenario(project, buildScenario);
-				if (!syncConnectionMap.containsKey(pas)) {
-					syncConnectionMap.put(pas, new GitRemoteSyncConnection(project, buildScenario.getRemoteConnection(),
-							project.getLocation().toString(), buildScenario.getLocation(project), fileFilter, progress));
+				GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario, fileFilter, progress);
+				if (fSyncConnection == null) {
+					throw new RemoteSyncException(Messages.GitServiceProvider_5);
 				}
-				GitRemoteSyncConnection fSyncConnection = syncConnectionMap.get(pas);
-				fSyncConnection.setFileFilter(fileFilter);
-				
 				// Open remote connection if necessary
 				if (buildScenario.getRemoteConnection().isOpen() == false) {
 					buildScenario.getRemoteConnection().open(progress.newChild(10));
@@ -373,20 +380,19 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				synchronized (syncTaskId) {
 					willFinishTaskId = syncTaskId;
 				}
-
-				// Sync local and remote. For now, do both ways each time.
-				// TODO: Sync more efficiently and appropriately to the situation.
-				fSyncConnection.syncLocalToRemote(progress.newChild(40));
-				fSyncConnection.syncRemoteToLocal(progress.newChild(40), true); // Temporarily enable syncing new remote files
-
+				
+				try {
+					fSyncConnection.sync(progress.newChild(40), true);
+				// Unlike other exceptions, we need to do some post-sync activities after a merge exception.
+				// TODO: Refactor code to get rid of duplication of post-sync activities.
+				} catch (RemoteSyncMergeConflictException e) {
+					project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(20));
+					throw e;
+				}
 				finishedSyncTaskId = willFinishTaskId;
-				// TODO: Review exception handling
-			} catch (final RemoteSyncException e) {
-				this.handleRemoteSyncException(project, e, syncFlags);
-				return;
+				// TODO: review exception handling
 			} catch (RemoteConnectionException e) {
-				this.handleRemoteSyncException(project, new RemoteSyncException(e), syncFlags);
-				return;
+				throw new RemoteSyncException(e);
 			} finally {
 				syncLock.unlock();
 			}
@@ -403,39 +409,54 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			}
 		}
 	}
+	
+	// Return appropriate sync connection or null for scenarios with no sync provider. Creates a new connection if necessary.
+	// This function must properly maintain the map of connections and also remember to set the file filter (always, not just for
+	// new connections).
+	// TODO: Create progress monitor if passed monitor is null.
+	private GitRemoteSyncConnection getSyncConnection(IProject project, BuildScenario buildScenario, SyncFileFilter fileFilter,
+			SubMonitor progress) throws RemoteSyncException {
+		if (buildScenario.getSyncProvider() == null) {
+			return null;
+		}
+		ProjectAndScenario pas = new ProjectAndScenario(project, buildScenario);
+		if (!syncConnectionMap.containsKey(pas)) {
+			syncConnectionMap.put(pas, new GitRemoteSyncConnection(project, buildScenario.getRemoteConnection(),
+					project.getLocation().toString(), buildScenario.getLocation(project), fileFilter, progress));
+		}
+		GitRemoteSyncConnection fSyncConnection = syncConnectionMap.get(pas);
+		fSyncConnection.setFileFilter(fileFilter);
+		return fSyncConnection;
+	}
 
-	/**
-	 * Handle sync errors appropriately. Currently, this function only handles forced sync errors by displaying them to the user.
-	 * Non-forced syncs are called by the UI, so errors are thrown for the UI to handle.
-	 * 
-	 * @param e
-	 *            the remote sync exception
-	 * @param syncFlags
-	 * @throws RemoteSyncException
-	 *             for non-forced syncs
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#getMergeConflictFiles()
 	 */
-	private void handleRemoteSyncException(IProject project, RemoteSyncException e, EnumSet<SyncFlag> syncFlags)
-			throws RemoteSyncException {
-		if (syncFlags == SyncFlag.NO_FORCE) {
-			throw e;
-		}
-		final String message;
-		final String endOfLineChar = System.getProperty("line.separator"); //$NON-NLS-1$
-
-		// RemoteSyncException is generally used by either creating a new exception with a message describing the problem or by
-		// embedding another type of error. So we need to decide which message to use.
-		if ((e.getMessage() != null && e.getMessage().length() > 0) || e.getCause() == null) {
-			message = Messages.GSP_SyncErrorMessage + project.getName()
-					+ ":" + endOfLineChar + endOfLineChar + e.getMessage(); //$NON-NLS-1$
+	@Override
+	public Set<IPath> getMergeConflictFiles(IProject project, BuildScenario buildScenario) throws RemoteSyncException {
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
+				SyncManager.getFileFilter(project), null);
+		if (fSyncConnection == null) {
+			return new HashSet<IPath>();
 		} else {
-			message = Messages.GSP_SyncErrorMessage + project.getName()
-					+ ":" + endOfLineChar + endOfLineChar + e.getCause().getMessage(); //$NON-NLS-1$
+			return fSyncConnection.getMergeConflictFiles();
 		}
+	}
 
-		IStatus status = null;
-		int severity = e.getStatus().getSeverity();
-		status = new Status(severity, Activator.PLUGIN_ID, message, e);
-		StatusManager.getManager().handle(status, severity == IStatus.ERROR ? StatusManager.SHOW : StatusManager.LOG);
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#getMergeConflictParts(org.eclipse.core.resources.IFile)
+	 */
+	@Override
+	public String[] getMergeConflictParts(IProject project, BuildScenario buildScenario, IFile file) throws RemoteSyncException {
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
+				SyncManager.getFileFilter(project), null);
+		if (fSyncConnection == null) {
+			return null;
+		} else {
+			return fSyncConnection.getMergeConflictParts(file);
+		}
 	}
 
 	// Paths that the Git sync provider can ignore.
@@ -493,6 +514,28 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	public void close() {
 		for (GitRemoteSyncConnection conn : syncConnectionMap.values()) {
 			conn.close();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#setResolved(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.sync.core.BuildScenario, org.eclipse.core.runtime.IPath)
+	 */
+	@Override
+	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
+				SyncManager.getFileFilter(project), null);
+		if (fSyncConnection != null) {
+			fSyncConnection.setMergeAsResolved(path);
+		}
+	}
+
+	@Override
+	public void checkout(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
+				SyncManager.getFileFilter(project), null);
+		if (fSyncConnection != null) {
+			fSyncConnection.checkout(path);
 		}
 	}
 }

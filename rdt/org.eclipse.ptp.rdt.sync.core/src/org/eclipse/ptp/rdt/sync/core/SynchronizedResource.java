@@ -41,7 +41,7 @@ public class SynchronizedResource implements IRemoteResource {
 	 */
 	@Override
 	public void refresh(IProgressMonitor monitor) throws CoreException {
-		SyncManager.syncBlocking(null, fResource.getProject(), SyncFlag.FORCE, monitor);
+		SyncManager.syncBlocking(null, fResource.getProject(), SyncFlag.FORCE, monitor, null);
 	}
 
 	/*

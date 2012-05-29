@@ -11,10 +11,13 @@
 package org.eclipse.ptp.rdt.sync.core.serviceproviders;
 
 import java.util.EnumSet;
+import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
@@ -62,8 +65,52 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
 	
 	/**
-	 * Close any resources (files, sockets) that were open by the sync provider. Resources not open by the provider should not be
-	 * touched. This is called, for example, when a project is about to be deleted.
+	 * Get the current list of merge-conflicted files for the passed project and build scenario
+	 * 
+	 * @param project
+	 * @param buildScenario
+	 * @return set of files as project-relative IPaths. This may be an empty set but never null.
+	 * @throws CoreException
+	 *              for system-level problems retrieving merge information
 	 */
-	public void close();
+	public Set<IPath> getMergeConflictFiles(IProject project, BuildScenario buildScenario) throws CoreException;
+	
+	/**
+	 * Get the three parts of the merge-conflicted file (left, right, and ancestor, respectively)
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param file
+	 * @return the three parts as strings. Either three strings (some may be empty) or null if file is not merge-conflicted.
+	 * @throws CoreException
+	 * 				for system-level problems retrieving merge information
+	 */
+	public String[] getMergeConflictParts(IProject project, BuildScenario buildScenario, IFile file) throws CoreException;
+	
+	/**
+	 * Set the given file path as resolved (merge conflict does not exist)
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param path
+	 * @throws CoreException
+	 * 				for system-level problems setting the state
+	 */
+	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath path) throws CoreException;
+
+	/**
+	 * Replace the current contents of the given path with the previous version in the repository
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param path
+	 * @throws CoreException
+	 */
+	public void checkout(IProject project, BuildScenario buildScenario, IPath path)  throws CoreException;
+
+    /**
+     * Close any resources (files, sockets) that were open by the sync provider. Resources not open by the provider should not be
+     * touched. This is called, for example, when a project is about to be deleted.
+     */
+    public void close();
 }

@@ -10,7 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
@@ -25,7 +30,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.osgi.service.prefs.Preferences;
 
 public class SyncManager  {
@@ -47,6 +51,16 @@ public class SyncManager  {
 	private static final String SYNC_AUTO_KEY = "sync-auto"; //$NON-NLS-1$
 	private static final String SHOW_ERROR_KEY = "show-error"; //$NON-NLS-1$
 	
+	private static ISyncExceptionHandler defaultSyncExceptionHandler = new ISyncExceptionHandler() {
+		@Override
+		public void handle(IProject project, CoreException e) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_8 + project.getName(), e);
+		}
+	};
+
+	private static final Map<IProject, Set<ISyncListener>> fProjectToSyncListenersMap = Collections
+			.synchronizedMap(new HashMap<IProject, Set<ISyncListener>>());
+	
 	// Sync unavailable by default. Wizards should explicitly set the sync mode once the project is ready.
 	private static final SYNC_MODE DEFAULT_SYNC_MODE = SYNC_MODE.UNAVAILABLE;
 	private static final boolean DEFAULT_SYNC_AUTO_SETTING = true;
@@ -58,10 +72,10 @@ public class SyncManager  {
 		private final IResourceDelta fDelta;
 		private final SyncRunner fSyncRunner;
 		private final EnumSet<SyncFlag> fSyncFlags;
-		private final SyncExceptionHandler fSyncExceptionHandler;
+		private final ISyncExceptionHandler fSyncExceptionHandler;
 
 		public SynchronizeJob(IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncRunner runner,
-				EnumSet<SyncFlag> syncFlags, SyncExceptionHandler seHandler) {
+				EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
 			fProject = project;
 			fBuildScenario = buildScenario;
@@ -84,12 +98,13 @@ public class SyncManager  {
 						fSyncFlags);
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
-					System.out.println(Messages.SyncManager_8 + e.getLocalizedMessage());
+					defaultSyncExceptionHandler.handle(fProject, e);
 				} else {
-					fSyncExceptionHandler.handle(e);
+					fSyncExceptionHandler.handle(fProject, e);
 				}
 			} finally {
 				monitor.done();
+				SyncManager.notifySyncListeners(fProject);
 			}
 			return Status.OK_STATUS;
 		}
@@ -200,7 +215,7 @@ public class SyncManager  {
 
 	/**
 	 * Set sync mode for a project
-	 * 
+	 *
 	 * @param project
 	 * @param mode
 	 */
@@ -285,7 +300,7 @@ public class SyncManager  {
 		if (project == null || filter == null) {
 			throw new NullPointerException();
 		}
-		
+
 		IScopeContext context = new ProjectScope(project);
 		Preferences node = context.getNode(projectScopeSyncNode);
 		if (node == null) {
@@ -297,7 +312,7 @@ public class SyncManager  {
 
 		BuildConfigurationManager.flushNode(node);
 	}
-
+	
 	/**
 	 * Save a new default file filter.
 	 * Use this in conjunction with "getDefaultFileFilter()" to modify the default filter.
@@ -334,13 +349,35 @@ public class SyncManager  {
 	 * @return the scheduled sync job
 	 * @throws CoreException 
 	 */
-	public static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, SyncExceptionHandler seHandler)
+	public static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler)
 			throws CoreException {
-		return sync(delta, project, syncFlags, false, seHandler, null);
+		return sync(delta, project, syncFlags, false, true, seHandler, null);
 	}
 	
 	/**
 	 * Invoke sync and block until sync finishes. This does not spawn another thread and no locking of resources is done.
+	 * Throws sync exceptions for client to handle.
+	 *
+	 * @param delta
+	 *            project delta
+	 * @param project
+	 *            project to sync
+	 * @param syncFlags
+	 *            sync flags
+	 * @param monitor
+	 *            progress monitor
+	 * @return the scheduled sync job
+	 * @throws CoreException
+	 * 			  on problems sync'ing
+	 */
+	public static Job syncBlocking(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, IProgressMonitor monitor)
+			throws CoreException {
+		return sync(delta, project, syncFlags, true, false, null, monitor);
+	}
+	
+	/**
+	 * Invoke sync and block until sync finishes. This does not spawn another thread and no locking of resources is done.
+	 * Sync exceptions are handled by the passed exception handler or by the default handler if null.
 	 * 
 	 * @param delta
 	 *            project delta
@@ -348,17 +385,21 @@ public class SyncManager  {
 	 *            project to sync
 	 * @param syncFlags
 	 *            sync flags
+	 * @param monitor
+	 *            progress monitor
+	 * @param seHandler
+	 *            sync exception handler
 	 * @return the scheduled sync job
 	 * @throws CoreException
 	 * 			  on problems sync'ing
 	 */
-	public static Job syncBlocking(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, IProgressMonitor monitor)
-			throws CoreException {
-		return sync(delta, project, syncFlags, true, null, monitor);
+	public static Job syncBlocking(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, IProgressMonitor monitor,
+			ISyncExceptionHandler seHandler) throws CoreException {
+		return sync(delta, project, syncFlags, true, true, seHandler, monitor);
 	}
 	
 	private static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, boolean isBlocking,
-			SyncExceptionHandler seHandler, IProgressMonitor monitor) throws CoreException {
+			boolean useExceptionHandler, ISyncExceptionHandler seHandler, IProgressMonitor monitor) throws CoreException {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		if (!(bcm.isInitialized(project))) {
 			return null;
@@ -366,7 +407,8 @@ public class SyncManager  {
 
 		IConfiguration[] buildConfigurations = new IConfiguration[1];
 		buildConfigurations[0] = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
-		Job[] syncJobs = scheduleSyncJobs(delta, project, syncFlags, buildConfigurations, isBlocking, seHandler, monitor);
+		Job[] syncJobs = scheduleSyncJobs(delta, project, syncFlags, buildConfigurations, isBlocking, useExceptionHandler,
+				seHandler, monitor);
 		return syncJobs[0];
 	}
 
@@ -386,7 +428,7 @@ public class SyncManager  {
 	 * @throws CoreException
 	 * 			  on problems sync'ing
 	 */
-	public static Job[] syncAll(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, SyncExceptionHandler seHandler)
+	public static Job[] syncAll(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler)
 			throws CoreException {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		if (!(bcm.isInitialized(project))) {
@@ -394,13 +436,13 @@ public class SyncManager  {
 		}
 
 		return scheduleSyncJobs(delta, project, syncFlags, ManagedBuildManager.getBuildInfo(project).getManagedProject()
-				.getConfigurations(), false, seHandler, null);
+				.getConfigurations(), false, true, seHandler, null);
 	}
 
 	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor
 	private static Job[] scheduleSyncJobs(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags,
-			IConfiguration[] buildConfigurations, boolean isBlocking, SyncExceptionHandler seHandler, IProgressMonitor monitor)
-			throws CoreException {
+			IConfiguration[] buildConfigurations, boolean isBlocking, boolean useExceptionHandler, ISyncExceptionHandler seHandler,
+			IProgressMonitor monitor) throws CoreException {
 		int jobNum = 0;
 		Job[] syncJobs = new Job[buildConfigurations.length];
 		for (IConfiguration buildConfig : buildConfigurations) {
@@ -410,9 +452,21 @@ public class SyncManager  {
 			SyncRunner syncRunner = bcm.getSyncRunnerForBuildConfiguration(buildConfig);
 			if (syncRunner != null) {
 				if (isBlocking) {
+					try {
 						syncRunner.synchronize(project, buildScenario, delta, getFileFilter(project), monitor, syncFlags);
+					} catch (CoreException e) {
+						if (!useExceptionHandler) {
+							throw e;
+						} else if (seHandler == null) {
+							defaultSyncExceptionHandler.handle(project, e);
+						} else {
+							seHandler.handle(project, e);
+						}
+					} finally {
+						SyncManager.notifySyncListeners(project);
+					}
 				} else {
-						job = new SynchronizeJob(project, buildScenario, delta, syncRunner, syncFlags, seHandler);
+					job = new SynchronizeJob(project, buildScenario, delta, syncRunner, syncFlags, seHandler);
 					job.schedule();
 				}
 			}
@@ -423,5 +477,60 @@ public class SyncManager  {
 		}
 
 		return syncJobs;
+	}
+
+	/**
+	 * Get the current default sync exception handler
+	 * @return default sync exception handler
+	 */
+	public static ISyncExceptionHandler getDefaultSyncExceptionHandler() {
+		return defaultSyncExceptionHandler;
+	}
+	
+	/**
+	 * Set the default sync exception handler
+	 * @param handler
+	 */
+	public static void setDefaultSyncExceptionHandler(ISyncExceptionHandler handler) {
+		defaultSyncExceptionHandler = handler;
+	}
+	
+	/**
+	 * Add a listener for sync events on a certain project
+	 *
+	 * @param project
+	 * @param listener
+	 */
+	public static void addPostSyncListener(IProject project, ISyncListener listener) {
+		Set<ISyncListener> listenerSet = fProjectToSyncListenersMap.get(project);
+		if (listenerSet == null) {
+			listenerSet = new HashSet<ISyncListener>();
+			fProjectToSyncListenersMap.put(project, listenerSet);
+		}
+		listenerSet.add(listener);
+	}
+	
+	/**
+	 * Remove a listener for sync events on a certain project
+	 *
+	 * @param project
+	 * @param listener
+	 */
+	public static void removePostSyncListener(IProject project, ISyncListener listener) {
+		Set<ISyncListener> listenerSet = fProjectToSyncListenersMap.get(project);
+		if (listenerSet != null) {
+			listenerSet.remove(listener);
+		}
+	}
+	
+	private static void notifySyncListeners(IProject project) {
+		Set<ISyncListener> listenerSet = fProjectToSyncListenersMap.get(project);
+		if (listenerSet == null) {
+			return;
+		}
+
+		for (ISyncListener listener : listenerSet) {
+			listener.handleSyncEvent(new SyncEvent());
+		}
 	}
 }
