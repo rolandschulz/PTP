@@ -60,34 +60,46 @@ sub read_xml_fast {
     $xmlin=~s/\n/ /gs;
     $xmlin=~s/\s\s+/ /gs;
     my ($tag,$tagname,$rest,$ctag,$nrc);
-    foreach $tag (split(/\>\s*/,$xmlin)) {
+    foreach $tag (split(/\>/,$xmlin)) {
 	$ctag.=$tag;
 	$nrc=($ctag=~ tr/\"/\"/);
 	if($nrc%2==0) {
 	    $tag=$ctag;
 	    $ctag="";
 	} else {
+	    $ctag.="\>";
 	    next;
 	}
 	
+	$tag=~s/^\s*//gs;$tag=~s/\s*$//gs;
+
+	# comment
+	next if($tag =~ /\!\-\-/);
+
 #	print "TAG: '$tag'\n";
 	if($tag=~/^<[\/\?](.*[^\s\>])/) {
 	    $tagname=$1;
 #	    print "TAGE: '$tagname'\n";
 	    $self->xml_end($self->{DATA},$tagname,());
-	} elsif($tag=~/<([^\s]+)\s*$/) {
+	} elsif($tag=~/<([^\s\/]+)\s*$/) {
 	    $tagname=$1;
 #	    print "TAG0: '$tagname'\n";
 	    $self->xml_start($self->{DATA},$tagname,());
 	} elsif($tag=~/<([^\s]+)(\s(.*)[^\/])$/) {
 	    $tagname=$1;
-	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;
+	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;$rest=~s/\s+\=\"/\=\"/gs;
 #	    print "TAG1: '$tagname' rest='$rest'\n";
 	    $self->xml_start($self->{DATA},$tagname,split(/=?\"\s*/,$rest));
-	} elsif($tag=~/<([^\s]+)(\s(.*)\s?)\/$/) {
+	} elsif($tag=~/<([^\s\/]+)(\s(.*)\s?)\/$/) {
 	    $tagname=$1;
-	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;
+	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;$rest=~s/\s+\=\"/\=\"/gs;
 #	    print "TAG2: '$tagname' rest='$rest' closed\n";
+	    $self->xml_start($self->{DATA},$tagname,split(/=?\"\s*/,$rest));
+	    $self->xml_end($self->{DATA},$tagname,());
+	} elsif($tag=~/<([^\s\/]+)\/$/) {
+	    $tagname=$1;
+	    $rest="";
+#	    print "TAG2e: '$tagname' rest='$rest' closed\n";
 	    $self->xml_start($self->{DATA},$tagname,split(/=?\"\s*/,$rest));
 	    $self->xml_end($self->{DATA},$tagname,());
 	}
@@ -115,6 +127,8 @@ sub xml_start {
 	return(1);
     }
     my %attr=(@_);
+
+#    print Dumper(\%attr);
 
     if($name eq "LML_da_workflow") {
 	foreach $k (sort keys %attr) {

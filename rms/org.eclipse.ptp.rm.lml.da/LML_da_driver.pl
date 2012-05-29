@@ -350,12 +350,16 @@ if($rawfile) {
 #########################
 # check if default layout should used (by request)
 my $usedefaultlayout=0;
-if(exists($filehandler_request->{DATA}->{request})) {
-    if(exists($filehandler_request->{DATA}->{request}->[0]->{getDefaultData})) {
-        if($filehandler_request->{DATA}->{request}->[0]->{getDefaultData}=~/^true$/i) {
-            $usedefaultlayout=1;
-        }
+if(!$options{nocheckrequest}) {
+    if(exists($filehandler_request->{DATA}->{request})) {
+	if(exists($filehandler_request->{DATA}->{request}->[0]->{getDefaultData})) {
+	    if($filehandler_request->{DATA}->{request}->[0]->{getDefaultData}=~/^true$/i) {
+		$usedefaultlayout=1;
+	    }
+	}
     }
+} else {
+    $usedefaultlayout=1;
 }
 #check if layout is given in request
 my $layoutfound=0;

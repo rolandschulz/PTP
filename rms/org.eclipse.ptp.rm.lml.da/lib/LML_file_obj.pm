@@ -61,7 +61,9 @@ sub new {
 #                               ->{column}->{$cid}->{id}
 #                                                 ->{name}
 #                                                 ->{sort}
-#                                                 ->{pattern}=[[include|exclude, regexp], ...]
+#                                                 ->{pattern}=[ [include, regexp]|
+#                                                               [exclude, regexp]|                
+#                                                               [select,rel,value]  ...]
 #                               ->{row}->{$id}->{cell}->{$cid}->{value}
 #                                                             ->{cid}
 #
@@ -460,6 +462,14 @@ sub lml_start {
 	if($o->{LASTPATTERNLIST}) {
 	    if(exists($attr{'regexp'})) {
 		push(@{$o->{LASTPATTERNLIST}},['include',$attr{'regexp'}]);
+	    }
+	}
+	return(1);
+    }
+    if($name eq "select") {
+	if($o->{LASTPATTERNLIST}) {
+	    if(exists($attr{'rel'}) && (exists($attr{'value'}))) {
+		push(@{$o->{LASTPATTERNLIST}},['select',$attr{'rel'},$attr{'value'}]);
 	    }
 	}
 	return(1);

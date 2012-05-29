@@ -443,3 +443,13 @@ ChangeLog:
     - incoporated support for new RMS (TORQUE-ALPS)
    - bug fixes
 
+1.16:
+   - bug fixes
+
+1.17: 
+   - Support for BG/P and BG/Q (Slurm, LL, Cobalt)
+   - Initial support for GPU attribute (PBS)
+   - new option for LML_da_driver (nocheckrequest) 
+   - bug fixes
+   - improved internal XML parser
+

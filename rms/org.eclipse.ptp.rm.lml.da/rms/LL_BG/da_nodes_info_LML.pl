@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #*******************************************************************************
-#* Copyright (c) 2011 Forschungszentrum Juelich GmbH.
+#* Copyright (c) 2012 Forschungszentrum Juelich GmbH.
 #* All rights reserved. This program and the accompanying materials
 #* are made available under the terms of the Eclipse Public License v1.0
 #* which accompanies this distribution, and is available at
@@ -60,7 +60,7 @@ $cmd=$ENV{"CMD_NODEINFO"} if($ENV{"CMD_NODEINFO"});
 open(IN," $cmd -M all |");
 my $nodeid="-";
 my $lastkey="-";
-
+my $hwnodeid="";
 
 while($line=<IN>) {
     chomp($line);
@@ -68,7 +68,10 @@ while($line=<IN>) {
     next if ($line=~/^\=+$/);
 
     if($line=~/^\s*Midplane Location\s*[:]\s*$patwrd/) {
-	$nodeid=$1;
+	$hwnodeid=$1;
+	if($hwnodeid=~/^R(.)(.)-(.*)$/) {
+	    $nodeid=sprintf("R%02d%02d-%s",&Rack_ord($1),&Rack_ord($2),$3);
+	}
 	$nodes{$nodeid}{id}=$nodeid;
 #	print "line $line\n";
     } elsif($line=~/^\s*([^\:]+)\s*\:\s+(.*)$/) {
@@ -81,7 +84,7 @@ while($line=<IN>) {
 	$key=~s/\s/_/gs;
 	$lastkey=$key;
 	$nodes{$nodeid}{$key}="";
-    } else {
+     } else {
 	$line=~s/^\s*//gs;
 	$nodes{$nodeid}{$lastkey}.=$line;
     }
@@ -170,25 +173,6 @@ sub modify {
 	}
     }
 
-    if($mkey eq "nodelist") {
-	if($ret ne "-") {
-	    $ret=~s/\//,/gs;
-	    my @nodes = split(/\+/,$ret);
-	    $ret="(".join(')(',@nodes).")";
-	}
-    }
-
-    if($mkey eq "totalcores") {
-	if($ret=~/$patint[:]ppn=$patint/) {
-	    $ret=$1*$2;
-	}
-    }
-    if($mkey eq "totaltasks") {
-	if($ret=~/$patint[:]ppn=$patint/) {
-	    $ret=$1*$2;
-	}
-    }
-
     if(($mkey eq "comment")) {
 	$ret=~s/\"//gs;
     }
@@ -196,5 +180,18 @@ sub modify {
 	$ret=~s/\<unknown\>/unknown/gs;
     }
 
+    return($ret);
+}
+
+sub Rack_ord {
+    my($spec)=@_;
+    my$ret=0;
+    if($spec=~/\d+/) {
+	$ret=$spec;
+    } elsif($spec=~/[a-z]/) {
+	$ret=ord($spec)-ord('a')+10;
+    }elsif($spec=~/[A-Z]/) {
+	$ret=ord($spec)-ord('A')+10;
+    }
     return($ret);
 }

@@ -1,29 +1,29 @@
 #!/usr/bin/perl -w
 #*******************************************************************************
-#* Copyright (c) 2011 Forschungszentrum Juelich GmbH.
+#* Copyright (c) 2012 ParaTools, Inc.
 #* All rights reserved. This program and the accompanying materials
 #* are made available under the terms of the Eclipse Public License v1.0
 #* which accompanies this distribution, and is available at
 #* http://www.eclipse.org/legal/epl-v10.html
 #*
 #* Contributors:
-#*    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
+#*    Kevin A. Huck (ParaTools, Inc.)
 #*******************************************************************************/ 
 use strict;
 
-sub check_rms_PBS {
+sub check_rms_COBALT_BG {
     my($rmsref,$cmdsref,$verbose)=@_;
     my($key, $cmd);
     my $rc=1;
     
     my %cmdname=(
 		"job"  => "qstat",
-		"node" => "pbsnodes",
+		"node" => "partlist",
 	);
 	
     my %cmdpath=(
 		"job" => "/usr/bin/qstat",
-		"node" => "/usr/bin/pbsnodes",
+		"node" => "/usr/bin/partlist",
 	);
     
     foreach $key (keys(%cmdname)) {
@@ -38,68 +38,43 @@ sub check_rms_PBS {
 	    if (!$?) {
 		chomp($cmdpath);
 		$cmd=$cmdpath;
-		&report_if_verbose("%s","$0: check_rms_PBS: found $cmdname{$key} by which ($cmd)\n");
+		&report_if_verbose("%s","$0: check_rms_COBALT_BG: found $cmdname{$key} by which ($cmd)\n");
 	    }
 	}
 	if (-f $cmd) {
 	    $cmdsref->{"cmd_${key}info"}=$cmd;
 	} else {
-	    &report_if_verbose("%s","$0: check_rms_PBS: no cmd found for $cmdname{$key}\n");
+	    &report_if_verbose("%s","$0: check_rms_COBALT_BG: no cmd found for $cmdname{$key}\n");
 	    $rc=0;
 	}
     }
     
-    # Ensure it is a PBSpro system
-    if (exists($cmdsref->{"cmd_jobinfo"})) {
-	$cmd=$cmdsref->{"cmd_jobinfo"}." --version";
-	    my $cmdversion=`$cmd 2>/dev/null`; 	
-	chomp($cmdversion);
-	if ($cmdversion=~/version/) {
-	    if ($cmdversion=~/PBSPro/) {
-		print STDERR "$0: check_rms: PBSpro found\n" if($verbose);
-	    }
-	} else {
-	    &report_if_verbose("%s","$0: check_rms_PBS: could not obtain version info from command $cmd\n");
-	    $rc=0;
-	}
-    }
-
-    # Ensure it is not a ALPS system (check 1)
-    {
-	my $alps_cmd="xtnodestat";
-	my $cmdpath=`which $alps_cmd 2>/dev/null`; 	# try: which 
-	if (!$?) {
-	    chomp($cmdpath);
-	    $cmd=$cmdpath;
-	    &report_if_verbose("%s","$0: check_rms_PBS: found $alps_cmd by which ($cmd) --> seems to be a ALPS system\n");
-	    $rc=0;
-	}
-    }
-
-    # Ensure it is not a Cobalt system
+    # Ensure it is a Cobalt system
     if (exists($cmdsref->{"cmd_jobinfo"})) {
 	$cmd=$cmdsref->{"cmd_jobinfo"}." --version";
 	    my $cmdversion=`$cmd 2>/dev/null`; 	
 	chomp($cmdversion);
 	if ($cmdversion=~/(C|c)obalt/) {
-	    &report_if_verbose("%s","$0: check_rms_PBS: seems to be a Cobalt system\n");
+	  print STDERR "$0: check_rms_COBALT_BG: COBALT_BG found\n" if($verbose);
+	} else {
+	    &report_if_verbose("%s","$0: check_rms_COBALT_BG: could not obtain version info from command $cmd\n");
 	    $rc=0;
-	} 
+	}
     }
     
     if ($rc==1)  {
-    	$$rmsref = "PBS";
-	&report_if_verbose("%s%s%s", "$0: check_rms_PBS: found PBS commands (",
+    	$$rmsref = "COBALT_BG";
+	&report_if_verbose("%s%s%s", "$0: check_rms_COBALT_BG: found COBALT_BG commands (",
 			   join(",",(values(%{$cmdsref}))),
 			   ")\n");
     } else {
-	&report_if_verbose("%s","$0: check_rms_PBS: seems not to be a PBS system\n");
+	&report_if_verbose("%s","$0: check_rms_COBALT_BG: seems not to be a COBALT_BG system\n");
     }
     
     return($rc);
 }
 
-sub generate_step_rms_PBS {
+sub generate_step_rms_COBALT_BG {
     my($workflowxml, $laststep, $cmdsref)=@_;
     my($step,$envs,$key,$ukey);
 
@@ -110,9 +85,9 @@ sub generate_step_rms_PBS {
     }
     $step="getdata";
     &add_exec_step_to_workflow($workflowxml,$step, $laststep, 
-			       "$envs $^X rms/PBS/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
-			       "$envs $^X rms/PBS/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
-			       "$envs $^X rms/PBS/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
+			       "$envs $^X rms/COBALT_BG/da_system_info_LML.pl               \$tmpdir/sysinfo_LML.xml",
+			       "$envs $^X rms/COBALT_BG/da_nodes_info_LML.pl                \$tmpdir/nodes_LML.xml",
+			       "$envs $^X rms/COBALT_BG/da_jobs_info_LML.pl                 \$tmpdir/jobs_LML.xml");
     $laststep=$step;
 
     $step="combineLML";
@@ -124,7 +99,7 @@ sub generate_step_rms_PBS {
     return($laststep);
 }
 
-$main::check_functions->{PBS}   =\&check_rms_PBS;
-$main::generate_functions->{PBS}=\&generate_step_rms_PBS;
+$main::check_functions->{COBALT_BG}   =\&check_rms_COBALT_BG;
+$main::generate_functions->{COBALT_BG}=\&generate_step_rms_COBALT_BG;
 
 1;

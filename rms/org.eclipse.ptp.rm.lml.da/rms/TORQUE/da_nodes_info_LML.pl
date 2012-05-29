@@ -59,6 +59,16 @@ my %mapping = (
     "totmem"                                 => "",
     "uname"                                  => "",
     "varattr"                                => "",
+
+    "Resource_List.vmem"                     => "",
+    "totalgpus"                              => "",
+    "umask"                                  => "",
+    "gpus"                                   => "gpus",
+    "mom_manager_port"                       => "",
+    "mom_service_port"                       => "",
+    "plugin_ver"                             => "",
+    "version"                                => "",
+
 # unknown attributes
     );
 

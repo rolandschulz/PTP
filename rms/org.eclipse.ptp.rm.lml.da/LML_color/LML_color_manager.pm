@@ -261,17 +261,15 @@ sub fill_buffer {
 		$h = ($self->{VALUEHSTART}[$cat]+$i)%360; 
 		$s=$self->{VALUE_S}[$cat]; 
 		$v=$self->{VALUE_V}[$cat]; 
-		if($v+$off<100) {
-		    $v+=$off;
-		} else {
-		    $v-=$off;
-		    $v=0 if ($v<0);
-		}
+
+		$v= ($v+$off)%100;
+#		if($v+$off<100) {$v+=$off;} else {$v-=$off;$v=0 if ($v<0);}
+
 		($r,$g,$b)=&hsv2rgb($h,$s,$v);
 		$r = int 255.0/100.0 * $r;	$g = int 255.0/100.0 *$g;	$b = int 255.0/100.0 * $b;
 		$work[$i]=sprintf( "\#%02x%02x%02x", $r, $g, $b);
 	    }
-
+	    
 	    # put colors in buffer
 	    while(@work) {
 		if($self->{RANDOM}[$cat]==1) {
@@ -289,6 +287,7 @@ sub fill_buffer {
 	    }
 	    $off++; 
 	    last if($c>$self->{BUFFERSIZE_INT}[$cat]);
+	    last if($off>100);
 	}
     }
     if($scheme eq "RGB") {
@@ -512,7 +511,7 @@ sub get_color {
 	    }
 	} else {
 	    printf("llview_manage_color: not enough colors in category %s(%d) buffersize=%d...\n",$category,$cat,$self->{BUFFERSIZE}[$cat]);
-	    $color="red"; 
+	    $color="#ff0000"; 
 	}
 	if($self->{USEDCOLORS}[$cat]->{$color}) {
 	    printf( "llview_manage_color: warning color $color in use by: %10s %-15s -> %-20s #buffer=%3d\n",

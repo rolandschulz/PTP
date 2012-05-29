@@ -20,7 +20,9 @@ use lib "$FindBin::RealBin/../lib";
 use LML_combine_file_obj;
 use LML_combine_obj_check;
 use LML_combine_obj_bgp;
+use LML_combine_obj_bgq;
 use LML_combine_obj_alps;
+use LML_combine_obj_cluster;
 
 
 my $patint="([\\+\\-\\d]+)";   # Pattern for Integer number
@@ -96,6 +98,10 @@ if($system_type eq "BG/P") {
     &LML_combine_obj_bgp::update($filehandler->get_data_ref(),$opt_dbdir);
 }
 
+if($system_type eq "BG/Q") {
+    &LML_combine_obj_bgq::update($filehandler->get_data_ref(),$opt_dbdir);
+}
+
 if($system_type eq "ALPS") {
     &LML_combine_obj_alps::update($filehandler->get_data_ref(),$opt_dbdir);
 }
@@ -117,6 +123,10 @@ if($system_type eq "Cluster") {
 	    last; 
 	}
     }
+}
+
+if($system_type eq "Cluster") {
+    &LML_combine_obj_cluster::update($filehandler->get_data_ref(),$opt_dbdir);
 }
 
 &LML_combine_obj_check::check_jobs($filehandler->get_data_ref());

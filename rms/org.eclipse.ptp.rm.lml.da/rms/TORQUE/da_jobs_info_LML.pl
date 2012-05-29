@@ -90,6 +90,13 @@ my %mapping = (
     "status"                                 => "status",
     "detailedstatus"                         => "detailedstatus",
 
+    "Resource_List.pvmem"                    => "",
+    "exec_gpus"                              => "gpulist",
+    "exec_port"                              => "",
+    "init_work_dir"                          => "",
+    "submit_host"                            => "",
+
+
 # unknown attributes
     "group"                                  => "group",
     );
@@ -125,6 +132,7 @@ foreach $jobid (sort(keys(%jobs))) {
     $jobs{$jobid}{group}      = "unknown" if(!exists($jobs{$jobid}{group}));
     $jobs{$jobid}{exec_host}  = "-" if(!exists($jobs{$jobid}{exec_host}));
     $jobs{$jobid}{totaltasks} = $jobs{$jobid}{"Resource_List.nodes"} if(!exists($jobs{$jobid}{totaltasks}));
+    $jobs{$jobid}{totalgpus}  = $jobs{$jobid}{"Resource_List.nodes"} if(!exists($jobs{$jobid}{totalgpus}));
     $jobs{$jobid}{spec}       = $jobs{$jobid}{"Resource_List.nodes"} if(!exists($jobs{$jobid}{spec}));
     # check state
     ($jobs{$jobid}{status},$jobs{$jobid}{detailedstatus}) = &get_state($jobs{$jobid}{job_state},
@@ -177,7 +185,7 @@ sub get_state {
     my($job_state,$Hold_types)=@_;
     my($state,$detailed_state);
 
-    $state="UNDETERMINED";$detailed_state="";
+    $state="UNDETERMINED";$detailed_state="-";
 
     if($job_state eq "C") {
 	$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
@@ -193,18 +201,19 @@ sub get_state {
 	$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
     }    
     if($job_state eq "Q") {
-	$state="SUBMITTED";$detailed_state="";
+	$state="SUBMITTED";$detailed_state="-";
     }    
     if($job_state eq "W") {
-	$state="SUBMITTED";$detailed_state="";
+	$state="SUBMITTED";$detailed_state="-";
     }    
     if($job_state eq "T") {
-	$state="SUBMITTED";$detailed_state="";
+	$state="SUBMITTED";$detailed_state="-";
     }    
     if($job_state eq "R") {
-	$state="RUNNING";$detailed_state="";
+	$state="RUNNING";$detailed_state="-";
     }    
 
+   
     return($state,$detailed_state);
 }
 
@@ -251,6 +260,14 @@ sub modify {
 	}
     }
 
+    if($mkey eq "gpulist") {
+	if($ret ne "-") {
+	    $ret=~s/\//,/gs;
+	    my @gpus = split(/\+/,$ret);
+	    $ret="(".join(')(',@gpus).")";
+	}
+    }
+
     if($mkey eq "totalcores") {
 	my $numcores=0;
 	my ($spec);
@@ -263,6 +280,19 @@ sub modify {
 	    }
 	}
 	$ret=$numcores if($numcores>0);
+    }
+    if($mkey eq "totalgpus") {
+	my $numgpus=0;
+	my ($spec);
+	foreach $spec (split(/\s*\+\s*/,$ret)) {
+	    # std job
+	    if($ret=~/^$patint[:]ppn=$patint[:]gpus=$patint/) {
+		$numgpus+=$1*$3;
+	    } elsif($ret=~/^$patwrd[:]gpus=$patint/) {
+		$numgpus+=1*$2;
+	    }
+	}
+	$ret=$numgpus;
     }
     if($mkey eq "totaltasks") {
 	my $numcores=0;

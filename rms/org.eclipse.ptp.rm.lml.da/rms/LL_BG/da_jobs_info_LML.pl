@@ -1,48 +1,14 @@
 #!/usr/bin/perl -w
-#
-#          LLview - supervising LoadLeveler batch queue utilization 
-#
-#   Copyright (C) 2010, Forschungszentrum Juelich GmbH, Federal Republic of
-#   Germany. All rights reserved.
-#
-#   Redistribution and use in source and binary forms, with or without
-#   modification, are permitted provided that the following conditions are met:
-#
-#   Redistributions of source code must retain the above copyright notice, this
-#   list of conditions and the following disclaimer.
-#
-#     - Redistributions of source code must retain the above copyright notice,
-#       this list of conditions and the following disclaimer.
-#
-#     - Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
-#       documentation and/or other materials provided with the distribution.
-#
-#     - Any publications that result from the use of this software shall
-#       reasonably refer to the Research Centre's development.
-#
-#     - All advertising materials mentioning features or use of this software
-#       must display the following acknowledgement:
-#
-#           This product includes software developed by Forschungszentrum
-#           Juelich GmbH, Federal Republic of Germany.
-#
-#     - Forschungszentrum Juelich GmbH is not obligated to provide the user with
-#       any support, consulting, training or assistance of any kind with regard
-#       to the use, operation and performance of this software or to provide
-#       the user with any updates, revisions or new versions.
-#
-#
-#   THIS SOFTWARE IS PROVIDED BY FORSCHUNGSZENTRUM JUELICH GMBH "AS IS" AND ANY
-#   EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-#   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-#   DISCLAIMED. IN NO EVENT SHALL FORSCHUNGSZENTRUM JUELICH GMBH BE LIABLE FOR
-#   ANY SPECIAL, DIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
-#   RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
-#   CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
-#   CONNECTION WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE.
-#
-#
+#*******************************************************************************
+#* Copyright (c) 2012 Forschungszentrum Juelich GmbH.
+#* All rights reserved. This program and the accompanying materials
+#* are made available under the terms of the Eclipse Public License v1.0
+#* which accompanies this distribution, and is available at
+#* http://www.eclipse.org/legal/epl-v10.html
+#*
+#* Contributors:
+#*    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
+#*******************************************************************************/ 
 use strict;
 
 my $patint="([\\+\\-\\d]+)";   # Pattern for Integer number
@@ -356,6 +322,41 @@ sub modify {
 	}
     }
 
+    if($mkey eq "nodelist") {
+	if($ret ne "-") {
+	    my $node;
+	    my $newnodelist = "";
+	    foreach $node (split(/\s*,\s*/,$ret)) {
+		next if($node=~/^\s*$/);
+		if($node=~/^R(.)(.)-(.*)$/) {
+		    $newnodelist.="," if($newnodelist);
+		    $newnodelist.=sprintf("R%02d%02d-%s",&Rack_ord($1),&Rack_ord($2),$3);
+		}
+		print "WF: $node $newnodelist\n";
+	    }
+	    $ret=$newnodelist;
+	}
+	print "WF: $ret\n";
+    }
+
+    if($mkey eq "nodelist_boards") {
+	if($ret ne "-") {
+	    my $node;
+	    my $newnodelist = "";
+	    foreach $node (split(/\s*,\s*/,$ret)) {
+		next if($node=~/^\s*$/);
+		if($node=~/^R(.)(.)-(.*)$/) {
+		    $newnodelist.="," if($newnodelist);
+		    $newnodelist.=sprintf("R%02d%02d-%s",&Rack_ord($1),&Rack_ord($2),$3);
+		}
+		print "WF: $node $newnodelist\n";
+	    }
+	    $ret=$newnodelist;
+	}
+	print "WF: $ret\n";
+    }
+
+
     if(($mkey eq "comment")) {
 	$ret=~s/\"//gs;
     }
@@ -363,5 +364,18 @@ sub modify {
 	$ret=~s/\<unknown\>/unknown/gs;
     }
 
+    return($ret);
+}
+
+sub Rack_ord {
+    my($spec)=@_;
+    my$ret=0;
+    if($spec=~/\d+/) {
+	$ret=$spec;
+    } elsif($spec=~/[a-z]/) {
+	$ret=ord($spec)-ord('a')+10;
+    }elsif($spec=~/[A-Z]/) {
+	$ret=ord($spec)-ord('A')+10;
+    }
     return($ret);
 }

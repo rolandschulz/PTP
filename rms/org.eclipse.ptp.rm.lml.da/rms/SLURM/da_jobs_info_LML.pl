@@ -499,7 +499,7 @@ sub generate_bgnode_list() {
                     $nodeid = sprintf( "R%01d%01d-M%01d-N%02d", $row, $rack, $mid, $nodecard );
                 }
                 if ( $bgq eq "true" ) {
-                    $nodeid = sprintf( "R%02d%01d-M%01d-N%02d", $row, $rack, $mid, $nodecard );
+                    $nodeid = sprintf( "R%02d%02d-M%01d-N%02d", $row, $rack, $mid, $nodecard );
                 }
                 $nodenr{$midplane}[$nodecard] = $nodeid;
             }
