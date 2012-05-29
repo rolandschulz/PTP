@@ -21,7 +21,7 @@
 		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
 		<cdt-version>juno</cdt-version>
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/nightly</cdt-site>	
-		<egit-version>1.1</egit-version>
+		<egit-version>nightly</egit-version>
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<photran-site>file://home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-photran-nightly</photran-site>
 	</properties>
