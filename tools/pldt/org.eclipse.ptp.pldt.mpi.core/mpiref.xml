@@ -1093,6 +1093,742 @@
 </function>
 
 <function>
+<cname>MPI_File_close</cname>
+<cppname>MPI::File::Close()</cppname>
+<fname>MPI_FILE_CLOSE</fname>
+<namespace></namespace>
+<description>Closes a file (collective)</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_close</name>
+<arguments>MPI_File</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_delete</cname>
+<cppname>MPI::File::Delete</cppname>
+<fname>MPI_FILE_DELETE</fname>
+<namespace></namespace>
+<description>Deletes a file.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_delete</name>
+<arguments>char*filename, MPI_Info info</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_get_amode</cname>
+<cppname>MPI::File::Get_amode()</cppname>
+<fname>MPI_FILE_GET_AMODE</fname>
+<namespace></namespace>
+<description>Returns access mode associated with an open file.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_get_amode</name>
+<arguments>MPI_File fh, int *amode</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_get_atomicity</cname>
+<cppname>MPI::File::Get_atomicity</cppname>
+<fname>MPI_FILE_GET_ATOMICITY</fname>
+<namespace></namespace>
+<description>Returns current consistency semantics for data-access operations.</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_get_atomicity</name>
+<arguments>MPI_File fh, int *flag</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_get_byte_offset</cname>
+<cppname>MPI::File::Get_byte_offset</cppname>
+<fname>MPI_FILE_GET_BYTE_OFFSET</fname>
+<namespace></namespace>
+<description>Converts a view-relative offset into an absolute byte position.</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_get_byte_offset</name>
+<arguments>MPI_File fh, MPI_Offset offset,MPI_Offset *disp</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_get_group</cname>
+<cppname>MPI::File::Get_group</cppname>
+<fname>MPI_FILE_GET_GROUP</fname>
+<namespace></namespace>
+<description>Returns a duplicate of the process group of a file.</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_get_group</name>
+<arguments>MPI_File fh, MPI_Group *group</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_get_info</cname>
+<cppname>MPI::File::Get_info</cppname>
+<fname>MPI_FILE_GET_INFO</fname>
+<namespace></namespace>
+<description>Returns a new info object containing values for current hints associated with a file.</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_get_info</name>
+<arguments>MPI_File fh, MPI_Info *info_used</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_get_position</cname>
+<cppname>MPI::File::get_position</cppname>
+<fname>MPI_FILE_GET_POSITION</fname>
+<namespace></namespace>
+<description>Returns the current position of the individual file pointer.</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_get_position</name>
+<arguments>MPI_File fh, MPI_Offset *offset</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_get_position_shared</cname>
+<cppname>MPI::File::Get_position_shared</cppname>
+<fname>MPI_FILE_GET_POSITION_SHARED</fname>
+<namespace></namespace>
+<description>Returns the current position of the shared file
+pointer.</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_get_position_shared</name>
+<arguments>MPI_File fh, MPI_Offset *offset</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_get_size</cname>
+<cppname>MPI::File::Get_size</cppname>
+<fname>MPI_FILE_GET_SIZE</fname>
+<namespace></namespace>
+<description>Returns the current size of the file.</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_get_size</name>
+<arguments>MPI_File fh, MPI_Offset *offset</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_get_type_extent</cname>
+<cppname>MPI::File::Get_type_extent</cppname>
+<fname>MPI_FILE_GET_TYPE_EXTENT</fname>
+<namespace></namespace>
+<description>Returns the extent of the data type in a file.</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_get_type_extent</name>
+<arguments>MPI_File fh, MPI_Datatype datatype, MPI_Aint *extent</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_get_view</cname>
+<cppname>MPI::File::Get_view</cppname>
+<fname>MPI_FILE_GET_VIEW</fname>
+<namespace></namespace>
+<description>Returns the process's view of data in the file.</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_get_view</name>
+<arguments>MPI_File fh, MPI_Offset *disp, MPI_Datatype *etype,MPI_Datatype *filetype, char *datarep</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_iread</cname>
+<cppname>MPI::File::IRead</cppname>
+<fname>MPI_FILE_IREAD</fname>
+<namespace></namespace>
+<description>Reads a file starting at the location specified by the individual file pointer (nonblocking, noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_iread</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype, MPI_Request *request</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_iread_at</cname>
+<cppname>MPI::File::IRead_at</cppname>
+<fname>MPI_FILE_IREAD_AT</fname>
+<namespace></namespace>
+<description>Reads a file at an explicitly specified offset (nonblocking, noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_iread_at</name>
+<arguments>MPI_File fh, MPI_Offset offset, void *buf, int count,MPI_Datatype datatype, MPI_Request *request</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_iread_shared</cname>
+<cppname>MPI::File::IRead_shared</cppname>
+<fname>MPI_FILE_IREAD_SHARED</fname>
+<namespace></namespace>
+<description>Reads a file using the shared file pointer (nonblocking, noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_iread_shared</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype, MPI_Request *request</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_iwrite</cname>
+<cppname>MPI::File::Iwrite</cppname>
+<fname>MPI_FILE_IWRITE</fname>
+<namespace></namespace>
+<description>Writes a file starting at the location specified by the individual file pointer (nonblocking, noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_iwrite</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype, MPI_Request *request</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_iwrite_at</cname>
+<cppname>MPI::File::Iwrite_at</cppname>
+<fname>MPI_FILE_IWRITE_AT</fname>
+<namespace></namespace>
+<description>Writes a file at an explicitly specified offset (nonblocking, noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_iwrite_at</name>
+<arguments>MPI_File fh, MPI_Offset offset, void *buf,int count, MPI_Datatype datatype, MPI_Request *request</arguments>
+</prototype>
+</function>
+<function>
+<cname>MPI_File_iwrite_shared</cname>
+<cppname>MPI::File::Iwrite_shared</cppname>
+<fname>MPI_FILE_IWRITE_SHARED</fname>
+<namespace></namespace>
+<description>Writes a file using the shared file pointer (nonblocking, noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_iwrite_shared</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype, MPI_Request *requestMPI_File fh, void *buf, int count,MPI_Datatype datatype, MPI_Request *request</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_open</cname>
+<cppname>MPI::File::Open</cppname>
+<fname>MPI_FILE_OPEN</fname>
+<namespace></namespace>
+<description>Opens a file (collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_open</name>
+<arguments>fixme MPI_Comm, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_preallocate</cname>
+<cppname>MPI::File::Preallocate</cppname>
+<fname>MPI_FILE_PREALLOCATE</fname>
+<namespace></namespace>
+<description>Preallocates a specified amount of storage space at the beginning of a file (collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_preallocate</name>
+<arguments>MPI_file fh, MPI_Offset size</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_read</cname>
+<cppname>MPI::File::Read</cppname>
+<fname>MPI_FILE_READ</fname>
+<namespace></namespace>
+<description>Reads a file starting at the location specified by
+the individual file pointer (blocking, noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_read</name>
+<arguments>MPI_File fh, void *buf, int count, MPI_Datatype datatype,MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_read_all</cname>
+<cppname>MPI::File::Read_all</cppname>
+<fname>MPI_FILE_READ_ALL</fname>
+<namespace></namespace>
+<description>Reads a file starting at the locations specified by individual file pointers (blocking, collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_read_all</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_read_all_begin</cname>
+<cppname>MPI::File::Read_all_begin</cppname>
+<fname>MPI_FILE_READ_ALL_BEGIN</fname>
+<namespace></namespace>
+<description>Reads a file starting at the locations specified by
+individual file pointers; beginning part of a split
+collective routine (nonblocking).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_read_all_begin</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype</arguments>
+</prototype>
+</function>
+ 
+<function>
+<cname>MPI_File_read_all_end</cname>
+<cppname>MPI::File::Read_all_end</cppname>
+<fname>MPI_FILE_READ_ALL_END</fname>
+<namespace></namespace>
+<description>Reads a file starting at the locations specified by individual file pointers; ending part of a split collective routine (blocking).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_read_all_end</name>
+<arguments>MPI_File fh, void *buf, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_read_at</cname>
+<cppname>MPI::File::read_at</cppname>
+<fname>MPI_FILE_READ_AT</fname>
+<namespace></namespace>
+<description>Reads a file at an explicitly specified offset
+(blocking, noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_read_at</name>
+<arguments>MPI_File fh, MPI_Offset offset, void *buf, int count,MPI_Datatype datatype, MPI_Status *status</arguments>
+</prototype>
+</function>
+<function>
+<cname>MPI_File_read_at_all</cname>
+<cppname>MPI::File::read_at_all</cppname>
+<fname>MPI_FILE_READ_AT_ALL</fname>
+<namespace></namespace>
+<description>Reads a file at explicitly specified offsets (blocking, collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_read_at_all</name>
+<arguments>(MPI_File fh, MPI_Offset offset, void *buf,int count, MPI_Datatype datatype, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_read_at_all_begin</cname>
+<cppname>MPI::File::read_at_all_begin</cppname>
+<fname>MPI_FILE_READ_AT_ALL_BEGIN</fname>
+<namespace></namespace>
+<description>Reads a file at explicitly specified offsets;
+beginning part of a split collective routine
+(nonblocking).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_read_at_all_begin</name>
+<arguments>MPI_File fh, MPI_Offset offset, void *buf,int count, MPI_Datatype datatype</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_read_at_all_end</cname>
+<cppname>MPI::File::read_at_all_end</cppname>
+<fname>MPI_FILE_READ_AT_ALL_END</fname>
+<namespace></namespace>
+<description>Reads a file at explicitly specified offsets; ending
+part of a split collective routine (blocking).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_read_at_all_end</name>
+<arguments>MPI_File fh, void *buf, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_read_ordered</cname>
+<cppname>MPI::File::read_ordered</cppname>
+<fname>MPI_FILE_READ_ORDERED</fname>
+<namespace></namespace>
+<description>Reads a file at a location specified by a shared
+file pointer (blocking, collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_read_ordered</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_read_ordered_begin</cname>
+<cppname>MPI::File::read_ordered_begin</cppname>
+<fname>MPI_FILE_READ_ORDERED_BEGIN</fname>
+<namespace></namespace>
+<description>Reads a file at a location specified by a shared file pointer; beginning part of a split collective routine (nonblocking).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_read_ordered_begin</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_read_ordered_end</cname>
+<cppname>MPI::File::read_ordered_end</cppname>
+<fname>MPI_FILE_READ_ORDERED_END</fname>
+<namespace></namespace>
+<description>Reads a file at a location specified by a shared file pointer; ending part of a split collective routine (blocking).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_read_ordered_end</name>
+<arguments>MPI_File fh, void *buf, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_read_shared</cname>
+<cppname>MPI::File::read_shared</cppname>
+<fname>MPI_FILE_READ_SHARED</fname>
+<namespace></namespace>
+<description>Reads a file using the shared file pointer (blocking, noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_read_shared</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_seek</cname>
+<cppname>MPI::File::Seek</cppname>
+<fname>MPI_FILE_SEEK</fname>
+<namespace></namespace>
+<description>Updates individual file pointers (noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_seek</name>
+<arguments>MPI_File fh, MPI_Offset offset, int whence</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_seek_shared</cname>
+<cppname>MPI::File::Seek_Shared</cppname>
+<fname>MPI_FILE_SEEK_SHARED</fname>
+<namespace></namespace>
+<description>Updates the global shared file pointer (collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_seek_shared</name>
+<arguments>MPI_File fh, MPI_Offset offset, int whence</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_set_atomicity</cname>
+<cppname>MPI::File::Set_Atomicity</cppname>
+<fname>MPI_FILE_SET_ATOMICITY</fname>
+<namespace></namespace>
+<description>Sets consistency semantics for data-access operations (collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_set_atomicity</name>
+<arguments>MPI_File fh, int flag</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_set_info</cname>
+<cppname>MPI::File::Set_Info</cppname>
+<fname>MPI_FILE_SET_INFO</fname>
+<namespace></namespace>
+<description>Sets new values for hints (collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_set_info</name>
+<arguments>MPI_File fh, MPI_Info info</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_set_size</cname>
+<cppname>MPI::File::Set_Size</cppname>
+<fname>MPI_FILE_SET_SIZE</fname>
+<namespace></namespace>
+<description>Resizes a file (collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_set_size</name>
+<arguments>MPI_File fh, MPI_Offset size</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_set_view</cname>
+<cppname>MPI::File::Set_View</cppname>
+<fname>MPI_FILE_SET_VIEW</fname>
+<namespace></namespace>
+<description>Changes process's view of data in file
+(collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_set_view</name>
+<arguments>MPI_File fh, MPI_Offset disp, MPI_Datatype etype,MPI_Datatype filetype, char *datarep, MPI_Info info</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_sync</cname>
+<cppname>MPI::File::Sync</cppname>
+<fname>MPI_FILE_SYNC</fname>
+<namespace></namespace>
+<description>Makes semantics consistent for data-access operations (collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_sync</name>
+<arguments>MPI_File fh</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_write</cname>
+<cppname>MPI::File::Write</cppname>
+<fname>MPI_FILE_WRITE</fname>
+<namespace></namespace>
+<description>Writes a file starting at the location specified by the individual file pointer (blocking, noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_write</name>
+<arguments>MPI_File fh, void *buf, int count, MPI_Datatype datatype,MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_write_all</cname>
+<cppname>MPI::File::Write_all</cppname>
+<fname>MPI_FILE_WRITE_ALL</fname>
+<namespace></namespace>
+<description>Writes a file starting at the locations specified by
+individual file pointers (blocking, collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_write_all</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_write_all_begin</cname>
+<cppname>MPI::File::Write_all_begin</cppname>
+<fname>MPI_FILE_WRITE_ALL_BEGIN</fname>
+<namespace></namespace>
+<description>Writes a file starting at the locations specified by individual file pointers; beginning part of a split collective routine (nonblocking).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_write_all_begin</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_write_all_end</cname>
+<cppname>MPI::File::Write_all_end</cppname>
+<fname>MPI_FILE_WRITE_ALL_END</fname>
+<namespace></namespace>
+<description>Writes a file starting at the locations specified by individual file pointers; ending part of a split collective routine (blocking).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_write_all_end</name>
+<arguments>MPI_File fh, void *buf, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_write_at</cname>
+<cppname>MPI::File::write_at</cppname>
+<fname>MPI_FILE_WRITE_AT</fname>
+<namespace></namespace>
+<description>Writes a file at an explicitly specified offset (blocking, noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_write_at</name>
+<arguments>MPI_File fh, MPI_Offset offset, void *buf, int count,MPI_Datatype datatype, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_write_at_all</cname>
+<cppname>MPI::File::write_at_all</cppname>
+<fname>MPI_FILE_WRITE_AT_ALL</fname>
+<namespace></namespace>
+<description>Writes a file at explicitly specified offsets (blocking, collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_write_at_all</name>
+<arguments>(MPI_File fh, MPI_Offset offset, void *buf,int count, MPI_Datatype datatype, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_write_at_all_begin</cname>
+<cppname>MPI::File::write_at_all_begin</cppname>
+<fname>MPI_FILE_WRITE_AT_ALL_BEGIN</fname>
+<namespace></namespace>
+<description>Writes a file at explicitly specified offsets; beginning part of a split collective routine (nonblocking).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_write_at_all_begin</name>
+<arguments>MPI_File fh, MPI_Offset offset, void *buf,int count, MPI_Datatype datatype</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_write_at_all_end</cname>
+<cppname>MPI::File::write_at_all_end</cppname>
+<fname>MPI_FILE_WRITE_AT_ALL_END</fname>
+<namespace></namespace>
+<description>Writes a file at explicitly specified offsets;
+ending part of a split collective routine (blocking).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_write_at_all_end</name>
+<arguments>MPI_File fh, void *buf, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_write_ordered</cname>
+<cppname>MPI::File::write_ordered</cppname>
+<fname>MPI_FILE_WRITE_ORDERED</fname>
+<namespace></namespace>
+<description>Writes a file at a location specified by a shared file pointer (blocking, collective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_write_ordered</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_write_ordered_begin</cname>
+<cppname>MPI::File::write_ordered_begin</cppname>
+<fname>MPI_FILE_WRITE_ORDERED_BEGIN</fname>
+<namespace></namespace>
+<description>Writes a file at a location specified by a shared file pointer; beginning part of a split collective routine (nonblocking).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_write_ordered_begin</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_write_ordered_end</cname>
+<cppname>MPI::File::write_ordered_end</cppname>
+<fname>MPI_FILE_WRITE_ORDERED_END</fname>
+<namespace></namespace>
+<description>Writes a file at a location specified by a shared file pointer; ending part of a split collective routine (blocking).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_write_ordered_end</name>
+<arguments>MPI_File fh, void *buf, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_write_shared</cname>
+<cppname>MPI::File::write_shared</cppname>
+<fname>MPI_FILE_WRITE_SHARED</fname>
+<namespace></namespace>
+<description>Writes a file using the shared file pointer
+(blocking, noncollective).</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_write_shared</name>
+<arguments>MPI_File fh, void *buf, int count,MPI_Datatype datatype, MPI_Status *status</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Register_datarep</cname>
+<cppname>(none)</cppname>
+<fname>MPI_REGISTER_DATAREP</fname>
+<namespace></namespace>
+<description>Defines data representation.</description>
+
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Register_datarep</name>
+<arguments>char *datarep,MPI_Datarep_conversion_function *read_conversion_fn,MPI_Datarep_conversion_function *write_conversion_fn,MPI_Datarep_extent_function *dtype_file_extent_fn,void *extra_state</arguments>
+</prototype>
+</function>
+
+<function>
 <cname>MPI_Finalized</cname>
 <cppname>MPI::Is_finalized</cppname>
 <fname>MPI_FINALIZED</fname>

@@ -18,6 +18,7 @@ import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
@@ -109,7 +110,13 @@ public class ArgImpl {
 			}
 		}
 		String undefined = arg.getIsUndefinedIfMatches();
-		if (undefined != null && dereferenced != null) {
+		String attribute = arg.getAttribute();
+		if (attribute != null && undefined != null) {
+			AttributeType attrVal = map.get(attribute);
+			if (attrVal == null || attrVal.getValue() == null || attrVal.getValue().toString().matches(undefined.trim())) {
+				return JAXBCoreConstants.ZEROSTR;
+			}
+		} else if (undefined != null && dereferenced != null) {
 			String dtrim = dereferenced.trim();
 			String utrim = undefined.trim();
 			utrim = map.getString(uuid, utrim);

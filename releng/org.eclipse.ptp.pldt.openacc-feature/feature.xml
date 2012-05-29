@@ -17,10 +17,6 @@
       %license
    </license>
 
-   <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/indigo"/>
-   </url>
-
    <requires>
       <import feature="org.eclipse.ptp.pldt" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui"/>
