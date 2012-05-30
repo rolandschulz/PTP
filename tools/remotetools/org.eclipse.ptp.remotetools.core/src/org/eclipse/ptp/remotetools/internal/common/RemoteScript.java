@@ -28,6 +28,7 @@ public class RemoteScript implements IRemoteScript {
 	private final List<String> environment = new ArrayList<String>();
 
 	private boolean willForwardX11;
+	private boolean clearEnv;
 
 	private InputStream inputStream = null;
 	private OutputStream outputStream = null;
@@ -44,9 +45,17 @@ public class RemoteScript implements IRemoteScript {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.IRemoteScript#addEnvironment(java.lang.String
-	 * )
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteScript#clearEnvironment()
+	 */
+	public void clearEnvironment() {
+		clearEnv = true;
+		environment.clear();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remotetools.IRemoteScript#addEnvironment(java.lang.String )
 	 */
 	public void addEnvironment(String variable) {
 		environment.add(variable);
@@ -55,9 +64,7 @@ public class RemoteScript implements IRemoteScript {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.core.IRemoteScript#addEnvironment(java.lang
-	 * .String[])
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteScript#addEnvironment(java.lang .String[])
 	 */
 	public void addEnvironment(String[] variables) {
 		environment.addAll(Arrays.asList(variables));
@@ -98,14 +105,30 @@ public class RemoteScript implements IRemoteScript {
 
 		StringBuffer sb = new StringBuffer();
 
-		for (String env : environment) {
-			sb.append("export \"" + env + "\"; "); //$NON-NLS-1$ //$NON-NLS-2$
+		if (clearEnv) {
+			for (int i = 0; i < script.length; i++) {
+				sb.append("env -i"); //$NON-NLS-1$
+				for (String env : environment) {
+					sb.append(" \"" + env + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				sb.append(" " + script[i]); //$NON-NLS-1$
+				if (i < script.length - 1) {
+					sb.append(" &&");//$NON-NLS-1$
+				}
+			}
+		} else {
+			for (String env : environment) {
+				sb.append("export \"" + env + "\"; "); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			for (int i = 0; i < script.length; i++) {
+				sb.append(script[i]);
+				if (i < script.length - 1) {
+					sb.append("&& ");//$NON-NLS-1$
+				}
+			}
 		}
 
-		for (int i = 0; i < script.length; i++) {
-			sb.append(script[i]);
-			if (i < script.length-1) sb.append("&& ");//$NON-NLS-1$
-		}
 		return sb.toString();
 	}
 
@@ -140,9 +163,7 @@ public class RemoteScript implements IRemoteScript {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.core.IRemoteScript#setProcessErrorStream(
-	 * java.io.OutputStream)
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteScript#setProcessErrorStream( java.io.OutputStream)
 	 */
 	public void setProcessErrorStream(OutputStream output) {
 		errorStream = output;
@@ -152,9 +173,7 @@ public class RemoteScript implements IRemoteScript {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.IRemoteScript#setProcessInputStream(java.
-	 * io.InputStream)
+	 * @see org.eclipse.ptp.remotetools.IRemoteScript#setProcessInputStream(java. io.InputStream)
 	 */
 	public void setProcessInputStream(InputStream input) {
 		inputStream = input;
@@ -164,9 +183,7 @@ public class RemoteScript implements IRemoteScript {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.IRemoteScript#setProcessOutputStream(java
-	 * .io.OutputStream)
+	 * @see org.eclipse.ptp.remotetools.IRemoteScript#setProcessOutputStream(java .io.OutputStream)
 	 */
 	public void setProcessOutputStream(OutputStream output) {
 		outputStream = output;
@@ -176,8 +193,7 @@ public class RemoteScript implements IRemoteScript {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.IRemoteScript#setScript(java.lang.String)
+	 * @see org.eclipse.ptp.remotetools.IRemoteScript#setScript(java.lang.String)
 	 */
 	public void setScript(String script) {
 		this.script = new String[1];
@@ -187,8 +203,7 @@ public class RemoteScript implements IRemoteScript {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.IRemoteScript#setScript(java.lang.String[])
+	 * @see org.eclipse.ptp.remotetools.IRemoteScript#setScript(java.lang.String[])
 	 */
 	public void setScript(String[] script) {
 		this.script = script;

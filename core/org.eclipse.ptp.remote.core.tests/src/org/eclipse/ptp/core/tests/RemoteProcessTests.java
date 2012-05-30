@@ -3,6 +3,9 @@ package org.eclipse.ptp.core.tests;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -16,38 +19,33 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public class RemoteProcessTests extends TestCase {
-	private static final String USERNAME = "username"; //$NON-NLS-1$
+	private static final String USERNAME = "greg"; //$NON-NLS-1$
 	private static final String PASSWORD = ""; //$NON-NLS-1$
 	private static final String HOST = "localhost"; //$NON-NLS-1$
-	private static int NUM_THREADS = 15;
+	private static int NUM_THREADS = 5;
 
 	private IRemoteServices fRemoteServices;
 	private IRemoteConnection fRemoteConnection;
 
-	public void testProcess() {
+	public void testConcurrentProcess() {
 		Thread[] threads = new Thread[NUM_THREADS];
+		final Set<String> results = Collections.synchronizedSet(new HashSet<String>());
 
 		for (int t = 0; t < NUM_THREADS; t++) {
-			System.out.println("creating thread...");
 			Thread thread = new Thread("test thread " + t) {
 				@Override
 				public void run() {
-					System.out.println("Thread " + getId() + " starting...");
-
 					IRemoteProcessBuilder builder = fRemoteServices.getProcessBuilder(fRemoteConnection, "perl", "-V:version"); //$NON-NLS-1$
 					builder.redirectErrorStream(true);
-					for (int i = 0; i < 100; i++) {
-						System.out.println("Testing process " + i + " (of 10)..." + getId());
+					for (int i = 0; i < 10; i++) {
 						try {
 							IRemoteProcess proc = builder.start();
-							System.out.println("start proc (" + getId() + ")");
 							BufferedReader stdout = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 							String line;
 							while ((line = stdout.readLine()) != null) {
-								System.out.println("read (" + getId() + ") " + line);
+								results.add(line);
 							}
 							try {
-								System.out.println("about to wait (" + getId() + ")");
 								proc.waitFor();
 							} catch (InterruptedException e) {
 								e.printStackTrace();
@@ -56,11 +54,6 @@ public class RemoteProcessTests extends TestCase {
 							e.printStackTrace();
 							fail(e.getLocalizedMessage());
 						}
-						// try {
-						// Thread.sleep(500);
-						// } catch (InterruptedException e) {
-						// e.printStackTrace();
-						// }
 					}
 				}
 
@@ -74,7 +67,29 @@ public class RemoteProcessTests extends TestCase {
 			} catch (InterruptedException e) {
 			}
 		}
+		assertTrue(results.size() == 1);
+	}
 
+	public void testEnv() {
+		IRemoteProcessBuilder builder = fRemoteServices.getProcessBuilder(fRemoteConnection, "printenv"); //$NON-NLS-1$
+		builder.redirectErrorStream(true);
+		String path = builder.environment().get("PATH");
+		builder.environment().clear();
+		builder.environment().put("PATH", path);
+		try {
+			IRemoteProcess proc = builder.start();
+			BufferedReader stdout = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+			String line;
+			String result = null;
+			while ((line = stdout.readLine()) != null) {
+				assertTrue(result == null);
+				result = line;
+			}
+			assertEquals(result, "PATH=" + path);
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
 	}
 
 	/*

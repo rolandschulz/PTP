@@ -34,7 +34,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	private final RemoteToolsFileManager fFileMgr;
 	private final Map<String, String> fRemoteEnv;
 	private Map<String, String> fNewRemoteEnv = null;
-	private Set<Character> charSet = new HashSet<Character>();
+	private final Set<Character> charSet = new HashSet<Character>();
 
 	/**
 	 * @since 4.0
@@ -44,8 +44,8 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 		fConnection = conn;
 		fFileMgr = fileMgr;
 		fRemoteEnv = new HashMap<String, String>(conn.getEnv());
-		
-		//Create set of characters not to escape
+
+		// Create set of characters not to escape
 		String trustedChars = null;
 		trustedChars = "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; //$NON-NLS-1$ //$NON-NLS-2$
 		trustedChars += "0123456789" + "/._-"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -80,8 +80,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#environment()
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#environment()
 	 */
 	@Override
 	public Map<String, String> environment() {
@@ -95,9 +94,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getSupportedFlags
-	 * ()
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getSupportedFlags ()
 	 */
 	@Override
 	public int getSupportedFlags() {
@@ -142,13 +139,46 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 			}
 
 			/*
-			 * Only update new or changed environment variables.
+			 * There are two possibilities:
+			 * 
+			 * 1. Some environment variables have changed values, or new variables have been added. In this case we just want to
+			 * send send the changed values rather than all the variables.
+			 * 
+			 * 2. Some of the existing variables have been removed. In this case, we need to resend the entire environment variable
+			 * list.
 			 */
+
 			if (fNewRemoteEnv != null) {
-				for (Entry<String, String> entry : fNewRemoteEnv.entrySet()) {
-					String oldValue = fRemoteEnv.get(entry.getKey());
-					if (oldValue == null || !oldValue.equals(entry.getValue())) {
+				boolean clearEnv = false;
+
+				/*
+				 * See if any of the existing variables have been removed
+				 */
+				for (String key : fRemoteEnv.keySet()) {
+					if (fNewRemoteEnv.get(key) == null) {
+						clearEnv = true;
+						break;
+					}
+				}
+
+				if (clearEnv) {
+					script.clearEnvironment();
+
+					/*
+					 * Add new/changed variables
+					 */
+					for (Entry<String, String> entry : fNewRemoteEnv.entrySet()) {
 						script.addEnvironment(entry.getKey() + "=" + entry.getValue()); //$NON-NLS-1$
+					}
+				} else {
+					/*
+					 * Just add new or changed environment variables.
+					 */
+					for (Entry<String, String> entry : fNewRemoteEnv.entrySet()) {
+						String oldValue = fRemoteEnv.get(entry.getKey());
+						if (oldValue == null || !oldValue.equals(entry.getValue())) {
+							script.addEnvironment(entry.getKey() + "=" + entry.getValue()); //$NON-NLS-1$
+						}
 					}
 				}
 			}
