@@ -62,6 +62,11 @@
             name="IBM LoadLeveler">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
+            configurationFile="data/com.ibm.ll_bg.xml"
+            monitorType="LL_BG"
+            name="IBM LoadLeveler (Blue Gene)">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
             configurationFile="data/mpich2-generic-interactive.xml"
             name="MPICH2-Generic-Interactive">
       </JAXBResourceManagerConfiguration>

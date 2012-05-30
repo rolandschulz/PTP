@@ -7,7 +7,7 @@
 <!-- * -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="LL-Generic-Batch">
+	xsi:schemaLocation="resource_manager_type.xsd" name="LL-Generic-Batch for Blue Gene">
 	<control-data>
 		<!-- Set the default value of this attribute if LL is installed in a non-standard location -->
 		<attribute name="bindir" visible="false"/>
@@ -1043,6 +1043,6 @@
 			</import>
 		</launch-tab>
 	</control-data>
-	<monitor-data schedulerType="LL">
+	<monitor-data schedulerType="LL_BG">
 	</monitor-data>
 </resource-manager-builder>
