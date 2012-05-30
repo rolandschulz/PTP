@@ -334,8 +334,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		IExtensionPoint extensionPoint = registry.getExtensionPoint(SDMDebugUIPlugin.getUniqueIdentifier(), EXTENSION_POINT_ID);
 		if (extensionPoint != null) {
 			for (IExtension ext : extensionPoint.getExtensions()) {
-				final IConfigurationElement[] elements = ext.getConfigurationElements();
-				for (IConfigurationElement ce : elements) {
+				for (IConfigurationElement ce : ext.getConfigurationElements()) {
 					String attr = ce.getAttribute(ATTR_PATH);
 					if (attr != null) {
 						return attr;
