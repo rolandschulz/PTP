@@ -22,12 +22,12 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 
 /**
- * This event is generated when the attributes on one or more queues have
- * changed. It is a bulk event that is sent to child listeners on the source
- * resource manager.
+ * This event is generated when the attributes on one or more queues have changed. It is a bulk event that is sent to child
+ * listeners on the source resource manager.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
  */
+@Deprecated
 public interface IChangedQueueEvent {
 
 	/**

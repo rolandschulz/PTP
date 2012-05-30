@@ -22,24 +22,24 @@ import java.math.BigInteger;
 
 import org.eclipse.ptp.core.messages.Messages;
 
-public final class BigIntegerAttributeDefinition
-		extends AbstractAttributeDefinition<BigInteger, BigIntegerAttribute, BigIntegerAttributeDefinition> {
+@Deprecated
+public final class BigIntegerAttributeDefinition extends
+		AbstractAttributeDefinition<BigInteger, BigIntegerAttribute, BigIntegerAttributeDefinition> {
 
 	private final BigInteger minValue;
 	private final BigInteger maxValue;
 	private final BigInteger defaultValue;
 
-	public BigIntegerAttributeDefinition(final String uniqueId, final String name,
-			final String description, final boolean display, final BigInteger defaultValue) {
+	public BigIntegerAttributeDefinition(final String uniqueId, final String name, final String description, final boolean display,
+			final BigInteger defaultValue) {
 		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
 		this.minValue = BigInteger.ZERO;
 		this.maxValue = BigInteger.valueOf(Long.MAX_VALUE);
 	}
 
-	public BigIntegerAttributeDefinition(final String uniqueId, final String name,
-			final String description, final boolean display, final BigInteger defaultValue,
-			final BigInteger minValue, final BigInteger maxValue) throws IllegalValueException {
+	public BigIntegerAttributeDefinition(final String uniqueId, final String name, final String description, final boolean display,
+			final BigInteger defaultValue, final BigInteger minValue, final BigInteger maxValue) throws IllegalValueException {
 		super(uniqueId, name, description, display);
 		if (minValue.compareTo(maxValue) > 0) {
 			throw new IllegalArgumentException(Messages.BigIntegerAttributeDefinition_0);

@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
+@Deprecated
 public interface IServiceConstants {
 	public static final String LAUNCH_SERVICE = "org.eclipse.ptp.core.LaunchService"; //$NON-NLS-1$
 	public static final String DEBUG_SERVICE = "org.eclipse.ptp.core.DebugService"; //$NON-NLS-1$

@@ -20,6 +20,7 @@ import org.eclipse.ptp.services.core.ServiceProvider;
  * 
  * @since 5.0
  */
+@Deprecated
 public class ResourceManagerServiceProvider extends ServiceProvider {
 
 	private static final String TAG_UNIQUE_NAME = "uniqName"; //$NON-NLS-1$

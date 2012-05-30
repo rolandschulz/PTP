@@ -21,9 +21,10 @@ package org.eclipse.ptp.rtsystem.events;
 
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
+@Deprecated
 public abstract class AbstractRuntimeNewEvent implements IRuntimeNewEvent {
-	private String parentId;
-	private ElementAttributeManager attrMgr;
+	private final String parentId;
+	private final ElementAttributeManager attrMgr;
 
 	public AbstractRuntimeNewEvent(String parentId, ElementAttributeManager attrMgr) {
 		this.parentId = parentId;
@@ -33,9 +34,7 @@ public abstract class AbstractRuntimeNewEvent implements IRuntimeNewEvent {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.events.IRuntimeNewEvent#getElementAttributeManager
-	 * ()
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeNewEvent#getElementAttributeManager ()
 	 */
 	public ElementAttributeManager getElementAttributeManager() {
 		return attrMgr;

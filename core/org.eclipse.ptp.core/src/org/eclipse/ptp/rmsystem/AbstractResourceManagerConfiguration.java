@@ -16,6 +16,7 @@ import org.eclipse.ptp.services.core.IServiceProvider;
 /**
  * @since 5.0
  */
+@Deprecated
 public abstract class AbstractResourceManagerConfiguration implements IResourceManagerConfiguration,
 		IResourceManagerComponentConfiguration {
 	public static final String BASE = "base."; //$NON-NLS-1$

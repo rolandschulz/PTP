@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An attribute manager is responsible for managing a set of attribute
- * definition ID's and attributes. It is used where groups of attributes are
- * needed.
+ * An attribute manager is responsible for managing a set of attribute definition ID's and attributes. It is used where groups of
+ * attributes are needed.
  * 
  * @author greg
  * 
  */
+@Deprecated
 public class AttributeManager {
 	private final Map<IAttributeDefinition<?, ?, ?>, IAttribute<?, ?, ?>> map = Collections
 			.synchronizedMap(new HashMap<IAttributeDefinition<?, ?, ?>, IAttribute<?, ?, ?>>());
@@ -52,9 +52,8 @@ public class AttributeManager {
 	}
 
 	/**
-	 * Add new attributes to the attributes being managed. Handle array
-	 * attributes specially: the new array is appended to an existing array, if
-	 * any.
+	 * Add new attributes to the attributes being managed. Handle array attributes specially: the new array is appended to an
+	 * existing array, if any.
 	 * 
 	 * @param attrs
 	 */

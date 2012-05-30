@@ -20,11 +20,11 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPMachine;
 
 /**
- * This event is sent when the attributes on a machine change. It is sent to
- * element listeners on the machine.
+ * This event is sent when the attributes on a machine change. It is sent to element listeners on the machine.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IMachineListener
  */
+@Deprecated
 public interface IMachineChangeEvent {
 
 	/**

@@ -11,6 +11,7 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
+@Deprecated
 public interface IRuntimeRemoveNodeEvent extends IRuntimeRemoveEvent {
 
 }

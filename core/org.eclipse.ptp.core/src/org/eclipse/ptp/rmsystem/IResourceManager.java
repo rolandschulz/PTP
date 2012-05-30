@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 /**
  * @since 5.0
  */
+@Deprecated
 public interface IResourceManager extends IResourceManagerControl, IResourceManagerMonitor, IAdaptable {
 	/**
 	 * State indicating resource manager is stopped
@@ -100,8 +101,7 @@ public interface IResourceManager extends IResourceManagerControl, IResourceMana
 	public String getState();
 
 	/**
-	 * Get a unique name that can be used to identify this resource manager
-	 * persistently between PTP invocations. Used by the
+	 * Get a unique name that can be used to identify this resource manager persistently between PTP invocations. Used by the
 	 * ResourceManagerPersistence.
 	 * 
 	 * @return string representing a unique name for the resource manager
@@ -119,21 +119,18 @@ public interface IResourceManager extends IResourceManagerControl, IResourceMana
 	public void setState(String state);
 
 	/**
-	 * Start up the resource manager. This could potentially take a long time
-	 * (or forever), particularly if the RM is located on a remote system.
+	 * Start up the resource manager. This could potentially take a long time (or forever), particularly if the RM is located on a
+	 * remote system.
 	 * 
-	 * Callers can assume that the operation was successful if no exception is
-	 * thrown and the monitor was not cancelled. However, the resource manager
-	 * may still fail later due to some other condition.
+	 * Callers can assume that the operation was successful if no exception is thrown and the monitor was not cancelled. However,
+	 * the resource manager may still fail later due to some other condition.
 	 * 
 	 * @param monitor
-	 *            the progress monitor to use for reporting progress to the
-	 *            user. It is the caller's responsibility to call done() on the
-	 *            given monitor. Accepts null, indicating that no progress
-	 *            should be reported and that the operation cannot be cancelled.
+	 *            the progress monitor to use for reporting progress to the user. It is the caller's responsibility to call done()
+	 *            on the given monitor. Accepts null, indicating that no progress should be reported and that the operation cannot
+	 *            be cancelled.
 	 * @throws CoreException
-	 *             this exception is thrown if the resource manager fails to
-	 *             start
+	 *             this exception is thrown if the resource manager fails to start
 	 * @since 5.0
 	 */
 	public void start(IProgressMonitor monitor) throws CoreException;

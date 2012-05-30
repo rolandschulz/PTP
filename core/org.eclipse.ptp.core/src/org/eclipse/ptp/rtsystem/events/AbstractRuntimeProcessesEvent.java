@@ -18,6 +18,7 @@ import org.eclipse.ptp.utils.core.RangeSet;
  * @since 4.0
  * 
  */
+@Deprecated
 public abstract class AbstractRuntimeProcessesEvent implements IRuntimeProcessesEvent {
 
 	private final String jobId;
@@ -44,9 +45,7 @@ public abstract class AbstractRuntimeProcessesEvent implements IRuntimeProcesses
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.events.IRuntimeProcessesEvent#getProcessJobRanks
-	 * ()
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeProcessesEvent#getProcessJobRanks ()
 	 */
 	public RangeSet getProcessJobRanks() {
 		return processJobRanks;

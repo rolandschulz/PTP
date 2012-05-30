@@ -20,11 +20,11 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPNode;
 
 /**
- * This event is sent when the attributes on a node change. It is sent to
- * element listeners on the node.
+ * This event is sent when the attributes on a node change. It is sent to element listeners on the node.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.INodeListener
  */
+@Deprecated
 public interface INodeChangeEvent {
 
 	/**

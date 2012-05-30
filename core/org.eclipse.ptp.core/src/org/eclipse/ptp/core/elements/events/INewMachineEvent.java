@@ -24,11 +24,12 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 
 /**
- * This event is generated when one or more new machines are created. It is a
- * bulk event that is sent to child listeners on the source resource manager.
+ * This event is generated when one or more new machines are created. It is a bulk event that is sent to child listeners on the
+ * source resource manager.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
  */
+@Deprecated
 public interface INewMachineEvent {
 
 	/**

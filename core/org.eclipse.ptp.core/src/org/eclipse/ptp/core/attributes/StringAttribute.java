@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public final class StringAttribute
-		extends AbstractAttribute<String, StringAttribute, StringAttributeDefinition> {
+@Deprecated
+public final class StringAttribute extends AbstractAttribute<String, StringAttribute, StringAttributeDefinition> {
 
 	private final StringBuffer value = new StringBuffer();
 
@@ -68,8 +68,7 @@ public final class StringAttribute
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
 	 */
 	public void setValue(String value) throws IllegalValueException {
 		setValueAsString(value);
@@ -78,9 +77,7 @@ public final class StringAttribute
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang
-	 * .String)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang .String)
 	 */
 	public synchronized void setValueAsString(String string) {
 		if (string == null) {

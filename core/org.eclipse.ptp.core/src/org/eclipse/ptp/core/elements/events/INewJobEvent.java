@@ -22,11 +22,12 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 
 /**
- * This event is generated when one or more new jobs are created. It is a bulk
- * event that is sent to child listeners on the source queue.
+ * This event is generated when one or more new jobs are created. It is a bulk event that is sent to child listeners on the source
+ * queue.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener
  */
+@Deprecated
 public interface INewJobEvent {
 
 	/**

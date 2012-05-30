@@ -13,6 +13,7 @@ package org.eclipse.ptp.rtsystem.events;
 
 import org.eclipse.ptp.utils.core.RangeSet;
 
+@Deprecated
 public interface IRuntimeRemoveEvent extends IRuntimeEvent {
 	public RangeSet getElementIds();
 }

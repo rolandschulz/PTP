@@ -203,6 +203,7 @@ import com.ibm.icu.util.ULocale;
  *	EVENT_HEADER is the event message header
  */
 
+@Deprecated
 public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem implements IProxyRuntimeEventListener {
 
 	private final static int ATTR_MIN_LEN = 5;
@@ -254,9 +255,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IMonitoringSystem#filterEvents(org.eclipse.ptp
-	 * .core.elements.IPElement, boolean,
+	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#filterEvents(org.eclipse.ptp .core.elements.IPElement, boolean,
 	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	public void filterEvents(IPElement element, boolean filterChildren, AttributeManager filterAttributes) throws CoreException {
@@ -273,8 +272,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IControlSystem#getAttributeDefinitionManager()
+	 * @see org.eclipse.ptp.rtsystem.IControlSystem#getAttributeDefinitionManager()
 	 */
 	/**
 	 * @since 5.0
@@ -286,8 +284,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeAttributeDefEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeAttributeDefEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent)
 	 */
 	public void handleEvent(IProxyRuntimeAttributeDefEvent e) {
@@ -329,8 +326,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeConnectedStateEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeConnectedStateEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent)
 	 */
 	public void handleEvent(IProxyRuntimeConnectedStateEvent e) {
@@ -340,8 +336,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeErrorStateEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener# handleProxyRuntimeErrorStateEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorStateEvent)
 	 */
 	public void handleEvent(IProxyRuntimeErrorStateEvent e) {
@@ -351,8 +346,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeJobChangeEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeJobChangeEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeJobChangeEvent e) {
@@ -374,8 +368,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeMachineChangeEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeMachineChangeEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeMachineChangeEvent e) {
@@ -397,8 +390,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeErrorEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeErrorEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorEvent)
 	 */
 	public void handleEvent(IProxyRuntimeMessageEvent e) {
@@ -415,8 +407,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeNewJobEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeNewJobEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewJobEvent)
 	 */
 	public void handleEvent(IProxyRuntimeNewJobEvent e) {
@@ -454,8 +445,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeNewMachineEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeNewMachineEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewMachineEvent)
 	 */
 	public void handleEvent(IProxyRuntimeNewMachineEvent e) {
@@ -477,8 +467,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeNewNodeEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeNewNodeEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewNodeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeNewNodeEvent e) {
@@ -500,8 +489,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeNewProcessEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeNewProcessEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewProcessEvent)
 	 */
 	public void handleEvent(IProxyRuntimeNewProcessEvent e) {
@@ -523,8 +511,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeNewQueueEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeNewQueueEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewQueueEvent)
 	 */
 	public void handleEvent(IProxyRuntimeNewQueueEvent e) {
@@ -546,8 +533,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeNodeChangeEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeNodeChangeEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNodeChangeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeNodeChangeEvent e) {
@@ -569,8 +555,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeProcessChangeEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeProcessChangeEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeProcessChangeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeProcessChangeEvent e) {
@@ -592,8 +577,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeQueueChangeEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeQueueChangeEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeQueueChangeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeQueueChangeEvent e) {
@@ -615,8 +599,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeRemoveAllEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener# handleProxyRuntimeRemoveAllEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveAllEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRemoveAllEvent e) {
@@ -626,8 +609,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeRemoveJobEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeRemoveJobEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveJobEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRemoveJobEvent e) {
@@ -644,8 +626,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeRemoveMachineEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeRemoveMachineEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveMachineEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRemoveMachineEvent e) {
@@ -662,8 +643,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeRemoveNodeEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeRemoveNodeEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveNodeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRemoveNodeEvent e) {
@@ -680,8 +660,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeRemoveProcessEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeRemoveProcessEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveProcessEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRemoveProcessEvent e) {
@@ -698,8 +677,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeRemoveQueueEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeRemoveQueueEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveQueueEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRemoveQueueEvent e) {
@@ -716,8 +694,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeEventListener#handleEvent
+	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeEventListener#handleEvent
 	 * (org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRMChangeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRMChangeEvent e) {
@@ -739,8 +716,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeRunningStateEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeRunningStateEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRunningStateEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRunningStateEvent e) {
@@ -750,8 +726,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeShutdownStateEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeShutdownStateEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeShutdownStateEvent)
 	 */
 	public void handleEvent(IProxyRuntimeShutdownStateEvent e) {
@@ -761,8 +736,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeStartupErrorEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeStartupErrorEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeStartupErrorEvent)
 	 */
 	public void handleEvent(IProxyRuntimeStartupErrorEvent e) {
@@ -785,8 +759,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeSubmitJobErrorEvent
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeSubmitJobErrorEvent
 	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeSubmitJobErrorEvent)
 	 */
 	public void handleEvent(IProxyRuntimeSubmitJobErrorEvent e) {
@@ -818,10 +791,8 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
-	 * handleProxyRuntimeTerminateJobErrorEvent
-	 * (org.eclipse.ptp.rtsystem.proxy.event
-	 * .IProxyRuntimeTerminateJobErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener# handleProxyRuntimeTerminateJobErrorEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event .IProxyRuntimeTerminateJobErrorEvent)
 	 */
 	public void handleEvent(IProxyRuntimeTerminateJobErrorEvent e) {
 		String[] attrs = e.getAttributes();
@@ -880,9 +851,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime
-	 * .IProgressMonitor)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime .IProgressMonitor)
 	 */
 	public void startup(IProgressMonitor monitor) throws CoreException {
 		initialize();
@@ -911,8 +880,8 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(java.lang.String,
-	 * org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
+	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(java.lang.String, org.eclipse.debug.core.ILaunchConfiguration,
+	 * java.lang.String)
 	 */
 	/**
 	 * @since 5.0
@@ -934,8 +903,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(java.lang.String)
+	 * @see org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(java.lang.String)
 	 */
 	/**
 	 * @since 5.0
@@ -955,13 +923,10 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	}
 
 	/**
-	 * Create an attribute manager given an array of key/value strings. Each
-	 * key/value string must be in the form "key=value", where "key" is a string
-	 * containing at least one character, and "value" is a string containing
-	 * zero or more characters. The "key" string cannot contain an '='
-	 * character. There is no white space allowed between the end of the "key"
-	 * string, the '=', and the start of the "value" string, unless that white
-	 * space is part of those strings.
+	 * Create an attribute manager given an array of key/value strings. Each key/value string must be in the form "key=value", where
+	 * "key" is a string containing at least one character, and "value" is a string containing zero or more characters. The "key"
+	 * string cannot contain an '=' character. There is no white space allowed between the end of the "key" string, the '=', and the
+	 * start of the "value" string, unless that white space is part of those strings.
 	 * 
 	 * @param kvs
 	 * @param start
@@ -980,9 +945,8 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					IAttributeDefinition<?, ?, ?> attrDef = attrDefManager.getAttributeDefinition(id);
 					if (attrDef == null) {
 						/*
-						 * Treat this as a string attribute. This allows the
-						 * proxy to send unsolicited attributes when their type
-						 * is not important.
+						 * Treat this as a string attribute. This allows the proxy to send unsolicited attributes when their type is
+						 * not important.
 						 */
 						attrDef = attrDefManager.createStringAttributeDefinition(id, id, id, true, ""); //$NON-NLS-1$
 					}
@@ -1323,8 +1287,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	}
 
 	/**
-	 * Initialize the attribute manager. This must be called each time the
-	 * runtime is started.
+	 * Initialize the attribute manager. This must be called each time the runtime is started.
 	 * 
 	 * @since 5.0
 	 */

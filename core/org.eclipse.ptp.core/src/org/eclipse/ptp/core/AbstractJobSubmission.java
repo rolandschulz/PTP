@@ -17,20 +17,17 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
- * Abstract class to manage coordination of job submission with receipt of the
- * corresponding event.
+ * Abstract class to manage coordination of job submission with receipt of the corresponding event.
  * 
- * Because model IDs are always server generated, we require some way to link a
- * job submission with the corresponding INewJobEvent, which is done using the
- * jobSubID attribute. However, it is often necessary to wait for the event to
- * be received without blocking the UI. This class provides a waitFor method for
- * this purpose.
+ * Because model IDs are always server generated, we require some way to link a job submission with the corresponding INewJobEvent,
+ * which is done using the jobSubID attribute. However, it is often necessary to wait for the event to be received without blocking
+ * the UI. This class provides a waitFor method for this purpose.
  * 
- * The INewJobEvent handler should set the status to SUBMITTED once the event is
- * received.
+ * The INewJobEvent handler should set the status to SUBMITTED once the event is received.
  * 
  * @since 5.0
  */
+@Deprecated
 public abstract class AbstractJobSubmission {
 	/**
 	 * Status of the job submission (NOT the job itself)
@@ -39,11 +36,13 @@ public abstract class AbstractJobSubmission {
 		/**
 		 * @since 4.0
 		 */
-		UNSUBMITTED, SUBMITTED,
+		UNSUBMITTED,
+		SUBMITTED,
 		/**
 		 * @since 5.0
 		 */
-		CANCELLED, ERROR
+		CANCELLED,
+		ERROR
 	}
 
 	private final String fId;

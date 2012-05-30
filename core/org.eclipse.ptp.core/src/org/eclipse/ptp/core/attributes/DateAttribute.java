@@ -28,6 +28,7 @@ import org.eclipse.ptp.core.messages.Messages;
 import com.ibm.icu.text.DateFormat;
 import com.ibm.icu.util.ULocale;
 
+@Deprecated
 public class DateAttribute extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 
 	private static DateFormat[] dateFormats = null;

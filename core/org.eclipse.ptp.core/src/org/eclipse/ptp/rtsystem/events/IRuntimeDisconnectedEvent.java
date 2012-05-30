@@ -19,6 +19,7 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
+@Deprecated
 public interface IRuntimeDisconnectedEvent extends IRuntimeEvent {
 	public String getMessage();
 }

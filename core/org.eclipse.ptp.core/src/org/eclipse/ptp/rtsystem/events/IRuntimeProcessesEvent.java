@@ -18,6 +18,7 @@ import org.eclipse.ptp.utils.core.RangeSet;
  * @since 4.0
  * 
  */
+@Deprecated
 public interface IRuntimeProcessesEvent extends IRuntimeEvent {
 	/**
 	 * @return the id of the job for which this process event pertains

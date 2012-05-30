@@ -48,6 +48,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
 
+@Deprecated
 public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	final private ListenerList listeners = new ListenerList();
 
@@ -292,12 +293,10 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang
-	 * .String, java.lang.String, org.eclipse.ptp.core.attributes.IAttribute[])
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang .String, java.lang.String,
+	 * org.eclipse.ptp.core.attributes.IAttribute[])
 	 */
-	public IAttribute<?, ?, ?>[] getLaunchAttributes(String machineName, String queueName,
-			IAttribute<?, ?, ?>[] currentAttrs) {
+	public IAttribute<?, ?, ?>[] getLaunchAttributes(String machineName, String queueName, IAttribute<?, ?, ?>[] currentAttrs) {
 		// TODO Auto-generated method stub
 		return null;
 	}

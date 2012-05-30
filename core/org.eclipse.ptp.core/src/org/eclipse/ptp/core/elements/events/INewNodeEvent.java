@@ -22,11 +22,12 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 
 /**
- * This event is generated when one or more new nodes are created. It is a bulk
- * event that is sent to child listeners on the source machine.
+ * This event is generated when one or more new nodes are created. It is a bulk event that is sent to child listeners on the source
+ * machine.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IMachineChildListener
  */
+@Deprecated
 public interface INewNodeEvent {
 
 	/**

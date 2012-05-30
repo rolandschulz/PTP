@@ -25,6 +25,7 @@ import org.eclipse.ptp.core.messages.Messages;
 
 import com.ibm.icu.text.DateFormat;
 
+@Deprecated
 public final class DateAttributeDefinition extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefinition> {
 
 	private Date minDate = new Date(Long.MIN_VALUE);

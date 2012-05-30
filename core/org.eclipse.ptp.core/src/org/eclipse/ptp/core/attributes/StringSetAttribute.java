@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.eclipse.ptp.core.messages.Messages;
 
-public final class StringSetAttribute
-		extends AbstractAttribute<String, StringSetAttribute, StringSetAttributeDefinition> {
+@Deprecated
+public final class StringSetAttribute extends AbstractAttribute<String, StringSetAttribute, StringSetAttributeDefinition> {
 
 	private String value;
 
@@ -112,8 +112,7 @@ public final class StringSetAttribute
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
 	 */
 	public void setValue(String value) throws IllegalValueException {
 		setValueAsString(value);
@@ -122,13 +121,12 @@ public final class StringSetAttribute
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
 	public synchronized void setValueAsString(String valueIn) throws IllegalValueException {
 		if (!isValid(valueIn)) {
-			throw new IllegalValueException(Messages.StringSetAttribute_0 + valueIn +
-					Messages.StringSetAttribute_1 + getDefinition().getName());
+			throw new IllegalValueException(Messages.StringSetAttribute_0 + valueIn + Messages.StringSetAttribute_1
+					+ getDefinition().getName());
 		}
 		this.value = valueIn;
 	}

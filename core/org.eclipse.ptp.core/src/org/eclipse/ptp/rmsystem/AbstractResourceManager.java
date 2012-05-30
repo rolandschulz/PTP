@@ -43,6 +43,7 @@ import org.eclipse.ptp.core.messages.Messages;
  * @since 5.0
  * 
  */
+@Deprecated
 public abstract class AbstractResourceManager implements IResourceManager {
 	private final IPResourceManager fPResourceManager;
 	private final AbstractResourceManagerControl fResourceManagerControl;

@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
+@Deprecated
 public interface IAttribute<T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>> extends Comparable<A> {
 
 	/**

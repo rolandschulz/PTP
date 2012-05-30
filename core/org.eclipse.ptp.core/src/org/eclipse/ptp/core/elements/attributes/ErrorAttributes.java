@@ -18,26 +18,23 @@ import org.eclipse.ptp.core.messages.Messages;
 /**
  * Error attributes
  */
+@Deprecated
 public class ErrorAttributes {
 	private static final String CODE_ATTR_ID = "errorCode"; //$NON-NLS-1$
 	private static final String MESSAGE_ATTR_ID = "errorMsg"; //$NON-NLS-1$
 
-	private final static IntegerAttributeDefinition codeAttrDef =
-			new IntegerAttributeDefinition(CODE_ATTR_ID, "Error Code", //$NON-NLS-1$
-					Messages.ErrorAttributes_0, true, 0);
+	private final static IntegerAttributeDefinition codeAttrDef = new IntegerAttributeDefinition(CODE_ATTR_ID, "Error Code", //$NON-NLS-1$
+			Messages.ErrorAttributes_0, true, 0);
 
-	private final static StringAttributeDefinition msgAttrDef =
-			new StringAttributeDefinition(MESSAGE_ATTR_ID, "Error Message", //$NON-NLS-1$
-					Messages.ErrorAttributes_1, true, ""); //$NON-NLS-1$
+	private final static StringAttributeDefinition msgAttrDef = new StringAttributeDefinition(MESSAGE_ATTR_ID, "Error Message", //$NON-NLS-1$
+			Messages.ErrorAttributes_1, true, ""); //$NON-NLS-1$
 
 	public static IntegerAttributeDefinition getCodeAttributeDefinition() {
 		return codeAttrDef;
 	}
 
 	public static IAttributeDefinition<?, ?, ?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[] {
-				codeAttrDef,
-				msgAttrDef };
+		return new IAttributeDefinition[] { codeAttrDef, msgAttrDef };
 	}
 
 	public static StringAttributeDefinition getMsgAttributeDefinition() {

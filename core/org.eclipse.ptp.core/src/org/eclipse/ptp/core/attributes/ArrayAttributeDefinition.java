@@ -15,13 +15,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class ArrayAttributeDefinition<T extends Comparable<? super T>>
-		extends AbstractAttributeDefinition<List<? extends T>, ArrayAttribute<T>, ArrayAttributeDefinition<T>> {
+@Deprecated
+public final class ArrayAttributeDefinition<T extends Comparable<? super T>> extends
+		AbstractAttributeDefinition<List<? extends T>, ArrayAttribute<T>, ArrayAttributeDefinition<T>> {
 
 	private final List<T> defaultValue;
 
-	public <U extends T> ArrayAttributeDefinition(final String uniqueId, final String name,
-			final String description, final boolean display, final U[] defaultValue) {
+	public <U extends T> ArrayAttributeDefinition(final String uniqueId, final String name, final String description,
+			final boolean display, final U[] defaultValue) {
 		super(uniqueId, name, description, display);
 		if (defaultValue != null) {
 			this.defaultValue = Arrays.asList((T[]) defaultValue.clone());

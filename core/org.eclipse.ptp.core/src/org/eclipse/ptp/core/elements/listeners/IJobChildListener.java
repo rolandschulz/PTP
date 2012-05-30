@@ -29,6 +29,7 @@ import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
  * @author rsqrd
  * 
  */
+@Deprecated
 public interface IJobChildListener {
 
 	/**

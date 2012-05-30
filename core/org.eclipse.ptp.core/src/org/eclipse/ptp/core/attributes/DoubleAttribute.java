@@ -20,8 +20,8 @@ package org.eclipse.ptp.core.attributes;
 
 import org.eclipse.ptp.core.messages.Messages;
 
-public final class DoubleAttribute
-		extends AbstractAttribute<Double, DoubleAttribute, DoubleAttributeDefinition> {
+@Deprecated
+public final class DoubleAttribute extends AbstractAttribute<Double, DoubleAttribute, DoubleAttributeDefinition> {
 
 	private Double value;
 

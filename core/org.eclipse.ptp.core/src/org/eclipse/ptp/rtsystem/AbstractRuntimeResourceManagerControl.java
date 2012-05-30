@@ -77,6 +77,7 @@ import org.eclipse.ptp.utils.core.RangeSet;
  * @since 5.0
  * 
  */
+@Deprecated
 public abstract class AbstractRuntimeResourceManagerControl extends AbstractResourceManagerControl implements IRuntimeEventListener {
 
 	private class JobStatus implements IJobStatus {

@@ -24,6 +24,7 @@ import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
+@Deprecated
 public interface IModelManager extends IModelPresentation {
 	/**
 	 * Add a job controller to the model.

@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
+@Deprecated
 public abstract class AbstractAttribute<T, A extends AbstractAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
 		implements IAttribute<T, A, D> {
 
@@ -92,21 +93,27 @@ public abstract class AbstractAttribute<T, A extends AbstractAttribute<T, A, D>,
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		final A other = (A) obj;
 		if (definition == null) {
-			if (other.definition != null)
+			if (other.definition != null) {
 				return false;
-		} else if (!definition.equals(other.definition))
+			}
+		} else if (!definition.equals(other.definition)) {
 			return false;
+		}
 		final boolean doEquals = doEquals(other);
-		if (!doEquals)
+		if (!doEquals) {
 			return false;
+		}
 		return true;
 	}
 

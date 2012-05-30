@@ -18,6 +18,7 @@ import org.eclipse.ptp.services.core.IServiceProvider;
  * @since 5.0
  * 
  */
+@Deprecated
 public interface IResourceManagerMonitorFactory {
 	/**
 	 * Create a monitor configuration using the supplied service provider

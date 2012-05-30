@@ -20,8 +20,8 @@ package org.eclipse.ptp.core.attributes;
 
 import org.eclipse.ptp.core.messages.Messages;
 
-public final class IntegerAttribute
-		extends AbstractAttribute<Integer, IntegerAttribute, IntegerAttributeDefinition> {
+@Deprecated
+public final class IntegerAttribute extends AbstractAttribute<Integer, IntegerAttribute, IntegerAttributeDefinition> {
 
 	private Integer value;
 

@@ -21,6 +21,7 @@ import org.eclipse.ptp.core.messages.Messages;
 /**
  * Job attributes
  */
+@Deprecated
 public class JobAttributes {
 	public enum State {
 		STARTING,

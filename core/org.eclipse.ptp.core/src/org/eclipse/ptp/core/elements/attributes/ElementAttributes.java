@@ -17,6 +17,7 @@ import org.eclipse.ptp.core.messages.Messages;
 /**
  * Element attributes
  */
+@Deprecated
 public class ElementAttributes {
 	/*
 	 * Predefine attributes. These are attributes that the UI knows about.
@@ -24,16 +25,14 @@ public class ElementAttributes {
 	private final static String ATTR_ID = "id"; //$NON-NLS-1$
 	private final static String ATTR_NAME = "name"; //$NON-NLS-1$
 
-	private final static StringAttributeDefinition idAttributeDefinition =
-			new StringAttributeDefinition(ATTR_ID, "ID", Messages.ElementAttributes_0, false, ""); //$NON-NLS-1$ //$NON-NLS-2$
+	private final static StringAttributeDefinition idAttributeDefinition = new StringAttributeDefinition(ATTR_ID,
+			"ID", Messages.ElementAttributes_0, false, ""); //$NON-NLS-1$ //$NON-NLS-2$
 
-	private final static StringAttributeDefinition nameAttributeDefinition =
-			new StringAttributeDefinition(ATTR_NAME, "Name", Messages.ElementAttributes_1, true, ""); //$NON-NLS-1$ //$NON-NLS-2$
+	private final static StringAttributeDefinition nameAttributeDefinition = new StringAttributeDefinition(ATTR_NAME,
+			"Name", Messages.ElementAttributes_1, true, ""); //$NON-NLS-1$ //$NON-NLS-2$
 
 	public static IAttributeDefinition<?, ?, ?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[] {
-				idAttributeDefinition,
-				nameAttributeDefinition };
+		return new IAttributeDefinition[] { idAttributeDefinition, nameAttributeDefinition };
 	}
 
 	public static StringAttributeDefinition getIdAttributeDefinition() {

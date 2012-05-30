@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
+@Deprecated
 public abstract class AbstractAttributeDefinition<T, A extends IAttribute<T, A, D>, D extends AbstractAttributeDefinition<T, A, D>>
 		implements IAttributeDefinition<T, A, D> {
 	private final String name;
@@ -44,26 +45,30 @@ public abstract class AbstractAttributeDefinition<T, A extends IAttribute<T, A, 
 	@Override
 	@SuppressWarnings("unchecked")
 	final public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		final D other = (D) obj;
 		if (uniqueId == null) {
-			if (other.uniqueId != null)
+			if (other.uniqueId != null) {
 				return false;
-		} else if (!uniqueId.equals(other.uniqueId))
+			}
+		} else if (!uniqueId.equals(other.uniqueId)) {
 			return false;
+		}
 		return true;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.attributes.IAttributeDefinition#getDescription()
+	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#getDescription()
 	 */
 	public String getDescription() {
 		return description;

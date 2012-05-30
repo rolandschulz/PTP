@@ -29,6 +29,7 @@ import org.eclipse.ptp.core.messages.Messages;
  * @author rsqrd
  * 
  */
+@Deprecated
 public final class EnumeratedAttribute<E extends Enum<E>> extends
 		AbstractAttribute<E, EnumeratedAttribute<E>, EnumeratedAttributeDefinition<E>> {
 
@@ -49,8 +50,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 	 * @param valueIndex
 	 * @throws IllegalValueException
 	 */
-	public EnumeratedAttribute(EnumeratedAttributeDefinition<E> definition,
-			int valueIndex) throws IllegalValueException {
+	public EnumeratedAttribute(EnumeratedAttributeDefinition<E> definition, int valueIndex) throws IllegalValueException {
 		super(definition);
 		setValue(valueIndex);
 	}
@@ -60,8 +60,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 	 * @param valueString
 	 * @throws IllegalValueException
 	 */
-	public EnumeratedAttribute(EnumeratedAttributeDefinition<E> definition,
-			String valueString) throws IllegalValueException {
+	public EnumeratedAttribute(EnumeratedAttributeDefinition<E> definition, String valueString) throws IllegalValueException {
 		super(definition);
 		setValueAsString(valueString);
 	}
@@ -163,8 +162,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
 	public synchronized void setValueAsString(String string) throws IllegalValueException {
 		Class<E> enumClass = getDefinition().getEnumClass();

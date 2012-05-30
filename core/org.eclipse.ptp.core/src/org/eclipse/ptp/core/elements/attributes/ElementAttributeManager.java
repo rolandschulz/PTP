@@ -18,14 +18,15 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.utils.core.RangeSet;
 
 /**
- * An ElementAttributeManager maintains a mapping between ranges of element ID's
- * and a set of attributes managed by an AttributeManager.
+ * An ElementAttributeManager maintains a mapping between ranges of element ID's and a set of attributes managed by an
+ * AttributeManager.
  * 
  * @author greg
  * 
  */
+@Deprecated
 public class ElementAttributeManager {
-	private Map<RangeSet, AttributeManager> map;
+	private final Map<RangeSet, AttributeManager> map;
 
 	public ElementAttributeManager() {
 		this.map = new HashMap<RangeSet, AttributeManager>();

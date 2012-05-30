@@ -20,6 +20,7 @@ package org.eclipse.ptp.core.attributes;
 
 import org.eclipse.ptp.core.messages.Messages;
 
+@Deprecated
 public class BooleanAttribute extends AbstractAttribute<Boolean, BooleanAttribute, BooleanAttributeDefinition> {
 
 	private Boolean value;

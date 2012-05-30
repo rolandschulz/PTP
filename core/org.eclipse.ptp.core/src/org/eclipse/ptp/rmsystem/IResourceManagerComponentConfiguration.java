@@ -13,6 +13,7 @@ package org.eclipse.ptp.rmsystem;
 /**
  * @since 5.0
  */
+@Deprecated
 public interface IResourceManagerComponentConfiguration {
 	/**
 	 * Get the connection name. This is a string used by the remote service provider to identify a particular connection. A resource

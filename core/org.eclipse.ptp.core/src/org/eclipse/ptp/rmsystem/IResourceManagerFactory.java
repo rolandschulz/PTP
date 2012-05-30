@@ -27,6 +27,7 @@ import org.eclipse.ptp.services.core.IServiceProvider;
  * Factory to create a resource manager.
  * 
  */
+@Deprecated
 public interface IResourceManagerFactory {
 	/**
 	 * Create a resource manager using the supplied configuration.
@@ -44,8 +45,7 @@ public interface IResourceManagerFactory {
 			IResourceManagerMonitor monitor);
 
 	/**
-	 * Create a resource manager configuration using the supplied service
-	 * provider
+	 * Create a resource manager configuration using the supplied service provider
 	 * 
 	 * @param provider
 	 *            service provider

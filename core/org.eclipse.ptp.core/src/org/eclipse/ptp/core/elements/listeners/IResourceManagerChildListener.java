@@ -34,6 +34,7 @@ import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
  * @author rsqrd
  * 
  */
+@Deprecated
 public interface IResourceManagerChildListener {
 
 	/**

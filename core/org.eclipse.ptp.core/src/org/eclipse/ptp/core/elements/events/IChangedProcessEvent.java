@@ -23,12 +23,12 @@ import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 
 /**
- * This event is generated when the attributes on one or more processes have
- * changed. It is a bulk event that is sent to child listeners on the source
- * job.
+ * This event is generated when the attributes on one or more processes have changed. It is a bulk event that is sent to child
+ * listeners on the source job.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener
  */
+@Deprecated
 public interface IChangedProcessEvent {
 
 	/**
@@ -56,8 +56,7 @@ public interface IChangedProcessEvent {
 	public BitSet getProcesses();
 
 	/**
-	 * Get the source of the event. This event can come from either a job or a
-	 * node.
+	 * Get the source of the event. This event can come from either a job or a node.
 	 * 
 	 * @return the source of the event
 	 */

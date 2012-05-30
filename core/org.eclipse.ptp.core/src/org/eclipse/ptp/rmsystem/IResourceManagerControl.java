@@ -23,6 +23,7 @@ import org.eclipse.ptp.core.jobs.IJobControl;
 /**
  * @since 5.0
  */
+@Deprecated
 public interface IResourceManagerControl extends IJobControl {
 	/**
 	 * Safely dispose of this Resource Manager.

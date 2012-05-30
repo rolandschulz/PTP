@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
+@Deprecated
 public class IllegalValueException extends Exception {
 
 	/**

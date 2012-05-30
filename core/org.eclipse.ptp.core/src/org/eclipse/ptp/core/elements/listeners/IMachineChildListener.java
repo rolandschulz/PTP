@@ -29,6 +29,7 @@ import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
  * @author rsqrd
  * 
  */
+@Deprecated
 public interface IMachineChildListener {
 
 	/**

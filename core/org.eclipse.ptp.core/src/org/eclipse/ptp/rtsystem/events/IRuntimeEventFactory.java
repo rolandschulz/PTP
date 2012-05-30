@@ -17,6 +17,7 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
 import org.eclipse.ptp.utils.core.RangeSet;
 
+@Deprecated
 public interface IRuntimeEventFactory {
 
 	/**

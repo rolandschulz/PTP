@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+@Deprecated
 public final class ArrayAttribute<T extends Comparable<? super T>> extends
 		AbstractAttribute<List<? extends T>, ArrayAttribute<T>, ArrayAttributeDefinition<T>> {
 
@@ -59,9 +60,7 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.attributes.AbstractAttribute#doCompareTo(org.eclipse
-	 * .ptp.core.attributes.AbstractAttribute)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doCompareTo(org.eclipse .ptp.core.attributes.AbstractAttribute)
 	 */
 	@Override
 	protected synchronized int doCompareTo(ArrayAttribute<T> other) {
@@ -98,9 +97,7 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.attributes.AbstractAttribute#doEquals(org.eclipse
-	 * .ptp.core.attributes.AbstractAttribute)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doEquals(org.eclipse .ptp.core.attributes.AbstractAttribute)
 	 */
 	@Override
 	protected synchronized boolean doEquals(ArrayAttribute<T> other) {
@@ -153,8 +150,7 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
 	 */
 	public synchronized void setValue(List<? extends T> value) {
 		if (value != null) {
@@ -179,9 +175,7 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang
-	 * .String)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang .String)
 	 */
 	@SuppressWarnings("unchecked")
 	public void setValueAsString(String string) throws IllegalValueException {

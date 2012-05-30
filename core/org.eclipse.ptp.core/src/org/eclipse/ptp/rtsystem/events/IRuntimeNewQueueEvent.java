@@ -19,6 +19,7 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
+@Deprecated
 public interface IRuntimeNewQueueEvent extends IRuntimeNewEvent {
 
 }

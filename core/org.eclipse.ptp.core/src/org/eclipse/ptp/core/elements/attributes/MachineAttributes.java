@@ -18,6 +18,7 @@ import org.eclipse.ptp.core.messages.Messages;
 /**
  * Machine attributes
  */
+@Deprecated
 public class MachineAttributes {
 	public enum State {
 		UP,
@@ -30,13 +31,13 @@ public class MachineAttributes {
 	private static final String STATE_ATTR_ID = "machineState"; //$NON-NLS-1$
 	private static final String NUMNODES_ATTR_ID = "numNodes"; //$NON-NLS-1$
 
-	private final static EnumeratedAttributeDefinition<State> stateAttrDef =
-			new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", Messages.MachineAttributes_0, //$NON-NLS-1$
-					true, State.UNKNOWN);
+	private final static EnumeratedAttributeDefinition<State> stateAttrDef = new EnumeratedAttributeDefinition<State>(
+			STATE_ATTR_ID, "state", Messages.MachineAttributes_0, //$NON-NLS-1$
+			true, State.UNKNOWN);
 
-	private final static IntegerAttributeDefinition numNodesAttrDef =
-			new IntegerAttributeDefinition(NUMNODES_ATTR_ID, "nodes", Messages.MachineAttributes_1, //$NON-NLS-1$
-					true, 0);
+	private final static IntegerAttributeDefinition numNodesAttrDef = new IntegerAttributeDefinition(NUMNODES_ATTR_ID,
+			"nodes", Messages.MachineAttributes_1, //$NON-NLS-1$
+			true, 0);
 
 	public static IAttributeDefinition<?, ?, ?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[] { stateAttrDef, numNodesAttrDef };

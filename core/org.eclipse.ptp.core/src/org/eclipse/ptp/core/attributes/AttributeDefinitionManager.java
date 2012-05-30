@@ -26,6 +26,7 @@ import java.util.Map;
 
 import com.ibm.icu.text.DateFormat;
 
+@Deprecated
 public class AttributeDefinitionManager {
 	private final Map<String, IAttributeDefinition<?, ?, ?>> attributeDefs = Collections
 			.synchronizedMap(new HashMap<String, IAttributeDefinition<?, ?, ?>>());
@@ -291,8 +292,9 @@ public class AttributeDefinitionManager {
 	 */
 	public void setAttributeDefinition(IAttributeDefinition<?, ?, ?> attrDef) {
 		synchronized (attributeDefs) {
-			if (!attributeDefs.containsKey(attrDef.getId()))
+			if (!attributeDefs.containsKey(attrDef.getId())) {
 				attributeDefs.put(attrDef.getId(), attrDef);
+			}
 		}
 	}
 
@@ -300,7 +302,8 @@ public class AttributeDefinitionManager {
 	 * @param attrDefs
 	 */
 	public void setAttributeDefinitions(IAttributeDefinition<?, ?, ?>[] attrDefs) {
-		for (IAttributeDefinition<?, ?, ?> attrDef : attrDefs)
+		for (IAttributeDefinition<?, ?, ?> attrDef : attrDefs) {
 			setAttributeDefinition(attrDef);
+		}
 	}
 }

@@ -19,12 +19,12 @@ package org.eclipse.ptp.core.events;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
- * This event is sent when a resource manager state changes. It is sent to
- * listeners on the resource manager.
+ * This event is sent when a resource manager state changes. It is sent to listeners on the resource manager.
  * 
  * @see org.eclipse.ptp.core.listeners.IResourceManagerListener
  * @since 5.0
  */
+@Deprecated
 public interface IResourceManagerChangedEvent {
 
 	/**

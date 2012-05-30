@@ -22,6 +22,7 @@ package org.eclipse.ptp.rtsystem.events;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 
+@Deprecated
 public interface IRuntimeMessageEvent extends IRuntimeEvent {
 	/**
 	 * @return message attributes

@@ -16,6 +16,7 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
  * @since 5.0
  * 
  */
+@Deprecated
 public interface IRuntimeSystemFactory {
 	/**
 	 * Create a runtime system using the supplied configuration.

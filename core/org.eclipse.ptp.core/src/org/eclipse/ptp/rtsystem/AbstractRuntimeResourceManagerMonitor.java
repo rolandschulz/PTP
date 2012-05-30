@@ -93,6 +93,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
  * @since 5.0
  * 
  */
+@Deprecated
 public abstract class AbstractRuntimeResourceManagerMonitor extends AbstractResourceManagerMonitor implements IRuntimeEventListener {
 	private class StreamMonitor implements IStreamMonitor, IJobChildListener {
 		private final ListenerList fListeners = new ListenerList();

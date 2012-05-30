@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Deprecated
 public final class EnumeratedAttributeDefinition<E extends Enum<E>> extends
 		AbstractAttributeDefinition<E, EnumeratedAttribute<E>, EnumeratedAttributeDefinition<E>> {
 

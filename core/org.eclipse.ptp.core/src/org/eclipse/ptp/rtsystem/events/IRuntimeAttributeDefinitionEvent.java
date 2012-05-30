@@ -21,6 +21,7 @@ package org.eclipse.ptp.rtsystem.events;
 
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 
+@Deprecated
 public interface IRuntimeAttributeDefinitionEvent extends IRuntimeEvent {
 	public IAttributeDefinition<?, ?, ?>[] getDefinitions();
 }

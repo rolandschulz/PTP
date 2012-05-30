@@ -22,24 +22,21 @@ import java.math.BigInteger;
 
 import org.eclipse.ptp.core.messages.Messages;
 
-public final class BigIntegerAttribute
-		extends AbstractAttribute<BigInteger, BigIntegerAttribute, BigIntegerAttributeDefinition> {
+@Deprecated
+public final class BigIntegerAttribute extends AbstractAttribute<BigInteger, BigIntegerAttribute, BigIntegerAttributeDefinition> {
 
 	private BigInteger value;
 
-	public BigIntegerAttribute(BigIntegerAttributeDefinition definition,
-			BigInteger initialValue) throws IllegalValueException {
+	public BigIntegerAttribute(BigIntegerAttributeDefinition definition, BigInteger initialValue) throws IllegalValueException {
 		super(definition);
 		setValue(initialValue);
 	}
 
-	public BigIntegerAttribute(BigIntegerAttributeDefinition definition,
-			Integer value) throws IllegalValueException {
+	public BigIntegerAttribute(BigIntegerAttributeDefinition definition, Integer value) throws IllegalValueException {
 		this(definition, BigInteger.valueOf(value));
 	}
 
-	public BigIntegerAttribute(BigIntegerAttributeDefinition definition,
-			String initialValue) throws IllegalValueException {
+	public BigIntegerAttribute(BigIntegerAttributeDefinition definition, String initialValue) throws IllegalValueException {
 		super(definition);
 		setValueAsString(initialValue);
 	}

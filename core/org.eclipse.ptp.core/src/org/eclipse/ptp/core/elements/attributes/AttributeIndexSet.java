@@ -20,11 +20,11 @@ import org.eclipse.ptp.utils.core.DisjointBitSets;
 import org.eclipse.ptp.utils.core.ICopier;
 
 /**
- * {@code AttributeIndexSet} associates sets of indices with attribute values.
- * The index sets are enforced to be disjoint among distinct attribute values. <br>
- * <br> {@code AttributeIndexSet} will make copies of any attributes set within it. <br>
- * {@code AttributeIndexSet} will not modify the attributes stored in it, nor
- * allow anyone else to.
+ * {@code AttributeIndexSet} associates sets of indices with attribute values. The index sets are enforced to be disjoint among
+ * distinct attribute values. <br>
+ * <br>
+ * {@code AttributeIndexSet} will make copies of any attributes set within it. <br>
+ * {@code AttributeIndexSet} will not modify the attributes stored in it, nor allow anyone else to.
  * 
  * @author Randy M. Roberts
  * 
@@ -32,6 +32,7 @@ import org.eclipse.ptp.utils.core.ICopier;
  *            the attribute type that implements {@code IAttribute}
  * @since 4.0
  */
+@Deprecated
 public class AttributeIndexSet<A extends IAttribute<?, A, ?>> implements Iterable<DisjointBitSets.Entry<A>> {
 
 	private final DisjointBitSets<A> disjointBitSets;
@@ -141,8 +142,7 @@ public class AttributeIndexSet<A extends IAttribute<?, A, ?>> implements Iterabl
 	}
 
 	/**
-	 * @return the set of all attributes that are contained by at least one
-	 *         index
+	 * @return the set of all attributes that are contained by at least one index
 	 */
 	public Set<A> getAttributes() {
 		return disjointBitSets.getKeys();
@@ -156,13 +156,11 @@ public class AttributeIndexSet<A extends IAttribute<?, A, ?>> implements Iterabl
 	}
 
 	/**
-	 * Retrieve the {@code BitSet} representing the indices that contain this
-	 * value for their attribute.
+	 * Retrieve the {@code BitSet} representing the indices that contain this value for their attribute.
 	 * 
 	 * @param attribute
 	 *            may not be null
-	 * @return the {@code BitSet} of indices containing this value for the
-	 *         attribute
+	 * @return the {@code BitSet} of indices containing this value for the attribute
 	 * @throws NullPointerException
 	 *             if provided a null attribute
 	 */
@@ -174,9 +172,8 @@ public class AttributeIndexSet<A extends IAttribute<?, A, ?>> implements Iterabl
 	 * Retrieve an {@code AttributeIndexSet} for a subSet of its indices.
 	 * 
 	 * @param indices
-	 * @return the {@code AttributeIndexSet} determined from the intersection of
-	 *         the given indices with the indices contained in this
-	 *         {@code AttributeIndexSet}
+	 * @return the {@code AttributeIndexSet} determined from the intersection of the given indices with the indices contained in
+	 *         this {@code AttributeIndexSet}
 	 */
 	public AttributeIndexSet<A> getSubset(BitSet indices) {
 		return new AttributeIndexSet<A>(disjointBitSets.getSubset(indices));
@@ -184,8 +181,7 @@ public class AttributeIndexSet<A extends IAttribute<?, A, ?>> implements Iterabl
 
 	/**
 	 * @param indices
-	 * @return whether there are indices in common with those that contain an
-	 *         attribute.
+	 * @return whether there are indices in common with those that contain an attribute.
 	 */
 	public boolean intersects(BitSet indices) {
 		return disjointBitSets.intersects(indices);
@@ -208,8 +204,8 @@ public class AttributeIndexSet<A extends IAttribute<?, A, ?>> implements Iterabl
 	}
 
 	/**
-	 * Sets the given attribute for the given indices. These indices will have
-	 * their previous attributes cleared, and set to this value.
+	 * Sets the given attribute for the given indices. These indices will have their previous attributes cleared, and set to this
+	 * value.
 	 * 
 	 * @param attribute
 	 *            may not be null

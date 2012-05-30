@@ -19,9 +19,10 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
+@Deprecated
 public abstract class AbstractRuntimeErrorEvent implements IRuntimeErrorEvent {
-	private int errorCode;
-	private String errorMessage;
+	private final int errorCode;
+	private final String errorMessage;
 
 	public AbstractRuntimeErrorEvent(int code, String message) {
 		this.errorCode = code;

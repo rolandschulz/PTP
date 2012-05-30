@@ -16,11 +16,12 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 /**
  * Filter attributes
  */
+@Deprecated
 public class FilterAttributes {
 	private final static String ATTR_FILTER_CHILDREN = "filterChildren"; //$NON-NLS-1$
 
-	private final static BooleanAttributeDefinition filterChildrenAttributeDefinition =
-			new BooleanAttributeDefinition(ATTR_FILTER_CHILDREN, ATTR_FILTER_CHILDREN, ATTR_FILTER_CHILDREN, false, false);
+	private final static BooleanAttributeDefinition filterChildrenAttributeDefinition = new BooleanAttributeDefinition(
+			ATTR_FILTER_CHILDREN, ATTR_FILTER_CHILDREN, ATTR_FILTER_CHILDREN, false, false);
 
 	public static IAttributeDefinition<?, ?, ?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[] { filterChildrenAttributeDefinition };

@@ -71,6 +71,7 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  * 
  * @since 5.0
  */
+@Deprecated
 public class ModelManager implements IModelManager {
 
 	private class RMFactory {

@@ -17,6 +17,7 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
+@Deprecated
 public interface IRuntimeMachineChangeEvent extends IRuntimeChangeEvent {
 
 }

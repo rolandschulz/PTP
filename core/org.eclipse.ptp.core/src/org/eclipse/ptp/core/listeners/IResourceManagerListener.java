@@ -8,6 +8,7 @@ import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
 /**
  * @since 5.0
  */
+@Deprecated
 public interface IResourceManagerListener {
 
 	/**

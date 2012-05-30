@@ -24,13 +24,13 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 
 /**
- * A Control System is a portion of a runtime system that handles controlling
- * jobs. This includes starting new jobs, terminating jobs, getting information
- * about running jobs and processes, etc.
+ * A Control System is a portion of a runtime system that handles controlling jobs. This includes starting new jobs, terminating
+ * jobs, getting information about running jobs and processes, etc.
  * 
  * @author Nathan DeBardeleben
  */
 
+@Deprecated
 public interface IControlSystem {
 
 	/**
@@ -42,15 +42,13 @@ public interface IControlSystem {
 	public AttributeDefinitionManager getAttributeDefinitionManager();
 
 	/**
-	 * Submits a job run using the submission ID and the attributes provided by
-	 * the ILaunchConfiguration.
+	 * Submits a job run using the submission ID and the attributes provided by the ILaunchConfiguration.
 	 * 
-	 * The job submission ID can be used to identify the new job that is
-	 * created. The ID will be returned as an attribute on the new job.
+	 * The job submission ID can be used to identify the new job that is created. The ID will be returned as an attribute on the new
+	 * job.
 	 * 
-	 * This will call will result in either a new job event when the job is
-	 * created by the resource manager or an error event if the job submission
-	 * fails.
+	 * This will call will result in either a new job event when the job is created by the resource manager or an error event if the
+	 * job submission fails.
 	 * 
 	 * @param subId
 	 *            job submission ID
@@ -64,8 +62,7 @@ public interface IControlSystem {
 	public void submitJob(String subId, ILaunchConfiguration configuration, String mode) throws CoreException;
 
 	/**
-	 * Terminates a running job. The job identifier is used to locate the job by
-	 * the control system.
+	 * Terminates a running job. The job identifier is used to locate the job by the control system.
 	 * 
 	 * @param jobId
 	 *            ID of the job to terminate

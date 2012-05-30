@@ -6,6 +6,7 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
 /**
  * @since 5.0
  */
+@Deprecated
 public interface IResourceManagerRemovedEvent {
 	/**
 	 * @return

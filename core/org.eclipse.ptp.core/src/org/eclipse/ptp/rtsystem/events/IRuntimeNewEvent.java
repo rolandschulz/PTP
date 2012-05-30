@@ -21,6 +21,7 @@ package org.eclipse.ptp.rtsystem.events;
 
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
+@Deprecated
 public interface IRuntimeNewEvent extends IRuntimeEvent {
 	public ElementAttributeManager getElementAttributeManager();
 

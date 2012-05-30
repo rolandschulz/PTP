@@ -22,14 +22,13 @@ import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 
 /**
- * This event is generated when one or more processes are removed. It is a bulk
- * event that is sent to child listeners on the source element. Since processes
- * belong to a job, but can also be associated with a node, the source element
- * can be either a job or node.
+ * This event is generated when one or more processes are removed. It is a bulk event that is sent to child listeners on the source
+ * element. Since processes belong to a job, but can also be associated with a node, the source element can be either a job or node.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener
  * @see org.eclipse.ptp.core.elements.listeners.INodeChildListener
  */
+@Deprecated
 public interface IRemoveProcessEvent {
 
 	/**

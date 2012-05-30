@@ -45,6 +45,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
 
+@Deprecated
 public interface IRuntimeEventListener {
 	/**
 	 * @param e

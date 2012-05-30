@@ -30,6 +30,7 @@ import org.eclipse.ptp.core.jobs.JobManager;
  * @since 5.0
  * 
  */
+@Deprecated
 public abstract class AbstractResourceManagerMonitor implements IResourceManagerMonitor {
 	private class JobListener implements IJobListener {
 		public void jobAdded(IJobStatus status) {

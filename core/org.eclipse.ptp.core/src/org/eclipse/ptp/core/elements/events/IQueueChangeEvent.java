@@ -20,12 +20,12 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPQueue;
 
 /**
- * This event is sent when the attributes on a queue change. It is sent to
- * element listeners on the queue.
+ * This event is sent when the attributes on a queue change. It is sent to element listeners on the queue.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IQueueListener
  */
 
+@Deprecated
 public interface IQueueChangeEvent {
 
 	/**

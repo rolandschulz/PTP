@@ -22,23 +22,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class StringSetAttributeDefinition
-		extends AbstractAttributeDefinition<String, StringSetAttribute, StringSetAttributeDefinition> {
+@Deprecated
+public final class StringSetAttributeDefinition extends
+		AbstractAttributeDefinition<String, StringSetAttribute, StringSetAttributeDefinition> {
 
 	private final String defaultValue;
 	private final List<String> values;
 
-	public StringSetAttributeDefinition(final String uniqueId, final String name,
-			final String description, final boolean display,
-			final String defaultValue, final List<String> values)
-			throws IllegalValueException {
+	public StringSetAttributeDefinition(final String uniqueId, final String name, final String description, final boolean display,
+			final String defaultValue, final List<String> values) throws IllegalValueException {
 		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
 		this.values = new ArrayList<String>(values);
 	}
 
-	public StringSetAttributeDefinition(final String uniqueId, final String name,
-			final String description, final boolean display,
+	public StringSetAttributeDefinition(final String uniqueId, final String name, final String description, final boolean display,
 			final String defaultValue, final String[] values) throws IllegalValueException {
 		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
@@ -57,9 +55,7 @@ public final class StringSetAttributeDefinition
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.attributes.IAttributeDefinition#create(java.lang
-	 * .String)
+	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#create(java.lang .String)
 	 */
 	public StringSetAttribute create(String value) throws IllegalValueException {
 		return new StringSetAttribute(this, value);

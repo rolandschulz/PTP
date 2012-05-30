@@ -20,6 +20,7 @@ package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.IAdaptable;
 
+@Deprecated
 public interface IResourceManagerConfiguration extends IAdaptable {
 
 	/**

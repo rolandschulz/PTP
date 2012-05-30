@@ -39,6 +39,7 @@ import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
  * @since 5.0
  * 
  */
+@Deprecated
 public abstract class AbstractRuntimeResourceManager extends AbstractResourceManager {
 	private static String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
 	private static String CLASS_ATTRIBUTE = "class"; //$NON-NLS-1$
