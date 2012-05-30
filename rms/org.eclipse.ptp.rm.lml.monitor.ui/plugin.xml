@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="monitors" name="monitors" schema="schema/monitors.exsd"/>
    <extension
          point="org.eclipse.ptp.ui.rmConfigurationWizards">
       <configurationWizard
@@ -121,5 +122,52 @@
                visible="true">
          </separator>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.rm.lml.monitor.ui.monitors">
+      <monitor
+            name="Cobalt (Blue Gene)"
+            type="COBALT_BG">
+      </monitor>
+      <monitor
+            name="Grid Engine"
+            type="GRIDENGINE">
+      </monitor>
+      <monitor
+            name="IBM LoadLeveler"
+            type="LL">
+      </monitor>
+      <monitor
+            name="IBM LoadLeveler (Blue Gene)"
+            type="LL_BG">
+      </monitor>
+      <monitor
+            name="Open MPI"
+            type="OPENMPI">
+      </monitor>
+      <monitor
+            name="PBS"
+            type="PBS">
+      </monitor>
+      <monitor
+            name="IBM Parallel Environment"
+            type="PE">
+      </monitor>
+      <monitor
+            name="SLURM"
+            type="SLURM">
+      </monitor>
+      <monitor
+            name="TORQUE Resource Manager"
+            type="TORQUE">
+      </monitor>
+      <monitor
+            name="TORQUE Resource Manager (ALPS)"
+            type="TORQUE_ALPS">
+      </monitor>
+      <monitor
+            name="Auto Select"
+            type="DEFAULT">
+      </monitor>
    </extension>
 </plugin>

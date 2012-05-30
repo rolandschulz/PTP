@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
-import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
@@ -46,7 +45,6 @@ import org.osgi.framework.Bundle;
 public class JAXBExtensionUtils {
 	private static Map<String, URL> fPluginConfigurations = new TreeMap<String, URL>();
 	private static Map<String, URL> fExternalConfigurations = new TreeMap<String, URL>();
-	private static Set<String> fMonitorTypes = new TreeSet<String>();
 
 	public static String[] getConfiguationNames() {
 		loadExtensions(true);
@@ -63,11 +61,6 @@ public class JAXBExtensionUtils {
 			url = fExternalConfigurations.get(name);
 		}
 		return url;
-	}
-
-	public static String[] getMonitorTypes() {
-		loadExtensions(true);
-		return fMonitorTypes.toArray(new String[0]);
 	}
 
 	public static Map<String, URL> getPluginConfiguations() {
@@ -126,10 +119,6 @@ public class JAXBExtensionUtils {
 									continue;
 								}
 								fExternalConfigurations.put(data.getName(), url);
-								MonitorType monitorType = data.getMonitorData();
-								if (monitorType != null && monitorType.getSchedulerType() != null) {
-									fMonitorTypes.add(data.getMonitorData().getSchedulerType());
-								}
 							} catch (MalformedURLException t) {
 								JAXBUIPlugin.log(t);
 							}
@@ -162,11 +151,6 @@ public class JAXBExtensionUtils {
 			if (extensionPoint != null) {
 				for (IExtension ext : extensionPoint.getExtensions()) {
 					for (IConfigurationElement ce : ext.getConfigurationElements()) {
-						ce.getAttribute(JAXBUIConstants.ID);
-						String monitorType = ce.getAttribute(JAXBUIConstants.MONITOR_TYPE);
-						if (monitorType != null) {
-							fMonitorTypes.add(monitorType);
-						}
 						String name = ce.getAttribute(JAXBUIConstants.NAME);
 						String configurationFile = ce.getAttribute(JAXBUIConstants.CONFIGURATION_FILE_ATTRIBUTE);
 						String bundleId = ce.getDeclaringExtension().getContributor().getName();

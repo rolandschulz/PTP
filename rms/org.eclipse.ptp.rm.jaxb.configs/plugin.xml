@@ -5,17 +5,14 @@
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
             configurationFile="data/pbs-generic-batch.xml"
-            monitorType="PBS"
             name="PBS-Generic-Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/pbs-generic-interactive.xml"
-            monitorType="PBS"
             name="PBS-Generic-Interactive">
       </JAXBResourceManagerConfiguration>
-            <JAXBResourceManagerConfiguration
+      <JAXBResourceManagerConfiguration
             configurationFile="data/gridengine-generic-batch.xml"
-            monitorType="GRIDENGINE"
             name="Grid Engine-Generic-Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
@@ -24,27 +21,22 @@
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/slurm-bgp-batch.xml"
-            monitorType="SLURM"
             name="SLURM-BGP-Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/slurm-bgq-batch.xml"
-            monitorType="SLURM"
             name="SLURM-BGQ-Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/slurm-generic-batch.xml"
-            monitorType="SLURM"
             name="SLURM-Generic-Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/torque-generic-batch.xml"
-            monitorType="TORQUE"
             name="Torque-Generic-Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/torque-generic-interactive.xml"
-            monitorType="TORQUE"
             name="Torque-Generic-Interactive">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
@@ -53,52 +45,19 @@
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/com.ibm.pe.xml"
-            monitorType="PE"
             name="IBM Parallel Environment">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/com.ibm.ll.xml"
-            monitorType="LL"
             name="IBM LoadLeveler">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/com.ibm.ll_bg.xml"
-            monitorType="LL_BG"
             name="IBM LoadLeveler (Blue Gene)">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/mpich2-generic-interactive.xml"
             name="MPICH2-Generic-Interactive">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-      		monitorType="COBALT_BG">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-      		monitorType="GRIDENGINE">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-      		monitorType="LL">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-      		monitorType="LL_BG">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-      		monitorType="OPENMPI">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-      		monitorType="PBS">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-      		monitorType="PE">
-      </JAXBResourceManagerConfiguration>
-       <JAXBResourceManagerConfiguration
-      		monitorType="SLURM">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-      		monitorType="TORQUE">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-      		monitorType="TORQUE_ALPS">
       </JAXBResourceManagerConfiguration>
    </extension>
 </plugin>

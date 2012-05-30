@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.ptp.rm.jaxb.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.eclipse.ptp.rm.lml.monitor.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.ptp.rm.jaxb.ui" id="JAXBResourceManagers" name="JAXBResourceManagers"/>
+         <meta.schema plugin="org.eclipse.ptp.rm.lml.monitor.ui" id="monitors" name="monitors"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="JAXBResourceManagerConfiguration"/>
+            <element ref="monitor"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,23 +47,20 @@
       </complexType>
    </element>
 
-   <element name="JAXBResourceManagerConfiguration">
+   <element name="monitor">
       <complexType>
-         <attribute name="name" type="string">
+         <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  Name of the target configuration to be displayed in the UI. This name needs to match the &apos;name&apos; attribute in the target configuration file exactly. It should also be unique across all target configurations.
+                  Name of the monitor to be displayed in the UI.
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="configurationFile" type="string">
+         <attribute name="type" type="string" use="required">
             <annotation>
                <documentation>
-                  Location of the configuration file for the target system.
+                  Type of the monitor. Must correspond to one of the monitor types supported by the LML DA Driver package.
                </documentation>
-               <appinfo>
-                  <meta.attribute kind="resource"/>
-               </appinfo>
             </annotation>
          </attribute>
       </complexType>

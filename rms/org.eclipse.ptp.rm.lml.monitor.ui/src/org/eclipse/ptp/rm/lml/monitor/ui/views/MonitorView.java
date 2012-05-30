@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.ptp.rm.lml.monitor.core.listeners.IMonitorChangedListener;
+import org.eclipse.ptp.rm.lml.monitor.ui.ExtensionUtils;
 import org.eclipse.ptp.rm.lml.monitor.ui.MonitorImages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -97,10 +98,10 @@ public class MonitorView extends ViewPart {
 			String name1 = null;
 			String name2 = null;
 			if (e1 instanceof IMonitorControl) {
-				name1 = ((IMonitorControl) e1).getSystemType();
+				name1 = ExtensionUtils.getMonitorName(((IMonitorControl) e1).getSystemType());
 			}
 			if (e2 instanceof IMonitorControl) {
-				name2 = ((IMonitorControl) e2).getSystemType();
+				name2 = ExtensionUtils.getMonitorName(((IMonitorControl) e2).getSystemType());
 			}
 			if (name1 != null && name2 != null) {
 				int res = name1.compareTo(name2);
@@ -209,7 +210,7 @@ public class MonitorView extends ViewPart {
 						case 1:
 							return monitor.getConnectionName();
 						case 2:
-							return monitor.getSystemType();
+							return ExtensionUtils.getMonitorName(monitor.getSystemType());
 						}
 						return null;
 					}

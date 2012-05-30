@@ -82,7 +82,6 @@ public class JAXBCoreConstants {
 	public static final String RM_CONFIG_EXTENSION_POINT = "org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations"; //$NON-NLS-1$
 	public static final String IMPORTED_JAXB_CONFIG = "org.eclipse.ptp.rm.jaxb.ImportedConfigurations"; //$NON-NLS-1$
 	public static final String PTP_PACKAGE = "org.eclipse.ptp";//$NON-NLS-1$
-	public static final String MONITOR_TYPE = "monitorType";//$NON-NLS-1$
 
 	/* KEY WORDS */
 	public static final String ID = "id";//$NON-NLS-1$
