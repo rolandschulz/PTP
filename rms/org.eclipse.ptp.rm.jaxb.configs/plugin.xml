@@ -66,7 +66,34 @@
             name="MPICH2-Generic-Interactive">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
+      		monitorType="COBALT_BG">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+      		monitorType="GRIDENGINE">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+      		monitorType="LL">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+      		monitorType="LL_BG">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
       		monitorType="OPENMPI">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+      		monitorType="PBS">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+      		monitorType="PE">
+      </JAXBResourceManagerConfiguration>
+       <JAXBResourceManagerConfiguration
+      		monitorType="SLURM">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+      		monitorType="TORQUE">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+      		monitorType="TORQUE_ALPS">
       </JAXBResourceManagerConfiguration>
    </extension>
 </plugin>
