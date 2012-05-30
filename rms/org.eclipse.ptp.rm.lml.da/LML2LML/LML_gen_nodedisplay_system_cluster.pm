@@ -48,7 +48,7 @@ sub _get_system_size_cluster  {
 
     $numnodes=0;
     foreach $ncores (sort {$a <=> $b} keys %{$self->{NODESIZES}}) {
-	foreach $name (@{$self->{NODESIZES}->{$ncores}}) {
+	foreach $name (sort @{$self->{NODESIZES}->{$ncores}}) {
 	    # register new node 
 	    if(!exists($self->{NODEMAPPING}->{$name})) {
 		$self->{NODEMAPPING}->{$name}=sprintf($self->{NODENAMENAMASK},$numnodes);
