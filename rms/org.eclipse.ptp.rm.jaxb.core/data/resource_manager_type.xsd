@@ -95,7 +95,7 @@
 		<xs:sequence>
 			<xs:element name="arg" maxOccurs="unbounded" type="rm:arg-type"/>
 			<xs:element name="input" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type"/>
-			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:name-value-pair-type"/>
+			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:environment-type"/>
 			<xs:element name="stdout-parser" minOccurs="0" type="rm:tokenizer-type"/>
 			<xs:element name="stderr-parser" minOccurs="0" type="rm:tokenizer-type"/>
 			<xs:element name="redirect-parser" minOccurs="0" type="rm:tokenizer-type"/>
@@ -175,12 +175,13 @@
      <xs:attribute name="greaterThan" type="xs:string"/>
      <xs:attribute name="greaterThanOrEqualTo" type="xs:string"/>
    </xs:complexType>
-	<xs:complexType name="name-value-pair-type">
+	<xs:complexType name="environment-type">
 		<xs:sequence>
 			<xs:element name="arg" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type"/>
 		</xs:sequence>
 		<xs:attribute name="name" use="required" type="xs:string"/>
 		<xs:attribute name="value" type="xs:string"/>
+		<xs:attribute name="preserve" type="xs:boolean"/>
 	</xs:complexType>
 	<xs:complexType name="tab-controller-type">
 		<xs:sequence>

@@ -20,6 +20,7 @@ import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,7 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
-import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
+import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentType;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 import org.eclipse.ptp.utils.core.ArgumentParser;
@@ -709,17 +710,40 @@ public class CommandJob extends Job implements ICommandJob {
 				builder.environment().put(var, live.get(var));
 			}
 		} else {
+			List<EnvironmentType> vars = command.getEnvironment();
+
 			if (command.isReplaceEnvironment()) {
+				/*
+				 * Preserve any environment variables
+				 */
+				Map<String, String> savedVars = new HashMap<String, String>();
+				for (EnvironmentType var : vars) {
+					if (var.isPreserve()) {
+						savedVars.put(var.getName(), builder.environment().get(var.getName()));
+					}
+				}
+
+				/*
+				 * Clear out environment
+				 */
 				builder.environment().clear();
+
+				/*
+				 * Restore preserved vars
+				 */
+				builder.environment().putAll(savedVars);
 			}
+
 			/*
-			 * first static env, then dynamic
+			 * Add any variables from the resource manager configuration
 			 */
-			List<NameValuePairType> vars = command.getEnvironment();
-			for (NameValuePairType var : vars) {
+			for (EnvironmentType var : vars) {
 				EnvironmentVariableUtils.addVariable(uuid, var, builder.environment(), rmVarMap);
 			}
 
+			/*
+			 * Add any variables from the launch configuration environment tab
+			 */
 			Map<String, String> live = control.getLaunchEnv();
 			for (String var : live.keySet()) {
 				builder.environment().put(var, live.get(var));

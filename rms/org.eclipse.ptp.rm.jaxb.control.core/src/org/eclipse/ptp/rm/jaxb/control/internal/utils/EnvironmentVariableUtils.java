@@ -18,10 +18,10 @@ import org.eclipse.ptp.rm.jaxb.control.data.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
-import org.eclipse.ptp.rm.jaxb.core.data.NameValuePairType;
+import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentType;
 
 /**
- * Convenience methods for handling name-value pair objects (the JAXB NameValuePair).
+ * Convenience methods for handling environment object (the JAXB NameValuePair).
  * 
  * @author arossi
  * 
@@ -34,13 +34,13 @@ public class EnvironmentVariableUtils {
 	 * @param uuid
 	 *            an internal or resource-specific job id.
 	 * @param var
-	 *            name-value pair
+	 *            environment name-value pair
 	 * @param env
 	 *            the environment map to which to add the pair
 	 * @param map
 	 *            resource manager active environment map
 	 */
-	public static void addVariable(String uuid, NameValuePairType var, Map<String, String> env, IVariableMap map) {
+	public static void addVariable(String uuid, EnvironmentType var, Map<String, String> env, IVariableMap map) {
 		String key = var.getValue();
 		String value = null;
 		if (key == null) {
