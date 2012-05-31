@@ -40,17 +40,9 @@ import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
-import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRefNameException;
-import org.eclipse.jgit.api.errors.JGitInternalException;
-import org.eclipse.jgit.api.errors.NoFilepatternException;
-import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
-import org.eclipse.jgit.api.errors.RefNotFoundException;
-import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.NotSupportedException;
 import org.eclipse.jgit.errors.TransportException;
-import org.eclipse.jgit.errors.UnmergedPathException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -500,9 +492,7 @@ public class GitRemoteSyncConnection {
 				filesToAdd.addAll(status.getUntracked());
 			}
 			filesToDelete.addAll(status.getMissing());
-		} catch (NoWorkTreeException e) {
-			throw new RemoteSyncException(e);
-		} catch (IOException e) {
+		} catch (GitAPIException e) {
 			throw new RemoteSyncException(e);
 		}
 
@@ -654,8 +644,6 @@ public class GitRemoteSyncConnection {
 			}
 		} catch (final GitAPIException e) {
 			throw new RemoteSyncException(e);
-		} catch (final UnmergedPathException e) {
-			throw new RemoteSyncException(e);
 		}
 	}
 	
@@ -709,9 +697,9 @@ public class GitRemoteSyncConnection {
 				String[] mergeParts = {localContents, remoteContents, ancestorContents};
 				FileToMergePartsMap.put(new Path(s), mergeParts);
 			}
-		} catch (NoWorkTreeException e) {
-			throw new RemoteSyncException(e);
 		} catch (IOException e) {
+			throw new RemoteSyncException(e);
+		} catch (GitAPIException e) {
 			throw new RemoteSyncException(e);
 		} finally {
 			if (walk != null) {
@@ -791,6 +779,8 @@ public class GitRemoteSyncConnection {
 			} catch (final InterruptedException e) {
 				throw new RemoteSyncException(e);
 			} catch (RemoteConnectionException e) {
+				throw new RemoteSyncException(e);
+			} catch (GitAPIException e) {
 				throw new RemoteSyncException(e);
 			}
 		} finally {
@@ -1000,7 +990,7 @@ public class GitRemoteSyncConnection {
 		addCommand.addFilepattern(path.toOSString());
 		try {
 			addCommand.call();
-		} catch (NoFilepatternException e) {
+		} catch (GitAPIException e) {
 			throw new RemoteSyncException(e);
 		}
 		FileToMergePartsMap.remove(path);
@@ -1012,15 +1002,7 @@ public class GitRemoteSyncConnection {
 		checkoutCommand.setStartPoint("HEAD"); //$NON-NLS-1$
 		try {
 			checkoutCommand.call();
-		} catch (JGitInternalException e) {
-			throw new RemoteSyncException(e);
-		} catch (RefAlreadyExistsException e) {
-			throw new RemoteSyncException(e);
-		} catch (RefNotFoundException e) {
-			throw new RemoteSyncException(e);
-		} catch (InvalidRefNameException e) {
-			throw new RemoteSyncException(e);
-		} catch (CheckoutConflictException e) {
+		} catch (GitAPIException e) {
 			throw new RemoteSyncException(e);
 		}
 		
