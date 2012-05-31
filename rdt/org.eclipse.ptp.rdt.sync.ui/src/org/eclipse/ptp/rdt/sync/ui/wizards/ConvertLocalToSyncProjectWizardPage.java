@@ -7,7 +7,7 @@
  *
  * Contributors:
  * IBM Corporation - Initial API and implementation
- * John Eblen - Do not change current configurations but add a new remote
+ * John Eblen - Alter to support changes to synchronized projects
  *******************************************************************************/
 
 package org.eclipse.ptp.rdt.sync.ui.wizards;
@@ -80,7 +80,8 @@ import org.eclipse.swt.widgets.Label;
  * @since 1.0
  */
 public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPage {
-
+	private final boolean showProviderCombo = false; // Change this variable to support multiple sync providers
+													 // Otherwise, the first provider is used automatically
 	private Combo fProviderCombo;
 	private Composite fProviderArea;
 	private StackLayout fProviderStack;
@@ -123,22 +124,24 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 		comp.setLayoutData(gd);
 
 		// Label for "Provider:"
-		Label providerLabel = new Label(comp, SWT.LEFT);
-		providerLabel.setText(Messages.NewRemoteSyncProjectWizardPage_syncProvider);
+		if (showProviderCombo) {
+			Label providerLabel = new Label(comp, SWT.LEFT);
+			providerLabel.setText(Messages.NewRemoteSyncProjectWizardPage_syncProvider);
 
-		// combo for providers
-		fProviderCombo = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY);
-		// set layout to grab horizontal space
-		fProviderCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-		gd = new GridData();
-		gd.horizontalSpan = 2;
-		fProviderCombo.setLayoutData(gd);
-		fProviderCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleProviderSelected();
-			}
-		});
+			// combo for providers
+			fProviderCombo = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY);
+			// set layout to grab horizontal space
+			fProviderCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+			gd = new GridData();
+			gd.horizontalSpan = 2;
+			fProviderCombo.setLayoutData(gd);
+			fProviderCombo.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					handleProviderSelected(fProviderCombo.getSelectionIndex());
+				}
+			});
+		}
 
 		fProviderArea = new Group(comp, SWT.SHADOW_ETCHED_IN);
 		fProviderStack = new StackLayout();
@@ -147,17 +150,22 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 		providerAreaData.horizontalSpan = 3;
 		fProviderArea.setLayoutData(providerAreaData);
 
-		// populate the combo with a list of providers
+		// Get provider information
 		ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
 
 		for (int k = 0; k < providers.length; k++) {
-			fProviderCombo.add(providers[k].getName(), k);
+			if (showProviderCombo) {
+				fProviderCombo.add(providers[k].getName(), k);
+			}
 			fComboIndexToDescriptorMap.put(k, providers[k]);
 			addProviderControl(providers[k]);
 		}
 
-		fProviderCombo.select(0);
-		handleProviderSelected();
+		// TODO: Consider the case where there are no providers
+		if (showProviderCombo) {
+			fProviderCombo.select(0);
+		}
+		handleProviderSelected(0);
 		
 		// Need to update whenever the project selection changes
 		this.tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -432,8 +440,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 	/**
 	 * Handle synchronize provider selected.
 	 */
-	private void handleProviderSelected() {
-		int index = fProviderCombo.getSelectionIndex();
+	private void handleProviderSelected(int index) {
 		fProviderStack.topControl = fProviderControls.get(index);
 		fSelectedProvider = fComboIndexToDescriptorMap.get(index);
 		fProviderArea.layout();
