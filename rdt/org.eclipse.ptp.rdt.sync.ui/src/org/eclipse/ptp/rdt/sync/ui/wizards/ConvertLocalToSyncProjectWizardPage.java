@@ -48,6 +48,7 @@ import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
@@ -310,6 +311,9 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 				config.setName(config.getName() + "_local"); //$NON-NLS-1$
 			}
 			ManagedBuildManager.saveBuildInfo(project, true);
+			
+		    // Enable sync'ing
+		    SyncManager.setSyncMode(project, SyncManager.SYNC_MODE.ACTIVE);
 		} finally {
 			monitor.done();
 		}
