@@ -25,70 +25,49 @@ connection is lost.
 <p>To host a synchronized project, the remote system must support the <a href="http://git-scm.com/">Git</a> distributed version control system.
 
 <h2 id=create>Creating a new Synchronized Project</h2>
-<p>To create a new Synchronized Project, use the following steps:</p>
-<ol>
-<li>
+<p>To create a new Synchronized Project, first select an appropriate wizard:</p>
 Select <b>File > New > Other...</b>
-and in the wizard selection dialog, then select <b>Remote > Synchronized Project</b>.
+and in the wizard selection dialog, then select <b>Remote > Synchronized C/C++ Project</b> or <b>Synchronized Fortran Project</b>
 <p><br></p>
 <p><img src="images/sync-newproj.png">
 <p><br></p>
 <p>Or, from the context menu (right-mouse) in the Project Explorer,
-select <b>New > Synchronized Project</b>
+select <b>New > Synchronized C/C++ Project</b> or <b>Synchronized Fortran Project</b>
 <p><br></p>
 <p><img src="images/sync-newprojContext.png">
 <p><br></p>
-</li>
-<li>
-Enter a name for the project
+Now fill out the dialog shown. As for any Eclipse project, give the project name and location, which must be a local directory for
+a Synchronized Project. Next, indicate the remote location by specifying a connection and remote directory.
+Then specify the project type. Finally, select toolchains to be used for remote and local sites.
+Normally, you will select only one toolchain in each case, but it is possible to select multiple toolchains.
 <p><br></p>
-</li>
-<li>Choose <b>Makefile Project > Empty Project</b> for the <b>Project type</b>
+Select <b>Next</b> to scroll through the remaining pages, which differ based on the selected project types and toolchains.
+At some point, you should see the configuration page, which will list a separate build configuration for each toolchain.
+
+ADD CONFIG PAGE
+
+From here, you can configure certain properties, but this can be done after project creation as well.
+Note that if you select the same toolchain for both local and remote, only one configuration is shown.
+During project creation, this configuration will be duplicated, one for local and one for remote.
 <p><br></p>
 <p><img src="images/sync-newprojCreate.png">
 <p><br></p>
-</li>
-<li>
-<p>Select <b>Next > </b> and then <b>Next > </b> again.</p>
-<p><br></p>
-</li>
-<li>
-On the "Configure Remote Synchronization" page, you should see the Git Synchronization Provider is already selected (different providers
-may be available in the future). Select an existing connection or create a new one. 
-<p><br></p>
-<p><img src="images/sync-newprojNewConnection.png">
-<p><br></p>
-<li>
+Select an existing connection or create a new one. 
 Select the <b>New...</b> button to create a new remote connection with the <b>Remote Tools</b> remote service provider.
 The Target Environment Configuration dialog is shown. Fill in host name, user, and password (or other authentication
 information).
 <p><br></p>
 <p><img src="images/sync-newprojConnection.png">
 <p><br></p>
-</li>
-<li>
 Select <b>Finish</b>.  The connection will be tested at this
 point before returning to the <b>Configure Remote Synchronization</b> page.
 <p><br></p>
-</li>
-<li>
 Specify a remote location by selecting <b>Browse...</b>
-<p><br></p>
-<p><img src="images/sync-newprojConfigLocn.png">
-<p><br></p>
-<li>
 A <b>Browse Directory</b> dialog appears in which you can navigate to find the directory
 in which your new project's files will be contained on the remote system. Hit <b>OK</b> to finish.
 The <b>Configure Remote Synchronization</b> page now contains the location of the remote files:
-<p><br></p>
-<p><img src="images/sync-newprojLocn.png">
-<p><br></p>
-</li>
-<li>
 Hit <b>Finish</b> to complete project creation. If the remote location does not exist, it is
 created. Otherwise, the files in that directory will be synchronized to the local workspace.
-</li>
-</ol>
 
 <h2 id="work">Working with a Synchronized Project</h2>
 <p>Edit the files as you would any local project.
