@@ -41,10 +41,15 @@ import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
+import org.eclipse.ptp.core.elements.events.INewProcessEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
+import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -60,6 +65,7 @@ import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.control.data.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
+import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.control.internal.IStreamParserTokenizer;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
@@ -74,6 +80,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentType;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 import org.eclipse.ptp.utils.core.ArgumentParser;
+import org.eclipse.ptp.utils.core.BitSetIterable;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
@@ -416,9 +423,9 @@ public class CommandJob extends Job implements ICommandJob {
 			/*
 			 * Remove any old jobs with the same job ID
 			 */
-			IPJob job = rm.getJobById(jobId);
-			if (job != null) {
-				rm.removeJobs(Arrays.asList(job));
+			IPJob oldJob = rm.getJobById(jobId);
+			if (oldJob != null) {
+				rm.removeJobs(Arrays.asList(oldJob));
 			}
 
 			AttributeManager attrMgr = new AttributeManager();
@@ -426,7 +433,45 @@ public class CommandJob extends Job implements ICommandJob {
 			attrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(JobAttributes.State.RUNNING));
 			attrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 
-			job = rm.newJob(jobId, attrMgr);
+			final IPJob job = rm.newJob(jobId, attrMgr);
+
+			job.addChildListener(new IJobChildListener() {
+
+				public void handleEvent(IChangedProcessEvent e) {
+					boolean hasOutput = e.getAttributes().getAttribute(ProcessAttributes.getStderrAttributeDefinition()) != null;
+					if (hasOutput) {
+						ICommandJobStreamMonitor monitor = (ICommandJobStreamMonitor) proxy.getOutputStreamMonitor();
+						final BitSet indices = e.getProcesses();
+						for (Integer index : new BitSetIterable(indices)) {
+							StringAttribute stderr = job.getProcessAttribute(ProcessAttributes.getStderrAttributeDefinition(),
+									index);
+							if (stderr != null) {
+								monitor.append(stderr.getValueAsString());
+							}
+						}
+					}
+					hasOutput = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition()) != null;
+					if (hasOutput) {
+						ICommandJobStreamMonitor monitor = (ICommandJobStreamMonitor) proxy.getOutputStreamMonitor();
+						final BitSet indices = e.getProcesses();
+						for (Integer index : new BitSetIterable(indices)) {
+							StringAttribute stdout = job.getProcessAttribute(ProcessAttributes.getStdoutAttributeDefinition(),
+									index);
+							if (stdout != null) {
+								monitor.append(stdout.getValueAsString());
+							}
+						}
+					}
+				}
+
+				public void handleEvent(INewProcessEvent e) {
+					// TODO Auto-generated method stub
+				}
+
+				public void handleEvent(IRemoveProcessEvent e) {
+					// TODO Auto-generated method stub
+				}
+			});
 
 			attrMgr = new AttributeManager();
 			attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
@@ -481,8 +526,8 @@ public class CommandJob extends Job implements ICommandJob {
 			}
 			progress.worked(30);
 			maybeInitializeTokenizers(builder, progress.newChild(10));
-			setOutStreamRedirection(process);
-			setErrStreamRedirection(process);
+			setOutStreamRedirection(process, null);
+			setErrStreamRedirection(process, null);
 			startConsumers(process);
 
 			synchronized (this) {
@@ -792,7 +837,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param process
 	 * @throws IOException
 	 */
-	private void setErrStreamRedirection(IRemoteProcess process) throws IOException {
+	private void setErrStreamRedirection(IRemoteProcess process, IPJob job) throws IOException {
 		if (stderrTokenizer == null) {
 			proxy.setErrMonitor(new CommandJobStreamMonitor(process.getErrorStream()));
 		} else {
@@ -800,7 +845,7 @@ public class CommandJob extends Job implements ICommandJob {
 			this.tokenizerErr = tokenizerErr;
 			PipedInputStream monitorErr = new PipedInputStream();
 			errSplitter = new StreamSplitter(process.getErrorStream(), tokenizerErr, monitorErr);
-			proxy.setErrMonitor(new CommandJobStreamMonitor(monitorErr));
+			proxy.setErrMonitor(new CommandJobStreamMonitor(monitorErr, null));
 		}
 		proxy.getErrorStreamMonitor().addListener(new IStreamListener() {
 			public void streamAppended(String text, IStreamMonitor monitor) {
@@ -816,7 +861,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param process
 	 * @throws IOException
 	 */
-	private void setOutStreamRedirection(IRemoteProcess process) throws IOException {
+	private void setOutStreamRedirection(IRemoteProcess process, IPJob job) throws IOException {
 		if (stdoutTokenizer == null) {
 			proxy.setOutMonitor(new CommandJobStreamMonitor(process.getInputStream()));
 		} else {
@@ -824,7 +869,7 @@ public class CommandJob extends Job implements ICommandJob {
 			this.tokenizerOut = tokenizerOut;
 			PipedInputStream monitorOut = new PipedInputStream();
 			outSplitter = new StreamSplitter(process.getInputStream(), tokenizerOut, monitorOut);
-			proxy.setOutMonitor(new CommandJobStreamMonitor(monitorOut));
+			proxy.setOutMonitor(new CommandJobStreamMonitor(monitorOut, null));
 		}
 	}
 

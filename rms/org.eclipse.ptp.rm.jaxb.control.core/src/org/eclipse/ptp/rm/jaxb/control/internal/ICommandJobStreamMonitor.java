@@ -21,6 +21,14 @@ import org.eclipse.debug.core.model.IStreamMonitor;
 public interface ICommandJobStreamMonitor extends IStreamMonitor {
 
 	/**
+	 * Append string to stream
+	 * 
+	 * @param text
+	 *            text to append to the stream
+	 */
+	public void append(String text);
+
+	/**
 	 * Manually close the monitor/streams.
 	 */
 	public void close();

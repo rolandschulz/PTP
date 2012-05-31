@@ -22,20 +22,17 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
-import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
+import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 
 /**
- * Monitors the output stream of a system process and notifies listeners of
- * additions to the stream.<br>
+ * Monitors the output stream of a system process and notifies listeners of additions to the stream.<br>
  * <br>
  * The output stream monitor reads system out (or err) via an input stream.<br>
  * <br>
- * This class has been adapted from
- * <code>org.eclipse.debug.internal.core.OutputStreamMonitor</code> (internal,
- * discouraged access).
+ * This class has been adapted from <code>org.eclipse.debug.internal.core.OutputStreamMonitor</code> (internal, discouraged access).
  * 
  * @author arossi
  * 
@@ -94,8 +91,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor {
 	}
 
 	/**
-	 * Creates an output stream monitor on the given stream (connected to system
-	 * out or err).
+	 * Creates an output stream monitor on the given stream (connected to system out or err).
 	 * 
 	 * @param stream
 	 *            input stream to read from
@@ -118,9 +114,15 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor {
 		fListeners.add(listener);
 	}
 
+	public void append(String text) {
+		synchronized (this) {
+			fContents.append(text);
+		}
+		fireStreamAppended(text);
+	}
+
 	/**
-	 * Causes the monitor to close all communications between it and the
-	 * underlying stream by waiting for the thread to terminate.
+	 * Causes the monitor to close all communications between it and the underlying stream by waiting for the thread to terminate.
 	 */
 	public synchronized void close() {
 		fKilled = true;
@@ -155,9 +157,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.debug.core.model.IStreamMonitor#removeListener(org.eclipse
-	 * .debug.core.IStreamListener)
+	 * @see org.eclipse.debug.core.model.IStreamMonitor#removeListener(org.eclipse .debug.core.IStreamListener)
 	 */
 	public synchronized void removeListener(IStreamListener listener) {
 		fListeners.remove(listener);
@@ -204,9 +204,8 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor {
 	/**
 	 * Continually reads from the stream.
 	 * <p>
-	 * This method, along with the <code>startReading</code> method is used to
-	 * allow <code>OutputStreamMonitor</code> to implement <code>Runnable</code>
-	 * without publicly exposing a <code>run</code> method.
+	 * This method, along with the <code>startReading</code> method is used to allow <code>OutputStreamMonitor</code> to implement
+	 * <code>Runnable</code> without publicly exposing a <code>run</code> method.
 	 */
 	protected void read() {
 		if (fStream == null) {
@@ -237,8 +236,8 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor {
 						if (bufferLimit != JAXBControlConstants.UNDEFINED && len > bufferLimit) {
 							fContents.delete(0, len - bufferLimit);
 						}
-						fireStreamAppended(text);
 					}
+					fireStreamAppended(text);
 				}
 			} catch (EOFException eof) {
 				break;
