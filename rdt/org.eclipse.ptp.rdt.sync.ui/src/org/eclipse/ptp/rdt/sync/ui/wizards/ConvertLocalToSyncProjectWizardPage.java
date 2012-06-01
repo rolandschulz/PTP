@@ -298,6 +298,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			}
 			
 			// Iterate through all configs
+			boolean defaultConfigSet = false;
 			IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 			for (IConfiguration config : allConfigs) {
 				// For selected configs, create a new remote config and modify it to use the sync builder and to handle environment
@@ -312,6 +313,12 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 					ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(remoteConfig);
 					if (c_mb_confgDes != null) {
 						EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+					}
+
+					// The first remote found will be the initial default (active) configuration.
+					if (!defaultConfigSet) {
+						ManagedBuildManager.setDefaultConfiguration(project, remoteConfig);
+						defaultConfigSet = true;
 					}
 				}
 				

@@ -118,6 +118,7 @@ public class NewRemoteSyncProjectWizardOperation {
 		if (buildInfo == null) {
 			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 		}
+		boolean defaultConfigSet = false;
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allConfigs) {
 			boolean isRemote = mainPage.isRemoteConfig(config);
@@ -144,6 +145,12 @@ public class NewRemoteSyncProjectWizardOperation {
 				ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
 				if (c_mb_confgDes != null) {
 					EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+				}
+				
+				// The first remote found will be the initial default (active) configuration.
+				if (!defaultConfigSet) {
+					ManagedBuildManager.setDefaultConfiguration(project, config);
+					defaultConfigSet = true;
 				}
 			}
 		}
