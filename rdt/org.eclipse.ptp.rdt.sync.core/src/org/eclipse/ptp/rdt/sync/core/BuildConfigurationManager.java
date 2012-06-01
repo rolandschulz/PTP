@@ -240,6 +240,10 @@ public class BuildConfigurationManager {
                     throw new RuntimeException(Messages.BuildConfigurationManager_15);
             }
             String oldConfigId = getTemplateServiceConfigurationId(project);
+            if (oldConfigId == null) {
+            	RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_9);
+            	return null;
+            }
             IServiceConfiguration oldConfig = ServiceModelManager.getInstance().getConfiguration(oldConfigId);
             if (oldConfig == null) {
                     RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_10 + oldConfigId + Messages.BuildConfigurationManager_11 + project.getName());
@@ -315,6 +319,10 @@ public class BuildConfigurationManager {
 	private ISyncServiceProvider getProjectSyncServiceProvider(IProject project) {
 		checkProject(project);
 		String serviceConfigId = getTemplateServiceConfigurationId(project);
+		if (serviceConfigId == null) {
+        	RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_9);
+        	return null;
+		}
 		IServiceConfiguration serviceConfig = ServiceModelManager.getInstance().getConfiguration(serviceConfigId);
 		if (serviceConfig == null) {
 			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_10 + serviceConfigId + Messages.BuildConfigurationManager_11 + project.getName());
@@ -544,18 +552,18 @@ public class BuildConfigurationManager {
 		}
 	}
 	
-	// Return ID of the project's template service configuration, or null if not found (project not initialized)
-	// Returned value is never null
+	// Return ID of the project's template service configuration, or null if not found, which indicates it is not a sync project
+	// or has not yet been initialized.
 	private static String getTemplateServiceConfigurationId(IProject project) {
 		IScopeContext context = new ProjectScope(project);
 		Preferences node = context.getNode(projectScopeSyncNode);
 		if (node == null) {
-			throw new RuntimeException(Messages.BuildConfigurationManager_0);
+			return null;
 		}
 		
 		String configId = node.get(TEMPLATE_KEY, null);
 		if (configId == null) {
-			throw new RuntimeException(Messages.BuildConfigurationManager_9);
+			return null;
 		}
 		
 		return configId;
