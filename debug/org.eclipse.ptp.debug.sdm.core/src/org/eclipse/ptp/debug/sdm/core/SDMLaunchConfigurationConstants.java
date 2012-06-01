@@ -21,4 +21,13 @@ public interface SDMLaunchConfigurationConstants {
 	 * Launch configuration attribute key to specify the SDM debugger backend
 	 */
 	public static final String ATTR_DEBUGGER_SDM_BACKEND = IPTPLaunchConfigurationConstants.PTP_LAUNCH_ID + ".DEBUGGER_SDM_BACKEND"; //$NON-NLS-1$
+
+	/**
+	 * Launch configuration attribute key to specify the SDM debugger backend path
+	 * 
+	 * @since 6.0
+	 */
+	public static final String ATTR_DEBUGGER_SDM_BACKEND_PATH = IPTPLaunchConfigurationConstants.PTP_LAUNCH_ID
+			+ ".DEBUGGER_SDM_BACKEND_PATH"; //$NON-NLS-1$
+
 }

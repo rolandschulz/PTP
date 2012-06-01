@@ -35,16 +35,14 @@ public interface SDMPreferenceConstants {
 	public static final String PLUGIN_ID = SDMDebugCorePlugin.getUniqueIdentifier();
 
 	/**
-	 * Extra arguments to pass to the sdm (e.g. debugging flags)
-	 */
-	public static final String SDM_DEBUGGER_ARGS = PLUGIN_ID + ".debugger_args"; //$NON-NLS-1$
-
-	/**
 	 * SDM debugging
 	 */
 	public static final String SDM_DEBUG_ENABLED = PLUGIN_ID + ".debug_enabled"; //$NON-NLS-1$
 	public static final String SDM_DEBUG_LEVEL = PLUGIN_ID + ".debug_level"; //$NON-NLS-1$
 
+	/**
+	 * SDM debugging levels
+	 */
 	public static final int DEBUG_LEVEL_NONE = 0x00;
 	public static final int DEBUG_LEVEL_STARTUP = 0x01;
 	public static final int DEBUG_LEVEL_MESSAGES = 0x02;
@@ -84,13 +82,24 @@ public interface SDMPreferenceConstants {
 	public static final int DEBUG_CLIENT_OUTPUT = 0x04;
 
 	/**
-	 * Debugger backend
+	 * Default SDM backend
+	 * 
+	 * @since 6.0
 	 */
-	public static final String SDM_DEBUGGER_BACKEND_TYPE = PLUGIN_ID + ".debugger_backend"; //$NON-NLS-1$
+	public static final String PREFS_SDM_BACKEND = PLUGIN_ID + ".sdm_backend"; //$NON-NLS-1$
 
 	/**
-	 * Path to backend debugger
+	 * Default path to backend debugger for SDM
+	 * 
+	 * @since 6.0
 	 */
-	public static final String SDM_DEBUGGER_BACKEND_PATH = PLUGIN_ID + ".debugger_backend_path"; //$NON-NLS-1$
-	public static final String SDM_DEFAULT_DEDUGGER_BACKEND_PATH = ""; //$NON-NLS-1$
+	public static final String PREFS_SDM_BACKEND_PATH = PLUGIN_ID + ".sdm_backend_path."; //$NON-NLS-1$
+
+	/**
+	 * Default path to sdm
+	 * 
+	 * @since 6.0
+	 */
+	public static final String PREFS_SDM_PATH = PLUGIN_ID + ".sdm_path."; //$NON-NLS-1$
+
 }

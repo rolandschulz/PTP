@@ -13,12 +13,7 @@ package org.eclipse.ptp.debug.sdm.internal.ui;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
@@ -28,7 +23,6 @@ import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
 import org.eclipse.ptp.debug.sdm.core.SDMLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
-import org.eclipse.ptp.debug.sdm.ui.SDMDebugUIPlugin;
 import org.eclipse.ptp.debug.sdm.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -36,6 +30,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.ui.preferences.ScrolledPageContent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -46,9 +41,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 /**
  * The dynamic tab for SDM-based debugger implementations.
@@ -60,13 +60,33 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	protected static final String LOCALHOST = "localhost"; //$NON-NLS-1$
 
-	private IRemoteConnection fRemoteConnection = null;
+	private IRemoteConnection fRemoteConnection;
 
-	protected Combo fSDMBackendCombo = null;
-	protected Text fRMDebuggerPathText = null;
-	protected Text fSessionAddressText = null;
-	protected Button fRMDebuggerBrowseButton = null;
+	protected Combo fSDMBackendCombo;
+	protected Text fSDMPathText;
+	protected Text fSessionAddressText;
+	protected Text fBackendPathText;
+	protected Button fSDMPathBrowseButton;
+	protected Button fBackendPathBrowseButton;
 	protected Button fDefaultSessionAddressButton;
+	protected ExpandableComposite fAdvancedOptions;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#canSave()
+	 */
+	@Override
+	public boolean canSave() {
+		setErrorMessage(null);
+		if (getFieldContent(fSessionAddressText.getText()) == null) {
+			setErrorMessage(Messages.SDMPage_7);
+		} else if (getFieldContent(fSDMPathText.getText()) == null) {
+			setErrorMessage(Messages.SDMPage_8);
+		}
+		// setErrorMessage(errMsg);
+		return (getErrorMessage() == null);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -74,7 +94,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse .swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
-		Composite comp = new Composite(parent, SWT.NONE);
+		ScrolledPageContent pageContent = new ScrolledPageContent(parent);
+		pageContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		Composite comp = pageContent.getBody();
 		comp.setLayout(new GridLayout(2, false));
 		comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -87,8 +109,10 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		fSDMBackendCombo = new Combo(comp, SWT.READ_ONLY);
 		fSDMBackendCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 		fSDMBackendCombo.setItems(SDMDebugCorePlugin.getDefault().getDebuggerBackends());
-		fSDMBackendCombo.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
+		fSDMBackendCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				updateBackend();
 				updateLaunchConfigurationDialog();
 			}
 		});
@@ -99,26 +123,58 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
 
-		fRMDebuggerPathText = new Text(comp, SWT.SINGLE | SWT.BORDER);
-		fRMDebuggerPathText.setText(getSDMDefaultPath());
-		fRMDebuggerPathText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-		fRMDebuggerPathText.addModifyListener(new ModifyListener() {
+		fSDMPathText = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		fSDMPathText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		fSDMPathText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		fRMDebuggerBrowseButton = createPushButton(comp, Messages.SDMPage_1, null);
-		fRMDebuggerBrowseButton.addSelectionListener(new SelectionAdapter() {
+
+		fSDMPathBrowseButton = createPushButton(comp, Messages.SDMPage_1, null);
+		fSDMPathBrowseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		fSDMPathBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String file = browseFile();
 				if (file != null) {
-					fRMDebuggerPathText.setText(file);
+					fSDMPathText.setText(file);
 				}
 			}
 		});
 
-		fDefaultSessionAddressButton = createCheckButton(comp, Messages.SDMPage_Use_default_session_address);
+		/*
+		 * Advanced options
+		 */
+		fAdvancedOptions = new ExpandableComposite(comp, SWT.NONE, ExpandableComposite.TWISTIE | ExpandableComposite.CLIENT_INDENT);
+		fAdvancedOptions.setText(Messages.SDMPage_12);
+		fAdvancedOptions.addExpansionListener(new ExpansionAdapter() {
+			@Override
+			public void expansionStateChanged(ExpansionEvent e) {
+				ScrolledPageContent parent = getParentScrolledComposite((ExpandableComposite) e.getSource());
+				if (parent != null) {
+					parent.reflow(true);
+				}
+			}
+		});
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		gd.horizontalSpan = 2;
+		fAdvancedOptions.setLayoutData(gd);
+
+		Composite advComp = new Composite(fAdvancedOptions, SWT.NONE);
+		fAdvancedOptions.setClient(advComp);
+		advComp.setLayout(new GridLayout(3, false));
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		gd.horizontalSpan = 2;
+		advComp.setLayoutData(gd);
+
+		Group sessGroup = new Group(advComp, SWT.SHADOW_ETCHED_IN);
+		sessGroup.setLayout(new GridLayout(2, false));
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		gd.horizontalSpan = 3;
+		sessGroup.setLayoutData(gd);
+
+		fDefaultSessionAddressButton = createCheckButton(sessGroup, Messages.SDMPage_Use_default_session_address);
 		fDefaultSessionAddressButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -128,18 +184,45 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 		gd.horizontalSpan = 2;
 		fDefaultSessionAddressButton.setLayoutData(gd);
+		fDefaultSessionAddressButton.setSelection(true);
 
-		label = new Label(comp, SWT.NONE);
+		label = new Label(sessGroup, SWT.NONE);
 		label.setText(Messages.SDMPage_Session_address);
-		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
-		gd.horizontalSpan = 2;
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, false, false);
 		label.setLayoutData(gd);
 
-		fSessionAddressText = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		fSessionAddressText = new Text(sessGroup, SWT.SINGLE | SWT.BORDER);
 		fSessionAddressText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 		fSessionAddressText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				updateLaunchConfigurationDialog();
+			}
+		});
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		fSessionAddressText.setLayoutData(gd);
+
+		label = new Label(advComp, SWT.NONE);
+		label.setText(Messages.SDMPage_13);
+		gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		label.setLayoutData(gd);
+
+		fBackendPathText = new Text(advComp, SWT.SINGLE | SWT.BORDER);
+		fBackendPathText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		fBackendPathText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				updateLaunchConfigurationDialog();
+			}
+		});
+
+		fBackendPathBrowseButton = createPushButton(advComp, Messages.SDMPage_1, null);
+		fBackendPathBrowseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		fBackendPathBrowseButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String file = browseFile();
+				if (file != null) {
+					fBackendPathText.setText(file);
+				}
 			}
 		});
 
@@ -165,22 +248,26 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		 * Launch configuration is selected or we have just selected SDM as the debugger...
 		 */
 		try {
-			fSDMBackendCombo.setText(configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
-					Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
-							SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)));
+			String backend = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
+					SDMPreferenceConstants.PREFS_SDM_BACKEND);
+			fSDMBackendCombo
+					.setText(configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND, backend));
 			fSessionAddressText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, LOCALHOST));
-			fRMDebuggerPathText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
-					EMPTY_STRING));
+			fSDMPathText.setText(configuration
+					.getAttribute(
+							IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
+							Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_PATH
+									+ backend)));
+			fBackendPathText.setText(configuration.getAttribute(
+					SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND_PATH,
+					Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_BACKEND_PATH
+							+ backend)));
 			fRemoteConnection = getRemoteConnection(configuration);
 			fDefaultSessionAddressButton.setSelection(fRemoteConnection == null
 					|| (fRemoteConnection.supportsTCPPortForwarding() && fSessionAddressText.getText().equals(LOCALHOST)));
 			updateEnablement();
 		} catch (CoreException e) {
 		}
-	}
-
-	private void updateEnablement() {
-		fSessionAddressText.setEnabled(!fDefaultSessionAddressButton.getSelection());
 	}
 
 	/*
@@ -193,26 +280,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		setErrorMessage(null);
 		if (getFieldContent(fSessionAddressText.getText()) == null) {
 			setErrorMessage(Messages.SDMPage_4);
-		} else if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
+		} else if (getFieldContent(fSDMPathText.getText()) == null) {
 			setErrorMessage(Messages.SDMPage_5);
 		}
-		return (getErrorMessage() == null);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#canSave()
-	 */
-	@Override
-	public boolean canSave() {
-		setErrorMessage(null);
-		if (getFieldContent(fSessionAddressText.getText()) == null) {
-			setErrorMessage(Messages.SDMPage_7);
-		} else if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
-			setErrorMessage(Messages.SDMPage_8);
-		}
-		// setErrorMessage(errMsg);
 		return (getErrorMessage() == null);
 	}
 
@@ -229,8 +299,12 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		if (isValid(configuration)) {
 			configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
 					getFieldContent(fSDMBackendCombo.getText()));
+			String backendPath = getFieldContent(fBackendPathText.getText());
+			if (backendPath != null) {
+				configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND_PATH, backendPath);
+			}
 			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
-					getFieldContent(fRMDebuggerPathText.getText()));
+					getFieldContent(fSDMPathText.getText()));
 			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST,
 					getFieldContent(fSessionAddressText.getText()));
 		}
@@ -245,9 +319,14 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		/*
 		 * We have just selected SDM as the debugger...
 		 */
-		configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
-				Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE));
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, EMPTY_STRING);
+		String backend = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_BACKEND);
+		configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND, backend);
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
+				Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_PATH + backend));
+		configuration.setAttribute(
+				SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND_PATH,
+				Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_BACKEND_PATH
+						+ backend));
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, LOCALHOST);
 	}
 
@@ -264,15 +343,26 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				IRemoteUIFileManager fileManager = remoteUISrv.getUIFileManager();
 				if (fileManager != null) {
 					fileManager.setConnection(fRemoteConnection);
-					return fileManager.browseFile(getShell(), Messages.SDMPage_10, fRMDebuggerPathText.getText(), 0);
+					return fileManager.browseFile(getShell(), Messages.SDMPage_10, fSDMPathText.getText(), 0);
 				}
 			}
 		}
 
 		FileDialog dialog = new FileDialog(getShell());
 		dialog.setText(Messages.SDMPage_10);
-		dialog.setFileName(fRMDebuggerPathText.getText());
+		dialog.setFileName(fSDMPathText.getText());
 		return dialog.open();
+	}
+
+	private ScrolledPageContent getParentScrolledComposite(Control control) {
+		Control parent = control.getParent();
+		while (!(parent instanceof ScrolledPageContent) && parent != null) {
+			parent = parent.getParent();
+		}
+		if (parent instanceof ScrolledPageContent) {
+			return (ScrolledPageContent) parent;
+		}
+		return null;
 	}
 
 	/**
@@ -309,6 +399,20 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		return null;
 	}
 
+	private void updateBackend() {
+		String backend = getFieldContent(fSDMBackendCombo.getText());
+		if (backend != null) {
+			fSDMPathText.setText(Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
+					SDMPreferenceConstants.PREFS_SDM_PATH + backend));
+			fBackendPathText.setText(Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
+					SDMPreferenceConstants.PREFS_SDM_BACKEND_PATH + backend));
+		}
+	}
+
+	private void updateEnablement() {
+		fSessionAddressText.setEnabled(!fDefaultSessionAddressButton.getSelection());
+	}
+
 	/**
 	 * Get and clean content of a Text field
 	 * 
@@ -321,27 +425,5 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			return null;
 		}
 		return text;
-	}
-
-	/**
-	 * Get SDM default path if it exists
-	 * 
-	 * @return sdm default path
-	 */
-
-	private String getSDMDefaultPath() {
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(SDMDebugUIPlugin.getUniqueIdentifier(), EXTENSION_POINT_ID);
-		if (extensionPoint != null) {
-			for (IExtension ext : extensionPoint.getExtensions()) {
-				for (IConfigurationElement ce : ext.getConfigurationElements()) {
-					String attr = ce.getAttribute(ATTR_PATH);
-					if (attr != null) {
-						return attr;
-					}
-				}
-			}
-		}
-		return EMPTY_STRING;
 	}
 }

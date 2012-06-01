@@ -55,14 +55,15 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Object source = e.getSource();
-			if (source == sdmBackendCombo)
+			if (source == sdmBackendCombo) {
 				handleSDMComboSelected();
+			}
 		}
 	}
 
-	private Text sdmBackendPathText = null;
-	private Text sdmArgsText = null;
-	private Combo sdmBackendCombo = null;
+	private Text sdmBackendPathText;
+	private Text sdmPathText;
+	private Combo sdmBackendCombo;
 	private Button debugEnabledButton;
 	private Button debugStartupButton;
 	private Button debugMessagesButton;
@@ -108,10 +109,7 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	 */
 	@Override
 	public void performDefaults() {
-		IPreferenceStore store = getPreferenceStore();
-		sdmArgsText.setText(store.getDefaultString(SDMPreferenceConstants.SDM_DEBUGGER_ARGS));
-		sdmBackendCombo.select(sdmBackendCombo.indexOf(store.getDefaultString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)));
-		sdmBackendPathText.setText(store.getDefaultString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH));
+		initializeValues();
 		debugEnabled = false;
 		debugLevel = SDMPreferenceConstants.DEBUG_LEVEL_NONE;
 		debugClientEnabled = false;
@@ -147,294 +145,12 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	private void handleSDMComboSelected() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse
-	 * .swt.widgets.Composite)
-	 */
-	@Override
-	protected Control createContents(Composite parent) {
-		// TODO ignored help
-		// getWorkbench().getHelpSystem().setHelp(getControl(),
-		// IPDebugHelpContextIds.P_DEBUG_PREFERENCE_PAGE);
-		Composite composite = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout(1, false);
-		layout.numColumns = 1;
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		composite.setLayout(layout);
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		data.verticalAlignment = GridData.FILL;
-		data.horizontalAlignment = GridData.FILL;
-		composite.setLayoutData(data);
-		createSpacer(composite, 1);
-		createSDMSetting(composite);
-		setValues();
-		return composite;
-	}
-
-	/**
-	 * @param parent
-	 */
-	protected void createSDMSetting(Composite parent) {
-		Composite group = createGroupComposite(parent, 1, false, Messages.SDMPreferencePage_1);
-		Composite comp = createComposite(group, 2);
-
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-
-		new Label(comp, SWT.NONE).setText(Messages.SDMPreferencePage_2);
-		sdmBackendCombo = new Combo(comp, SWT.READ_ONLY);
-		sdmBackendCombo.setLayoutData(gd);
-		sdmBackendCombo.setItems(SDMDebugCorePlugin.getDefault().getDebuggerBackends());
-		sdmBackendCombo.addSelectionListener(listener);
-
-		new Label(comp, SWT.NONE).setText(Messages.SDMPreferencePage_3);
-		sdmBackendPathText = new Text(comp, SWT.SINGLE | SWT.BORDER);
-		sdmBackendPathText.setLayoutData(gd);
-		sdmBackendPathText.addModifyListener(listener);
-
-		new Label(comp, SWT.NONE).setText(Messages.SDMPreferencePage_4);
-		sdmArgsText = new Text(comp, SWT.SINGLE | SWT.BORDER);
-		sdmArgsText.setLayoutData(gd);
-		sdmArgsText.addModifyListener(listener);
-
-		Composite debugGroup = createGroupComposite(parent, 2, false, Messages.SDMPreferencePage_5);
-		Composite sdmDebugComp = createComposite(debugGroup, 1);
-		gd = new GridData();
-		gd.verticalAlignment = SWT.TOP;
-		sdmDebugComp.setLayoutData(gd);
-
-		debugEnabledButton = new Button(sdmDebugComp, SWT.CHECK);
-		debugEnabledButton.setText(Messages.SDMPreferencePage_6);
-		debugEnabledButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				debugEnabled = debugEnabledButton.getSelection();
-				if (debugEnabled) {
-					debugClientEnabled = true;
-					debugClientLevel |= SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT;
-				}
-				updateDebugButtons();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-
-		debugStartupButton = new Button(sdmDebugComp, SWT.CHECK);
-		debugStartupButton.setText(Messages.SDMPreferencePage_7);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugStartupButton.setLayoutData(gd);
-		debugStartupButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				if (debugStartupButton.getSelection()) {
-					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_STARTUP;
-				} else {
-					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_STARTUP;
-				}
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-
-		debugMessagesButton = new Button(sdmDebugComp, SWT.CHECK);
-		debugMessagesButton.setText(Messages.SDMPreferencePage_8);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugMessagesButton.setLayoutData(gd);
-		debugMessagesButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				if (debugMessagesButton.getSelection()) {
-					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_MESSAGES;
-				} else {
-					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_MESSAGES;
-				}
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-
-		debugRoutingButton = new Button(sdmDebugComp, SWT.CHECK);
-		debugRoutingButton.setText(Messages.SDMPreferencePage_9);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugRoutingButton.setLayoutData(gd);
-		debugRoutingButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				if (debugRoutingButton.getSelection()) {
-					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_ROUTING;
-				} else {
-					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_ROUTING;
-				}
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-
-		debugMasterButton = new Button(sdmDebugComp, SWT.CHECK);
-		debugMasterButton.setText(Messages.SDMPreferencePage_17);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugMasterButton.setLayoutData(gd);
-		debugMasterButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				if (debugMasterButton.getSelection()) {
-					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_MASTER;
-				} else {
-					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_MASTER;
-				}
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-
-		debugServerButton = new Button(sdmDebugComp, SWT.CHECK);
-		debugServerButton.setText(Messages.SDMPreferencePage_10);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugServerButton.setLayoutData(gd);
-		debugServerButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				if (debugServerButton.getSelection()) {
-					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_SERVER;
-				} else {
-					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_SERVER;
-				}
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-
-		debugBackendButton = new Button(sdmDebugComp, SWT.CHECK);
-		debugBackendButton.setText(Messages.SDMPreferencePage_11);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugBackendButton.setLayoutData(gd);
-		debugBackendButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				if (debugBackendButton.getSelection()) {
-					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_BACKEND;
-				} else {
-					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_BACKEND;
-				}
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-
-		debugProtocolButton = new Button(sdmDebugComp, SWT.CHECK);
-		debugProtocolButton.setText(Messages.SDMPreferencePage_12);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugProtocolButton.setLayoutData(gd);
-		debugProtocolButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				if (debugProtocolButton.getSelection()) {
-					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL;
-				} else {
-					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL;
-				}
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-
-		Composite masterDebugComp = createComposite(debugGroup, 1);
-		gd = new GridData();
-		gd.verticalAlignment = SWT.TOP;
-		masterDebugComp.setLayoutData(gd);
-
-		debugClientEnabledButton = new Button(masterDebugComp, SWT.CHECK);
-		debugClientEnabledButton.setText(Messages.SDMPreferencePage_13);
-		debugClientEnabledButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				debugClientEnabled = debugEnabled || debugClientEnabledButton.getSelection();
-				updateDebugButtons();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-
-		debugClientTraceButton = new Button(masterDebugComp, SWT.CHECK);
-		debugClientTraceButton.setText(Messages.SDMPreferencePage_14);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugClientTraceButton.setLayoutData(gd);
-		debugClientTraceButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				if (debugClientTraceButton.getSelection()) {
-					debugClientLevel |= SDMPreferenceConstants.DEBUG_CLIENT_TRACING;
-				} else {
-					debugClientLevel &= ~SDMPreferenceConstants.DEBUG_CLIENT_TRACING;
-				}
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-
-		debugClientTraceMoreButton = new Button(masterDebugComp, SWT.CHECK);
-		debugClientTraceMoreButton.setText(Messages.SDMPreferencePage_15);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugClientTraceMoreButton.setLayoutData(gd);
-		debugClientTraceMoreButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				if (debugClientTraceMoreButton.getSelection()) {
-					debugClientLevel |= SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE;
-				} else {
-					debugClientLevel &= ~SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE;
-				}
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-
-		debugClientOutputButton = new Button(masterDebugComp, SWT.CHECK);
-		debugClientOutputButton.setText(Messages.SDMPreferencePage_16);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugClientOutputButton.setLayoutData(gd);
-		debugClientOutputButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				if (debugClientOutputButton.getSelection()) {
-					debugClientLevel |= SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT;
-				} else if (!debugEnabled) {
-					debugClientLevel &= ~SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT;
-				}
-				updateDebugButtons();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-
-		updateDebugButtons();
-
-		Dialog.applyDialogFont(parent);
+	private void initializeValues() {
+		int index = sdmBackendCombo.getSelectionIndex();
+		if (index >= 0) {
+			sdmBackendPathText.setText(SDMDebugCorePlugin.getDefault().getDebuggerBackendPath(sdmBackendCombo.getItem(index)));
+			sdmPathText.setText(SDMDebugCorePlugin.getDefault().getDebuggerSDMPath(sdmBackendCombo.getItem(index)));
+		}
 	}
 
 	private void updateDebugButtons() {
@@ -475,6 +191,318 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 				.setSelection((debugClientLevel & SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT) == SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT);
 	}
 
+	private void updateValues() {
+		IPreferenceStore store = getPreferenceStore();
+		int idx = sdmBackendCombo.getSelectionIndex();
+		if (idx >= 0) {
+			String backend = sdmBackendCombo.getItem(idx);
+			sdmPathText.setText(store.getString(SDMPreferenceConstants.PREFS_SDM_PATH + backend));
+			sdmBackendPathText.setText(store.getString(SDMPreferenceConstants.PREFS_SDM_BACKEND_PATH + backend));
+		}
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse .swt.widgets.Composite)
+	 */
+	@Override
+	protected Control createContents(Composite parent) {
+		// TODO ignored help
+		// getWorkbench().getHelpSystem().setHelp(getControl(),
+		// IPDebugHelpContextIds.P_DEBUG_PREFERENCE_PAGE);
+		Composite composite = new Composite(parent, SWT.NULL);
+		GridLayout layout = new GridLayout(1, false);
+		layout.numColumns = 1;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		composite.setLayout(layout);
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.verticalAlignment = GridData.FILL;
+		data.horizontalAlignment = GridData.FILL;
+		composite.setLayoutData(data);
+		createSpacer(composite, 1);
+		createSDMSetting(composite);
+		setValues();
+		return composite;
+	}
+
+	/**
+	 * @param parent
+	 */
+	protected void createSDMSetting(Composite parent) {
+		Composite group = createGroupComposite(parent, 1, false, Messages.SDMPreferencePage_1);
+		Composite comp = createComposite(group, 2);
+
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+
+		new Label(comp, SWT.NONE).setText(Messages.SDMPreferencePage_2);
+		sdmBackendCombo = new Combo(comp, SWT.READ_ONLY);
+		sdmBackendCombo.setLayoutData(gd);
+		sdmBackendCombo.setItems(SDMDebugCorePlugin.getDefault().getDebuggerBackends());
+		sdmBackendCombo.addSelectionListener(listener);
+		sdmBackendCombo.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				updateValues();
+				storeValues();
+			}
+		});
+
+		new Label(comp, SWT.NONE).setText(Messages.SDMPreferencePage_3);
+		sdmBackendPathText = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		sdmBackendPathText.setLayoutData(gd);
+		sdmBackendPathText.addModifyListener(listener);
+
+		new Label(comp, SWT.NONE).setText(Messages.SDMPreferencePage_18);
+		sdmPathText = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		sdmPathText.setLayoutData(gd);
+		sdmPathText.addModifyListener(listener);
+
+		Composite debugGroup = createGroupComposite(parent, 2, false, Messages.SDMPreferencePage_5);
+		Composite sdmDebugComp = createComposite(debugGroup, 1);
+		gd = new GridData();
+		gd.verticalAlignment = SWT.TOP;
+		sdmDebugComp.setLayoutData(gd);
+
+		debugEnabledButton = new Button(sdmDebugComp, SWT.CHECK);
+		debugEnabledButton.setText(Messages.SDMPreferencePage_6);
+		debugEnabledButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				debugEnabled = debugEnabledButton.getSelection();
+				if (debugEnabled) {
+					debugClientEnabled = true;
+					debugClientLevel |= SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT;
+				}
+				updateDebugButtons();
+			}
+		});
+
+		debugStartupButton = new Button(sdmDebugComp, SWT.CHECK);
+		debugStartupButton.setText(Messages.SDMPreferencePage_7);
+		gd = new GridData();
+		gd.horizontalIndent = 20;
+		debugStartupButton.setLayoutData(gd);
+		debugStartupButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				if (debugStartupButton.getSelection()) {
+					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_STARTUP;
+				} else {
+					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_STARTUP;
+				}
+			}
+		});
+
+		debugMessagesButton = new Button(sdmDebugComp, SWT.CHECK);
+		debugMessagesButton.setText(Messages.SDMPreferencePage_8);
+		gd = new GridData();
+		gd.horizontalIndent = 20;
+		debugMessagesButton.setLayoutData(gd);
+		debugMessagesButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				if (debugMessagesButton.getSelection()) {
+					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_MESSAGES;
+				} else {
+					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_MESSAGES;
+				}
+			}
+		});
+
+		debugRoutingButton = new Button(sdmDebugComp, SWT.CHECK);
+		debugRoutingButton.setText(Messages.SDMPreferencePage_9);
+		gd = new GridData();
+		gd.horizontalIndent = 20;
+		debugRoutingButton.setLayoutData(gd);
+		debugRoutingButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				if (debugRoutingButton.getSelection()) {
+					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_ROUTING;
+				} else {
+					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_ROUTING;
+				}
+			}
+		});
+
+		debugMasterButton = new Button(sdmDebugComp, SWT.CHECK);
+		debugMasterButton.setText(Messages.SDMPreferencePage_17);
+		gd = new GridData();
+		gd.horizontalIndent = 20;
+		debugMasterButton.setLayoutData(gd);
+		debugMasterButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				if (debugMasterButton.getSelection()) {
+					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_MASTER;
+				} else {
+					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_MASTER;
+				}
+			}
+		});
+
+		debugServerButton = new Button(sdmDebugComp, SWT.CHECK);
+		debugServerButton.setText(Messages.SDMPreferencePage_10);
+		gd = new GridData();
+		gd.horizontalIndent = 20;
+		debugServerButton.setLayoutData(gd);
+		debugServerButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				if (debugServerButton.getSelection()) {
+					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_SERVER;
+				} else {
+					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_SERVER;
+				}
+			}
+		});
+
+		debugBackendButton = new Button(sdmDebugComp, SWT.CHECK);
+		debugBackendButton.setText(Messages.SDMPreferencePage_11);
+		gd = new GridData();
+		gd.horizontalIndent = 20;
+		debugBackendButton.setLayoutData(gd);
+		debugBackendButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				if (debugBackendButton.getSelection()) {
+					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_BACKEND;
+				} else {
+					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_BACKEND;
+				}
+			}
+		});
+
+		debugProtocolButton = new Button(sdmDebugComp, SWT.CHECK);
+		debugProtocolButton.setText(Messages.SDMPreferencePage_12);
+		gd = new GridData();
+		gd.horizontalIndent = 20;
+		debugProtocolButton.setLayoutData(gd);
+		debugProtocolButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				if (debugProtocolButton.getSelection()) {
+					debugLevel |= SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL;
+				} else {
+					debugLevel &= ~SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL;
+				}
+			}
+		});
+
+		Composite masterDebugComp = createComposite(debugGroup, 1);
+		gd = new GridData();
+		gd.verticalAlignment = SWT.TOP;
+		masterDebugComp.setLayoutData(gd);
+
+		debugClientEnabledButton = new Button(masterDebugComp, SWT.CHECK);
+		debugClientEnabledButton.setText(Messages.SDMPreferencePage_13);
+		debugClientEnabledButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				debugClientEnabled = debugEnabled || debugClientEnabledButton.getSelection();
+				updateDebugButtons();
+			}
+		});
+
+		debugClientTraceButton = new Button(masterDebugComp, SWT.CHECK);
+		debugClientTraceButton.setText(Messages.SDMPreferencePage_14);
+		gd = new GridData();
+		gd.horizontalIndent = 20;
+		debugClientTraceButton.setLayoutData(gd);
+		debugClientTraceButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				if (debugClientTraceButton.getSelection()) {
+					debugClientLevel |= SDMPreferenceConstants.DEBUG_CLIENT_TRACING;
+				} else {
+					debugClientLevel &= ~SDMPreferenceConstants.DEBUG_CLIENT_TRACING;
+				}
+			}
+		});
+
+		debugClientTraceMoreButton = new Button(masterDebugComp, SWT.CHECK);
+		debugClientTraceMoreButton.setText(Messages.SDMPreferencePage_15);
+		gd = new GridData();
+		gd.horizontalIndent = 20;
+		debugClientTraceMoreButton.setLayoutData(gd);
+		debugClientTraceMoreButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				if (debugClientTraceMoreButton.getSelection()) {
+					debugClientLevel |= SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE;
+				} else {
+					debugClientLevel &= ~SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE;
+				}
+			}
+		});
+
+		debugClientOutputButton = new Button(masterDebugComp, SWT.CHECK);
+		debugClientOutputButton.setText(Messages.SDMPreferencePage_16);
+		gd = new GridData();
+		gd.horizontalIndent = 20;
+		debugClientOutputButton.setLayoutData(gd);
+		debugClientOutputButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				if (debugClientOutputButton.getSelection()) {
+					debugClientLevel |= SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT;
+				} else if (!debugEnabled) {
+					debugClientLevel &= ~SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT;
+				}
+				updateDebugButtons();
+			}
+		});
+
+		updateDebugButtons();
+
+		sdmBackendCombo.select(0);
+		initializeValues();
+
+		Dialog.applyDialogFont(parent);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -483,9 +511,13 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	@Override
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
-		sdmArgsText.setText(store.getString(SDMPreferenceConstants.SDM_DEBUGGER_ARGS));
-		sdmBackendCombo.select(sdmBackendCombo.indexOf(store.getString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)));
-		sdmBackendPathText.setText(store.getString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH));
+		String backend = store.getString(SDMPreferenceConstants.PREFS_SDM_BACKEND);
+		int index = sdmBackendCombo.indexOf(backend);
+		if (index >= 0) {
+			sdmBackendCombo.select(index);
+		}
+		sdmPathText.setText(store.getString(SDMPreferenceConstants.PREFS_SDM_PATH + backend));
+		sdmBackendPathText.setText(store.getString(SDMPreferenceConstants.PREFS_SDM_BACKEND_PATH + backend));
 		debugEnabled = store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_ENABLED);
 		debugLevel = store.getInt(SDMPreferenceConstants.SDM_DEBUG_LEVEL);
 		debugClientEnabled = store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED);
@@ -501,13 +533,16 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	@Override
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
-		store.setValue(SDMPreferenceConstants.SDM_DEBUGGER_ARGS, sdmArgsText.getText());
 		store.setValue(SDMPreferenceConstants.SDM_DEBUG_ENABLED, debugEnabled);
 		store.setValue(SDMPreferenceConstants.SDM_DEBUG_LEVEL, debugLevel);
 		store.setValue(SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED, debugClientEnabled);
 		store.setValue(SDMPreferenceConstants.SDM_DEBUG_CLIENT_LEVEL, debugClientLevel);
-		store.setValue(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE,
-				sdmBackendCombo.getItem(sdmBackendCombo.getSelectionIndex()));
-		store.setValue(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH, sdmBackendPathText.getText());
+		int index = sdmBackendCombo.getSelectionIndex();
+		if (index >= 0) {
+			String backend = sdmBackendCombo.getItem(index);
+			store.setValue(SDMPreferenceConstants.PREFS_SDM_BACKEND, backend);
+			store.setValue(SDMPreferenceConstants.PREFS_SDM_BACKEND_PATH + backend, sdmBackendPathText.getText());
+			store.setValue(SDMPreferenceConstants.PREFS_SDM_PATH + backend, sdmPathText.getText());
+		}
 	}
 }

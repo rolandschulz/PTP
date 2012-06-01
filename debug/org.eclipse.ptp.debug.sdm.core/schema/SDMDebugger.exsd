@@ -52,14 +52,28 @@
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  Name of an SDM debugger backend
+                  Name of the SDM debugger backend that is displayed in the UI. This string is also passed to the SDM using the &quot;--debugger&quot; argument.
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="default" type="boolean">
+         <attribute name="priority" type="string">
             <annotation>
                <documentation>
-                  If &quot;true&quot;, this backend will be selected as the default.
+                  Specifies the priority of this debugger when displayed in the user interface. Debuggers with a higher priority are displayed first.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="backendPath" type="string">
+            <annotation>
+               <documentation>
+                  Specifies the path to the debugger backend (e.g. gdb) on the target system. This is passed to the sdm using the &quot;--debugger_path&quot; option.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="sdmPath" type="string">
+            <annotation>
+               <documentation>
+                  Specifies the default path to the sdm executable on the target system. This path is set in the debugger tab of the launch configuration, and can be overidden by the user. If no path is specified, the launch configuration field will be blank.
                </documentation>
             </annotation>
          </attribute>

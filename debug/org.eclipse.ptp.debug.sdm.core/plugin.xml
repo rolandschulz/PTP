@@ -22,8 +22,9 @@
      <extension
            point="org.eclipse.ptp.debug.sdm.core.SDMDebugger">
         <debugger
-              default="true"
-              name="gdb-mi">
+              name="gdb-mi"
+              priority="10"
+              sdmPath="/usr/local/bin/sdm">
         </debugger>
      </extension>
 </plugin>

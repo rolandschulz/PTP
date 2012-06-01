@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Random;
@@ -196,22 +195,15 @@ public class SDMDebugger implements IPDebugger {
 			String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
 
 			dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
-			String debuggerBackend = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
-					SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE);
-			debuggerBackend = configuration
-					.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND, debuggerBackend);
-			dbgArgs.add("--debugger=" + debuggerBackend); //$NON-NLS-1$
-
-			String dbgPath = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
-					SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH);
-			if (dbgPath.length() > 0) {
-				dbgArgs.add("--debugger_path=" + dbgPath); //$NON-NLS-1$
+			String debuggerBackend = configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
+					(String) null);
+			if (debuggerBackend != null) {
+				dbgArgs.add("--debugger=" + debuggerBackend); //$NON-NLS-1$
 			}
-
-			String dbgExtraArgs = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
-					SDMPreferenceConstants.SDM_DEBUGGER_ARGS);
-			if (dbgExtraArgs.length() > 0) {
-				dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" "))); //$NON-NLS-1$
+			String dbgPath = configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND_PATH,
+					(String) null);
+			if (dbgPath != null) {
+				dbgArgs.add("--debugger_path=" + dbgPath); //$NON-NLS-1$
 			}
 
 			if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
