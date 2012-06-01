@@ -299,10 +299,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		if (isValid(configuration)) {
 			configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
 					getFieldContent(fSDMBackendCombo.getText()));
-			String backendPath = getFieldContent(fBackendPathText.getText());
-			if (backendPath != null) {
-				configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND_PATH, backendPath);
-			}
+			configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND_PATH,
+					getFieldContent(fBackendPathText.getText()));
 			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
 					getFieldContent(fSDMPathText.getText()));
 			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST,
