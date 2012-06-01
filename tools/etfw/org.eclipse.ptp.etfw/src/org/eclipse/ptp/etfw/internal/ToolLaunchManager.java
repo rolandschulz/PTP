@@ -206,6 +206,10 @@ public class ToolLaunchManager {
 				if (!runStep(launcher)) {
 					return;
 				}
+				if(launcher.outputLocation!=null)
+				{
+					bOutLoc=launcher.outputLocation;
+				}
 			} else if (t instanceof PostProcTool) {
 				/**
 				 * Collect performance data from the execution handled in the

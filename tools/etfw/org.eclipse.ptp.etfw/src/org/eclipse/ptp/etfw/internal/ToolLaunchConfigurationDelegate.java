@@ -32,7 +32,7 @@ import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
  * @since 5.0
  */
 @SuppressWarnings("restriction")
-public class ToolLaunchConfigurationDelegate extends LocalRunLaunchDelegate implements IToolLaunchConfigurationConstants {
+public class ToolLaunchConfigurationDelegate extends LocalRunLaunchDelegate implements IToolLaunchConfigurationConstants,IToolLaunchConfigurationDelegate {
 
 	private boolean initialized = false;
 
@@ -83,5 +83,15 @@ public class ToolLaunchConfigurationDelegate extends LocalRunLaunchDelegate impl
 	@Override
 	public String getPluginID() {
 		return org.eclipse.ptp.etfw.Activator.PLUGIN_ID;
+	}
+
+	public void setInitialized(boolean init) {
+		initialized=init;
+		
+	}
+
+	public boolean getInitialized() {
+		// TODO Auto-generated method stub
+		return initialized;
 	}
 }

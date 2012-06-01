@@ -183,8 +183,8 @@
                       <optvalue type="toggle" seton="1"/>
                 </togoption>
                 
-                <togoption label="Profile Output Directory" optname="TAU_PROFILEDIR" envvar="true" tooltip="Location of profile output.  Current directory by default.  Changing this may disable automatic profile storage.">
-                      <optvalue type="dir" default="."/>
+                <togoption label="Profile Output Directory" optname="PROFILEDIR" envvar="true"  defstate="true" tooltip="Location of profile output.  Current directory by default.  Changing this may disable automatic profile storage.">
+                      <optvalue type="dir" default="%%PROJECT_DIR%%"/>
                 </togoption>
                 
                 <togoption label="Profile Format" optname="TAU_PROFILE_FORMAT" envvar="true" defstate="false" tooltip="Format of profile output. Note that merged output may prevent automatic database uploads.">
@@ -227,8 +227,8 @@
                       <optvalue type="toggle" seton="1"/>
                 </togoption>
                 
-                <togoption label="Trace Output Directory" optname="TAU_TRACEDIR" envvar="true" tooltip="Location of trace output.  Current directory by default.">
-                      <optvalue type="dir" default="."/>
+                <togoption label="Trace Output Directory" optname="TRACEDIR" envvar="true"  defstate="true" tooltip="Location of trace output.  Current directory by default.">
+                      <optvalue type="dir" default="%%PROJECT_DIR%%"/>
                 </togoption>
                 
                 <togoption label="Synchronize Clocks" optname="TAU_SYNCHRONIZE_CLOCKS" envvar="true" defstate="true" tooltip="Synchronize different MPI process clocks for tracing">

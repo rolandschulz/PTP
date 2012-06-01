@@ -41,6 +41,7 @@ import org.eclipse.ptp.etfw.toolopts.ToolApp;
 import org.eclipse.ptp.etfw.toolopts.ToolIO;
 import org.eclipse.ptp.etfw.toolopts.ToolsOptionsConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 
 /**
  * Manages the process of building instrumented applications and collecting the
@@ -104,7 +105,7 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 		thisProject = getProject(configuration);
 		thisCProject = CCorePlugin.getDefault().getCoreModel().create(thisProject);
 		
-		isSyncProject=BuildConfigurationManager.getInstance().isInitialized(thisProject);
+		isSyncProject=RemoteSyncNature.hasNature(thisProject);//BuildConfigurationManager.getInstance().isInitialized(thisProject);
 		
 		if(isSyncProject){
 			IConfiguration configuration = ManagedBuildManager.getBuildInfo(thisProject).getDefaultConfiguration();
@@ -369,7 +370,10 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 		if(toolPath==null||toolPath.length()==0)
 			toolPath=utilBlob.checkToolEnvPath(command);
 		if (toolPath != null && toolPath.length() > 0) {
-			command = toolPath + File.separator + command;
+			String fiSep=File.separator;
+			if(toolPath.startsWith(UNIX_SLASH))
+				fiSep=UNIX_SLASH;
+			command = toolPath + fiSep + command;
 		}
 
 		return command;

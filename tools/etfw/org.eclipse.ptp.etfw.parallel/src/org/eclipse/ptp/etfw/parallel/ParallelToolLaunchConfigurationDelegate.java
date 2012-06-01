@@ -29,6 +29,7 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.internal.ILaunchFactory;
+import org.eclipse.ptp.etfw.internal.IToolLaunchConfigurationDelegate;
 import org.eclipse.ptp.etfw.internal.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.etfw.internal.ToolLaunchManager;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
@@ -38,7 +39,7 @@ import org.eclipse.ptp.rm.launch.ParallelLaunchConfigurationDelegate;
  * Launches parallel C/C++ (or Fortran) applications after rebuilding them with performance instrumentation
  */
 public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfigurationDelegate implements
-		IToolLaunchConfigurationConstants {
+		IToolLaunchConfigurationConstants,IToolLaunchConfigurationDelegate {
 
 	private boolean initialized = false;
 
@@ -86,7 +87,7 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 		ILaunchFactory lf = new ParallelLaunchFactory();
 
 		{
-			initialized = true;
+			//initialized = true;
 
 			if (launchIn instanceof PLaunch) {
 				ToolLaunchManager plaunch = new ToolLaunchManager(this, lf, new RemoteBuildLaunchUtils(configuration));
@@ -94,5 +95,14 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 			}
 		}
 		initialized = false;
+	}
+
+	public void setInitialized(boolean init) {
+		initialized=init;
+		
+	}
+
+	public boolean getInitialized() {
+		return initialized;
 	}
 }

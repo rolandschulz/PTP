@@ -271,11 +271,14 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			//Process p = new ProcessBuilder("which", toolname).start();//Runtime.getRuntime().exec("which "+toolname); //$NON-NLS-1$
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			pPath = reader.readLine();
-			while (reader.readLine() != null) {
+			String line;
+			while ((line=reader.readLine()) != null) {
+				//System.out.println(line);
 			}
 			reader.close();
 			reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			while (reader.readLine() != null) {
+			while ((line=reader.readLine()) != null) {
+				//System.out.println(line);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

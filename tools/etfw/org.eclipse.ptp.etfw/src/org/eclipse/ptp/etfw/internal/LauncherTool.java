@@ -18,6 +18,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.messages.Messages;
@@ -130,8 +131,10 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 			}
 			
 			if ((testStore != null&&testStore.fetchInfo().exists()&&!testStore.fetchInfo().isDirectory()) || progStoreGood) {
-				
-				savePath = confWC.getAttribute(apppathattrib, (String) null);
+				if(apppathattrib!=null)
+					savePath = confWC.getAttribute(apppathattrib, (String) null);
+				else
+					savePath=null;
 				
 				//IFileStore testStore=utilBlob.getFile(progPath);
 				//IFileStore progStore=utilBlob.getFile(projectLocation);
@@ -224,7 +227,13 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 				}
 
 				if (envMap.size() > 0) {
-					String projectDir=getDirectory(path);
+					
+					String wd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
+					String projectDir=null;
+					if(wd !=null && wd.length()>0)
+						projectDir=wd;
+					else
+					projectDir=getDirectory(path);
 					if(projectDir==null){
 						projectDir=getDirectory(prog);
 					}
@@ -264,6 +273,11 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 					launch.removeProcess(p);
 				}
 			}
+			
+			if(paraDel instanceof IToolLaunchConfigurationDelegate){
+				((IToolLaunchConfigurationDelegate)paraDel).setInitialized(true);
+			}
+			
 
 			paraDel.launch(configuration, ILaunchManager.RUN_MODE, launch, monitor);
 
@@ -271,6 +285,9 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 			{
 				if (monitor.isCanceled()) {
 					launch.terminate();
+					if(paraDel instanceof IToolLaunchConfigurationDelegate){
+						((IToolLaunchConfigurationDelegate)paraDel).setInitialized(false);
+					}
 					cleanup();
 					throw new OperationCanceledException();
 				}
@@ -278,6 +295,9 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 			}
 			return true;
 		} finally {
+			if(paraDel instanceof IToolLaunchConfigurationDelegate){
+				((IToolLaunchConfigurationDelegate)paraDel).setInitialized(false);
+			}
 			cleanup();
 		}
 	}

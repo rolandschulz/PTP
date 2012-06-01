@@ -65,10 +65,13 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListDialog;
 import org.eclipse.ui.editors.text.TextEditor;
@@ -408,7 +411,7 @@ public class PerfDMFView extends ViewPart {
 			return ((TreeNode) parent).hasChildren();
 		}
 
-		private final boolean initialized = false;
+		//private final boolean initialized = false;
 
 		/*
 		 * We will set up a dummy model to initialize tree heararchy. In a real code, you will connect to a real model and expose
@@ -470,7 +473,10 @@ public class PerfDMFView extends ViewPart {
 			}
 
 			if (database == null) {
-				getDatabase(Messages.PerfDMFView_Default);
+				String recall = recallSelectedDB();
+				if(recall==null)
+					recall=Messages.PerfDMFView_Default;
+				getDatabase(recall);
 				if (database == null) {
 					database = ParaProfController.EMPTY;
 					return true;
@@ -536,6 +542,41 @@ public class PerfDMFView extends ViewPart {
 
 	}
 
+	   private static final String DATABASE_SELECTION = "DATABASE.SELECTION";
+	   public void saveState(IMemento memento) {
+	      super.saveState(memento);
+	      //ISelection sel = viewer.getSelection();
+	      //IStructuredSelection ss = (IStructuredSelection) sel;
+	      //StringBuffer buf = new StringBuffer();
+	      String db = null;
+	      if(database!=null)
+	    	  db=database.name;
+//	      for (Iterator it = ss.iterator(); it.hasNext();) {
+//	         buf.append(it.next());
+//	         buf.append(',');
+//	      }
+	      memento.putString(DATABASE_SELECTION, db);
+	   }
+
+	   private IMemento memento;
+
+	   public void init(IViewSite site, IMemento memento)
+	      throws PartInitException {
+	      super.init(site, memento);
+	      this.memento = memento;
+	   }
+	   /**
+	 * @since 3.0
+	 */
+	public String recallSelectedDB() {
+	      //create widgets ...
+	      if (memento == null) return null;
+	      String value = memento.getString(DATABASE_SELECTION);
+	      return value;
+	   }
+	
+	
+	
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize it.
 	 */
