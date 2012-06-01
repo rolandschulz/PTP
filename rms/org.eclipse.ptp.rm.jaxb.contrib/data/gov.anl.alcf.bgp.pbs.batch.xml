@@ -11,26 +11,26 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="pbs-bgp-batch">
 	<control-data>
-		<!-- Set the default value of this property if PBS is installed in a non-standard location -->
-		<property name="bindir" visible="false"/>
-		<!-- This is a necessary property for the functioning of LML; link it to the batch-specific variable name -->
-		<property name="control.queue.name" visible="false">
+		<!-- Set the default value of this attribute if PBS is installed in a non-standard location -->
+		<attribute name="bindir" visible="false"/>
+		<!-- This is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
+		<attribute name="control.queue.name" visible="false">
 			<link-value-to>destination</link-value-to>
-		</property>
+		</attribute>
 		<!-- We set this to invisible because the values are not really modifiable -->
-		<property name="queues" visible="false"/>
+		<attribute name="queues" visible="false"/>
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
-		<property name="stdout_remote_path" visible="false">
+		<attribute name="stdout_remote_path" visible="false">
 <!-- 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o${ptp_rm:@jobId#default}</default>  -->
 			<default>${ptp_rm:directory#value}/${ptp_rm:@jobId#default}.output</default>
 			<link-value-to>Output_Path</link-value-to>
-		</property>
+		</attribute>
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
-		<property name="stderr_remote_path" visible="false">
+		<attribute name="stderr_remote_path" visible="false">
 <!-- 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>  -->
 			<default>${ptp_rm:directory#value}/${ptp_rm:@jobId#default}.error</default>
 			<link-value-to>Error_Path</link-value-to>
-		</property>
+		</attribute>
 		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>cobalt-mpirun,cobalt-mpiexec</choice>
@@ -580,7 +580,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:Job_Name#tooltip}</tooltip>
 						<fixed-text>Job Name: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Job_Name">
+					<widget type="text" style="SWT.BORDER" attribute="Job_Name">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -599,7 +599,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
                   <tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
                   <fixed-text>Account: </fixed-text>
                </widget>
-               <widget type="text" style="SWT.BORDER" saveValueTo="Account_Name">
+               <widget type="text" style="SWT.BORDER" attribute="Account_Name">
                   <layout-data>
                      <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
                   </layout-data>
@@ -618,7 +618,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 						<fixed-text>Queue: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
@@ -638,7 +638,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:Resource_List.nodes#tooltip}</tooltip>
 						<fixed-text>Number of nodes: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.nodes">
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.nodes">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -657,7 +657,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
 						<fixed-text>Wallclock Time: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Resource_List.walltime">
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.walltime">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -675,7 +675,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>BG/P Mode: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="bgpMode">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="bgpMode">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
@@ -693,7 +693,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>Environment Variables: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" saveValueTo="Environment_String">
+					<widget type="text" style="SWT.BORDER" attribute="Environment_String">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -720,7 +720,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 						<fixed-text>Queue: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" saveValueTo="destination">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
 						<layout-data>
 							<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
 						</layout-data>
