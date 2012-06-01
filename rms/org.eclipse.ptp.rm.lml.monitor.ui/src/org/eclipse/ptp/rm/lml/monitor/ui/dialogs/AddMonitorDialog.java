@@ -116,7 +116,7 @@ public class AddMonitorDialog extends TitleAreaDialog {
 
 			public void widgetSelected(SelectionEvent e) {
 				if (fSystemTypeCombo.getSelectionIndex() > 0) {
-					fSystemType = ExtensionUtils.getMonitorTypes()[fSystemTypeCombo.getSelectionIndex()];
+					fSystemType = ExtensionUtils.getMonitorType(fSystemTypeCombo.getItem(fSystemTypeCombo.getSelectionIndex()));
 				}
 				updateEnablement();
 			}
