@@ -27,7 +27,7 @@ connection is lost.
 <h2 id=create>Creating a new Synchronized Project</h2>
 <p>To create a new Synchronized Project, first select an appropriate wizard:</p>
 Select <b>File > New > Other...</b>
-and in the wizard selection dialog, then select <b>Remote > Synchronized C/C++ Project</b> or <b>Synchronized Fortran Project</b>
+then in the wizard selection dialog, select <b>Remote > Synchronized C/C++ Project</b> or <b>Synchronized Fortran Project</b>
 <p><br></p>
 <p><img src="images/sync-newproj.png">
 <p><br></p>
@@ -36,59 +36,57 @@ select <b>New > Synchronized C/C++ Project</b> or <b>Synchronized Fortran Projec
 <p><br></p>
 <p><img src="images/sync-newprojContext.png">
 <p><br></p>
-Now fill out the dialog shown. As for any Eclipse project, give the project name and location, which must be a local directory for
-a Synchronized Project. Next, indicate the remote location by specifying a connection and remote directory.
-Then specify the project type. Finally, select toolchains to be used for remote and local sites.
-Normally, you will select only one toolchain in each case, but it is possible to select multiple toolchains.
-<p><br></p>
-Select <b>Next</b> to scroll through the remaining pages, which differ based on the selected project types and toolchains.
-At some point, you should see the configuration page, which will list a separate build configuration for each toolchain.
-
-ADD CONFIG PAGE
-
-From here, you can configure certain properties, but this can be done after project creation as well.
-Note that if you select the same toolchain for both local and remote, only one configuration is shown.
-During project creation, this configuration will be duplicated, one for local and one for remote.
+Now fill out the dialog shown.
 <p><br></p>
 <p><img src="images/sync-newprojCreate.png">
 <p><br></p>
-Select an existing connection or create a new one. 
-Select the <b>New...</b> button to create a new remote connection with the <b>Remote Tools</b> remote service provider.
-The Target Environment Configuration dialog is shown. Fill in host name, user, and password (or other authentication
-information).
+As for any Eclipse project, give the project name and location, which must be a local directory for a Synchronized Project.
+Then give a remote location by specifying a <a href="#connection">connection</a> and remote directory.
+Next, specify the project type. Finally, select toolchains to be used for remote and local sites.
+Normally, you will select only one toolchain for both, but it is possible to select additional toolchains.
+<p>
+Select <b>Next</b> to scroll through the remaining pages, which differ based on the selected project types and toolchains.
+At some point, you should see the configuration page, which will list a separate build configuration for each toolchain selected earlier.
+<p><br></p>
+<p><img src="images/sync-newprojConfig.png">
+<p><br></p>
+From here, you can configure build properties. (This can also be done after the project is created.)
+Note that if you select the same toolchain for both local and remote, only one configuration is shown.
+During project creation, this configuration will be duplicated, creating one for local and another for remote.
+
+<h3 id="connection">Creating a remote connection</h3>
+On the first wizard page, the <b>New...</b> button can be used to create a new remote connection.
+Fill in host name, user, and password (or other authentication information).
+Select <b>Finish</b>.  The connection will be tested at this point.
 <p><br></p>
 <p><img src="images/sync-newprojConnection.png">
 <p><br></p>
-Select <b>Finish</b>.  The connection will be tested at this
-point before returning to the <b>Configure Remote Synchronization</b> page.
-<p><br></p>
-Specify a remote location by selecting <b>Browse...</b>
-A <b>Browse Directory</b> dialog appears in which you can navigate to find the directory
-in which your new project's files will be contained on the remote system. Hit <b>OK</b> to finish.
-The <b>Configure Remote Synchronization</b> page now contains the location of the remote files:
-Hit <b>Finish</b> to complete project creation. If the remote location does not exist, it is
-created. Otherwise, the files in that directory will be synchronized to the local workspace.
 
 <h2 id="work">Working with a Synchronized Project</h2>
-<p>Edit the files as you would any local project.
-Each time you save a file, it will be synchronized with the remote system. If you create or delete files, the remote system will be updated appropriately.
+<p>The starting configuration will be for one of the remote toolchains.
+Thus, for the most common case (a single remote site to be modified and built), a synchronized project works out-of-the-box.
+If the remote location does not exist, it is created. Otherwise, the files in that directory will be synchronized to the local workspace.
+Edit the files as you would any local project.
+Each time you save a file, it will be synchronized with the remote system.
+If you create or delete files, the remote system will be updated appropriately.
 </p>
 <p>
-By default, a synchronized project is configured to build on the same remote host used for synchronization. To build the project (assuming you have already 
-created a makefile), make sure the project is selected in the <b>Project Explorer</b> view, then click on the build icon (the icon that looks like a hammer).
-A build configuration called "Workspace" is also available to build on the local machine if this is required.
+By default, a synchronized project is configured to build on the same remote host as for synchronization.
+To build the project (assuming you have already created a makefile), make sure the project is selected in the <b>Project Explorer</b> view, then click
+on the build icon (the icon that looks like a hammer).
 </p>
 <p>
-You can create configurations to synchronize and build on other remote systems using the <b>C/C++ Build > Synchronize</b> project properties.
+Synchronization and building are done between the local workspace and the active configuration.
+You can change the active configuration by using the "sundial" icon next to the build icon, or build and switch simultaneously using the arrow next to the build icon.
+Local configurations have sync disabled initially and build in the Eclipse workspace.
+</p>
+<p>
+You can create configurations to synchronize and build on other remote systems from the <b>C/C++ Build > Synchronize</b> project properties.
 To bring up the Synchronize project properties, in the <b>Project Explorer</b> view, select the project and choose <b>Properties</b> from the context
 menu (right click).
+You can also use these property pages to modify configurations in general. See the CDT documentation for more details.
 </p>
 <p><img src="images/sync-projProperties.png">
-<p>
-Synchronization is done between the local workspace and the active configuration. You can change the active configuration by using the 
-<b>Build Configurations > Set Active...</b> context menu on the project or via the <b>Manage Configurations</b> button on the <b>Synchronize</b>
-properties page. If "Workspace" is the active configuration, no synchronization is done.
-</p>
 
 <h2 id="context-menu">Changing sync behavior with the Sync Context Menu</h2>
 <p>The sync context menu lets you alter the sync behavior and can be accessed with a right click on a sync project. From this menu, you can turn off automatic sync'ing (sync after saving files and other resource changes) so that syncs only occur on request. This setting is applied to all projects in the workspace. The "Project Auto-Sync Settings" submenu allows you to alter the behavior of automatic sync'ing per project. The next two selections allow you to force an immediate sync of the current project. A "sync all" syncs all configurations of a project. Note that this can be quite slow if your project has several configurations. Prior to a build, files are always updated with a forced sync of only the active configuration, regardless of any settings. This ensures that the build is based on the latest revisions. Another sync may occur after the build to update files, since the build may alter the remote files during compilation. (This sync, however, does respect the user's settings.) See "<a href="#file-filter">Changing which files are synchronized</a>" for information on the "Filter..." option.
@@ -112,7 +110,7 @@ Patterns are applied in the order given in the Pattern View, and new patterns ar
 
 <h2 id="conversion-wizard">Converting a project to a Synchronized Project</h2>
 <p>
-The conversion wizard allows you to convert current C/C++ or Fortran projects to synchronized projects. Currently only local projects can be converted. To convert a project right-click in the workspace and select <b>New > Other...</b> In the wizard selection dialog, select <b> Remote > Convert C/C++ or Fortran Project to a Synchronized Project > Next</b>. From this dialog, you can select a project to convert and configure a remote site. See <a href="#create">Creating a new Synchronized Project</a> for details on configuring a remote site. This wizard will add a single new remote build configuration. Its settings are copied from the current active configuration. You can change these settings and add new configurations as with any other synchronization project. See <a href="#work">Working with a Synchronized Project</a> for details.
+The conversion wizard allows you to convert current C/C++ or Fortran projects to synchronized projects. Currently only local projects can be converted. To convert a project right-click in the workspace and select <b>New > Other...</b> In the wizard selection dialog, select <b> Remote > Convert C/C++ or Fortran Project to a Synchronized Project > Next</b>. From this dialog, you can select a project to convert and configure a remote site. See <a href="#connection">Creating a remote connection</a> for details on creating new connections. The selected configurations are duplicated to create a local version and a remote version. Unselected configurations remain as local configurations only.
 </p>
 <table cellpadding="5" cellspacing="5" border="0">
 <tr>
@@ -153,7 +151,7 @@ The conversion wizard allows you to convert current C/C++ or Fortran projects to
 
 <p>See also 
 <a href="http://wiki.eclipse.org/PTP/sync-projects">Synchronized Projects usage info on the PTP Wiki page</a>
-for information available after PTP 5.0 release.
+for information available after the PTP 6.0 release.
 
 <p>&nbsp;<p>&nbsp;<p>&nbsp;
 
