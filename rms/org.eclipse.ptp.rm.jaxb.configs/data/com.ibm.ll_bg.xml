@@ -32,124 +32,100 @@
 				
 		<attribute name="LL_BLOCKING" type="string">
 			<description>Specify blocking factor for assigning tasks to nodes.</description>
-			<tooltip>Specify blocking factor for assigning tasks to nodes.</tooltip>
 		</attribute>
 						
 		<attribute name="LL_BULKXFER" type="boolean" translateBooleanAs="yes,no">
 			<description>Use bulk data transfer for user space jobs.</description>
-			<tooltip>Use bulk data transfer for user space jobs.</tooltip>
 		</attribute>
 		
 		<attribute name="LL_COMMENT" type="string">
 			<description>Describe characteristics or distinguishing features of job.</description>
-			<tooltip>Describe characteristics or distinguishing features of job.</tooltip>
 		</attribute>
 		
 		<attribute name="LL_ENVIRONMENT" type="string">
 			<description>Specify handling of job's environment variables by LoadLeveler.</description>
-			<tooltip>Specify handling of job's environment variables by LoadLeveler.</tooltip>
 		</attribute>
 				
 		<attribute name="LL_HARD_LIMIT" type="string">
 			<description>Specify the hard elaspsed time limit for this job.</description>
-			<tooltip>Specify the hard elaspsed time limit for this job.</tooltip>
 		</attribute>
 					
 		<attribute name="LL_JOB_CLASS" type="string">
 			<description>Specify the job class to use.</description>
-			<tooltip>Specify the job class to use.</tooltip>
 		</attribute>
 						
 		<attribute name="LL_JOB_NAME" type="string">
 			<description>Specify the name of the job.</description>
-			<tooltip>Specify the name of the job.</tooltip>
 		</attribute>
 				
 		<attribute name="LL_JOB_TYPE" type="string">
 			<description>Specify the type of the job.</description>
-			<tooltip>Specify the type of the job.</tooltip>
-			<choice>Serial,Parallel,MPICH</choice>
+			<choice>Serial,Parallel,MPICH,bluegene</choice>
 		</attribute>
 						
 		<attribute name="LL_LARGE_PAGE" type="string">
 			<description>Specify if a job requires large page support (AIX).</description>
-			<tooltip>Specify if a job requires large page support (AIX).</tooltip>
 			<choice>Y,M,N</choice>
 		</attribute>
 								
 		<attribute name="LL_MAX_NODES" type="string">
 			<description>Specify maximum number of nodes.</description>
-			<tooltip>Specify maximum number of nodes.</tooltip>
 		</attribute>
 								
 		<attribute name="LL_MIN_NODES" type="string">
 			<description>Specify minimum number of nodes.</description>
-			<tooltip>Specify minimum number of nodes.</tooltip>
 		</attribute>
 								
 		<attribute name="LL_NETWORK_LAPI" type="string">
 			<description>Specify network adapters and characteristics for LAPI applications.</description>
-			<tooltip>Specify network adapters and characteristics for LAPI applications.</tooltip>
 		</attribute>
 										
 		<attribute name="LL_NETWORK_MPI" type="string">
 			<description>Specify network adapters and characteristics for MPI applications.</description>
-			<tooltip>Specify network adapters and characteristics for MPI applications.</tooltip>
 		</attribute>
 										
 		<attribute name="LL_NETWORK_MPI_LAPI" type="string">
 			<description>Specify network adapters and characteristics for MPI/LAPI applications.</description>
-			<tooltip>Specify network adapters and characteristics for MPI/LAPI applications.</tooltip>
 		</attribute>
 						
 		<attribute name="LL_REQUIREMENTS" type="string">
 			<description>Specify requirements a node must meet to run a job.</description>
-			<tooltip>Specify requirements a node must meet to run a job.</tooltip>
 		</attribute>
 								
 		<attribute name="LL_RESOURCES" type="string">
 			<description>Specify quantity of consumable resources used by each task.</description>
-			<tooltip>Specify quantity of consumable resources used by each task.</tooltip>
 		</attribute>
 												
 		<attribute name="LL_SHELL" type="string">
 			<description>Specify the name of a shell to use for this job.</description>
-			<tooltip>Specify the name of a shell to use for this job.</tooltip>
 		</attribute>
 				
 		<attribute name="LL_SOFT_LIMIT" type="string">
 			<description>Specify the soft elaspsed time limit for this job.</description>
-			<tooltip>Specify the soft elaspsed time limit for this job.</tooltip>
 		</attribute>
 												
 		<attribute name="LL_STDERR" type="string">
 			<description>Specify a file to use for stderr output.</description>
-			<tooltip>Specify a file to use for stderr output.</tooltip>
 		</attribute>
 												
 		<attribute name="LL_STDIN" type="string">
 			<description>Specify a file to use for stdin input.</description>
-			<tooltip>Specify a file to use for stdin input.</tooltip>
 		</attribute>
 												
 		<attribute name="LL_STDOUT" type="string">
 			<description>Specify a file to use for stdout output.</description>
-			<tooltip>Specify a file to use for stdout output.</tooltip>
 		</attribute>	
 												
 		<attribute name="LL_TASK_GEOMETRY" type="string">
 			<description>Specify grouping of parallel tasks on nodes.</description>
-			<tooltip>Specify grouping of parallel tasks on nodes.</tooltip>
 		</attribute>
 												
 		<attribute name="LL_TASKS_PER_NODE" type="string">
 			<description>Specify number of tasks per node.</description>
-			<tooltip>Specify number of tasks per node.</tooltip>
 		</attribute>	
 												
 		<attribute name="LL_TOTAL_TASKS" type="string">
 			<description>Specify total number of tasks.</description>
-			<tooltip>Specify number of tasks per node.</tooltip>
 		</attribute>		
 		
 		<script insertEnvironmentAfter="0">
@@ -266,6 +242,14 @@
 					</match>
 				</target>
 			</stdout-parser>
+			<stderr-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>.*2512-051.*</expression>
+						<throw message="Job Submit Failed"/>
+					</match>
+				</target>
+			</stderr-parser>
 		</submit-batch>
 		<get-job-status name="get-job-status" ignoreExitStatus="true">
 			<arg>${ptp_rm:bindir#value}llq</arg>
@@ -283,8 +267,7 @@
 					<match>
 						<!--  Match job status line like 'z25c2s1.59.0             user     5/29 08:24 R  50  No_Class     z25c2s1' -->
 						<!--  Note that node name (last token) will be blank if job is in holding state so don't include that in pattern -->
-						<!-- expression>^[\S]+ +[\S]+ +[\S]+ +[\S] ([\S])  [\d]+ +([\S]+).*$)</expression-->
-						<expression>^[\S]+ +[\S]+ +[\S]+ +[\S]+ ([\S])  [\d]+ +([\S]+) +([\S])+.*$</expression>
+						<expression>^\S+ +\S+ +\S+ +\S+ (\S)  \d+ +(\S+) +(\S)+.*$</expression>
 						<set field="value">
 							<entry valueGroup="1"/>
 						</set>
@@ -995,29 +978,42 @@
 					<layout-data>
 						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
 					</layout-data>
-					<widget type="text" readOnly="true" style="SWT.BORDER | SWT.WRAP | SWT.V_SCROLL">
+					<viewer name="PESettings" style="SWT.BORDER | SWT.MULTI" sort="true" type="table">
 						<layout-data>
-							<grid-data heightHint="75" horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+							<grid-data widthHint="600" heightHint="200" horizontalSpan="1" />
 						</layout-data>
-						<dynamic-text>
-							<arg>${ptp_rm:allAttributes#value}</arg>
-							<arg isUndefinedIfMatches=" destination=''"> destination='${ptp_rm:destination#value}'</arg>
-						</dynamic-text>
-					</widget>
-					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="tree" initialAllChecked="false">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
-						</layout-data>
-						<column-data name="Name" width="175" resizable="true">
-							<tooltip>Multi-select and click checkbox to apply change to all rows.</tooltip>
-						</column-data>
-						<column-data name="Value" width="200" resizable="true">
-							<tooltip>Click to activate value widget.</tooltip>
-						</column-data>
-						<items allPredefined="true">
-							<exclude>destination</exclude>
+						<!-- These are the 6 attribute fields mappable to columns. In a "table viewer" the order of the columns is entirely arbitrary -->
+						<column-data name="Name" width="200" />
+						<column-data name="Description" width="200" />
+						<column-data name="Value" width="200" />
+						<items>
+							<include>LL_BLOCKING</include>
+							<include>LL_BULKXFER</include>
+							<include>LL_COMMENT</include>
+							<include>LL_ENVIRONMENT</include>
+							<include>LL_HARD_LIMIT</include>
+							<include>LL_JOB_CLASS</include>
+							<include>LL_JOB_NAME</include>
+							<include>LL_JOB_TYPE</include>
+							<include>LL_LARGE_PAGE</include>
+							<include>LL_MAX_NODES</include>
+							<include>LL_MIN_NODES</include>
+							<include>LL_NETWORK_LAPI</include>
+							<include>LL_NETWORK_MPI</include>
+							<include>LL_NETWORK_MPI_LAPI</include>
+							<include>LL_REQUIREMENTS</include>
+							<include>LL_RESOURCES</include>
+							<include>LL_SHELL</include>
+							<include>LL_SODT_LIMIT</include>
+							<include>LL_STDERR</include>
+							<include>LL_STDIN</include>
+							<include>LL_STDOUT</include>
+							<include>LL_TASK_GEOMETRY</include>
+							<include>LL_TASKS_PER_NODE</include>
+							<include>LL_TOTAL_TASKS</include>
+							<include>MP_ACK_THRESH_ATTR</include>
 						</items>
-						<value pattern="@name='@value'"/>
+						<value pattern="export @name='@value'" separator="; " />
 					</viewer>
 				</composite>
 			</dynamic>
