@@ -169,15 +169,9 @@
 			<line>
 				<arg isUndefinedIfMatches="# @ large_page ="># @ large_page = ${ptp_rm:LL_LARGE_PAGE#value}</arg>
 			</line>
-			<!-- line>
-				<arg isUndefinedIfMatches="# @ node = ,"># @ node = ${ptp_rm:LL_MIN_NODES#value},${ptp_rm:LL_MAX_NODES#value}</arg>
-			</line-->
 			<line>
-				<arg isUndefinedIfMatches="# @ node = ,[\d]+"># @ node = ${ptp_rm:LL_MIN_NODES#value},${ptp_rm:LL_MAX_NODES#value}</arg>
+				<arg isUndefinedIfMatches="# @ node = ,"># @ node = ${ptp_rm:LL_MIN_NODES#value},${ptp_rm:LL_MAX_NODES#value}</arg>
 			</line>
-			<!-- line>
-				<arg isUndefinedIfMatches="# @ node = [\d]+"># @ node = ${ptp_rm:LL_MIN_NODES#value}</arg>
-			</line-->
 			<line>
 				<arg isUndefinedIfMatches="# @ network.LAPI ="># @ network.LAPI = ${ptp_rm:LL_NETWORK_LAPI#value}</arg>
 			</line>
