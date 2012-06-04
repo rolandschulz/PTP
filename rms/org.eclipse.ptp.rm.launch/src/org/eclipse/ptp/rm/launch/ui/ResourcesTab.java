@@ -312,9 +312,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			LaunchUtils.setResourceManagerUniqueName(configuration, fLaunchControl.getControlId());
 			LaunchUtils.setConnectionName(configuration, fLaunchControl.getConnectionName());
 			LaunchUtils.setRemoteServicesId(configuration, fLaunchControl.getRemoteServicesId());
-			MonitorType monitorData = fLaunchControl.getConfiguration().getMonitorData();
-			if (monitorData != null) {
-				LaunchUtils.setSystemType(configuration, monitorData.getSchedulerType());
+			if (fLaunchControl.getConfiguration() != null) {
+				MonitorType monitorData = fLaunchControl.getConfiguration().getMonitorData();
+				if (monitorData != null) {
+					LaunchUtils.setSystemType(configuration, monitorData.getSchedulerType());
+				}
 			}
 			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl);
 			if (dynamicTab == null) {
