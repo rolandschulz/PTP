@@ -37,7 +37,6 @@ import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand;
-import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -69,6 +68,7 @@ import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
+import org.eclipse.ptp.rdt.sync.git.core.RmCommandCached;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
@@ -620,7 +620,7 @@ public class GitRemoteSyncConnection {
 			}
 
 			if (!filesToRemove.isEmpty()) {
-				final RmCommand rmCommand = git.rm();
+				final RmCommandCached rmCommand = new RmCommandCached(git.getRepository());
 				for (String fileName : filesToRemove) {
 					rmCommand.addFilepattern(fileName);
 				}
