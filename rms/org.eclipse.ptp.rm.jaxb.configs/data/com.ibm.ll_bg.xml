@@ -338,18 +338,18 @@
                <!-- Job Comment -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Comment:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="LL_COMMENT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_COMMENT#description}</fixed-text>
 					</widget>
@@ -357,18 +357,18 @@
                <!-- Job Name -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Job name:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="LL_JOB_NAME">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_JOB_NAME#description}</fixed-text>
 					</widget>
@@ -376,18 +376,18 @@
                <!-- Job Type -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Job type:</fixed-text>
 					</widget>
 					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="LL_JOB_TYPE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_JOB_TYPE#description}</fixed-text>
 					</widget>
@@ -407,19 +407,19 @@
 					
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Name</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" minWidth="200" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" minWidth="200" grabExcessHorizontal="true"/>
 						</layout-data>
 						<fixed-text>Value</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Description</fixed-text>
 					</widget>
@@ -427,19 +427,19 @@
                <!-- Job Class -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Job class:</fixed-text>
 					</widget>
 					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="LL_JOB_CLASS">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 						<items-from>classes</items-from>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_JOB_CLASS#description}</fixed-text>
 					</widget>
@@ -447,7 +447,7 @@
                <!-- Large page support -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Large page:</fixed-text>
 						<control-state>
@@ -456,7 +456,7 @@
 					</widget>
 					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="LL_LARGE_PAGE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 						<control-state>
 							<enable-if attribute="os.name" value="AIX"/>
@@ -464,7 +464,7 @@
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_LARGE_PAGE#description}</fixed-text>
 						<control-state>
@@ -475,18 +475,18 @@
                <!-- Job requirements -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Requirements:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="LL_REQUIREMENTS">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_REQUIREMENTS#description}</fixed-text>
 					</widget>
@@ -494,18 +494,18 @@
                <!-- Job resources -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Resources:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="LL_RESOURCES">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_RESOURCES#description}</fixed-text>
 					</widget>
@@ -525,19 +525,19 @@
 					
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Name</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" minWidth="200" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" minWidth="200" grabExcessHorizontal="true"/>
 						</layout-data>
 						<fixed-text>Value</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Description</fixed-text>
 					</widget>
@@ -545,22 +545,22 @@
                <!-- STDIN -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>STDIN:</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="LL_STDIN"
 						title="Browse" directory="false">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 					</browse>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_STDIN#description}</fixed-text>
 					</widget>
@@ -568,22 +568,22 @@
                <!-- STDOUT -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>STDOUT:</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="LL_STDOUT"
 						title="Browse" directory="false">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 					</browse>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_STDOUT#description}</fixed-text>
 					</widget>
@@ -591,22 +591,22 @@
                <!-- STDERR -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>STDERR:</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="LL_STDERR"
 						title="Browse" directory="false">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 					</browse>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_STDERR#description}</fixed-text>
 					</widget>
@@ -614,22 +614,22 @@
                <!-- Shell -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>Shell:</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="LL_SHELL"
 						title="Browse" directory="false">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 					</browse>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_SHELL#description}</fixed-text>
 					</widget>
@@ -648,7 +648,7 @@
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_ENVIRONMENT#description}</fixed-text>
 					</widget>
@@ -668,19 +668,19 @@
 					
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Name</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2"  minWidth="200" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2"  minWidth="200" grabExcessHorizontal="true"/>
 						</layout-data>
 						<fixed-text>Value</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Description</fixed-text>
 					</widget>
@@ -688,18 +688,18 @@
                <!-- Task blocking factor -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Blocking:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER"  attribute="LL_BLOCKING">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_BLOCKING#description}</fixed-text>
 					</widget>
@@ -707,20 +707,20 @@
                <!-- Bulk transfer -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Bulk Transfer:</fixed-text>
 					</widget>
 					<widget type="checkbox" attribute="LL_BULKXFER"
 						style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL"
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" 
 								grabExcessHorizontal="false" horizontalSpan="2" />
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_BULKXFER#description}</fixed-text>
 					</widget>
@@ -728,18 +728,18 @@
 					<!--  MPI adapter specification -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Network for MPI:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER"  attribute="LL_NETWORK_MPI">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_NETWORK_MPI#description}</fixed-text>
 					</widget>
@@ -747,18 +747,18 @@
 					<!--  LAPI adapter specification --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Network for LAPI:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER"  attribute="LL_NETWORK_LAPI">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_NETWORK_LAPI#description}</fixed-text>
 					</widget>
@@ -766,18 +766,18 @@
 					<!--  MPI/LAPI adapter specification --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Network for MPI/LAPI:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER"  attribute="LL_NETWORK_MPI_LAPI">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_NETWORK_MPI_LAPI#description}</fixed-text>
 					</widget>
@@ -785,18 +785,18 @@
 					<!--  Min node  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Minimum node count:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER"  attribute="LL_MIN_NODES">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_MIN_NODES#description}</fixed-text>
 					</widget>
@@ -804,18 +804,18 @@
 					<!--  Max node  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Maximum node count:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER"  attribute="LL_MAX_NODES">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_MAX_NODES#description}</fixed-text>
 					</widget>
@@ -823,18 +823,18 @@
 					<!--  Task geometry  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Task geometry:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER"  attribute="LL_TASK_GEOMETRY">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_TASK_GEOMETRY#description}</fixed-text>
 					</widget>
@@ -842,18 +842,18 @@
 					<!--  Tasks per node  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Tasks per node:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER"  attribute="LL_TASKS_PER_NODE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_TASKS_PER_NODE#description}</fixed-text>
 					</widget>
@@ -861,18 +861,18 @@
 					<!--  Total tasks  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Total tasks:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER"  attribute="LL_TOTAL_TASKS">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_TOTAL_TASKS#description}</fixed-text>
 					</widget>
@@ -892,19 +892,19 @@
 					
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Name</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" minWidth="200" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" minWidth="200" grabExcessHorizontal="true"/>
 						</layout-data>
 						<fixed-text>Value</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Description</fixed-text>
 					</widget>
@@ -912,18 +912,18 @@
                <!-- Job hard limit -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Hard limit:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER"  attribute="LL_HARD_LIMIT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_HARD_LIMIT#description}</fixed-text>
 					</widget>
@@ -931,18 +931,18 @@
                <!-- Job soft limit -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Soft limit:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER"  attribute="LL_SOFT_LIMIT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_SOFT_LIMIT#description}</fixed-text>
 					</widget>
@@ -954,22 +954,6 @@
 				<layout>
 					<grid-layout/>
 				</layout>
-				<!-- QUEUES remote path group -->
-				<composite group="true">
-					<layout>
-						<grid-layout numColumns="3"/>
-					</layout>
-					<widget type="label" style="SWT.LEFT">
-						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
-						<fixed-text>Queue: </fixed-text>
-					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
-						<layout-data>
-							<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
-						</layout-data>
-						<items-from>classes</items-from>
-					</widget>
-				</composite>
 				<!-- VIEWER group -->
 				<composite group="true">
 					<layout>

@@ -1246,21 +1246,22 @@
 					<!--MP_HOSTFILE: Specifies task to node mapping -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_HOSTFILE_ATTR#description}</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="MP_HOSTFILE_ATTR"
 						title="Browse">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_HOSTFILE_ATTR#tooltip}</tooltip>
 					</browse>
-										<!--MP_PROCS: Specifies number of application tasks -->
+					
+					<!--MP_PROCS: Specifies number of application tasks -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data widthHint="200" />
@@ -1354,8 +1355,6 @@
 							<enable-if button="useLL" selected="true"/>
 						</control-state>
 					</widget>
-
-
 				</composite>
 			</dynamic>
 
@@ -1477,16 +1476,16 @@
 					<!--MP_PMDLOG_DIR - specifies directory where PMD log is stored -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_PMDLOG_DIR_ATTR#description}</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="MP_PMDLOG_DIR_ATTR" title="Browse" directory="true">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_PMDLOG_DIR_ATTR#tooltip}</tooltip>
 					</browse>
@@ -1509,17 +1508,17 @@
 					<!--MP_PRIORITY_LOG_DIR - specifies directory where co-scheduler log is stored -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_PRIORITY_LOG_DIR_ATTR#description}
 						</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="MP_PRIORITY_LOG_DIR_ATTR" title="Browse" directory="true">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_PRIORITY_LOG_DIR_ATTR#tooltip}</tooltip>
 					</browse>
@@ -1620,17 +1619,17 @@
 					<!--MP_COREDIR - specifies directory where core files are stored -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_COREDIR_ATTR#description}</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="MP_COREDIR_ATTR"
 						title="Browse" directory="true">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_COREDIR_ATTR#tooltip}</tooltip>
 					</browse>
@@ -1662,7 +1661,7 @@
 					<!--MP_PROFDIR - specifies directory where gmon.out files are stored -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_PROFDIR_ATTR#description}</fixed-text>
 						<control-state>
@@ -1672,10 +1671,10 @@
 					<browse textStyle="SWT.BORDER" attribute="MP_PROFDIR_ATTR"
 						title="Browse" directory="true">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_PROFDIR_ATTR#tooltip}</tooltip>
 						<text-control-state>
@@ -1863,17 +1862,17 @@
 					<!-- MP_CKPTDIR: Checkpoint directory-->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_CKPTDIR_ATTR#description}</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="MP_EUILIBPATH_ATTR"
 						title="Browse" directory="true">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_CKPTDIR_ATTR#tooltip}</tooltip>
 					</browse>
@@ -2123,17 +2122,17 @@
 						partition -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_CMDFILE_ATTR#description}</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="MP_CMDFILE_ATTR"
 						title="Browse">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_CMDFILE_ATTR#tooltip}</tooltip>
 					</browse>
@@ -2141,7 +2140,7 @@
 					<!-- MP_RMFILE: Command file for node allocation -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_RMFILE_ATTR#description}</fixed-text>
 						<control-state>
@@ -2151,10 +2150,10 @@
 					<browse textStyle="SWT.BORDER" attribute="MP_RMFILE_ATTR"
 						title="Browse">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_RMFILE_ATTR#tooltip}</tooltip>
 						<text-control-state>
@@ -2168,7 +2167,7 @@
 					<!-- MP_REMOTEDIR: Scrit to echo current directory on remote nodes -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_REMOTEDIR_ATTR#description}</fixed-text>
 						<control-state>
@@ -2178,10 +2177,10 @@
 					<browse textStyle="SWT.BORDER" attribute="MP_REMOTEDIR_ATTR"
 						title="Browse">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_REMOTEDIR_ATTR#tooltip}</tooltip>
 						<text-control-state>
@@ -2931,17 +2930,17 @@
 						path -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_EUILIBPATH_ATTR#description}</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="MP_EUILIBPATH_ATTR"
 						title="Browse" directory="true">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_EUILIBPATH_ATTR#tooltip}</tooltip>
 					</browse>
@@ -2950,17 +2949,17 @@
 						parallel I/O -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_IONODEFILE_ATTR#description}</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="MP_IONODEFILE_ATTR"
 						title="Browse">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_IONODEFILE_ATTR#tooltip}</tooltip>
 					</browse>
@@ -2968,7 +2967,7 @@
 					<!-- MP_SAVEHOSTFILE: Host file generated by partition manager -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_SAVEHOSTFILE_ATTR#description}
 						</fixed-text>
@@ -2979,10 +2978,10 @@
 					<browse textStyle="SWT.BORDER" attribute="MP_SAVEHOSTFILE_ATTR"
 						title="Browse">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_SAVEHOSTFILE_ATTR#tooltip}</tooltip>
 						<text-control-state>
@@ -2996,17 +2995,17 @@
 					<!-- MP_SAVE_RMFILE: Job command file generated by partition manager -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" />
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_SAVE_RMFILE_ATTR#description}</fixed-text>
 					</widget>
 					<browse textStyle="SWT.BORDER" attribute="MP_SAVE_RMFILE_ATTR"
 						title="Browse">
 						<text-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data widthHint="200" />
+							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
 						</button-layout-data>
 						<tooltip>${ptp_rm:MP_SAVE_RMFILE_ATTR#tooltip}</tooltip>
 						<text-control-state>
