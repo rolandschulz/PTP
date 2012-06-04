@@ -781,6 +781,6 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			</import>
 		</launch-tab>
 	</control-data>
-	<monitor-data schedulerType="PBS_BGP"> <!-- The BG/P and BG/Q resource managers are the same. -->
+	<monitor-data schedulerType="COBALT_BG"> <!-- The BG/P and BG/Q resource managers are the same. -->
 	</monitor-data>
 </resource-manager-builder>

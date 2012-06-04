@@ -149,10 +149,6 @@
             name="PBS"
             type="PBS">
       </monitor>
-       <monitor
-            name="PBS (Blue Gene/P)"
-            type="PBS_BGP">
-      </monitor>
       <monitor
             name="IBM Parallel Environment"
             type="PE">
