@@ -11,6 +11,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -45,6 +47,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.core.server.RemoteServerManager;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
@@ -70,6 +73,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.SiteType;
+import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.eclipse.ui.progress.UIJob;
@@ -710,6 +714,8 @@ public class LaunchController implements ILaunchController {
 			}
 			worked(progress, 20);
 
+			maybeUpdateServer(progress.newChild(10));
+
 			ICommandJob job = null;
 
 			try {
@@ -829,13 +835,6 @@ public class LaunchController implements ILaunchController {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getJobStatus(java.lang.String, boolean,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-
 	/**
 	 * Checks to see if there was an exception thrown by the run method.
 	 * 
@@ -854,6 +853,13 @@ public class LaunchController implements ILaunchController {
 			}
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getJobStatus(java.lang.String, boolean,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
 
 	/**
 	 * @param jobId
@@ -1152,6 +1158,32 @@ public class LaunchController implements ILaunchController {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Some target configurations require helper scripts for launching, debugging, etc. Make sure these helper scripts are available
+	 * on the target system if no monitoring is enabled.
+	 * 
+	 * @param monitor
+	 *            progress monitor
+	 * @throws CoreException
+	 */
+	private void maybeUpdateServer(IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
+		try {
+			IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
+			LMLDAServer server = (LMLDAServer) RemoteServerManager.getServer(LMLDAServer.SERVER_ID, conn);
+			server.setWorkDir(new Path(conn.getWorkingDirectory()).append(".eclipsesettings").toString()); //$NON-NLS-1$
+			try {
+				server.updateServer(progress.newChild(100));
+			} catch (IOException e) {
+				throw CoreExceptionUtils.newException(e.getMessage(), e);
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
 	}
 
 	/**
