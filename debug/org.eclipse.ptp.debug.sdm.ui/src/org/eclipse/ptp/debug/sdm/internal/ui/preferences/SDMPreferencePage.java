@@ -148,8 +148,9 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	private void initializeValues() {
 		int index = sdmBackendCombo.getSelectionIndex();
 		if (index >= 0) {
-			sdmBackendPathText.setText(SDMDebugCorePlugin.getDefault().getDebuggerBackendPath(sdmBackendCombo.getItem(index)));
-			sdmPathText.setText(SDMDebugCorePlugin.getDefault().getDebuggerSDMPath(sdmBackendCombo.getItem(index)));
+			String backend = sdmBackendCombo.getItem(index);
+			sdmBackendPathText.setText(SDMDebugCorePlugin.getDefault().getDebuggerBackendPath(backend));
+			sdmPathText.setText(SDMDebugCorePlugin.getDefault().getDebuggerSDMPath(backend));
 		}
 	}
 

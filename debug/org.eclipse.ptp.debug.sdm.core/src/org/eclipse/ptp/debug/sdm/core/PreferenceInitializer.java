@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.sdm.core;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.ptp.core.Preferences;
 
 /**
  * @author Clement chu
@@ -33,5 +34,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	 */
 	@Override
 	public void initializeDefaultPreferences() {
+		for (String backend : SDMDebugCorePlugin.getDefault().getDebuggerBackends()) {
+			Preferences.setDefaultString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_BACKEND_PATH
+					+ backend, SDMDebugCorePlugin.getDefault().getDebuggerBackendPath(backend));
+			Preferences.setDefaultString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_PATH + backend,
+					SDMDebugCorePlugin.getDefault().getDebuggerSDMPath(backend));
+		}
 	}
 }
