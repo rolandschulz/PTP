@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -482,6 +483,41 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * Update the server with a new version if necessary.
+	 * 
+	 * @param monitor
+	 *            progress monitor
+	 * @since 6.0
+	 */
+	public void updateServer(IProgressMonitor monitor) throws IOException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		try {
+			if (fRemoteConnection != null) {
+				if (!fRemoteConnection.isOpen()) {
+					try {
+						fRemoteConnection.open(subMon.newChild(20));
+					} catch (RemoteConnectionException e) {
+						throw new IOException(e.getMessage());
+					}
+					if (subMon.isCanceled()) {
+						return;
+					}
+					if (!fRemoteConnection.isOpen()) {
+						throw new IOException(Messages.AbstractRemoteServerRunner_7);
+					}
+				}
+
+				doUpdate(subMon.newChild(80));
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+
+	}
+
+	/**
 	 * Wait for the server to finished. Will do nothing if the server is stopped.
 	 * 
 	 * @param monitor
@@ -596,6 +632,37 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		}
 	}
 
+	private IFileStore doUpdate(IProgressMonitor monitor) throws IOException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		try {
+			/*
+			 * Check if the remote file exists or is a different size to the local version and copy over if required.
+			 */
+			IRemoteFileManager fileManager = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection);
+			IFileStore directory = fileManager.getResource(getWorkingDir());
+			/*
+			 * Create the directory if it doesn't exist (has no effect if the directory already exists). Also, check if a file of
+			 * this name exists and generate exception if it does.
+			 */
+			directory.mkdir(EFS.NONE, subMon.newChild(10));
+
+			if (checkAndUploadPayload(directory, subMon.newChild(30))) {
+				if (!subMon.isCanceled()) {
+					unpackPayload(directory, subMon.newChild(30));
+				}
+			}
+
+			return directory;
+		} catch (CoreException e) {
+			throw new IOException(e.getMessage());
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+
+	}
+
 	/**
 	 * Checks if the command is valid. It uses a pattern which is define in the "plugin.xml" file to match with the output
 	 * 
@@ -653,32 +720,16 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	private IRemoteProcess launchServer(IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
-			/*
-			 * First check if the remote file exists or is a different size to the local version and copy over if required.
-			 */
-			IRemoteFileManager fileManager = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection);
-			IFileStore directory = fileManager.getResource(getWorkingDir());
-			/*
-			 * Create the directory if it doesn't exist (has no effect if the directory already exists). Also, check if a file of
-			 * this name exists and generate exception if it does.
-			 */
-			directory.mkdir(EFS.NONE, subMon.newChild(10));
-
-			if (checkAndUploadPayload(directory, subMon.newChild(30))) {
-				if (!subMon.isCanceled()) {
-					unpackPayload(directory, subMon.newChild(30));
-				}
-			}
+			IFileStore directory = doUpdate(subMon.newChild(50));
 
 			/*
 			 * Now launch the server.
 			 */
 			if (!subMon.isCanceled()) {
-				return runCommand(getLaunchCommand(), Messages.AbstractRemoteServerRunner_5, directory, false, subMon.newChild(30));
+				return runCommand(getLaunchCommand(), Messages.AbstractRemoteServerRunner_5, directory, false, subMon.newChild(50));
 			}
+
 			return null;
-		} catch (Exception e) {
-			throw new IOException(e.getMessage());
 		} finally {
 			if (monitor != null) {
 				monitor.done();
