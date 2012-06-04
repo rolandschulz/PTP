@@ -477,6 +477,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		if (i > 0) {
 			ProviderInfo provider = ProviderInfo.getProviders().get(i - 1);
 			if (fSelectedLaunchControl == null
+					|| fSelectedLaunchControl.getConfiguration() == null
 					|| (fSelectedLaunchControl.getConfiguration() != null && !fSelectedLaunchControl.getConfiguration().getName()
 							.equals(provider.getName()))) {
 				ILaunchController control = RMLaunchUtils.getLaunchControl(provider.getName());
