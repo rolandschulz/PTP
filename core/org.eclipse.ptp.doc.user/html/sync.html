@@ -14,6 +14,7 @@
 <li><a href="#context-menu">Changing sync behavior with the Sync Context Menu</a>
 <li><a href="#file-filter">Changing which files are synchronized</a>
 <li><a href="#conversion-wizard">Converting a project to a Synchronized Project</a>
+<li><a href="#merge-conflict">Resolving merge conflicts</a>
 </ul>
 <p>Synchronized projects consist of files that are mirrored on the local system as well as on one or more remote systems.
 Editing occurs locally and each file is synchronized with the currently active remote system when it is changed, created, or deleted.  
@@ -118,6 +119,24 @@ The conversion wizard allows you to convert current C/C++ or Fortran projects to
 <td><img src="images/sync-conversionWizard.png"></td>
 </tr>
 </table>
+
+<h2 id="merge-conflict">Resolving merge conflicts</h2>
+<p>
+A "merge conflict" can occur, in general, when merging two different versions of a file into a single version. There may be disagreement, for various reasons, on what the final version should be. For synchronized projects, merge conflicts do not occur during normal use, because the underlying system knows that local file changes are updates to older remote versions, or vice versa. Merge conflicts may occur, however, if files are changed both locally and remotely without an intervening sync, because the next sync may not know how to merge the two versions. (It is a good idea to sync after making remote changes before resuming work in Eclipse.) When a conflict is detected, the following dialog appears:
+
+<p><br></p>
+<p><img src="images/sync-mergeConflictDialog.png">
+<p><br></p>
+
+You can open the merge conflict view from this dialog or from <b>Window > Show View > Other..</b> and then <b>Remote Development > Synchronized Merge View</b>. This view shows a list of conflicting files. Clicking on a file brings up a "compare editor" where differences can be viewed and conflicts resolved. The left pane shows the local file, which has been marked up to show conflicts, and the right pane shows the remote file. The "ancestor" file optionally appears above these two panes and can be toggled on or off using the editor's leftmost icon. The ancestor is the last known version of the file from which both local and remote are derived. Also note that right-clicking the file in the viewer brings up a context menu from which certain options can be selected (discussed below).
+
+<p><br></p>
+<p><img src="images/sync-mergeConflictResolve.png">
+<p><br></p>
+
+In the compare editor, editing the left pane edits the local version of the file. The compare editor is only for convenience. You can also edit the file from the normal Eclipse text editor. When finished editing, select "Mark as resolved" from the context menu. This version will then be copied to the remote site on the next sync. Do the same for each conflicted file. Sync'ing is disabled until all conflicts have been resolved.
+<p>
+After a merge conflict, the local file has markers and annotation added to show the differing content on the local and remote sites. This is useful for editing the file by itself, but not so much for using the compare editor. Select "Reset to version before merge" in the context menu to revert the local file to its prior version. Now the compare editor will show clearly the differences between local and remote.
 
 <h2 id="includes">Remote Include Paths</h2>
 <p>At the time of the PTP 5.0 release (June 2011),
