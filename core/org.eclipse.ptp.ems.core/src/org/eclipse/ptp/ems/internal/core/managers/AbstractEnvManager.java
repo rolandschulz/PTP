@@ -26,6 +26,8 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.ems.internal.core.EMSCorePlugin;
@@ -131,13 +133,20 @@ public abstract class AbstractEnvManager implements IEnvManager {
 	 */
 	protected final List<String> runCommand(IProgressMonitor pm, boolean requireCleanExit, String... command) throws RemoteConnectionException,
 			IOException {
+		log(IStatus.INFO, "Running remote command; clean exit%s required:", requireCleanExit ? "" : " not"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		for (int i = 0; i < command.length; i++) {
+			log(IStatus.INFO, "[%d] %s", i, command[i]); //$NON-NLS-1$
+		}
+
 		final IRemoteProcessBuilder processBuilder = createRemoteProcessBuilder(pm, command);
 		if (processBuilder == null) {
+			log(IStatus.ERROR, "- Could not create remote process builder"); //$NON-NLS-1$
 			return null;
 		}
 
 		final IRemoteProcess p = processBuilder.start();
 		if (p == null) {
+			log(IStatus.ERROR, "- Could not start remote process builder"); //$NON-NLS-1$
 			return null;
 		}
 
@@ -150,15 +159,37 @@ public abstract class AbstractEnvManager implements IEnvManager {
 			}
 		}
 
+		if (hasTerminated(p)) {
+			final int severity = (p.exitValue() == 0 ? IStatus.INFO : IStatus.WARNING);
+			log(severity, "- Remote process terminated with exit code %d", p.exitValue()); //$NON-NLS-1$
+		} else {
+			log(IStatus.WARNING, "- Remote process timed out"); //$NON-NLS-1$
+		}
+
 		final List<String> result = new ArrayList<String>(256);
 		readLines(p.getInputStream(), result);
 		readLines(p.getErrorStream(), result);
+		log(IStatus.INFO, "- Lines read: %d", result.size()); //$NON-NLS-1$
 
 		p.destroy();
+		log(IStatus.INFO, "- Remote process destroyed"); //$NON-NLS-1$
 		if (requireCleanExit && (!hasTerminated(p) || p.exitValue() != 0)) {
 			return Collections.emptyList();
 		} else {
 			return result;
+		}
+	}
+
+	// See http://wiki.eclipse.org/FAQ_How_do_I_use_the_platform_debug_tracing_facility%3F
+	protected final void log(int severity, String format, Object... args) {
+		final String message = String.format(format, args);
+
+		if (EMSCorePlugin.getDefault().isDebugging()) {
+			System.out.println(message);
+		}
+
+		if (severity == IStatus.ERROR || severity == IStatus.WARNING) {
+			EMSCorePlugin.log(new Status(severity, EMSCorePlugin.PLUGIN_ID, message));
 		}
 	}
 
