@@ -28,32 +28,27 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	private final List<InfoTreeNodeModel> children;
 
 	/**
-	 * Cell editor model for Tree node with underlying Property data.
+	 * Cell editor model for Tree node with underlying attribute data.
 	 * 
 	 * @param name
-	 *            of the model, which will correspond to the name of a Property
-	 *            or Attribute the value is to be saved to
+	 *            of the model, which will correspond to the name of an attribute the value is to be saved to
 	 * @param linkUpdateTo
-	 *            if a change in this property or attribute value overwrites
-	 *            other property or attribute values
+	 *            if a change in this property or attribute value overwrites other property or attribute values
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 * @param editor
 	 *            the cell editor for the value cell
 	 * @param items
 	 *            if this is a combo editor, the selection items
 	 * @param itemsFrom
-	 *            if this is a combo editor, the property or attribute value to
-	 *            get the items from
+	 *            if this is a combo editor, the property or attribute value to get the items from
 	 * @param translateBooleanAs
 	 *            if this is a checkbox, use these string values for T/F
 	 * @param readOnly
 	 *            whether it is editable
 	 * @param inValueCol
-	 *            whether to display the field value in the Value column of the
-	 *            viewer. (<code>false</code> means that its value displays in a
-	 *            column whose name matches the id.
+	 *            whether to display the field value in the Value column of the viewer. (<code>false</code> means that its value
+	 *            displays in a column whose name matches the id.
 	 */
 	public ValueTreeNodeUpdateModel(String name, ValueUpdateHandler handler, CellEditor editor, String[] items, String itemsFrom,
 			String translateBooleanAs, boolean readOnly, boolean inValueCol) {
@@ -67,26 +62,22 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 * Cell editor model for Tree node with underlying Attribute data.
 	 * 
 	 * @param name
-	 *            of the model, which will correspond to the name of a Property
-	 *            or Attribute the value is to be saved to
+	 *            of the model, which will correspond to the name of an attribute the value is to be saved to
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 * @param editor
 	 *            the cell editor for the value cell
 	 * @param items
 	 *            if this is a combo editor, the selection items
 	 * @param itemsFrom
-	 *            if this is a combo editor, the property or attribute value to
-	 *            get the items from
+	 *            if this is a combo editor, the property or attribute value to get the items from
 	 * @param translateBooleanAs
 	 *            if this is a checkbox, use these string values for T/F
 	 * @param readOnly
 	 *            whether it is editable
 	 * @param inValueCol
-	 *            whether to display the field value in the Value column of the
-	 *            viewer. (<code>false</code> means that its value displays in a
-	 *            column whose name matches the id.
+	 *            whether to display the field value in the Value column of the viewer. (<code>false</code> means that its value
+	 *            displays in a column whose name matches the id.
 	 * @param data
 	 *            the Attribute object
 	 */
@@ -113,12 +104,9 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	}
 
 	/*
-	 * The parent value node displays only the name and the editable value.
-	 * (non-Javadoc)
+	 * The parent value node displays only the name and the editable value. (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport#getDisplayValue(
-	 * java.lang.String)
+	 * @see org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport#getDisplayValue( java.lang.String)
 	 */
 	public String getDisplayValue(String columnName) {
 		String displayValue = null;
@@ -144,9 +132,8 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 	 * Creates the info nodes for this entry.
 	 * 
 	 * @param inValueCol
-	 *            whether to display the field value in the Value column of the
-	 *            viewer. (<code>false</code> means that its value displays in a
-	 *            column whose name matches the id.
+	 *            whether to display the field value in the Value column of the viewer. (<code>false</code> means that its value
+	 *            displays in a column whose name matches the id.
 	 */
 	private void generateChildren(boolean inValueCol) {
 		children.add(new InfoTreeNodeModel(this, JAXBControlUIConstants.COLUMN_DEFAULT, inValueCol));

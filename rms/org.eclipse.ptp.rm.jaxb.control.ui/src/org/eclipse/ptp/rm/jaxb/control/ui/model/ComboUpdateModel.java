@@ -34,8 +34,7 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 
 	/**
 	 * @param name
-	 *            name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be
-	 *            saved.
+	 *            name of the model, which will correspond to the name of an attribute if the widget value is to be saved.
 	 * @param itemsFrom
 	 *            property or attribute having combo items
 	 * @param handler

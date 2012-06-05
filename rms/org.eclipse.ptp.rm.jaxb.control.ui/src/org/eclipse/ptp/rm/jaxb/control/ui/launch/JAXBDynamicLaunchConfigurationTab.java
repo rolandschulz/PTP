@@ -95,7 +95,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 
 	protected TabControllerType controller;
 	protected String[] shared;
-	protected Collection<IUpdateModel> sharedModels;
+	protected final Collection<IUpdateModel> sharedModels;
 
 	/**
 	 * @param rm
@@ -140,7 +140,6 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		updateHandler = parentTab.getUpdateHandler();
 		localWidgets = new HashMap<Object, IUpdateModel>();
 		viewers = new ArrayList<Viewer>();
-		sharedModels = new ArrayList<IUpdateModel>();
 	}
 
 	/*
@@ -583,7 +582,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		Set<String> sharedValid = new TreeSet<String>();
 		for (IUpdateModel m : sharedModels) {
 			String name = m.getName();
-			if (!sharedInvalid.contains(name) && !localInvalid.contains(name)) {
+			if (name != null && !sharedInvalid.contains(name) && !localInvalid.contains(name)) {
 				sharedValid.add(name);
 			}
 		}

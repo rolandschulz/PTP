@@ -71,7 +71,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 
 	/**
 	 * @param name
-	 *            name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be saved
+	 *            name of the model, which will correspond to the name of an attribute if the widget value is to be saved
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their values
 	 */
@@ -89,16 +89,16 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	public abstract Object getControl();
 
 	/**
-	 * @return name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be saved.
+	 * @return name of the model, which will correspond to the name of an attribute if the widget value is to be saved.
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * If this widget saves its value to a Property or Attribute, then the default value here is retrieved. The widget value is then
-	 * refreshed from the map, and if the value is <code>null</code>, the default value is restored to the map and another refresh
-	 * is called on the actual value.
+	 * If this widget saves its value to an attribute, then the default value here is retrieved. The widget value is then refreshed
+	 * from the map, and if the value is <code>null</code>, the default value is restored to the map and another refresh is called
+	 * on the actual value.
 	 */
 	public void initialize(IVariableMap rmMap, LCVariableMap lcMap) {
 		this.lcMap = lcMap;

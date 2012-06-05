@@ -540,11 +540,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 						if (startController) {
 							try {
 								fSelectedLaunchControl.start(progress.newChild(10));
+								dynamicTab[0] = getLaunchConfigurationDynamicTab(controller, progress.newChild(10));
 							} catch (CoreException e) {
-								RMLaunchPlugin.errorDialog(e.getLocalizedMessage(), e);
+								RMLaunchPlugin.errorDialog(e.getMessage(), e);
 							}
 						}
-						dynamicTab[0] = getLaunchConfigurationDynamicTab(controller, progress.newChild(10));
 					}
 				});
 			} catch (InvocationTargetException e) {

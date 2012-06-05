@@ -73,7 +73,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 
 	/**
 	 * @param name
-	 *            of the model, which will correspond to the name of a Property or Attribute the value is to be saved to
+	 *            of the model, which will correspond to the name of an attribute the value is to be saved to
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their values
 	 * @param editor

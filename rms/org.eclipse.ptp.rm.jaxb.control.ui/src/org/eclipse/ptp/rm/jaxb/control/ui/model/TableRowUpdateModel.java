@@ -23,21 +23,18 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 public class TableRowUpdateModel extends CellEditorUpdateModel {
 
 	/**
-	 * Cell editor model for Table row with underlying Property data.
+	 * Cell editor model for Table row with underlying attribute data.
 	 * 
 	 * @param name
-	 *            of the model, which will correspond to the name of a Property
-	 *            or Attribute the value is to be saved to
+	 *            of the model, which will correspond to the name of an attribute the value is to be saved to
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 * @param editor
 	 *            the cell editor for the value cell
 	 * @param items
 	 *            if this is a combo editor, the preset selection items
 	 * @param itemsFrom
-	 *            if this is a combo editor, the property or attribute value to
-	 *            get the items from
+	 *            if this is a combo editor, the property or attribute value to get the items from
 	 * @param translateBooleanAs
 	 *            if this is a checkbox, use these string values for T/F
 	 * @param readOnly
@@ -53,18 +50,15 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 * * Cell editor model for Table row with underlying Attribute data.
 	 * 
 	 * @param name
-	 *            of the model, which will correspond to the name of a Property
-	 *            or Attribute the value is to be saved to
+	 *            of the model, which will correspond to the name of an attribute the value is to be saved to
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their
-	 *            values
+	 *            the handler for notifying other widgets to refresh their values
 	 * @param editor
 	 *            the cell editor for the value cell
 	 * @param items
 	 *            if this is a combo editor, the selection items
 	 * @param itemsFrom
-	 *            if this is a combo editor, the property or attribute value to
-	 *            get the items from
+	 *            if this is a combo editor, the property or attribute value to get the items from
 	 * @param translateBooleanAs
 	 *            if this is a checkbox, use these string values for T/F
 	 * @param readOnly
@@ -79,13 +73,10 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	}
 
 	/*
-	 * For a table row, the field to access on the model corresponds to the
-	 * column name. If the item is not checked, an empty string is
-	 * returned.(non-Javadoc)
+	 * For a table row, the field to access on the model corresponds to the column name. If the item is not checked, an empty string
+	 * is returned.(non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport#getDisplayValue(
-	 * java.lang.String)
+	 * @see org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport#getDisplayValue( java.lang.String)
 	 */
 	public String getDisplayValue(String columnName) {
 		String displayValue = null;

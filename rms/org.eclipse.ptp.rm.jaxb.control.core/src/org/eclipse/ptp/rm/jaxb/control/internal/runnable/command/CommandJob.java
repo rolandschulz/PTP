@@ -563,6 +563,8 @@ public class CommandJob extends Job implements ICommandJob {
 
 			if (exit != 0) {
 				processError(builder.command().get(0), exit, e);
+			} else if (e != null) {
+				return e.getStatus();
 			}
 		} catch (CoreException ce) {
 			return ce.getStatus();

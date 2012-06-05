@@ -24,6 +24,14 @@
 		<attribute name="noLocalOption" type="boolean"/>
 		<attribute name="prefixOption" type="boolean"/>
 		<attribute name="prefix" type="string"/>
+		<attribute name="hostFileOption" type="boolean"/>
+		<attribute name="hostFile" type="string"/>
+		<attribute name="hostListOption" type="boolean"/>
+		<attribute name="hostList" type="string"/>
+		<attribute name="useDefaultArguments" visible="false" type="boolean">
+			<default>true</default>
+		</attribute>
+		
 		<start-up-command name="ompi_info">
 			<arg>${ptp_rm:local_prefix#value}ompi_info</arg>
 			<arg>-a</arg>
@@ -91,70 +99,44 @@
 				</target>
 			</stdout-parser>
 		</start-up-command>
-		<submit-interactive name="submit-interactive" directory="${ptp_rm:directory#value}" waitForId="true" keepOpen="true">
+		<submit-interactive name="submit-interactive" directory="${ptp_rm:directory#value}">
 			<arg>${ptp_rm:local_prefix#value}mpirun</arg>
-			<arg>--report-pid</arg>
-			<arg>-np</arg>
-			<arg>${ptp_rm:mpiNumberOfProcesses#value}</arg>
+			<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
+			<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
+			<arg attribute="bySlotOption" isUndefinedIfMatches="false">-byslot</arg>
+			<arg attribute="noOversubscribeOption" isUndefinedIfMatches="false">-nooversubscribe</arg>
+			<arg attribute="noLocalOption" isUndefinedIfMatches="false">-nolocal</arg>
+			<arg attribute="prefixOption" isUndefinedIfMatches="false">--prefix ${ptp_rm:prefix#value}</arg>
+			<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
+			<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
 			<arg>${ptp_rm:progArgs#value}</arg>
-			<stdout-parser delim="\n">
-				<target ref="@jobId">
-					<match>
-						<expression>^mpirun pid: ([\d]+)$</expression>
-						<set field="name">
-							<entry valueGroup="1"/>
-						</set>
-						<set field="value">
-							<entry value="RUNNING"/>
-						</set>
-					</match>
-				</target>
-				<exit-after>^mpirun pid: ([\d]+)$</exit-after>
-			</stdout-parser>
 			<stderr-parser delim="\n">
-				<target ref="@jobId">
+				<target>
 					<match>
 						<expression>.+</expression>
-						<set field="name">
-							<entry value="${ptp_rm:@jobId#name}"/>
-						</set>
-						<set field="value">
-							<entry value="FAILED"/>
-						</set>
+						<throw message="Unable to launch Open MPI job"/>
 					</match>
 				</target>
 			</stderr-parser>
 		</submit-interactive>
-		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true">
+		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}">
 			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</arg>
 			<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
+			<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
+			<arg attribute="bySlotOption" isUndefinedIfMatches="false">-byslot</arg>
+			<arg attribute="noOversubscribeOption" isUndefinedIfMatches="false">-nooversubscribe</arg>
+			<arg attribute="noLocalOption" isUndefinedIfMatches="false">-nolocal</arg>
+			<arg attribute="prefixOption" isUndefinedIfMatches="false">--prefix ${ptp_rm:prefix#value}</arg>
+			<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
+			<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
 			<arg>${ptp_rm:debuggerArgs#value}</arg>
-			<stdout-parser delim="\n">
-				<target ref="@jobId">
-					<match>
-						<expression>^mpirun pid: ([\d]+)$</expression>
-						<set field="name">
-							<entry valueGroup="1"/>
-						</set>
-						<set field="value">
-							<entry value="RUNNING"/>
-						</set>
-					</match>
-				</target>
-				<exit-after>^mpirun pid: ([\d]+)$</exit-after>
-			</stdout-parser>
 			<stderr-parser delim="\n">
-				<target ref="@jobId">
+				<target>
 					<match>
 						<expression>.+</expression>
-						<set field="name">
-							<entry value="${ptp_rm:@jobId#name}"/>
-						</set>
-						<set field="value">
-							<entry value="FAILED"/>
-						</set>
+						<throw message="Unable to launch Open MPI job"/>
 					</match>
 				</target>
 			</stderr-parser>
@@ -162,8 +144,8 @@
 			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
 		</submit-interactive-debug>		
 		<launch-tab>
-			<dynamic>
-				<title>Basic Open MPI</title>
+			<dynamic includeWidgetValuesFrom="Advanced Options">
+				<title>Basic Options</title>
 				<layout>
 					<grid-layout numColumns="1"/>
 				</layout>
@@ -212,8 +194,8 @@
 						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL"  grabExcessHorizontal="true" grabExcessVertical="true"/>
 					</layout-data>
 					<title>Hosts</title>
-					<widget type="checkbox" title="Host file:" buttonId="hostFileButton" attribute="useHostFile"/>
-					<browse textStyle="SWT.BORDER" title="Browse">
+					<widget type="checkbox" title="Host file:" buttonId="hostFileButton" attribute="hostFileOption"/>
+					<browse textStyle="SWT.BORDER" title="Browse" attribute="hostFile">
 						<text-layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
 						</text-layout-data>
@@ -227,15 +209,15 @@
 							<enable-if button="hostFileButton" selected="true"/>
 						</button-control-state>
 					</browse>					
-					<widget type="checkbox" title="Host list:" buttonId="hostListButton" attribute="useHostList">
+					<widget type="checkbox" title="Host list:" buttonId="hostListButton" attribute="hostListOption">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.TOP"/>
 						</layout-data>
 					</widget>
-					<widget type="text" style="SWT.BORDER" attribute="host_list">
+					<widget type="text" style="SWT.BORDER" attribute="hostList">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" horizontalSpan="2" 
-								grabExcessHorizontal="true" grabExcessVertical="true"/>
+								grabExcessHorizontal="true" grabExcessVertical="false" heightHint="400"/>
 						</layout-data>
 						<control-state>
 							<enable-if button="hostListButton" selected="true"/>
@@ -243,8 +225,8 @@
 					</widget>
 				</composite>
 			</dynamic>
-			<dynamic>
-				<title>Advanced Open MPI</title>
+			<dynamic includeWidgetValuesFrom="Basic Options">
+				<title>Advanced Options</title>
 				<layout>
 					<grid-layout numColumns="1"/>
 				</layout>
@@ -264,7 +246,7 @@
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="false"/>
 						</layout-data>
 						<title>Launch Arguments</title>
-						<widget type="checkbox" title="Use default arguments" attribute="useDefaultAguments">
+						<widget type="checkbox" title="Use default arguments" buttonId="defaultArguments" attribute="useDefaultArguments">
 							<layout-data>
 								<grid-data horizontalSpan="2"/>
 							</layout-data>
@@ -272,13 +254,23 @@
 						<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 							<fixed-text>Arguments:</fixed-text>
 						</widget>
-						<widget type="text" readOnly="true" style="SWT.LEFT | SWT.BORDER">
+						<widget type="text" style="SWT.LEFT | SWT.BORDER">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="false" widthHint="400"/>
 							</layout-data>
 							<dynamic-text>
+								<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
+								<arg attribute="bySlotOption" isUndefinedIfMatches="false">-byslot</arg>
+								<arg attribute="noOversubscribeOption" isUndefinedIfMatches="false">-nooversubscribe</arg>
+								<arg attribute="noLocalOption" isUndefinedIfMatches="false">-nolocal</arg>
+								<arg attribute="prefixOption" isUndefinedIfMatches="false">--prefix ${ptp_rm:prefix#value}</arg>
+								<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
+								<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
 								<arg>${ptp_rm:allAttributes#value}</arg>
 							</dynamic-text>
+							<control-state>
+								<enable-if button="defaultArguments" selected="false"/>
+							</control-state>
 						</widget>
 					</composite>
 					<!-- MCA group -->
@@ -290,7 +282,7 @@
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
 						</layout-data>
 						<title>MCA Parameters</title>
-						<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" sort="true" type="table">
+						<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" sort="true" type="table" initialAllChecked="false">
 							<layout-data>
 								<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
 							</layout-data>

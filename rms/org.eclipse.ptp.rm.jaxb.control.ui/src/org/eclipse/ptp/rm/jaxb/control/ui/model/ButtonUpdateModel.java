@@ -27,8 +27,7 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 
 	/**
 	 * @param name
-	 *            name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be
-	 *            saved.
+	 *            name of the model, which will correspond to the name of an attribute if the widget value is to be saved.
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their values
 	 * @param button

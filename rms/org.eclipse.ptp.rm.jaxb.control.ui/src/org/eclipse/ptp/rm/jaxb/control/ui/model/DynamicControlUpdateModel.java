@@ -45,8 +45,7 @@ public abstract class DynamicControlUpdateModel extends AbstractUpdateModel {
 	 * Default constructor for editable widget.
 	 * 
 	 * @param name
-	 *            name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be
-	 *            saved.
+	 *            name of the model, which will correspond to the name of an attribute if the widget value is to be saved.
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their values
 	 */

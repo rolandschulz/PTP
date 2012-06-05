@@ -96,7 +96,7 @@ if ($#ARGV < 1) {
   die " Usage: $0 [mpi_args ...] [debugger_args ...]\n";
 }
 my $args = join(" ", @ARGV);
-my $cmd="mpirun --report-pid -mca orte_show_resolved_nodenames 1 -display-map";
+my $cmd="mpirun -mca orte_show_resolved_nodenames 1 -display-map";
 
 print "running command $cmd $args\n" if ($verbose);
 

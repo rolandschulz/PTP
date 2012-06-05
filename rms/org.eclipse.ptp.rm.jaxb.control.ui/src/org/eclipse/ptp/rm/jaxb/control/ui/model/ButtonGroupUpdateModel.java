@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * Update model for the entire button group. <br>
  * <br>
- * The group control is used to map the entire group; the group itself updates a single property or attribute value.
+ * The group control is used to map the entire group; the group itself updates a single attribute value.
  * 
  * @author arossi
  * 
@@ -35,8 +35,7 @@ public class ButtonGroupUpdateModel extends AbstractUpdateModel implements Selec
 
 	/**
 	 * @param name
-	 *            name of the model, which will correspond to the name of a Property or Attribute if the widget value is to be
-	 *            saved.
+	 *            name of the model, which will correspond to the name of an attribute if the widget value is to be saved.
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their values
 	 * @param control
