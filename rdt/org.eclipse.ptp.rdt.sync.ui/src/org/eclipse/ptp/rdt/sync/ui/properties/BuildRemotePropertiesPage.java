@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -301,43 +302,49 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 */
 	@Override
 	public boolean performOk() {
-		super.performOk();
-		if (fWidgetsReady == false) {
-			return true;
-		}
-		// Don't forget to save changes made to the current configuration before proceeding
-		this.storeSettings(getCfg());
-		IProject project = getProject();
-		for (ICConfigurationDescription desc : getCfgsReadOnly(project)) {
-			IConfiguration config = getCfg(desc);
-			if (config == null || config instanceof MultiConfiguration) {
-				continue;
+		// Disable sync auto while changing config files but make sure the previous setting is restored before exiting.
+		boolean syncAutoSetting = SyncManager.getSyncAuto();
+		SyncManager.setSyncAuto(false);
+		try {
+			super.performOk();
+			if (fWidgetsReady == false) {
+				return true;
 			}
+			// Don't forget to save changes made to the current configuration before proceeding
+			this.storeSettings(getCfg());
+			IProject project = getProject();
+			for (ICConfigurationDescription desc : getCfgsReadOnly(project)) {
+				IConfiguration config = getCfg(desc);
+				if (config == null || config instanceof MultiConfiguration) {
+					continue;
+				}
 
-			// Save settings for changed configs. Call modify functions only when necessary.
-			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-			PageSettings settings = fConfigToPageSettings.get(config.getId());
-			if (settings != null) {
-				PageSettings systemSettings = this.loadSettings(config);
-				if (!settings.equals(systemSettings)) {
-					this.saveConfig(config,  settings);
-					if ((systemSettings == null) || (settings.syncProvider != systemSettings.syncProvider)) {
-						if (settings.syncProvider == null) {
-							bcm.modifyConfigurationAsSyncLocal(config);
-							try {
-								BuildScenario localBuildScenario = bcm.createLocalBuildScenario(project);
-								bcm.setBuildScenarioForBuildConfiguration(localBuildScenario, config);
-							} catch (CoreException e) {
-								RDTSyncUIPlugin.log(Messages.BuildRemotePropertiesPage_2, e);
+				// Save settings for changed configs. Call modify functions only when necessary.
+				BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+				PageSettings settings = fConfigToPageSettings.get(config.getId());
+				if (settings != null) {
+					PageSettings systemSettings = this.loadSettings(config);
+					if (!settings.equals(systemSettings)) {
+						this.saveConfig(config,  settings);
+						if ((systemSettings == null) || (settings.syncProvider != systemSettings.syncProvider)) {
+							if (settings.syncProvider == null) {
+								bcm.modifyConfigurationAsSyncLocal(config);
+								try {
+									BuildScenario localBuildScenario = bcm.createLocalBuildScenario(project);
+									bcm.setBuildScenarioForBuildConfiguration(localBuildScenario, config);
+								} catch (CoreException e) {
+									RDTSyncUIPlugin.log(Messages.BuildRemotePropertiesPage_2, e);
+								}
+							} else {
+								bcm.modifyConfigurationAsSyncRemote(config);
 							}
-						} else {
-							bcm.modifyConfigurationAsSyncRemote(config);
 						}
 					}
 				}
 			}
+		} finally {
+			SyncManager.setSyncAuto(syncAutoSetting);
 		}
-		
 		return true;
 	}
 
