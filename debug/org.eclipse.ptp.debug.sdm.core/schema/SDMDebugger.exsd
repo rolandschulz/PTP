@@ -59,7 +59,7 @@
          <attribute name="priority" type="string">
             <annotation>
                <documentation>
-                  Specifies the priority of this debugger when displayed in the user interface. Debuggers with a higher priority are displayed first.
+                  Specifies the priority of this debugger when displayed in the user interface. Debuggers with a higher priority are displayed first. Can also be used to override an existing backend&apos;s default values. Default values will be taken from the extension with the highest priority.
                </documentation>
             </annotation>
          </attribute>

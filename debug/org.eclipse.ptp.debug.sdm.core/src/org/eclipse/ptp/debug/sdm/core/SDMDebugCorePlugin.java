@@ -142,6 +142,28 @@ public class SDMDebugCorePlugin extends Plugin {
 		plugin = null;
 	}
 
+	/**
+	 * Compare two strings as integers. Returns the difference between the values. If either string is not parseable as an integer,
+	 * it is assumed to be 0.
+	 * 
+	 * @param p1
+	 * @param p2
+	 * @return
+	 */
+	private int compare(String p1, String p2) {
+		int pri1 = 0;
+		int pri2 = 0;
+		try {
+			pri1 = Integer.parseInt(p1);
+		} catch (NumberFormatException e) {
+		}
+		try {
+			pri2 = Integer.parseInt(p2);
+		} catch (NumberFormatException e) {
+		}
+		return pri1 - pri2;
+	}
+
 	private void initializeDebuggerBackends() {
 		if (debuggerBackends == null) {
 			debuggerBackends = new HashMap<String, String>();
@@ -153,16 +175,19 @@ public class SDMDebugCorePlugin extends Plugin {
 			for (int i = 0; i < configs.length; i++) {
 				IConfigurationElement configurationElement = configs[i];
 				if (configurationElement.getName().equals(DEBUGGER_ELEMENT)) {
-					String priority = configurationElement.getAttribute(ATTR_PRIORITY);
-					if (priority == null) {
-						priority = "0"; //$NON-NLS-1$
+					String newPriority = configurationElement.getAttribute(ATTR_PRIORITY);
+					if (newPriority == null) {
+						newPriority = "0"; //$NON-NLS-1$
 					}
 					String backend = configurationElement.getAttribute(ATTR_NAME);
-					debuggerBackends.put(backend, priority);
-					String path = configurationElement.getAttribute(ATTR_BACKEND_PATH);
-					debuggerBackendPaths.put(backend, path == null ? EMPTY_STRING : path);
-					String sdm_path = configurationElement.getAttribute(ATTR_SDM_PATH);
-					debuggerSDMPaths.put(backend, sdm_path == null ? EMPTY_STRING : sdm_path);
+					String oldPriority = debuggerBackends.get(backend);
+					if (oldPriority == null || compare(newPriority, oldPriority) > 0) {
+						debuggerBackends.put(backend, newPriority);
+						String path = configurationElement.getAttribute(ATTR_BACKEND_PATH);
+						debuggerBackendPaths.put(backend, path == null ? EMPTY_STRING : path);
+						String sdm_path = configurationElement.getAttribute(ATTR_SDM_PATH);
+						debuggerSDMPaths.put(backend, sdm_path == null ? EMPTY_STRING : sdm_path);
+					}
 				}
 			}
 		}
