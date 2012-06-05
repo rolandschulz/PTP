@@ -20,6 +20,7 @@ import java.util.UUID;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -805,6 +806,8 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 			getVarMap().maybeAddAttribute(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
 			getVarMap().maybeAddAttribute(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 			getVarMap().maybeAddAttribute(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
+			getVarMap().maybeAddAttribute(JAXBControlConstants.PTP_DIRECTORY,
+					new Path(rc.getWorkingDirectory()).append(JAXBControlConstants.ECLIPSESETTINGS).toString(), false);
 		}
 	}
 
@@ -856,7 +859,6 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		getVarMap().overwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr);
 		getVarMap().overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
 		getVarMap().overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
-		getVarMap().overwrite(JAXBControlConstants.PTP_DIRECTORY, JAXBControlConstants.PTP_DIRECTORY, lcattr);
 
 		/*
 		 * update the dynamic properties

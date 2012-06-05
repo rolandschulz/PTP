@@ -1173,7 +1173,7 @@ public class LaunchController implements ILaunchController {
 		try {
 			IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
 			LMLDAServer server = (LMLDAServer) RemoteServerManager.getServer(LMLDAServer.SERVER_ID, conn);
-			server.setWorkDir(new Path(conn.getWorkingDirectory()).append(".eclipsesettings").toString()); //$NON-NLS-1$
+			server.setWorkDir(new Path(conn.getWorkingDirectory()).append(JAXBControlConstants.ECLIPSESETTINGS).toString());
 			try {
 				server.updateServer(progress.newChild(100));
 			} catch (IOException e) {
@@ -1296,6 +1296,8 @@ public class LaunchController implements ILaunchController {
 			rmVarMap.maybeAddAttribute(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
 			rmVarMap.maybeAddAttribute(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 			rmVarMap.maybeAddAttribute(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
+			rmVarMap.maybeAddAttribute(JAXBControlConstants.PTP_DIRECTORY,
+					new Path(rc.getWorkingDirectory()).append(JAXBControlConstants.ECLIPSESETTINGS).toString(), false);
 		}
 	}
 
@@ -1352,7 +1354,6 @@ public class LaunchController implements ILaunchController {
 		rmVarMap.overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_ID, JAXBControlConstants.DEBUGGER_ID, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.PTP_DIRECTORY, JAXBControlConstants.PTP_DIRECTORY, lcattr);
 
 		/*
 		 * update the dynamic attributes

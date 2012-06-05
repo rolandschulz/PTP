@@ -132,8 +132,7 @@ public class RMVariableMap implements IVariableMap {
 				|| name.equals(JAXBControlConstants.EXEC_PATH) || name.equals(JAXBControlConstants.EXEC_DIR)
 				|| name.equals(JAXBControlConstants.PROG_ARGS) || name.equals(JAXBControlConstants.DEBUGGER_EXEC_PATH)
 				|| name.equals(JAXBControlConstants.DEBUGGER_ARGS) || name.equals(JAXBControlConstants.DEBUGGER_ID)
-				|| name.equals(JAXBControlConstants.STDOUT_REMOTE_FILE) || name.equals(JAXBControlConstants.STDERR_REMOTE_FILE)
-				|| name.equals(JAXBControlConstants.PTP_DIRECTORY);
+				|| name.equals(JAXBControlConstants.STDOUT_REMOTE_FILE) || name.equals(JAXBControlConstants.STDERR_REMOTE_FILE);
 	}
 
 	private final Map<String, AttributeType> variables;
