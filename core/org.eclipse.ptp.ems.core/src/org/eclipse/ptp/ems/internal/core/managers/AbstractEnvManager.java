@@ -213,7 +213,7 @@ public abstract class AbstractEnvManager implements IEnvManager {
 	 * @throws IOException
 	 */
 	protected final List<String> runCommandInBashLoginShell(IProgressMonitor pm, String command) throws RemoteConnectionException, IOException {
-		return runCommand(pm, true, "bash", "--login", "-c", command); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return runCommand(pm, false, "bash", "--login", "-c", command); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/*
