@@ -21,6 +21,7 @@ import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.internal.core.MultiConfiguration;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractSingleBuildPage;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -66,6 +67,9 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		String rootLocation;
 		
 		public boolean equals(PageSettings otherSettings) {
+			if (otherSettings == null) {
+				return false;
+			}
 			if (this.syncProvider != otherSettings.syncProvider) {
 				return false;
 			}
@@ -303,39 +307,38 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 		// Don't forget to save changes made to the current configuration before proceeding
 		this.storeSettings(getCfg());
-		for (ICConfigurationDescription desc : getCfgsReadOnly(getProject())) {
+		IProject project = getProject();
+		for (ICConfigurationDescription desc : getCfgsReadOnly(project)) {
 			IConfiguration config = getCfg(desc);
 			if (config == null || config instanceof MultiConfiguration) {
 				continue;
 			}
 
+			// Save settings for changed configs. Call modify functions only when necessary.
+			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 			PageSettings settings = fConfigToPageSettings.get(config.getId());
-			if (settings != null && this.isConfigAltered(config, settings)) {
-				this.saveConfig(config, settings);
+			if (settings != null) {
+				PageSettings systemSettings = this.loadSettings(config);
+				if (!settings.equals(systemSettings)) {
+					this.saveConfig(config,  settings);
+					if ((systemSettings == null) || (settings.syncProvider != systemSettings.syncProvider)) {
+						if (settings.syncProvider == null) {
+							bcm.modifyConfigurationAsSyncLocal(config);
+							try {
+								BuildScenario localBuildScenario = bcm.createLocalBuildScenario(project);
+								bcm.setBuildScenarioForBuildConfiguration(localBuildScenario, config);
+							} catch (CoreException e) {
+								RDTSyncUIPlugin.log(Messages.BuildRemotePropertiesPage_2, e);
+							}
+						} else {
+							bcm.modifyConfigurationAsSyncRemote(config);
+						}
+					}
+				}
 			}
 		}
 		
 		return true;
-	}
-	
-	/**
-	 * Load system settings for config and see if they differ from passed settings
-	 *
-	 * @param config
-	 * 				the configuration to load and compare
-	 * @param settings
-	 * 				settings to compare (presumably the settings entered by the user)
-	 * @return whether or not settings differ
-	 */
-	private boolean isConfigAltered(IConfiguration config, PageSettings settings) {
-		PageSettings systemSettings = this.loadSettings(config);
-		if (systemSettings == null) {
-			return true; // Is logged inside loadSettings
-		} else if (settings.equals(systemSettings)) {
-			return false;
-		} else {
-			return true;
-		}
 	}
 
 	/**

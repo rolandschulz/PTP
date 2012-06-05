@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui;
 
-import java.util.Date;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogConstants;

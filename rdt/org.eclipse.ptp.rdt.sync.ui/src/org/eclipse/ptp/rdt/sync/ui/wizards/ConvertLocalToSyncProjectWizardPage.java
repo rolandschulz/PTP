@@ -23,9 +23,6 @@ import java.util.Set;
 
 import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
-import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
-import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
-import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
@@ -301,19 +298,11 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			boolean defaultConfigSet = false;
 			IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 			for (IConfiguration config : allConfigs) {
-				// For selected configs, create a new remote config and modify it to use the sync builder and to handle environment
-				// variables properly.
+				// For selected configs, create a new remote config
 				if (selectedConfigsSet.contains(config)) {
 					IConfiguration remoteConfig = bcm.createConfiguration(project, (Configuration) config, remoteBuildScenario,
-							config.getName() + "_remote", null); //$NON-NLS-1$
-					IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
-					remoteConfig.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
-
-					// turn off append contributed(local) environment variables for the build configuration of the remote project
-					ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(remoteConfig);
-					if (c_mb_confgDes != null) {
-						EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
-					}
+							config.getName(), null);
+					bcm.modifyConfigurationAsSyncRemote(remoteConfig);
 
 					// The first remote found will be the initial default (active) configuration.
 					if (!defaultConfigSet) {
@@ -322,8 +311,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 					}
 				}
 				
-				// For all previously existing configs, append "(local)" to the name.
-				config.setName(config.getName() + "_local"); //$NON-NLS-1$
+				bcm.modifyConfigurationAsSyncLocal(config);
 			}
 			ManagedBuildManager.saveBuildInfo(project, true);
 			

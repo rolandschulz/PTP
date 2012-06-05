@@ -24,6 +24,8 @@ import org.eclipse.cdt.core.settings.model.ICProjectDescription;
 import org.eclipse.cdt.core.settings.model.ICStorageElement;
 import org.eclipse.cdt.core.settings.model.WriteAccessException;
 import org.eclipse.cdt.core.settings.model.extension.CConfigurationData;
+import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
+import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
@@ -70,7 +72,9 @@ public class BuildConfigurationManager {
 	private static final String configSyncDataStorageName = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String TEMPLATE_KEY = "template-service-configuration"; //$NON-NLS-1$
 	private static final String projectLocationPathVariable = "${project_loc}"; //$NON-NLS-1$
-	
+	private static final String localConfigAnnotation = "_local"; //$NON-NLS-1$
+	private static final String remoteConfigAnnotation = "_remote"; //$NON-NLS-1$
+
 	// Setup as a singleton
 	private BuildConfigurationManager() {
 	}
@@ -943,5 +947,43 @@ public class BuildConfigurationManager {
 			return;
 		}
 		provider.checkout(project, buildScenario, path);
+	}
+	
+	public void modifyConfigurationAsSyncLocal(IConfiguration config) {
+		String configName = config.getName();
+		if (configName.endsWith(localConfigAnnotation)) {
+			// nothing to do
+		} else {
+			if (configName.endsWith(remoteConfigAnnotation)) {
+				configName = configName.substring(0, configName.length() - remoteConfigAnnotation.length());
+			}
+			configName += localConfigAnnotation;
+			config.setName(configName);
+		}
+		
+		ManagedBuildManager.saveBuildInfo(config.getOwner().getProject(), true);
+	}
+	
+	public void modifyConfigurationAsSyncRemote(IConfiguration config) {
+		String configName = config.getName();
+		if (configName.endsWith(remoteConfigAnnotation)) {
+			// nothing to do
+		} else {
+			if (configName.endsWith(localConfigAnnotation)) {
+				configName = configName.substring(0, configName.length() - localConfigAnnotation.length());
+			}
+			configName += remoteConfigAnnotation;
+			config.setName(configName);
+		}
+		
+		IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
+		config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
+		// turn off append contributed (local) environment variables for the build configuration of the remote project
+		ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
+		if (c_mb_confgDes != null) {
+			EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+		}
+		
+		ManagedBuildManager.saveBuildInfo(config.getOwner().getProject(), true);
 	}
 }

@@ -16,9 +16,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
-import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
-import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
@@ -127,25 +124,20 @@ public class NewRemoteSyncProjectWizardOperation {
 			// If config is both local and remote, then we need to create a config. Let the existing config be the remote and
 			// create a new local config based on the remote config.
 			if (isLocal && isRemote) {
-				bcm.createConfiguration(project, (Configuration) config, localBuildScenario, config.getName() + "_local", null); //$NON-NLS-1$
+				IConfiguration localConfig = bcm.createConfiguration(project, (Configuration) config, localBuildScenario,
+						config.getName(), null);
+				bcm.modifyConfigurationAsSyncLocal(localConfig);
 			}
 			
 			// If local only, change its build scenario to the local build scenario.
 			if (isLocal && !isRemote) {
 				bcm.setBuildScenarioForBuildConfiguration(localBuildScenario, config);
-				config.setName(config.getName() + "_local"); //$NON-NLS-1$
+				bcm.modifyConfigurationAsSyncLocal(config);
 			}
 			
 			// If type is remote, change to the sync builder and set environment variable support.
 			if (isRemote) {
-				config.setName(config.getName() + "_remote"); //$NON-NLS-1$
-				IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder("org.eclipse.ptp.rdt.sync.core.SyncBuilder"); //$NON-NLS-1$
-				config.changeBuilder(syncBuilder, "org.eclipse.ptp.rdt.sync.core.SyncBuilder", "Sync Builder"); //$NON-NLS-1$ //$NON-NLS-2$
-				// turn off append contributed (local) environment variables for the build configuration of the remote project
-				ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
-				if (c_mb_confgDes != null) {
-					EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
-				}
+				bcm.modifyConfigurationAsSyncRemote(config);
 				
 				// The first remote found will be the initial default (active) configuration.
 				if (!defaultConfigSet) {
