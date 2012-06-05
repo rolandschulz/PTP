@@ -9,6 +9,9 @@
 <resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="resource_manager_type.xsd" name="Remote-Generic-Interactive">
 	<control-data>
+		<attribute name="mpiNumberOfProcesses" type="integer">
+			<default>1</default>
+		</attribute>
 		<submit-interactive name="submit-interactive" directory="${ptp_rm:directory#value}" waitForId="false" keepOpen="true">
 			<arg>${ptp_rm:executablePath#value}</arg>
 			<arg>${ptp_rm:progArgs#value}</arg>
