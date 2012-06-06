@@ -40,6 +40,7 @@ import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.NotSupportedException;
 import org.eclipse.jgit.errors.TransportException;
 import org.eclipse.jgit.lib.ObjectId;
@@ -634,7 +635,7 @@ public class GitRemoteSyncConnection {
 			boolean indexHasNewFiles = !status.getAdded().isEmpty();
 			boolean indexHasModifiedFiles = !status.getChanged().isEmpty();
 			boolean indexHasDeletedFiles = !status.getRemoved().isEmpty();
-			if (addedOrRemovedFiles || indexHasNewFiles || indexHasModifiedFiles || indexHasDeletedFiles) {
+			if (addedOrRemovedFiles || indexHasNewFiles || indexHasModifiedFiles || indexHasDeletedFiles || inMergeState()) {
 				final CommitCommand commitCommand = git.commit();
 				commitCommand.setMessage(commitMessage);
 				commitCommand.call();
@@ -644,6 +645,23 @@ public class GitRemoteSyncConnection {
 			}
 		} catch (final GitAPIException e) {
 			throw new RemoteSyncException(e);
+		} catch (IOException e) {
+			throw new RemoteSyncException(e);
+		}
+	}
+	
+	// Is the repository currently in a merge state?
+	private boolean inMergeState() throws IOException {
+		try {
+			if (git.getRepository().resolve("MERGE_HEAD") == null) { //$NON-NLS-1$
+				return false;
+			} else {
+				return true;
+			}
+		} catch (AmbiguousObjectException e) {
+			// Should never happen...
+			RDTSyncCorePlugin.log(e);
+			return true;
 		}
 	}
 	
