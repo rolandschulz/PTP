@@ -194,8 +194,12 @@ public class OpenshmemCHelpBook extends CHelpBookImpl {
 				"Transfers data to a specified processing element(PE)",
 				new FunctionPrototypeSummaryImpl("shmem_longdouble_put", "void",
 						"long double *target, const long double *source, size_t len, int pe"), null));
+		funcName2FuncInfo.put("shmem_ptr",
+				new FunctionSummaryImpl("shmem_ptr", "", "Returns a pointer to a data object of a processing element(PE)",
+						new FunctionPrototypeSummaryImpl("shmem_ptr", "void",
+								"void *target, int pe"), null));
 		funcName2FuncInfo.put("shmem_put",
-				new FunctionSummaryImpl("shmem_put", "", "Transfers data to a specified processing element(PE)",
+				new FunctionSummaryImpl("shmem_put", "", "processing element(PE)",
 						new FunctionPrototypeSummaryImpl("shmem_put", "void",
 								"void *target, const void *source, size_t len, int pe"), null));
 		funcName2FuncInfo.put("shmem_put32", new FunctionSummaryImpl("shmem_put32", "",
