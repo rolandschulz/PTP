@@ -291,7 +291,7 @@ public final class SearchableChecklist extends Composite {
 		} else {
 			final Matcher matcher = pattern.matcher(moduleName);
 			if (matcher.find()) {
-				return true; // TO ONLY MATCH PREFIXES: return matcher.start() == 0;
+				return matcher.start() == 0; // Match prefixes only
 			} else {
 				return false;
 			}
