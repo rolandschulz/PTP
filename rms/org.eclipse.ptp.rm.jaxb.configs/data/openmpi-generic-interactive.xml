@@ -120,7 +120,7 @@
 				</target>
 			</stderr-parser>
 		</submit-interactive>
-		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}">
+		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" keepOpen="true">
 			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</arg>
 			<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
 			<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>

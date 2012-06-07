@@ -39,12 +39,28 @@
 			<arg>${ptp_rm:mpiNumberOfProcesses#value}</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
 			<arg>${ptp_rm:progArgs#value}</arg>
+			<stderr-parser delim="\n">
+				<target>
+					<match>
+						<expression>.+</expression>
+						<throw message="Unable to launch job"/>
+					</match>
+				</target>
+			</stderr-parser>
 		</submit-interactive>
-		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true">
+		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" keepOpen="true">
 			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</arg>
 			<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
 			<arg>${ptp_rm:debuggerArgs#value}</arg>
+			<stderr-parser delim="\n">
+				<target>
+					<match>
+						<expression>.+</expression>
+						<throw message="Unable to launch job"/>
+					</match>
+				</target>
+			</stderr-parser>
 			<pre-launch-cmd name="Cleanup" exec="rm -f routing_file" wait="true"/>
 			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
 		</submit-interactive-debug>		
