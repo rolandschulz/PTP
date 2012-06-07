@@ -15,16 +15,15 @@ import java.util.List;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.core.jobs.IJobControl;
+import org.eclipse.ptp.rm.jaxb.control.IJobController;
+import org.eclipse.ptp.rm.jaxb.control.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
@@ -84,40 +83,31 @@ public abstract class AbstractStatusAction implements IObjectActionDelegate {
 	 * @return
 	 */
 	protected static boolean operationSupported(JobStatusData status, String operation, IViewPart targetPart) {
-		IJAXBResourceManager rm = (IJAXBResourceManager) ModelManager.getInstance().getResourceManagerFromUniqueName(
-				status.getControlId());
-		if (rm == null) {
-			return false;
-		}
-		if (!IResourceManager.STARTED_STATE.equals(rm.getState())) {
-			return false;
-		}
-		IJAXBResourceManagerConfiguration config = (IJAXBResourceManagerConfiguration) rm.getConfiguration();
-		if (config == null) {
-			return false;
-		}
-
 		try {
-			ResourceManagerData data = config.getResourceManagerData();
-			if (data != null) {
-				ControlType control = data.getControlData();
-				if (operation.equals(JOB_STATUS)) {
-					return control.getGetJobStatus() != null;
-				}
-				if (operation.equals(IResourceManager.HOLD_OPERATION)) {
-					return control.getHoldJob() != null;
-				}
-				if (operation.equals(IResourceManager.RELEASE_OPERATION)) {
-					return control.getReleaseJob() != null;
-				}
-				if (operation.equals(IResourceManager.RESUME_OPERATION)) {
-					return control.getResumeJob() != null;
-				}
-				if (operation.equals(IResourceManager.SUSPEND_OPERATION)) {
-					return control.getSuspendJob() != null;
-				}
-				if (operation.equals(IResourceManager.TERMINATE_OPERATION)) {
-					return control.getTerminateJob() != null;
+			IJobController jobController = LaunchControllerManager.getInstance().getLaunchController(status.getRemoteId(),
+					status.getConnectionName(), status.getControlType());
+			if (jobController != null) {
+				ResourceManagerData data = jobController.getConfiguration();
+				if (data != null) {
+					ControlType control = data.getControlData();
+					if (operation.equals(JOB_STATUS)) {
+						return control.getGetJobStatus() != null;
+					}
+					if (operation.equals(IJobControl.HOLD_OPERATION)) {
+						return control.getHoldJob() != null;
+					}
+					if (operation.equals(IJobControl.RELEASE_OPERATION)) {
+						return control.getReleaseJob() != null;
+					}
+					if (operation.equals(IJobControl.RESUME_OPERATION)) {
+						return control.getResumeJob() != null;
+					}
+					if (operation.equals(IJobControl.SUSPEND_OPERATION)) {
+						return control.getSuspendJob() != null;
+					}
+					if (operation.equals(IJobControl.TERMINATE_OPERATION)) {
+						return control.getTerminateJob() != null;
+					}
 				}
 			}
 		} catch (Throwable t) {

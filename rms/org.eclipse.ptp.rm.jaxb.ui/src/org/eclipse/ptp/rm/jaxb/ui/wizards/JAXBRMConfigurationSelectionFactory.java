@@ -13,10 +13,15 @@
  */
 package org.eclipse.ptp.rm.jaxb.ui.wizards;
 
+import java.net.URL;
+
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.ui.util.JAXBExtensionUtils;
+import org.eclipse.ptp.rm.jaxb.core.JAXBExtensionUtils;
+import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.wizards.RMConfigurationSelectionFactory;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * For retrieving and loading configurations for the JAXB class of resource managers. Looks for configurations in two ways: by
@@ -33,7 +38,13 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	 */
 	@Override
 	public String[] getConfigurationNames() {
-		return JAXBExtensionUtils.getConfiguationNames();
+		String[] configs = JAXBExtensionUtils.getConfiguationNames();
+		if (JAXBExtensionUtils.getInvalid() != null) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.InvalidConfiguration_title,
+					Messages.InvalidConfiguration + JAXBExtensionUtils.getInvalid());
+		}
+
+		return configs;
 	}
 
 	/*
@@ -46,7 +57,12 @@ public class JAXBRMConfigurationSelectionFactory extends RMConfigurationSelectio
 	public void setConfigurationName(String name, IResourceManagerConfiguration configuration) {
 		if (configuration instanceof IJAXBResourceManagerConfiguration) {
 			IJAXBResourceManagerConfiguration jaxbConfiguration = (IJAXBResourceManagerConfiguration) configuration;
-			jaxbConfiguration.setRMConfigurationURL(JAXBExtensionUtils.getConfigurationURL(name));
+			URL url = JAXBExtensionUtils.getConfigurationURL(name);
+			if (JAXBExtensionUtils.getInvalid() != null) {
+				MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.InvalidConfiguration_title,
+						Messages.InvalidConfiguration + JAXBExtensionUtils.getInvalid());
+			}
+			jaxbConfiguration.setRMConfigurationURL(url);
 		}
 		configuration.setName(name);
 	}

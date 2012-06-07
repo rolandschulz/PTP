@@ -13,7 +13,6 @@ package org.eclipse.ptp.rm.lml.monitor.core;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ui.IMemento;
 
 /**
  * @since 6.0
@@ -56,12 +55,11 @@ public interface IMonitorControl {
 	public boolean isActive();
 
 	/**
-	 * Load persisted monitor information. Returns the state of the monitor when it was saved.
+	 * Load persisted monitor information.
 	 * 
-	 * @param memento
 	 * @return true if the monitor was active when saved
 	 */
-	public boolean load(IMemento memento);
+	public boolean load();
 
 	/**
 	 * Force the monitor to refresh its data. This will typically cause a command to be run on the target system.
@@ -70,10 +68,8 @@ public interface IMonitorControl {
 
 	/**
 	 * Save monitor data to persisted store.
-	 * 
-	 * @param memento
 	 */
-	public void save(IMemento memento);
+	public void save();
 
 	/**
 	 * Set the connection name for the monitor

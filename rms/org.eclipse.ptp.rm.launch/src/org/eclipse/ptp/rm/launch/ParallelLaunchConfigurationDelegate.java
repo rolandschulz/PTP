@@ -76,7 +76,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 
 				switchPerspective(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG,
 						Messages.ParallelLaunchConfigurationDelegate_OpenDebugPerspective,
-						PreferenceConstants.PREF_SWITCH_TO_DEBUG_PERSPECTIVE);
+						PreferenceConstants.PREF_SWITCH_TO_DEBUG_PERSPECTIVE, false);
 
 				session.connectToDebugger(subMon.newChild(8), app, path, cwd, args);
 			} catch (CoreException e) {

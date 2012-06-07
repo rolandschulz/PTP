@@ -18,9 +18,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
-import org.eclipse.ptp.rm.jaxb.control.LaunchController;
-import org.eclipse.ptp.rm.jaxb.ui.util.JAXBExtensionUtils;
-import org.eclipse.ptp.rm.launch.internal.ProviderInfo;
+import org.eclipse.ptp.rm.jaxb.control.LaunchControllerManager;
 
 /**
  * @since 6.0
@@ -33,47 +31,16 @@ public class RMLaunchUtils {
 	 * @return
 	 * @throws CoreException
 	 */
-	public static ILaunchController getLaunchControl(ILaunchConfiguration configuration) throws CoreException {
+	public static ILaunchController getLaunchController(ILaunchConfiguration configuration) throws CoreException {
 		String type = LaunchUtils.getTemplateName(configuration);
 		if (type != null) {
-			ProviderInfo provider = ProviderInfo.getProvider(type);
-			if (provider != null) {
-				String controlId = LaunchUtils.getResourceManagerUniqueName(configuration);
-				ILaunchController control = getLaunchControl(provider.getName(), controlId);
-				String name = LaunchUtils.getConnectionName(configuration);
-				String id = LaunchUtils.getRemoteServicesId(configuration);
-				if (name != null && id != null) {
-					control.setConnectionName(name);
-					control.setRemoteServicesId(id);
-					return control;
-				}
+			String connName = LaunchUtils.getConnectionName(configuration);
+			String remId = LaunchUtils.getRemoteServicesId(configuration);
+			if (connName != null && remId != null) {
+				return LaunchControllerManager.getInstance().getLaunchController(remId, connName, type);
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * @param name
-	 *            configuration name
-	 * @return launch controller
-	 */
-	public static ILaunchController getLaunchControl(String name) {
-		ILaunchController control = new LaunchController(name);
-		control.setRMConfigurationURL(JAXBExtensionUtils.getConfigurationURL(name));
-		return control;
-	}
-
-	/**
-	 * @param name
-	 *            configuration name
-	 * @param controlId
-	 *            ID of controller
-	 * @return launch controller
-	 */
-	public static ILaunchController getLaunchControl(String name, String controlId) {
-		ILaunchController control = new LaunchController(name, controlId);
-		control.setRMConfigurationURL(JAXBExtensionUtils.getConfigurationURL(name));
-		return control;
 	}
 
 	/**

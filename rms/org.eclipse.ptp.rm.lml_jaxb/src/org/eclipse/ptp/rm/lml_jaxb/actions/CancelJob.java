@@ -15,12 +15,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml_jaxb.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * Cancels the job.
@@ -41,7 +41,7 @@ public class CancelJob extends AbstractStatusAction {
 				for (Row row : selected) {
 					JobStatusData status = row.status;
 					try {
-						ActionUtils.callDoControl(status, IResourceManager.TERMINATE_OPERATION, view, monitor);
+						ActionUtils.callDoControl(status, IJobControl.TERMINATE_OPERATION, monitor);
 						if (monitor.isCanceled()) {
 							break;
 						}
@@ -60,9 +60,7 @@ public class CancelJob extends AbstractStatusAction {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.actions.AbstractStatusAction#validate(org.
-	 * eclipse.jface.action.IAction,
+	 * @see org.eclipse.ptp.rm.jaxb.ui.actions.AbstractStatusAction#validate(org. eclipse.jface.action.IAction,
 	 * org.eclipse.ptp.rm.jaxb.ui.data.PersistentCommandJobStatus)
 	 */
 	@Override
@@ -73,7 +71,7 @@ public class CancelJob extends AbstractStatusAction {
 				action.setEnabled(false);
 				return;
 			}
-			if (!operationSupported(status, IResourceManager.TERMINATE_OPERATION, view)) {
+			if (!operationSupported(status, IJobControl.TERMINATE_OPERATION, view)) {
 				action.setEnabled(false);
 				return;
 			}

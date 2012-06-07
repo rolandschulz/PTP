@@ -262,9 +262,9 @@ public class TableHandler extends LguiHandler {
 				final String sort = getColumnSortProperty(getTable(gid), cids, i);
 				// when there is a change
 				if (column.getSorted() != null && column.getSorted().value() != null && sort != null) {
-					if (sort.equals("numeric")) {
+					if (sort.equals("numeric")) { //$NON-NLS-1$
 						style = ITableColumnLayout.COLUMN_STYLE_RIGHT;
-					} else if (sort.equals("alpha")) {
+					} else if (sort.equals("alpha")) { //$NON-NLS-1$
 						style = ITableColumnLayout.COLUMN_STYLE_LEFT;
 					} else {
 						style = ITableColumnLayout.COLUMN_STYLE_CENTER;
@@ -349,7 +349,9 @@ public class TableHandler extends LguiHandler {
 				if (status == null) {
 					final String queueName = getCellValue(table, row, ILguiItem.JOB_QUEUE_NAME);
 					final String owner = getCellValue(table, row, ILguiItem.JOB_OWNER);
-					status = new JobStatusData(jobId, lguiItem.toString(), queueName, owner, null, null, false);
+					String[][] attrs = { { JobStatusData.JOB_ID_ATTR, jobId }, { JobStatusData.QUEUE_NAME_ATTR, queueName },
+							{ JobStatusData.OWNER_ATTR, owner } };
+					status = new JobStatusData(attrs);
 				}
 				tableData[i].setJobStatusData(status);
 			}
@@ -411,7 +413,7 @@ public class TableHandler extends LguiHandler {
 					// Range
 					final String minValue = pattern.getMinValueRange();
 					final String maxValue = pattern.getMaxValueRange();
-					if (type.equals("numeric")) {
+					if (type.equals("numeric")) { //$NON-NLS-1$
 						if ((Integer.valueOf(rowValue) < Integer.valueOf(minValue))
 								|| (Integer.valueOf(maxValue) < Integer.valueOf(rowValue))) {
 							allIncluded = false;
@@ -427,50 +429,50 @@ public class TableHandler extends LguiHandler {
 					// Relation
 					final String compareValue = pattern.getRelationValue();
 					final String compareOperator = pattern.getRelationOperator();
-					if (type.equals("numeric")) {
+					if (type.equals("numeric")) { //$NON-NLS-1$
 						final int rowValueInt = Integer.valueOf(rowValue);
 						final int compareValueInt = Integer.valueOf(compareValue);
-						if (compareOperator.equals("=") && rowValueInt != compareValueInt) {
+						if (compareOperator.equals("=") && rowValueInt != compareValueInt) { //$NON-NLS-1$
 							allIncluded = false;
 							break;
-						} else if (compareOperator.equals("!=") && rowValueInt == compareValueInt) {
+						} else if (compareOperator.equals("!=") && rowValueInt == compareValueInt) { //$NON-NLS-1$
 							allIncluded = false;
 							break;
-						} else if (compareOperator.equals("<") && rowValueInt >= compareValueInt) {
+						} else if (compareOperator.equals("<") && rowValueInt >= compareValueInt) { //$NON-NLS-1$
 							allIncluded = false;
 							break;
-						} else if (compareOperator.equals("<=") && rowValueInt > compareValueInt) {
+						} else if (compareOperator.equals("<=") && rowValueInt > compareValueInt) { //$NON-NLS-1$
 							allIncluded = false;
 							break;
-						} else if (compareOperator.equals(">") && rowValueInt <= compareValueInt) {
+						} else if (compareOperator.equals(">") && rowValueInt <= compareValueInt) { //$NON-NLS-1$
 							allIncluded = false;
 							break;
-						} else if (compareOperator.equals(">=") && rowValueInt < compareValueInt) {
+						} else if (compareOperator.equals(">=") && rowValueInt < compareValueInt) { //$NON-NLS-1$
 							allIncluded = false;
 							break;
 						}
 					} else {
-						if ((compareOperator.equals("=") && !compareValue.equals(rowValue))
-								|| (compareOperator.equals("!=") && compareValue.equals(rowValue))) {
+						if ((compareOperator.equals("=") && !compareValue.equals(rowValue)) //$NON-NLS-1$
+								|| (compareOperator.equals("!=") && compareValue.equals(rowValue))) { //$NON-NLS-1$
 							allIncluded = false;
 							break;
-						} else if (type.equals("alpha")) {
-							if ((compareOperator.equals("=~") && !rowValue.contains(compareValue))
-									|| (compareOperator.equals("!~") && rowValue.contains(compareValue))) {
+						} else if (type.equals("alpha")) { //$NON-NLS-1$
+							if ((compareOperator.equals("=~") && !rowValue.contains(compareValue)) //$NON-NLS-1$
+									|| (compareOperator.equals("!~") && rowValue.contains(compareValue))) { //$NON-NLS-1$
 								allIncluded = false;
 								break;
 							}
-						} else if (type.equals("date")) {
-							if (compareOperator.equals("<") && rowValue.compareTo(compareValue) >= 0) {
+						} else if (type.equals("date")) { //$NON-NLS-1$
+							if (compareOperator.equals("<") && rowValue.compareTo(compareValue) >= 0) { //$NON-NLS-1$
 								allIncluded = false;
 								break;
-							} else if (compareOperator.equals("<=") && rowValue.compareTo(compareValue) > 0) {
+							} else if (compareOperator.equals("<=") && rowValue.compareTo(compareValue) > 0) { //$NON-NLS-1$
 								allIncluded = false;
 								break;
-							} else if (compareOperator.equals(">") && rowValue.compareTo(compareValue) <= 0) {
+							} else if (compareOperator.equals(">") && rowValue.compareTo(compareValue) <= 0) { //$NON-NLS-1$
 								allIncluded = false;
 								break;
-							} else if (compareOperator.equals(">=") && rowValue.compareTo(compareValue) < 0) {
+							} else if (compareOperator.equals(">=") && rowValue.compareTo(compareValue) < 0) { //$NON-NLS-1$
 								allIncluded = false;
 								break;
 							}
@@ -685,7 +687,7 @@ public class TableHandler extends LguiHandler {
 				}
 			}
 		}
-		return "alpha";
+		return "alpha"; //$NON-NLS-1$
 	}
 
 	/**

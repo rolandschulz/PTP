@@ -17,6 +17,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
+import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.ptp.rm.lml_jaxb.messages.Messages;
 
 /**
@@ -35,7 +36,9 @@ public class RemoveJob extends AbstractStatusAction {
 			for (Row row : selected) {
 				JobStatusData status = row.status;
 				data.add(status);
-				LMLManager.getInstance().removeUserJob(status.getControlId(), status.getJobId());
+				String monitorId = MonitorControlManager.generateMonitorId(status.getRemoteId(), status.getConnectionName(),
+						status.getMonitorType());
+				LMLManager.getInstance().removeUserJob(monitorId, status.getJobId());
 			}
 			view.refresh();
 			ActionUtils.removeFiles(data);

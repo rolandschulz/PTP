@@ -20,8 +20,7 @@ import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 
 /**
- * Base class for actions on the job status object which initiate a batch
- * control operation.
+ * Base class for actions on the job status object which initiate a batch control operation.
  * 
  * @author arossi
  * 
@@ -42,7 +41,7 @@ public abstract class AbstractControlAction extends AbstractStatusAction {
 				for (Row row : selected) {
 					JobStatusData status = row.status;
 					try {
-						ActionUtils.callDoControl(status, operation, view, monitor);
+						ActionUtils.callDoControl(status, operation, monitor);
 						if (monitor.isCanceled()) {
 							break;
 						}
@@ -59,9 +58,7 @@ public abstract class AbstractControlAction extends AbstractStatusAction {
 	}
 
 	/*
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.actions.AbstractStatusAction#validate(org.
-	 * eclipse.jface.action.IAction,
+	 * @see org.eclipse.ptp.rm.jaxb.ui.actions.AbstractStatusAction#validate(org. eclipse.jface.action.IAction,
 	 * org.eclipse.ptp.rm.jaxb.ui.data.PersistentCommandJobStatus)
 	 */
 	@Override

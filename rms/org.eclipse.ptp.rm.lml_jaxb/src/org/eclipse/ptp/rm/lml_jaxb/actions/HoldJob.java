@@ -9,9 +9,9 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.lml_jaxb.actions;
 
+import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
  * Puts the job on hold.
@@ -22,15 +22,13 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
 public class HoldJob extends AbstractControlAction {
 
 	public HoldJob() {
-		operation = IResourceManager.HOLD_OPERATION;
+		operation = IJobControl.HOLD_OPERATION;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.actions.AbstractBatchControlAction#validateState
-	 * (org.eclipse.jface.action.IAction,
+	 * @see org.eclipse.ptp.rm.jaxb.ui.actions.AbstractBatchControlAction#validateState (org.eclipse.jface.action.IAction,
 	 * org.eclipse.ptp.rm.jaxb.ui.data.PersistentCommandJobStatus)
 	 */
 	@Override

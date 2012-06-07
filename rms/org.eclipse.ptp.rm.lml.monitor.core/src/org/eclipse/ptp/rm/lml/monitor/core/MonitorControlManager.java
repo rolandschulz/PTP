@@ -17,9 +17,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.CoreException;
@@ -55,13 +55,13 @@ public class MonitorControlManager {
 	}
 
 	public static String generateMonitorId(String remoteServicesId, String connectionName, String monitorType) {
-		String bytes = remoteServicesId + "." + connectionName + "." + monitorType; //$NON-NLS-1$//$NON-NLS-2$
+		String bytes = remoteServicesId + "/" + connectionName + "/" + monitorType; //$NON-NLS-1$//$NON-NLS-2$
 		return UUID.nameUUIDFromBytes(bytes.getBytes()).toString();
 	}
 
 	private final Map<String, IMonitorControl> fMonitorControls = Collections
 			.synchronizedMap(new HashMap<String, IMonitorControl>());
-	private final Set<IMonitorControl> fMonitorControlsToStart = new TreeSet<IMonitorControl>();
+	private final Set<IMonitorControl> fMonitorControlsToStart = new HashSet<IMonitorControl>();
 
 	private MonitorControlManager() {
 	}
@@ -229,7 +229,7 @@ public class MonitorControlManager {
 			IMemento[] monitorsMemento = memento.getChildren(MONITOR_ID_ATTR);
 			for (IMemento monitorMemento : monitorsMemento) {
 				IMonitorControl monitor = new MonitorControl(monitorMemento.getID());
-				if (monitor.load(monitorMemento)) {
+				if (monitor.load()) {
 					fMonitorControlsToStart.add(monitor);
 				}
 				addMonitorControl(monitor);
@@ -244,8 +244,7 @@ public class MonitorControlManager {
 	private void saveMonitors() {
 		final XMLMemento memento = XMLMemento.createWriteRoot(MONITORS_ATTR);
 		for (IMonitorControl monitor : fMonitorControls.values()) {
-			final IMemento monitorMemento = memento.createChild(MONITOR_ID_ATTR, monitor.getMonitorId());
-			monitor.save(monitorMemento);
+			memento.createChild(MONITOR_ID_ATTR, monitor.getMonitorId());
 		}
 
 		try {

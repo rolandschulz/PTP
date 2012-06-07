@@ -66,14 +66,6 @@ public class LCVariableMap implements IVariableMap {
 	 */
 	public static void normalizeStandardProperties(String rmPrefix, ILaunchConfigurationWorkingCopy configuration)
 			throws CoreException {
-		String cdir = configuration.getAttribute(rmPrefix + JAXBControlConstants.CONTROL_WORKING_DIR_VAR,
-				JAXBControlConstants.ZEROSTR);
-		String dir = configuration.getAttribute(rmPrefix + JAXBControlConstants.DIRECTORY, JAXBControlConstants.ZEROSTR);
-		if (JAXBControlConstants.ZEROSTR.equals(dir)) {
-			dir = cdir;
-		}
-
-		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DIRECTORY);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.EXEC_PATH);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.EXEC_DIR);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.PROG_ARGS);
@@ -81,11 +73,8 @@ public class LCVariableMap implements IVariableMap {
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_ARGS);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_ID);
 
-		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, dir);
-		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
-			configuration.setAttribute(rmPrefix + JAXBControlConstants.DIRECTORY, attr);
-		}
-		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, JAXBControlConstants.ZEROSTR);
+		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
+				JAXBControlConstants.ZEROSTR);
 		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.EXEC_PATH, attr);
 			attr = new Path(attr).removeLastSegments(1).toString();

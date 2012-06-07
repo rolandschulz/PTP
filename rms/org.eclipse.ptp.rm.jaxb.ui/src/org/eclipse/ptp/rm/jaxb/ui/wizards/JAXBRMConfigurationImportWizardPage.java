@@ -14,10 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.ptp.rm.jaxb.core.JAXBExtensionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.ui.util.JAXBExtensionUtils;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,6 +27,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
@@ -106,7 +108,12 @@ public class JAXBRMConfigurationImportWizardPage extends WizardPage implements S
 		names.add(JAXBUIConstants.ZEROSTR);
 		List<URL> locations = new ArrayList<URL>();
 		locations.add(null);
-		for (Map.Entry<String, URL> e : JAXBExtensionUtils.getPluginConfiguations().entrySet()) {
+		Map<String, URL> configs = JAXBExtensionUtils.getPluginConfiguations();
+		if (JAXBExtensionUtils.getInvalid() != null) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.InvalidConfiguration_title,
+					Messages.InvalidConfiguration + JAXBExtensionUtils.getInvalid());
+		}
+		for (Map.Entry<String, URL> e : configs.entrySet()) {
 			names.add(e.getKey());
 			locations.add(e.getValue());
 		}

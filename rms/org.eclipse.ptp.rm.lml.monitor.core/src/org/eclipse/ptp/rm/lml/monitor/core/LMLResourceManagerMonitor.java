@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
@@ -33,6 +34,7 @@ import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -188,16 +190,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	private static final String FILTER_MIN_VALUE_RANGE_ATTR = "minValueRange";//$NON-NLS-1$
 	private static final String FILTER_RELATION_OPERATOR_ATTR = "relationOperartor";//$NON-NLS-1$
 	private static final String FILTER_RELATION_VALUE_ATTR = "relationValue";//$NON-NLS-1$
-	private static final String JOB_ID_ATTR = "job_id";//$NON-NLS-1$
-	private static final String CONTROL_ID_ATTR = "control_id";//$NON-NLS-1$
-	private static final String STDOUT_REMOTE_FILE_ATTR = "stdout_remote_path";//$NON-NLS-1$
-	private static final String STDERR_REMOTE_FILE_ATTR = "stderr_remote_path";//$NON-NLS-1$
-	private static final String INTERACTIVE_ATTR = "interactive";//$NON-NLS-1$;
-	private static final String STATE_ATTR = "state";//$NON-NLS-1$;
-	private static final String STATE_DETAIL_ATTR = "state_detail";//$NON-NLS-1$;
-	private static final String OID_ATTR = "oid";//$NON-NLS-1$;
-	private static final String QUEUE_NAME_ATTR = "queue_name";//$NON-NLS-1$;
-	private static final String OWNER_ATTR = "owner";//$NON-NLS-1$;
 
 	public LMLResourceManagerMonitor(AbstractResourceManagerConfiguration config) {
 		super(config);
@@ -228,6 +220,14 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 			}
 		}
 		return request;
+	}
+
+	private String getMonitorType() {
+		final MonitorType monitorType = getResourceManagerData().getMonitorData();
+		if (monitorType != null) {
+			return monitorType.getSchedulerType();
+		}
+		return ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -264,12 +264,22 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	private JobStatusData[] reloadJobs(IMemento memento) {
 		final List<JobStatusData> jobs = new ArrayList<JobStatusData>();
 		if (memento != null) {
-			final IMemento[] children = memento.getChildren(JOB_ID_ATTR);
+			final IMemento[] children = memento.getChildren(JobStatusData.JOB_ID_ATTR);
 			for (final IMemento child : children) {
-				jobs.add(new JobStatusData(child.getID(), child.getString(CONTROL_ID_ATTR), child.getString(STATE_ATTR), child
-						.getString(STATE_DETAIL_ATTR), child.getString(STDOUT_REMOTE_FILE_ATTR), child
-						.getString(STDERR_REMOTE_FILE_ATTR), child.getBoolean(INTERACTIVE_ATTR), child.getString(QUEUE_NAME_ATTR),
-						child.getString(OWNER_ATTR), child.getString(OID_ATTR)));
+				String[][] attrs = { { JobStatusData.JOB_ID_ATTR, child.getID() },
+						{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getMonitorConfiguration().getRemoteServicesId() },
+						{ JobStatusData.CONNECTION_NAME_ATTR, getMonitorConfiguration().getConnectionName() },
+						{ JobStatusData.CONTROL_TYPE_ATTR, child.getString(JobStatusData.CONTROL_TYPE_ATTR) },
+						{ JobStatusData.MONITOR_TYPE_ATTR, getMonitorType() },
+						{ JobStatusData.STATE_ATTR, child.getString(JobStatusData.STATE_ATTR) },
+						{ JobStatusData.STATE_DETAIL_ATTR, child.getString(JobStatusData.STATE_DETAIL_ATTR) },
+						{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, child.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR) },
+						{ JobStatusData.STDERR_REMOTE_FILE_ATTR, child.getString(JobStatusData.STDERR_REMOTE_FILE_ATTR) },
+						{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(child.getBoolean(JobStatusData.INTERACTIVE_ATTR)) },
+						{ JobStatusData.QUEUE_NAME_ATTR, child.getString(JobStatusData.QUEUE_NAME_ATTR) },
+						{ JobStatusData.OWNER_ATTR, child.getString(JobStatusData.OWNER_ATTR) },
+						{ JobStatusData.OID_ATTR, child.getString(JobStatusData.OID_ATTR) } };
+				jobs.add(new JobStatusData(attrs));
 			}
 		}
 		return jobs.toArray(new JobStatusData[jobs.size()]);
@@ -303,16 +313,16 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	}
 
 	private void saveJob(JobStatusData job, XMLMemento memento) {
-		final IMemento jobMemento = memento.createChild(JOB_ID_ATTR, job.getJobId());
-		jobMemento.putString(CONTROL_ID_ATTR, job.getControlId());
-		jobMemento.putString(STATE_ATTR, job.getState());
-		jobMemento.putString(STATE_DETAIL_ATTR, job.getStateDetail());
-		jobMemento.putString(STDOUT_REMOTE_FILE_ATTR, job.getOutputPath());
-		jobMemento.putString(STDERR_REMOTE_FILE_ATTR, job.getErrorPath());
-		jobMemento.putBoolean(INTERACTIVE_ATTR, job.isInteractive());
-		jobMemento.putString(QUEUE_NAME_ATTR, job.getQueueName());
-		jobMemento.putString(OWNER_ATTR, job.getOwner());
-		jobMemento.putString(OID_ATTR, job.getOid());
+		final IMemento jobMemento = memento.createChild(JobStatusData.JOB_ID_ATTR, job.getJobId());
+		jobMemento.putString(JobStatusData.CONTROL_TYPE_ATTR, job.getControlType());
+		jobMemento.putString(JobStatusData.STATE_ATTR, job.getState());
+		jobMemento.putString(JobStatusData.STATE_DETAIL_ATTR, job.getStateDetail());
+		jobMemento.putString(JobStatusData.STDOUT_REMOTE_FILE_ATTR, job.getOutputPath());
+		jobMemento.putString(JobStatusData.STDERR_REMOTE_FILE_ATTR, job.getErrorPath());
+		jobMemento.putBoolean(JobStatusData.INTERACTIVE_ATTR, job.isInteractive());
+		jobMemento.putString(JobStatusData.QUEUE_NAME_ATTR, job.getQueueName());
+		jobMemento.putString(JobStatusData.OWNER_ATTR, job.getOwner());
+		jobMemento.putString(JobStatusData.OID_ATTR, job.getOid());
 
 	}
 
@@ -340,8 +350,17 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 	 */
 	@Override
 	protected void doAddJob(IJobStatus status) {
-		final JobStatusData data = new JobStatusData(status.getJobId(), status.getControlId(), status.getQueueName(),
-				status.getOwner(), status.getOutputPath(), status.getErrorPath(), status.isInteractive());
+		ILaunchConfiguration configuration = status.getLaunchConfiguration();
+		String controlName = LaunchUtils.getTemplateName(configuration);
+		String[][] attrs = { { JobStatusData.JOB_ID_ATTR, status.getJobId() },
+				{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getMonitorConfiguration().getRemoteServicesId() },
+				{ JobStatusData.CONNECTION_NAME_ATTR, getMonitorConfiguration().getConnectionName() },
+				{ JobStatusData.CONTROL_TYPE_ATTR, controlName }, { JobStatusData.MONITOR_TYPE_ATTR, getMonitorType() },
+				{ JobStatusData.QUEUE_NAME_ATTR, status.getQueueName() }, { JobStatusData.OWNER_ATTR, status.getOwner() },
+				{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, status.getOutputPath() },
+				{ JobStatusData.STDERR_REMOTE_FILE_ATTR, status.getErrorPath() },
+				{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(status.isInteractive()) } };
+		final JobStatusData data = new JobStatusData(attrs);
 		data.setState(status.getState());
 		data.setStateDetail(status.getStateDetail());
 		fLMLManager.addUserJob(getResourceManager().getUniqueName(), status.getJobId(), data);

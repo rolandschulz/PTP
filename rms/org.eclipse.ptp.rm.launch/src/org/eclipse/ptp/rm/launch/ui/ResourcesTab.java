@@ -35,11 +35,11 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
+import org.eclipse.ptp.rm.jaxb.control.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
+import org.eclipse.ptp.rm.jaxb.core.JAXBExtensionUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
 import org.eclipse.ptp.rm.launch.RMLaunchPlugin;
-import org.eclipse.ptp.rm.launch.RMLaunchUtils;
-import org.eclipse.ptp.rm.launch.internal.ProviderInfo;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -52,6 +52,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 /**
@@ -81,10 +82,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	private boolean fDefaultConnection;
 
 	/*
-	 * Job controller created when type is selected from the combo.
-	 */
-	private ILaunchController fSelectedLaunchControl;
-	/*
 	 * Job controller with all necessary configuration information.
 	 */
 	private ILaunchController fLaunchControl;
@@ -110,7 +107,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	@Override
 	public boolean canSave() {
 		setErrorMessage(null);
-		if (fSelectedLaunchControl == null) {
+		if (fSystemTypeCombo.getSelectionIndex() == 0) {
 			setErrorMessage(Messages.ResourcesTab_No_Target_Configuration);
 			return false;
 		}
@@ -155,9 +152,14 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		fSystemTypeCombo.setLayoutData(gd);
 		fSystemTypeCombo.add(Messages.ResourcesTab_pleaseSelectTargetSystem);
-		for (ProviderInfo provider : ProviderInfo.getProviders()) {
-			fSystemTypeCombo.add(provider.getName());
-			fProviders.add(provider.getName());
+		String[] configNames = JAXBExtensionUtils.getConfiguationNames();
+		if (JAXBExtensionUtils.getInvalid() != null) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.ResourcesTab_InvalidConfig_title,
+					Messages.ResourcesTab_InvalidConfig_message + JAXBExtensionUtils.getInvalid());
+		}
+		for (String name : configNames) {
+			fSystemTypeCombo.add(name);
+			fProviders.add(name);
 		}
 		fSystemTypeCombo.addSelectionListener(new SelectionListener() {
 			@Override
@@ -232,35 +234,28 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		super.initializeFrom(configuration);
 
-		String rmType = LaunchUtils.getTemplateName(configuration);
-		String controlId = LaunchUtils.getResourceManagerUniqueName(configuration);
-		ProviderInfo provider = ProviderInfo.getProvider(rmType);
-		if (provider != null) {
-			if (fSelectedLaunchControl == null || !fSelectedLaunchControl.getControlId().equals(controlId)) {
-				fSelectedLaunchControl = RMLaunchUtils.getLaunchControl(provider.getName(), controlId);
-				fSystemTypeCombo.select(fProviders.lastIndexOf(provider.getName()) + 1);
-				updateEnablement();
+		stopController(fLaunchControl);
+		fLaunchControl = null;
+		fRemoteConnection = null;
 
-				/*
-				 * Initialize remote connection widget
-				 */
-				String remId = LaunchUtils.getRemoteServicesId(configuration);
-				String remName = LaunchUtils.getConnectionName(configuration);
-				if (remId != null && remName != null) {
-					fRemoteConnectionWidget.setConnection(remId, remName);
-					/*
-					 * Update UI
-					 */
-					if (connectionChanged(fSelectedLaunchControl)) {
-						fLaunchControl = fSelectedLaunchControl;
-						fRemoteConnection = fRemoteConnectionWidget.getConnection();
-					} else {
-						fLaunchControl = null;
-						fRemoteConnection = null;
-					}
+		final String rmType = LaunchUtils.getTemplateName(configuration);
+		if (rmType != null) {
+			fSystemTypeCombo.select(fProviders.lastIndexOf(rmType) + 1);
+
+			final String remId = LaunchUtils.getRemoteServicesId(configuration);
+			final String remName = LaunchUtils.getConnectionName(configuration);
+			if (remId != null && remName != null) {
+				fRemoteConnectionWidget.setConnection(remId, remName);
+				if (openConnection()) {
+					fLaunchControl = getNewController(remId, remName, rmType);
+				}
+				if (fLaunchControl != null) {
+					fRemoteConnection = fRemoteConnectionWidget.getConnection();
 					updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
 					updateLaunchConfigurationDialog();
 					fDefaultConnection = false;
+				} else {
+					updateEnablement();
 				}
 			}
 		}
@@ -275,7 +270,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	public boolean isValid(ILaunchConfiguration configuration) {
 		setErrorMessage(null);
 		setMessage(null);
-		if (fSelectedLaunchControl == null) {
+		if (fSystemTypeCombo.getSelectionIndex() == 0) {
 			setErrorMessage(Messages.ResourcesTab_No_Target_Configuration);
 			return false;
 		}
@@ -307,8 +302,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		int index = fSystemTypeCombo.getSelectionIndex();
 		if (fLaunchControl != null && index > 0) {
-			ProviderInfo provider = ProviderInfo.getProviders().get(index - 1);
-			LaunchUtils.setConfigurationName(configuration, provider.getName());
+			LaunchUtils.setConfigurationName(configuration, fSystemTypeCombo.getItem(index));
 			LaunchUtils.setResourceManagerUniqueName(configuration, fLaunchControl.getControlId());
 			LaunchUtils.setConnectionName(configuration, fLaunchControl.getConnectionName());
 			LaunchUtils.setRemoteServicesId(configuration, fLaunchControl.getRemoteServicesId());
@@ -343,28 +337,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		fDefaultConnection = true;
 	}
 
-	private boolean connectionChanged(final ILaunchController control) {
-		IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
-		if (conn != null) {
-			try {
-				control.stop();
-			} catch (CoreException e) {
-			}
-			control.setConnectionName(conn.getName());
-			control.setRemoteServicesId(conn.getRemoteServices().getId());
-
-			if (!conn.isOpen()) {
-				boolean result = MessageDialog.openQuestion(getShell(), Messages.ResourcesTab_openConnection,
-						NLS.bind(Messages.ResourcesTab_noInformation, conn.getName()));
-				if (!result) {
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
-	}
-
 	/**
 	 * @param parent
 	 * @param colspan
@@ -385,33 +357,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 */
 	private ScrolledComposite getLaunchAttrsScrollComposite() {
 		return launchAttrsScrollComposite;
-	}
-
-	/**
-	 * Returns a cached launch configuration dynamic tab. If it isn't in the cache then it creates a new one, and puts it in the
-	 * cache.
-	 * 
-	 * @param controller
-	 *            launch controller
-	 * @param monitor
-	 *            progress monitor
-	 * @return
-	 */
-	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final IJobController controller,
-			IProgressMonitor monitor) {
-		if (!fDynamicTabs.containsKey(controller)) {
-			try {
-				IRMLaunchConfigurationDynamicTab dynamicTab = new JAXBControllerLaunchConfigurationTab(controller, monitor);
-				dynamicTab.addContentsChangedListener(launchContentsChangedListener);
-				fDynamicTabs.put(controller, dynamicTab);
-				return dynamicTab;
-			} catch (Throwable e) {
-				setErrorMessage(e.getMessage());
-				RMLaunchPlugin.errorDialog(e.getMessage(), e);
-				return null;
-			}
-		}
-		return fDynamicTabs.get(controller);
 	}
 
 	/**
@@ -441,6 +386,42 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		return fDynamicTabs.get(controller);
 	}
 
+	/**
+	 * Returns a cached launch configuration dynamic tab. If it isn't in the cache then it creates a new one, and puts it in the
+	 * cache.
+	 * 
+	 * @param controller
+	 *            launch controller
+	 * @param monitor
+	 *            progress monitor
+	 * @return
+	 */
+	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final IJobController controller,
+			IProgressMonitor monitor) {
+		if (!fDynamicTabs.containsKey(controller)) {
+			try {
+				IRMLaunchConfigurationDynamicTab dynamicTab = new JAXBControllerLaunchConfigurationTab(controller, monitor);
+				dynamicTab.addContentsChangedListener(launchContentsChangedListener);
+				fDynamicTabs.put(controller, dynamicTab);
+				return dynamicTab;
+			} catch (Throwable e) {
+				setErrorMessage(e.getMessage());
+				RMLaunchPlugin.errorDialog(e.getMessage(), e);
+				return null;
+			}
+		}
+		return fDynamicTabs.get(controller);
+	}
+
+	private ILaunchController getNewController(final String remId, final String connName, final String type) {
+		try {
+			return LaunchControllerManager.getInstance().getLaunchController(remId, connName, type);
+		} catch (CoreException e) {
+			RMLaunchPlugin.errorDialog(e.getMessage(), e);
+			return null;
+		}
+	}
+
 	private void handleConnectionChanged() {
 		/*
 		 * LaunchConfigurationsDialog#run() tries to preserve the focus control. However, updateLaunchAttributeControls() will
@@ -454,15 +435,21 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			conn = fRemoteConnectionWidget.getConnection();
 		}
 		if (conn == null) {
+			stopController(fLaunchControl);
 			fLaunchControl = null;
 			fRemoteConnection = null;
 			updateLaunchAttributeControls(null, getLaunchConfiguration(), false);
 			updateLaunchConfigurationDialog();
-		} else if (connectionChanged(fSelectedLaunchControl)) {
-			fLaunchControl = fSelectedLaunchControl;
-			fRemoteConnection = conn;
-			updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
-			updateLaunchConfigurationDialog();
+		} else if (openConnection()) {
+			String type = fSystemTypeCombo.getItem(fSystemTypeCombo.getSelectionIndex());
+			ILaunchController controller = getNewController(conn.getRemoteServices().getId(), conn.getName(), type);
+			if (controller != null) {
+				stopController(fLaunchControl);
+				fLaunchControl = controller;
+				fRemoteConnection = conn;
+				updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
+				updateLaunchConfigurationDialog();
+			}
 		} else {
 			/*
 			 * Failed to change connection, reset back to the previous one
@@ -471,32 +458,27 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 	}
 
+	private boolean openConnection() {
+		IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
+		if (conn != null) {
+			if (!conn.isOpen()) {
+				boolean result = MessageDialog.openQuestion(getShell(), Messages.ResourcesTab_openConnection,
+						NLS.bind(Messages.ResourcesTab_noInformation, conn.getName()));
+				if (!result) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Handle selection of a resource manager type
 	 */
 	private void rmTypeSelectionChanged() {
-		int i = fSystemTypeCombo.getSelectionIndex();
-		if (i > 0) {
-			ProviderInfo provider = ProviderInfo.getProviders().get(i - 1);
-			if (fSelectedLaunchControl == null
-					|| fSelectedLaunchControl.getConfiguration() == null
-					|| (fSelectedLaunchControl.getConfiguration() != null && !fSelectedLaunchControl.getConfiguration().getName()
-							.equals(provider.getName()))) {
-				ILaunchController control = RMLaunchUtils.getLaunchControl(provider.getName());
-				if (control != null) {
-					if (fDefaultConnection) {
-						fRemoteConnectionWidget.setConnection(control.getRemoteServicesId(), control.getConnectionName());
-					}
-					if (fSelectedLaunchControl != null) {
-						try {
-							fSelectedLaunchControl.stop();
-						} catch (CoreException e) {
-						}
-					}
-					fSelectedLaunchControl = control;
-				}
-			}
-		}
+		stopController(fLaunchControl);
+		fLaunchControl = null;
 	}
 
 	/**
@@ -504,6 +486,16 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 */
 	private void setLaunchAttrsScrollComposite(ScrolledComposite comp) {
 		this.launchAttrsScrollComposite = comp;
+	}
+
+	private void stopController(ILaunchController controller) {
+		if (controller != null) {
+			try {
+				controller.stop();
+			} catch (CoreException e) {
+			}
+		}
+
 	}
 
 	private void updateEnablement() {
@@ -523,7 +515,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @param queue
 	 * @param launchConfiguration
 	 */
-	private void updateLaunchAttributeControls(final IJobController controller, ILaunchConfiguration launchConfiguration,
+	private void updateLaunchAttributeControls(final ILaunchController controller, ILaunchConfiguration launchConfiguration,
 			final boolean startController) {
 		final ScrolledComposite launchAttrsScrollComp = getLaunchAttrsScrollComposite();
 		launchAttrsScrollComp.setContent(null);
@@ -539,7 +531,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 						SubMonitor progress = SubMonitor.convert(monitor, 20);
 						if (startController) {
 							try {
-								fSelectedLaunchControl.start(progress.newChild(10));
+								controller.start(progress.newChild(10));
 								dynamicTab[0] = getLaunchConfigurationDynamicTab(controller, progress.newChild(10));
 							} catch (CoreException e) {
 								RMLaunchPlugin.errorDialog(e.getMessage(), e);

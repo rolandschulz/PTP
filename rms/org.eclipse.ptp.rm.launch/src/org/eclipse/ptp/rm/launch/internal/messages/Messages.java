@@ -19,6 +19,10 @@ public class Messages extends NLS {
 	public static String Launch_common_DebuggerColon;
 	public static String Launch_common_Error;
 
+	public static String ResourcesTab_InvalidConfig_message;
+
+	public static String ResourcesTab_InvalidConfig_title;
+
 	public static String ResourcesTab_No_Connection_name;
 
 	public static String ResourcesTab_No_Resource_Manager_Available;
@@ -121,6 +125,12 @@ public class Messages extends NLS {
 
 	public static String ApplicationTab_Unable_to_open_connection;
 
+	public static String ArgumentsTab_Arguments;
+
+	public static String ArgumentsTab_Cannot_read_configuration;
+
+	public static String ArgumentsTab_Program_arguments;
+
 	public static String ParallelLaunchConfigurationDelegate_0;
 	public static String ParallelLaunchConfigurationDelegate_1;
 	public static String ParallelLaunchConfigurationDelegate_3;
@@ -138,6 +148,26 @@ public class Messages extends NLS {
 	public static String ParallelLaunchConfigurationDelegate_Start_rm;
 
 	public static String RuntimeProcess_Exit_value_not_available;
+
+	public static String WorkingDirectoryBlock_Browse;
+
+	public static String WorkingDirectoryBlock_Cannot_read_configuration;
+
+	public static String WorkingDirectoryBlock_Directory;
+
+	public static String WorkingDirectoryBlock_Directory_cannot_be_empty;
+
+	public static String WorkingDirectoryBlock_Please_select_remote_connection_first;
+
+	public static String WorkingDirectoryBlock_Select_Working_Directory;
+
+	public static String WorkingDirectoryBlock_Unable_to_open_connection;
+
+	public static String WorkingDirectoryBlock_Use_default_working_directory;
+
+	public static String WorkingDirectoryBlock_Working_directory;
+
+	public static String WorkingDirectoryBlock_Working_Directory;
 
 	static {
 		// initialize resource bundle

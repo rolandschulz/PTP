@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.lml.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Wrapper for job status which extracts the persistent properties and saves them or reloads them from a memento.
  * 
@@ -25,67 +28,61 @@ public class JobStatusData {
 	public static final String FAILED = "FAILED";//$NON-NLS-1$
 	public static final String CANCELED = "CANCELED";//$NON-NLS-1$
 
+	public static final String JOB_ID_ATTR = "jobId";//$NON-NLS-1$
+	public static final String CONTROL_TYPE_ATTR = "controlType";//$NON-NLS-1$
+	public static final String MONITOR_TYPE_ATTR = "monitorType";//$NON-NLS-1$
+	public static final String STDOUT_REMOTE_FILE_ATTR = "stdoutRemotePath";//$NON-NLS-1$
+	public static final String STDERR_REMOTE_FILE_ATTR = "stderrRemotePath";//$NON-NLS-1$
+	public static final String INTERACTIVE_ATTR = "interactive";//$NON-NLS-1$;
+	public static final String STATE_ATTR = "state";//$NON-NLS-1$;
+	public static final String STATE_DETAIL_ATTR = "stateDetail";//$NON-NLS-1$;
+	public static final String OID_ATTR = "oid";//$NON-NLS-1$;
+	public static final String QUEUE_NAME_ATTR = "queueName";//$NON-NLS-1$;
+	public static final String OWNER_ATTR = "owner";//$NON-NLS-1$;
+	public static final String REMOTE_SERVICES_ID_ATTR = "remoteServicesId";//$NON-NLS-1$;
+	public static final String CONNECTION_NAME_ATTR = "connectionName";//$NON-NLS-1$;
+
 	private static boolean detailIsFinal(String detail) {
 		return CANCELED.equals(detail) || FAILED.equals(detail) || JOB_OUTERR_READY.equals(detail);
 	}
 
-	private final String fControlId;
-	private final String fJobId;
-	private final String fOutputPath;
-	private final String fErrorPath;
-	private final String fQueueName;
-	private final String fOwner;
-	private final boolean fInteractive;
-
-	private String fState = SUBMITTED;
-	private String fStateDetail = SUBMITTED;
 	private boolean fOutReady = false;
 	private boolean fErrReady = false;
-
-	private String fOid;
-
 	private boolean fRemoved = false;
 
-	/**
-	 * Incoming constructor. For saving active status.
-	 * 
-	 * @param status
-	 *            to persist
-	 */
-	public JobStatusData(String jobId, String controlId, String queueName, String owner, String outputPath, String errorPath,
-			boolean interactive) {
-		fControlId = controlId;
-		fJobId = jobId;
-		fQueueName = queueName;
-		fOwner = owner;
-		fOutputPath = outputPath;
-		fErrorPath = errorPath;
-		fInteractive = interactive;
-	}
+	private final Map<String, String> fAttrs = new HashMap<String, String>();
 
-	public JobStatusData(String jobId, String controlId, String state, String stateDetail, String outputPath, String errorPath,
-			boolean interactive, String queueName, String owner, String oid) {
-		this(jobId, controlId, queueName, owner, outputPath, errorPath, interactive);
-		fState = state;
-		fStateDetail = stateDetail;
-		fOid = oid;
-		fOutReady = fOutputPath != null && JOB_OUTERR_READY.equals(fStateDetail);
-		fErrReady = fErrorPath != null && JOB_OUTERR_READY.equals(fStateDetail);
+	public JobStatusData(String[][] attrs) {
+		setState(SUBMITTED);
+		setStateDetail(SUBMITTED);
+
+		for (String[] attr : attrs) {
+			fAttrs.put(attr[0], attr[1]);
+		}
+
+		fOutReady = getOutputPath() != null && JOB_OUTERR_READY.equals(getStateDetail());
+		fErrReady = getErrorPath() != null && JOB_OUTERR_READY.equals(getStateDetail());
 	}
 
 	/**
-	 * 
-	 * @return control ID
+	 * @return connection name
 	 */
-	public String getControlId() {
-		return fControlId;
+	public String getConnectionName() {
+		return fAttrs.get(CONNECTION_NAME_ATTR);
+	}
+
+	/**
+	 * @return control type
+	 */
+	public String getControlType() {
+		return fAttrs.get(CONTROL_TYPE_ATTR);
 	}
 
 	/**
 	 * @return path to remote error file
 	 */
 	public String getErrorPath() {
-		return fErrorPath;
+		return fAttrs.get(STDERR_REMOTE_FILE_ATTR);
 	}
 
 	/**
@@ -99,18 +96,25 @@ public class JobStatusData {
 	 * @return job id
 	 */
 	public String getJobId() {
-		return fJobId;
+		return fAttrs.get(JOB_ID_ATTR);
+	}
+
+	/**
+	 * @return monitor type
+	 */
+	public String getMonitorType() {
+		return fAttrs.get(MONITOR_TYPE_ATTR);
 	}
 
 	public String getOid() {
-		return fOid;
+		return fAttrs.get(OID_ATTR);
 	}
 
 	/**
 	 * @return path to remote output file
 	 */
 	public String getOutputPath() {
-		return fOutputPath;
+		return fAttrs.get(STDOUT_REMOTE_FILE_ATTR);
 	}
 
 	/**
@@ -124,42 +128,56 @@ public class JobStatusData {
 	 * @return job id
 	 */
 	public String getOwner() {
-		return fOwner;
+		return fAttrs.get(OWNER_ATTR);
 	}
 
 	/**
 	 * @return queue name
 	 */
 	public String getQueueName() {
-		return fQueueName;
+		return fAttrs.get(QUEUE_NAME_ATTR);
+	}
+
+	/**
+	 * @return remote services ID
+	 */
+	public String getRemoteId() {
+		return fAttrs.get(REMOTE_SERVICES_ID_ATTR);
 	}
 
 	/**
 	 * @return fState, or empty string if none.
 	 */
 	public String getState() {
-		return fState;
+		return fAttrs.get(STATE_ATTR);
 	}
 
 	/**
 	 * @return fState detail, or empty string if none.
 	 */
 	public String getStateDetail() {
-		return fStateDetail;
+		return fAttrs.get(STATE_DETAIL_ATTR);
 	}
 
 	/**
 	 * @return job is completed
 	 */
 	public boolean isCompleted() {
-		return fState.equals(COMPLETED);
+		return getState().equals(COMPLETED);
 	}
 
 	/**
 	 * @return job was submitted interactively
 	 */
 	public boolean isInteractive() {
-		return fInteractive;
+		String interactive = fAttrs.get(INTERACTIVE_ATTR);
+		if (interactive != null) {
+			try {
+				return Boolean.parseBoolean(interactive);
+			} catch (Exception e) {
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -182,7 +200,7 @@ public class JobStatusData {
 	 *            the oid
 	 */
 	public void setOid(String oid) {
-		fOid = oid;
+		fAttrs.put(OID_ATTR, oid);
 	}
 
 	/**
@@ -206,7 +224,7 @@ public class JobStatusData {
 	 *            the state
 	 */
 	public void setState(String state) {
-		fState = state;
+		fAttrs.put(STATE_ATTR, state);
 	}
 
 	/**
@@ -214,9 +232,9 @@ public class JobStatusData {
 	 *            the state detail
 	 */
 	public void setStateDetail(String stateDetail) {
-		fStateDetail = stateDetail;
-		fOutReady = fOutputPath != null && JOB_OUTERR_READY.equals(stateDetail);
-		fErrReady = fErrorPath != null && JOB_OUTERR_READY.equals(stateDetail);
+		fAttrs.put(STATE_DETAIL_ATTR, stateDetail);
+		fOutReady = getOutputPath() != null && JOB_OUTERR_READY.equals(stateDetail);
+		fErrReady = getErrorPath() != null && JOB_OUTERR_READY.equals(stateDetail);
 	}
 
 	/**
@@ -225,8 +243,8 @@ public class JobStatusData {
 	 * @param status
 	 */
 	public void updateState(String state, String stateDetail) {
-		if (!detailIsFinal(fStateDetail)) {
-			fState = state;
+		if (!detailIsFinal(getStateDetail())) {
+			setState(state);
 			setStateDetail(stateDetail);
 		}
 	}

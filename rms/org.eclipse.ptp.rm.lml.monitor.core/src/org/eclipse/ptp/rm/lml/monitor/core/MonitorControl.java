@@ -10,6 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.monitor.core;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -46,6 +51,8 @@ import org.eclipse.ptp.rm.lml.internal.core.model.Pattern;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
 import org.eclipse.ptp.rm.lml.monitor.core.messages.Messages;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.XMLMemento;
 
 /**
  * LML JAXB resource manager monitor
@@ -125,15 +132,17 @@ public class MonitorControl implements IMonitorControl {
 	private final String fMonitorId;
 	private final LMLManager fLMLManager = LMLManager.getInstance();
 	private final JobListener fJobListener = new JobListener();
-	private String fSavedLayout = new String();
-	private JobStatusData[] fSavedJobs;
-	private Map<String, List<IPattern>> fSavedPattern;
+	private final StringBuffer fSavedLayout = new StringBuffer();
+	private final List<JobStatusData> fSavedJobs = new ArrayList<JobStatusData>();
+	private final Map<String, List<IPattern>> fSavedPattern = new HashMap<String, List<IPattern>>();
 	private String fSystemType;
 	private boolean fActive;
 	private String fRemoteServicesId;
 	private String fConnectionName;
 
+	private static final String XML = "xml";//$NON-NLS-1$ 
 	private static final String JOBS_ATTR = "jobs";//$NON-NLS-1$ 
+	private static final String JOB_ATTR = "job";//$NON-NLS-1$ 
 	private static final String LAYOUT_ATTR = "layout";//$NON-NLS-1$
 	private static final String LAYOUT_STRING_ATTR = "layoutString";//$NON-NLS-1$
 	private static final String PATTERNS_ATTR = "patterns";//$NON-NLS-1$
@@ -146,20 +155,11 @@ public class MonitorControl implements IMonitorControl {
 	private static final String FILTER_MIN_VALUE_RANGE_ATTR = "minValueRange";//$NON-NLS-1$
 	private static final String FILTER_RELATION_OPERATOR_ATTR = "relationOperartor";//$NON-NLS-1$
 	private static final String FILTER_RELATION_VALUE_ATTR = "relationValue";//$NON-NLS-1$
-	private static final String JOB_ID_ATTR = "job_id";//$NON-NLS-1$
-	private static final String CONTROL_ID_ATTR = "control_id";//$NON-NLS-1$
-	private static final String STDOUT_REMOTE_FILE_ATTR = "stdout_remote_path";//$NON-NLS-1$
-	private static final String STDERR_REMOTE_FILE_ATTR = "stderr_remote_path";//$NON-NLS-1$
-	private static final String INTERACTIVE_ATTR = "interactive";//$NON-NLS-1$;
-	private static final String STATE_ATTR = "state";//$NON-NLS-1$;
-	private static final String STATE_DETAIL_ATTR = "state_detail";//$NON-NLS-1$;
-	private static final String OID_ATTR = "oid";//$NON-NLS-1$;
-	private static final String QUEUE_NAME_ATTR = "queue_name";//$NON-NLS-1$;
-	private static final String OWNER_ATTR = "owner";//$NON-NLS-1$;
-	private static final String REMOTE_SERVICES_ID_ATTR = "remoteServicesId";//$NON-NLS-1$;
-	private static final String CONNECTION_NAME_ATTR = "connectionName";//$NON-NLS-1$;
 	private static final String SYSTEM_TYPE_ATTR = "systemType";//$NON-NLS-1$;
 	private static final String MONITOR_STATE = "monitorState";//$NON-NLS-1$;
+	private static final String REMOTE_SERVICES_ID_ATTR = "remoteServicesId";//$NON-NLS-1$;
+	private static final String CONNECTION_NAME_ATTR = "connectionName";//$NON-NLS-1$;
+	private static final String MONITOR_ATTR = "monitor";//$NON-NLS-1$
 
 	public MonitorControl(String monitorId) {
 		fMonitorId = monitorId;
@@ -213,25 +213,37 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#load(org.eclipse.ui.IMemento)
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#load()
 	 */
-	public boolean load(IMemento memento) {
-		IMemento childLayout = memento.getChild(LAYOUT_ATTR);
-		if (childLayout != null) {
-			fSavedLayout = childLayout.getString(LAYOUT_STRING_ATTR);
-		}
+	public boolean load() {
+		try {
+			fSavedLayout.setLength(0);
+			fSavedJobs.clear();
+			fSavedPattern.clear();
 
-		childLayout = memento.getChild(JOBS_ATTR);
-		if (childLayout != null) {
-			fSavedJobs = loadJobs(memento);
-		}
+			FileReader reader = new FileReader(getSaveLocation());
+			IMemento memento = XMLMemento.createReadRoot(reader);
 
-		childLayout = memento.getChild(PATTERNS_ATTR);
-		if (childLayout != null) {
-			fSavedPattern = loadPattern(memento);
-		}
+			boolean active = loadState(memento);
 
-		return loadState(memento);
+			IMemento childLayout = memento.getChild(LAYOUT_ATTR);
+			if (childLayout != null) {
+				fSavedLayout.append(childLayout.getString(LAYOUT_STRING_ATTR));
+			}
+
+			childLayout = memento.getChild(JOBS_ATTR);
+			loadJobs(childLayout, fSavedJobs);
+
+			childLayout = memento.getChild(PATTERNS_ATTR);
+			loadPattern(childLayout, fSavedPattern);
+
+			return active;
+		} catch (FileNotFoundException e) {
+			LMLMonitorCorePlugin.log(e.getLocalizedMessage());
+		} catch (WorkbenchException e) {
+			LMLMonitorCorePlugin.log(e.getLocalizedMessage());
+		}
+		return false;
 	}
 
 	/*
@@ -246,12 +258,16 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#save(org.eclipse.ui.IMemento)
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#save()
 	 */
-	public void save(IMemento memento) {
+	public void save() {
+		final XMLMemento memento = XMLMemento.createWriteRoot(MONITOR_ATTR);
+
 		final String layout = fLMLManager.getCurrentLayout(getMonitorId());
 		final JobStatusData[] jobs = fLMLManager.getUserJobs(getMonitorId());
 		final Map<String, List<IPattern>> patternMap = fLMLManager.getCurrentPattern(getMonitorId());
+
+		saveState(memento);
 
 		if (layout != null) {
 			final IMemento layoutMemento = memento.createChild(LAYOUT_ATTR);
@@ -274,7 +290,13 @@ public class MonitorControl implements IMonitorControl {
 			}
 		}
 
-		saveState(memento);
+		try {
+			FileWriter writer = new FileWriter(getSaveLocation());
+			memento.save(writer);
+		} catch (final IOException e) {
+			LMLMonitorCorePlugin.log(e.getLocalizedMessage());
+		}
+
 	}
 
 	/*
@@ -331,11 +353,13 @@ public class MonitorControl implements IMonitorControl {
 					}
 				}
 
+				load();
+
 				/*
 				 * Initialize LML classes
 				 */
-				fLMLManager.openLgui(getMonitorId(), conn.getUsername(), getMonitorConfigurationRequestType(), fSavedLayout,
-						fSavedJobs, fSavedPattern);
+				fLMLManager.openLgui(getMonitorId(), conn.getUsername(), getMonitorConfigurationRequestType(),
+						fSavedLayout.toString(), fSavedJobs.toArray(new JobStatusData[0]), fSavedPattern);
 
 				fActive = true;
 
@@ -370,6 +394,8 @@ public class MonitorControl implements IMonitorControl {
 		if (isActive()) {
 			JobManager.getInstance().removeListener(fJobListener);
 
+			save();
+
 			fLMLManager.closeLgui(getMonitorId());
 
 			synchronized (this) {
@@ -388,8 +414,17 @@ public class MonitorControl implements IMonitorControl {
 	private void addJob(IJobStatus status) {
 		String monitorId = getMonitorId(status);
 		if (monitorId != null && monitorId.equals(getMonitorId())) {
-			final JobStatusData data = new JobStatusData(status.getJobId(), status.getControlId(), status.getQueueName(),
-					status.getOwner(), status.getOutputPath(), status.getErrorPath(), status.isInteractive());
+			ILaunchConfiguration configuration = status.getLaunchConfiguration();
+			String controlName = LaunchUtils.getTemplateName(configuration);
+			String[][] attrs = { { JobStatusData.JOB_ID_ATTR, status.getJobId() },
+					{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
+					{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() }, { JobStatusData.CONTROL_TYPE_ATTR, controlName },
+					{ JobStatusData.MONITOR_TYPE_ATTR, getSystemType() }, { JobStatusData.QUEUE_NAME_ATTR, status.getQueueName() },
+					{ JobStatusData.OWNER_ATTR, status.getOwner() },
+					{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, status.getOutputPath() },
+					{ JobStatusData.STDERR_REMOTE_FILE_ATTR, status.getErrorPath() },
+					{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(status.isInteractive()) } };
+			final JobStatusData data = new JobStatusData(attrs);
 			data.setState(status.getState());
 			data.setStateDetail(status.getStateDetail());
 			fLMLManager.addUserJob(getMonitorId(), status.getJobId(), data);
@@ -433,20 +468,33 @@ public class MonitorControl implements IMonitorControl {
 		throw CoreExceptionUtils.newException(Messages.MonitorControl_unableToOpenRemoteConnection, null);
 	}
 
-	private JobStatusData[] loadJobs(IMemento memento) {
-		final List<JobStatusData> jobs = new ArrayList<JobStatusData>();
-		final IMemento[] children = memento.getChildren(JOB_ID_ATTR);
-		for (final IMemento child : children) {
-			jobs.add(new JobStatusData(child.getID(), child.getString(CONTROL_ID_ATTR), child.getString(STATE_ATTR), child
-					.getString(STATE_DETAIL_ATTR), child.getString(STDOUT_REMOTE_FILE_ATTR), child
-					.getString(STDERR_REMOTE_FILE_ATTR), child.getBoolean(INTERACTIVE_ATTR), child.getString(QUEUE_NAME_ATTR),
-					child.getString(OWNER_ATTR), child.getString(OID_ATTR)));
-		}
-		return jobs.toArray(new JobStatusData[jobs.size()]);
+	private File getSaveLocation() {
+		return LMLMonitorCorePlugin.getDefault().getStateLocation().append(getMonitorId()).addFileExtension(XML).toFile();
 	}
 
-	private Map<String, List<IPattern>> loadPattern(IMemento memento) {
-		final Map<String, List<IPattern>> pattern = new HashMap<String, List<IPattern>>();
+	private void loadJobs(IMemento memento, List<JobStatusData> jobs) {
+		if (memento != null) {
+			final IMemento[] children = memento.getChildren(JOB_ATTR);
+			for (final IMemento child : children) {
+				String[][] attrs = { { JobStatusData.JOB_ID_ATTR, child.getID() },
+						{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
+						{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() },
+						{ JobStatusData.CONTROL_TYPE_ATTR, child.getString(JobStatusData.CONTROL_TYPE_ATTR) },
+						{ JobStatusData.MONITOR_TYPE_ATTR, getSystemType() },
+						{ JobStatusData.STATE_ATTR, child.getString(JobStatusData.STATE_ATTR) },
+						{ JobStatusData.STATE_DETAIL_ATTR, child.getString(JobStatusData.STATE_DETAIL_ATTR) },
+						{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, child.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR) },
+						{ JobStatusData.STDERR_REMOTE_FILE_ATTR, child.getString(JobStatusData.STDERR_REMOTE_FILE_ATTR) },
+						{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(child.getBoolean(JobStatusData.INTERACTIVE_ATTR)) },
+						{ JobStatusData.QUEUE_NAME_ATTR, child.getString(JobStatusData.QUEUE_NAME_ATTR) },
+						{ JobStatusData.OWNER_ATTR, child.getString(JobStatusData.OWNER_ATTR) },
+						{ JobStatusData.OID_ATTR, child.getString(JobStatusData.OID_ATTR) } };
+				jobs.add(new JobStatusData(attrs));
+			}
+		}
+	}
+
+	private void loadPattern(IMemento memento, Map<String, List<IPattern>> pattern) {
 		if (memento != null) {
 			final IMemento[] childrenPattern = memento.getChildren(PATTERN_GID_ATTR);
 			for (final IMemento childPattern : childrenPattern) {
@@ -469,28 +517,26 @@ public class MonitorControl implements IMonitorControl {
 				}
 			}
 		}
-		return pattern;
 	}
 
 	private boolean loadState(IMemento memento) {
-		setRemoteServicesId(memento.getString(REMOTE_SERVICES_ID_ATTR));
-		setConnectionName(memento.getString(CONNECTION_NAME_ATTR));
+		setRemoteServicesId(memento.getString(JobStatusData.REMOTE_SERVICES_ID_ATTR));
+		setConnectionName(memento.getString(JobStatusData.CONNECTION_NAME_ATTR));
 		fSystemType = memento.getString(SYSTEM_TYPE_ATTR);
 		return memento.getBoolean(MONITOR_STATE);
 	}
 
 	private void saveJob(JobStatusData job, IMemento memento) {
-		final IMemento jobMemento = memento.createChild(JOB_ID_ATTR, job.getJobId());
-		jobMemento.putString(CONTROL_ID_ATTR, job.getControlId());
-		jobMemento.putString(STATE_ATTR, job.getState());
-		jobMemento.putString(STATE_DETAIL_ATTR, job.getStateDetail());
-		jobMemento.putString(STDOUT_REMOTE_FILE_ATTR, job.getOutputPath());
-		jobMemento.putString(STDERR_REMOTE_FILE_ATTR, job.getErrorPath());
-		jobMemento.putBoolean(INTERACTIVE_ATTR, job.isInteractive());
-		jobMemento.putString(QUEUE_NAME_ATTR, job.getQueueName());
-		jobMemento.putString(OWNER_ATTR, job.getOwner());
-		jobMemento.putString(OID_ATTR, job.getOid());
-
+		final IMemento jobMemento = memento.createChild(JOB_ATTR, job.getJobId());
+		jobMemento.putString(JobStatusData.CONTROL_TYPE_ATTR, job.getControlType());
+		jobMemento.putString(JobStatusData.STATE_ATTR, job.getState());
+		jobMemento.putString(JobStatusData.STATE_DETAIL_ATTR, job.getStateDetail());
+		jobMemento.putString(JobStatusData.STDOUT_REMOTE_FILE_ATTR, job.getOutputPath());
+		jobMemento.putString(JobStatusData.STDERR_REMOTE_FILE_ATTR, job.getErrorPath());
+		jobMemento.putBoolean(JobStatusData.INTERACTIVE_ATTR, job.isInteractive());
+		jobMemento.putString(JobStatusData.QUEUE_NAME_ATTR, job.getQueueName());
+		jobMemento.putString(JobStatusData.OWNER_ATTR, job.getOwner());
+		jobMemento.putString(JobStatusData.OID_ATTR, job.getOid());
 	}
 
 	private void savePattern(String key, List<IPattern> value, IMemento memento) {

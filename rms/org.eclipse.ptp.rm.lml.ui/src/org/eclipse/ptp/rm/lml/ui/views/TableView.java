@@ -514,6 +514,8 @@ public class TableView extends ViewPart {
 
 	@Override
 	public void dispose() {
+		super.dispose();
+		viewCreated = false;
 		lmlManager.removeListener(lmlListener);
 	}
 

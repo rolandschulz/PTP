@@ -21,8 +21,7 @@ import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml_jaxb.messages.Messages;
 
 /**
- * Refreshes the state of the job by invoking getJobStatus on the resource
- * manager control.
+ * Refreshes the state of the job by invoking getJobStatus on the resource manager control.
  * 
  * @author arossi
  * 
@@ -40,7 +39,7 @@ public class RefreshJobStatus extends AbstractStatusAction {
 				for (Row row : selected) {
 					JobStatusData status = row.status;
 					try {
-						ActionUtils.maybeUpdateJobState(status, view, monitor);
+						ActionUtils.maybeUpdateJobState(status, monitor);
 					} catch (CoreException t) {
 						return CoreExceptionUtils.getErrorStatus(Messages.RefreshJobStatusError, t);
 					}
@@ -60,9 +59,7 @@ public class RefreshJobStatus extends AbstractStatusAction {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.ui.actions.AbstractStatusAction#validate(org.
-	 * eclipse.jface.action.IAction,
+	 * @see org.eclipse.ptp.rm.jaxb.ui.actions.AbstractStatusAction#validate(org. eclipse.jface.action.IAction,
 	 * org.eclipse.ptp.rm.jaxb.ui.data.PersistentCommandJobStatus)
 	 */
 	@Override

@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.ui.util;
+package org.eclipse.ptp.rm.jaxb.core;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -27,13 +27,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
-import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
-import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 
 /**
@@ -45,9 +39,14 @@ import org.osgi.framework.Bundle;
 public class JAXBExtensionUtils {
 	private static Map<String, URL> fPluginConfigurations = new TreeMap<String, URL>();
 	private static Map<String, URL> fExternalConfigurations = new TreeMap<String, URL>();
+	private static String fInvalid;
+
+	public static String getInvalid() {
+		return fInvalid;
+	}
 
 	public static String[] getConfiguationNames() {
-		loadExtensions(true);
+		loadExtensions();
 		Set<String> set = new TreeSet<String>();
 		set.addAll(fPluginConfigurations.keySet());
 		set.addAll(fExternalConfigurations.keySet());
@@ -55,7 +54,7 @@ public class JAXBExtensionUtils {
 	}
 
 	public static URL getConfigurationURL(String name) {
-		loadExtensions(true);
+		loadExtensions();
 		URL url = fPluginConfigurations.get(name);
 		if (url == null) {
 			url = fExternalConfigurations.get(name);
@@ -64,7 +63,7 @@ public class JAXBExtensionUtils {
 	}
 
 	public static Map<String, URL> getPluginConfiguations() {
-		loadExtensions(true);
+		loadExtensions();
 		Map<String, URL> map = new TreeMap<String, URL>();
 		map.putAll(fPluginConfigurations);
 		map.putAll(fExternalConfigurations);
@@ -78,14 +77,14 @@ public class JAXBExtensionUtils {
 	 *            display an error message if any configuration is invalid (against the internal XSD). Only true when loading the
 	 *            widget the first time.
 	 */
-	public static void loadExtensions(boolean showError) {
+	private static void loadExtensions() {
 		loadPlugins();
 
 		/*
 		 * Also search the workspace for managers. By convention these should all go in a directory called "resourceManagers". Loads
 		 * only valid XML
 		 */
-		loadExternal(showError);
+		loadExternal();
 	}
 
 	/**
@@ -96,8 +95,8 @@ public class JAXBExtensionUtils {
 	 *            display an error message if any configuration is invalid (against the internal XSD). Only true when loading the
 	 *            widget the first time.
 	 */
-	private static void loadExternal(boolean showError) {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBUIConstants.RESOURCE_MANAGERS);
+	private static void loadExternal() {
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBCoreConstants.RESOURCE_MANAGERS);
 		StringBuffer invalid = new StringBuffer();
 		if (project.exists()) {
 			try {
@@ -106,7 +105,7 @@ public class JAXBExtensionUtils {
 				for (IResource resource : resources) {
 					if (resource instanceof IFile) {
 						IFile file = (IFile) resource;
-						if (file.exists() && file.getName().endsWith(JAXBUIConstants.DOT_XML)) {
+						if (file.exists() && file.getName().endsWith(JAXBCoreConstants.DOT_XML)) {
 							try {
 								ResourceManagerData data;
 								URI uri = file.getLocationURI();
@@ -114,25 +113,30 @@ public class JAXBExtensionUtils {
 								try {
 									data = JAXBInitializationUtils.initializeRMData(url);
 								} catch (Throwable t) {
-									invalid.append(JAXBUIConstants.LINE_SEP).append(file.getName());
-									JAXBUIPlugin.log(t.getMessage());
+									invalid.append(JAXBCoreConstants.LINE_SEP).append(file.getName());
+									JAXBCorePlugin.log(t.getMessage());
 									continue;
 								}
 								fExternalConfigurations.put(data.getName(), url);
 							} catch (MalformedURLException t) {
-								JAXBUIPlugin.log(t);
+								JAXBCorePlugin.log(t);
 							}
 
 						}
 					}
 				}
 			} catch (CoreException e) {
-				JAXBUIPlugin.log(e);
+				JAXBCorePlugin.log(e);
 			}
 		}
-		if (showError && invalid.length() > 0) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.InvalidConfiguration_title,
-					Messages.InvalidConfiguration + invalid.toString());
+		if (invalid.length() > 0) {
+			fInvalid = invalid.toString();
+		} else {
+			fInvalid = null;
+			// if (showError && invalid.length() > 0) {
+			// MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.InvalidConfiguration_title,
+			// Messages.InvalidConfiguration + invalid.toString());
+			// }
 		}
 	}
 
@@ -146,13 +150,13 @@ public class JAXBExtensionUtils {
 	private static void loadPlugins() {
 		if (fPluginConfigurations.isEmpty()) {
 			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IExtensionPoint extensionPoint = registry.getExtensionPoint(JAXBUIConstants.RM_CONFIG_EXTENSION_POINT);
+			IExtensionPoint extensionPoint = registry.getExtensionPoint(JAXBCoreConstants.RM_CONFIG_EXTENSION_POINT);
 
 			if (extensionPoint != null) {
 				for (IExtension ext : extensionPoint.getExtensions()) {
 					for (IConfigurationElement ce : ext.getConfigurationElements()) {
-						String name = ce.getAttribute(JAXBUIConstants.NAME);
-						String configurationFile = ce.getAttribute(JAXBUIConstants.CONFIGURATION_FILE_ATTRIBUTE);
+						String name = ce.getAttribute(JAXBCoreConstants.NAME);
+						String configurationFile = ce.getAttribute(JAXBCoreConstants.CONFIGURATION_FILE_ATTRIBUTE);
 						String bundleId = ce.getDeclaringExtension().getContributor().getName();
 						Bundle bundle = Platform.getBundle(bundleId);
 						if (name != null && configurationFile != null && bundle != null) {

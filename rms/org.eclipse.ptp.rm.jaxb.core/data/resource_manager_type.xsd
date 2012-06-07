@@ -21,6 +21,9 @@
 	</xs:complexType>
 	<xs:complexType name="site-type">
 		<xs:sequence>
+			<xs:element minOccurs="0" name="remote-services" type="xs:string"/>
+			<xs:element minOccurs="0" name="connection-name" type="xs:string"/>
+			<!--  The following elements are deprecated. Do not use. -->
 			<xs:element minOccurs="0" name="control-connection" type="xs:string"/>
 			<xs:element minOccurs="0" name="monitor-connection" type="xs:string"/>
 		</xs:sequence>

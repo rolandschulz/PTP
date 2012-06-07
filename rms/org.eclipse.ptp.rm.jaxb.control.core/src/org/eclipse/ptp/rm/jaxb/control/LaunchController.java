@@ -12,8 +12,6 @@
 package org.eclipse.ptp.rm.jaxb.control;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +41,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemotePreferenceConstants;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
@@ -125,7 +124,8 @@ public class LaunchController implements ILaunchController {
 	private final ConnectionChangeListener connectionListener = new ConnectionChangeListener();
 	private final Map<String, String> launchEnv = new TreeMap<String, String>();
 	private final JobIdPinTable pinTable = new JobIdPinTable();
-	private final String fControlId;
+
+	private String fControlId;
 
 	private ICommandJob interactiveJob;
 	private ICommandJobStatusMap jobStatusMap;
@@ -141,13 +141,7 @@ public class LaunchController implements ILaunchController {
 	private RemoteServicesDelegate fRemoteServicesDelegate;
 	private ResourceManagerData configData;
 
-	public LaunchController(String configurationName) {
-		this(configurationName, UUID.randomUUID().toString());
-	}
-
-	public LaunchController(String configurationName, String controlId) {
-		fControlId = controlId;
-		ModelManager.getInstance().getUniverse().addResourceManager(configurationName, controlId);
+	public LaunchController() {
 	}
 
 	/*
@@ -420,10 +414,9 @@ public class LaunchController implements ILaunchController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#initialize(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#initialize()
 	 */
-	public void initialize(IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 10);
+	public void initialize() throws CoreException {
 		try {
 			realizeRMDataFromXML();
 			rmVarMap = (RMVariableMap) getEnvironment();
@@ -436,33 +429,20 @@ public class LaunchController implements ILaunchController {
 					 */
 					SiteType site = configData.getSiteData();
 					if (site != null) {
-						String controlURI = site.getControlConnection();
-						if (controlURI != null) {
-							try {
-								URI uri = new URI(controlURI);
-								IRemoteServices remServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(uri,
-										progress.newChild(5));
-								if (remServices != null) {
-									IRemoteConnection remConn = remServices.getConnectionManager().getConnection(uri);
-									if (remConn != null) {
-										servicesId = remServices.getId();
-										connectionName = remConn.getName();
-									}
-								}
-							} catch (URISyntaxException e) {
-							}
+						servicesId = site.getRemoteServices();
+						if (servicesId == null) {
+							servicesId = IRemotePreferenceConstants.REMOTE_TOOLS_REMOTE_SERVICES_ID;
 						}
+						connectionName = site.getConnectionName();
 					}
 				}
+				if (servicesId != null && connectionName != null) {
+					fControlId = LaunchControllerManager.generateControlId(servicesId, connectionName, configData.getName());
+					isInitialized = true;
+				}
 			}
-			setFixedConfigurationProperties(progress.newChild(10));
-			isInitialized = true;
 		} catch (Throwable t) {
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
 		}
 	}
 
@@ -597,7 +577,7 @@ public class LaunchController implements ILaunchController {
 			 * Support legacy RM API
 			 */
 			if (!isInitialized) {
-				initialize(progress.newChild(30));
+				initialize();
 			}
 
 			fRemoteServicesDelegate = RemoteServicesDelegate.getDelegate(servicesId, connectionName, progress.newChild(50));
@@ -607,6 +587,7 @@ public class LaunchController implements ILaunchController {
 				conn.addConnectionChangeListener(connectionListener);
 			}
 
+			setFixedConfigurationProperties(conn);
 			addConnectionPropertyAttributes(conn);
 
 			appendLaunchEnv = true;
@@ -1290,12 +1271,12 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @throws CoreException
 	 */
-	private void setFixedConfigurationProperties(IProgressMonitor monitor) throws CoreException {
-		IRemoteConnection rc = getRemoteServicesDelegate(monitor).getRemoteConnection();
+	private void setFixedConfigurationProperties(IRemoteConnection rc) throws CoreException {
 		if (rc != null) {
 			rmVarMap.maybeAddAttribute(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
 			rmVarMap.maybeAddAttribute(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 			rmVarMap.maybeAddAttribute(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
+			rmVarMap.maybeAddAttribute(JAXBControlConstants.DIRECTORY, rc.getWorkingDirectory(), false);
 			rmVarMap.maybeAddAttribute(JAXBControlConstants.PTP_DIRECTORY,
 					new Path(rc.getWorkingDirectory()).append(JAXBControlConstants.ECLIPSESETTINGS).toString(), false);
 		}
@@ -1348,7 +1329,7 @@ public class LaunchController implements ILaunchController {
 		 * make sure these fixed properties are included
 		 */
 		rmVarMap.overwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.DIRECTORY, JAXBControlConstants.DIRECTORY, lcattr);
+		// rmVarMap.overwrite(JAXBControlConstants.DIRECTORY, JAXBControlConstants.DIRECTORY, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.EXEC_PATH, JAXBControlConstants.EXEC_PATH, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
@@ -1365,6 +1346,12 @@ public class LaunchController implements ILaunchController {
 				a = new AttributeType();
 				getEnvironment().put(JAXBControlConstants.DEBUGGER_ARGS, a);
 			}
+			a.setValue(attr);
+		}
+
+		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
+		if (attr != null) {
+			AttributeType a = getEnvironment().get(JAXBControlConstants.DIRECTORY);
 			a.setValue(attr);
 		}
 

@@ -63,9 +63,9 @@
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.ArgumentsTab"
+            class="org.eclipse.ptp.rm.launch.ui.ArgumentsTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.rm.argumentsTab"
+            id="org.eclipse.ptp.rm.launch.applicationLaunch.argumentsTab"
             name="%ArgumentsLaunchTab.name">
          <associatedDelegate
                delegate="org.eclipse.ptp.rm.launch.parallelLaunch">
@@ -133,9 +133,9 @@
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.ArgumentsTab"
+            class="org.eclipse.ptp.rm.launch.ui.ArgumentsTab"
             group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.rm.argumentsTab"
+            id="org.eclipse.ptp.rm.launch.applicationLaunch.argumentsTab"
             name="%ArgumentsLaunchTab.name">
          <associatedDelegate
                delegate="org.eclipse.ptp.rm.launch.parallelLaunch">

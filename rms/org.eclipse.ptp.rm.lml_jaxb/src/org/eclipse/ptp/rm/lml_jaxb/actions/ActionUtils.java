@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -31,13 +30,12 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManager;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerConfiguration;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
+import org.eclipse.ptp.rm.jaxb.control.LaunchControllerManager;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
-import org.eclipse.ptp.rm.lml.ui.views.TableView;
+import org.eclipse.ptp.rm.lml.core.LMLManager;
+import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.ptp.rm.lml_jaxb.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
@@ -144,12 +142,21 @@ public class ActionUtils {
 	 * @param operation
 	 * @throws CoreException
 	 */
-	public static void callDoControl(JobStatusData job, String operation, TableView view, IProgressMonitor monitor)
-			throws CoreException {
-		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
-		IResourceManagerControl control = rm.getControl();
-		control.control(job.getJobId(), operation, monitor);
-		maybeUpdateJobState(job, view, monitor);
+	public static void callDoControl(JobStatusData status, String operation, IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 20);
+		try {
+			ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(status.getRemoteId(),
+					status.getConnectionName(), status.getControlType());
+			if (controller != null) {
+				controller.start(progress.newChild(10));
+				controller.control(status.getJobId(), operation, progress.newChild(10));
+				maybeUpdateJobState(controller, status, progress.newChild(10));
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
 	}
 
 	/**
@@ -157,25 +164,14 @@ public class ActionUtils {
 	 * @return
 	 */
 	public static boolean isAuthorised(JobStatusData status) {
-		IJAXBResourceManager rm = (IJAXBResourceManager) ModelManager.getInstance().getResourceManagerFromUniqueName(
-				status.getControlId());
-		if (rm == null) {
+		if (status.getRemoteId() == null || status.getConnectionName() == null) {
 			return false;
 		}
-		if (!IResourceManager.STARTED_STATE.equals(rm.getState())) {
-			return false;
-		}
-		IJAXBResourceManagerConfiguration config = (IJAXBResourceManagerConfiguration) rm.getControlConfiguration();
-		if (config == null) {
-			return false;
-		}
-		String servicesId = config.getRemoteServicesId();
-		String connName = config.getConnectionName();
-		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(servicesId);
+		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(status.getRemoteId());
 		if (!services.isInitialized()) {
 			return false;
 		}
-		IRemoteConnection connection = services.getConnectionManager().getConnection(connName);
+		IRemoteConnection connection = services.getConnectionManager().getConnection(status.getConnectionName());
 		if (connection == null || !connection.getUsername().equals(status.getOwner())) {
 			return false;
 		}
@@ -189,16 +185,38 @@ public class ActionUtils {
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	public static void maybeUpdateJobState(JobStatusData job, TableView view, IProgressMonitor monitor) throws CoreException {
-		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
-		if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
-			return;
+	public static void maybeUpdateJobState(JobStatusData status, IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 20);
+		try {
+			ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(status.getRemoteId(),
+					status.getConnectionName(), status.getControlType());
+			if (controller != null) {
+				controller.start(progress.newChild(10));
+				maybeUpdateJobState(controller, status, progress.newChild(10));
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
-		IResourceManagerControl control = rm.getControl();
-		IJobStatus refreshed = control.getJobStatus(job.getJobId(), true, monitor);
-		job.updateState(refreshed.getState(), refreshed.getStateDetail());
-		maybeCheckFiles(job);
-		view.refresh();
+	}
+
+	private static void maybeUpdateJobState(ILaunchController controller, JobStatusData status, IProgressMonitor monitor)
+			throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 20);
+		try {
+			IJobStatus refreshed = controller.getJobStatus(status.getJobId(), true, progress.newChild(10));
+			status.updateState(refreshed.getState(), refreshed.getStateDetail());
+			maybeCheckFiles(status);
+			String monitorId = MonitorControlManager.generateMonitorId(status.getRemoteId(), status.getConnectionName(),
+					status.getMonitorType());
+			LMLManager.getInstance().updateUserJob(monitorId, status.getJobId(), status.getState(), status.getStateDetail());
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+
 	}
 
 	/**
@@ -225,13 +243,12 @@ public class ActionUtils {
 			protected IStatus run(IProgressMonitor monitor) {
 				SubMonitor progress = SubMonitor.convert(monitor, 50 * selected.size());
 				for (JobStatusData status : selected) {
-					IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(status.getControlId());
-					if (rm != null) {
+					if (status.getRemoteId() != null && status.getConnectionName() != null) {
 						String remotePath = status.getOutputPath();
 						if (remotePath != null) {
 							try {
-								IFileStore lres = getRemoteFile(rm.getControlConfiguration().getRemoteServicesId(), rm
-										.getControlConfiguration().getConnectionName(), remotePath, progress);
+								IFileStore lres = getRemoteFile(status.getRemoteId(), status.getConnectionName(), remotePath,
+										progress);
 								if (lres != null) {
 									if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
 										lres.delete(EFS.NONE, progress.newChild(25));
@@ -244,8 +261,8 @@ public class ActionUtils {
 						remotePath = status.getErrorPath();
 						if (remotePath != null) {
 							try {
-								IFileStore lres = getRemoteFile(rm.getControlConfiguration().getRemoteServicesId(), rm
-										.getControlConfiguration().getConnectionName(), remotePath, progress);
+								IFileStore lres = getRemoteFile(status.getRemoteId(), status.getConnectionName(), remotePath,
+										progress);
 								if (lres != null) {
 									if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
 										lres.delete(EFS.NONE, progress.newChild(25));

@@ -30,11 +30,9 @@ public interface ILaunchController extends IJobController {
 	 * Initialize the controller. The controller is ready to be used after initialization, however it must be started before any
 	 * control operations can be performed.
 	 * 
-	 * @param monitor
-	 *            progress monitor
 	 * @throws CoreException
 	 */
-	public void initialize(IProgressMonitor monitor) throws CoreException;
+	public void initialize() throws CoreException;
 
 	/**
 	 * Check if controller is initialized.

@@ -12,11 +12,9 @@ package org.eclipse.ptp.rm.lml_jaxb.actions;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml.ui.views.TableView;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
@@ -38,13 +36,9 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
-		if (status != null) {
+		if (status.getRemoteId() != null && status.getConnectionName() != null) {
 			String path = error ? status.getErrorPath() : status.getOutputPath();
-			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(status.getControlId());
-			if (rm != null) {
-				ActionUtils.readRemoteFile(rm.getControlConfiguration().getRemoteServicesId(), rm.getControlConfiguration()
-						.getConnectionName(), path);
-			}
+			ActionUtils.readRemoteFile(status.getRemoteId(), status.getConnectionName(), path);
 		}
 	}
 
@@ -66,15 +60,8 @@ public abstract class AbstractConsoleAction implements IObjectActionDelegate {
 		status = row.status;
 		if (status == null) {
 			action.setEnabled(false);
-			return;
-		}
-		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(status.getControlId());
-		if (rm == null || !IResourceManager.STARTED_STATE.equals(rm.getState())) {
-			action.setEnabled(false);
-		} else if (getReady()) {
-			action.setEnabled(true);
 		} else {
-			action.setEnabled(false);
+			action.setEnabled(getReady());
 		}
 	}
 

@@ -556,9 +556,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected void submitJob(ILaunchConfiguration configuration, String mode, IPLaunch launch, IPDebugger debugger,
 			IProgressMonitor progress) throws CoreException {
-		SubMonitor subMon = SubMonitor.convert(progress, 40);
+		SubMonitor subMon = SubMonitor.convert(progress, 50);
 		try {
-			final ILaunchController control = RMLaunchUtils.getLaunchControl(configuration);
+			final ILaunchController control = RMLaunchUtils.getLaunchController(configuration);
 			if (control == null) {
 				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
@@ -573,7 +573,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 					if (monitor == null) {
 						if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
 								Messages.AbstractParallelLaunchConfigurationDelegate_launchType1,
-								PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE)) {
+								PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, true)) {
 
 							monitor = MonitorControlManager.getInstance().createMonitorControl(monitorType,
 									control.getRemoteServicesId(), control.getConnectionName());
@@ -583,14 +583,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						if (!monitor.isActive()) {
 							if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
 									Messages.AbstractParallelLaunchConfigurationDelegate_launchType2,
-									PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE)) {
+									PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, true)) {
 
 								monitor.start(subMon.newChild(10));
 							}
 						} else {
 							switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
 									Messages.AbstractParallelLaunchConfigurationDelegate_launchType3,
-									PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE);
+									PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, false);
 						}
 					}
 				}
@@ -623,7 +623,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * 
 	 * @param perspectiveID
 	 */
-	protected boolean switchPerspective(final String perspectiveId, final String message, final String preferenceKey) {
+	protected boolean switchPerspective(final String perspectiveId, final String message, final String preferenceKey,
+			final boolean alwaysDisplayMessage) {
 		final boolean[] result = new boolean[1];
 		result[0] = false;
 		if (perspectiveId != null) {
@@ -636,7 +637,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						if (window != null) {
 							IWorkbenchPage page = window.getActivePage();
 							if (page != null) {
-								if (page.getPerspective().getId().equals(perspectiveId)) {
+								if (!alwaysDisplayMessage && page.getPerspective().getId().equals(perspectiveId)) {
+									result[0] = true;
 									return;
 								}
 
