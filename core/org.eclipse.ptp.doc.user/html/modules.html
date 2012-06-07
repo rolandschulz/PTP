@@ -1,0 +1,147 @@
+<html>
+<head>
+<title>Configuring Environment Modules</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+<script type="text/javascript" src="thumb.js"> </script>
+</head> 
+<body>
+<h1 id="top">Configuring Environment Modules</h1>
+<p>
+
+<p>Environment modules allow users to switch between different versions of
+compilers, libraries, and other installed software on a supercomputer.
+On the command line, environment modules are typically configured using commands like
+<tt>module load gcc/4.6.2</tt> or <tt>module swap PrgEnv/cray PrgEnv/pgi</tt>.</p>
+
+<p>PTP provides the ability to configure a set of
+modules to be loaded when a synchronized C/C++ or Fortran project is built.
+Module commands can be entered manually -- just as you would enter at the command
+line -- or they can be configured using a graphical interface.</p>
+
+<p><i><b>Note: The following instructions apply only to synchronized projects.</b>
+Currently, it is not possible to configure modules for local or remote projects.</i></p>
+
+<p>To configure environment modules used to build a synchronized C/C++ or Fortran project:</p>
+<ol>
+<li>In the Project Explorer view, right-click on a C/C++ or Fortran project.</li>
+<li>In the context menu, select Properties.  This will open the Project Properties dialog.</li>
+<li>In the tree on the left, navigate to <b>C/C++ Build &gt; Environment Management</b>.
+<br/>
+<p align="center"><script>thumb("images/modules-unchecked.png",245)</script></p><p><br/></p>
+</li>
+<li>Select <b>Use an environment management system to customize the remote build environment</b>.</li>
+<li>If a message appears reading <b>The remote environment <i>(connection name)</i> is not connected</b>,
+    click the <b>Connect</b> button.
+    If no such message appears, proceed to the next step.
+<br/>
+<p align="center"><script>thumb("images/modules-notConnected.png",245)</script></p><p><br/></p>
+</li>
+<li>Within 10-15 seconds, one of one of the following will appear.<br/>&nbsp;<br/>
+    <ul>
+    <li>If a message appears reading
+        <b><i>(connection name)</i> does not have a supported environment management system installed</b>,
+        you will need to specify environment configuration commands manually.
+        <a href="#manual">Click here</a> for further instructions.
+        <br/>
+        <p align="center"><script>thumb("images/modules-notDetected.png",245)</script></p><p><br/></p>
+        </li>
+    <li>If a check list with a list of modules appears,
+        you may select the modules to be loaded from the check list.
+        <a href="#checklist">Click here</a> for further instructions.
+        <br/>
+        <p align="center"><script>thumb("images/modules-list.png",245)</script></p><p><br/></p>
+        </li>
+    </ul>
+</li>
+<li>After you have configured the environment modules for your build,
+    click the <b>OK</b> button to save the configuration and close the Project Properties dialog.</li>
+</ol>
+
+<h2 id="top">Configuring Environment Modules Using the Module List</h1>
+
+<p>PTP allows modules to be configured using a check list when the remote
+machine runs one of the following environment management systems:</p>
+<ul>
+<li><a href="http://modules.sourceforge.net/">Modules</a> - C or Tcl versions</li>
+<li><a href="http://lmod.sourceforge.net/">Lmod</a> - Modules based on Lua</li>
+<li>SoftEnv</li>
+</ul>
+
+<p align="center"><img src="images/modules-checklist-cropped.png"/></p><p><br/></p>
+
+<p>The module configuration area contains the following elements.</p>
+<ul>
+<li>The list displays all of the modules available on the remote machine.
+    If a module is checked, that module will be loaded when the project is
+    built.  If a module is not checked, PTP will ensure that the module is
+    not loaded when the project is built.</li>
+<li>A <b>Clear Selection</b> button clears all of the check boxes in the
+    module list.</li>
+<li>A <b>Select Defaults</b> button restores the list so that only the
+    default modules are checked.  The &quot;default modules&quot; are
+    those that are loaded automatically when a new Bash login shell is
+    launched on the remote machine.  (Some systems allow users to customize
+    their default modules by creating a <i>~/.modules</i> file on the remote
+    machine.)</li>
+<li>A <b>Reload List</b> button reloads the list of available modules from the
+    remote machine.  This is useful if the set of available modules changes
+    while the dialog box is open, or if communication problems prevented the
+    list from loading correctly.</li>
+<li>A <b>Filter List</b> text field allows you to temporarily display only a
+    subset of the available modules.  This is useful for quickly finding
+    modules with a particular name.  Note that entering filter text does
+    <i>not</i> change what modules are checked; rather, it temporarily removes
+    some modules from view.  For further instructions,
+    <a href="#filter">see below</a>.</li>
+</ul>
+</p>
+
+<h3 id="top">Using the <b>Filter List</b> Text Field</h1>
+
+<p>The <b>Filter List</b> text field can be used to temporarily display only
+modules with a particular name.  (Entering text in this field does not affect
+what modules are selected; it simply hides some entries from view until the
+filter text is cleared.)</p>
+
+<ul>
+<li>Typing text in the field restricts the display to only those modules whose
+    names begin with that text.  For example:
+    <ul>
+    <li>Entering "open" would display
+    modules such as open64/4.5.1, open64/5.0, openmpi-1.4.3-intel-12.0.4,
+    and openmpi_gcc-1.4.2 -- i.e., modules whose names begin with "open."
+    </ul></li>
+<li>An asterisk (*) in the text matches any text (or none at all).   For example:
+    <ul>
+    <li>Entering "*gcc" would match modules named gcc, gcc/4.6.2, openmpi_gcc-1.4.2,
+    and even R/2.14.2-gcc -- i.e., any module whose name contains "gcc".</li>
+    <li>Entering "metis/*/gnu" would match metis/4.0/gnu and metis/5.0/gnu
+    (but not metis/4.0/intel or metis/5.0/intel).
+    <li>Entering "m*pi" would match mpi, mpip, mvapich2 -- modules whose
+    names start with an <i>m</i> and have <i>pi</i> later in the name.</li>
+    </ul></li>
+<li>A question mark (?) in the text matches exactly one character.  For example:
+    <ul>
+    <li>Entering "openmpi-1.?-intel" would match a module named openmpi-1.6-intel-12.0.4
+    but not openmpi-1.4.3-intel-12.0.4.)</li>
+    </ul></li>
+</ul>
+
+<h2 id="top">Configuring Environment Modules Manually</h1>
+
+<p>To configure environment modules manually:</p>
+<ol>
+<li>Select <b>Manually specify environment configuration commands</b>.</li>
+<li>A text box will appear.  If the check list was previously visible, the text
+    box will contain the commands needed to configure the modules according to
+    what was selected in the checklist.</li>
+<li>Enter Bash shell commands necessary to configure the environment, one per
+    line.</li>
+</ol>
+
+<p>&nbsp;</p>
+
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+</body>
+
+</html>
