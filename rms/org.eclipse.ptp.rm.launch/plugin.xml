@@ -83,7 +83,7 @@
                delegate="org.eclipse.ptp.rm.launch.parallelLaunch">
          </associatedDelegate>
          <placement
-               after="org.eclipse.ptp.launch.applicationLaunch.argumentsTab">
+               after="org.eclipse.ptp.rm.launch.applicationLaunch.argumentsTab">
          </placement>
       </tab>
       <tab
@@ -153,7 +153,7 @@
                delegate="org.eclipse.ptp.rm.launch.parallelLaunch">
          </associatedDelegate>
          <placement
-               after="org.eclipse.ptp.launch.applicationLaunch.argumentsTab">
+               after="org.eclipse.ptp.rm.launch.applicationLaunch.argumentsTab">
          </placement>
       </tab>
       <tab
