@@ -1275,7 +1275,7 @@
        id="org.eclipse.ptp.rdt.managedbuild.target.gnu.exe"
        isAbstract="false"
        isTest="false"
-       name="org.eclipse.ptp.rdt.managedbuild.target.gnu.exe"
+       name="%projectType.exe.name"
        projectEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteProjectEnvironmentSupplier">
     <configuration
           buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe"
@@ -1411,7 +1411,7 @@
        id="org.eclipse.ptp.rdt.managedbuild.target.gnu.so"
        isAbstract="false"
        isTest="false"
-       name="org.eclipse.ptp.rdt.managedbuild.target.gnu.so"
+       name="%projectType.so.name"
        projectEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteProjectEnvironmentSupplier">
     <configuration
           buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
@@ -1571,7 +1571,7 @@
        id="org.eclipse.ptp.rdt.managedbuild.target.gnu.lib"
        isAbstract="false"
        isTest="false"
-       name="org.eclipse.ptp.rdt.managedbuild.target.gnu.lib"
+       name="%projectType.lib.name"
        projectEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteProjectEnvironmentSupplier">
     <configuration
           buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
