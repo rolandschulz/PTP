@@ -571,47 +571,49 @@ public class LaunchController implements ILaunchController {
 	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#start(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void start(IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 60);
-		try {
-			/*
-			 * Support legacy RM API
-			 */
-			if (!isInitialized) {
-				initialize();
-			}
+		if (!isActive) {
+			SubMonitor progress = SubMonitor.convert(monitor, 60);
+			try {
+				/*
+				 * Support legacy RM API
+				 */
+				if (!isInitialized) {
+					initialize();
+				}
 
-			fRemoteServicesDelegate = RemoteServicesDelegate.getDelegate(servicesId, connectionName, progress.newChild(50));
-			IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
-			if (conn != null) {
-				checkConnection(conn, progress);
-				conn.addConnectionChangeListener(connectionListener);
-			}
+				fRemoteServicesDelegate = RemoteServicesDelegate.getDelegate(servicesId, connectionName, progress.newChild(50));
+				IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
+				if (conn != null) {
+					checkConnection(conn, progress);
+					conn.addConnectionChangeListener(connectionListener);
+				}
 
-			setFixedConfigurationProperties(conn);
-			addConnectionPropertyAttributes(conn);
+				setFixedConfigurationProperties(conn);
+				addConnectionPropertyAttributes(conn);
 
-			appendLaunchEnv = true;
+				appendLaunchEnv = true;
 
-			/*
-			 * start daemon
-			 */
-			jobStatusMap = new JobStatusMap(this);
-			((Thread) jobStatusMap).start();
+				/*
+				 * start daemon
+				 */
+				jobStatusMap = new JobStatusMap(this);
+				((Thread) jobStatusMap).start();
 
-			/*
-			 * Run the start up commands, if any
-			 */
-			List<CommandType> onStartUp = controlData.getStartUpCommand();
-			runCommands(onStartUp);
+				/*
+				 * Run the start up commands, if any
+				 */
+				List<CommandType> onStartUp = controlData.getStartUpCommand();
+				runCommands(onStartUp);
 
-			isActive = true;
-		} catch (CoreException ce) {
-			throw ce;
-		} catch (Throwable t) {
-			throw CoreExceptionUtils.newException(t.getMessage(), t);
-		} finally {
-			if (monitor != null) {
-				monitor.done();
+				isActive = true;
+			} catch (CoreException ce) {
+				throw ce;
+			} catch (Throwable t) {
+				throw CoreExceptionUtils.newException(t.getMessage(), t);
+			} finally {
+				if (monitor != null) {
+					monitor.done();
+				}
 			}
 		}
 	}
@@ -622,31 +624,33 @@ public class LaunchController implements ILaunchController {
 	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#stop()
 	 */
 	public void stop() throws CoreException {
-		String iJobId = null;
-		synchronized (this) {
-			if (interactiveJob != null) {
-				ICommandJobStatus status = interactiveJob.getJobStatus();
-				if (status != null) {
-					iJobId = status.getJobId();
+		if (isActive) {
+			String iJobId = null;
+			synchronized (this) {
+				if (interactiveJob != null) {
+					ICommandJobStatus status = interactiveJob.getJobStatus();
+					if (status != null) {
+						iJobId = status.getJobId();
+					}
 				}
 			}
+			control(iJobId, TERMINATE_OPERATION, null);
+
+			List<CommandType> onShutDown = controlData.getShutDownCommand();
+			runCommands(onShutDown);
+
+			if (rmVarMap != null) {
+				rmVarMap.clear();
+			}
+			jobStatusMap.halt();
+
+			IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
+			if (conn != null) {
+				conn.removeConnectionChangeListener(connectionListener);
+			}
+
+			isActive = false;
 		}
-		control(iJobId, TERMINATE_OPERATION, null);
-
-		List<CommandType> onShutDown = controlData.getShutDownCommand();
-		runCommands(onShutDown);
-
-		if (rmVarMap != null) {
-			rmVarMap.clear();
-		}
-		jobStatusMap.halt();
-
-		IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
-		if (conn != null) {
-			conn.removeConnectionChangeListener(connectionListener);
-		}
-
-		isActive = false;
 	}
 
 	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {

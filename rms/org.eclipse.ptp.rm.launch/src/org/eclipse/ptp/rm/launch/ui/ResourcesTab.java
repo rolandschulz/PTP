@@ -234,10 +234,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		super.initializeFrom(configuration);
 
-		stopController(fLaunchControl);
-		fLaunchControl = null;
-		fRemoteConnection = null;
-
 		final String rmType = LaunchUtils.getTemplateName(configuration);
 		if (rmType != null) {
 			fSystemTypeCombo.select(fProviders.lastIndexOf(rmType) + 1);
@@ -245,16 +241,22 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			final String remId = LaunchUtils.getRemoteServicesId(configuration);
 			final String remName = LaunchUtils.getConnectionName(configuration);
 			if (remId != null && remName != null) {
-				fRemoteConnectionWidget.setConnection(remId, remName);
-				if (openConnection()) {
-					fLaunchControl = getNewController(remId, remName, rmType);
-				}
 				if (fLaunchControl != null) {
+					if (!fLaunchControl.getConfiguration().getName().equals(rmType)
+							|| !fLaunchControl.getRemoteServicesId().equals(remId)
+							|| !fLaunchControl.getConnectionName().equals(remName)) {
+						stopController(fLaunchControl);
+						fRemoteConnectionWidget.setConnection(remId, remName);
+						if (openConnection()) {
+							fLaunchControl = getNewController(remId, remName, rmType);
+						}
+					}
 					fRemoteConnection = fRemoteConnectionWidget.getConnection();
 					updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
 					updateLaunchConfigurationDialog();
 					fDefaultConnection = false;
 				} else {
+					fRemoteConnection = null;
 					updateEnablement();
 				}
 			}
