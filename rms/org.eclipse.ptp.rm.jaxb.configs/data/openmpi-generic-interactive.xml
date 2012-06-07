@@ -99,7 +99,8 @@
 				</target>
 			</stdout-parser>
 		</start-up-command>
-		<submit-interactive name="submit-interactive" directory="${ptp_rm:directory#value}">
+		<submit-interactive name="submit-interactive" directory="${ptp_rm:directory#value}" waitForId="true" keepOpen="true">
+			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_job.pl</arg>
 			<arg>${ptp_rm:local_prefix#value}mpirun</arg>
 			<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
 			<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
@@ -111,17 +112,32 @@
 			<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
 			<arg>${ptp_rm:progArgs#value}</arg>
+			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>#PTP job_id=([0-9]+)</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
+						<set field="value">
+							<entry value="RUNNING" />
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
 			<stderr-parser delim="\n">
 				<target>
 					<match>
 						<expression>.+</expression>
-						<throw message="Unable to launch Open MPI job"/>
+						<throw message="Unable to launch job"/>
 					</match>
 				</target>
 			</stderr-parser>
 		</submit-interactive>
-		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" keepOpen="true">
-			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</arg>
+		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true">
+			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_job.pl</arg>
+			<arg>${ptp_rm:local_prefix#value}mpirun</arg>
 			<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
 			<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
 			<arg attribute="bySlotOption" isUndefinedIfMatches="false">-byslot</arg>
@@ -132,11 +148,25 @@
 			<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
 			<arg>${ptp_rm:debuggerArgs#value}</arg>
+			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>#PTP job_id=([0-9]+)</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
+						<set field="value">
+							<entry value="RUNNING" />
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
 			<stderr-parser delim="\n">
 				<target>
 					<match>
 						<expression>.+</expression>
-						<throw message="Unable to launch Open MPI job"/>
+						<throw message="Unable to launch job"/>
 					</match>
 				</target>
 			</stderr-parser>

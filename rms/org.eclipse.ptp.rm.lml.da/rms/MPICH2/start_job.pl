@@ -22,6 +22,9 @@ my $TOTAL_PROCS=0;
 my @JOB;
 
 my $line;
+my $launchMode;
+my $debuggerId;
+my $pid;
 
 #####################################################################
 #
@@ -67,16 +70,18 @@ sub get_node_map {
 
 sub get_job_map {
     my $node;
-    my $nprocs;
+    my $rank;
     my $line;
 	# find node/proc info
 	while ($line=<IN>) {
-	    if ($line=~/^ Data for node: Name: $patnode\s*Num procs: $patint/) {
-			($node,$nprocs) = ($1, $3);
-			print "found node $node, procs $nprocs\n" if ($verbose);
-			$TOTAL_PROCS += $nprocs;
-			get_node_map($node);
-		} elsif ($line =~ /^ =+$/) {
+		if ($line=~/\s*\*+\s*/) {
+			next;
+		} elsif ($line=~/\s*\[$patint\] proxy: $patnode/) {
+			($node,$rank) = ($2, $1);
+			print "found node $node, rank $rank\n" if ($verbose);
+			$TOTAL_PROCS++;
+			$JOB[$rank-1] = $node;
+		} elsif ($line =~ /^=+$/) {
 			print "found end of table\n" if ($verbose);
 			return;
 		}
@@ -92,29 +97,48 @@ sub generate_routing_file {
 	close(OUT);
 }
 
+$launchMode = $ENV{'PTP_LAUNCH_MODE'};
+$debuggerId = $ENV{'PTP_DEBUGGER_ID'};
+
 if ($#ARGV < 1) {
   die " Usage: $0 [mpi_args ...] [debugger_args ...]\n";
 }
+my $cmd = shift(@ARGV);
 my $args = join(" ", @ARGV);
-my $cmd="mpirun -mca orte_show_resolved_nodenames 1 -display-map";
-
+if ($launchMode eq 'debug') {
+	$cmd .= " -verbose";
+}
 print "running command $cmd $args\n" if ($verbose);
 
 # Set autoflush to pass output as soon as possble
 $|=1;
 
-if (open(IN,"$cmd $args 2>&1 |")) {
-    while ($line=<IN>) {
-		chomp($line);
-		if ($line=~/=*\s*JOB MAP\s*=*/) {
-			print "found job map\n" if ($verbose);
-			get_job_map();
-			generate_routing_file();
-		} else {
-			print "$line\n";
-		}
-    }
-    close(IN);
-} 
+$pid = fork();
+if ( $pid == 0 ) {
+	printf("#PTP job_id=%d\n", $$);
+	if ($launchMode eq 'debug') {
+		if (open(IN,"$cmd $args 2>&1 |")) {
+		    while ($line=<IN>) {
+				chomp($line);
+				if ($line=~/\s*Proxy information:\s*/) {
+					print "found job map\n" if ($verbose);
+					get_job_map();
+					generate_routing_file();
+				} else {
+					print "$line\n";
+				}
+		    }
+		    close(IN);
+		} 
+		exit(0);
+	} else {
+		exec($cmd, @ARGV);
+		exit(1);
+	}
+}
+
+waitpid($pid, 0);
+exit($? >> 8);
+
 
 
