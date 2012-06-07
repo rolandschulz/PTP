@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005,2010 IBM Corporation.
+ * Copyright (c) 2005,2012 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -152,6 +152,61 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 		funcMap.put("omp_get_wtick", new FunctionSummaryImpl( //$NON-NLS-1$
 				"omp_get_wtick", "", Messages.OpenMPCHelpBook_get_wtick, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_get_wtick", "double", //$NON-NLS-1$ //$NON-NLS-2$
+						"void"), null)); //$NON-NLS-1$
+		// new for 6.0, OpenMP 3.1
+		funcMap.put("omp_set_schedule", new FunctionSummaryImpl( //$NON-NLS-1$
+				"omp_set_schedule", "", Messages.OpenMPCHelpBook_set_schedule, //$NON-NLS-1$ //$NON-NLS-2$
+				new FunctionPrototypeSummaryImpl("omp_set_schedule", "void", //$NON-NLS-1$ //$NON-NLS-2$
+						"omp_sched_t kind, int modifier"), null)); //$NON-NLS-1$
+
+		funcMap.put("omp_get_schedule", new FunctionSummaryImpl( //$NON-NLS-1$
+				"omp_get_schedule", "", Messages.OpenMPCHelpBook_get_schedule, //$NON-NLS-1$ //$NON-NLS-2$
+				new FunctionPrototypeSummaryImpl("omp_get_schedule", "void", //$NON-NLS-1$ //$NON-NLS-2$
+						"omp_sched_t kind, int modifier"), null)); //$NON-NLS-1$
+
+		funcMap.put("omp_get_thread_limit", new FunctionSummaryImpl( //$NON-NLS-1$
+				"omp_get_thread_limit", "", Messages.OpenMPCHelpBook_get_thread_limit, //$NON-NLS-1$ //$NON-NLS-2$
+				new FunctionPrototypeSummaryImpl("omp_get_thread_limit", "int", //$NON-NLS-1$ //$NON-NLS-2$
+						"void"), null)); //$NON-NLS-1$	
+
+		funcMap.put("omp_set_max_active_levels", new FunctionSummaryImpl( //$NON-NLS-1$
+				"omp_set_max_active_levels", "", Messages.OpenMPCHelpBook_set_max_active_levels, //$NON-NLS-1$ //$NON-NLS-2$
+				new FunctionPrototypeSummaryImpl("omp_set_max_active_levels", "int", //$NON-NLS-1$ //$NON-NLS-2$
+						"void"), null)); //$NON-NLS-1$
+
+		funcMap.put("omp_get_max_active_levels", new FunctionSummaryImpl( //$NON-NLS-1$
+				"omp_get_max_active_levels", "", Messages.OpenMPCHelpBook_get_max_active_levels, //$NON-NLS-1$ //$NON-NLS-2$
+				new FunctionPrototypeSummaryImpl("omp_get_max_active_levels", "int", //$NON-NLS-1$ //$NON-NLS-2$
+						"void"), null)); //$NON-NLS-1$
+
+		funcMap.put("omp_get_level", new FunctionSummaryImpl( //$NON-NLS-1$
+				"omp_get_level", "", Messages.OpenMPCHelpBook_get_level, //$NON-NLS-1$ //$NON-NLS-2$
+				new FunctionPrototypeSummaryImpl("omp_get_level", "int", //$NON-NLS-1$ //$NON-NLS-2$
+						"void"), null)); //$NON-NLS-1$
+
+		funcMap.put("omp_get_ancestor_thread_num", new FunctionSummaryImpl( //$NON-NLS-1$
+						Messages.OpenMPCHelpBook_get_ancestor_thread_num,
+						"", "Returns, for a given nested level of the current thread, the thread number of the ancestor or the current thread", //$NON-NLS-1$ //$NON-NLS-2$
+				new FunctionPrototypeSummaryImpl("omp_get_ancestor_thread_num", "int", //$NON-NLS-1$ //$NON-NLS-2$
+						"int level"), null)); //$NON-NLS-1$
+
+		funcMap.put(
+				"omp_get_team_size", new FunctionSummaryImpl( //$NON-NLS-1$
+						Messages.OpenMPCHelpBook_get_team_size,
+						"", "Returns, for a given nested level of the current thread, the size of the thread team to which the ancestor or the current thread belongs", //$NON-NLS-1$ //$NON-NLS-2$
+						new FunctionPrototypeSummaryImpl("omp_get_team_size", "int", //$NON-NLS-1$ //$NON-NLS-2$
+								"int level"), null)); //$NON-NLS-1$
+
+		funcMap.put("omp_get_active_level", new FunctionSummaryImpl( //$NON-NLS-1$
+				Messages.OpenMPCHelpBook_get_active_level,
+				"", "Returns the number of nested, active parallel regions enclosing the task that contains the call", //$NON-NLS-1$ //$NON-NLS-2$
+				new FunctionPrototypeSummaryImpl("omp_get_active_level", "int", //$NON-NLS-1$ //$NON-NLS-2$
+						"void"), null)); //$NON-NLS-1$
+
+		funcMap.put("omp_in_final", new FunctionSummaryImpl( //$NON-NLS-1$
+				Messages.OpenMPCHelpBook_in_final,
+				"", "Returns true if the routine is executed in a final or included task region; otherwise, it returns false", //$NON-NLS-1$ //$NON-NLS-2$
+				new FunctionPrototypeSummaryImpl("omp_in_final", "int", //$NON-NLS-1$ //$NON-NLS-2$
 						"void"), null)); //$NON-NLS-1$
 
 		// try to define constants too...
