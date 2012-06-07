@@ -83,6 +83,8 @@ public class Messages extends NLS {
 	public static String SyncMainWizardPage_7;
 	public static String SyncMainWizardPage_8;
 	public static String SyncMainWizardPage_9;
+	public static String SyncMainWizardPage_Local_directory;
+	public static String SyncMainWizardPage_Remote_directory;
 	public static String SyncMenuOperation_0;
 	public static String SyncMenuOperation_1;
 	public static String SyncMenuOperation_2;

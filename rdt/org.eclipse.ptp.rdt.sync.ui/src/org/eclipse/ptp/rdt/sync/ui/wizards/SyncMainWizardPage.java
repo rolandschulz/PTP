@@ -22,6 +22,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.IToolChain;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
+import org.eclipse.cdt.ui.CDTSharedImages;
+import org.eclipse.cdt.ui.CUIPlugin;
+import org.eclipse.cdt.ui.newui.PageLayout;
+import org.eclipse.cdt.ui.wizards.CDTMainWizardPage;
+import org.eclipse.cdt.ui.wizards.CNewWizard;
+import org.eclipse.cdt.ui.wizards.CWizardHandler;
+import org.eclipse.cdt.ui.wizards.EntryDescriptor;
+import org.eclipse.cdt.ui.wizards.IWizardItemsListListener;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -64,6 +76,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -75,27 +88,12 @@ import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
-import org.eclipse.cdt.ui.CDTSharedImages;
-import org.eclipse.cdt.ui.CUIPlugin;
-import org.eclipse.cdt.ui.newui.PageLayout;
-import org.eclipse.cdt.ui.wizards.CDTMainWizardPage;
-import org.eclipse.cdt.ui.wizards.CNewWizard;
-import org.eclipse.cdt.ui.wizards.CWizardHandler;
-import org.eclipse.cdt.ui.wizards.EntryDescriptor;
-import org.eclipse.cdt.ui.wizards.IWizardItemsListListener;
-import org.eclipse.cdt.managedbuilder.core.IConfiguration;
-import org.eclipse.cdt.managedbuilder.core.IToolChain;
-import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
-import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 
 /**
- * Main wizard page for creating new synchronized projects. All elements needed for a synchronized project are configured here.
- * This includes:
- * 1) Project name and workspace location
- * 2) Remote connection and directory
- * 3) Project type
- * 4) Local and remote toolchains
- *
+ * Main wizard page for creating new synchronized projects. All elements needed for a synchronized project are configured here. This
+ * includes: 1) Project name and workspace location 2) Remote connection and directory 3) Project type 4) Local and remote
+ * toolchains
+ * 
  * Since this wizard page's operation differs greatly from a normal CDT wizard page, this class simply reimplements (overrides) all
  * functionality in the two immediate superclasses (CDTMainWizardPage and WizardNewProjectCreationPage) but borrows much of the code
  * from those two classes. Thus, except for very basic functionality, such as jface methods, this class is self-contained.
@@ -138,16 +136,17 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	/**
 	 * Creates a new project creation wizard page.
-	 *
-	 * @param pageName the name of this page
+	 * 
+	 * @param pageName
+	 *            the name of this page
 	 */
 	public SyncMainWizardPage(String pageName) {
 		super(pageName);
 		setPageComplete(false);
 	}
 
-	/** (non-Javadoc)
-	 * Method declared on IDialogPage.
+	/**
+	 * (non-Javadoc) Method declared on IDialogPage.
 	 */
 	@Override
 	public void createControl(Composite parent) {
@@ -162,7 +161,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 		createProjectBasicInfoGroup(composite);
 		createProjectRemoteInfoGroup(composite);
-		createProjectDetailedInfoGroup(composite); 
+		createProjectDetailedInfoGroup(composite);
 		this.switchTo(this.updateData(projectTypeTree, allToolChainsHiddenComposite, false, SyncMainWizardPage.this, getWizard()),
 				getDescriptor(projectTypeTree));
 
@@ -194,27 +193,29 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				TreeItem[] tis = projectTypeTree.getSelection();
-				if (tis == null || tis.length == 0) return;
-				switchTo((CWizardHandler)tis[0].getData(), (EntryDescriptor)tis[0].getData(DESC));
+				if (tis == null || tis.length == 0) {
+					return;
+				}
+				switchTo((CWizardHandler) tis[0].getData(), (EntryDescriptor) tis[0].getData(DESC));
 				setPageComplete(validatePage());
 				getWizard().getContainer().updateMessage();
-			}});
-		projectTypeTree.getAccessible().addAccessibleListener(
-				new AccessibleAdapter() {                       
-					@Override
-					public void getName(AccessibleEvent e) {
-						for (int i = 0; i < projectTypeTree.getItemCount(); i++) {
-							if (projectTypeTree.getItem(i).getText().equals(e.result))
-								return;
-						}
-						e.result = Messages.SyncMainWizardPage_2;
+			}
+		});
+		projectTypeTree.getAccessible().addAccessibleListener(new AccessibleAdapter() {
+			@Override
+			public void getName(AccessibleEvent e) {
+				for (int i = 0; i < projectTypeTree.getItemCount(); i++) {
+					if (projectTypeTree.getItem(i).getText().equals(e.result)) {
+						return;
 					}
 				}
-				);
+				e.result = Messages.SyncMainWizardPage_2;
+			}
+		});
 
 		allToolChainsHiddenComposite = new Composite(c.getParent(), SWT.NONE);
 		allToolChainsHiddenComposite.setVisible(false);
-		
+
 		remoteToolChain = new Composite(c, SWT.NONE);
 		remoteToolChain.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		remoteToolChain.setLayout(new PageLayout());
@@ -264,69 +265,69 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			public void widgetSelected(SelectionEvent e) {
 				switchTo(updateData(projectTypeTree, allToolChainsHiddenComposite, false, SyncMainWizardPage.this, getWizard()),
 						getDescriptor(projectTypeTree));
-			}} );
+			}
+		});
 		showSupportedOnlyButton.setSelection(false);
-		
+
 		// File filter button
-        final Button filterButton = new Button(c, SWT.PUSH);
-        filterButton.setText(Messages.NewRemoteSyncProjectWizardPage_0);
-        filterButton.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 2, 1));
-        filterButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                        SyncFileFilter tmpFilter;
-                        if (customFilter == null) {
-                                tmpFilter = SyncManager.getDefaultFileFilter();
-                        } else {
-                                tmpFilter = new SyncFileFilter(customFilter);
-                        }
-                        int filterReturnCode = SyncFileFilterPage.openBlocking(tmpFilter, filterButton.getShell());
-                        if (filterReturnCode == Window.OK) {
-                                customFilter = tmpFilter;
-                        }
-                }
-        });
+		final Button filterButton = new Button(c, SWT.PUSH);
+		filterButton.setText(Messages.NewRemoteSyncProjectWizardPage_0);
+		filterButton.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 2, 1));
+		filterButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				SyncFileFilter tmpFilter;
+				if (customFilter == null) {
+					tmpFilter = SyncManager.getDefaultFileFilter();
+				} else {
+					tmpFilter = new SyncFileFilter(customFilter);
+				}
+				int filterReturnCode = SyncFileFilterPage.openBlocking(tmpFilter, filterButton.getShell());
+				if (filterReturnCode == Window.OK) {
+					customFilter = tmpFilter;
+				}
+			}
+		});
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
 		return (h_selected == null) ? null : h_selected.getSpecificPage();
-	}		
+	}
 
 	/**
 	 * Returns the current project location path as entered by the user
-	 *
+	 * 
 	 * @return the project location path or its anticipated initial value.
 	 */
 	@Override
 	public IPath getLocationPath() {
 		return new Path(projectLocationField.getText());
 	}
-	
 
 	/**
 	 * Get workspace URI
 	 * 
 	 * @return URI or null if location path is not a valid URI
 	 */
-    @Override
-    public URI getLocationURI() {
-    	try {
+	@Override
+	public URI getLocationURI() {
+		try {
 			return new URI(getLocationPath().toString());
 		} catch (URISyntaxException e) {
 			return null;
 		}
-    }
+	}
 
-    /**
-     * Get project location URI
-     * @return URI (may be null if location path is not a valid URI)
-     */
-    @Override
-    public URI getProjectLocation() {
-    	return useDefaults() ? null : getLocationURI();
-    }
-
+	/**
+	 * Get project location URI
+	 * 
+	 * @return URI (may be null if location path is not a valid URI)
+	 */
+	@Override
+	public URI getProjectLocation() {
+		return useDefaults() ? null : getLocationURI();
+	}
 
 	@Override
 	protected boolean validatePage() {
@@ -367,10 +368,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			errorMessage = Messages.SyncMainWizardPage_7;
 			return false;
 		}
-		
+
 		// Validate location according to built-in rules
-		if (!defaultLocationButton.getSelection())
-		{
+		if (!defaultLocationButton.getSelection()) {
 			IStatus locationStatus = ResourcesPlugin.getWorkspace().validateProjectLocationURI(handle, location);
 			if (!locationStatus.isOK()) {
 				errorMessage = locationStatus.getMessage();
@@ -407,10 +407,10 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		if (h_selected == null) {
 			message = Messages.SyncMainWizardPage_11;
 			messageType = IMessageProvider.NONE;
-			return false;	        	
+			return false;
 		}
 
-		String s = h_selected.getErrorMessage(); 
+		String s = h_selected.getErrorMessage();
 		if (s != null) {
 			errorMessage = s;
 			return false;
@@ -421,7 +421,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	protected boolean validateRemoteLocation() {
 		errorMessage = fSelectedParticipant.getErrorMessage();
-		return fSelectedParticipant.getErrorMessage()==null && fSelectedParticipant.isConfigComplete();
+		return fSelectedParticipant.getErrorMessage() == null && fSelectedParticipant.isConfigComplete();
 	}
 
 	/*
@@ -469,18 +469,22 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	public CWizardHandler updateData(Tree tree, Composite right, boolean show_sup, IWizardItemsListListener ls, IWizard wizard) {
 		// remember selected item
 		TreeItem[] selection = tree.getSelection();
-		TreeItem selectedItem = selection.length>0 ? selection[0] : null; 
-		String savedLabel = selectedItem!=null ? selectedItem.getText() : null;
+		TreeItem selectedItem = selection.length > 0 ? selection[0] : null;
+		String savedLabel = selectedItem != null ? selectedItem.getText() : null;
 		String savedParentLabel = getParentText(selectedItem);
 
 		tree.removeAll();
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(EXTENSION_POINT_ID);
-		if (extensionPoint == null) return null;
+		if (extensionPoint == null) {
+			return null;
+		}
 		IExtension[] extensions = extensionPoint.getExtensions();
-		if (extensions == null) return null;
+		if (extensions == null) {
+			return null;
+		}
 
 		List<EntryDescriptor> items = new ArrayList<EntryDescriptor>();
-		for (int i = 0; i < extensions.length; ++i)	{
+		for (int i = 0; i < extensions.length; ++i) {
 			IConfigurationElement[] elements = extensions[i].getConfigurationElements();
 			for (IConfigurationElement element : elements) {
 				if (element.getName().equals(ELEMENT_NAME)) {
@@ -488,10 +492,12 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 					try {
 						w = (CNewWizard) element.createExecutableExtension(CLASS_NAME);
 					} catch (CoreException e) {
-						System.out.println(Messages.SyncMainWizardPage_12 + e.getLocalizedMessage()); 
-						return null; 
+						System.out.println(Messages.SyncMainWizardPage_12 + e.getLocalizedMessage());
+						return null;
 					}
-					if (w == null) return null;
+					if (w == null) {
+						return null;
+					}
 					w.setDependentControl(right, ls);
 					for (EntryDescriptor ed : w.createItems(show_sup, wizard)) {
 						items.add(ed);
@@ -499,71 +505,75 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 				}
 			}
 		}
-		// If there is a EntryDescriptor which is default for category, make sure it 
+		// If there is a EntryDescriptor which is default for category, make sure it
 		// is in the front of the list.
-		for (int i = 0; i < items.size(); ++i)
-		{
+		for (int i = 0; i < items.size(); ++i) {
 			EntryDescriptor ed = items.get(i);
-			if (ed.isDefaultForCategory())
-			{
+			if (ed.isDefaultForCategory()) {
 				items.remove(i);
 				items.add(0, ed);
 				break;
-			}				
+			}
 		}
 
 		// bug # 211935 : allow items filtering.
-		if (ls != null) // NULL means call from prefs
+		if (ls != null) {
 			items = ls.filterItems(items);
+		}
 		addItemsToTree(tree, items);
 
 		if (tree.getItemCount() > 0) {
 			TreeItem target = null;
 			// try to search item which was selected before
-			if (savedLabel!=null) {
+			if (savedLabel != null) {
 				target = findItem(tree, savedLabel, savedParentLabel);
 			}
 			if (target == null) {
 				target = tree.getItem(0);
-				if (target.getItemCount() != 0)
+				if (target.getItemCount() != 0) {
 					target = target.getItem(0);
+				}
 			}
 			tree.setSelection(target);
-			return (CWizardHandler)target.getData();
+			return (CWizardHandler) target.getData();
 		}
 		return null;
 	}
 
 	private static String getParentText(TreeItem item) {
-		if (item==null || item.getParentItem()==null)
+		if (item == null || item.getParentItem() == null) {
 			return ""; //$NON-NLS-1$
+		}
 		return item.getParentItem().getText();
 	}
 
 	private static TreeItem findItem(Tree tree, String label, String parentLabel) {
 		for (TreeItem item : tree.getItems()) {
 			TreeItem foundItem = findTreeItem(item, label, parentLabel);
-			if (foundItem!=null)
+			if (foundItem != null) {
 				return foundItem;
+			}
 		}
 		return null;
 	}
 
 	private static TreeItem findTreeItem(TreeItem item, String label, String parentLabel) {
-		if (item.getText().equals(label) && getParentText(item).equals(parentLabel))
+		if (item.getText().equals(label) && getParentText(item).equals(parentLabel)) {
 			return item;
+		}
 
 		for (TreeItem child : item.getItems()) {
 			TreeItem foundItem = findTreeItem(child, label, parentLabel);
-			if (foundItem!=null)
+			if (foundItem != null) {
 				return foundItem;
+			}
 		}
 		return null;
 	}
 
 	private static void addItemsToTree(Tree tree, List<EntryDescriptor> items) {
-		//  Sorting is disabled because of users requests	
-		//	Collections.sort(items, CDTListComparator.getInstance());
+		// Sorting is disabled because of users requests
+		// Collections.sort(items, CDTListComparator.getInstance());
 
 		ArrayList<TreeItem> placedTreeItemsList = new ArrayList<TreeItem>(items.size());
 		ArrayList<EntryDescriptor> placedEntryDescriptorsList = new ArrayList<EntryDescriptor>(items.size());
@@ -579,33 +589,38 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 				placedEntryDescriptorsList.add(wd);
 			}
 		}
-		while(true) {
+		while (true) {
 			boolean found = false;
 			Iterator<EntryDescriptor> it2 = items.iterator();
 			while (it2.hasNext()) {
 				EntryDescriptor wd1 = it2.next();
-				if (wd1.getParentId() == null) continue;
-				for (int i = 0; i< placedEntryDescriptorsList.size(); i++) {
+				if (wd1.getParentId() == null) {
+					continue;
+				}
+				for (int i = 0; i < placedEntryDescriptorsList.size(); i++) {
 					EntryDescriptor wd2 = placedEntryDescriptorsList.get(i);
 					if (wd2.getId().equals(wd1.getParentId())) {
 						found = true;
 						wd1.setParentId(null);
 						CWizardHandler h = wd2.getHandler();
-						/* If neither wd1 itself, nor its parent (wd2) have a handler
-						 * associated with them, and the item is not a category,
-						 * then skip it. If it's category, then it's possible that
-						 * children will have a handler associated with them.
+						/*
+						 * If neither wd1 itself, nor its parent (wd2) have a handler associated with them, and the item is not a
+						 * category, then skip it. If it's category, then it's possible that children will have a handler associated
+						 * with them.
 						 */
-						if (h == null && wd1.getHandler() == null && !wd1.isCategory())
+						if (h == null && wd1.getHandler() == null && !wd1.isCategory()) {
 							break;
+						}
 
 						wd1.setPath(wd2.getPath() + "/" + wd1.getId()); //$NON-NLS-1$
 						wd1.setParent(wd2);
 						if (h != null) {
-							if (wd1.getHandler() == null && !wd1.isCategory())
-								wd1.setHandler((CWizardHandler)h.clone());
-							if (!h.isApplicable(wd1))
+							if (wd1.getHandler() == null && !wd1.isCategory()) {
+								wd1.setHandler((CWizardHandler) h.clone());
+							}
+							if (!h.isApplicable(wd1)) {
 								break;
+							}
 						}
 
 						TreeItem p = placedTreeItemsList.get(i);
@@ -621,30 +636,40 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 				}
 			}
 			// repeat iterations until all items are placed.
-			if (!found) break;
+			if (!found) {
+				break;
+			}
 		}
 		// orphan elements (with not-existing parentId) are ignored
 	}
 
 	private static Image calcImage(EntryDescriptor ed) {
-		if (ed.getImage() != null) return ed.getImage();
-		if (ed.isCategory()) return IMG_CATEGORY;
+		if (ed.getImage() != null) {
+			return ed.getImage();
+		}
+		if (ed.isCategory()) {
+			return IMG_CATEGORY;
+		}
 		return IMG_ITEM;
 	}
 
 	private void switchTo(CWizardHandler h, EntryDescriptor ed) {
-		if (h == null) 
+		if (h == null) {
 			h = ed.getHandler();
-		if (ed.isCategory())
-			h = null;
-		try {
-			if (h != null) 
-				h.initialize(ed);
-		} catch (CoreException e) { 
+		}
+		if (ed.isCategory()) {
 			h = null;
 		}
-		if (h_selected != null) 
+		try {
+			if (h != null) {
+				h.initialize(ed);
+			}
+		} catch (CoreException e) {
+			h = null;
+		}
+		if (h_selected != null) {
 			h_selected.handleUnSelection();
+		}
 		h_selected = h;
 		if (h == null) {
 			if (ed.isCategory()) {
@@ -662,10 +687,12 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			}
 			return;
 		}
-		if (categorySelectedForRemoteLabel != null)
+		if (categorySelectedForRemoteLabel != null) {
 			categorySelectedForRemoteLabel.setVisible(false);
-		if (categorySelectedForLocalLabel != null)
+		}
+		if (categorySelectedForLocalLabel != null) {
 			categorySelectedForLocalLabel.setVisible(false);
+		}
 		h_selected.handleSelection();
 		h_selected.setSupportedOnly(false);
 
@@ -687,7 +714,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		for (Map.Entry<String, IToolChain> entry : toolChainMap.entrySet()) {
 			String name = entry.getKey();
 			IToolChain tc = entry.getValue();
-			
+
 			if (filterToolChains) {
 				if (tc != null && (!tc.isSupported() || !ManagedBuildManager.isPlatformOk(tc))) {
 					continue;
@@ -703,9 +730,10 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	public static EntryDescriptor getDescriptor(Tree _tree) {
 		TreeItem[] sel = _tree.getSelection();
-		if (sel == null || sel.length == 0) 
+		if (sel == null || sel.length == 0) {
 			return null;
-		return (EntryDescriptor)sel[0].getData(DESC);
+		}
+		return (EntryDescriptor) sel[0].getData(DESC);
 	}
 
 	@Override
@@ -715,14 +743,15 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}
 
 	@Override
-	public boolean isCurrent() { return isCurrentPage(); }
+	public boolean isCurrent() {
+		return isCurrentPage();
+	}
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List filterItems(List items) {
 		/*
-		 * Remove RDT project types as these will not work with synchronized
-		 * projects
+		 * Remove RDT project types as these will not work with synchronized projects
 		 */
 		Iterator iterator = items.iterator();
 
@@ -740,8 +769,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	/**
 	 * Creates the project name specification controls.
-	 *
-	 * @param parent the parent composite
+	 * 
+	 * @param parent
+	 *            the parent composite
 	 */
 	private final void createProjectBasicInfoGroup(Composite parent) {
 		Composite projectGroup = new Composite(parent, SWT.NONE);
@@ -764,6 +794,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		projectNameField.setFont(parent.getFont());
 
 		projectNameField.addListener(SWT.Modify, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
 				setProjectLocation();
 				setPageComplete(validatePage());
@@ -771,8 +802,13 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			}
 		});
 
+		Group locationGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		locationGroup.setText(Messages.SyncMainWizardPage_Local_directory);
+		locationGroup.setLayout(new GridLayout(3, false));
+		locationGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
 		// Use default location button
-		defaultLocationButton = new Button(projectGroup, SWT.CHECK);
+		defaultLocationButton = new Button(locationGroup, SWT.CHECK);
 		defaultLocationButton.setText(Messages.SyncMainWizardPage_15);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
@@ -781,21 +817,23 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setProjectLocation();
-			}});
+			}
+		});
 		defaultLocationButton.setSelection(true);
 
 		// new project location label
-		Label projectLocationLabel = new Label(projectGroup, SWT.NONE);
+		Label projectLocationLabel = new Label(locationGroup, SWT.NONE);
 		projectLocationLabel.setText(Messages.SyncMainWizardPage_16);
 		projectLocationLabel.setFont(parent.getFont());
 
 		// new project location entry field
-		projectLocationField = new Text(projectGroup, SWT.BORDER);
+		projectLocationField = new Text(locationGroup, SWT.BORDER);
 		GridData locationData = new GridData(GridData.FILL_HORIZONTAL);
 		locationData.widthHint = SIZING_TEXT_FIELD_WIDTH;
 		projectLocationField.setLayoutData(locationData);
 		projectLocationField.setFont(parent.getFont());
 		projectLocationField.addListener(SWT.Modify, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
 				setPageComplete(validatePage());
 				getWizard().getContainer().updateMessage();
@@ -805,7 +843,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		this.setProjectLocation();
 
 		// Browse button
-		browseButton = new Button(projectGroup, SWT.PUSH);
+		browseButton = new Button(locationGroup, SWT.PUSH);
 		browseButton.setText(Messages.SyncMainWizardPage_17);
 		browseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -819,11 +857,16 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}
 
 	private final void createProjectRemoteInfoGroup(Composite parent) {
+		Group locationGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		locationGroup.setText(Messages.SyncMainWizardPage_Remote_directory);
+		locationGroup.setLayout(new GridLayout(1, false));
+		locationGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		// For now, assume only one provider, to reduce the number of GUI elements.
+
 		// TODO: Add error handling if there are no providers
 		ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
 		fSelectedParticipant = providers[0].getParticipant();
-		fSelectedParticipant.createConfigurationArea(parent, getWizard().getContainer());
+		fSelectedParticipant.createConfigurationArea(locationGroup, getWizard().getContainer());
 	}
 
 	// Decides what should appear in project location field and whether or not it should be enabled
@@ -841,12 +884,11 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}
 
 	/**
-	 * Creates a project resource handle for the current project name field
-	 * value. The project handle is created relative to the workspace root.
+	 * Creates a project resource handle for the current project name field value. The project handle is created relative to the
+	 * workspace root.
 	 * <p>
-	 * This method does not create the project resource; this is the
-	 * responsibility of <code>IProject::create</code> invoked by the new
-	 * project resource wizard.
+	 * This method does not create the project resource; this is the responsibility of <code>IProject::create</code> invoked by the
+	 * new project resource wizard.
 	 * </p>
 	 * 
 	 * @return the new project resource handle
@@ -857,11 +899,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}
 
 	/**
-	 * Returns the current project name as entered by the user, or its anticipated
-	 * initial value.
-	 *
-	 * @return the project name, its anticipated initial value, or <code>null</code>
-	 *   if no project name is known
+	 * Returns the current project name as entered by the user, or its anticipated initial value.
+	 * 
+	 * @return the project name, its anticipated initial value, or <code>null</code> if no project name is known
 	 */
 	@Override
 	public String getProjectName() {
@@ -869,8 +909,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}
 
 	/**
-	 * Returns the value of the project name field
-	 * with leading and trailing spaces removed.
+	 * Returns the value of the project name field with leading and trailing spaces removed.
 	 * 
 	 * @return the project name in the field
 	 */
@@ -883,20 +922,17 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}
 
 	/**
-	 * Sets the initial project name that this page will use when
-	 * created. The name is ignored if the createControl(Composite)
-	 * method has already been called. Leading and trailing spaces
-	 * in the name are ignored.
-	 * Providing the name of an existing project will not necessarily 
-	 * cause the wizard to warn the user.  Callers of this method 
-	 * should first check if the project name passed already exists 
-	 * in the workspace.
+	 * Sets the initial project name that this page will use when created. The name is ignored if the createControl(Composite)
+	 * method has already been called. Leading and trailing spaces in the name are ignored. Providing the name of an existing
+	 * project will not necessarily cause the wizard to warn the user. Callers of this method should first check if the project name
+	 * passed already exists in the workspace.
 	 * 
-	 * @param name initial project name for this page
+	 * @param name
+	 *            initial project name for this page
 	 * 
 	 * @see IWorkspace#validateName(String, int)
 	 * 
-	 * TODO: Calls to this function can be ignored probably, but I'm not certain.
+	 *      TODO: Calls to this function can be ignored probably, but I'm not certain.
 	 */
 	@Override
 	public void setInitialProjectName(String name) {
@@ -913,7 +949,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			projectNameField.setFocus();
 		}
 	}
-	
+
 	@Override
 	public boolean useDefaults() {
 		return defaultLocationButton.getSelection();
@@ -921,6 +957,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	/**
 	 * Get the synchronize participant, which contains remote information
+	 * 
 	 * @return participant
 	 */
 	public ISynchronizeParticipant getSynchronizeParticipant() {
@@ -929,10 +966,11 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	/**
 	 * Get the selected local tool chain
+	 * 
 	 * @return tool chain or null if either none selected or name does not map to a value (such as "Other Toolchain")
 	 */
 	public IToolChain getLocalToolChain() {
-		TableItem[] selectedToolChains  = localToolChainTable.getSelection();
+		TableItem[] selectedToolChains = localToolChainTable.getSelection();
 		if (selectedToolChains.length < 1) {
 			return null;
 		} else {
@@ -940,16 +978,17 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			return toolChainMap.get(toolChainName);
 		}
 	}
-	
-    /**
+
+	/**
 	 * No working sets for this wizard
+	 * 
 	 * @return null
 	 */
 	@Override
 	public IWorkingSet[] getSelectedWorkingSets() {
 		return null;
 	}
-	
+
 	// Select toolchains in the hidden table that are selected in the visible remote and local tables
 	private void updateHiddenToolChainList() {
 		Set<String> currentSelections = new HashSet<String>();
@@ -969,10 +1008,10 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			}
 		}
 	}
-	
+
 	/**
 	 * Return whether the passed config is remote
-	 *
+	 * 
 	 * @param config
 	 * @return whether passed config is remote
 	 */
@@ -988,7 +1027,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	/**
 	 * Return whether the passed config is local
-	 *
+	 * 
 	 * @param config
 	 * @return whether passed config is local
 	 */
@@ -1001,7 +1040,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		}
 		return false;
 	}
-	
+
 	public SyncFileFilter getCustomFileFilter() {
 		return customFilter;
 	}
