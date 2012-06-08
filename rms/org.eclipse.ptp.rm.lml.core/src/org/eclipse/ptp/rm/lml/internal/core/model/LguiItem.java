@@ -261,13 +261,15 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/**
-	 * @return <code>message</code> with predefined XML entities replaced
-	 * (see <a href="http://www.w3.org/TR/xml/#dt-escape">http://www.w3.org/TR/xml/#dt-escape</a>
+	 * @return <code>message</code> with predefined XML entities replaced (see <a
+	 *         href="http://www.w3.org/TR/xml/#dt-escape">http://www.w3.org/TR/xml/#dt-escape</a>
 	 */
 	// This is not particularly efficient (the entire message is scanned 5 times),
 	// but it's simple and fast enough for un-escaping the contents of /etc/motd
 	private String replacePredefinedXMLEntities(String message) {
-		if (message == null) return null;
+		if (message == null) {
+			return null;
+		}
 		message = message.replace("&lt;", "<");
 		message = message.replace("&gt;", ">");
 		message = message.replace("&amp;", "&");
@@ -277,14 +279,16 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/**
-	 * @return <code>message</code> with XML character references replaced
-	 * (see <a href="http://www.w3.org/TR/xml/#sec-references">http://www.w3.org/TR/xml/#sec-references</a>
+	 * @return <code>message</code> with XML character references replaced (see <a
+	 *         href="http://www.w3.org/TR/xml/#sec-references">http://www.w3.org/TR/xml/#sec-references</a>
 	 */
 	// This is not particularly efficient (the entire message is scanned 2*n times,
 	// where n is the number of "&#...;" escape sequences), but it's simple and fast
 	// enough for un-escaping the contents of /etc/motd
 	private String replaceXMLCharacterReferences(String message) {
-		if (message == null) return null;
+		if (message == null) {
+			return null;
+		}
 		final Pattern pattern = Pattern.compile("&#([0-9]+|x[0-9a-fA-F]+);");
 		for (Matcher matcher = pattern.matcher(message); matcher.find(); matcher = pattern.matcher(message)) {
 			final String group = matcher.group(1);
@@ -702,7 +706,8 @@ public class LguiItem implements ILguiItem {
 					if (tableOld.getRow() != null) {
 						for (int i = 0; i < tableOld.getRow().size(); i++) {
 							final RowType row = tableOld.getRow().get(i);
-							if (handler.getCellValue(tableOld, row, JOB_ID).equals(jobId)) {
+							String cell = handler.getCellValue(tableOld, row, JOB_ID);
+							if (cell != null && cell.equals(jobId)) {
 								handler.setCellValue(tableOld, row, JOB_STATUS, status);
 								rowOld = row;
 								index = i;
