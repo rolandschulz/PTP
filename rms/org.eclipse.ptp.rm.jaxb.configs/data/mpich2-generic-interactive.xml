@@ -93,7 +93,7 @@
 				</target>
 			</stderr-parser>
 			<pre-launch-cmd name="Cleanup" exec="rm -f routing_file" wait="true"/>
-			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
+			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} -master ${ptp_rm:debuggerArgs#value}" wait="false"/>
 		</submit-interactive-debug-->		
 		<launch-tab>
 			<dynamic includeWidgetValuesFrom="Advanced Options">

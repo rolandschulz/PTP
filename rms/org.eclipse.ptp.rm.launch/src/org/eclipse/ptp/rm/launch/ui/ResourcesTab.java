@@ -235,31 +235,42 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		super.initializeFrom(configuration);
 
 		final String rmType = LaunchUtils.getTemplateName(configuration);
-		if (rmType != null) {
+		final String remId = LaunchUtils.getRemoteServicesId(configuration);
+		final String remName = LaunchUtils.getConnectionName(configuration);
+		if (rmType != null && remId != null && remName != null) {
 			fSystemTypeCombo.select(fProviders.lastIndexOf(rmType) + 1);
-
-			final String remId = LaunchUtils.getRemoteServicesId(configuration);
-			final String remName = LaunchUtils.getConnectionName(configuration);
-			if (remId != null && remName != null) {
-				if (fLaunchControl != null) {
-					if (!fLaunchControl.getConfiguration().getName().equals(rmType)
-							|| !fLaunchControl.getRemoteServicesId().equals(remId)
-							|| !fLaunchControl.getConnectionName().equals(remName)) {
-						stopController(fLaunchControl);
-						fRemoteConnectionWidget.setConnection(remId, remName);
-						if (openConnection()) {
-							fLaunchControl = getNewController(remId, remName, rmType);
-						}
-					}
-					fRemoteConnection = fRemoteConnectionWidget.getConnection();
-					updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
-					updateLaunchConfigurationDialog();
-					fDefaultConnection = false;
-				} else {
-					fRemoteConnection = null;
-					updateEnablement();
-				}
+			updateEnablement();
+			/*
+			 * Only stop the controller if something has changed.
+			 */
+			if (fLaunchControl != null
+					&& (!fLaunchControl.getConfiguration().getName().equals(rmType)
+							|| !fLaunchControl.getRemoteServicesId().equals(remId) || !fLaunchControl.getConnectionName().equals(
+							remName))) {
+				stopController(fLaunchControl);
+				fLaunchControl = null;
 			}
+			/*
+			 * Set the connection and see if the user wants to open it. If yes, create a new controller if one doesn't already
+			 * exist. If no, revert to no connection selected.
+			 */
+			fRemoteConnectionWidget.setConnection(remId, remName);
+			if (openConnection()) {
+				fRemoteConnection = fRemoteConnectionWidget.getConnection();
+				if (fLaunchControl == null) {
+					fLaunchControl = getNewController(remId, remName, rmType);
+				}
+			} else {
+				fRemoteConnectionWidget.setConnection(null);
+			}
+			updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
+			updateLaunchConfigurationDialog();
+			fDefaultConnection = false;
+		} else {
+			stopController(fLaunchControl);
+			fLaunchControl = null;
+			fRemoteConnection = null;
+			updateEnablement();
 		}
 	}
 
