@@ -270,14 +270,14 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					</layout>
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" />
 						</layout-data>
 						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 						<fixed-text>Queue: </fixed-text>
 					</widget>
 					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
 						<layout-data>
-							<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
+							<grid-data widthHint="150" horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2"/>
 						</layout-data>
 						<items-from>queues</items-from>
 					</widget>
@@ -291,112 +291,112 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					<!-- HEADER -->
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Name</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Value</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Description</fixed-text>
 					</widget>
 					<!-- row 1 -->
 					<widget type="label" style="SWT.LEFT">
 					   <layout-data>
-					      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+					      <grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 					   </layout-data>
 					   <tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
 					   <fixed-text>Account: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="Account_Name">
 					   <layout-data>
-					      <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+					      <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 					   </layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 					   <layout-data>
-					      <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+					      <grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 					   </layout-data>
 					   <fixed-text>${ptp_rm:Account_Name#description}</fixed-text>
 					</widget>
 					<!-- row 2 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
 						<fixed-text>Total Memory Needed: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="Resource_List.mem">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:Resource_List.mem#description}</fixed-text>
 					</widget>
 					<!-- row 3 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
 						<fixed-text>Wallclock Time: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="Resource_List.walltime">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:Resource_List.walltime#description}</fixed-text>
 					</widget>
 					<!-- row 4 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>MPI Command: </fixed-text>
 					</widget>
 					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="mpiCommand">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:mpiCommand#description}</fixed-text>
 					</widget>
 					<!-- row 5 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>MPI Number of Processes: </fixed-text>
 					</widget>
 					<widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="mpiNumberOfProcesses">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:mpiNumberOfProcesses#description}</fixed-text>
 					</widget>
