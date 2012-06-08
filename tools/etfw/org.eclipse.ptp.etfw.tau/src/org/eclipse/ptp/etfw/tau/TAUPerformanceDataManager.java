@@ -187,6 +187,36 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 		return IDs;
 	}
 
+
+	/**
+	 * Returns true if the directory exists and contains a tau profile or tau xml file.
+	 * @param directory
+	 * @param utils
+	 * @return
+	 */
+	private boolean checkDirectory(String directory,IBuildLaunchUtils utils){
+		IFileStore d = utils.getFile(directory);
+		boolean check = d.fetchInfo().exists();
+		if(!check)
+			return false;
+		
+		try {
+			String[] children = d.childNames(EFS.NONE, null);
+			for (int i=0;i<children.length;i++)
+			{
+				if(children[i].contains(PROFXML)||children[i].contains("profile.0.0.0"))
+					return true;
+			}
+			
+		} catch (CoreException e) {
+			
+			e.printStackTrace();
+			return false;
+		}
+		
+		return false;
+	}
+	
 	@Override
 	public void process(String projname, ILaunchConfiguration configuration, String directory) throws CoreException {
 		String projectDirectory = directory;
@@ -201,16 +231,22 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 			hasLocalParaprof = false;
 		}
 
-		if (LaunchUtils.getRemoteServicesId(configuration) != null) {
+		/*
+		 * Determining if the job was local or remote at this point is tricky.  It's safest to see if profiles are available locally and if not use the remote location.
+		 */
+		boolean dirgood=checkDirectory(directory,tmpub);
+		
+		if (!dirgood&&LaunchUtils.getRemoteServicesId(configuration) != null) {
 			utilBlob = new RemoteBuildLaunchUtils(configuration);
 		} else {
 			utilBlob = tmpub;
 		}
 
+		if(!dirgood){
 		String tmpDir = utilBlob.getWorkingDirectory();
 		if (tmpDir != null) {
 			directory = tmpDir;
-		}
+		}}
 
 		tbpath = utilBlob.getToolPath(Messages.TAUPerformanceDataManager_0);
 
