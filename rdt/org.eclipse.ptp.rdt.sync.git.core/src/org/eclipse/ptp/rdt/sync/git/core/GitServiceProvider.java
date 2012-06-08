@@ -414,8 +414,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	// This function must properly maintain the map of connections and also remember to set the file filter (always, not just for
 	// new connections).
 	// TODO: Create progress monitor if passed monitor is null.
-	private GitRemoteSyncConnection getSyncConnection(IProject project, BuildScenario buildScenario, SyncFileFilter fileFilter,
-			SubMonitor progress) throws RemoteSyncException {
+	private synchronized GitRemoteSyncConnection getSyncConnection(IProject project, BuildScenario buildScenario,
+			SyncFileFilter fileFilter, SubMonitor progress) throws RemoteSyncException {
 		if (buildScenario.getSyncProvider() == null) {
 			return null;
 		}
