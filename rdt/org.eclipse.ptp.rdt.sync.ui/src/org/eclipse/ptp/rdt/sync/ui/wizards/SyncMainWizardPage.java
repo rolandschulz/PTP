@@ -530,9 +530,10 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			}
 			if (target == null) {
 				target = tree.getItem(0);
-				if (target.getItemCount() != 0) {
-					target = target.getItem(0);
-				}
+// We don't select the first element within the first group, because this causes a display bug with Autotools and Windows
+//				if (target.getItemCount() != 0) {
+//					target = target.getItem(0);
+//				}
 			}
 			tree.setSelection(target);
 			return (CWizardHandler) target.getData();
