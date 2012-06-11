@@ -1017,6 +1017,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 */
 	public boolean isRemoteConfig(IConfiguration config) {
 		String toolChainName = config.getToolChain().getSuperClass().getName();
+		if (toolChainName.equals("No ToolChain")) { //$NON-NLS-1$
+			toolChainName = "-- Other Toolchain --"; //$NON-NLS-1$
+		}
 		for (TableItem ti : remoteToolChainTable.getSelection()) {
 			if (ti.getText().equals(toolChainName)) {
 				return true;
@@ -1033,6 +1036,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 */
 	public boolean isLocalConfig(IConfiguration config) {
 		String toolChainName = config.getToolChain().getSuperClass().getName();
+		if (toolChainName.equals("No ToolChain")) { //$NON-NLS-1$
+			toolChainName = "-- Other Toolchain --"; //$NON-NLS-1$
+		}
 		for (TableItem ti : localToolChainTable.getSelection()) {
 			if (ti.getText().equals(toolChainName)) {
 				return true;
