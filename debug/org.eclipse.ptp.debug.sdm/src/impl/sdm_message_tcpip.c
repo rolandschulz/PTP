@@ -276,24 +276,24 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 	for (childport = childbaseport;childport < childbaseport + MAX_PORT_INCREMENT; childport++) {
 		char port_str[10];
 
-		// Get first result from the linked list
-		sockfd = socket(PF_INET, SOCK_STREAM, 0);
-		if (sockfd < 0) {
-			perror("Socket");
-			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] socket syscall error\n", sdm_route_get_id());
-			return -1;
-		}
-
-		// Connect to the provided address & port
-		sprintf(port_str, "%d", childport);
-		if (getaddrinfo(hostname, port_str, &hints, &result)) {
-			perror("getaddrinfo");
-			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] getaddrinfo error. hostname: %s, port: %s\n",
-					sdm_route_get_id(), hostname, port_str);
-			return -1;
-		}
-
 		for (num_tries = 0; num_tries < CHILD_CONNECT_TRIES; num_tries++) {
+			// Get first result from the linked list
+			sockfd = socket(PF_INET, SOCK_STREAM, 0);
+			if (sockfd < 0) {
+				perror("Socket");
+				DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] socket syscall error\n", sdm_route_get_id());
+				return -1;
+			}
+
+			// Connect to the provided address & port
+			sprintf(port_str, "%d", childport);
+			if (getaddrinfo(hostname, port_str, &hints, &result)) {
+				perror("getaddrinfo");
+				DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] getaddrinfo error. hostname: %s, port: %s\n",
+						sdm_route_get_id(), hostname, port_str);
+				return -1;
+			}
+
 			if (connect(sockfd, result->ai_addr, result->ai_addrlen) >= 0) {
 				break;
 			}
@@ -307,6 +307,7 @@ sdm_connect_to_child(char *hostname, int childbaseport)
 				return -1;
 			}
 
+			close(sockfd);
 			sleep(CHILD_CONNECT_SLEEP);
 		}
 
