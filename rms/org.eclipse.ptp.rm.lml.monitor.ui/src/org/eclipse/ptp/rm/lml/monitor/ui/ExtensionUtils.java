@@ -35,7 +35,10 @@ public class ExtensionUtils {
 
 	public static String getMonitorName(String type) {
 		loadExtensions();
-		return fMonitorsByType.get(type);
+		if (type != null) {
+			return fMonitorsByType.get(type);
+		}
+		return null;
 	}
 
 	public static String[] getMonitorNames() {
@@ -47,7 +50,10 @@ public class ExtensionUtils {
 
 	public static String getMonitorType(String name) {
 		loadExtensions();
-		return fMonitorsByName.get(name);
+		if (name != null) {
+			return fMonitorsByName.get(name);
+		}
+		return null;
 	}
 
 	public static String[] getMonitorTypes() {

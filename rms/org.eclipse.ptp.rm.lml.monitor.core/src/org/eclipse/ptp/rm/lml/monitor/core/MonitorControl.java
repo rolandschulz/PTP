@@ -51,7 +51,6 @@ import org.eclipse.ptp.rm.lml.internal.core.model.Pattern;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
 import org.eclipse.ptp.rm.lml.monitor.core.messages.Messages;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 
 /**
@@ -168,6 +167,19 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#dispose()
+	 */
+	public void dispose() {
+		try {
+			getSaveLocation().delete();
+		} catch (Exception e) {
+			LMLMonitorCorePlugin.log(e.getLocalizedMessage());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getConnectionName()
 	 */
 	public String getConnectionName() {
@@ -215,35 +227,33 @@ public class MonitorControl implements IMonitorControl {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#load()
 	 */
-	public boolean load() {
+	public boolean load() throws CoreException {
+		fSavedLayout.setLength(0);
+		fSavedJobs.clear();
+		fSavedPattern.clear();
+
+		FileReader reader;
 		try {
-			fSavedLayout.setLength(0);
-			fSavedJobs.clear();
-			fSavedPattern.clear();
-
-			FileReader reader = new FileReader(getSaveLocation());
-			IMemento memento = XMLMemento.createReadRoot(reader);
-
-			boolean active = loadState(memento);
-
-			IMemento childLayout = memento.getChild(LAYOUT_ATTR);
-			if (childLayout != null) {
-				fSavedLayout.append(childLayout.getString(LAYOUT_STRING_ATTR));
-			}
-
-			childLayout = memento.getChild(JOBS_ATTR);
-			loadJobs(childLayout, fSavedJobs);
-
-			childLayout = memento.getChild(PATTERNS_ATTR);
-			loadPattern(childLayout, fSavedPattern);
-
-			return active;
+			reader = new FileReader(getSaveLocation());
 		} catch (FileNotFoundException e) {
-			LMLMonitorCorePlugin.log(e.getLocalizedMessage());
-		} catch (WorkbenchException e) {
-			LMLMonitorCorePlugin.log(e.getLocalizedMessage());
+			throw CoreExceptionUtils.newException(e.getMessage(), e);
 		}
-		return false;
+		IMemento memento = XMLMemento.createReadRoot(reader);
+
+		boolean active = loadState(memento);
+
+		IMemento childLayout = memento.getChild(LAYOUT_ATTR);
+		if (childLayout != null) {
+			fSavedLayout.append(childLayout.getString(LAYOUT_STRING_ATTR));
+		}
+
+		childLayout = memento.getChild(JOBS_ATTR);
+		loadJobs(childLayout, fSavedJobs);
+
+		childLayout = memento.getChild(PATTERNS_ATTR);
+		loadPattern(childLayout, fSavedPattern);
+
+		return active;
 	}
 
 	/*
@@ -335,6 +345,15 @@ public class MonitorControl implements IMonitorControl {
 		if (!isActive()) {
 			SubMonitor progress = SubMonitor.convert(monitor, 30);
 			try {
+				try {
+					load();
+				} catch (CoreException e) {
+					/*
+					 * Can find monitor data for some reason, so just log a message but allow the monitor to be started anyway
+					 */
+					LMLMonitorCorePlugin.log(e.getLocalizedMessage());
+				}
+
 				final IRemoteConnection conn = getRemoteConnection(progress.newChild(10));
 				if (progress.isCanceled()) {
 					return;
@@ -352,8 +371,6 @@ public class MonitorControl implements IMonitorControl {
 								Messages.LMLResourceManagerMonitor_unableToOpenConnection));
 					}
 				}
-
-				load();
 
 				/*
 				 * Initialize LML classes

@@ -19,6 +19,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public interface IMonitorControl {
 	/**
+	 * Dispose of monitor and any saved state.
+	 */
+	public void dispose();
+
+	/**
 	 * Get the connection name for the monitor
 	 * 
 	 * @return connection name
@@ -59,7 +64,7 @@ public interface IMonitorControl {
 	 * 
 	 * @return true if the monitor was active when saved
 	 */
-	public boolean load();
+	public boolean load() throws CoreException;
 
 	/**
 	 * Force the monitor to refresh its data. This will typically cause a command to be run on the target system.
