@@ -22,10 +22,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
@@ -112,10 +112,10 @@ public class SyncMergeFileTableViewer extends ViewPart {
 			fileTableViewer.getTable().setHeaderVisible(true);
 			fileTableViewer.getTable().setLinesVisible(true);
 			
-			// On selection, open the compare editor for the selected file
-			fileTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			// Open merge editor for file on double-click
+			fileTableViewer.addDoubleClickListener(new IDoubleClickListener() {
 				@Override
-				public void selectionChanged(SelectionChangedEvent event) {
+				public void doubleClick(DoubleClickEvent event) {
 					Object selection = ((IStructuredSelection)event.getSelection()).getFirstElement();
 					if (selection != null) {
 						assert(selection instanceof IFile);
