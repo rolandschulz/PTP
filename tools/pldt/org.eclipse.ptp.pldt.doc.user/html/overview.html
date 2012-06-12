@@ -18,7 +18,6 @@ PLDT is part of the <a href="PLUGINS_ROOT/org.eclipse.ptp.doc.user/html/toc.html
 <ul>
 <li>MPI
 <li>OpenMP
-<li>LAPI
 <li>UPC
 <li>OpenACC
 <li>OpenSHMEM
@@ -55,12 +54,15 @@ See also <a href="whatsnew.html">New and Noteworthy </a> - what's new in this re
 <h2>
 Pre-requisites:
 </h2>
-<p>PLDT requires the base Eclipse platform, the CDT, and (usually) header files for the API set you wish to use (MPI, OpenMP, etc.) 
+<p>PLDT requires the base Eclipse platform, the CDT, and (optionally) header files for the API set you wish to use (MPI, OpenMP, etc.) 
+<p>PLDT is included in most installations of PTP, and is most easily installed with the
+<b>Eclipse for Parallel Application Developers</b> package available on the <a href="http://eclipse.org/downloads">
+Eclipse download page.</a>.
 <ul>
-<li><b>Eclipse</b> platform: Version  3.7 (Indigo)  
+<li><b>Eclipse</b> platform: Version  4.2 (Juno)  
 <li><b>CDT:</b>
-Version 8.0 or later for C/C++ files.  (Wherever CDT is mentioned, Photran projects and files,
-for C/C++, if based on Eclipse 3.7/CDT 8.0 or later, should also work, but not much testing has yet been done.)
+Version 8.1 or later for C/C++ files.  (Wherever CDT is mentioned, Photran projects and files,
+for C/C++, if based on Eclipse 4.2/CDT 8.1 or later, should also work, but not much testing has yet been done.)
 
 <li><b>MPI:</b>
 Get MPI and its header file, a version that runs on
@@ -72,14 +74,13 @@ your system (e.g. OpenMPI for Linux/Mac; MPICH2 for win32).
 (that is, not in 'Program Files' etc.)
 </ul>
 <li><b>OpenMP:</b>
-The PTP PLDT OpenMP tools also  need the OpenMP header file.
+The PTP PLDT OpenMP tools also (optionally) need the OpenMP header file.
 <li><b>UPC:</b>
 Header file is now optional for UPC artifact identification.
-<li><b>LAPI:</b>
-Header file required
+
 
 </ul>
-<p>Note that <i>running</i> MPI or OpenMP (or UPC, or LAPI) is not really required for the PLDT
+<p>Note that <i>running</i> MPI, UPC or OpenMP (etc.) is not really required for the PLDT
 to function and provide analysis and help with parallel development.
 Just the header files are required (in some cases these are now optional) in order to know which "artifacts" should
 be located.
@@ -90,7 +91,7 @@ other systems can be accessed remotely, and don't need to be installed on the sa
 <p>For PLDT, a runtime system is not required, and PLDT will work (e.g. for development and analysis only) on Windows as well.
 
 <h2>Miscellaneous Topics</h2>
-<h3>Misplaced icon?</h3>
+<h3>Misplaced menu icon?</h3>
 <p>Note: if, after installing PLDT, the PLDT menu icon is misplaced over on the left side
 of the Eclipse toolbar:
 <br><img src="images/pldtIconMisplaced.gif">
