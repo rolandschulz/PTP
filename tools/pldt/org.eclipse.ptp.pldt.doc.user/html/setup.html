@@ -33,7 +33,7 @@ to find the include paths for build as well as for other Eclipse tools.
 refer to a C project in which it manages the makefile as  a "Managed Make Project" or a "Managed Build Project."
 They refer to a project which 
 you supply the makefile is a "Standard Make project".
-<p>The current version of CDT that works with PTP 5.0 is CDT 8.0.
+<p>The current version of CDT that works with PTP 6.0 is CDT 8.1.
 CDT 5.0 and later refers to a C project in which it manages the makefile as just a "C Project" and a project which 
 you supply the makefile is a <a href="setupMakefileProject.html">"Makefile project."</a>
 <p>Both terminologies are sometimes used in these instructions.
@@ -50,24 +50,10 @@ and the selection may be different from what is shown here.
 <img src="images/mpiWizard.png">
 <!--  ========================================== -->
 <p>&nbsp;
-<ul>
-<li>Note: if you have modified the MPI Preferences to <b>Uncheck</b> "Recognize MPI Artifacts by prefix (MPI) alone?"
-then the header file must be located for MPI artifacts to be recognized. 
-<p><img src="images/recognize-mpi-prefix.png">
-<p>&nbsp;
-<p>So if
-you are <i>not</i> recognizing MPI artifacts by prefix alone, then PLDT will have to use include files to
-identify MPI artifacts. If you have not set the MPI includes on the MPI Preferences page yet, 
-you'll be prompted at this point in the new project wizard dialog:
-<br><img src="images/mpiPrefsHaveNotBeenSet.png">
-<p>&nbsp;
-<p>See <a href="includes.html">A word about includes and MPI preferences</a>
-for more information and how to fill this in.
-</li>
-</ul>
+
 <!--  ========================================== -->
 <p>&nbsp;
-<p>After specifying the include files in the preferences, or if it wasn't required, select Next to go to the next page of the New Project Wizard.
+<p>Select Next to go to the next page of the New Project Wizard.
 
 <br>On the Basic Settings page of the wizard, fill in any project template values, e.g. your name
 in the Author field.
@@ -78,7 +64,9 @@ in the code that is generated.  The "Source" field indicates the name of the sou
 <p>On the next page, "MPI Project Settings" page,  the "Add MPI project settings to this project" should be checked.
 If you want to change any of the default values for this project, you can do so
 here by unchecking the "Use default information" and altering the values.
-The default values were chosen based on your input to the PLDT MPI Preferences above.
+The default values were chosen based on  input to the PLDT MPI Preferences page.
+To have a specific include path added to all new MPI projects, see <a href="#reco">below</a>
+for how to specify the MPI Include path in the Preferences.
 
 <br><img src="images/mpiWizard3.gif">
 <p>Select Finish.
@@ -135,6 +123,25 @@ You probably also need to do the same for the linker tool.
 previously known as "Managed Build" projects.  If you provide your own makefile, you will create a "Makefile project"
 and create the makefile within that project.
 See <a href="setupMakefileProject.html">Setting up project properties for a Makefile project</a>.
+
+
+<p>&nbsp;
+<h3 id="reco">Recognizing Artifacts by prefix, vs Include path</h3>   
+<p><b>Note:</b> if you have modified the MPI Preferences to <b>Uncheck</b> "Recognize MPI Artifacts by prefix (MPI) alone?"
+then the header file must be located for MPI artifacts to be recognized. 
+<p><img src="images/recognize-mpi-prefix.png">
+<p>&nbsp;
+<p>So if
+you are <i>not</i> recognizing MPI artifacts by prefix alone, then PLDT will have to use include files to
+identify MPI artifacts. If you have not set the MPI includes on the MPI Preferences page yet, 
+you'll be prompted after the first page in the new project wizard dialog:
+<br><img src="images/mpiPrefsHaveNotBeenSet.png">
+<p>&nbsp;
+<p>See <a href="includes.html">A word about includes and MPI preferences</a>
+for more information and how to fill this in.
+ 
+
+<p>&nbsp;
 <p>Now continue to set up to <a href="run.html">run the MPI tools</a>
 
 <p>&nbsp;
