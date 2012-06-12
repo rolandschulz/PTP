@@ -11,7 +11,7 @@ such as those using MPI, but also provides support for Open MP and Unified Paral
 PTP provides a range of tools and services to support 
 application development in the following four main areas:
 <ul>
-<li>Runtime tools that allow developers to monitor and control the execution of parallel applications
+<li>Runtime services that allow developers to monitor and control the execution of parallel applications
 <li>Debugging tools for locating runtime errors in parallel applications
 <li>Analysis tools that provide advanced editing, error checking, and programmer assistance for developing parallel applications
 <li>A framework for the integration of additional tools, such as performance tools for analyzing and optimizing the performance of parallel applications
@@ -20,13 +20,15 @@ application development in the following four main areas:
 as well as on a remote target machine.  Remote machines can be utilized for a variety of services including 
 source file hosting, remote builds, execution and monitoring, and debugging.
 
-<h2>Runtime Tools</h2>
+<h2>Runtime Services</h2>
 
-These tools aid the developer in launching and monitoring parallel applications on a range of local and remote systems. PTP provides a parallel model
-that represents the state of a (possibly remote) parallel system, and the applications running on that system. This model includes the notion of 
-a <i>resource manager</i> which is used to control interaction with the target system. Developers can use the normal Eclipse launch configuration 
-mechanism to specify the system-specifc attributes necessary to launch a parallel job, and monitor the status of the system and job using a number of 
-different views.
+These services allow the developer to launch and monitor parallel applications on both local and remote systems. PTP provides configuration
+files to support a wide range of job schedulers, including PBS, TORQUE, SLURM, GridEngine, LoadLeveler, and runtime systems, including IBM Parallel
+Environment, Open MPI, and MPICH2, BG/Q, and BG/P. A number of configuration files are also provided to support specific XSEDE systems (http://xsede.org).
+The runtime services framework also allow users to easily add support for their own systems.
+
+Application monitoring allows the user to see the job queues and the status of the nodes (including the location of running jobs, if supported)
+on the target systems. Users are also able to control jobs that they have launched via the Eclipse interface.
 
 <h2>Debugging Tools</h2>
 
@@ -44,7 +46,7 @@ analysis functions, such as parallelization assistance.
 
 <h2>External Tools Framework and Performance Tools</h2>
 
-The External Tools Framework (formerly the Performance Tools Framework) provides a simple mechanism 
+The External Tools Framework (ETFw) provides a simple mechanism 
 for integrating external performance tools, and other arbitrary external tools, with PTP. 
 By providing an XML description file, the tool is able to be integrated with the editor, build, and 
 launch systems. 

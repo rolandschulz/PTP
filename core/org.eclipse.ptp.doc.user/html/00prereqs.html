@@ -12,51 +12,96 @@ detailed information, including installation instructions, see
 http://wiki.eclipse.org/PTP/release_notes/6.0</a></p>
 <ul>
 <li>Java 1.6 or later</li>
-<li><a href="http://eclipse.org/downloads">Eclipse SDK</a> Juno (release 4.2) or later</li>
+<li><a href="http://eclipse.org/downloads">Eclipse SDK</a> Juno (version 4.2) or later</li>
 <li><a href="http://eclipse.org/cdt/">Eclipse C/C++ Development Tools (CDT)</a> version 8.1 or later</li>
-<li><a href="http://eclipse.org/dsdp/tm">Remote System Explorer 3.3 or later</a></li>
+<li><a href="http://eclipse.org/dsdp/tm">Remote System Explorer (RSE)</a> version 3.3 or later</li>
 </ul>
 
+<h2>PTP Client</h2>
+<p>PTP is now available as a single download package called <a href="http://eclipse.org/downloads">Eclipse for Parallel Application Developers</a> that includes all the pre-requisite
+components (apart from Java). This is the preferred method for obtaining PTP. The PTP package is available for the following platforms:</p>
+
 <table border="1">
-  <tr>
-    <th colspan="4" scope="col">PTP Support Matrix <br></th>
-  </tr>
-  <tr>
+   <tr>
     <th scope="col">Operating System</th>
     <th scope="col">Architecture</th>
-    <th scope="col">Components</th>
+  </tr>
+  <tr>
+    <td>Linux</td>
+    <td>x86, x86_64</td>
+  </tr>
+  <tr>
+    <td>MacOS X (10.6 and later)</td>
+    <td>x86, x86_64</td>
+  </tr>
+  <tr>
+    <td>Windows</td>
+    <td>x86, x86_64</td>
+  </tr>
+</table>
+
+<p>The Eclipse PTP client is also supported on any of the platforms that Eclipse supports, however installation is more complicated. More information on installing PTP from an
+update site can be found can be found <a href="http://wiki.eclipse.org/PTP/release_notes/6.0">here</a>. Information on Eclipse supported platforms can be found
+<a href="http://www.eclipse.org/projects/project-plan.php?planurl=/eclipse/development/plans/eclipse_project_plan_4_2.xml#target_environments">here</a>.</p>
+
+<h2>Target Systems</h2>
+
+<p>PTP supports the following target systems:</p>
+
+<table border="1">
+   <tr>
+    <th scope="col">Operating System</th>
+    <th scope="col">Architecture</th>
     <th scope="col">Debugging</th>
   </tr>
   <tr>
     <td>Linux</td>
     <td>x86, x86_64, ppc</td>
-    <td>Eclipse+Agents</td>
     <td>gdb 6.3 and later</td>
   </tr>
   <tr>
-    <td>MacOS X</td>
-    <td>x86</td>
-    <td>Eclipse+Agents</td>
+    <td>MacOS X (10.6 and later)</td>
+    <td>x86, x86_64</td>
     <td>gdb 6.3 and later</td>
-  </tr>
-  <tr>
-    <td>Windows</td>
-    <td>x86</td>
-    <td>Eclipse only</td>
-    <td>N/A</td>
   </tr>
 </table>
 
-<p>PTP supports a number of parallel runtime systems and job schedulers. These need to be installed on the target system prior to using PTP:</p>
-<ul>
-<li><a href="http://open-mpi.org">Open MPI</a> version 1.3 or later (preferred version is 1.4.x)</li>
-<li>MPICH2 version 1.0.6p1 and later</li>
-<li>IBM Parallel Environment (PE)</li>
-<li>IBM LoadLeveler (LL)</li>
-<li>SLURM</li>
-<li>PBS/Torque</li>
-<li>Others ... </li>
-</ul>
+<p>PTP also supports a number of parallel runtime systems and job schedulers. These need to be available on the target system prior to using PTP:</p>
+
+<table border="1">
+   <tr>
+    <th scope="col">Job Scheduler/Runtime</th>
+    <th scope="col">Version</th>
+  </tr>
+  <tr>
+    <td>IBM LoadLeveler</td>
+    <td>Any</td>
+  </tr>
+  <tr>
+    <td>SLURM</td>
+    <td>Any</td>
+  </tr>
+  <tr>
+    <td>PBS</td>
+    <td>Any</td>
+  </tr>
+  <tr>
+    <td>TORQUE</td>
+    <td>Any</td>
+  </tr>
+  <tr>
+    <td>GridEngine</td>
+    <td>Any</td>
+  </tr>
+  <tr>
+    <td>Open MPI</td>
+    <td>1.3 or later</td>
+  </tr>
+  <tr>
+    <td>MPICH2</td>
+    <td>1.0.6p1 or later</td>
+  </tr>
+</table>
 
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 
