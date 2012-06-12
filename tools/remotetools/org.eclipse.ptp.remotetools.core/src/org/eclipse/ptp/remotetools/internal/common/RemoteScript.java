@@ -106,16 +106,18 @@ public class RemoteScript implements IRemoteScript {
 		StringBuffer sb = new StringBuffer();
 
 		if (clearEnv) {
+			sb.append("env -i"); //$NON-NLS-1$
+			for (String env : environment) {
+				sb.append(" \"" + env + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			sb.append(" /bin/sh -c \""); //$NON-NLS-1$
 			for (int i = 0; i < script.length; i++) {
-				sb.append("env -i"); //$NON-NLS-1$
-				for (String env : environment) {
-					sb.append(" \"" + env + "\""); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				sb.append(" " + script[i]); //$NON-NLS-1$
+				sb.append(script[i]);
 				if (i < script.length - 1) {
-					sb.append(" &&");//$NON-NLS-1$
+					sb.append(" && ");//$NON-NLS-1$
 				}
 			}
+			sb.append("\""); //$NON-NLS-1$
 		} else {
 			for (String env : environment) {
 				sb.append("export \"" + env + "\"; "); //$NON-NLS-1$ //$NON-NLS-2$
@@ -124,7 +126,7 @@ public class RemoteScript implements IRemoteScript {
 			for (int i = 0; i < script.length; i++) {
 				sb.append(script[i]);
 				if (i < script.length - 1) {
-					sb.append("&& ");//$NON-NLS-1$
+					sb.append(" && ");//$NON-NLS-1$
 				}
 			}
 		}

@@ -28,6 +28,14 @@
             name="SLURM-BGQ-Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
+            configurationFile="data/pbs-bgp-batch.xml"
+            name="PBS-BGP-Batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/pbs-bgq-batch.xml"
+            name="PBS-BGQ-Batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
             configurationFile="data/slurm-generic-batch.xml"
             name="SLURM-Generic-Batch">
       </JAXBResourceManagerConfiguration>

@@ -13,12 +13,10 @@
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/edu.illinois.ncsa.bluewaters.pbs.batch.xe.xml"
-            monitorType="TORQUE_ALPS"
             name="edu.illinois.ncsa.bluewaters.pbs.batch.xe">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/edu.illinois.ncsa.bluewaters.pbs.batch.xk.xml"
-            monitorType="TORQUE_ALPS"
             name="edu.illinois.ncsa.bluewaters.pbs.batch.xk">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
@@ -53,8 +51,6 @@
             configurationFile="data/gov.anl.alcf.bgq.pbs.batch.xml"
         name="gov.anl.alcf.bgq.pbs.batch">
       </JAXBResourceManagerConfiguration>
-      
-
    </extension>
 
 </plugin>
