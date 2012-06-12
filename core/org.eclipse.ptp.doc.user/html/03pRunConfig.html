@@ -12,7 +12,7 @@ this is called &quot;running a job&quot;.
 <p>Previous releases of PTP required setting up a <i>Resource Manager</i> for each job scheduler/runtime environment before
 a job could be launched.
 In PTP 6.0 this is not handled separately, and instead a 
-<a href="03tsc.html">Target System Configuration</a>
+<i>Target System Configuration</i>
 is specified on the Run Configuration page.  Further interaction to set up the parallel
 job is highly dependent on which TSC is selected.
 <p>PTP is
@@ -74,65 +74,101 @@ configuration</h2>
 	</li>
 	<li>
 	<p>Enter a name for the configuration in the <b>Name:</b> field.
-	Here we use the same name as the project.</p>
+	Here we use the same name as the project.  If the project was selected in the Project Explorer, it may be already filled in here.</p>
 	<p><br>
 	</p>
 	<p><img src="images/03launch1a.png"></p>
-	</li>
+	 </li>
 </ol>
 
 <h2 id="resources">Step 2: Complete the Resources tab</h2>
 <p>The <b>Resources tab</b> is used to specify the resources
 required for the job execution. The contents of this tab will vary for
-different target configurations. This sample description only applies to the 
-target configuration used here: PBS.</p>
-<p>For more information on different choices
-available with PTP, see <a href="03tsc.html">Target System Configurations.</a>
-After selecting the TSC
+different target configurations. 
+<br>The Job Scheduler/Runtime configurations included with PTP include
+the following:
+<blockquote>
+<table border="1">
+   <tr>
+    <th scope="col">Job Scheduler/Runtime</th>
+    <th scope="col">Version</th>
+  </tr>
+  <tr>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.ll.help/html/IBMLLMainHelp.html">IBM LoadLeveler</a></td>
+    <td>Any</td>
+  </tr>
+    <tr>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.pe.help/html/PEMainHelp.html">
+IBM Parallel Environment</a></td>
+    <td>Any</td>
+  </tr>
+  <tr>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.slurm.help/html/toc.html">SLURM</a></td>
+    <td>Any</td>
+  </tr>
+  <tr>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.doc.user/html/PBSHelpPage.html">PBS</a></td>
+    <td>Any</td>
+  </tr>
+  <tr>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.doc.user/html/PBSHelpPage.html">TORQUE</a></td>
+    <td>Any</td>
+  </tr>
+  <tr>
+    <td><a href="rms/gridengine.html">Grid Engine</a></td>
+    <td>Any</td>
+  </tr>
+  <tr>
+    <td><a href="rms/openMPI.html">Open MPI</a></td>
+    <td>1.3 or later</td>
+  </tr>
+  <tr>
+    <td>MPICH2</td>
+    <td>1.0.6p1 or later</td>
+  </tr>
+</table>
+</blockquote>
+</p>
 <ol>
 	<li>
 	<p>Select a <b>Target System Configuration</b> 
 	you wish to use from the drop-down. 
-	Note that a number of pre-configured target system configurations
+	Note that a number of pre-configured target system configurations for various job scheduler and runtime systems
 	have been included with the PTP installation.
 	</p>
+	<p>&nbsp;
 	<p><img src="images/03resources_configs.png">
 	</p>
+	<p>&nbsp
 	<p>To launch with various legacy-style configurations from previous
 	releases of PTP, use the <b>Using Parallel Application Launcher - <u>Select other...</u></b>
 	link at the bottom of this dialog.
 	 
 	<p><br>
-	When you select the Target System Configuration, the contents of the dialog
-	will change depending on the requirements of this type of system.
+	When you select the Target System Configuration, the contents of the <b>Resources</b>
+	tab will change depending on the requirements of this type of system.
 	</p>
-	<p>&nbsp</p>
+	<p>&nbsp
+	
 	</li>
 	<li>
 	<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
 	<p>Select the connection to use for the target system.
-	In the case of a synchronized project, a connection is probably already selected.
+	In the case of a synchronized or remote project, a connection is probably already selected.
 	You can create a new connection here by selecting the <b>New...</b> button.
+	<p>Fill in the other tabs in the run configuration as the selected
+	target system configuration requires.
+	 </p>
 	<p>
-	For the PBS example in the screenshots shown here,
-	and for most parallel launches, you will need to enter
-	the number of processes, MPI tasks, etc. 
-	In this case <b>Number of Processes</b> field. This
-	field must be greater than 0 in order to launch a job, and specifies
-	the number of processes to use for the application launch.</p>
-	<p><br>
-	</p>
-	</li>
+	<p>&nbsp</p>
 	<li>
-	<p>Fields in the <b>Options</b> section correspond to command-line
-	options supported by Open MPI. If desired, it is also possible to
-	specify a file containing the list of hosts on which to run the
-	application using the <b>Host file</b> field, or the list can be
-	entered directly into the <b>Host list</b> field.</p>
-	<p><br>
+	<p>Fill in the other information within the <b>Resources</b> as your target system configuration requires.<br>
 	</p>
-	<p><img src="images/03launchResTab.png"></p>
 	</li>
+
+
+	<!-- unused image<img src="images/03launchResTab.png"> -->
+
 </ol>
 
 <h2 id="application">Step 3: Complete the <b>Application</b> tab</h2>
@@ -149,14 +185,16 @@ After selecting the TSC
 
 	<li>
 	<p>Select the <b>Application Program</b> (executable) you wish to
-	launch. If the resource manager is connected to a remote target, then
+	launch. If the target system connection points to a remote target, then
 	this means the <i>path of the executable on the remote target</i>.
-	Otherwise, for a resource manager on the local machine, it should be
-	the path to the executable within the project directory.</p>
+	Otherwise, for a connection pointing to the local machine, it should be
+	the path to the executable within the project directory.
+	<p>The <b>Browse...</b> button can be used to select the executable file.
+	</p>
 	<p><br>
 	</p>
 	</li>
-
+    
 	<li>
 	<p>If you are running the application on a remote machine and the
 	project was <i>built</i> locally, then you will have to copy the
@@ -167,9 +205,11 @@ After selecting the TSC
 	automatically to the remote target before starting the run/debug
 	session. If not enabled, then you will need to copy the executable
 	manually to the remote target.</p>
+ 
 	<p><br>
 	</p>
 	</li>
+	 
 	<p><img src="images/03launch6.png"></p>
 	<p><br>
 	</p>
@@ -181,6 +221,7 @@ After selecting the TSC
 	<p><br>
 	</p>
 	</li>
+	  
 </ol>
 
 <h2 id="arguments">Step 4: Complete the Arguments tab</h2>
@@ -189,8 +230,8 @@ arguments require by the parallel application and to modify the working
 directory.</p>
 <ol>
 	<li>
-	<p>Enter any arguments required by the application in the <b>Parallel
-	program arguments</b> field. This is a free form text field that will be
+	<p>Enter any arguments required by the application in the <b>Program arguments</b> field. 
+	This is a free form text field that will be
 	passed to the application verbatim.</p>
 	<p><br>
 	</p>
@@ -321,13 +362,11 @@ produced by the parallel application execution.</p>
 </ol>
 
 <h2 id="launch">Step 7: Launching the application</h2>
-<p>The launch configuration is now complete. Click on the <b>Apply</b>
-button to save the configuration and then
-click on the <b>Run</b> button to launch the job.
-Switch to the <b>Parallel Runtime</b> perspective (or <b>System Monitoring</b> perspective)
+<p>The launch configuration is now complete. 
+Select the <b>Run</b> button (in the bottom right corner of the <b>Run Configurations</b> dialog to launch the job.
+Switch to the <b>System Monitoring</b> perspective
 to view the status of the job and inspect the program output.
-<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to
-Table of Contents</a>
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 </body>
 </html>
 
