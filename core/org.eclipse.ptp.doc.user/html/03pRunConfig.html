@@ -8,29 +8,32 @@
 
 <h1 id="top">Running Parallel Programs</h1>
 <p>This section describes how to run a parallel program. In PTP,
-this is called &quot;launching a job&quot;. Launching requires the
-services of a resource manager, which should have been set up as
-described in <a href="02resMgrSetup.html">Resource Managers</a>. PTP is
+this is called &quot;running a job&quot;. 
+<p>Previous releases of PTP required setting up a <i>Resource Manager</i> for each job scheduler/runtime environment before
+a job could be launched.
+In PTP 6.0 this is not handled separately, and instead a <i>Target System Configuration</i>
+is specified on the Run Configuration.
+<p>PTP is
 able to launch parallel applications that use a variety of programming
-models (e.g. MPI, OpenMP, UPC, etc.) provided that the resource manager
+models (e.g. MPI, OpenMP, UPC, etc.) provided that the <i>Target System Configuration</i>
 supports the programming model. It is also possible to launch multiple
 copies of a sequential program so that they execute simultaneously.</p>
 
-<p>Eclipse uses a <i>launch configuration</i> to encapsulate all the
+<p>Eclipse uses a <i>run configuration</i> to encapsulate all the
 settings and arguments necessary to launch a job normally or under the
 control of a debugger. A launch configuration is created using the <b>Run
 &gt; Run Configurations...</b> menu. 
 
 <p>This section only describes how to launch a parallel program. A
 description of how to monitor the application launch is provided in 
-<a href="05monitoring.html">Monitoring Jobs and Systems</a>. A
-description of how to debug an application is provided in 
+<a href="05monitoring.html">Monitoring Jobs and Systems</a>. 
+A description of how to debug an application is provided in 
 <a href="06parDebugging.html">Parallel Debugging</a>.</p>
 
 <p>Topics include:</p>
 <ol>
 	<li><a href="#create">Creating a <b>Parallel Application</b>
-	launch configuration</a></li>
+	run configuration</a></li>
 	<li><a href="#resources">Completing the <b>Resources tab</b></a></li>
 	<li><a href="#application">Completing the <b>Application
 	tab</b></a></li>
@@ -39,24 +42,26 @@ description of how to debug an application is provided in
 	tab</b></a></li>
 	<li><a href="#synchronize">Completing the <b>Synchronize
 	tab</b></a></li>
-	<li><a href="#launch">Launching the application </a></li>
+	<li><a href="#launch">Running the application </a></li>
 </ol>
-<h2 id="create">Step 1: Create a Parallel Application launch
+<h2 id="create">Step 1: Create a Parallel Application run
 configuration</h2>
-<p>Note: At least one resource manager must have been configured
-before it is possible to create a parallel application run
-configuration.</p>
+
 <ol>
 	<li>
-	<p>To set up a launch configuration, open the <b>Run Configuration</b>
-	dialog using <b>Run &gt; Run Configurations...</b> or click the run
-	icon menu on the tool bar and select <b>Run Configuration...</b>.</p>
+	<p>To set up a run configuration, open the <b>Run Configuration</b>
+	dialog using <b>Run &gt; Run Configurations...</b> 
+	<p><img src="images/03runMenu.png">
+	<br>or click the run
+	icon menu on the tool bar and select <b>Run Configuration...</b>.
+	<p><img src="images/03runMenu2.png">
+	</p>
 	</p>
 	<p><br>
 	</p>
 	</li>
 	<li>
-	<p>Create a new Parallel Application launch configuration by
+	<p>Create a new Parallel Application run configuration by
 	clicking <b>Parallel Application</b> and then clicking on the <b>New</b>
 	button icon.</p>
 	<p><br>
@@ -73,7 +78,7 @@ configuration.</p>
 	<p><img src="images/03launch1a.png"></p>
 	</li>
 </ol>
-
+<!--  stopped here tues 2pm BRT temporarily to check in -->
 <h2 id="resources">Step 2: Complete the Resources tab</h2>
 <p>The <b>Resources tab</b> is used to specify the resources
 required for the job execution. The contents of this tab will vary for
