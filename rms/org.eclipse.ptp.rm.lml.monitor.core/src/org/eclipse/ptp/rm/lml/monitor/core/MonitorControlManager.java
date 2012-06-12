@@ -50,13 +50,13 @@ public class MonitorControlManager {
 	private static final String MONITORS_ATTR = "monitors";//$NON-NLS-1$
 	private static final String MONITOR_ID_ATTR = "monitor";//$NON-NLS-1$
 
-	public static MonitorControlManager getInstance() {
-		return fInstance;
-	}
-
 	public static String generateMonitorId(String remoteServicesId, String connectionName, String monitorType) {
 		String bytes = remoteServicesId + "/" + connectionName + "/" + monitorType; //$NON-NLS-1$//$NON-NLS-2$
 		return UUID.nameUUIDFromBytes(bytes.getBytes()).toString();
+	}
+
+	public static MonitorControlManager getInstance() {
+		return fInstance;
 	}
 
 	private final Map<String, IMonitorControl> fMonitorControls = Collections
@@ -83,7 +83,9 @@ public class MonitorControlManager {
 		monitor.setRemoteServicesId(remoteServicesId);
 		monitor.setConnectionName(connectionName);
 		monitor.setSystemType(type);
+		monitor.save();
 		addMonitorControl(monitor);
+		saveMonitors();
 		return monitor;
 	}
 
@@ -189,7 +191,9 @@ public class MonitorControlManager {
 	public void removeMonitorControls(IMonitorControl[] monitors) {
 		for (IMonitorControl monitor : monitors) {
 			fMonitorControls.remove(monitor.getMonitorId());
+			monitor.dispose();
 		}
+		saveMonitors();
 		fireMonitorRemoved(monitors);
 	}
 
@@ -210,7 +214,6 @@ public class MonitorControlManager {
 
 	public void stop() throws CoreException {
 		stopMonitors();
-		saveMonitors();
 	}
 
 	private void addMonitorControl(IMonitorControl monitor) {
@@ -222,17 +225,33 @@ public class MonitorControlManager {
 		return LMLMonitorCorePlugin.getDefault().getStateLocation().append(MONITORS_SAVED_STATE).toFile();
 	}
 
+	/**
+	 * Load a monitor from persistent storage. Logs an error if it can't be loaded.
+	 * 
+	 * @param memento
+	 */
+	private void loadMonitor(IMemento memento) {
+		try {
+			IMonitorControl monitor = new MonitorControl(memento.getID());
+			if (monitor.load()) {
+				fMonitorControlsToStart.add(monitor);
+			}
+			addMonitorControl(monitor);
+		} catch (CoreException e) {
+			LMLMonitorCorePlugin.log(e.getLocalizedMessage());
+		}
+	}
+
+	/**
+	 * Load all monitors from persistent storage.
+	 */
 	private void loadMonitors() {
 		try {
 			FileReader reader = new FileReader(getSaveLocation());
 			IMemento memento = XMLMemento.createReadRoot(reader);
 			IMemento[] monitorsMemento = memento.getChildren(MONITOR_ID_ATTR);
 			for (IMemento monitorMemento : monitorsMemento) {
-				IMonitorControl monitor = new MonitorControl(monitorMemento.getID());
-				if (monitor.load()) {
-					fMonitorControlsToStart.add(monitor);
-				}
-				addMonitorControl(monitor);
+				loadMonitor(monitorMemento);
 			}
 		} catch (FileNotFoundException e) {
 			LMLMonitorCorePlugin.log(e.getLocalizedMessage());
@@ -241,6 +260,10 @@ public class MonitorControlManager {
 		}
 	}
 
+	/**
+	 * Save monitors to persistent storage. Just saves the monitor metadata. The actual monitor information will be saved when the
+	 * monitor is created.
+	 */
 	private void saveMonitors() {
 		final XMLMemento memento = XMLMemento.createWriteRoot(MONITORS_ATTR);
 		for (IMonitorControl monitor : fMonitorControls.values()) {

@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <dirent.h>
 #include <string.h>
+#include <time.h>
 
 #include "sdm.h"
 
@@ -37,12 +38,17 @@ static char * NumRankVars[] = {
 #define BUFFER_SIZE				255
 #define ROUTING_TABLE_TIMEOUT	1000 /* number of tries */
 #define ROUTING_TABLE_WAIT		1000*1000 /* usec */
+#define PORT_BASE				50000
+#define PORT_RANGE				10000
 
 static int wait_for_routing_file(char *filename, FILE **routing_file, int *route_size, unsigned sec);
 static int read_routing_table_entry(FILE *routing_file, routing_table_entry *entry);
 static int close_routing_file(FILE *routing_file);
+static int generate_routing_file(char *filename, char *routes);
+static int generate_port(void);
 
 static FILE *	routing_file = NULL;
+static int		master;
 
 /**
  * Initialize the routetable abstraction. The routetable will provide
@@ -59,32 +65,10 @@ sdm_routing_table_init(int argc, char *argv[])
 	FILE *				rt_file;
 	int					rv;
 	int					tbl_size;
-	int					id = -1; /* assume master */
+	int					server_id;
 	int					ch;
 	char *				envval = NULL;
 	char **				var;
-
-	/*
-	 * Master and servers wait for the routing file to appear
-	 */
-	rv = wait_for_routing_file("routing_file", &rt_file, &tbl_size, ROUTING_TABLE_TIMEOUT); //TODO: Get filename from the environment
-	if (rv == -1) { // No need to close, since wait_for_routing_file does it when error
-		// Error!
-		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Error opening the routing file\n");
-		return -1;
-	} else if (rv == -2){
-		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Timeout while waiting for routing file\n");
-		return -1;
-	}
-	close_routing_file(rt_file);
-
-	if (tbl_size == 0) {
-		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Invalid routing file size\n");
-		return -1;
-	}
-
-	sdm_route_set_size(tbl_size+1);
-	SDM_MASTER = tbl_size;
 
 	/*
 	 * If sdm servers are started by the mpirun, then their ID (rank) will be
@@ -100,29 +84,67 @@ sdm_routing_table_init(int argc, char *argv[])
 	for (ch = 0; ch < argc; ch++) {
 		char * arg = argv[ch];
 		if (strncmp(arg, "--master", 8) == 0) {
-			break;
+			master = 1;
 		} else if (strncmp(arg, "--server=", 9) == 0) {
-			id = (int)strtol(arg+9, NULL, 10);
+			master = 0;
+			server_id = (int)strtol(arg+9, NULL, 10);
 		}
 	}
 
-	/*
-	 * If no options were set, check the environment
-	 */
-	if (id < 0) {
+	if (!master) {
+		/*
+		 * If no server IDs were set, check the environment
+		 */
 		for (var = RankVars; *var != NULL; var++) {
 			envval = getenv(*var);
 			if (envval != NULL) {
-				id = (int)strtol(envval, NULL, 10);
+				server_id = (int)strtol(envval, NULL, 10);
 				break;
+			}
+		}
+	} else {
+		/*
+		 * If master, see if we need to generate routing file
+		 */
+		for (ch = 0; ch < argc; ch++) {
+			char * arg = argv[ch];
+			if (strncmp(arg, "--generate_routes=", 18) == 0) {
+				rv = generate_routing_file("routing_file", &arg[18]);
+				if (rv == -1) {
+					DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%s] Error creating routing file\n", master ? "master" : "server");
+					return -1;
+				}
 			}
 		}
 	}
 
-	if (id < 0) {
+	/*
+	 * Master and servers wait for the routing file to appear
+	 */
+	rv = wait_for_routing_file("routing_file", &rt_file, &tbl_size, ROUTING_TABLE_TIMEOUT); //TODO: Get filename from the environment
+	if (rv == -1) { // No need to close, since wait_for_routing_file does it when error
+		// Error!
+		DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%s] Error opening the routing file\n", master ? "master" : "server");
+		return -1;
+	} else if (rv == -2){
+		DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%s] Timeout while waiting for routing file\n", master ? "master" : "server");
+		return -1;
+	}
+	close_routing_file(rt_file);
+
+	DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%s] Found routing file, size=%d\n", master ? "master" : "server", tbl_size);
+	if (tbl_size == 0) {
+		DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%s] Invalid routing file size\n", master ? "master" : "server");
+		return -1;
+	}
+
+	sdm_route_set_size(tbl_size+1);
+	SDM_MASTER = tbl_size;
+
+	if (master) {
 		sdm_route_set_id(SDM_MASTER);
 	} else {
-		sdm_route_set_id(id);
+		sdm_route_set_id(server_id);
 	}
 
 	DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%d] size %d\n", sdm_route_get_id(), sdm_route_get_size());
@@ -319,8 +341,7 @@ wait_for_routing_file(char *filename, FILE **routing_file, int *route_size, unsi
 			rv = read_routing_table_size(fp, &size); // Returns FILE pointer to
 															// the after the header
 
-			DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%d] effsize: %d, size: %d, rv: %d\n", sdm_route_get_id(),
-					eff_size, size, rv);
+			DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%s] effsize: %d, size: %d, rv: %d\n", master ? "master" : "server", eff_size, size, rv);
 
 			switch (rv) {
 			case -1:
@@ -341,6 +362,7 @@ wait_for_routing_file(char *filename, FILE **routing_file, int *route_size, unsi
 				}
 
 				fclose(fp);
+				break;
 			}
 		}
 
@@ -348,4 +370,37 @@ wait_for_routing_file(char *filename, FILE **routing_file, int *route_size, unsi
 	}
 
 	return -2;
+}
+
+static int
+generate_routing_file(char *filename, char *routes)
+{
+	int		cnt;
+	char *	s;
+	char *	t;
+	char *	route;
+	FILE *	fp;
+
+	srandom(time(NULL));
+
+	for (s = routes, cnt = 1; (t = strchr(s, ',')) != NULL; s = t+1, cnt++);
+
+	fp = fopen(filename, "w");
+	if (fp == NULL) {
+		perror("fopen");
+		return -1;
+	}
+
+	fprintf(fp, "%d\n", cnt);
+	for (cnt = 0; (route = strsep(&routes, ",")) != NULL; cnt++) {
+		fprintf(fp, "%d %s %d\n", cnt, route, generate_port());
+	}
+	fclose(fp);
+	return 0;
+}
+
+static int
+generate_port(void)
+{
+	return PORT_BASE + random() / (RAND_MAX / PORT_RANGE + 1);
 }

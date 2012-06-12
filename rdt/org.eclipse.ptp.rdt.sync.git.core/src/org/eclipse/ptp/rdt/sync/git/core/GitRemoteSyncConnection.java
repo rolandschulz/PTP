@@ -1005,7 +1005,7 @@ public class GitRemoteSyncConnection {
 	 */
 	public void setMergeAsResolved(IPath path) throws RemoteSyncException {
 		AddCommand addCommand = git.add();
-		addCommand.addFilepattern(path.toOSString());
+		addCommand.addFilepattern(path.toString());
 		try {
 			addCommand.call();
 		} catch (GitAPIException e) {
@@ -1016,7 +1016,7 @@ public class GitRemoteSyncConnection {
 
 	public void checkout(IPath path) throws RemoteSyncException {
 		CheckoutCommand checkoutCommand = git.checkout();
-		checkoutCommand.addPath(path.toOSString());
+		checkoutCommand.addPath(path.toString());
 		checkoutCommand.setStartPoint("HEAD"); //$NON-NLS-1$
 		try {
 			checkoutCommand.call();

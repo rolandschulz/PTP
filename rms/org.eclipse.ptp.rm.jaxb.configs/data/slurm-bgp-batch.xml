@@ -397,6 +397,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
             <line>
                 <arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:bgp.reboot#value}</arg>
             </line>
+            <line>
                 <arg># Set mpirun arguments</arg></line>
             <line>
                 <arg isUndefinedIfMatches='NP="-np "'>NP="-np ${ptp_rm:mpirun.np#value}"</arg></line>
@@ -454,13 +455,11 @@ Default from "blugene.conf" if not set.]]></tooltip>
                 </target>
             </stdout-parser>
         </start-up-command>
-        <submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true">
-            <arg>env</arg>
-            <arg>-</arg>
-            <arg resolve="false">PATH=${PATH}</arg>
-            <arg resolve="false">MMCS_SERVER_IP=${MMCS_SERVER_IP}</arg>
-            <arg>sbatch</arg>
-            <arg>${ptp_rm:managed_file_for_script#value}</arg>
+        <submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true" replaceEnvironment="true">
+            <arg>sbatch</arg> 
+            <arg>${ptp_rm:managed_file_for_script#value}</arg> 
+            <environment name="PATH" preserve="true"/> 
+            <environment name="MMCS_SERVER_IP" preserve="true"/>
             <stdout-parser delim="\n">
                 <target ref="@jobId">
                     <match>

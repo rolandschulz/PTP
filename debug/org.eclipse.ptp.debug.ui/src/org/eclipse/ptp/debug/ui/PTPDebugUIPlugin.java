@@ -19,9 +19,12 @@
 package org.eclipse.ptp.debug.ui;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -29,8 +32,11 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.ui.IDebugModelPresentation;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -51,6 +57,15 @@ import org.osgi.framework.BundleContext;
  */
 public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.ui"; //$NON-NLS-1$
+
+	public static final String PDEBUGGERCONFIGURATION_EXTENSION_POINT_ID = "debuggerConfigurations"; //$NON-NLS-1$
+
+	public static final String DEBUGGERID_ELEMENT = "debuggerID"; //$NON-NLS-1$
+
+	/*
+	 * Note spelling mistake in eclipse...
+	 */
+	private static final String DEBUG_VIEW_TOOLBAR_HIDDEN_PERSPECTIVES = "org.eclispe.debug.ui.Debug_view.debug_toolbar_hidden_perspectives"; //$NON-NLS-1$
 
 	private static PTPDebugUIPlugin plugin;
 	private static UIDebugManager uiDebugManager = null;
@@ -319,11 +334,18 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		return null;
 	}
 
-	public static final String PDEBUGGERCONFIGURATION_EXTENSION_POINT_ID = "debuggerConfigurations"; //$NON-NLS-1$
-	public static final String DEBUGGERID_ELEMENT = "debuggerID"; //$NON-NLS-1$
-
+	private static Set<String> parseList(String listString) {
+		Set<String> list = new HashSet<String>(10);
+		StringTokenizer tokenizer = new StringTokenizer(listString, ","); //$NON-NLS-1$
+		while (tokenizer.hasMoreTokens()) {
+			String token = tokenizer.nextToken();
+			list.add(token);
+		}
+		return list;
+	}
 	// Resource bundle.
 	private ResourceBundle resourceBundle;
+
 	protected Map<String, IConfigurationElement> fDebuggerPageMap;
 
 	/**
@@ -374,6 +396,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		uiDebugManager = new UIDebugManager();
+		enableDebugViewToolbar();
 	}
 
 	/**
@@ -386,6 +409,20 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		super.stop(context);
 		plugin = null;
 		resourceBundle = null;
+	}
+
+	private void enableDebugViewToolbar() {
+		IEclipsePreferences node = InstanceScope.INSTANCE.getNode(IDebugUIConstants.PLUGIN_ID);
+		String preference = node.get(DEBUG_VIEW_TOOLBAR_HIDDEN_PERSPECTIVES, ""); //$NON-NLS-1$
+		if (!preference.equals("")) { //$NON-NLS-1$
+			Set<String> perspectives = parseList(preference);
+			if (!perspectives.contains(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG)) {
+				preference += "," + IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG; //$NON-NLS-1$
+			}
+		} else {
+			preference = IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG;
+		}
+		node.put(DEBUG_VIEW_TOOLBAR_HIDDEN_PERSPECTIVES, preference);
 	}
 
 	/**

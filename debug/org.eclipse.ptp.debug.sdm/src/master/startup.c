@@ -42,7 +42,8 @@ extern void server(dbg_backend *dbgr);
 #define OPT_TYPE_HOST			4
 #define OPT_TYPE_MASTER			5
 #define OPT_TYPE_SERVER			6
-#define OPT_TYPE_DEBUG			7
+#define OPT_TYPE_GENERATE		7
+#define OPT_TYPE_DEBUG			8
 
 static int opt_type;
 
@@ -55,6 +56,7 @@ static struct option longopts[] = {
 	{"host",			required_argument,	&opt_type, 	OPT_TYPE_HOST},
 	{"master",			no_argument,	 	&opt_type,	OPT_TYPE_MASTER},
 	{"server",			required_argument,	&opt_type,	OPT_TYPE_SERVER},
+	{"generate_routes",	required_argument,	&opt_type,	OPT_TYPE_GENERATE},
 #ifdef DEBUG
 	{"debug",			optional_argument,	&opt_type, 	OPT_TYPE_DEBUG},
 #endif /* DEBUG */
@@ -63,9 +65,9 @@ static struct option longopts[] = {
 #endif
 
 #ifdef DEBUG
-static char * shortopts = "b:e:P:p:h:d:ms:";
+static char * shortopts = "b:e:P:p:h:d:ms:g:";
 #else /* DEBUG */
-static char * shortopts = "b:e:P:p:h:ms:";
+static char * shortopts = "b:e:P:p:h:ms:g:";
 #endif /* DEBUG */
 
 static int	fatal_error = 0;
@@ -102,6 +104,7 @@ print_error_msg()
  * @arg	--proxy=proxy_type		type of proxy connection to use
  * @arg --master				master process
  * @arg --server=id				server process with rank 'id'
+ * @arg --generate_routes=list	master will generate routing file using the supplied list
  */
 int
 main(int argc, char *argv[])
@@ -140,6 +143,7 @@ main(int argc, char *argv[])
 				break;
 			case OPT_TYPE_MASTER:
 			case OPT_TYPE_SERVER:
+			case OPT_TYPE_GENERATE:
 				break;
 #ifdef DEBUG
 			case OPT_TYPE_DEBUG:
@@ -157,6 +161,7 @@ main(int argc, char *argv[])
 				"    [--host=host_name] [--port=port]\n"
 				"	 [--master]\n"
 				"    [--server=rank]\n"
+				"    [--generate_routes=list]\n"
 #ifdef DEBUG
 				"    [--debug[=level]]\n"
 #endif /* DEBUG */
@@ -174,7 +179,8 @@ main(int argc, char *argv[])
 		cp = strchr(argv[n], '=');
 		if (cp == NULL) {
 			if (strcmp(argv[n], "--master") == 0 ||
-				strncmp(argv[n], "--server", 8) == 0) {
+				strncmp(argv[n], "--server", 8) == 0 ||
+				strncmp(argv[n], "--generate_routes", 17) == 0) {
 				/* No action required */
 #ifdef DEBUG
 			} else if (strcmp(argv[n], "--debug") == 0) {
@@ -188,6 +194,7 @@ main(int argc, char *argv[])
 					"    [--host=host_name] [--port=port]\n"
 					"	 [--master]\n"
 					"    [--server=rank]\n"
+					"    [--generate_routes=list]\n"
 #ifdef DEBUG
 					"    [--debug[=level]]\n"
 #endif /* DEBUG */
@@ -224,6 +231,7 @@ main(int argc, char *argv[])
 					"    [--host=host_name] [--port=port]\n"
 					"	 [--master]\n"
 					"    [--server=rank]\n"
+					"    [--generate_routes=list]\n"
 #ifdef DEBUG
 					"    [--debug[=level]]\n"
 #endif /* DEBUG */

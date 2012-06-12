@@ -17,12 +17,10 @@
 			<arg>${ptp_rm:progArgs#value}</arg>
 		</submit-interactive>
 		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" waitForId="false" keepOpen="true">
-			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</arg>
-			<arg>-np 1</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
 			<arg>${ptp_rm:debuggerArgs#value}</arg>
 			<pre-launch-cmd name="Cleanup" exec="rm -f routing_file" wait="true"/>
-			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
+			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master --generate_routes=${ptp_rm:control.address#value} ${ptp_rm:debuggerArgs#value}" wait="false"/>
 		</submit-interactive-debug>		
 	</control-data>
 </resource-manager-builder>
