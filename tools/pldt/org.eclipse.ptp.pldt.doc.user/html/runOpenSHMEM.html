@@ -1,71 +1,77 @@
 <html>
 <head>
 <title>
-Running the OpenACC Tools within the Parallel Language Development Tools
+Running the OpenSHMEM Tools within the Parallel Language Development Tools
 </title>
 	<link rel="stylesheet" type="text/css" href="help.css">
 	<link rel="stylesheet" type="text/css" href="help.css">
 	<script type="text/javascript" src="thumb.js"> </script>
 	</head>
 <body>
-<h1 id="top"> Running the OpenACC Tools within the Parallel Language Development Tools</h1>
+<h1 id="top"> Running the OpenSHMEM Tools within the Parallel Language Development Tools</h1>
 
-<p>The Parallel Language Development Tools work on C, C++, and Fortran projects.
-
+<!--  <p>The Parallel Language Development Tools work on C, C++, and Fortran projects.
+-->
 <ol>
-<li>Within the project, create a source file that includes OpenACC code.
-<li>In the Project Explorer View, select the source file to analyze, to find the OpenACC artifacts.
+<li>Within the project, create a source file that includes OpenSHMEM code.
+<li>In the Project Explorer View, select the source file to analyze, to find the OpenSHMEM artifacts.
 To do this, select the source file in the Project Explorer on the left to highlight it.
-<p>Select the "Show OpenACC Artifacts" menu item in the PLDT icon menu  in the tool bar.
-<br> <img src="images/accMenu.png">
+<p>Select the "Show OpenSHMEM Artifacts" menu item in the PLDT icon menu  in the tool bar.
+<br> <img src="images/pldt-menu-OpenSHMEM.png">
 <br>(Note: if it complains that a source file is not selected the first time, select it again and retry.)
 <p>The workbench with the selection and menu item is shown below:
 
-<p><script> thumb("images/accButtons.gif",300)</script>
-<li>The OpenACC Artifact View is opened, if it was not present.
-It is populated with OpenACC artifacts found.
-<p><script> thumb("images/accViewAnn.gif",300)</script>
+<p><script> thumb("images/shmemButtons.png",300)</script>
+<p>&nbsp;
+<li>The OpenSHMEM Artifact View is opened, if it was not present.
+It is populated with OpenSHMEM artifacts found.
+<p><script> thumb("images/shmemViewAnn.png",300)</script>
 
 
 <p>&nbsp;
-<li>Double click on any line in the OpenACC Artifact View
+<li>Double click on any line in the OpenSHMEM Artifact View
 to navigate the editor to that line in the source file.
-<li>Rows in the OpenACC Artifact View can be sorted by any of the columns.
+<p>&nbsp;
+<li>Rows in the OpenSHMEM Artifact View can be sorted by any of the columns.
 Select the column heading to sort.
-<li>Select the "Clear OpenACC Artifacts Markers" button (red X)
-in the tool bar <i>of the OpenACC Artifact View</i> to remove all
-the OpenACC artifact markers.
-<br><img src="images/accClearMarkers.png"> 
+<p>&nbsp;
+<li>Select the "Clear OpenSHMEM Artifacts Markers" button (red X)
+in the tool bar <i>of the OpenSHMEM Artifact View</i> to remove all
+the OpenSHMEM artifact markers.
+<br><img src="images/shmemClearMarkers.png"> 
+<p>&nbsp;
 <li>You can run the analysis on another file and its markers
 will be added to the view.
+<p>&nbsp;
 <li>You can run the analysis on more than one file (multiple selection)
 or a container (folder or project), to analyze more than one file at a time.
 Click on a project or a folder, then select the
-"Show OpenACC Artifacts" action
+"Show OpenSHMEM Artifacts" action
  to run it on all C source files in that folder.
-<br> <img src="images/accMenu.png">
-<p>
+<br> <img src="images/pldt-menu-OpenSHMEM.png"> 
+<p>&nbsp;
 <li><b>Hover Help</b><br>
 In the editor, hover over an OpenSHMEM api and a popup box shows details of that API.
-<!--  fixme need image-->
-<p>
+<br><img src="images/shmemHoverHelp.png">
+<p>&nbsp;
 <li><b>Content Assist</b><br>
-Type an incomplete OpenACC function name e.g. "acc_get_"
+Type an incomplete OpenSHMEM function name e.g. "shmem_"
 and hit Ctrl-Space. The information that is shown
 is populated with CDT completions including argument
-types, but in addition, the PTP-OpenACC tools also provide
-specific information about actual OpenACC functions
+types, but in addition, the PTP-OpenSHMEM tools also provide
+specific information about actual OpenSHMEM functions
 where appropriate, and a yellow popup with additional 
 textual descriptive information about the function.
 Pick the one you want with the arrow keys or the mouse, to add the API to your source file.
-<br><img src="images/accContentAssist.gif">
-<p>
+<br><img src="images/shmemContentAssist.png">
+<p>&nbsp;
 <li><b>Context sensitive help</b><br>
 Also, if F1 is pressed when the cursor is within
 a function name, a help view appears which shows additional information.
 (In Linux press Ctrl-F1; in Mac Use Help button or use menu Help > Dynamic Help)
-<br><img src="images/accDocsFortran.png">
-
+<br><img src="images/shmemDocs1.png">
+<p>Click on the link to navigate to the doc file for that API.
+<br><img src="images/shmemDocs2.png">
 <!-- li><b>Context sensitive help</b><br>
 Also, if F1 is pressed when the cursor is within
 a function name, a help view appears which shows additional information.
