@@ -13,6 +13,7 @@
          point="org.eclipse.ui.views">
       <view
             class="org.eclipse.ptp.rm.lml.monitor.ui.views.MonitorView"
+            icon="icons/eview16/started.gif"
             id="org.eclipse.ptp.rm.ui.views.MonitorView"
             name="%MonitorView.name"
             restorable="true">
