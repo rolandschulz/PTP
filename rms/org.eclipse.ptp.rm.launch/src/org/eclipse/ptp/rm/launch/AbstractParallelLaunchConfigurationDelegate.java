@@ -153,7 +153,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 					while (fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
 							&& !subMon.isCanceled()) {
 						try {
-							fSubCondition.await(100, TimeUnit.MILLISECONDS);
+							fSubCondition.await(500, TimeUnit.MILLISECONDS);
 						} catch (InterruptedException e) {
 							// Expect to be interrupted if monitor is canceled
 						}
