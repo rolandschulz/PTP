@@ -173,7 +173,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				handleConnectionChanged();
 			}
 		});
-		fSystemTypeCombo.deselectAll();
+		fSystemTypeCombo.select(0);
 
 		fRemoteConnectionWidget = new RemoteConnectionWidget(comp, SWT.NONE, null, getLaunchConfigurationDialog());
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
