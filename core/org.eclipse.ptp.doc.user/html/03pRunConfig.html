@@ -11,8 +11,10 @@
 this is called &quot;running a job&quot;. 
 <p>Previous releases of PTP required setting up a <i>Resource Manager</i> for each job scheduler/runtime environment before
 a job could be launched.
-In PTP 6.0 this is not handled separately, and instead a <i>Target System Configuration</i>
-is specified on the Run Configuration.
+In PTP 6.0 this is not handled separately, and instead a 
+<a href="03tsc.html">Target System Configuration</a>
+is specified on the Run Configuration page.  Further interaction to set up the parallel
+job is highly dependent on which TSC is selected.
 <p>PTP is
 able to launch parallel applications that use a variety of programming
 models (e.g. MPI, OpenMP, UPC, etc.) provided that the <i>Target System Configuration</i>
@@ -78,21 +80,44 @@ configuration</h2>
 	<p><img src="images/03launch1a.png"></p>
 	</li>
 </ol>
-<!--  stopped here tues 2pm BRT temporarily to check in -->
+
 <h2 id="resources">Step 2: Complete the Resources tab</h2>
 <p>The <b>Resources tab</b> is used to specify the resources
 required for the job execution. The contents of this tab will vary for
-different resource managers. This description only applys to the Open
-MPI and MPICH2 resource managers.</p>
+different target configurations. This sample description only applies to the 
+target configuration used here: PBS.</p>
+<p>For more information on different choices
+available with PTP, see <a href="03tsc.html">Target System Configurations.</a>
+After selecting the TSC
 <ol>
 	<li>
-	<p>Select a resource manager you wish to use from the drop-down. If the resource manager you have selected is not running,
-	then you will see a warning message in the dialog.</p>
-	<p><br>
+	<p>Select a <b>Target System Configuration</b> 
+	you wish to use from the drop-down. 
+	Note that a number of pre-configured target system configurations
+	have been included with the PTP installation.
 	</p>
+	<p><img src="images/03resources_configs.png">
+	</p>
+	<p>To launch with various legacy-style configurations from previous
+	releases of PTP, use the <b>Using Parallel Application Launcher - <u>Select other...</u></b>
+	link at the bottom of this dialog.
+	 
+	<p><br>
+	When you select the Target System Configuration, the contents of the dialog
+	will change depending on the requirements of this type of system.
+	</p>
+	<p>&nbsp</p>
 	</li>
 	<li>
-	<p>Enter a value in the <b>Number of Processes</b> field. This
+	<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+	<p>Select the connection to use for the target system.
+	In the case of a synchronized project, a connection is probably already selected.
+	You can create a new connection here by selecting the <b>New...</b> button.
+	<p>
+	For the PBS example in the screenshots shown here,
+	and for most parallel launches, you will need to enter
+	the number of processes, MPI tasks, etc. 
+	In this case <b>Number of Processes</b> field. This
 	field must be greater than 0 in order to launch a job, and specifies
 	the number of processes to use for the application launch.</p>
 	<p><br>
