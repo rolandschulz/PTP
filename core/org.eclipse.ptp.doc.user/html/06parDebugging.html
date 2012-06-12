@@ -52,11 +52,11 @@ Resources, Application, Arguments, Environment, Synchronize.
 	<p><br></p>
 	</li>
 	<li>
-	Under <b>Debugger Options</b>, leave the <b>Debugger backend</b> set to <code>gdb-mi</code>.
+	Under <b>Debugger Options</b>, make sure the <b>Debugger backend</b> is set to <code>gdb-mi</code>.
 	<p><br></p>
 	</li>
-	<li>Make sure that the <b>Path to debugger
-	executable</b> is correct.
+	<li>Make sure that the <b>Path to SDM
+	executable</b> is correct for your target system.
 	<p><br></p>
 	<p>If you are debugging on the local machine, this path should
 	point to the <code>sdm</code> executable in your Ecilpse installation's
@@ -74,7 +74,12 @@ Resources, Application, Arguments, Environment, Synchronize.
 	<p><br></p>
 	</li>
 	<li>
-	<p>Set the <b>Debugger session address</b>. This is the address
+	<p><b>(Optional) Advanced Options</b> are accessed by clicking on the twistie. The advanced options allow you to set the <b>Session address</b>
+	and the <b>Path to gdb executable</b>.</p>
+	<p><br></p>
+	<p><img src="images/06debugAdvanced.png"></p>
+	<p><br></p>
+	<p>The session address is the address
 	that the debugger will connect to when it starts, and will depend on
 	where you are launching the application:</p>
 	<p><br></p>
@@ -89,7 +94,10 @@ Resources, Application, Arguments, Environment, Synchronize.
 	one running Eclipse). <i>This address must be accessible from the
 	remote machine.</i>. If your local network configuration precludes the
 	remote machine accessing your local machine, you will need to
-	reconfigure the resource manager to use port forwarding.</p>
+	reconfigure the connection to use port forwarding.</p>
+	<p><br></p>
+	<p>The path of gdb executable can be overridden if it is located in
+	a non-standard directory, or you wish to use an alternative to gdb.</p>
 	</li>
 	</ol>
 
