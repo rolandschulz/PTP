@@ -1,18 +1,19 @@
 <html>
 <head>
-<title>Local vs Remote Projects</title>
+<title>Introduction to PTP Project Types</title>
 <link rel="stylesheet" type="text/css" href="help.css">
 <script type="text/javascript" src="thumb.js"> </script>
 </head> 
 <body>
-<h1>Local vs Remote Projects</h1>
+<h1>Introduction to PTP Project Types</h1>
 <p>Projects comprise the source code, build rules (e.g. makefiles),
 and build results (e.g. object files and executables) for a particular application. These projects can reside in a number of different
 locations, including on the user's local machine, on a remote system, or in a source code repository. The target systems on which these 
 applications run are also typically located at remote sites, though users may also want to run the applications on their local machines.
 <p>
-To cater to as many situations as possible, PTP supports a variety of project and target system configurations. In addition to normal
-Eclipse projects, PTP adds two new project types. With PTP installed, the user has the choice of the following project types:
+PTP supports a wide variety of different target systems. In order to provide the flexibility needed for developing parallel applications
+in such varied environment, PTP adds two new project types to the normal Eclipse projects. With PTP installed, the user has the choice of 
+the following project types:
 <dl>
 <dt><a href="#local">Local projects</a><dt>
 <dd>These projects exist on the local machine which is the same machine on which Eclipse is running.</dd>
@@ -20,41 +21,22 @@ Eclipse projects, PTP adds two new project types. With PTP installed, the user h
 <dd>These projects consist of source code and other files that exist exclusively on a remote target machine.</dd>
 <dt><a href="#sync">Synchronized projects</a></dt>
 <dd>These projects are a hybrid of the two; source code is located on <i>both</i> the local system and on
-a remote target machine. These two copies are kept "in sync" by Eclipse.</dd>
+a remote target machine. These two copies are kept "in sync" by Eclipse. Synchronized projects are the preferred method for developing
+parallel applications for most typical HPC installations.</dd>
 </dl>
 <p>
 In addition to the project location, there are two other activities that depend on the user's desired working environment and target system
-configuration. These include where the project will be built, and where the application will be launched (including where it will be launched in order to
-be debugged.) These activities tend to be interrelated, since, for example, launching an application requires access to the executable. But if the executable
-is built locally, and should be launched on a remote system, then it will need to be staged to the remote machine. Similarly, if the executable is
-to be built and launched remotely, the location of the executable must be known for it to be launched.
-
-<p>
-The projects and services provided by PTP can operate both locally and remotely. In order to determine how to access local and remote files and
-systems, PTP uses a number of <i>remote service providers</i>. There are three remote service providers that are available to PTP:
+configuration. These include where the project will be built, and where the application will be run (including where it will be run in order to
+be debugged.) These activities tend to be interrelated, since, for example, running an application requires access to the executable. But if the executable
+is built locally, and should be run on a remote system, then it will need to be staged to the remote machine. Similarly, if the executable is
+to be built and run remotely, the location of the executable must be known for it to be started. Running a parallel application is covered in
+more detail in the <a href="03pRunConfig.html">Running Parallel Programs</a> section.
 </p>
-<dl>
-<dt>Local</dt>
-<dd>This service provider operates directly on the local machine (where Eclipse is running).</dd>
-<dt>Remote Tools</dt>
-<dd>This service provider is part of PTP and provides a light-weight wrapper around the ssh protocol. It provides features such as port forwarding (to avoid
-firewall problems). It is part of PTP and is the recommended remote service provider, since it is
-simpler to set up and contains all you need for PTP remote projects. 
-More information about Remote Tools as a remote service provider is in the section about
-<a href="02resMgrSetup.html#remote">remote Resource Managers</a>.</dd>
-<dt><a href="http://www.eclipse.org/dsdp/tm">Remote Systems Explorer</a> (RSE)</dt>
-<dd>This service provider is an optional component that provides support for a variety of protocols, including ssh, telnet, and ftp, as well as a custom
-DataStore protocol. It also provides a separate user interface for displaying and interacting with files on remote systems. The section on 
-<a href="PLUGINS_ROOT/org.eclipse.ptp.rdt.doc.user/html/toc.html">Remote Development Tools</a> 
-is written describing the use of RSE as the remote service provider.
-RSE may be used if your remote system does not use the ssh protocol for remote connections, 
-or you wish to use the additional functionality that RSE provides.</dd>
-</dl>
 
 <h2 id="local">Local Projects</h2>
 <p>Local projects are the default type for Eclipse projects.  All files reside on the local machine, which is the same machine
-on which Eclipse is running.  The section <a href="01buildMPIprog.html">Creating MPI Projects</a> 
-describes mostly this type of local project. These projects may have been checked
+on which Eclipse is running.  The section <a href="01buildMPIprog.html">Introduction to Creating MPI Projects</a> 
+describes this type of local project. These projects may have been checked
 out or cloned from a source repository, but the user is working on a local copy of the code. Updates to the repository must be controlled
 manually by the user.
 </p>
@@ -64,27 +46,25 @@ be run remotely only if both the local and remote machines have the same archite
 </p>
 
 <h2 id="remote">Remote Projects</h2>
-<p><a href="PLUGINS_ROOT/org.eclipse.ptp.rdt.doc.user/html/toc.html">Remote Development Tools</a> 
-(RDT) is part of PTP and provides the ability for C and C++ projects to be located and developed
+<p>PTP provides the ability for C and C++ projects to be located and developed
 remotely. Fortran projects can also be developed using RDT, but certain functionality (such as content assist and searching) will not be available.
 In a remote project, the source code and other files are located on a remote system but appear to the user as if they
 are on the local machine. They are brought to the local machine only when opened in an editor.
 When the project is built, the build happens on the remote system and the resulting executable will be
-located on the remote system also. Launching the executable requires a <a href="02resMgrSetup.html#defn">resource manager</a> that has been configured to use
+located on the remote system also. Launching the executable requires a launch configuration that has been configured to use
 the remote target system.
 </p>
-<p>
-When creating a remote project, the <b>New Remote C/C++ Project</b> wizard allows the user to choose which type of remote service
-provider to use, as shown below:
-</p>
-<img src="images/rm-new-project-provider.png">
 <p>
 Remote projects have a number of limitations. In order to work on the remote project, the user requires a constant network connection to the remote system,
 which precludes off-line development. Some Eclipse features are also not available on remote projects. Remote projects can only be checked out or cloned from
 a version control system on the remote system, and the user will have no access to the normal Team functionality through the Eclipse user interface.
 Remote projects do have the advantage that a copy of the source code is not required on the user's system, which may be a requirement in some environments.
+</p>
+<p>
+See the <a href="PLUGINS_ROOT/org.eclipse.ptp.rdt.doc.user/html/toc.html">Remote Development Tools (RDT)</a> section for more information.
+</p>
 
-<h2 id="sync">Synchronized Projects (new for 5.0)</h2>
+<h2 id="sync">Synchronized Projects</h2>
 <p>Synchronized projects maintain a copy of the source code and other project files on both the local system and the remote system.
 The user edits the local copy of a file, then each file is synchronized with the remote system when it is saved. Files that are created or deleted
 are also synchronized with the remote system. In addition, if files are changed on the remote system, these will be synchronized with the local system on a regular 
@@ -96,10 +76,6 @@ synchronization process.
 Synchronized projects support multiple build configurations, so the build can happen either locally or on one or more remote systems. The user can select
 which system will be used to build the project. A launch configuration can then be created to to run the application on the target machine.
 </p>
-<p>
-When creating a synchronized project, the <b>New Synchronized Project</b> wizard provides a page to choose the service provider to use:
-</p>
-<img src="images/sync-project-provider.png">
 <p>
 Synchronized projects offer a number of advantages over remote projects. Keeping a local copy of the source code enables faster interaction during
 editing, and all the normal C, C++ and Fortran editor, content assist, and search features are available. Synchronized projects do not require a

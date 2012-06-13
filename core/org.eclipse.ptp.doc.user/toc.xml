@@ -4,31 +4,17 @@
 <toc label="Parallel Tools Platform (PTP) User Guide">
       <topic label="Contents" href="html/toc.html"/>
       <topic label="Overview"  href="html/00overview.html"/> 
-      <topic label="PTP Prerequisites" href="html/00prereqs.html"/>
-      <topic label="Local vs. Remote Projects"  href="html/localVsRemote.html"/>
-      <topic label="Creating an MPI Project" href="html/01buildMPIprog.html"/> 
+      <topic label="Prerequisites" href="html/00prereqs.html"/>
+      <topic label="New and Noteworthy"  href="html/00newNoteworthy.html"/> 
+      <topic label="Introduction to PTP Project Types"  href="html/localVsRemote.html"/>
+      <topic label="Introduction to Creating MPI Projects" href="html/01buildMPIprog.html"/> 
       <topic label="Synchronized Projects" href="html/sync.html"/>
       <topic label="Configuring Environment Modules" href="html/modules.html"/>
       <topic label="Recognizing Compiler Errors: Cray, PGI, and Open64" href="html/errorParsers.html"/>
-      <topic label="Resource Managers">
-      	<topic label="Configuring Resource Managers" href="html/02resMgrSetup.html"/>
-      	<topic label="Running IBM LoadLeveler Batch Jobs">
-       		<anchor id="ptpLL"/>
-     	</topic>
-      	<topic label="Running IBM Parallel Environment Jobs">
-       		<anchor id="ptpPE"/>
-     	</topic>
-      	<topic label="Running PBS Jobs">
-       		<anchor id="ptpPBS"/>
-        </topic>
-      	<topic label="Running SLURM Jobs">
-       		<anchor id="ptpSLURM"/>
-     	</topic>
-      </topic>
       <topic label="Running Parallel Programs"  href="html/03pLaunchConfig.html"/> 
       <topic label="Monitoring Jobs and Systems" href="html/05monitoring.html"/>
       <topic label="Parallel Debugging"  href="html/06parDebugging.html"/>
-      <topic label="PTP Preferences" href="html/07ptpPrefs.html"/>
+      <topic label="Preferences" href="html/07ptpPrefs.html"/>
        <topic label="Parallel Language Development Tools (PLDT)">
       	<anchor id="ptpPLDT"/>
       </topic>
@@ -38,6 +24,5 @@
       <topic label="Graphical Explorer of MPI Programs (GEM)">
       	<anchor id="ptpGEM"/>
       </topic>
-      <topic label="New and Noteworthy"  href="html/00newNoteworthy.html"/> 
    
 </toc>
