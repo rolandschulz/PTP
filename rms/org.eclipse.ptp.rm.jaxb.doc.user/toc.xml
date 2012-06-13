@@ -8,7 +8,8 @@
 
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="Running PBS Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpPBS" topic="html/toc.html">
+<toc label="Running PBS Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpRun" topic="html/toc.html">
+<topic label="Running PBS Jobs">
       <topic href="html/toc.html" label="Contents"/> 
       <topic label="Introduction" href="html/PBSHelpPage.html#Introduction"/>
       <topic label="Preconfigured PBS Resource Manager Types" href="html/PBSHelpPage.html#ProvidedTypes"/>
@@ -16,5 +17,6 @@
       <topic label="Submission Using the PBS Interactive Resource Manager" href="html/PBSHelpPage.html#InteractiveSubmission"/>
       <topic label="Preferences" href="html/PBSHelpPage.html#Preferences"/>
       <topic label="Customizing the Configuration" href="html/PBSHelpPage.html#Customizing"/>
+      </topic>
 </toc>
 

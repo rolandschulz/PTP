@@ -8,9 +8,9 @@
 
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="Running IBM Parallel Environment Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpPE">
-	<topic label="Introduction"  href="html/PEMainHelp.html#introduction"> 
-	</topic>
+<toc label="Running IBM Parallel Environment Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpRun">
+<topic label="Running IBM Parallel Environment Jobs">
+	<topic label="Introduction"  href="html/PEMainHelp.html#introduction"> 	</topic>
 	<topic label="Requirements" href="html/PEMainHelp.html#requirements"></topic>
 	<topic label="Installation" href="html/PEMainHelp.html#installation"></topic>
 	<topic label="Getting Started" href="html/PEMainHelp.html#starting"></topic>
@@ -18,4 +18,5 @@
 	<topic label="Redirecting stdio" href="html/PEMainHelp.html#redirection"></topic>
 	<topic label="Monitoring application execution" href="html/PEMainHelp.html#monitoring"></topic>
 	<topic label="Restrictions" href="html/PEMainHelp.html#restrictions"></topic>
+	</topic>
 </toc>

@@ -1,22 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="Running SLURM Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpSLURM">
-   <topic href="html/toc.html" label="Contents">
-   </topic>
-	<topic label="Requirements"  href="html/require.html"> 
-	</topic>
+<toc label="Running SLURM Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpRun">
+<topic label="Running SLURM Jobs">
+   <topic href="html/toc.html" label="Contents"></topic>
+	<topic label="Requirements"  href="html/require.html"></topic>
 	<topic href="html/install.html" label="Installation"/>
- <topic href="html/start.html" label="Getting Started">
- </topic>
- <topic href="html/create_rms.html" label="Creating a Resource Manager">
- </topic>
- <topic href="html/start_rms.html" label="Starting a Resource Manager">
- </topic>
- <topic href="html/run_job.html" label="Running a Parallel Application">
- </topic>
- <topic href="html/mon_job.html" label="Monitoring Application Execution">
- </topic>
- <topic href="html/restrict.html" label="Restrictions">
- </topic>
+ 	<topic href="html/start.html" label="Getting Started"> </topic>
+ 	<topic href="html/create_rms.html" label="Creating a Resource Manager"> </topic>
+ 	<topic href="html/start_rms.html" label="Starting a Resource Manager"> </topic>
+ 	<topic href="html/run_job.html" label="Running a Parallel Application"> </topic>
+ 	<topic href="html/mon_job.html" label="Monitoring Application Execution"> </topic>
+ 	<topic href="html/restrict.html" label="Restrictions"> </topic>
+ 	</topic>
 </toc>

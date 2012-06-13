@@ -8,9 +8,9 @@
 
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="Running IBM LoadLeveler Batch Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpLL">
-	<topic label="Introduction"  href="html/IBMLLMainHelp.html#introduction"> 
-	</topic>
+<toc label="Running IBM LoadLeveler Batch Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpRun">
+<topic label="Running IBM LoadLeveler Batch Jobs">
+	<topic label="Introduction"  href="html/IBMLLMainHelp.html#introduction"></topic>
 	<topic label="Requirements" href="html/IBMLLMainHelp.html#requirements"></topic>
 	<topic label="Getting Started" href="html/IBMLLMainHelp.html#starting"></topic>
 	<topic label="Setting Up Preferences" href="html/IBMLLMainHelp.html#preferences"></topic>
@@ -19,4 +19,5 @@
 	<topic label="Running an application" href="html/IBMLLMainHelp.html#running"></topic>
 	<topic label="Template File For Basic Mode" href="html/IBMLLMainHelp.html#template"></topic>
 	<topic label="Restrictions" href="html/IBMLLMainHelp.html#restrictions"></topic>
+	</topic>
 </toc>

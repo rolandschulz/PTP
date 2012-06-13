@@ -11,11 +11,13 @@
       <topic label="Synchronized Projects" href="html/sync.html"/>
       <topic label="Configuring Environment Modules" href="html/modules.html"/>
       <topic label="Recognizing Compiler Errors: Cray, PGI, and Open64" href="html/errorParsers.html"/>
-      <topic label="Running Parallel Programs"  href="html/03pLaunchConfig.html"/> 
+      <topic label="Running Parallel Programs"  href="html/03pRunConfig.html"> 
+          <anchor id="ptpRun"/>
+          </topic>
       <topic label="Monitoring Jobs and Systems" href="html/05monitoring.html"/>
       <topic label="Parallel Debugging"  href="html/06parDebugging.html"/>
       <topic label="Preferences" href="html/07ptpPrefs.html"/>
-       <topic label="Parallel Language Development Tools (PLDT)">
+      <topic label="Parallel Language Development Tools (PLDT)">
       	<anchor id="ptpPLDT"/>
       </topic>
       <topic label="External Tools Framework (ETFw)">
