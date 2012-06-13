@@ -84,47 +84,78 @@ configuration</h2>
 <h2 id="resources">Step 2: Complete the Resources tab</h2>
 <p>The <b>Resources tab</b> is used to specify the resources
 required for the job execution. The contents of this tab will vary for
-different target configurations. 
-<br>The Job Scheduler/Runtime configurations included with PTP include
-the following:
+different target configurations. PTP includes a number of target configurations
+for different systems. The following table lists the common configurations along with 
+links to additional help documentation.
 <blockquote>
 <table border="1">
    <tr>
-    <th scope="col">Job Scheduler/Runtime</th>
-    <th scope="col">Version</th>
-  </tr>
+   <th scope="col">Target Configuration</th>
+   <th scope="col">Description</th>
+   </tr>
   <tr>
     <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.ll.help/html/IBMLLMainHelp.html">IBM LoadLeveler</a></td>
-    <td>Any</td>
-  </tr>
-    <tr>
-    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.pe.help/html/PEMainHelp.html">
-IBM Parallel Environment</a></td>
-    <td>Any</td>
+	<td>Generic IBM LoadLeveler batch systems</td>
   </tr>
   <tr>
-    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.slurm.help/html/toc.html">SLURM</a></td>
-    <td>Any</td>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.ll.help/html/IBMLLMainHelp.html">IBM LoadLeveler (Blue Gene)</a></td>
+	<td>IBM LoadLeveler on Blue Gene systems</td>
   </tr>
   <tr>
-    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.doc.user/html/PBSHelpPage.html">PBS</a></td>
-    <td>Any</td>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.pe.help/html/PEMainHelp.html">IBM Parallel Environment</a></td>
+    <td>Interactive execution using IBM Parallel Environment</td>
   </tr>
   <tr>
-    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.doc.user/html/PBSHelpPage.html">TORQUE</a></td>
-    <td>Any</td>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.slurm.help/html/toc.html">SLURM-Generic-Batch</a></td>
+    <td>Generic SLURM batch systems</td>
   </tr>
   <tr>
-    <td><a href="rms/gridengine.html">Grid Engine</a></td>
-    <td>Any</td>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.slurm.help/html/toc.html">SLURM-BGP-Batch</a></td>
+    <td>Blue Gene/P systems using SLURM</td>
   </tr>
   <tr>
-    <td><a href="rms/openMPI.html">Open MPI</a></td>
-    <td>1.3 or later</td>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.slurm.help/html/toc.html">SLURM-BGQ-Batch</a></td>
+    <td>Blue Gene/Q systems using SLURM</td>
   </tr>
   <tr>
-    <td>MPICH2</td>
-    <td>1.0.6p1 or later</td>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.doc.user/html/PBSHelpPage.html">PBS-Generic-Batch</a></td>
+    <td>Generic PBS batch systems</td>
+  </tr>
+  <tr>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.doc.user/html/PBSHelpPage.html">PBS-Generic-Interactive</a></td>
+    <td>Interactive job execution using PBS batch systems</td>
+  </tr>
+  <tr>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.doc.user/html/PBSHelpPage.html">PBS-BGP-Batch</a></td>
+    <td>Blue Gene/P systems using </td>
+  </tr>
+  <tr>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.doc.user/html/PBSHelpPage.html">PBS-BGQ-Batch</a></td>
+    <td>Blue Gene/Q systems using PBS</td>
+  </tr>
+  <tr>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.doc.user/html/PBSHelpPage.html">Torque-Generic-Batch</a></td>
+    <td>Generic TORQUE batch systems</td>
+  </tr>
+  <tr>
+    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.doc.user/html/PBSHelpPage.html">Torque-Generic-Interactive</a></td>
+    <td>Interactive job execution using Torque batch systems</td>
+  </tr>
+  <tr>
+    <td><a href="rms/gridengine.html">Grid Engine-Generic-Batch</a></td>
+    <td>Batch exectuion using Grid Engine</td>
+  </tr>
+  <tr>
+    <td><a href="rms/openMPI.html">Open MPI-Generic-Interactive</a></td>
+    <td>Interactive execution on Open MPI systems</td>
+  </tr>
+  <tr>
+    <td>MPICH2-Generic-Interactive</td>
+    <td>Interactive execution on MPICH2 systems</td>
+  </tr>
+  <tr>
+    <td>Remote-Generic-Interactive</td>
+    <td>Simple (non-parallel) interactive execution on remote systems</td>
   </tr>
 </table>
 </blockquote>
@@ -133,36 +164,34 @@ IBM Parallel Environment</a></td>
 	<li>
 	<p>Select a <b>Target System Configuration</b> 
 	you wish to use from the drop-down. 
-	Note that a number of pre-configured target system configurations for various job scheduler and runtime systems
-	have been included with the PTP installation.
+
 	</p>
 	<p>&nbsp;
 	<p><img src="images/03resources_configs.png">
 	</p>
 	<p>&nbsp
-	<p>To launch with various legacy-style configurations from previous
-	releases of PTP, use the <b>Using Parallel Application Launcher - <u>Select other...</u></b>
-	link at the bottom of this dialog.
+	
+	<p><i>Note: PTP provides the ability to launch with various legacy-style configurations from previous
+	releases of PTP. Use the <b>Using Parallel Application Launcher - <u>Select other...</u></b>
+	link at the bottom of this dialog to choose a legacy launcher.</i>
 	 
-	<p><br>
-	When you select the Target System Configuration, the contents of the <b>Resources</b>
-	tab will change depending on the requirements of this type of system.
-	</p>
 	<p>&nbsp
 	
 	</li>
 	<li>
 	<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
 	<p>Select the connection to use for the target system.
-	In the case of a synchronized or remote project, a connection is probably already selected.
-	You can create a new connection here by selecting the <b>New...</b> button.
-	<p>Fill in the other tabs in the run configuration as the selected
-	target system configuration requires.
+	If you have previously configured a synchronized or remote project, then a connection should be 
+	available, and may be already be selected.
+	You can create a new connection here by clicking the <b>New...</b> button. 
 	 </p>
 	<p>
 	<p>&nbsp</p>
 	<li>
-	<p>Fill in the other information within the <b>Resources</b> as your target system configuration requires.<br>
+	<p>
+	Once you select the connection, you may be prompted to open the connection if it is not already open. The contents of the <b>Resources</b>
+	tab will then populate with controls that allow you to configure the necessary launch information for the target system. Fill in the information 
+	required by the target system configuration.<br>
 	</p>
 	</li>
 

@@ -55,7 +55,7 @@ are:</p>
 preferences that apply to any parallel debugger.</p>
 <p><img src="images/07prefsDebug.png"></p>
 
-<h3>Default setting</h3>
+<h3>Default settings</h3>
 <p>These preferences control some debugger default behavior</p>
 <dl>
 	<dt><b>Show full paths on breakpoint</b> (default disabled)</dt>
@@ -111,12 +111,12 @@ launched. They do not normally need to be altered.</p>
 	<dd>The name of the backend debugger to use when debugging the
 	application. This is an internal name known by the SDM, not the name of
 	the debugger itself. Currently only gdb using the MI mode is supported.</dd>
-	<dt><b>Path to backend debugger</b> (default empty)</dt>
+	<dt><b>Path to gdb executable</b> (default empty)</dt>
 	<dd>If the backend debugger (e.g. gdb) is not located in a standard directory
 	then this field can be used to specify an alternate location.</dd>
-	<dt><b>Extra SDM arguments</b> (default empty)</dt>
-	<dd>Any extra arguments that need to be supplied to the sdm (e.g.
-	for debugging purposes)</dd>
+	<dt><b>Path to SDM executable</b> (default empty)</dt>
+	<dd>Sets the preferred path to the SDM executable. This will be used
+	to populate the Debug tab on the launch configuration.</dd>
 </dl>
 
 <h3>SDM debugging options</h3>
@@ -140,19 +140,23 @@ provided using the ETFw extensions.
 For more information see <a href="http://wiki.eclipse.org/PTP/ETFw/PTP_External_Tools_Framework">the ETFw wiki page</a>.
 </p>
 <p><img src="images/07prefsExternal.png"></p>
-<a name="feedback"></a>
-<p>The Feedback view preferences page handles cases where extensions are installed that utilize the
-Feedback view.  Here a checkbox controls whether or not the items in the Feedback tree table view
-are left expanded/contracted or not.
-See <a href="PLUGINS_ROOT/org.eclipse.ptp.etfw.feedback/html/toc.html">
-Feedback view</a> for more information.
-</p>
-<p><img src="images/07prefsExternal2.png"></p>
-<p>The Tool Configuration Location page allows the user to enter information about where to find
-tools that utilize the ETFw extensions.  In this case PPW and TAU tools can have their bin directories specified.
 
-</p>
-<p><img src="images/07prefsExternal3.png"></p>
+<h3>External Tool Configuration</h3>
+<p>These preferences are used to configure ETFw</p>
+
+<dl>
+	<dt><b>Tool Definition File</b> (default empty)</dt>
+	<dd>The name of a file containing the ETFw XML configuration.</dd>
+</dl>
+
+<h2 id="feedback">Feedback View (Parallel Tools &gt; External Tools &gt; Feedback View)</h2>
+<p>The Feedback view preferences page handles cases where extensions are installed that utilize the
+Feedback view.</p>
+<p><img src="images/07prefsExternal2.png"></p>
+
+<h3>Preferences for Feedback View</h3>
+<p>These preferences are used to configure the feedback view. See <a href="PLUGINS_ROOT/org.eclipse.ptp.etfw.feedback/html/toc.html">
+Feedback view</a> for more information.</p>
 
 <h2 id="pldt">Parallel Language Development Tools (PLDT) Preferences</h2>
 <p>See the help for <a
