@@ -13,6 +13,8 @@
       <topic label="Recognizing Compiler Errors: Cray, PGI, and Open64" href="html/errorParsers.html"/>
       <topic label="Running Parallel Programs"  href="html/03pRunConfig.html"> 
           <anchor id="ptpRun"/>
+          <topic label="Running Open MPI Jobs" href="html/rms/openMPI.html"/>
+          <topic label="Running Grid Engine Jobs" href="html/rms/gridengine.html"/>
           </topic>
       <topic label="Monitoring Jobs and Systems" href="html/05monitoring.html"/>
       <topic label="Parallel Debugging"  href="html/06parDebugging.html"/>
