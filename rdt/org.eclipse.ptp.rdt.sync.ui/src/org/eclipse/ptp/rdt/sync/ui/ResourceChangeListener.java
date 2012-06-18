@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
@@ -48,6 +49,7 @@ public class ResourceChangeListener {
 					return;
 				}
 				SyncManager.setSyncMode(project, SYNC_MODE.UNAVAILABLE);
+				BuildConfigurationManager.getInstance().shutdown(project);
 				return;
 			}
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {

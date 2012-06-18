@@ -986,4 +986,13 @@ public class BuildConfigurationManager {
 		
 		ManagedBuildManager.saveBuildInfo(config.getOwner().getProject(), true);
 	}
+	
+	/**
+	 * Do any necessary actions to shutdown the given project.
+	 * @param project
+	 */
+	public void shutdown(IProject project) {
+		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
+		provider.close(project);
+	}
 }

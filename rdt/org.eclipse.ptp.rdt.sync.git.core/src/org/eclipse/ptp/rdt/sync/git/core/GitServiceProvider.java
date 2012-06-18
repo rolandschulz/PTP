@@ -510,10 +510,16 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		putString(GIT_LOCATION, configLocation);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#close(org.eclipse.core.resources.IProject)
+	 */
 	@Override
-	public void close() {
-		for (GitRemoteSyncConnection conn : syncConnectionMap.values()) {
-			conn.close();
+	public void close(IProject project) {
+		for (Map.Entry<ProjectAndScenario, GitRemoteSyncConnection> entry : syncConnectionMap.entrySet()) {
+			if (entry.getKey().project == project) {
+				entry.getValue().close();
+			}
 		}
 	}
 
