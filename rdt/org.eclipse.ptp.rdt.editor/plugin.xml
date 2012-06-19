@@ -50,7 +50,7 @@
                style="pulldown">
          </action>
          <action
-               class="org.eclipse.cdt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
+               class="org.eclipse.cdt.debug.internal.ui.actions.breakpoints.CRulerEnableDisableBreakpointActionDelegate"
                id="org.eclipse.ptp.rdt.ui.editors.EnableDisableBreakpointRulerActionDelegate"
                label="%DisableBreakpoint.name"
                menubarPath="debug">
