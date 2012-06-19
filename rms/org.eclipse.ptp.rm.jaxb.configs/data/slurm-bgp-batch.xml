@@ -672,7 +672,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
         
         <launch-tab>
             <dynamic>
-                <title>Basic SLURM Settings</title>
+                <title>Basic Settings</title>
                 <layout>
                     <grid-layout/>
                 </layout>
@@ -872,7 +872,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
                 </composite>
             </dynamic>
             <dynamic>
-                <title>Advanced SLURM Settings</title>
+                <title>Advanced Settings</title>
                 <layout>
                     <grid-layout/>
                 </layout>

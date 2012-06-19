@@ -192,7 +192,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		</terminate-job>
 		<launch-tab>
 			<dynamic>
-				<title>Basic PBS Settings</title>
+				<title>Basic Settings</title>
 				<layout>
 					<grid-layout/>
 				</layout>
@@ -241,25 +241,25 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						<fixed-text>Description</fixed-text>
 					</widget>
 					<!-- row 1 -->
-               <widget type="label" style="SWT.LEFT">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
-                  <fixed-text>Account: </fixed-text>
-               </widget>
-               <widget type="text" style="SWT.BORDER" attribute="Account_Name">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-                  </layout-data>
-               </widget>
-               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <fixed-text>${ptp_rm:Account_Name#description}</fixed-text>
-               </widget>
-               <!-- row 2 -->
+	               	<widget type="label" style="SWT.LEFT">
+	                  <layout-data>
+	                     <grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+	                  </layout-data>
+	                  <tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
+	                  <fixed-text>Account: </fixed-text>
+	               	</widget>
+	               	<widget type="text" style="SWT.BORDER" attribute="Account_Name">
+	                  <layout-data>
+	                     <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+	                  </layout-data>
+	               	</widget>
+	               	<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+	                  <layout-data>
+	                     <grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+	                  </layout-data>
+	                  <fixed-text>${ptp_rm:Account_Name#description}</fixed-text>
+	               	</widget>
+	               	<!-- row 2 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>

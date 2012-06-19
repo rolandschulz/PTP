@@ -548,7 +548,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 		</terminate-job>
 		<launch-tab>
 			<dynamic>
-				<title>Basic PBS Settings</title>
+				<title>Basic Settings</title>
 				<layout>
 					<grid-layout/>
 				</layout>
@@ -714,7 +714,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>MPI Number of Cores: </fixed-text>
+						<fixed-text>MPI Number of Tasks: </fixed-text>
 					</widget>
 					<widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="mpiNumberOfProcesses">
 						<layout-data>
@@ -749,7 +749,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				</composite>
 			</dynamic>
 			<dynamic>
-				<title>Advanced PBS Settings</title>
+				<title>Advanced Settings</title>
 				<layout>
 					<grid-layout/>
 				</layout>

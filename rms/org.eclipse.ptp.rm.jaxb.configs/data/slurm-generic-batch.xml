@@ -613,7 +613,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
         
         <launch-tab>
             <dynamic>
-                <title>Basic SLURM Settings</title>
+                <title>Basic Settings</title>
                 <layout>
                     <grid-layout/>
                 </layout>
@@ -813,7 +813,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                 </composite>
             </dynamic>
             <dynamic>
-                <title>Advanced SLURM Settings</title>
+                <title>Advanced Settings</title>
                 <layout>
                     <grid-layout/>
                 </layout>
