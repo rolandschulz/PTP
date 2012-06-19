@@ -84,7 +84,11 @@ public class SpinnerUpdateModel extends AbstractUpdateModel implements ModifyLis
 		int i = spinner.getMinimum();
 		if (mapValue != null) {
 			if (mapValue instanceof String) {
-				i = Integer.parseInt((String) mapValue);
+				try {
+					i = Integer.parseInt((String) mapValue);
+				} catch (NumberFormatException e) {
+					i = spinner.getMinimum();
+				}
 			} else {
 				i = (Integer) mapValue;
 			}

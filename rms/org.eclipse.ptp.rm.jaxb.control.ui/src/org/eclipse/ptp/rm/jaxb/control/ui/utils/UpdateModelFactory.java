@@ -551,8 +551,8 @@ public class UpdateModelFactory {
 	/**
 	 * Constructs the cell editor and its update model.
 	 * 
-	 * @param data
-	 *            Property or Attribute for this viewer row.
+	 * @param attr
+	 *            Attribute for this viewer row.
 	 * @param viewer
 	 *            CheckboxTableViewer or CheckboxTreeViewer
 	 * @param columnData
@@ -561,15 +561,15 @@ public class UpdateModelFactory {
 	 *            launch tab being built
 	 * @return
 	 */
-	public static ICellEditorUpdateModel createModel(AttributeType data, ColumnViewer viewer, List<ColumnDataType> columnData,
+	public static ICellEditorUpdateModel createModel(AttributeType attr, ColumnViewer viewer, List<ColumnDataType> columnData,
 			IJAXBLaunchConfigurationTab tab) {
 		ICellEditorUpdateModel model = null;
 		if (viewer instanceof TableViewer) {
-			model = createModel(data, (TableViewer) viewer, columnData, tab);
+			model = createModel(attr, (TableViewer) viewer, columnData, tab);
 		} else {
-			model = createModel(data, (TreeViewer) viewer, columnData, tab);
+			model = createModel(attr, (TreeViewer) viewer, columnData, tab);
 		}
-		maybeAddValidator(model, data, tab.getParent());
+		maybeAddValidator(model, attr, tab.getParent());
 		return model;
 	}
 
@@ -866,8 +866,8 @@ public class UpdateModelFactory {
 	 * @see org.eclipse.jface.viewers.CellEditor
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.TableRowUpdateModel
 	 * 
-	 * @param data
-	 *            Property or Attribute
+	 * @param attr
+	 *            Attribute
 	 * @param viewer
 	 *            to which this row belongs
 	 * @param columnData
@@ -876,13 +876,13 @@ public class UpdateModelFactory {
 	 *            launch tab being built
 	 * @return the cell editor update model, which contains a reference to the CellEditor
 	 */
-	private static ICellEditorUpdateModel createModel(AttributeType data, TableViewer viewer, List<ColumnDataType> columnData,
+	private static ICellEditorUpdateModel createModel(AttributeType attr, TableViewer viewer, List<ColumnDataType> columnData,
 			IJAXBLaunchConfigurationTab tab) {
-		CellDescriptor cd = new CellDescriptor(data, columnData);
-		CellEditor editor = createEditor(cd, data, viewer.getTable());
+		CellDescriptor cd = new CellDescriptor(attr, columnData);
+		CellEditor editor = createEditor(cd, attr, viewer.getTable());
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		ICellEditorUpdateModel model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom,
-				cd.translateBooleanAs, cd.readOnly, data);
+				cd.translateBooleanAs, cd.readOnly, attr);
 		if (model != null) {
 			model.setBackground(cd.background);
 			model.setFont(cd.font);
@@ -897,8 +897,8 @@ public class UpdateModelFactory {
 	 * @see org.eclipse.jface.viewers.CellEditor
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.model.ValueTreeNodeUpdateModel
 	 * 
-	 * @param data
-	 *            Property or Attribute
+	 * @param attr
+	 *            Attribute
 	 * @param viewer
 	 *            to which this row belongs
 	 * @param columnData
@@ -907,15 +907,15 @@ public class UpdateModelFactory {
 	 *            launch tab being built
 	 * @return the cell editor update model, which contains a reference to the CellEditor
 	 */
-	private static ICellEditorUpdateModel createModel(AttributeType data, TreeViewer viewer, List<ColumnDataType> columnData,
+	private static ICellEditorUpdateModel createModel(AttributeType attr, TreeViewer viewer, List<ColumnDataType> columnData,
 			IJAXBLaunchConfigurationTab tab) {
-		CellDescriptor cd = new CellDescriptor(data, columnData);
-		CellEditor editor = createEditor(cd, data, viewer.getTree());
+		CellDescriptor cd = new CellDescriptor(attr, columnData);
+		CellEditor editor = createEditor(cd, attr, viewer.getTree());
 		ValueUpdateHandler handler = tab.getParent().getUpdateHandler();
 		Object[] properties = viewer.getColumnProperties();
 		boolean inValueCol = properties.length == 2;
 		ICellEditorUpdateModel model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom,
-				cd.translateBooleanAs, cd.readOnly, inValueCol, data);
+				cd.translateBooleanAs, cd.readOnly, inValueCol, attr);
 		if (model != null) {
 			model.setBackground(cd.background);
 			model.setFont(cd.font);
@@ -942,14 +942,14 @@ public class UpdateModelFactory {
 	 * 
 	 * @param model
 	 *            update model object to associate validator with
-	 * @param data
-	 *            JAXB property or attribute descriptor
+	 * @param attr
+	 *            JAXB attribute descriptor
 	 * @param tab
 	 *            launch tab being built
 	 */
-	private static void maybeAddValidator(IUpdateModel model, AttributeType data, IJAXBParentLaunchConfigurationTab tab) {
-		if (data != null) {
-			model.setValidator(data.getValidator(), tab);
+	private static void maybeAddValidator(IUpdateModel model, AttributeType attr, IJAXBParentLaunchConfigurationTab tab) {
+		if (attr != null) {
+			model.setValidator(attr.getValidator(), tab);
 		}
 	}
 }
