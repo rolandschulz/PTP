@@ -536,12 +536,29 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#checkout(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.sync.core.BuildScenario, org.eclipse.core.runtime.IPath)
+	 */
 	@Override
 	public void checkout(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
 		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
 				SyncManager.getFileFilter(project), null);
 		if (fSyncConnection != null) {
 			fSyncConnection.checkout(path);
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#checkoutRemote(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.sync.core.BuildScenario, org.eclipse.core.runtime.IPath)
+	 */
+	@Override
+	public void checkoutRemoteCopy(IProject project, BuildScenario buildScenario, IPath path) throws RemoteSyncException {
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario,
+				SyncManager.getFileFilter(project), null);
+		if (fSyncConnection != null) {
+			fSyncConnection.checkoutRemoteCopy(path);
 		}
 	}
 }

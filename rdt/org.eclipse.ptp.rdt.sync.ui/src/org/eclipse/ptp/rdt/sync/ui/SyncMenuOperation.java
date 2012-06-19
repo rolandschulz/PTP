@@ -51,6 +51,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String syncExcludeCommand = "sync_exclude"; //$NON-NLS-1$
 	private static final String syncIncludeCommand = "sync_include"; //$NON-NLS-1$
 	private static final String checkoutCommand = "checkout"; //$NON-NLS-1$
+	private static final String resolveAsRemoteCommand = "checkout_remote_copy"; //$NON-NLS-1$
 	private static final String resolveMergeCommand = "resolve"; //$NON-NLS-1$
 	private static final ISyncExceptionHandler syncExceptionHandler = new CommonSyncExceptionHandler(false, true);
 
@@ -115,7 +116,8 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				SyncFileFilterPage.open(project, null);
 			} else if (command.equals(syncDefaultFileList)) {
 				SyncFileFilterPage.open(null, null);
-			} else if (command.equals(checkoutCommand) || command.equals(resolveMergeCommand)) {
+			} else if (command.equals(checkoutCommand) || command.equals(resolveMergeCommand) ||
+					(command.equals(resolveAsRemoteCommand))) {
 				BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 				BuildScenario buildScenario = bcm.getBuildScenarioForProject(project);
 				IStructuredSelection sel = this.getSelectedElements();
@@ -134,7 +136,11 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 					IPath path = selection.getProjectRelativePath();
 					if (command.equals(checkoutCommand)) {
 						bcm.checkout(project, buildScenario, path);
-					} else if (command.equals(resolveMergeCommand)) {
+					}
+					if (command.equals(resolveAsRemoteCommand)) {
+						bcm.checkoutRemoteCopy(project, buildScenario, path);
+					}
+					if (command.equals(resolveMergeCommand) || command.equals(resolveAsRemoteCommand)) {
 						bcm.setMergeAsResolved(project, buildScenario, path);
 						SyncMergeFileTableViewer viewer = SyncMergeFileTableViewer.getActiveInstance();
 						if (viewer != null) {

@@ -1027,6 +1027,19 @@ public class GitRemoteSyncConnection {
 		this.doRefresh(null);
 	}
 	
+	public void checkoutRemoteCopy(IPath path) throws RemoteSyncException {
+		CheckoutCommand checkoutCommand = git.checkout();
+		checkoutCommand.addPath(path.toString());
+		checkoutCommand.setStartPoint("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
+		try {
+			checkoutCommand.call();
+		} catch (GitAPIException e) {
+			throw new RemoteSyncException(e);
+		}
+
+		this.doRefresh(null);
+	}
+
 	// Refresh the workspace after creating new local files
 	// Bug 374409 - run refresh in a separate thread to avoid possible deadlock from locking both the sync lock and the
 	// workspace lock.
