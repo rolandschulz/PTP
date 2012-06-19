@@ -1014,6 +1014,12 @@ public class GitRemoteSyncConnection {
 		FileToMergePartsMap.remove(path);
 	}
 
+	/**
+	 * Replace given file with the most recent version in the repository
+	 *
+	 * @param path
+	 * @throws RemoteSyncException
+	 */
 	public void checkout(IPath path) throws RemoteSyncException {
 		CheckoutCommand checkoutCommand = git.checkout();
 		checkoutCommand.addPath(path.toString());
@@ -1027,6 +1033,12 @@ public class GitRemoteSyncConnection {
 		this.doRefresh(null);
 	}
 	
+	/**
+	 * Replace given file with the most recent local copy of the remote (not necessarily the same as the current remote)
+	 *
+	 * @param path
+	 * @throws RemoteSyncException
+	 */
 	public void checkoutRemoteCopy(IPath path) throws RemoteSyncException {
 		CheckoutCommand checkoutCommand = git.checkout();
 		checkoutCommand.addPath(path.toString());
