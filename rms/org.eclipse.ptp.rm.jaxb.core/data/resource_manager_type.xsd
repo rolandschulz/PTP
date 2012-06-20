@@ -8,7 +8,7 @@
 <!-- * Contributors: -->
 <!-- * Albert L. Rossi - design and implementation -->
 <!-- ****************************************************************************** -->
-<xs:schema targetNamespace="http://org.eclipse.ptp/rm" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rm="http://org.eclipse.ptp/rm"
+<xs:schema targetNamespace="org.eclipse.ptp" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rm="org.eclipse.ptp"
 	elementFormDefault="qualified">
 	<xs:element name="resource-manager-builder" type="rm:resource-manager-data"/>
 	<xs:complexType name="resource-manager-data">
