@@ -313,8 +313,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	@Override
 	public URI getLocationURI() {
 		try {
-			return new URI(getLocationPath().toString());
+			return new URI("file://" + getLocationPath().toString()); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
+			CUIPlugin.log(e);
 			return null;
 		}
 	}
