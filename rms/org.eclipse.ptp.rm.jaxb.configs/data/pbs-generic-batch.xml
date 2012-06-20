@@ -597,24 +597,24 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					</widget>
 					<!-- row 2 -->
 					<widget type="label" style="SWT.LEFT">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
-                  <fixed-text>Account: </fixed-text>
-               </widget>
-               <widget type="text" style="SWT.BORDER" attribute="Account_Name">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-                  </layout-data>
-               </widget>
-               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <fixed-text>${ptp_rm:Account_Name#description}</fixed-text>
-               </widget>
-               <!-- row 3 -->
+                  		<layout-data>
+                     		<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+                  		</layout-data>
+                  		<tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
+                  		<fixed-text>Account: </fixed-text>
+               		</widget>
+               		<widget type="text" style="SWT.BORDER" attribute="Account_Name">
+                  		<layout-data>
+                     		<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+                  		</layout-data>
+               		</widget>
+               		<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+                  		<layout-data>
+                     		<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+                  		</layout-data>
+                  		<fixed-text>${ptp_rm:Account_Name#description}</fixed-text>
+               		</widget>
+               		<!-- row 3 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -716,7 +716,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>MPI Number of Tasks: </fixed-text>
 					</widget>
-					<widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="mpiNumberOfProcesses">
+					<widget type="spinner" style="SWT.BORDER" attribute="mpiNumberOfProcesses">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
 						</layout-data>

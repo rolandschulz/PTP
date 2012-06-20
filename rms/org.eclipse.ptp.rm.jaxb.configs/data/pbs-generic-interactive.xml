@@ -322,7 +322,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>MPI Number of Cores: </fixed-text>
 					</widget>
-					<widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="mpiNumberOfProcesses">
+					<widget type="spinner" style="SWT.BORDER" attribute="mpiNumberOfProcesses">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
 						</layout-data>
