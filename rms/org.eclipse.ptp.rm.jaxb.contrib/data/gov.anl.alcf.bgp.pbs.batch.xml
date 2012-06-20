@@ -8,8 +8,11 @@
 <!-- * Contributors: -->
 <!-- * Kevin A. Huck - design and implementation -->
 <!-- ****************************************************************************** -->
-<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="gov.anl.alcf.bgp.pbs.batch">
+<resource-manager-builder 
+	xmlns="http://eclipse.org/ptp" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://eclipse.org/ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	name="gov.anl.alcf.bgp.pbs.batch">
 	<control-data>
 		<!-- Set the default value of this attribute if PBS is installed in a non-standard location -->
 		<attribute name="bindir" visible="false"/>

@@ -6,8 +6,11 @@
 <!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
 <!-- * -->
 <!-- ****************************************************************************** -->
-<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="IBM LoadLeveler (Blue Gene)">
+<resource-manager-builder 
+	xmlns="http://eclipse.org/ptp" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://eclipse.org/ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	name="IBM LoadLeveler (Blue Gene)">
 	<control-data>
 		<!-- Set the default value of this attribute if LL is installed in a non-standard location -->
 		<attribute name="bindir" visible="false"/>

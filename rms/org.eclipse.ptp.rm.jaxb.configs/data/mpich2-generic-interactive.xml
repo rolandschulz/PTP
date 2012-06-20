@@ -6,8 +6,11 @@
 <!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
 <!-- * -->
 <!-- ****************************************************************************** -->
-<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="MPICH2-Generic-Interactive">
+<resource-manager-builder 
+	xmlns="http://eclipse.org/ptp" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://eclipse.org/ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	name="MPICH2-Generic-Interactive">
 	<control-data>
 		<!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
 		<attribute name="control.queue.name" visible="false">
