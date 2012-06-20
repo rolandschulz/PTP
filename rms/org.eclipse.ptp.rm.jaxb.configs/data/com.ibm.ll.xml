@@ -6,8 +6,11 @@
 <!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
 <!-- * -->
 <!-- ****************************************************************************** -->
-<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="IBM LoadLeveler">
+<resource-manager-builder 
+	xmlns="org.eclipse.ptp" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	name="IBM LoadLeveler">
 	<control-data>
 		<!-- Set the default value of this attribute if LL is installed in a non-standard location -->
 		<attribute name="bindir" visible="false"/>
@@ -27,7 +30,10 @@
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
 			<link-value-to>Error_Path</link-value-to>
 		</attribute>
-		
+		<attribute name="mpiCommand" type="choice">
+			<description>Optional MPI command to run job.</description>
+			<choice>,poe,mpiexec,mpirun</choice>
+		</attribute>
 		<!-- Attribute definitions for user-specified fields -->
 				
 		<attribute name="LL_BLOCKING" type="string">
@@ -128,6 +134,10 @@
 			<description>Specify total number of tasks.</description>
 		</attribute>		
 		
+		<attribute name="LL_WALL_CLOCK_LIMIT" type="string">
+			<description>Specify the elapsed time the job can run (hardlimit,softlimit).</description>
+		</attribute>		
+
 		<script insertEnvironmentAfter="0">
 			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 				<!--  If the substituted value of the statement following the '>' in the following <arg> 
@@ -200,16 +210,21 @@
 				<arg isUndefinedIfMatches="# @ tasks_per_node ="># @ tasks_per_node = ${ptp_rm:LL_TASKS_PER_NODE#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="# @ total_nodes ="># @ total_nodes = ${ptp_rm:LL_TOTAL_NODES#value}</arg>
+				<arg isUndefinedIfMatches="# @ total_tasks ="># @ total_tasks = ${ptp_rm:LL_TOTAL_TASKS#value}</arg>
 			</line>
 			<line>
-				<arg># @ executable = ${ptp_rm:executablePath#value}</arg>
-			</line>
-			<line>
-				<arg isUndefinedIfMatches="# @ arguments ="># @ arguments = ${ptp_rm:progArgs#value}</arg>
+				<arg isUndefinedIfMatches="# @ wall_clock_limit ="># @ wall_clock_limit = ${ptp_rm:LL_WALL_CLOCK_LIMIT#value}</arg>
 			</line>
 			<line>
 				<arg># @ queue</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="">${ptp_rm:modules#value}</arg>
+			</line>
+			<line>
+				<arg>${ptp_rm:mpiCommand#value} </arg>
+				<arg>${ptp_rm:executablePath#value} </arg>
+				<arg isUndefinedIfMatches="">${ptp_rm:progArgs#value}</arg>
 			</line>
 		</script>
 		<start-up-command name="get-classes">
@@ -229,6 +244,7 @@
 		<submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true">
 			<arg>${ptp_rm:bindir#value}llsubmit</arg>
 			<arg>${ptp_rm:managed_file_for_script#value}</arg>
+			<environment name="MP_RESD" value="yes" />
 			<stdout-parser delim="\n" all="true" save="1">
 				<target ref="@jobId">
 					<match>
@@ -308,7 +324,7 @@
 						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
 					</layout>
 					
-					<!-- HEADER -->
+				<!-- HEADER -->
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -383,6 +399,24 @@
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_JOB_TYPE#description}</fixed-text>
+					</widget>
+				<!-- MPI Command -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>MPI Command: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="mpiCommand">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:mpiCommand#description}</fixed-text>
 					</widget>
 				</composite>
 			</dynamic>
@@ -718,7 +752,7 @@
 						<fixed-text>${ptp_rm:LL_BULKXFER#description}</fixed-text>
 					</widget>
 					
-					<!--  MPI adapter specification -->
+				<!--  MPI adapter specification -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -737,7 +771,7 @@
 						<fixed-text>${ptp_rm:LL_NETWORK_MPI#description}</fixed-text>
 					</widget>
 					
-					<!--  LAPI adapter specification --> 
+				<!--  LAPI adapter specification --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -756,7 +790,7 @@
 						<fixed-text>${ptp_rm:LL_NETWORK_LAPI#description}</fixed-text>
 					</widget>
 					
-					<!--  MPI/LAPI adapter specification --> 
+				<!--  MPI/LAPI adapter specification --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -775,7 +809,7 @@
 						<fixed-text>${ptp_rm:LL_NETWORK_MPI_LAPI#description}</fixed-text>
 					</widget>
 					
-					<!--  Min node  --> 
+				<!--  Min node  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -794,7 +828,7 @@
 						<fixed-text>${ptp_rm:LL_MIN_NODES#description}</fixed-text>
 					</widget>
 					
-					<!--  Max node  --> 
+				<!--  Max node  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -813,7 +847,7 @@
 						<fixed-text>${ptp_rm:LL_MAX_NODES#description}</fixed-text>
 					</widget>
 					
-					<!--  Task geometry  --> 
+				<!--  Task geometry  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -832,7 +866,7 @@
 						<fixed-text>${ptp_rm:LL_TASK_GEOMETRY#description}</fixed-text>
 					</widget>
 					
-					<!--  Tasks per node  --> 
+				<!--  Tasks per node  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -851,7 +885,7 @@
 						<fixed-text>${ptp_rm:LL_TASKS_PER_NODE#description}</fixed-text>
 					</widget>
 					
-					<!--  Total tasks  --> 
+				<!--  Total tasks  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -938,6 +972,25 @@
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_SOFT_LIMIT#description}</fixed-text>
+					</widget>
+
+               <!-- Wall clock limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Wall clock limit:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER"  attribute="LL_WALL_CLOCK_LIMIT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LL_WALL_CLOCK_LIMIT#description}</fixed-text>
 					</widget>
 					
 				</composite>
