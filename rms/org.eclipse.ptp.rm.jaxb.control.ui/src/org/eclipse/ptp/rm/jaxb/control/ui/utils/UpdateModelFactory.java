@@ -343,7 +343,13 @@ public class UpdateModelFactory {
 			choice = a.getChoice();
 			itemsFrom = a.getItemsFrom();
 			min = a.getMin();
+			if (min == null) {
+				min = 0;
+			}
 			max = a.getMax();
+			if (max == null) {
+				max = Integer.MAX_VALUE;
+			}
 			translateBooleanAs = a.getTranslateBooleanAs();
 		}
 
