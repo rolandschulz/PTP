@@ -361,7 +361,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			return false;
 		}
 
-		IProject handle = ResourcesPlugin.getWorkspace().getRoot().getProject(projectNameField.getText());
+		IProject handle = ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName());
 		URI location = URIUtil.toURI(projectLocationField.getText());
 
 		// Check if project exists
@@ -799,6 +799,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			@Override
 			public void handleEvent(Event e) {
 				setProjectLocation();
+				if (fSelectedParticipant != null) {
+					fSelectedParticipant.setProjectName(getProjectName());
+				}
 				setPageComplete(validatePage());
 				getWizard().getContainer().updateMessage();
 			}
@@ -869,13 +872,15 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
 		fSelectedParticipant = providers[0].getParticipant();
 		fSelectedParticipant.createConfigurationArea(locationGroup, getWizard().getContainer());
+		// Without this, participant uses the old project name from the last time it was invoked.
+		fSelectedParticipant.setProjectName(""); //$NON-NLS-1$
 	}
 
 	// Decides what should appear in project location field and whether or not it should be enabled
 	private void setProjectLocation() {
 		// Build string if default location is indicated.
 		if (defaultLocationButton.getSelection()) {
-			projectLocationField.setText(Platform.getLocation().toOSString() + File.separator + projectNameField.getText());
+			projectLocationField.setText(Platform.getLocation().toOSString() + File.separator + getProjectName());
 			// If user just unchecked default location, erase field contents.
 		} else if (!projectLocationField.isEnabled()) {
 			projectLocationField.setText(""); //$NON-NLS-1$
