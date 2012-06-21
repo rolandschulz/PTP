@@ -111,6 +111,10 @@ my %mapping = (
 my $cmd="/usr/bin/llstatus";
 $cmd=$ENV{"CMD_NODEINFO"} if($ENV{"CMD_NODEINFO"}); 
 
+# Ensure llstatus generates machine level output (default changed in LL 5.1)
+# See bug 382735.
+$ENV{"LOADL_STATUS_LEVEL"} = "machine";
+
 open(IN," $cmd -l |");
 my $nodeid="-";
 my $lastkey="-";
@@ -122,32 +126,35 @@ while($line=<IN>) {
     next if ($line=~/^\=+$/);
 
     if($line=~/^\s*Machine\s*[=]\s*$patwrd/) {
-	$nodeid=$1;
-	$nodeid=~s/\..*$//gs;  # remove domain
-	$nodes{$nodeid}{id}=$nodeid;
+		$nodeid=$1;
+# LL seems to use full domain name for job id, don't remove
+#		$nodeid=~s/\..*$//gs;  # remove domain
+		$nodes{$nodeid}{id}=$nodeid;
 #	print "line $line\n";
-    } elsif($line=~/^\s*([^\=\s]+)\s+\=\s+(.*)$/) {
-	($key,$value)=($1,$2);
-	$key=~s/\s/_/gs;
-	$lastkey=$key;
-	$nodes{$nodeid}{$key}=$value;
+    } elsif($line=~/^\s*([^\=\s]+(\s*[^\=\s]+)*)\s*\=\s+(.*)$/) {
+		($key,$value)=($1,$3);
+		$key=~s/\s/_/gs;
+		$lastkey=$key;
+		$nodes{$nodeid}{$key}=$value;
     } else {
-	$line=~s/^\s*//gs;
-	$nodes{$nodeid}{$lastkey}.=$line;
+		$line=~s/^\s*//gs;
+		$nodes{$nodeid}{$lastkey}.=$line;
     }
 }
 close(IN);
+
+# Remove any unknown nodes
+delete $nodes{"-"};
 
 # add unknown but manatory attributes to nodes
 foreach $nodeid (keys(%nodes)) {
     my($key,$value,$pair);
     if(exists($nodes{$nodeid}{status})) {
-	foreach $pair (split(/,/,$nodes{$nodeid}{status})) {
-	    ($key,$value)=split(/=/,$pair);
-	    $nodes{$nodeid}{$key}=$value;
-	}
+		foreach $pair (split(/,/,$nodes{$nodeid}{status})) {
+		    ($key,$value)=split(/=/,$pair);
+		    $nodes{$nodeid}{$key}=$value;
+		}
     } 
-
 }
 
 open(OUT,"> $filename") || die "cannot open file $filename";
@@ -166,18 +173,18 @@ printf(OUT "<information>\n");
 foreach $nodeid (sort(keys(%nodes))) {
     printf(OUT "<info oid=\"nd%06d\" type=\"short\">\n",$nodenr{$nodeid});
     foreach $key (sort(keys(%{$nodes{$nodeid}}))) {
-	if(exists($mapping{$key})) {
-	    if($mapping{$key} ne "") {
-		$value=&modify($key,$mapping{$key},$nodes{$nodeid}{$key});
-		if($value) {
-		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",$value);
+		if(exists($mapping{$key})) {
+		    if($mapping{$key} ne "") {
+				$value=&modify($key,$mapping{$key},$nodes{$nodeid}{$key});
+				if($value) {
+				    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",$value);
+				}
+		    } else {
+				$notmappedkeys{$key}++;
+	    	}
+		} else {
+		    $notfoundkeys{$key}++;
 		}
-	    } else {
-		$notmappedkeys{$key}++;
-	    }
-	} else {
-	    $notfoundkeys{$key}++;
-	}
     }
     printf(OUT "</info>\n");
 }
@@ -198,52 +205,52 @@ sub modify {
     my $ret=$value;
 
     if($mkey eq "owner") {
-	$ret=~s/\@.*//gs;
+		$ret=~s/\@.*//gs;
     }
 
     if($mkey eq "state") {
-	$ret="Running"  if ($value eq "Running");
-	$ret="Down"     if ($value eq "Down");
-	$ret="Idle"     if ($value eq "Idle");
-	$ret="unknown"  if ($value eq "unknown");
+		$ret="Running"  if ($value eq "Running");
+		$ret="Down"     if ($value eq "Down");
+		$ret="Idle"     if ($value eq "Idle");
+		$ret="unknown"  if ($value eq "unknown");
     }
 
     if(($mkey eq "wall") || ($mkey eq "wallsoft")) {
-	if($value=~/\($patint seconds\)/) {
-	    $ret=$1;
-	}
-	if($value=~/$patint minutes/) {
-	    $ret=$1*60;
-	}
-	if($value=~/^$patint[:]$patint[:]$patint$/) {
-	    $ret=$1*60*60+$2*60+$3;
-	}
+		if($value=~/\($patint seconds\)/) {
+		    $ret=$1;
+		}
+		if($value=~/$patint minutes/) {
+		    $ret=$1*60;
+		}
+		if($value=~/^$patint[:]$patint[:]$patint$/) {
+		    $ret=$1*60*60+$2*60+$3;
+		}
     }
 
     if($mkey eq "nodelist") {
-	if($ret ne "-") {
-	    $ret=~s/\//,/gs;
-	    my @nodes = split(/\+/,$ret);
-	    $ret="(".join(')(',@nodes).")";
-	}
+		if($ret ne "-") {
+		    $ret=~s/\//,/gs;
+		    my @nodes = split(/\+/,$ret);
+		    $ret="(".join(')(',@nodes).")";
+		}
     }
 
     if($mkey eq "totalcores") {
-	if($ret=~/$patint[:]ppn=$patint/) {
-	    $ret=$1*$2;
-	}
+		if($ret=~/$patint[:]ppn=$patint/) {
+		    $ret=$1*$2;
+		}
     }
     if($mkey eq "totaltasks") {
-	if($ret=~/$patint[:]ppn=$patint/) {
-	    $ret=$1*$2;
-	}
+		if($ret=~/$patint[:]ppn=$patint/) {
+		    $ret=$1*$2;
+		}
     }
 
     if(($mkey eq "comment")) {
-	$ret=~s/\"//gs;
+		$ret=~s/\"//gs;
     }
     if(($mkey eq "bgp_state")) {
-	$ret=~s/\<unknown\>/unknown/gs;
+		$ret=~s/\<unknown\>/unknown/gs;
     }
 
     return($ret);
