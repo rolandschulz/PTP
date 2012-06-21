@@ -248,9 +248,12 @@
 			<stdout-parser delim="\n" all="true" save="1">
 				<target ref="@jobId">
 					<match>
-						<expression>^llsubmit: The job "(.*)" has been submitted.*$</expression>
+						<expression>^llsubmit: The job "(.*)" (with [0-9]+ job steps )?has been submitted.*$</expression>
 						<append field="name">
 							<entry valueGroup="1"/>
+						</append>
+						<append field="name">
+							<entry value=".0"/>
 						</append>
 						<set field="default">
 							<entry valueGroup="1"/>

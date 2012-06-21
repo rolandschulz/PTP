@@ -352,7 +352,9 @@ public class CommandJob extends Job implements ICommandJob {
 				stderrT.join();
 			} catch (InterruptedException ignored) {
 			}
-			t = stderrTokenizer.getInternalError();
+			if (t == null) {
+				t = stderrTokenizer.getInternalError();
+			}
 		}
 
 		if (t != null) {
@@ -998,7 +1000,7 @@ public class CommandJob extends Job implements ICommandJob {
 				return Status.CANCEL_STATUS;
 			}
 
-			if (uuid == null) {
+			if (uuid == null || !status.isOK()) {
 				/*
 				 * these jobs will have waited for the exit of the process.
 				 */
