@@ -137,11 +137,13 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<arg>-l nodes=1,mem=${ptp_rm:Resource_List.mem#value},walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			<arg isUndefinedIfMatches="-A">-A ${ptp_rm:Account_Name#value}</arg>
 			<arg>-V</arg>
-			<input>cd ${ptp_rm:executableDirectory#value} &amp;&amp; perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</input>
+			<input>cd ${ptp_rm:executableDirectory#value} &amp;&amp; perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_job.pl</input>
+			<input>mpirun</input>
 			<input isUndefinedIfMatches="-np">-np ${ptp_rm:mpiNumberOfProcesses#value}</input>
 			<input>-hostfile $PBS_NODEFILE</input>
 			<input>${ptp_rm:debuggerExecutablePath#value}</input>
 			<input>${ptp_rm:debuggerArgs#value}</input>
+			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
 			<environment name="OMPI_MCA_btl_openib_flags" value="1"/>
 			<environment name="OMPI_MCA_btl_mpi_leave_pinned" value="0"/>
 			<environment name="OMPI_MCA_btl_openib_warn_default_gid_prefix" value="0"/>
