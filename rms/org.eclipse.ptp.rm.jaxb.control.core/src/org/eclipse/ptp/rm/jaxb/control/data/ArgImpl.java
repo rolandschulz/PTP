@@ -100,7 +100,7 @@ public class ArgImpl {
 			return arg.getContent();
 		}
 		String dereferenced = map.getString(uuid, arg.getContent());
-		if (EnvManagerConfigString.isEnvMgmtConfigString(dereferenced)) {
+		if (dereferenced != null && !dereferenced.equals("") && EnvManagerConfigString.isEnvMgmtConfigString(dereferenced)) {
 			IEnvManager mgr = map.getEnvManager();
 			if (mgr != null) {
 				dereferenced = mgr.getBashConcatenation("\n", false, new EnvManagerConfigString(dereferenced), //$NON-NLS-1$

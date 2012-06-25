@@ -18,9 +18,11 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
@@ -138,7 +140,13 @@ public class RMVariableMap implements IVariableMap {
 	private final Map<String, AttributeType> variables;
 	private final Map<String, AttributeType> discovered;
 	private boolean initialized;
+	
+	/** Environment manager for this connection, or <code>null</code> */
 	private IEnvManager envManager;
+	
+	/** A connection from which an environment management system can be detected at a later point in time,
+	 *  if necessary.  Used when {@link #envManager} is <code>null</code>. */
+	private IRemoteConnection envManagerConnection;
 
 	public RMVariableMap() {
 		this.variables = Collections.synchronizedMap(new TreeMap<String, AttributeType>());
@@ -198,6 +206,9 @@ public class RMVariableMap implements IVariableMap {
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getEnvManager()
 	 */
 	public IEnvManager getEnvManager() {
+		if (envManager == null && envManagerConnection != null) {
+			envManager = EnvManagerRegistry.getEnvManager(new NullProgressMonitor(), envManagerConnection);
+		}
 		return envManager;
 	}
 
@@ -331,8 +342,9 @@ public class RMVariableMap implements IVariableMap {
 
 	}
 
-	public void setEnvManager(IEnvManager mgr) {
-		this.envManager = mgr;
+	public void setEnvManagerFromConnection(IRemoteConnection connection) {
+		this.envManager = null;
+		this.envManagerConnection = connection;
 	}
 
 	/*

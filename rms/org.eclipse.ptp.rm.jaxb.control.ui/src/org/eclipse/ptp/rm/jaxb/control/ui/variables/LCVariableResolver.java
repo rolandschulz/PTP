@@ -47,7 +47,7 @@ public class LCVariableResolver implements IDynamicVariableResolver {
 			}
 			Object value = active.getValue(argument);
 			if (value != null) {
-				if (value instanceof String && EnvManagerConfigString.isEnvMgmtConfigString((String) value)) {
+				if (value instanceof String && !((String)value).equals("") && EnvManagerConfigString.isEnvMgmtConfigString((String) value)) {
 					IEnvManager envMgr = active.getEnvironmentManager();
 					if (envMgr != null) {
 						return envMgr.getBashConcatenation("\n", false, new EnvManagerConfigString((String) value), //$NON-NLS-1$
