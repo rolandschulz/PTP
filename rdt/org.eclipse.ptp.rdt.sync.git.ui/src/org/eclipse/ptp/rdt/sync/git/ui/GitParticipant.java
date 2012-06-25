@@ -251,12 +251,12 @@ public class GitParticipant implements ISynchronizeParticipant {
 			// Handle files specially. Assume a file if there is no project to
 			// query
 			if (defaultURI != null && defaultURI.getScheme().equals(FILE_SCHEME)) {
-				return Platform.getLocation().append(fProjectName).toOSString();
+				return Platform.getLocation().append(fProjectName).toString();
 			}
 			if (defaultURI == null) {
 				return ""; //$NON-NLS-1$
 			}
-			return new Path(defaultURI.getPath()).append(fProjectName).toOSString();
+			return new Path(defaultURI.getPath()).append(fProjectName).toString();
 		}
 		return ""; //$NON-NLS-1$
 	}
