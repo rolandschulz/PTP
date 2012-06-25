@@ -378,7 +378,7 @@ public abstract class AbstractEnvManager implements IEnvManager {
 		PrintStream out = null;
 		try {
 			out = new PrintStream(new BufferedOutputStream(script.openOutputStream(EFS.NONE, null)));
-			out.println("#!/bin/bash"); //$NON-NLS-1$
+			out.println("#!/bin/bash --login"); //$NON-NLS-1$
 			out.println("echo ''"); //$NON-NLS-1$
 			out.println("echo '**** Environment configuration script temporarily stored in " + pathToTempFile + " ****'"); //$NON-NLS-1$ //$NON-NLS-2$
 			if (config.isEnvMgmtEnabled()) {
