@@ -18,6 +18,7 @@ use Time::Local;
 use Time::HiRes qw ( time );
 
 use LML_ndtree;
+use LML_da_util;
 
 sub new {
     my $self    = {};
@@ -227,12 +228,14 @@ sub read_lml_fast {
 	} elsif($tag=~/<([^\s]+)(\s(.*)[^\/])$/) {
 	    $tagname=$1;
 	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;$rest=~s/\s+\=\"/\=\"/gs;
+	    $rest=&LML_da_util::escape_special_characters($rest) if($tagname=~/(select)/);
 #	    print "TAG1: '$tagname' rest='$rest'\n";
 	    $self->lml_start($self->{DATA},$tagname,split(/=?\"\s*/,$rest));
 	} elsif($tag=~/<([^\s\/]+)(\s(.*)\s?)\/$/) {
 	    $tagname=$1;
 	    $rest=$2;$rest=~s/^\s*//gs;$rest=~s/\s*$//gs;$rest=~s/\=\s+\"/\=\"/gs;$rest=~s/\s+\=\"/\=\"/gs;
 #	    print "TAG2: '$tagname' rest='$rest' closed\n";
+	    $rest=&LML_da_util::escape_special_characters($rest) if($tagname=~/(select)/);
 	    $self->lml_start($self->{DATA},$tagname,split(/=?\"\s*/,$rest));
 	    $self->lml_end($self->{DATA},$tagname,());
 	} elsif($tag=~/<([^\s\/]+)\/$/) {
@@ -252,20 +255,20 @@ sub read_lml_fast {
 
 }
 
-
 sub lml_start {
     my $self=shift; # object reference
     my $o   =shift;
     my $name=shift;
     my($k,$v,$actnodename,$id,$cid,$oid);
 
-#    print "LML_file_obj: lml_start >$name< \n";
 
     if($name eq "!--") {
 	# a comment
 	return(1);
     }
     my %attr=(@_);
+
+#   print "LML_file_obj: lml_start >$name< ",Dumper(\%attr),"\n";
 
     if($name eq "lml:lgui") {
 	foreach $k (sort keys %attr) {
@@ -669,7 +672,11 @@ sub write_lml {
 		    printf(OUT ">\n");
 		    printf(OUT " <pattern>\n");
 		    foreach $ref (@{$table->{column}->{$k}->{pattern}}) {
-			printf(OUT " <%s regexp=\"%s\"/>\n",$ref->[0],$ref->[1]);
+			printf(OUT " <%s regexp=\"%s\"/>\n",$ref->[0],$ref->[1]) if (($ref->[0] eq "include") || ($ref->[0] eq "exclude") );
+			printf(OUT " <%s rel=\"%s\" value=\"%s\"/>\n",
+			       $ref->[0],
+			       &LML_da_util::unescape_special_characters($ref->[1]),
+			       ,$ref->[2]) if (($ref->[0] eq "select") );
 		    }
 		    
 		    printf(OUT " </pattern>\n");

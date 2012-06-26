@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -57,6 +58,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.PaneType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.PatternMatchType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.PatternType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SelectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SplitlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TablelayoutType;
@@ -377,12 +379,16 @@ public class JAXBUtil {
 
 	}
 
-	public void addPatternInclude(PatternType pattern,
-			PatternMatchType patternMatch) {
-		pattern.getIncludeAndExclude().add(
+	public void addPatternInclude(PatternType pattern, PatternMatchType patternMatch) {
+		pattern.getIncludeAndExcludeAndSelect().add(
 				new JAXBElement<PatternMatchType>(new QName(
 						ILMLCoreConstants.INCLUDE_ELEMENT),
 						PatternMatchType.class, patternMatch));
+	}
+
+	public void addPatternSelect(PatternType pattern, SelectType select) {
+		pattern.getIncludeAndExcludeAndSelect().add(
+				new JAXBElement<SelectType>(new QName(ILMLCoreConstants.SELECT_ELEMENT), SelectType.class, select));
 	}
 
 	public void addTable(LguiType lgui, TableType table) {
@@ -431,6 +437,16 @@ public class JAXBUtil {
 			list.add(element.getValue());
 		}
 		return list;
+	}
+
+	public List<SelectType> getSelects(List<JAXBElement<?>> listOfPatternElements) {
+		final LinkedList<SelectType> selectsList = new LinkedList<SelectType>();
+		for (final JAXBElement<?> patternElement : listOfPatternElements) {
+			if (patternElement.getValue() instanceof SelectType) {
+				selectsList.add((SelectType) patternElement.getValue());
+			}
+		}
+		return selectsList;
 	}
 
 	public void marshal(LguiType lgui, OutputStream output) {

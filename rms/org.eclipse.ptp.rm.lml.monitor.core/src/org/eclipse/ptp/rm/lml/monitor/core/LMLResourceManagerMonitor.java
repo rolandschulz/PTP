@@ -13,11 +13,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -49,12 +45,10 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
-import org.eclipse.ptp.rm.lml.core.model.IPattern;
 import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
 import org.eclipse.ptp.rm.lml.internal.core.elements.CommandType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.DriverType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
-import org.eclipse.ptp.rm.lml.internal.core.model.Pattern;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
 import org.eclipse.ptp.rm.lml.monitor.core.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
@@ -285,33 +279,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		return jobs.toArray(new JobStatusData[jobs.size()]);
 	}
 
-	private Map<String, List<IPattern>> reloadPattern(IMemento memento) {
-		final Map<String, List<IPattern>> pattern = new HashMap<String, List<IPattern>>();
-		if (memento != null) {
-			final IMemento[] childrenPattern = memento.getChildren(PATTERN_GID_ATTR);
-			for (final IMemento childPattern : childrenPattern) {
-				final List<IPattern> filters = new LinkedList<IPattern>();
-				final IMemento[] childrenFilter = childPattern.getChildren(FILTER_TITLE_ATTR);
-				for (final IMemento childFilter : childrenFilter) {
-					final IPattern filter = new Pattern(childFilter.getID(), childFilter.getString(FILTER_TYPE_ATTR));
-					if (childFilter.getBoolean(FILTER_RANGE_ATTR)) {
-						filter.setRange(childFilter.getString(FILTER_MIN_VALUE_RANGE_ATTR),
-								childFilter.getString(FILTER_MAX_VALUE_RANGE_ATTR));
-					} else if (childFilter.getBoolean(FILTER_RELATION_ATTR)) {
-						filter.setRelation(childFilter.getString(FILTER_RELATION_OPERATOR_ATTR),
-								childFilter.getString(FILTER_RELATION_VALUE_ATTR));
-					}
-					filters.add(filter);
-				}
-
-				if (filters.size() > 0) {
-					pattern.put(childPattern.getID(), filters);
-				}
-			}
-		}
-		return pattern;
-	}
-
 	private void saveJob(JobStatusData job, XMLMemento memento) {
 		final IMemento jobMemento = memento.createChild(JobStatusData.JOB_ID_ATTR, job.getJobId());
 		jobMemento.putString(JobStatusData.CONTROL_TYPE_ATTR, job.getControlType());
@@ -324,23 +291,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		jobMemento.putString(JobStatusData.OWNER_ATTR, job.getOwner());
 		jobMemento.putString(JobStatusData.OID_ATTR, job.getOid());
 
-	}
-
-	private void savePattern(String key, List<IPattern> value, IMemento memento) {
-		final IMemento patternMemento = memento.createChild(PATTERN_GID_ATTR, key);
-		for (final IPattern filterValue : value) {
-			final IMemento filterMemento = patternMemento.createChild(FILTER_TITLE_ATTR, filterValue.getColumnTitle());
-			filterMemento.putString(FILTER_TYPE_ATTR, filterValue.getType());
-			filterMemento.putBoolean(FILTER_RANGE_ATTR, filterValue.isRange());
-			filterMemento.putBoolean(FILTER_RELATION_ATTR, filterValue.isRelation());
-			if (filterValue.isRange()) {
-				filterMemento.putString(FILTER_MIN_VALUE_RANGE_ATTR, filterValue.getMinValueRange());
-				filterMemento.putString(FILTER_MAX_VALUE_RANGE_ATTR, filterValue.getMaxValueRange());
-			} else if (filterValue.isRelation()) {
-				filterMemento.putString(FILTER_RELATION_OPERATOR_ATTR, filterValue.getRelationOperator());
-				filterMemento.putString(FILTER_RELATION_VALUE_ATTR, filterValue.getRelationValue());
-			}
-		}
 	}
 
 	/*
@@ -393,7 +343,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 			String qualifier = getResourceManager().getUniqueName();
 			final String layout = fLMLManager.getCurrentLayout(qualifier);
 			final JobStatusData[] jobs = fLMLManager.getUserJobs(qualifier);
-			final Map<String, List<IPattern>> patternMap = fLMLManager.getCurrentPattern(qualifier);
 
 			if (layout != null) {
 				final IMemento layoutMemento = memento.createChild(LAYOUT);
@@ -405,12 +354,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 					if (!status.isRemoved()) {
 						saveJob(status, memento);
 					}
-				}
-			}
-
-			if (patternMap != null && patternMap.keySet().size() > 0) {
-				for (final Entry<String, List<IPattern>> pattern : patternMap.entrySet()) {
-					savePattern(pattern.getKey(), pattern.getValue(), memento);
 				}
 			}
 		}
@@ -458,7 +401,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 
 		String layout = new String();
 		JobStatusData[] jobs = null;
-		Map<String, List<IPattern>> pattern = null;
 
 		if (memento != null) {
 			final IMemento childLayout = memento.getChild(LAYOUT);
@@ -466,7 +408,6 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 				layout = childLayout.getString(LAYOUT_STRING);
 			}
 
-			pattern = reloadPattern(memento);
 			jobs = reloadJobs(memento);
 		}
 		final IRemoteConnection conn = getRemoteConnection(monitor);
@@ -491,7 +432,7 @@ public class LMLResourceManagerMonitor extends AbstractResourceManagerMonitor {
 		 * Initialize LML classes
 		 */
 		fLMLManager.openLgui(getResourceManager().getUniqueName(), conn.getUsername(), getMonitorConfigurationRequestType(),
-				layout, jobs, pattern);
+				layout, jobs);
 
 		/*
 		 * Start monitoring job

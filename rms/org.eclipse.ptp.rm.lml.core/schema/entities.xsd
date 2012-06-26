@@ -60,15 +60,16 @@ The color defines with which color this object is identified and painted.</docum
     		</documentation>
     	</annotation>
     	<restriction base="string">
-    		<enumeration value="job"/>
-    		<enumeration value="node"/>
-    		<enumeration value="system"/>
-    		<enumeration value="queue"/>
-    		<enumeration value="scheduler"/>
-    		<enumeration value="class"/>
-    		<enumeration value="partition"/>
-    		<enumeration value="partmap"/>
-    		<enumeration value="smallpartition"/>
+    		<enumeration value="job" />
+    		<enumeration value="node" />
+    		<enumeration value="system" />
+    		<enumeration value="queue" />
+    		<enumeration value="scheduler" />
+    		<enumeration value="class" />
+    		<enumeration value="partition" />
+    		<enumeration value="partmap" />
+    		<enumeration value="smallpartition" />
+    		<enumeration value="reservation"></enumeration>
     	</restriction>
     </simpleType>
 

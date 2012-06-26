@@ -11,6 +11,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.core.model.IPattern;
@@ -36,8 +37,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * Implementation of the Dialog to set filters for the TableView.
+ */
 public class FilterDialog extends Dialog {
 
+	/**
+	 * Implementation of a dialog to choose a date of the format yyyy-mm-dd hh:mm:ss
+	 * 
+	 * The choosen date will than we displayed on a given button.
+	 */
 	public class SelectDateAdpater extends SelectionAdapter {
 
 		private final Button button;
@@ -89,10 +98,11 @@ public class FilterDialog extends Dialog {
 			ok.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					final NumberFormat formatter = new DecimalFormat("00"); //$NON-NLS-1$
-					button.setText(calendar.getYear() + "-" + formatter.format(calendar.getMonth() + 1) + "-" //$NON-NLS-1$ //$NON-NLS-2$
-							+ formatter.format(calendar.getDay()) + " " + formatter.format(time.getHours()) + ":" //$NON-NLS-1$ //$NON-NLS-2$
-							+ formatter.format(time.getMinutes()) + ":" + formatter.format(time.getSeconds())); //$NON-NLS-1$
+					final NumberFormat formatter = new DecimalFormat(ILMLCoreConstants.Z2);
+					button.setText(calendar.getYear() + ILMLCoreConstants.HYPH + formatter.format(calendar.getMonth() + 1)
+							+ ILMLCoreConstants.HYPH + formatter.format(calendar.getDay()) + ILMLCoreConstants.SP
+							+ formatter.format(time.getHours()) + ILMLCoreConstants.CO + formatter.format(time.getMinutes())
+							+ ILMLCoreConstants.CO + formatter.format(time.getSeconds()));
 					date = button.getText();
 					dialog.close();
 				}
@@ -104,7 +114,7 @@ public class FilterDialog extends Dialog {
 			delete.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					button.setText(""); //$NON-NLS-1$
+					button.setText(ILMLCoreConstants.EMPTY);
 					date = new String();
 					dialog.close();
 				}
@@ -134,6 +144,11 @@ public class FilterDialog extends Dialog {
 
 	}
 
+	/**
+	 * Array of the a structure containing UI-Elements.
+	 * 
+	 * For every visible column in the TableView one FilterDataRow is created.
+	 */
 	private FilterDataRow[] filterData;
 
 	private final ILguiItem lguiItem;
@@ -141,24 +156,21 @@ public class FilterDialog extends Dialog {
 
 	private final Shell shell;
 
+	private boolean filtered = false;
+
+	/**
+	 * List of the previous filters
+	 */
 	private final List<IPattern> filterOld;
 
 	public FilterDialog(Shell parentShell, String gid) {
 		super(parentShell);
 		lguiItem = LMLManager.getInstance().getSelectedLguiItem();
 		this.gid = gid;
-		filterOld = lguiItem.getPattern(gid);
+		filterOld = lguiItem.getTableHandler().getPattern(gid);
+
 		setShellStyle(SWT.RESIZE | SWT.APPLICATION_MODAL);
 		this.shell = parentShell;
-	}
-
-	private boolean includeStatus(ITableColumnLayout[] columnLayouts) {
-		for (final ITableColumnLayout columnLayout : columnLayouts) {
-			if (columnLayout.getTitle().equals(ILMLUIConstants.COLUMN_STATUS)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/*
@@ -171,8 +183,11 @@ public class FilterDialog extends Dialog {
 
 		if (buttonId == IDialogConstants.CANCEL_ID) {
 			// Cancel Button
-			lguiItem.setPattern(gid, filterOld);
-			LMLManager.getInstance().filterLgui(gid, filterOld);
+
+			if (filtered) {
+				LMLManager.getInstance().filterLgui(gid, new LinkedList<IPattern>());
+			}
+
 			close();
 			return;
 		}
@@ -183,35 +198,37 @@ public class FilterDialog extends Dialog {
 			if (!row.isCheckboxSet()) {
 				continue;
 			}
-			if (row.getType().equals("alpha")) { //$NON-NLS-1$
-				if (row.getRelationValueTextAlpha().getText().equals("")) { //$NON-NLS-1$
+			if (row.getType().equals(ILMLCoreConstants.TABLECOLUMN_ALPHA)) {
+				if (row.getRelationValueTextAlpha().getText().equals(ILMLCoreConstants.EMPTY)
+						|| row.getRelationValueTextAlpha().getText().equals(ILMLCoreConstants.QM)) {
 					error = true;
 					break;
 				}
 			} else {
 				if (row.getRadioButtonRelation().getSelection()) {
-					if (row.getType().equals("numeric")) { //$NON-NLS-1$
-						if (row.getRelationValueTextNumeric().getText().equals("")) { //$NON-NLS-1$
+					if (row.getType().equals(ILMLCoreConstants.TABLECOLUMN_NUMERIC)) {
+						if (row.getRelationValueTextNumeric().getText().equals(ILMLCoreConstants.EMPTY)) {
 							error = true;
 							break;
 						}
-					} else if (row.getType().equals("date")) { //$NON-NLS-1$
-						if (row.getRelationValueButtonDate().getText().equals("")) { //$NON-NLS-1$
+					} else if (row.getType().equals(ILMLCoreConstants.TABLECOLUMN_DATE)) {
+						if (row.getRelationValueButtonDate().getText().equals(ILMLCoreConstants.EMPTY)) {
 							error = true;
 							break;
 						}
 					}
 				} else if (row.getRadioButtonRange().getSelection()) {
-					if (row.getType().equals("numeric")) { //$NON-NLS-1$
-						if (row.getMinValueTextNumeric().getText().equals("") //$NON-NLS-1$
-								|| row.getMaxValueTextNumeric().equals("") //$NON-NLS-1$
+					if (row.getType().equals(ILMLCoreConstants.TABLECOLUMN_NUMERIC)) {
+						if (row.getMinValueTextNumeric().getText().equals(ILMLCoreConstants.EMPTY)
+								|| row.getMaxValueTextNumeric().equals(ILMLCoreConstants.EMPTY)
 								|| (Integer.parseInt(row.getMinValueTextNumeric().getText()) >= Integer.parseInt(row
 										.getMaxValueTextNumeric().getText()))) {
 							error = true;
 							break;
 						}
-					} else if (row.getType().equals("date")) { //$NON-NLS-1$
-						if (row.getMinValueButtonDate().getText().equals("") || row.getMaxValueButtonDate().equals("") //$NON-NLS-1$ //$NON-NLS-2$
+					} else if (row.getType().equals(ILMLCoreConstants.TABLECOLUMN_DATE)) {
+						if (row.getMinValueButtonDate().getText().equals(ILMLCoreConstants.EMPTY)
+								|| row.getMaxValueButtonDate().equals(ILMLCoreConstants.EMPTY)
 								|| (row.getMinValueButtonDate().getText().compareTo(row.getMaxValueButtonDate().getText()) >= 0)) {
 							error = true;
 							break;
@@ -238,24 +255,24 @@ public class FilterDialog extends Dialog {
 				continue;
 			}
 			final IPattern pattern = new Pattern(row.getTitle(), row.getType());
-			if (row.getType().equals("alpha")) { //$NON-NLS-1$
+			if (row.getType().equals(ILMLCoreConstants.TABLECOLUMN_ALPHA)) {
 				pattern.setRelation(row.getRelationComboAlpha().getText(), row.getRelationValueTextAlpha().getText());
 				complete = true;
 			} else {
 				if (row.getRadioButtonRelation().getSelection()) {
-					if (row.getType().equals("numeric")) { //$NON-NLS-1$
+					if (row.getType().equals(ILMLCoreConstants.TABLECOLUMN_NUMERIC)) {
 						pattern.setRelation(row.getRelationComboNumericDate().getText(), row.getRelationValueTextNumeric()
 								.getText());
 						complete = true;
-					} else if (row.getType().equals("date")) { //$NON-NLS-1$
+					} else if (row.getType().equals(ILMLCoreConstants.TABLECOLUMN_DATE)) {
 						pattern.setRelation(row.getRelationComboNumericDate().getText(), row.getRelationValueButtonDate().getText());
 						complete = true;
 					}
 				} else if (row.getRadioButtonRange().getSelection()) {
-					if (row.getType().equals("numeric")) { //$NON-NLS-1$
+					if (row.getType().equals(ILMLCoreConstants.TABLECOLUMN_NUMERIC)) {
 						pattern.setRange(row.getMinValueTextNumeric().getText(), row.getMaxValueTextNumeric().getText());
 						complete = true;
-					} else if (row.getType().equals("date")) { //$NON-NLS-1$
+					} else if (row.getType().equals(ILMLCoreConstants.TABLECOLUMN_NUMERIC)) {
 						pattern.setRange(row.getMinValueButtonDate().getText(), row.getMaxValueButtonDate().getText());
 						complete = true;
 					}
@@ -266,11 +283,22 @@ public class FilterDialog extends Dialog {
 			}
 		}
 
-		lguiItem.setPattern(gid, filterValues);
+		if (buttonId == IDialogConstants.OK_ID) {
+			// Okay Button
+			// Setting Patterns to enable filtering on server side
+			if (lguiItem != null && lguiItem.getTableHandler() != null) {
+				lguiItem.lockPattern();
+				lguiItem.getTableHandler().deleteOldPattern(gid);
+				lguiItem.getTableHandler().generateNewPattern(gid, filterValues);
+				lguiItem.unlockPattern();
+			}
+		}
+
+		// Filtering on client side
+		filtered = true;
 		LMLManager.getInstance().filterLgui(gid, filterValues);
 
 		if (buttonId == IDialogConstants.OK_ID) {
-			// Okay Button
 			close();
 		}
 
@@ -330,19 +358,14 @@ public class FilterDialog extends Dialog {
 			return composite;
 		}
 
-		int length = columnLayouts.length;
-		if (gid.equals(ILMLUIConstants.ID_ACTIVE_JOBS_VIEW) && includeStatus(columnLayouts)) {
-			length = length - 1;
-		}
-
-		filterData = new FilterDataRow[length];
+		filterData = new FilterDataRow[columnLayouts.length];
 
 		final VerifyListener numericListener = new VerifyListener() {
 
 			@Override
 			public void verifyText(VerifyEvent e) {
 				final String s = ((Text) e.widget).getText() + e.text;
-				e.doit = s.matches("0|([1-9][0-9]*)"); //$NON-NLS-1$
+				e.doit = s.matches(ILMLUIConstants.VERIFY_TEXT_NUMERIC);
 			}
 		};
 
@@ -351,19 +374,13 @@ public class FilterDialog extends Dialog {
 			@Override
 			public void verifyText(VerifyEvent e) {
 				final String s = ((Text) e.widget).getText() + e.text;
-				e.doit = s.matches(".+"); //$NON-NLS-1$
+				e.doit = s.matches(ILMLUIConstants.VERIFY_TEXT_ALPHA);
 			}
 		};
 
 		composite.setLayout(new GridLayout(2, false));
 
-		int dif = 0;
 		for (int i = 0; i < columnLayouts.length; i++) {
-			if (gid.equals(ILMLUIConstants.ID_ACTIVE_JOBS_VIEW)
-					&& columnLayouts[i].getTitle().equals(ILMLUIConstants.COLUMN_STATUS)) {
-				dif = 1;
-				continue;
-			}
 
 			final String type = columnLayouts[i].getOrder();
 
@@ -374,12 +391,13 @@ public class FilterDialog extends Dialog {
 
 			final FilterDataRow row = new FilterDataRow(type, checkbox);
 
-			if (type == "alpha") { //$NON-NLS-1$
+			if (type == ILMLCoreConstants.TABLECOLUMN_ALPHA) {
 				// Input in text elements with choosing a relation operator before
 				final Composite compositeText = new Composite(composite, SWT.NONE);
 				compositeText.setLayout(new GridLayout(2, false));
 				final Combo relationCombo = new Combo(compositeText, SWT.READ_ONLY);
-				relationCombo.setItems(new String[] { "=", "!=", "=~", "!~" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				relationCombo.setItems(new String[] { ILMLCoreConstants.EQ, ILMLCoreConstants.NEQ, ILMLCoreConstants.SI,
+						ILMLCoreConstants.NSI });
 				relationCombo.select(0);
 				relationCombo.setLayoutData(new GridData());
 				relationCombo.setEnabled(false);
@@ -407,14 +425,15 @@ public class FilterDialog extends Dialog {
 				final Composite compositeRelation = new Composite(compositeRadio, SWT.NONE);
 				compositeRelation.setLayout(new GridLayout(2, false));
 				final Combo relations = new Combo(compositeRelation, SWT.READ_ONLY);
-				relations.setItems(new String[] { "=", "<", "<=", ">", ">=", "!=" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+				relations.setItems(new String[] { ILMLCoreConstants.EQ, ILMLCoreConstants.LT, ILMLCoreConstants.LE,
+						ILMLCoreConstants.GT, ILMLCoreConstants.GE, ILMLCoreConstants.NEQ });
 				relations.select(0);
 
 				relations.setEnabled(false);
 				relations.setLayoutData(new GridData(GridData.FILL));
 				row.addRelationComboNumericDate(relations);
 
-				if (type == "numeric") { //$NON-NLS-1$
+				if (type == ILMLCoreConstants.TABLECOLUMN_NUMERIC) {
 					final Text relationValueText = new Text(compositeRelation, SWT.SINGLE | SWT.TRAIL);
 					relationValueText.addVerifyListener(numericListener);
 					relationValueText.setEnabled(false);
@@ -460,15 +479,14 @@ public class FilterDialog extends Dialog {
 
 				final Composite compositeRange = new Composite(compositeRadio, SWT.NONE);
 				compositeRange.setLayout(new GridLayout(3, false));
-				if (type == "numeric") { //$NON-NLS-1$
+				if (type == ILMLCoreConstants.TABLECOLUMN_NUMERIC) {
 					final Text textValueMin = new Text(compositeRange, SWT.SINGLE | SWT.TRAIL);
 					textValueMin.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 					textValueMin.setEnabled(false);
 					textValueMin.addVerifyListener(numericListener);
 
-					// TODO replace with another combo box
 					final Label labelMinus = new Label(compositeRange, SWT.NONE);
-					labelMinus.setText(" - "); //$NON-NLS-1$
+					labelMinus.setText(ILMLUIConstants.TEXT_SEPARATOR);
 					labelMinus.setLayoutData(new GridData(GridData.FILL));
 
 					final Text textValueMax = new Text(compositeRange, SWT.SINGLE | SWT.TRAIL);
@@ -484,7 +502,7 @@ public class FilterDialog extends Dialog {
 					buttonValueMin.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 					final Label labelMinus = new Label(compositeRange, SWT.NONE);
-					labelMinus.setText(" - "); //$NON-NLS-1$
+					labelMinus.setText(ILMLUIConstants.TEXT_SEPARATOR);
 					labelMinus.setLayoutData(new GridData(GridData.FILL));
 
 					final Button buttonValueMax = new Button(compositeRange, SWT.NONE);
@@ -565,14 +583,13 @@ public class FilterDialog extends Dialog {
 				}
 			});
 
-			final List<IPattern> oldFilters = lguiItem.getPattern(gid);
-			if (oldFilters.size() > 0) {
-				for (final IPattern filter : oldFilters) {
+			if (filterOld.size() > 0) {
+				for (final IPattern filter : filterOld) {
 					if (!filter.getColumnTitle().equals(row.getTitle())) {
 						continue;
 					}
 					row.getCheckbox().setSelection(true);
-					if (filter.getType().equals("alpha")) { //$NON-NLS-1$
+					if (filter.getType().equals(ILMLCoreConstants.TABLECOLUMN_ALPHA)) {
 						row.getRelationValueTextAlpha().setText(filter.getRelationValue());
 						row.getRelationValueTextAlpha().setEnabled(true);
 						final String[] items = row.getRelationComboAlpha().getItems();
@@ -588,7 +605,7 @@ public class FilterDialog extends Dialog {
 						if (filter.isRange()) {
 							row.getRadioButtonRange().setSelection(true);
 							row.getRadioButtonRelation().setSelection(false);
-							if (filter.getType().equals("numeric")) { //$NON-NLS-1$
+							if (filter.getType().equals(ILMLCoreConstants.TABLECOLUMN_NUMERIC)) {
 								row.getMinValueTextNumeric().setText(filter.getMinValueRange());
 								row.getMaxValueTextNumeric().setText(filter.getMaxValueRange());
 								row.getMinValueTextNumeric().setEnabled(true);
@@ -608,7 +625,7 @@ public class FilterDialog extends Dialog {
 									row.getRelationComboNumericDate().select(j);
 								}
 							}
-							if (filter.getType().equals("numeric")) { //$NON-NLS-1$
+							if (filter.getType().equals(ILMLCoreConstants.TABLECOLUMN_NUMERIC)) {
 								row.getRelationValueTextNumeric().setText(filter.getRelationValue());
 								row.getRelationValueTextNumeric().setEnabled(true);
 							} else {
@@ -620,7 +637,16 @@ public class FilterDialog extends Dialog {
 				}
 			}
 
-			filterData[i - dif] = row;
+			// TODO Define the possible setting for the InactiveJobsView (maybe also an adaption of the elements in the
+			// FilterDataRow)
+			if ((gid.equals(ILMLCoreConstants.ID_ACTIVE_JOBS_VIEW) || gid.equals(ILMLCoreConstants.ID_INACTIVE_JOBS_VIEW))
+					&& columnLayouts[i].getTitle().equals(ILMLUIConstants.COLUMN_STATUS)) {
+				row.getCheckbox().setEnabled(false);
+				row.getRelationComboAlpha().setEnabled(false);
+				row.getRelationValueTextAlpha().setEnabled(false);
+			}
+
+			filterData[i] = row;
 		}
 
 		scrolledComposite.setContent(composite);

@@ -38,13 +38,16 @@
 
 <table title="Running" id="org.eclipse.ptp.rm.lml.ui.ActiveJobsView"  contenttype="jobs" description="This is the table showing all running jobs">
 <column id="1" name="step"/>
-<column id="2" name="owner">  <pattern>    <include regexp=".*"/>  </pattern></column>
+<column id="2" name="owner"></column>
 <column id="3" name="queue"/>
 <column id="4" name="wall"/>
 <column id="5" name="queuedate"/>
 <column id="6" name="dispatchdate"/>
 <column id="7" name="totalcores"/>
-<column id="8" name="state" type="mandatory">  <pattern>    <include regexp="Running"/>  </pattern> </column>
+<column id="8" name="state" type="mandatory">  <pattern><select
+    	rel="=" value="RUNNING">
+</select>
+  </pattern> </column>
 </table>
 
 <tablelayout id="tl_WAIT" gid="org.eclipse.ptp.rm.lml.ui.InactiveJobsView" active="false">
@@ -60,13 +63,16 @@
 
 <table title="Waiting" id="org.eclipse.ptp.rm.lml.ui.InactiveJobsView"  contenttype="jobs" description="This is the table showing all waiting jobs">
 <column id="1" name="step"/>
-<column id="2" name="owner">  <pattern>    <include regexp=".*"/>  </pattern></column>
+<column id="2" name="owner"></column>
 <column id="3" name="queue"/>
 <column id="4" name="wall"/>
 <column id="5" name="queuedate"/>
 <column id="6" name="dispatchdate"/>
 <column id="7" name="totalcores"/>
-<column id="8" name="state" type="mandatory">  <pattern>    <include regexp="Idle"/>  </pattern> </column>
+<column id="8" name="state" type="mandatory">  <pattern><select
+    	rel="!=" value="RUNNING">
+</select>
+  </pattern> </column>
 </table>
 
 
