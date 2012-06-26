@@ -1,13 +1,47 @@
 <html>
 <head>
 <title>Open MPI</title>
-<link rel="stylesheet" type="text/css" href="help.css">
+<link rel="stylesheet" type="text/css" href="../help.css">
 <script type="text/javascript" src="thumb.js"> </script>
 </head>
 <body>
 
 <h1 id="top">Open MPI</h1>
 <p>How to set up run configuration using Open MPI as a target system configuration
+
+<p>When running an Open MPI program from PTP, first create a C/C++/Fortran project, and build it.
+For more information, see
+<ul>
+<li><a href="../01buildMPIprog.html">Introduction to creating MPI projects</a>
+which includes information on building
+<li><a href="PLUGINS_ROOT/org.eclipse.ptp.pldt.doc.user/html/setup.html">Setting up an MPI project with PTP's PLDT</a>
+<li><a href="../sync.html">Synchronized Projects</a> - creating and building projects on remote machines
+</ul> 
+<p>As described in <a href="../03pRunConfig.html">Running Parallel Programs</a>, next create a run configuration
+via Run > Run Configurations ... and create a new <b>Parallel Application</b>.
+<p>The specifics for running an Open MPI program with PTP are specified on
+the <b>Resources</b> tab of the run configuration.
+For <b>Target System Configuration</b>, select <b>OpenMPI-Generic-Interactive</b>
+<p><img src="../images/openmpi-rm.png">
+<p>Then specify a connection.  If you have already specified a connection, e.g.
+for a <a href="../sync.html">Synchronized Project</a> or a remote project,
+it will be selected already.
+If you are launching a local application, which we are doing in this example,
+you must specify a connection back to the local machine.
+<p><img src="../images/openmpi-conn.png">
+<blockquote>
+<p>See <a href="../remoteTools.html#create">Creating Remote Connections</a> and 
+<a href="../remoteTools.html#local">Local Connections</a>
+
+<p>Note: To edit connection information after a connection has been created, e.g. to change user name or password, see
+<a href="../remoteTools.html#edit">Editing Remote Connections</a> in Remote Tools.
+</blockquote>
+<p>Fill in the OpenMPI options you need. Here we specify 4 processes.
+<p><img src="../images/openmpi-nodes.png">
+<p>Now continue with the 
+<a href="../03pRunConfig.html#application">run configuration setup for running your parallel application</a> by specifying the Application program
+on the <b>Application</b> tab, and any other information required.
+
 
 <p>&nbsp
 <p><a href="#top">Back to Top</a> | <a href="../toc.html">Back to Table of Contents</a>
