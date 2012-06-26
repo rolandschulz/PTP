@@ -6,8 +6,11 @@
 <!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
 <!-- * -->
 <!-- ****************************************************************************** -->
-<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="IBM LoadLeveler">
+<resource-manager-builder 
+	xmlns="org.eclipse.ptp" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	name="IBM LoadLeveler">
 	<control-data>
 		<!-- Set the default value of this attribute if LL is installed in a non-standard location -->
 		<attribute name="bindir" visible="false"/>
@@ -27,7 +30,10 @@
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
 			<link-value-to>Error_Path</link-value-to>
 		</attribute>
-		
+		<attribute name="mpiCommand" type="choice">
+			<description>Optional MPI command to run job.</description>
+			<choice>,poe,mpiexec,mpirun</choice>
+		</attribute>
 		<!-- Attribute definitions for user-specified fields -->
 				
 		<attribute name="LL_BLOCKING" type="string">
@@ -46,14 +52,15 @@
 			<description>Specify handling of job's environment variables by LoadLeveler.</description>
 		</attribute>
 				
-		<attribute name="LL_HARD_LIMIT" type="string">
-			<description>Specify the hard elaspsed time limit for this job.</description>
-		</attribute>
-					
 		<attribute name="LL_JOB_CLASS" type="string">
 			<description>Specify the job class to use.</description>
 		</attribute>
 						
+		<attribute name="LL_JOB_CPU_LIMIT" type="string">
+			<description>Specify the elaspsed time limit for this job.</description>
+			<tooltip>job_cpu_limit = [hardlimit][,softlimit]; limit = [[hours:]minutes:]seconds[.fraction]</tooltip>
+		</attribute>
+					
 		<attribute name="LL_JOB_NAME" type="string">
 			<description>Specify the name of the job.</description>
 		</attribute>
@@ -68,12 +75,9 @@
 			<choice>Y,M,N</choice>
 		</attribute>
 								
-		<attribute name="LL_MAX_NODES" type="string">
-			<description>Specify maximum number of nodes.</description>
-		</attribute>
-								
-		<attribute name="LL_MIN_NODES" type="string">
-			<description>Specify minimum number of nodes.</description>
+		<attribute name="LL_NODE" type="string">
+			<description>Specify minimum and maximum number of nodes.</description>
+			<tooltip>node = [min][,max]</tooltip>
 		</attribute>
 								
 		<attribute name="LL_NETWORK_LAPI" type="string">
@@ -100,10 +104,6 @@
 			<description>Specify the name of a shell to use for this job.</description>
 		</attribute>
 				
-		<attribute name="LL_SOFT_LIMIT" type="string">
-			<description>Specify the soft elaspsed time limit for this job.</description>
-		</attribute>
-												
 		<attribute name="LL_STDERR" type="string">
 			<description>Specify a file to use for stderr output.</description>
 		</attribute>
@@ -128,6 +128,11 @@
 			<description>Specify total number of tasks.</description>
 		</attribute>		
 		
+		<attribute name="LL_WALL_CLOCK_LIMIT" type="string">
+			<description>Specify the elapsed time the job can run.</description>
+			<tooltip>wall_clock_limit = [hardlimit][,softlimit]; limit = [[hours:]minutes:]seconds[.fraction]</tooltip>
+		</attribute>		
+
 		<script insertEnvironmentAfter="0">
 			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 				<!--  If the substituted value of the statement following the '>' in the following <arg> 
@@ -158,7 +163,7 @@
 				<arg isUndefinedIfMatches="# @ input ="># @ input = ${ptp_rm:LL_STDIN#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="# @ job_cpu_limit = ,"># @ job_cpu_limit = ${ptp_rm:LL_HARD_LIMIT#value},${ptp_rm:LL_SOFT_LIMIT#value}</arg>
+				<arg isUndefinedIfMatches="# @ job_cpu_limit ="># @ job_cpu_limit = ${ptp_rm:LL_JOB_CPU_LIMIT#value}</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="# @ job_name ="># @ job_name = ${ptp_rm:LL_JOB_NAME#value}</arg>
@@ -170,7 +175,7 @@
 				<arg isUndefinedIfMatches="# @ large_page ="># @ large_page = ${ptp_rm:LL_LARGE_PAGE#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="# @ node = ,"># @ node = ${ptp_rm:LL_MIN_NODES#value},${ptp_rm:LL_MAX_NODES#value}</arg>
+				<arg isUndefinedIfMatches="# @ node ="># @ node = ${ptp_rm:LL_NODE#value}</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="# @ network.LAPI ="># @ network.LAPI = ${ptp_rm:LL_NETWORK_LAPI#value}</arg>
@@ -200,16 +205,21 @@
 				<arg isUndefinedIfMatches="# @ tasks_per_node ="># @ tasks_per_node = ${ptp_rm:LL_TASKS_PER_NODE#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="# @ total_nodes ="># @ total_nodes = ${ptp_rm:LL_TOTAL_NODES#value}</arg>
+				<arg isUndefinedIfMatches="# @ total_tasks ="># @ total_tasks = ${ptp_rm:LL_TOTAL_TASKS#value}</arg>
 			</line>
 			<line>
-				<arg># @ executable = ${ptp_rm:executablePath#value}</arg>
-			</line>
-			<line>
-				<arg isUndefinedIfMatches="# @ arguments ="># @ arguments = ${ptp_rm:progArgs#value}</arg>
+				<arg isUndefinedIfMatches="# @ wall_clock_limit ="># @ wall_clock_limit = ${ptp_rm:LL_WALL_CLOCK_LIMIT#value}</arg>
 			</line>
 			<line>
 				<arg># @ queue</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="">${ptp_rm:modules#value}</arg>
+			</line>
+			<line>
+				<arg>${ptp_rm:mpiCommand#value} </arg>
+				<arg>${ptp_rm:executablePath#value} </arg>
+				<arg isUndefinedIfMatches="">${ptp_rm:progArgs#value}</arg>
 			</line>
 		</script>
 		<start-up-command name="get-classes">
@@ -229,12 +239,16 @@
 		<submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true">
 			<arg>${ptp_rm:bindir#value}llsubmit</arg>
 			<arg>${ptp_rm:managed_file_for_script#value}</arg>
+			<environment name="MP_RESD" value="yes" />
 			<stdout-parser delim="\n" all="true" save="1">
 				<target ref="@jobId">
 					<match>
-						<expression>^llsubmit: The job "(.*)" has been submitted.*$</expression>
+						<expression>^llsubmit: The job "(.*)" (with [0-9]+ job steps )?has been submitted.*$</expression>
 						<append field="name">
 							<entry valueGroup="1"/>
+						</append>
+						<append field="name">
+							<entry value=".0"/>
 						</append>
 						<set field="default">
 							<entry valueGroup="1"/>
@@ -308,7 +322,7 @@
 						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
 					</layout>
 					
-					<!-- HEADER -->
+				<!-- HEADER -->
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -383,6 +397,24 @@
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_JOB_TYPE#description}</fixed-text>
+					</widget>
+				<!-- MPI Command -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>MPI Command: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="mpiCommand">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:mpiCommand#description}</fixed-text>
 					</widget>
 				</composite>
 			</dynamic>
@@ -718,7 +750,7 @@
 						<fixed-text>${ptp_rm:LL_BULKXFER#description}</fixed-text>
 					</widget>
 					
-					<!--  MPI adapter specification -->
+				<!--  MPI adapter specification -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -737,7 +769,7 @@
 						<fixed-text>${ptp_rm:LL_NETWORK_MPI#description}</fixed-text>
 					</widget>
 					
-					<!--  LAPI adapter specification --> 
+				<!--  LAPI adapter specification --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -756,7 +788,7 @@
 						<fixed-text>${ptp_rm:LL_NETWORK_LAPI#description}</fixed-text>
 					</widget>
 					
-					<!--  MPI/LAPI adapter specification --> 
+				<!--  MPI/LAPI adapter specification --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -775,45 +807,27 @@
 						<fixed-text>${ptp_rm:LL_NETWORK_MPI_LAPI#description}</fixed-text>
 					</widget>
 					
-					<!--  Min node  --> 
+				<!--  Node  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>Minimum node count:</fixed-text>
+						<fixed-text>Node count:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER"  attribute="LL_MIN_NODES">
+					<widget type="text" style="SWT.BORDER"  attribute="LL_NODE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
+						<tooltip>${ptp_rm:LL_NODE#tooltip}</tooltip>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${ptp_rm:LL_MIN_NODES#description}</fixed-text>
+						<fixed-text>${ptp_rm:LL_NODE#description}</fixed-text>
 					</widget>
 					
-					<!--  Max node  --> 
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
-						</layout-data>
-						<fixed-text>Maximum node count:</fixed-text>
-					</widget>
-					<widget type="text" style="SWT.BORDER"  attribute="LL_MAX_NODES">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
-						</layout-data>
-					</widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
-						</layout-data>
-						<fixed-text>${ptp_rm:LL_MAX_NODES#description}</fixed-text>
-					</widget>
-					
-					<!--  Task geometry  --> 
+				<!--  Task geometry  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -832,7 +846,7 @@
 						<fixed-text>${ptp_rm:LL_TASK_GEOMETRY#description}</fixed-text>
 					</widget>
 					
-					<!--  Tasks per node  --> 
+				<!--  Tasks per node  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -851,7 +865,7 @@
 						<fixed-text>${ptp_rm:LL_TASKS_PER_NODE#description}</fixed-text>
 					</widget>
 					
-					<!--  Total tasks  --> 
+				<!--  Total tasks  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -902,42 +916,44 @@
 						<fixed-text>Description</fixed-text>
 					</widget>
 													
-               <!-- Job hard limit -->
+               <!-- Job CPU limit -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>Hard limit:</fixed-text>
+						<fixed-text>Job CPU limit:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER"  attribute="LL_HARD_LIMIT">
+					<widget type="text" style="SWT.BORDER"  attribute="LL_JOB_CPU_LIMIT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
+						<tooltip>${ptp_rm:LL_JOB_CPU_LIMIT#tooltip}</tooltip>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${ptp_rm:LL_HARD_LIMIT#description}</fixed-text>
+						<fixed-text>${ptp_rm:LL_JOB_CPU_LIMIT#description}</fixed-text>
 					</widget>
 													
-               <!-- Job soft limit -->
+               <!-- Wall clock limit -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>Soft limit:</fixed-text>
+						<fixed-text>Wall clock limit:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER"  attribute="LL_SOFT_LIMIT">
+					<widget type="text" style="SWT.BORDER"  attribute="LL_WALL_CLOCK_LIMIT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
 						</layout-data>
+						<tooltip>${ptp_rm:LL_WALL_CLOCK_LIMIT#tooltip}</tooltip>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>${ptp_rm:LL_SOFT_LIMIT#description}</fixed-text>
+						<fixed-text>${ptp_rm:LL_WALL_CLOCK_LIMIT#description}</fixed-text>
 					</widget>
 					
 				</composite>
@@ -968,8 +984,8 @@
 							<include>LL_BULKXFER</include>
 							<include>LL_COMMENT</include>
 							<include>LL_ENVIRONMENT</include>
-							<include>LL_HARD_LIMIT</include>
 							<include>LL_JOB_CLASS</include>
+							<include>LL_JOB_CPU_LIMIT</include>
 							<include>LL_JOB_NAME</include>
 							<include>LL_JOB_TYPE</include>
 							<include>LL_LARGE_PAGE</include>

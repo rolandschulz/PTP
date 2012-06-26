@@ -8,8 +8,11 @@
 <!-- * Contributors: -->
 <!-- * Kevin A. Huck - design and implementation -->
 <!-- ****************************************************************************** -->
-<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="PBS-BGP-Batch">
+<resource-manager-builder 
+	xmlns="org.eclipse.ptp" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	name="PBS-BGP-Batch">
 	<control-data>
 		<!-- Set the default value of this attribute if PBS is installed in a non-standard location -->
 		<attribute name="bindir" visible="false"/>
@@ -544,7 +547,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 		</terminate-job>
 		<launch-tab>
 			<dynamic>
-				<title>Basic PBS Settings</title>
+				<title>Basic Settings</title>
 				<layout>
 					<grid-layout/>
 				</layout>
@@ -707,7 +710,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				</composite>
 			</dynamic>
 			<dynamic>
-				<title>Advanced PBS Settings</title>
+				<title>Advanced Settings</title>
 				<layout>
 					<grid-layout/>
 				</layout>

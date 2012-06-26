@@ -34,9 +34,9 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Columnsortedtype;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.PatternMatchType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.PatternType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RowType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SelectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.SortingType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TablelayoutType;
@@ -106,6 +106,28 @@ public class TableHandler extends LguiHandler {
 		}
 	}
 
+	public void deleteOldPattern(String gid) {
+		final TableType table = getTable(gid);
+		if (table != null) {
+			for (final ColumnType column : table.getColumn()) {
+				column.setPattern(null);
+			}
+		}
+	}
+
+	public void deleteOldPattern(String gid, List<String> columnsTitle) {
+		final TableType table = getTable(gid);
+		if (table != null) {
+			for (final ColumnType column : table.getColumn()) {
+				for (final String columnTitle : columnsTitle) {
+					if (column.getName().equals(columnTitle)) {
+						column.setPattern(null);
+					}
+				}
+			}
+		}
+	}
+
 	public TableType generateDefaultTable(String gid) {
 		final TableType table = new TableType();
 		table.setId(gid);
@@ -118,15 +140,12 @@ public class TableHandler extends LguiHandler {
 				column.setId(columnLayout.getCid());
 				column.setName(columnLayout.getKey());
 				generateDefaultSorting(column);
-				if (columnLayout.getKey().equals(ILguiItem.JOB_OWNER)) {
-					generateDefaultPattern(".*", column); //$NON-NLS-1$
-				}
 				if (columnLayout.getKey().equals(ILguiItem.JOB_STATUS)) {
 					column.setType(ITableColumnLayout.COLUMN_TYPE_MANDATORY);
 					if (gid.equals(ILMLCoreConstants.ID_ACTIVE_JOBS_VIEW)) {
-						generateDefaultPattern(JobStatusData.RUNNING, column);
+						generateDefaultPattern(JobStatusData.RUNNING, ILMLCoreConstants.EQ, column);
 					} else {
-						generateDefaultPattern(JobStatusData.SUBMITTED, column);
+						generateDefaultPattern(JobStatusData.RUNNING, ILMLCoreConstants.NEQ, column);
 					}
 				}
 				table.getColumn().add(column);
@@ -134,6 +153,45 @@ public class TableHandler extends LguiHandler {
 		}
 		jaxbUtil.addTable(lgui, table);
 		return table;
+	}
+
+	public void generateNewPattern(String gid, List<IPattern> filterValues) {
+		final TableType table = getTable(gid);
+		if (table != null) {
+			for (final ColumnType column : table.getColumn()) {
+				for (final IPattern filterValue : filterValues) {
+					if (column.getName().equals(filterValue.getColumnTitle())) {
+						final PatternType pattern = new PatternType();
+						if (filterValue.isRange()) {
+							final SelectType selectMin = new SelectType();
+							selectMin.setRel(ILMLCoreConstants.xGE_LC);
+							selectMin.setValue(filterValue.getMinValueRange());
+							final SelectType selectMax = new SelectType();
+							selectMax.setRel(ILMLCoreConstants.xLE_LC);
+							selectMax.setValue(filterValue.getMaxValueRange());
+							jaxbUtil.addPatternSelect(pattern, selectMin);
+							jaxbUtil.addPatternSelect(pattern, selectMax);
+						} else {
+							final SelectType select = new SelectType();
+							select.setValue(filterValue.getRelationValue());
+							if (filterValue.getRelationOperator().equals(ILMLCoreConstants.LT)) {
+								select.setRel(ILMLCoreConstants.xLT_LC);
+							} else if (filterValue.getRelationOperator().equals(ILMLCoreConstants.LE)) {
+								select.setRel(ILMLCoreConstants.xLE_LC);
+							} else if (filterValue.getRelationOperator().equals(ILMLCoreConstants.GT)) {
+								select.setRel(ILMLCoreConstants.xGT_LC);
+							} else if (filterValue.getRelationOperator().equals(ILMLCoreConstants.GE)) {
+								select.setRel(ILMLCoreConstants.xGE_LC);
+							} else {
+								select.setRel(filterValue.getRelationOperator());
+							}
+							jaxbUtil.addPatternSelect(pattern, select);
+						}
+						column.setPattern(pattern);
+					}
+				}
+			}
+		}
 	}
 
 	public ITableColumnLayout[] getActiveTableColumnLayout(String gid) {
@@ -180,6 +238,60 @@ public class TableHandler extends LguiHandler {
 		return getTables().size();
 	}
 
+	/**
+	 * Reading out the select patterns from the JAXB objects.
+	 * 
+	 * Also taking care of the switch between the operators on the client side and in the LML file.
+	 * 
+	 * @param gid
+	 *            Id of the table from which we want to get the list of patterns.
+	 * @return List of select patterns
+	 */
+	public List<IPattern> getPattern(String gid) {
+		final TableType table = getTable(gid);
+		final LinkedList<IPattern> patternList = new LinkedList<IPattern>();
+		if (table != null) {
+			for (final ColumnType column : table.getColumn()) {
+				if (column != null && column.getPattern() != null) {
+					final List<SelectType> selects = jaxbUtil.getSelects(column.getPattern().getIncludeAndExcludeAndSelect());
+					if (selects.size() == 1) {
+						String rel = null;
+						if (selects.get(0).getRel().equals(ILMLCoreConstants.xLT_LC)) {
+							rel = ILMLCoreConstants.LT;
+						} else if (selects.get(0).getRel().equals(ILMLCoreConstants.xLE_LC)) {
+							rel = ILMLCoreConstants.LE;
+						} else if (selects.get(0).getRel().equals(ILMLCoreConstants.xGT_LC)) {
+							rel = ILMLCoreConstants.GT;
+						} else if (selects.get(0).getRel().equals(ILMLCoreConstants.xGE_LC)) {
+							rel = ILMLCoreConstants.GE;
+						} else {
+							rel = selects.get(0).getRel();
+						}
+						if (rel != null) {
+							patternList.add((new Pattern(column.getName(), column.getSort().value())).setRelation(rel,
+									selects.get(0).getValue()));
+						}
+					} else if (selects.size() == 2) {
+						String minValue = null;
+						String maxValue = null;
+						for (final SelectType select : selects) {
+							if (select.getRel().equals(ILMLCoreConstants.xLE_LC)) {
+								maxValue = select.getValue();
+							} else if (select.getRel().equals(ILMLCoreConstants.xGE_LC)) {
+								minValue = select.getValue();
+							}
+						}
+						if (minValue != null && maxValue != null) {
+							patternList.add((new Pattern(column.getName(), column.getSort().value())).setRange(minValue, maxValue));
+
+						}
+					}
+				}
+			}
+		}
+		return patternList;
+	}
+
 	public Object[] getSortProperties(String gid) {
 		final Object[] values = new Object[2];
 		values[0] = -1;
@@ -212,7 +324,7 @@ public class TableHandler extends LguiHandler {
 				return tag;
 			}
 		}
-		LMLCorePlugin.log("No table found for gid \"" + gid + "\"!"); //$NON-NLS-1$ //$NON-NLS-2$
+		LMLCorePlugin.log(ILMLCoreConstants.LOG_NO_TABLE_1 + gid + ILMLCoreConstants.LOG_NO_TABLE_2);
 		return null;
 	}
 
@@ -262,9 +374,9 @@ public class TableHandler extends LguiHandler {
 				final String sort = getColumnSortProperty(getTable(gid), cids, i);
 				// when there is a change
 				if (column.getSorted() != null && column.getSorted().value() != null && sort != null) {
-					if (sort.equals("numeric")) { //$NON-NLS-1$
+					if (sort.equals(ILMLCoreConstants.TABLECOLUMN_NUMERIC)) {
 						style = ITableColumnLayout.COLUMN_STYLE_RIGHT;
-					} else if (sort.equals("alpha")) { //$NON-NLS-1$
+					} else if (sort.equals(ILMLCoreConstants.TABLECOLUMN_ALPHA)) {
 						style = ITableColumnLayout.COLUMN_STYLE_LEFT;
 					} else {
 						style = ITableColumnLayout.COLUMN_STYLE_CENTER;
@@ -338,7 +450,7 @@ public class TableHandler extends LguiHandler {
 					}
 				}
 				if (tableDataRow[j] == null) {
-					tableDataRow[j] = new Cell("?", tableData[i]); //$NON-NLS-1$
+					tableDataRow[j] = new Cell(ILMLCoreConstants.QM, tableData[i]);
 				}
 				if (cids[j].equals(jobIdIndex)) {
 					jobId = tableDataRow[j].value;
@@ -349,7 +461,7 @@ public class TableHandler extends LguiHandler {
 				if (status == null) {
 					final String queueName = getCellValue(table, row, ILguiItem.JOB_QUEUE_NAME);
 					final String owner = getCellValue(table, row, ILguiItem.JOB_OWNER);
-					String[][] attrs = { { JobStatusData.JOB_ID_ATTR, jobId }, { JobStatusData.QUEUE_NAME_ATTR, queueName },
+					final String[][] attrs = { { JobStatusData.JOB_ID_ATTR, jobId }, { JobStatusData.QUEUE_NAME_ATTR, queueName },
 							{ JobStatusData.OWNER_ATTR, owner } };
 					status = new JobStatusData(attrs);
 				}
@@ -407,13 +519,18 @@ public class TableHandler extends LguiHandler {
 				final IPattern pattern = filterPosValues.get(position);
 				final String rowValue = row.cells[position].value;
 
+				if (rowValue.equals(ILMLCoreConstants.QM)) {
+					allIncluded = false;
+					continue;
+				}
+
 				final String type = pattern.getType();
 
 				if (pattern.isRange()) {
 					// Range
 					final String minValue = pattern.getMinValueRange();
 					final String maxValue = pattern.getMaxValueRange();
-					if (type.equals("numeric")) { //$NON-NLS-1$
+					if (type.equals(ILMLCoreConstants.TABLECOLUMN_NUMERIC)) {
 						if ((Integer.valueOf(rowValue) < Integer.valueOf(minValue))
 								|| (Integer.valueOf(maxValue) < Integer.valueOf(rowValue))) {
 							allIncluded = false;
@@ -429,50 +546,50 @@ public class TableHandler extends LguiHandler {
 					// Relation
 					final String compareValue = pattern.getRelationValue();
 					final String compareOperator = pattern.getRelationOperator();
-					if (type.equals("numeric")) { //$NON-NLS-1$
+					if (type.equals(ILMLCoreConstants.TABLECOLUMN_NUMERIC)) {
 						final int rowValueInt = Integer.valueOf(rowValue);
 						final int compareValueInt = Integer.valueOf(compareValue);
-						if (compareOperator.equals("=") && rowValueInt != compareValueInt) { //$NON-NLS-1$
+						if (compareOperator.equals(ILMLCoreConstants.EQ) && rowValueInt != compareValueInt) {
 							allIncluded = false;
 							break;
-						} else if (compareOperator.equals("!=") && rowValueInt == compareValueInt) { //$NON-NLS-1$
+						} else if (compareOperator.equals(ILMLCoreConstants.NEQ) && rowValueInt == compareValueInt) {
 							allIncluded = false;
 							break;
-						} else if (compareOperator.equals("<") && rowValueInt >= compareValueInt) { //$NON-NLS-1$
+						} else if (compareOperator.equals(ILMLCoreConstants.LT) && rowValueInt >= compareValueInt) {
 							allIncluded = false;
 							break;
-						} else if (compareOperator.equals("<=") && rowValueInt > compareValueInt) { //$NON-NLS-1$
+						} else if (compareOperator.equals(ILMLCoreConstants.LE) && rowValueInt > compareValueInt) {
 							allIncluded = false;
 							break;
-						} else if (compareOperator.equals(">") && rowValueInt <= compareValueInt) { //$NON-NLS-1$
+						} else if (compareOperator.equals(ILMLCoreConstants.GT) && rowValueInt <= compareValueInt) {
 							allIncluded = false;
 							break;
-						} else if (compareOperator.equals(">=") && rowValueInt < compareValueInt) { //$NON-NLS-1$
+						} else if (compareOperator.equals(ILMLCoreConstants.GE) && rowValueInt < compareValueInt) {
 							allIncluded = false;
 							break;
 						}
 					} else {
-						if ((compareOperator.equals("=") && !compareValue.equals(rowValue)) //$NON-NLS-1$
-								|| (compareOperator.equals("!=") && compareValue.equals(rowValue))) { //$NON-NLS-1$
+						if ((compareOperator.equals(ILMLCoreConstants.EQ) && !compareValue.equals(rowValue))
+								|| (compareOperator.equals(ILMLCoreConstants.NEQ) && compareValue.equals(rowValue))) {
 							allIncluded = false;
 							break;
-						} else if (type.equals("alpha")) { //$NON-NLS-1$
-							if ((compareOperator.equals("=~") && !rowValue.contains(compareValue)) //$NON-NLS-1$
-									|| (compareOperator.equals("!~") && rowValue.contains(compareValue))) { //$NON-NLS-1$
+						} else if (type.equals(ILMLCoreConstants.TABLECOLUMN_ALPHA)) {
+							if ((compareOperator.equals(ILMLCoreConstants.SI) && !rowValue.contains(compareValue))
+									|| (compareOperator.equals(ILMLCoreConstants.NSI) && rowValue.contains(compareValue))) {
 								allIncluded = false;
 								break;
 							}
-						} else if (type.equals("date")) { //$NON-NLS-1$
-							if (compareOperator.equals("<") && rowValue.compareTo(compareValue) >= 0) { //$NON-NLS-1$
+						} else if (type.equals(ILMLCoreConstants.TABLECOLUMN_DATE)) {
+							if (compareOperator.equals(ILMLCoreConstants.LT) && rowValue.compareTo(compareValue) >= 0) {
 								allIncluded = false;
 								break;
-							} else if (compareOperator.equals("<=") && rowValue.compareTo(compareValue) > 0) { //$NON-NLS-1$
+							} else if (compareOperator.equals(ILMLCoreConstants.LE) && rowValue.compareTo(compareValue) > 0) {
 								allIncluded = false;
 								break;
-							} else if (compareOperator.equals(">") && rowValue.compareTo(compareValue) <= 0) { //$NON-NLS-1$
+							} else if (compareOperator.equals(ILMLCoreConstants.GT) && rowValue.compareTo(compareValue) <= 0) {
 								allIncluded = false;
 								break;
-							} else if (compareOperator.equals(">=") && rowValue.compareTo(compareValue) < 0) { //$NON-NLS-1$
+							} else if (compareOperator.equals(ILMLCoreConstants.GE) && rowValue.compareTo(compareValue) < 0) {
 								allIncluded = false;
 								break;
 							}
@@ -509,7 +626,7 @@ public class TableHandler extends LguiHandler {
 	public String getTableTitle(String gid) {
 		final TableType table = getTable(gid);
 		if (table == null) {
-			return ""; //$NON-NLS-1$
+			return ILMLCoreConstants.EMPTY;
 		}
 		return table.getTitle();
 	}
@@ -597,11 +714,12 @@ public class TableHandler extends LguiHandler {
 		}
 	}
 
-	private void generateDefaultPattern(String regexp, ColumnType column) {
+	private void generateDefaultPattern(String value, String relation, ColumnType column) {
 		final PatternType pattern = new PatternType();
-		final PatternMatchType patternMatch = new PatternMatchType();
-		patternMatch.setRegexp(regexp);
-		jaxbUtil.addPatternInclude(pattern, patternMatch);
+		final SelectType select = new SelectType();
+		select.setRel(relation);
+		select.setValue(value);
+		jaxbUtil.addPatternSelect(pattern, select);
 		column.setPattern(pattern);
 	}
 
@@ -687,7 +805,7 @@ public class TableHandler extends LguiHandler {
 				}
 			}
 		}
-		return "alpha"; //$NON-NLS-1$
+		return ILMLCoreConstants.TABLECOLUMN_ALPHA;
 	}
 
 	/**
@@ -714,7 +832,7 @@ public class TableHandler extends LguiHandler {
 				if (!exists) {
 					final CellType newCell = new CellType();
 					newCell.setCid(cid);
-					newCell.setValue("?"); //$NON-NLS-1$
+					newCell.setValue(ILMLCoreConstants.QM);
 					tableData[i].getCell().add(newCell);
 				}
 			}

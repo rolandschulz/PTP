@@ -1077,7 +1077,7 @@ public class LaunchController implements ILaunchController {
 			}
 			IRemoteConnection conn = getRemoteConnection(progress.newChild(5));
 			if (conn != null) {
-				rmVarMap.setEnvManager(EnvManagerRegistry.getEnvManager(progress.newChild(5), conn));
+				rmVarMap.setEnvManagerFromConnection(conn);
 				ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, launchEnv, false);
 				job.schedule();
 				try {

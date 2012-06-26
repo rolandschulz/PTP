@@ -205,28 +205,31 @@ while($line=<IN>) {
     last if($line=~/There is currently no job step to report/);
 
     if($line=~/^\s*Task Instance[:]\s*$patwrd[:]$patint/) {
-	my($host,$num)=($1,$2);
-	$nodelastcorenumber{$host}=0 if(!exists($nodelastcorenumber{$host}));
-	if($num>=0) {
-	    $jobs{$jobid}{TaskInstances}.="($host,".$nodelastcorenumber{$host}.")";
-	    $nodelastcorenumber{$host}++;
-	    $jobs{$jobid}{totalcores}++;
-	    $jobs{$jobid}{totaltasks}++;
-	}
+		my($host,$num)=($1,$2);
+		$nodelastcorenumber{$host}=0 if(!exists($nodelastcorenumber{$host}));
+		if($num>=0) {
+		    $jobs{$jobid}{TaskInstances}.="($host,".$nodelastcorenumber{$host}.")";
+		    $nodelastcorenumber{$host}++;
+		    $jobs{$jobid}{totalcores}++;
+		    $jobs{$jobid}{totaltasks}++;
+		}
     } elsif($line=~/^=+ Job Step $patwrd =+/) {
-	$jobid=$1;
+		$jobid=$1;
     } elsif($line=~/^\s*([^\:]+): (.*)$/) {
-	($key,$value)=($1,$2);
-	$key=~s/\s+$//gs;
-	$key=~s/\s/_/gs;
-	$lastkey=$key;
-	$jobs{$jobid}{$key}=$value;
+		($key,$value)=($1,$2);
+		$key=~s/\s+$//gs;
+		$key=~s/\s/_/gs;
+		$lastkey=$key;
+		$jobs{$jobid}{$key}=$value;
     } else {
-	$line=~s/^\s*//gs;
-	$jobs{$jobid}{$lastkey}.=",$line";
+		$line=~s/^\s*//gs;
+		$jobs{$jobid}{$lastkey}.=",$line";
     }
 }
 close(IN);
+
+# Remove unknown jobs
+delete $jobs{"-"};
 
 # add unknown but manatory attributes to jobs
 foreach $jobid (sort(keys(%jobs))) {
@@ -254,18 +257,18 @@ printf(OUT "<information>\n");
 foreach $jobid (sort(keys(%jobs))) {
     printf(OUT "<info oid=\"j%06d\" type=\"short\">\n",$jobnr{$jobid});
     foreach $key (sort(keys(%{$jobs{$jobid}}))) {
-	if(exists($mapping{$key})) {
-	    if($mapping{$key} ne "") {
-		$value=&modify($key,$mapping{$key},$jobs{$jobid}{$key});
-		if($value) {
-		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",$value);
+		if(exists($mapping{$key})) {
+		    if($mapping{$key} ne "") {
+				$value=&modify($key,$mapping{$key},$jobs{$jobid}{$key});
+				if($value) {
+				    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",$value);
+				}
+			} else {
+				$notmappedkeys{$key}++;
+		    }
+		} else {
+		    $notfoundkeys{$key}++;
 		}
-	    } else {
-		$notmappedkeys{$key}++;
-	    }
-	} else {
-	    $notfoundkeys{$key}++;
-	}
     }
     printf(OUT "</info>\n");
 }
@@ -287,27 +290,27 @@ sub get_state {
     $state="UNDETERMINED";$detailed_state="";
 
     if($job_state eq "Completed") {
-	$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
+		$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
     }
     if($job_state eq "User Hold") {
-	$state="SUBMITTED";
-	$detailed_state="USER_ON_HOLD";
+		$state="SUBMITTED";
+		$detailed_state="USER_ON_HOLD";
     }
     if($job_state eq "System Hold") {
-	$state="SUBMITTED";
-	$detailed_state="SYSTEM_ON_HOLD";
+		$state="SUBMITTED";
+		$detailed_state="SYSTEM_ON_HOLD";
     }
-    if($job_state eq "Removed") {
-	$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
+	if($job_state eq "Removed") {
+		$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
     }    
-    if($job_state eq "Idle") {
-	$state="SUBMITTED";$detailed_state="";
+	if($job_state eq "Idle") {
+		$state="SUBMITTED";$detailed_state="";
     }    
-    if($job_state eq "Not Queued") {
-	$state="SUBMITTED";$detailed_state="JOB_NOT_QUEUED";
+	if($job_state eq "Not Queued") {
+		$state="SUBMITTED";$detailed_state="JOB_NOT_QUEUED";
     }    
-    if($job_state eq "Running") {
-	$state="RUNNING";$detailed_state="";
+	if($job_state eq "Running") {
+		$state="RUNNING";$detailed_state="";
     }    
 
     return($state,$detailed_state);
@@ -319,19 +322,19 @@ sub modify {
     my $ret=$value;
 
     if(($mkey eq "wall") || ($mkey eq "wallsoft")) {
-	if($value=~/\($patint seconds\)/) {
-	    $ret=$1;
-	}
-	if($value=~/$patint minutes/) {
-	    $ret=$1*60;
-	}
+		if($value=~/\($patint seconds\)/) {
+		    $ret=$1;
+		}
+		if($value=~/$patint minutes/) {
+		    $ret=$1*60;
+		}
     }
 
     if(($mkey eq "comment")) {
-	$ret=~s/\"//gs;
+		$ret=~s/\"//gs;
     }
     if(($mkey eq "bgp_state")) {
-	$ret=~s/\<unknown\>/unknown/gs;
+		$ret=~s/\<unknown\>/unknown/gs;
     }
 
     return($ret);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, 2012 Forschungszentrum Juelich GmbH and others.
+ * Copyright (c) 2011 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
@@ -7,7 +7,6 @@
  * 
  * Contributors:
  * 		Claudia Knobloch, Carsten Karbach, FZ Juelich
- * 		Jeff Overbey, Illinois
  */
 package org.eclipse.ptp.rm.lml.internal.core.model;
 
@@ -28,8 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
@@ -75,7 +72,7 @@ public class LguiItem implements ILguiItem {
 	 */
 	private final List<ILguiListener> listeners = new LinkedList<ILguiListener>();
 
-	private Map<String, List<IPattern>> filters = new HashMap<String, List<IPattern>>();
+	private final Map<String, List<IPattern>> filters = new HashMap<String, List<IPattern>>();
 
 	/**
 	 * List of encapsulated classes, which handle parts of the lml-hierarchy
@@ -94,7 +91,7 @@ public class LguiItem implements ILguiItem {
 
 	private String username = null;
 
-	private boolean lockUpdate = true;
+	private boolean lockUpdate = false;
 
 	private boolean lockPattern = false;
 
@@ -249,8 +246,6 @@ public class LguiItem implements ILguiItem {
 					if (data.getKey().equals(ILMLCoreConstants.MOTD)) {
 						type = ILMLCoreConstants.MOTD;
 						message = data.getValue();
-						message = replacePredefinedXMLEntities(message);
-						message = replaceXMLCharacterReferences(message);
 					} else if (data.getKey().equals(ILMLCoreConstants.ERROR)) {
 						return new String[] { ILMLCoreConstants.ERROR, data.getValue() };
 					}
@@ -258,50 +253,6 @@ public class LguiItem implements ILguiItem {
 			}
 		}
 		return new String[] { type, message };
-	}
-
-	/**
-	 * @return <code>message</code> with predefined XML entities replaced (see <a
-	 *         href="http://www.w3.org/TR/xml/#dt-escape">http://www.w3.org/TR/xml/#dt-escape</a>
-	 */
-	// This is not particularly efficient (the entire message is scanned 5 times),
-	// but it's simple and fast enough for un-escaping the contents of /etc/motd
-	private String replacePredefinedXMLEntities(String message) {
-		if (message == null) {
-			return null;
-		}
-		message = message.replace("&lt;", "<");
-		message = message.replace("&gt;", ">");
-		message = message.replace("&amp;", "&");
-		message = message.replace("&apos;", "'");
-		message = message.replace("&quot;", "\"");
-		return message;
-	}
-
-	/**
-	 * @return <code>message</code> with XML character references replaced (see <a
-	 *         href="http://www.w3.org/TR/xml/#sec-references">http://www.w3.org/TR/xml/#sec-references</a>
-	 */
-	// This is not particularly efficient (the entire message is scanned 2*n times,
-	// where n is the number of "&#...;" escape sequences), but it's simple and fast
-	// enough for un-escaping the contents of /etc/motd
-	private String replaceXMLCharacterReferences(String message) {
-		if (message == null) {
-			return null;
-		}
-		final Pattern pattern = Pattern.compile("&#([0-9]+|x[0-9a-fA-F]+);");
-		for (Matcher matcher = pattern.matcher(message); matcher.find(); matcher = pattern.matcher(message)) {
-			final String group = matcher.group(1);
-			int codePoint;
-			if (group.startsWith("x")) {
-				codePoint = Integer.parseInt(group.substring("x".length()), 16);
-			} else {
-				codePoint = Integer.parseInt(group, 10);
-			}
-			String replacement = String.valueOf(Character.toChars(codePoint));
-			message = matcher.replaceFirst(replacement);
-		}
-		return message;
 	}
 
 	/*
@@ -377,29 +328,6 @@ public class LguiItem implements ILguiItem {
 			return null;
 		}
 		return (OverviewAccess) lguiHandlers.get(OverviewAccess.class);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getPattern()
-	 */
-	@Override
-	public Map<String, List<IPattern>> getPattern() {
-		return filters;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getPattern(java.lang.String)
-	 */
-	@Override
-	public List<IPattern> getPattern(String gid) {
-		if (filters.containsKey(gid)) {
-			return filters.get(gid);
-		}
-		return new LinkedList<IPattern>();
 	}
 
 	/*
@@ -485,14 +413,14 @@ public class LguiItem implements ILguiItem {
 	 */
 	@Override
 	public boolean isFilterOwnJobActive(String gid) {
-		final List<IPattern> filters = getPattern(gid);
+		final List<IPattern> filters = getTableHandler().getPattern(gid);
 		if (filters.size() > 0) {
 			for (final IPattern filter : filters) {
-				if (filter.getColumnTitle().equals("owner")) {
-					if (filter.getRelationOperator().equals("=") && filter.getRelationValue().equals(username)) {
+				if (filter.getColumnTitle().equals(ILMLCoreConstants.OWNER)) {
+					if (filter.getRelationOperator().equals(ILMLCoreConstants.EQ) && filter.getRelationValue().equals(username)) {
 						return true;
 					} else {
-						break;
+						return false;
 					}
 				}
 			}
@@ -508,6 +436,14 @@ public class LguiItem implements ILguiItem {
 	@Override
 	public boolean isLayout() {
 		return lgui != null && lgui.isLayout();
+	}
+
+	@Override
+	public void lockPattern() {
+		while (lockUpdate) {
+			System.out.print(ILMLCoreConstants.EMPTY);
+		}
+		lockPattern = true;
 	}
 
 	/*
@@ -603,27 +539,6 @@ public class LguiItem implements ILguiItem {
 	}
 
 	@Override
-	public void setPattern(Map<String, List<IPattern>> pattern) {
-		if (pattern != null) {
-			filters = pattern;
-		}
-	}
-
-	@Override
-	public void setPattern(String gid, List<IPattern> filterValues) {
-		while (lockUpdate) {
-			// wait until the update with the server is finished
-			System.out.print("");
-		}
-		lockPattern = true;
-		if (filters.containsKey(gid)) {
-			filters.remove(gid);
-		}
-		filters.put(gid, filterValues);
-		lockPattern = false;
-	}
-
-	@Override
 	public void setRequest(RequestType request) {
 		this.request = request;
 		if (lgui != null) {
@@ -643,6 +558,11 @@ public class LguiItem implements ILguiItem {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	@Override
+	public void unlockPattern() {
+		lockPattern = false;
 	}
 
 	/*
@@ -706,8 +626,7 @@ public class LguiItem implements ILguiItem {
 					if (tableOld.getRow() != null) {
 						for (int i = 0; i < tableOld.getRow().size(); i++) {
 							final RowType row = tableOld.getRow().get(i);
-							String cell = handler.getCellValue(tableOld, row, JOB_ID);
-							if (cell != null && cell.equals(jobId)) {
+							if (handler.getCellValue(tableOld, row, JOB_ID).equals(jobId)) {
 								handler.setCellValue(tableOld, row, JOB_STATUS, status);
 								rowOld = row;
 								index = i;

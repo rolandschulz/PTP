@@ -377,7 +377,7 @@ LML-clients are able to stop reading the tree on every level by using the usageb
     				</annotation>
     				<simpleType>
     					<restriction base="string">
-    						<pattern value="(([^%])*%(\-|\+|\s|\#)*0(\-|\+|\s|\#)*(\d)+d([^%])*)|(([^%])*%(\-|\+|\s|\#)*d([^%\d])+)|(([^%])*%(\-|\+|\s|\#)*1d([^%])*)">
+    						<pattern value="(([^%])*%(\-|\+|\s|#)*0(\-|\+|\s|#)*(\d)+d([^%])*)|(([^%])*%(\-|\+|\s|#)*d([^%\d])+)|(([^%])*%(\-|\+|\s|#)*1d([^%])*)">
     						</pattern>
     					</restriction>
     				</simpleType>

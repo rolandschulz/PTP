@@ -35,6 +35,9 @@ public interface ILMLCoreConstants {
 	public static final String TAB = "\t"; //$NON-NLS-1$
 	public static final String SP = " ";//$NON-NLS-1$
 	public static final String EQ = "=";//$NON-NLS-1$
+	public static final String NEQ = "!=";//$NON-NLS-1$
+	public static final String SI = "=~";//$NON-NLS-1$
+	public static final String NSI = "!~";//$NON-NLS-1$
 	public static final String QT = "\"";//$NON-NLS-1$
 	public static final String QM = "?";//$NON-NLS-1$
 	public static final String PD = "#";//$NON-NLS-1$
@@ -43,8 +46,10 @@ public interface ILMLCoreConstants {
 	public static final String CO = ":";//$NON-NLS-1$
 	public static final String SC = ";";//$NON-NLS-1$
 	public static final String LT = "<"; //$NON-NLS-1$
+	public static final String LE = "<="; //$NON-NLS-1$
 	public static final String LTS = "</";//$NON-NLS-1$
 	public static final String GT = ">";//$NON-NLS-1$
+	public static final String GE = ">=";//$NON-NLS-1$
 	public static final String GTLT = "><";//$NON-NLS-1$
 	public static final String HYPH = "-";//$NON-NLS-1$
 	public static final String AT = "@";//$NON-NLS-1$
@@ -53,6 +58,7 @@ public interface ILMLCoreConstants {
 	public static final String REGPIP = "[|]";//$NON-NLS-1$
 	public static final String DOT = ".";//$NON-NLS-1$
 	public static final String Z3 = "000";//$NON-NLS-1$
+	public static final String Z2 = "00";//$NON-NLS-1$
 	public static final String OPENP = "(";//$NON-NLS-1$
 	public static final String OPENSQ = "[";//$NON-NLS-1$
 	public static final String OPENV = "${";//$NON-NLS-1$
@@ -89,9 +95,13 @@ public interface ILMLCoreConstants {
 	public static final String AND = "and";//$NON-NLS-1$
 	public static final String xEQ = "EQ";//$NON-NLS-1$
 	public static final String xLT = "LT";//$NON-NLS-1$
+	public static final String xLT_LC = "lt";//$NON-NLS-1$
 	public static final String xGT = "GT";//$NON-NLS-1$
+	public static final String xGT_LC = "gt";//$NON-NLS-1$
 	public static final String xLE = "LE";//$NON-NLS-1$
+	public static final String xLE_LC = "le";//$NON-NLS-1$
 	public static final String xGE = "GE";//$NON-NLS-1$
+	public static final String xGE_LC = "ge";//$NON-NLS-1$
 	public static final String GET = "get";//$NON-NLS-1$
 	public static final String SET = "set";//$NON-NLS-1$
 	public static final String IS = "is";//$NON-NLS-1$
@@ -242,6 +252,7 @@ public interface ILMLCoreConstants {
 	 * Element keywords
 	 */
 	public static final String INCLUDE_ELEMENT = "include"; //$NON-NLS-1$
+	public static final String SELECT_ELEMENT = "select"; //$NON-NLS-1$
 	public static final String TABLE_ELEMENT = "table"; //$NON-NLS-1$
 	public static final String USAGEBAR_ELEMENT = "usagebar"; //$NON-NLS-1$
 	public static final String TEXT_ELEMENT = "text"; //$NON-NLS-1$
@@ -259,4 +270,11 @@ public interface ILMLCoreConstants {
 	public static final String SYSTEM = "system"; //$NON-NLS-1$
 	public static final String ERROR = "error"; //$NON-NLS-1$
 	public static final String MOTD = "motd"; //$NON-NLS-1$
+	public static final String OWNER = "owner"; //$NON-NLS-1$
+	public static final String TABLECOLUMN_ALPHA = "alpha"; //$NON-NLS-1$
+	public static final String TABLECOLUMN_NUMERIC = "numeric"; //$NON-NLS-1$
+	public static final String TABLECOLUMN_DATE = "date"; //$NON-NLS-1$
+
+	public static final String LOG_NO_TABLE_1 = "No table found for gid \""; //$NON-NLS-1$
+	public static final String LOG_NO_TABLE_2 = "\"!"; //$NON-NLS-1$
 }

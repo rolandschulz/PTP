@@ -393,7 +393,7 @@ public class RemoteServicesDelegate {
 				remoteConnection.open(progress.newChild(1));
 			}
 		} catch (Throwable t) {
-			throw newException("RemoteServicesDelegate.initialize " + remoteServicesId + COSP + remoteConnection, t); //$NON-NLS-1$
+			throw newException(remoteConnection + COSP + t.getLocalizedMessage(), t);
 		} finally {
 			if (monitor != null) {
 				monitor.done();

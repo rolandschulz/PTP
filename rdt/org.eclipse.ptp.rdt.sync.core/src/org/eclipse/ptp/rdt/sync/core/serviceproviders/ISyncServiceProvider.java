@@ -108,9 +108,20 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 */
 	public void checkout(IProject project, BuildScenario buildScenario, IPath path)  throws CoreException;
 
+	/**
+	 * Replace the current contents of the given path with the current local copy of the remote (not necessarily the same as what
+	 * is on the remote site). This is useful in merge-conflict resolution.
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param path
+	 * @throws CoreException
+	 */
+	public void checkoutRemoteCopy(IProject project, BuildScenario buildScenario, IPath path)  throws CoreException;
+
     /**
-     * Close any resources (files, sockets) that were open by the sync provider. Resources not open by the provider should not be
-     * touched. This is called, for example, when a project is about to be deleted.
+     * Close any resources (files, sockets) that were open by the sync provider for the given project. Resources not open by the
+     * provider should not be touched. This is called, for example, when a project is about to be deleted.
      */
-    public void close();
+    public void close(IProject project);
 }

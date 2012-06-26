@@ -139,7 +139,9 @@ public class TargetImpl implements IMatchable {
 			int tail = m.doMatch(segment.toString());
 			match = m.getMatched();
 			if (match) {
-				segment.delete(0, tail);
+				if (tail >= 0) {
+					segment.delete(0, tail);
+				}
 				matched++;
 				selected = m.getMoveToTop();
 				break;

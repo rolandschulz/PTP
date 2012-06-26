@@ -12,8 +12,6 @@ package org.eclipse.ptp.rm.lml.core.model;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
@@ -96,6 +94,8 @@ public interface ILguiItem {
 	 */
 	public String[] getMessageOfTheDay();
 
+	public String getName();
+
 	/**
 	 * @return NodedisplayAccess-instance for accessing layouts of nodedisplays
 	 */
@@ -123,10 +123,6 @@ public interface ILguiItem {
 	 */
 	public OverviewAccess getOverviewAccess();
 
-	public Map<String, List<IPattern>> getPattern();
-
-	public List<IPattern> getPattern(String gid);
-
 	/**
 	 * @return
 	 */
@@ -144,8 +140,6 @@ public interface ILguiItem {
 	public JobStatusData[] getUserJobs();
 
 	public String getUsername();
-
-	public String getName();
 
 	/**
 	 * Getting the version of the LguiType:
@@ -167,6 +161,8 @@ public interface ILguiItem {
 	 * @return
 	 */
 	public boolean isLayout();
+
+	public void lockPattern();
 
 	/**
 	 * Inform all listeners, that something changed in the data-model. Handlers should use this event to update their
@@ -192,10 +188,6 @@ public interface ILguiItem {
 	 */
 	public String saveCurrentLayout();
 
-	public void setPattern(Map<String, List<IPattern>> pattern);
-
-	public void setPattern(String gid, List<IPattern> filterValues);
-
 	public void setRequest(RequestType request);
 
 	/**
@@ -205,6 +197,8 @@ public interface ILguiItem {
 	 */
 	@Override
 	public String toString();
+
+	public void unlockPattern();
 
 	/**
 	 * 

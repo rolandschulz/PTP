@@ -40,10 +40,7 @@ public class Messages extends NLS {
 	public static String UsagebarPainter_CPUText;
 
 	public static String TableUpdate;
-
-	public static String TableView_Alpha;
 	public static String TableView_Filters;
-	public static String TableView_Owner;
 	public static String TableView_Show_only_my_jobs;
 
 	static {

@@ -10,8 +10,11 @@
 <!-- * Galen Arnold - adapt to openmpi -->
 <!-- * Greg Watson - adapt to interactive/debug -->
 <!-- ****************************************************************************** -->
-<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="edu.illinois.ncsa.forge.pbs.interactive.openmpi">
+<resource-manager-builder 
+	xmlns="org.eclipse.ptp" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	name="edu.illinois.ncsa.forge.pbs.interactive.openmpi">
 	<control-data>
 		<!-- Set the default value of this attribute if PBS is installed in a non-standard location -->
 		<attribute name="bindir" visible="false"/>
@@ -134,11 +137,13 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<arg>-l nodes=1,mem=${ptp_rm:Resource_List.mem#value},walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			<arg isUndefinedIfMatches="-A">-A ${ptp_rm:Account_Name#value}</arg>
 			<arg>-V</arg>
-			<input>cd ${ptp_rm:executableDirectory#value} &amp;&amp; perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_debugger.pl</input>
+			<input>cd ${ptp_rm:executableDirectory#value} &amp;&amp; perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_job.pl</input>
+			<input>mpirun</input>
 			<input isUndefinedIfMatches="-np">-np ${ptp_rm:mpiNumberOfProcesses#value}</input>
 			<input>-hostfile $PBS_NODEFILE</input>
 			<input>${ptp_rm:debuggerExecutablePath#value}</input>
 			<input>${ptp_rm:debuggerArgs#value}</input>
+			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
 			<environment name="OMPI_MCA_btl_openib_flags" value="1"/>
 			<environment name="OMPI_MCA_btl_mpi_leave_pinned" value="0"/>
 			<environment name="OMPI_MCA_btl_openib_warn_default_gid_prefix" value="0"/>

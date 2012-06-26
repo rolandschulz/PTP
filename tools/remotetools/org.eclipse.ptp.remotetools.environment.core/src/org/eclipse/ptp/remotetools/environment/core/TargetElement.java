@@ -74,9 +74,7 @@ public class TargetElement implements ITargetElement {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#getAttributes
-	 * ()
+	 * @see org.eclipse.ptp.remotetools.environment.core.ITargetElement#getAttributes ()
 	 */
 	/**
 	 * @since 2.0
@@ -92,8 +90,7 @@ public class TargetElement implements ITargetElement {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#getControl()
+	 * @see org.eclipse.ptp.remotetools.environment.core.ITargetElement#getControl()
 	 */
 	public ITargetControl getControl() throws CoreException {
 		if (control == null) {
@@ -116,8 +113,7 @@ public class TargetElement implements ITargetElement {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#getName()
+	 * @see org.eclipse.ptp.remotetools.environment.core.ITargetElement#getName()
 	 */
 	public String getName() {
 		return name;
@@ -126,8 +122,7 @@ public class TargetElement implements ITargetElement {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#getStatus()
+	 * @see org.eclipse.ptp.remotetools.environment.core.ITargetElement#getStatus()
 	 */
 	public int getStatus() {
 		return status;
@@ -136,8 +131,7 @@ public class TargetElement implements ITargetElement {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#getType()
+	 * @see org.eclipse.ptp.remotetools.environment.core.ITargetElement#getType()
 	 */
 	public TargetTypeElement getType() {
 		return type;
@@ -146,15 +140,22 @@ public class TargetElement implements ITargetElement {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#setAttributes
-	 * (java.util.Map)
+	 * @see org.eclipse.ptp.remotetools.environment.core.ITargetElement#setAttributes (java.util.Map)
 	 */
 	/**
 	 * @since 2.0
 	 */
 	public void setAttributes(ControlAttributes attributes) {
-		this.attributes = attributes;
+		/*
+		 * Update control configuration with new attributes. See bug 383029.
+		 */
+		try {
+			ITargetConfig config = getControl().getConfig();
+			for (Map.Entry<String, String> attrs : attributes.getAttributesAsMap().entrySet()) {
+				config.setAttribute(attrs.getKey(), attrs.getValue());
+			}
+		} catch (CoreException e) {
+		}
 		if (getStatus() == ITargetStatus.STOPPED) {
 			update();
 		} else {
@@ -169,9 +170,7 @@ public class TargetElement implements ITargetElement {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#setName(java
-	 * .lang.String)
+	 * @see org.eclipse.ptp.remotetools.environment.core.ITargetElement#setName(java .lang.String)
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -192,8 +191,7 @@ public class TargetElement implements ITargetElement {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.environment.core.ITargetElement#toString()
+	 * @see org.eclipse.ptp.remotetools.environment.core.ITargetElement#toString()
 	 */
 	@Override
 	public String toString() {

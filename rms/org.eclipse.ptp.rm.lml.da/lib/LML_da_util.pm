@@ -330,5 +330,30 @@ sub unify_string {
     $$lineref=$data;
 }
 
+sub unescape_special_characters {
+    my($str)=@_;
+    my $newstr=$str;
+    $newstr=~s/\&eq;/=/gs;
+    $newstr=~s/\&ne;/!=/gs;
+    $newstr=~s/\&lt;/</gs;
+    $newstr=~s/\&le;/<=/gs;
+    $newstr=~s/\&gt;/>/gs;
+    $newstr=~s/\&ge;/>=/gs;
+    return($newstr);
+}
+
+
+sub escape_special_characters {
+    my($str)=@_;
+    my $newstr=$str;
+    $newstr=~s/"="/"&eq;"/gs;
+    $newstr=~s/"!="/"&ne;"/gs;
+    $newstr=~s/"<"/"&lt;"/gs;
+    $newstr=~s/"<="/"&le;"/gs;
+    $newstr=~s/">"/"&gt;"/gs;
+    $newstr=~s/">="/"&ge;"/gs;
+    return($newstr);
+}
+
 
 1;

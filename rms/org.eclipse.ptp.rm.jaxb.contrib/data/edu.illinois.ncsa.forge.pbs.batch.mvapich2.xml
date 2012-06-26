@@ -9,8 +9,11 @@
 <!-- * Al Rossi - design and implementation -->
 <!-- * Galen Arnold - adapt to mvapich2 -->
 <!-- ****************************************************************************** -->
-<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="edu.illinois.ncsa.forge.pbs.batch.mvapich2">
+<resource-manager-builder 
+	xmlns="org.eclipse.ptp" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	name="edu.illinois.ncsa.forge.pbs.batch.mvapich2">
 	<control-data>
 		<!-- Set the default value of this attribute if PBS is installed in a non-standard location -->
 		<attribute name="bindir" visible="false"/>
@@ -815,7 +818,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 							<arg isUndefinedIfMatches=" destination=''"> destination='${ptp_rm:destination#value}'</arg>
 						</dynamic-text>
 					</widget>
-					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="tree" initialAllChecked="false">
+					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table" initialAllChecked="false">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
 						</layout-data>

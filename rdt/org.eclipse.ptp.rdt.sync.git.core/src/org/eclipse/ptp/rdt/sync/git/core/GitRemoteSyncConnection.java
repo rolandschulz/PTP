@@ -1014,6 +1014,12 @@ public class GitRemoteSyncConnection {
 		FileToMergePartsMap.remove(path);
 	}
 
+	/**
+	 * Replace given file with the most recent version in the repository
+	 *
+	 * @param path
+	 * @throws RemoteSyncException
+	 */
 	public void checkout(IPath path) throws RemoteSyncException {
 		CheckoutCommand checkoutCommand = git.checkout();
 		checkoutCommand.addPath(path.toString());
@@ -1027,6 +1033,25 @@ public class GitRemoteSyncConnection {
 		this.doRefresh(null);
 	}
 	
+	/**
+	 * Replace given file with the most recent local copy of the remote (not necessarily the same as the current remote)
+	 *
+	 * @param path
+	 * @throws RemoteSyncException
+	 */
+	public void checkoutRemoteCopy(IPath path) throws RemoteSyncException {
+		CheckoutCommand checkoutCommand = git.checkout();
+		checkoutCommand.addPath(path.toString());
+		checkoutCommand.setStartPoint("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
+		try {
+			checkoutCommand.call();
+		} catch (GitAPIException e) {
+			throw new RemoteSyncException(e);
+		}
+
+		this.doRefresh(null);
+	}
+
 	// Refresh the workspace after creating new local files
 	// Bug 374409 - run refresh in a separate thread to avoid possible deadlock from locking both the sync lock and the
 	// workspace lock.

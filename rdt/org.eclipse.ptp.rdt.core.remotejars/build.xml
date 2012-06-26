@@ -49,9 +49,9 @@
 	<property name="jdtUIJar" value="org.eclipse.jdt.ui_${jdtUIVersion}.jar"/>
 
 	<!-- RSE VERSIONS MUST BE UPDATED FOR NEW TM VERSION -->
-	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
-	<property name="rseVersion" value="R-3.3-201106080935"/>
-	<property name="dStoreBaseName" value="rseserver-3.3"/>
+	<property name="rseBaseUrl" value="http://download.eclipse.org/tm/downloads/drops"/>
+	<property name="rseVersion" value="R-3.4-201205300905"/>
+	<property name="dStoreBaseName" value="rseserver-3.4"/>
 
 	<!-- CDT PROPERTIES -->
 	<property name="cdtBaseUrl" value="http://download.eclipse.org/tools/cdt/builds/juno/nightly"/>
@@ -324,7 +324,7 @@
 				<include name="xlcparser.jar"/>
 				<include name="spawner.jar"/>
 				<include name="${serverBaseName}-aix-*.tar"/>
-				<include name="${serverBaseName}-linux.ppc-*.tar"/>
+				<include name="${serverBaseName}-linux.ppc64-*.tar"/>
 				<include name="${serverBaseName}-linux.x86-*.tar"/>
 				<include name="${serverBaseName}-macosx-*.tar"/>
 				<include name="${serverBaseName}-unix-*.tar"/>
@@ -426,7 +426,7 @@
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.pl"/>
 	</target>
 	
-	<target name="prepare.script.linux.ppc">
+	<target name="prepare.script.linux.ppc64">
 		<property name="rdtClassPath" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/upcparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/spawner.jar:$plugins_dir/${lpgRuntimeJar}"/>
 		<replace token=":$oldClasspath" value=":${rdtClassPath}:$oldClasspath" file="${remoteServerTempDir}/server.pl"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.pl"/>
@@ -452,7 +452,7 @@ $ENV{LD_LIBRARY_PATH}="$dir:$LD_LIBRARY_PATH";
 	</target>
 	
 	<target name="prepare.script.linux.x86">
-		<antcall target="prepare.script.linux.ppc"/>
+		<antcall target="prepare.script.linux.ppc64"/>
 	</target>
 	
 	<target name="prepare.script.unix">
@@ -594,7 +594,7 @@ export serverpath CLASSPATH LIBPATH
 		<copy file="${basedir}/../org.eclipse.cdt.core.aix/os/aix/ppc/libpty.so" todir="${remoteServerTempDir}"/>
 	</target>
 	
-	<target name="add.so.linux.ppc">
+	<target name="add.so.linux.ppc64">
 		<get src="${cdtBaseUrl}/plugins/${cdtCoreLinuxPPC64Jar}" dest="${downloads}/${cdtCoreLinuxPPC64Jar}"/>
 		<unzip dest="${basedir}/../org.eclipse.cdt.core.linux.ppc64">
 			<fileset dir="${downloads}" includes="${cdtCoreLinuxPPC64Jar}"/>
@@ -685,7 +685,7 @@ export serverpath CLASSPATH LIBPATH
 			<param name="jarplatform" value="unix"/>
 		</antcall>
 		<antcall target="tar.remote">
-			<param name="platform" value="linux.ppc"/>
+			<param name="platform" value="linux.ppc64"/>
 			<param name="jarplatform" value="linux"/>
 		</antcall>
 		<antcall target="tar.remote">

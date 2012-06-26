@@ -223,24 +223,15 @@ public class TableView extends ViewPart {
 				UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 					@Override
 					public void run() throws Exception {
-						if (composite != null && fLguiItem != null && viewCreated) {
-							if (componentAdded) {
-								fLguiItem.getObjectStatus().removeComponent(eventForwarder);
-								componentAdded = false;
+						if (event.getGid().equals(gid)) {
+							if (event.getPattern().size() > 0) {
+								setViewerInput(event.getPattern());
+								updateAfterLastFilter = false;
+							} else {
+								setViewerInput();
 							}
-							saveColumnLayout();
-							disposeTable();
-							viewCreated = false;
-						}
-						if (composite != null && !viewCreated) {
-							fLguiItem = lmlManager.getSelectedLguiItem();
-							if (fLguiItem != null) {
-								viewCreated = createTable();
-								if (fLguiItem.getObjectStatus() != null) {
-									fLguiItem.getObjectStatus().addComponent(eventForwarder);
-									componentAdded = true;
-								}
-							}
+
+							filterOwnJobsActionItem.getAction().setChecked(fLguiItem.isFilterOwnJobActive(gid));
 						}
 					}
 				});
@@ -261,8 +252,8 @@ public class TableView extends ViewPart {
 							&& tree.getSortColumn() != null) {
 						fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
 					}
-					if (fLguiItem.getPattern(gid).size() > 0) {
-						setViewerInput(fLguiItem.getPattern(gid));
+					if (!updateAfterLastFilter && fLguiItem.getTableHandler().getPattern(gid).size() > 0) {
+						setViewerInput(fLguiItem.getTableHandler().getPattern(gid));
 					} else {
 						setViewerInput();
 					}
@@ -282,9 +273,6 @@ public class TableView extends ViewPart {
 				@Override
 				public void run() throws Exception {
 					selectedOid = null;
-					// if (composite != null && !composite.isDisposed()) {
-					// viewer.refresh();
-					// }
 					if (composite != null && !composite.isDisposed()) {
 						tree.deselectAll();
 					}
@@ -337,11 +325,8 @@ public class TableView extends ViewPart {
 							fLguiItem.getTableHandler().getSortProperties(gid);
 							fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
 						}
-						if (fLguiItem.getPattern(gid).size() > 0) {
-							setViewerInput(fLguiItem.getPattern(gid));
-						} else {
-							setViewerInput();
-						}
+						setViewerInput();
+						updateAfterLastFilter = true;
 						if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
 							fLguiItem.getObjectStatus().addComponent(eventForwarder);
 							componentAdded = true;
@@ -376,6 +361,8 @@ public class TableView extends ViewPart {
 
 	private boolean isMouseDown = false;
 	private final EventForwarder eventForwarder = new EventForwarder();
+
+	private boolean updateAfterLastFilter = true;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -464,22 +451,22 @@ public class TableView extends ViewPart {
 
 			@Override
 			public void run() {
-				final List<IPattern> filterValuesNew = new LinkedList<IPattern>();
-				final List<IPattern> filterValuesOld = fLguiItem.getPattern(gid);
 
-				for (final IPattern filterValue : filterValuesOld) {
-					if (!filterValue.getColumnTitle().equals(Messages.TableView_Owner)) {
-						filterValuesNew.add(filterValue);
-					}
-				}
+				final List<String> columnsTitle = new LinkedList<String>();
+				columnsTitle.add(ILMLCoreConstants.OWNER);
+				fLguiItem.getTableHandler().deleteOldPattern(gid, columnsTitle);
 
 				if (isChecked()) {
-					filterValuesNew.add((new Pattern(Messages.TableView_Owner, Messages.TableView_Alpha)).setRelation(
-							"=", fLguiItem.getUsername())); //$NON-NLS-1$
+					final List<IPattern> filterValuesNew = new LinkedList<IPattern>();
+					filterValuesNew.add((new Pattern(ILMLCoreConstants.OWNER, ILMLCoreConstants.TABLECOLUMN_ALPHA)).setRelation(
+							ILMLCoreConstants.EQ, fLguiItem.getUsername()));
+
+					fLguiItem.getTableHandler().generateNewPattern(gid, filterValuesNew);
+					setViewerInput(fLguiItem.getTableHandler().getPattern(gid));
+				} else {
+					setViewerInput();
 				}
-				// TODO After decision about new structure of LML and server side
-				fLguiItem.setPattern(gid, filterValuesNew);
-				lmlManager.filterLgui(gid, filterValuesNew);
+				updateAfterLastFilter = false;
 			}
 
 		};
@@ -514,8 +501,6 @@ public class TableView extends ViewPart {
 
 	@Override
 	public void dispose() {
-		super.dispose();
-		viewCreated = false;
 		lmlManager.removeListener(lmlListener);
 	}
 
@@ -538,8 +523,8 @@ public class TableView extends ViewPart {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (viewer != null) {
-					if (fLguiItem.getPattern(gid).size() > 0) {
-						setViewerInput(fLguiItem.getPattern(gid));
+					if (fLguiItem.getTableHandler().getPattern(gid).size() > 0) {
+						setViewerInput(fLguiItem.getTableHandler().getPattern(gid));
 					} else {
 						setViewerInput();
 					}
@@ -835,11 +820,7 @@ public class TableView extends ViewPart {
 			}
 
 			// Insert the input
-			if (fLguiItem.getPattern(gid).size() > 0) {
-				setViewerInput(fLguiItem.getPattern(gid));
-			} else {
-				setViewerInput();
-			}
+			setViewerInput();
 			viewChanged = true;
 		}
 		composite.layout();

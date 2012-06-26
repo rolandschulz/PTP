@@ -6,8 +6,11 @@
 <!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
 <!-- * -->
 <!-- ****************************************************************************** -->
-<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="resource_manager_type.xsd" name="IBM LoadLeveler (Blue Gene)">
+<resource-manager-builder 
+	xmlns="org.eclipse.ptp" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	name="IBM LoadLeveler (Blue Gene)">
 	<control-data>
 		<!-- Set the default value of this attribute if LL is installed in a non-standard location -->
 		<attribute name="bindir" visible="false"/>
@@ -27,9 +30,33 @@
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
 			<link-value-to>Error_Path</link-value-to>
 		</attribute>
+		<attribute name="mpiCommand" type="choice">
+			<description>Optional MPI command to run job.</description>
+			<choice>,runjob :</choice>
+		</attribute>
 		
 		<!-- Attribute definitions for user-specified fields -->
 				
+		<attribute name="LL_BG_BLOCK" type="string">
+			<description>Specify node block where job is to be run.</description>
+		</attribute>
+						
+		<attribute name="LL_BG_CONNECTIVITY" type="string">
+			<description>Specify type of connectivity for node block.</description>
+		</attribute>
+						
+		<attribute name="LL_BG_REQUIREMENTS" type="string">
+			<description>Specify Blue Gene midplane requirements.</description>
+		</attribute>
+						
+		<attribute name="LL_BG_SHAPE" type="string">
+			<description>Specify Blue Gene job shape.</description>
+		</attribute>
+			
+		<attribute name="LL_BG_SIZE" type="string">
+			<description>Specify Blue Gene job size.</description>
+		</attribute>
+		
 		<attribute name="LL_BLOCKING" type="string">
 			<description>Specify blocking factor for assigning tasks to nodes.</description>
 		</attribute>
@@ -126,12 +153,31 @@
 												
 		<attribute name="LL_TOTAL_TASKS" type="string">
 			<description>Specify total number of tasks.</description>
-		</attribute>		
+		</attribute>
+			
+		<attribute name="LL_WALL_CLOCK_LIMIT" type="string">
+			<description>Specify the elapsed time the job can run (hardlimit,softlimit).</description>
+		</attribute>			
 		
 		<script insertEnvironmentAfter="0">
 			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 			<line>
 				<arg>#!/bin/bash</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ bg_block ="># @ bg_block = ${ptp_rm:LL_BG_BLOCK#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ bg_connectivity ="># @ bg_connectivity = ${ptp_rm:LL_BG_CONNECTIVITY#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ bg_requirements ="># @ bg_requirements = ${ptp_rm:LL_BG_REQUIREMENTS#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ bg_shape ="># @ bg_shape = ${ptp_rm:LL_BG_SHAPE#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="# @ bg_size ="># @ bg_size = ${ptp_rm:LL_BG_SIZE#value}</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="# @ blocking ="># @ blocking = ${ptp_rm:LL_BLOCKING#value}</arg>
@@ -197,16 +243,21 @@
 				<arg isUndefinedIfMatches="# @ tasks_per_node ="># @ tasks_per_node = ${ptp_rm:LL_TASKS_PER_NODE#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="# @ total_nodes ="># @ total_nodes = ${ptp_rm:LL_TOTAL_NODES#value}</arg>
+				<arg isUndefinedIfMatches="# @ total_tasks ="># @ total_tasks = ${ptp_rm:LL_TOTAL_TASKS#value}</arg>
 			</line>
 			<line>
-				<arg># @ executable = ${ptp_rm:executablePath#value}</arg>
-			</line>
-			<line>
-				<arg isUndefinedIfMatches="# @ arguments ="># @ arguments = ${ptp_rm:progArgs#value}</arg>
+				<arg isUndefinedIfMatches="# @ wall_clock_limit ="># @ wall_clock_limit = ${ptp_rm:LL_WALL_CLOCK_LIMIT#value}</arg>
 			</line>
 			<line>
 				<arg># @ queue</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="">${ptp_rm:modules#value}</arg>
+			</line>
+			<line>
+				<arg>${ptp_rm:mpiCommand#value} </arg>
+				<arg>${ptp_rm:executablePath#value} </arg>
+				<arg isUndefinedIfMatches="">${ptp_rm:progArgs#value}</arg>
 			</line>
 		</script>
 		<start-up-command name="get-classes">
@@ -391,6 +442,25 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_JOB_TYPE#description}</fixed-text>
 					</widget>
+					
+				<!-- MPI Command -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>MPI Command: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="false" attribute="mpiCommand">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:mpiCommand#description}</fixed-text>
+					</widget>
 				</composite>
 			</dynamic>
 			
@@ -508,6 +578,25 @@
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_RESOURCES#description}</fixed-text>
+					</widget>
+											
+               <!-- BG Midplane requirements -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Midplane requirements:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="LL_BG_REQUIREMENTS">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LL_BG_REQUIREMENTS#description}</fixed-text>
 					</widget>
 				</composite>
 			</dynamic>
@@ -782,6 +871,82 @@
 						<fixed-text>${ptp_rm:LL_NETWORK_MPI_LAPI#description}</fixed-text>
 					</widget>
 					
+					<!--  BG Block  --> 
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Node block:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER"  attribute="LL_BG_BLOCK">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LL_BG_BLOCK#description}</fixed-text>
+					</widget>
+					
+					<!--  BG Block Connectivity --> 
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Node block connectivity:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER"  attribute="LL_BG_CONNECTIVITY">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LL_BG_CONNECTIVITY#description}</fixed-text>
+					</widget>
+					
+					<!--  BG Job Shape --> 
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Job shape:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER"  attribute="LL_BG_SHAPE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LL_BG_SHAPE#description}</fixed-text>
+					</widget>
+					
+					<!--  BG Job Size --> 
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Job size:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER"  attribute="LL_BG_SIZE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LL_BG_SIZE#description}</fixed-text>
+					</widget>
+					
 					<!--  Min node  --> 
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
@@ -946,7 +1111,25 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_SOFT_LIMIT#description}</fixed-text>
 					</widget>
-					
+
+               <!-- Wall clock limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Wall clock limit:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER"  attribute="LL_WALL_CLOCK_LIMIT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LL_WALL_CLOCK_LIMIT#description}</fixed-text>
+					</widget>
 				</composite>
 			</dynamic>
 			<dynamic>
@@ -971,6 +1154,11 @@
 						<column-data name="Description" width="200" />
 						<column-data name="Value" width="200" />
 						<items>
+							<include>LL_BG_BLOCK</include>
+							<include>LL_BG_CONNECTIVITY</include>
+							<include>LL_BG_REQUIREMENTS</include>
+							<include>LL_BG_SHAPE</include>
+							<include>LL_BG_SIZE</include>
 							<include>LL_BLOCKING</include>
 							<include>LL_BULKXFER</include>
 							<include>LL_COMMENT</include>
@@ -995,7 +1183,8 @@
 							<include>LL_TASK_GEOMETRY</include>
 							<include>LL_TASKS_PER_NODE</include>
 							<include>LL_TOTAL_TASKS</include>
-							<include>MP_ACK_THRESH_ATTR</include>
+							<include>LL_WALL_CLOCK_LIMIT</include>
+							<include>mpiCommand</include>							
 						</items>
 						<value pattern="export @name='@value'" separator="; " />
 					</viewer>

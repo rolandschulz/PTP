@@ -38,4 +38,7 @@ public interface ILMLUIConstants extends ILMLCoreConstants {
 	public static final String INFO_KEY = "Key"; //$NON-NLS-1$
 	public static final String INFO_VALUES = "Value"; //$NON-NLS-1$
 
+	public static final String VERIFY_TEXT_NUMERIC = "0|([1-9][0-9]*)"; //$NON-NLS-1$
+	public static final String VERIFY_TEXT_ALPHA = ".+"; //$NON-NLS-1$
+	public static final String TEXT_SEPARATOR = " - "; //$NON-NLS-1$
 }

@@ -41,10 +41,12 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
@@ -53,6 +55,7 @@ import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
+import org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage;
 import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -67,6 +70,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -84,6 +88,8 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 	private StackLayout fProviderStack;
 	private Composite fConfigArea;
 	private CheckboxTableViewer fConfigTable;
+	private Button switchToRemoteConfigButton;
+	private SyncFileFilter customFilter = null;
 	private final List<Composite> fProviderControls = new ArrayList<Composite>();
 	private ISynchronizeParticipantDescriptor fSelectedProvider;
 	private final Map<Integer, ISynchronizeParticipantDescriptor> fComboIndexToDescriptorMap = new HashMap<Integer, ISynchronizeParticipantDescriptor>();
@@ -236,6 +242,34 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			}
 		});
 		
+		// Button to switch to remote config after conversion
+		switchToRemoteConfigButton = new Button(comp, SWT.CHECK);
+		switchToRemoteConfigButton.setText(Messages.ConvertLocalToSyncProjectWizardPage_4);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		switchToRemoteConfigButton.setLayoutData(gd);
+		switchToRemoteConfigButton.setSelection(true);
+
+		// File filter button
+		final Button filterButton = new Button(comp, SWT.PUSH);
+		filterButton.setText(Messages.ConvertLocalToSyncProjectWizardPage_3);
+		filterButton.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 3, 1));
+		filterButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				SyncFileFilter tmpFilter;
+				if (customFilter == null) {
+					tmpFilter = SyncManager.getDefaultFileFilter();
+				} else {
+					tmpFilter = new SyncFileFilter(customFilter);
+				}
+				int filterReturnCode = SyncFileFilterPage.openBlocking(tmpFilter, filterButton.getShell());
+				if (filterReturnCode == Window.OK) {
+					customFilter = tmpFilter;
+				}
+			}
+		});
+		
 		// These buttons are useless when only one project should be selected
 		this.selectAllButton.setVisible(false);
 		this.deselectAllButton.setVisible(false);
@@ -295,6 +329,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			}
 			
 			// Iterate through all configs
+			boolean switchToRemoteConfig = switchToRemoteConfigButton.getSelection();
 			boolean defaultConfigSet = false;
 			IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 			for (IConfiguration config : allConfigs) {
@@ -305,7 +340,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 					bcm.modifyConfigurationAsSyncRemote(remoteConfig);
 
 					// The first remote found will be the initial default (active) configuration.
-					if (!defaultConfigSet) {
+					if (switchToRemoteConfig && !defaultConfigSet) {
 						ManagedBuildManager.setDefaultConfiguration(project, remoteConfig);
 						defaultConfigSet = true;
 					}
@@ -314,6 +349,10 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 				bcm.modifyConfigurationAsSyncLocal(config);
 			}
 			ManagedBuildManager.saveBuildInfo(project, true);
+			
+			if (customFilter != null) {
+				SyncManager.saveFileFilter(project, customFilter);
+			}
 			
 		    // Enable sync'ing
 		    SyncManager.setSyncMode(project, SyncManager.SYNC_MODE.ACTIVE);

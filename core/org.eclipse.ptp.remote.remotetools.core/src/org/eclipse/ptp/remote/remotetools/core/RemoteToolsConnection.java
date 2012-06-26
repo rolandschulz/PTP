@@ -29,9 +29,13 @@ import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemotePortForwarding;
+import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
+import org.eclipse.ptp.remotetools.environment.core.ITargetElementStatus;
+import org.eclipse.ptp.remotetools.environment.core.ITargetEventListener;
+import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
 import org.eclipse.ptp.remotetools.exception.PortForwardingException;
@@ -51,6 +55,14 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	private final ITargetControl fTargetControl;
 	private final ListenerList fListeners = new ListenerList();
 
+	private final ITargetEventListener fTargetEventListener = new ITargetEventListener() {
+		public void handleStateChangeEvent(int event, ITargetElement element) {
+			if (element.getName().equals(fConnName) && event == ITargetElementStatus.STOPPED) {
+				doClose();
+			}
+		}
+	};
+
 	/**
 	 * @since 5.0
 	 */
@@ -59,6 +71,8 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		fTargetControl = element.getControl();
 		fConnName = name;
 		fRemoteServices = services;
+		TargetEnvironmentManager targetMgr = EnvironmentPlugin.getDefault().getTargetsManager();
+		targetMgr.addModelEventListener(fTargetEventListener);
 	}
 
 	/*
@@ -82,6 +96,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				fTargetControl.kill();
 			} catch (CoreException e) {
 			}
+			doClose();
 		}
 	}
 
@@ -100,6 +115,8 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * connection is closed!
 	 */
 	public void dispose() {
+		TargetEnvironmentManager targetMgr = EnvironmentPlugin.getDefault().getTargetsManager();
+		targetMgr.removeModelEventListener(fTargetEventListener);
 		fTargetElement.getType().removeElement(fTargetElement);
 		fListeners.clear();
 	}
@@ -533,6 +550,16 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			str += ":" + getPort(); //$NON-NLS-1$
 		}
 		return str + "]"; //$NON-NLS-1$
+	}
+
+	/**
+	 * Actions to perform when connection closes
+	 */
+	private void doClose() {
+		/*
+		 * Force refresh of working directory when connection is closed. See bug 383033.
+		 */
+		fWorkingDir = null;
 	}
 
 	/**

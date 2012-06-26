@@ -16,11 +16,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -43,11 +39,9 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.server.RemoteServerManager;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
-import org.eclipse.ptp.rm.lml.core.model.IPattern;
 import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
 import org.eclipse.ptp.rm.lml.internal.core.elements.DriverType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
-import org.eclipse.ptp.rm.lml.internal.core.model.Pattern;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
 import org.eclipse.ptp.rm.lml.monitor.core.messages.Messages;
 import org.eclipse.ui.IMemento;
@@ -133,7 +127,6 @@ public class MonitorControl implements IMonitorControl {
 	private final JobListener fJobListener = new JobListener();
 	private final StringBuffer fSavedLayout = new StringBuffer();
 	private final List<JobStatusData> fSavedJobs = new ArrayList<JobStatusData>();
-	private final Map<String, List<IPattern>> fSavedPattern = new HashMap<String, List<IPattern>>();
 	private String fSystemType;
 	private boolean fActive;
 	private String fRemoteServicesId;
@@ -144,16 +137,6 @@ public class MonitorControl implements IMonitorControl {
 	private static final String JOB_ATTR = "job";//$NON-NLS-1$ 
 	private static final String LAYOUT_ATTR = "layout";//$NON-NLS-1$
 	private static final String LAYOUT_STRING_ATTR = "layoutString";//$NON-NLS-1$
-	private static final String PATTERNS_ATTR = "patterns";//$NON-NLS-1$
-	private static final String PATTERN_GID_ATTR = "gid";//$NON-NLS-1$
-	private static final String FILTER_TITLE_ATTR = "columnTitle";//$NON-NLS-1$
-	private static final String FILTER_TYPE_ATTR = "type";//$NON-NLS-1$
-	private static final String FILTER_RANGE_ATTR = "range";//$NON-NLS-1$
-	private static final String FILTER_RELATION_ATTR = "relation";//$NON-NLS-1$
-	private static final String FILTER_MAX_VALUE_RANGE_ATTR = "maxValueRange";//$NON-NLS-1$
-	private static final String FILTER_MIN_VALUE_RANGE_ATTR = "minValueRange";//$NON-NLS-1$
-	private static final String FILTER_RELATION_OPERATOR_ATTR = "relationOperartor";//$NON-NLS-1$
-	private static final String FILTER_RELATION_VALUE_ATTR = "relationValue";//$NON-NLS-1$
 	private static final String SYSTEM_TYPE_ATTR = "systemType";//$NON-NLS-1$;
 	private static final String MONITOR_STATE = "monitorState";//$NON-NLS-1$;
 	private static final String REMOTE_SERVICES_ID_ATTR = "remoteServicesId";//$NON-NLS-1$;
@@ -230,7 +213,6 @@ public class MonitorControl implements IMonitorControl {
 	public boolean load() throws CoreException {
 		fSavedLayout.setLength(0);
 		fSavedJobs.clear();
-		fSavedPattern.clear();
 
 		FileReader reader;
 		try {
@@ -249,9 +231,6 @@ public class MonitorControl implements IMonitorControl {
 
 		childLayout = memento.getChild(JOBS_ATTR);
 		loadJobs(childLayout, fSavedJobs);
-
-		childLayout = memento.getChild(PATTERNS_ATTR);
-		loadPattern(childLayout, fSavedPattern);
 
 		return active;
 	}
@@ -275,7 +254,6 @@ public class MonitorControl implements IMonitorControl {
 
 		final String layout = fLMLManager.getCurrentLayout(getMonitorId());
 		final JobStatusData[] jobs = fLMLManager.getUserJobs(getMonitorId());
-		final Map<String, List<IPattern>> patternMap = fLMLManager.getCurrentPattern(getMonitorId());
 
 		saveState(memento);
 
@@ -290,13 +268,6 @@ public class MonitorControl implements IMonitorControl {
 				if (!status.isRemoved()) {
 					saveJob(status, jobsMemento);
 				}
-			}
-		}
-
-		if (patternMap != null && patternMap.keySet().size() > 0) {
-			final IMemento patternMemento = memento.createChild(PATTERNS_ATTR);
-			for (final Entry<String, List<IPattern>> pattern : patternMap.entrySet()) {
-				savePattern(pattern.getKey(), pattern.getValue(), patternMemento);
 			}
 		}
 
@@ -376,7 +347,7 @@ public class MonitorControl implements IMonitorControl {
 				 * Initialize LML classes
 				 */
 				fLMLManager.openLgui(getMonitorId(), conn.getUsername(), getMonitorConfigurationRequestType(),
-						fSavedLayout.toString(), fSavedJobs.toArray(new JobStatusData[0]), fSavedPattern);
+						fSavedLayout.toString(), fSavedJobs.toArray(new JobStatusData[0]));
 
 				fActive = true;
 
@@ -511,31 +482,6 @@ public class MonitorControl implements IMonitorControl {
 		}
 	}
 
-	private void loadPattern(IMemento memento, Map<String, List<IPattern>> pattern) {
-		if (memento != null) {
-			final IMemento[] childrenPattern = memento.getChildren(PATTERN_GID_ATTR);
-			for (final IMemento childPattern : childrenPattern) {
-				final List<IPattern> filters = new LinkedList<IPattern>();
-				final IMemento[] childrenFilter = childPattern.getChildren(FILTER_TITLE_ATTR);
-				for (final IMemento childFilter : childrenFilter) {
-					final IPattern filter = new Pattern(childFilter.getID(), childFilter.getString(FILTER_TYPE_ATTR));
-					if (childFilter.getBoolean(FILTER_RANGE_ATTR)) {
-						filter.setRange(childFilter.getString(FILTER_MIN_VALUE_RANGE_ATTR),
-								childFilter.getString(FILTER_MAX_VALUE_RANGE_ATTR));
-					} else if (childFilter.getBoolean(FILTER_RELATION_ATTR)) {
-						filter.setRelation(childFilter.getString(FILTER_RELATION_OPERATOR_ATTR),
-								childFilter.getString(FILTER_RELATION_VALUE_ATTR));
-					}
-					filters.add(filter);
-				}
-
-				if (filters.size() > 0) {
-					pattern.put(childPattern.getID(), filters);
-				}
-			}
-		}
-	}
-
 	private boolean loadState(IMemento memento) {
 		setRemoteServicesId(memento.getString(JobStatusData.REMOTE_SERVICES_ID_ATTR));
 		setConnectionName(memento.getString(JobStatusData.CONNECTION_NAME_ATTR));
@@ -554,23 +500,6 @@ public class MonitorControl implements IMonitorControl {
 		jobMemento.putString(JobStatusData.QUEUE_NAME_ATTR, job.getQueueName());
 		jobMemento.putString(JobStatusData.OWNER_ATTR, job.getOwner());
 		jobMemento.putString(JobStatusData.OID_ATTR, job.getOid());
-	}
-
-	private void savePattern(String key, List<IPattern> value, IMemento memento) {
-		final IMemento patternMemento = memento.createChild(PATTERN_GID_ATTR, key);
-		for (final IPattern filterValue : value) {
-			final IMemento filterMemento = patternMemento.createChild(FILTER_TITLE_ATTR, filterValue.getColumnTitle());
-			filterMemento.putString(FILTER_TYPE_ATTR, filterValue.getType());
-			filterMemento.putBoolean(FILTER_RANGE_ATTR, filterValue.isRange());
-			filterMemento.putBoolean(FILTER_RELATION_ATTR, filterValue.isRelation());
-			if (filterValue.isRange()) {
-				filterMemento.putString(FILTER_MIN_VALUE_RANGE_ATTR, filterValue.getMinValueRange());
-				filterMemento.putString(FILTER_MAX_VALUE_RANGE_ATTR, filterValue.getMaxValueRange());
-			} else if (filterValue.isRelation()) {
-				filterMemento.putString(FILTER_RELATION_OPERATOR_ATTR, filterValue.getRelationOperator());
-				filterMemento.putString(FILTER_RELATION_VALUE_ATTR, filterValue.getRelationValue());
-			}
-		}
 	}
 
 	private void saveState(IMemento memento) {

@@ -8,8 +8,11 @@
 <!-- * Contributors: -->
 <!-- * Simon Wail - design and implementation -->
 <!-- ****************************************************************************** -->
-<resource-manager-builder xmlns="http://org.eclipse.ptp/rm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="resource_manager_type.xsd" name="SLURM-BGP-Batch">
+<resource-manager-builder 
+	xmlns="org.eclipse.ptp" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	name="SLURM-BGP-Batch">
     <control-data>
         <!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
         <attribute name="control.queue.name" visible="false">
@@ -672,7 +675,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
         
         <launch-tab>
             <dynamic>
-                <title>Basic SLURM Settings</title>
+                <title>Basic Settings</title>
                 <layout>
                     <grid-layout/>
                 </layout>
@@ -872,7 +875,7 @@ Default from "blugene.conf" if not set.]]></tooltip>
                 </composite>
             </dynamic>
             <dynamic>
-                <title>Advanced SLURM Settings</title>
+                <title>Advanced Settings</title>
                 <layout>
                     <grid-layout/>
                 </layout>

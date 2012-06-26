@@ -941,6 +941,14 @@ public class BuildConfigurationManager {
 		provider.setMergeAsResolved(project, buildScenario, path);
 	}
 	
+	/**
+	 * Replace given file with the most recent version in the repository
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param path
+	 * @throws CoreException
+	 */
 	public void checkout(IProject project, BuildScenario buildScenario, IPath path) throws CoreException {
 		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
 		if (provider == null) { // Error handled in call
@@ -949,6 +957,26 @@ public class BuildConfigurationManager {
 		provider.checkout(project, buildScenario, path);
 	}
 	
+	/**
+	 * Replace given file with the most recent local copy of the remote (not necessarily the same as the current remote)
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param path
+	 * @throws CoreException
+	 */
+	public void checkoutRemoteCopy(IProject project, BuildScenario buildScenario, IPath path) throws CoreException {
+		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
+		if (provider == null) { // Error handled in call
+			return;
+		}
+		provider.checkoutRemoteCopy(project, buildScenario, path);
+	}
+
+	/**
+	 * Make the given configuration a local configuration
+	 * @param config
+	 */
 	public void modifyConfigurationAsSyncLocal(IConfiguration config) {
 		String configName = config.getName();
 		if (configName.endsWith(localConfigAnnotation)) {
@@ -964,6 +992,10 @@ public class BuildConfigurationManager {
 		ManagedBuildManager.saveBuildInfo(config.getOwner().getProject(), true);
 	}
 	
+	/**
+	 * Make the given configuration a remote configuration
+	 * @param config
+	 */
 	public void modifyConfigurationAsSyncRemote(IConfiguration config) {
 		String configName = config.getName();
 		if (configName.endsWith(remoteConfigAnnotation)) {
@@ -985,5 +1017,14 @@ public class BuildConfigurationManager {
 		}
 		
 		ManagedBuildManager.saveBuildInfo(config.getOwner().getProject(), true);
+	}
+	
+	/**
+	 * Do any necessary actions to shutdown the given project.
+	 * @param project
+	 */
+	public void shutdown(IProject project) {
+		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
+		provider.close(project);
 	}
 }

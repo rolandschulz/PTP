@@ -677,7 +677,7 @@ public final class JAXBResourceManagerControl extends AbstractResourceManagerCon
 		if (script == null) {
 			return false;
 		}
-		getVarMap().setEnvManager(EnvManagerRegistry.getEnvManager(monitor, getRemoteConnection()));
+		getVarMap().setEnvManagerFromConnection(getRemoteConnection());
 		ScriptHandler job = new ScriptHandler(uuid, script, getVarMap(), launchEnv, false);
 		job.schedule();
 		try {

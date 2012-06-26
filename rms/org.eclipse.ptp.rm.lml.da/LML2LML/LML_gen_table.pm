@@ -18,6 +18,7 @@ use Time::Local;
 use Time::HiRes qw ( time );
 use lib "$FindBin::RealBin/../LML_specs";
 use LML_specs;
+use LML_da_util;
 
 sub new {
     my $self    = {};
@@ -57,7 +58,7 @@ sub process {
     my $layoutref  = shift;
     my $tableref   = shift;
     my $filehandler_LML  = shift;
-    my ($numids,$gid,$contenttype,$idlistref,$objtype_pattern,$patternsref);
+    my ($numids,$gid,$contenttype,$idlistref,$objtype_pattern,$patternsref,$selectsref);
     $numids=0;
     $self->{LAYOUT}    = $layoutref; 
     $self->{TABLE}     = $tableref; 
@@ -84,11 +85,14 @@ sub process {
     # check pattern
     $patternsref=$self->_extract_patterns($layoutref,$tableref);
 
+    # check select
+    $selectsref=$self->_extract_selects($layoutref,$tableref);
+
     $idlistref=[];
     print "LML_gen_table::process: gid=$gid contenttype=$contenttype objtype_pattern=$objtype_pattern\n" 
 	if($self->{VERBOSE});
 
-    $idlistref=$self->_select_objs($objtype_pattern, $patternsref);
+    $idlistref=$self->_select_objs($objtype_pattern, $patternsref, $selectsref);
 
     $self->{IDLISTREF}=$idlistref;
     $numids=scalar @{$idlistref};
@@ -134,32 +138,131 @@ sub _extract_patterns {
     return(\%patterns);
 }
 
-
-sub _select_objs {
+sub _extract_selects {
     my($self) = shift;
-    my($objtype_pattern,$patternsref)=@_;
-    my (@idlist,$key,$ref,$skey,$found,$regexp);
+    my($layoutref,$tableref) = @_;
+    my(%selects,$cid,$key,$ptype,$rel,$value,$ref);
     
-    keys(%{$self->{LMLFH}->{DATA}->{OBJECT}}); # reset iterator
-    while(($key,$ref)=each(%{$self->{LMLFH}->{DATA}->{OBJECT}})) {
-	# check against contenttype
-	next if($ref->{type} ne $objtype_pattern);
-	# check attributes against pattern
-	$found=1;
-	foreach $skey (keys(%{$patternsref})) {
-	    $regexp=$patternsref->{$skey};
-	    if(exists($self->{LMLFH}->{DATA}->{INFODATA}->{$key}->{$skey})) {
-		if($self->{LMLFH}->{DATA}->{INFODATA}->{$key}->{$skey}!~/$regexp/) {
-#		    print "not matched for $key $skey $regexp\n";
-		    $found=0; # not matched
-		} 
-	    } else {
-#		print "not found for $key $skey $regexp\n";
-		if($regexp ne ".*") {
-		    $found=0; # attribute not available, but user defined a pattern
+    foreach $cid (keys(%{$layoutref->{column}})) {
+	if(exists($layoutref->{column}->{$cid}->{key})) {
+	    $key=$layoutref->{column}->{$cid}->{key};
+	} elsif($tableref->{column}->{$cid}->{key}) {
+	    $key=$tableref->{column}->{$cid}->{key};
+	} else {
+	    print "LML_gen_table: ERROR, could not find key for column $cid of table $layoutref->{gid}, skipping column ...\n";
+	    next;
+	}
+	$selects{$key}=undef; # default
+	if(exists($tableref->{column}->{$cid})) {
+	    if(exists($tableref->{column}->{$cid}->{pattern})) {
+		my (@selectlist);
+		foreach $ref (@{$tableref->{column}->{$cid}->{pattern}}) {
+		    if($ref->[0] eq "select") {
+			($ptype,$rel,$value)=@{$ref};
+			$rel=&LML_da_util::unescape_special_characters($rel);
+			push(@selectlist,[$rel,$value]);
+		    }
+		}
+		if($#selectlist>=0) { 
+		    $selects{$key}=[@selectlist];
 		}
 	    }
 	}
+    }
+    return(\%selects);
+}
+
+
+sub _select_objs {
+    my($self) = shift;
+    my($objtype_pattern,$patternsref,$selectsref)=@_;
+    my (@idlist,$key,$ref,$sref,$skey,$found,$regexp,$selects,$sort,$specref);
+    
+
+    keys(%{$self->{LMLFH}->{DATA}->{OBJECT}}); # reset iterator
+    while(($key,$ref)=each(%{$self->{LMLFH}->{DATA}->{OBJECT}})) {
+	$found=1;
+
+	# check against contenttype
+	next if($ref->{type} ne $objtype_pattern);
+
+	# checking against include/exclude pattern
+	foreach $skey (keys(%{$patternsref})) {
+	    $regexp=$patternsref->{$skey};
+
+	    if(exists($self->{LMLFH}->{DATA}->{INFODATA}->{$key}->{$skey})) {
+		my $val=$self->{LMLFH}->{DATA}->{INFODATA}->{$key}->{$skey};
+
+		if($val!~/$regexp/) {
+		    $found=0; # not matched
+#		    print "not matched for $key $skey $regexp\n";
+		}
+	    } else {
+		if($regexp ne ".*") {
+		    $found=0; # attribute not available, but user defined a pattern
+		}
+#		print "not found for $key $skey $regexp\n";
+	    }
+	}
+	
+
+	# checking against select pattern
+
+
+	foreach $skey (keys(%{$selectsref})) {
+	    $selects=$selectsref->{$skey};
+	    $specref = $LML_specs::LMLattributes->{$objtype_pattern}->{$skey};
+
+	    $sort="alpha"; # default
+	    $sort="alpha"   if ( ($specref->[0] eq "s") || ($specref->[0] eq "k") );
+	    $sort="numeric" if ( ($specref->[0] eq "d") || ($specref->[0] eq "f") );
+	    $sort="date"    if ( ($specref->[0] eq "D") );
+	    
+
+	    if(exists($self->{LMLFH}->{DATA}->{INFODATA}->{$key}->{$skey})) {
+		my $val=$self->{LMLFH}->{DATA}->{INFODATA}->{$key}->{$skey};
+
+		if($selects) {
+		    foreach $sref (@{$selects}) {
+			my($rel,$refval)=(@{$sref});
+			
+			# equal
+			$found=0 if ($sort eq "numeric") && ($rel eq "=") && (!($val == $refval));
+			$found=0 if ($sort eq "alpha")   && ($rel eq "=") && (!($val eq $refval));
+			$found=0 if ($sort eq "date")    && ($rel eq "=") && (!($val eq $refval));
+
+			# not equal
+			$found=0 if ($sort eq "numeric") && ($rel eq "!=") && (!($val != $refval));
+			$found=0 if ($sort eq "alpha")   && ($rel eq "!=") && (!($val ne $refval));
+			$found=0 if ($sort eq "date")    && ($rel eq "!=") && (!($val ne $refval));
+
+			# less (equal)
+			$found=0 if ($sort eq "numeric") && ($rel eq "lt")   && (!($val <  $refval));
+			$found=0 if ($sort eq "numeric") && ($rel eq "le")  && (!($val <= $refval));
+			$found=0 if ($sort eq "date") && ($rel eq "lt")   && (!($val lt  $refval));
+			$found=0 if ($sort eq "date") && ($rel eq "le")  && (!($val le $refval));
+
+			# greater (equal)
+			$found=0 if ($sort eq "numeric") && ($rel eq "gt")   && (!($val >  $refval));
+			$found=0 if ($sort eq "numeric") && ($rel eq "ge")  && (!($val >= $refval));
+			$found=0 if ($sort eq "date") && ($rel eq "gt")   && (!($val gt  $refval));
+			$found=0 if ($sort eq "date") && ($rel eq "ge")  && (!($val ge $refval));
+
+			# (not) match reqexp
+			$found=0 if ($sort eq "alpha") && ($rel eq "=~")   && (!($val=~/$refval/));
+			$found=0 if ($sort eq "alpha") && ($rel eq "!~")   && (!($val!~/$refval/));
+			
+		    }
+		}
+
+	    } else {
+		if($selects) {
+		    $found=0; # attribute not available, but user defined a select
+		}
+#		print "skey not defined not found for $key $skey (select)\n";
+	    } 
+	}
+
 	if($found) {
 	    push(@idlist,$key);
 	}

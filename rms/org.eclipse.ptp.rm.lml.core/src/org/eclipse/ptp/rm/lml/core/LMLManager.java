@@ -131,18 +131,6 @@ public class LMLManager {
 		return null;
 	}
 
-	public Map<String, List<IPattern>> getCurrentPattern(String name) {
-		ILguiItem item = null;
-		synchronized (LGUIS) {
-			item = LGUIS.get(name);
-		}
-		if (item != null) {
-			final Map<String, List<IPattern>> map = item.getPattern();
-			return map;
-		}
-		return new HashMap<String, List<IPattern>>();
-	}
-
 	public ILguiItem getSelectedLguiItem() {
 		return fLguiItem;
 	}
@@ -181,10 +169,8 @@ public class LMLManager {
 	 *            Layout from an earlier Eclipse session
 	 * @param jobs
 	 *            Array of earlier started jobs
-	 * @param pattern
 	 */
-	public void openLgui(String name, String username, RequestType request, String layout, JobStatusData[] jobs,
-			Map<String, List<IPattern>> pattern) {
+	public void openLgui(String name, String username, RequestType request, String layout, JobStatusData[] jobs) {
 		synchronized (LGUIS) {
 			ILguiItem item = LGUIS.get(name);
 			if (item == null) {
@@ -196,7 +182,6 @@ public class LMLManager {
 
 		fLguiItem.reloadLastLayout(layout);
 		fLguiItem.setRequest(request);
-		fLguiItem.setPattern(pattern);
 		restoreJobStatusData(fLguiItem, jobs);
 
 		if (!fLguiItem.isEmpty()) {

@@ -35,9 +35,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.UIJob;
 
 /**
- * Base class for the wrappers around the data objects providing information as
- * to the operations on a target property to be undertaken when there is a
- * match.
+ * Base class for the wrappers around the data objects providing information as to the operations on a target property to be
+ * undertaken when there is a match.
  * 
  * @author arossi
  * 
@@ -48,8 +47,7 @@ public abstract class AbstractAssign implements IAssign {
 	 * Auxiliary for adding a wrapper implementation.
 	 * 
 	 * @param uuid
-	 *            unique id associated with this resource manager operation (can
-	 *            be <code>null</code>).
+	 *            unique id associated with this resource manager operation (can be <code>null</code>).
 	 * @param assign
 	 *            the JAXB element class.
 	 * @param list
@@ -111,14 +109,13 @@ public abstract class AbstractAssign implements IAssign {
 	}
 
 	/**
-	 * Determines whether the input represents an object field or a resolvable
-	 * expression. Also converts string to int or boolean, if applicable,
+	 * Determines whether the input represents an object field or a resolvable expression. Also converts string to int or boolean,
+	 * if applicable,
 	 * 
 	 * @param target
 	 *            on which to apply the getter.
 	 * @param uuid
-	 *            unique id associated with this resource manager operation (can
-	 *            be <code>null</code>).
+	 *            unique id associated with this resource manager operation (can be <code>null</code>).
 	 * @param expression
 	 *            input to be interpreted
 	 * @param convert
@@ -155,8 +152,7 @@ public abstract class AbstractAssign implements IAssign {
 	 * @param field
 	 *            on the target on which to set the value.
 	 * @param values
-	 *            corresonding to the parameter(s) of the set method (usually a
-	 *            single one)
+	 *            corresonding to the parameter(s) of the set method (usually a single one)
 	 * @throws Throwable
 	 */
 	static void set(Object target, String field, Object[] values) throws Throwable {
@@ -219,9 +215,6 @@ public abstract class AbstractAssign implements IAssign {
 				return false;
 			}
 			try {
-				if (string.indexOf(JAXBControlConstants.DOT) >= 0) {
-					return new Double(string);
-				}
 				return new Integer(string);
 			} catch (NumberFormatException nfe) {
 			}
@@ -268,10 +261,9 @@ public abstract class AbstractAssign implements IAssign {
 	}
 
 	/**
-	 * Used in the case of references to targets constructed in connection with
-	 * the tokenization. The assumption is that an Assign action will be applied
-	 * only once to any given target, in the order of their construction; this
-	 * index keeps track of where this particular assign action is in the list.
+	 * Used in the case of references to targets constructed in connection with the tokenization. The assumption is that an Assign
+	 * action will be applied only once to any given target, in the order of their construction; this index keeps track of where
+	 * this particular assign action is in the list.
 	 * 
 	 * @return the index of the current target
 	 */
@@ -306,8 +298,7 @@ public abstract class AbstractAssign implements IAssign {
 	}
 
 	/**
-	 * Decides whether the index of the map key is a segment (from
-	 * regex.split()) or a regex group number.
+	 * Decides whether the index of the map key is a segment (from regex.split()) or a regex group number.
 	 * 
 	 * @param entry
 	 *            from the target map
@@ -323,8 +314,7 @@ public abstract class AbstractAssign implements IAssign {
 	}
 
 	/**
-	 * Decides whether the index of the map value is a segment (from
-	 * regex.split()) or a regex group number.
+	 * Decides whether the index of the map value is a segment (from regex.split()) or a regex group number.
 	 * 
 	 * @param entry
 	 *            carries the key and value indices
@@ -414,12 +404,10 @@ public abstract class AbstractAssign implements IAssign {
 	}
 
 	/**
-	 * Method specific to the assign type for retrieving the values from the
-	 * matched expression.
+	 * Method specific to the assign type for retrieving the values from the matched expression.
 	 * 
 	 * @param previous
-	 *            the value currently assigned to the field of the target in
-	 *            question.
+	 *            the value currently assigned to the field of the target in question.
 	 * @param values
 	 *            the parsed result of the expression match
 	 * @return the value(s) retrieved from the parsed result
