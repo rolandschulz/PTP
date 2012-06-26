@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>PTP Remote Tools</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+<script type="text/javascript" src="thumb.js"> </script>
+</head> 
+<body>
+<h1 id="top">PTP Remote Tools</h1>
+<p><b>Remote Tools</b> is a lightweight remote service provider that is included
+with the Parallel Tools Platform (PTP).
+
+
+
+To access the remote target system, PTP supports a number of
+<i>remote service providers</i>. 
+Currently supported remote service providers include <b>Remote Tools</b> (part of PTP) and 
+the <b>Eclipse Remote Systems Explorer (RSE)</b> which is an optional package that can be installed at any time. 
+<b>The preferred remote service provider is Remote Tools</b> which supports all the PTP and Remote Development Tools (RDT) 
+functionality, however
+some installations use additional features that are only available in RSE. 
+Most PTP information is described using <b>Remote Tools</b>, since it is the simplest and easiest to use.</p>
+<p>See also <a href="localVsRemote.html">Local vs. Remote Projects</a> for more information on local and remote
+projects, and the different service providers.
+<h2 id="edit">Editing Remote Connections</h2>
+<p>To edit remote connection information after a connection is created, e.g. to change userid, password, etc.,
+first select the <b>Remote Environments</b> view. 
+<p><img src="images/rt_remoteEnvironments.png">
+<p>To edit a connection, it must first be stopped.  To stop a connection, select it and use the "red box"
+action on the <b>Remote Environments</b> view toolbar.
+<p><img src="images/rt_stopConnection.png">
+<p>Once stopped, edit the connection via the context menu (right mouse)
+<p><img src="images/rt_remoteEnv_edit.png">
+<p>Then make any changes to the connection and select <b>Finish</b>
+<p><img src="images/rt_editConnection.png">
+<p>The connection need not be manually restarted.  It will automatically restart the next
+time communication with the target machine is needed.
+
+<p>&nbsp;</p>
+
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+</body>
+
+</html>
