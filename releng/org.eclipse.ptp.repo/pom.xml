@@ -43,7 +43,7 @@
 											<fileset dir="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars">
 												<include name="rdt-server-aix-${unqualifiedVersion}.tar"/>
 												<include name="rdt-server-linux-${unqualifiedVersion}.tar"/>
-												<include name="rdt-server-linux.ppc-${unqualifiedVersion}.tar"/>
+												<include name="rdt-server-linux.ppc64-${unqualifiedVersion}.tar"/>
 												<include name="rdt-server-linux.x86-${unqualifiedVersion}.tar"/>
 												<include name="rdt-server-macosx-${unqualifiedVersion}.tar"/>
 												<include name="rdt-server-unix-${unqualifiedVersion}.tar"/>
