@@ -465,10 +465,12 @@ public class GitRemoteSyncConnection {
 				char status = line.charAt(0);
 				String fn = line.substring(2);
 				fn = QuotedString.GIT_PATH.dequote(fn);
-				if (status == 'R') {
-					filesToDelete.add(fn);
-				} else if (!(fileFilter.shouldIgnore(project.getFile(fn)))) {
-					filesToAdd.add(fn);
+				if (!(fileFilter.shouldIgnore(project.getFile(fn)))) {
+					if (status == 'R') {
+						filesToDelete.add(fn);
+					} else {
+						filesToAdd.add(fn);
+					}
 				}
 			}
 			statusReader.close();
@@ -497,13 +499,17 @@ public class GitRemoteSyncConnection {
 			throw new RemoteSyncException(e);
 		}
 
+		Set<String> allFiles = new HashSet<String>();
+		allFiles.addAll(filesToAdd);
+		allFiles.addAll(filesToDelete);
 		Set<String> filesToBeIgnored = new HashSet<String>();
-		for (String fileName : filesToAdd) {
+		for (String fileName : allFiles) {
 			if (fileFilter.shouldIgnore(project.getFile(fileName))) {
 				filesToBeIgnored.add(fileName);
 			}
 		}
 		filesToAdd.removeAll(filesToBeIgnored);
+		filesToDelete.removeAll(filesToBeIgnored);
 		
 		return status;
 	}
@@ -697,13 +703,19 @@ public class GitRemoteSyncConnection {
 
 			// For each merge-conflicted file, pull out and store its contents for each of the three commits
 			for (String s : status.getConflicting()) {
+				String localContents = ""; //$NON-NLS-1$
 				TreeWalk localTreeWalk = TreeWalk.forPath(git.getRepository(), s, head.getTree());
-				ObjectId localId = localTreeWalk.getObjectId(0);
-				String localContents = new String(git.getRepository().open(localId).getBytes());
+				if (localTreeWalk != null) {
+					ObjectId localId = localTreeWalk.getObjectId(0);
+					localContents = new String(git.getRepository().open(localId).getBytes());
+				}
 
+				String remoteContents = ""; //$NON-NLS-1$
 				TreeWalk remoteTreeWalk = TreeWalk.forPath(git.getRepository(), s, mergeHead.getTree());
-				ObjectId remoteId = remoteTreeWalk.getObjectId(0);
-				String remoteContents = new String(git.getRepository().open(remoteId).getBytes());
+				if (remoteTreeWalk != null) {
+					ObjectId remoteId = remoteTreeWalk.getObjectId(0);
+					remoteContents = new String(git.getRepository().open(remoteId).getBytes());
+				}
 
 				String ancestorContents = ""; //$NON-NLS-1$
 				if (mergeBase != null) {
@@ -1008,10 +1020,16 @@ public class GitRemoteSyncConnection {
 		addCommand.addFilepattern(path.toString());
 		try {
 			addCommand.call();
+			// Make sure file is no longer conflicted before marking as resolved.
+			// Sometimes JGit will silently fail to add.
+			StatusCommand statusCommand = git.status();
+			Status status = statusCommand.call();
+			if (!(status.getConflicting().contains(path.toString()))) {
+				FileToMergePartsMap.remove(path);
+			}
 		} catch (GitAPIException e) {
 			throw new RemoteSyncException(e);
 		}
-		FileToMergePartsMap.remove(path);
 	}
 
 	/**
