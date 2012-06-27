@@ -930,7 +930,7 @@ public class TableView extends ViewPart {
 		for (final TreeColumn column : columns) {
 			width += column.getWidth();
 		}
-		final Double[] widths = new Double[columns.length - 1];
+		final Double[] widths = new Double[columns.length - 2];
 		for (int i = 0; i < columns.length - 2; i++) {
 			final TreeColumn column = columns[i + 1];
 			Double columnWidth = (double) 0;

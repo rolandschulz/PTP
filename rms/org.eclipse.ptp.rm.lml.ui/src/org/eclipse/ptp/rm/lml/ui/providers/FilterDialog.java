@@ -169,7 +169,6 @@ public class FilterDialog extends Dialog {
 		this.gid = gid;
 		filterOld = lguiItem.getTableHandler().getPattern(gid);
 
-		setShellStyle(SWT.RESIZE | SWT.APPLICATION_MODAL);
 		this.shell = parentShell;
 	}
 
