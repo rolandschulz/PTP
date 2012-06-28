@@ -14,7 +14,7 @@
 	<name>PTP Parent</name>
 
 	<properties>
-		<tycho-version>0.13.0</tycho-version>
+		<tycho-version>0.15.0</tycho-version>
 		<platform-version>4.2milestones</platform-version>
 		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
 		<tm-version>3.4</tm-version>
