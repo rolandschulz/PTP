@@ -105,6 +105,7 @@ public class NewFortranSyncProjectWizard extends FortranProjectWizard {
 	 */
 	@Override
 	protected IProject continueCreation(IProject prj) {
+		super.continueCreation(prj);
 		return prj;
 	}
 
