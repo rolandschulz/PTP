@@ -246,6 +246,12 @@ public class LguiItem implements ILguiItem {
 					if (data.getKey().equals(ILMLCoreConstants.MOTD)) {
 						type = ILMLCoreConstants.MOTD;
 						message = data.getValue();
+						message = message.replaceAll("&#10;", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+						message = message.replaceAll("&lt;", "<"); //$NON-NLS-1$ //$NON-NLS-2$
+						message = message.replaceAll("&gt;", ">"); //$NON-NLS-1$ //$NON-NLS-2$
+						message = message.replaceAll("&amp;", "&"); //$NON-NLS-1$ //$NON-NLS-2$
+						message = message.replaceAll("&apos;", "\'"); //$NON-NLS-1$ //$NON-NLS-2$
+						message = message.replaceAll("&quot", "\""); //$NON-NLS-1$ //$NON-NLS-2$
 					} else if (data.getKey().equals(ILMLCoreConstants.ERROR)) {
 						return new String[] { ILMLCoreConstants.ERROR, data.getValue() };
 					}
@@ -575,10 +581,12 @@ public class LguiItem implements ILguiItem {
 
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 		StringBuilder xmlStream = new StringBuilder();
+		final StringBuilder out = new StringBuilder();
 		String s;
 		try {
 			while (null != (s = reader.readLine())) {
 				xmlStream.append(s);
+				out.append(s + "\n");
 			}
 		} catch (final IOException e) {
 			xmlStream = new StringBuilder();
@@ -591,6 +599,7 @@ public class LguiItem implements ILguiItem {
 				}
 			}
 		}
+		System.out.println(out.toString());
 		if (xmlStream.length() > 0) {
 			lgui = jaxbUtil.unmarshal(xmlStream.toString());
 			if (listeners.isEmpty()) {
