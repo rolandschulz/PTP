@@ -17,4 +17,3 @@ Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.core.runtime
 Bundle-Localization: plugin
-Import-Package: javax.xml.bind

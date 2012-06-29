@@ -377,31 +377,33 @@ public abstract class AbstractEnvManager implements IEnvManager {
 		final IFileStore script = fileManager.getResource(pathToTempFile);
 		PrintStream out = null;
 		try {
+			// Bash requires line endings to be "\n", so don't use println (will use "\r\n" on Windows)
 			out = new PrintStream(new BufferedOutputStream(script.openOutputStream(EFS.NONE, null)));
-			out.println("#!/bin/bash --login"); //$NON-NLS-1$
-			out.println("echo ''"); //$NON-NLS-1$
-			out.println("echo '**** Environment configuration script temporarily stored in " + pathToTempFile + " ****'"); //$NON-NLS-1$ //$NON-NLS-2$
+			out.print("#!/bin/bash --login\n"); //$NON-NLS-1$
+			out.print("echo ''\n"); //$NON-NLS-1$
+			out.print("echo '**** Environment configuration script temporarily stored in " + pathToTempFile + " ****'\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			if (config.isEnvMgmtEnabled()) {
 				if (config.isManualConfigEnabled()) {
-					out.println(config.getManualConfigText());
+					out.print(config.getManualConfigText().replace("\r\n", "\n") + "\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				} else {
 					for (final String command : getInitialBashCommands(echo)) {
-						out.println(command);
+						out.print(command + "\n"); //$NON-NLS-1$
 					}
 					for (final String moduleName : config.getConfigElements()) {
 						for (final String command : getBashCommand(echo, moduleName)) {
-							out.println(command);
+							out.print(command + "\n"); //$NON-NLS-1$
 						}
 					}
 				}
 			}
 			if (commandToExecuteAfterward != null && commandToExecuteAfterward.length() > 0) {
 				if (echo) {
-					out.println("echo '" + commandToExecuteAfterward + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+					out.print("echo '" + commandToExecuteAfterward + "'\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				out.println(commandToExecuteAfterward);
+				out.print(commandToExecuteAfterward + "\n"); //$NON-NLS-1$
 			}
-			out.println("rm -f '" + pathToTempFile + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+			out.print("rm -f '" + pathToTempFile + "'\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			out.flush();
 			out.close();
 		} catch (final Exception e) {
 			EMSCorePlugin.log(e);
