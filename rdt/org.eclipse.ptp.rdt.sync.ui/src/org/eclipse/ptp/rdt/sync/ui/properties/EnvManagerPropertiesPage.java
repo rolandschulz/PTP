@@ -74,7 +74,8 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		}
 
 		final BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-		final IServiceConfiguration serviceConfig = bcm.getConfigurationForBuildConfiguration(getCfg());
+		// final IServiceConfiguration serviceConfig = bcm.getConfigurationForBuildConfiguration(getCfg());
+		final IServiceConfiguration serviceConfig = null;
 		if (serviceConfig == null) {
 			return null;
 		}
