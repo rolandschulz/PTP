@@ -477,4 +477,9 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 		return out;// true;
 	}
 
+	public boolean isRemote() {
+		
+		return false;
+	}
+
 }

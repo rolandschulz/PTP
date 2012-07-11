@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.AbstractToolDataManager;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
@@ -143,7 +144,9 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 		if (tool == null) {
 			return new Status(IStatus.WARNING, "com.ibm.jdg2e.concurrency", IStatus.OK, Messages.PostlaunchTool_NoToolNoData, null); //$NON-NLS-1$
 		}
+		
 
+		
 		/*
 		 * If we have not defined output location...
 		 */
@@ -157,7 +160,7 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 			/*
 			 * Otherwise we need to ask the user where the performance data is located
 			 */
-			else {
+			else {//TODO: This needs to support remote filesystems!
 				Display.getDefault().syncExec(new Runnable() {
 
 					public void run() {
@@ -177,6 +180,23 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 				 * This means we have specified data potentially outside of the workspace.
 				 */
 				externalTarget = true;
+			}
+		}
+		else{
+			String customOutLoc=null;
+			
+			try {
+				customOutLoc = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR,(String)null);
+			} catch (CoreException e1) {
+				e1.printStackTrace();
+			}
+
+			if(customOutLoc!=null)
+			{	
+				outputLocation=customOutLoc;			
+			}
+			else if(utilBlob.isRemote()){
+				outputLocation=utilBlob.getWorkingDirectory();
 			}
 		}
 
@@ -211,11 +231,17 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 		List<IFileStore> files = new ArrayList<IFileStore>();
 		IFileStore[] filea = null;
 		try {
-			filea = root.childStores(EFS.NONE, null);
+			if(root.fetchInfo().exists()&&root.fetchInfo().isDirectory()){
+				filea = root.childStores(EFS.NONE, null);
+			}
+			else{
+				return files;
+			}
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 		String test = matchSuffix.toLowerCase();
+		if( filea !=null)
 		for(IFileStore f : filea){
 			if(f.getName().endsWith(test))
 				files.add(f);

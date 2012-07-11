@@ -113,5 +113,8 @@ public interface IBuildLaunchUtils {
 	public void runVis(List<String> tool, Map<String, String> env, String directory);
 
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory);
+	
+	
+	public boolean isRemote();
 
 }

@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -481,6 +482,13 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			//
 			// //Process p =
 			// pb.start();
+			
+			if(env==null)
+				env=new HashMap<String,String>();
+		
+			
+			if(env.get("DISPLAY")==null)
+				env.put("DISPLAY", ":0.0");
 
 			getProcess(tool, env, directory);
 
@@ -527,6 +535,10 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public boolean isRemote() {
+		return true;
 	}
 
 }

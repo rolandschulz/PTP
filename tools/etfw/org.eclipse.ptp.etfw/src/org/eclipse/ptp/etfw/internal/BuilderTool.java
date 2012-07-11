@@ -607,28 +607,35 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		}
 		return didChange;
 	}
-	private static final String CComp="CC=";
-	private static final String CxxComp="CXX=";
-	private static final String FComp="F90=";
-	private static final String UPCComp="UPCC=";
+	private static final String CComp="CC";
+	private static final String CxxComp="CXX";
+	private static final String FComp="F90";
+	private static final String UPCComp="UPCC";
+	private static final String EQ=":=";
 	private String getStandardMakeBuildOps(BuildTool tool, ILaunchConfiguration configuration, String allargs) throws CoreException{
 		String ops=EMPTY;
 		//String tmp;
 		if(tool.getCcCompiler()!=null)
-			ops+=getStandardMakeOp(CComp,getToolCommand(tool.getCcCompiler(), configuration), allargs );
+			ops+=getStandardMakeOp(CComp,getToolCommand(tool.getCcCompiler(), configuration), allargs,tool.replaceCompiler);
 		if(tool.getCxxCompiler()!=null)
-			ops+=getStandardMakeOp(CxxComp,getToolCommand(tool.getCxxCompiler(), configuration), allargs);
+			ops+=getStandardMakeOp(CxxComp,getToolCommand(tool.getCxxCompiler(), configuration), allargs,tool.replaceCompiler);
 		if(tool.getF90Compiler()!=null)
-			ops+=getStandardMakeOp(FComp,getToolCommand(tool.getF90Compiler(), configuration) , allargs);
+			ops+=getStandardMakeOp(FComp,getToolCommand(tool.getF90Compiler(), configuration) , allargs,tool.replaceCompiler);
 		if(tool.getUPCCompiler()!=null)
-			ops+=getStandardMakeOp(UPCComp,getToolCommand(tool.getUPCCompiler(), configuration) , allargs);
+			ops+=getStandardMakeOp(UPCComp,getToolCommand(tool.getUPCCompiler(), configuration) , allargs,tool.replaceCompiler);
 		return ops;
 	}
 
-	private String getStandardMakeOp(String var,String command, String args){
+	private String getStandardMakeOp(String var,String command, String args,boolean replace){
 		String op = EMPTY;
 		if(command!=null)
-			op=var+command+SPACE + args + NEWLINE;
+		{
+			op=var+EQ+command+SPACE + args;
+			if(!replace){
+				op+=SPACE+"$("+var+")";
+			}
+			op+= NEWLINE;
+		}
 			
 		return op;
 	}
