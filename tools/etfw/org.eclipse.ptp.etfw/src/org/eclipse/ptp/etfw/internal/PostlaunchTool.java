@@ -3,6 +3,8 @@ package org.eclipse.ptp.etfw.internal;
 //import java.io.File;
 //import java.io.FileFilter;
 //import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -27,6 +29,10 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.console.ConsolePlugin;
+import org.eclipse.ui.console.IConsole;
+import org.eclipse.ui.console.IConsoleManager;
+import org.eclipse.ui.console.MessageConsole;
 
 public class PostlaunchTool extends ToolStep implements IToolLaunchConfigurationConstants {
 
@@ -100,7 +106,27 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 							if (anap.isVisualizer)
 								utilBLob.runVis(runTool, null, outputLocation);
 							else {
+								
+								if(anap.outToFile!=null)
+								{
 								utilBLob.runTool(runTool, null, outputLocation, anap.outToFile);
+								}
+								else{
+									byte[] utout = null;
+									MessageConsole mc = findConsole("ETFw");
+									mc.clearConsole();
+									OutputStream os = mc.newOutputStream();
+									utout = utilBlob.runToolGetOutput(runTool, null, outputLocation,true);
+									
+										try {
+										if(utout!=null)
+											os.write(utout);
+										os.close();
+										} catch (IOException e) {
+											e.printStackTrace();
+										}
+									mc.activate();
+								}
 							}
 						} else {
 							System.out.println(Messages.PostlaunchTool_TheCommand + anap.toolCommand
@@ -293,6 +319,21 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 				findFiles(fileSet, r, depth - 1, matchSuffix,latestOnly);
 			}
 		}
+	}
+	
+	public static MessageConsole findConsole(String name) {
+		ConsolePlugin plugin = ConsolePlugin.getDefault();
+		IConsoleManager conMan = plugin.getConsoleManager();
+		IConsole[] existing = conMan.getConsoles();
+		for (int i = 0; i < existing.length; i++) {
+			if (name.equals(existing[i].getName())) {
+				return (MessageConsole) existing[i];
+			}
+		}
+		// no console found, so create a new one
+		MessageConsole myConsole = new MessageConsole(name, null);
+		conMan.addConsoles(new IConsole[] { myConsole });
+		return myConsole;
 	}
 
 }

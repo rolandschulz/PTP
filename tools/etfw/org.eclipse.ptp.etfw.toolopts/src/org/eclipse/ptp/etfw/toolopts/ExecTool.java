@@ -8,6 +8,12 @@ public class ExecTool extends ExternalTool {
 	public boolean prependExecution=false;
 	
 	/**
+	 * If true the executable and arguments in the launch configuration are ignored and the utilities given are run instead.
+	 * @since 4.1
+	 */
+	public boolean replaceExecution=false;
+	
+	/**
 	 * The array of individual tools to be passed the executable being analyzed (in nesting order)
 	 */
 	public ToolApp[] execUtils=null;

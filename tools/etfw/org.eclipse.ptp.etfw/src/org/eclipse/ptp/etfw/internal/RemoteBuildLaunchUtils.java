@@ -272,13 +272,13 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			//Process p = new ProcessBuilder("which", toolname).start();//Runtime.getRuntime().exec("which "+toolname); //$NON-NLS-1$
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			pPath = reader.readLine();
-			String line;
-			while ((line=reader.readLine()) != null) {
+			//String line;
+			while ((reader.readLine()) != null) {
 				//System.out.println(line);
 			}
 			reader.close();
 			reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			while ((line=reader.readLine()) != null) {
+			while ((reader.readLine()) != null) {
 				//System.out.println(line);
 			}
 		} catch (IOException e) {
@@ -394,7 +394,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			// pb.environment().putAll(env);
 			// }
 
-			IRemoteProcess p = getProcess(tool, env, directory);// pb.start();// Runtime.getRuntime().exec(tool, env,
+			IRemoteProcess p = getProcess(tool, env, directory,false);// pb.start();// Runtime.getRuntime().exec(tool, env,
 			// directory);
 			StreamRunner outRun = new StreamRunner(p.getInputStream(), "out", fos); //$NON-NLS-1$
 			StreamRunner errRun = new StreamRunner(p.getErrorStream(), "err", null); //$NON-NLS-1$
@@ -415,6 +415,10 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	}
 
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory) {
+		return runToolGetOutput(tool,env,directory,false);
+	}
+	
+	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory,boolean showErr) {
 		int eval = -1;
 		byte[] out = null;
 		try {
@@ -433,10 +437,13 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			// fos = test.openOutputStream(EFS.NONE, null);//test.openOutputStream(options, monitor)new FileOutputStream(test);
 			// }
 
-			IRemoteProcess p = getProcess(tool, env, directory);// pb.start();// Runtime.getRuntime().exec(tool, env,
+			IRemoteProcess p = getProcess(tool, env, directory,showErr);// pb.start();// Runtime.getRuntime().exec(tool, env,
 			// directory);
 			StreamRunner outRun = new StreamRunner(p.getInputStream(), "out", fos); //$NON-NLS-1$
-			StreamRunner errRun = new StreamRunner(p.getErrorStream(), "err", null); //$NON-NLS-1$
+			StreamRunner errRun =null;
+
+			 errRun = new StreamRunner(p.getErrorStream(), "err", null); //$NON-NLS-1$
+			
 			outRun.start();
 			errRun.start();
 			outRun.join();
@@ -457,7 +464,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		return out;
 	}
 
-	private IRemoteProcess getProcess(List<String> tool, Map<String, String> env, String directory) throws IOException {
+	private IRemoteProcess getProcess(List<String> tool, Map<String, String> env, String directory,boolean mergeOutput) throws IOException {
 
 		IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);// new IRemoteProcessBuilder(tool);
 		if (directory != null) {
@@ -466,6 +473,8 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		if (env != null) {
 			pb.environment().putAll(env);
 		}
+		
+		pb.redirectErrorStream(mergeOutput);
 
 		return pb.start();
 	}
@@ -490,7 +499,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			if(env.get("DISPLAY")==null)
 				env.put("DISPLAY", ":0.0");
 
-			getProcess(tool, env, directory);
+			getProcess(tool, env, directory,false);
 
 		} catch (Exception e) {
 			e.printStackTrace();

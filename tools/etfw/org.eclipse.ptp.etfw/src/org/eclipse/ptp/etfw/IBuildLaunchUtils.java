@@ -114,6 +114,8 @@ public interface IBuildLaunchUtils {
 
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory);
 	
+	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory, boolean showErr);
+	
 	
 	public boolean isRemote();
 

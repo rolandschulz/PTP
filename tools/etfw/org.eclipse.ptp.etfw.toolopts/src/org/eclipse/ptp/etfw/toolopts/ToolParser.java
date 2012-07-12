@@ -280,6 +280,7 @@ public class ToolParser extends DefaultHandler{
 			inExecution=true;
 			execTool=new ExecTool();
 			toolApps=new ArrayList<ToolApp>();
+			execTool.replaceExecution=getBooleanAttribute("replace_execution",false,atts);
 			execTool.requireTrue=getAttribute("if",atts);
 		}
 		else if(name.equals(ANALYZE)&&!inAnalysis)

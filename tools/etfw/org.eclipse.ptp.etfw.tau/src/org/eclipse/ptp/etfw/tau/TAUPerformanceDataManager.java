@@ -38,6 +38,7 @@ import org.eclipse.ptp.etfw.AbstractToolDataManager;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
+import org.eclipse.ptp.etfw.internal.PostlaunchTool;
 import org.eclipse.ptp.etfw.internal.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.tau.perfdmf.PerfDMFUIPlugin;
@@ -45,9 +46,6 @@ import org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.console.ConsolePlugin;
-import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 
 public class TAUPerformanceDataManager extends AbstractToolDataManager {
@@ -445,7 +443,7 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 		// IFileStore ppk = getPPKFile(directory, projname, projtype, projtrial);
 		byte[] ppout = null;
 
-		MessageConsole mc = findConsole(PARAPROFCONSOLE);
+		MessageConsole mc = PostlaunchTool.findConsole(PARAPROFCONSOLE);
 		mc.clearConsole();
 		OutputStream os = mc.newOutputStream();
 
@@ -512,20 +510,7 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 
 	private static final String PARAPROFCONSOLE = "TAU Profile Output";
 
-	private MessageConsole findConsole(String name) {
-		ConsolePlugin plugin = ConsolePlugin.getDefault();
-		IConsoleManager conMan = plugin.getConsoleManager();
-		IConsole[] existing = conMan.getConsoles();
-		for (int i = 0; i < existing.length; i++) {
-			if (name.equals(existing[i].getName())) {
-				return (MessageConsole) existing[i];
-			}
-		}
-		// no console found, so create a new one
-		MessageConsole myConsole = new MessageConsole(name, null);
-		conMan.addConsoles(new IConsole[] { myConsole });
-		return myConsole;
-	}
+
 
 	@Override
 	public void view() {
@@ -768,7 +753,7 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 			profdir.mkdir(EFS.OVERWRITE, null);
 			IFileStore dest = profdir.getChild(profileFile.getName());
 			profileFile.move(dest, EFS.OVERWRITE, null);
-			MessageConsole mc = findConsole(PARAPROFCONSOLE);
+			MessageConsole mc = PostlaunchTool.findConsole(PARAPROFCONSOLE);
 			OutputStream os = mc.newOutputStream();
 			os.write(("Moving profile data to: " + profileFile.toString()).getBytes());
 			os.close();

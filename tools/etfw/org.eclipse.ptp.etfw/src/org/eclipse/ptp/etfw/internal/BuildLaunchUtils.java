@@ -441,7 +441,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	}
 
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env,
-			String directory) {
+			String directory, boolean showErr) {
 		int eval = -1;
 		byte[] out = null;
 		try {
@@ -454,7 +454,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 			if (env != null) {
 				pb.environment().putAll(env);
 			}
-
+			pb.redirectErrorStream(showErr);
 			Process p = pb.start();// Runtime.getRuntime().exec(tool, env,
 									// directory);
 			StreamRunner outRun = new StreamRunner(p.getInputStream(), "out", fos); //$NON-NLS-1$
@@ -480,6 +480,11 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	public boolean isRemote() {
 		
 		return false;
+	}
+
+	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env,
+			String directory) {
+		return runToolGetOutput(tool,env,directory,false);
 	}
 
 }

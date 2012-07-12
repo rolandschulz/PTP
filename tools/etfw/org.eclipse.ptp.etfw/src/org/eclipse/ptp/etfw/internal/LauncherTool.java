@@ -172,6 +172,8 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 
 			if (tool != null)
 			{
+
+				
 				prog = confWC.getAttribute(appnameattrib, EMPTY_STRING);
 				boolean usepathforapp=false;
 				if(prog==null||prog.equals(EMPTY_STRING)){
@@ -185,9 +187,12 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 				String arg = confWC.getAttribute(appargattrib, EMPTY_STRING);
 				saveApp = prog;
 				saveArgs = arg;
-
 				Map<String, String> envMap = new LinkedHashMap<String, String>();
+				
+				
 				if (tool.execUtils != null && tool.execUtils.length > 0) {
+					
+					
 
 					String firstExecUtil = getToolExecutable(tool.execUtils[0]);
 
@@ -208,7 +213,15 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 						otherUtils += SPACE + getToolCommand(tool.execUtils[i], configuration);
 					}
 					swappedArgs = true;
-					String toArgs = otherUtils + SPACE + prog + SPACE + arg; 
+					
+					String toArgs = otherUtils;
+					
+					if(!tool.replaceExecution){
+					
+					toArgs = toArgs + SPACE + prog + SPACE + arg; 
+					
+					}
+					
 					confWC.setAttribute(appargattrib, toArgs);
 					
 					String jaxbAtt=confWC.getAttribute(EXTOOL_JAXB_ATTR_ARGUMENTS_TAG, EMPTY_STRING);
@@ -218,10 +231,15 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 					if(jaxbAtt!=null&&jaxbAtt.length()>0)
 						confWC.setAttribute(jaxbAtt, firstExecUtil);
 
+					
+					
 					for (int i = 0; i < tool.execUtils.length; i++) {
 						envMap.putAll(tool.execUtils[i].getEnvVars(configuration));
 					}
+				
+				
 				}
+				
 				if (tool.global != null) {
 					envMap.putAll(tool.global.getEnvVars(configuration));
 				}
@@ -263,7 +281,8 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 					confWC.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, newvars);
 				}
 
-			}
+			
+		}
 			configuration = confWC.doSave();
 
 			boolean reRun = launch.isTerminated();
