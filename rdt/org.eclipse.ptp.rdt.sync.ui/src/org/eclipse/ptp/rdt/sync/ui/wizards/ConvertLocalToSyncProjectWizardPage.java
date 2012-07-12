@@ -43,25 +43,19 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
-import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
-import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
-import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage;
 import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
@@ -289,31 +283,8 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 		try {
 			ISynchronizeParticipant participant = fSelectedProvider.getParticipant();
 
-			// Build the service configuration
-			ServiceModelManager smm = ServiceModelManager.getInstance();
-			IServiceConfiguration serviceConfig = smm.newServiceConfiguration(getConfigName(project.getName()));
-			IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-			serviceConfig.setServiceProvider(syncService, participant.getProvider(project));
-
-			IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
-			IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(SyncBuildServiceProvider.ID);
-			SyncBuildServiceProvider rbsp = (SyncBuildServiceProvider) smm.getServiceProvider(descriptor);
-			if (rbsp != null) {
-				IRemoteConnection remoteConnection = participant.getProvider(project).getRemoteConnection();
-				rbsp.setRemoteToolsConnection(remoteConnection);
-				serviceConfig.setServiceProvider(buildService, rbsp);
-			}
-
-			smm.addConfiguration(project, serviceConfig);
-			try {
-				smm.saveModelConfiguration();
-			} catch (IOException e) {
-				RDTSyncUIPlugin.log(e.toString(), e);
-			}
-
-			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-
 			// Initialize project with a local build scenario, which is applied to all configurations
+			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 			bcm.setBuildScenarioForAllBuildConfigurations(project, bcm.createLocalBuildScenario(project));
 
 			// Create a remote build scenario
@@ -407,29 +378,6 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			projectConfigs.put(project, config);
 		}
 		return config;
-	}
-
-	/**
-	 * Creates a name for the service configuration based on the remote
-	 * connection name. If multiple names exist, appends a qualifier to the
-	 * name.
-	 * 
-	 * @return new name guaranteed to be unique
-	 */
-	private String getConfigName(String candidateName) {
-		Set<IServiceConfiguration> configs = ServiceModelManager.getInstance().getConfigurations();
-		Set<String> existingNames = new HashSet<String>();
-		for (IServiceConfiguration config : configs) {
-			existingNames.add(config.getName());
-		}
-
-		int i = 2;
-		String newConfigName = candidateName;
-		while (existingNames.contains(newConfigName)) {
-			newConfigName = candidateName + " (" + (i++) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		return newConfigName;
 	}
 
 	/*
