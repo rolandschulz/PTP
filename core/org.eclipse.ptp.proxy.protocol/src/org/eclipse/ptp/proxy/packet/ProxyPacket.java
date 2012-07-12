@@ -44,14 +44,13 @@ public class ProxyPacket {
 	private static final int SMALL_PACKET = 100;
 
 	/*
-	 * frequency table will preferably be updated with packets larger than this
-	 * size. Avoids sending frequency table with small packets.
+	 * frequency table will preferably be updated with packets larger than this size. Avoids sending frequency table with small
+	 * packets.
 	 */
 	private static final int LARGE_PACKET = 8192;
 
 	/*
-	 * allow compression if difference between original and compressed packet is
-	 * >= that this
+	 * allow compression if difference between original and compressed packet is >= that this
 	 */
 	private static final int COMPRESSION_DIFF = 100;
 
@@ -73,7 +72,7 @@ public class ProxyPacket {
 	private String[] fPacketArgs;
 	private HuffmanByteCompress compressor;
 	private HuffmanByteUncompress uncompressor;
-	private final Charset fCharset = Charset.forName("US-ASCII"); //$NON-NLS-1$
+	private final Charset fCharset = Charset.forName("ISO-8859-1"); //$NON-NLS-1$
 
 	private final CharsetEncoder encoder = fCharset.newEncoder();
 	private final CharsetDecoder decoder = fCharset.newDecoder();
@@ -213,9 +212,9 @@ public class ProxyPacket {
 	/**
 	 * Process packets from the wire.
 	 * 
-	 * @return false if a protocol error occurs
+	 * @return false if the connection has closed (read returns < 0)
 	 * @throws IOException
-	 *             if the connection is terminated (read returns < 0)
+	 *             if a protocol error occurs
 	 * 
 	 */
 	public boolean read(ReadableByteChannel channel) throws IOException {
@@ -223,7 +222,9 @@ public class ProxyPacket {
 		 * First PACKET_LENGTH_SIZE bytes are the length of the event
 		 */
 		ByteBuffer lengthBytes = ByteBuffer.allocate(PACKET_LENGTH_SIZE);
-		fullRead(channel, lengthBytes);
+		if (fullRead(channel, lengthBytes) < 0) {
+			return false;
+		}
 		int len;
 		VarInt val;
 		try {
@@ -236,7 +237,9 @@ public class ProxyPacket {
 		 * Read len bytes of rest of packet
 		 */
 		ByteBuffer packetBytes = ByteBuffer.allocate(len);
-		fullRead(channel, packetBytes);
+		if (fullRead(channel, packetBytes) < 0) {
+			return false;
+		}
 
 		if (debug) {
 			System.out.println("RECEIVE:[" + len + "] -> " + Thread.currentThread().getName()); //$NON-NLS-1$//$NON-NLS-2$
@@ -284,8 +287,7 @@ public class ProxyPacket {
 		}
 
 		/*
-		 * Extract rest of the arguments. Each argument is a 1 byte type
-		 * followed by the argument value.
+		 * Extract rest of the arguments. Each argument is a 1 byte type followed by the argument value.
 		 * 
 		 * XXX: all arguments are assumed to be string attributes for now
 		 */
@@ -402,8 +404,7 @@ public class ProxyPacket {
 		compressedPacket = compressor.apply(bb);
 
 		/*
-		 * If compression is not good enough, return original packet. If
-		 * frequency table is updated, send compressed packet anyway.
+		 * If compression is not good enough, return original packet. If frequency table is updated, send compressed packet anyway.
 		 */
 		if (limit - compressedPacket.limit() > COMPRESSION_DIFF || updated) {
 			flagByte |= COMPRESSION_FLAG;
@@ -427,38 +428,34 @@ public class ProxyPacket {
 	}
 
 	/**
-	 * Read a full buffer from the socket. Guaranteed to read buf.remaining()
-	 * bytes from the channel.
+	 * Read a full buffer from the socket. Guaranteed to read buf.remaining() bytes from the channel.
 	 * 
-	 * FIXME: Can this block if there is nothing available on the channel? If
-	 * so, then there should be some kind of timeout to prevent the UI from
-	 * hanging.
+	 * FIXME: Can this block if there is nothing available on the channel? If so, then there should be some kind of timeout to
+	 * prevent the UI from hanging.
 	 * 
 	 * @param buf
 	 *            buffer containing the result of the read
+	 * @returns the number of bytes read, or -1 on EOF
 	 * @throws IOException
-	 *             if EOF
+	 *             if an I/O error occurs
 	 */
-	private void fullRead(ReadableByteChannel channel, ByteBuffer buf) throws IOException {
+	private int fullRead(ReadableByteChannel channel, ByteBuffer buf) throws IOException {
+		int n = 0;
 		buf.clear();
 		while (buf.hasRemaining()) {
-			int n = channel.read(buf);
-			if (n < 0) {
-				throw new IOException(Messages.getString("ProxyPacket_2")); //$NON-NLS-1$
-			}
+			n += channel.read(buf);
 		}
 		buf.flip();
+		return n;
 	}
 
 	/**
-	 * Write an array of buffers to the socket. Guarantees to write the whole
-	 * buffer array.
+	 * Write an array of buffers to the socket. Guarantees to write the whole buffer array.
 	 * 
-	 * NOTE: Originally used GatherByteChannel but the performance is pathetic.
-	 * This implementation requires a buffer copy, which should be eliminated.
+	 * NOTE: Originally used GatherByteChannel but the performance is pathetic. This implementation requires a buffer copy, which
+	 * should be eliminated.
 	 * 
-	 * FIXME: Can this block? If so, then there should be some kind of timeout
-	 * to prevent the UI from hanging.
+	 * FIXME: Can this block? If so, then there should be some kind of timeout to prevent the UI from hanging.
 	 * 
 	 * @param bufs
 	 *            array of buffers to write
@@ -481,8 +478,7 @@ public class ProxyPacket {
 	}
 
 	/**
-	 * Return some default values for the Huffman frequency table based on
-	 * experimentation.
+	 * Return some default values for the Huffman frequency table based on experimentation.
 	 * 
 	 * @since 5.0
 	 */

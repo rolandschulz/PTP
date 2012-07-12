@@ -34,7 +34,6 @@ import org.eclipse.ptp.internal.proxy.command.ProxyQuitCommand;
 import org.eclipse.ptp.internal.proxy.event.ProxyConnectedEvent;
 import org.eclipse.ptp.internal.proxy.event.ProxyDisconnectedEvent;
 import org.eclipse.ptp.internal.proxy.event.ProxyMessageEvent;
-import org.eclipse.ptp.internal.proxy.event.ProxyShutdownEvent;
 import org.eclipse.ptp.internal.proxy.event.ProxyTimeoutEvent;
 import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeClearFiltersCommand;
 import org.eclipse.ptp.internal.proxy.runtime.command.ProxyRuntimeResumeEventsCommand;
@@ -57,8 +56,8 @@ import org.eclipse.ptp.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 import org.eclipse.ptp.proxy.util.DebugOptions;
-import org.eclipse.ptp.proxy.util.compression.IEncoder;
 import org.eclipse.ptp.proxy.util.compression.IDecoder;
+import org.eclipse.ptp.proxy.util.compression.IEncoder;
 import org.eclipse.ptp.proxy.util.compression.huffmancoder.HuffmanByteCompress;
 import org.eclipse.ptp.proxy.util.compression.huffmancoder.HuffmanByteUncompress;
 
@@ -89,9 +88,9 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	private SocketChannel sessSock = null;
 	private IProxyEventFactory proxyEventFactory;
 	private FlowControlState flowState = FlowControlState.NORMAL_FLOW;
-	
-	private IEncoder compressor;
-	private IDecoder uncompressor;
+
+	private final IEncoder compressor;
+	private final IDecoder uncompressor;
 
 	private Thread eventThread;
 	private Thread acceptThread;
@@ -115,9 +114,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.proxy.client.IProxyClient#addProxyEventListener(org.eclipse
-	 * .ptp.proxy.client.event.IProxyEventListener)
+	 * @see org.eclipse.ptp.proxy.client.IProxyClient#addProxyEventListener(org.eclipse .ptp.proxy.client.event.IProxyEventListener)
 	 */
 	public void addProxyEventListener(IProxyEventListener listener) {
 		listeners.add(listener);
@@ -252,13 +249,20 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		return ++transactionID;
 	}
 
-	private void processPacket() throws IOException {
+	/**
+	 * Read a packet
+	 * 
+	 * @return true if successful, false if the connection was disconnected
+	 * @throws IOException
+	 *             if a protocol error occurs
+	 */
+	private boolean processPacket() throws IOException {
 		ProxyPacket packet = new ProxyPacket(uncompressor);
 		if (getDebugOptions().PROTOCOL_TRACING) {
 			packet.setDebug(true);
 		}
 		if (!packet.read(sessSock)) {
-			return;
+			return false;
 		}
 
 		/*
@@ -268,13 +272,13 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		if (e != null) {
 			eventQueue.addProxyEvent(e);
 		}
+		return true;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.proxy.client.IProxyClient#removeProxyEventListener(org
+	 * @see org.eclipse.ptp.proxy.client.IProxyClient#removeProxyEventListener(org
 	 * .eclipse.ptp.proxy.client.event.IProxyEventListener)
 	 */
 	public void removeProxyEventListener(IProxyEventListener listener) {
@@ -349,26 +353,22 @@ public abstract class AbstractProxyClient implements IProxyClient {
 						break;
 					}
 					try {
-						processPacket();
+						if (!processPacket()) {
+							eventQueue.addPriorityProxyEvent(new ProxyDisconnectedEvent(true));
+							state = SessionState.SHUTTING_DOWN;
+							eventQueue.addPriorityProxyEvent(proxyEventFactory.newShutdownEvent(0));
+						}
 					} catch (IOException e) {
 						/*
-						 * Handle the situation where the proxy doesn't respond
-						 * to a quit command with an OK event. In this case, we
+						 * Handle the situation where the proxy doesn't respond to a quit command with an OK event. In this case, we
 						 * fake a shutdown event.
 						 */
 						if (state == SessionState.SHUTTING_DOWN) {
-							eventQueue.addPriorityProxyEvent(new ProxyShutdownEvent(0));
+							eventQueue.addPriorityProxyEvent(proxyEventFactory.newShutdownEvent(0));
 						} else {
-							eventQueue.addPriorityProxyEvent(new ProxyDisconnectedEvent(true));
+							eventQueue.addPriorityProxyEvent(proxyEventFactory.newErrorEvent(0,
+									new String[] { e.getLocalizedMessage() }));
 						}
-						/*
-						 * If the connection closes this loop loops on an
-						 * IOException thrown by ProxyPacket.fullRead(); To
-						 * prevent this thread from looping, exit on an
-						 * IOException.
-						 */
-						state = SessionState.SHUTTING_DOWN;
-						eventQueue.addPriorityProxyEvent(new ProxyShutdownEvent(0));
 						break;
 					}
 				}
@@ -378,8 +378,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	}
 
 	/**
-	 * Send a command to the proxy instructing it to remove filtering for the
-	 * specified event types
+	 * Send a command to the proxy instructing it to remove filtering for the specified event types
 	 * 
 	 * @param args
 	 *            Array of event types to remove filtering
@@ -401,8 +400,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.proxy.client.IProxyClient#sendCommand(java.lang.String)
+	 * @see org.eclipse.ptp.proxy.client.IProxyClient#sendCommand(java.lang.String)
 	 */
 	public synchronized void sendCommand(IProxyCommand cmd) throws IOException {
 		if (!isReady()) {
@@ -416,8 +414,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	}
 
 	/**
-	 * Send a command to the proxy instructing it to resume sending messages to
-	 * the client
+	 * Send a command to the proxy instructing it to resume sending messages to the client
 	 */
 	private void sendResumeEventsCommand() {
 		try {
@@ -431,8 +428,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	}
 
 	/**
-	 * Send a command to the proxy instructing it to apply filtering for the
-	 * specified event types
+	 * Send a command to the proxy instructing it to apply filtering for the specified event types
 	 * 
 	 * @param args
 	 *            Array of event types to apply filtering
@@ -466,8 +462,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	}
 
 	/**
-	 * Send a command to the proxy instructing it to suspend sending messages to
-	 * the client
+	 * Send a command to the proxy instructing it to suspend sending messages to the client
 	 */
 	private void sendSuspendEventsCommand() {
 		try {
@@ -588,8 +583,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		case WAITING:
 			if (acceptThread.isAlive()) {
 				/*
-				 * Force interrupt of accept. Note that this will cause a
-				 * ProxyErrorEvent to be generated
+				 * Force interrupt of accept. Note that this will cause a ProxyErrorEvent to be generated
 				 */
 				acceptThread.interrupt();
 			}
@@ -605,8 +599,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			break;
 		case RUNNING:
 			/*
-			 * Send quit command. Proxy will shut down when OK is received or
-			 * after shutdownTimeout.
+			 * Send quit command. Proxy will shut down when OK is received or after shutdownTimeout.
 			 */
 			IProxyCommand cmd = new ProxyQuitCommand();
 			// TODO: start shutdown timeout
@@ -629,14 +622,12 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	}
 
 	/**
-	 * Start threads to read packets sent to the client by a proxy and to
-	 * process events created from the packets. Communication between these two
-	 * threads is thru a ProxyEventQueue object The event thread is guaranteed
-	 * to produce a ProxyDisconnectedEvent when it exits.
+	 * Start threads to read packets sent to the client by a proxy and to process events created from the packets. Communication
+	 * between these two threads is thru a ProxyEventQueue object The event thread is guaranteed to produce a ProxyDisconnectedEvent
+	 * when it exits.
 	 * 
 	 * @throws IOException
-	 *             if the session is not connected or the event thread fails to
-	 *             start
+	 *             if the session is not connected or the event thread fails to start
 	 */
 	public void sessionHandleEvents() throws IOException {
 		eventQueue = new ProxyEventQueue();
