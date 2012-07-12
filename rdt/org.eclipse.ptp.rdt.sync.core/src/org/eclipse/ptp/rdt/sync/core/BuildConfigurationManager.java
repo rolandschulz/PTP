@@ -255,19 +255,11 @@ public class BuildConfigurationManager {
 	 * @param sc - the service configuration - ignored
 	 * @param bs - the build scenario - cannot be null
 	 */
-	public void initProject(IProject project, IServiceConfiguration sc, BuildScenario bs) {
-		if (project == null || bs == null) {
+	public void setBuildScenarioForAllBuildConfigurations(IProject project, BuildScenario bs) {
+		if (bs == null) {
 			throw new NullPointerException();
 		}
-
-		// Cannot call "checkProject" because project not yet initialized
-		try {
-			if (!project.hasNature(RemoteSyncNature.NATURE_ID)) {
-				throw new IllegalArgumentException(Messages.BuildConfigurationManager_6);
-			}
-		} catch (CoreException e) {
-			throw new IllegalArgumentException(Messages.BuildConfigurationManager_8);
-		}
+		checkProject(project);
 
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {

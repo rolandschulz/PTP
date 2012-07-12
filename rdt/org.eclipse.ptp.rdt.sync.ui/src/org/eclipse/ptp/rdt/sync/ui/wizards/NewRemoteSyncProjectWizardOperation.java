@@ -99,7 +99,7 @@ public class NewRemoteSyncProjectWizardOperation {
 		
 		// Initialize project with this build scenario, which will be applied to all current configurations.
 		// Note then that we initially assume all configs are remote.
-		bcm.initProject(project, serviceConfig, remoteBuildScenario);
+		bcm.setBuildScenarioForAllBuildConfigurations(project, remoteBuildScenario);
 		
 	
 		// Create a local build scenario
