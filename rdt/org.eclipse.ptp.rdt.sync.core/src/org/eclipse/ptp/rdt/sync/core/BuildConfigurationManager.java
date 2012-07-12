@@ -76,6 +76,11 @@ public class BuildConfigurationManager {
 	private BuildConfigurationManager() {
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
+		
+		// Refactoring - July 2012
+		// Use a single provider instance for all syncs. This does not preclude support for additional sync tools other than Git.
+		// Such support can easily be added by mapping the "syncProvider" attribute of BuildScenario to the appropriate provider
+		// instance (one per tool).
 		provider = (ISyncServiceProvider) smm.getServiceProvider(syncService.getProviderDescriptor(syncServiceProviderID));
 		if (provider == null) {
 			throw new RuntimeException(Messages.BuildConfigurationManager_25);
