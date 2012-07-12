@@ -206,16 +206,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 			// System.out.println(targs[i].getName()+" "+targs[i].getTargetBuilderID());
 		}
 		if (select == null) {
-			
-			
-			if(isSyncProject){
-				if(!BuildConfigurationManager.getInstance().isInitialized(thisProject))
-				{
-					System.out.println("Sync project not initialized");
-					return;
-				}
-			}
-			else{
+			if(!isSyncProject) {
 				final IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(thisProject, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID);
 			
 			
