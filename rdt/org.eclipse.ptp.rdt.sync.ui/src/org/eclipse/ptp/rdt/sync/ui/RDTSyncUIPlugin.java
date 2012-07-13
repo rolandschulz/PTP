@@ -57,6 +57,7 @@ public class RDTSyncUIPlugin extends Plugin {
 		super.start(context);
 		ResourceChangeListener.startListening();
 		SyncManager.setDefaultSyncExceptionHandler(new CommonSyncExceptionHandler(false, true));
+		SyncManager.setDefaultMissingConnectionHandler(new CommonMissingConnectionHandler());
 	}
 
 	@Override

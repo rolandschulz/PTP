@@ -88,9 +88,21 @@ public class BuildScenario {
 	 * 1) The connection was renamed
 	 * 2) The connection was deleted
 	 * 3) The connection never existed, such as when a project is imported to a different workspace
+	 * 
+	 * Since this function calls the missing-connection handler, callers can assume that users were given an opportunity to correct
+	 * the problem. So no further UI handling is needed. (The operation is free to silently fail.)
 	 */
 	public IRemoteConnection getRemoteConnection() {
-		return remoteServices.getConnectionManager().getConnection(remoteConnection);
+		IRemoteConnection conn = remoteServices.getConnectionManager().getConnection(remoteConnection);
+		if (conn == null) {
+			IMissingConnectionHandler mcHandler = SyncManager.getDefaultMissingConnectionHandler();
+			if (mcHandler != null) {
+				mcHandler.handle(remoteServices, remoteConnection);
+				conn = remoteServices.getConnectionManager().getConnection(remoteConnection);
+			}
+		}
+
+		return conn;
 	}
 
 	/**
