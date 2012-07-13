@@ -156,4 +156,11 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		ViewActivator.activateView(IDs.VIEW_ID);
 	}
 
+	@Override
+	public boolean areIncludePathsNeeded() {
+		boolean allowPrefixOnlyMatch = OpenMPPlugin.getDefault().getPreferenceStore()
+				.getBoolean(OpenMPIDs.OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE);
+		return !allowPrefixOnlyMatch;
+	}
+
 }
