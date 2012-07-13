@@ -7,7 +7,8 @@
 <!-- * -->
 <!-- * Contributors: -->
 <!-- * Albert L. Rossi - design and implementation -->
-<!-- * Galen Arnold - adapt to kraken -->
+<!-- * Galen Arnold - adapt to trestles -->
+<!-- * Jeff Overbey - modifications since /phase1 decommissioned -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder 
 	xmlns="org.eclipse.ptp" 
@@ -16,7 +17,9 @@
 	name="edu.sdsc.trestles.pbs.batch">
 	<control-data>
 		<!-- Set the default value of this attribute if PBS is installed in a non-standard location -->
-		<attribute name="bindir" visible="false"/>
+		<attribute name="bindir" visible="false">
+			<default>/opt/torque/bin/</default>
+		</attribute>
 		<!-- This is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
 		<attribute name="control.queue.name" visible="false">
 			<link-value-to>destination</link-value-to>
@@ -390,7 +393,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<line>
 				<arg resolve="false">fi</arg>
 			</line>
-			<line><arg resolve="false">cd /phase1/${USER}</arg></line>
+			<line><arg resolve="false">cd /oasis/scratch/trestles/$USER/$PBS_JOBID</arg></line>
 			<line><arg>cp ${ptp_rm:executablePath#value} .</arg></line>
 			<line><arg>MYSCREXE=`basename ${ptp_rm:executablePath#value}`</arg></line>
 			<line>
