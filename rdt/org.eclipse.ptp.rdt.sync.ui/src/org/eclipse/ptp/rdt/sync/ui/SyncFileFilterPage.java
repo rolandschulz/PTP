@@ -47,6 +47,7 @@ import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter.PatternType;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -622,7 +623,12 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 				// System error handled by BuildConfigurationManager
 				remoteFiles = null;
 			} else {
-				remoteFiles = new RemoteContentProvider(bs.getRemoteConnection(), new Path(bs.getLocation(project)), project);
+				IRemoteConnection conn = bs.getRemoteConnection();
+				if (conn == null) {
+					remoteFiles = null;
+				} else {
+					remoteFiles = new RemoteContentProvider(conn, new Path(bs.getLocation(project)), project);
+				}
 			}
 		}
 

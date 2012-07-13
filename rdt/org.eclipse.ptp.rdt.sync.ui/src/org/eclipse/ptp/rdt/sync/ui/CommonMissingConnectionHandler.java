@@ -13,6 +13,7 @@ package org.eclipse.ptp.rdt.sync.ui;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rdt.sync.core.IMissingConnectionHandler;
+import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 
 public class CommonMissingConnectionHandler implements IMissingConnectionHandler {
@@ -23,8 +24,12 @@ public class CommonMissingConnectionHandler implements IMissingConnectionHandler
 			public void run() {
 				String[] buttonLabels = new String[1];
 				buttonLabels[0] = IDialogConstants.OK_LABEL;
-				MessageDialog dialog = new MessageDialog(null, "Missing Connection", null, "Connection does not exist: " + //$NON-NLS-1$ //$NON-NLS-2$
-						connectionName, MessageDialog.ERROR, buttonLabels, 0);
+				String newline = System.getProperty("line.separator"); //$NON-NLS-1$
+				MessageDialog dialog = new MessageDialog(null, Messages.CommonMissingConnectionHandler_0, null,
+						Messages.CommonMissingConnectionHandler_1 + connectionName + Messages.CommonMissingConnectionHandler_2 +
+						newline + newline + Messages.CommonMissingConnectionHandler_3 + newline +
+						Messages.CommonMissingConnectionHandler_4 + newline + Messages.CommonMissingConnectionHandler_5,
+						MessageDialog.ERROR, buttonLabels, 0);
 				dialog.open();
 			}
 		});
