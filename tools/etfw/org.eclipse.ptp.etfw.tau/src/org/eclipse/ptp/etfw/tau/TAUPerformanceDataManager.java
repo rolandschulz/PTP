@@ -240,11 +240,19 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 			utilBlob = tmpub;
 		}
 
+		String tmpDir=null;
 		if(!dirgood){
-		String tmpDir = utilBlob.getWorkingDirectory();
+		tmpDir = utilBlob.getWorkingDirectory();
 		if (tmpDir != null) {
 			directory = tmpDir;
 		}}
+		
+		dirgood=checkDirectory(directory,utilBlob);
+		if(!dirgood){
+			tmpDir=configuration.getAttribute(IToolLaunchConfigurationConstants.PROJECT_DIR, "");
+			if(tmpDir!=null)
+				directory=tmpDir;
+		}
 
 		tbpath = utilBlob.getToolPath(Messages.TAUPerformanceDataManager_0);
 

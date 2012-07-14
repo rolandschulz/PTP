@@ -279,6 +279,7 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 					newvars.putAll(envMap);
 					swappedEnv = true;
 					confWC.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, newvars);
+					confWC.setAttribute(PROJECT_DIR, projectDir);
 				}
 
 			
