@@ -62,6 +62,7 @@ import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.QuotedString;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
@@ -88,10 +89,9 @@ public class GitRemoteSyncConnection {
 	public static final String gitDir = ".ptp-sync"; //$NON-NLS-1$
 	private static final String gitCommand = "git --git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
-	private final IRemoteConnection connection;
-	private SyncFileFilter fileFilter;
 	private final String localDirectory;
-	private final String remoteDirectory;
+	private final BuildScenario buildScenario;
+	private SyncFileFilter fileFilter;
 	private Git git;
 	private TransportGitSsh transport;
 	private final IProject project;
@@ -113,15 +113,14 @@ public class GitRemoteSyncConnection {
 	 *             exception nested. Upon such an exception, the instance is
 	 *             invalid and should not be used.
 	 */
-	public GitRemoteSyncConnection(IProject proj, IRemoteConnection conn, String localDir, String remoteDir, SyncFileFilter filter,
+	public GitRemoteSyncConnection(IProject proj, String localDir, BuildScenario bs, SyncFileFilter filter,
 			IProgressMonitor monitor) throws RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
 			project = proj;
-			connection = conn;
-			fileFilter = filter;
 			localDirectory = localDir;
-			remoteDirectory = remoteDir;
+			buildScenario = bs;
+			fileFilter = filter;
 
 			// Build repo, creating it if it is not already present.
 			try {
@@ -227,7 +226,8 @@ public class GitRemoteSyncConnection {
 
 			// Create remote directory if necessary.
 			try {
-				CommandRunner.createRemoteDirectory(connection, remoteDirectory, subMon.newChild(5));
+				CommandRunner.createRemoteDirectory(buildScenario.getRemoteConnection(), buildScenario.getLocation(project),
+						subMon.newChild(5));
 			} catch (final CoreException e) {
 				throw new RemoteSyncException(e);
 			}
@@ -270,7 +270,7 @@ public class GitRemoteSyncConnection {
 			CommandResults commandResults = null;
 
 			try {
-				commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(10));
+				commandResults = this.executeRemoteCommand(command, subMon.newChild(10));
 			} catch (final InterruptedException e) {
 				throw new RemoteExecutionException(e);
 			} catch (RemoteConnectionException e) {
@@ -353,7 +353,7 @@ public class GitRemoteSyncConnection {
 			CommandResults commandResults = null;
 
 			try {
-				commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(10));
+				commandResults = this.executeRemoteCommand(command, subMon.newChild(10));
 			} catch (final InterruptedException e) {
 				throw new RemoteSyncException(e);
 			} catch (RemoteConnectionException e) {
@@ -378,14 +378,14 @@ public class GitRemoteSyncConnection {
 			RemoteExecutionException, RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
-			List<String> command = stringToList(gitCommand + " rm --"); //$NON-NLS-1$
+			List<String> commandList = stringToList(gitCommand + " rm --"); //$NON-NLS-1$
 			for (String fileName : filesToDelete) {
-				command.add(fileName);
+				commandList.add(fileName);
 			}
 
 			CommandResults commandResults = null;
 			try {
-				commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(10));
+				commandResults = this.executeRemoteCommand(commandList, subMon.newChild(10));
 			} catch (final InterruptedException e) {
 				throw new RemoteExecutionException(e);
 			} catch (RemoteConnectionException e) {
@@ -426,8 +426,7 @@ public class GitRemoteSyncConnection {
 
 				CommandResults commandResults = null;
 				try {
-					commandResults = CommandRunner.executeRemoteCommand(connection, commandList, remoteDirectory,
-							subMon.newChild(10));
+					commandResults = this.executeRemoteCommand(commandList, subMon.newChild(10));
 				} catch (final InterruptedException e) {
 					throw new RemoteExecutionException(e);
 				} catch (RemoteConnectionException e) {
@@ -463,7 +462,7 @@ public class GitRemoteSyncConnection {
 			CommandResults commandResults = null;
 
 			try {
-				commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(10));
+				commandResults = this.executeRemoteCommand(command, subMon.newChild(10));
 			} catch (final InterruptedException e) {
 				throw new RemoteExecutionException(e);
 			} catch (RemoteConnectionException e) {
@@ -548,6 +547,7 @@ public class GitRemoteSyncConnection {
 			commandList.add(command);
 
 			try {
+				IRemoteConnection connection = buildScenario.getRemoteConnection();
 				if (!connection.isOpen()) {
 					connection.open(null);
 				}
@@ -611,7 +611,8 @@ public class GitRemoteSyncConnection {
 				.setHost("none") //$NON-NLS-1$
 				// .setPass("")
 				.setScheme("ssh") //$NON-NLS-1$
-				.setPath(remoteDirectory + "/" + gitDir); //$NON-NLS-1$  //Should use remote path seperator but first 315720 has to be fixed
+				.setPath(buildScenario.getLocation(project) + "/" + gitDir); //$NON-NLS-1$  // Should use remote path seperator but
+		                                                                                    // first 315720 has to be fixed
 	}
 
 	public void close() {
@@ -768,7 +769,7 @@ public class GitRemoteSyncConnection {
 	 * @return the connection (IRemoteConnection)
 	 */
 	public IRemoteConnection getConnection() {
-		return connection;
+		return buildScenario.getRemoteConnection();
 	}
 
 	/**
@@ -782,7 +783,7 @@ public class GitRemoteSyncConnection {
 	 * @return the remoteDirectory
 	 */
 	public String getRemoteDirectory() {
-		return remoteDirectory;
+		return buildScenario.getLocation(project);
 	}
 
 	/**
@@ -816,7 +817,7 @@ public class GitRemoteSyncConnection {
 					CommandResults mergeResults;
 					final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
 	
-					mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
+					mergeResults = this.executeRemoteCommand(command, subMon.newChild(5));
 	
 					if (mergeResults.getExitCode() != 0) {
 						throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
@@ -980,8 +981,7 @@ public class GitRemoteSyncConnection {
 				// final String command = gitCommand + " merge --ff-only " + remotePushBranch; //$NON-NLS-1$
 				final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
 
-				mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
-
+				mergeResults = this.executeRemoteCommand(command, subMon.newChild(5));
 				if (mergeResults.getExitCode() != 0) {
 					throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
 							+ mergeResults.getStderr()));
@@ -1104,5 +1104,19 @@ public class GitRemoteSyncConnection {
 		}, "Refresh workspace thread"); //$NON-NLS-1$
 		refreshWorkspaceThread.start();
 		return refreshWorkspaceThread;
+	}
+	
+	private CommandResults executeRemoteCommand(String command, SubMonitor monitor) throws RemoteSyncException, IOException,
+	InterruptedException, RemoteConnectionException {
+		IRemoteConnection conn = buildScenario.getRemoteConnection();
+		String remoteDirectory = buildScenario.getLocation(project);
+		return CommandRunner.executeRemoteCommand(conn, command, remoteDirectory, monitor);
+	}
+	
+	private CommandResults executeRemoteCommand(List<String> command, SubMonitor monitor) throws RemoteSyncException, IOException,
+	InterruptedException, RemoteConnectionException {
+		IRemoteConnection conn = buildScenario.getRemoteConnection();
+		String remoteDirectory = buildScenario.getLocation(project);
+		return CommandRunner.executeRemoteCommand(conn, command, remoteDirectory, monitor);
 	}
 }

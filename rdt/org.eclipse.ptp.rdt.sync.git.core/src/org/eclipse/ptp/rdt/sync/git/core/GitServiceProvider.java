@@ -43,7 +43,6 @@ import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
 public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider {
@@ -362,18 +361,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				if (buildScenario == null) {
 					throw new RuntimeException(Messages.GitServiceProvider_3 + project.getName());
 				}
-				
-				if (buildScenario.getRemoteConnection() == null) {
-					return;
-				}
 
 				GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario, fileFilter, progress);
 				if (fSyncConnection == null) {
 					throw new RemoteSyncException(Messages.GitServiceProvider_5);
-				}
-				// Open remote connection if necessary
-				if (buildScenario.getRemoteConnection().isOpen() == false) {
-					buildScenario.getRemoteConnection().open(progress.newChild(10));
 				}
 
 				// This synchronization operation will include all tasks up to current syncTaskId
@@ -396,8 +387,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				}
 				finishedSyncTaskId = willFinishTaskId;
 				// TODO: review exception handling
-			} catch (RemoteConnectionException e) {
-				throw new RemoteSyncException(e);
 			} finally {
 				syncLock.unlock();
 			}
@@ -426,12 +415,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 		ProjectAndScenario pas = new ProjectAndScenario(project, buildScenario);
 		if (!syncConnectionMap.containsKey(pas)) {
-			IRemoteConnection conn = buildScenario.getRemoteConnection();
-			if (conn == null) {
-				return null;
-			}
-			syncConnectionMap.put(pas, new GitRemoteSyncConnection(project, conn, project.getLocation().toString(),
-					buildScenario.getLocation(project), fileFilter, progress));
+			syncConnectionMap.put(pas, new GitRemoteSyncConnection(project, project.getLocation().toString(), buildScenario,
+					fileFilter, progress));
 		}
 		GitRemoteSyncConnection fSyncConnection = syncConnectionMap.get(pas);
 		fSyncConnection.setFileFilter(fileFilter);
