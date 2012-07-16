@@ -365,7 +365,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 				GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario, fileFilter, progress);
 				if (fSyncConnection == null) {
-					throw new RemoteSyncException(Messages.GitServiceProvider_5);
+					// Should never happen
+					if (buildScenario.getSyncProvider() == null) {
+						throw new RemoteSyncException(Messages.GitServiceProvider_5);
+					// Happens whenever connection does not exist
+					} else {
+						return;
+					}
 				}
 
 				// This synchronization operation will include all tasks up to current syncTaskId
