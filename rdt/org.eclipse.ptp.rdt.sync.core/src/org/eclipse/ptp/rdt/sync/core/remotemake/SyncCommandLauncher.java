@@ -146,12 +146,6 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			return null;
 		}
 		IRemoteConnection connection = bs.getRemoteConnection();
-
-		if (connection == null) {
-			throw new CoreException(new Status(IStatus.CANCEL,
-					"org.eclipse.ptp.rdt.sync.core", "Build canceled because connection does not exist")); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
 		if (!connection.isOpen()) {
 			try {
 				connection.open(monitor);

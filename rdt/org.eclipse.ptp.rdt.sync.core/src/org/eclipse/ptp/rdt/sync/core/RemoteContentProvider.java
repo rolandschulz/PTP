@@ -11,7 +11,6 @@
 package org.eclipse.ptp.rdt.sync.core;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
@@ -179,7 +178,7 @@ public class RemoteContentProvider implements ITreeContentProvider {
 	 * Get the contents of the corresponding remote file for the given IFile. (IFile should belong to a synchronized project.)
 	 *
 	 * @param file
-	 * @return a stream, possibly empty if the remote connection does not exist
+	 * @return a stream
 	 * @throws CoreException on problems accessing the remote file.
 	 */
 	public static BufferedInputStream getFileContents(IFile file) throws CoreException {
@@ -188,11 +187,7 @@ public class RemoteContentProvider implements ITreeContentProvider {
 		IConfiguration bconf = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
 		BuildScenario bs = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(bconf);
 		if (bs != null) {
-			IRemoteConnection conn = bs.getRemoteConnection();
-			if (conn == null) {
-				return new BufferedInputStream(new ByteArrayInputStream("".getBytes())); //$NON-NLS-1$
-			}
-			IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(bs.getRemoteConnection());
+			IRemoteFileManager fileManager = bs.getRemoteConnection().getRemoteServices().getFileManager(bs.getRemoteConnection());
 			IPath remotePath = new Path(bs.getLocation(project)).addTrailingSeparator().append(file.getProjectRelativePath());
 			IFileStore fileStore = fileManager.getResource(remotePath.toString()); // Assumes "/" separator on remote
 			InputStream fileInput = fileStore.openInputStream(EFS.NONE, null);

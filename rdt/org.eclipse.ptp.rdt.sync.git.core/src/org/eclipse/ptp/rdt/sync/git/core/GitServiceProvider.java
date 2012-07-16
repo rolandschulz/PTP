@@ -404,9 +404,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 	
-	// Return appropriate sync connection or null for scenarios with no sync provider or where remote connection does not exist.
-	// Creates a new sync connection if necessary. This function must properly maintain the map of connections and also remember
-	// to set the file filter (always, not just for new connections).
+	// Return appropriate sync connection or null for scenarios with no sync provider. Creates a new sync connection if necessary
+	// This function must properly maintain the map of connections and also remember to set the file filter (always, not just for
+	// new connections).
 	// TODO: Create progress monitor if passed monitor is null.
 	private synchronized GitRemoteSyncConnection getSyncConnection(IProject project, BuildScenario buildScenario,
 			SyncFileFilter fileFilter, SubMonitor progress) throws RemoteSyncException {

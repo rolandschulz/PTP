@@ -267,9 +267,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private void populateConnectionCombo(final Combo connectionCombo) {
 		fSelectedConnection = null;
 		connectionCombo.removeAll();
-		if (fSelectedProvider == null) {
-			return;
-		}
 		IRemoteConnection[] connections = fSelectedProvider.getConnectionManager().getConnections();
 		for (int k = 0; k < connections.length; k++) {
 			connectionCombo.add(connections[k].getName(), k);
@@ -423,9 +420,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 
 		// Note that provider selection populates the local connection map variables as well as the connection combo. Thus, the
 		// provider must be selected first. (Calling select invokes the "handle" listeners for each combo.)
-		if (settings.remoteProvider != null) {
-			fProviderCombo.select(fComboRemoteServicesProviderToIndexMap.get(settings.remoteProvider));
-		}
+		fProviderCombo.select(fComboRemoteServicesProviderToIndexMap.get(settings.remoteProvider));
 		handleServicesSelected();
 		if (settings.connection!=null) {
 			Integer index = fComboRemoteConnectionToIndexMap.get(settings.connection);
@@ -494,10 +489,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 		PageSettings settings = new PageSettings();
 		settings.syncProvider = buildScenario.getSyncProvider();
+		settings.remoteProvider = buildScenario.getRemoteConnection().getRemoteServices();
 		settings.connection = buildScenario.getRemoteConnection();
-		if (settings.connection != null) {
-			settings.remoteProvider = buildScenario.getRemoteConnection().getRemoteServices();
-		}
 		IProject project = config.getOwner().getProject();
 		settings.rootLocation = buildScenario.getLocation(project);
 
