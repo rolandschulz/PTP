@@ -87,6 +87,8 @@ public class BinaryResourceMatcher extends ResourceMatcher {
 		} catch (IOException e) {
 			RDTSyncCorePlugin.log(Messages.BinaryResourceMatcher_1 + candidate.getProjectRelativePath().toString(), e);
 			return false;
+		} catch (MissingConnectionException e) {
+			return false;
 		} finally {
 			if (fileInput != null) {
 				try {

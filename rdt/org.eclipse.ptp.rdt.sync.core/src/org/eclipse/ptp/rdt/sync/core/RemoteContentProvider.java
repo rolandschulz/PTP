@@ -180,8 +180,9 @@ public class RemoteContentProvider implements ITreeContentProvider {
 	 * @param file
 	 * @return a stream
 	 * @throws CoreException on problems accessing the remote file.
+	 * @throws MissingConnectionException 
 	 */
-	public static BufferedInputStream getFileContents(IFile file) throws CoreException {
+	public static BufferedInputStream getFileContents(IFile file) throws CoreException, MissingConnectionException {
 		BufferedInputStream retStream = null;
 		IProject project = file.getProject();
 		IConfiguration bconf = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();

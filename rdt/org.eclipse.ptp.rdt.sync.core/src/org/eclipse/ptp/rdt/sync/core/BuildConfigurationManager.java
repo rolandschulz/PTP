@@ -235,11 +235,14 @@ public class BuildConfigurationManager {
 		BuildScenario scenario = getBuildScenarioForBuildConfiguration(configuration);
 		if (scenario != null) {
 			IPath path = new Path(scenario.location).append(resource.getProjectRelativePath());
-			IRemoteConnection conn = scenario.getRemoteConnection();
-			if (conn != null) {
-				IRemoteFileManager fileMgr = scenario.getRemoteConnection().getRemoteServices().getFileManager(conn);
-				return fileMgr.toURI(path);
+			IRemoteConnection conn;
+			try {
+				conn = scenario.getRemoteConnection();
+			} catch (MissingConnectionException e) {
+				return null;
 			}
+			IRemoteFileManager fileMgr = conn.getRemoteServices().getFileManager(conn);
+			return fileMgr.toURI(path);
 		}
 		return null;
 	}

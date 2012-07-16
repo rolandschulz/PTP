@@ -43,6 +43,7 @@ import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
@@ -145,7 +146,13 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		if (bs == null) {
 			return null;
 		}
-		IRemoteConnection connection = bs.getRemoteConnection();
+		IRemoteConnection connection;
+		try {
+			connection = bs.getRemoteConnection();
+		} catch (MissingConnectionException e2) {
+            throw new CoreException(new Status(IStatus.CANCEL,
+                    "org.eclipse.ptp.rdt.sync.core", "Build canceled because connection does not exist")); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		if (!connection.isOpen()) {
 			try {
 				connection.open(monitor);

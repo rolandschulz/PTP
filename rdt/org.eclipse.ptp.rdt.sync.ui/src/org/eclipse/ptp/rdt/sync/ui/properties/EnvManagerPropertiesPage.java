@@ -22,6 +22,7 @@ import org.eclipse.ptp.ems.ui.EnvManagerConfigWidget;
 import org.eclipse.ptp.ems.ui.IErrorListener;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -72,7 +73,11 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 			return null;
 		}
 		
-		return bs.getRemoteConnection(); 
+		try {
+			return bs.getRemoteConnection();
+		} catch (MissingConnectionException e) {
+			return null;
+		}
 	}
 
 	private boolean isEnvConfigSupportEnabled() {

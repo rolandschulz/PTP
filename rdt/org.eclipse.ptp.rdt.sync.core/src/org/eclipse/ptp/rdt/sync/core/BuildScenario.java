@@ -85,7 +85,7 @@ public class BuildScenario {
 	 * the exception, callers can assume user has already been notified and given an opportunity to define the connection. So
 	 * callers only need to worry about recovering gracefully.
 	 * 
-	 * @return remote connection
+	 * @return remote connection - never null
 	 *
 	 * @throws MissingConnectionException if no connection with the stored name exist. This can happen for various reasons:
 	 * 1) The connection was renamed
@@ -107,6 +107,14 @@ public class BuildScenario {
 		} else {
 			return conn;
 		}
+	}
+	
+	/**
+	 * Get remote provider
+	 * @return remote provider - never null
+	 */
+	public IRemoteServices getRemoteProvider() {
+		return remoteServices;
 	}
 
 	/**

@@ -39,6 +39,7 @@ import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.ptp.rdt.sync.core.BinaryResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.PathResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.RemoteContentProvider;
 import org.eclipse.ptp.rdt.sync.core.ResourceMatcher;
@@ -622,7 +623,13 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 				// System error handled by BuildConfigurationManager
 				remoteFiles = null;
 			} else {
-				remoteFiles = new RemoteContentProvider(bs.getRemoteConnection(), new Path(bs.getLocation(project)), project);
+				RemoteContentProvider tmpRCP;
+				try {
+					tmpRCP = new RemoteContentProvider(bs.getRemoteConnection(), new Path(bs.getLocation(project)), project);
+				} catch (MissingConnectionException e) {
+					tmpRCP = null;
+				}
+				remoteFiles = tmpRCP;
 			}
 		}
 
