@@ -81,18 +81,18 @@ public class BuildScenario {
 	}
 
 	/**
-	 * Get remote connection
+	 * Get remote connection. If connection is missing, this function calls the missing-connection handler. Thus, after catching
+	 * the exception, callers can assume user has already been notified and given an opportunity to define the connection. So
+	 * callers only need to worry about recovering gracefully.
 	 * 
-	 * @return remote connection or null if no connection with the stored name exist. Callers should handle this case, as it can
-	 * happen often for various reasons:
+	 * @return remote connection
+	 *
+	 * @throws MissingConnectionException if no connection with the stored name exist. This can happen for various reasons:
 	 * 1) The connection was renamed
 	 * 2) The connection was deleted
 	 * 3) The connection never existed, such as when a project is imported to a different workspace
-	 * 
-	 * Since this function calls the missing-connection handler, callers can assume that users were given an opportunity to correct
-	 * the problem. So no further UI handling is needed. (The operation is free to silently fail.)
 	 */
-	public IRemoteConnection getRemoteConnection() {
+	public IRemoteConnection getRemoteConnection() throws MissingConnectionException {
 		IRemoteConnection conn = remoteServices.getConnectionManager().getConnection(remoteConnection);
 		if (conn == null) {
 			IMissingConnectionHandler mcHandler = SyncManager.getDefaultMissingConnectionHandler();
@@ -102,7 +102,11 @@ public class BuildScenario {
 			}
 		}
 
-		return conn;
+		if (conn == null) {
+			throw new MissingConnectionException(remoteConnection);
+		} else {
+			return conn;
+		}
 	}
 
 	/**
