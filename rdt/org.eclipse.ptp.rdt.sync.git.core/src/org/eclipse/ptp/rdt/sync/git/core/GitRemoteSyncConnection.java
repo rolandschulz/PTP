@@ -113,7 +113,9 @@ public class GitRemoteSyncConnection {
 	 *             on problems building the remote repository. Specific
 	 *             exception nested. Upon such an exception, the instance is
 	 *             invalid and should not be used.
-	 * @throws MissingConnectionException 
+	 * @throws MissingConnectionException
+	 * 				when connection missing. In this case, the instance is
+	 *              also invalid.
 	 */
 	public GitRemoteSyncConnection(IProject proj, String localDir, BuildScenario bs, SyncFileFilter filter,
 			IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
@@ -266,8 +268,8 @@ public class GitRemoteSyncConnection {
 	 * @throws IOException
 	 * @throws RemoteExecutionException
 	 * @throws RemoteSyncException
+	 * @throws MissingConnectionException
 	 * @return whether this repo already existed
-	 * @throws MissingConnectionException 
 	 */
 	private boolean doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
 	MissingConnectionException {
