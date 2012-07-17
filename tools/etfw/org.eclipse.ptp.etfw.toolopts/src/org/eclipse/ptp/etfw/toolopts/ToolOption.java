@@ -213,7 +213,7 @@ public class ToolOption {
 			return argbox.getText();
 		} else if (numopt != null) {
 			return numopt.getText();
-		} else if (combopt != null) {
+		} else if (combopt != null && combopt.getSelectionIndex() != -1) {
 			return combopt.getItem(combopt.getSelectionIndex());
 		}
 		return null;
