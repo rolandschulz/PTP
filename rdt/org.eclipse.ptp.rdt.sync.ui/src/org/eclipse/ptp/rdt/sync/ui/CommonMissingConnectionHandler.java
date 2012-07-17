@@ -13,7 +13,10 @@ package org.eclipse.ptp.rdt.sync.ui;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rdt.sync.core.IMissingConnectionHandler;
+import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 
 public class CommonMissingConnectionHandler implements IMissingConnectionHandler {
 	private static long lastMissingConnectiontDialogTimeStamp = 0;
@@ -29,11 +32,23 @@ public class CommonMissingConnectionHandler implements IMissingConnectionHandler
 					return;
 				}
 				lastMissingConnectiontDialogTimeStamp = System.currentTimeMillis();
-				String[] buttonLabels = new String[1];
+				String[] buttonLabels = new String[2];
 				buttonLabels[0] = IDialogConstants.OK_LABEL;
-				MessageDialog dialog = new MessageDialog(null, "Missing Connection", null, "Connection does not exist: " + //$NON-NLS-1$ //$NON-NLS-2$
-						connectionName, MessageDialog.ERROR, buttonLabels, 0);
-				dialog.open();
+				buttonLabels[1] = Messages.CommonMissingConnectionHandler_6;
+				String newline = System.getProperty("line.separator"); //$NON-NLS-1$
+				MessageDialog dialog = new MessageDialog(null, Messages.CommonMissingConnectionHandler_0, null,
+                        Messages.CommonMissingConnectionHandler_1 + connectionName + Messages.CommonMissingConnectionHandler_2 +
+                        newline + newline + Messages.CommonMissingConnectionHandler_3 + newline +
+                        Messages.CommonMissingConnectionHandler_4 + newline + Messages.CommonMissingConnectionHandler_5,
+                        MessageDialog.ERROR, buttonLabels, 0);
+				int buttonPressed = dialog.open();
+				if (buttonPressed == 1) {
+					IRemoteUIConnectionManager connectionManager = PTPRemoteUIPlugin.getDefault().
+							getRemoteUIServices(remoteServices).getUIConnectionManager();
+					if (connectionManager != null) {
+						connectionManager.newConnection(dialog.getShell());
+					}
+				}
 			}
 		});
 	}

@@ -20,6 +20,13 @@ public class Messages extends NLS {
 	public static String NewRemoteSyncProjectWizardPage_0;
 	public static String NewRemoteSyncProjectWizardPage_syncProvider;
 	public static String WizardProjectConversion_windowLabel;
+	public static String CommonMissingConnectionHandler_0;
+	public static String CommonMissingConnectionHandler_1;
+	public static String CommonMissingConnectionHandler_2;
+	public static String CommonMissingConnectionHandler_3;
+	public static String CommonMissingConnectionHandler_4;
+	public static String CommonMissingConnectionHandler_5;
+	public static String CommonMissingConnectionHandler_6;
 	public static String CommonSyncExceptionHandler_0;
 	public static String CommonSyncExceptionHandler_1;
 	public static String CommonSyncExceptionHandler_2;
