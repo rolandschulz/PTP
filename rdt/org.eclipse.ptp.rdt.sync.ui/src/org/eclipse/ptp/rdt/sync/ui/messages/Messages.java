@@ -15,6 +15,7 @@ import org.eclipse.osgi.util.NLS;
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.sync.ui.messages.messages"; //$NON-NLS-1$
+	public static String NewRemoteSyncProjectWizard_0;
 	public static String NewRemoteSyncProjectWizard_description;
 	public static String NewRemoteSyncProjectWizard_title;
 	public static String NewRemoteSyncProjectWizardPage_0;
