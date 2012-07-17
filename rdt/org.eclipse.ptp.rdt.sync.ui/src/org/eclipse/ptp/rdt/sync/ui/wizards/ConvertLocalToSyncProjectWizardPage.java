@@ -30,6 +30,9 @@ import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
 import org.eclipse.cdt.ui.newui.PageLayout;
 import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceDescription;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -47,11 +50,13 @@ import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
+import org.eclipse.ptp.rdt.sync.ui.CommonSyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
@@ -354,8 +359,9 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 				SyncManager.saveFileFilter(project, customFilter);
 			}
 			
-		    // Enable sync'ing
+		    // Enable sync'ing and force an initial sync
 		    SyncManager.setSyncMode(project, SyncManager.SYNC_MODE.ACTIVE);
+		    SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
 		} finally {
 			monitor.done();
 		}
@@ -389,15 +395,35 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 
 	@Override
 	public void doRun(IProgressMonitor monitor, String projectID, String bsId) throws CoreException {
-		monitor.beginTask(Messages.ConvertToRemoteWizardPage_0, 2);
-		super.doRun(new SubProgressMonitor(monitor, 1), projectID, bsId);
+		// Disable initial auto build but make sure to set it back to previous value before exiting.
+		boolean autoBuildWasSet = setAutoBuild(false);
 		try {
+			monitor.beginTask(Messages.ConvertToRemoteWizardPage_0, 2);
+			super.doRun(new SubProgressMonitor(monitor, 1), projectID, bsId);
 			ServiceModelManager.getInstance().saveModelConfiguration();
 		} catch (IOException e) {
 			RDTSyncUIPlugin.log(e);
 		} finally {
+			setAutoBuild(autoBuildWasSet);
 			monitor.done();
 		}
+	}
+	
+	// Helper function to disable/enable auto build during project conversion
+	// Returns the value of auto build before function was called.
+	private static boolean setAutoBuild(boolean shouldBeEnabled) {
+		IWorkspace workspace= ResourcesPlugin.getWorkspace();
+		IWorkspaceDescription desc= workspace.getDescription();
+		boolean isAutoBuilding= desc.isAutoBuilding();
+		if (isAutoBuilding != shouldBeEnabled) {
+			desc.setAutoBuilding(shouldBeEnabled);
+			try {
+				workspace.setDescription(desc);
+			} catch (CoreException e) {
+				RDTSyncUIPlugin.log(e);
+			}
+		}
+		return isAutoBuilding;
 	}
 
 	protected IServiceConfiguration getConfig(IProject project) {

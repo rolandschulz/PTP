@@ -17,10 +17,17 @@ import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.wizards.CDTCommonProjectWizard;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceDescription;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.internal.rdt.sync.ui.SyncPluginImages;
+import org.eclipse.ptp.rdt.sync.core.SyncFlag;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
+import org.eclipse.ptp.rdt.sync.ui.CommonSyncExceptionHandler;
+import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 
 /**
@@ -82,20 +89,55 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		boolean success = super.performFinish();
-		if (success) {
-			IProject project = this.getProject(true);
-			// Uncomment try/catch statements if run is ever changed to spawn a thread.
-//			try {
+		// Disable initial auto build but make sure to set it back to previous value before exiting.
+		boolean autoBuildWasSet = setAutoBuild(false);
+		boolean success = false;
+		IProject project = null;
+		try {
+			success = super.performFinish();
+			if (success) {
+				project = this.getProject(true);
+				// Uncomment try/catch statements if run is ever changed to spawn a thread.
+				//			try {
 				NewRemoteSyncProjectWizardOperation.run(project, (SyncMainWizardPage) fMainPage, null);
-//			} catch (InvocationTargetException e) {
-//				success = false;
-//			} catch (InterruptedException e) {
-//				success = false;
-//			}
+				//			} catch (InvocationTargetException e) {
+				//				success = false;
+				//			} catch (InterruptedException e) {
+				//				success = false;
+				//			}
+			}
+		} finally {
+			setAutoBuild(autoBuildWasSet);
+		}
+		
+		// Force an initial sync
+		if (success && project != null) {
+			try {
+				SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+			} catch (CoreException e) {
+				// This should never happen because only a blocking sync can throw a core exception.
+				RDTSyncUIPlugin.log(Messages.NewRemoteSyncProjectWizard_0, e);
+			}
 		}
 
 		return success;
+	}
+	
+	// Helper function to disable/enable auto build during project creation
+	// Returns the value of auto build before function was called.
+	private static boolean setAutoBuild(boolean shouldBeEnabled) {
+		IWorkspace workspace= ResourcesPlugin.getWorkspace();
+		IWorkspaceDescription desc= workspace.getDescription();
+		boolean isAutoBuilding= desc.isAutoBuilding();
+		if (isAutoBuilding != shouldBeEnabled) {
+			desc.setAutoBuilding(shouldBeEnabled);
+			try {
+				workspace.setDescription(desc);
+			} catch (CoreException e) {
+				RDTSyncUIPlugin.log(e);
+			}
+		}
+		return isAutoBuilding;
 	}
 
 	/*
