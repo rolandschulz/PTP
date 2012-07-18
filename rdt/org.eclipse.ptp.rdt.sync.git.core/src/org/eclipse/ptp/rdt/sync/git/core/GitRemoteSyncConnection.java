@@ -205,8 +205,25 @@ public class GitRemoteSyncConnection {
 				// An initial commit to create the master branch.
 				doCommit();
 			}
+
+			// Refresh project 
+			final Thread refreshThread = this.doRefresh(subMon.newChild(5));
 			
-			this.doRefresh(subMon.newChild(5));
+			// Set git repo as derived, which can only be done after refresh completes.
+			// This prevents user-level operations, such as searching, from considering the repo directory.
+			Thread setDerivedThread = new Thread(new Runnable() {
+				public void run() {
+					try {
+						refreshThread.join();
+						project.getFolder(gitDir).setDerived(true, null);
+					} catch (InterruptedException e) {
+						RDTSyncCorePlugin.log(e);
+					} catch (CoreException e) {
+						RDTSyncCorePlugin.log(e);
+					}
+				}
+			}, "Set repo as derived thread"); //$NON-NLS-1$
+			setDerivedThread.start();
 
 			// Create remote directory if necessary.
 			try {
@@ -1075,7 +1092,7 @@ public class GitRemoteSyncConnection {
 	// Refresh the workspace after creating new local files
 	// Bug 374409 - run refresh in a separate thread to avoid possible deadlock from locking both the sync lock and the
 	// workspace lock.
-	private void doRefresh(final SubMonitor subMon) {
+	private Thread doRefresh(final SubMonitor subMon) {
 		Thread refreshWorkspaceThread = new Thread(new Runnable() {
 			public void run() {
 				try {
@@ -1086,5 +1103,6 @@ public class GitRemoteSyncConnection {
 			}
 		}, "Refresh workspace thread"); //$NON-NLS-1$
 		refreshWorkspaceThread.start();
+		return refreshWorkspaceThread;
 	}
 }
