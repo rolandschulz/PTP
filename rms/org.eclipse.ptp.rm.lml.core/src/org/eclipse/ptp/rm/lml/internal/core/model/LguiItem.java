@@ -581,12 +581,10 @@ public class LguiItem implements ILguiItem {
 
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 		StringBuilder xmlStream = new StringBuilder();
-		final StringBuilder out = new StringBuilder();
 		String s;
 		try {
 			while (null != (s = reader.readLine())) {
 				xmlStream.append(s);
-				out.append(s + "\n");
 			}
 		} catch (final IOException e) {
 			xmlStream = new StringBuilder();
@@ -599,7 +597,6 @@ public class LguiItem implements ILguiItem {
 				}
 			}
 		}
-		System.out.println(out.toString());
 		if (xmlStream.length() > 0) {
 			lgui = jaxbUtil.unmarshal(xmlStream.toString());
 			if (listeners.isEmpty()) {

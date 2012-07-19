@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- * 		Carsten Karbach,FZ Juelich
+ * 		Claudia Knobloch,FZ Juelich
  */
 package org.eclipse.ptp.rm.lml.ui.providers;
 
