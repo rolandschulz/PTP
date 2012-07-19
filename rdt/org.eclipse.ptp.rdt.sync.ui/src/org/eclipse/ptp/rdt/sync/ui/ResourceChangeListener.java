@@ -66,9 +66,11 @@ public class ResourceChangeListener {
 					try {
 						// Post-build event
 						// Force a sync in order to download any new remote files but no need to sync if sync'ing is disabled.
-						// Ignore auto builds, which are triggered for every resource change.
-						if (event.getType() == IResourceChangeEvent.POST_BUILD &&
-								event.getBuildKind() != IncrementalProjectBuilder.AUTO_BUILD) {
+						if (event.getType() == IResourceChangeEvent.POST_BUILD) {
+							// Ignore auto builds, which are triggered for every resource change.
+							if (event.getBuildKind() == IncrementalProjectBuilder.AUTO_BUILD) {
+								continue;
+							}
 							if (!syncOn || syncMode == SYNC_MODE.UNAVAILABLE) {
 								continue;
 							} else if (syncMode == SYNC_MODE.ALL) {
