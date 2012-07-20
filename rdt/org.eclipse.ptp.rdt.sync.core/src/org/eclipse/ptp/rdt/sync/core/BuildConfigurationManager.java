@@ -33,14 +33,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
@@ -50,22 +48,18 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.services.core.IService;
-import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 /**
- * Singleton that handles the storing of information about CDT build configurations. This includes the configuration's build
- * scenario (information on the sync point for the configuration), and its service configuration. New projects should call
- * "initProject" and specify a template service configuration and a build scenario, which is assigned to all existing
- * configurations. The template service configuration should specify all non-sync services. (Normally, the project's active
- * configuration should be used.) This template is copied as needed to create service configurations for build configurations.
+ * Singleton that mainly serves as an interface to core-level sync information and operations, specifically those concerning CDT
+ * build configurations and specific build scenarios. During creation of a sync project, a build scenario should be set for all
+ * build configurations using the methods provided. As of Juno, this class no longer stores and manages sync data. Instead, it
+ * relies on storage space offered by Eclipse and CDT. This greatly simplifies the logic and makes sync projects more portable.
  */
 public class BuildConfigurationManager {
-	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String configSyncDataStorageName = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
-	private static final String TEMPLATE_KEY = "template-service-configuration"; //$NON-NLS-1$
 	private static final String projectLocationPathVariable = "${project_loc}"; //$NON-NLS-1$
 	private static final String localConfigAnnotation = "_local"; //$NON-NLS-1$
 	private static final String remoteConfigAnnotation = "_remote"; //$NON-NLS-1$
@@ -210,10 +204,10 @@ public class BuildConfigurationManager {
 	}
 
 	/**
-	 * Return the name of the sync provider for this project, as stored in the project's template service configuration.
+	 * Return the name of the sync provider for this project.
 	 * 
 	 * @param project - cannot be null
-	 * @return sync provider name or null if provider cannot be loaded (should not normally happen)
+	 * @return sync provider name
 	 */
 	public String getProjectSyncProvider(IProject project) {
 		return provider.getName();
@@ -245,14 +239,9 @@ public class BuildConfigurationManager {
 	}
 
 	/**
-	 * Initialize a project. Set the project's template service configuration to the passed configuration and set all current build
-	 * configurations to use the passed build scenario. This function must be called before any calls to get or set methods.
-	 * 
-	 * The template service configuration is the one that is copied and modified to create a custom configuration for each build
-	 * configuration.
+	 * Set all build configurations to the passed build scenario. This is usually called as part of project creation.
 	 * 
 	 * @param project - cannot be null
-	 * @param sc - the service configuration - ignored
 	 * @param bs - the build scenario - cannot be null
 	 */
 	public void setBuildScenarioForAllBuildConfigurations(IProject project, BuildScenario bs) {
@@ -270,23 +259,6 @@ public class BuildConfigurationManager {
 		for (IConfiguration config : allConfigs) {
 			setBuildScenarioForBuildConfigurationInternal(bs, config);
 		}
-	}
-	
-	/**
-	 * Set the template service configuration for the given project to the given configuration
-	 * 
-	 * @param project
-	 * @param sc
-	 */
-	public void setTemplateServiceConfiguration(IProject project, IServiceConfiguration sc) {
-		checkProject(project);
-		IScopeContext context = new ProjectScope(project);
-		Preferences node = context.getNode(projectScopeSyncNode);
-		if (node == null) {
-			throw new RuntimeException(Messages.BuildConfigurationManager_0);
-		}
-		node.put(TEMPLATE_KEY, sc.getId());
-		flushNode(node);
 	}
 
 	/**
