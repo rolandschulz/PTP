@@ -109,7 +109,7 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 		
 		if(isSyncProject){
 			IConfiguration configuration = ManagedBuildManager.getBuildInfo(thisProject).getDefaultConfiguration();
-			projectLocation = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration).getLocation();
+			projectLocation = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration).getLocation(thisProject);
 		}
 		else
 		{
