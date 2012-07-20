@@ -15,6 +15,7 @@ import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLNodeData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Node;
+import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 
@@ -204,7 +205,10 @@ public class MouseInteraction {
 		if (object == null) {
 			return null;
 		}
-		if (object.getName() != null) {
+		if (isEmptyJob(object)) {
+			info = Messages.MouseInteraction_0;
+		}
+		else if (object.getName() != null) {
 			info = "Job: " + object.getName(); //$NON-NLS-1$
 		}
 		else {

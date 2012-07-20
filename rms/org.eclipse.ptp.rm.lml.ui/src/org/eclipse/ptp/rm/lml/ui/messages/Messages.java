@@ -31,6 +31,7 @@ public class Messages extends NLS {
 	public static String NodesView_3;
 	public static String InfoView_Node;
 	public static String InfoView_Show_message_of_the_day;
+	public static String MouseInteraction_0;
 	public static String UIUtils_1;
 	public static String UIUtils_2;
 	public static String UIUtils_3;
