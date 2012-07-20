@@ -311,7 +311,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 				return true;
 			}
 			// Don't forget to save changes made to the current configuration before proceeding
-			this.storeSettings(getCfg());
+			this.storeSettings(fConfigBeforeSwitch);
 			IProject project = getProject();
 			for (ICConfigurationDescription desc : getCfgsReadOnly(project)) {
 				IConfiguration config = getCfg(desc);
