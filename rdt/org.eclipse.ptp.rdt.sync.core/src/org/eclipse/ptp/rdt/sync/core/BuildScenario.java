@@ -116,19 +116,7 @@ public class BuildScenario {
 	public IRemoteServices getRemoteProvider() {
 		return remoteServices;
 	}
-
-	/**
-	 * Get location (directory)
-	 * 
-	 * @return location (directory)
-	 * @deprecated as of 6.0.0, replaced by {@link #getLocation(IProject)}
-	 *   The new function supports the use of path variables, such as the project location, useful for project relocation
-	 *   (see bug 371507). Such support is not possible, though, without project information.
-	 */
-	@Deprecated public String getLocation() {
-		return location;
-	}
-
+	
 	/**
 	 * Get location (directory), resolved in terms of the passed project
 	 *
