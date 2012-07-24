@@ -51,4 +51,30 @@
             nature="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
       </remoteResource>
    </extension>
+   <extension
+         id="id1"
+         name="name"
+         point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
+      <scannerInfoCollector
+            class="org.eclipse.ptp.rdt.core.remotemake.ProjectDescriptionCollector"
+            scope="project">
+      </scannerInfoCollector>
+      <scannerInfoProvider
+            providerId="specsFile">
+         <scannerInfoConsoleParser
+               class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser">
+         </scannerInfoConsoleParser>
+         <run
+               arguments="-E -P -v -dD ${specs_file_path}"
+               class="org.eclipse.ptp.rdt.core.remotemake.RemoteSpecsRunSIProvider"
+               command="gcc">
+         </run>
+      </scannerInfoProvider>
+      <buildOutputProvider>
+         <scannerInfoConsoleParser
+               class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCScannerInfoConsoleParser">
+         </scannerInfoConsoleParser>
+         <open></open>
+      </buildOutputProvider>
+   </extension>
 </plugin>
