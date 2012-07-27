@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.ui.search;
 
+import java.util.Map;
+
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.utils.EFSExtensionManager;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInfoProviderFactory;
 import org.eclipse.ptp.internal.rdt.core.RemoteScannerInfo;
 import org.eclipse.ptp.internal.rdt.core.model.ModelAdapter;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
@@ -81,18 +85,41 @@ public class RemoteSearchService extends AbstractRemoteService implements ISearc
 		return new RemoteSearchElementQueryAdapter(getSubSystem(), indexScope, query);
 	}
 
-	public ISearchQuery createSearchTextSelectionQuery(Scope indexScope, ICElement[] searchScope, ITranslationUnit element, ITextSelection selNode, int limitTo) {
+	public ISearchQuery createSearchTextSelectionQuery(Scope indexScope, ICElement[] searchScope, ITranslationUnit element, ITextSelection selNode, int limitTo, IProject project) {
 		try {
 			ITranslationUnit unit = ModelAdapter.adaptElement(null, element, 0, false);
 			if (unit instanceof TranslationUnit) {
 				TranslationUnit tu = (TranslationUnit) unit;
 				// TODO is it ok to use an empty scanner info?
-				tu.setASTContext(new RemoteScannerInfo(), null);
+				// SALINAS:  No, it's not OK.
+				Map<String,String> langaugeProperties = null;
+				try {
+					String languageId = unit.getLanguage().getId();
+					langaugeProperties = RemoteIndexerInfoProviderFactory.getLanguageProperties(languageId, project);
+				} catch(Exception e) {
+					RDTLog.logError(e);
+				}
+				tu.setASTContext(new RemoteScannerInfo(), langaugeProperties);
 			}
 			RemoteSearchTextSelectionQuery query = new RemoteSearchTextSelectionQuery(convertScope(searchScope), unit, selNode.getText(), selNode.getOffset(), selNode.getLength(), limitTo);
 			return new RemoteSearchTextSelectionQueryAdapter(getSubSystem(), indexScope, query);
 		} catch (CModelException e) {
 			throw new IllegalArgumentException(e);
 		}
+	}
+
+	public ISearchQuery createSearchTextSelectionQuery(Scope indexScope, ICElement[] searchScope, ITranslationUnit element,	ITextSelection selNode, int limitTo) {
+	try {
+		ITranslationUnit unit = ModelAdapter.adaptElement(null, element, 0, false);
+		if (unit instanceof TranslationUnit) {
+			TranslationUnit tu = (TranslationUnit) unit;
+			// TODO is it ok to use an empty scanner info?
+			tu.setASTContext(new RemoteScannerInfo(), null);
+		}
+		RemoteSearchTextSelectionQuery query = new RemoteSearchTextSelectionQuery(convertScope(searchScope), unit, selNode.getText(), selNode.getOffset(), selNode.getLength(), limitTo);
+		return new RemoteSearchTextSelectionQueryAdapter(getSubSystem(), indexScope, query);
+	} catch (CModelException e) {
+		throw new IllegalArgumentException(e);
+	}
 	}
 }

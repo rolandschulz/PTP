@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
+import org.eclipse.ptp.internal.rdt.ui.search.RemoteSearchService;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.ui.serviceproviders.IIndexServiceProvider2;
 import org.eclipse.ptp.services.core.IService;
@@ -112,8 +113,11 @@ public abstract class FindAction extends SelectionParseAction {
 		IProject project = element.getCProject().getProject();
 		ISearchService service = getSearchService(project);
 		Scope scope = new Scope(project);
-		return service.createSearchTextSelectionQuery(scope, getScope(),
-				(ITranslationUnit)element, selNode, getLimitTo());
+		if (service instanceof RemoteSearchService) {
+			RemoteSearchService rss = (RemoteSearchService)service;
+			return rss.createSearchTextSelectionQuery(scope, getScope(), (ITranslationUnit)element, selNode, getLimitTo(), project);
+		} else	
+			return service.createSearchTextSelectionQuery(scope, getScope(), (ITranslationUnit)element, selNode, getLimitTo());
 	}
 	
     abstract protected String getScopeDescription(); 
