@@ -16,6 +16,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.ptp.rdt.sync.core.ISyncExceptionHandler;
+import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
@@ -42,6 +43,7 @@ public class CommonSyncExceptionHandler implements ISyncExceptionHandler {
 
 	@Override
 	public void handle(final IProject project, final CoreException e) {
+		RDTSyncCorePlugin.log(e);
 		if (!alwaysShowDialog && !SyncManager.getShowErrors(project)) {
 			return;
 		}
