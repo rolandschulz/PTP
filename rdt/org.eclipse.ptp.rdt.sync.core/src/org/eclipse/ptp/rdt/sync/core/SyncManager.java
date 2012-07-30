@@ -400,8 +400,7 @@ public class SyncManager  {
 	
 	private static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, boolean isBlocking,
 			boolean useExceptionHandler, ISyncExceptionHandler seHandler, IProgressMonitor monitor) throws CoreException {
-		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-		if (!(bcm.isInitialized(project)) || (getSyncMode(project) == SYNC_MODE.UNAVAILABLE)) {
+		if (getSyncMode(project) == SYNC_MODE.UNAVAILABLE) {
 			return null;
 		}
 
@@ -430,8 +429,7 @@ public class SyncManager  {
 	 */
 	public static Job[] syncAll(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler)
 			throws CoreException {
-		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-		if (!(bcm.isInitialized(project)) || (getSyncMode(project) == SYNC_MODE.UNAVAILABLE)) {
+		if (getSyncMode(project) == SYNC_MODE.UNAVAILABLE) {
 			return new Job[0];
 		}
 

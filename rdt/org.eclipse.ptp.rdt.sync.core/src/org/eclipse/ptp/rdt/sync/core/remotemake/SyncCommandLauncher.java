@@ -41,9 +41,8 @@ import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
-import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
-import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
@@ -54,10 +53,6 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteProcessAdapter;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.services.core.IService;
-import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.ServiceModelManager;
 
 /**
  * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part of a work in progress. There is no guarantee that
@@ -144,97 +139,82 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		changeToDirectory = new Path(changeToDirectory.toString().replaceFirst(projectLocalRoot, projectActualRoot));
 		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
 
-		// Determine the service model for this configuration, and use the provider of the build service to execute the build
+		// Get the service model for this configuration, and use the provider of the build service to execute the build
 		// command.
-		ServiceModelManager smm = ServiceModelManager.getInstance();
-		IServiceConfiguration serviceConfig = BuildConfigurationManager.getInstance().getConfigurationForBuildConfiguration(
-				configuration);
-		if (serviceConfig == null) {
-			throw new RuntimeException("Cannot find service configuration for build configuration"); //$NON-NLS-1$
+		BuildScenario bs = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration);
+		if (bs == null) {
+			return null;
 		}
-		IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
-		IServiceProvider provider = serviceConfig.getServiceProvider(buildService);
-		IRemoteExecutionServiceProvider executionProvider = null;
-		if (provider instanceof IRemoteExecutionServiceProvider) {
-			executionProvider = (IRemoteExecutionServiceProvider) provider;
-		}
-
-		if (executionProvider != null) {
-
-			IRemoteServices remoteServices = executionProvider.getRemoteServices();
-			if (remoteServices == null) {
-				return null;
-			}
-			if (!remoteServices.isInitialized()) {
-				remoteServices.initialize();
-			}
-
-			IRemoteConnection connection = executionProvider.getConnection();
-
-			if (!connection.isOpen()) {
-				try {
-					connection.open(monitor);
-				} catch (RemoteConnectionException e1) {
-					// rethrow as CoreException
-					throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.core", "Error opening connection.", e1)); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			}
-
-			List<String> command = constructCommand(commandPath, args, executionProvider, monitor);
-
-			IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
-
-			remoteEnvMap = processBuilder.environment();
-
-			for (String envVar : env) {
-				String[] splitStr = envVar.split("="); //$NON-NLS-1$
-				if (splitStr.length > 1) {
-					remoteEnvMap.put(splitStr[0], splitStr[1]);
-				} else if (splitStr.length == 1) {
-					// Empty environment variable
-					remoteEnvMap.put(splitStr[0], ""); //$NON-NLS-1$
-				}
-			}
-
-			// set the directory in which to run the command
-			IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
-			if (changeToDirectory != null && fileManager != null) {
-				processBuilder.directory(fileManager.getResource(changeToDirectory.toString()));
-			}
-
-			// combine stdout and stderr
-			processBuilder.redirectErrorStream(true);
-
-			// Synchronize before building
-			SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10), null);
-
-			IRemoteProcess p = null;
+		IRemoteConnection connection = bs.getRemoteConnection();
+		if (!connection.isOpen()) {
 			try {
-				p = processBuilder.start();
-			} catch (IOException e) {
-				if (projectStatus != null) {
-					projectStatus.setRuntimeBuildStatus(IndexBuildSequenceController.STATUS_INCOMPLETE);
-				}
+				connection.open(monitor);
+			} catch (RemoteConnectionException e1) {
 				// rethrow as CoreException
-				throw new CoreException(new Status(IStatus.ERROR,
-						"org.eclipse.ptp.rdt.sync.core", "Error launching remote process.", e)); //$NON-NLS-1$ //$NON-NLS-2$
+				throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.core", "Error opening connection.", e1)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-
-			if (projectStatus != null) {
-				if (!isCleanBuild) {
-					projectStatus.setBuildRunning();
-				}
-			}
-
-			fRemoteProcess = p;
-			fProcess = new RemoteProcessAdapter(p);
-			return fProcess;
 		}
 
-		return null;
+		IRemoteServices remoteServices = connection.getRemoteServices();
+		if (remoteServices == null) {
+			return null;
+		}
+		if (!remoteServices.isInitialized()) {
+			remoteServices.initialize();
+		}
+
+		List<String> command = constructCommand(commandPath, args, connection, monitor);
+
+		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
+
+		remoteEnvMap = processBuilder.environment();
+
+		for (String envVar : env) {
+			String[] splitStr = envVar.split("="); //$NON-NLS-1$
+			if (splitStr.length > 1) {
+				remoteEnvMap.put(splitStr[0], splitStr[1]);
+			} else if (splitStr.length == 1) {
+				// Empty environment variable
+				remoteEnvMap.put(splitStr[0], ""); //$NON-NLS-1$
+			}
+		}
+
+		// set the directory in which to run the command
+		IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
+		if (changeToDirectory != null && fileManager != null) {
+			processBuilder.directory(fileManager.getResource(changeToDirectory.toString()));
+		}
+
+		// combine stdout and stderr
+		processBuilder.redirectErrorStream(true);
+
+		// Synchronize before building
+		SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10), null);
+
+		IRemoteProcess p = null;
+		try {
+			p = processBuilder.start();
+		} catch (IOException e) {
+			if (projectStatus != null) {
+				projectStatus.setRuntimeBuildStatus(IndexBuildSequenceController.STATUS_INCOMPLETE);
+			}
+			// rethrow as CoreException
+			throw new CoreException(new Status(IStatus.ERROR,
+					"org.eclipse.ptp.rdt.sync.core", "Error launching remote process.", e)); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		if (projectStatus != null) {
+			if (!isCleanBuild) {
+				projectStatus.setBuildRunning();
+			}
+		}
+
+		fRemoteProcess = p;
+		fProcess = new RemoteProcessAdapter(p);
+		return fProcess;
 	}
 
-	private List<String> constructCommand(IPath commandPath, String[] args, IRemoteExecutionServiceProvider executionProvider, IProgressMonitor monitor) throws CoreException {
+	private List<String> constructCommand(IPath commandPath, String[] args, IRemoteConnection connection, IProgressMonitor monitor) throws CoreException {
 		/*
 		 * Prior to Modules/SoftEnv support, this was the following:
 		 * 
@@ -248,7 +228,6 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
 		if (projectProperties.isEnvMgmtEnabled()) {
 			// Environment management is enabled for the build.  Issue custom Modules/SoftEnv commands to configure the environment.
-			IRemoteConnection connection = executionProvider == null ? null : executionProvider.getConnection();
 			IEnvManager envManager = EnvManagerRegistry.getEnvManager(monitor, connection);
 			try {
 				// Create and execute a Bash script which will configure the environment and then execute the command

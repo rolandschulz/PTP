@@ -20,17 +20,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
 import org.eclipse.ptp.ems.ui.EnvManagerConfigWidget;
 import org.eclipse.ptp.ems.ui.IErrorListener;
-import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
-import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
-import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.services.core.IService;
-import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -49,8 +43,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 	 */
 	@Override
 	public void createWidgets(Composite parent) {
-		final IRemoteExecutionServiceProvider executionProvider = getRemoteServicesExecutionProvider();
-		final IRemoteConnection remoteConnection = executionProvider == null ? null : executionProvider.getConnection();
+		final IRemoteConnection remoteConnection = getConnection();
 
 		this.ui = new EnvManagerConfigWidget(parent, remoteConnection);
 		this.ui.setErrorListener(new IErrorListener() {
@@ -68,34 +61,18 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		this.ui.configurationChanged(getSyncURI(), remoteConnection, computeSelectedItems());
 	}
 
-	private IRemoteExecutionServiceProvider getRemoteServicesExecutionProvider() {
+	private IRemoteConnection getConnection() {
 		if (getControl().isDisposed()) {
 			return null;
 		}
 
 		final BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-		final IServiceConfiguration serviceConfig = bcm.getConfigurationForBuildConfiguration(getCfg());
-		if (serviceConfig == null) {
+		final BuildScenario bs = bcm.getBuildScenarioForBuildConfiguration(getCfg());
+		if (bs == null) {
 			return null;
 		}
-
-		final ServiceModelManager smm = ServiceModelManager.getInstance();
-		final IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-		if (syncService == null || serviceConfig.isDisabled(syncService)) {
-			return null;
-		}
-
-		final IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
-		if (buildService == null) {
-			return null;
-		}
-
-		final IServiceProvider provider = serviceConfig.getServiceProvider(buildService);
-		if (!(provider instanceof IRemoteExecutionServiceProvider)) {
-			return null;
-		}
-
-		return (IRemoteExecutionServiceProvider) provider;
+		
+		return bs.getRemoteConnection(); 
 	}
 
 	private boolean isEnvConfigSupportEnabled() {
@@ -168,8 +145,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 	protected void cfgChanged(ICConfigurationDescription cfgd) {
 		super.cfgChanged(cfgd);
 		if (ui != null) {
-			final IRemoteExecutionServiceProvider executionProvider = getRemoteServicesExecutionProvider();
-			IRemoteConnection connection = executionProvider == null ? null : executionProvider.getConnection();
+			IRemoteConnection connection = getConnection();
 			ui.configurationChanged(getSyncURI(), connection, computeSelectedItems());
 		}
 	}

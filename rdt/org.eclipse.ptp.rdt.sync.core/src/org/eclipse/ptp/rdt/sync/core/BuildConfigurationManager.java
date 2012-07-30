@@ -10,10 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -43,7 +41,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
@@ -55,8 +52,6 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.core.ServiceProvider;
-import org.eclipse.ui.XMLMemento;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
@@ -74,9 +69,22 @@ public class BuildConfigurationManager {
 	private static final String projectLocationPathVariable = "${project_loc}"; //$NON-NLS-1$
 	private static final String localConfigAnnotation = "_local"; //$NON-NLS-1$
 	private static final String remoteConfigAnnotation = "_remote"; //$NON-NLS-1$
+	private static final String syncServiceProviderID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
+	private final ISyncServiceProvider provider;
 
 	// Setup as a singleton
 	private BuildConfigurationManager() {
+		ServiceModelManager smm = ServiceModelManager.getInstance();
+		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
+		
+		// Refactoring - July 2012
+		// Use a single provider instance for all syncs. This does not preclude support for additional sync tools other than Git.
+		// Such support can easily be added by mapping the "syncProvider" attribute of BuildScenario to the appropriate provider
+		// instance (one per tool).
+		provider = (ISyncServiceProvider) smm.getServiceProvider(syncService.getProviderDescriptor(syncServiceProviderID));
+		if (provider == null) {
+			throw new RuntimeException(Messages.BuildConfigurationManager_25);
+		}
 	}
 
 	private static BuildConfigurationManager fInstance = null;
@@ -177,35 +185,6 @@ public class BuildConfigurationManager {
 		}
 		return null;
 	}
-
-	/**
-	 * Returns the service configuration set for the given build configuration, or null if it is unavailable.
-	 * 
-	 * @param bconf
-	 *            The build configuration - cannot be null
-	 * @return service configuration for the build configuration or null on problems retrieving the configuration.
-	 * @deprecated This method is inefficient and can easily be used incorrectly. It is inefficient because it requires a copy of
-	 * 				the project's template service configuration. Also, sync'ing with the contained provider precludes optimizations
-	 * 				done by the true provider in the template. Finally, changing data on this copy has no effect, except for the
-	 * 				data stored in the copy. Instead, use {@link #getBuildScenarioForBuildConfiguration} when you need data about
-	 * 				the configuration and use {@link #getSyncRunnerForBuildConfiguration(IConfiguration)} when you need to use the
-	 * 				contained sync provider for sync'ing.
-	 * 				
-	 */
-	public IServiceConfiguration getConfigurationForBuildConfiguration(IConfiguration bconf) {
-		IProject project = bconf.getOwner().getProject();
-		checkProject(project);
-
-		BuildScenario bs = this.getBuildScenarioForBuildConfiguration(bconf);
-		// Should never happen, but if it does do not continue. (Function call should have invoked error handling.)
-		if (bs == null) {
-			return null;
-		}
-		
-        IServiceConfiguration sconf = copyTemplateServiceConfiguration(project);
-        this.modifyServiceConfigurationForBuildScenario(sconf, project, bs);
-		return sconf;
-	}
 	
 	/**
 	 * Get a SyncRunner object that can be used to do sync'ing.
@@ -217,11 +196,6 @@ public class BuildConfigurationManager {
 	public SyncRunner getSyncRunnerForBuildConfiguration(IConfiguration bconf) {
 		IProject project = bconf.getOwner().getProject();
 		checkProject(project);
-
-		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
-		if (provider == null) { // Error handled in call
-			return null;
-		}
 		
 		BuildScenario buildScenario = this.getBuildScenarioForBuildConfigurationInternal(bconf).bs;
 		if (buildScenario == null) { // Error handled in call
@@ -234,69 +208,6 @@ public class BuildConfigurationManager {
 			return new SyncRunner(provider);
 		}
 	}
-	
-    // Does the low-level work of creating a copy of a service configuration
-    // Returned configuration is never null.
-    // This method supports deprecated code and can be removed once {@link #getConfigurationForBuildConfiguration} is removed.
-    private IServiceConfiguration copyTemplateServiceConfiguration(IProject project) {
-            IServiceConfiguration newConfig = ServiceModelManager.getInstance().newServiceConfiguration(""); //$NON-NLS-1$
-            if (newConfig == null) {
-                    throw new RuntimeException(Messages.BuildConfigurationManager_15);
-            }
-            String oldConfigId = getTemplateServiceConfigurationId(project);
-            if (oldConfigId == null) {
-            	RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_9);
-            	return null;
-            }
-            IServiceConfiguration oldConfig = ServiceModelManager.getInstance().getConfiguration(oldConfigId);
-            if (oldConfig == null) {
-                    RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_10 + oldConfigId + Messages.BuildConfigurationManager_11 + project.getName());
-                    return null;
-            }
-
-            for (IService service : oldConfig.getServices()) {
-                    ServiceProvider oldProvider = (ServiceProvider) oldConfig.getServiceProvider(service);
-                    try {
-                            // The memento creation methods seem the most robust way to copy state. It is more robust than
-                    	    // getProperties() and setProperties(), which saveState() and restoreState() use by default but which
-                    	    // can be overriden by subclasses.
-                            ServiceProvider newProvider = oldProvider.getClass().newInstance();
-                            XMLMemento oldProviderState = XMLMemento.createWriteRoot("provider"); //$NON-NLS-1$
-                            oldProvider.saveState(oldProviderState);
-                            newProvider.restoreState(oldProviderState);
-                            newConfig.setServiceProvider(service, newProvider);
-                    } catch (InstantiationException e) {
-                            throw new RuntimeException(Messages.BCM_ProviderError + oldProvider.getClass());
-                    } catch (IllegalAccessException e) {
-                            throw new RuntimeException(Messages.BCM_ProviderError + oldProvider.getClass());
-                    }
-            }
-
-            return newConfig;
-    }
-
-    // Does the low-level work of changing a service configuration for a new build scenario.
-    // This method supports deprecated code and can be removed once {@link #getConfigurationForBuildConfiguration} is removed.
-	private void modifyServiceConfigurationForBuildScenario(IServiceConfiguration sConfig, IProject project, BuildScenario bs) {
-		IService syncService = null; // Only set if sync service should be disabled
-		for (IService service : sConfig.getServices()) {
-			ServiceProvider provider = (ServiceProvider) sConfig.getServiceProvider(service);
-			if (provider instanceof IRemoteExecutionServiceProvider) {
-				// For local configuration, for example, that does not need to sync
-				if (provider instanceof ISyncServiceProvider && bs.getSyncProvider() == null) {
-					syncService = service;
-				} else {
-					((IRemoteExecutionServiceProvider) provider).setRemoteToolsConnection(bs.getRemoteConnection());
-					((IRemoteExecutionServiceProvider) provider).setConfigLocation(bs.getLocation(project));
-
-				}
-			}
-		}
-		if (syncService != null) {
-			sConfig.disable(syncService);
-		}
-	}
-
 
 	/**
 	 * Return the name of the sync provider for this project, as stored in the project's template service configuration.
@@ -305,41 +216,7 @@ public class BuildConfigurationManager {
 	 * @return sync provider name or null if provider cannot be loaded (should not normally happen)
 	 */
 	public String getProjectSyncProvider(IProject project) {
-		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
-		if (provider == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_13 + project.getName());
-			return null;
-		}
-
 		return provider.getName();
-	}
-	
-	/**
-	 * Return the sync service provider for this project, as stored in the project's template service configuration
-	 *
-	 * @param project
-	 * @return the service provider
-	 */
-	private ISyncServiceProvider getProjectSyncServiceProvider(IProject project) {
-		checkProject(project);
-		String serviceConfigId = getTemplateServiceConfigurationId(project);
-		if (serviceConfigId == null) {
-        	RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_9);
-        	return null;
-		}
-		IServiceConfiguration serviceConfig = ServiceModelManager.getInstance().getConfiguration(serviceConfigId);
-		if (serviceConfig == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_10 + serviceConfigId + Messages.BuildConfigurationManager_11 + project.getName());
-			return null;
-		}
-
-		IService syncService = ServiceModelManager.getInstance().getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-		if (syncService == null) {
-			RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_12);
-			return null;
-		}
-		
-		return (ISyncServiceProvider) serviceConfig.getServiceProvider(syncService);
 	}
 
 	/**
@@ -375,39 +252,14 @@ public class BuildConfigurationManager {
 	 * configuration.
 	 * 
 	 * @param project - cannot be null
-	 * @param sc - the service configuration - cannot be null
+	 * @param sc - the service configuration - ignored
 	 * @param bs - the build scenario - cannot be null
 	 */
-	public void initProject(IProject project, IServiceConfiguration sc, BuildScenario bs) {
-		if (project == null || sc == null || bs == null) {
+	public void setBuildScenarioForAllBuildConfigurations(IProject project, BuildScenario bs) {
+		if (bs == null) {
 			throw new NullPointerException();
 		}
-		
-		// Store configuration independently of project, which can be useful if the project is deleted.
-		ServiceModelManager smm = ServiceModelManager.getInstance();
-		smm.addConfiguration(sc);
-		try {
-			smm.saveModelConfiguration();
-		} catch (IOException e) {
-			RDTSyncCorePlugin.log(e.toString(), e);
-		}
-
-		// Cannot call "checkProject" because project not yet initialized
-		try {
-			if (!project.hasNature(RemoteSyncNature.NATURE_ID)) {
-				throw new IllegalArgumentException(Messages.BuildConfigurationManager_6);
-			}
-		} catch (CoreException e) {
-			throw new IllegalArgumentException(Messages.BuildConfigurationManager_8);
-		}
-
-		IScopeContext context = new ProjectScope(project);
-		Preferences node = context.getNode(projectScopeSyncNode);
-		if (node == null) {
-			throw new RuntimeException(Messages.BuildConfigurationManager_0);
-		}
-		node.put(TEMPLATE_KEY, sc.getId());
-		flushNode(node);
+		checkProject(project);
 
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
@@ -435,23 +287,6 @@ public class BuildConfigurationManager {
 		}
 		node.put(TEMPLATE_KEY, sc.getId());
 		flushNode(node);
-	}
-
-	/**
-	 * Indicate if the project has yet been initialized.
-	 * 
-	 * @param project - cannot be null
-	 * @return whether or not the project has been initialized
-	 */
-	public boolean isInitialized(IProject project) {
-		if (project == null) {
-			throw new NullPointerException();
-		}
-		if (getTemplateServiceConfigurationId(project) == null) {
-			return false;
-		} else {
-			return true;
-		}
 	}
 
 	/**
@@ -554,23 +389,6 @@ public class BuildConfigurationManager {
 						Messages.BuildConfigurationManager_11 + project.getName());
 			}
 		}
-	}
-	
-	// Return ID of the project's template service configuration, or null if not found, which indicates it is not a sync project
-	// or has not yet been initialized.
-	private static String getTemplateServiceConfigurationId(IProject project) {
-		IScopeContext context = new ProjectScope(project);
-		Preferences node = context.getNode(projectScopeSyncNode);
-		if (node == null) {
-			return null;
-		}
-		
-		String configId = node.get(TEMPLATE_KEY, null);
-		if (configId == null) {
-			return null;
-		}
-		
-		return configId;
 	}
 	
 	/**
@@ -760,9 +578,6 @@ public class BuildConfigurationManager {
 		} catch (CoreException e) {
 			throw new IllegalArgumentException(Messages.BuildConfigurationManager_8);
 		}
-		if (!isInitialized(project)) {
-			throw new RuntimeException(Messages.BuildConfigurationManager_7);
-		}
 	}
 	
 	/**
@@ -896,12 +711,7 @@ public class BuildConfigurationManager {
 	 *              for system-level problems retrieving merge information
 	 */
 	public Set<IPath> getMergeConflictFiles(IProject project, BuildScenario buildScenario) throws CoreException {
-		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
-		if (provider == null) { // Error handled in call
-			return new HashSet<IPath>();
-		} else {
-			return provider.getMergeConflictFiles(project, buildScenario);
-		}
+		return provider.getMergeConflictFiles(project, buildScenario);
 	}
 
 	/**
@@ -916,12 +726,7 @@ public class BuildConfigurationManager {
 	 * 				for system-level problems retrieving merge information
 	 */
 	public String[] getMergeConflictParts(IProject project, BuildScenario buildScenario, IFile file) throws CoreException {
-		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
-		if (provider == null) { // Error handled in call
-			return null;
-		} else {
-			return provider.getMergeConflictParts(project, buildScenario, file);
-		}
+		return provider.getMergeConflictParts(project, buildScenario, file);
 	}
 	
 	/**
@@ -934,10 +739,6 @@ public class BuildConfigurationManager {
 	 * 				for system-level problems setting the state
 	 */
 	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath path) throws CoreException {
-		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
-		if (provider == null) { // Error handled in call
-			return;
-		}
 		provider.setMergeAsResolved(project, buildScenario, path);
 	}
 	
@@ -950,10 +751,6 @@ public class BuildConfigurationManager {
 	 * @throws CoreException
 	 */
 	public void checkout(IProject project, BuildScenario buildScenario, IPath path) throws CoreException {
-		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
-		if (provider == null) { // Error handled in call
-			return;
-		}
 		provider.checkout(project, buildScenario, path);
 	}
 	
@@ -966,10 +763,6 @@ public class BuildConfigurationManager {
 	 * @throws CoreException
 	 */
 	public void checkoutRemoteCopy(IProject project, BuildScenario buildScenario, IPath path) throws CoreException {
-		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
-		if (provider == null) { // Error handled in call
-			return;
-		}
 		provider.checkoutRemoteCopy(project, buildScenario, path);
 	}
 
@@ -1024,7 +817,6 @@ public class BuildConfigurationManager {
 	 * @param project
 	 */
 	public void shutdown(IProject project) {
-		ISyncServiceProvider provider = this.getProjectSyncServiceProvider(project);
 		provider.close(project);
 	}
 }
