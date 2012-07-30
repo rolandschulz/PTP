@@ -378,21 +378,28 @@ public class GitRemoteSyncConnection {
 			RemoteExecutionException, RemoteSyncException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
-			List<String> command = stringToList(gitCommand + " rm --"); //$NON-NLS-1$
-			for (String fileName : filesToDelete) {
-				command.add(fileName);
-			}
+			while (!filesToDelete.isEmpty()) {
+				List<String> commandList = stringToList(gitCommand + " rm --"); //$NON-NLS-1$
+				int count = 1;
+				for (String fileName : filesToDelete.toArray(new String[0])) {
+					if (count++ % MAX_FILES == 0) {
+						break;
+					}
+					commandList.add(fileName);
+					filesToDelete.remove(fileName);
+				}
 
-			CommandResults commandResults = null;
-			try {
-				commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(10));
-			} catch (final InterruptedException e) {
-				throw new RemoteExecutionException(e);
-			} catch (RemoteConnectionException e) {
-				throw new RemoteExecutionException(e);
-			}
-			if (commandResults.getExitCode() != 0) {
-				throw new RemoteExecutionException(Messages.GRSC_GitRmFailure + commandResults.getStderr());
+				CommandResults commandResults = null;
+				try {
+					commandResults = CommandRunner.executeRemoteCommand(connection, commandList, remoteDirectory, subMon.newChild(10));
+				} catch (final InterruptedException e) {
+					throw new RemoteExecutionException(e);
+				} catch (RemoteConnectionException e) {
+					throw new RemoteExecutionException(e);
+				}
+				if (commandResults.getExitCode() != 0) {
+					throw new RemoteExecutionException(Messages.GRSC_GitRmFailure + commandResults.getStderr());
+				}
 			}
 		} finally {
 			if (monitor != null) {
