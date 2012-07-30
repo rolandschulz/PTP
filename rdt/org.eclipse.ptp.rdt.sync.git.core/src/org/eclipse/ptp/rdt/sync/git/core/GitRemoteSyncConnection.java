@@ -62,6 +62,8 @@ import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.QuotedString;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
@@ -88,10 +90,9 @@ public class GitRemoteSyncConnection {
 	public static final String gitDir = ".ptp-sync"; //$NON-NLS-1$
 	private static final String gitCommand = "git --git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
-	private final IRemoteConnection connection;
-	private SyncFileFilter fileFilter;
 	private final String localDirectory;
-	private final String remoteDirectory;
+	private final BuildScenario buildScenario;
+	private SyncFileFilter fileFilter;
 	private Git git;
 	private TransportGitSsh transport;
 	private final IProject project;
@@ -112,16 +113,18 @@ public class GitRemoteSyncConnection {
 	 *             on problems building the remote repository. Specific
 	 *             exception nested. Upon such an exception, the instance is
 	 *             invalid and should not be used.
+	 * @throws MissingConnectionException
+	 * 				when connection missing. In this case, the instance is
+	 *              also invalid.
 	 */
-	public GitRemoteSyncConnection(IProject proj, IRemoteConnection conn, String localDir, String remoteDir, SyncFileFilter filter,
-			IProgressMonitor monitor) throws RemoteSyncException {
+	public GitRemoteSyncConnection(IProject proj, String localDir, BuildScenario bs, SyncFileFilter filter,
+			IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
 			project = proj;
-			connection = conn;
-			fileFilter = filter;
 			localDirectory = localDir;
-			remoteDirectory = remoteDir;
+			buildScenario = bs;
+			fileFilter = filter;
 
 			// Build repo, creating it if it is not already present.
 			try {
@@ -187,8 +190,11 @@ public class GitRemoteSyncConnection {
 	 *             which can leave the repo in a partial state. For example, if
 	 *             the repo is created but the initial commit fails. TODO:
 	 *             Consider evaluating the output of "git init".
+	 * @throws MissingConnectionException
+	 *				on missing connection.
 	 */
-	private Git buildRepo(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
+	private Git buildRepo(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
+	MissingConnectionException {
 		final SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		subMon.subTask(Messages.GitRemoteSyncConnection_building_repo);
 		try {
@@ -227,7 +233,8 @@ public class GitRemoteSyncConnection {
 
 			// Create remote directory if necessary.
 			try {
-				CommandRunner.createRemoteDirectory(connection, remoteDirectory, subMon.newChild(5));
+				CommandRunner.createRemoteDirectory(buildScenario.getRemoteConnection(), buildScenario.getLocation(project),
+						subMon.newChild(5));
 			} catch (final CoreException e) {
 				throw new RemoteSyncException(e);
 			}
@@ -261,16 +268,18 @@ public class GitRemoteSyncConnection {
 	 * @throws IOException
 	 * @throws RemoteExecutionException
 	 * @throws RemoteSyncException
+	 * @throws MissingConnectionException
 	 * @return whether this repo already existed
 	 */
-	private boolean doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException {
+	private boolean doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
+	MissingConnectionException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
 			String command = "git --git-dir=" + gitDir + " init"; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = null;
 
 			try {
-				commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(10));
+				commandResults = this.executeRemoteCommand(command, subMon.newChild(10));
 			} catch (final InterruptedException e) {
 				throw new RemoteExecutionException(e);
 			} catch (RemoteConnectionException e) {
@@ -308,7 +317,8 @@ public class GitRemoteSyncConnection {
 	 * 
 	 * @return whether there are changes to be committed.
 	 */
-	private boolean prepareRemoteForCommit(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
+	private boolean prepareRemoteForCommit(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException,
+	MissingConnectionException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
 			Set<String> filesToAdd = new HashSet<String>();
@@ -345,7 +355,7 @@ public class GitRemoteSyncConnection {
 	/*
 	 * Do a "git commit" on the remote host
 	 */
-	private void commitRemoteFiles(IProgressMonitor monitor) throws RemoteSyncException {
+	private void commitRemoteFiles(IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		subMon.subTask(Messages.GitRemoteSyncConnection_committing_remote);
 		try {
@@ -353,7 +363,7 @@ public class GitRemoteSyncConnection {
 			CommandResults commandResults = null;
 
 			try {
-				commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(10));
+				commandResults = this.executeRemoteCommand(command, subMon.newChild(10));
 			} catch (final InterruptedException e) {
 				throw new RemoteSyncException(e);
 			} catch (RemoteConnectionException e) {
@@ -361,6 +371,7 @@ public class GitRemoteSyncConnection {
 			} catch (IOException e) {
 				throw new RemoteSyncException(e);
 			}
+
 			if (commandResults.getExitCode() != 0) {
 				throw new RemoteSyncException(Messages.GRSC_GitCommitFailure + commandResults.getStderr());
 			}
@@ -375,7 +386,7 @@ public class GitRemoteSyncConnection {
 	 * Do a "git rm <Files>" on the remote host
 	 */
 	private void deleteRemoteFiles(Set<String> filesToDelete, IProgressMonitor monitor) throws IOException,
-			RemoteExecutionException, RemoteSyncException {
+			RemoteExecutionException, RemoteSyncException, MissingConnectionException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
 			while (!filesToDelete.isEmpty()) {
@@ -391,7 +402,7 @@ public class GitRemoteSyncConnection {
 
 				CommandResults commandResults = null;
 				try {
-					commandResults = CommandRunner.executeRemoteCommand(connection, commandList, remoteDirectory, subMon.newChild(10));
+				commandResults = this.executeRemoteCommand(commandList, subMon.newChild(10));
 				} catch (final InterruptedException e) {
 					throw new RemoteExecutionException(e);
 				} catch (RemoteConnectionException e) {
@@ -416,7 +427,7 @@ public class GitRemoteSyncConnection {
 	 * Do a "git add <Files>" on the remote host
 	 */
 	private void addRemoteFiles(Set<String> filesToAdd, IProgressMonitor monitor) throws IOException, RemoteExecutionException,
-			RemoteSyncException {
+			RemoteSyncException, MissingConnectionException {
 		SubMonitor subMon = SubMonitor.convert(monitor, filesToAdd.size());
 		subMon.subTask(Messages.GitRemoteSyncConnection_adding_files);
 		try {
@@ -433,8 +444,7 @@ public class GitRemoteSyncConnection {
 
 				CommandResults commandResults = null;
 				try {
-					commandResults = CommandRunner.executeRemoteCommand(connection, commandList, remoteDirectory,
-							subMon.newChild(10));
+					commandResults = this.executeRemoteCommand(commandList, subMon.newChild(10));
 				} catch (final InterruptedException e) {
 					throw new RemoteExecutionException(e);
 				} catch (RemoteConnectionException e) {
@@ -457,7 +467,8 @@ public class GitRemoteSyncConnection {
 	 * deleted from the git index.
 	 */
 	private void getRemoteFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, IProgressMonitor monitor,
-			boolean includeUntrackedFiles) throws IOException, RemoteExecutionException, RemoteSyncException {
+			boolean includeUntrackedFiles) throws IOException, RemoteExecutionException, RemoteSyncException,
+			MissingConnectionException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		subMon.subTask(Messages.GitRemoteSyncConnection_getting_remote_file_status);
 		try {
@@ -470,7 +481,7 @@ public class GitRemoteSyncConnection {
 			CommandResults commandResults = null;
 
 			try {
-				commandResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(10));
+				commandResults = this.executeRemoteCommand(command, subMon.newChild(10));
 			} catch (final InterruptedException e) {
 				throw new RemoteExecutionException(e);
 			} catch (RemoteConnectionException e) {
@@ -555,6 +566,7 @@ public class GitRemoteSyncConnection {
 			commandList.add(command);
 
 			try {
+				IRemoteConnection connection = buildScenario.getRemoteConnection();
 				if (!connection.isOpen()) {
 					connection.open(null);
 				}
@@ -563,6 +575,8 @@ public class GitRemoteSyncConnection {
 				throw new TransportException(uri, e.getMessage(), e);
 			} catch (RemoteConnectionException e) {
 				throw new TransportException(uri, e.getMessage(), e);
+			} catch (MissingConnectionException e) {
+				throw new TransportException(uri, Messages.GitRemoteSyncConnection_3 + e.getConnectionName(), e);
 			}
 
 		}
@@ -618,7 +632,8 @@ public class GitRemoteSyncConnection {
 				.setHost("none") //$NON-NLS-1$
 				// .setPass("")
 				.setScheme("ssh") //$NON-NLS-1$
-				.setPath(remoteDirectory + "/" + gitDir); //$NON-NLS-1$  //Should use remote path seperator but first 315720 has to be fixed
+				.setPath(buildScenario.getLocation(project) + "/" + gitDir); //$NON-NLS-1$  // Should use remote path seperator but
+		                                                                                    // first 315720 has to be fixed
 	}
 
 	public void close() {
@@ -773,9 +788,10 @@ public class GitRemoteSyncConnection {
 
 	/**
 	 * @return the connection (IRemoteConnection)
+	 * @throws MissingConnectionException 
 	 */
-	public IRemoteConnection getConnection() {
-		return connection;
+	public IRemoteConnection getConnection() throws MissingConnectionException {
+		return buildScenario.getRemoteConnection();
 	}
 
 	/**
@@ -789,7 +805,7 @@ public class GitRemoteSyncConnection {
 	 * @return the remoteDirectory
 	 */
 	public String getRemoteDirectory() {
-		return remoteDirectory;
+		return buildScenario.getLocation(project);
 	}
 
 	/**
@@ -823,7 +839,7 @@ public class GitRemoteSyncConnection {
 					CommandResults mergeResults;
 					final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
 	
-					mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
+					mergeResults = this.executeRemoteCommand(command, subMon.newChild(5));
 	
 					if (mergeResults.getExitCode() != 0) {
 						throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
@@ -838,6 +854,8 @@ public class GitRemoteSyncConnection {
 				throw new RemoteSyncException(e);
 			} catch (GitAPIException e) {
 				throw new RemoteSyncException(e);
+			} catch (MissingConnectionException e) {
+				// nothing to do
 			}
 		} finally {
 			if (monitor != null) {
@@ -902,6 +920,8 @@ public class GitRemoteSyncConnection {
 			throw new RemoteSyncException(e);
 		} catch (GitAPIException e) {
 			throw new RemoteSyncException(e);
+		} catch (MissingConnectionException e) {
+			// nothing to do
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -987,8 +1007,7 @@ public class GitRemoteSyncConnection {
 				// final String command = gitCommand + " merge --ff-only " + remotePushBranch; //$NON-NLS-1$
 				final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
 
-				mergeResults = CommandRunner.executeRemoteCommand(connection, command, remoteDirectory, subMon.newChild(5));
-
+				mergeResults = this.executeRemoteCommand(command, subMon.newChild(5));
 				if (mergeResults.getExitCode() != 0) {
 					throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
 							+ mergeResults.getStderr()));
@@ -1002,6 +1021,8 @@ public class GitRemoteSyncConnection {
 			throw new RemoteSyncException(e);
 		} catch (GitAPIException e) {
 			throw new RemoteSyncException(e);
+		} catch (MissingConnectionException e) {
+			// nothing to do
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -1111,5 +1132,19 @@ public class GitRemoteSyncConnection {
 		}, "Refresh workspace thread"); //$NON-NLS-1$
 		refreshWorkspaceThread.start();
 		return refreshWorkspaceThread;
+	}
+	
+	private CommandResults executeRemoteCommand(String command, SubMonitor monitor) throws RemoteSyncException, IOException,
+	InterruptedException, RemoteConnectionException, MissingConnectionException {
+		IRemoteConnection conn = buildScenario.getRemoteConnection();
+		String remoteDirectory = buildScenario.getLocation(project);
+		return CommandRunner.executeRemoteCommand(conn, command, remoteDirectory, monitor);
+	}
+	
+	private CommandResults executeRemoteCommand(List<String> command, SubMonitor monitor) throws RemoteSyncException, IOException,
+	InterruptedException, RemoteConnectionException, MissingConnectionException {
+		IRemoteConnection conn = buildScenario.getRemoteConnection();
+		String remoteDirectory = buildScenario.getLocation(project);
+		return CommandRunner.executeRemoteCommand(conn, command, remoteDirectory, monitor);
 	}
 }

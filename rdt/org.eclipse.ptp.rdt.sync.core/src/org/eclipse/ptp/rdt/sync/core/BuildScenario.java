@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
@@ -28,7 +29,8 @@ public class BuildScenario {
 	private static final String ATTR_LOCATION = "location"; //$NON-NLS-1$
 	private static final String ATTR_REMOTE_SERVICES_ID = "remote-services-id"; //$NON-NLS-1$
 	final String syncProvider;
-	final IRemoteConnection remoteConnection;
+	final String remoteConnection;
+	final IRemoteServices remoteServices;
 	final String location;
 	
 	/**
@@ -36,14 +38,37 @@ public class BuildScenario {
 	 * 
 	 * @param sp
 	 *           Name of sync provider
-	 * @param rcn
-	 * 			 Name of remote connection
+	 * @param rc
+	 * 			 Remote connection to use - cannot be null
 	 * @param l
 	 * 			 Location (directory) on remote host
 	 */
 	public BuildScenario(String sp, IRemoteConnection rc, String l) {
 		syncProvider = sp;
+		remoteConnection = rc.getName();
+		remoteServices = rc.getRemoteServices();
+		location = l;
+	}
+	
+	/**
+	 * Create a new build scenario
+	 *
+	 * @param sp
+	 * 			Name of sync provider
+	 * @param rc
+	 * 			Name of remote connection
+	 * @param rs
+	 * 			Name of remote service - must be a valid service
+	 * @param l
+	 * 			Location (directory) on remote host
+	 */
+	public BuildScenario(String sp, String rc, String rs, String l) {
+		syncProvider = sp;
 		remoteConnection = rc;
+		remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rs);
+		if (remoteServices == null) {
+			throw new IllegalArgumentException(Messages.BuildScenario_0 + rs);
+		}
 		location = l;
 	}
 
@@ -56,23 +81,40 @@ public class BuildScenario {
 	}
 
 	/**
-	 * Get remote connection
-	 * @return remote connection
-	 */
-	public IRemoteConnection getRemoteConnection() {
-		return remoteConnection;
-	}
-
-	/**
-	 * Get location (directory)
+	 * Get remote connection. If connection is missing, this function calls the missing-connection handler. Thus, after catching
+	 * the exception, callers can assume user has already been notified and given an opportunity to define the connection. So
+	 * callers only need to worry about recovering gracefully.
 	 * 
-	 * @return location (directory)
-	 * @deprecated as of 6.0.0, replaced by {@link #getLocation(IProject)}
-	 *   The new function supports the use of path variables, such as the project location, useful for project relocation
-	 *   (see bug 371507). Such support is not possible, though, without project information.
+	 * @return remote connection - never null
+	 *
+	 * @throws MissingConnectionException if no connection with the stored name exist. This can happen for various reasons:
+	 * 1) The connection was renamed
+	 * 2) The connection was deleted
+	 * 3) The connection never existed, such as when a project is imported to a different workspace
 	 */
-	@Deprecated public String getLocation() {
-		return location;
+	public IRemoteConnection getRemoteConnection() throws MissingConnectionException {
+		IRemoteConnection conn = remoteServices.getConnectionManager().getConnection(remoteConnection);
+		if (conn == null) {
+			IMissingConnectionHandler mcHandler = SyncManager.getDefaultMissingConnectionHandler();
+			if (mcHandler != null) {
+				mcHandler.handle(remoteServices, remoteConnection);
+				conn = remoteServices.getConnectionManager().getConnection(remoteConnection);
+			}
+		}
+
+		if (conn == null) {
+			throw new MissingConnectionException(remoteConnection);
+		} else {
+			return conn;
+		}
+	}
+	
+	/**
+	 * Get remote provider
+	 * @return remote provider - never null
+	 */
+	public IRemoteServices getRemoteProvider() {
+		return remoteServices;
 	}
 	
 	/**
@@ -130,9 +172,9 @@ public class BuildScenario {
 		if (syncProvider != null) {
 			map.put(ATTR_SYNC_PROVIDER, syncProvider);
 		}
-		map.put(ATTR_REMOTE_CONNECTION_ID, remoteConnection.getName());
+		map.put(ATTR_REMOTE_CONNECTION_ID, remoteConnection);
 		map.put(ATTR_LOCATION, location);
-		map.put(ATTR_REMOTE_SERVICES_ID, remoteConnection.getRemoteServices().getId());
+		map.put(ATTR_REMOTE_SERVICES_ID, remoteServices.getId());
 	}
 	
 	/**
@@ -145,23 +187,13 @@ public class BuildScenario {
 	public static BuildScenario loadScenario(Map<String, String> map) {
 		String sp = map.get(ATTR_SYNC_PROVIDER);
 		String rc = map.get(ATTR_REMOTE_CONNECTION_ID);
-		String l = map.get(ATTR_LOCATION);
 		String rs = map.get(ATTR_REMOTE_SERVICES_ID);
+		String l = map.get(ATTR_LOCATION);
 		if (rc == null || l == null || rs == null) { // null is okay for sync provider
 			return null;
+		} else {
+			return new BuildScenario(sp, rc, rs, l);
 		}
-		
-		IRemoteServices remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(rs);
-		if (remoteService == null) {
-			return null;
-		}
-
-		IRemoteConnection remoteConnection = remoteService.getConnectionManager().getConnection(rc);
-		if (remoteConnection == null) {
-			return null;
-		}
-
-		return new BuildScenario(sp, remoteConnection, l);
 	}
 
 	@Override
@@ -173,6 +205,8 @@ public class BuildScenario {
 		result = prime
 				* result
 				+ ((remoteConnection == null) ? 0 : remoteConnection.hashCode());
+		result = prime * result
+				+ ((remoteServices == null) ? 0 : remoteServices.hashCode());
 		result = prime * result
 				+ ((syncProvider == null) ? 0 : syncProvider.hashCode());
 		return result;
@@ -196,6 +230,11 @@ public class BuildScenario {
 			if (other.remoteConnection != null)
 				return false;
 		} else if (!remoteConnection.equals(other.remoteConnection))
+			return false;
+		if (remoteServices == null) {
+			if (other.remoteServices != null)
+				return false;
+		} else if (!remoteServices.equals(other.remoteServices))
 			return false;
 		if (syncProvider == null) {
 			if (other.syncProvider != null)

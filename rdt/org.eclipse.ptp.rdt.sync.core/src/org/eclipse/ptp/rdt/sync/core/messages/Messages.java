@@ -131,6 +131,8 @@ public class Messages extends NLS {
 	public static String SyncManager_0;
  
 	public static String SyncManager_1;
+
+	public static String SyncManager_10;
  
 	public static String SyncManager_2;
 

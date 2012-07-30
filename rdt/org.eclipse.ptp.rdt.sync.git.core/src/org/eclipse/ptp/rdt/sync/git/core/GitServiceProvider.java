@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -43,7 +44,6 @@ import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
 public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider {
@@ -362,13 +362,16 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				if (buildScenario == null) {
 					throw new RuntimeException(Messages.GitServiceProvider_3 + project.getName());
 				}
+
 				GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario, fileFilter, progress);
 				if (fSyncConnection == null) {
-					throw new RemoteSyncException(Messages.GitServiceProvider_5);
-				}
-				// Open remote connection if necessary
-				if (buildScenario.getRemoteConnection().isOpen() == false) {
-					buildScenario.getRemoteConnection().open(progress.newChild(10));
+					// Should never happen
+					if (buildScenario.getSyncProvider() == null) {
+						throw new RemoteSyncException(Messages.GitServiceProvider_5);
+					// Happens whenever connection does not exist
+					} else {
+						return;
+					}
 				}
 
 				// This synchronization operation will include all tasks up to current syncTaskId
@@ -391,8 +394,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				}
 				finishedSyncTaskId = willFinishTaskId;
 				// TODO: review exception handling
-			} catch (RemoteConnectionException e) {
-				throw new RemoteSyncException(e);
 			} finally {
 				syncLock.unlock();
 			}
@@ -410,9 +411,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 	}
 	
-	// Return appropriate sync connection or null for scenarios with no sync provider. Creates a new connection if necessary.
-	// This function must properly maintain the map of connections and also remember to set the file filter (always, not just for
-	// new connections).
+	// Return appropriate sync connection or null for scenarios with no sync provider or if the connection is missing.
+	// Creates a new sync connection if necessary. This function must properly maintain the map of connections and also remember to set
+	// the file filter (always, not just for new connections).
 	// TODO: Create progress monitor if passed monitor is null.
 	private synchronized GitRemoteSyncConnection getSyncConnection(IProject project, BuildScenario buildScenario,
 			SyncFileFilter fileFilter, SubMonitor progress) throws RemoteSyncException {
@@ -421,8 +422,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 		ProjectAndScenario pas = new ProjectAndScenario(project, buildScenario);
 		if (!syncConnectionMap.containsKey(pas)) {
-			syncConnectionMap.put(pas, new GitRemoteSyncConnection(project, buildScenario.getRemoteConnection(),
-					project.getLocation().toString(), buildScenario.getLocation(project), fileFilter, progress));
+			try {
+				GitRemoteSyncConnection grsc = new GitRemoteSyncConnection(project, project.getLocation().toString(), buildScenario,
+						fileFilter, progress);
+				syncConnectionMap.put(pas, grsc);
+			} catch (MissingConnectionException e) {
+				return null;
+			}
 		}
 		GitRemoteSyncConnection fSyncConnection = syncConnectionMap.get(pas);
 		fSyncConnection.setFileFilter(fileFilter);

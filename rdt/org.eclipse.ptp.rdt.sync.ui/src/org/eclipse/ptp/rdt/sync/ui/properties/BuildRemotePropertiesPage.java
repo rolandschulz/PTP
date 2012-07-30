@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
@@ -489,8 +490,12 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 		PageSettings settings = new PageSettings();
 		settings.syncProvider = buildScenario.getSyncProvider();
-		settings.remoteProvider = buildScenario.getRemoteConnection().getRemoteServices();
-		settings.connection = buildScenario.getRemoteConnection();
+		settings.remoteProvider = buildScenario.getRemoteProvider();
+		try {
+			settings.connection = buildScenario.getRemoteConnection();
+		} catch (MissingConnectionException e) {
+			// nothing to do
+		}
 		IProject project = config.getOwner().getProject();
 		settings.rootLocation = buildScenario.getLocation(project);
 

@@ -43,6 +43,7 @@ import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
@@ -139,13 +140,18 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		changeToDirectory = new Path(changeToDirectory.toString().replaceFirst(projectLocalRoot, projectActualRoot));
 		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
 
-		// Get the service model for this configuration, and use the provider of the build service to execute the build
-		// command.
+		// Get and setup the connection and remote services for this build configuration.
 		BuildScenario bs = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration);
 		if (bs == null) {
 			return null;
 		}
-		IRemoteConnection connection = bs.getRemoteConnection();
+		IRemoteConnection connection;
+		try {
+			connection = bs.getRemoteConnection();
+		} catch (MissingConnectionException e2) {
+            throw new CoreException(new Status(IStatus.CANCEL,
+                    "org.eclipse.ptp.rdt.sync.core", "Build canceled because connection does not exist")); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		if (!connection.isOpen()) {
 			try {
 				connection.open(monitor);
@@ -163,6 +169,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			remoteServices.initialize();
 		}
 
+		// Set process's command and environment
 		List<String> command = constructCommand(commandPath, args, connection, monitor);
 
 		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);

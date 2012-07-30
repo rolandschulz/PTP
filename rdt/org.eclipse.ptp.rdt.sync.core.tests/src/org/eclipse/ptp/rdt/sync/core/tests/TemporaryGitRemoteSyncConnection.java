@@ -17,6 +17,7 @@ import static org.junit.Assert.fail;
 import java.util.Random;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.git.core.GitRemoteSyncConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -110,7 +111,8 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 		/* remote folder (just delete - is created by GitRemoteSyncConnection) */
 		fileManager.getResource(remoteFolder).delete(EFS.NONE, null);
 
-		fGITConn = new GitRemoteSyncConnection(null, fRemoteConnection, localFolder.getRoot().getPath(), remoteFolder,
+		BuildScenario buildScenario = new BuildScenario("Git", fRemoteConnection, remoteFolder);
+		fGITConn = new GitRemoteSyncConnection(null, localFolder.getRoot().getPath(), buildScenario,
 				SyncFileFilter.createBuiltInDefaultFilter(), null);
 	}
 

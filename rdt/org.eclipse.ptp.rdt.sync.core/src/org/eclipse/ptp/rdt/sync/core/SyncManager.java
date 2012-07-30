@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.osgi.service.prefs.Preferences;
 
 public class SyncManager  {
@@ -55,6 +56,13 @@ public class SyncManager  {
 		@Override
 		public void handle(IProject project, CoreException e) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_8 + project.getName(), e);
+		}
+	};
+	
+	private static IMissingConnectionHandler defaultMissingConnectionHandler = new IMissingConnectionHandler() {
+		@Override
+		public void handle(IRemoteServices remoteServices, String connectionName) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_10 + connectionName);
 		}
 	};
 
@@ -491,6 +499,22 @@ public class SyncManager  {
 	 */
 	public static void setDefaultSyncExceptionHandler(ISyncExceptionHandler handler) {
 		defaultSyncExceptionHandler = handler;
+	}
+	
+	/**
+	 * Get the current default missing connection handler
+	 * @return default missing connection handler
+	 */
+	public static IMissingConnectionHandler getDefaultMissingConnectionHandler() {
+		return defaultMissingConnectionHandler;
+	}
+	
+	/**
+	 * Set the default sync exception handler
+	 * @param handler
+	 */
+	public static void setDefaultMissingConnectionHandler(IMissingConnectionHandler handler) {
+		defaultMissingConnectionHandler = handler;
 	}
 	
 	/**
