@@ -16,7 +16,11 @@
 
 package org.eclipse.ptp.gem.popup.actions;
 
-import org.eclipse.core.resources.IFile;
+import java.net.URI;
+
+import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
@@ -28,6 +32,7 @@ import org.eclipse.ptp.gem.util.GemUtilities;
 import org.eclipse.ptp.gem.views.GemAnalyzer;
 import org.eclipse.ptp.gem.views.GemBrowser;
 import org.eclipse.ptp.gem.views.GemConsole;
+import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPage;
@@ -45,6 +50,7 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @see org.eclipse.ui.IObjectActionDelegate
  */
+@SuppressWarnings("restriction")
 public class VerificationPopUpAction implements IObjectActionDelegate {
 
 	private IStructuredSelection selection;
@@ -60,49 +66,77 @@ public class VerificationPopUpAction implements IObjectActionDelegate {
 	 * @see IActionDelegate#run(IAction)
 	 */
 	public void run(IAction action) {
+
 		if (this.selection == null) {
 			return;
 		}
 
-		// Make sure the file selection is valid
+		// Check that the selection is valid
 		if (this.selection.toString().equals("<empty selection>")) { //$NON-NLS-1$
 			GemUtilities.showErrorDialog(Messages.VerificationPopUpAction_0);
 		} else {
-			final IFile inputFile = (IFile) this.selection.getFirstElement();
-			final String id = action.getId();
-			final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-			final IWorkbenchPage page = window.getActivePage();
-			final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+			final Object selectionElement = this.selection.getFirstElement();
+			IResource resource = null;
 
-			// Open GEM views in order determined by preference
-			try {
-				// ask for command line arguments
-				GemUtilities.setCommandLineArgs();
+			if (selectionElement instanceof IResource) {
+				resource = (IResource) selectionElement;
+			} else if (selectionElement instanceof ICElement) {
+				resource = ((ICElement) selectionElement).getResource();
+			}
 
-				final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
-				if (activeView.equals("analyzer")) { //$NON-NLS-1$
-					page.showView(GemBrowser.ID);
-					page.showView(GemAnalyzer.ID);
-				} else {
-					page.showView(GemAnalyzer.ID);
-					page.showView(GemBrowser.ID);
+			// Do the work if the resource is valid
+			if (resource != null) {
+				final String id = action.getId();
+				final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				final IWorkbenchPage page = window.getActivePage();
+				final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+
+				// Open GEM views in order determined by preference
+				try {
+					// ask for command line arguments
+					GemUtilities.setCommandLineArgs();
+
+					final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
+					if (activeView.equals("analyzer")) { //$NON-NLS-1$
+						page.showView(GemBrowser.ID);
+						page.showView(GemAnalyzer.ID);
+					} else {
+						page.showView(GemAnalyzer.ID);
+						page.showView(GemBrowser.ID);
+					}
+					page.showView(GemConsole.ID);
+
+					// if !isValidSourceFile, then its a .gem profiled executable
+					final boolean isValidSourceFile = id
+							.equals("org.eclipse.ptp.gem.verificationPopupC") //$NON-NLS-1$
+							|| id.equals("org.eclipse.ptp.gem.verificationPopupCpp") //$NON-NLS-1$
+							|| id.equals("org.eclipse.ptp.gem.verificationPopupC++") //$NON-NLS-1$
+							|| id.equals("org.eclipse.ptp.gem.verificationPopupCp") //$NON-NLS-1$
+							|| id.equals("org.eclipse.ptp.gem.verificationPopupCc"); //$NON-NLS-1$
+
+					// Save the URI of the most recent project resource
+					// if (isValidSourceFile) {
+					final boolean isSync = GemUtilities.isSynchronizedProject(resource);
+					URI resourceLocation = null;
+					try {
+						if (isSync) {
+							resourceLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(resource);
+						} else {
+							resourceLocation = resource.getLocationURI();
+						}
+					} catch (final CoreException e) {
+						GemUtilities.logExceptionDetail(e);
+					}
+					GemUtilities.saveMostRecentURI(resourceLocation);
+
+					GemUtilities.initGemViews(resource, isValidSourceFile, true);
+
+				} catch (final PartInitException e) {
+					GemUtilities.logExceptionDetail(e);
 				}
-				page.showView(GemConsole.ID);
-
-				final boolean isValidSourceFile = id
-						.equals("org.eclipse.ptp.gem.verificationPopupC") //$NON-NLS-1$
-						|| id.equals("org.eclipse.ptp.gem.verificationPopupCpp") //$NON-NLS-1$
-						|| id.equals("org.eclipse.ptp.gem.verificationPopupC++") //$NON-NLS-1$
-						|| id.equals("org.eclipse.ptp.gem.verificationPopupCp") //$NON-NLS-1$
-						|| id.equals("org.eclipse.ptp.gem.verificationPopupCc"); //$NON-NLS-1$
-
-				// if !isValidSourceFile, then its a .gem profiled executable
-				if (isValidSourceFile) {
-					GemUtilities.saveMostRecentURI(inputFile.getLocationURI());
-				}
-				GemUtilities.initGemViews(inputFile, isValidSourceFile, true);
-			} catch (final PartInitException e) {
-				GemUtilities.logExceptionDetail(e);
+			} else {
+				GemUtilities.showErrorDialog(Messages.VerificationPopUpAction_1);
+				return;
 			}
 		}
 	}

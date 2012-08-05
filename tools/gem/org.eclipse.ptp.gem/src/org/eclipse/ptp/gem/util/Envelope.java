@@ -308,6 +308,7 @@ public class Envelope {
 					env.interCb = interCb;
 					break;
 				}
+				break;
 			}
 			case 12: {
 				env.match_rank = Integer.parseInt(value);

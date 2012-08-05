@@ -96,11 +96,11 @@ public class IspPreferencePage extends FieldEditorPreferencePage implements IWor
 		// Create group for GEM-path FieldEditors
 		final Group remoteGemPathsGroup = new Group(fieldEditorParent, SWT.NULL);
 		remoteGemPathsGroup.setText(Messages.IspPreferencePage_18);
-		addField(new DirectoryFieldEditor(PreferenceConstants.GEM_PREF_REMOTE_ISPEXE_PATH, Messages.IspPreferencePage_19,
+		addField(new StringFieldEditor(PreferenceConstants.GEM_PREF_REMOTE_ISPEXE_PATH, Messages.IspPreferencePage_19,
 				remoteGemPathsGroup));
-		addField(new DirectoryFieldEditor(PreferenceConstants.GEM_PREF_REMOTE_ISPCC_PATH, Messages.IspPreferencePage_20,
+		addField(new StringFieldEditor(PreferenceConstants.GEM_PREF_REMOTE_ISPCC_PATH, Messages.IspPreferencePage_20,
 				remoteGemPathsGroup));
-		addField(new DirectoryFieldEditor(PreferenceConstants.GEM_PREF_REMOTE_ISPCPP_PATH, Messages.IspPreferencePage_21,
+		addField(new StringFieldEditor(PreferenceConstants.GEM_PREF_REMOTE_ISPCPP_PATH, Messages.IspPreferencePage_21,
 				remoteGemPathsGroup));
 
 		// Do the grid layout work for each group.

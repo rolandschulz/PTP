@@ -17,6 +17,8 @@
 package org.eclipse.ptp.gem.views;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,6 +31,8 @@ import javax.swing.JFrame;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -63,7 +67,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
@@ -323,55 +326,55 @@ public class GemBrowser extends ViewPart {
 	 * Helper method called by createPartControl.
 	 */
 	private void createSelectionListeners() {
+		// To conveniently run GEM from this view
 		this.runGemButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				// Find the active editor
-				final IWorkbench wb = PlatformUI.getWorkbench();
-				final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
-				final IWorkbenchPage page = window.getActivePage();
-				final IEditorPart editor = page.getActiveEditor();
-				IFile inputFile = null;
-				boolean isSourceFileExtension = false;
+				final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+				URI inputLocation = null;
+				IPath path = null;
 
-				if (editor == null) {
-					GemUtilities.showErrorDialog(Messages.GemBrowser_9);
-					return;
+				try {
+					inputLocation = new URI(pstore.getString(PreferenceConstants.GEM_PREF_MOST_RECENT_FILE));
+				} catch (final URISyntaxException e) {
+					GemUtilities.logExceptionDetail(e);
 				}
-				final IFileEditorInput editorInput = (IFileEditorInput) editor.getEditorInput();
-				inputFile = editorInput.getFile();
-				final String extension = inputFile.getFileExtension();
+				if (inputLocation != null) {
+					path = new Path(inputLocation.getPath());
+				}
+				final IFile file = GemUtilities.getCurrentProject().getFile(path.lastSegment());
+				path = file.getFullPath();
+				final String extension = file.getFileExtension();
+				boolean isSourceFile = false;
+
 				if (extension != null) {
 					// The most common C & C++ source file extensions
-					isSourceFileExtension = extension.equals("c") //$NON-NLS-1$
+					isSourceFile = extension.equals("c") //$NON-NLS-1$
 							|| extension.equals("cpp") || extension.equals("c++") //$NON-NLS-1$ //$NON-NLS-2$
 							|| extension.equals("cc") || extension.equals("cp"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
-				if (isSourceFileExtension) {
-					// ask for command line arguments
-					GemUtilities.setCommandLineArgs();
+				// ask for command line arguments
+				GemUtilities.setCommandLineArgs();
 
-					// Save most recent file reference to preference as a URI
-					GemUtilities.saveMostRecentURI(inputFile.getLocationURI());
-					final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+				// Open Analyzer and Browser Views in preference order
+				// Find the active editor
+				final IWorkbench wb = PlatformUI.getWorkbench();
+				final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
+				final IWorkbenchPage page = window.getActivePage();
 
-					// Open Analyzer and Browser Views in preference order
-					try {
-						final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
-						if (activeView.equals("analyzer")) { //$NON-NLS-1$
-							page.showView(GemBrowser.ID);
-							page.showView(GemAnalyzer.ID);
-						} else {
-							page.showView(GemAnalyzer.ID);
-							page.showView(GemBrowser.ID);
-						}
-						GemUtilities.initGemViews(inputFile, true, true);
-					} catch (final PartInitException e) {
-						GemUtilities.logExceptionDetail(e);
+				try {
+					final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
+					if (activeView.equals("analyzer")) { //$NON-NLS-1$
+						page.showView(GemBrowser.ID);
+						page.showView(GemAnalyzer.ID);
+					} else {
+						page.showView(GemAnalyzer.ID);
+						page.showView(GemBrowser.ID);
 					}
-				} else {
-					GemUtilities.showErrorDialog(Messages.GemBrowser_10);
+					GemUtilities.initGemViews(file, isSourceFile, true);
+				} catch (final PartInitException e) {
+					GemUtilities.logExceptionDetail(e);
 				}
 			}
 		});
@@ -484,8 +487,6 @@ public class GemBrowser extends ViewPart {
 	 */
 	private void fillBrowserTabs() {
 		final Boolean FIB = GemPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.GEM_PREF_FIB);
-		final Boolean compareOutput = GemPlugin.getDefault().getPreferenceStore()
-				.getBoolean(PreferenceConstants.GEM_PREF_COMPARE_OUTPUT);
 
 		int tabIndex = 0;
 		fillDeadlockTab(this.tabFolder, tabIndex++);
@@ -495,9 +496,6 @@ public class GemBrowser extends ViewPart {
 			fillIrrelevantBarrierTab(this.tabFolder, tabIndex++);
 		}
 		fillTypeMismatchTab(this.tabFolder, tabIndex++);
-		if (compareOutput) {
-			fillCompareOutputTab(this.tabFolder, tabIndex++);
-		}
 
 		// Open up the first tab
 		this.tabFolder.setSelection(this.tabFolder.getItem(0));
@@ -511,34 +509,6 @@ public class GemBrowser extends ViewPart {
 			this.summaryLabel.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/no-error.gif")));//$NON-NLS-1$
 		} else {
 			this.summaryLabel.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/magnified-trident.gif")));//$NON-NLS-1$
-		}
-	}
-
-	/*
-	 * Calling this will create a tab filled with info on MPI program output
-	 * differences if they exist.
-	 */
-	private void fillCompareOutputTab(CTabFolder tabFolder, int tabIndex) {
-		new CTabItem(tabFolder, SWT.NONE, tabIndex).setText(Messages.GemBrowser_13);
-		final CTabItem outputTab = tabFolder.getItem(tabIndex);
-		outputTab.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/no-error.gif"))); //$NON-NLS-1$
-		outputTab.setToolTipText(Messages.GemBrowser_21);
-		final Tree tree = new Tree(tabFolder, SWT.BORDER);
-		outputTab.setControl(tree);
-		tree.setLinesVisible(true);
-		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
-		tree.setFont(setFontSize(tree.getFont(), 8));
-		final TreeItem item = new TreeItem(tree, SWT.NULL);
-		item.setText(GemUtilities.getOutputSameMessage());
-
-		// If the outputs vary
-		if (!GemUtilities.getOutputSameMessage().equals(Messages.GemBrowser_28)) {
-			outputTab.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/magnified-trident.gif")));//$NON-NLS-1$
-			final TreeItem details = new TreeItem(item, SWT.NULL);
-			details.setText(GemUtilities.getOutputSameDetails());
-
-			final TreeItem disclaimer = new TreeItem(tree, SWT.NULL);
-			disclaimer.setText(Messages.GemBrowser_34);
 		}
 	}
 

@@ -19,6 +19,7 @@ package org.eclipse.ptp.gem.views;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -29,6 +30,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -82,7 +84,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -583,7 +584,7 @@ public class GemAnalyzer extends ViewPart {
 					public void widgetSelected(SelectionEvent e) {
 						if (GemAnalyzer.this.transitions.hasPreviousInterleaving()) {
 							while (GemAnalyzer.this.transitions.setPreviousInterleaving()) {
-								;
+								// do nothing
 							}
 							updateTransitionLabels(true);
 						} else {
@@ -686,53 +687,51 @@ public class GemAnalyzer extends ViewPart {
 		this.runGemButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				// Find the active editor
-				final IWorkbench wb = PlatformUI.getWorkbench();
-				final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
-				final IWorkbenchPage page = window.getActivePage();
-				final IEditorPart editor = page.getActiveEditor();
-				IFile inputFile = null;
-				boolean isSourceFileExtension = false;
+				final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+				URI inputLocation = null;
+				IPath path = null;
 
-				if (editor == null) {
-					GemUtilities.showErrorDialog(Messages.GemBrowser_9);
-					return;
+				try {
+					inputLocation = new URI(pstore.getString(PreferenceConstants.GEM_PREF_MOST_RECENT_FILE));
+				} catch (final URISyntaxException e) {
+					GemUtilities.logExceptionDetail(e);
 				}
+				if (inputLocation != null) {
+					path = new Path(inputLocation.getPath());
+				}
+				final IFile file = GemUtilities.getCurrentProject(GemAnalyzer.this.activeFile).getFile(path.lastSegment());
+				path = file.getFullPath();
+				final String extension = file.getFileExtension();
+				boolean isSourceFile = false;
 
-				final IFileEditorInput editorInput = (IFileEditorInput) editor.getEditorInput();
-				inputFile = editorInput.getFile();
-				final String extension = inputFile.getFileExtension();
 				if (extension != null) {
 					// The most common C & C++ source file extensions
-					isSourceFileExtension = extension.equals("c") //$NON-NLS-1$
+					isSourceFile = extension.equals("c") //$NON-NLS-1$
 							|| extension.equals("cpp") || extension.equals("c++") //$NON-NLS-1$ //$NON-NLS-2$
 							|| extension.equals("cc") || extension.equals("cp"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
-				if (isSourceFileExtension) {
-					// ask for command line arguments
-					GemUtilities.setCommandLineArgs();
+				// ask for command line arguments
+				GemUtilities.setCommandLineArgs();
 
-					// Save most recent file reference to preference as a URI
-					GemUtilities.saveMostRecentURI(inputFile.getLocationURI());
-					final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+				// Open Analyzer and Browser Views in preference order
+				// Find the active editor
+				final IWorkbench wb = PlatformUI.getWorkbench();
+				final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
+				final IWorkbenchPage page = window.getActivePage();
 
-					// Open Analyzer and Browser Views in preference order
-					try {
-						final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
-						if (activeView.equals("analyzer")) { //$NON-NLS-1$
-							page.showView(GemBrowser.ID);
-							page.showView(GemAnalyzer.ID);
-						} else {
-							page.showView(GemAnalyzer.ID);
-							page.showView(GemBrowser.ID);
-						}
-						GemUtilities.initGemViews(inputFile, true, true);
-					} catch (final PartInitException e) {
-						GemUtilities.logExceptionDetail(e);
+				try {
+					final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
+					if (activeView.equals("analyzer")) { //$NON-NLS-1$
+						page.showView(GemBrowser.ID);
+						page.showView(GemAnalyzer.ID);
+					} else {
+						page.showView(GemAnalyzer.ID);
+						page.showView(GemBrowser.ID);
 					}
-				} else {
-					GemUtilities.showErrorDialog(Messages.GemBrowser_10);
+					GemUtilities.initGemViews(file, isSourceFile, true);
+				} catch (final PartInitException e) {
+					GemUtilities.logExceptionDetail(e);
 				}
 			}
 		});
@@ -782,17 +781,10 @@ public class GemAnalyzer extends ViewPart {
 					sourceFile = currentProject.getFile(sourceFilePath);
 				}
 
-				if (sourceFile != null && sourceFile.exists()) {
-					/*
-					 * Currently, GEM does not support the Happens Before Viewer
-					 * with remote projects.
-					 * 
-					 * Check if the project is local or remote and abort if it
-					 * is.
-					 */
-					if (GemUtilities.isRemoteProject()) {
-						GemUtilities
-								.showErrorDialog(Messages.GemAnalyzer_23);
+				if (sourceFile != null) {
+					if (GemUtilities.isRemoteProject(GemAnalyzer.this.activeFile)
+							|| GemUtilities.isSynchronizedProject(GemAnalyzer.this.activeFile)) {
+						GemUtilities.showInformationDialog(Messages.GemAnalyzer_23);
 						return;
 					}
 
@@ -814,7 +806,127 @@ public class GemAnalyzer extends ViewPart {
 					GemUtilities.showErrorDialog(message);
 					return;
 				}
-				launchCallBrowser();
+				final class CallBrowserDisplay implements Runnable {
+					public void run() {
+						final IWorkbench wb = PlatformUI.getWorkbench();
+						final Display display = wb.getDisplay();
+						final Shell shell = new Shell();
+						shell.setText(Messages.GemAnalyzer_68);
+						shell.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/magnified-trident.gif"))); //$NON-NLS-1$
+						shell.setLayout(new GridLayout());
+						final CLabel fileNameLabel = new CLabel(shell, SWT.BORDER_SOLID);
+						fileNameLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+						final CLabel numProcsLabel = new CLabel(shell, SWT.BORDER_SOLID);
+						numProcsLabel.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/processes.gif"))); //$NON-NLS-1$
+						numProcsLabel.setText(Messages.GemAnalyzer_69 + GemAnalyzer.this.numRanks);
+						numProcsLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+						final Tree tree = new Tree(shell, SWT.BORDER);
+						tree.setLinesVisible(true);
+						tree.setLayoutData(new GridData(GridData.FILL_BOTH));
+						tree.setFont(setFontSize(tree.getFont(), 8));
+
+						// Declare everything we'll be working with
+						TreeItem interleavingItem = null;
+						TreeItem callItem = null;
+						final int currentInter = GemAnalyzer.this.transitions.getCurrentInterleaving();
+
+						// Loop over all interleavings
+						final int numInterleavings = GemAnalyzer.this.transitions.getTotalInterleavings() + 1; // 0-based
+						for (int currentInterleaving = 1; currentInterleaving < numInterleavings; currentInterleaving++) {
+
+							// Create a root node for each interleaving
+							interleavingItem = new TreeItem(tree, SWT.NULL);
+							interleavingItem.setText(Messages.GemAnalyzer_70 + currentInterleaving);
+
+							// Loop over all envelopes (transitions) in the current interleaving
+							final ArrayList<Envelope> envelopes = GemAnalyzer.this.transitions
+									.getInterleavingEnvelopes(currentInterleaving);
+							final int listSize = envelopes.size();
+							Envelope env = null;
+							String functionName = null;
+							String fileName = null;
+							int lineNumber = -1;
+							int envRank = -1;
+
+							try {
+								for (int envIndex = 0; envIndex < listSize; envIndex++) {
+									env = envelopes.get(envIndex);
+
+									// Don't display resource leaks
+									if (env.isLeak()) {
+										continue;
+									}
+
+									// Create the leaf node representing the call
+									callItem = new TreeItem(interleavingItem, SWT.NULL);
+									functionName = env.getFunctionName();
+									fileName = new Path(env.getFilePath()).lastSegment().toString();
+									lineNumber = env.getLinenumber();
+									envRank = env.getRank();
+
+									// make all calls have same name length
+									while (functionName.length() < 12) {
+										functionName += " "; //$NON-NLS-1$
+									}
+
+									final StringBuffer stringBuffer = new StringBuffer();
+									stringBuffer.append("Rank: "); //$NON-NLS-1$
+									stringBuffer.append(envRank);
+									stringBuffer.append("\t\t"); //$NON-NLS-1$
+									stringBuffer.append(functionName);
+									stringBuffer.append("\t\t"); //$NON-NLS-1$
+									stringBuffer.append(fileName);
+									stringBuffer.append(":"); //$NON-NLS-1$
+									stringBuffer.append(lineNumber);
+									final String callItemText = stringBuffer.toString();
+									callItem.setText(callItemText);
+
+									// Mark the calls with errors red
+									if (env.getIssueIndex() == -1) {
+										callItem.setForeground(new Color(null, 255, 0, 0));
+									}
+
+									// Mark the current call(s) blue
+									String currentFile = null;
+									int currentLine = -1;
+									if (GemAnalyzer.this.transitions.getCurrentTransition() != null) {
+										currentFile = GemAnalyzer.this.transitions.getCurrentTransition().getFilePath();
+										currentLine = GemAnalyzer.this.transitions.getCurrentTransition().getLinenumber();
+									}
+									if (currentFile != null) {
+										if (currentLine == env.getLinenumber() && currentFile.equals(env.getFilePath())
+												&& currentInter == env.getInterleaving()) {
+											callItem.setForeground(new Color(null, 0, 0, 255));
+											// Comment this out if you don't want items expanded
+											revealTreeItem(callItem);
+										}
+									}
+								}
+							} catch (final Exception e) {
+								GemUtilities.logExceptionDetail(e);
+							}
+						}
+
+						// Open up the Call Browser window with the specified size
+						shell.setSize(550, 550);
+						shell.open();
+
+						if (GemAnalyzer.this.activeShells == null) {
+							GemAnalyzer.this.activeShells = new LinkedList<Shell>();
+						}
+						GemAnalyzer.this.activeShells.add(shell);
+
+						// Set up the event loop for disposal
+						while (!shell.isDisposed()) {
+							if (!display.readAndDispatch()) {
+								display.sleep();
+							}
+						}
+					}
+				}
+				final CallBrowserDisplay browser = new CallBrowserDisplay();
+				Display.getDefault().syncExec(browser);
 			}
 		});
 	}
@@ -1081,7 +1193,8 @@ public class GemAnalyzer extends ViewPart {
 		final StringBuffer stringBuffer = new StringBuffer();
 
 		// determine which ranks are involved; by default only call's rank
-		String ranks = Messages.GemAnalyzer_53 + env.getRank() + newline;
+		String ranks = Messages.GemAnalyzer_53 + env.getRank()
+				+ (System.getProperty("os.name").contains("Windows") ? "\t" : newline); //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
 		if (env.isCollective() && this.lockedRank == -1) {
 
 			// If it was a group call then discover who else is here
@@ -1164,12 +1277,13 @@ public class GemAnalyzer extends ViewPart {
 	 * Initializing everything and creates threads to be used by the main UI
 	 * thread to do updates.
 	 * 
-	 * @param sourceFile
-	 *            The file resource to initialize this view with.
+	 * @param resource
+	 *            The resource to initialize this view with.
 	 * @return void
 	 */
-	public void init(IFile sourceFile) {
-		this.activeFile = sourceFile;
+	public void init(IResource resource) {
+
+		this.activeFile = GemUtilities.adaptResource(resource);
 
 		this.analyzerUpdateThread = new Thread() {
 			@Override
@@ -1250,123 +1364,6 @@ public class GemAnalyzer extends ViewPart {
 	 * code windows (blue), as well as uncompleted calls due to a deadlock in
 	 * the particular interleaving (red).
 	 */
-	private void launchCallBrowser() {
-		final IWorkbench wb = PlatformUI.getWorkbench();
-		final Display display = wb.getDisplay();
-		final Shell shell = new Shell();
-		shell.setText(Messages.GemAnalyzer_68);
-		shell.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/magnified-trident.gif"))); //$NON-NLS-1$
-		shell.setLayout(new GridLayout());
-		final CLabel fileNameLabel = new CLabel(shell, SWT.BORDER_SOLID);
-		fileNameLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		final CLabel numProcsLabel = new CLabel(shell, SWT.BORDER_SOLID);
-		numProcsLabel.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/processes.gif"))); //$NON-NLS-1$
-		numProcsLabel.setText(Messages.GemAnalyzer_69 + this.numRanks);
-		numProcsLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		final Tree tree = new Tree(shell, SWT.BORDER);
-		tree.setLinesVisible(true);
-		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
-		tree.setFont(setFontSize(tree.getFont(), 8));
-
-		// Declare everything we'll be working with
-		TreeItem interleavingItem = null;
-		TreeItem callItem = null;
-		final int currentInter = this.transitions.getCurrentInterleaving();
-
-		// Loop over all interleavings
-		final int numInterleavings = this.transitions.getTotalInterleavings() + 1; // 0-based
-		for (int currentInterleaving = 1; currentInterleaving < numInterleavings; currentInterleaving++) {
-
-			// Create a root node for each interleaving
-			interleavingItem = new TreeItem(tree, SWT.NULL);
-			interleavingItem.setText(Messages.GemAnalyzer_70 + currentInterleaving);
-
-			// Loop over all envelopes (transitions) in the current interleaving
-			final ArrayList<Envelope> envelopes = this.transitions.getInterleavingEnvelopes(currentInterleaving);
-			final int listSize = envelopes.size();
-			Envelope env = null;
-			String functionName = null;
-			String fileName = null;
-			int lineNumber = -1;
-			int envRank = -1;
-
-			try {
-				for (int envIndex = 0; envIndex < listSize; envIndex++) {
-					env = envelopes.get(envIndex);
-
-					// Don't display resource leaks
-					if (env.isLeak()) {
-						continue;
-					}
-
-					// Create the leaf node representing the call
-					callItem = new TreeItem(interleavingItem, SWT.NULL);
-					functionName = env.getFunctionName();
-					fileName = new Path(env.getFilePath()).lastSegment().toString();
-					lineNumber = env.getLinenumber();
-					envRank = env.getRank();
-
-					// make all calls have same name length
-					while (functionName.length() < 12) {
-						functionName += " "; //$NON-NLS-1$
-					}
-
-					final StringBuffer stringBuffer = new StringBuffer();
-					stringBuffer.append("Rank: "); //$NON-NLS-1$
-					stringBuffer.append(envRank);
-					stringBuffer.append("\t"); //$NON-NLS-1$
-					stringBuffer.append(functionName);
-					stringBuffer.append("\t"); //$NON-NLS-1$
-					stringBuffer.append(fileName);
-					stringBuffer.append("Line:"); //$NON-NLS-1$
-					stringBuffer.append("\t"); //$NON-NLS-1$
-					stringBuffer.append(lineNumber);
-					final String callItemText = stringBuffer.toString();
-					callItem.setText(callItemText);
-
-					// Mark the calls with errors red
-					if (env.getIssueIndex() == -1) {
-						callItem.setForeground(new Color(null, 255, 0, 0));
-					}
-
-					// Mark the current call(s) blue
-					String currentFile = null;
-					int currentLine = -1;
-					if (this.transitions.getCurrentTransition() != null) {
-						currentFile = this.transitions.getCurrentTransition().getFilePath();
-						currentLine = this.transitions.getCurrentTransition().getLinenumber();
-					}
-					if (currentFile != null) {
-						if (currentLine == env.getLinenumber() && currentFile.equals(env.getFilePath())
-								&& currentInter == env.getInterleaving()) {
-							callItem.setForeground(new Color(null, 0, 0, 255));
-							// Comment this out if you don't want items expanded
-							revealTreeItem(callItem);
-						}
-					}
-				}
-			} catch (final Exception e) {
-				GemUtilities.logExceptionDetail(e);
-			}
-		}
-
-		// Open up the Call Browser window with the specified size
-		shell.setSize(550, 550);
-		shell.open();
-
-		if (this.activeShells == null) {
-			this.activeShells = new LinkedList<Shell>();
-		}
-		this.activeShells.add(shell);
-
-		// Set up the event loop for disposal
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
 
 	/*
 	 * Creates the actions associated with the action bar buttons and context
@@ -2060,7 +2057,6 @@ public class GemAnalyzer extends ViewPart {
 		}
 	}
 
-	// TODO Let's clean this up
 	// ONLY CALL WHEN YOU HAVE STARTED A NEW INTERLEAVING!!!
 	// As it searches it will never display the envelope
 	// displayEnvelope decides whether or not the final destination is displayed
