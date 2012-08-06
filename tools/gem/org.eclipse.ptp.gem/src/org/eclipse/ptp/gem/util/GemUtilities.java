@@ -445,7 +445,7 @@ public class GemUtilities {
 
 		// Run isp -v to get version number
 		ispExePath += (ispExePath == "") ? "" : "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		String ispExeCommand = ispExePath + "isp -v"; //$NON-NLS-1$
+		final String ispExeCommand = ispExePath + "isp -v"; //$NON-NLS-1$
 
 		// Abort if ISP is not installed
 		if (runCommand(ispExeCommand, false) == -1) {
@@ -539,7 +539,7 @@ public class GemUtilities {
 	 *         specified IRemoteServices.
 	 */
 	public static IRemoteConnection getRemoteConnection(IRemoteServices services, URI projectURI) {
-		IRemoteConnection connection = services.getConnectionManager().getConnection(projectURI);
+		final IRemoteConnection connection = services.getConnectionManager().getConnection(projectURI);
 
 		// Open the connection if it's closed
 		if (connection != null && !connection.isOpen()) {
@@ -563,10 +563,10 @@ public class GemUtilities {
 	 */
 	public static IRemoteFileManager getRemoteFileManager(IFile projectResource) {
 		final URI projectURI = projectResource.getProject().getLocationURI();
-		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(projectURI);
+		final IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(projectURI);
 		services.initialize();
-		IRemoteConnection connection = services.getConnectionManager().getConnection(projectURI);
-		IRemoteFileManager manager = services.getFileManager(connection);
+		final IRemoteConnection connection = services.getConnectionManager().getConnection(projectURI);
+		final IRemoteFileManager manager = services.getFileManager(connection);
 
 		return manager;
 	}
@@ -595,7 +595,7 @@ public class GemUtilities {
 			projectURI = currentProject.getLocationURI();
 		}
 
-		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(projectURI);
+		final IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(projectURI);
 		services.initialize();
 		final IRemoteConnection connection = getRemoteConnection(services, projectURI);
 		final IRemoteProcessBuilder rpb = services.getProcessBuilder(connection, args);
@@ -618,7 +618,7 @@ public class GemUtilities {
 
 		final IProject currentProject = resource.getProject();
 
-//		if (true) {
+		// if (true) {
 		if (!isSynchronizedProject(currentProject) && !isRemoteProject(resource)) {
 			final String currentProjectPath = currentProject.getLocationURI().getPath();
 			IPath sourceFilePath = new Path(fullPath);
@@ -893,7 +893,8 @@ public class GemUtilities {
 		final IProject project = getCurrentProject(gemActiveResource);
 		final IConfiguration configuration = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
 		String buildLocation = null;
-		buildLocation = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration).getLocation(project);
+		buildLocation = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration)
+				.getLocation(project);
 		// BuildConfigurationManager.getInstance().getActiveSyncLocationURI(gemInputResource).getPath();
 		final String projectLocation = project.getLocationURI().getPath();
 
