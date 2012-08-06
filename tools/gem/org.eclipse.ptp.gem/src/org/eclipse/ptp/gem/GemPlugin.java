@@ -131,7 +131,7 @@ public class GemPlugin extends AbstractUIPlugin {
 	 */
 	public Preferences getConfigPrefs() {
 		if (this.gemPreferences == null) {
-			this.gemPreferences = new ConfigurationScope().getNode(PLUGIN_ID);
+			this.gemPreferences = (IEclipsePreferences) ConfigurationScope.INSTANCE;
 		}
 		return this.gemPreferences;
 	}
