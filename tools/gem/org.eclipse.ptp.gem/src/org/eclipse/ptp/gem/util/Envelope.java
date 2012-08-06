@@ -326,6 +326,8 @@ public class Envelope {
 				env.linenumber = Integer.parseInt(value);
 				break;
 			}
+			default:
+				break;
 			}
 		}
 		return env;

@@ -445,23 +445,26 @@ public class GemUtilities {
 
 		// Run isp -v to get version number
 		ispExePath += (ispExePath == "") ? "" : "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		ispExePath += "isp -v"; //$NON-NLS-1$
+		String ispExeCommand = ispExePath + "isp -v"; //$NON-NLS-1$
 
 		// Abort if ISP is not installed
-		if (runCommand(ispExePath, false) == -1) {
+		if (runCommand(ispExeCommand, false) == -1) {
 			return null;
 		}
 
-		// Parse first line of STDOUT from GEM Console
-		final Scanner scanner = new Scanner(consoleStdOutMessage);
-		final String version = scanner.nextLine();
-		scanner.close();
-		final Pattern intraCbRegex = Pattern.compile("([0-9]+.[0-9]+.[0-9]+)$"); //$NON-NLS-1$
-		final Matcher versionMatcher = intraCbRegex.matcher(version);
-		if (versionMatcher.find()) {
-			return versionMatcher.group(1);
+		// Parse first line of STDOUT from GEM Console if no errors, e.g. bad path
+		if (consoleStdOutMessage.contains("In-Situ Partial Order")) { //$NON-NLS-1$
+			final Scanner scanner = new Scanner(consoleStdOutMessage);
+			final String version = scanner.nextLine();
+			scanner.close();
+			final Pattern intraCbRegex = Pattern.compile("([0-9]+.[0-9]+.[0-9]+)$"); //$NON-NLS-1$
+			final Matcher versionMatcher = intraCbRegex.matcher(version);
+			if (versionMatcher.find()) {
+				return versionMatcher.group(1);
+			}
 		}
 
+		showErrorDialog(ispExePath + Messages.GemUtilities_15);
 		return null;
 	}
 
@@ -1259,7 +1262,7 @@ public class GemUtilities {
 		Window.setDefaultImage(GemPlugin.getImageDescriptor("icons/processes.gif").createImage()); //$NON-NLS-1$
 		dlg.open();
 
-		// This avoids and ui event loop exception
+		// This avoids a UI event loop exception
 		if (dlg.getReturnCode() == Window.CANCEL) {
 			return;
 		}
