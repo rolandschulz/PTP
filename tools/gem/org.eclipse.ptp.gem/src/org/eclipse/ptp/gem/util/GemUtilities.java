@@ -776,13 +776,9 @@ public class GemUtilities {
 				final boolean isLogFile = gemActiveResource.getFileExtension().equals("log"); //$NON-NLS-1$
 				// If not a log file, check for ISP installation and version
 				if (!isLogFile) {
-					if (getIspVersion() == null) {
-						cancelAnalysis();
-						return;
-					}
-
+					
 					// Check for correct version of ISP on the target machine
-					if (!hasCorrectIspVersion() && taskStatus == TaskStatus.ACTIVE) {
+					if (!hasCorrectIspVersion()) {
 						cancelAnalysis();
 						showErrorDialog(Messages.GemUtilities_7);
 						return;
@@ -894,9 +890,11 @@ public class GemUtilities {
 		final IProject project = getCurrentProject(gemActiveResource);
 		final IConfiguration configuration = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
 		String buildLocation = null;
-		buildLocation = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration)
-				.getLocation(project);
-		// BuildConfigurationManager.getInstance().getActiveSyncLocationURI(gemInputResource).getPath();
+		try {
+			buildLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(project).getPath();
+		} catch (CoreException e) {
+			GemUtilities.logExceptionDetail(e);
+		}
 		final String projectLocation = project.getLocationURI().getPath();
 
 		return !buildLocation.equals(projectLocation);
