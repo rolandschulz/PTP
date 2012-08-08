@@ -140,7 +140,6 @@ public class Messages extends NLS {
 	public static String GemUtilities_13;
 	public static String GemUtilities_14;
 
-	public static String GemUtilities_15;
 	public static String GemUtilities_2;
 	public static String GemUtilities_28;
 	public static String GemUtilities_3;

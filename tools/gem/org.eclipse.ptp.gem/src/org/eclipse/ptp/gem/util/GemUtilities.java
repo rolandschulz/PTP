@@ -465,7 +465,6 @@ public class GemUtilities {
 			}
 		}
 
-		showErrorDialog(ispExePath + Messages.GemUtilities_15);
 		return null;
 	}
 
@@ -711,15 +710,15 @@ public class GemUtilities {
 		final StringTokenizer st = new StringTokenizer(ispVersion, ".", false); //$NON-NLS-1$
 		st.nextToken();
 		final int majorVersionNum = Integer.parseInt(st.nextToken());
-		final int minorVersionNum = Integer.parseInt(st.nextToken());
+//		final int minorVersionNum = Integer.parseInt(st.nextToken());
 
-		// if we have version 2, we need at least 2.5
-		if (majorVersionNum == 2) {
-			return minorVersionNum >= 5;
+		// we need a compatible version of ISP, e.g. v0.3.0+
+		if (majorVersionNum == 3) {
+			return true;
 		}
 
-		// otherwise we know have a compatible version, v0.3.0+
-		return true;
+		showErrorDialog(Messages.GemUtilities_7);
+		return false;
 	}
 
 	/**
@@ -776,11 +775,10 @@ public class GemUtilities {
 				final boolean isLogFile = gemActiveResource.getFileExtension().equals("log"); //$NON-NLS-1$
 				// If not a log file, check for ISP installation and version
 				if (!isLogFile) {
-					
+
 					// Check for correct version of ISP on the target machine
 					if (!hasCorrectIspVersion()) {
 						cancelAnalysis();
-						showErrorDialog(Messages.GemUtilities_7);
 						return;
 					}
 
@@ -892,7 +890,7 @@ public class GemUtilities {
 		String buildLocation = null;
 		try {
 			buildLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(project).getPath();
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			GemUtilities.logExceptionDetail(e);
 		}
 		final String projectLocation = project.getLocationURI().getPath();
