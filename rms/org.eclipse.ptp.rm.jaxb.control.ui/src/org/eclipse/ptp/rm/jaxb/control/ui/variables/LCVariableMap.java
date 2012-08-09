@@ -72,6 +72,7 @@ public class LCVariableMap implements IVariableMap {
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_EXEC_PATH);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_ARGS);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_ID);
+		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_LAUNCHER);
 
 		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
 				JAXBControlConstants.ZEROSTR);
@@ -96,6 +97,10 @@ public class LCVariableMap implements IVariableMap {
 		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, JAXBControlConstants.ZEROSTR);
 		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_ID, attr);
+		}
+		attr = configuration.getAttribute("org.eclipse.ptp.launch.DEBUGGER_LAUNCHER", JAXBControlConstants.ZEROSTR); //$NON-NLS-1$
+		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
+			configuration.setAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_LAUNCHER, attr);
 		}
 	}
 

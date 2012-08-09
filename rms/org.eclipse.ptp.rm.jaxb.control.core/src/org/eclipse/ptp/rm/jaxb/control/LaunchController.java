@@ -36,7 +36,6 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
-import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
@@ -1338,6 +1337,7 @@ public class LaunchController implements ILaunchController {
 		rmVarMap.overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
 		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_ID, JAXBControlConstants.DEBUGGER_ID, lcattr);
+		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_LAUNCHER, JAXBControlConstants.DEBUGGER_LAUNCHER, lcattr);
 
 		/*
 		 * update the dynamic attributes

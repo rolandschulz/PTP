@@ -122,6 +122,14 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String ATTR_DEBUGGER_ID = PTP_LAUNCH_ID + ".DEBUGGER_ID"; //$NON-NLS-1$
 
 	/**
+	 * Launch configuration attribute key. The value is the path of the debugger launcher used to start the debugger
+	 * 
+	 * TODO: enable for PTP 7.0
+	 * 
+	 * public static final String ATTR_DEBUGGER_LAUNCHER = PTP_LAUNCH_ID + ".DEBUGGER_LAUNCHER"; //$NON-NLS-1$
+	 */
+
+	/**
 	 * Launch configuration attribute key. The value is the program arguments that have been supplied.
 	 */
 	public static final String ATTR_ARGUMENTS = PTP_LAUNCH_ID + ".ARGUMENT_ATTR"; //$NON-NLS-1$

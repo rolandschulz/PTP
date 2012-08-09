@@ -133,19 +133,21 @@ public class RMVariableMap implements IVariableMap {
 		return name.startsWith(JAXBControlConstants.CONTROL_DOT) || name.equals(JAXBControlConstants.EXEC_PATH)
 				|| name.equals(JAXBControlConstants.EXEC_DIR) || name.equals(JAXBControlConstants.PROG_ARGS)
 				|| name.equals(JAXBControlConstants.DEBUGGER_EXEC_PATH) || name.equals(JAXBControlConstants.DEBUGGER_ARGS)
-				|| name.equals(JAXBControlConstants.DEBUGGER_ID) || name.equals(JAXBControlConstants.STDOUT_REMOTE_FILE)
-				|| name.equals(JAXBControlConstants.STDERR_REMOTE_FILE);
+				|| name.equals(JAXBControlConstants.DEBUGGER_ID) || name.equals(JAXBControlConstants.DEBUGGER_LAUNCHER)
+				|| name.equals(JAXBControlConstants.STDOUT_REMOTE_FILE) || name.equals(JAXBControlConstants.STDERR_REMOTE_FILE);
 	}
 
 	private final Map<String, AttributeType> variables;
 	private final Map<String, AttributeType> discovered;
 	private boolean initialized;
-	
+
 	/** Environment manager for this connection, or <code>null</code> */
 	private IEnvManager envManager;
-	
-	/** A connection from which an environment management system can be detected at a later point in time,
-	 *  if necessary.  Used when {@link #envManager} is <code>null</code>. */
+
+	/**
+	 * A connection from which an environment management system can be detected at a later point in time, if necessary. Used when
+	 * {@link #envManager} is <code>null</code>.
+	 */
 	private IRemoteConnection envManagerConnection;
 
 	public RMVariableMap() {

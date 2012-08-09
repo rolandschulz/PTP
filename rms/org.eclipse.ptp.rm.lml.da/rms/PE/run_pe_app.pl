@@ -8,6 +8,7 @@
 #*******************************************************************************/
 
 use strict;
+use File::Basename;
 
 my $patint  = "([\\+\\-\\d]+)";              # Pattern for Integer number
 my $patnode = "([\^\\s]+(\\.[\^\\s]*)*)";    # Pattern for domain name (a.b.c)
@@ -24,6 +25,7 @@ my $pid;
 my $hpcrun;
 my $launchMode;
 my $debuggerId;
+my $debuggerLauncher;
 my @child_pids;
 
 # Waits for the attach.cfg file to appear, then checks that the whole
@@ -133,10 +135,17 @@ sub start_sdm_master {
 
 $launchMode = $ENV{'PTP_LAUNCH_MODE'};
 $debuggerId = $ENV{'PTP_DEBUGGER_ID'};
+$debuggerLauncher = $ENV{'PTP_DEBUGGER_LAUNCHER'};
 $hpcrun = $ENV{'HPC_USE_HPCRUN'};
 
-if ($launchMode eq 'debug' && $debuggerId eq 'org.eclipse.ptp.debug.sdm') {
-	unlink($ROUTING_FILE);		
+if ($launchMode eq 'debug') {
+	if ($debuggerId eq 'org.eclipse.ptp.debug.sdm') {
+		unlink($ROUTING_FILE);		
+	} elsif ($debuggerLauncher) {
+	    exec($debuggerLauncher, @ARGV); # try running directly first
+	    exec('/usr/bin/perl', $debuggerLauncher, @ARGV); # assume perl script if this fails
+	    exit(5);	# Not reached
+	}
 }
 
 $pid = fork();

@@ -81,6 +81,7 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 	public static final String DEBUGGER_EXEC_PATH = "debuggerExecutablePath";//$NON-NLS-1$
 	public static final String DEBUGGER_ARGS = "debuggerArgs";//$NON-NLS-1$
 	public static final String DEBUGGER_ID = "debuggerId";//$NON-NLS-1$
+	public static final String DEBUGGER_LAUNCHER = "debuggerLauncher";//$NON-NLS-1$
 	public static final String PTP_DIRECTORY = "ptpDirectory";//$NON-NLS-1$
 	public static final String LAUNCH_MODE = "launchMode";//$NON-NLS-1$
 

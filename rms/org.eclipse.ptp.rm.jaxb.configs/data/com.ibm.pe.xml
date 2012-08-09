@@ -1195,6 +1195,9 @@
 			<environment name="SCI_DEBUG_FANOUT" value="${ptp_rm:SCI_DEBUG_FANOUT_ATTR#value}" />
 			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
 			<environment name="PTP_DEBUGGER_ID" value="${ptp_rm:debuggerId#value}" />
+			<environment name="PTP_DEBUGGER_LAUNCHER" value="${ptp_rm:debuggerLauncher#value}" />
+			<environment name="PTP_APP_EXEC_PATH" value="${ptp_rm:executablePath#value}" />
+			<environment name="PTP_APP_EXEC_ARGS" value="${ptp_rm:progArgs#value}" />
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
