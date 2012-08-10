@@ -212,7 +212,7 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	private Set<String> getChecked() {
 		Set<String> set = new TreeSet<String>();
 		String state = (String) lcMap.getValue(JAXBControlUIConstants.CHECKED_ATTRIBUTES + name);
-		if (state != null) {
+		if (state != null && !state.equals(JAXBControlUIConstants.ZEROSTR)) {
 			String[] split = state.split(JAXBControlUIConstants.SP);
 			for (String s : split) {
 				set.add(s);
