@@ -3,7 +3,7 @@
 
 <head>
     <link rel="stylesheet" type="text/css" href="help.css">
-    <title>Remote Projects</title>
+    <title>Remote and Synchronized Projects</title>
 </head>
 
 <body>
@@ -14,14 +14,14 @@
             <img src="images/trident_transparent.png">
         </td>
         <td>
-            <h1>Remote Projects</h1>
+            <h1>Remote and Synchronized Projects</h1>
         </td>
     </tr>
 </table>
 
 <hr>
 
-<h3>GEM supports remote C/C++ MPI projects whose connections are through one of the following remote service providers:</h3>
+<h3>GEM supports remote and synchronized C/C++ MPI projects whose connections are through one of the following remote service providers:</h3>
 
 <ul>
 	<li>Remote Tools</li>
@@ -33,20 +33,22 @@
 <ul>
     <li><a href="http://www.cs.utah.edu/formal_verification/ISP-release/">ISP</a> version 0.3.0 or later</li>
 	<li>
-		<b>gcc/g++</b>
+		<b>C/C++ Compiler</b>
 	</li>    
     <li>
-		<b>Some implementation of MPI</b> must be installed, MPICH2 or OpenMPI both work well. If you are using MPICH v1.2 or lower, 
+		<b>Some implementation of MPI</b> must be installed, OpenMPI and MPICH2 both work well. If you are using MPICH v1.2 or lower, 
 		you will also need to have your process manager (e.g. mpd) and running. GEM assumes your process manager is already 
-		running when it is loaded. If you are using MPICH2 v1.3 with Hydra, you don&#39;t need to worry about this.
+		running when it is loaded. If you are using MPICH2 v1.3 or later with Hydra, you don&#39;t need to worry about this.
 	</li>
 		
 </ul>
 
 <p>
-GEM operates and behaves identically with local and remote C/C++ MPI projects &#40;managed-build or makefile&#41;. 
-The only limitation is that GEM does not currently support the <a href="happensBeforeViewer.html">
-Happens Before Viewer</a> with remote projects.
+GEM operates and behaves identically with local, remote and synchronized C/C++ MPI projects. 
+The only limitation is that GEM currently does not support the <a href="happensBeforeViewer.html">
+Happens Before Viewer</a> with remote and synchronized projects, as it is an external tool.
+The <a href="happensBeforeViewer.html"> Happens Before Viewer</a> will soon be integrated into
+a new GEM view.
 </p>
 
 <br/><br/>
