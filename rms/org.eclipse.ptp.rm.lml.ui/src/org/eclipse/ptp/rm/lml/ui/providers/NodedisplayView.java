@@ -406,7 +406,7 @@ public class NodedisplayView extends AbstractNodedisplayView {
 				// is larger than 65536. Do not increase the rectangle size, if this would happen.
 				// Otherwise parts of the nodedisplay are painted over with black rectangles
 				// Decrease the minRectangleSize until the newMinSize is smaller than the maximumSize
-				while (minRectangleSize > 1 && newMinSize.x > maximumSize || newMinSize.y > maximumSize) {
+				while (minRectangleSize > 1 && (newMinSize.x > maximumSize || newMinSize.y > maximumSize)) {
 					minRectangleSize--;
 
 					((IMinSizeNodedisplay) root).setMinimumRectangleHeight(minRectangleSize);
@@ -720,7 +720,7 @@ public class NodedisplayView extends AbstractNodedisplayView {
 		firstPaintListener.reset();
 		root.addZoomListener(new ZoomListener());
 		updateScrollPane();
-		setMinimalRectangleSize(minRectangleSize);
+		setMinimalRectangleSize(NodedisplayCompMinSize.defaultMinSize);
 		adjustScrollPaneSize();
 	}
 
