@@ -231,7 +231,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		if (!hasBeenSynced) {
 			project.accept(new IResourceVisitor() {
 				public boolean visit(IResource resource) throws CoreException {
-					if (irrelevantPath(resource.getFullPath().toString())) {
+					if (irrelevantPath(project, resource)) {
 						return false;
 					}
 					if (resource.getType() == IResource.FOLDER) {
@@ -258,7 +258,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			private boolean relevantChangeFound = false;
 
 			public boolean visit(IResourceDelta delta) throws CoreException {
-				if (irrelevantPath(delta.getFullPath().toString())) {
+				if (irrelevantPath(project, delta.getResource())) {
 					return false;
 				} else {
 					if ((delta.getAffectedChildren().length == 0) && (delta.getFlags() != IResourceDelta.MARKERS)) {
@@ -466,7 +466,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	}
 
 	// Paths that the Git sync provider can ignore.
-	private boolean irrelevantPath(String path) {
+	private boolean irrelevantPath(IProject project, IResource resource) {
+		if (SyncManager.getFileFilter(project).shouldIgnore(resource)) {
+			return true;
+		}
+		
+		String path = resource.getFullPath().toString();
 		if (path.endsWith("/" + GitRemoteSyncConnection.gitDir)) { //$NON-NLS-1$
 			return true;
 		} else if (path.endsWith("/.git")) { //$NON-NLS-1$
