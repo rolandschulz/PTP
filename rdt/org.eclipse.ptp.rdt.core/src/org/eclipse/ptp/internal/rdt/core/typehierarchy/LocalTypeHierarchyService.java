@@ -75,19 +75,15 @@ public class LocalTypeHierarchyService extends AbstractTypeHierarchyService {
 	}
 
 	private static IBinding findTypeBinding(IBinding memberBinding) {
-		try {
-			if (memberBinding instanceof IEnumerator) {
-				IType type = ((IEnumerator) memberBinding).getType();
-				if (type instanceof IBinding) {
-					return (IBinding) type;
-				}
-			} else if (memberBinding instanceof ICPPMember) {
-				return ((ICPPMember) memberBinding).getClassOwner();
-			} else if (memberBinding instanceof IField) {
-				return ((IField) memberBinding).getCompositeTypeOwner();
+		if (memberBinding instanceof IEnumerator) {
+			IType type = ((IEnumerator) memberBinding).getType();
+			if (type instanceof IBinding) {
+				return (IBinding) type;
 			}
-		} catch (DOMException e) {
-			// don't log problem bindings
+		} else if (memberBinding instanceof ICPPMember) {
+			return ((ICPPMember) memberBinding).getClassOwner();
+		} else if (memberBinding instanceof IField) {
+			return ((IField) memberBinding).getCompositeTypeOwner();
 		}
 		return null;
 	}

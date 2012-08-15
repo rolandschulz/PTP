@@ -320,7 +320,7 @@ public abstract class RemoteSearchQuery implements Serializable {
 
 					if (binding instanceof ICPPMethod) {
 						ICPPMethod m= (ICPPMethod) binding;
-						ICPPMethod[] msInBases = ClassTypeHelper.findOverridden(m);
+						ICPPMethod[] msInBases = ClassTypeHelper.findOverridden(m, null);
 						if (msInBases.length > 0) {
 							if (polymorphicNames == null) {
 								polymorphicNames= new ArrayList<IIndexName>();

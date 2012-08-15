@@ -38,21 +38,17 @@ import org.eclipse.ptp.internal.rdt.core.model.IIndexLocationConverterFactory;
 public class TypeHierarchyUtil {
 
 	public static IBinding findTypeBinding(IBinding memberBinding) {
-		try {
-			if (memberBinding instanceof IEnumerator) {
-				IType type= ((IEnumerator) memberBinding).getType();
-				if (type instanceof IBinding) {
-					return (IBinding) type;
-				}
+		if (memberBinding instanceof IEnumerator) {
+			IType type= ((IEnumerator) memberBinding).getType();
+			if (type instanceof IBinding) {
+				return (IBinding) type;
 			}
-			else if (memberBinding instanceof ICPPMember) {
-				return ((ICPPMember) memberBinding).getClassOwner();
-			}
-			else if (memberBinding instanceof IField) {
-				return ((IField) memberBinding).getCompositeTypeOwner();
-			}
-		} catch (DOMException e) {
-			// don't log problem bindings
+		}
+		else if (memberBinding instanceof ICPPMember) {
+			return ((ICPPMember) memberBinding).getClassOwner();
+		}
+		else if (memberBinding instanceof IField) {
+			return ((IField) memberBinding).getCompositeTypeOwner();
 		}
 		return null;
 	}

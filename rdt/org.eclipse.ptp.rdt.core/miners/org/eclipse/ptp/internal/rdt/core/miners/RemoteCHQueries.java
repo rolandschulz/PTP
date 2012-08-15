@@ -80,7 +80,7 @@ public class RemoteCHQueries {
 			try{
 				findCalledBy1(serach_scope_index, calleeBinding, true, project, scheme, hostName, result, _dataStore, converter);
 				if (calleeBinding instanceof ICPPMethod) {
-					IBinding[] overriddenBindings= ClassTypeHelper.findOverridden((ICPPMethod) calleeBinding);
+					IBinding[] overriddenBindings= ClassTypeHelper.findOverridden((ICPPMethod) calleeBinding, null);
 					for (IBinding overriddenBinding : overriddenBindings) {
 						findCalledBy1(serach_scope_index, overriddenBinding, false, project, scheme, hostName, result, _dataStore, converter);
 					}
