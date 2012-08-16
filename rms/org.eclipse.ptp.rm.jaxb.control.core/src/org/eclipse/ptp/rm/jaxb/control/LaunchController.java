@@ -1353,8 +1353,18 @@ public class LaunchController implements ILaunchController {
 		}
 
 		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
+		if (attr == null) {
+			AttributeType a = getEnvironment().get(JAXBControlConstants.EXEC_DIR);
+			if (a != null) {
+				attr = (String) a.getValue();
+			}
+		}
 		if (attr != null) {
 			AttributeType a = getEnvironment().get(JAXBControlConstants.DIRECTORY);
+			if (a == null) {
+				a = new AttributeType();
+				getEnvironment().put(JAXBControlConstants.DIRECTORY, a);
+			}
 			a.setValue(attr);
 		}
 
