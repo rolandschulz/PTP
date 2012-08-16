@@ -35,6 +35,7 @@ static char * NumRankVars[] = {
 	NULL
 };
 
+#define DEFAULT_ROUTING_FILE	"routing_file"
 #define BUFFER_SIZE				255
 #define ROUTING_TABLE_TIMEOUT	1000 /* number of tries */
 #define ROUTING_TABLE_WAIT		1000*1000 /* usec */
@@ -48,6 +49,7 @@ static int generate_routing_file(char *filename, char *routes);
 static int generate_port(void);
 
 static FILE *	routing_file = NULL;
+static char *	routing_file_path = DEFAULT_ROUTING_FILE;
 static int		master;
 
 /**
@@ -88,6 +90,8 @@ sdm_routing_table_init(int argc, char *argv[])
 		} else if (strncmp(arg, "--server=", 9) == 0) {
 			master = 0;
 			server_id = (int)strtol(arg+9, NULL, 10);
+		} else if (strncmp(arg, "--routing_file=", 15) == 0) {
+			routing_file_path = &arg[15];
 		}
 	}
 
@@ -109,7 +113,7 @@ sdm_routing_table_init(int argc, char *argv[])
 		for (ch = 0; ch < argc; ch++) {
 			char * arg = argv[ch];
 			if (strncmp(arg, "--generate_routes=", 18) == 0) {
-				rv = generate_routing_file("routing_file", &arg[18]);
+				rv = generate_routing_file(routing_file_path, &arg[18]);
 				if (rv == -1) {
 					DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%s] Error creating routing file\n", master ? "master" : "server");
 					return -1;
@@ -121,7 +125,7 @@ sdm_routing_table_init(int argc, char *argv[])
 	/*
 	 * Master and servers wait for the routing file to appear
 	 */
-	rv = wait_for_routing_file("routing_file", &rt_file, &tbl_size, ROUTING_TABLE_TIMEOUT); //TODO: Get filename from the environment
+	rv = wait_for_routing_file(routing_file_path, &rt_file, &tbl_size, ROUTING_TABLE_TIMEOUT); //TODO: Get filename from the environment
 	if (rv == -1) { // No need to close, since wait_for_routing_file does it when error
 		// Error!
 		DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%s] Error opening the routing file\n", master ? "master" : "server");
@@ -171,7 +175,7 @@ sdm_routing_table_set(void)
 		routing_file = NULL;
 	}
 
-	rv = wait_for_routing_file("routing_file", &routing_file, &tbl_size, ROUTING_TABLE_TIMEOUT); //TODO: Get filename from the environment
+	rv = wait_for_routing_file(routing_file_path, &routing_file, &tbl_size, ROUTING_TABLE_TIMEOUT); //TODO: Get filename from the environment
 	if (rv == -1) { // No need to close, since wait_for_routing_file does it when error
 		// Error!
 		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Error opening the routing file\n");

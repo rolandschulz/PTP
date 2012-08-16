@@ -43,7 +43,8 @@ extern void server(dbg_backend *dbgr);
 #define OPT_TYPE_MASTER			5
 #define OPT_TYPE_SERVER			6
 #define OPT_TYPE_GENERATE		7
-#define OPT_TYPE_DEBUG			8
+#define OPT_TYPE_ROUTING_FILE	8
+#define OPT_TYPE_DEBUG			9
 
 static int opt_type;
 
@@ -57,6 +58,7 @@ static struct option longopts[] = {
 	{"master",			no_argument,	 	&opt_type,	OPT_TYPE_MASTER},
 	{"server",			required_argument,	&opt_type,	OPT_TYPE_SERVER},
 	{"generate_routes",	required_argument,	&opt_type,	OPT_TYPE_GENERATE},
+	{"routing_file",	required_argument,	&opt_type,	OPT_TYPE_ROUTING_FILE},
 #ifdef DEBUG
 	{"debug",			optional_argument,	&opt_type, 	OPT_TYPE_DEBUG},
 #endif /* DEBUG */
@@ -65,9 +67,9 @@ static struct option longopts[] = {
 #endif
 
 #ifdef DEBUG
-static char * shortopts = "b:e:P:p:h:d:ms:g:";
+static char * shortopts = "b:e:P:p:h:d:ms:g:r:";
 #else /* DEBUG */
-static char * shortopts = "b:e:P:p:h:ms:g:";
+static char * shortopts = "b:e:P:p:h:ms:g:r:";
 #endif /* DEBUG */
 
 static int	fatal_error = 0;
@@ -105,6 +107,7 @@ print_error_msg()
  * @arg --master				master process
  * @arg --server=id				server process with rank 'id'
  * @arg --generate_routes=list	master will generate routing file using the supplied list
+ * @arg --routing_file=path		path to routing file
  */
 int
 main(int argc, char *argv[])
@@ -144,6 +147,7 @@ main(int argc, char *argv[])
 			case OPT_TYPE_MASTER:
 			case OPT_TYPE_SERVER:
 			case OPT_TYPE_GENERATE:
+			case OPT_TYPE_ROUTING_FILE:
 				break;
 #ifdef DEBUG
 			case OPT_TYPE_DEBUG:
@@ -162,6 +166,7 @@ main(int argc, char *argv[])
 				"	 [--master]\n"
 				"    [--server=rank]\n"
 				"    [--generate_routes=list]\n"
+				"    [--routing_file=path]\n"
 #ifdef DEBUG
 				"    [--debug[=level]]\n"
 #endif /* DEBUG */
@@ -180,7 +185,8 @@ main(int argc, char *argv[])
 		if (cp == NULL) {
 			if (strcmp(argv[n], "--master") == 0 ||
 				strncmp(argv[n], "--server", 8) == 0 ||
-				strncmp(argv[n], "--generate_routes", 17) == 0) {
+				strncmp(argv[n], "--generate_routes", 17) == 0) ||
+				strncmp(argv[n], "--routing_file", 14) == 0) {
 				/* No action required */
 #ifdef DEBUG
 			} else if (strcmp(argv[n], "--debug") == 0) {
@@ -232,6 +238,7 @@ main(int argc, char *argv[])
 					"	 [--master]\n"
 					"    [--server=rank]\n"
 					"    [--generate_routes=list]\n"
+					"    [--routing_file=path]\n"
 #ifdef DEBUG
 					"    [--debug[=level]]\n"
 #endif /* DEBUG */
