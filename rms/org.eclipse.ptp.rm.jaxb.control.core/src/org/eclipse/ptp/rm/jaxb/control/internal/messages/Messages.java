@@ -69,6 +69,7 @@ public class Messages extends NLS {
 	public static String MatchImpl_5;
 	public static String BadEntryIndex;
 
+	public static String LaunchController_missingServicesOrConnectionName;
 	public static String LaunchController_missingURL;
 	public static String LaunchController_resourceManagerNotStarted;
 	public static String LaunchController_unableToLoad;

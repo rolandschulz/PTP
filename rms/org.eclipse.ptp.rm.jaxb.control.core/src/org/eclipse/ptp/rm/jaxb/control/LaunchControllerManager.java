@@ -54,13 +54,14 @@ public class LaunchControllerManager {
 					controller.setConnectionName(connectionName);
 					controller.setRemoteServicesId(remoteServicesId);
 				}
-			}
-			controller.initialize();
-			if (controller.isInitialized()) {
+				controller.initialize();
 				ModelManager.getInstance().addJobControl(controller);
 				ModelManager.getInstance().getUniverse().addResourceManager(configName, controlId);
-				return controller;
 			}
+			if (!controller.isInitialized()) {
+				controller.initialize();
+			}
+			return controller;
 		}
 		return null;
 	}

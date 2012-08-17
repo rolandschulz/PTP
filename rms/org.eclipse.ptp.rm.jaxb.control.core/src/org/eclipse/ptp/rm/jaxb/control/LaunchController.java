@@ -170,10 +170,10 @@ public class LaunchController implements ILaunchController {
 			AttributeType a = new AttributeType();
 			a.setVisible(false);
 			a.setName(jobId);
-			rmVarMap.put(jobId, a);
+			getRMVariableMap().put(jobId, a);
 			worked(progress, 30);
 			doControlCommand(jobId, operation);
-			rmVarMap.remove(jobId);
+			getRMVariableMap().remove(jobId);
 			worked(progress, 40);
 			if (TERMINATE_OPERATION.equals(operation)) {
 				IJobStatus canceledStatus = jobStatusMap.cancel(jobId);
@@ -250,13 +250,7 @@ public class LaunchController implements ILaunchController {
 	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBJobControl#getEnvironment()
 	 */
 	public IVariableMap getEnvironment() {
-		if (rmVarMap == null) {
-			rmVarMap = new RMVariableMap();
-		}
-		if (!rmVarMap.isInitialized()) {
-			JAXBInitializationUtils.initializeMap(configData, rmVarMap);
-		}
-		return rmVarMap;
+		return getRMVariableMap();
 	}
 
 	/*
@@ -316,7 +310,7 @@ public class LaunchController implements ILaunchController {
 			String state = status == null ? IJobStatus.UNDETERMINED : status.getStateDetail();
 
 			try {
-				AttributeType a = rmVarMap.get(jobId);
+				AttributeType a = getRMVariableMap().get(jobId);
 
 				CommandType job = controlData.getGetJobStatus();
 				if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
@@ -324,9 +318,9 @@ public class LaunchController implements ILaunchController {
 					a = new AttributeType();
 					a.setVisible(false);
 					a.setName(jobId);
-					rmVarMap.put(jobId, a);
+					getRMVariableMap().put(jobId, a);
 					runCommand(jobId, job, CommandJob.JobMode.STATUS, null, ILaunchManager.RUN_MODE, true);
-					a = rmVarMap.remove(jobId);
+					a = getRMVariableMap().remove(jobId);
 				}
 
 				if (a != null) {
@@ -338,7 +332,7 @@ public class LaunchController implements ILaunchController {
 
 			if (status == null) {
 				status = new CommandJobStatus(jobId, state, null, this);
-				status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+				status.setOwner(getRMVariableMap().getString(JAXBControlConstants.CONTROL_USER_NAME));
 				jobStatusMap.addJobStatus(jobId, status);
 			} else {
 				status.setState(state);
@@ -418,7 +412,6 @@ public class LaunchController implements ILaunchController {
 	public void initialize() throws CoreException {
 		try {
 			realizeRMDataFromXML();
-			rmVarMap = (RMVariableMap) getEnvironment();
 			if (configData != null) {
 				controlData = configData.getControlData();
 				if (servicesId == null && connectionName == null) {
@@ -435,23 +428,25 @@ public class LaunchController implements ILaunchController {
 						connectionName = site.getConnectionName();
 					}
 				}
-				if (servicesId != null && connectionName != null) {
-					fControlId = LaunchControllerManager.generateControlId(servicesId, connectionName, configData.getName());
-					isInitialized = true;
+				if (servicesId == null || connectionName == null) {
+					throw new Throwable(Messages.LaunchController_missingServicesOrConnectionName);
 				}
 			}
 		} catch (Throwable t) {
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
 		}
+
+		fControlId = LaunchControllerManager.generateControlId(servicesId, connectionName, configData.getName());
+		isInitialized = true;
+	}
+
+	public boolean isInitialized() {
+		return isInitialized;
 	}
 
 	/*
 	 * return JAXBInitializationUtils.getRMConfigurationXML(url);
 	 */
-
-	public boolean isInitialized() {
-		return isInitialized;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -488,7 +483,7 @@ public class LaunchController implements ILaunchController {
 		AttributeType changedValue = null;
 
 		if (resetValue != null) {
-			changedValue = rmVarMap.get(resetValue);
+			changedValue = getRMVariableMap().get(resetValue);
 			changedValue.setValue(null);
 		}
 
@@ -668,7 +663,7 @@ public class LaunchController implements ILaunchController {
 
 			AttributeType a = new AttributeType();
 			a.setVisible(false);
-			rmVarMap.put(uuid, a);
+			getRMVariableMap().put(uuid, a);
 
 			/*
 			 * Overwrite attribute values based on user choices. Note that the launch can also modify attributes.
@@ -729,7 +724,7 @@ public class LaunchController implements ILaunchController {
 			 * property containing actual jobId as name was set in the wait call; we may need the new jobId mapping momentarily to
 			 * resolve proxy-specific info
 			 */
-			rmVarMap.remove(uuid);
+			getRMVariableMap().remove(uuid);
 			jobId = a.getName();
 
 			/*
@@ -737,7 +732,7 @@ public class LaunchController implements ILaunchController {
 			 */
 			if (jobId == null) {
 				status = new CommandJobStatus(uuid, IJobStatus.CANCELED, null, this);
-				status.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+				status.setOwner(getRMVariableMap().getString(JAXBControlConstants.CONTROL_USER_NAME));
 				return status.getJobId();
 			}
 
@@ -751,8 +746,8 @@ public class LaunchController implements ILaunchController {
 			/*
 			 * to ensure the most recent script is used at the next call
 			 */
-			rmVarMap.remove(JAXBControlConstants.SCRIPT_PATH);
-			rmVarMap.remove(JAXBControlConstants.SCRIPT);
+			getRMVariableMap().remove(JAXBControlConstants.SCRIPT_PATH);
+			getRMVariableMap().remove(JAXBControlConstants.SCRIPT);
 			return status.getJobId();
 		} finally {
 			if (monitor != null) {
@@ -838,13 +833,6 @@ public class LaunchController implements ILaunchController {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getJobStatus(java.lang.String, boolean,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-
 	/**
 	 * @param jobId
 	 *            resource-specific id
@@ -887,6 +875,13 @@ public class LaunchController implements ILaunchController {
 
 		runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, null, ILaunchManager.RUN_MODE, true);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getJobStatus(java.lang.String, boolean,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
 
 	/**
 	 * Run either interactive or batch job for run or debug modes. ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE are the
@@ -950,17 +945,6 @@ public class LaunchController implements ILaunchController {
 	}
 
 	/**
-	 * Reinitializes when the connection info has been changed on a cached resource manager.
-	 * 
-	 * @param monitor
-	 * @return wrapper object for remote services, connections and file managers
-	 * @throws CoreException
-	 */
-	private RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
-		return RemoteServicesDelegate.getDelegate(servicesId, connectionName, monitor);
-	}
-
-	/**
 	 * @return the configuration XML used to construct the data tree.
 	 */
 	private String getRMConfigurationXML() {
@@ -968,6 +952,21 @@ public class LaunchController implements ILaunchController {
 			return null;
 		}
 		return configXML;
+	}
+
+	/**
+	 * Get the variable map. Returns an initialized map if one doesn't already exist.
+	 * 
+	 * @return initialized variable map
+	 */
+	private RMVariableMap getRMVariableMap() {
+		if (rmVarMap == null) {
+			rmVarMap = new RMVariableMap();
+		}
+		if (!rmVarMap.isInitialized()) {
+			JAXBInitializationUtils.initializeMap(configData, rmVarMap);
+		}
+		return rmVarMap;
 	}
 
 	/**
@@ -993,8 +992,8 @@ public class LaunchController implements ILaunchController {
 			}
 		}
 
-		AttributeType scriptVar = rmVarMap.get(JAXBControlConstants.SCRIPT);
-		AttributeType scriptPathVar = rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
+		AttributeType scriptVar = getRMVariableMap().get(JAXBControlConstants.SCRIPT);
+		AttributeType scriptPathVar = getRMVariableMap().get(JAXBControlConstants.SCRIPT_PATH);
 		if (scriptVar != null || scriptPathVar != null) {
 			if (files == null) {
 				files = new ManagedFilesType();
@@ -1067,7 +1066,7 @@ public class LaunchController implements ILaunchController {
 	private boolean maybeHandleScript(String uuid, ScriptType script, IProgressMonitor monitor) {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			AttributeType a = rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
+			AttributeType a = getRMVariableMap().get(JAXBControlConstants.SCRIPT_PATH);
 			if (a != null && a.getValue() != null) {
 				return false;
 			}
@@ -1076,8 +1075,8 @@ public class LaunchController implements ILaunchController {
 			}
 			IRemoteConnection conn = getRemoteConnection(progress.newChild(5));
 			if (conn != null) {
-				rmVarMap.setEnvManagerFromConnection(conn);
-				ScriptHandler job = new ScriptHandler(uuid, script, rmVarMap, launchEnv, false);
+				getRMVariableMap().setEnvManagerFromConnection(conn);
+				ScriptHandler job = new ScriptHandler(uuid, script, getRMVariableMap(), launchEnv, false);
 				job.schedule();
 				try {
 					job.join();
@@ -1276,11 +1275,11 @@ public class LaunchController implements ILaunchController {
 	 */
 	private void setFixedConfigurationProperties(IRemoteConnection rc) throws CoreException {
 		if (rc != null) {
-			rmVarMap.maybeAddAttribute(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
-			rmVarMap.maybeAddAttribute(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
-			rmVarMap.maybeAddAttribute(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
-			rmVarMap.maybeAddAttribute(JAXBControlConstants.DIRECTORY, rc.getWorkingDirectory(), false);
-			rmVarMap.maybeAddAttribute(JAXBControlConstants.PTP_DIRECTORY,
+			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
+			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
+			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
+			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.DIRECTORY, rc.getWorkingDirectory(), false);
+			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.PTP_DIRECTORY,
 					new Path(rc.getWorkingDirectory()).append(JAXBControlConstants.ECLIPSESETTINGS).toString(), false);
 		}
 	}
@@ -1300,12 +1299,12 @@ public class LaunchController implements ILaunchController {
 		/*
 		 * Add launch mode attribute
 		 */
-		rmVarMap.maybeAddAttribute(JAXBControlConstants.LAUNCH_MODE, mode, false);
+		getRMVariableMap().maybeAddAttribute(JAXBControlConstants.LAUNCH_MODE, mode, false);
 
 		Map<String, Object> lcattr = RMVariableMap.getValidAttributes(configuration);
 		for (String key : lcattr.keySet()) {
 			Object value = lcattr.get(key);
-			AttributeType target = rmVarMap.get(key.toString());
+			AttributeType target = getRMVariableMap().get(key.toString());
 			if (target != null) {
 				target.setValue(value);
 			}
@@ -1317,9 +1316,9 @@ public class LaunchController implements ILaunchController {
 		 * The non-selected variables have been excluded from the valid attributes of the configuration; but we need to null out the
 		 * superset values here that are undefined.
 		 */
-		for (String key : rmVarMap.getAttributes().keySet()) {
+		for (String key : getRMVariableMap().getAttributes().keySet()) {
 			if (!lcattr.containsKey(key)) {
-				AttributeType target = rmVarMap.get(key.toString());
+				AttributeType target = getRMVariableMap().get(key.toString());
 				if (target.isVisible()) {
 					target.setValue(null);
 				}
@@ -1331,13 +1330,13 @@ public class LaunchController implements ILaunchController {
 		/*
 		 * make sure these fixed properties are included
 		 */
-		rmVarMap.overwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.EXEC_PATH, JAXBControlConstants.EXEC_PATH, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_ID, JAXBControlConstants.DEBUGGER_ID, lcattr);
-		rmVarMap.overwrite(JAXBControlConstants.DEBUGGER_LAUNCHER, JAXBControlConstants.DEBUGGER_LAUNCHER, lcattr);
+		getRMVariableMap().overwrite(JAXBControlConstants.SCRIPT_PATH, JAXBControlConstants.SCRIPT_PATH, lcattr);
+		getRMVariableMap().overwrite(JAXBControlConstants.EXEC_PATH, JAXBControlConstants.EXEC_PATH, lcattr);
+		getRMVariableMap().overwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr);
+		getRMVariableMap().overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
+		getRMVariableMap().overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
+		getRMVariableMap().overwrite(JAXBControlConstants.DEBUGGER_ID, JAXBControlConstants.DEBUGGER_ID, lcattr);
+		getRMVariableMap().overwrite(JAXBControlConstants.DEBUGGER_LAUNCHER, JAXBControlConstants.DEBUGGER_LAUNCHER, lcattr);
 
 		/*
 		 * update the dynamic attributes
