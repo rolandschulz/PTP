@@ -9,6 +9,7 @@
 
 use strict;
 use File::Basename;
+use Cwd;
 
 my $patint  = "([\\+\\-\\d]+)";              # Pattern for Integer number
 my $patnode = "([\^\\s]+(\\.[\^\\s]*)*)";    # Pattern for domain name (a.b.c)
@@ -82,8 +83,8 @@ sub wait_for_cfg_file {
 #	port_num is a semi-random port number that the debugger will listen on
 #
 #####################################################################
-sub generate_routing_table {
-	my ($pid) = @_;
+sub generate_routing_file {
+	my ($pid, $file) = @_;
 	my $line;
 	my $ntasks;
 	my $fd;
@@ -93,7 +94,7 @@ sub generate_routing_table {
 	
 	if ( open(CFG, $cfg_file) ) {
 
-		open( OUT, "> $ROUTING_FILE" ) || die "cannot open file $ROUTING_FILE";
+		open( OUT, "> $file" ) || die "cannot open file $file";
 
 		# Ignore first line
 		$line = <CFG>;
@@ -134,13 +135,15 @@ sub start_sdm_master {
 }
 
 $launchMode = $ENV{'PTP_LAUNCH_MODE'};
-$debuggerId = $ENV{'PTP_DEBUGGER_ID'};
-$debuggerLauncher = $ENV{'PTP_DEBUGGER_LAUNCHER'};
 $hpcrun = $ENV{'HPC_USE_HPCRUN'};
 
 if ($launchMode eq 'debug') {
+	$debuggerId = $ENV{'PTP_DEBUGGER_ID'};
+	$debuggerLauncher = $ENV{'PTP_DEBUGGER_LAUNCHER'};
+	
 	if ($debuggerId eq 'org.eclipse.ptp.debug.sdm') {
-		unlink($ROUTING_FILE);		
+		$ROUTING_FILE = getcwd() . "/route." . $$;
+		push(@ARGV, "--routing_file=$ROUTING_FILE");
 	} elsif ($debuggerLauncher) {
 	    exec($debuggerLauncher, @ARGV); # try running directly first
 	    exec('/usr/bin/perl', $debuggerLauncher, @ARGV); # assume perl script if this fails
@@ -162,12 +165,16 @@ if ( $pid == 0 ) {
 push(@child_pids, $pid);
 
 if ($launchMode eq 'debug' && $debuggerId eq 'org.eclipse.ptp.debug.sdm') {
-	generate_routing_table($pid);
+	generate_routing_file($pid, $ROUTING_FILE);
 	start_sdm_master(@ARGV);
 }
 
 foreach (@child_pids) {
 	waitpid($_, 0);
+}
+
+if ($launchMode eq 'debug' && $debuggerId eq 'org.eclipse.ptp.debug.sdm') {
+	unlink($ROUTING_FILE);
 }
 
 exit( $? >> 8 );

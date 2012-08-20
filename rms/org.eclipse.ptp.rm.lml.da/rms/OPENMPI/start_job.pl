@@ -10,6 +10,9 @@
 #*     IBM Corporation - Initial Implementation
 #*******************************************************************************/ 
 use strict;
+use File::Temp qw/tempfile/;
+use Text::ParseWords;
+use Cwd;
 
 my $patint="([\\+\\-\\d]+)";   # Pattern for Integer number
 my $patnode="([\^\\s]+(\\.[\^\\s]*)*)";       # Pattern for domain name (a.b.c)
@@ -17,14 +20,16 @@ my $patnode="([\^\\s]+(\\.[\^\\s]*)*)";       # Pattern for domain name (a.b.c)
 my $portbase=50000;
 my $portrange=10000;
 my $verbose=0;
-my $ROUTING_FILE="routing_file";
 my $TOTAL_PROCS=0;
 my @JOB;
 
 my $line;
-my $launchMode;
-my $debuggerId;
 my $pid;
+my $ROUTING_FILE;
+my $debuggerId;
+my $debuggerPath;
+my @debuggerArgs;
+my @child_pids;
 
 #####################################################################
 #
@@ -87,7 +92,8 @@ sub get_job_map {
 }
 
 sub generate_routing_file {
-	open(OUT,"> $ROUTING_FILE") || die "cannot open file $ROUTING_FILE";
+	my ($file) = @_;
+	open(OUT,"> $file") || die "cannot open file $file";
 	printf(OUT "%d\n", $TOTAL_PROCS);
 	for (my $count=0; $count < $TOTAL_PROCS; $count++) {
 	    printf(OUT "%d %s %d\n",$count,$JOB[$count],$portbase+int(rand($portrange)));
@@ -95,18 +101,33 @@ sub generate_routing_file {
 	close(OUT);
 }
 
-$launchMode = $ENV{'PTP_LAUNCH_MODE'};
-$debuggerId = $ENV{'PTP_DEBUGGER_ID'};
+sub start_sdm_master {
+	my ($path, @args) = @_;
+	
+	my $pid = fork();
+	if ($pid == 0) {
+		exec($path, @args, "--master");
+		exit(1);
+	}
+	push(@child_pids, $pid);
+}
 
 if ($#ARGV < 1) {
-  die " Usage: $0 [mpi_args ...] [debugger_args ...]\n";
+  die " Usage: $0 mpi_cmd [mpi_args ...]\n";
 }
-my $cmd = shift(@ARGV);
-my $args = join(" ", @ARGV);
+
+my $launchMode = $ENV{'PTP_LAUNCH_MODE'};
+
+my $launchCommand = shift(@ARGV);
+
 if ($launchMode eq 'debug') {
-	$cmd .= " -mca orte_show_resolved_nodenames 1 -display-map";
+	$debuggerId = $ENV{'PTP_DEBUGGER_ID'};
+	$debuggerPath = $ENV{'PTP_DEBUGGER_EXECUTABLE_PATH'};
+	@debuggerArgs = shellwords($ENV{'PTP_DEBUGGER_ARGS'});
+	$ROUTING_FILE = getcwd() . "/route." . $$;
+	push(@ARGV, "-mca", "orte_show_resolved_nodenames", "1", "-display-map");
+	push(@debuggerArgs, "--routing_file=$ROUTING_FILE");
 }
-print "running command $cmd $args\n" if ($verbose);
 
 # Set autoflush to pass output as soon as possble
 $|=1;
@@ -115,27 +136,37 @@ $pid = fork();
 if ( $pid == 0 ) {
 	printf("#PTP job_id=%d\n", $$);
 	if ($launchMode eq 'debug') {
-		if (open(IN,"$cmd $args 2>&1 |")) {
+		my $launchArgs = join(" ", @ARGV);
+		my $dbgArgs = join(" ", @debuggerArgs);
+		if (open(IN,"$launchCommand $launchArgs $debuggerPath $dbgArgs 2>&1 |")) {
 		    while ($line=<IN>) {
 				chomp($line);
 				if ($line=~/=*\s*JOB MAP\s*=*/) {
 					print "found job map\n" if ($verbose);
 					get_job_map();
-					generate_routing_file();
+					generate_routing_file($ROUTING_FILE);
 				} else {
 					print "$line\n";
 				}
 		    }
 		    close(IN);
+		    unlink($ROUTING_FILE);
 		} 
-		exit(0);
 	} else {
-		exec($cmd, @ARGV);
+		exec($launchCommand, @ARGV);
 		exit(1);
 	}
 }
+push(@child_pids, $pid);
 
-waitpid($pid, 0);
+if ($launchMode eq 'debug') {
+	start_sdm_master($debuggerPath, @debuggerArgs);
+}
+
+foreach (@child_pids) {
+	waitpid($_, 0);
+}
+
 exit($? >> 8);
 
 

@@ -115,6 +115,7 @@
 			<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
 			<arg>${ptp_rm:progArgs#value}</arg>
+			<environment name="PTP_JOBID" value="@jobId"/>
 			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
@@ -149,9 +150,10 @@
 			<arg attribute="prefixOption" isUndefinedIfMatches="false">--prefix ${ptp_rm:prefix#value}</arg>
 			<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
 			<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
-			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
-			<arg>${ptp_rm:debuggerArgs#value}</arg>
+			<environment name="PTP_JOBID" value="@jobId"/>
 			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
+			<environment name="PTP_DEBUGGER_EXECUTABLE_PATH" value="${ptp_rm:debuggerExecutablePath#value}"/>
+			<environment name="PTP_DEBUGGER_ARGS" value="${ptp_rm:debuggerArgs#value}"/>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
@@ -173,8 +175,6 @@
 					</match>
 				</target>
 			</stderr-parser>
-			<pre-launch-cmd name="Cleanup" exec="rm -f routing_file" wait="true"/>
-			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master ${ptp_rm:debuggerArgs#value}" wait="false"/>
 		</submit-interactive-debug>		
 		<launch-tab>
 			<dynamic includeWidgetValuesFrom="Advanced Options">
