@@ -22,13 +22,11 @@ import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 
 /**
- * Wrapper implementation. Consists of a Regular Expression and a reference to a
- * target (Property or Attribute). When the regex is satisfied, the match
- * applies the list of assign actions to its target.<br>
+ * Wrapper implementation. Consists of a Regular Expression and a reference to a target attribute. When the regex is satisfied, the
+ * match applies the list of assign actions to its target.<br>
  * <br>
- * A match can also be set to force its target to the front of the list of
- * targets held by the tokenizer (<code>moveToTop</code>) when the match is
- * successful.
+ * A match can also be set to force its target to the front of the list of targets held by the tokenizer (<code>moveToTop</code>)
+ * when the match is successful.
  * 
  * @author arossi
  * 
@@ -43,8 +41,7 @@ public class MatchImpl {
 
 	/**
 	 * @param uuid
-	 *            unique id associated with this resource manager operation (can
-	 *            be <code>null</code>).
+	 *            unique id associated with this resource manager operation (can be <code>null</code>).
 	 * @param match
 	 *            JAXB data element
 	 * @param target
@@ -72,8 +69,7 @@ public class MatchImpl {
 	}
 
 	/**
-	 * Executes the regular expression match on the provided segment and applies
-	 * the assign actions if match is positive.
+	 * Executes the regular expression match on the provided segment and applies the assign actions if match is positive.
 	 * 
 	 * @param sequence
 	 *            string segment to match.
@@ -133,8 +129,8 @@ public class MatchImpl {
 	}
 
 	/**
-	 * Flag for prioritizing the target bound to this match by promoting it to
-	 * the head of the ordered list of targets held by the tokenizer.
+	 * Flag for prioritizing the target bound to this match by promoting it to the head of the ordered list of targets held by the
+	 * tokenizer.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.ConfigurableRegexTokenizer
 	 * @see org.eclipse.ptp.rm.jaxb.control.internal.data.TargetImpl
