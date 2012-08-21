@@ -8,7 +8,7 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.git.core;
+package org.eclipse.ptp.rdt.sync.core;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -24,9 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jgit.util.io.StreamCopyThread;
-import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
-import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -240,7 +238,7 @@ public class CommandRunner {
 			getOutput.join(250);
 			if (!getOutput.isAlive()) break;
 			if (monitor!=null && monitor.isCanceled()) {
-				throw new RemoteSyncException(new Status(IStatus.CANCEL,Activator.PLUGIN_ID,Messages.CommandRunner_0));
+				throw new RemoteSyncException(new Status(IStatus.CANCEL, RDTSyncCorePlugin.PLUGIN_ID, Messages.CommandRunner_0));
 			}
 		}
 		//rp and getError should be finished as soon as getOutput is finished
@@ -256,6 +254,6 @@ public class CommandRunner {
 
 	// Enforce as static
 	private CommandRunner() {
-		throw new AssertionError(Messages.CR_CreateInstanceError);
+		throw new AssertionError(Messages.CommandRunner_1);
 	}
 }
