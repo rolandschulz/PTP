@@ -32,6 +32,7 @@ import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.rdt.editor.info.IRemoteCEditorInfoProvider;
+import org.eclipse.ptp.rdt.editor.info.IRemoteCEditorInfoProviderSaveAsExtension;
 import org.eclipse.ptp.rdt.editor.info.RemoteCInfoProviderUtilities;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
@@ -268,8 +269,12 @@ public class RemoteCEditor extends CEditor implements HelpListener {
 			if (!provider.doPrePerformSave(overwrite))
 				return;
 		}
-
-		super.performSave(overwrite, progressMonitor);
+		if (provider != null && provider instanceof IRemoteCEditorInfoProviderSaveAsExtension 
+				&& ((IRemoteCEditorInfoProviderSaveAsExtension)provider).forceSaveToSaveAs(input)) {
+			performSaveAs(progressMonitor);
+		} else {
+			super.performSave(overwrite, progressMonitor);
+		}
 
 		if (provider != null)
 			provider.doPostPerformSave();
