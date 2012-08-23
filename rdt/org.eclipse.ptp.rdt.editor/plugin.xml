@@ -106,5 +106,18 @@
 	         <part id="org.eclipse.ptp.rdt.ui.editor.CEditor"/>
 	      </actionSetPartAssociation>  
      </extension>
+
+	<extension
+      point="org.eclipse.ui.preferencePages">
+	<page
+            name="%PrintPreference"
+			category="org.eclipse.cdt.ui.preferences.CEditorPreferencePage"            
+            class="org.eclipse.ptp.internal.rdt.editor.preferences.PrintPreferencePage"
+            id="org.eclipse.ptp.rdt.ui.editor.PrintPreferencePage">
+      </page>
+	</extension>
+	<extension point="org.eclipse.core.runtime.preferences">
+		<initializer class="org.eclipse.ptp.internal.rdt.editor.preferences.PreferenceInitializer"/>
+	</extension>
      
 </plugin>
