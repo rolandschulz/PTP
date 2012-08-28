@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -122,6 +123,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				BuildScenario buildScenario = bcm.getBuildScenarioForProject(project);
 				IStructuredSelection sel = this.getSelectedElements();
 
+				ArrayList<IPath> paths = new ArrayList<IPath>();
 				for (Object element : sel.toArray()) {
 					IResource selection;
 					if (element instanceof IResource) {
@@ -133,19 +135,20 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 						continue;
 					}
 
-					IPath path = selection.getProjectRelativePath();
-					if (command.equals(checkoutCommand)) {
-						bcm.checkout(project, buildScenario, path);
-					}
-					if (command.equals(resolveAsRemoteCommand)) {
-						bcm.checkoutRemoteCopy(project, buildScenario, path);
-					}
-					if (command.equals(resolveMergeCommand) || command.equals(resolveAsRemoteCommand)) {
-						bcm.setMergeAsResolved(project, buildScenario, path);
-						SyncMergeFileTableViewer viewer = SyncMergeFileTableViewer.getActiveInstance();
-						if (viewer != null) {
-							viewer.update(null);
-						}
+					paths.add(selection.getProjectRelativePath());
+				}
+
+				if (command.equals(checkoutCommand)) {
+					bcm.checkout(project, buildScenario, paths.toArray(new IPath[paths.size()]));
+				}
+				if (command.equals(resolveAsRemoteCommand)) {
+					bcm.checkoutRemoteCopy(project, buildScenario, paths.toArray(new IPath[paths.size()]));
+				}
+				if (command.equals(resolveMergeCommand) || command.equals(resolveAsRemoteCommand)) {
+					bcm.setMergeAsResolved(project, buildScenario, paths.toArray(new IPath[paths.size()]));
+					SyncMergeFileTableViewer viewer = SyncMergeFileTableViewer.getActiveInstance();
+					if (viewer != null) {
+						viewer.update(null);
 					}
 				}
 			}

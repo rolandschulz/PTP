@@ -85,7 +85,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 	public void createPartControl(final Composite parent) {
 		synchronized(this) {
 			activeViewerInstance = this;
-			fileTableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+			fileTableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.MULTI);
 			
 			// Create file column
 			TableViewerColumn fileColumn = new TableViewerColumn(fileTableViewer, SWT.NONE);

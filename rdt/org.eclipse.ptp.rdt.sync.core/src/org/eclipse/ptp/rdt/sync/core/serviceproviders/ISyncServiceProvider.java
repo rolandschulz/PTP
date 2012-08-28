@@ -88,7 +88,7 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	public String[] getMergeConflictParts(IProject project, BuildScenario buildScenario, IFile file) throws CoreException;
 	
 	/**
-	 * Set the given file path as resolved (merge conflict does not exist)
+	 * Set the given file paths as resolved (merge conflict does not exist)
 	 *
 	 * @param project
 	 * @param buildScenario
@@ -96,20 +96,20 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * @throws CoreException
 	 * 				for system-level problems setting the state
 	 */
-	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath path) throws CoreException;
+	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath[] paths) throws CoreException;
 
 	/**
-	 * Replace the current contents of the given path with the previous version in the repository
+	 * Replace the current contents of the given paths with the previous versions in the repository
 	 *
 	 * @param project
 	 * @param buildScenario
 	 * @param path
 	 * @throws CoreException
 	 */
-	public void checkout(IProject project, BuildScenario buildScenario, IPath path)  throws CoreException;
+	public void checkout(IProject project, BuildScenario buildScenario, IPath[] paths)  throws CoreException;
 
 	/**
-	 * Replace the current contents of the given path with the current local copy of the remote (not necessarily the same as what
+	 * Replace the current contents of the given paths with the current local copies of the remote (not necessarily the same as what
 	 * is on the remote site). This is useful in merge-conflict resolution.
 	 *
 	 * @param project
@@ -117,7 +117,7 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * @param path
 	 * @throws CoreException
 	 */
-	public void checkoutRemoteCopy(IProject project, BuildScenario buildScenario, IPath path)  throws CoreException;
+	public void checkoutRemoteCopy(IProject project, BuildScenario buildScenario, IPath[] paths)  throws CoreException;
 
     /**
      * Close any resources (files, sockets) that were open by the sync provider for the given project. Resources not open by the

@@ -714,7 +714,20 @@ public class BuildConfigurationManager {
 	 * 				for system-level problems setting the state
 	 */
 	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath path) throws CoreException {
-		provider.setMergeAsResolved(project, buildScenario, path);
+		this.setMergeAsResolved(project, buildScenario, new IPath[]{path});
+	}
+	
+	/**
+	 * Set the given paths as resolved (no merge conflict)
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param path
+	 * @throws CoreException
+	 * 				for system-level problems setting the state
+	 */
+	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath[] paths) throws CoreException {
+		provider.setMergeAsResolved(project, buildScenario, paths);
 	}
 	
 	/**
@@ -726,7 +739,19 @@ public class BuildConfigurationManager {
 	 * @throws CoreException
 	 */
 	public void checkout(IProject project, BuildScenario buildScenario, IPath path) throws CoreException {
-		provider.checkout(project, buildScenario, path);
+		this.checkout(project, buildScenario, new IPath[]{path});
+	}
+	
+	/**
+	 * Replace given files with the most recent versions in the repository
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param paths
+	 * @throws CoreException
+	 */
+	public void checkout(IProject project, BuildScenario buildScenario, IPath[] paths) throws CoreException {
+		provider.checkout(project, buildScenario, paths);
 	}
 	
 	/**
@@ -738,7 +763,19 @@ public class BuildConfigurationManager {
 	 * @throws CoreException
 	 */
 	public void checkoutRemoteCopy(IProject project, BuildScenario buildScenario, IPath path) throws CoreException {
-		provider.checkoutRemoteCopy(project, buildScenario, path);
+		this.checkoutRemoteCopy(project, buildScenario, new IPath[]{path});
+	}
+	
+	/**
+	 * Replace given files with the most recent local copies of the remote (not necessarily the same as the current remotes)
+	 *
+	 * @param project
+	 * @param buildScenario
+	 * @param path
+	 * @throws CoreException
+	 */
+	public void checkoutRemoteCopy(IProject project, BuildScenario buildScenario, IPath[] paths) throws CoreException {
+		provider.checkoutRemoteCopy(project, buildScenario, paths);
 	}
 
 	/**

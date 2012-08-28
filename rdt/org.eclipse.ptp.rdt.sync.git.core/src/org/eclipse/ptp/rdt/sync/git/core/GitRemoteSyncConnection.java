@@ -1062,17 +1062,21 @@ public class GitRemoteSyncConnection {
 	 * Add the path to the repository, resolving the merge conflict (if any)
 	 * @param path
 	 */
-	public void setMergeAsResolved(IPath path) throws RemoteSyncException {
+	public void setMergeAsResolved(IPath[] paths) throws RemoteSyncException {
 		AddCommand addCommand = git.add();
-		addCommand.addFilepattern(path.toString());
+		for (IPath p : paths) {
+			addCommand.addFilepattern(p.toString());
+		}
 		try {
 			addCommand.call();
-			// Make sure file is no longer conflicted before marking as resolved.
+			// Make sure each file is no longer conflicted before marking as resolved.
 			// Sometimes JGit will silently fail to add.
 			StatusCommand statusCommand = git.status();
 			Status status = statusCommand.call();
-			if (!(status.getConflicting().contains(path.toString()))) {
-				FileToMergePartsMap.remove(path);
+			for (IPath p : paths) {
+				if (!(status.getConflicting().contains(p.toString()))) {
+					FileToMergePartsMap.remove(p);
+				}
 			}
 		} catch (GitAPIException e) {
 			throw new RemoteSyncException(e);
@@ -1085,9 +1089,11 @@ public class GitRemoteSyncConnection {
 	 * @param path
 	 * @throws RemoteSyncException
 	 */
-	public void checkout(IPath path) throws RemoteSyncException {
+	public void checkout(IPath[] paths) throws RemoteSyncException {
 		CheckoutCommand checkoutCommand = git.checkout();
-		checkoutCommand.addPath(path.toString());
+		for (IPath p : paths) {
+			checkoutCommand.addPath(p.toString());
+		}
 		checkoutCommand.setStartPoint("HEAD"); //$NON-NLS-1$
 		try {
 			checkoutCommand.call();
@@ -1104,9 +1110,11 @@ public class GitRemoteSyncConnection {
 	 * @param path
 	 * @throws RemoteSyncException
 	 */
-	public void checkoutRemoteCopy(IPath path) throws RemoteSyncException {
+	public void checkoutRemoteCopy(IPath[] paths) throws RemoteSyncException {
 		CheckoutCommand checkoutCommand = git.checkout();
-		checkoutCommand.addPath(path.toString());
+		for (IPath p : paths) {
+			checkoutCommand.addPath(p.toString());
+		}
 		checkoutCommand.setStartPoint("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
 		try {
 			checkoutCommand.call();
