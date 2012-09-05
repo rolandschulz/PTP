@@ -133,7 +133,7 @@
 			<tooltip>wall_clock_limit = [hardlimit][,softlimit]; limit = [[hours:]minutes:]seconds[.fraction]</tooltip>
 		</attribute>		
 
-		<script insertEnvironmentAfter="0" deleteAfterSubmit="false">
+		<script insertEnvironmentAfter="0">
 			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 				<!--  If the substituted value of the statement following the '>' in the following <arg> 
 				      specifications evaluates to the value specified for isUndefinedIfMatches then the 
