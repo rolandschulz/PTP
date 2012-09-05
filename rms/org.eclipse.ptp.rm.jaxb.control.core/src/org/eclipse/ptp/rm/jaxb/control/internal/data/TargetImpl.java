@@ -43,9 +43,9 @@ import org.eclipse.ptp.rm.jaxb.core.data.ThrowType;
  * There are two modes to matching. The default is to treat the matches as logically OR'd (like a SAT; <code>matchAll</code> =
  * false). When the latter is set to true, the matches are taken as logically ANDed.<br>
  * <br>
- * The target can be a reference to a pre-existent Property or Attribute in the resource manager environment, or can be constructed
- * when the match occurs. Dynamically constructed targets are added to a list during the tokenization, and then upon termination are
- * merged according to property or attribute name, which is treated as a unique identifier. <br>
+ * The target can be a reference to a pre-existent attribute in the resource manager environment, or can be constructed when the
+ * match occurs. Dynamically constructed targets are added to a list during the tokenization, and then upon termination are merged
+ * according to attribute name, which is treated as a unique identifier. <br>
  * <br>
  * Tests are applied at the end of the tokenization. <br>
  * 
@@ -161,9 +161,9 @@ public class TargetImpl implements IMatchable {
 	 * <br>
 	 * This method is called by the Match on its target parent. If the target is a reference to an existing object in the
 	 * environment, this is then returned; else, the index counter for the assign task is retrieved, indicating where in the list of
-	 * constructed targets it last was (the assumption is that an assign action is applied once to any given Property or Attribute),
-	 * and this object is returned if it exists; in the case that the index is equal to or greater than the size of the list, a new
-	 * target object is constructed and added to the list.
+	 * constructed targets it last was (the assumption is that an assign action is applied once to any given attribute), and this
+	 * object is returned if it exists; in the case that the index is equal to or greater than the size of the list, a new target
+	 * object is constructed and added to the list.
 	 * 
 	 * @param assign
 	 *            action to be applied to target
@@ -212,19 +212,27 @@ public class TargetImpl implements IMatchable {
 	 */
 	public synchronized void postProcess() throws Throwable {
 		if (refTarget == null) {
-			DebuggingLogger.getLogger().logPropertyInfo(Messages.TargetImpl_2 + targets.size() + Messages.TargetImpl_3);
-			mergeAttributes(targets);
-			if (rmVarMap instanceof RMVariableMap) {
-				Map<String, AttributeType> dmap = ((RMVariableMap) rmVarMap).getDiscovered();
-				for (AttributeType t : targets) {
-					runTests(t);
-					AttributeType a = t;
-					DebuggingLogger.getLogger().logPropertyInfo(
-							Messages.TargetImpl_6 + a.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP + a.getValue());
-					dmap.put(a.getName(), a);
+			if (targets.isEmpty() && defaultAction != null) {
+				/*
+				 * No match succeeded but there is a default action. Perform it.
+				 */
+				defaultAction.setTarget(getTarget(defaultAction));
+				defaultAction.assign(null);
+			} else {
+				DebuggingLogger.getLogger().logPropertyInfo(Messages.TargetImpl_2 + targets.size() + Messages.TargetImpl_3);
+				mergeAttributes(targets);
+				if (rmVarMap instanceof RMVariableMap) {
+					Map<String, AttributeType> dmap = ((RMVariableMap) rmVarMap).getDiscovered();
+					for (AttributeType t : targets) {
+						runTests(t);
+						AttributeType a = t;
+						DebuggingLogger.getLogger().logPropertyInfo(
+								Messages.TargetImpl_6 + a.getName() + JAXBCoreConstants.CM + JAXBCoreConstants.SP + a.getValue());
+						dmap.put(a.getName(), a);
+					}
 				}
+				targets.clear();
 			}
-			targets.clear();
 		} else {
 			runTests(refTarget);
 			refTarget = null;
