@@ -632,7 +632,8 @@ public class LguiItem implements ILguiItem {
 					if (tableOld.getRow() != null) {
 						for (int i = 0; i < tableOld.getRow().size(); i++) {
 							final RowType row = tableOld.getRow().get(i);
-							if (handler.getCellValue(tableOld, row, JOB_ID).equals(jobId)) {
+							final String id = handler.getCellValue(tableOld, row, JOB_ID);
+							if (id != null && id.equals(jobId)) {
 								handler.setCellValue(tableOld, row, JOB_STATUS, status);
 								rowOld = row;
 								index = i;
