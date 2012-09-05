@@ -315,12 +315,17 @@ public class LaunchController implements ILaunchController {
 				CommandType job = controlData.getGetJobStatus();
 				if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
 					pinTable.pin(jobId);
-					a = new AttributeType();
-					a.setVisible(false);
-					a.setName(jobId);
-					getRMVariableMap().put(jobId, a);
+					AttributeType tmp = null;
+					if (a == null) {
+						tmp = new AttributeType();
+						tmp.setVisible(false);
+						tmp.setName(jobId);
+						getRMVariableMap().put(jobId, tmp);
+					}
 					runCommand(jobId, job, CommandJob.JobMode.STATUS, null, ILaunchManager.RUN_MODE, true);
-					a = getRMVariableMap().remove(jobId);
+					if (tmp != null) {
+						a = getRMVariableMap().remove(jobId);
+					}
 				}
 
 				if (a != null) {
@@ -352,7 +357,7 @@ public class LaunchController implements ILaunchController {
 				 * leave the status in the map in case there are further calls (regarding remote file state); it will be pruned by
 				 * the daemon
 				 */
-				status = jobStatusMap.terminated(jobId, progress.newChild(50));
+				jobStatusMap.terminated(jobId, progress.newChild(50));
 			}
 
 			if (status.stateChanged()) {
