@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.services.core.ServiceModelManager;
 
 @Deprecated
 public interface IModelManager extends IModelPresentation {
