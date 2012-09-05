@@ -289,29 +289,90 @@ sub get_state {
 
     $state="UNDETERMINED";$detailed_state="";
 
+    if($job_state eq "Canceled") {
+		$state="COMPLETED";
+		$detailed_state="JOB_OUTERR_READY";
+    }
+	if($job_state eq "Checkpointing") {
+		$state="RUNNING";
+    }    
     if($job_state eq "Completed") {
-		$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
+		$state="COMPLETED";
+		$detailed_state="JOB_OUTERR_READY";
     }
-    if($job_state eq "User Hold") {
+    if($job_state eq "Completed Pending") {
+		$state="COMPLETED";
+		$detailed_state="JOB_OUTERR_READY";
+    }
+	if($job_state eq "Deferred") {
 		$state="SUBMITTED";
-		$detailed_state="USER_ON_HOLD";
+    }    
+	if($job_state eq "Idle") {
+		$state="SUBMITTED";
+    }    
+	if($job_state eq "Not Queued") {
+		$state="COMPLETED";
+		$detailed_state="FAILED";
     }
+    if($job_state eq "Not Run") {
+		$state="SUBMITTED";
+    }    
+	if($job_state eq "Pending") {
+		$state="RUNNING";
+    }    
+	if($job_state eq "Preempted") {
+		$state="RUNNING";
+    }    
+	if($job_state eq "Preempt Pending") {
+		$state="RUNNING";
+    }    
+	if($job_state eq "Rejected") {
+		$state="COMPLETED";
+		$detailed_state="FAILED";
+    }
+	if($job_state eq "Rejected Pending") {
+		$state="COMPLETED";
+		$detailed_state="FAILED";
+    }
+	if($job_state eq "Removed") {
+		$state="COMPLETED";
+		$detailed_state="JOB_OUTERR_READY";
+    }    
+	if($job_state eq "Remove Pending") {
+		$state="COMPLETED";
+		$detailed_state="JOB_OUTERR_READY";
+    }    
+	if($job_state eq "Resume Pending") {
+		$state="RUNNING";
+    }    
+ 	if($job_state eq "Running") {
+		$state="RUNNING";
+    }    
+	if($job_state eq "Starting") {
+		$state="RUNNING";
+    }    
     if($job_state eq "System Hold") {
 		$state="SUBMITTED";
 		$detailed_state="SYSTEM_ON_HOLD";
     }
-	if($job_state eq "Removed") {
-		$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
+	if($job_state eq "Terminated") {
+		$state="COMPLETED";
+		$detailed_state="JOB_OUTERR_READY";
     }    
-	if($job_state eq "Idle") {
-		$state="SUBMITTED";$detailed_state="";
-    }    
-	if($job_state eq "Not Queued") {
-		$state="SUBMITTED";$detailed_state="JOB_NOT_QUEUED";
-    }    
-	if($job_state eq "Running") {
-		$state="RUNNING";$detailed_state="";
-    }    
+    if($job_state eq "User Hold") {
+		$state="SUBMITTED";
+		$detailed_state="USER_ON_HOLD";
+    }
+    if($job_state eq "User & System Hold") {
+		$state="SUBMITTED";
+		$detailed_state="SYSTEM_ON_HOLD";
+    }
+    if($job_state eq "Vacated") {
+		$state="SUBMITTED";
+    }
+    if($job_state eq "Vacate Pending") {
+		$state="SUBMITTED";
+    }
 
     return($state,$detailed_state);
 }
