@@ -807,7 +807,7 @@ public class LguiItem implements ILguiItem {
 	 * and status information.
 	 */
 	private void updateJobData() {
-		final Set<JobStatusData> jobsInTable = new HashSet<JobStatusData>();
+		final Set<String> jobsInTable = new HashSet<String>();
 		final List<String> oidsToRemove = new ArrayList<String>();
 
 		/*
@@ -828,7 +828,7 @@ public class LguiItem implements ILguiItem {
 							/*
 							 * Remember this job is in the table for later
 							 */
-							jobsInTable.add(status);
+							jobsInTable.add(status.getJobId());
 						} else {
 							/*
 							 * job has been removed by the user. remove it from the table
@@ -865,7 +865,7 @@ public class LguiItem implements ILguiItem {
 
 			synchronized (fJobMap) {
 				for (final JobStatusData status : fJobMap.values()) {
-					if (!status.isRemoved() && !jobsInTable.contains(status)) {
+					if (!status.isRemoved() && !jobsInTable.contains(status.getJobId())) {
 						if (!status.isCompleted()) {
 							status.setState(JobStatusData.COMPLETED);
 							status.setOid(generateOid());
