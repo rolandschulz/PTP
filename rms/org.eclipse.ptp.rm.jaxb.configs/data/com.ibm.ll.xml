@@ -276,69 +276,40 @@
 			<arg>${ptp_rm:@jobId#name}</arg>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
+					<!-- Match and discard heading line -->
 					<match>
-						<!-- Match and discard heading line -->
 						<expression>^Id.*$</expression>
 					</match>
+					<!--  Match and discard heading line -->
 					<match>
-						<!--  Match and discard heading line -->
 						<expression>^------.*$</expression>
 					</match>
+					<!--  Match job status line like 'z25c2s1.59.0             user     5/29 08:24 R  50  No_Class     z25c2s1' -->
+					<!--  Note that node name (last token) will be blank if job is in holding state so don't include that in pattern -->
 					<match>
-						<!--  Match job status line like 'z25c2s1.59.0             user     5/29 08:24 R  50  No_Class     z25c2s1' -->
-						<!--  Note that node name (last token) will be blank if job is in holding state so don't include that in pattern -->
-						<expression>^\S+ +\S+ +\S+ +\S+ (\S)  \d+ +(\S+) +(\S)+.*$</expression>
+						<expression>^\S+ +\S+ +\S+ +\S+ ((R )|(ST)|(CK)) \d+ +\S+ +\S+.*$</expression>
 						<set field="value">
-							<entry valueGroup="1"/>
+							<entry value="RUNNING"/>
 						</set>
 					</match>
-					<test op="EQ">
-						<value>#value</value>
-						<value>R</value>
-						<set field="value">
-							<entry value="RUNNING"/>
-						</set>
-					</test>
-					<test op="EQ">
-						<value>#value</value>
-						<value>ST</value>
-						<set field="value">
-							<entry value="RUNNING"/>
-						</set>
-					</test>
-					<test op="EQ">
-						<value>#value</value>
-						<value>CK</value>
-						<set field="value">
-							<entry value="RUNNING"/>
-						</set>
-					</test>
-					<test op="EQ">
-						<value>#value</value>
-						<value>H</value>
+					<match>
+						<expression>^\S+ +\S+ +\S+ +\S+ (H ) \d+ +(\S+) +(\S)+.*$</expression>
 						<set field="value">
 							<entry value="USER_ON_HOLD"/>
 						</set>
-					</test>
-					<test op="EQ">
-						<value>#value</value>
-						<value>S</value>
+					</match>
+					<match>
+						<expression>^\S+ +\S+ +\S+ +\S+ ((S )|(HS)) \d+ +(\S+) +(\S)+.*$</expression>
 						<set field="value">
 							<entry value="SYSTEM_ON_HOLD"/>
 						</set>
-					</test>
-					<test op="EQ">
-						<value>#value</value>
-						<value>HS</value>
-						<set field="value">
-							<entry value="SYSTEM_ON_HOLD"/>
-						</set>
-					</test>
-					<else>
+					</match>
+					<match>
+						<expression>^\S+ +\S+ +\S+ +\S+ (..) \d+ +(\S+) +(\S)+.*$</expression>
 						<set field="value">
 							<entry value="COMPLETED"/>
 						</set>
-					</else>
+					</match>
 				</target>
 			</stdout-parser>
 		</get-job-status>
