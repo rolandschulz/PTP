@@ -310,6 +310,12 @@
 							<entry value="COMPLETED"/>
 						</set>
 					</match>
+					<match>
+						<expression>^.*There is currently no job status to report.*$</expression>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</match>
 				</target>
 			</stdout-parser>
 		</get-job-status>
