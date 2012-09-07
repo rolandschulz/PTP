@@ -7,23 +7,16 @@ Bundle-Activator: org.eclipse.ptp.remotetools.environment.launcher.RemoteLaunche
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.debug.core,
  org.eclipse.debug.ui,
  org.eclipse.cdt.core,
  org.eclipse.cdt.debug.core,
  org.eclipse.cdt.launch,
- org.eclipse.ptp.remotetools.environment.core,
- org.eclipse.swt,
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.ptp.remotetools.core,
  org.eclipse.core.variables,
- org.eclipse.cdt.managedbuilder.core,
  org.eclipse.ui.ide,
- org.eclipse.jface.text,
  org.eclipse.core.filesystem,
- org.eclipse.core.resources,
- org.eclipse.ptp.remotetools.utils,
  org.eclipse.ptp.utils.ui;bundle-version="1.0.0",
  org.eclipse.ptp.utils.core;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy

@@ -10,7 +10,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.remotetools.environment.core,
  org.eclipse.ui,
  org.eclipse.ptp.remotetools.core,
- org.eclipse.ptp.remotetools.utils,
  org.eclipse.ptp.remotetools.preferences,
  org.eclipse.ptp.utils.ui
 Bundle-ActivationPolicy: lazy

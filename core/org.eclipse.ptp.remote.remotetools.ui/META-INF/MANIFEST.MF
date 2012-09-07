@@ -6,19 +6,14 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.remote.remotetools.ui.RemoteToolsAdapterUIPlugin
 Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.filesystem;bundle-version="1.2.0",
+ org.eclipse.core.filesystem,
  org.eclipse.ui,
  org.eclipse.ui.ide,
- org.eclipse.ptp.core,
  org.eclipse.ptp.remote.remotetools.core;bundle-version="3.0.0",
- org.eclipse.ptp.remotetools.core;bundle-version="2.1.8",
  org.eclipse.ptp.remotetools.environment.core;bundle-version="1.3.3",
  org.eclipse.ptp.remotetools.environment.generichost;bundle-version="1.4.0",
- org.eclipse.ptp.remotetools.preferences;bundle-version="1.3.1",
- org.eclipse.ptp.remotetools.utils;bundle-version="3.0.0",
  org.eclipse.ptp.remote.core;bundle-version="3.0.0",
- org.eclipse.ptp.remote.ui;bundle-version="3.0.0",
- org.eclipse.ptp.utils.ui;bundle-version="1.0.0"
+ org.eclipse.ptp.remote.ui;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

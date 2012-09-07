@@ -7,12 +7,9 @@ Bundle-Activator: org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCore
 Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem,
- org.eclipse.ptp.core,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.remotetools.core,
  org.eclipse.ptp.remotetools.environment.core,
- org.eclipse.ptp.remotetools.utils,
- org.eclipse.ptp.remotetools.preferences,
  org.eclipse.cdt.core
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.remote.remotetools.core;x-friends:="org.eclipse.ptp.remote.remotetools.ui"

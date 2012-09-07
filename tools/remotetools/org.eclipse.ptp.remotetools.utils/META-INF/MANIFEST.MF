@@ -6,13 +6,7 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.remotetools.utils.UtilsPlugin
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ui.console,
- org.eclipse.core.filesystem,
- org.eclipse.core.resources,
- org.eclipse.swt,
- org.eclipse.jface,
- org.eclipse.ui
+Require-Bundle: org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
 Export-Package: 
  org.eclipse.ptp.remotetools.utils,
