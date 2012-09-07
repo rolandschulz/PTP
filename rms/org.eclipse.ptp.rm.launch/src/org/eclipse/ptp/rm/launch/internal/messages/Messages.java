@@ -169,6 +169,40 @@ public class Messages extends NLS {
 
 	public static String WorkingDirectoryBlock_Working_Directory;
 
+	public static String DefaultDynamicTab_title;
+
+	public static String JAXBControllerLaunchConfigurationTab_unableToObtainConfigurationInfo;
+
+	public static String JAXBControllerLaunchConfigurationTab_unableToObtainConnectionInfo;
+
+	public static String VoidLaunchTabMessage;
+	public static String VoidLaunchTabTitle;
+	public static String UninitializedRemoteServices;
+	public static String CreateControlConfigurableError;
+	public static String ViewScript;
+	public static String ViewConfig;
+	public static String DisplayConfig;
+	public static String DisplayScript;
+	public static String ViewExcluded;
+	public static String ScriptNotSupportedWarning;
+	public static String ScriptNotSupportedWarning_title;
+	public static String DisplayError;
+	public static String DisplayErrorTitle;
+	public static String ViewConfigTooltip;
+	public static String ViewExcludedTooltip;
+	public static String DefaultValues;
+	public static String BatchScriptPath;
+	public static String JAXBRMConfigurationSelectionWizardPage_1;
+	public static String ClearScript;
+	public static String OverrideEnvironment;
+	public static String OverrideEnvironmentTooltip;
+	public static String ReadOnlyWarning;
+	public static String ReadOnlyWarning_title;
+	public static String ErrorOnLoadTitle;
+	public static String ErrorOnLoadFromStore;
+	public static String WidgetSelectedError;
+	public static String WidgetSelectedErrorTitle;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
