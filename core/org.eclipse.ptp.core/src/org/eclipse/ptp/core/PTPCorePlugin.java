@@ -233,33 +233,35 @@ public class PTPCorePlugin extends Plugin {
 
 		ILaunchConfigurationType localCfg = launchMgr
 				.getLaunchConfigurationType(IPTPLaunchConfigurationConstants.LAUNCH_APP_TYPE_ID);
-		try {
-			if (localCfg.getPreferredDelegate(debugSet) == null) {
-				ILaunchDelegate[] delegates = localCfg.getDelegates(debugSet);
-				for (ILaunchDelegate delegate : delegates) {
-					if (IPTPLaunchConfigurationConstants.PREFERRED_DEBUG_LAUNCH_DELEGATE.equals(delegate.getId())) {
-						localCfg.setPreferredDelegate(debugSet, delegate);
-						break;
+		if (localCfg != null) {
+			try {
+				if (localCfg.getPreferredDelegate(debugSet) == null) {
+					ILaunchDelegate[] delegates = localCfg.getDelegates(debugSet);
+					for (ILaunchDelegate delegate : delegates) {
+						if (IPTPLaunchConfigurationConstants.PREFERRED_DEBUG_LAUNCH_DELEGATE.equals(delegate.getId())) {
+							localCfg.setPreferredDelegate(debugSet, delegate);
+							break;
+						}
 					}
 				}
+			} catch (CoreException e) {
 			}
-		} catch (CoreException e) {
-		}
 
-		HashSet<String> runSet = new HashSet<String>();
-		runSet.add(ILaunchManager.RUN_MODE);
+			HashSet<String> runSet = new HashSet<String>();
+			runSet.add(ILaunchManager.RUN_MODE);
 
-		try {
-			if (localCfg.getPreferredDelegate(runSet) == null) {
-				ILaunchDelegate[] delegates = localCfg.getDelegates(runSet);
-				for (ILaunchDelegate delegate : delegates) {
-					if (IPTPLaunchConfigurationConstants.PREFERRED_RUN_LAUNCH_DELEGATE.equals(delegate.getId())) {
-						localCfg.setPreferredDelegate(runSet, delegate);
-						break;
+			try {
+				if (localCfg.getPreferredDelegate(runSet) == null) {
+					ILaunchDelegate[] delegates = localCfg.getDelegates(runSet);
+					for (ILaunchDelegate delegate : delegates) {
+						if (IPTPLaunchConfigurationConstants.PREFERRED_RUN_LAUNCH_DELEGATE.equals(delegate.getId())) {
+							localCfg.setPreferredDelegate(runSet, delegate);
+							break;
+						}
 					}
 				}
+			} catch (CoreException e) {
 			}
-		} catch (CoreException e) {
 		}
 	}
 }
