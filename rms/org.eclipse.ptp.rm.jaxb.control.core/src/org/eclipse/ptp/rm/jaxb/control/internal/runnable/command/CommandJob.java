@@ -60,8 +60,8 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
-import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
+import org.eclipse.ptp.rm.jaxb.control.LaunchController;
 import org.eclipse.ptp.rm.jaxb.control.data.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
@@ -719,7 +719,7 @@ public class CommandJob extends Job implements ICommandJob {
 			}
 			IRemoteConnection conn = delegate.getRemoteConnection();
 			try {
-				JAXBResourceManagerControl.checkConnection(conn, progress.newChild(5));
+				LaunchController.checkConnection(conn, progress.newChild(5));
 			} catch (RemoteConnectionException rce) {
 				throw CoreExceptionUtils.newException(rce.getLocalizedMessage(), rce);
 			}

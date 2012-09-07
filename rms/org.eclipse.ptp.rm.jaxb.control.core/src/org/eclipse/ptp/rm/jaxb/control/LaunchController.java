@@ -120,12 +120,32 @@ public class LaunchController implements ILaunchController {
 		}
 	}
 
+	/**
+	 * tries to open connection if closed
+	 * 
+	 * @param connection
+	 * @param progress
+	 * @throws RemoteConnectionException
+	 */
+	public static void checkConnection(IRemoteConnection connection, SubMonitor progress) throws RemoteConnectionException {
+		if (connection != null) {
+			if (!connection.isOpen()) {
+				connection.open(progress.newChild(25));
+				if (!connection.isOpen()) {
+					throw new RemoteConnectionException(Messages.RemoteConnectionError + connection.getAddress());
+				}
+			}
+		} else {
+			new RemoteConnectionException(Messages.RemoteConnectionError + connection);
+		}
+	}
+	
 	private final ConnectionChangeListener connectionListener = new ConnectionChangeListener();
 	private final Map<String, String> launchEnv = new TreeMap<String, String>();
+
 	private final JobIdPinTable pinTable = new JobIdPinTable();
 
 	private String fControlId;
-
 	private ICommandJob interactiveJob;
 	private ICommandJobStatusMap jobStatusMap;
 	private RMVariableMap rmVarMap;
@@ -138,9 +158,67 @@ public class LaunchController implements ILaunchController {
 	private String configURL;
 	private String configXML;
 	private RemoteServicesDelegate fRemoteServicesDelegate;
+
 	private ResourceManagerData configData;
 
 	public LaunchController() {
+	}
+
+	/**
+	 * Helper to add a read-only attribute
+	 * 
+	 * @param name
+	 * @param value
+	 */
+	private void addAttribute(String name, String value) {
+		AttributeType attr = getEnvironment().get(name);
+		if (attr == null) {
+			attr = new AttributeType();
+			attr.setName(name);
+			attr.setVisible(true);
+			attr.setReadOnly(true);
+			getEnvironment().put(name, attr);
+		}
+		attr.setValue(value);
+	}
+
+	/**
+	 * Add connection properties to the attribute map.
+	 * 
+	 * @param conn
+	 */
+	private void addConnectionPropertyAttributes(IRemoteConnection conn) {
+		String property = conn.getProperty(IRemoteConnection.OS_ARCH_PROPERTY);
+		if (property != null) {
+			addAttribute(IRemoteConnection.OS_ARCH_PROPERTY, property);
+		}
+		property = conn.getProperty(IRemoteConnection.OS_NAME_PROPERTY);
+		if (property != null) {
+			addAttribute(IRemoteConnection.OS_NAME_PROPERTY, property);
+		}
+		property = conn.getProperty(IRemoteConnection.OS_VERSION_PROPERTY);
+		if (property != null) {
+			addAttribute(IRemoteConnection.OS_VERSION_PROPERTY, property);
+		}
+	}
+
+	/**
+	 * Checks to see if there was an exception thrown by the run method.
+	 * 
+	 * @param job
+	 * @throws CoreException
+	 *             if the job execution raised and exception
+	 */
+	private void checkJobForError(ICommandJob job) throws CoreException {
+		IStatus status = job.getRunStatus();
+		if (status != null && status.getSeverity() == IStatus.ERROR) {
+			Throwable t = status.getException();
+			if (t instanceof CoreException) {
+				throw (CoreException) t;
+			} else {
+				throw CoreExceptionUtils.newException(status.getMessage(), t);
+			}
+		}
 	}
 
 	/*
@@ -198,6 +276,92 @@ public class LaunchController implements ILaunchController {
 	 */
 	public void dispose() {
 		// NOP for the moment
+	}
+
+	/**
+	 * @param jobId
+	 *            resource-specific id
+	 * @param operation
+	 *            terminate, hold, suspend, release, resume.
+	 * @throws CoreException
+	 *             If the command is not supported
+	 */
+	private void doControlCommand(String jobId, String operation) throws CoreException {
+		CoreException ce = CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + operation, null);
+
+		CommandType job = null;
+		if (TERMINATE_OPERATION.equals(operation)) {
+			maybeKillInteractive(jobId);
+			job = controlData.getTerminateJob();
+			if (job == null) { // there may not be an external cancel
+				return;
+			}
+		} else if (SUSPEND_OPERATION.equals(operation)) {
+			job = controlData.getSuspendJob();
+			if (job == null) {
+				throw ce;
+			}
+		} else if (RESUME_OPERATION.equals(operation)) {
+			job = controlData.getResumeJob();
+			if (job == null) {
+				throw ce;
+			}
+		} else if (RELEASE_OPERATION.equals(operation)) {
+			job = controlData.getReleaseJob();
+			if (job == null) {
+				throw ce;
+			}
+		} else if (HOLD_OPERATION.equals(operation)) {
+			job = controlData.getHoldJob();
+			if (job == null) {
+				throw ce;
+			}
+		}
+
+		runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, null, ILaunchManager.RUN_MODE, true);
+	}
+
+	/**
+	 * Run either interactive or batch job for run or debug modes. ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE are the
+	 * corresponding LaunchConfiguration modes; batch/interactive are currently determined by the configuration (the configuration
+	 * cannot implement both). This may need to be modified.
+	 * 
+	 * @param uuid
+	 *            temporary internal id for as yet unsubmitted job
+	 * @param mode
+	 *            either ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE
+	 * @return job wrapper object
+	 * @throws CoreException
+	 */
+	private ICommandJob doJobSubmitCommand(String uuid, ILaunchConfiguration configuration, String mode) throws CoreException {
+		CommandType command = null;
+		CommandJob.JobMode jobMode = CommandJob.JobMode.INTERACTIVE;
+
+		if (ILaunchManager.RUN_MODE.equals(mode)) {
+			command = controlData.getSubmitBatch();
+			if (command != null) {
+				jobMode = CommandJob.JobMode.BATCH;
+			} else {
+				command = controlData.getSubmitInteractive();
+			}
+		} else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
+			command = controlData.getSubmitBatchDebug();
+			if (command != null) {
+				jobMode = CommandJob.JobMode.BATCH;
+			} else {
+				command = controlData.getSubmitInteractiveDebug();
+			}
+		}
+
+		if (command == null) {
+			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + JAXBControlConstants.SP + uuid
+					+ JAXBControlConstants.SP + mode, null);
+		}
+
+		/*
+		 * NOTE: changed this to join, because the waitForId is now part of the run() method of the command itself (05.01.2011)
+		 */
+		return runCommand(uuid, command, jobMode, configuration, mode, true);
 	}
 
 	/*
@@ -370,6 +534,10 @@ public class LaunchController implements ILaunchController {
 	}
 
 	/*
+	 * return JAXBInitializationUtils.getRMConfigurationXML(url);
+	 */
+
+	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getJobStatus(java.lang.String,
@@ -386,6 +554,24 @@ public class LaunchController implements ILaunchController {
 		return launchEnv;
 	}
 
+	private IRemoteConnection getRemoteConnection(IProgressMonitor monitor) {
+		final IRemoteServices rsrv = getRemoteServices(monitor);
+		if (rsrv == null) {
+			return null;
+		} else {
+			IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
+			if (connMgr == null) {
+				return null;
+			} else {
+				return connMgr.getConnection(connectionName);
+			}
+		}
+	}
+
+	private IRemoteServices getRemoteServices(IProgressMonitor monitor) {
+		return PTPRemoteCorePlugin.getDefault().getRemoteServices(servicesId, monitor);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -393,6 +579,31 @@ public class LaunchController implements ILaunchController {
 	 */
 	public String getRemoteServicesId() {
 		return servicesId;
+	}
+
+	/**
+	 * @return the configuration XML used to construct the data tree.
+	 */
+	private String getRMConfigurationXML() {
+		if (JAXBCoreConstants.ZEROSTR.equals(configXML)) {
+			return null;
+		}
+		return configXML;
+	}
+
+	/**
+	 * Get the variable map. Returns an initialized map if one doesn't already exist.
+	 * 
+	 * @return initialized variable map
+	 */
+	private RMVariableMap getRMVariableMap() {
+		if (rmVarMap == null) {
+			rmVarMap = new RMVariableMap();
+		}
+		if (!rmVarMap.isInitialized()) {
+			JAXBInitializationUtils.initializeMap(configData, rmVarMap);
+		}
+		return rmVarMap;
 	}
 
 	/*
@@ -445,10 +656,6 @@ public class LaunchController implements ILaunchController {
 	}
 
 	/*
-	 * return JAXBInitializationUtils.getRMConfigurationXML(url);
-	 */
-
-	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#jobStateChanged(java.lang.String,
@@ -465,6 +672,262 @@ public class LaunchController implements ILaunchController {
 			}
 		}
 		JobManager.getInstance().fireJobChanged(status);
+	}
+
+	/**
+	 * Checks for existence of either internally generated script or custom script path. In either case, either replaces contents of
+	 * the corresponding managed file object or creates one.
+	 * 
+	 * @param lists
+	 *            the lists of managed files for this submission
+	 * @param stagingLocation
+	 *            for the script (may be <code>null</null>
+	 * @param delete
+	 *            whether the script target should be deleted after submission
+	 */
+	private void maybeAddManagedFileForScript(List<ManagedFilesType> lists, String stagingLocation, boolean delete) {
+		ManagedFilesType files = null;
+		if (stagingLocation == null) {
+			stagingLocation = JAXBControlConstants.ECLIPSESETTINGS;
+		}
+		for (ManagedFilesType f : lists) {
+			if (stagingLocation.equals(f.getFileStagingLocation())) {
+				files = f;
+				break;
+			}
+		}
+
+		AttributeType scriptVar = getRMVariableMap().get(JAXBControlConstants.SCRIPT);
+		AttributeType scriptPathVar = getRMVariableMap().get(JAXBControlConstants.SCRIPT_PATH);
+		if (scriptVar != null || scriptPathVar != null) {
+			if (files == null) {
+				files = new ManagedFilesType();
+				files.setFileStagingLocation(stagingLocation);
+				lists.add(files);
+			}
+			List<ManagedFileType> fileList = files.getFile();
+			ManagedFileType scriptFile = null;
+			if (!fileList.isEmpty()) {
+				for (ManagedFileType f : fileList) {
+					if (f.getName().equals(JAXBControlConstants.SCRIPT_FILE)) {
+						scriptFile = f;
+						break;
+					}
+				}
+			}
+			if (scriptFile == null) {
+				scriptFile = new ManagedFileType();
+				scriptFile.setName(JAXBControlConstants.SCRIPT_FILE);
+				fileList.add(scriptFile);
+			}
+			scriptFile.setResolveContents(false);
+			scriptFile.setUniqueIdPrefix(true);
+			if (scriptPathVar != null) {
+				scriptFile.setPath(String.valueOf(scriptPathVar.getValue()));
+				scriptFile.setDeleteSourceAfterUse(false);
+			} else {
+				scriptFile.setContents(JAXBControlConstants.OPENVRM + JAXBControlConstants.SCRIPT + JAXBControlConstants.PD
+						+ JAXBControlConstants.VALUE + JAXBControlConstants.CLOSV);
+				scriptFile.setDeleteSourceAfterUse(true);
+			}
+			scriptFile.setDeleteTargetAfterUse(delete);
+		}
+	}
+
+	/**
+	 * Looks for cleanup flag and removes the remote file if indicated.
+	 * 
+	 * @param uuid
+	 * @param lists
+	 * @throws CoreException
+	 */
+	private void maybeCleanupManagedFiles(String uuid, List<ManagedFilesType> lists) throws CoreException {
+		if (lists == null || lists.isEmpty()) {
+			return;
+		}
+		for (ManagedFilesType files : lists) {
+			if (files.getFile().isEmpty()) {
+				continue;
+			}
+			ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
+			job.setOperation(Operation.DELETE);
+			job.schedule();
+			try {
+				job.join();
+			} catch (InterruptedException ignored) {
+			}
+		}
+	}
+
+	/**
+	 * Serialize script content if necessary. We first check to see if there is a custom script (path).
+	 * 
+	 * @param uuid
+	 *            temporary internal id for as yet unsubmitted job
+	 * @param script
+	 *            configuration object describing how to construct the script from the environment
+	 * @return whether the script target should be deleted
+	 */
+	private boolean maybeHandleScript(String uuid, ScriptType script, IProgressMonitor monitor) {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		try {
+			AttributeType a = getRMVariableMap().get(JAXBControlConstants.SCRIPT_PATH);
+			if (a != null && a.getValue() != null) {
+				return false;
+			}
+			if (script == null) {
+				return false;
+			}
+			IRemoteConnection conn = getRemoteConnection(progress.newChild(5));
+			if (conn != null) {
+				getRMVariableMap().setEnvManagerFromConnection(conn);
+				ScriptHandler job = new ScriptHandler(uuid, script, getRMVariableMap(), launchEnv, false);
+				job.schedule();
+				try {
+					job.join();
+				} catch (InterruptedException ignored) {
+				}
+				return script.isDeleteAfterSubmit();
+			}
+			return false;
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getJobStatus(java.lang.String, boolean,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+
+	/**
+	 * If job is interactive, kill the process directly rather than issuing a remote command.
+	 * 
+	 * @param jobId
+	 *            either process id or internal identifier.
+	 * @return whether job has been canceled
+	 */
+	private boolean maybeKillInteractive(String jobId) {
+		ICommandJobStatus status = jobStatusMap.getStatus(jobId);
+		boolean killed = false;
+		if (status != null) {
+			killed = status.cancel();
+		}
+		return killed;
+	}
+
+	/**
+	 * Write content to file if indicated, and stage to host.
+	 * 
+	 * @param uuid
+	 *            temporary internal id for as yet unsubmitted job
+	 * @param lists
+	 *            the set of managed files for this submission
+	 * @return whether the necessary staging completed without error
+	 * @throws CoreException
+	 */
+	private boolean maybeTransferManagedFiles(String uuid, List<ManagedFilesType> lists) throws CoreException {
+		if (lists == null || lists.isEmpty()) {
+			return true;
+		}
+		/*
+		 * one job to a staging location
+		 */
+		for (ManagedFilesType files : lists) {
+			if (files.getFile().isEmpty()) {
+				continue;
+			}
+			ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
+			job.setOperation(Operation.COPY);
+			job.schedule();
+			try {
+				job.join();
+			} catch (InterruptedException ignored) {
+			}
+			if (!job.getSuccess()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Some target configurations require helper scripts for launching, debugging, etc. Make sure these helper scripts are available
+	 * on the target system if no monitoring is enabled.
+	 * 
+	 * @param monitor
+	 *            progress monitor
+	 * @throws CoreException
+	 */
+	private void maybeUpdateServer(IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
+		try {
+			IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
+			LMLDAServer server = (LMLDAServer) RemoteServerManager.getServer(LMLDAServer.SERVER_ID, conn);
+			server.setWorkDir(new Path(conn.getWorkingDirectory()).append(JAXBControlConstants.ECLIPSESETTINGS).toString());
+			try {
+				server.updateServer(progress.newChild(100));
+			} catch (IOException e) {
+				throw CoreExceptionUtils.newException(e.getMessage(), e);
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	/**
+	 * Unmarshals the XML into the JAXB data tree.<br>
+	 * <br>
+	 * If the current xml is <code>null</code>, or if the "force reload" preference is set, a fresh attempt is made to store the xml
+	 * from the location. Otherwise, the cached xml is used.
+	 * 
+	 * @throws unmarshaling
+	 *             or URL exceptions
+	 */
+	private void realizeRMDataFromXML() throws CoreException {
+		String xml = getRMConfigurationXML();
+		boolean force = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD);
+		if (xml == null || force) {
+			if (configURL != null) {
+				try {
+					xml = JAXBInitializationUtils.getRMConfigurationXML(new URL(configURL));
+					configXML = xml;
+					configData = null;
+				} catch (Throwable t) {
+					if (xml != null) {
+						new UIJob(Messages.LaunchController_usingCachedDefinition) {
+							@Override
+							public IStatus runInUIThread(IProgressMonitor monitor) {
+								MessageDialog.openWarning(Display.getDefault().getActiveShell(),
+										Messages.LaunchController_usingCachedDefinition, Messages.LaunchController_missingURL);
+								return Status.OK_STATUS;
+							}
+						}.schedule();
+					}
+				}
+			}
+		}
+		if (xml == null) {
+			throw CoreExceptionUtils.newException(Messages.LaunchController_unableToLoad, null);
+		}
+		try {
+			configData = JAXBInitializationUtils.initializeRMData(xml);
+		} catch (Exception e) {
+			throw CoreExceptionUtils.newException(e.getLocalizedMessage(), e.getCause());
+		}
+	}
+
+	/**
+	 * @return whether the state of the resource manager is stopped or not.
+	 */
+	private boolean resourceManagerIsActive() {
+		return isActive;
 	}
 
 	/*
@@ -521,6 +984,56 @@ public class LaunchController implements ILaunchController {
 		return changedValue;
 	}
 
+	/**
+	 * Create command job, and schedule. Used for job-specific commands directly.
+	 * 
+	 * @param uuid
+	 *            temporary internal id for as yet unsubmitted job
+	 * @param command
+	 *            configuration object containing the command arguments and tokenizers
+	 * @param mode
+	 *            whether batch, interactive, or a status job
+	 * @param join
+	 *            whether to launch serially or not
+	 * @return the runnable job object
+	 * @throws CoreException
+	 */
+	private ICommandJob runCommand(String uuid, CommandType command, CommandJob.JobMode jobMode,
+			ILaunchConfiguration configuration, String launchMode, boolean join) throws CoreException {
+		if (command == null) {
+			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
+		}
+
+		ICommandJob job = new CommandJob(uuid, command, jobMode, this, configuration, launchMode);
+		((Job) job).setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
+		job.schedule();
+		if (join) {
+			try {
+				job.join();
+			} catch (InterruptedException ignored) {
+			}
+		}
+		if (!command.isIgnoreExitStatus()) {
+			checkJobForError(job);
+		}
+		return job;
+	}
+
+	/**
+	 * Run command sequence. Invoked by startup or shutdown commands. Delegates to
+	 * {@link #runCommand(String, CommandType, boolean, boolean)}. If a job in the sequence fails, the subsequent commands will not
+	 * run.
+	 * 
+	 * @param cmds
+	 *            configuration objects containing the command arguments and tokenizers
+	 * @throws CoreException
+	 */
+	private void runCommands(List<CommandType> cmds) throws CoreException {
+		for (CommandType cmd : cmds) {
+			runCommand(null, cmd, CommandJob.JobMode.INTERACTIVE, null, ILaunchManager.RUN_MODE, true);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -528,6 +1041,22 @@ public class LaunchController implements ILaunchController {
 	 */
 	public void setConnectionName(String connName) {
 		connectionName = connName;
+	}
+
+	/**
+	 * Create attributes from constants that are fixed while the controller is initialized.
+	 * 
+	 * @throws CoreException
+	 */
+	private void setFixedConfigurationProperties(IRemoteConnection rc) throws CoreException {
+		if (rc != null) {
+			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
+			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
+			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
+			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.DIRECTORY, rc.getWorkingDirectory(), false);
+			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.PTP_DIRECTORY,
+					new Path(rc.getWorkingDirectory()).append(JAXBControlConstants.ECLIPSESETTINGS).toString(), false);
+		}
 	}
 
 	/*
@@ -753,534 +1282,6 @@ public class LaunchController implements ILaunchController {
 			if (monitor != null) {
 				monitor.done();
 			}
-		}
-	}
-
-	/**
-	 * Helper to add a read-only attribute
-	 * 
-	 * @param name
-	 * @param value
-	 */
-	private void addAttribute(String name, String value) {
-		AttributeType attr = getEnvironment().get(name);
-		if (attr == null) {
-			attr = new AttributeType();
-			attr.setName(name);
-			attr.setVisible(true);
-			attr.setReadOnly(true);
-			getEnvironment().put(name, attr);
-		}
-		attr.setValue(value);
-	}
-
-	/**
-	 * Add connection properties to the attribute map.
-	 * 
-	 * @param conn
-	 */
-	private void addConnectionPropertyAttributes(IRemoteConnection conn) {
-		String property = conn.getProperty(IRemoteConnection.OS_ARCH_PROPERTY);
-		if (property != null) {
-			addAttribute(IRemoteConnection.OS_ARCH_PROPERTY, property);
-		}
-		property = conn.getProperty(IRemoteConnection.OS_NAME_PROPERTY);
-		if (property != null) {
-			addAttribute(IRemoteConnection.OS_NAME_PROPERTY, property);
-		}
-		property = conn.getProperty(IRemoteConnection.OS_VERSION_PROPERTY);
-		if (property != null) {
-			addAttribute(IRemoteConnection.OS_VERSION_PROPERTY, property);
-		}
-	}
-
-	/**
-	 * tries to open connection if closed
-	 * 
-	 * @param connection
-	 * @param progress
-	 * @throws RemoteConnectionException
-	 */
-	private void checkConnection(IRemoteConnection connection, SubMonitor progress) throws RemoteConnectionException {
-		if (connection != null) {
-			if (!connection.isOpen()) {
-				connection.open(progress.newChild(25));
-				if (!connection.isOpen()) {
-					throw new RemoteConnectionException(Messages.RemoteConnectionError + connection.getAddress());
-				}
-			}
-		} else {
-			new RemoteConnectionException(Messages.RemoteConnectionError + connection);
-		}
-	}
-
-	/**
-	 * Checks to see if there was an exception thrown by the run method.
-	 * 
-	 * @param job
-	 * @throws CoreException
-	 *             if the job execution raised and exception
-	 */
-	private void checkJobForError(ICommandJob job) throws CoreException {
-		IStatus status = job.getRunStatus();
-		if (status != null && status.getSeverity() == IStatus.ERROR) {
-			Throwable t = status.getException();
-			if (t instanceof CoreException) {
-				throw (CoreException) t;
-			} else {
-				throw CoreExceptionUtils.newException(status.getMessage(), t);
-			}
-		}
-	}
-
-	/**
-	 * @param jobId
-	 *            resource-specific id
-	 * @param operation
-	 *            terminate, hold, suspend, release, resume.
-	 * @throws CoreException
-	 *             If the command is not supported
-	 */
-	private void doControlCommand(String jobId, String operation) throws CoreException {
-		CoreException ce = CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + operation, null);
-
-		CommandType job = null;
-		if (TERMINATE_OPERATION.equals(operation)) {
-			maybeKillInteractive(jobId);
-			job = controlData.getTerminateJob();
-			if (job == null) { // there may not be an external cancel
-				return;
-			}
-		} else if (SUSPEND_OPERATION.equals(operation)) {
-			job = controlData.getSuspendJob();
-			if (job == null) {
-				throw ce;
-			}
-		} else if (RESUME_OPERATION.equals(operation)) {
-			job = controlData.getResumeJob();
-			if (job == null) {
-				throw ce;
-			}
-		} else if (RELEASE_OPERATION.equals(operation)) {
-			job = controlData.getReleaseJob();
-			if (job == null) {
-				throw ce;
-			}
-		} else if (HOLD_OPERATION.equals(operation)) {
-			job = controlData.getHoldJob();
-			if (job == null) {
-				throw ce;
-			}
-		}
-
-		runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, null, ILaunchManager.RUN_MODE, true);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getJobStatus(java.lang.String, boolean,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-
-	/**
-	 * Run either interactive or batch job for run or debug modes. ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE are the
-	 * corresponding LaunchConfiguration modes; batch/interactive are currently determined by the configuration (the configuration
-	 * cannot implement both). This may need to be modified.
-	 * 
-	 * @param uuid
-	 *            temporary internal id for as yet unsubmitted job
-	 * @param mode
-	 *            either ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE
-	 * @return job wrapper object
-	 * @throws CoreException
-	 */
-	private ICommandJob doJobSubmitCommand(String uuid, ILaunchConfiguration configuration, String mode) throws CoreException {
-		CommandType command = null;
-		CommandJob.JobMode jobMode = CommandJob.JobMode.INTERACTIVE;
-
-		if (ILaunchManager.RUN_MODE.equals(mode)) {
-			command = controlData.getSubmitBatch();
-			if (command != null) {
-				jobMode = CommandJob.JobMode.BATCH;
-			} else {
-				command = controlData.getSubmitInteractive();
-			}
-		} else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-			command = controlData.getSubmitBatchDebug();
-			if (command != null) {
-				jobMode = CommandJob.JobMode.BATCH;
-			} else {
-				command = controlData.getSubmitInteractiveDebug();
-			}
-		}
-
-		if (command == null) {
-			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + JAXBControlConstants.SP + uuid
-					+ JAXBControlConstants.SP + mode, null);
-		}
-
-		/*
-		 * NOTE: changed this to join, because the waitForId is now part of the run() method of the command itself (05.01.2011)
-		 */
-		return runCommand(uuid, command, jobMode, configuration, mode, true);
-	}
-
-	private IRemoteConnection getRemoteConnection(IProgressMonitor monitor) {
-		final IRemoteServices rsrv = getRemoteServices(monitor);
-		if (rsrv == null) {
-			return null;
-		} else {
-			IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
-			if (connMgr == null) {
-				return null;
-			} else {
-				return connMgr.getConnection(connectionName);
-			}
-		}
-	}
-
-	private IRemoteServices getRemoteServices(IProgressMonitor monitor) {
-		return PTPRemoteCorePlugin.getDefault().getRemoteServices(servicesId, monitor);
-	}
-
-	/**
-	 * @return the configuration XML used to construct the data tree.
-	 */
-	private String getRMConfigurationXML() {
-		if (JAXBCoreConstants.ZEROSTR.equals(configXML)) {
-			return null;
-		}
-		return configXML;
-	}
-
-	/**
-	 * Get the variable map. Returns an initialized map if one doesn't already exist.
-	 * 
-	 * @return initialized variable map
-	 */
-	private RMVariableMap getRMVariableMap() {
-		if (rmVarMap == null) {
-			rmVarMap = new RMVariableMap();
-		}
-		if (!rmVarMap.isInitialized()) {
-			JAXBInitializationUtils.initializeMap(configData, rmVarMap);
-		}
-		return rmVarMap;
-	}
-
-	/**
-	 * Checks for existence of either internally generated script or custom script path. In either case, either replaces contents of
-	 * the corresponding managed file object or creates one.
-	 * 
-	 * @param lists
-	 *            the lists of managed files for this submission
-	 * @param stagingLocation
-	 *            for the script (may be <code>null</null>
-	 * @param delete
-	 *            whether the script target should be deleted after submission
-	 */
-	private void maybeAddManagedFileForScript(List<ManagedFilesType> lists, String stagingLocation, boolean delete) {
-		ManagedFilesType files = null;
-		if (stagingLocation == null) {
-			stagingLocation = JAXBControlConstants.ECLIPSESETTINGS;
-		}
-		for (ManagedFilesType f : lists) {
-			if (stagingLocation.equals(f.getFileStagingLocation())) {
-				files = f;
-				break;
-			}
-		}
-
-		AttributeType scriptVar = getRMVariableMap().get(JAXBControlConstants.SCRIPT);
-		AttributeType scriptPathVar = getRMVariableMap().get(JAXBControlConstants.SCRIPT_PATH);
-		if (scriptVar != null || scriptPathVar != null) {
-			if (files == null) {
-				files = new ManagedFilesType();
-				files.setFileStagingLocation(stagingLocation);
-				lists.add(files);
-			}
-			List<ManagedFileType> fileList = files.getFile();
-			ManagedFileType scriptFile = null;
-			if (!fileList.isEmpty()) {
-				for (ManagedFileType f : fileList) {
-					if (f.getName().equals(JAXBControlConstants.SCRIPT_FILE)) {
-						scriptFile = f;
-						break;
-					}
-				}
-			}
-			if (scriptFile == null) {
-				scriptFile = new ManagedFileType();
-				scriptFile.setName(JAXBControlConstants.SCRIPT_FILE);
-				fileList.add(scriptFile);
-			}
-			scriptFile.setResolveContents(false);
-			scriptFile.setUniqueIdPrefix(true);
-			if (scriptPathVar != null) {
-				scriptFile.setPath(String.valueOf(scriptPathVar.getValue()));
-				scriptFile.setDeleteSourceAfterUse(false);
-			} else {
-				scriptFile.setContents(JAXBControlConstants.OPENVRM + JAXBControlConstants.SCRIPT + JAXBControlConstants.PD
-						+ JAXBControlConstants.VALUE + JAXBControlConstants.CLOSV);
-				scriptFile.setDeleteSourceAfterUse(true);
-			}
-			scriptFile.setDeleteTargetAfterUse(delete);
-		}
-	}
-
-	/**
-	 * Looks for cleanup flag and removes the remote file if indicated.
-	 * 
-	 * @param uuid
-	 * @param lists
-	 * @throws CoreException
-	 */
-	private void maybeCleanupManagedFiles(String uuid, List<ManagedFilesType> lists) throws CoreException {
-		if (lists == null || lists.isEmpty()) {
-			return;
-		}
-		for (ManagedFilesType files : lists) {
-			if (files.getFile().isEmpty()) {
-				continue;
-			}
-			ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
-			job.setOperation(Operation.DELETE);
-			job.schedule();
-			try {
-				job.join();
-			} catch (InterruptedException ignored) {
-			}
-		}
-	}
-
-	/**
-	 * Serialize script content if necessary. We first check to see if there is a custom script (path).
-	 * 
-	 * @param uuid
-	 *            temporary internal id for as yet unsubmitted job
-	 * @param script
-	 *            configuration object describing how to construct the script from the environment
-	 * @return whether the script target should be deleted
-	 */
-	private boolean maybeHandleScript(String uuid, ScriptType script, IProgressMonitor monitor) {
-		SubMonitor progress = SubMonitor.convert(monitor, 10);
-		try {
-			AttributeType a = getRMVariableMap().get(JAXBControlConstants.SCRIPT_PATH);
-			if (a != null && a.getValue() != null) {
-				return false;
-			}
-			if (script == null) {
-				return false;
-			}
-			IRemoteConnection conn = getRemoteConnection(progress.newChild(5));
-			if (conn != null) {
-				getRMVariableMap().setEnvManagerFromConnection(conn);
-				ScriptHandler job = new ScriptHandler(uuid, script, getRMVariableMap(), launchEnv, false);
-				job.schedule();
-				try {
-					job.join();
-				} catch (InterruptedException ignored) {
-				}
-				return script.isDeleteAfterSubmit();
-			}
-			return false;
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
-	}
-
-	/**
-	 * If job is interactive, kill the process directly rather than issuing a remote command.
-	 * 
-	 * @param jobId
-	 *            either process id or internal identifier.
-	 * @return whether job has been canceled
-	 */
-	private boolean maybeKillInteractive(String jobId) {
-		ICommandJobStatus status = jobStatusMap.getStatus(jobId);
-		boolean killed = false;
-		if (status != null) {
-			killed = status.cancel();
-		}
-		return killed;
-	}
-
-	/**
-	 * Write content to file if indicated, and stage to host.
-	 * 
-	 * @param uuid
-	 *            temporary internal id for as yet unsubmitted job
-	 * @param lists
-	 *            the set of managed files for this submission
-	 * @return whether the necessary staging completed without error
-	 * @throws CoreException
-	 */
-	private boolean maybeTransferManagedFiles(String uuid, List<ManagedFilesType> lists) throws CoreException {
-		if (lists == null || lists.isEmpty()) {
-			return true;
-		}
-		/*
-		 * one job to a staging location
-		 */
-		for (ManagedFilesType files : lists) {
-			if (files.getFile().isEmpty()) {
-				continue;
-			}
-			ManagedFilesJob job = new ManagedFilesJob(uuid, files, this);
-			job.setOperation(Operation.COPY);
-			job.schedule();
-			try {
-				job.join();
-			} catch (InterruptedException ignored) {
-			}
-			if (!job.getSuccess()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Some target configurations require helper scripts for launching, debugging, etc. Make sure these helper scripts are available
-	 * on the target system if no monitoring is enabled.
-	 * 
-	 * @param monitor
-	 *            progress monitor
-	 * @throws CoreException
-	 */
-	private void maybeUpdateServer(IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 100);
-		try {
-			IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
-			LMLDAServer server = (LMLDAServer) RemoteServerManager.getServer(LMLDAServer.SERVER_ID, conn);
-			server.setWorkDir(new Path(conn.getWorkingDirectory()).append(JAXBControlConstants.ECLIPSESETTINGS).toString());
-			try {
-				server.updateServer(progress.newChild(100));
-			} catch (IOException e) {
-				throw CoreExceptionUtils.newException(e.getMessage(), e);
-			}
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
-	}
-
-	/**
-	 * Unmarshals the XML into the JAXB data tree.<br>
-	 * <br>
-	 * If the current xml is <code>null</code>, or if the "force reload" preference is set, a fresh attempt is made to store the xml
-	 * from the location. Otherwise, the cached xml is used.
-	 * 
-	 * @throws unmarshaling
-	 *             or URL exceptions
-	 */
-	private void realizeRMDataFromXML() throws CoreException {
-		String xml = getRMConfigurationXML();
-		boolean force = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD);
-		if (xml == null || force) {
-			if (configURL != null) {
-				try {
-					xml = JAXBInitializationUtils.getRMConfigurationXML(new URL(configURL));
-					configXML = xml;
-					configData = null;
-				} catch (Throwable t) {
-					if (xml != null) {
-						new UIJob(Messages.LaunchController_usingCachedDefinition) {
-							@Override
-							public IStatus runInUIThread(IProgressMonitor monitor) {
-								MessageDialog.openWarning(Display.getDefault().getActiveShell(),
-										Messages.LaunchController_usingCachedDefinition, Messages.LaunchController_missingURL);
-								return Status.OK_STATUS;
-							}
-						}.schedule();
-					}
-				}
-			}
-		}
-		if (xml == null) {
-			throw CoreExceptionUtils.newException(Messages.LaunchController_unableToLoad, null);
-		}
-		try {
-			configData = JAXBInitializationUtils.initializeRMData(xml);
-		} catch (Exception e) {
-			throw CoreExceptionUtils.newException(e.getLocalizedMessage(), e.getCause());
-		}
-	}
-
-	/**
-	 * @return whether the state of the resource manager is stopped or not.
-	 */
-	private boolean resourceManagerIsActive() {
-		return isActive;
-	}
-
-	/**
-	 * Create command job, and schedule. Used for job-specific commands directly.
-	 * 
-	 * @param uuid
-	 *            temporary internal id for as yet unsubmitted job
-	 * @param command
-	 *            configuration object containing the command arguments and tokenizers
-	 * @param mode
-	 *            whether batch, interactive, or a status job
-	 * @param join
-	 *            whether to launch serially or not
-	 * @return the runnable job object
-	 * @throws CoreException
-	 */
-	private ICommandJob runCommand(String uuid, CommandType command, CommandJob.JobMode jobMode,
-			ILaunchConfiguration configuration, String launchMode, boolean join) throws CoreException {
-		if (command == null) {
-			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
-		}
-
-		ICommandJob job = new CommandJob(uuid, command, jobMode, this, configuration, launchMode);
-		((Job) job).setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
-		job.schedule();
-		if (join) {
-			try {
-				job.join();
-			} catch (InterruptedException ignored) {
-			}
-		}
-		if (!command.isIgnoreExitStatus()) {
-			checkJobForError(job);
-		}
-		return job;
-	}
-
-	/**
-	 * Run command sequence. Invoked by startup or shutdown commands. Delegates to
-	 * {@link #runCommand(String, CommandType, boolean, boolean)}. If a job in the sequence fails, the subsequent commands will not
-	 * run.
-	 * 
-	 * @param cmds
-	 *            configuration objects containing the command arguments and tokenizers
-	 * @throws CoreException
-	 */
-	private void runCommands(List<CommandType> cmds) throws CoreException {
-		for (CommandType cmd : cmds) {
-			runCommand(null, cmd, CommandJob.JobMode.INTERACTIVE, null, ILaunchManager.RUN_MODE, true);
-		}
-	}
-
-	/**
-	 * Create attributes from constants that are fixed while the controller is initialized.
-	 * 
-	 * @throws CoreException
-	 */
-	private void setFixedConfigurationProperties(IRemoteConnection rc) throws CoreException {
-		if (rc != null) {
-			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
-			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
-			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
-			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.DIRECTORY, rc.getWorkingDirectory(), false);
-			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.PTP_DIRECTORY,
-					new Path(rc.getWorkingDirectory()).append(JAXBControlConstants.ECLIPSESETTINGS).toString(), false);
 		}
 	}
 
