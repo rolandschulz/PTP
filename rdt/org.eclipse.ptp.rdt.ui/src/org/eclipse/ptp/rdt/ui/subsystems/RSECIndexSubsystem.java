@@ -57,6 +57,10 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
+import org.eclipse.ptp.internal.rdt.core.formatter.RemoteDefaultCodeFormatterOptions;
+import org.eclipse.ptp.internal.rdt.core.formatter.RemoteMultiTextEdit;
+import org.eclipse.ptp.internal.rdt.core.formatter.RemoteReplaceEdit;
+import org.eclipse.ptp.internal.rdt.core.formatter.RemoteTextEdit;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.index.IRemoteFastIndexerUpdateEvent;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerProgress;
@@ -91,6 +95,9 @@ import org.eclipse.rse.core.subsystems.SubSystem;
 import org.eclipse.rse.services.clientserver.messages.CommonMessages;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.dstore.util.DStoreStatusMonitor;
+import org.eclipse.text.edits.MultiTextEdit;
+import org.eclipse.text.edits.ReplaceEdit;
+import org.eclipse.text.edits.TextEdit;
 
 import com.ibm.icu.text.MessageFormat;
 
@@ -1336,5 +1343,37 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 		
 		return IRemoteFastIndexerUpdateEvent.EventType.EVENT_REINDEX;
 	}
-	
+
+	/**
+	 * @since 4.1
+	 */
+	public TextEdit computeCodeFormatting(Scope scope, ITranslationUnit targetUnit, String source, RemoteDefaultCodeFormatterOptions preferences, int offset, int length, IProgressMonitor monitor) {
+		Object result = sendRequest(CDTMiner.C_CODE_FORMATTING, new Object[] {scope.getName(), targetUnit, source, preferences, offset, length}, monitor);
+		if (result == null) 
+		{
+			return null;
+		}
+		
+		return transformEdit((RemoteTextEdit) result);
+	}
+
+	private TextEdit transformEdit(RemoteTextEdit remoteEdit) {
+		TextEdit edit = null;
+		if (remoteEdit instanceof RemoteMultiTextEdit) {
+			RemoteMultiTextEdit source = (RemoteMultiTextEdit) remoteEdit;
+			edit = new MultiTextEdit(source.getOffset(), source.getLength());
+			 
+		} else if (remoteEdit instanceof RemoteReplaceEdit) {
+			RemoteReplaceEdit source = (RemoteReplaceEdit) remoteEdit;
+			edit = new ReplaceEdit(source.getOffset(), source.getLength(), source.getText());
+		}
+		
+		if (edit != null) {
+			RemoteTextEdit[] children = remoteEdit.getChildren();
+			 for (int i = 0; i < children.length; i++) {
+				 edit.addChild(transformEdit(children[i]));				 
+			 }
+		}
+		return edit;
+	}
 }

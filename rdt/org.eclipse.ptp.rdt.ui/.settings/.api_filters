@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><component id="org.eclipse.ptp.rdt.ui" version="2">
+    <resource path="src/org/eclipse/ptp/rdt/ui/serviceproviders/IIndexServiceProvider2.java" type="org.eclipse.ptp.rdt.ui.serviceproviders.IIndexServiceProvider2">
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.eclipse.ptp.rdt.ui.serviceproviders.IIndexServiceProvider2"/>
+                <message_argument value="getRemoteCodeFormattingService()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>

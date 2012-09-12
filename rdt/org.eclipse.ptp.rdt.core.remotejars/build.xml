@@ -31,22 +31,25 @@
 	<property name="platformTempDir" value="${basedir}/platform.temp"/>
 	
 	<!-- PLATFORM VERSIONS MUST BE UPDATED FOR NEW PLATFORM VERSION -->
-	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/updates/3.7"/>
-	<property name="platformVersion" value="R-3.7-201106131736"/>
+	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/updates/3.8"/>
+	<property name="platformVersion" value="R-3.8-201206081200"/>
 	
-	<property name="icuBaseJar" value="com.ibm.icu.base_4.4.2.v20110208.jar"/>
+	<property name="icuBaseJar" value="com.ibm.icu.base_4.4.2.v20110831.jar"/>
 	
-	<property name="coreRuntimeVersion" value="3.7.0.v20110110"/>
+	<property name="coreRuntimeVersion" value="3.8.0.v20120521-2346"/>
 	<property name="coreRuntimeJar" value="org.eclipse.core.runtime_${coreRuntimeVersion}.jar"/>
 	
-	<property name="equinoxVersion" value="3.6.0.v20110523"/>
+	<property name="equinoxVersion" value="3.6.100.v20120522-1841"/>
 	<property name="equinoxJar" value="org.eclipse.equinox.common_${equinoxVersion}.jar"/>
 	
-	<property name="filesystemVersion" value="1.3.100.v20110423-0524"/>
+	<property name="filesystemVersion" value="1.3.200.v20120522-2012"/>
 	<property name="filesystemJar" value="org.eclipse.core.filesystem_${filesystemVersion}.jar"/>
 	
-	<property name="jdtUIVersion" value="3.7.0.v20110531-1200"/>
+	<property name="jdtUIVersion" value="3.8.0.v20120524-1551"/>
 	<property name="jdtUIJar" value="org.eclipse.jdt.ui_${jdtUIVersion}.jar"/>
+	
+	<property name="textVersion" value="3.5.200.v20120523-1310"/>
+	<property name="textJar" value="org.eclipse.text_${textVersion}.jar"/>
 
 	<!-- RSE VERSIONS MUST BE UPDATED FOR NEW TM VERSION -->
 	<property name="rseBaseUrl" value="http://download.eclipse.org/tm/downloads/drops"/>
@@ -67,7 +70,7 @@
 	
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
 	
-	<target name="fetch" depends="fetch.rse, fetch.icu" unless="nofetch"/>
+	<target name="fetch" depends="fetch.rse, fetch.icu, fetch.text" unless="nofetch"/>
 	<target name="server.all" depends="fetch.cdt.versions, jar, fetch, unpack.platform, all.remote"/>
 	
 	<target name="build.jars" depends="server.all"/>
@@ -391,6 +394,10 @@
 	<target name="fetch.jdt">
 		<get src="${platformBaseUrl}/${platformVersion}/plugins/${jdtUIJar}" dest="${platformTempDir}/eclipse/plugins/${jdtUIJar}"/>
 	</target>
+	
+	<target name="fetch.text">
+		<get src="${platformBaseUrl}/${platformVersion}/plugins/${textJar}" dest="${platformTempDir}/eclipse/plugins/${textJar}"/>
+	</target>
 
 	<target name="unpack.platform">
 		<mkdir dir="${platformTempDir}/eclipse/plugins"/>
@@ -416,7 +423,7 @@
 	</target>
 	
 	<target name="prepare.script.linux">
-		<property name="rdtClassPath" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/upcparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/spawner.jar:$plugins_dir/${lpgRuntimeJar}"/>
+		<property name="rdtClassPath" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/${textJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/upcparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/spawner.jar:$plugins_dir/${lpgRuntimeJar}"/>
 		<replace token=":$oldClasspath" value=":${rdtClassPath}:$oldClasspath" file="${remoteServerTempDir}/server.pl"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.pl"/>
 		
@@ -427,7 +434,7 @@
 	</target>
 	
 	<target name="prepare.script.linux.ppc64">
-		<property name="rdtClassPath" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/upcparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/spawner.jar:$plugins_dir/${lpgRuntimeJar}"/>
+		<property name="rdtClassPath" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/${textJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/upcparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/spawner.jar:$plugins_dir/${lpgRuntimeJar}"/>
 		<replace token=":$oldClasspath" value=":${rdtClassPath}:$oldClasspath" file="${remoteServerTempDir}/server.pl"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.pl"/>
 		
@@ -456,19 +463,19 @@ $ENV{LD_LIBRARY_PATH}="$dir:$LD_LIBRARY_PATH";
 	</target>
 	
 	<target name="prepare.script.unix">
-		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:${icuBaseJar}:stubs.jar:lrparser.jar:upcparser.jar:xlcparser.jar:spawner.jar:${lpgRuntimeJar}"/>
+		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:${icuBaseJar}:${textJar}:stubs.jar:lrparser.jar:upcparser.jar:xlcparser.jar:spawner.jar:${lpgRuntimeJar}"/>
 		<replace token=":$CLASSPATH" value=":${rdtClassPath}:$CLASSPATH" file="${remoteServerTempDir}/server.sh"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.sh"/>
 		
 		<!-- update classpath in daemon.pl -->
 		<property name="orgClassPath" value="$ENV{CLASSPATH}=&quot;$plugins_dir:$plugins_dir/dstore_extra_server.jar:$plugins_dir/dstore_core.jar:$plugins_dir/dstore_miners.jar:$plugins_dir/clientserver.jar"/>
-		<property name="rdtClassPathpl" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/upcparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/spawner.jar:$plugins_dir/${lpgRuntimeJar}"/>				
+		<property name="rdtClassPathpl" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/${textJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/upcparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/spawner.jar:$plugins_dir/${lpgRuntimeJar}"/>				
 		<replace token="${orgClassPath}" value="${orgClassPath}:${rdtClassPathpl}" file="${remoteServerTempDir}/daemon.pl"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.pl"/>
 	</target>
 	
 	<target name="prepare.script.aix">
-		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:${icuBaseJar}:stubs.jar:lrparser.jar:upcparser.jar:xlcparser.jar:spawner.jar:${lpgRuntimeJar}"/>
+		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:${icuBaseJar}:${textJar}:stubs.jar:lrparser.jar:upcparser.jar:xlcparser.jar:spawner.jar:${lpgRuntimeJar}"/>
 		<replace token=":$CLASSPATH" value=":${rdtClassPath}:$CLASSPATH" file="${remoteServerTempDir}/server.sh"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.sh"/>
 		
@@ -481,7 +488,7 @@ export serverpath CLASSPATH LIBPATH
 		
 		<!-- update classpath in daemon.pl -->
 		<property name="orgClassPath" value="$ENV{CLASSPATH}=&quot;$plugins_dir:$plugins_dir/dstore_extra_server.jar:$plugins_dir/dstore_core.jar:$plugins_dir/dstore_miners.jar:$plugins_dir/clientserver.jar"/>
-		<property name="rdtClassPathpl" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/upcparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/spawner.jar:$plugins_dir/${lpgRuntimeJar}"/>				
+		<property name="rdtClassPathpl" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/${textJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/upcparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/spawner.jar:$plugins_dir/${lpgRuntimeJar}"/>				
 		<replace token="${orgClassPath}" value="${orgClassPath}:${rdtClassPathpl}" file="${remoteServerTempDir}/daemon.pl"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.pl"/>
 		
@@ -494,13 +501,13 @@ export serverpath CLASSPATH LIBPATH
 	</target>
 	
 	<target name="prepare.script.macosx">
-		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:${icuBaseJar}:stubs.jar:lrparser.jar:upcparser.jar:xlcparser.jar:spawner.jar:${lpgRuntimeJar}"/>
+		<property name="rdtClassPath" value="cdtminer.jar:cdtmodel.jar:cdtparser.jar:${coreRuntimeJar}:${equinoxJar}:${filesystemJar}:${icuBaseJar}:${textJar}:stubs.jar:lrparser.jar:upcparser.jar:xlcparser.jar:spawner.jar:${lpgRuntimeJar}"/>
 		<replace token=":$CLASSPATH" value=":${rdtClassPath}:$CLASSPATH" file="${remoteServerTempDir}/server.sh"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.sh"/>
 		
 		<!-- update classpath in daemon.pl -->
 		<property name="orgClassPath" value="$classpath = &quot;$plugin_dir"/>
-		<property name="rdtClassPathpl" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/upcparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/spawner.jar:$plugins_dir/${lpgRuntimeJar}"/>				
+		<property name="rdtClassPathpl" value="$plugins_dir/cdtminer.jar:$plugins_dir/cdtmodel.jar:$plugins_dir/cdtparser.jar:$plugins_dir/${coreRuntimeJar}:$plugins_dir/${equinoxJar}:$plugins_dir/${filesystemJar}:$plugins_dir/${icuBaseJar}:$plugins_dir/${textJar}:$plugins_dir/stubs.jar:$plugins_dir/lrparser.jar:$plugins_dir/upcparser.jar:$plugins_dir/xlcparser.jar:$plugins_dir/spawner.jar:$plugins_dir/${lpgRuntimeJar}"/>				
 		<replace token="${orgClassPath}" value="${orgClassPath}:${rdtClassPathpl}" file="${remoteServerTempDir}/daemon.pl"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.pl"/>
 	</target>
@@ -518,7 +525,7 @@ export serverpath CLASSPATH LIBPATH
 		<concat destfile="${remoteServerTempDir}/minerFile.dat" append="true">org.eclipse.ptp.internal.remote.rse.core.miners.SpawnerMiner</concat>
 
 		<!-- Add RDT JARs to the server script's classpath -->
-		<property name="rdtClassPath" value="%ECLIPSEDIR%\cdtminer.jar;%ECLIPSEDIR%\cdtmodel.jar;%ECLIPSEDIR%\cdtparser.jar;%ECLIPSEDIR%\${coreRuntimeJar};%ECLIPSEDIR%\${equinoxJar};%ECLIPSEDIR%\${filesystemJar};%ECLIPSEDIR%\${icuBaseJar};%ECLIPSEDIR%\stubs.jar;%ECLIPSEDIR%\lrparser.jar;%ECLIPSEDIR%\upcparser.jar;%ECLIPSEDIR%\xlcparser.jar;%ECLIPSEDIR%\spawner.jar;%ECLIPSEDIR%\${lpgRuntimeJar}"/>
+		<property name="rdtClassPath" value="%ECLIPSEDIR%\cdtminer.jar;%ECLIPSEDIR%\cdtmodel.jar;%ECLIPSEDIR%\cdtparser.jar;%ECLIPSEDIR%\${coreRuntimeJar};%ECLIPSEDIR%\${equinoxJar};%ECLIPSEDIR%\${filesystemJar};%ECLIPSEDIR%\${icuBaseJar};%ECLIPSEDIR%\${textJar};%ECLIPSEDIR%\stubs.jar;%ECLIPSEDIR%\lrparser.jar;%ECLIPSEDIR%\upcparser.jar;%ECLIPSEDIR%\xlcparser.jar;%ECLIPSEDIR%\spawner.jar;%ECLIPSEDIR%\${lpgRuntimeJar}"/>
 		<replace token=";%CLASSPATH%" value=";${rdtClassPath};%CLASSPATH%" file="${remoteServerTempDir}/setup.bat"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/server.bat"/>
 		<replace token="java " value="java ${defaultJVMHeapSize} " file="${remoteServerTempDir}/daemon.bat"/>
@@ -572,6 +579,7 @@ export serverpath CLASSPATH LIBPATH
 				<include name="${filesystemJar}"/>
 				<include name="${equinoxJar}"/>
 				<include name="${icuBaseJar}"/>
+				<include name="${textJar}"/>
 			</fileset>
 		</copy>
 		
@@ -653,7 +661,7 @@ export serverpath CLASSPATH LIBPATH
 	<target name="jar.remote" depends="prepare.remote.jar, assemble.remote">
 		<jar destfile="${serverJar}.jar" basedir="${basedir}/rdt-server">
 			<manifest>
-				<attribute name="Rsrc-Class-Path" value="./ dstore_extra_server.jar dstore_core.jar dstore_miners.jar clientserver.jar cdtminer.jar cdtmodel.jar cdtparser.jar ${coreRuntimeJar} ${equinoxJar} ${filesystemJar} ${icuBaseJar} stubs.jar lrparser.jar upcparser.jar xlcparser.jar spawner.jar ${lpgRuntimeJar}"/>
+				<attribute name="Rsrc-Class-Path" value="./ dstore_extra_server.jar dstore_core.jar dstore_miners.jar clientserver.jar cdtminer.jar cdtmodel.jar cdtparser.jar ${coreRuntimeJar} ${equinoxJar} ${filesystemJar} ${icuBaseJar} ${textJar} stubs.jar lrparser.jar upcparser.jar xlcparser.jar spawner.jar ${lpgRuntimeJar}"/>
 				<attribute name="Class-Path" value="."/>
 				<attribute name="Rsrc-Main-Class" value="org.eclipse.dstore.core.server.Server"/>
 				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>

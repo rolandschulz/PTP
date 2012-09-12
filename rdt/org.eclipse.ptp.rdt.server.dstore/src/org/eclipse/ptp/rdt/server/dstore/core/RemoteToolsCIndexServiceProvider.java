@@ -25,8 +25,10 @@ import org.eclipse.ptp.internal.rdt.core.typehierarchy.RemoteTypeHierarchyServic
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.RemoteContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCCodeFoldingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCodeFormattingService;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteSemanticHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.editor.RemoteCCodeFoldingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.RemoteCodeFormattingService;
 import org.eclipse.ptp.internal.rdt.ui.editor.RemoteSemanticHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.RemoteNavigationService;
@@ -63,6 +65,10 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	 * @since 3.0
 	 */
 	protected RemoteCCodeFoldingService fRemoteCCodeFoldingService = null;
+	/**
+	 * @since 3.1
+	 */
+	protected IRemoteCodeFormattingService fRemoteCodeFormattingService = null;
 	protected RemoteToolsCIndexSubsystem fSubsystem = null;
 	protected boolean fIsDirty = false;
 	protected RemoteToolsCIndexServiceProvider fProvider = null;
@@ -470,5 +476,18 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 			fRemoteCCodeFoldingService = new RemoteCCodeFoldingService(fSubsystem);
 
 		return fRemoteCCodeFoldingService;
+	}
+
+	/**
+	 * @since 3.1
+	 */
+	public IRemoteCodeFormattingService getRemoteCodeFormattingService() {
+		if(!isConfigured())
+			return null;
+
+		if(fRemoteCodeFormattingService== null)
+			fRemoteCodeFormattingService = new RemoteCodeFormattingService(fSubsystem);
+
+		return fRemoteCodeFormattingService;
 	}
 }

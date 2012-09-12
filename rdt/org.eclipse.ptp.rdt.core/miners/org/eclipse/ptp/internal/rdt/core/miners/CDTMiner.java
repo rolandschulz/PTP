@@ -62,12 +62,17 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.contentassist.CompletionProposalComputer;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
+import org.eclipse.ptp.internal.rdt.core.formatter.RemoteDefaultCodeFormatterOptions;
+import org.eclipse.ptp.internal.rdt.core.formatter.RemoteMultiTextEdit;
+import org.eclipse.ptp.internal.rdt.core.formatter.RemoteReplaceEdit;
+import org.eclipse.ptp.internal.rdt.core.formatter.RemoteTextEdit;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 import org.eclipse.ptp.internal.rdt.core.miners.RemoteFoldingRegionsHandler.Branch;
 import org.eclipse.ptp.internal.rdt.core.miners.RemoteFoldingRegionsHandler.StatementRegion;
 import org.eclipse.ptp.internal.rdt.core.miners.RemoteFoldingRegionsHandler.StatementVisitor;
+import org.eclipse.ptp.internal.rdt.core.miners.formatter.RemoteCodeFormatterVisitor;
 import org.eclipse.ptp.internal.rdt.core.model.CModelBuilder2;
 import org.eclipse.ptp.internal.rdt.core.model.CProject;
 import org.eclipse.ptp.internal.rdt.core.model.IIndexLocationConverterFactory;
@@ -82,6 +87,9 @@ import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.TypeHierarchyUtil;
 import org.eclipse.rse.dstore.universal.miners.UniversalServerUtilities;
+import org.eclipse.text.edits.MultiTextEdit;
+import org.eclipse.text.edits.ReplaceEdit;
+import org.eclipse.text.edits.TextEdit;
 
 /**
  * @author crecoskie
@@ -159,6 +167,10 @@ public class CDTMiner extends Miner {
 	public static final String T_HIGHTLIGHTING_POSITIONS_RESULT = "Highlighting.Positions.Result"; //$NON-NLS-1$
 	public static final String C_CODE_FOLDING_COMPUTE_REGIONS = "C_CODE_FOLDING_COMPUTE_REGIONS"; //$NON-NLS-1$
 	public static final String T_CODE_FOLDING_RESULT = "Folding.Region.Result"; //$NON-NLS-1$
+	
+	//code formatting
+	public static final String C_CODE_FORMATTING = "C_CODE_FORMATTING"; //$NON-NLS-1$
+	public static final String T_CODE_FORMATTING_RESULT = "Code.Formatting.Result"; //$NON-NLS-1$
 	
 	public static String LINE_SEPARATOR;
 	
@@ -758,10 +770,76 @@ public class CDTMiner extends Miner {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 			}
 		}
+		else if (name.equals(C_CODE_FORMATTING)) {
+			try {
+				String scopeName = getString(theCommand, 1);
+				ITranslationUnit tu = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 2));
+				String source = getString(theCommand, 3);
+				RemoteDefaultCodeFormatterOptions preferences = (RemoteDefaultCodeFormatterOptions) Serializer.deserialize(getString(theCommand, 4));
+				int offset = getInteger(theCommand, 5);
+				int length = getInteger(theCommand, 6);
+				
+				handleComputeCodeFormatting(scopeName, tu, source, preferences, offset, length, status);
+			} catch (IOException e) {
+				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			} catch (ClassNotFoundException e) {
+				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			}
+		}
 		
 		return status;
 	}
 	
+	protected void handleComputeCodeFormatting(String scopeName, ITranslationUnit tu, String source, RemoteDefaultCodeFormatterOptions preferences, int offset, int length, DataElement status) {
+		try {
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
+			index.acquireReadLock();
+			try  {
+				IASTTranslationUnit ast = tu.getAST(index,  ITranslationUnit.AST_SKIP_ALL_HEADERS);
+				RemoteCodeFormatterVisitor codeFormatter = new RemoteCodeFormatterVisitor(preferences, offset, length, LOG_TAG, _dataStore);
+				TextEdit edit= codeFormatter.format(source, ast);
+				
+				RemoteTextEdit copy = copyEdit(edit);
+				
+				String resultString = Serializer.serialize(copy);
+				status.getDataStore().createObject(status, T_CODE_FORMATTING_RESULT, resultString);
+			}
+			finally {
+				index.releaseReadLock();
+			}
+		} catch (IOException e) {
+			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		} catch (CoreException e) {
+			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		} catch (InterruptedException e) {
+			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		finally {
+			statusDone(status);
+		}
+	}
+
+	private RemoteTextEdit copyEdit(TextEdit edit) {
+		RemoteTextEdit copy = null;
+		if (edit instanceof MultiTextEdit) {
+			 MultiTextEdit source = (MultiTextEdit) edit;
+			 copy = new RemoteMultiTextEdit(source);
+			 
+		} else if (edit instanceof ReplaceEdit) {
+			ReplaceEdit source = (ReplaceEdit) edit;
+			copy = new RemoteReplaceEdit(source);
+		} else {
+			copy = new RemoteTextEdit(edit);
+		}
+
+		TextEdit[] children = edit.getChildren();
+		for (int i = 0; i < children.length; i++) {
+			copy.addChild(copyEdit(children[i]));
+		}
+
+		return copy;
+	}
+
 	protected void handleComputeSemanticHightlightingPositions(String scopeName, ITranslationUnit tu, DataElement status) {
 		try {
 			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
@@ -1603,6 +1681,9 @@ public class CDTMiner extends Miner {
 		
 		//get model
 		createCommandDescriptor(schemaRoot, "Get model", C_MODEL_BUILDER, false); //$NON-NLS-1$
+		
+		//code formatting
+		createCommandDescriptor(schemaRoot, "Compute code formatting", C_CODE_FORMATTING, false); //$NON-NLS-1$
 		
 		_dataStore.refresh(schemaRoot);
 	}

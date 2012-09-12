@@ -33,6 +33,7 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.ICallHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
+import org.eclipse.ptp.internal.rdt.core.formatter.RemoteDefaultCodeFormatterOptions;
 import org.eclipse.ptp.internal.rdt.core.index.IIndexLifecycleService;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask;
 import org.eclipse.ptp.internal.rdt.core.index.IRemoteFastIndexerUpdateEvent.EventType;
@@ -44,6 +45,7 @@ import org.eclipse.ptp.internal.rdt.core.typehierarchy.ITypeHierarchyService;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCCodeFoldingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCodeFormattingService;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteSemanticHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
@@ -52,6 +54,7 @@ import org.eclipse.rse.core.model.IHost;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.ISearchResult;
 import org.eclipse.search.ui.ISearchResultListener;
+import org.eclipse.text.edits.TextEdit;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
@@ -336,6 +339,21 @@ public class NullCIndexServiceProvider extends
 	public IRemoteCCodeFoldingService getRemoteCodeFoldingService() {
 		 return new IRemoteCCodeFoldingService() {
 			public FoldingRegionsResult computeCodeFoldingRegions(IWorkingCopy workingCopy, int docLength, boolean fPreprocessorBranchFoldingEnabled, boolean fStatementsFoldingEnabled) {
+				return null;
+			}
+		 };
+	}
+
+	/**
+	 * @since 4.1
+	 */
+	public IRemoteCodeFormattingService getRemoteCodeFormattingService() {
+		return new IRemoteCodeFormattingService() {
+
+			public TextEdit computeCodeFormatting(ITranslationUnit tu,
+					String source,
+					RemoteDefaultCodeFormatterOptions preferences, int offset,
+					int length, IProgressMonitor monitor) throws CoreException {
 				return null;
 			}
 		 };

@@ -24,6 +24,7 @@ import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.contentassist.Proposal;
 import org.eclipse.ptp.internal.rdt.core.contentassist.RemoteContentAssistInvocationContext;
+import org.eclipse.ptp.internal.rdt.core.formatter.RemoteDefaultCodeFormatterOptions;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.index.IRemoteFastIndexerUpdateEvent.EventType;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteIndexerTask;
@@ -33,6 +34,7 @@ import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchMatch;
 import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchQuery;
 import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
+import org.eclipse.text.edits.TextEdit;
 
 
 
@@ -297,4 +299,7 @@ public interface ICIndexSubsystem {
 	public String computeHighlightPositions(ITranslationUnit targetUnit);
 	
 	public FoldingRegionsResult computeFoldingRegions(ITranslationUnit targetUnit, int docLength, boolean fPreprocessorBranchFoldingEnabled, boolean fStatementsFoldingEnabled);
+	
+	public TextEdit computeCodeFormatting(Scope scope, ITranslationUnit targetUnit, String source, RemoteDefaultCodeFormatterOptions preferences, int offset, int length, IProgressMonitor monitor);
+	
 }
