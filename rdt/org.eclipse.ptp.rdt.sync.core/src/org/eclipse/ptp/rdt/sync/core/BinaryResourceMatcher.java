@@ -25,6 +25,9 @@ import org.eclipse.ptp.rdt.sync.core.messages.Messages;
  * Linux systems.
  * 
  * Other binary file types, such as image files, are not excluded, but compiler-produced files are the main concern.
+ * 
+ * Bug 386525: Decided to remove the option to filter binary files for Juno SR1. So this class is no longer used but is available for
+ * possible future development to create a more efficient and useful binary filter.
  */
 public class BinaryResourceMatcher extends ResourceMatcher {
 	/**
