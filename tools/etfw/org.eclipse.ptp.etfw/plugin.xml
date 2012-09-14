@@ -4,6 +4,7 @@
    <extension-point id="dataManagers" name="Performance Data Managers" schema="schema/dataManagers.exsd"/>
    <extension-point id="workflows" name="Performance Workflow Definitions" schema="schema/workflows.exsd"/>
    <extension-point id="configurationTabs" name="Performance Configuration Tabs" schema="schema/configurationTabs.exsd"/>
+   <extension-point id="toolUITabs" name="External Tool UI Tabs" schema="schema/toolUITabs.exsd"/>
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup

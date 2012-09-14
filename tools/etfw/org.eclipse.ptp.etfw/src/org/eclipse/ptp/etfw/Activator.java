@@ -41,6 +41,7 @@ import org.eclipse.ptp.etfw.toolopts.BuildTool;
 import org.eclipse.ptp.etfw.toolopts.ExecTool;
 import org.eclipse.ptp.etfw.toolopts.ExternalTool;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
+import org.eclipse.ptp.etfw.toolopts.IToolUITab;
 import org.eclipse.ptp.etfw.toolopts.PostProcTool;
 import org.eclipse.ptp.etfw.toolopts.ToolMaker;
 import org.eclipse.ptp.etfw.toolopts.ToolPane;
@@ -102,13 +103,13 @@ public class Activator extends AbstractUIPlugin {
 	 * @param panes
 	 * @param paneList
 	 */
-	private static void insertPanes(ToolPane[] panes, List<ToolPane> paneList)
+	private static void insertPanes(IToolUITab[] panes, List<IToolUITab> paneList)
 	{
 		if(panes!=null&&panes.length>0)
 		{
 			for(int k=0;k<panes.length;k++)
 			{
-				if(!panes[k].virtual)
+				if(!panes[k].isVirtual())
 					paneList.add(panes[k]);
 			}
 		}
@@ -119,13 +120,13 @@ public class Activator extends AbstractUIPlugin {
 	 * @param panes
 	 * @param paneList
 	 */
-	private static void insertPanes(List<ToolPane> panes, List<ToolPane> paneList)
+	private static void insertPanes(List<IToolUITab> panes, List<IToolUITab> paneList)
 	{
 		if(panes!=null&&panes.size()>0)
 		{
 			for(int k=0;k<panes.size();k++)
 			{
-				if(!panes.get(k).virtual)
+				if(!panes.get(k).isVirtual())
 					paneList.add(panes.get(k));
 			}
 		}
@@ -135,11 +136,12 @@ public class Activator extends AbstractUIPlugin {
 	 * Returns an array of all of the non-virtual tool panes defined in available tool definition xml files
 	 * Panes are ordered by tool, and within each tool by compilation, execution and analysis step
 	 * @return
+	 * @since 5.0
 	 */
-	public static ToolPane[] getToolPanes()
+	public static IToolUITab[] getToolPanes()
 	{
-		ArrayList<ToolPane> paneList = new ArrayList<ToolPane>();
-		ToolPane[] panes = null;
+		ArrayList<IToolUITab> paneList = new ArrayList<IToolUITab>();
+		IToolUITab[] panes = null;
 		
 		if(tools.length<=0)
 			return null;
@@ -201,7 +203,16 @@ public class Activator extends AbstractUIPlugin {
 			}
 		}
 		
-		panes=new ToolPane[paneList.size()];
+		
+		ArrayList<IToolUITab> uitList= getToolUITabs();
+		if(uitList!=null&&uitList.size()>0){//TODO: Improve ordering of panes
+			for(int i=0;i<uitList.size();i++){
+				paneList.add(uitList.get(i));
+			}
+		}
+		
+		
+		panes=new IToolUITab[paneList.size()];
 		paneList.toArray(panes);
 		
 		return panes;
@@ -416,6 +427,37 @@ public class Activator extends AbstractUIPlugin {
 		return perfConfTabs;
 	}
 	
+	private static ArrayList<IToolUITab> toolUITabs=null;
+	/**
+	 * @since 5.0
+	 */
+	public static ArrayList<IToolUITab> getToolUITabs(){
+		if(toolUITabs==null){
+			toolUITabs = new ArrayList<IToolUITab>();
+			
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.toolUITabs"); //$NON-NLS-1$
+			final IExtension[] extensions = extensionPoint.getExtensions();
+			
+			for (int iext = 0; iext < extensions.length; ++iext) {
+				final IExtension ext = extensions[iext];
+				
+				final IConfigurationElement[] elements = ext.getConfigurationElements();
+			
+				for (int i=0; i< elements.length; i++)
+				{
+					IConfigurationElement ce = elements[i];
+					try {
+						IToolUITab aGetter = (IToolUITab) ce.createExecutableExtension("class"); //$NON-NLS-1$
+						toolUITabs.add(aGetter);
+					} catch (CoreException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return toolUITabs;
+	}
 	
 	private static ArrayList<AbstractToolDataManager> perfConfManagers=null;
 	

@@ -9,9 +9,6 @@
    </extension>
    <extension
          point="org.eclipse.ptp.etfw.configurationTabs">
-      <perfconfigurationtab
-            class="org.eclipse.ptp.etfw.tau.TAUAnalysisTab">
-      </perfconfigurationtab>
    </extension>
    <extension
          point="org.eclipse.ptp.etfw.workflows">
@@ -30,15 +27,18 @@
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabs">
-      <tab
-            class="org.eclipse.ptp.etfw.tau.TAUAnalysisTab"
-            group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
-            id="org.eclipse.ptp.etfw.tau.TAUANalysisTab"
-            name="TAU">
-         <placement
-               after="org.eclipse.ptp.etfw.parallelToolSelectionTab">
-         </placement>
-      </tab>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.etfw.toolUITabs">
+      <tooluitab
+            class="org.eclipse.ptp.etfw.tau.TAUMakefileTab">
+      </tooluitab>
+      <tooluitab
+            class="org.eclipse.ptp.etfw.tau.TAUSelectiveTab">
+      </tooluitab>
+      <tooluitab
+            class="org.eclipse.ptp.etfw.tau.TAUDataTab">
+      </tooluitab>
    </extension>
 
 </plugin>
