@@ -12,8 +12,6 @@ package org.eclipse.ptp.rdt.sync.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
@@ -36,7 +34,6 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.ApplicationWindow;
-import org.eclipse.ptp.rdt.sync.core.BinaryResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
@@ -60,7 +57,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -102,13 +98,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	private Text newRegex;
 	private Button excludeButtonForRegex;
 	private Button includeButtonForRegex;
-	private Combo specialFiltersCombo;
-	private Button excludeButtonForSpecial;
-	private Button includeButtonForSpecial;
 	private Label patternErrorLabel;
 	private Button cancelButton;
 	private Button okButton;
-	private final Map<String, ResourceMatcher> specialFilterNameToPatternMap = new HashMap<String, ResourceMatcher>();
 
 	private enum FilterSaveTarget {
 		NONE, DEFAULT, PROJECT
@@ -153,11 +145,6 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			saveTarget = FilterSaveTarget.NONE;
 		}
 
-		// Only one special (not path or regex) filter at the moment. If more are added later, we need a more sophisticated
-		// method for handling these special filters.
-		BinaryResourceMatcher bpm = new BinaryResourceMatcher();
-		specialFilterNameToPatternMap.put(bpm.toString(), bpm);
-		
 		windowWidth = display.getBounds().width / 3;
 		viewHeight = display.getBounds().height / 5;
 		this.setReturnCode(CANCEL);
@@ -409,34 +396,6 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	    		enterNewRegexPattern(PatternType.INCLUDE);
 	    	}
 	    });
-	    
-	    // Label for special filters combo
-	    new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileFilterPage_12);
-	    // Combo for special filters
-	    specialFiltersCombo = new Combo(patternEnterComposite, SWT.READ_ONLY);
-		specialFiltersCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-	    for (String filterName : specialFilterNameToPatternMap.keySet()) {
-	    	specialFiltersCombo.add(filterName);
-	    }
-	    
-	    // Submit buttons (exclude and include)
-	    excludeButtonForSpecial = new Button(patternEnterComposite, SWT.PUSH);
-	    excludeButtonForSpecial.setText(Messages.SyncFileFilterPage_10);
-	    excludeButtonForSpecial.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-	    excludeButtonForSpecial.addSelectionListener(new SelectionAdapter() {
-	    	public void widgetSelected(SelectionEvent event) {
-	    		enterNewSpecialPattern(PatternType.EXCLUDE);
-	    	}
-	    });
-
-	    includeButtonForSpecial = new Button(patternEnterComposite, SWT.PUSH);
-	    includeButtonForSpecial.setText(Messages.SyncFileFilterPage_11);
-	    includeButtonForSpecial.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-	    includeButtonForSpecial.addSelectionListener(new SelectionAdapter() {
-	    	public void widgetSelected(SelectionEvent event) {
-	    		enterNewSpecialPattern(PatternType.INCLUDE);
-	    	}
-	    });
 
 	    // Place for displaying error message if pattern is illegal
 	    patternErrorLabel = new Label(patternEnterComposite, SWT.NONE);
@@ -544,21 +503,6 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		filter.addPattern(matcher, type);
 
 		newRegex.setText(""); //$NON-NLS-1$
-		update();
-	}
-	
-	private void enterNewSpecialPattern(PatternType type) {
-		int selectionIndex = specialFiltersCombo.getSelectionIndex();
-		if (selectionIndex < 0) {
-			return;
-		}
-		String filterName = specialFiltersCombo.getItem(selectionIndex);
-		ResourceMatcher rm = specialFilterNameToPatternMap.get(filterName);
-		if (rm != null) {
-			filter.addPattern(rm, type);
-		}
-		
-		specialFiltersCombo.deselectAll();
 		update();
 	}
 

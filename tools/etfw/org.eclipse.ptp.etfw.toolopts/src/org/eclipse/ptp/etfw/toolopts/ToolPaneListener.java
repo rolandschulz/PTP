@@ -29,9 +29,12 @@ import org.eclipse.swt.events.SelectionListener;
  */
 public class ToolPaneListener implements ModifyListener, SelectionListener {
 
-	ToolPane thisTool;
+	IToolUITab thisTool;
 
-	public ToolPaneListener(ToolPane tool) {
+	/**
+	 * @since 4.1
+	 */
+	public ToolPaneListener(IToolUITab tool) {
 		thisTool = tool;
 	}
 
@@ -52,9 +55,10 @@ public class ToolPaneListener implements ModifyListener, SelectionListener {
 	}
 
 	public void modifyText(ModifyEvent evt) {
-		Object source = evt.getSource();
-		if (thisTool.updateOptField(source))
-			localAction();
+		//Object source = evt.getSource();
+		//if (thisTool.updateOptField(source))
+			//localAction();
+		//TODO: This should only be set off once per reload.  For now, don't use it at all.
 	}
 
 	public void widgetDefaultSelected(SelectionEvent e) {}

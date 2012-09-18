@@ -5,7 +5,7 @@
 		<CXX command="tau_cxx.sh" group="tau"/>
 		<F90 command="tau_f90.sh" group="tau"/>
 		<allcompilers group="tau">
-		<optionpane title="Tau Compiler" prependwith="-tau_options=" enclosewith="'" separatewith=" " virtual="true">
+		<optionpane title="Tau Compiler" prependwith="-tau_options=" enclosewith="'" separatewith=" ">
 		
 			<togoption label="Verbose" optname="-optVerbose" tooltip="Turn on verbose debugging message"/>
 			
@@ -173,7 +173,7 @@
               <!--This is a static value that will always be put in the environment and bypass the UI entirely 
               <envvar flag="A_VAR" value="1"/>  -->
 
-            <optionpane title="TAU Runtime" virtual="true" displayoptions="false">
+            <optionpane title="TAU Runtime" displayoptions="false">
             
                  <togoption label="Verbose Output" optname="TAU_VERBOSE" envvar="true" defstate="false" tooltip="Enable verbose diagnostic output">
                       <optvalue type="toggle" seton="1"/>

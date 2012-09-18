@@ -12,6 +12,7 @@ package org.eclipse.ptp.rdt.ui.serviceproviders;
 
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCCodeFoldingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCodeFormattingService;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteSemanticHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
@@ -44,4 +45,9 @@ public interface IIndexServiceProvider2 extends IIndexServiceProvider {
 	 * @since 4.1
 	 */
 	public IRemoteCCodeFoldingService getRemoteCodeFoldingService();
+	
+	/**
+	 * @since 4.2
+	 */
+	public IRemoteCodeFormattingService getRemoteCodeFormattingService();
 }

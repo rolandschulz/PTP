@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Text;
  * @author wspear
  * 
  */
-public class ToolPane implements IAppInput {
+public class ToolPane implements IAppInput, IToolUITab {
 
 	/**
 	 * A listener class to launch file or directory browsers from browse buttons
@@ -60,7 +60,6 @@ public class ToolPane implements IAppInput {
 				}
 			}
 		}
-
 	}
 
 	public static final int ALL_COMPILERS = 0;
@@ -113,6 +112,12 @@ public class ToolPane implements IAppInput {
 
 	/**
 	 * The name associated with this tool pane
+	 * @since 4.1
+	 */
+	public String paneName;
+	
+	/**
+	 * The name of the top-level tool workflow associated with this pane
 	 */
 	public String toolName;
 
@@ -353,20 +358,24 @@ public class ToolPane implements IAppInput {
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		for (int i = 0; i < options.length; i++) {
 			boolean set = true;
-			if (options[i].unitCheck != null) {
+			if (options[i].unitCheck != null&&!options[i].unitCheck.isDisposed()) {
 				set = options[i].unitCheck.getSelection();
 				configuration.setAttribute(options[i].confDefString, set);
+				updateOptField(options[i].unitCheck);
 			}
-			if (options[i].usesTextBox()) {
+			if (options[i].usesTextBox()&&options[i].argbox!=null) {
 				configuration.setAttribute(options[i].confArgString, options[i].argbox.getText());
+				updateOptField(options[i].argbox);
 			}
 
 			if (options[i].numopt != null) {
 				configuration.setAttribute(options[i].confArgString, options[i].numopt.getSelection());
+				updateOptField(options[i].numopt);
 			}
 
 			if (options[i].combopt != null) {
 				configuration.setAttribute(options[i].confArgString, options[i].items[options[i].combopt.getSelectionIndex()]);
+				updateOptField(options[i].combopt);
 			}
 			// if(options[i].type==ToolOption.TOGGLE){
 			// String argVal=null;
@@ -378,6 +387,7 @@ public class ToolPane implements IAppInput {
 			// configuration.setAttribute(options[i].confArgString,argVal);
 			// }
 		}
+		
 	}
 
 	/**
@@ -448,7 +458,7 @@ public class ToolPane implements IAppInput {
 	}
 
 	protected void setName(String name) {
-		toolName = name;
+		paneName = name;
 		configID = name + ToolsOptionsConstants.TOOL_PANE_ID_SUFFIX;
 		configVarID = name + ToolsOptionsConstants.TOOL_PANE_VAR_ID_SUFFIX;
 	}
@@ -474,12 +484,55 @@ public class ToolPane implements IAppInput {
 	/**
 	 * Places the current string of name/value pairs in the option-display text
 	 * box
+	 * @since 4.1
 	 * 
 	 */
-	protected void updateOptDisplay() {
+	public void updateOptDisplay() {
 		if (showOpts != null && optString != null) {
 			showOpts.setText(optString.toString());
 		}
+	}
+
+	/**
+	 * @since 4.1
+	 */
+	public String getName() {
+		return paneName;
+	}
+
+	/**
+	 * @since 4.1
+	 */
+	public String getToolName() {
+		return toolName;
+	}
+
+	/**
+	 * @since 4.1
+	 */
+	public String getConfigID() {
+		return configID;
+	}
+
+	/**
+	 * @since 4.1
+	 */
+	public String getConfigVarID() {
+		return configVarID;
+	}
+
+	/**
+	 * @since 4.1
+	 */
+	public boolean isVirtual() {
+		return virtual;
+	}
+
+	/**
+	 * @since 4.1
+	 */
+	public boolean isEmbedded() {
+		return embedded;
 	}
 
 }

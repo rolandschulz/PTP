@@ -12,6 +12,7 @@
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.search"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core{RemoteScannerInfo.java"/>
+        <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.formatter"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.index{IndexQueries.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core.typehierarchy{TypeHierarchyUtil.java"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.rdt.core/src&lt;org.eclipse.ptp.internal.rdt.core{RemoteIndexerInputAdapter.java"/>

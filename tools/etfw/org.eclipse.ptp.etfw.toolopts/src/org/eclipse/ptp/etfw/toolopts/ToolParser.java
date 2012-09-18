@@ -432,6 +432,7 @@ public class ToolParser extends DefaultHandler{
 			toolOptions=new ArrayList<ToolOption>();
 			currentPane=new ToolPane(virtual);
 			currentPane.setName(getAttribute("title",atts));
+			currentPane.toolName=currentTool.toolName;
 			currentPane.embedded=embedded;
 			int optdex = atts.getIndex(PREPENDWITH);
 			if(optdex>=0)

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name.0
 Bundle-SymbolicName: org.eclipse.ptp.rdt.core;singleton:=true
-Bundle-Version: 4.1.0.qualifier
+Bundle-Version: 4.2.0.qualifier
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.cdt.core;bundle-version="5.0.2",
  org.eclipse.core.runtime,
@@ -18,10 +18,12 @@ Require-Bundle: org.eclipse.cdt.core;bundle-version="5.0.2",
  org.eclipse.rse.services.dstore;bundle-version="3.1.1",
  org.eclipse.cdt.core.lrparser.xlc,
  org.eclipse.cdt.core.parser.upc,
- org.eclipse.cdt.make.xlc.core
+ org.eclipse.cdt.make.xlc.core,
+ org.eclipse.text
 Export-Package: org.eclipse.ptp.internal.rdt.core;x-internal:=true,
  org.eclipse.ptp.internal.rdt.core.callhierarchy;x-friends:="org.eclipse.ptp.rdt.ui",
  org.eclipse.ptp.internal.rdt.core.contentassist;x-friends:="org.eclipse.ptp.rdt.ui",
+ org.eclipse.ptp.internal.rdt.core.formatter,
  org.eclipse.ptp.internal.rdt.core.includebrowser;x-friends:="org.eclipse.ptp.rdt.ui",
  org.eclipse.ptp.internal.rdt.core.index;x-friends:="org.eclipse.ptp.rdt.ui,org.eclipse.ptp.rdt.server.dstore",
  org.eclipse.ptp.internal.rdt.core.miners;x-friends:="org.eclipse.ptp.rdt.ui",

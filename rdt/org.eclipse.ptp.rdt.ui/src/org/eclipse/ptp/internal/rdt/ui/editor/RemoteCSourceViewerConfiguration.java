@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,8 @@ import org.eclipse.cdt.internal.ui.text.CReconciler;
 import org.eclipse.cdt.internal.ui.text.CSourceViewerScalableConfiguration;
 import org.eclipse.cdt.ui.text.IColorManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.formatter.IContentFormatter;
+import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -48,6 +50,16 @@ public class RemoteCSourceViewerConfiguration extends
 			return reconciler;
 		}
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.text.CSourceViewerConfiguration#getContentFormatter(org.eclipse.jface.text.source.ISourceViewer)
+	 */
+	@Override
+	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer) {
+		MultiPassContentFormatter formatter = (MultiPassContentFormatter) super.getContentFormatter(sourceViewer);
+		formatter.setMasterStrategy(new RemoteCFormattingStrategy());
+		return formatter;
 	}
 }
 

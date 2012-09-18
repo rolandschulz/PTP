@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,26 @@ public class CCorePlugin {
 
 	public static final String PLUGIN_ID = "org.eclipse.cdt.core"; //$NON-NLS-1$
 	
+	/**
+	 * Possible  configurable option value.
+	 * @see #getDefaultOptions()
+	 */
+	public static final String INSERT = "insert"; //$NON-NLS-1$
+	/**
+	 * Possible  configurable option value.
+	 * @see #getDefaultOptions()
+	 */
+	public static final String DO_NOT_INSERT = "do not insert"; //$NON-NLS-1$
+	/**
+	 * Possible  configurable option value.
+	 * @see #getDefaultOptions()
+	 */
+	public static final String TAB = "tab"; //$NON-NLS-1$
+	/**
+	 * Possible  configurable option value.
+	 * @see #getDefaultOptions()
+	 */
+	public static final String SPACE = "space"; //$NON-NLS-1$
 	
 	public static void log(Throwable e) {
 		if(e != null)

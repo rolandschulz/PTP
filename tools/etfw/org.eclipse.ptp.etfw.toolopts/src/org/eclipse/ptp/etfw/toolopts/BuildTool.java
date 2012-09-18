@@ -20,9 +20,9 @@ public class BuildTool extends ExternalTool {
 	protected ToolApp allCompilers=null;
 	protected ToolApp upcCompiler=null;
 	
-	public ArrayList<ToolPane> getAllCompilerPanes(){
+	public ArrayList<IToolUITab> getAllCompilerPanes(){
 		
-		ArrayList<ToolPane> allPanes=new ArrayList<ToolPane>();
+		ArrayList<IToolUITab> allPanes=new ArrayList<IToolUITab>();
 		
 		if(ccCompiler!=null&&ccCompiler.toolPanes!=null){
 			allPanes.addAll(Arrays.asList(ccCompiler.toolPanes));
