@@ -634,7 +634,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	 * @return Contents of text, or null if text is the empty string
 	 */
 	protected String getFieldContent(String text) {
-		if ((text.trim().length() == 0) || text.equals("")) { //$NON-NLS-1$
+		if (text==null || (text.trim().length() == 0) || text.equals("")) { //$NON-NLS-1$
 			return null;
 		}
 
