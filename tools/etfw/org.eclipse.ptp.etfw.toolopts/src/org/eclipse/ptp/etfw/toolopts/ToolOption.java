@@ -289,8 +289,9 @@ public class ToolOption {
 	 * Sets if this is an argument or an env variable.
 	 * 
 	 * @param isarg
+	 * @since 4.1
 	 */
-	public void setIsArgumetn(boolean isarg) {
+	public void setIsArgument(boolean isarg) {
 		isArgument = isarg;
 	}
 
