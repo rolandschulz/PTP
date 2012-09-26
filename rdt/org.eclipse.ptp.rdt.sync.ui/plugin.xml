@@ -289,6 +289,10 @@
       <menuContribution
             allPopups="false"
             locationURI="popup:org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer">
+         <separator
+               name="org.eclipse.ptp.rdt.sync.ui.separator0"
+               visible="true">
+         </separator>
          <command
                commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
                label="Reset to version before merge"
@@ -316,6 +320,10 @@
                   value="checkout_remote_copy">
             </parameter>
          </command>
+         <separator
+               name="org.eclipse.ptp.rdt.sync.ui.separator1"
+               visible="true">
+         </separator>
       </menuContribution>
    </extension>
    <extension
