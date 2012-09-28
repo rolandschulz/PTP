@@ -83,7 +83,7 @@ public class LocalCIndexServiceProvider extends AbstractLocalCIndexServiceProvid
 	}
 	
 	/**
-	 * @since 4.1
+	 * @since 4.2
 	 */
 	public IRemoteCodeFormattingService getRemoteCodeFormattingService() {
 		if(!isConfigured())

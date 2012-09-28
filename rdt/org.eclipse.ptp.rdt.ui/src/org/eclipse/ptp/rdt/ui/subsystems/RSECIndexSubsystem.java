@@ -1345,7 +1345,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	}
 
 	/**
-	 * @since 4.1
+	 * @since 4.2
 	 */
 	public TextEdit computeCodeFormatting(Scope scope, ITranslationUnit targetUnit, String source, RemoteDefaultCodeFormatterOptions preferences, int offset, int length, IProgressMonitor monitor) {
 		Object result = sendRequest(CDTMiner.C_CODE_FORMATTING, new Object[] {scope.getName(), targetUnit, source, preferences, offset, length}, monitor);

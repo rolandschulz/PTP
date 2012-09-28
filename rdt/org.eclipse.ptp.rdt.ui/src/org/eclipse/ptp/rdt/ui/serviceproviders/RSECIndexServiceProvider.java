@@ -172,7 +172,7 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 	}
 
 	/**
-	 * @since 4.1
+	 * @since 4.2
 	 */
 	public IRemoteCodeFormattingService getRemoteCodeFormattingService() {
 		if(!isConfigured())
