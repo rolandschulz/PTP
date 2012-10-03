@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.control.ui.launch;
+package org.eclipse.ptp.rm.launch.ui.dynamic;
 
 import java.io.BufferedReader;
 import java.io.EOFException;
@@ -24,7 +24,6 @@ import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
-import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
@@ -32,6 +31,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
+import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -79,7 +79,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	 *            the parent controller tab
 	 */
 	public JAXBImportedScriptLaunchConfigurationTab(IJobController control, LaunchTabType.Import importTab,
-			IJAXBParentLaunchConfigurationTab parentTab, IProgressMonitor monitor) {
+			JAXBControllerLaunchConfigurationTab parentTab, IProgressMonitor monitor) {
 		super(control, parentTab);
 		setProgressMonitor(monitor);
 		this.title = importTab.getTitle();

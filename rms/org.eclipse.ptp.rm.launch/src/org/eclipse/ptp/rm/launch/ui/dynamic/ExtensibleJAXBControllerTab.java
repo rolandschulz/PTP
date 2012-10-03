@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.control.ui.launch;
+package org.eclipse.ptp.rm.launch.ui.dynamic;
 
 import java.util.HashMap;
 import java.util.LinkedList;

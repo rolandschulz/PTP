@@ -10,13 +10,13 @@
 package org.eclipse.ptp.rm.jaxb.ui;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceManager;
 import org.eclipse.ptp.rm.jaxb.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
-import org.eclipse.ptp.rm.ui.preferences.AbstractRemoteRMPreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -29,13 +29,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
  * 
  * @author arossi
  * 
  */
-public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implements SelectionListener, ModifyListener {
+public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage, SelectionListener, ModifyListener {
 
 	private Button reloadOption;
 	private Button segmentPattern;
@@ -47,103 +49,10 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 	private Text logFile;
 
 	@Override
-	public String getPreferenceQualifier() {
-		return JAXBCorePlugin.getUniqueIdentifier();
-	}
-
-	/*
-	 * Serves a listener for the preference widgets. (non-Javadoc) (non-Javadoc)
-	 * 
-	 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events .ModifyEvent)
-	 */
-	public void modifyText(ModifyEvent e) {
-		Text source = (Text) e.getSource();
-		if (source == logFile) {
-			String text = logFile.getText();
-			Preferences.setString(getPreferenceQualifier(), JAXBRMPreferenceConstants.LOG_FILE, text);
-		}
-	}
-
-	@Override
-	public void performApply() {
-		savePreferences();
-	}
-
-	@Override
-	public void performDefaults() {
-		reloadOption.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(),
-				JAXBRMPreferenceConstants.FORCE_XML_RELOAD, false));
-		segmentPattern.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(),
-				JAXBRMPreferenceConstants.SEGMENT_PATTERN, false));
-		matchStatus.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.MATCH_STATUS,
-				false));
-		actions.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.ACTIONS, false));
-		createdProperties.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(),
-				JAXBRMPreferenceConstants.CREATED_PROPERTIES, false));
-		showCommand.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND,
-				false));
-		showCommandOutput.setSelection(Preferences.getDefaultBoolean(getPreferenceQualifier(),
-				JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, false));
-		logFile.setText(Preferences.getDefaultString(getPreferenceQualifier(), JAXBRMPreferenceConstants.LOG_FILE,
-				JAXBUIConstants.ZEROSTR));
-		updateApplyButton();
-	}
-
-	@Override
-	public boolean performOk() {
-		return true;
-	}
-
-	@Override
-	public void savePreferences() {
-		JAXBRMPreferenceManager.savePreferences();
-	}
-
-	/*
-	 * Serves a listener for the preference widgets. (non-Javadoc)
-	 * 
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse .swt.events.SelectionEvent)
-	 */
-	public void widgetDefaultSelected(SelectionEvent e) {
-		widgetSelected(e);
-	}
-
-	/*
-	 * Serves a listener for the preference widgets. (non-Javadoc)
-	 * 
-	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt .events.SelectionEvent)
-	 */
-	public void widgetSelected(SelectionEvent e) {
-		Button source = (Button) e.getSource();
-		if (source == reloadOption) {
-			boolean b = reloadOption.getSelection();
-			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD, b);
-		} else if (source == segmentPattern) {
-			boolean b = segmentPattern.getSelection();
-			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN, b);
-		} else if (source == matchStatus) {
-			boolean b = matchStatus.getSelection();
-			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.MATCH_STATUS, b);
-		} else if (source == actions) {
-			boolean b = actions.getSelection();
-			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.ACTIONS, b);
-		} else if (source == createdProperties) {
-			boolean b = createdProperties.getSelection();
-			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES, b);
-		} else if (source == showCommand) {
-			boolean b = showCommand.getSelection();
-			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND, b);
-		} else if (source == showCommandOutput) {
-			boolean b = showCommandOutput.getSelection();
-			Preferences.setBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, b);
-		}
-	}
-
-	@Override
 	protected Control createContents(Composite parent) {
-		Composite preferences = (Composite) super.createContents(parent);
+		Composite preferences = new Composite(parent, SWT.NONE);
+		preferences.setLayout(createGridLayout(1, true, 0, 0));
+		preferences.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 
 		Group optionsGroup = new Group(preferences, SWT.SHADOW_ETCHED_IN);
 		optionsGroup.setText(Messages.JAXBRMPreferencesPage_Preferences_options);
@@ -222,41 +131,166 @@ public class JAXBRMPreferencesPage extends AbstractRemoteRMPreferencePage implem
 		return preferences;
 	}
 
+	private GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 */
+	public void init(IWorkbench workbench) {
+		// Nothing to do
+	}
+
 	/**
 	 * Load values from preference store
 	 */
 	private void loadSaved() {
-		boolean def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD, false);
-		boolean b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(),
+		boolean def = Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.FORCE_XML_RELOAD, false);
+		boolean b = Platform.getPreferencesService().getBoolean(JAXBCorePlugin.getUniqueIdentifier(),
 				JAXBRMPreferenceConstants.FORCE_XML_RELOAD, def, null);
 		reloadOption.setSelection(b);
-		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN, false);
-		b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN, def,
+		def = Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN, false);
+		b = Platform.getPreferencesService().getBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.SEGMENT_PATTERN, def,
 				null);
 		segmentPattern.setSelection(b);
-		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.MATCH_STATUS, false);
+		def = Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.MATCH_STATUS, false);
 		b = Platform.getPreferencesService()
-				.getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.MATCH_STATUS, def, null);
+				.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.MATCH_STATUS, def, null);
 		matchStatus.setSelection(b);
-		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.ACTIONS, false);
-		b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.ACTIONS, def, null);
+		def = Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS, false);
+		b = Platform.getPreferencesService().getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS,
+				def, null);
 		actions.setSelection(b);
-		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES, false);
-		b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES,
+		def = Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES,
+				false);
+		b = Platform.getPreferencesService().getBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.CREATED_PROPERTIES,
 				def, null);
 		createdProperties.setSelection(b);
-		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND, false);
+		def = Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SHOW_COMMAND, false);
 		b = Platform.getPreferencesService()
-				.getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND, def, null);
+				.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SHOW_COMMAND, def, null);
 		showCommand.setSelection(b);
-		def = Preferences.getDefaultBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, false);
-		b = Platform.getPreferencesService().getBoolean(getPreferenceQualifier(), JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT,
+		def = Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT,
+				false);
+		b = Platform.getPreferencesService().getBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT,
 				def, null);
 		showCommandOutput.setSelection(b);
-		String defText = Preferences.getDefaultString(getPreferenceQualifier(), JAXBRMPreferenceConstants.LOG_FILE,
+		String defText = Preferences.getDefaultString(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.LOG_FILE,
 				JAXBUIConstants.ZEROSTR);
-		String text = Platform.getPreferencesService().getString(getPreferenceQualifier(), JAXBRMPreferenceConstants.LOG_FILE,
+		String text = Platform.getPreferencesService().getString(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.LOG_FILE,
 				defText, null);
 		logFile.setText(text);
+	}
+
+	/*
+	 * Serves a listener for the preference widgets. (non-Javadoc) (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events .ModifyEvent)
+	 */
+	public void modifyText(ModifyEvent e) {
+		Text source = (Text) e.getSource();
+		if (source == logFile) {
+			String text = logFile.getText();
+			Preferences.setString(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.LOG_FILE, text);
+		}
+	}
+
+	@Override
+	public void performApply() {
+		JAXBRMPreferenceManager.savePreferences();
+	}
+
+	@Override
+	public void performDefaults() {
+		reloadOption.setSelection(Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.FORCE_XML_RELOAD, false));
+		segmentPattern.setSelection(Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.SEGMENT_PATTERN, false));
+		matchStatus.setSelection(Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.MATCH_STATUS,
+				false));
+		actions.setSelection(Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS,
+				false));
+		createdProperties.setSelection(Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.CREATED_PROPERTIES, false));
+		showCommand.setSelection(Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.SHOW_COMMAND,
+				false));
+		showCommandOutput.setSelection(Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, false));
+		logFile.setText(Preferences.getDefaultString(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.LOG_FILE,
+				JAXBUIConstants.ZEROSTR));
+		updateApplyButton();
+	}
+
+	@Override
+	public boolean performOk() {
+		return true;
+	}
+
+	private GridData spanGridData(int style, int space) {
+		GridData gd = null;
+		if (style == -1) {
+			gd = new GridData();
+		} else {
+			gd = new GridData(style);
+		}
+		gd.horizontalSpan = space;
+		return gd;
+	}
+
+	/*
+	 * Serves a listener for the preference widgets. (non-Javadoc)
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse .swt.events.SelectionEvent)
+	 */
+	public void widgetDefaultSelected(SelectionEvent e) {
+		widgetSelected(e);
+	}
+
+	/*
+	 * Serves a listener for the preference widgets. (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt .events.SelectionEvent)
+	 */
+	public void widgetSelected(SelectionEvent e) {
+		Button source = (Button) e.getSource();
+		if (source == reloadOption) {
+			boolean b = reloadOption.getSelection();
+			Preferences.setBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD, b);
+		} else if (source == segmentPattern) {
+			boolean b = segmentPattern.getSelection();
+			Preferences.setBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SEGMENT_PATTERN, b);
+		} else if (source == matchStatus) {
+			boolean b = matchStatus.getSelection();
+			Preferences.setBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.MATCH_STATUS, b);
+		} else if (source == actions) {
+			boolean b = actions.getSelection();
+			Preferences.setBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.ACTIONS, b);
+		} else if (source == createdProperties) {
+			boolean b = createdProperties.getSelection();
+			Preferences.setBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.CREATED_PROPERTIES, b);
+		} else if (source == showCommand) {
+			boolean b = showCommand.getSelection();
+			Preferences.setBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SHOW_COMMAND, b);
+		} else if (source == showCommandOutput) {
+			boolean b = showCommandOutput.getSelection();
+			Preferences.setBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, b);
+		}
 	}
 }

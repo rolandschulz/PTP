@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui.launch;
 
-import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
@@ -20,7 +19,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
  * JAXB Launch configuration tab
  * 
  */
-public interface IJAXBParentLaunchConfigurationTab extends IRMLaunchConfigurationDynamicTab {
+public interface IJAXBParentLaunchConfigurationTab {
 	public ValueUpdateHandler getUpdateHandler();
 
 	public IJobController getJobControl();

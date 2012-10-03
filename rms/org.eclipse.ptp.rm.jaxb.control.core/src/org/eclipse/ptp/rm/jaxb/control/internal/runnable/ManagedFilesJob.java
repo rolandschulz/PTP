@@ -29,8 +29,8 @@ import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
-import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
+import org.eclipse.ptp.rm.jaxb.control.LaunchController;
 import org.eclipse.ptp.rm.jaxb.control.internal.data.LineImpl;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
@@ -112,7 +112,7 @@ public class ManagedFilesJob extends Job {
 				delegate = JAXBUtils.getRemoteServicesDelegate(control.getRemoteServicesId(), control.getConnectionName(),
 						progress.newChild(2));
 				IRemoteConnection conn = delegate.getRemoteConnection();
-				JAXBResourceManagerControl.checkConnection(conn, progress);
+				LaunchController.checkConnection(conn, progress);
 				if (delegate.getRemoteFileManager() == null) {
 					throw new Throwable(Messages.UninitializedRemoteServices);
 				}

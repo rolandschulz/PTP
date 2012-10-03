@@ -36,11 +36,11 @@ import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.LaunchControllerManager;
-import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.core.JAXBExtensionUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
 import org.eclipse.ptp.rm.launch.RMLaunchPlugin;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
+import org.eclipse.ptp.rm.launch.ui.dynamic.JAXBControllerLaunchConfigurationTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
@@ -79,7 +79,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 	private Combo fSystemTypeCombo;
 	private final List<String> fProviders = new ArrayList<String>();
-	private boolean fDefaultConnection;
 
 	/*
 	 * Job controller with all necessary configuration information.
@@ -265,7 +264,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			}
 			updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
 			updateLaunchConfigurationDialog();
-			fDefaultConnection = false;
 		} else {
 			stopController(fLaunchControl);
 			fLaunchControl = null;
@@ -347,7 +345,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 */
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		fDefaultConnection = true;
 	}
 
 	/**

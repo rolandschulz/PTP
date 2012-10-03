@@ -2,13 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.ptp.core.resourceManagers">
-      <resourceManagerControl
-            class="org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerFactory"
-            id="org.eclipse.ptp.rm.jaxb.control">
-      </resourceManagerControl>
-   </extension>
-   <extension
          point="org.eclipse.core.variables.dynamicVariables">
       <variable
             description="Dynamic resource manager configuration variable"

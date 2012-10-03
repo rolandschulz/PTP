@@ -8,7 +8,7 @@
  * 	Albert L. Rossi - design and implementation
  * 	Jeff Overbey - Environment Manager support
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.control.ui.launch;
+package org.eclipse.ptp.rm.launch.ui.dynamic;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +30,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -45,7 +46,8 @@ import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
 import org.eclipse.ptp.rm.jaxb.control.ui.dialogs.ScrollingEditableMessageDialog;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ControlStateListener;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
-import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab;
+import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
@@ -56,6 +58,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
+import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -90,6 +93,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	protected final ValueUpdateHandler updateHandler;
 	protected final List<Viewer> viewers;
 	protected final Map<Object, IUpdateModel> localWidgets;
+	protected final IRMLaunchConfigurationDynamicTab fDynamicTab;
 	protected Collection<ControlStateListener> listeners;
 	protected ILaunchConfiguration listenerConfiguration;
 
@@ -108,7 +112,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 *            the parent controller tab
 	 */
 	public JAXBDynamicLaunchConfigurationTab(IJobController control, TabControllerType controller,
-			IJAXBParentLaunchConfigurationTab parentTab, IProgressMonitor monitor) {
+			JAXBControllerLaunchConfigurationTab parentTab, IProgressMonitor monitor) {
 		this(control, parentTab);
 		setProgressMonitor(monitor);
 		String title = controller.getTitle();
@@ -133,9 +137,10 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	protected JAXBDynamicLaunchConfigurationTab(IJobController control, IJAXBParentLaunchConfigurationTab parentTab) {
+	protected JAXBDynamicLaunchConfigurationTab(IJobController control, JAXBControllerLaunchConfigurationTab parentTab) {
 		super(parentTab);
 		fControl = control;
+		fDynamicTab = parentTab;
 		sharedModels = new ArrayList<IUpdateModel>();
 		updateHandler = parentTab.getUpdateHandler();
 		localWidgets = new HashMap<Object, IUpdateModel>();
@@ -351,7 +356,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		getJobControl().runActionCommand(action.getAction(), action.getClearValue(), listenerConfiguration);
 		if (action.isRefresh()) {
 			try {
-				parentTab.initializeFrom(null);
+				fDynamicTab.initializeFrom(null);
 			} catch (Throwable t) {
 				throw CoreExceptionUtils.newException(t.getLocalizedMessage(), t);
 			}

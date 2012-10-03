@@ -17,12 +17,8 @@ import org.eclipse.osgi.util.NLS;
  */
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.lml_jaxb.messages.messages"; //$NON-NLS-1$
-	public static String LMLJAXBRMLaunchConfigurationFactory_wrongRMType;
-	public static String LMLJAXBRMLaunchConfigurationFactory_doCreateError;
-
 	public static String RemoveJobWarning;
 	public static String CannotUndoOperation;
-
 	public static String RefreshJobStatusError;
 	public static String RefreshJobStatus;
 	public static String CancelJob;

@@ -7,7 +7,7 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.rm.jaxb.control.ui.launch;
+package org.eclipse.ptp.rm.launch.ui.dynamic;
 
 import java.util.Map;
 import java.util.Set;
@@ -18,9 +18,10 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
-import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
+import org.eclipse.ptp.rm.launch.internal.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 

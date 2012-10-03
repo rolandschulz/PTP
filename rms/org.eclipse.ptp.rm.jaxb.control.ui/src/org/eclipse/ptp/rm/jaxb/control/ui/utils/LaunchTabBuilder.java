@@ -25,7 +25,6 @@ import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ControlStateListener;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab;
-import org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;

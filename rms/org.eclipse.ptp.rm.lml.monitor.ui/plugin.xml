@@ -3,13 +3,6 @@
 <plugin>
    <extension-point id="monitors" name="monitors" schema="schema/monitors.exsd"/>
    <extension
-         point="org.eclipse.ptp.ui.rmConfigurationWizards">
-      <configurationWizard
-            class="org.eclipse.ptp.rm.lml.monitor.ui.wizards.LMLRMMonitorConfigurationWizardPageFactory"
-            id="org.eclipse.ptp.rm.lml.monitor">
-      </configurationWizard>
-   </extension>
-   <extension
          point="org.eclipse.ui.views">
       <view
             class="org.eclipse.ptp.rm.lml.monitor.ui.views.MonitorView"
