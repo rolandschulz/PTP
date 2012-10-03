@@ -1,4 +1,0 @@
-Note that the files in this directory can be overridden if an extension exists 
-  to provide alternative files.  
-  
-See the 'althelp' extension in org.eclipse.pldt.common.
