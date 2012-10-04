@@ -11,15 +11,23 @@
 
 package org.eclipse.ptp.rdt.sync.git.ui;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.wizard.IWizardContainer;
+import org.eclipse.ptp.rdt.sync.core.CommandRunner;
+import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
+import org.eclipse.ptp.rdt.sync.core.RemoteExecutionException;
+import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.git.ui.messages.Messages;
@@ -28,6 +36,7 @@ import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
@@ -69,10 +78,12 @@ public class GitParticipant implements ISynchronizeParticipant {
 //	private Point fDialogSize;
 //	private Text fNameText;
 	private Button fBrowseButton;
+	private Button fUseGitDefaultLocationButton;
 	private Button fNewConnectionButton;
 	private Combo fProviderCombo;
 	private Combo fConnectionCombo;
 	private Text fLocationText;
+	private Text fGitLocationText;
 
 	private IWizardContainer container;
 	
@@ -182,9 +193,12 @@ public class GitParticipant implements ISynchronizeParticipant {
 			}
 		});
 
+		// Remote directory location
+		// Label for "Remote directory:"
 		Label locationLabel = new Label(configArea, SWT.LEFT);
 		locationLabel.setText(Messages.GitParticipant_location);
 
+		// Remote directory textbox
 		fLocationText = new Text(configArea, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
@@ -193,14 +207,13 @@ public class GitParticipant implements ISynchronizeParticipant {
 		fLocationText.setLayoutData(gd);
 		fLocationText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				// MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID,
+				// MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID,setGitLocation
 				// PATH_PROPERTY, fLocationText.getText());
 				update();
 			}
 		});
-		handleConnectionSelected();
-
-		// new connection button
+		
+		// browse button
 		fBrowseButton = new Button(configArea, SWT.PUSH);
 		fBrowseButton.setText(Messages.GitParticipant_browse);
 		fBrowseButton.addSelectionListener(new SelectionAdapter() {
@@ -227,6 +240,36 @@ public class GitParticipant implements ISynchronizeParticipant {
 				}
 			}
 		});
+		
+		// Git location
+		// "Use default location" button
+		fUseGitDefaultLocationButton = new Button(configArea, SWT.CHECK);
+		fUseGitDefaultLocationButton.setText("Use default Git location");
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		fUseGitDefaultLocationButton.setLayoutData(gd);
+		fUseGitDefaultLocationButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setGitLocation();
+			}
+		});
+		fUseGitDefaultLocationButton.setSelection(true);
+
+		// Git location label
+		Label gitLocationLabel = new Label(configArea, SWT.NONE);
+		gitLocationLabel.setText("Git location: ");
+
+		// Git location entry field
+		fGitLocationText = new Text(configArea, SWT.SINGLE | SWT.BORDER);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 1;
+		gd.grabExcessHorizontalSpace = true;
+		gd.widthHint = 250;
+		fGitLocationText.setLayoutData(gd);
+		fGitLocationText.setEnabled(false);
+		
+		handleConnectionSelected();
 	}
 
 	/**
@@ -272,8 +315,10 @@ public class GitParticipant implements ISynchronizeParticipant {
 		if (fLocationText.getText().length() == 0 ) 
 			return Messages.GitParticipant_2;
 		IRemoteFileManager fileManager = fSelectedProvider.getFileManager(fSelectedConnection);
-		if ( fileManager.toURI(fLocationText.getText()) == null) 
+		if (fileManager.toURI(fLocationText.getText()) == null)
 			return Messages.GitParticipant_3;
+		if (fileManager.toURI(fGitLocationText.getText()) == null)
+			return "invalid Git path";
 		// should we check permissions of: fileManager.getResource(fLocationText.getText()).getParent() ?
 		return null;
 	}
@@ -312,6 +357,9 @@ public class GitParticipant implements ISynchronizeParticipant {
 		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		fLocationText.setText(getDefaultPathDisplayString());
+		// Assume users want to select this too whenever they change the connection
+		fUseGitDefaultLocationButton.setSelection(true);
+		this.setGitLocation();
 		update();
 	}
 
@@ -380,5 +428,79 @@ public class GitParticipant implements ISynchronizeParticipant {
 	public void setProjectName(String projectName) {
 		fProjectName = projectName;
 		fLocationText.setText(getDefaultPathDisplayString());
+	}
+	
+	// Fill in Git location text and set the related UI elements.
+	private void setGitLocation() {
+		// If "use default" not selected - enable and clear textbox only if not yet enabled.
+		if (!fUseGitDefaultLocationButton.getSelection()) {
+			if (!fGitLocationText.isEnabled()) {
+				fGitLocationText.setText(""); //$NON-NLS-1$
+				fGitLocationText.setEnabled(true);
+			}
+		// Otherwise, ask remote machine for location.
+		// Textbox must be either enabled or disabled depending on if the request is successful.
+		} else {
+			List<String> args = Arrays.asList("which", "git");
+			String errorMessage;
+			CommandResults cr = null;
+			try {
+				cr = this.runRemoteCommand(args);
+				errorMessage = this.buildErrorMessage(cr, "Unable to find Git on remote", null);
+			} catch (RemoteExecutionException e) {
+				errorMessage = this.buildErrorMessage(null, "Unable to find Git on remote", e);
+			}
+
+			// Unable to find Git location
+			if (errorMessage != null) {
+				fGitLocationText.setText("");
+				fUseGitDefaultLocationButton.setSelection(false);
+				fGitLocationText.setEnabled(true);
+				MessageDialog.openError(null, "Remote Execution", errorMessage);
+			// Git location found
+			} else {
+				fGitLocationText.setText(cr.getStdout().trim());
+				fGitLocationText.setEnabled(false);
+			}
+		}
+	}
+	
+	// Wrapper for using command runner - primarily wrapping all of the exceptions.
+	private CommandResults runRemoteCommand(List<String> command) throws RemoteExecutionException {
+		try {
+			return CommandRunner.executeRemoteCommand(fSelectedConnection, command, fLocationText.getText(), null);
+		} catch (RemoteSyncException e) {
+			throw new RemoteExecutionException(e);
+		} catch (IOException e) {
+			throw new RemoteExecutionException(e);
+		} catch (InterruptedException e) {
+			throw new RemoteExecutionException(e);
+		} catch (RemoteConnectionException e) {
+			throw new RemoteExecutionException(e);
+		}
+	}
+	
+	// Builds error message for command.
+	// Either the command result or the exception should be null, but not both.
+	// baseMessage cannot be null.
+	// Returns error message or null if no error occurred (can only occur if cr is not null).
+	private String buildErrorMessage(CommandResults cr, String baseMessage, RemoteExecutionException e) {
+		// Command successful
+		if (cr != null && cr.getExitCode() == 0) {
+			return null;
+		}
+
+		// Command runs but unsuccessfully
+		if (cr != null) {
+			return baseMessage + ": " + cr.getStderr();
+		}
+
+		// Command did not run - exception thrown
+		String errorMessage = baseMessage;
+		if (e.getMessage() != null) {
+			errorMessage += ": " + e.getMessage();
+		}
+
+		return errorMessage;
 	}
 }
