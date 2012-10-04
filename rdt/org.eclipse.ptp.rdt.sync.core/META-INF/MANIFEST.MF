@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.cdt.core,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.services.core,
  org.eclipse.ui
-Export-Package: org.eclipse.ptp.rdt.sync.core;x-friends:="org.eclipse.ptp.rdt.sync.ui,org.eclipse.ptp.rdt.sync.git.core",
+Export-Package: org.eclipse.ptp.rdt.sync.core;x-friends:="org.eclipse.ptp.rdt.sync.ui,org.eclipse.ptp.rdt.sync.git.ui,org.eclipse.ptp.rdt.sync.git.core",
  org.eclipse.ptp.rdt.sync.core.remotemake;x-friends:="org.eclipse.ptp.rdt.sync.ui",
  org.eclipse.ptp.rdt.sync.core.resources;x-friends:="org.eclipse.ptp.rdt.sync.ui",
  org.eclipse.ptp.rdt.sync.core.serviceproviders;x-friends:="org.eclipse.ptp.rdt.sync.git.core,org.eclipse.ptp.rdt.sync.git.ui",
