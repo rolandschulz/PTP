@@ -363,6 +363,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		GitServiceProvider provider = (GitServiceProvider) smm.getServiceProvider(syncService
 				.getProviderDescriptor(GitServiceProvider.ID));
 		provider.setLocation(fLocationText.getText());
+		provider.setToolLocation(fGitLocationText.getText());
 		provider.setRemoteConnection(fSelectedConnection);
 		provider.setRemoteServices(fSelectedProvider);
 		return provider;

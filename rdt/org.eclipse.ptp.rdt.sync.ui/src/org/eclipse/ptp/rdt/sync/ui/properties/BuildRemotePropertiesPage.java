@@ -73,6 +73,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	// Container for all information that appears on a page
 	private static class PageSettings {
 		String syncProvider;
+		String syncProviderPath;
 		IRemoteConnection connection;
 		IRemoteServices remoteProvider;
 		String rootLocation;
@@ -82,6 +83,9 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 				return false;
 			}
 			if (this.syncProvider != otherSettings.syncProvider) {
+				return false;
+			}
+			if (this.syncProviderPath != otherSettings.syncProviderPath) {
 				return false;
 			}
 			if (this.connection != otherSettings.connection) {
@@ -431,7 +435,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
         // Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
         // the BuildConfigurationManager relies on the data being up-to-date.
         BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-        BuildScenario buildScenario = new BuildScenario(settings.syncProvider, settings.connection, settings.rootLocation);
+        BuildScenario buildScenario = new BuildScenario(settings.syncProvider, settings.syncProviderPath, settings.connection, 
+        		settings.rootLocation);
         bcm.setBuildScenarioForBuildConfiguration(buildScenario, config);
 	}
 	
@@ -497,6 +502,21 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 		handleConnectionSelected();
 		fRootLocationText.setText(settings.rootLocation);
+		
+		// Git location UI elements
+		// For a local project, make blank
+		if (settings.syncProvider == null) {
+			fUseGitDefaultLocationButton.setSelection(false);
+			fGitLocationText.setText(""); //$NON-NLS-1$
+		// If provider path is empty, assume user wants the default and attempt to find it.
+		} else if (settings.syncProviderPath == null) {
+			fUseGitDefaultLocationButton.setSelection(true);
+			this.setGitLocation();
+		// Otherwise, just print the current settings.
+		} else {
+			fUseGitDefaultLocationButton.setSelection(false);
+			fGitLocationText.setText(settings.syncProviderPath);
+		}
 	}
 
 	private void setEnabledForAllWidgets(boolean shouldBeEnabled) {
@@ -559,6 +579,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 		PageSettings settings = new PageSettings();
 		settings.syncProvider = buildScenario.getSyncProvider();
+		settings.syncProviderPath = buildScenario.getSyncProviderPath();
 		settings.remoteProvider = buildScenario.getRemoteProvider();
 		try {
 			settings.connection = buildScenario.getRemoteConnection();
@@ -588,8 +609,10 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		Integer connectionIndex = fConnectionCombo.getSelectionIndex();
 		if (fSyncToggleButton.getSelection()) {
 			settings.syncProvider = BuildConfigurationManager.getInstance().getProjectSyncProvider(project);
+			settings.syncProviderPath = fGitLocationText.getText();
 		} else {
 			settings.syncProvider = null;
+			settings.syncProviderPath = null;
 		}
 		settings.remoteProvider = fComboIndexToRemoteServicesProviderMap.get(remoteServicesIndex);
 		settings.connection = fComboIndexToRemoteConnectionMap.get(connectionIndex);
