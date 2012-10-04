@@ -77,7 +77,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 //	private Control fDialogControl;
 //	private Point fDialogSize;
 //	private Text fNameText;
-	private Button fBrowseButton;
+	private Button fRemoteLocationBrowseButton;
+	private Button fGitLocationBrowseButton;
 	private Button fUseGitDefaultLocationButton;
 	private Button fNewConnectionButton;
 	private Combo fProviderCombo;
@@ -213,10 +214,10 @@ public class GitParticipant implements ISynchronizeParticipant {
 			}
 		});
 		
-		// browse button
-		fBrowseButton = new Button(configArea, SWT.PUSH);
-		fBrowseButton.setText(Messages.GitParticipant_browse);
-		fBrowseButton.addSelectionListener(new SelectionAdapter() {
+		// Remote location browse button
+		fRemoteLocationBrowseButton = new Button(configArea, SWT.PUSH);
+		fRemoteLocationBrowseButton.setText(Messages.GitParticipant_browse);
+		fRemoteLocationBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (fSelectedConnection != null) {
@@ -268,6 +269,33 @@ public class GitParticipant implements ISynchronizeParticipant {
 		gd.widthHint = 250;
 		fGitLocationText.setLayoutData(gd);
 		fGitLocationText.setEnabled(false);
+		
+		// Git location browse button
+		fGitLocationBrowseButton = new Button(configArea, SWT.PUSH);
+		fGitLocationBrowseButton.setText(Messages.GitParticipant_browse);
+		fGitLocationBrowseButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (fSelectedConnection != null) {
+					checkConnection();
+					if (fSelectedConnection.isOpen()) {
+						IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedProvider);
+						if (remoteUIServices != null) {
+							IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
+							if (fileMgr != null) {
+								fileMgr.setConnection(fSelectedConnection);
+								String selectedPath = fileMgr.browseFile(
+										fLocationText.getShell(),
+										"Project Location (" + fSelectedConnection.getName() + ")", null, IRemoteUIConstants.NONE); //$NON-NLS-1$ //$NON-NLS-2$
+								if (selectedPath != null) {
+									fGitLocationText.setText(selectedPath);
+								}
+							}
+						}
+					}
+				}
+			}
+		});
 		
 		handleConnectionSelected();
 	}
