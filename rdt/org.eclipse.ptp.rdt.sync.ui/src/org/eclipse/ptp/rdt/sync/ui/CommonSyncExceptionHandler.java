@@ -52,10 +52,8 @@ public class CommonSyncExceptionHandler implements ISyncExceptionHandler {
 		String endOfLineChar = System.getProperty("line.separator"); //$NON-NLS-1$
 
 		message = Messages.CommonSyncExceptionHandler_0 + project.getName() + ":" + endOfLineChar + endOfLineChar; //$NON-NLS-1$
-		if ((e.getMessage() != null && e.getMessage().length() > 0) || e.getCause() == null) {
+		if (e.getMessage() != null) {
 			message = message + e.getMessage();
-		} else {
-			message = message + e.getCause().getMessage();
 		}
 
 		final String finalMessage = message;
