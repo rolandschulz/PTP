@@ -86,12 +86,11 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
  * 
  */
 public class GitRemoteSyncConnection {
-
 	private final int MAX_FILES = 100;
 	private static final String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
 	private static final String commitMessage = Messages.GRSC_CommitMessage;
 	public static final String gitDir = ".ptp-sync"; //$NON-NLS-1$
-	private static final String gitCommand = "git --git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String gitArgs = "--git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 	private final String localDirectory;
 	private final BuildScenario buildScenario;
@@ -132,8 +131,8 @@ public class GitRemoteSyncConnection {
 			
 			// Build repo, creating it if it is not already present.
 			try {
-				remoteGitVersion = getRemoteGitVersion(subMon.newChild(1));
 				buildRepo(subMon.newChild(10));
+				remoteGitVersion = getRemoteGitVersion(subMon.newChild(1));
 			} catch (final IOException e) {
 				throw new RemoteSyncException(e);
 			} catch (final RemoteExecutionException e) {
@@ -365,7 +364,7 @@ public class GitRemoteSyncConnection {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		subMon.subTask(Messages.GitRemoteSyncConnection_committing_remote);
 		try {
-			final String command = gitCommand + " commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+			final String command = gitCommand() + " commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = null;
 
 			try {
@@ -396,7 +395,7 @@ public class GitRemoteSyncConnection {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
 			while (!filesToDelete.isEmpty()) {
-				List<String> commandList = stringToList(gitCommand + " rm --"); //$NON-NLS-1$
+				List<String> commandList = stringToList(gitCommand() + " rm --"); //$NON-NLS-1$
 				int count = 1;
 				for (String fileName : filesToDelete.toArray(new String[0])) {
 					if (count++ % MAX_FILES == 0) {
@@ -438,7 +437,7 @@ public class GitRemoteSyncConnection {
 		subMon.subTask(Messages.GitRemoteSyncConnection_adding_files);
 		try {
 			while (!filesToAdd.isEmpty()) {
-				List<String> commandList = stringToList(gitCommand + " add -f --"); //$NON-NLS-1$
+				List<String> commandList = stringToList(gitCommand() + " add -f --"); //$NON-NLS-1$
 				int count = 1;
 				for (String fileName : filesToAdd.toArray(new String[0])) {
 					if (count++ % MAX_FILES == 0) {
@@ -481,14 +480,14 @@ public class GitRemoteSyncConnection {
 			final String command, deletePrefix;
 			final int fileNamePos;
 			if (remoteGitVersion>=10700) {
-				command = gitCommand + " status --porcelain"; //$NON-NLS-1$
+				command = gitCommand() + " status --porcelain"; //$NON-NLS-1$
 				deletePrefix = " D"; //$NON-NLS-1$
 				fileNamePos = 3;
 			} else {
 				if (includeUntrackedFiles) {
-					command = gitCommand + " ls-files -t --modified --others --deleted"; //$NON-NLS-1$
+					command = gitCommand() + " ls-files -t --modified --others --deleted"; //$NON-NLS-1$
 				} else {
-					command = gitCommand + " ls-files -t --modified --deleted"; //$NON-NLS-1$
+					command = gitCommand() + " ls-files -t --modified --deleted"; //$NON-NLS-1$
 				}
 				deletePrefix = "R "; //$NON-NLS-1$
 				fileNamePos = 2;
@@ -851,7 +850,7 @@ public class GitRemoteSyncConnection {
 	
 					// Now remotely merge changes with master branch
 					CommandResults mergeResults;
-					final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
+					final String command = gitCommand() + " merge " + remotePushBranch; //$NON-NLS-1$
 	
 					mergeResults = this.executeRemoteCommand(command, subMon.newChild(5));
 	
@@ -1019,7 +1018,7 @@ public class GitRemoteSyncConnection {
 				CommandResults mergeResults;
 				// ff-only prevents accidental corruption of the remote repository but is supported only in recent Git versions.
 				// final String command = gitCommand + " merge --ff-only " + remotePushBranch; //$NON-NLS-1$
-				final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
+				final String command = gitCommand() + " merge " + remotePushBranch; //$NON-NLS-1$
 
 				mergeResults = this.executeRemoteCommand(command, subMon.newChild(5));
 				if (mergeResults.getExitCode() != 0) {
@@ -1101,7 +1100,7 @@ public class GitRemoteSyncConnection {
 	public int getRemoteGitVersion(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
 			MissingConnectionException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
-		String command = "git --version"; //$NON-NLS-1$
+		String command = gitCommand() + " --version"; //$NON-NLS-1$
 		CommandResults commandResults = null;
 	
 		try {
@@ -1197,5 +1196,15 @@ public class GitRemoteSyncConnection {
 		IRemoteConnection conn = buildScenario.getRemoteConnection();
 		String remoteDirectory = buildScenario.getLocation(project);
 		return CommandRunner.executeRemoteCommand(conn, command, remoteDirectory, monitor);
+	}
+	
+	// Get the base git command for this system, includes the git binary plus sync-specific arguments.
+	private String gitCommand() {
+		String gitPath = buildScenario.getSyncProviderPath();
+		if (gitPath == null) {
+			return "git " + gitArgs; //$NON-NLS-1$
+		} else {
+			return gitPath + " " + gitArgs;  //$NON-NLS-1$
+		}
 	}
 }
