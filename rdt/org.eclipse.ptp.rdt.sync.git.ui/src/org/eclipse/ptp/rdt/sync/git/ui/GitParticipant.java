@@ -285,7 +285,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 							if (fileMgr != null) {
 								fileMgr.setConnection(fSelectedConnection);
 								String selectedPath = fileMgr.browseFile(
-										fLocationText.getShell(),
+										fGitLocationText.getShell(),
 										"Project Location (" + fSelectedConnection.getName() + ")", null, IRemoteUIConstants.NONE); //$NON-NLS-1$ //$NON-NLS-2$
 								if (selectedPath != null) {
 									fGitLocationText.setText(selectedPath);

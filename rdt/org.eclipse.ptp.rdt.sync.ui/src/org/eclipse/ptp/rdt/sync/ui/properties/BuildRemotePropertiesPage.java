@@ -10,7 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui.properties;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
@@ -25,16 +28,22 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.CommandRunner;
 import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
+import org.eclipse.ptp.rdt.sync.core.RemoteExecutionException;
+import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
+import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
@@ -99,10 +108,13 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 
 	private Button fSyncToggleButton;
 	private Button fBrowseButton;
+	private Button fGitLocationBrowseButton;
 	private Button fNewConnectionButton;
+	private Button fUseGitDefaultLocationButton;
 	private Combo fProviderCombo;
 	private Combo fConnectionCombo;
 	private Text fRootLocationText;
+	private Text fGitLocationText;
 	private Composite composite;
 
 	/**
@@ -208,7 +220,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 				update();
 			}
 		});
-			
 
 		// browse button
 		fBrowseButton = new Button(composite, SWT.PUSH);
@@ -230,6 +241,61 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 										"Project Location (" + fSelectedConnection.getName() + ")", correctPath, IRemoteUIConstants.NONE); //$NON-NLS-1$ //$NON-NLS-2$
 								if (selectedPath != null) {
 									fRootLocationText.setText(selectedPath);
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+		
+		// Git location
+		// "Use default location" button
+		fUseGitDefaultLocationButton = new Button(composite, SWT.CHECK);
+		fUseGitDefaultLocationButton.setText(Messages.BuildRemotePropertiesPage_3);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		fUseGitDefaultLocationButton.setLayoutData(gd);
+		fUseGitDefaultLocationButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setGitLocation();
+			}
+		});
+		fUseGitDefaultLocationButton.setSelection(true);
+
+		// Git location label
+		Label gitLocationLabel = new Label(composite, SWT.NONE);
+		gitLocationLabel.setText(Messages.BuildRemotePropertiesPage_4);
+
+		// Git location entry field
+		fGitLocationText = new Text(composite, SWT.SINGLE | SWT.BORDER);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 1;
+		gd.grabExcessHorizontalSpace = true;
+		gd.widthHint = 250;
+		fGitLocationText.setLayoutData(gd);
+		fGitLocationText.setEnabled(false);
+		
+		// Git location browse button
+		fGitLocationBrowseButton = new Button(composite, SWT.PUSH);
+		fGitLocationBrowseButton.setText(Messages.BuildRemotePropertiesPage_5);
+		fGitLocationBrowseButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (fSelectedConnection != null) {
+					checkConnection();
+					if (fSelectedConnection.isOpen()) {
+						IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedProvider);
+						if (remoteUIServices != null) {
+							IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
+							if (fileMgr != null) {
+								fileMgr.setConnection(fSelectedConnection);
+								String selectedPath = fileMgr.browseFile(
+										fGitLocationText.getShell(),
+										"Project Location (" + fSelectedConnection.getName() + ")", null, IRemoteUIConstants.NONE); //$NON-NLS-1$ //$NON-NLS-2$
+								if (selectedPath != null) {
+									fGitLocationText.setText(selectedPath);
 								}
 							}
 						}
@@ -443,6 +509,9 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		} else {
 			fNewConnectionButton.setEnabled(false);
 		}
+		fGitLocationBrowseButton.setEnabled(shouldBeEnabled);
+		fUseGitDefaultLocationButton.setEnabled(shouldBeEnabled);
+		fGitLocationText.setEnabled(shouldBeEnabled);
 	}
 
 	/**
@@ -603,4 +672,77 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		return super.isValid() && getErrorMessage()==null;
 	}
 	
+	// Fill in Git location text and set the related UI elements.
+	private void setGitLocation() {
+		// If "use default" not selected - enable and clear textbox only if not yet enabled.
+		if (!fUseGitDefaultLocationButton.getSelection()) {
+			if (!fGitLocationText.isEnabled()) {
+				fGitLocationText.setText(""); //$NON-NLS-1$
+				fGitLocationText.setEnabled(true);
+			}
+		// Otherwise, ask remote machine for location.
+		// Textbox must be either enabled or disabled depending on if the request is successful.
+		} else {
+			List<String> args = Arrays.asList("which", "git"); //$NON-NLS-1$ //$NON-NLS-2$
+			String errorMessage;
+			CommandResults cr = null;
+			try {
+				cr = this.runRemoteCommand(args);
+				errorMessage = this.buildErrorMessage(cr, Messages.BuildRemotePropertiesPage_6, null);
+			} catch (RemoteExecutionException e) {
+				errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_7, e);
+			}
+
+			// Unable to find Git location
+			if (errorMessage != null) {
+				fGitLocationText.setText(""); //$NON-NLS-1$
+				fUseGitDefaultLocationButton.setSelection(false);
+				fGitLocationText.setEnabled(true);
+				MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_8, errorMessage);
+			// Git location found
+			} else {
+				fGitLocationText.setText(cr.getStdout().trim());
+				fGitLocationText.setEnabled(false);
+			}
+		}
+	}
+	
+	// Wrapper for using command runner - primarily wrapping all of the exceptions.
+	private CommandResults runRemoteCommand(List<String> command) throws RemoteExecutionException {
+		try {
+			return CommandRunner.executeRemoteCommand(fSelectedConnection, command, fRootLocationText.getText(), null);
+		} catch (RemoteSyncException e) {
+			throw new RemoteExecutionException(e);
+		} catch (IOException e) {
+			throw new RemoteExecutionException(e);
+		} catch (InterruptedException e) {
+			throw new RemoteExecutionException(e);
+		} catch (RemoteConnectionException e) {
+			throw new RemoteExecutionException(e);
+		}
+	}
+	
+	// Builds error message for command.
+	// Either the command result or the exception should be null, but not both.
+	// baseMessage cannot be null.
+	// Returns error message or null if no error occurred (can only occur if cr is not null).
+	private String buildErrorMessage(CommandResults cr, String baseMessage, RemoteExecutionException e) {
+		// Command successful
+		if (cr != null && cr.getExitCode() == 0) {
+			return null;
+		}
+
+		// Command runs but unsuccessfully
+		if (cr != null) {
+			return baseMessage + ": " + cr.getStderr(); //$NON-NLS-1$
+		}
+
+		// Command did not run - exception thrown
+		String errorMessage = baseMessage;
+		if (e.getMessage() != null) {
+			errorMessage += ": " + e.getMessage(); //$NON-NLS-1$
+		}
+
+		return errorMessage;
+	}
 }

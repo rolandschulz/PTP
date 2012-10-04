@@ -124,6 +124,12 @@ public class Messages extends NLS {
 	public static String BuildRemotePropertiesPage_0;
 	public static String BuildRemotePropertiesPage_1;
 	public static String BuildRemotePropertiesPage_2;
+	public static String BuildRemotePropertiesPage_3;
+	public static String BuildRemotePropertiesPage_4;
+	public static String BuildRemotePropertiesPage_5;
+	public static String BuildRemotePropertiesPage_6;
+	public static String BuildRemotePropertiesPage_7;
+	public static String BuildRemotePropertiesPage_8;
 	public static String GitParticipant_0;
 	public static String GitParticipant_1;
 	public static String GitParticipant_2;
