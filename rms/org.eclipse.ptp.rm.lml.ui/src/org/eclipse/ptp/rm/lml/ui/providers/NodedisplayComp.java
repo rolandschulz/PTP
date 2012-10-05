@@ -500,6 +500,10 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		return y;
 	}
 
+	public boolean hasParentNodedisplay() {
+		return parentNodedisplayComp != null;
+	}
+
 	/**
 	 * Hide title or name for this panel
 	 */
@@ -811,7 +815,13 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		borderComp.setBorderWidth(nodedisplayLayout.getBorder().intValue());
 		borderComp.setLayoutData(new BorderData(BorderLayout.MFIELD));
 
-		innerComp = new Composite(borderComp, SWT.NONE);
+		// If this composite is not painted by a recpaintlistener
+		if (node.getLowerLevelCount() == 0 || node.getLowerLevelCount() > levelsPaintedByPaintListener) {
+			innerComp = new Composite(borderComp, SWT.None);
+		}
+		else {
+			innerComp = new Composite(borderComp, SWT.NO_BACKGROUND);
+		}
 
 		mouseInteraction = new MouseInteraction(lguiItem, innerComp);
 
