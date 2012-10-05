@@ -6,7 +6,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.internal.ui.SWTFactory;
-import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.tau.perfdmf.PerfDMFUIPlugin;
 import org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView;
@@ -21,12 +20,11 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabItem;
 
 public class TAUDataTab implements IToolUITab {
-	
+
 	protected Combo dbCombo = null;
-	
+
 	protected Button nocleanCheck;
 
 	protected Button keepprofsCheck;
@@ -63,9 +61,6 @@ public class TAUDataTab implements IToolUITab {
 		}
 	}
 
-	
-	
-
 	public TAUDataTab() {
 	}
 
@@ -85,23 +80,21 @@ public class TAUDataTab implements IToolUITab {
 		configuration.setAttribute(ITAULaunchConfigurationConstants.PROFSUMMARY, profSummaryCheck.getSelection());
 
 		configuration.setAttribute(ITAULaunchConfigurationConstants.PORTAL, portalCheck.getSelection());
-		
-		int idex=dbCombo.getSelectionIndex();
-		if(idex>=0)
-		{
-		configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB, dbCombo.getItem(idex));
-		configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB_NAME,
-				PerfDMFView.extractDatabaseName(dbCombo.getItem(idex)));
+
+		int idex = dbCombo.getSelectionIndex();
+		if (idex >= 0) {
+			configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB, dbCombo.getItem(idex));
+			configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB_NAME,
+					PerfDMFView.extractDatabaseName(dbCombo.getItem(idex)));
 		}
 
 	}
 
 	private ToolPaneListener paneListener;
 	Composite fComp;
-	
+
 	public void makeToolPane(Composite dataComp, ToolPaneListener listener) {
-		fComp=dataComp;
-		this.paneListener=paneListener;
+		fComp = dataComp;
 		/*
 		 * 
 		 * Data Collection: Storage and management of output data
@@ -146,7 +139,7 @@ public class TAUDataTab implements IToolUITab {
 	}
 
 	public void makeToolPane(Composite comp) {
-		makeToolPane(comp,null);
+		makeToolPane(comp, null);
 
 	}
 
@@ -198,8 +191,7 @@ public class TAUDataTab implements IToolUITab {
 
 	}
 
-	public void initializePane(ILaunchConfiguration configuration)
-			throws CoreException {
+	public void initializePane(ILaunchConfiguration configuration) throws CoreException {
 		initDBCombo(configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB, (String) null));
 
 		keepprofsCheck.setSelection(configuration.getAttribute(ITAULaunchConfigurationConstants.KEEPPROFS, false));
@@ -207,8 +199,6 @@ public class TAUDataTab implements IToolUITab {
 		profSummaryCheck.setSelection(configuration.getAttribute(ITAULaunchConfigurationConstants.PROFSUMMARY, false));
 
 		portalCheck.setSelection(configuration.getAttribute(ITAULaunchConfigurationConstants.PORTAL, false));
-
-
 
 	}
 
@@ -221,26 +211,28 @@ public class TAUDataTab implements IToolUITab {
 		return false;
 	}
 
-	
 	/**
 	 * Creates vertical space in the parent <code>Composite</code>
-	 * @param comp the parent to add the vertical space to
-	 * @param colSpan the number of line of vertical space to add
+	 * 
+	 * @param comp
+	 *            the parent to add the vertical space to
+	 * @param colSpan
+	 *            the number of line of vertical space to add
 	 */
 	protected void createVerticalSpacer(Composite comp, int colSpan) {
 		SWTFactory.createVerticalSpacer(comp, colSpan);
-	}	
-	
+	}
+
 	/**
 	 * Produces a new GridLayout based on provided arguments
+	 * 
 	 * @param columns
 	 * @param isEqual
 	 * @param mh
 	 * @param mw
 	 * @return
 	 */
-	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh,
-			int mw) {
+	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
@@ -251,6 +243,7 @@ public class TAUDataTab implements IToolUITab {
 
 	/**
 	 * Creates a new GridData based on provided style and space arguments
+	 * 
 	 * @param style
 	 * @param space
 	 * @return
@@ -265,41 +258,44 @@ public class TAUDataTab implements IToolUITab {
 		gd.horizontalSpan = space;
 		return gd;
 	}
-	
+
 	/**
-	 * Creates and returns a new push button with the given
-	 * label and/or image.
+	 * Creates and returns a new push button with the given label and/or image.
 	 * 
-	 * @param parent parent control
-	 * @param label button label or <code>null</code>
-	 * @param image image of <code>null</code>
+	 * @param parent
+	 *            parent control
+	 * @param label
+	 *            button label or <code>null</code>
+	 * @param image
+	 *            image of <code>null</code>
 	 * 
 	 * @return a new push button
 	 */
 	protected Button createPushButton(Composite parent, String label, Image image) {
-		return SWTFactory.createPushButton(parent, label, image);	
+		return SWTFactory.createPushButton(parent, label, image);
 	}
-	
+
 	/**
-	 * Creates and returns a new radio button with the given
-	 * label and/or image.
+	 * Creates and returns a new radio button with the given label and/or image.
 	 * 
-	 * @param parent parent control
-	 * @param label button label or <code>null</code>
+	 * @param parent
+	 *            parent control
+	 * @param label
+	 *            button label or <code>null</code>
 	 * 
 	 * @return a new radio button
 	 */
 	protected Button createRadioButton(Composite parent, String label) {
-		return SWTFactory.createRadioButton(parent, label);	
-	}	
-	
+		return SWTFactory.createRadioButton(parent, label);
+	}
+
 	/**
 	 * Returns the shell this tab is contained in, or <code>null</code>.
 	 * 
 	 * @return the shell this tab is contained in, or <code>null</code>
 	 */
 	protected Shell getShell() {
-		//Control control = getControl();
+		// Control control = getControl();
 		if (fComp != null) {
 			return fComp.getShell();
 		}
@@ -308,6 +304,7 @@ public class TAUDataTab implements IToolUITab {
 
 	/**
 	 * Treats empty strings as null
+	 * 
 	 * @param text
 	 * @return Contents of text, or null if text is the empty string
 	 */
@@ -318,13 +315,14 @@ public class TAUDataTab implements IToolUITab {
 
 		return text;
 	}
-	
+
 	/**
-	 * Creates and returns a new check button with the given
-	 * label.
+	 * Creates and returns a new check button with the given label.
 	 * 
-	 * @param parent the parent composite
-	 * @param label the button label
+	 * @param parent
+	 *            the parent composite
+	 * @param label
+	 *            the button label
 	 * @return a new check button
 	 * @since 3.0
 	 */
