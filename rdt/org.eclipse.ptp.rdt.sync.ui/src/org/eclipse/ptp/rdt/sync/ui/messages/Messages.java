@@ -130,6 +130,7 @@ public class Messages extends NLS {
 	public static String BuildRemotePropertiesPage_6;
 	public static String BuildRemotePropertiesPage_7;
 	public static String BuildRemotePropertiesPage_8;
+	public static String BuildRemotePropertiesPage_9;
 	public static String GitParticipant_0;
 	public static String GitParticipant_1;
 	public static String GitParticipant_2;

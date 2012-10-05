@@ -149,12 +149,12 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		fSyncToggleButton.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				setEnabledForAllWidgets(fSyncToggleButton.getSelection());
+				setIsRemoteConfig(fSyncToggleButton.getSelection());
 				update();
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				setEnabledForAllWidgets(fSyncToggleButton.getSelection());
+				setIsRemoteConfig(fSyncToggleButton.getSelection());
 				update();
 			}
 		});
@@ -263,7 +263,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		fUseGitDefaultLocationButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				setGitLocation();
+				handleGitDefaultLocationButtonPushed();
 			}
 		});
 		fUseGitDefaultLocationButton.setSelection(true);
@@ -307,6 +307,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 				}
 			}
 		});
+		fGitLocationBrowseButton.setSelection(false);
 		
 		fConfigBeforeSwitch = getCfg();
 		this.setValues(getCfg());
@@ -484,10 +485,10 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 
 		if (settings.syncProvider != null) {
 			fSyncToggleButton.setSelection(true);
-			this.setEnabledForAllWidgets(true);
+			this.setIsRemoteConfig(true);
 		} else {
 			fSyncToggleButton.setSelection(false);
-			this.setEnabledForAllWidgets(false);
+			this.setIsRemoteConfig(false);
 		}
 
 		// Note that provider selection populates the local connection map variables as well as the connection combo. Thus, the
@@ -503,35 +504,20 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		handleConnectionSelected();
 		fRootLocationText.setText(settings.rootLocation);
 		
-		// Git location UI elements
-		// For a local project, make blank
-		if (settings.syncProvider == null) {
-			fUseGitDefaultLocationButton.setSelection(false);
-			fGitLocationText.setText(""); //$NON-NLS-1$
-		// If provider path is empty, assume user wants the default and attempt to find it.
-		} else if (settings.syncProviderPath == null) {
-			fUseGitDefaultLocationButton.setSelection(true);
-			this.setGitLocation();
-		// Otherwise, just print the current settings.
-		} else {
-			fUseGitDefaultLocationButton.setSelection(false);
-			fGitLocationText.setText(settings.syncProviderPath);
-		}
+		this.setGitLocationUI((settings.syncProvider == null ? false : true), settings.syncProviderPath);
 	}
 
-	private void setEnabledForAllWidgets(boolean shouldBeEnabled) {
-		fProviderCombo.setEnabled(shouldBeEnabled);
-		fConnectionCombo.setEnabled(shouldBeEnabled);
-		fRootLocationText.setEnabled(shouldBeEnabled);
-		fBrowseButton.setEnabled(shouldBeEnabled);
-		if (shouldBeEnabled && this.isConnectionManagerAvailable()) {
+	private void setIsRemoteConfig(boolean isRemote) {
+		fProviderCombo.setEnabled(isRemote);
+		fConnectionCombo.setEnabled(isRemote);
+		fRootLocationText.setEnabled(isRemote);
+		fBrowseButton.setEnabled(isRemote);
+		if (isRemote && this.isConnectionManagerAvailable()) {
 			fNewConnectionButton.setEnabled(true);
 		} else {
 			fNewConnectionButton.setEnabled(false);
 		}
-		fGitLocationBrowseButton.setEnabled(shouldBeEnabled);
-		fUseGitDefaultLocationButton.setEnabled(shouldBeEnabled);
-		fGitLocationText.setEnabled(shouldBeEnabled);
+		this.setGitLocationUI(isRemote, fGitLocationText.getText());
 	}
 
 	/**
@@ -695,45 +681,80 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		return super.isValid() && getErrorMessage()==null;
 	}
 	
-	// Fill in Git location text and set the related UI elements.
-	private void setGitLocation() {
-		// If "use default" not selected - enable and clear textbox only if not yet enabled.
-		if (!fUseGitDefaultLocationButton.getSelection()) {
-			if (!fGitLocationText.isEnabled()) {
-				fGitLocationText.setText(""); //$NON-NLS-1$
-				fGitLocationText.setEnabled(true);
-			}
-		// Otherwise, ask remote machine for location.
-		// Textbox must be either enabled or disabled depending on if the request is successful.
+	// Alter content and UI elements in response to button push
+	private void handleGitDefaultLocationButtonPushed() {
+		if (fUseGitDefaultLocationButton.getSelection()) {
+			this.changeToDefaultGitLocation();
 		} else {
+			fGitLocationText.setText(""); //$NON-NLS-1$
+			this.setUsingDefaultGitLocation(false);
+		}
+	}
+
+	// Fill in Git location text and set the related UI elements based on the given information.
+	// syncProviderPath may be null or empty, in which case this function attempts to set the default Git.
+	private void setGitLocationUI(boolean isRemote, String syncProviderPath) {
+		// For a local project, make blank
+		if (!isRemote) {
+			this.setUsingDefaultGitLocation(true);
+			fGitLocationText.setText(""); //$NON-NLS-1$
+		// If path already available, use it and assume it is not default.
+		} else if (syncProviderPath != null && syncProviderPath.length() > 0) {
+			this.setUsingDefaultGitLocation(false);
+			fGitLocationText.setText(syncProviderPath);
+		// Otherwise, attempt to retrieve default path
+		} else {
+			this.changeToDefaultGitLocation();
+		}
+	}
+	
+	// Attempt to retrieve default Git on remote and set UI elements appropriately.
+	// Fills in textbox only if default Git found.
+	private void changeToDefaultGitLocation() {
+		String errorMessage = null;
+		CommandResults cr = null;
+		if (fSelectedConnection == null) {
+			errorMessage = Messages.BuildRemotePropertiesPage_6 + ": " + Messages.BuildRemotePropertiesPage_9; //$NON-NLS-1$
+		} else {
+			// Run command to get Git path
 			List<String> args = Arrays.asList("which", "git"); //$NON-NLS-1$ //$NON-NLS-2$
-			String errorMessage;
-			CommandResults cr = null;
 			try {
-				cr = this.runRemoteCommand(args);
+				cr = this.runRemoteCommand(fSelectedConnection, args);
 				errorMessage = this.buildErrorMessage(cr, Messages.BuildRemotePropertiesPage_6, null);
 			} catch (RemoteExecutionException e) {
 				errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_7, e);
 			}
+		}
 
-			// Unable to find Git location
-			if (errorMessage != null) {
-				fGitLocationText.setText(""); //$NON-NLS-1$
-				fUseGitDefaultLocationButton.setSelection(false);
-				fGitLocationText.setEnabled(true);
-				MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_8, errorMessage);
-			// Git location found
-			} else {
-				fGitLocationText.setText(cr.getStdout().trim());
-				fGitLocationText.setEnabled(false);
-			}
+		// Unable to find Git location
+		if (errorMessage != null) {
+			this.setUsingDefaultGitLocation(false);
+			MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_8, errorMessage);
+		// Git location found
+		} else {
+			this.setUsingDefaultGitLocation(true);
+			fGitLocationText.setText(cr.getStdout().trim());
+		}
+	}
+	
+	// Set UI elements either for using default Git or not using default Git.
+	// Enforces the following invariant: Other elements disabled if and only if "use default" selected.
+	private void setUsingDefaultGitLocation(boolean useDefault) {
+		if (useDefault) {
+			fUseGitDefaultLocationButton.setSelection(true);
+			fGitLocationText.setEnabled(false);
+			fGitLocationBrowseButton.setEnabled(false);
+		} else {
+			fUseGitDefaultLocationButton.setSelection(false);
+			fGitLocationText.setEnabled(true);
+			fGitLocationBrowseButton.setEnabled(true);
 		}
 	}
 	
 	// Wrapper for using command runner - primarily wrapping all of the exceptions.
-	private CommandResults runRemoteCommand(List<String> command) throws RemoteExecutionException {
+	private CommandResults runRemoteCommand(IRemoteConnection conn, List<String> command) throws RemoteExecutionException {
 		try {
-			return CommandRunner.executeRemoteCommand(fSelectedConnection, command, fRootLocationText.getText(), null);
+			return CommandRunner.executeRemoteCommand(fSelectedConnection, command, null, null);
 		} catch (RemoteSyncException e) {
 			throw new RemoteExecutionException(e);
 		} catch (IOException e) {
