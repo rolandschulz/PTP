@@ -26,6 +26,8 @@ import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayCompMinSize;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -77,6 +79,12 @@ public class RectanglePaintListener implements PaintListener {
 	 * space around the grid in y-direction
 	 */
 	public int marginHeight = 1;
+
+	/**
+	 * Saves the maximum width accepted for double buffering. Otherwise
+	 * it is switched of in order to workaround the SWT bug.
+	 */
+	private static final int maxWidthForDoubleBuffer = 30000;
 
 	/**
 	 * Minimal width of drawn rectangles
@@ -137,6 +145,12 @@ public class RectanglePaintListener implements PaintListener {
 	 * it is false.
 	 */
 	private final boolean rootListener;
+
+	/**
+	 * Image for double buffering this painter.
+	 * It is only created for root listeners
+	 */
+	private Image doubleBuffer = null;
 
 	/**
 	 * Create the listener, initialize attributes and generate nodetocolor-map.
@@ -360,12 +374,24 @@ public class RectanglePaintListener implements PaintListener {
 	 * 
 	 * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
 	 */
+	@Override
 	public void paintControl(PaintEvent event) {
 		updateRectangleSize();
 
 		// Do not paint, if rectangle is invisible
 		if (!isPaintAreaVisible()) {
 			return;
+		}
+		GC eventGC = null;
+		GC doubleBufGC = null;
+
+		if (doDoubleBuffering()) {
+			// Init double buffering
+			eventGC = event.gc;
+			doubleBufGC = new GC(doubleBuffer);
+			doubleBufGC.setForeground(eventGC.getForeground());
+			doubleBufGC.setFont(eventGC.getFont());
+			event.gc = doubleBufGC;
 		}
 
 		// Paint background color
@@ -380,6 +406,16 @@ public class RectanglePaintListener implements PaintListener {
 				paintChild(event, x, y);
 			}
 
+		}
+
+		if (doDoubleBuffering()) {
+			// Finish double buffering
+			if (eventGC != null) {
+				eventGC.drawImage(doubleBuffer, 0, 0);
+			}
+			if (doubleBufGC != null) {
+				doubleBufGC.dispose();
+			}
 		}
 
 	}
@@ -621,6 +657,15 @@ public class RectanglePaintListener implements PaintListener {
 	}
 
 	/**
+	 * @return true, if double buffering should be enabled, false otherwise
+	 */
+	protected boolean doDoubleBuffering() {
+		return rootListener && doubleBuffer != null &&
+				doubleBuffer.getBounds().width < maxWidthForDoubleBuffer
+				&& doubleBuffer.getBounds().height < maxWidthForDoubleBuffer;
+	}
+
+	/**
 	 * Find a rectangle, in which a direct child node is painted.
 	 * This function only handles nodes, which can be found
 	 * in the nodes-list.
@@ -661,6 +706,24 @@ public class RectanglePaintListener implements PaintListener {
 		if (rootListener) {
 			final Point nodedisplaySize = usingListener.getSize();
 			updatePaintArea(new Rectangle(0, 0, nodedisplaySize.x, nodedisplaySize.y));
+			final Rectangle subPaintArea = NodedisplayComp.getNextNodedisplayBounds(usingListener);
+			int imgWidth = subPaintArea.width;
+			int imgHeight = subPaintArea.height;
+			if (imgWidth == 0) {
+				imgWidth = 1;
+			}
+			if (imgHeight == 0) {
+				imgHeight = 1;
+			}
+			if (doubleBuffer == null ||
+					doubleBuffer.getBounds().width != imgWidth ||
+					doubleBuffer.getBounds().height != imgHeight) {
+				// Delete the old image if necessary
+				if (doubleBuffer != null) {
+					doubleBuffer.dispose();
+				}
+				doubleBuffer = new Image(nodedisplayComp.getDisplay(), imgWidth, imgHeight);
+			}
 		}
 
 		int width, height;
