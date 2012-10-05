@@ -175,6 +175,9 @@ public class CommandRunner {
 	 * 
 	 * @param conn
 	 * @param command
+	 * @param remoteDirectory
+	 * 					Working directory for command
+	 * @param monitor
 	 * @return CommandResults (contains stdout, stderr, and exit code)
 	 * @throws IOException
 	 *             in several cases if there is a problem communicating with the remote host.
@@ -200,7 +203,10 @@ public class CommandRunner {
 	 * Execute command on a remote host and wait for the command to complete.
 	 * 
 	 * @param conn
-	 * @param command
+	 * @param commandList
+	 * @param remoteDirectory
+	 * 					Working directory for command
+	 * @param monitor
 	 * @return CommandResults (contains stdout, stderr, and exit code)
 	 * @throws IOException
 	 *             in several cases if there is a problem communicating with the remote host.
@@ -214,14 +220,14 @@ public class CommandRunner {
 	public static CommandResults executeRemoteCommand(IRemoteConnection conn, List<String> commandList, String remoteDirectory,
 															IProgressMonitor monitor) throws 
 																	IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
-	
-		
 		if (!conn.isOpen()) {
 			conn.open(monitor);
 		}
 		final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandList);
 		final IRemoteFileManager rfm = conn.getRemoteServices().getFileManager(conn);
-		rpb.directory(rfm.getResource(remoteDirectory));
+		if (remoteDirectory != null && remoteDirectory.length() > 0) {
+			rpb.directory(rfm.getResource(remoteDirectory));
+		}
 
 		// Run process and stream readers
 		OutputStream output = new ByteArrayOutputStream();
