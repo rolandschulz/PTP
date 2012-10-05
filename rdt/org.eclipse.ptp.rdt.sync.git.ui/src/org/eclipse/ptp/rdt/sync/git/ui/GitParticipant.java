@@ -273,6 +273,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		// Git location browse button
 		fGitLocationBrowseButton = new Button(configArea, SWT.PUSH);
 		fGitLocationBrowseButton.setText(Messages.GitParticipant_browse);
+		fGitLocationBrowseButton.setEnabled(false);
 		fGitLocationBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -492,12 +493,15 @@ public class GitParticipant implements ISynchronizeParticipant {
 				fGitLocationText.setEnabled(false);
 			}
 		}
+		
+		// Browse button should be enabled if and only if textbox is enabled.
+		fGitLocationBrowseButton.setEnabled(fGitLocationText.isEnabled());
 	}
 	
 	// Wrapper for using command runner - primarily wrapping all of the exceptions.
 	private CommandResults runRemoteCommand(List<String> command) throws RemoteExecutionException {
 		try {
-			return CommandRunner.executeRemoteCommand(fSelectedConnection, command, fLocationText.getText(), null);
+			return CommandRunner.executeRemoteCommand(fSelectedConnection, command, null, null);
 		} catch (RemoteSyncException e) {
 			throw new RemoteExecutionException(e);
 		} catch (IOException e) {
