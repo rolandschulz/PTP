@@ -106,6 +106,11 @@ public class NodedisplayView extends AbstractNodedisplayView {
 	}
 
 	/**
+	 * Saves the currently displayed LML-node.
+	 */
+	private Node<LMLNodeData> shownNode;
+
+	/**
 	 * Count of readjustments after the nodedisplay was changed
 	 */
 	private final int adjustCount = 10;
@@ -386,6 +391,36 @@ public class NodedisplayView extends AbstractNodedisplayView {
 		super.setFixedLevel(level);
 	}
 
+	@Override
+	public void setMaxLevel(int maxLevel) {
+		// Check constraints for the maxLevel
+		if (maxLevel < 1) {
+			maxLevel = 1;
+		}
+		// Make sure that level is not greater then the deepest level defined in the nodedisplay's scheme
+		if (nodedisplay != null) {
+			if (nodedisplay.getScheme() != null) {
+				if (LMLCheck.getDeepestSchemeLevel(nodedisplay.getScheme()) < maxLevel) {
+					maxLevel = LMLCheck.getDeepestSchemeLevel(nodedisplay.getScheme());
+				}
+			}
+		}
+
+		final int nodeLevel = shownNode.getData().getLevelIds().size();
+		lguiItem.getLayoutAccess().setMaxLevelOnLevel(nodedisplayLayout, nodeLevel, maxLevel);
+	}
+
+	/**
+	 * Really adjusts the maxlevel attribute defined in this Nodedisplay's layout.
+	 * Checks wether this level is allowed.
+	 * 
+	 * @param level
+	 *            the new maxlevel of detail shown by the nodedisplay at current zoom position
+	 */
+	public void setMaxLevelInLayout(int level) {
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -483,6 +518,8 @@ public class NodedisplayView extends AbstractNodedisplayView {
 			zoomStack.push(oldShown);
 		}
 
+		notifyZoom(impName, true);
+
 		this.setCursor(defaultCursor);
 	}
 
@@ -505,10 +542,12 @@ public class NodedisplayView extends AbstractNodedisplayView {
 
 			// Switch view to node with impname
 			goToImpName(impName);
+			notifyZoom(impName, false);
 		}
 		else {
 			// If zoom-stack is empty go to root level view
 			goToImpName(null);
+			notifyZoom(null, true);
 		}
 
 		this.setCursor(defaultCursor);
@@ -622,6 +661,7 @@ public class NodedisplayView extends AbstractNodedisplayView {
 		TreeExpansion.expandLMLNode(newNode, maxLevel);
 		TreeExpansion.generateUsagebarsForAllLeaves(newNode);
 		shownLevel = maxLevel;
+		shownNode = newNode;
 
 		return createChildNodedisplay(newNode, layout);
 	}

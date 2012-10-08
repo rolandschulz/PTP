@@ -182,6 +182,15 @@ public abstract class AbstractNodedisplayView extends LguiWidget {
 	}
 
 	/**
+	 * Set the maxLevel of detail, which the nodedisplay should render.
+	 * Really changes the maxLevel in the nodedisplay's layout.
+	 * 
+	 * @param maxLevel
+	 *            the maximum level of detail shown
+	 */
+	public abstract void setMaxLevel(int maxLevel);
+
+	/**
 	 * Define the minimum size of rectangles painted
 	 * within this nodedisplay. This function informs
 	 * the RectangleSizeChange-listeners about the size change.

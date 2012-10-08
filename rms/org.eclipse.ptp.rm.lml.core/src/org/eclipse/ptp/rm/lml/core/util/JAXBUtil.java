@@ -406,9 +406,9 @@ public class JAXBUtil {
 
 			if (object instanceof LayoutType) {
 				if (object instanceof SplitlayoutType) {
-					lgui.getObjectsAndRelationsAndInformation().add(element);
+					result.getObjectsAndRelationsAndInformation().add(element);
 				} else if (object instanceof AbslayoutType) {
-					lgui.getObjectsAndRelationsAndInformation().add(element);
+					result.getObjectsAndRelationsAndInformation().add(element);
 				}
 
 				if (object instanceof SplitlayoutType) {
