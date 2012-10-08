@@ -321,6 +321,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		int selectionIndex = fConnectionCombo.getSelectionIndex();
 		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
 		update();
+		this.changeGitLocationUIForConnection();
 	}
 	
 	/**
@@ -483,14 +484,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			fConfigToPageSettings.put(getCfg().getId(), settings);
 		}
 
-		if (settings.syncProvider != null) {
-			fSyncToggleButton.setSelection(true);
-			this.setIsRemoteConfig(true);
-		} else {
-			fSyncToggleButton.setSelection(false);
-			this.setIsRemoteConfig(false);
-		}
-
 		// Note that provider selection populates the local connection map variables as well as the connection combo. Thus, the
 		// provider must be selected first. (Calling select invokes the "handle" listeners for each combo.)
 		fProviderCombo.select(fComboRemoteServicesProviderToIndexMap.get(settings.remoteProvider));
@@ -503,8 +496,14 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 		handleConnectionSelected();
 		fRootLocationText.setText(settings.rootLocation);
-		
-		this.setGitLocationUI((settings.syncProvider == null ? false : true), settings.syncProviderPath);
+
+		if (settings.syncProvider != null) {
+			fSyncToggleButton.setSelection(true);
+			this.setIsRemoteConfig(true);
+		} else {
+			fSyncToggleButton.setSelection(false);
+			this.setIsRemoteConfig(false);
+		}
 	}
 
 	private void setIsRemoteConfig(boolean isRemote) {
@@ -681,6 +680,18 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		return super.isValid() && getErrorMessage()==null;
 	}
 	
+	// Functions for setting Git location UI elements
+	// The first three functions are the outer interface to change the elements. The next two functions are helpers that should
+	// only be invoked by the first three.
+	
+	private void changeGitLocationUIForConnection() {
+		if (!fUseGitDefaultLocationButton.getSelection()) {
+			return;
+		} else {	
+			this.changeToDefaultGitLocation();
+		}
+	}
+
 	// Alter content and UI elements in response to button push
 	private void handleGitDefaultLocationButtonPushed() {
 		if (fUseGitDefaultLocationButton.getSelection()) {
@@ -750,6 +761,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			fGitLocationBrowseButton.setEnabled(true);
 		}
 	}
+	
+	// End functions for setting Git location UI elements
 	
 	// Wrapper for using command runner - primarily wrapping all of the exceptions.
 	private CommandResults runRemoteCommand(IRemoteConnection conn, List<String> command) throws RemoteExecutionException {
