@@ -180,6 +180,11 @@ public class NodedisplayViewDecorator extends AbstractNodedisplayView {
 		nodedisplayView.setLguiItem(lguiItem);
 	}
 
+	@Override
+	public void setMaxLevel(int maxLevel) {
+		nodedisplayView.setMaxLevel(maxLevel);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

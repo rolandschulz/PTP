@@ -32,8 +32,20 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfoboxlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
+import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplayelement;
 import org.eclipse.ptp.rm.lml.internal.core.elements.NodedisplaylayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement1;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement2;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement3;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement4;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement5;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement6;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement7;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement8;
+import org.eclipse.ptp.rm.lml.internal.core.elements.SchemeElement9;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TableType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.TablelayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarlayoutType;
@@ -122,6 +134,7 @@ public class LayoutAccess extends LguiHandler {
 		super(lguiItem, lgui);
 
 		this.lguiItem.addListener(new ILguiListener() {
+			@Override
 			public void handleEvent(ILguiUpdatedEvent e) {
 				update(e.getLgui());
 			}
@@ -355,7 +368,11 @@ public class LayoutAccess extends LguiHandler {
 		else {
 			final ObjectFactory objfc = new ObjectFactory();
 			final NodedisplaylayoutType layout = objfc.createNodedisplaylayoutType();
+			layout.setId("nodedisplay"); //$NON-NLS-1$
+			layout.setGid(gid);
 			layout.setEl0(objfc.createNodedisplayelement0());
+			// Insert this default layout as there was not one so far
+			jaxbUtil.replaceComponentLayout(lgui, lguiItem, layout);
 			return layout;
 		}
 	}
@@ -496,6 +513,92 @@ public class LayoutAccess extends LguiHandler {
 		return type;
 	}
 
+	/**
+	 * Set the maxLevel attribute on the layoutLevel of the passed layout
+	 * for all elements within the corresponding nodedisplay.
+	 * 
+	 * @param layout
+	 *            the adapted nodedisplay
+	 * @param layoutLevel
+	 *            the level of the layout, which is adapted
+	 * @param maxLevel
+	 *            the new maximum level of this layout
+	 */
+	public void setMaxLevelOnLevel(NodedisplaylayoutType layout, int layoutLevel, int maxLevel) {
+		// Make sure that there is at least the El0 element
+		if (layout.getEl0() == null) {
+			layout.setEl0(objectFactory.createNodedisplayelement0());
+		}
+
+		// For layoutLevel 0 just set the el0 maxLevel value
+		if (layoutLevel == 0) {
+			layout.getEl0().setMaxlevel(BigInteger.valueOf(maxLevel));
+			return;
+		}
+
+		final Nodedisplay nodedisplay = lguiItem.getNodedisplayAccess().getNodedisplayById(layout.getGid());
+
+		// Do the recursive traversal
+		setMaxLevelOnLevel(layout.getEl0(), nodedisplay.getScheme(), layoutLevel, maxLevel);
+	}
+
+	/**
+	 * Creates a nodedisplay element, which is a layout part, for all elements
+	 * of the given schemeElement.
+	 * 
+	 * @param scheme
+	 *            the scheme, for which a layout has to be generated
+	 * @return the layout for all scheme elements defined by the scheme
+	 */
+	private Nodedisplayelement createNodedisplayelementFromSchemeElement(SchemeElement scheme) {
+		Nodedisplayelement result = null;
+
+		if (scheme instanceof SchemeElement1) {
+			result = objectFactory.createNodedisplayelement1();
+		}
+		else if (scheme instanceof SchemeElement1) {
+			result = objectFactory.createNodedisplayelement2();
+		}
+		else if (scheme instanceof SchemeElement2) {
+			result = objectFactory.createNodedisplayelement2();
+		}
+		else if (scheme instanceof SchemeElement3) {
+			result = objectFactory.createNodedisplayelement3();
+		}
+		else if (scheme instanceof SchemeElement4) {
+			result = objectFactory.createNodedisplayelement4();
+		}
+		else if (scheme instanceof SchemeElement5) {
+			result = objectFactory.createNodedisplayelement5();
+		}
+		else if (scheme instanceof SchemeElement6) {
+			result = objectFactory.createNodedisplayelement6();
+		}
+		else if (scheme instanceof SchemeElement7) {
+			result = objectFactory.createNodedisplayelement7();
+		}
+		else if (scheme instanceof SchemeElement8) {
+			result = objectFactory.createNodedisplayelement8();
+		}
+		else if (scheme instanceof SchemeElement9) {
+			result = objectFactory.createNodedisplayelement9();
+		}
+		else
+			return null;
+
+		if (scheme.getMin() != null) {
+			result.setMin(scheme.getMin());
+		}
+		if (scheme.getMax() != null) {
+			result.setMax(scheme.getMax());
+		}
+		if (scheme.getList() != null) {
+			result.setList(scheme.getList());
+		}
+
+		return result;
+	}
+
 	private ComponentlayoutType getComponent(String gid) {
 		for (final ComponentlayoutType object : getComponentLayouts()) {
 			if (object.getGid().equals(gid)) {
@@ -515,4 +618,72 @@ public class LayoutAccess extends LguiHandler {
 		return infoboxLayouts;
 	}
 
+	/**
+	 * Recursive function call. Sets all maxLevel attributes of all
+	 * elements in the recursive depth of recLevel as children of layout.
+	 * The scheme is traversed in the same manner as layout, thus they have to
+	 * correspond in depth to each other.
+	 * 
+	 * @param layout
+	 *            the root layout, of which only its children are changed by this function
+	 * @param scheme
+	 *            the scheme element corresponding to the layout element
+	 * @param recLevel
+	 *            the recursive level, in which the maxLevel has to be adjusted
+	 * @param maxLevel
+	 *            the maxLevel, which must be set
+	 */
+	private void setMaxLevelOnLevel(Nodedisplayelement layout, Object scheme, int recLevel, int maxLevel) {
+		final List<Nodedisplayelement> lowerLayout = (List<Nodedisplayelement>) LMLCheck.getLowerNodedisplayElements(layout);
+
+		final List<SchemeElement> lowerSchemes = (List<SchemeElement>) LMLCheck.getLowerSchemeElements(scheme);
+
+		// If there is no lower layout element, then insert dummy layout elements derived from the current scheme
+		if (lowerLayout.size() == 0) {
+			for (final SchemeElement el : lowerSchemes) {
+				lowerLayout.add(createNodedisplayelementFromSchemeElement(el));
+			}
+		}
+		// Adjust all maxLevel attributes
+		for (final Nodedisplayelement layoutEl : lowerLayout) {
+			if (recLevel == 1) {
+				layoutEl.setMaxlevel(BigInteger.valueOf(maxLevel));
+			}
+			else {
+				// Traverse all possible ids
+				// Is there a min/max pair?
+				if (layoutEl.getMin() != null) {
+					final int min = layoutEl.getMin().intValue();
+					int max = min;
+
+					if (layoutEl.getMax() != null) {
+						max = layoutEl.getMax().intValue();
+					}
+
+					for (int i = min; i <= max; i++) {
+						final ArrayList<Integer> lowerId = new ArrayList<Integer>();
+						lowerId.add(i);
+						final SchemeElement lowerScheme = LMLCheck.getSchemeByLevels(lowerId, scheme);
+
+						if (lowerScheme != null) {
+							setMaxLevelOnLevel(layoutEl, lowerScheme, recLevel - 1, maxLevel);
+						}
+					}
+				}
+				else if (layoutEl.getList() != null) { // Is there an id list?
+					final int[] ids = LMLCheck.getNumbersFromNumberlist(layoutEl.getList());
+					for (final int i : ids) {
+						final ArrayList<Integer> lowerId = new ArrayList<Integer>();
+						lowerId.add(i);
+						final SchemeElement lowerScheme = LMLCheck.getSchemeByLevels(lowerId, scheme);
+
+						if (lowerScheme != null) {
+							setMaxLevelOnLevel(layoutEl, lowerScheme, recLevel - 1, maxLevel);
+						}
+					}
+				}
+
+			}
+		}
+	}
 }

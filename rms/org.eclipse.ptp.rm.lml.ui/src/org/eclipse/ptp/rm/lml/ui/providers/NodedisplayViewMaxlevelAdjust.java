@@ -10,6 +10,8 @@
  */
 package org.eclipse.ptp.rm.lml.ui.providers;
 
+import org.eclipse.ptp.rm.lml.core.events.INodedisplayZoomEvent;
+import org.eclipse.ptp.rm.lml.core.listeners.INodedisplayZoomListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
@@ -126,19 +128,17 @@ public class NodedisplayViewMaxlevelAdjust extends NodedisplayViewDecorator {
 				}
 			});
 
-			chooseByLayout = new Button(north, SWT.CHECK);
-			chooseByLayout.setText(Messages.NodedisplayViewMaxlevelAdjust_0);
-
-			chooseByLayout.setSelection(false);
-
-			chooseByLayout.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					setChooseByLayout(chooseByLayout.getSelection());
-				}
-			});
-
 			north.layout();
+
+			// Listen for zoom events
+			addZoomListener(new INodedisplayZoomListener() {
+
+				@Override
+				public void handleEvent(INodedisplayZoomEvent event) {
+					handleUpdate();
+				}
+
+			});
 
 		}
 	}
@@ -153,7 +153,7 @@ public class NodedisplayViewMaxlevelAdjust extends NodedisplayViewDecorator {
 	 */
 	public void decreaseMaximumLevel() {
 		if (nodedisplayView.getShownMaxLevel() > 1) {
-			nodedisplayView.setFixedLevel(nodedisplayView.getShownMaxLevel() - 1);
+			nodedisplayView.setMaxLevel(nodedisplayView.getShownMaxLevel() - 1);
 			update();
 		}
 	}
@@ -176,11 +176,8 @@ public class NodedisplayViewMaxlevelAdjust extends NodedisplayViewDecorator {
 	 * increased level value.
 	 */
 	public void increaseMaximumLevel() {
-		final int lastShownLevel = nodedisplayView.getShownMaxLevel();
-		nodedisplayView.setFixedLevel(nodedisplayView.getShownMaxLevel() + 1);
-		if (nodedisplayView.getFixedLevel() != lastShownLevel) {
-			update();
-		}
+		nodedisplayView.setMaxLevel(nodedisplayView.getShownMaxLevel() + 1);
+		update();
 	}
 
 	/*
@@ -215,34 +212,6 @@ public class NodedisplayViewMaxlevelAdjust extends NodedisplayViewDecorator {
 	public void update(ILguiItem lguiItem, Nodedisplay nodedislay) {
 		super.update(lguiItem, nodedislay);
 		handleUpdate();
-	}
-
-	/**
-	 * This action is executed everytime the chooseByLayout-button is clicked.
-	 * In enables and disables the maxlevel adjusting buttons <code>plus</code> and <code>minus</code>.
-	 * 
-	 * @param byLayout
-	 *            true means that the maximum level is chosen from the LML layout, false
-	 *            means that the user is able to choose a fixed level of expansion
-	 */
-	private void setChooseByLayout(boolean byLayout) {
-		if (addButtons) {
-			chooseByLayout.setSelection(byLayout);
-			if (byLayout) {
-				plus.setEnabled(false);
-				minus.setEnabled(false);
-				nodedisplayView.setFixedLevel(-1);
-				update();
-				north.layout();
-			}
-			else {
-				plus.setEnabled(true);
-				minus.setEnabled(true);
-				nodedisplayView.setFixedLevel(nodedisplayView.getShownMaxLevel());
-				update();
-				north.layout();
-			}
-		}
 	}
 
 	/**

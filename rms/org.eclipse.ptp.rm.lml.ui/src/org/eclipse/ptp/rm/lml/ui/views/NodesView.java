@@ -20,6 +20,7 @@ import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.INodedisplayZoomEvent;
 import org.eclipse.ptp.rm.lml.core.events.ISelectObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableFilterEvent;
 import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
@@ -27,12 +28,13 @@ import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
+import org.eclipse.ptp.rm.lml.core.listeners.INodedisplayZoomListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
+import org.eclipse.ptp.rm.lml.ui.providers.AbstractNodedisplayView;
 import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayView;
-import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayViewMaxlevelAdjust;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -145,7 +147,7 @@ public class NodesView extends ViewPart {
 	}
 
 	private Composite composite = null;
-	private NodedisplayViewMaxlevelAdjust nodedisplayView = null;
+	private AbstractNodedisplayView nodedisplayView = null;
 	public Viewer viewer;
 	public ILguiItem fLguiItem = null;
 	private final ILMLListener lguiListener = new LguiListener();
@@ -179,10 +181,23 @@ public class NodesView extends ViewPart {
 		fLguiItem = lmlManager.getSelectedLguiItem();
 		lmlManager.addListener(lguiListener, this.getClass().getName());
 
-		nodedisplayView = new NodedisplayViewMaxlevelAdjust(new NodedisplayView(null, null, composite), false, composite);
+		nodedisplayView = new NodedisplayView(null, null, composite);
 		if (fLguiItem != null) {
 			nodedisplayView.update(fLguiItem);
 		}
+
+		// Check level of detail buttons on zoom event
+		nodedisplayView.addZoomListener(new INodedisplayZoomListener() {
+			@Override
+			public void handleEvent(INodedisplayZoomEvent event) {
+				UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+					@Override
+					public void run() throws Exception {
+						checkActionStates();
+					}
+				});
+			}
+		});
 
 		createToolbar();
 
@@ -208,7 +223,6 @@ public class NodesView extends ViewPart {
 	 * have to be enabled or disabled.
 	 */
 	protected void checkActionStates() {
-
 		if (nodedisplayView == null) {
 			decAction.setEnabled(false);
 			incAction.setEnabled(false);
@@ -228,7 +242,8 @@ public class NodesView extends ViewPart {
 			@Override
 			public void run() {
 				if (nodedisplayView != null) {
-					nodedisplayView.increaseMaximumLevel();
+					nodedisplayView.setMaxLevel(nodedisplayView.getShownMaxLevel() + 1);
+					nodedisplayView.update();
 				}
 				checkActionStates();
 			}
@@ -238,7 +253,10 @@ public class NodesView extends ViewPart {
 			@Override
 			public void run() {
 				if (nodedisplayView != null) {
-					nodedisplayView.decreaseMaximumLevel();
+					if (nodedisplayView.getShownMaxLevel() > 1) {
+						nodedisplayView.setMaxLevel(nodedisplayView.getShownMaxLevel() - 1);
+						nodedisplayView.update();
+					}
 				}
 				checkActionStates();
 			}
