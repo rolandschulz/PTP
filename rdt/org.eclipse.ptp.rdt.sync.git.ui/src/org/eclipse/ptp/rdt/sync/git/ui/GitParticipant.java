@@ -12,6 +12,7 @@
 package org.eclipse.ptp.rdt.sync.git.ui;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,10 +20,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
@@ -77,6 +82,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 //	private Control fDialogControl;
 //	private Point fDialogSize;
 //	private Text fNameText;
+	private Composite parent;
 	private Button fRemoteLocationBrowseButton;
 	private Button fGitLocationBrowseButton;
 	private Button fUseGitDefaultLocationButton;
@@ -109,7 +115,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * (org.eclipse.swt.widgets.Composite,
 	 * org.eclipse.jface.operation.IRunnableContext)
 	 */
-	public void createConfigurationArea(Composite parent, IRunnableContext context) {
+	public void createConfigurationArea(Composite p, IRunnableContext context) {
+		parent = p;
 		this.container = (IWizardContainer)context;
 		final Composite configArea = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -475,7 +482,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 			String errorMessage;
 			CommandResults cr = null;
 			try {
-				cr = this.runRemoteCommand(args);
+				cr = this.runRemoteCommand(args, "Finding remote Git location");
 				errorMessage = this.buildErrorMessage(cr, "Unable to find Git on remote", null);
 			} catch (RemoteExecutionException e) {
 				errorMessage = this.buildErrorMessage(null, "Unable to find Git on remote", e);
@@ -497,21 +504,41 @@ public class GitParticipant implements ISynchronizeParticipant {
 		// Browse button should be enabled if and only if textbox is enabled.
 		fGitLocationBrowseButton.setEnabled(fGitLocationText.isEnabled());
 	}
-	
-	// Wrapper for using command runner - primarily wrapping all of the exceptions.
-	private CommandResults runRemoteCommand(List<String> command) throws RemoteExecutionException {
+
+	// Wrapper for running commands - wraps exceptions and invoking of command runner inside container run command.
+	private CommandResults remoteCommandResults;
+	private CommandResults runRemoteCommand(final List<String> command, final String commandDesc) throws RemoteExecutionException {
+		ProgressMonitorDialog dialog = new ProgressMonitorDialog(parent.getShell()); 
 		try {
-			return CommandRunner.executeRemoteCommand(fSelectedConnection, command, null, null);
-		} catch (RemoteSyncException e) {
-			throw new RemoteExecutionException(e);
-		} catch (IOException e) {
-			throw new RemoteExecutionException(e);
+			dialog.run(false, true, new IRunnableWithProgress() {
+				@Override
+				public void run(IProgressMonitor monitor) throws InvocationTargetException {
+					monitor.beginTask(commandDesc, 100);
+					SubMonitor progress = SubMonitor.convert(monitor, 100);
+					try {
+						remoteCommandResults = CommandRunner.executeRemoteCommand(fSelectedConnection, command, null, progress);
+					} catch (RemoteSyncException e) {
+						throw new InvocationTargetException(e);
+					} catch (IOException e) {
+						throw new InvocationTargetException(e);
+					} catch (InterruptedException e) {
+						throw new InvocationTargetException(e);
+					} catch (RemoteConnectionException e) {
+						throw new InvocationTargetException(e);
+					} finally {
+						monitor.done();
+					}
+				}
+			});
+		} catch (InvocationTargetException e) {
+			throw new RemoteExecutionException(e.getCause());
 		} catch (InterruptedException e) {
 			throw new RemoteExecutionException(e);
-		} catch (RemoteConnectionException e) {
-			throw new RemoteExecutionException(e);
 		}
+		return remoteCommandResults;
 	}
+	
+
 	
 	// Builds error message for command.
 	// Either the command result or the exception should be null, but not both.
