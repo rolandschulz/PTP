@@ -525,6 +525,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			fNewConnectionButton.setEnabled(false);
 		}
 		this.setGitLocationUI(isRemote, fGitLocationText.getText());
+		fUseGitDefaultLocationButton.setEnabled(isRemote);
 	}
 
 	/**
