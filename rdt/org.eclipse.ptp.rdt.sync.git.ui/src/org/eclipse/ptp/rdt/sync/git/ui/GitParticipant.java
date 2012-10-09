@@ -59,6 +59,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -69,6 +70,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public class GitParticipant implements ISynchronizeParticipant {
 	private static final String FILE_SCHEME = "file"; //$NON-NLS-1$
+	private static final Display display = Display.getCurrent();
 
 	// private IServiceConfiguration fConfig;
 	private IRemoteConnection fSelectedConnection;
@@ -263,6 +265,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setGitLocation();
+				update();
 			}
 		});
 		fUseGitDefaultLocationButton.setSelection(false);
@@ -278,6 +281,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		gd.grabExcessHorizontalSpace = true;
 		gd.widthHint = 250;
 		fGitLocationText.setLayoutData(gd);
+		fGitLocationText.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
 		fGitLocationText.setEnabled(true);
 		
 		// Git location browse button
@@ -317,7 +321,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 		fGitLocationValidationButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				gitValidated = validateGit();
+				setGitIsValid(isGitValid());
+				update();
 			}
 		});
 		
@@ -499,6 +504,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		if (!fUseGitDefaultLocationButton.getSelection()) {
 			if (!fGitLocationText.isEnabled()) {
 				fGitLocationText.setText(""); //$NON-NLS-1$
+				this.setGitIsValid(false);
 				fGitLocationText.setEnabled(true);
 			}
 		// Otherwise, ask remote machine for location.
@@ -517,12 +523,14 @@ public class GitParticipant implements ISynchronizeParticipant {
 			// Unable to find Git location
 			if (errorMessage != null) {
 				fGitLocationText.setText("");
+				this.setGitIsValid(false);
 				fUseGitDefaultLocationButton.setSelection(false);
 				fGitLocationText.setEnabled(true);
 				MessageDialog.openError(null, "Remote Execution", errorMessage);
 			// Git location found
 			} else {
 				fGitLocationText.setText(cr.getStdout().trim());
+				this.setGitIsValid(true);
 				fGitLocationText.setEnabled(false);
 			}
 		}
@@ -531,7 +539,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 		fGitLocationBrowseButton.setEnabled(fGitLocationText.isEnabled());
 	}
 	
-	private boolean validateGit() {
+	// Check if the Git location is valid (does not actually set it as valid)
+	private boolean isGitValid() {
 		List<String> args = Arrays.asList("test", "-x", fGitLocationText.getText());
 		String errorMessage = null;
 		CommandResults cr = null;
@@ -548,6 +557,16 @@ public class GitParticipant implements ISynchronizeParticipant {
 			return false;
 		} else {
 			return true;
+		}
+	}
+	
+	// Set the Git location as valid
+	private void setGitIsValid(boolean isValid) {
+		gitValidated = isValid;
+		if (isValid) {
+			fGitLocationText.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+		} else {
+			fGitLocationText.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
 		}
 	}
 
