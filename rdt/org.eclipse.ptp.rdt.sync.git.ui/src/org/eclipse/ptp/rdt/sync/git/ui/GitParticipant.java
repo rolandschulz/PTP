@@ -86,6 +86,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private Button fRemoteLocationBrowseButton;
 	private Button fGitLocationBrowseButton;
 	private Button fUseGitDefaultLocationButton;
+	private Button fGitLocationValidationButton;
 	private Button fNewConnectionButton;
 	private Combo fProviderCombo;
 	private Combo fConnectionCombo;
@@ -93,6 +94,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private Text fGitLocationText;
 
 	private IWizardContainer container;
+	
+	private boolean gitValidated = false;
 	
 	// If false, automatically select "Remote Tools" provider instead of letting the user select the provider.
 	private boolean showProviderCombo = false;
@@ -305,13 +308,26 @@ public class GitParticipant implements ISynchronizeParticipant {
 			}
 		});
 		
+		// Git location validation button
+		fGitLocationValidationButton = new Button(configArea, SWT.PUSH);
+		fGitLocationValidationButton.setText("Validate");
+		gd = new GridData(GridData.END, GridData.CENTER, true, false);
+		gd.horizontalSpan = 3;
+		fGitLocationValidationButton.setLayoutData(gd);
+		fGitLocationValidationButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				gitValidated = validateGit();
+			}
+		});
+		
 		handleConnectionSelected();
 	}
 
 	/**
 	 * Return the path we are going to display. If it is a file URI then remove
 	 * the file prefix.
-	 * 
+	 *
 	 * Only do this if the connection is open. Otherwise we will attempt to
 	 * connect to the first machine in the list, which is annoying.
 	 * 
@@ -356,6 +372,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 		if (fileManager.toURI(fGitLocationText.getText()) == null)
 			return "invalid Git path";
 		// should we check permissions of: fileManager.getResource(fLocationText.getText()).getParent() ?
+		if (!gitValidated)
+			return "Git location must be validated";
 		return null;
 	}
 
@@ -394,7 +412,6 @@ public class GitParticipant implements ISynchronizeParticipant {
 		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		fLocationText.setText(getDefaultPathDisplayString());
-		// Assume users want to select this too whenever they change the connection
 		this.changeGitLocationUIForConnection();
 		update();
 	}
@@ -512,6 +529,26 @@ public class GitParticipant implements ISynchronizeParticipant {
 		
 		// Browse button should be enabled if and only if textbox is enabled.
 		fGitLocationBrowseButton.setEnabled(fGitLocationText.isEnabled());
+	}
+	
+	private boolean validateGit() {
+		List<String> args = Arrays.asList("test", "-x", fGitLocationText.getText());
+		String errorMessage = null;
+		CommandResults cr = null;
+		try {
+			cr = this.runRemoteCommand(args, "Verifying Git location");
+		} catch (RemoteExecutionException e) {
+			errorMessage = this.buildErrorMessage(null, "Unable to verify Git", e);
+		}
+
+		if (errorMessage != null) {
+			MessageDialog.openError(null, "Remote Execution", errorMessage);
+			return false;
+		} else if (cr.getExitCode() != 0) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	// Wrapper for running commands - wraps exceptions and invoking of command runner inside container run command.
