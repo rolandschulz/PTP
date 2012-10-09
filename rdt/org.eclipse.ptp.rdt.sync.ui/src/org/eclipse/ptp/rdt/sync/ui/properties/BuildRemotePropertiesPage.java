@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rdt.sync.ui.properties;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -25,10 +26,14 @@ import org.eclipse.cdt.managedbuilder.internal.core.MultiConfiguration;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractSingleBuildPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner;
@@ -110,6 +115,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	// Cache of page settings for each configuration accessed.
 	private final Map<String, PageSettings> fConfigToPageSettings = new HashMap<String, PageSettings>();
 
+	private Composite parent;
 	private Button fSyncToggleButton;
 	private Button fBrowseButton;
 	private Button fGitLocationBrowseButton;
@@ -134,7 +140,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 * @param parent
 	 * 				The parent composite
 	 */
-	public void createWidgets(Composite parent) {
+	public void createWidgets(Composite p) {
+		parent = p;
 		composite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
@@ -730,7 +737,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			// Run command to get Git path
 			List<String> args = Arrays.asList("which", "git"); //$NON-NLS-1$ //$NON-NLS-2$
 			try {
-				cr = this.runRemoteCommand(fSelectedConnection, args);
+				cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_10);
 				errorMessage = this.buildErrorMessage(cr, Messages.BuildRemotePropertiesPage_6, null);
 			} catch (RemoteExecutionException e) {
 				errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_7, e);
@@ -764,19 +771,37 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	
 	// End functions for setting Git location UI elements
 	
-	// Wrapper for using command runner - primarily wrapping all of the exceptions.
-	private CommandResults runRemoteCommand(IRemoteConnection conn, List<String> command) throws RemoteExecutionException {
+	// Wrapper for running commands - wraps exceptions and invoking of command runner inside container run command.
+	private CommandResults remoteCommandResults;
+	private CommandResults runRemoteCommand(final List<String> command, final String commandDesc) throws RemoteExecutionException {
+		ProgressMonitorDialog dialog = new ProgressMonitorDialog(parent.getShell()); 
 		try {
-			return CommandRunner.executeRemoteCommand(fSelectedConnection, command, null, null);
-		} catch (RemoteSyncException e) {
-			throw new RemoteExecutionException(e);
-		} catch (IOException e) {
-			throw new RemoteExecutionException(e);
+			dialog.run(false, true, new IRunnableWithProgress() {
+				@Override
+				public void run(IProgressMonitor monitor) throws InvocationTargetException {
+					monitor.beginTask(commandDesc, 100);
+					SubMonitor progress = SubMonitor.convert(monitor, 100);
+					try {
+						remoteCommandResults = CommandRunner.executeRemoteCommand(fSelectedConnection, command, null, progress);
+					} catch (RemoteSyncException e) {
+						throw new InvocationTargetException(e);
+					} catch (IOException e) {
+						throw new InvocationTargetException(e);
+					} catch (InterruptedException e) {
+						throw new InvocationTargetException(e);
+					} catch (RemoteConnectionException e) {
+						throw new InvocationTargetException(e);
+					} finally {
+						monitor.done();
+					}
+				}
+			});
+		} catch (InvocationTargetException e) {
+			throw new RemoteExecutionException(e.getCause());
 		} catch (InterruptedException e) {
 			throw new RemoteExecutionException(e);
-		} catch (RemoteConnectionException e) {
-			throw new RemoteExecutionException(e);
 		}
+		return remoteCommandResults;
 	}
 	
 	// Builds error message for command.

@@ -123,6 +123,7 @@ public class Messages extends NLS {
 	public static String BRPPage_ConnectionButton;
 	public static String BuildRemotePropertiesPage_0;
 	public static String BuildRemotePropertiesPage_1;
+	public static String BuildRemotePropertiesPage_10;
 	public static String BuildRemotePropertiesPage_2;
 	public static String BuildRemotePropertiesPage_3;
 	public static String BuildRemotePropertiesPage_4;
