@@ -502,7 +502,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			}
 		}
 		handleConnectionSelected();
-		fRootLocationText.setText(settings.rootLocation);
 
 		if (settings.syncProvider != null) {
 			fSyncToggleButton.setSelection(true);
@@ -511,6 +510,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			fSyncToggleButton.setSelection(false);
 			this.setIsRemoteConfig(false);
 		}
+		
+		fRootLocationText.setText(settings.rootLocation);
 	}
 
 	private void setIsRemoteConfig(boolean isRemote) {
