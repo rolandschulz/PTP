@@ -262,7 +262,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 				setGitLocation();
 			}
 		});
-		fUseGitDefaultLocationButton.setSelection(true);
+		fUseGitDefaultLocationButton.setSelection(false);
 
 		// Git location label
 		Label gitLocationLabel = new Label(configArea, SWT.NONE);
@@ -275,12 +275,12 @@ public class GitParticipant implements ISynchronizeParticipant {
 		gd.grabExcessHorizontalSpace = true;
 		gd.widthHint = 250;
 		fGitLocationText.setLayoutData(gd);
-		fGitLocationText.setEnabled(false);
+		fGitLocationText.setEnabled(true);
 		
 		// Git location browse button
 		fGitLocationBrowseButton = new Button(configArea, SWT.PUSH);
 		fGitLocationBrowseButton.setText(Messages.GitParticipant_browse);
-		fGitLocationBrowseButton.setEnabled(false);
+		fGitLocationBrowseButton.setEnabled(true);
 		fGitLocationBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -395,8 +395,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		fLocationText.setText(getDefaultPathDisplayString());
 		// Assume users want to select this too whenever they change the connection
-		fUseGitDefaultLocationButton.setSelection(true);
-		this.setGitLocation();
+		this.changeGitLocationUIForConnection();
 		update();
 	}
 
@@ -466,7 +465,17 @@ public class GitParticipant implements ISynchronizeParticipant {
 		fProjectName = projectName;
 		fLocationText.setText(getDefaultPathDisplayString());
 	}
-	
+
+	// Decide whether to check or not check "use default location" on a connection change before calling setGitLocation()
+	private void changeGitLocationUIForConnection() {
+		if (fSelectedConnection != null && fSelectedConnection.isOpen()) {
+			fUseGitDefaultLocationButton.setSelection(true);
+		} else {
+			fUseGitDefaultLocationButton.setSelection(false);
+		}
+		this.setGitLocation();
+	}
+
 	// Fill in Git location text and set the related UI elements.
 	private void setGitLocation() {
 		// If "use default" not selected - enable and clear textbox only if not yet enabled.
