@@ -537,9 +537,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		}
 		return remoteCommandResults;
 	}
-	
 
-	
 	// Builds error message for command.
 	// Either the command result or the exception should be null, but not both.
 	// baseMessage cannot be null.
