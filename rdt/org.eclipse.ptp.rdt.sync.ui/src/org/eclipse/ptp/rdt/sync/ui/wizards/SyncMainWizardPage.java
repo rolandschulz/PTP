@@ -56,7 +56,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.TextProcessor;
-import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
@@ -64,7 +63,6 @@ import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 import org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage;
 import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
@@ -1061,9 +1059,5 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	public SyncFileFilter getCustomFileFilter() {
 		return customFilter;
-	}
-	
-	private CommandResults runRemoteCommand(IRemoteConnection conn, List<String> command) {
-		return null;
 	}
 }
