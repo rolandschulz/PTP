@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizardContainer;
@@ -70,6 +70,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public class GitParticipant implements ISynchronizeParticipant {
 	private static final String FILE_SCHEME = "file"; //$NON-NLS-1$
+	private static final String TOUCH_TEST_FILE = ".touch_test_file_ptp_sync";
 	private static final Display display = Display.getCurrent();
 
 	// private IServiceConfiguration fConfig;
@@ -85,7 +86,9 @@ public class GitParticipant implements ISynchronizeParticipant {
 //	private Point fDialogSize;
 //	private Text fNameText;
 	private Composite parent;
+	private IRunnableContext context;
 	private Button fRemoteLocationBrowseButton;
+	private Button fRemoteLocationValidationButton;
 	private Button fGitLocationBrowseButton;
 	private Button fUseGitDefaultLocationButton;
 	private Button fGitLocationValidationButton;
@@ -98,6 +101,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private IWizardContainer container;
 	
 	private boolean gitValidated = false;
+	private boolean remoteValidated = false;
 	
 	// If false, automatically select "Remote Tools" provider instead of letting the user select the provider.
 	private boolean showProviderCombo = false;
@@ -120,8 +124,9 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * (org.eclipse.swt.widgets.Composite,
 	 * org.eclipse.jface.operation.IRunnableContext)
 	 */
-	public void createConfigurationArea(Composite p, IRunnableContext context) {
+	public void createConfigurationArea(Composite p, IRunnableContext c) {
 		parent = p;
+		context = c;
 		this.container = (IWizardContainer)context;
 		final Composite configArea = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -213,6 +218,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 
 		// Remote directory textbox
 		fLocationText = new Text(configArea, SWT.SINGLE | SWT.BORDER);
+		fLocationText.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		gd.grabExcessHorizontalSpace = true;
@@ -222,6 +228,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 			public void modifyText(ModifyEvent e) {
 				// MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID,setGitLocation
 				// PATH_PROPERTY, fLocationText.getText());
+				setRemoteIsValid(false);
 				update();
 			}
 		});
@@ -251,6 +258,20 @@ public class GitParticipant implements ISynchronizeParticipant {
 						}
 					}
 				}
+			}
+		});
+		
+		// Remote location validation button
+		fRemoteLocationValidationButton = new Button(configArea, SWT.PUSH);
+		fRemoteLocationValidationButton.setText("Validate");
+		gd = new GridData(GridData.END, GridData.CENTER, true, true);
+		gd.horizontalSpan = 3;
+		fRemoteLocationValidationButton.setLayoutData(gd);
+		fRemoteLocationValidationButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setRemoteIsValid(isRemoteValid());
+				update();
 			}
 		});
 		
@@ -315,7 +336,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		// Git location validation button
 		fGitLocationValidationButton = new Button(configArea, SWT.PUSH);
 		fGitLocationValidationButton.setText("Validate");
-		gd = new GridData(GridData.END, GridData.CENTER, true, false);
+		gd = new GridData(GridData.END, GridData.CENTER, true, true);
 		gd.horizontalSpan = 3;
 		fGitLocationValidationButton.setLayoutData(gd);
 		fGitLocationValidationButton.addSelectionListener(new SelectionAdapter() {
@@ -379,6 +400,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 		// should we check permissions of: fileManager.getResource(fLocationText.getText()).getParent() ?
 		if (!gitValidated)
 			return "Git location must be validated";
+		if (!remoteValidated)
+			return "Remote location must be validated";
 		return null;
 	}
 
@@ -417,6 +440,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		fLocationText.setText(getDefaultPathDisplayString());
+		this.setRemoteIsValid(false);
 		this.changeGitLocationUIForConnection();
 		update();
 	}
@@ -486,6 +510,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	public void setProjectName(String projectName) {
 		fProjectName = projectName;
 		fLocationText.setText(getDefaultPathDisplayString());
+		this.setRemoteIsValid(false);
 	}
 
 	// Decide whether to check or not check "use default location" on a connection change before calling setGitLocation()
@@ -539,6 +564,84 @@ public class GitParticipant implements ISynchronizeParticipant {
 		fGitLocationBrowseButton.setEnabled(fGitLocationText.isEnabled());
 	}
 	
+	// Check if the remote location is valid (does not actually set it as valid)
+	private boolean isRemoteValid() {
+		IPath parentPath = new Path(fLocationText.getText());
+		boolean isValid;
+		if (!parentPath.isAbsolute()) {
+			return false;
+		}
+
+		// Find the lowest-level file in the path that exist.
+		while(!parentPath.isRoot()) {
+			List<String> args = Arrays.asList("test", "-e", parentPath.toString());
+			String errorMessage = null;
+			CommandResults cr = null;
+			try {
+				cr = this.runRemoteCommand(args, "Verifying remote location");
+			} catch (RemoteExecutionException e) {
+				errorMessage = this.buildErrorMessage(null, "Unable to verify remote", e);
+			}
+
+			if (errorMessage != null) {
+				MessageDialog.openError(null, "Remote Execution", errorMessage);
+				return false;
+			} else if (cr.getExitCode() == 0) {
+				break;
+			}
+
+			parentPath = parentPath.removeLastSegments(1);
+		}
+
+		// Assume parent path is a directory and see if we can write a test file to it.
+		// Note that this test fails if parent path is not a directory, so no need to test that case.
+		String touchFile = parentPath.append(new Path(TOUCH_TEST_FILE)).toString();
+		List<String> args = Arrays.asList("touch", touchFile);
+		String errorMessage = null;
+		CommandResults cr = null;
+		try {
+			cr = this.runRemoteCommand(args, "Verifying remote location");
+		} catch (RemoteExecutionException e) {
+			errorMessage = this.buildErrorMessage(null, "Unable to verify remote", e);
+		}
+
+		if (errorMessage != null) {
+			MessageDialog.openError(null, "Remote Execution", errorMessage);
+			return false;
+		} else if (cr.getExitCode() == 0) {
+			isValid = true;
+		} else {
+			isValid = false;;
+		}
+		
+		// Remove the test file
+		args = Arrays.asList("rm", "-f", touchFile);
+		errorMessage = null;
+		cr = null;
+		try {
+			cr = this.runRemoteCommand(args, "Removing test file");
+			errorMessage = this.buildErrorMessage(cr, "Unable to remove test file: " + touchFile, null);
+		} catch (RemoteExecutionException e) {
+			errorMessage = this.buildErrorMessage(null, "Unable to remove test file: " + touchFile, e);
+		}
+
+		if (errorMessage != null) {
+			MessageDialog.openError(null, "Remote Execution", errorMessage);
+		}
+		
+		return isValid;
+	}
+	
+	// Set the remote location as valid
+	private void setRemoteIsValid(boolean isValid) {
+		remoteValidated = isValid;
+		if (isValid) {
+			fLocationText.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+		} else {
+			fLocationText.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
+		}
+	}
+
 	// Check if the Git location is valid (does not actually set it as valid)
 	private boolean isGitValid() {
 		List<String> args = Arrays.asList("test", "-x", fGitLocationText.getText());
@@ -573,9 +676,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 	// Wrapper for running commands - wraps exceptions and invoking of command runner inside container run command.
 	private CommandResults remoteCommandResults;
 	private CommandResults runRemoteCommand(final List<String> command, final String commandDesc) throws RemoteExecutionException {
-		ProgressMonitorDialog dialog = new ProgressMonitorDialog(parent.getShell()); 
 		try {
-			dialog.run(false, true, new IRunnableWithProgress() {
+			context.run(false, true, new IRunnableWithProgress() {
 				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException {
 					monitor.beginTask(commandDesc, 100);
