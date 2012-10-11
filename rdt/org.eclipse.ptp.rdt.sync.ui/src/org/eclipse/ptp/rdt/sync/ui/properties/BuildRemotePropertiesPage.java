@@ -83,6 +83,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private IConfiguration fConfigBeforeSwitch = null;
 	private boolean fWidgetsReady = false;
 	
+	// Assume values are valid by default
 	private boolean fGitValidated = true;
 	private boolean fRemoteValidated = true;
 
@@ -304,7 +305,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 				update();
 			}
 		});
-		fUseGitDefaultLocationButton.setSelection(true);
+		fUseGitDefaultLocationButton.setSelection(false);
 
 		// Git location label
 		Label gitLocationLabel = new Label(composite, SWT.NONE);
@@ -559,6 +560,16 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 		handleConnectionSelected();
 
+		fRootLocationText.setText(settings.rootLocation);
+		this.setRemoteIsValid(true);
+		
+		// Git location must be set before calling setIsRemoteConfig()
+		if (settings.syncProviderPath == null) {
+			fGitLocationText.setText(""); //$NON-NLS-1$
+		} else {
+			fGitLocationText.setText(settings.syncProviderPath);
+		}
+
 		if (settings.syncProvider != null) {
 			fSyncToggleButton.setSelection(true);
 			this.setIsRemoteConfig(true);
@@ -566,9 +577,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			fSyncToggleButton.setSelection(false);
 			this.setIsRemoteConfig(false);
 		}
-		
-		fRootLocationText.setText(settings.rootLocation);
-		this.setRemoteIsValid(true);
+
 		update();
 	}
 
@@ -804,8 +813,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	// Fill in Git location text and set the related UI elements based on the given information.
 	// syncProviderPath may be null or empty, in which case this function attempts to set the default Git.
 	private void setGitLocationUI(boolean isRemote, String syncProviderPath) {
-		this.setGitIsValid(true);
-		this.setRemoteIsValid(true);
 		// For a local project, make blank
 		if (!isRemote) {
 			this.setUsingDefaultGitLocation(true);
@@ -818,6 +825,10 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		} else {
 			this.changeToDefaultGitLocation();
 		}
+		
+		// Assume values are valid by default
+		this.setGitIsValid(true);
+		this.setRemoteIsValid(true);
 	}
 	
 	// Attempt to retrieve default Git on remote and set UI elements appropriately.
