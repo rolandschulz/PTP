@@ -76,7 +76,6 @@ public class GitParticipant implements ISynchronizeParticipant {
 	// private IServiceConfiguration fConfig;
 	private IRemoteConnection fSelectedConnection;
 	private IRemoteServices fSelectedProvider;
-	// private final IRunnableContext fContext;
 	private String fProjectName = ""; //$NON-NLS-1$
 
 	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
@@ -85,8 +84,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 //	private Control fDialogControl;
 //	private Point fDialogSize;
 //	private Text fNameText;
-	private Composite parent;
-	private IRunnableContext context;
+	private IRunnableContext fContext;
 	private Button fRemoteLocationBrowseButton;
 	private Button fRemoteLocationValidationButton;
 	private Button fGitLocationBrowseButton;
@@ -100,8 +98,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 
 	private IWizardContainer container;
 	
-	private boolean gitValidated = false;
-	private boolean remoteValidated = false;
+	private boolean fGitValidated = false;
+	private boolean fRemoteValidated = false;
 	
 	// If false, automatically select "Remote Tools" provider instead of letting the user select the provider.
 	private boolean showProviderCombo = false;
@@ -124,10 +122,9 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * (org.eclipse.swt.widgets.Composite,
 	 * org.eclipse.jface.operation.IRunnableContext)
 	 */
-	public void createConfigurationArea(Composite p, IRunnableContext c) {
-		parent = p;
-		context = c;
-		this.container = (IWizardContainer)context;
+	public void createConfigurationArea(Composite parent, IRunnableContext c) {
+		fContext = c;
+		this.container = (IWizardContainer)fContext;
 		final Composite configArea = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
@@ -157,7 +154,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		// IRemoteServices providerSelected = fProvider.getRemoteServices();
 
 		// populate the combo with a list of providers
-		IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(context);
+		IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(fContext);
 		int toSelect = 0;
 
 		for (int k = 0; k < providers.length; k++) {
@@ -398,9 +395,9 @@ public class GitParticipant implements ISynchronizeParticipant {
 		if (fileManager.toURI(fGitLocationText.getText()) == null)
 			return "invalid Git path";
 		// should we check permissions of: fileManager.getResource(fLocationText.getText()).getParent() ?
-		if (!gitValidated)
+		if (!fGitValidated)
 			return "Git location must be validated";
-		if (!remoteValidated)
+		if (!fRemoteValidated)
 			return "Remote location must be validated";
 		return null;
 	}
@@ -634,7 +631,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	
 	// Set the remote location as valid
 	private void setRemoteIsValid(boolean isValid) {
-		remoteValidated = isValid;
+		fRemoteValidated = isValid;
 		if (isValid) {
 			fLocationText.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
 		} else {
@@ -665,7 +662,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	
 	// Set the Git location as valid
 	private void setGitIsValid(boolean isValid) {
-		gitValidated = isValid;
+		fGitValidated = isValid;
 		if (isValid) {
 			fGitLocationText.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
 		} else {
@@ -677,7 +674,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private CommandResults remoteCommandResults;
 	private CommandResults runRemoteCommand(final List<String> command, final String commandDesc) throws RemoteExecutionException {
 		try {
-			context.run(false, true, new IRunnableWithProgress() {
+			fContext.run(false, true, new IRunnableWithProgress() {
 				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException {
 					monitor.beginTask(commandDesc, 100);
