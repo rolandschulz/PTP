@@ -194,6 +194,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 		// new connection button
 		fNewConnectionButton = new Button(configArea, SWT.PUSH);
 		fNewConnectionButton.setText(Messages.GitParticipant_new);
+		gd = new GridData(GridData.END, GridData.CENTER, false, false);
+		fNewConnectionButton.setLayoutData(gd);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		fNewConnectionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -233,6 +235,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 		// Remote location browse button
 		fRemoteLocationBrowseButton = new Button(configArea, SWT.PUSH);
 		fRemoteLocationBrowseButton.setText(Messages.GitParticipant_browse);
+		gd = new GridData(GridData.END, GridData.CENTER, false, false);
+		fRemoteLocationBrowseButton.setLayoutData(gd);
 		fRemoteLocationBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {

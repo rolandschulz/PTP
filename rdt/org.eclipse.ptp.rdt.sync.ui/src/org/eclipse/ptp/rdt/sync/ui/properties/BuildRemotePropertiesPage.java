@@ -12,6 +12,7 @@ package org.eclipse.ptp.rdt.sync.ui.properties;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -26,9 +27,11 @@ import org.eclipse.cdt.managedbuilder.internal.core.MultiConfiguration;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractSingleBuildPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -65,15 +68,23 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
+	private static final String FILE_SCHEME = "file"; //$NON-NLS-1$
+	private static final String TOUCH_TEST_FILE = ".touch_test_file_ptp_sync"; //$NON-NLS-1$
+	private static final Display display = Display.getCurrent();
+
 	private IRemoteConnection fSelectedConnection = null;
 	private IRemoteServices fSelectedProvider = null;
 	private IConfiguration fConfigBeforeSwitch = null;
 	private boolean fWidgetsReady = false;
+	
+	private boolean fGitValidated = true;
+	private boolean fRemoteValidated = true;
 
 	// Container for all information that appears on a page
 	private static class PageSettings {
@@ -115,12 +126,13 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	// Cache of page settings for each configuration accessed.
 	private final Map<String, PageSettings> fConfigToPageSettings = new HashMap<String, PageSettings>();
 
-	private Composite parent;
 	private Button fSyncToggleButton;
 	private Button fBrowseButton;
+	private Button fRemoteLocationValidationButton;
 	private Button fGitLocationBrowseButton;
 	private Button fNewConnectionButton;
 	private Button fUseGitDefaultLocationButton;
+	private Button fGitLocationValidationButton;
 	private Combo fProviderCombo;
 	private Combo fConnectionCombo;
 	private Text fRootLocationText;
@@ -140,8 +152,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 * @param parent
 	 * 				The parent composite
 	 */
-	public void createWidgets(Composite p) {
-		parent = p;
+	public void createWidgets(Composite parent) {
 		composite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
@@ -201,6 +212,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		// new connection button
 		fNewConnectionButton = new Button(composite, SWT.PUSH);
 		fNewConnectionButton.setText(Messages.BRPPage_ConnectionButton);
+		gd = new GridData(GridData.END, GridData.CENTER, false, false);
+		fNewConnectionButton.setLayoutData(gd);
 		fNewConnectionButton.setEnabled(false);
 		fNewConnectionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -228,13 +241,16 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			public void modifyText(ModifyEvent e) {
 				// MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID,
 				// PATH_PROPERTY, fLocationText.getText());
+				setRemoteIsValid(false);
 				update();
 			}
 		});
 
 		// browse button
 		fBrowseButton = new Button(composite, SWT.PUSH);
-		fBrowseButton.setText(Messages.BRPPage_BrowseButton);
+		fBrowseButton.setText(Messages.BuildRemotePropertiesPage_5);
+		gd = new GridData(GridData.END, GridData.CENTER, false, false);
+		fBrowseButton.setLayoutData(gd);
 		fBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -259,6 +275,20 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 				}
 			}
 		});
+		
+        // Remote location validation button
+        fRemoteLocationValidationButton = new Button(composite, SWT.PUSH);
+        fRemoteLocationValidationButton.setText(Messages.BuildRemotePropertiesPage_11);
+        gd = new GridData(GridData.END, GridData.CENTER, true, false);
+        gd.horizontalSpan = 3;
+        fRemoteLocationValidationButton.setLayoutData(gd);
+        fRemoteLocationValidationButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                        setRemoteIsValid(isRemoteValid());
+                        update();
+                }
+        });
 		
 		// Git location
 		// "Use default location" button
@@ -291,6 +321,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		// Git location browse button
 		fGitLocationBrowseButton = new Button(composite, SWT.PUSH);
 		fGitLocationBrowseButton.setText(Messages.BuildRemotePropertiesPage_5);
+		gd = new GridData(GridData.END);
+		fGitLocationBrowseButton.setLayoutData(gd);
 		fGitLocationBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -316,6 +348,21 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		});
 		fGitLocationBrowseButton.setSelection(false);
 		
+        // Git location validation button
+        fGitLocationValidationButton = new Button(composite, SWT.PUSH);
+        fGitLocationValidationButton.setText(Messages.BuildRemotePropertiesPage_11);
+        gd = new GridData(GridData.END, GridData.CENTER, true, false);
+        gd.horizontalSpan = 3;
+        fGitLocationValidationButton.setLayoutData(gd);
+        fGitLocationValidationButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                        setGitIsValid(isGitValid());
+                        update();
+                }
+        });
+
+		
 		fConfigBeforeSwitch = getCfg();
 		this.setValues(getCfg());
 		fWidgetsReady = true;
@@ -327,8 +374,10 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private void handleConnectionSelected() {
 		int selectionIndex = fConnectionCombo.getSelectionIndex();
 		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
-		update();
+		fRootLocationText.setText(getDefaultPathDisplayString());
+		this.setRemoteIsValid(false);
 		this.changeGitLocationUIForConnection();
+		update();
 	}
 	
 	/**
@@ -512,6 +561,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		}
 		
 		fRootLocationText.setText(settings.rootLocation);
+		this.setRemoteIsValid(true);
 	}
 
 	private void setIsRemoteConfig(boolean isRemote) {
@@ -638,6 +688,34 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		enableConfigSelection(isValid());
 	}
 	
+    /**
+     * Return the path we are going to display. If it is a file URI then remove
+     * the file prefix.
+     *
+     * Only do this if the connection is open. Otherwise we will attempt to
+     * connect to the first machine in the list, which is annoying.
+     *
+     * @return String
+     */
+    private String getDefaultPathDisplayString() {
+            if (fSelectedConnection != null && fSelectedConnection.isOpen()) {
+                    IRemoteFileManager fileMgr = fSelectedProvider.getFileManager(fSelectedConnection);
+                    URI defaultURI = fileMgr.toURI(fSelectedConnection.getWorkingDirectory());
+
+                    // Handle files specially. Assume a file if there is no project to
+                    // query
+                    String projectName = getCfg().getOwner().getProject().toString();
+                    if (defaultURI != null && defaultURI.getScheme().equals(FILE_SCHEME)) {
+                            return Platform.getLocation().append(projectName).toString();
+                    }
+                    if (defaultURI == null) {
+                            return ""; //$NON-NLS-1$
+                    }
+                    return new Path(defaultURI.getPath()).append(projectName).toString();
+            }
+            return ""; //$NON-NLS-1$
+    }
+
 	public String getErrorMessage() {
 		if (super.getErrorMessage() != null) 
 			return super.getErrorMessage();
@@ -653,6 +731,10 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		// should we check permissions of: fileManager.getResource(fLocationText.getText()).getParent() ?
 		if (fSyncToggleButton.getSelection() && locationIsInWorkspace())
 			return Messages.BuildRemotePropertiesPage_1;
+		if (!fGitValidated)
+			return Messages.BuildRemotePropertiesPage_15;
+		if (!fRemoteValidated)
+			return Messages.BuildRemotePropertiesPage_16;
 		return null;
 	}
 	
@@ -714,6 +796,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	// Fill in Git location text and set the related UI elements based on the given information.
 	// syncProviderPath may be null or empty, in which case this function attempts to set the default Git.
 	private void setGitLocationUI(boolean isRemote, String syncProviderPath) {
+		this.setGitIsValid(true);
+		this.setRemoteIsValid(true);
 		// For a local project, make blank
 		if (!isRemote) {
 			this.setUsingDefaultGitLocation(true);
@@ -750,10 +834,12 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		if (errorMessage != null) {
 			this.setUsingDefaultGitLocation(false);
 			MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_8, errorMessage);
+			this.setGitIsValid(false);
 		// Git location found
 		} else {
 			this.setUsingDefaultGitLocation(true);
 			fGitLocationText.setText(cr.getStdout().trim());
+			this.setGitIsValid(true);
 		}
 	}
 	
@@ -773,11 +859,121 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	
 	// End functions for setting Git location UI elements
 	
+    // Check if the remote location is valid (does not actually set it as valid)
+    private boolean isRemoteValid() {
+            IPath parentPath = new Path(fRootLocationText.getText());
+            boolean isValid;
+            if (!parentPath.isAbsolute()) {
+                    return false;
+            }
+
+            // Find the lowest-level file in the path that exist.
+            while(!parentPath.isRoot()) {
+                    List<String> args = Arrays.asList("test", "-e", parentPath.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+                    String errorMessage = null;
+                    CommandResults cr = null;
+                    try {
+                            cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_12);
+                    } catch (RemoteExecutionException e) {
+                            errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_13, e);
+                    }
+
+                    if (errorMessage != null) {
+                            MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_14, errorMessage);
+                            return false;
+                    } else if (cr.getExitCode() == 0) {
+                            break;
+                    }
+
+                    parentPath = parentPath.removeLastSegments(1);
+            }
+
+            // Assume parent path is a directory and see if we can write a test file to it.
+            // Note that this test fails if parent path is not a directory, so no need to test that case.
+            String touchFile = parentPath.append(new Path(TOUCH_TEST_FILE)).toString();
+            List<String> args = Arrays.asList("touch", touchFile); //$NON-NLS-1$
+            String errorMessage = null;
+            CommandResults cr = null;
+            try {
+                    cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_12);
+            } catch (RemoteExecutionException e) {
+                    errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_13, e);
+            }
+
+            if (errorMessage != null) {
+                    MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_14, errorMessage);
+                    return false;
+            } else if (cr.getExitCode() == 0) {
+                    isValid = true;
+            } else {
+                    isValid = false;;
+            }
+
+            // Remove the test file
+            args = Arrays.asList("rm", "-f", touchFile); //$NON-NLS-1$ //$NON-NLS-2$
+            errorMessage = null;
+            cr = null;
+            try {
+                    cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_18);
+                    errorMessage = this.buildErrorMessage(cr, Messages.BuildRemotePropertiesPage_19 + touchFile, null);
+            } catch (RemoteExecutionException e) {
+                    errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_19 + touchFile, e);
+            }
+
+            if (errorMessage != null) {
+                    MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_14, errorMessage);
+            }
+
+            return isValid;
+    }
+
+    // Set the remote location as valid
+    private void setRemoteIsValid(boolean isValid) {
+            fRemoteValidated = isValid;
+            if (isValid) {
+                    fRootLocationText.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+            } else {
+                    fRootLocationText.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
+            }
+    }
+
+    // Check if the Git location is valid (does not actually set it as valid)
+    private boolean isGitValid() {
+            List<String> args = Arrays.asList("test", "-x", fGitLocationText.getText()); //$NON-NLS-1$ //$NON-NLS-2$
+            String errorMessage = null;
+            CommandResults cr = null;
+            try {
+                    cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_22);
+            } catch (RemoteExecutionException e) {
+                    errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_23, e);
+            }
+
+            if (errorMessage != null) {
+                    MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_14, errorMessage);
+                    return false;
+            } else if (cr.getExitCode() != 0) {
+                    return false;
+            } else {
+                    return true;
+            }
+    }
+
+    // Set the Git location as valid
+    private void setGitIsValid(boolean isValid) {
+            fGitValidated = isValid;
+            if (isValid) {
+                    fGitLocationText.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+            } else {
+                    fGitLocationText.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
+            }
+    }
+
+	
 	// Wrapper for running commands - wraps exceptions and invoking of command runner inside container run command.
 	private CommandResults remoteCommandResults;
 	private CommandResults runRemoteCommand(final List<String> command, final String commandDesc) throws RemoteExecutionException {
-		ProgressMonitorDialog dialog = new ProgressMonitorDialog(parent.getShell()); 
 		try {
+			ProgressMonitorDialog dialog = new ProgressMonitorDialog(composite.getShell());
 			dialog.run(false, true, new IRunnableWithProgress() {
 				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException {
