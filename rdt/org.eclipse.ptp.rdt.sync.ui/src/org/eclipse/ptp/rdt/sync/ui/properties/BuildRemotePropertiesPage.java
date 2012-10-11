@@ -878,113 +878,117 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	
 	// End functions for setting Git location UI elements
 	
-    // Check if the remote location is valid (does not actually set it as valid)
-    private boolean isRemoteValid() {
-            IPath parentPath = new Path(fRootLocationText.getText());
-            boolean isValid;
-            if (!parentPath.isAbsolute()) {
-                    return false;
-            }
+	// Check if the remote location is valid (does not actually set it as valid)
+	private boolean isRemoteValid() {
+		IPath parentPath = new Path(fRootLocationText.getText());
+		boolean isValid;
+		if (!parentPath.isAbsolute()) {
+			return false;
+		}
 
-            // Find the lowest-level file in the path that exist.
-            while(!parentPath.isRoot()) {
-                    List<String> args = Arrays.asList("test", "-e", parentPath.toString()); //$NON-NLS-1$ //$NON-NLS-2$
-                    String errorMessage = null;
-                    CommandResults cr = null;
-                    try {
-                            cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_12);
-                    } catch (RemoteExecutionException e) {
-                            errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_13, e);
-                    }
+		// Find the lowest-level file in the path that exist.
+		while(!parentPath.isRoot()) {
+			List<String> args = Arrays.asList("test", "-e", parentPath.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+			String errorMessage = null;
+			CommandResults cr = null;
+			try {
+				cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_12);
+			} catch (RemoteExecutionException e) {
+				errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_13, e);
+			}
 
-                    if (errorMessage != null) {
-                            MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_14, errorMessage);
-                            return false;
-                    } else if (cr.getExitCode() == 0) {
-                            break;
-                    }
+			if (errorMessage != null) {
+				MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_14, errorMessage);
+				return false;
+			} else if (cr.getExitCode() == 0) {
+				break;
+			}
 
-                    parentPath = parentPath.removeLastSegments(1);
-            }
+			parentPath = parentPath.removeLastSegments(1);
+		}
 
-            // Assume parent path is a directory and see if we can write a test file to it.
-            // Note that this test fails if parent path is not a directory, so no need to test that case.
-            String touchFile = parentPath.append(new Path(TOUCH_TEST_FILE)).toString();
-            List<String> args = Arrays.asList("touch", touchFile); //$NON-NLS-1$
-            String errorMessage = null;
-            CommandResults cr = null;
-            try {
-                    cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_12);
-            } catch (RemoteExecutionException e) {
-                    errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_13, e);
-            }
+		// Assume parent path is a directory and see if we can write a test file to it.
+		// Note that this test fails if parent path is not a directory, so no need to test that case.
+		String touchFile = parentPath.append(new Path(TOUCH_TEST_FILE)).toString();
+		List<String> args = Arrays.asList("touch", touchFile); //$NON-NLS-1$
+		String errorMessage = null;
+		CommandResults cr = null;
+		try {
+			cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_12);
+		} catch (RemoteExecutionException e) {
+			errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_13, e);
+		}
 
-            if (errorMessage != null) {
-                    MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_14, errorMessage);
-                    return false;
-            } else if (cr.getExitCode() == 0) {
-                    isValid = true;
-            } else {
-                    isValid = false;;
-            }
+		if (errorMessage != null) {
+			MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_14, errorMessage);
+			return false;
+		} else if (cr.getExitCode() == 0) {
+			isValid = true;
+		} else {
+			isValid = false;;
+		}
 
-            // Remove the test file
-            args = Arrays.asList("rm", "-f", touchFile); //$NON-NLS-1$ //$NON-NLS-2$
-            errorMessage = null;
-            cr = null;
-            try {
-                    cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_18);
-                    errorMessage = this.buildErrorMessage(cr, Messages.BuildRemotePropertiesPage_19 + touchFile, null);
-            } catch (RemoteExecutionException e) {
-                    errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_19 + touchFile, e);
-            }
+		// Remove the test file
+		args = Arrays.asList("rm", "-f", touchFile); //$NON-NLS-1$ //$NON-NLS-2$
+		errorMessage = null;
+		cr = null;
+		try {
+			cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_18);
+			errorMessage = this.buildErrorMessage(cr, Messages.BuildRemotePropertiesPage_19 + touchFile, null);
+		} catch (RemoteExecutionException e) {
+			errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_19 + touchFile, e);
+		}
 
-            if (errorMessage != null) {
-                    MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_14, errorMessage);
-            }
+		if (errorMessage != null) {
+			MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_14, errorMessage);
+		}
 
-            return isValid;
-    }
+		return isValid;
+	}
 
     // Set the remote location as valid
     private void setRemoteIsValid(boolean isValid) {
-            fRemoteValidated = isValid;
-            if (isValid) {
-                    fRootLocationText.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
-            } else {
-                    fRootLocationText.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
-            }
+    	fRemoteValidated = isValid;
+    	if (isValid) {
+    		fRootLocationText.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+    	} else {
+    		fRootLocationText.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
+    	}
     }
 
     // Check if the Git location is valid (does not actually set it as valid)
     private boolean isGitValid() {
-            List<String> args = Arrays.asList("test", "-f", fGitLocationText.getText()); //$NON-NLS-1$ //$NON-NLS-2$
-            String errorMessage = null;
-            CommandResults cr = null;
-            try {
-                    cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_22);
-            } catch (RemoteExecutionException e) {
-                    errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_23, e);
-            }
+		IPath gitPath = new Path(fGitLocationText.getText());
+    	if (!gitPath.isAbsolute()) {
+    		return false;
+    	}
+    	List<String> args = Arrays.asList("test", "-f", gitPath.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+    	String errorMessage = null;
+    	CommandResults cr = null;
+    	try {
+    		cr = this.runRemoteCommand(args, Messages.BuildRemotePropertiesPage_22);
+    	} catch (RemoteExecutionException e) {
+    		errorMessage = this.buildErrorMessage(null, Messages.BuildRemotePropertiesPage_23, e);
+    	}
 
-            if (errorMessage != null) {
-                    MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_14, errorMessage);
-                    return false;
-            } else if (cr.getExitCode() != 0) {
-                    return false;
-            } else {
-                    return true;
-            }
+    	if (errorMessage != null) {
+    		MessageDialog.openError(null, Messages.BuildRemotePropertiesPage_14, errorMessage);
+    		return false;
+    	} else if (cr.getExitCode() != 0) {
+    		return false;
+    	} else {
+    		return true;
+    	}
     }
 
     // Set the Git location as valid
     private void setGitIsValid(boolean isValid) {
-            fGitValidated = isValid;
-            if (isValid) {
-                    fGitLocationText.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
-            } else {
-                    fGitLocationText.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
-            }
+    	fGitValidated = isValid;
+    	if (isValid) {
+    		fGitLocationText.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+    	} else {
+    		fGitLocationText.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
+    	}
     }
 
 	

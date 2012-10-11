@@ -651,7 +651,11 @@ public class GitParticipant implements ISynchronizeParticipant {
 
 	// Check if the Git location is valid (does not actually set it as valid)
 	private boolean isGitValid() {
-		List<String> args = Arrays.asList("test", "-f", fGitLocationText.getText());
+		IPath gitPath = new Path(fGitLocationText.getText());
+    	if (!gitPath.isAbsolute()) { //$NON-NLS-1$
+    		return false;
+    	}
+		List<String> args = Arrays.asList("test", "-f", gitPath.toString());
 		String errorMessage = null;
 		CommandResults cr = null;
 		try {
