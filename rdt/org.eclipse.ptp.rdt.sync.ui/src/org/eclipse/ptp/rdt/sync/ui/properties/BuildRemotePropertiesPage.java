@@ -301,6 +301,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleGitDefaultLocationButtonPushed();
+				update();
 			}
 		});
 		fUseGitDefaultLocationButton.setSelection(true);
@@ -317,6 +318,12 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		gd.widthHint = 250;
 		fGitLocationText.setLayoutData(gd);
 		fGitLocationText.setEnabled(false);
+		fGitLocationText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				setGitIsValid(false);
+				update();
+			}
+		});
 		
 		// Git location browse button
 		fGitLocationBrowseButton = new Button(composite, SWT.PUSH);
@@ -562,6 +569,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		
 		fRootLocationText.setText(settings.rootLocation);
 		this.setRemoteIsValid(true);
+		update();
 	}
 
 	private void setIsRemoteConfig(boolean isRemote) {
@@ -939,7 +947,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 
     // Check if the Git location is valid (does not actually set it as valid)
     private boolean isGitValid() {
-            List<String> args = Arrays.asList("test", "-x", fGitLocationText.getText()); //$NON-NLS-1$ //$NON-NLS-2$
+            List<String> args = Arrays.asList("test", "-f", fGitLocationText.getText()); //$NON-NLS-1$ //$NON-NLS-2$
             String errorMessage = null;
             CommandResults cr = null;
             try {

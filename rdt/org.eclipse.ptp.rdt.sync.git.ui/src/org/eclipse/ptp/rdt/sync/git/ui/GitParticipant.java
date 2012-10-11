@@ -305,6 +305,12 @@ public class GitParticipant implements ISynchronizeParticipant {
 		fGitLocationText.setLayoutData(gd);
 		fGitLocationText.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
 		fGitLocationText.setEnabled(true);
+		fGitLocationText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				setGitIsValid(false);
+				update();
+			}
+		});
 		
 		// Git location browse button
 		fGitLocationBrowseButton = new Button(configArea, SWT.PUSH);
@@ -645,7 +651,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 
 	// Check if the Git location is valid (does not actually set it as valid)
 	private boolean isGitValid() {
-		List<String> args = Arrays.asList("test", "-x", fGitLocationText.getText());
+		List<String> args = Arrays.asList("test", "-f", fGitLocationText.getText());
 		String errorMessage = null;
 		CommandResults cr = null;
 		try {
