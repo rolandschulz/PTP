@@ -997,7 +997,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private CommandResults runRemoteCommand(final List<String> command, final String commandDesc) throws RemoteExecutionException {
 		try {
 			ProgressMonitorDialog dialog = new ProgressMonitorDialog(composite.getShell());
-			dialog.run(false, true, new IRunnableWithProgress() {
+			dialog.run(true, true, new IRunnableWithProgress() {
 				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException {
 					monitor.beginTask(commandDesc, 100);
