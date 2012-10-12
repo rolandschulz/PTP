@@ -688,7 +688,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private CommandResults remoteCommandResults;
 	private CommandResults runRemoteCommand(final List<String> command, final String commandDesc) throws RemoteExecutionException {
 		try {
-			fContext.run(false, true, new IRunnableWithProgress() {
+			fContext.run(true, true, new IRunnableWithProgress() {
 				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException {
 					monitor.beginTask(commandDesc, 100);
