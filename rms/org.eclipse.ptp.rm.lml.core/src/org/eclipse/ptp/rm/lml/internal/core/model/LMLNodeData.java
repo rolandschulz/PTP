@@ -164,6 +164,10 @@ public class LMLNodeData {
 	 * @param toMerge the jobMap of a child of the node connected to jobMap
 	 */
 	private static void mergeJobMaps(String rootJobName, HashMap<String, Integer> jobMap, HashMap<String, Integer> toMerge) {
+		if (rootJobName == null) {
+			rootJobName = emptyJobName;
+		}
+
 		for (final String jobName : toMerge.keySet()) {
 			int cpuCount = toMerge.get(jobName);
 			// Reduce parent cpucount by current's job cpu count
@@ -564,7 +568,7 @@ public class LMLNodeData {
 		final HashMap<String, Integer> jobMap = new HashMap<String, Integer>();
 		// Insert the root job
 		String rootJob = emptyJobName;
-		if (getDataElement() != null) {
+		if (getDataElement() != null && getDataElement().getOid() != null) {
 			rootJob = getDataElement().getOid();
 		}
 		jobMap.put(rootJob, getLowestElementsCount());
@@ -573,7 +577,10 @@ public class LMLNodeData {
 		final List<LMLNodeData> lowerNodes = getLowerNodes();
 		for (final LMLNodeData node : lowerNodes) {
 			// Insert root node job of all lower nodes
-			final String jobName = node.getDataElement().getOid();
+			String jobName = node.getDataElement().getOid();
+			if (jobName == null) {// Avoid null jobnames
+				jobName = emptyJobName;
+			}
 			int cpuCount = node.getLowestElementsCount();
 			if (directChildMap.containsKey(jobName)) {
 				cpuCount += directChildMap.get(jobName);

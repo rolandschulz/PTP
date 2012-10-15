@@ -26,6 +26,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplayelement;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.PictureType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.UsageType;
 import org.eclipse.ptp.rm.lml.internal.core.events.NodedisplayZoomEvent;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLCheck;
 import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
@@ -1106,6 +1107,22 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * @return true, if usagebar was inserted, false otherwise
 	 */
 	private boolean insertUsagebar() {
+		if (!hasParentNodedisplay() && node.getData().getLevelIds().size() >= nodedisplayLayout.getMaxlevel().intValue()) {
+			innerComp.setLayout(new FillLayout());
+
+			final UsageType usageData = node.getData().generateUsage();
+
+			usagebar = new Usagebar(usageData, lguiItem, innerComp, SWT.None);
+			usagebar.setPaintScale(true);
+			// Take all available space for the usagebar
+			usagebar.setBarFactor(0.8);
+			// Set frame sizes
+			usagebar.setStandardFrame(nodedisplayLayout.getBorder().intValue());
+			usagebar.setMouseOverFrame(nodedisplayLayout.getMouseborder().intValue());
+
+			return true;
+		}
+
 		if (node.getData() != null) {
 			if (node.getData().getDataElement() != null) {
 				if (node.getData().getDataElement().getUsage() != null) {

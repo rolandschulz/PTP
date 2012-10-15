@@ -79,6 +79,7 @@ public class NodesView extends ViewPart {
 					}
 					fLguiItem = null;
 					setPartName("System Monitoring"); //$NON-NLS-1$
+					checkActionStates();
 				}
 			});
 		}
@@ -223,14 +224,16 @@ public class NodesView extends ViewPart {
 	 * have to be enabled or disabled.
 	 */
 	protected void checkActionStates() {
-		if (nodedisplayView == null) {
+		// If Nodedisplay is not visible, because not created or currently removed, deactivate toolbarbuttons
+		if (nodedisplayView == null || !nodedisplayView.isVisible()) {
 			decAction.setEnabled(false);
 			incAction.setEnabled(false);
 		}
+		else {
+			decAction.setEnabled(nodedisplayView.getShownMaxLevel() > nodedisplayView.getMinimumLevelOfDetail());
 
-		decAction.setEnabled(nodedisplayView.getShownMaxLevel() > 1);
-
-		incAction.setEnabled(nodedisplayView.getShownMaxLevel() < nodedisplayView.getMaximumNodedisplayDepth());
+			incAction.setEnabled(nodedisplayView.getShownMaxLevel() < nodedisplayView.getMaximumNodedisplayDepth());
+		}
 	}
 
 	/**
@@ -253,7 +256,7 @@ public class NodesView extends ViewPart {
 			@Override
 			public void run() {
 				if (nodedisplayView != null) {
-					if (nodedisplayView.getShownMaxLevel() > 1) {
+					if (nodedisplayView.getShownMaxLevel() > nodedisplayView.getMinimumLevelOfDetail()) {
 						nodedisplayView.setMaxLevel(nodedisplayView.getShownMaxLevel() - 1);
 						nodedisplayView.update();
 					}

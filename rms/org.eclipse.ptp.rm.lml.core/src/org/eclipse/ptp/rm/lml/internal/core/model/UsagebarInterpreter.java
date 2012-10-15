@@ -38,7 +38,15 @@ public class UsagebarInterpreter implements IUsagebarInterpreter {
 		 */
 		private static final String emptyString = "empty"; //$NON-NLS-1$
 
+		@Override
 		public int compare(JobType o1, JobType o2) {
+			// Catch null values
+			if (o1 == null || o1.getOid() == null) {
+				return 1;
+			}
+			if (o2 == null || o2.getOid() == null) {
+				return -1;
+			}
 			// Notice: wrong ordering so that bigger jobs are shown first
 			// Handle empty jobs
 			if (o1.getOid().equals(emptyString))
@@ -75,6 +83,7 @@ public class UsagebarInterpreter implements IUsagebarInterpreter {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.internal.core.model.IUsagebarInterpreter#getLastCPUinNode(int)
 	 */
+	@Override
 	public int getLastCpuInNode(int node) {
 		double nodes = 0;
 		int cpu = 0;
@@ -155,6 +164,7 @@ public class UsagebarInterpreter implements IUsagebarInterpreter {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.internal.core.model.IUsagebarInterpreter#getNodeCount()
 	 */
+	@Override
 	public int getNodeCount() {
 		final int cpuPerNode = usageAdapter.getCpuPerNode().intValue();
 
@@ -176,7 +186,8 @@ public class UsagebarInterpreter implements IUsagebarInterpreter {
 
 					final JobPartType jobPart = jobPartList.get(j);
 
-					final int jobPartCpuPerNode = jobPart.getCpupernode() == null ? jobCpuPerNode : jobPart.getCpupernode().intValue();
+					final int jobPartCpuPerNode = jobPart.getCpupernode() == null ? jobCpuPerNode : jobPart.getCpupernode()
+							.intValue();
 
 					nodes += jobPart.getCpucount().intValue() / (double) jobPartCpuPerNode;
 				}
@@ -191,6 +202,7 @@ public class UsagebarInterpreter implements IUsagebarInterpreter {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.internal.core.model.IUsagebarInterpreter#getNodecountAtCpu(int)
 	 */
+	@Override
 	public int getNodecountAtCpu(int cpuCount) {
 		final List<JobType> jobList = usageAdapter.getJob();
 

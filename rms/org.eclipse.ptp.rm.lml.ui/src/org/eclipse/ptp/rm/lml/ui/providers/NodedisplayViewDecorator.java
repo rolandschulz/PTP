@@ -110,6 +110,11 @@ public class NodedisplayViewDecorator extends AbstractNodedisplayView {
 		return nodedisplayView.getMinimalRectangleSize();
 	}
 
+	@Override
+	public int getMinimumLevelOfDetail() {
+		return nodedisplayView.getMinimumLevelOfDetail();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

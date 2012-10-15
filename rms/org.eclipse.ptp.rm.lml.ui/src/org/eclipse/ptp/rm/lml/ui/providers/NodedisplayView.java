@@ -266,6 +266,11 @@ public class NodedisplayView extends AbstractNodedisplayView {
 		return 0;
 	}
 
+	@Override
+	public int getMinimumLevelOfDetail() {
+		return shownNode.getData().getLevelIds().size();
+	}
+
 	/**
 	 * @return currently shown nodedisplaycomp
 	 */
@@ -393,9 +398,10 @@ public class NodedisplayView extends AbstractNodedisplayView {
 
 	@Override
 	public void setMaxLevel(int maxLevel) {
+		final int minlevel = getMinimumLevelOfDetail();
 		// Check constraints for the maxLevel
-		if (maxLevel < 1) {
-			maxLevel = 1;
+		if (maxLevel < minlevel) {
+			maxLevel = minlevel;
 		}
 		// Make sure that level is not greater then the deepest level defined in the nodedisplay's scheme
 		if (nodedisplay != null) {

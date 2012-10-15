@@ -114,6 +114,14 @@ public class UsageAdapter {
 	}
 
 	/**
+	 * 
+	 * @return true, if this adapter is fed by a usagetype without layout definition, false for a usagebartype
+	 */
+	public boolean isUsageType() {
+		return usage != null;
+	}
+
+	/**
 	 * Set the amount of cpu covered by this usage-instance.
 	 * 
 	 * @param value
