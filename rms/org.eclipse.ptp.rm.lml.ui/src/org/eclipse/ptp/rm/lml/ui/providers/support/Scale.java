@@ -63,11 +63,6 @@ public class Scale {
 	private Color color;
 
 	/**
-	 * if no interval given, it is calculated by (max-min)/standardIntervalCount
-	 */
-	private static final int standardIntervalCount = 10;
-
-	/**
 	 * Used for special non-equidistant scale for nodes, if null use equidistant scale.
 	 * Holds algorithm to map CPU ID to node ID.
 	 */
@@ -225,11 +220,16 @@ public class Scale {
 				x = (int) (((cpu - rmin) * width) / diff);
 			}
 
+			final String paintNumber = showString(i * interval);
+			final int strWidth = getStringWidth(gc, paintNumber);
+
+			if (x + strWidth / 2 >= xOff + width) {// Avoid tickmarks, where the painted number i not entirely visible
+				break;
+			}
+
 			gc.drawLine(x, yOff, x, yOff + lineHeight - 1);
 
-			final String paintNumber = showString(i * interval);
-
-			gc.drawString(paintNumber, x - getStringWidth(gc, paintNumber) / 2, yOff + lineHeight, true);
+			gc.drawString(paintNumber, x - strWidth / 2, yOff + lineHeight, true);
 		}
 
 		paintUnit(gc, yOff, width);

@@ -126,6 +126,11 @@ public abstract class AbstractNodedisplayView extends LguiWidget {
 	public abstract int getMinimalRectangleSize();
 
 	/**
+	 * @return minimum level of detail, which can be shown by this nodedisplay
+	 */
+	public abstract int getMinimumLevelOfDetail();
+
+	/**
 	 * @return currently shown nodedisplaycomp
 	 */
 	public abstract NodedisplayComp getRootNodedisplay();

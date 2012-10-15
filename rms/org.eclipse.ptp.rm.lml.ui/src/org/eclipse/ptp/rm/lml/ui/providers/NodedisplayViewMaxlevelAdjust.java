@@ -58,11 +58,6 @@ public class NodedisplayViewMaxlevelAdjust extends NodedisplayViewDecorator {
 	private Label maxLevelLabel;
 
 	/**
-	 * Checkbox for defining that the maximum level is chosen from the nodedisplaylayout.
-	 */
-	private Button chooseByLayout;
-
-	/**
 	 * if true, additional buttons are added into this composite in the north,
 	 * otherwise only the additional functions are provided by this composite
 	 */
@@ -152,7 +147,7 @@ public class NodedisplayViewMaxlevelAdjust extends NodedisplayViewDecorator {
 	 * are the parent grouping of processors.
 	 */
 	public void decreaseMaximumLevel() {
-		if (nodedisplayView.getShownMaxLevel() > 1) {
+		if (nodedisplayView.getShownMaxLevel() > nodedisplayView.getMinimumLevelOfDetail()) {
 			nodedisplayView.setMaxLevel(nodedisplayView.getShownMaxLevel() - 1);
 			update();
 		}

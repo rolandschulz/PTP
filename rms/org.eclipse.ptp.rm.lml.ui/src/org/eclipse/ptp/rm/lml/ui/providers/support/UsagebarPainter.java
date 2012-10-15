@@ -113,9 +113,9 @@ public class UsagebarPainter implements PaintListener {
 	private ArrayList<JobInterval> jobIntervals;
 
 	/**
-	 * Last painted jobs sorted by their size (number of CPUs per job)
+	 * The list of jobs sorted by their size (number of CPUs per job)
 	 */
-	private List<JobType> jobs;
+	private final List<JobType> jobs;
 
 	/**
 	 * Width of normal frame around job-rectangles in pixels.
@@ -144,6 +144,16 @@ public class UsagebarPainter implements PaintListener {
 	 * A factor of 1 means that all space for the scale is used by lines.
 	 */
 	private double lineFactor = 0.2;
+
+	/**
+	 * Defines the minimum amount of tickmarks painted in the usagebar
+	 */
+	private static final int minTickmarks = 10;
+
+	/**
+	 * When tickmarks are adjusted automatically, they are made multiples of this value.
+	 */
+	private static final int tickMarkMultipleOf = 10;
 
 	/**
 	 * Area within the using composite, which is used for painting this usagebar
@@ -216,9 +226,14 @@ public class UsagebarPainter implements PaintListener {
 
 		scale = new Scale(0, 0, layout.getInterval().intValue());
 
-		setShowModus(layout.getScale().equals("nodes")); //$NON-NLS-1$
+		setShowModus(!usageAdapter.isUsageType() && layout.getScale().equals("nodes")); //$NON-NLS-1$
 
 		paintScale = true;
+
+		jobs = usageAdapter.getJob();
+		final JobComparator comp = new JobComparator();
+
+		Collections.sort(jobs, comp);
 	}
 
 	/**
@@ -351,6 +366,7 @@ public class UsagebarPainter implements PaintListener {
 	 * 
 	 * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
 	 */
+	@Override
 	public void paintControl(PaintEvent event) {
 
 		// Update the paint area on its own if usagebarComp was passed to this listener
@@ -368,11 +384,6 @@ public class UsagebarPainter implements PaintListener {
 		final int barHeight = (int) (paintArea.height * barFactor); // Height of the bar
 
 		jobIntervals = new ArrayList<JobInterval>();
-
-		jobs = usageAdapter.getJob();
-		final JobComparator comp = new JobComparator();
-
-		Collections.sort(jobs, comp);
 
 		final int allCPU = usageAdapter.getCpuCount().intValue();
 
@@ -520,6 +531,8 @@ public class UsagebarPainter implements PaintListener {
 		else {
 			scale.setUsagebarInterpreter(null);
 		}
+
+		adjustScale();
 	}
 
 	/**
@@ -542,4 +555,33 @@ public class UsagebarPainter implements PaintListener {
 		this.paintArea = paintArea;
 	}
 
+	/**
+	 * Automatically adjusts the scale for usagetypes, which are not configured by
+	 * a corresponding layout tag. Tries to let the scale paint minTickmarks many
+	 * tickmarks.
+	 */
+	protected void adjustScale() {
+		if (!usageAdapter.isUsageType()) {
+			// Do not adjust scale for a configured usagebar
+			return;
+		}
+
+		final double max = scale.getMax();
+		final double min = 0.0;
+
+		// Create at least as many intervals as defined by minTickmarsk
+		int interval = (int) ((max - min) / minTickmarks);
+		// let the interval be a multiple of tickMarkMultipleOf
+		interval -= interval % tickMarkMultipleOf;
+		if (interval <= 0) {
+			// Try less tickmarks
+			interval = (int) ((max - min) / (minTickmarks / 2));
+			interval -= interval % tickMarkMultipleOf;
+			if (interval <= 0) {
+				interval = 1;
+			}
+		}
+
+		scale.setInterval(interval);
+	}
 }
