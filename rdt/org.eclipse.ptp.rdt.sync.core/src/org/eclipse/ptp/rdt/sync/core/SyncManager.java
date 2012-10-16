@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -100,10 +101,9 @@ public class SyncManager  {
 		 */
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
-			SubMonitor progress = SubMonitor.convert(monitor, 100);
+			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1000, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
 			try {
-				fSyncRunner.synchronize(fProject, fBuildScenario, fDelta, getFileFilter(fProject), progress.newChild(100),
-						fSyncFlags);
+				fSyncRunner.synchronize(fProject, fBuildScenario, fDelta, getFileFilter(fProject), subMonitor, fSyncFlags);
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
 					defaultSyncExceptionHandler.handle(fProject, e);
