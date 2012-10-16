@@ -221,7 +221,7 @@ public class CommandRunner {
 	public static CommandResults executeRemoteCommand(IRemoteConnection conn, List<String> commandList, String remoteDirectory,
 															IProgressMonitor monitor) throws 
 																	IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
-		SubMonitor progress = SubMonitor.convert(monitor, Messages.CommandRunner_2, 100);
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		try {
 			progress.subTask(Messages.CommandRunner_4);
 			conn.open(progress.newChild(50));
