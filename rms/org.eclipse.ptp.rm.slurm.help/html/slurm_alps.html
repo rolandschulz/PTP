@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+
+<body>
+<h1>SLURM Resource Manager for PTP</h1>
+<h2><a name=slurmalps></a>SLURM and ALPS</h2>
+
+<p>On Cray target systems SLURM can be combined with the Application Level Placement Scheduler (ALPS).
+To submit parallel applications to this target system, follow the instructions for <a href="PLUGINS_ROOT/org.eclipse.ptp.doc.user/html/03pRunConfig.html">Running Parallel applications</a>.
+</p>
+
+<h3>Monitoring SLURM-ALPS systems</h3>
+
+<p>
+ALPS provides valuable additional information for the monitoring perspective of PTP.
+The implicitly defined system hierarchy of the target system can be obtained. This allows
+to map jobs to the different hierarchy levels instead of simply mapping jobs to a two-level
+hierarchy of compute nodes and cores. 
+</p>
+
+<p>
+In order to use additional monitoring information provided by ALPS, a new monitoring 
+connection has to be configured in the <a href="PLUGINS_ROOT/org.eclipse.ptp.doc.user/html/05monitoring.html"><b>System Monitoring</b></a> perspective. Choose <b>SLURM (ALPS)</b>
+as monitoring type.
+</p>
+<img src="images/alps_monitoring1.png"/>
+
+<p>
+Afterwards you can start monitoring the target system by clicking on the <b>run</b> button.
+</p>
+<img src="images/alps_monitoring2.png"/>
+
+<p><a href="toc.html">Back to Table of Contents</a>
+</body>
+</html>

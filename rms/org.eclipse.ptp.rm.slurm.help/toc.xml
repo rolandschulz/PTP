@@ -11,6 +11,8 @@
  	<topic href="html/start_rms.html" label="Starting a Resource Manager"> </topic>
  	<topic href="html/run_job.html" label="Running a Parallel Application"> </topic>
  	<topic href="html/mon_job.html" label="Monitoring Application Execution"> </topic>
+  <topic href="html/slurm_alps.html" label="SLURM and ALPS">
+  </topic>
  	<topic href="html/restrict.html" label="Restrictions"> </topic>
  	</topic>
 </toc>

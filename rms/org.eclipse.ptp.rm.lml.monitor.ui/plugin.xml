@@ -159,6 +159,10 @@
             type="SLURM">
       </monitor>
       <monitor
+            name="SLURM (ALPS)"
+            type="SLURM_ALPS">
+      </monitor>
+      <monitor
             name="TORQUE Resource Manager"
             type="TORQUE">
       </monitor>

@@ -1,12 +1,12 @@
 #*******************************************************************************
-#* Copyright (c) 2011 Forschungszentrum Juelich GmbH.
+#* Copyright (c) 2011-2012 Forschungszentrum Juelich GmbH.
 #* All rights reserved. This program and the accompanying materials
 #* are made available under the terms of the Eclipse Public License v1.0
 #* which accompanies this distribution, and is available at
 #* http://www.eclipse.org/legal/epl-v10.html
 #*
 #* Contributors:
-#*    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
+#*    Wolfgang Frings, Carsten Karbach (Forschungszentrum Juelich GmbH) 
 #*******************************************************************************/ 
 package LML_gen_nodedisplay;
 my($debug)=0;
@@ -51,8 +51,7 @@ sub _adjust_layout_alps  {
     $ltreenode->{ATTR}->{cols}=$num;
 
     # set some default layout attributes
-#    $ltreenode->{ATTR}->{maxlevel} = 6              if(!exists($ltreenode->{ATTR}->{maxlevel}));
-    $ltreenode->{ATTR}->{maxlevel} = 4              ;
+    $ltreenode->{ATTR}->{maxlevel} = 4              if(!exists($ltreenode->{ATTR}->{maxlevel}));
     $ltreenode->{ATTR}->{vgap} = 5                  if(!exists($ltreenode->{ATTR}->{vgap}));
     $ltreenode->{ATTR}->{hgap} = 0                  if(!exists($ltreenode->{ATTR}->{hgap}));       
     $ltreenode->{ATTR}->{fontsize} = 10             if(!exists($ltreenode->{ATTR}->{fontsize}));   
@@ -88,8 +87,7 @@ sub _adjust_layout_alps  {
     $ltreenode->{ATTR}->{min}=$lmin;    $ltreenode->{ATTR}->{max}=$lmax;
 
     # set some default layout attributes
-#    $ltreenode->{ATTR}->{maxlevel} = 5              if(!exists($ltreenode->{ATTR}->{maxlevel}));
-    $ltreenode->{ATTR}->{maxlevel} = 5;
+    $ltreenode->{ATTR}->{maxlevel} = 5              if(!exists($ltreenode->{ATTR}->{maxlevel}));
     $ltreenode->{ATTR}->{vgap} = 5                  if(!exists($ltreenode->{ATTR}->{vgap}));
     $ltreenode->{ATTR}->{hgap} = 0                  if(!exists($ltreenode->{ATTR}->{hgap}));       
 #    $ltreenode->{ATTR}->{fontsize} = 10             if(!exists($ltreenode->{ATTR}->{fontsize}));   
@@ -213,7 +211,12 @@ sub _adjust_layout_alps  {
     $ltreenode=$treenode;
 
     # set size attributes
-    $ltreenode->{ATTR}->{rows}=1;       $ltreenode->{ATTR}->{cols}=12;
+    if($num%8==0) {
+		$ltreenode->{ATTR}->{cols}=8;
+    } else {
+		$ltreenode->{ATTR}->{cols}=12;
+    }
+    $ltreenode->{ATTR}->{rows}=1;       
     $ltreenode->{ATTR}->{min}=$lmin;    $ltreenode->{ATTR}->{max}=$lmax;
 
     # set some default layout attributes
