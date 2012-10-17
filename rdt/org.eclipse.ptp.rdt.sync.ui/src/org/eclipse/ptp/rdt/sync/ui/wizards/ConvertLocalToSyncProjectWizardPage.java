@@ -341,7 +341,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 				// For selected configs, create a new remote config
 				if (selectedConfigsSet.contains(config)) {
 					IConfiguration remoteConfig = bcm.createConfiguration(project, (Configuration) config, remoteBuildScenario,
-							config.getName(), null);
+							config.getName().replace(' ', '_'), null); // Bug 389899 - "remote toolchain name" contains spaces
 					bcm.modifyConfigurationAsSyncRemote(remoteConfig);
 
 					// The first remote found will be the initial default (active) configuration.
