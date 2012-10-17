@@ -268,7 +268,12 @@ public class NodedisplayView extends AbstractNodedisplayView {
 
 	@Override
 	public int getMinimumLevelOfDetail() {
-		return shownNode.getData().getLevelIds().size();
+		if (shownNode != null && shownNode.getData() != null) {
+			return shownNode.getData().getLevelIds().size();
+		}
+		else {
+			return 0;
+		}
 	}
 
 	/**
