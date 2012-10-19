@@ -10,7 +10,7 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>org.eclipse.ptp.rcp.sysmon</artifactId>
+	<artifactId>org.eclipse.ptp.rcp.sysmon.product</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 
 	<name>org.eclipse.ptp.rcp.sysmon.product product build</name>
