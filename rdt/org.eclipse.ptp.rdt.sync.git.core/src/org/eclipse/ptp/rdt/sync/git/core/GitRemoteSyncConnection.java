@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CommitCommand;
@@ -68,6 +67,7 @@ import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner;
 import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
+import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
@@ -122,7 +122,7 @@ public class GitRemoteSyncConnection {
 	 */
 	public GitRemoteSyncConnection(IProject proj, String localDir, BuildScenario bs, SyncFileFilter filter,
 			IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
-		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
 			project = proj;
 			localDirectory = localDir;
@@ -202,7 +202,7 @@ public class GitRemoteSyncConnection {
 	 */
 	private Git buildRepo(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
 	MissingConnectionException {
-		final SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
 			final File localDir = new File(localDirectory);
 			final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
@@ -331,7 +331,7 @@ public class GitRemoteSyncConnection {
 	 */
 	private boolean prepareRemoteForCommit(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException,
 	MissingConnectionException {
-		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
 			Set<String> filesToAdd = new HashSet<String>();
 			Set<String> filesToDelete = new HashSet<String>();
@@ -612,7 +612,7 @@ public class GitRemoteSyncConnection {
 	 *             if the requested transport is not supported by JGit.
 	 */
 	private void buildTransport(RemoteConfig remoteConfig, IProgressMonitor monitor) {
-		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		final URIish uri = buildURI();
 		try {
 			subMon.subTask(Messages.GitRemoteSyncConnection_8);
@@ -672,7 +672,7 @@ public class GitRemoteSyncConnection {
 	 * @return whether any changes were committed
 	 */
 	private boolean doCommit(IProgressMonitor monitor) throws RemoteSyncException {
-		SubMonitor subMon  = SubMonitor.convert(monitor, 100);
+		RecursiveSubMonitor subMon  = RecursiveSubMonitor.convert(monitor, 100);
 		Set<String> filesToAdd = new HashSet<String>();
 		Set<String> filesToRemove = new HashSet<String>();
 		Status status = this.getFileStatus(filesToAdd, filesToRemove, true);
@@ -853,7 +853,7 @@ public class GitRemoteSyncConnection {
 	 *             possible platform dependency.
 	 */
 	public void syncLocalToRemote(IProgressMonitor monitor) throws RemoteSyncException {
-		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		subMon.subTask(Messages.GitRemoteSyncConnection_sync_local_to_remote);
 		try {
 			// First commit changes to the local repository.
@@ -924,7 +924,7 @@ public class GitRemoteSyncConnection {
 		// } catch (CanceledException e) {
 		// throw new RemoteSyncException(e);
 		// }
-		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		subMon.subTask(Messages.GitRemoteSyncConnection_sync_remote_to_local);
 		try {
 			// First, commit in case any changes have occurred remotely.
@@ -992,7 +992,7 @@ public class GitRemoteSyncConnection {
 	 *             exceptions, embedded in a RemoteSyncException.
 	 */
 	public void sync(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
-		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
 			// Commit local and remote changes
 			subMon.subTask(Messages.GitRemoteSyncConnection_12);
@@ -1201,7 +1201,7 @@ public class GitRemoteSyncConnection {
 	// Refresh the workspace after creating new local files
 	// Bug 374409 - run refresh in a separate thread to avoid possible deadlock from locking both the sync lock and the
 	// workspace lock.
-	private Thread doRefresh(final SubMonitor subMon) {
+	private Thread doRefresh(final IProgressMonitor subMon) {
 		Thread refreshWorkspaceThread = new Thread(new Runnable() {
 			public void run() {
 				try {
