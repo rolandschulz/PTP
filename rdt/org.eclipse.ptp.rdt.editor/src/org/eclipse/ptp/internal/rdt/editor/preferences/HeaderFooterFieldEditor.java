@@ -9,7 +9,6 @@
  *    IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-
 package org.eclipse.ptp.internal.rdt.editor.preferences;
 
 import org.eclipse.jface.preference.FieldEditor;
@@ -24,9 +23,8 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * A field editor for a header and footer on a page.
- * 
  * @author batthish
- */ 
+ */
 public class HeaderFooterFieldEditor extends FieldEditor {
 
 	private Composite _composite;
@@ -40,7 +38,6 @@ public class HeaderFooterFieldEditor extends FieldEditor {
 
 	/**
 	 * The constructor
-	 * 
 	 * @param parent the parent composite
 	 */
 	public HeaderFooterFieldEditor(Composite parent) {
@@ -58,7 +55,7 @@ public class HeaderFooterFieldEditor extends FieldEditor {
 			GridData gd = (GridData) _composite.getLayoutData();
 			gd.horizontalSpan = columns - 1;
 			gd = (GridData) _spacer.getLayoutData();
-			gd.horizontalSpan = columns ;
+			gd.horizontalSpan = columns;
 		}
 	}
 
@@ -111,41 +108,50 @@ public class HeaderFooterFieldEditor extends FieldEditor {
 		Composite page = new Composite(_composite, SWT.BORDER);
 		gl = new GridLayout(3, true);
 		page.setLayout(gl);
-		page.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		Boolean highContrast = Display.getDefault().getHighContrast();
+		if (!highContrast)
+			page.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan = 3;
 		page.setLayoutData(gd);
 
 		hLeft = new Text(page, SWT.BORDER | SWT.LEFT);
 		hLeft.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		hLeft.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		if (!highContrast)
+			hLeft.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		new HeaderFooterContentProposalAdapter(hLeft);
 		hCenter = new Text(page, SWT.BORDER | SWT.CENTER);
 		hCenter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		hCenter.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		if (!highContrast)
+			hCenter.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		new HeaderFooterContentProposalAdapter(hCenter);
 		hRight = new Text(page, SWT.BORDER | SWT.RIGHT);
 		hRight.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		hRight.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		if (!highContrast)
+			hRight.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		new HeaderFooterContentProposalAdapter(hRight);
 
 		spacer = new Label(page, SWT.NONE);
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan = 3;
-		spacer.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		if (!highContrast)
+			spacer.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		spacer.setLayoutData(gd);
 
 		fLeft = new Text(page, SWT.BORDER | SWT.LEFT);
 		fLeft.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		fLeft.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		if (!highContrast)
+			fLeft.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		new HeaderFooterContentProposalAdapter(fLeft);
 		fCenter = new Text(page, SWT.BORDER | SWT.CENTER);
 		fCenter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		fCenter.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		if (!highContrast)
+			fCenter.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		new HeaderFooterContentProposalAdapter(fCenter);
 		fRight = new Text(page, SWT.BORDER | SWT.RIGHT);
 		fRight.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		fRight.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		if (!highContrast)
+			fRight.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		new HeaderFooterContentProposalAdapter(fRight);
 	}
 
