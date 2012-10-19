@@ -101,7 +101,7 @@ public class SyncManager  {
 		 */
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
-			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1000, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+			RecursiveSubMonitor subMonitor = RecursiveSubMonitor.convert(monitor);
 			try {
 				fSyncRunner.synchronize(fProject, fBuildScenario, fDelta, getFileFilter(fProject), subMonitor, fSyncFlags);
 			} catch (CoreException e) {
