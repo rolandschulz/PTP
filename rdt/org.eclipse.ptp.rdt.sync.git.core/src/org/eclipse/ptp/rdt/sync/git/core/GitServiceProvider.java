@@ -31,9 +31,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
+import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -253,7 +253,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void synchronize(final IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncFileFilter fileFilter,
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		SubMonitor subMon = SubMonitor.convert(monitor, 1000);
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 1000);
 		
 		// On first sync, place .gitignore in directories. This is useful for folders that are already present and thus are never
 		// captured by a resource add or change event. (This can happen for projects converted to sync projects.)
