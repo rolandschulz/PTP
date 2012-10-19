@@ -12,6 +12,7 @@
 
 	<artifactId>org.eclipse.ptp.rcp.sysmon.product</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
+	<packaging>eclipse-repository</packaging>
 
 	<name>org.eclipse.ptp.rcp.sysmon.product product build</name>
 	<build>
