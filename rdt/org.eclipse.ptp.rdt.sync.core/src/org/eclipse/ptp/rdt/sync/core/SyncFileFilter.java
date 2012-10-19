@@ -105,17 +105,28 @@ public class SyncFileFilter {
 	}
 
 	/**
-	 * Add a new pattern to the filter of the specified type
-	 * This function and others that manipulate the pattern list must enforce the invariant that no pattern appears more than once.
-	 * This invariant is assumed by other functions.
+	 * Add pattern to front of list (calls addPattern with position 0)
 	 * @param pattern
 	 * @param type
 	 */
 	public void addPattern(ResourceMatcher pattern, PatternType type) {
+		this.addPattern(pattern, type, 0);
+	}
+
+	/**
+	 * Add a new pattern to the filter of the specified type at the specified position
+	 * This function and others that manipulate the pattern list must enforce the invariant that no pattern appears more than once.
+	 * This invariant is assumed by other functions.
+	 * @param pattern
+	 * @param type
+	 * @param pos
+	 * @throws IndexOutOfBoundsException if position is out of range
+	 */
+	public void addPattern(ResourceMatcher pattern, PatternType type, int pos) {
 		if (patternToTypeMap.get(pattern) != null) {
 			filteredPaths.remove(pattern);
 		}
-		filteredPaths.add(0, pattern);
+		filteredPaths.add(pos, pattern);
 		patternToTypeMap.put(pattern, type);
 	}
 	
@@ -132,7 +143,8 @@ public class SyncFileFilter {
 	/**
 	 * Swap a pattern with its lower-index neighbor
 	 * Assumes pattern only appears once
-	 * @param whether pattern was actually promoted
+	 * @param pattern
+	 * @return whether pattern was actually promoted
 	 */
 	public boolean promote(ResourceMatcher pattern) {
 		int oldIndex = filteredPaths.indexOf(pattern);
@@ -148,7 +160,8 @@ public class SyncFileFilter {
 	/**
 	 * Swap a pattern with its higher-index neighbor
 	 * Assumes pattern appears no more than once
-	 * @param whether pattern was actually demoted
+	 * @param pattern
+	 * @return whether pattern was actually demoted
 	 */
 	public boolean demote(ResourceMatcher pattern) {
 		int oldIndex = filteredPaths.indexOf(pattern);
@@ -159,6 +172,23 @@ public class SyncFileFilter {
 		}
 		
 		return false;
+	}
+
+	/**
+	 * Replace pattern with another - useful for when existing patterns are edited
+	 * @param oldPattern
+	 * @param newPattern
+	 * @param type
+	 * @return whether replace was successful (old pattern was found)
+	 */
+	public boolean replacePattern(ResourceMatcher oldPattern, ResourceMatcher newPattern, PatternType type) {
+		int index = filteredPaths.indexOf(oldPattern);
+		if (index == -1) {
+			return false;
+		}
+		this.removePattern(oldPattern);
+		this.addPattern(newPattern, type, index);
+		return true;
 	}
 
 	/**
