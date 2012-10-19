@@ -145,6 +145,9 @@ public class NewRemoteSyncProjectWizardOperation {
 					defaultConfigSet = true;
 				}
 			}
+			
+			// Bug 389899 - Synchronized project: "remote toolchain name" contains spaces
+			config.setName(config.getName().replace(' ', '_'));
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
 		
