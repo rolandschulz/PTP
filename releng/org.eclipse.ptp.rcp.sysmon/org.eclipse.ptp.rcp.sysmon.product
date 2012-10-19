@@ -3,6 +3,7 @@
 
 <product name="System Monitor" id="org.eclipse.ptp.rcp.sysmon.product" application="org.eclipse.ptp.rcp.sysmon.application" version="1.0.0" useFeatures="false" includeLaunchers="true">
 
+
    <configIni use="default">
    </configIni>
 
@@ -12,6 +13,7 @@
 
    <windowImages/>
 
+
    <launcher>
       <solaris/>
       <win useIco="false">
@@ -19,8 +21,10 @@
       </win>
    </launcher>
 
+
    <vm>
    </vm>
+
 
    <plugins>
       <plugin id="com.ibm.icu"/>
@@ -100,7 +104,6 @@
       <plugin id="org.eclipse.ptp.ems.core"/>
       <plugin id="org.eclipse.ptp.ems.ui"/>
       <plugin id="org.eclipse.ptp.proxy.protocol"/>
-      <plugin id="org.eclipse.ptp.rcp.sysmon"/>
       <plugin id="org.eclipse.ptp.remote.core"/>
       <plugin id="org.eclipse.ptp.remote.remotetools.core"/>
       <plugin id="org.eclipse.ptp.remote.remotetools.ui"/>
