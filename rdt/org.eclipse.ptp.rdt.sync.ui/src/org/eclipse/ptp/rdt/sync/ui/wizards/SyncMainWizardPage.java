@@ -725,9 +725,8 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			TableItem ti = new TableItem(localToolChainTable, SWT.NONE);
 			ti.setText(name);
 		}
-		if (toolChainMap.keySet().size() > 0) {
-			localToolChainTable.select(0);
-		}
+		
+		this.updateHiddenToolChainList();
 	}
 
 	public static EntryDescriptor getDescriptor(Tree _tree) {
@@ -999,6 +998,10 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	// Select toolchains in the hidden table that are selected in the visible remote and local tables
 	private void updateHiddenToolChainList() {
 		Set<String> currentSelections = new HashSet<String>();
+		// Don't allow zero toolchains to be selected
+		if (remoteToolChainTable.getSelectionCount() == 0 && remoteToolChainTable.getItemCount() > 0) {
+			remoteToolChainTable.select(0);
+		}
 		for (TableItem ti : remoteToolChainTable.getSelection()) {
 			currentSelections.add(ti.getText());
 		}

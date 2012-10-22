@@ -61,11 +61,15 @@ public class Messages extends NLS {
 	public static String SyncFileFilterPage_15;
 	public static String SyncFileFilterPage_16;
 	public static String SyncFileFilterPage_17;
+	public static String SyncFileFilterPage_18;
 	public static String SyncFileFilterPage_19;
 	public static String SyncFileFilterPage_2;
 	public static String SyncFileFilterPage_20;
 	public static String SyncFileFilterPage_21;
 	public static String SyncFileFilterPage_22;
+	public static String SyncFileFilterPage_23;
+	public static String SyncFileFilterPage_24;
+	public static String SyncFileFilterPage_25;
 	public static String SyncFileFilterPage_3;
 	public static String SyncFileFilterPage_4;
 	public static String SyncFileFilterPage_5;

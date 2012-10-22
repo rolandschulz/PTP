@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.IPreferencePageContainer;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -34,6 +35,7 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.ApplicationWindow;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
@@ -48,6 +50,8 @@ import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -91,6 +95,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	private Label remoteErrorLabel;
 	private Button upButton;
 	private Button downButton;
+	private Button editButton;
 	private Button removeButton;
 	private Text newPath;
 	private Button excludeButtonForPath;
@@ -285,9 +290,25 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		
 		// Pattern table
 		patternTable = new Table(patternTableComposite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-		patternTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
+		patternTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4));
 		new TableColumn(patternTable, SWT.LEAD, 0);
 		new TableColumn(patternTable, SWT.LEAD, 1); // Separate column for pattern for alignment and font change.
+		patternTable.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				editPattern();
+			}
+
+			@Override
+			public void mouseDown(MouseEvent e) {
+				// do nothing
+			}
+
+			@Override
+			public void mouseUp(MouseEvent e) {
+				// do nothing
+			}
+		});
 		
 		// Pattern table buttons (up, down, and delete)
 		upButton = new Button(patternTableComposite, SWT.PUSH);
@@ -323,6 +344,15 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	    		}
 	    		update();
 	    		patternTable.select(patternIndex);
+	    	}
+	    });
+
+	    editButton = new Button(patternTableComposite, SWT.PUSH);
+	    editButton.setText(Messages.SyncFileFilterPage_18);
+	    editButton.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false));
+	    editButton.addSelectionListener(new SelectionAdapter() {
+	    	public void widgetSelected(SelectionEvent event) {
+	    		editPattern();
 	    	}
 	    });
 
@@ -504,6 +534,101 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 
 		newRegex.setText(""); //$NON-NLS-1$
 		update();
+	}
+	
+	// Creates a modal dialog to edit the selected pattern and replaces it if user hits "OK"
+	private void editPattern() {
+		TableItem[] selectedPatternItem = patternTable.getSelection();
+		// Modifying more than one pattern at a time is not supported
+		if (selectedPatternItem.length != 1) {
+			return;
+		}
+		ResourceMatcher selectedPattern = (ResourceMatcher) selectedPatternItem[0].getData();
+		SimpleEditPatternDialog dialog = new SimpleEditPatternDialog(selectedPattern, patternTable.getShell());
+		if (dialog.open() == Window.OK) {
+			filter.replacePattern(selectedPattern, dialog.getNewMatcher(),
+					dialog.getIsInclusive() ? PatternType.INCLUDE : PatternType.EXCLUDE);
+			update();
+		}
+	}
+
+	// Simple pattern editor that uses reflection and assumes that only the pattern's string needs to be edited.
+	// This will need to be more general if we add more pattern types in the future. Specifically, the logic of how to edit a
+	// pattern should be inside the specific matcher.
+	private class SimpleEditPatternDialog extends Dialog {
+		final ResourceMatcher oldMatcher;
+		ResourceMatcher newMatcher = null;
+		boolean isInclusive;
+		Button checkBox;
+		Text patternText;
+		Label errorLabel;
+
+		public SimpleEditPatternDialog(ResourceMatcher rm, Shell parentShell) {
+			super(parentShell);		
+			oldMatcher = rm;
+		}
+
+		@Override
+		protected Control createDialogArea(Composite parent) {
+			checkBox = new Button(parent, SWT.CHECK);
+			checkBox.setSelection(filter.getPatternType(oldMatcher) == PatternType.INCLUDE);
+			checkBox.setText(Messages.SyncFileFilterPage_24);
+			GridData gd= new GridData();
+			checkBox.setLayoutData(gd);
+
+			patternText = new Text(parent, SWT.BORDER);
+			gd = new GridData();
+			gd.grabExcessHorizontalSpace = true;
+			gd.horizontalAlignment = GridData.FILL;
+			patternText.setLayoutData(gd);
+			patternText.setText(oldMatcher.toString());
+			
+		    errorLabel = new Label(parent, SWT.NONE);
+		    errorLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
+			errorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+			return parent;
+		}
+
+		@Override
+		protected void configureShell(Shell shell) {
+			super.configureShell(shell);
+			shell.setText(Messages.SyncFileFilterPage_23);
+		}
+		
+		@Override
+		protected void okPressed() {
+			isInclusive = checkBox.getSelection();
+			if (oldMatcher instanceof PathResourceMatcher) {
+				newMatcher = new PathResourceMatcher(new Path(patternText.getText()));
+			} else if (oldMatcher instanceof RegexResourceMatcher) {
+				try {
+					newMatcher = new RegexResourceMatcher(patternText.getText());
+				// If regex invalid, display error for a few seconds and then return
+				} catch (PatternSyntaxException e) {
+					errorLabel.setText(Messages.SyncFileFilterPage_15);
+					display.timerExec(ERROR_DISPLAY_SECONDS*1000, new Runnable() {
+						public void run() {
+							if (errorLabel.isDisposed()) {
+								return;
+							}
+							errorLabel.setText(""); //$NON-NLS-1$
+						}
+					});
+					return;
+				}
+			} else {
+				assert false : Messages.SyncFileFilterPage_25;
+			}
+			super.okPressed();
+		}
+
+		public boolean getIsInclusive() {
+			return isInclusive;
+		}
+		public ResourceMatcher getNewMatcher() {
+			return newMatcher;
+		}
 	}
 
 	private void update() {
