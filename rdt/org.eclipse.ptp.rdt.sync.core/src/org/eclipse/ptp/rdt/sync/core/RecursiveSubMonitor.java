@@ -1,15 +1,17 @@
 package org.eclipse.ptp.rdt.sync.core;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SubMonitor;
 
 /**
- * Submonitor capable of recursive task reporting. A new subtask is appended to the parent's subtask
+ * Submonitor capable of recursive task reporting. New subtasks are appended to the parent's subtask.
+ * Operates as a thin wrapper around the usual tree of submonitors, which still do most of the work.
  *
  */
-public class RecursiveSubMonitor implements IProgressMonitor {
-	private final SubMonitor subMonitor;
+public class RecursiveSubMonitor implements IProgressMonitorWithBlocking {
+	private SubMonitor subMonitor;
 	private String subTaskName = ""; //$NON-NLS-1$
 	private RecursiveSubMonitor parent = null;
 	
@@ -71,45 +73,45 @@ public class RecursiveSubMonitor implements IProgressMonitor {
 	}
 
 	/**
-	 * Convert the underlying submonitor as before but wrap it in a recursive submonitor. Preserve the parent if necessary.
+	 * Convert the underlying submonitor as before but wrap it in a recursive submonitor.
 	 * @param monitor
 	 * @return
 	 */
 	public static RecursiveSubMonitor convert(IProgressMonitor monitor) {
-		// Preserve parent if monitor is recursive
-		RecursiveSubMonitor parent = null;
+		// If already a recursive submonitor, just replace the wrapped submonitor. Do not create a new instance.
 		if (monitor instanceof RecursiveSubMonitor) {
-			parent = ((RecursiveSubMonitor) monitor).getParentMonitor();
+			((RecursiveSubMonitor) monitor).subMonitor = SubMonitor.convert(((RecursiveSubMonitor) monitor).subMonitor);
+			return (RecursiveSubMonitor) monitor;
 		}
-		return new RecursiveSubMonitor(SubMonitor.convert(monitor), parent);
+		return new RecursiveSubMonitor(SubMonitor.convert(monitor));
 	}
 
 	/**
-	 * Convert the underlying submonitor as before but wrap it in a recursive submonitor. Preserve the parent if necessary.
+	 * Convert the underlying submonitor as before but wrap it in a recursive submonitor.
 	 * @param monitor
 	 * @return
 	 */
 	public static RecursiveSubMonitor convert(IProgressMonitor monitor, int work) {
-		// Preserve parent if monitor is recursive
-		RecursiveSubMonitor parent = null;
+		// If already a recursive submonitor, just replace the wrapped submonitor. Do not create a new instance.
 		if (monitor instanceof RecursiveSubMonitor) {
-			parent = ((RecursiveSubMonitor) monitor).getParentMonitor();
+			((RecursiveSubMonitor) monitor).subMonitor = SubMonitor.convert(((RecursiveSubMonitor) monitor).subMonitor, work);
+			return (RecursiveSubMonitor) monitor;
 		}
-		return new RecursiveSubMonitor(SubMonitor.convert(monitor, work), parent);
+		return new RecursiveSubMonitor(SubMonitor.convert(monitor, work));
 	}
 
 	/**
-	 * Convert the underlying submonitor as before but wrap it in a recursive submonitor. Preserve the parent if necessary.
+	 * Convert the underlying submonitor as before but wrap it in a recursive submonitor.
 	 * @param monitor
 	 * @return
 	 */
 	public static RecursiveSubMonitor convert(IProgressMonitor monitor, String taskName, int work) {
-		// Preserve parent if monitor is recursive
-		RecursiveSubMonitor parent = null;
+		// If already a recursive submonitor, just replace the wrapped submonitor. Do not create a new instance.
 		if (monitor instanceof RecursiveSubMonitor) {
-			parent = ((RecursiveSubMonitor) monitor).getParentMonitor();
+			((RecursiveSubMonitor) monitor).subMonitor = SubMonitor.convert(((RecursiveSubMonitor) monitor).subMonitor, taskName, work);
+			return (RecursiveSubMonitor) monitor;
 		}
-		return new RecursiveSubMonitor(SubMonitor.convert(monitor, taskName, work), parent);
+		return new RecursiveSubMonitor(SubMonitor.convert(monitor, taskName, work));
 	}
 
 	// Boilerplate forwarding functions - let the wrapped submonitor do most of the work 
