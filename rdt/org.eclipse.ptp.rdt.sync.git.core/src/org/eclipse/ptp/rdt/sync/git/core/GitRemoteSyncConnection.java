@@ -131,9 +131,9 @@ public class GitRemoteSyncConnection {
 			
 			// Build repo, creating it if it is not already present.
 			try {
-				subMon.subTask("Building remote repository");
+				subMon.subTask(Messages.GitRemoteSyncConnection_20);
 				buildRepo(subMon.newChild(80));
-				subMon.subTask("Reading remote Git version");
+				subMon.subTask(Messages.GitRemoteSyncConnection_21);
 				remoteGitVersion = getRemoteGitVersion(subMon.newChild(10));
 			} catch (final IOException e) {
 				throw new RemoteSyncException(e);
@@ -215,12 +215,12 @@ public class GitRemoteSyncConnection {
 				repository.create(false);
 
 				// An initial commit to create the master branch.
-				subMon.subTask("Initial commit of local files");
+				subMon.subTask(Messages.GitRemoteSyncConnection_22);
 				doCommit(subMon.newChild(4));
 			}
 
 			// Refresh project 
-			subMon.subTask("Refreshing workspace");
+			subMon.subTask(Messages.GitRemoteSyncConnection_23);
 			final Thread refreshThread = this.doRefresh(subMon.newChild(1));
 			
 			// Set git repo as derived, which can only be done after refresh completes.
@@ -241,7 +241,7 @@ public class GitRemoteSyncConnection {
 
 			// Create remote directory if necessary.
 			try {
-				subMon.subTask("Creating remote directory");
+				subMon.subTask(Messages.GitRemoteSyncConnection_24);
 				CommandRunner.createRemoteDirectory(buildScenario.getRemoteConnection(), buildScenario.getLocation(project),
 						subMon.newChild(5));
 			} catch (final CoreException e) {
@@ -249,17 +249,17 @@ public class GitRemoteSyncConnection {
 			}
 
 			// Initialize remote directory if necessary
-			subMon.subTask("initializing remote");
+			subMon.subTask(Messages.GitRemoteSyncConnection_25);
 			boolean existingGitRepo = doRemoteInit(subMon.newChild(5));
 
 			// Prepare remote site for committing (stage files using git) and
 			// then commit remote files if necessary
 			// Include untracked files for new git
-			subMon.subTask("Preparing remote for commit");
+			subMon.subTask(Messages.GitRemoteSyncConnection_26);
 			boolean needToCommitRemote = prepareRemoteForCommit(subMon.newChild(85), !existingGitRepo);
 			// repos
 			if (needToCommitRemote) {
-				subMon.subTask("Committing remote files");
+				subMon.subTask(Messages.GitRemoteSyncConnection_27);
 				commitRemoteFiles(subMon.newChild(5));
 			}
 
@@ -482,7 +482,7 @@ public class GitRemoteSyncConnection {
 		try {
 			final String command, deletePrefix;
 			final int fileNamePos;
-			if (remoteGitVersion>=99999) {
+			if (remoteGitVersion>=10700) {
 				command = gitCommand() + " status --porcelain"; //$NON-NLS-1$
 				deletePrefix = " D"; //$NON-NLS-1$
 				fileNamePos = 3;
@@ -511,7 +511,7 @@ public class GitRemoteSyncConnection {
 			BufferedReader statusReader = new BufferedReader(new StringReader(commandResults.getStdout()));
 			String line = null;
 			while ((line = statusReader.readLine()) != null) {
-				if (remoteGitVersion<99999 && (line.charAt(0) == ' ' || line.charAt(1) != ' ')) {
+				if (remoteGitVersion<10700 && (line.charAt(0) == ' ' || line.charAt(1) != ' ')) {
 					continue;
 				}
 				String fn = line.substring(fileNamePos);
