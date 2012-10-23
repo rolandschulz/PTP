@@ -10,9 +10,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -23,9 +28,12 @@ import org.eclipse.cdt.core.settings.model.ICStorageElement;
 import org.eclipse.cdt.core.settings.model.WriteAccessException;
 import org.eclipse.cdt.core.settings.model.extension.CConfigurationData;
 import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
+import org.eclipse.cdt.managedbuilder.core.BuildException;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.IOption;
+import org.eclipse.cdt.managedbuilder.core.ITool;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
 import org.eclipse.cdt.managedbuilder.internal.core.ManagedProject;
@@ -43,10 +51,13 @@ import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
+import org.eclipse.ptp.rdt.sync.core.CommandRunner;
+import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.osgi.service.prefs.BackingStoreException;
@@ -830,5 +841,148 @@ public class BuildConfigurationManager {
 	 */
 	public void shutdown(IProject project) {
 		provider.close(project);
+	}
+	
+	public void update(IProject project) {
+		IConfiguration cf = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
+		String includePaths = getIncludePaths(cf, project);
+		addIncludePath(cf, includePaths);
+	}
+	
+	private String getIncludePaths(IConfiguration cf, IProject project) {
+		List<String> scanCommand = Arrays.asList("gcc", "-v", "-x", "c", "-E", "/home/ejd/lilc.c"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+		BuildScenario bs = this.getBuildScenarioForBuildConfiguration(cf);
+		CommandResults cr = null;
+		try {
+			cr = CommandRunner.executeRemoteCommand(bs.getRemoteConnection(), scanCommand, bs.getLocation(project), null);
+		} catch (RemoteSyncException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RemoteConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MissingConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return parseIncludes(cr.getStderr());
+	}
+	
+	private String parseIncludes(String stdout) {
+		String includePaths = ""; //$NON-NLS-1$
+		Scanner scanner = new Scanner(stdout);
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+			if (line.contains("include") && line.contains("search starts here")) { //$NON-NLS-1$ //$NON-NLS-2$
+				scanner.nextLine(); // Two header lines
+				break;
+			}
+		}
+		
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+			if (line.contains("End of search list")) { //$NON-NLS-1$
+				break;
+			}
+			line = line.trim();
+			includePaths += line;
+			includePaths += ":"; //$NON-NLS-1$
+		}
+		return includePaths;
+	}
+
+
+	private void addIncludePath(IConfiguration cf, String newIncludePath) {
+		// note: could be > 1 path in 'newIncludePath'
+		String ext = "c"; //$NON-NLS-1$
+		ITool cfTool = cf.getToolFromInputExtension(ext);
+
+		// String id = cfTool.getId(); // "cdt.managedbuild.tool.xlc.c.compiler.exe.debug.1423270745"
+		String name = cfTool.getName();// "XL C Compiler"
+		IOption option = null;
+		if (name.startsWith("XL C")) { // special case for XL C compiler //$NON-NLS-1$
+			option = cfTool.getOptionById("xlc.c.compiler.option.include.paths"); //$NON-NLS-1$
+		} else { // otherwise we assume there is only one include path option.
+			// FIXME we want the other include path option, the one from C/C++ General -> Paths and Symbols
+			option = getFirstOptionByType(cf, cfTool, IOption.INCLUDE_PATH);
+
+		}
+		if (option != null) {
+			String[] includePaths = null;
+			try {
+				includePaths = option.getIncludePaths();
+			} catch (BuildException e) {
+				e.printStackTrace();
+			}
+			String[] newIncludePaths = add(cf, includePaths, newIncludePath);
+			ManagedBuildManager.setOption(cf, cfTool, option, newIncludePaths);
+		}
+		else {
+			System.out.println("MPIProjectProcess, no option for include paths found."); //$NON-NLS-1$
+		}
+	}
+	
+	private IOption getFirstOptionByType(IConfiguration cf, ITool cfTool, int optionType) {
+		List<IOption> allOptions = getOptionsByType(cf, cfTool, optionType);
+		if (allOptions.size() > 0) {
+			return allOptions.get(0);
+		}
+		return null;
+	}
+	
+	private List<IOption> getOptionsByType(IConfiguration cf, ITool cfTool, int optionType) {
+		// run thru ALL options and check type for each, returning the ones that match
+		IOption[] allOptions = cfTool.getOptions();
+		List<IOption> foundOptions = new ArrayList<IOption>();
+
+		for (int i = 0; i < allOptions.length; i++) {
+			IOption option = allOptions[i];
+
+			int oType = 0;
+			try {
+				oType = option.getValueType();
+			} catch (BuildException e) {
+				e.printStackTrace();
+				continue;
+			}
+			if (optionType == oType) {
+				// add it to the list
+				foundOptions.add(option);
+			}
+
+		}
+		// IOption[] ret= foundOptions.toArray(new IOption[foundOptions.size()]);
+		return foundOptions;
+	}
+	
+	protected String[] add(IConfiguration cf, String[] existingPaths, String newPath) {
+		BuildScenario bs = this.getBuildScenarioForBuildConfiguration(cf);
+		String pathSep = java.io.File.pathSeparator; // semicolon for windows, colon for Mac/Linux
+		List<String> newPathList = new ArrayList<String>();
+		String path;
+		for (int i = 0; i < existingPaths.length; i++) {
+			path = existingPaths[i];
+			newPathList.add(path);
+		}
+		String[] newPathArray = newPath.split(pathSep);
+		for (int i = 0; i < newPathArray.length; i++) {
+			path = newPathArray[i];
+			try {
+				path = "ssh://" + bs.getRemoteConnection().getAddress() + "/" + path; //$NON-NLS-1$ //$NON-NLS-2$
+			} catch (MissingConnectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			newPathList.add(path);
+		}
+
+		String[] newArray = (String[]) newPathList.toArray(new String[0]);
+		return newArray;
 	}
 }

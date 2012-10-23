@@ -284,6 +284,15 @@
                      value="sync_file_list">
                </parameter>
             </command>
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  label="Update"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_update">
+               </parameter>
+            </command>
          </menu>
       </menuContribution>
       <menuContribution

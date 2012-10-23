@@ -54,6 +54,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String checkoutCommand = "checkout"; //$NON-NLS-1$
 	private static final String resolveAsRemoteCommand = "checkout_remote_copy"; //$NON-NLS-1$
 	private static final String resolveMergeCommand = "resolve"; //$NON-NLS-1$
+	private static final String syncUpdateCommand = "sync_update"; //$NON-NLS-1$
 	private static final ISyncExceptionHandler syncExceptionHandler = new CommonSyncExceptionHandler(false, true);
 
 	public Object execute(ExecutionEvent event) {
@@ -151,6 +152,9 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 						viewer.update(null);
 					}
 				}
+			} else if (command.equals(syncUpdateCommand)) {
+				BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+				bcm.update(project);
 			}
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are non-blocking.
