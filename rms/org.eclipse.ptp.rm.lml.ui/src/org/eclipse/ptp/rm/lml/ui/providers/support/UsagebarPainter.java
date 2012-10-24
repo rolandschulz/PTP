@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * Copyright (c) 2011-2012 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
@@ -47,7 +47,7 @@ public class UsagebarPainter implements PaintListener {
 	 * on which this job is running.
 	 * 
 	 */
-	private static class JobInterval {
+	public static class JobInterval {
 
 		/**
 		 * Coordinates in x-direction relative to this component.
@@ -55,6 +55,21 @@ public class UsagebarPainter implements PaintListener {
 		 * at start and ending with its right edge with end.
 		 */
 		public int start, end;
+
+		/**
+		 * Width of the bar in pixels, which is colored by the job color
+		 */
+		public int innerWidth;
+
+		/**
+		 * Inner width plus frame widths
+		 */
+		public int outerWidth;
+
+		/**
+		 * Number of pixels used for the frame
+		 */
+		public int frame;
 
 		/**
 		 * The job painted in this rectangle.
@@ -71,11 +86,20 @@ public class UsagebarPainter implements PaintListener {
 		 *            the starting x-coordinate of the painted rectangle for this job.
 		 * @param end
 		 *            the end x-coordinate of the painted rectangle for this job.
+		 * @param innerWidth
+		 *            Width of the bar in pixels, which is colored by the job color
+		 * @param outerWidth
+		 *            Inner width plus frame widths
+		 * @param frame
+		 *            Number of pixels used for the frame
 		 */
-		public JobInterval(ObjectType job, int start, int end) {
+		public JobInterval(ObjectType job, int start, int end, int innerWidth, int outerWidth, int frame) {
 			this.job = job;
 			this.start = start;
 			this.end = end;
+			this.innerWidth = innerWidth;
+			this.outerWidth = outerWidth;
+			this.frame = frame;
 		}
 	}
 
@@ -110,7 +134,7 @@ public class UsagebarPainter implements PaintListener {
 	 * pixels on the screen to painted jobs
 	 * 
 	 */
-	private ArrayList<JobInterval> jobIntervals;
+	private List<JobInterval> jobIntervals;
 
 	/**
 	 * The list of jobs sorted by their size (number of CPUs per job)
@@ -306,6 +330,32 @@ public class UsagebarPainter implements PaintListener {
 	}
 
 	/**
+	 * Fills the jobIntervals attribute with all jobs, which have to be painted.
+	 */
+	public void detectJobPositions() {
+		// Update the paint area on its own if usagebarComp was passed to this listener
+		// Otherwise updatePaintArea has to be called externally
+		if (usagebarComp != null) {
+			updatePaintArea(new Rectangle(0, 0, usagebarComp.getSize().x, usagebarComp.getSize().y));
+		}
+
+		jobIntervals = new ArrayList<JobInterval>();
+
+		int cpuSum = 0;
+		// paint bar
+		for (final JobType job : jobs) {
+
+			final JobInterval jobInt = getCurrentJobInterval(job, cpuSum);
+
+			final int currentCPUs = job.getCpucount().intValue(); // current amount of cpus for this job
+			cpuSum += currentCPUs;
+
+			jobIntervals.add(jobInt);
+		}
+
+	}
+
+	/**
 	 * Use this function in mouse-over events of surrounding
 	 * widgets. Retrieve the job-instance at the x-coordinate x
 	 * passed to this function.
@@ -324,6 +374,13 @@ public class UsagebarPainter implements PaintListener {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @return absolute intervals in pixels, in which the job rectangles are painted
+	 */
+	public List<JobInterval> getJobIntervals() {
+		return jobIntervals;
 	}
 
 	/**
@@ -392,53 +449,30 @@ public class UsagebarPainter implements PaintListener {
 		// paint bar
 		for (final JobType job : jobs) {
 
+			final JobInterval jobInt = getCurrentJobInterval(job, cpuSum);
+
 			final int currentCPUs = job.getCpucount().intValue(); // current amount of cpus for this job
-
-			final int x = (cpuSum * width) / allCPU;
-
-			int aWidth = ((cpuSum + currentCPUs) * width) / allCPU - x + 1;
-
-			if (aWidth + x >= width) {
-				aWidth--;
-			}
-
 			cpuSum += currentCPUs;
 
 			Color jobColor = ColorConversion.getColor(oidToObject.getColorById(job.getOid()));
 
-			final ObjectType jobObject = oidToObject.getObjectById(job.getOid());
+			final ObjectType jobObject = jobInt.job;
 
 			if (!objectStatus.isMouseDown(jobObject) && objectStatus.isAnyMouseDown()) {
 				jobColor = ColorConversion.getColor(oidToObject.getColorById(null));
 			}
 
 			gc.setBackground(event.display.getSystemColor(SWT.COLOR_BLACK));
-
-			int frame = standardFrame;
-			// React to mouse-over-event
-			if (objectStatus.isMouseOver(jobObject)) {
-				frame = mouseOverFrame;
-			}
-
-			gc.fillRectangle(x + paintArea.x, 0 + paintArea.y, aWidth, barHeight);
+			gc.fillRectangle(jobInt.start, paintArea.y, jobInt.outerWidth, barHeight);
 
 			gc.setBackground(jobColor);
-			// avoid negative widths and heights
-			if (aWidth - 2 * frame < 0) {
-				frame = 1;
-			}
-			if (barHeight - 2 * frame < 0) {
-				frame = 1;
-			}
+			gc.fillRectangle(jobInt.start + jobInt.frame, jobInt.frame + paintArea.y, jobInt.outerWidth - 2 * jobInt.frame,
+					barHeight - 2 * jobInt.frame);
 
-			gc.fillRectangle(x + frame + paintArea.x, frame + paintArea.y, aWidth - 2 * frame, barHeight - 2 * frame);
-
-			// Save interval for this job
-			final int end = (cpuSum * width) / allCPU - 1;
-
-			jobIntervals.add(new JobInterval(jobObject, x + paintArea.x, end + paintArea.x));
+			jobIntervals.add(jobInt);
 		}
 
+		// Paint empty part
 		if (cpuSum < allCPU) {
 			final int x = (cpuSum * width) / allCPU;
 
@@ -583,5 +617,54 @@ public class UsagebarPainter implements PaintListener {
 		}
 
 		scale.setInterval(interval);
+	}
+
+	/**
+	 * Generate the pixel interval for the passed job. This
+	 * function is used by the functions for painting and detecting the job positions,
+	 * which have to be called separately.
+	 * 
+	 * @param job
+	 *            the job object, for which the interval has to be generated
+	 * @param cpuSum
+	 *            the current sum of cpus, which are painted before this job
+	 * @return the job interval where to paint the current job
+	 */
+	protected JobInterval getCurrentJobInterval(JobType job, int cpuSum) {
+		final int width = paintArea.width;
+		final int allCPU = usageAdapter.getCpuCount().intValue();
+		final OIDToObject oidToObject = lguiItem.getOIDToObject();
+		final ObjectType jobObject = oidToObject.getObjectById(job.getOid());
+
+		final int barHeight = (int) (paintArea.height * barFactor); // Height of the bar
+
+		final int currentCPUs = job.getCpucount().intValue(); // current amount of cpus for this job
+
+		final int x = (cpuSum * width) / allCPU;
+
+		int outerWidth = ((cpuSum + currentCPUs) * width) / allCPU - x + 1;
+
+		if (outerWidth + x >= width) {
+			outerWidth--;
+		}
+
+		int frame = standardFrame;
+		// React to mouse-over-event
+		if (lguiItem.getObjectStatus().isMouseOver(jobObject)) {
+			frame = mouseOverFrame;
+		}
+		// avoid negative widths and heights
+		if (outerWidth - 2 * frame < 0) {
+			frame = 1;
+		}
+		if (barHeight - 2 * frame < 0) {
+			frame = 1;
+		}
+		final int innerWidth = outerWidth - 2 * frame;
+
+		// Save interval for this job
+		final int end = ((cpuSum + currentCPUs) * width) / allCPU - 1;
+
+		return new JobInterval(jobObject, x + paintArea.x, end + paintArea.x, innerWidth, outerWidth, frame);
 	}
 }
