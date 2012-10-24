@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * Copyright (c) 2011-2012 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
@@ -10,6 +10,8 @@
  */
 package org.eclipse.ptp.rm.lml.ui.providers;
 
+import java.util.List;
+
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.UsageType;
@@ -17,6 +19,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarType;
 import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable;
 import org.eclipse.ptp.rm.lml.ui.providers.support.MouseInteraction;
 import org.eclipse.ptp.rm.lml.ui.providers.support.UsagebarPainter;
+import org.eclipse.ptp.rm.lml.ui.providers.support.UsagebarPainter.JobInterval;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -164,6 +167,14 @@ public class Usagebar extends LguiWidget implements Updatable {
 	public void dispose() {
 		super.dispose();
 		lguiItem.getObjectStatus().removeComponent(this);
+	}
+
+	/**
+	 * @return forwarded job intervals from the usagebarpainter
+	 */
+	public List<JobInterval> getJobIntervals() {
+		usagebarPainter.detectJobPositions();// Update job intervals
+		return usagebarPainter.getJobIntervals();
 	}
 
 	/**

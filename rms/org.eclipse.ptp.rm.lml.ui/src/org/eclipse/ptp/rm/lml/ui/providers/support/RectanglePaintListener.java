@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * Copyright (c) 2011-2012 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.lml.ui.providers.support;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplayelement;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
@@ -23,6 +24,7 @@ import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus;
 import org.eclipse.ptp.rm.lml.internal.core.model.RowColumnSorter;
 import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayComp;
 import org.eclipse.ptp.rm.lml.ui.providers.NodedisplayCompMinSize;
+import org.eclipse.ptp.rm.lml.ui.providers.support.UsagebarPainter.JobInterval;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -40,7 +42,7 @@ import org.eclipse.swt.widgets.Composite;
  * texts as titles have to be painted
  * and can not be inserted by using a layout-manager)
  */
-public class RectanglePaintListener implements PaintListener {
+public class RectanglePaintListener implements PaintListener, JobDetector {
 
 	/**
 	 * nodes which are painted in the composite
@@ -217,6 +219,20 @@ public class RectanglePaintListener implements PaintListener {
 		this.rootListener = rootListener;
 
 		updateRectangleSize();
+	}
+
+	@Override
+	public void detectJobPositions(Set<Point> points, String jobId) {
+
+		updateRectangleSize();
+
+		for (int x = 0; x < columnCount; x++) {
+
+			for (int y = 0; y < rowCount; y++) {
+				detectPaintPositionsForChild(points, jobId, x, y);
+			}
+
+		}
 	}
 
 	/**
@@ -541,40 +557,30 @@ public class RectanglePaintListener implements PaintListener {
 	 *            x-coordinate within the nodes' grid
 	 * @param y
 	 *            y-coordinate within the nodes' grid
-	 * @return <code>true</code> if child cannot be painted, because it dows not exist in the nodes' list
+	 * @return <code>true</code> if child cannot be painted, because it does not exist in the nodes' list
 	 */
 	private boolean paintChild(PaintEvent event, int x, int y) {
-		// get index of node
-		final int index = y * columnCount + x;
-		if (index >= nodes.size()) {
+		final Node<LMLNodeData> node = getNodeByIndexPosition(x, y);
+		if (node == null) {
 			return true;
 		}
 
-		final Node<LMLNodeData> node = nodes.get(index);
 		final Nodedisplayelement currentLayout = nodeToLayout.get(node);
 
-		final int horizontalSpacing = layout.getHgap().intValue();
-		final int verticalSpacing = layout.getVgap().intValue();
-
 		// Rectangle frame
-		final Rectangle rectangle = new Rectangle(marginWidth + rectangleWidth * x + paintArea.x, marginHeight + rectangleHeight
-				* y + paintArea.y, rectangleWidth - horizontalSpacing, rectangleHeight - verticalSpacing);
+		final Rectangle rectangle = getPaintAreaForNodePosition(x, y);
 
 		final Color borderColor = ColorConversion.getColor(LMLColor.stringToColor(currentLayout.getBordercolor()));
 		// Paint outer rectangle
 		event.gc.setBackground(borderColor);
-		event.gc.fillRectangle(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+		event.gc.fillRectangle(rectangle);
 
 		if (!innerListener.containsKey(node)) {
 			// Is this node on the lowest level?
 			paintLowestLevelChild(event, node, currentLayout, rectangle);
 		}
 		else {// Node has children and must be painted recursively
-				// Decrease inner rectangle size with regard to current border size
-			final int borderSize = currentLayout.getBorder().intValue();
-			final Rectangle decreasedRectangle = new Rectangle(rectangle.x + borderSize, rectangle.y + borderSize, rectangle.width
-					- 2 * borderSize, rectangle.height - 2 * borderSize);
-
+			final Rectangle decreasedRectangle = getInnerPaintAreaForRecursiveListener(rectangle, currentLayout);
 			paintHigherLevelChild(event, node, decreasedRectangle);
 		}
 		nodeToRectangle.put(node, rectangle);// save the current rectangle
@@ -619,9 +625,9 @@ public class RectanglePaintListener implements PaintListener {
 			Rectangle rectangle) {
 		// Paint this node by a usagebar?
 		if (usagebarsMap.containsKey(node)) {
-			final UsagebarPainter UsagebarPainter = usagebarsMap.get(node);
-			UsagebarPainter.updatePaintArea(rectangle);
-			UsagebarPainter.paintControl(event);
+			final UsagebarPainter usagebarPainter = usagebarsMap.get(node);
+			usagebarPainter.updatePaintArea(rectangle);
+			usagebarPainter.paintControl(event);
 			return;
 		}
 
@@ -633,6 +639,145 @@ public class RectanglePaintListener implements PaintListener {
 			event.gc.setBackground(nodeToColor.get(node));
 		}
 
+		final Rectangle innerRec = getLowestLevelFillRectangle(node, currentLayout, rectangle);
+
+		event.gc.fillRectangle(innerRec);
+	}
+
+	/**
+	 * Detect job positions for a node painted by a recursive painter.
+	 * 
+	 * @param points
+	 *            contains detected job positions
+	 * @param jobId
+	 *            searched job ID
+	 * @param node
+	 *            the node painted by the corresponding paint function
+	 * @param rectangle
+	 *            the sub area, in which this node is painted
+	 */
+	protected void detectHigherLevelChild(Set<Point> points, String jobId, Node<LMLNodeData> node, Rectangle rectangle) {
+		final RectanglePaintListener rectanglePaintListener = innerListener.get(node);
+		rectanglePaintListener.updatePaintArea(rectangle);
+
+		rectanglePaintListener.detectJobPositions(points, jobId);
+	}
+
+	/**
+	 * Detect jobs, which can be painted by the lowestLevelChild paint function.
+	 * 
+	 * @param points
+	 *            contains detected job positions
+	 * @param jobId
+	 *            searched job ID
+	 * @param node
+	 *            the node painted by the corresponding paint function
+	 * @param currentLayout
+	 *            layout for this node painting
+	 * @param rectangle
+	 *            the sub area, in which this node is painted
+	 */
+	protected void detectLowestLevelChild(Set<Point> points, String jobId, Node<LMLNodeData> node,
+			Nodedisplayelement currentLayout, Rectangle rectangle) {
+		// Paint this node by a usagebar?
+		if (usagebarsMap.containsKey(node)) {
+			final UsagebarPainter usagebarPainter = usagebarsMap.get(node);
+			usagebarPainter.updatePaintArea(rectangle);
+			usagebarPainter.detectJobPositions();
+
+			final List<JobInterval> jobintervals = usagebarPainter.getJobIntervals();
+			for (final JobInterval interval : jobintervals) {
+				if (interval.job.getId().equals(jobId)) {
+					// Detect this position in the ScrolledComposite
+					final Rectangle subPaintArea = NodedisplayComp.getNextNodedisplayBounds(usingListener);
+					final Point jobPoint = nodedisplayComp.getPositionInScrollComp(
+							new Point(rectangle.x + subPaintArea.x + interval.start, rectangle.y + subPaintArea.y));
+					points.add(jobPoint);
+				}
+			}
+
+			return;
+		}
+
+		final Rectangle innerRec = getLowestLevelFillRectangle(node, currentLayout, rectangle);
+
+		if (node.getData() != null && node.getData().getDataElement() != null && node.getData().getDataElement().getOid() != null) {
+			if (node.getData().getDataElement().getOid().equals(jobId)) {
+				final Rectangle subPaintArea = NodedisplayComp.getNextNodedisplayBounds(usingListener);
+				final Point jobPoint = nodedisplayComp.getPositionInScrollComp(new Point(subPaintArea.x + innerRec.x,
+						subPaintArea.y + innerRec.y));
+				points.add(jobPoint);
+			}
+		}
+	}
+
+	/**
+	 * Detect all painted rectangles for the given job ID.
+	 * 
+	 * @param points
+	 *            result set of job positions
+	 * @param jobId
+	 *            searched job
+	 * @param x
+	 *            x-index of painted child
+	 * @param y
+	 *            y-index of painted child
+	 */
+	protected void detectPaintPositionsForChild(Set<Point> points, String jobId, int x, int y) {
+		final Node<LMLNodeData> node = getNodeByIndexPosition(x, y);
+		if (node == null) {
+			return;
+		}
+		final Nodedisplayelement currentLayout = nodeToLayout.get(node);
+
+		// Rectangle frame
+		final Rectangle rectangle = getPaintAreaForNodePosition(x, y);
+
+		if (!innerListener.containsKey(node)) {
+			// Is this node on the lowest level?
+			detectLowestLevelChild(points, jobId, node, currentLayout, rectangle);
+		}
+		else {// Node has children and must be painted recursively
+			final Rectangle decreasedRectangle = getInnerPaintAreaForRecursiveListener(rectangle, currentLayout);
+
+			detectHigherLevelChild(points, jobId, node, decreasedRectangle);
+		}
+	}
+
+	/**
+	 * @return true, if double buffering should be enabled, false otherwise
+	 */
+	protected boolean doDoubleBuffering() {
+		return rootListener && doubleBuffer != null &&
+				doubleBuffer.getBounds().width < maxWidthForDoubleBuffer
+				&& doubleBuffer.getBounds().height < maxWidthForDoubleBuffer;
+	}
+
+	/**
+	 * @param outer
+	 *            the rectangle calculated inclusive bordersizes
+	 * @param layout
+	 *            the layout definition for the corresponding node
+	 * @return the rectangle area available to recursive rectanglepaintlisteners painting a sub area of this listener's area
+	 */
+	protected Rectangle getInnerPaintAreaForRecursiveListener(Rectangle outer, Nodedisplayelement layout) {
+		// Decrease inner rectangle size with regard to current border size
+		final int borderSize = layout.getBorder().intValue();
+		final Rectangle decreasedRectangle = new Rectangle(outer.x + borderSize, outer.y + borderSize, outer.width
+				- 2 * borderSize, outer.height - 2 * borderSize);
+		return decreasedRectangle;
+	}
+
+	/**
+	 * @param node
+	 *            the node, which is painted by the filled rectangle
+	 * @param currentLayout
+	 *            the layout for this node
+	 * @param rectangle
+	 *            the outer rectangle for this node inclusive border
+	 * @return the inner rectangle colored by the identifying job color
+	 */
+	protected Rectangle getLowestLevelFillRectangle(Node<LMLNodeData> node, Nodedisplayelement currentLayout, Rectangle rectangle) {
 		int border = currentLayout.getBorder().intValue();
 
 		if (objectStatus.isMouseOver(oidToObject.getObjectByLMLNode(node.getData()))) {
@@ -653,16 +798,42 @@ public class RectanglePaintListener implements PaintListener {
 			y = rectangle.y;
 		}
 
-		event.gc.fillRectangle(x, y, innerWidth, innerHeight);
+		return new Rectangle(x, y, innerWidth, innerHeight);
 	}
 
 	/**
-	 * @return true, if double buffering should be enabled, false otherwise
+	 * @param x
+	 *            index in 2d node array in x direction
+	 * @param y
+	 *            index in 2d node array in y direction
+	 * @return null, if there is no node with the given indices or the corresponding node data
 	 */
-	protected boolean doDoubleBuffering() {
-		return rootListener && doubleBuffer != null &&
-				doubleBuffer.getBounds().width < maxWidthForDoubleBuffer
-				&& doubleBuffer.getBounds().height < maxWidthForDoubleBuffer;
+	protected Node<LMLNodeData> getNodeByIndexPosition(int x, int y) {
+		final int index = y * columnCount + x;
+		if (index >= nodes.size()) {
+			return null;
+		}
+
+		return nodes.get(index);
+	}
+
+	/**
+	 * Determine the sub area for a node painted by this listener.
+	 * 
+	 * @param x
+	 *            index in 2d node array in x direction
+	 * @param y
+	 *            index in 2d node array in y direction
+	 * @return rectangle where to paint this node
+	 */
+	protected Rectangle getPaintAreaForNodePosition(int x, int y) {
+		final int horizontalSpacing = layout.getHgap().intValue();
+		final int verticalSpacing = layout.getVgap().intValue();
+
+		// Rectangle frame
+		final Rectangle rectangle = new Rectangle(marginWidth + rectangleWidth * x + paintArea.x, marginHeight + rectangleHeight
+				* y + paintArea.y, rectangleWidth - horizontalSpacing, rectangleHeight - verticalSpacing);
+		return rectangle;
 	}
 
 	/**
