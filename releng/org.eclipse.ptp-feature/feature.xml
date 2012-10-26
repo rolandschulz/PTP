@@ -62,14 +62,6 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp.rm.mpich2"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.ptp.rm.openmpi"
-         version="0.0.0"/>
-
-   <includes
          id="org.eclipse.ptp.rm.slurm"
          version="0.0.0"/>
 

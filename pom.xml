@@ -122,8 +122,6 @@
 		<module>releng/org.eclipse.ptp.rm.jaxb.contrib-feature</module>
 		<module>releng/org.eclipse.ptp.rm.lml-feature</module>
 		<module>releng/org.eclipse.ptp.rm.lml_jaxb-feature</module>
-		<module>releng/org.eclipse.ptp.rm.mpich2-feature</module>
-		<module>releng/org.eclipse.ptp.rm.openmpi-feature</module>
 		<module>releng/org.eclipse.ptp.rm.slurm-feature</module>
 		<module>releng/org.eclipse.ptp.sci-feature</module>
 		<module>releng/org.eclipse.ptp.sdk-feature</module>
@@ -131,16 +129,8 @@
 		<module>releng/org.eclipse.ptp.services-feature</module>
 		<module>releng/org.eclipse.ptp.utils-feature</module>
 		<module>rms/org.eclipse.ptp.rm.core</module>
-		<module>rms/org.eclipse.ptp.rm.generic.core</module>
-		<module>rms/org.eclipse.ptp.rm.generic.ui</module>
-		<module>rms/org.eclipse.ptp.rm.ibm.ll.core</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.ll.help</module>
-		<module>rms/org.eclipse.ptp.rm.ibm.ll.proxy</module>
-		<module>rms/org.eclipse.ptp.rm.ibm.ll.ui</module>
-		<module>rms/org.eclipse.ptp.rm.ibm.pe.core</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.help</module>
-		<module>rms/org.eclipse.ptp.rm.ibm.pe.proxy</module>
-		<module>rms/org.eclipse.ptp.rm.ibm.pe.ui</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.configs</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.contrib</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.control.core</module>
@@ -157,15 +147,8 @@
 		<module>rms/org.eclipse.ptp.rm.lml.monitor.core</module>
 		<module>rms/org.eclipse.ptp.rm.lml.monitor.ui</module>
 		<module>rms/org.eclipse.ptp.rm.lml.ui</module>
-		<module>rms/org.eclipse.ptp.rm.mpi.mpich2.core</module>
-		<module>rms/org.eclipse.ptp.rm.mpi.mpich2.ui</module>
-		<module>rms/org.eclipse.ptp.rm.mpi.openmpi.core</module>
-		<module>rms/org.eclipse.ptp.rm.mpi.openmpi.ui</module>
 		<module>rms/org.eclipse.ptp.rm.proxy.core</module>
-		<module>rms/org.eclipse.ptp.rm.slurm.core</module>
 		<module>rms/org.eclipse.ptp.rm.slurm.help</module>
-		<module>rms/org.eclipse.ptp.rm.slurm.proxy</module>
-		<module>rms/org.eclipse.ptp.rm.slurm.ui</module>
 		<module>rms/org.eclipse.ptp.rm.ui</module>
 		<module>tools/cdt/org.eclipse.ptp.cdt.compilers.core</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw</module>
