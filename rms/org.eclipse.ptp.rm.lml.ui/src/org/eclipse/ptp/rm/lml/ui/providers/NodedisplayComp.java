@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * Copyright (c) 2011-2012 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
@@ -17,6 +17,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.ptp.rm.lml.core.events.INodedisplayZoomEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.INodedisplayZoomListener;
@@ -42,8 +43,10 @@ import org.eclipse.ptp.rm.lml.ui.providers.support.BorderLayout;
 import org.eclipse.ptp.rm.lml.ui.providers.support.BorderLayout.BorderData;
 import org.eclipse.ptp.rm.lml.ui.providers.support.ColorConversion;
 import org.eclipse.ptp.rm.lml.ui.providers.support.CompositeListenerChooser;
+import org.eclipse.ptp.rm.lml.ui.providers.support.JobDetector;
 import org.eclipse.ptp.rm.lml.ui.providers.support.MouseInteraction;
 import org.eclipse.ptp.rm.lml.ui.providers.support.RectanglePaintListener;
+import org.eclipse.ptp.rm.lml.ui.providers.support.UsagebarPainter.JobInterval;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -78,7 +81,7 @@ import org.eclipse.swt.widgets.Listener;
  * nodedisplay-layout are searched.
  * 
  */
-public class NodedisplayComp extends LguiWidget implements Updatable {
+public class NodedisplayComp extends LguiWidget implements Updatable, JobDetector {
 
 	/**
 	 * This class is a workaround for a SWT-bug. The mouselistener callbacks receive negative coordinates as cursor positions, if
@@ -407,6 +410,42 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		zoomListeners.add(listener);
 	}
 
+	@Override
+	public void detectJobPositions(Set<Point> points, String jobId) {
+
+		for (final NodedisplayComp childComp : innerCompsList) {
+			childComp.detectJobPositions(points, jobId);
+		}
+		// Try to get job position from rectangle painter
+		if (rectanglePaintListener != null) {
+			rectanglePaintListener.detectJobPositions(points, jobId);
+		}
+		// Try to get job position from usagebar
+		if (usagebar != null) {
+			final List<JobInterval> jobintervals = usagebar.getJobIntervals();
+			for (final JobInterval interval : jobintervals) {
+				if (interval.job.getId().equals(jobId)) {
+					// Detect this position in the ScrolledComposite
+					final Rectangle subPaintArea = getNextNodedisplayBounds(usagebar);
+					final Point jobPoint = getPositionInScrollComp(
+							new Point(subPaintArea.x + interval.start, subPaintArea.y));
+					points.add(jobPoint);
+				}
+			}
+		}
+		if (node.getLowerLevelCount() == 0) {
+			final ObjectType object = getConnectedObject();
+			if (object != null) {
+				if (object.getId().equals(jobId)) {
+					final Rectangle subPaintArea = getNextNodedisplayBounds(innerComp);
+					final Point jobPoint = getPositionInScrollComp(
+							new Point(subPaintArea.x, subPaintArea.y));
+					points.add(jobPoint);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Search a layout-section for a lower node <code>nodeData</code>. This lower node must be a child of this instance.
 	 * 
@@ -474,6 +513,33 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 */
 	public Nodedisplayelement getNodedisplayLayout() {
 		return nodedisplayLayout;
+	}
+
+	/**
+	 * Retrieves the location of relative coordinates in this nodedisplay
+	 * relative to the scrolled composite, which wraps around the top nodedisplay.
+	 * 
+	 * @param relPoint
+	 *            the point relative for this nodedisplay
+	 * @return the coordinates of this point relative to the scrolled composite
+	 */
+	public Point getPositionInScrollComp(Point relPoint) {
+		Rectangle bounds = null;
+		if (parentNodedisplayComp == null) {
+			bounds = getBounds();
+		}
+		else {
+			bounds = getNextNodedisplayBounds(this);
+		}
+
+		final Point pointInParent = new Point(bounds.x + relPoint.x, bounds.y + relPoint.y);
+		if (parentNodedisplayComp == null) {
+			return pointInParent;
+		}
+		else {
+			return parentNodedisplayComp.getPositionInScrollComp(pointInParent);
+		}
+
 	}
 
 	/**
@@ -591,7 +657,6 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 		if (lguiItem.getObjectStatus() != null) {
 			// Is this node a leaf?
 			if (node.getLowerLevelCount() == 0) {
-
 				if (lguiItem.getObjectStatus().isMouseOver(connectedObject)) {
 					borderComp.setBorderWidth(nodedisplayLayout.getMouseborder().intValue());
 				} else {
@@ -979,6 +1044,7 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 				// Try to insert the usagebar, otherwise add listeners for lowest level rectangles
 				addLowestLevelListeners();
 			}
+
 			return;
 		}
 
@@ -1107,7 +1173,17 @@ public class NodedisplayComp extends LguiWidget implements Updatable {
 	 * @return true, if usagebar was inserted, false otherwise
 	 */
 	private boolean insertUsagebar() {
-		if (!hasParentNodedisplay() && node.getData().getLevelIds().size() >= nodedisplayLayout.getMaxlevel().intValue()) {
+		if (!hasParentNodedisplay()) {
+			if (node.getData() == null || node.getData().getLevelIds() == null) {
+				return false;
+			}
+			if (nodedisplayLayout.getMaxlevel() == null) {
+				return false;
+			}
+			if (node.getData().getLevelIds().size() < nodedisplayLayout.getMaxlevel().intValue()) {
+				return false;
+			}
+
 			innerComp.setLayout(new FillLayout());
 
 			final UsageType usageData = node.getData().generateUsage();

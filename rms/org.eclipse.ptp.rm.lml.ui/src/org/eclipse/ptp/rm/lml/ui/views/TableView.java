@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * Copyright (c) 2011-2012 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- * 		Claudia Knobloch, FZ Juelich
+ * 		Claudia Knobloch, Carsten Karbach, FZ Juelich
  */
 
 package org.eclipse.ptp.rm.lml.ui.views;
@@ -173,7 +173,7 @@ public class TableView extends ViewPart {
 							}
 						}
 						if (index > -1) {
-							tree.select(tree.getItem(index));
+							tree.setSelection(tree.getItem(index));
 						}
 					}
 				}
@@ -571,7 +571,7 @@ public class TableView extends ViewPart {
 				final Display display = treeColumns[0].getDisplay();
 				final Image image = new Image(display, 12, 12);
 				final GC gc = new GC(image);
-				if (((Row) element).oid != null && (selectedOid == null || ((Row) element).oid.equals(selectedOid))) {
+				if (((Row) element).oid != null) {
 					LMLColor color = ((Row) element).color;
 					if (color == null) {
 						color = LMLColor.LIGHT_GRAY;

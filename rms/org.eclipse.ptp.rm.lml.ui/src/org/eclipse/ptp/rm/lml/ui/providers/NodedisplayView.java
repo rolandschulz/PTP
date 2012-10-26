@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * Copyright (c) 2011-2012 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
@@ -11,10 +11,23 @@
 package org.eclipse.ptp.rm.lml.ui.providers;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
+import org.eclipse.ptp.rm.lml.core.LMLManager;
+import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
+import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
+import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.INodedisplayZoomEvent;
+import org.eclipse.ptp.rm.lml.core.events.ISelectObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.ITableFilterEvent;
+import org.eclipse.ptp.rm.lml.core.events.ITableSortedEvent;
+import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
+import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
+import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.listeners.INodedisplayZoomListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
@@ -220,6 +233,79 @@ public class NodedisplayView extends AbstractNodedisplayView {
 		setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
 		scrollComp = new ScrolledComposite(this, SWT.H_SCROLL | SWT.V_SCROLL);
+
+		LMLManager.getInstance().addListener(new ILMLListener() {
+
+			@Override
+			public void handleEvent(ILguiAddedEvent event) {
+			}
+
+			@Override
+			public void handleEvent(ILguiRemovedEvent event) {
+			}
+
+			@Override
+			public void handleEvent(IMarkObjectEvent event) {
+				if (root != null) {
+					final String jobId = event.getOid();
+					final Set<Point> points = new HashSet<Point>();
+					root.detectJobPositions(points, jobId);
+
+					final Point scrollSize = scrollComp.getSize();
+
+					boolean visible = false;
+					Point minPoint = null;
+					for (final Point p : points) {
+						if (p.x >= 0 && p.x < scrollSize.x
+								&& p.y >= 0 && p.y < scrollSize.y) {
+							visible = true;
+						}
+						if (minPoint == null || p.x < minPoint.x || (p.x == minPoint.x && p.y < minPoint.y)) {
+							minPoint = p;
+						}
+					}
+
+					if (!visible) {
+						if (minPoint != null) {
+							final Point origin = scrollComp.getOrigin();
+							origin.x += minPoint.x - 5;
+							origin.y += minPoint.y - 5;
+							if (origin.x < 0) {
+								origin.x = 0;
+							}
+							if (origin.y < 0) {
+								origin.y = 0;
+							}
+							scrollComp.setOrigin(origin);
+						}
+					}
+				}
+			}
+
+			@Override
+			public void handleEvent(ISelectObjectEvent event) {
+			}
+
+			@Override
+			public void handleEvent(ITableFilterEvent event) {
+			}
+
+			@Override
+			public void handleEvent(ITableSortedEvent event) {
+			}
+
+			@Override
+			public void handleEvent(IUnmarkObjectEvent event) {
+			}
+
+			@Override
+			public void handleEvent(IUnselectedObjectEvent event) {
+			}
+
+			@Override
+			public void handleEvent(IViewUpdateEvent event) {
+			}
+		}, null);
 
 		// Listen for the first paints of every new nodedisplay
 		// and adjust it to the new size
