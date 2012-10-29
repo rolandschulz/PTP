@@ -482,7 +482,7 @@ public class GitRemoteSyncConnection {
 		try {
 			final String command, deletePrefix;
 			final int fileNamePos;
-			if (remoteGitVersion>=10700) {
+			if (remoteGitVersion>=99999) {
 				command = gitCommand() + " status --porcelain"; //$NON-NLS-1$
 				deletePrefix = " D"; //$NON-NLS-1$
 				fileNamePos = 3;
@@ -511,7 +511,7 @@ public class GitRemoteSyncConnection {
 			BufferedReader statusReader = new BufferedReader(new StringReader(commandResults.getStdout()));
 			String line = null;
 			while ((line = statusReader.readLine()) != null) {
-				if (remoteGitVersion<10700 && (line.charAt(0) == ' ' || line.charAt(1) != ' ')) {
+				if (remoteGitVersion<99999 && (line.charAt(0) == ' ' || line.charAt(1) != ' ')) {
 					continue;
 				}
 				String fn = line.substring(fileNamePos);
