@@ -72,10 +72,12 @@ public abstract class SSHTargetControl implements ITargetControl {
 	private ITargetConfig fConfig = null;
 	private IAuthInfo fAuthInfo = null;
 
+	// FIXME: Required to avoid API change
+	private final String USE_LOGIN_SHELL_ATTR = "org.eclipse.ptp.remotetools.environment.generichost.use-login-shell";
+
 	/**
 	 * Create the remote target environment by opening a SSH connection to it.
-	 * First,
-	 * {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)
+	 * First, {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)
 	 * must be called.
 	 */
 	public boolean create(IProgressMonitor monitor) throws CoreException {
@@ -130,8 +132,8 @@ public abstract class SSHTargetControl implements ITargetControl {
 					null));
 		}
 
-		for (int i = 0; i < args.length; i++) {
-			command += (" " + args[i]); //$NON-NLS-1$
+		for (String arg : args) {
+			command += (" " + arg); //$NON-NLS-1$
 		}
 
 		try {
@@ -168,8 +170,8 @@ public abstract class SSHTargetControl implements ITargetControl {
 
 	/**
 	 * Create the SSH connection to the remote target environment. First,
-	 * {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)}
-	 * must be called.
+	 * {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)} must be
+	 * called.
 	 * 
 	 * @param monitor
 	 *            progress monitor
@@ -185,8 +187,16 @@ public abstract class SSHTargetControl implements ITargetControl {
 			remoteConnection = RemotetoolsPlugin.createSSHConnection();
 		}
 		try {
-			remoteConnection.connect(fAuthInfo, fConfig.getConnectionAddress(), fConfig.getConnectionPort(),
-					fConfig.getCipherType(), fConfig.getConnectionTimeout() * 1000, monitor);
+			// FIXME: Piggyback the UseLoginShell on cipherType to avoid API change
+			String cipherType = ""; //$NON-NLS-1$
+			if (fConfig.getCipherType() != null) {
+				cipherType = fConfig.getCipherType();
+			}
+			if (fConfig.getAttributes().getBoolean(USE_LOGIN_SHELL_ATTR)) {
+				cipherType += "+true";
+			}
+			remoteConnection.connect(fAuthInfo, fConfig.getConnectionAddress(), fConfig.getConnectionPort(), cipherType,
+					fConfig.getConnectionTimeout() * 1000, monitor);
 		} catch (RemoteConnectionException e) {
 			disconnect();
 			throw e;
@@ -228,8 +238,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 	}
 
 	/**
-	 * Set the connection parameters to be used by
-	 * {@link #create(IProgressMonitor)}.
+	 * Set the connection parameters to be used by {@link #create(IProgressMonitor)}.
 	 * 
 	 * @param hostname
 	 * @param port

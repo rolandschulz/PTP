@@ -115,7 +115,12 @@ public abstract class KillableExecution extends AbstractRemoteExecution {
 	protected void setCommandLine(String commandLine) {
 		PIID = getExecutionManager().getConnection().createNextPIID();
 
-		String newCommandLine = "/bin/sh -c '" //$NON-NLS-1$
+		String shell = "/bin/sh";
+		if (getExecutionManager().getConnection().useLoginShell()) {
+			shell = "/bin/bash -l";
+		}
+
+		String newCommandLine = shell + " -c '" //$NON-NLS-1$
 				+ getExecutionManager().getConnection().getKillablePrefix(this) + "; " //$NON-NLS-1$
 				+ commandLine + "'"; //$NON-NLS-1$
 

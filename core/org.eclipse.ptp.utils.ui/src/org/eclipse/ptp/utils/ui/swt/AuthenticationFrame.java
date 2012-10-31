@@ -44,9 +44,8 @@ import org.eclipse.swt.widgets.Text;
 public final class AuthenticationFrame extends Frame {
 
 	/**
-	 * Implements a {@link SelectionListener} that receives events from the
-	 * {@link Button} (SWT.OPTION style) children controls convert them to
-	 * {@link ModifyEvent} and forwards them to this control listeners. Also, it
+	 * Implements a {@link SelectionListener} that receives events from the {@link Button} (SWT.OPTION style) children controls
+	 * convert them to {@link ModifyEvent} and forwards them to this control listeners. Also, it
 	 * updates all widgets that depend on the controls that generate the event.
 	 * 
 	 * @author Richard Maciel
@@ -70,8 +69,8 @@ public final class AuthenticationFrame extends Frame {
 	}
 
 	/**
-	 * Implements a {@link SelectionListener} that receives events from the
-	 * {@link Combo} children controls convert them to {@link ModifyEvent} and
+	 * Implements a {@link SelectionListener} that receives events from the {@link Combo} children controls convert them to
+	 * {@link ModifyEvent} and
 	 * forwards them to this control listeners.
 	 * 
 	 * @author Richard Maciel
@@ -107,6 +106,7 @@ public final class AuthenticationFrame extends Frame {
 	// Bottom controls
 	private TextGroup timeoutTextGroup;
 	private ComboGroup cipherTypeGroup;
+	private Button loginShell;
 
 	// List of all listeners
 	private final Set<ModifyListener> modifyListeners = new HashSet<ModifyListener>();
@@ -138,14 +138,14 @@ public final class AuthenticationFrame extends Frame {
 				this.privateKeyPathGroup, this.passphraseTextGroup, this.timeoutTextGroup, this.cipherTypeGroup };
 
 		// Add listeners to all controls in the array
-		for (int i = 0; i < controls.length; i++) {
-			if (controls[i] instanceof TextGroup) {
-				((TextGroup) controls[i]).getText().addModifyListener(new TextModifyListener());
-			} else if (controls[i] instanceof Button) {
-				Button b = (Button) controls[i];
+		for (Control control : controls) {
+			if (control instanceof TextGroup) {
+				((TextGroup) control).getText().addModifyListener(new TextModifyListener());
+			} else if (control instanceof Button) {
+				Button b = (Button) control;
 				b.addSelectionListener(new OptionSelectionListener());
-			} else if (controls[i] instanceof ComboGroup) {
-				((ComboGroup) controls[i]).getCombo().addSelectionListener(new ComboSelectionListener());
+			} else if (control instanceof ComboGroup) {
+				((ComboGroup) control).getCombo().addSelectionListener(new ComboSelectionListener());
 			}
 		}
 	}
@@ -288,8 +288,8 @@ public final class AuthenticationFrame extends Frame {
 	}
 
 	/**
-	 * Implements a {@link ModifyListener} that receives events from the
-	 * {@link Text} children controls and forwards them to this control
+	 * Implements a {@link ModifyListener} that receives events from the {@link Text} children controls and forwards them to this
+	 * control
 	 * listeners'.
 	 * 
 	 * @author Richard Maciel

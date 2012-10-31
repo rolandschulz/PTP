@@ -30,6 +30,7 @@ public class DefaultValues extends NLS {
 	public static String KEY_PATH;
 	public static String KEY_PASSPHRASE;
 	public static String IS_PASSWORD_AUTH;
+	public static String USE_LOGIN_SHELL;
 
 	static {
 		// load message values from bundle file

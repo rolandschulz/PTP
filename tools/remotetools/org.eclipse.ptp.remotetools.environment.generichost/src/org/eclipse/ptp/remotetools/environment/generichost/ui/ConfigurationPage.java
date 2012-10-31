@@ -11,7 +11,6 @@
  */
 package org.eclipse.ptp.remotetools.environment.generichost.ui;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,7 +29,10 @@ import org.eclipse.ptp.utils.ui.swt.TextMold;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -56,6 +58,10 @@ public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 	private String targetName;
 	private TextGroup targetNameGroup;
 	private AuthenticationFrame remoteAuthFrame;
+	private Button fUseLoginShellButton;
+
+	// FIXME: Required because interfaces are not allowed to change
+	private final String USE_LOGIN_SHELL_ATTR = ConfigFactory.KEY_ARRAY[ConfigFactory.KEY_ARRAY.length - 1];
 
 	class DataModifyListener implements ModifyListener {
 		int counter = 0;
@@ -134,8 +140,7 @@ public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 		Map<String, String> cipherMap = TargetControl.getCipherTypesMap();
 		Set<String> cKeySet = cipherMap.keySet();
 		ComboGroup cipherGroup = remoteAuthFrame.getCipherTypeGroup();
-		for (Iterator<String> it = cKeySet.iterator(); it.hasNext();) {
-			String key = it.next();
+		for (String key : cKeySet) {
 			String value = cipherMap.get(key);
 
 			cipherGroup.add(new ComboGroupItem(key, value));
@@ -143,7 +148,17 @@ public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 		// Select the cipher type based on the attributes map.
 		cipherGroup.selectIndexUsingID(attributes.getString(ConfigFactory.ATTR_CIPHER_TYPE));
 
-		// org.eclipse.ptp.remotetools.internal.ssh.systemWorkspaceGroup.setString(attributes.getString(ConfigFactory.ATTR_SYSTEM_WORKSPACE));
+		Composite comp = remoteAuthFrame.getBottomUserReservedComposite();
+		fUseLoginShellButton = new Button(comp, SWT.CHECK);
+		fUseLoginShellButton.setText("Use login shell");
+		fUseLoginShellButton.setSelection(attributes.getBoolean(USE_LOGIN_SHELL_ATTR));
+		fUseLoginShellButton.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				readControls();
+			}
+		});
 	}
 
 	private void readControls() {
@@ -159,6 +174,7 @@ public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 		attributes.setString(ConfigFactory.ATTR_CONNECTION_TIMEOUT, Integer.toString(remoteAuthFrame.getTimeout()));
 		attributes.setBoolean(ConfigFactory.ATTR_IS_PASSWORD_AUTH, remoteAuthFrame.isPasswordBased());
 		attributes.setString(ConfigFactory.ATTR_CIPHER_TYPE, remoteAuthFrame.getSelectedCipherType().getId());
+		attributes.setBoolean(USE_LOGIN_SHELL_ATTR, fUseLoginShellButton.getSelection());
 	}
 
 	private void createAuthControl(Composite topControl) {

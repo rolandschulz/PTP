@@ -42,8 +42,11 @@ public class ConfigFactory {
 	public static final String ATTR_CONNECTION_TIMEOUT = PREFIX + ".connection-timeout"; //$NON-NLS-1$
 	public static final String ATTR_CIPHER_TYPE = PREFIX + ".cipher-type"; //$NON-NLS-1$
 
+	private static final String ATTR_USE_LOGIN_SHELL = PREFIX + ".use-login-shell"; //$NON-NLS-1$
+
 	public final static String[] KEY_ARRAY = { ATTR_LOCALHOST_SELECTION, ATTR_LOGIN_USERNAME, ATTR_CONNECTION_PORT,
-			ATTR_CONNECTION_ADDRESS, ATTR_KEY_PATH, ATTR_IS_PASSWORD_AUTH, ATTR_CONNECTION_TIMEOUT, ATTR_CIPHER_TYPE };
+			ATTR_CONNECTION_ADDRESS, ATTR_KEY_PATH, ATTR_IS_PASSWORD_AUTH, ATTR_CONNECTION_TIMEOUT, ATTR_CIPHER_TYPE,
+			ATTR_USE_LOGIN_SHELL };
 
 	public final static String[] KEY_CIPHERED_ARRAY = { ATTR_KEY_PASSPHRASE, ATTR_LOGIN_PASSWORD };
 
@@ -81,6 +84,7 @@ public class ConfigFactory {
 		attributes.setDefaultString(ATTR_IS_PASSWORD_AUTH, DefaultValues.IS_PASSWORD_AUTH);
 		attributes.setDefaultString(ATTR_CONNECTION_TIMEOUT, DefaultValues.CONNECTION_TIMEOUT);
 		attributes.setDefaultString(ATTR_CIPHER_TYPE, RemotetoolsPlugin.CIPHER_DEFAULT);
+		attributes.setDefaultString(ATTR_USE_LOGIN_SHELL, DefaultValues.USE_LOGIN_SHELL);
 	}
 
 	private void createCurrentMapFromPreferences() {
