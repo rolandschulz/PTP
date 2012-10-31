@@ -61,11 +61,11 @@ public class Connection implements IRemoteConnection {
 		}
 
 		ConnectionSlot(Session session, int initialLoad) {
-			assert(initialLoad<=ConnectionProperties.maxChannelsPerConnection);
+			assert (initialLoad <= ConnectionProperties.maxChannelsPerConnection);
 			this.session = session;
 			this.numberUsedChannels = initialLoad;
 		}
-		
+
 		/* Acquire right to create channel */
 		synchronized boolean acquire() {
 			if (numberUsedChannels < ConnectionProperties.maxChannelsPerConnection) {
@@ -75,11 +75,11 @@ public class Connection implements IRemoteConnection {
 				return false;
 			}
 		}
-		
+
 		void release() {
 			numberUsedChannels--;
 		}
-		
+
 	}
 
 /**
@@ -167,6 +167,7 @@ public class Connection implements IRemoteConnection {
 	private int fPort;
 	private int fTimeout;
 	private String fCipherType;
+	private boolean fUseLoginShell;
 
 	/**
 	 * The execution managers created for this connection.
@@ -212,7 +213,8 @@ public class Connection implements IRemoteConnection {
 	/**
 	 * Maps a channel to the connection where it was created.
 	 */
-	private final Map<Channel, ConnectionSlot> channelToConnectioPool = Collections.synchronizedMap(new HashMap<Channel, ConnectionSlot>());
+	private final Map<Channel, ConnectionSlot> channelToConnectioPool = Collections
+			.synchronizedMap(new HashMap<Channel, ConnectionSlot>());
 
 	/**
 	 * Locks used on synchronized operations.
@@ -255,7 +257,17 @@ public class Connection implements IRemoteConnection {
 				fPort = ConnectionProperties.defaultPort;
 			}
 
-			fCipherType = cipherType;
+			// FIXME: The UseLoginShell flag piggybacks on cipherType to avoid API change
+			if (cipherType.contains("+")) {
+				int pos = cipherType.indexOf('+');
+				if (pos > 0) {
+					fCipherType = cipherType.substring(0, pos);
+				}
+				fUseLoginShell = cipherType.substring(pos + 1, cipherType.length()).equalsIgnoreCase("true");
+			} else {
+				fCipherType = cipherType;
+				fUseLoginShell = false;
+			}
 			if (fCipherType == null) {
 				fCipherType = CipherTypes.CIPHER_DEFAULT;
 			}
@@ -318,9 +330,10 @@ public class Connection implements IRemoteConnection {
 							bInterrupted = true;
 						}
 					}
-					if (bInterrupted)
+					if (bInterrupted) {
 						Thread.currentThread().interrupt(); // set interrupt
 															// state
+					}
 				}
 			} catch (JSchException e) {
 				throw new RemoteConnectionException(Messages.Connection_2 + e.getMessage());
@@ -489,6 +502,10 @@ public class Connection implements IRemoteConnection {
 		return fUsername;
 	}
 
+	public boolean useLoginShell() {
+		return fUseLoginShell;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -636,8 +653,8 @@ public class Connection implements IRemoteConnection {
 			}
 			if (suggestedSlot == null) {
 				suggestedSlot = createConnectionSlot();
-				boolean isAcquired = suggestedSlot.acquire(); 
-				assert isAcquired;   // a new connectionSlot should always have a free channel
+				boolean isAcquired = suggestedSlot.acquire();
+				assert isAcquired; // a new connectionSlot should always have a free channel
 			}
 			/*
 			 * Create the channel and update the pool.
@@ -649,7 +666,7 @@ public class Connection implements IRemoteConnection {
 				suggestedSlot.release();
 				throw new RemoteConnectionException(Messages.Connection_CreateExecChannel_FailedCreateNewExecChannel, e);
 			}
-			
+
 			channelToConnectioPool.put(channel, suggestedSlot);
 			return channel;
 		} else {
@@ -782,13 +799,11 @@ public class Connection implements IRemoteConnection {
 	 * Performs a sanity test to make sure that the connection is alive and has
 	 * a valid state.
 	 * <p>
-	 * The connection may get dropped due some external interference, like
-	 * loosing physical access to the remote machine. Or the connection may drop
-	 * some channel, as it may be caused by a misbehavior of the remote SSH
-	 * server or by a bug in the local SSH implementation.
+	 * The connection may get dropped due some external interference, like loosing physical access to the remote machine. Or the
+	 * connection may drop some channel, as it may be caused by a misbehavior of the remote SSH server or by a bug in the local SSH
+	 * implementation.
 	 * <p>
-	 * If some problem is detected, then an {@link RemoteConnectionException} is
-	 * thrown. Else, the method returns.
+	 * If some problem is detected, then an {@link RemoteConnectionException} is thrown. Else, the method returns.
 	 * 
 	 * @throws RemoteConnectionException
 	 *             The connection was entirely dropped or some channel got lost.
