@@ -19,25 +19,23 @@ import java.io.OutputStream;
 /**
  * Connects an inputstream to an outputstream.
  * <p>
- * This is a general facility that allows to forward data received from an
- * inputstream to an outputstream.
+ * This is a general facility that allows to forward data received from an inputstream to an outputstream.
  * <p>
- * An example would be to forward automatically data received from a socket
- * inputstream to a file outputstream.
+ * An example would be to forward automatically data received from a socket inputstream to a file outputstream.
  * <p>
  * Do not forget to call run() method!
  * 
  * @author Daniel Felix Ferber
  * @since 1.0
  */
-public class StreamBridge  {
+public class StreamBridge {
 	/*
 	 * TODO: Open issues
 	 * - Handle exceptions
 	 */
 	IStreamListener dataForwarder = null;
 	StreamObserver streamObserver = null;
-	
+
 	private class DataForwarder implements IStreamListener {
 		OutputStream output;
 		StreamBridge bridge;
@@ -47,6 +45,7 @@ public class StreamBridge  {
 			this.bridge = bridge;
 		}
 
+		@Override
 		public void newBytes(byte[] bytes, int length) {
 			try {
 				output.write(bytes, 0, length);
@@ -56,14 +55,13 @@ public class StreamBridge  {
 			}
 		}
 
-		public void newChars(char[] chars, int length) {
-		}
-
+		@Override
 		public void streamClosed() {
 			bridge.kill();
 		}
 
-		public void streamError(Exception e) {	
+		@Override
+		public void streamError(Exception e) {
 			// TODO Handle exception
 			bridge.kill();
 		}
@@ -86,7 +84,7 @@ public class StreamBridge  {
 		dataForwarder = null;
 		streamObserver = null;
 	}
-	
+
 	public void run() {
 		streamObserver.start();
 	}

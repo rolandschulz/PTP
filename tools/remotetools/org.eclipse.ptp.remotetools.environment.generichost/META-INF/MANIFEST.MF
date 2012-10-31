@@ -2,17 +2,16 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.remotetools.environment.generichost;singleton:=true
-Bundle-Version: 1.4.0.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.remotetools.environment.generichost.Activator
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ptp.remotetools.environment.core,
  org.eclipse.ui,
+ org.eclipse.ptp.utils.ui,
  org.eclipse.ptp.remotetools.core,
- org.eclipse.ptp.remotetools.preferences,
- org.eclipse.ptp.utils.ui
+ org.eclipse.ptp.remotetools.environment.core,
+ org.eclipse.ptp.remotetools.preferences
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.remotetools.environment.generichost,
- org.eclipse.ptp.remotetools.environment.generichost.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.eclipse.ptp.remotetools.environment.generichost.core;x-friends:="org.eclipse.ptp.remote.remotetools.ui"

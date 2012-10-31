@@ -21,21 +21,20 @@ import org.eclipse.ptp.remotetools.environment.control.ITargetControlEventListen
 import org.eclipse.ptp.remotetools.environment.control.ITargetControlEventProvider;
 import org.eclipse.ptp.remotetools.environment.control.PoolingTargetControlEventProvider;
 
-
 /**
- * Manager class to support different event provider per each 
+ * Manager class to support different event provider per each
  * target control instance.
  * 
  * @author Ricardo M. Matinata
  * @since 1.2
- *
+ * 
  */
 public class TargetEnvironmentEventManager implements ITargetControlEventListener, ITargetEnvironmentEventListener {
-	
+
 	private TargetEnvironmentManager model = null;
-	private ITargetControlEventProvider defaultProvider = new PoolingTargetControlEventProvider();
-	private Map controls = new HashMap();
-	
+	private final ITargetControlEventProvider defaultProvider = new PoolingTargetControlEventProvider();
+	private final Map<ITargetControl, ControlInfo> controls = new HashMap<ITargetControl, ControlInfo>();
+
 	/**
 	 * Constructor
 	 */
@@ -43,85 +42,73 @@ public class TargetEnvironmentEventManager implements ITargetControlEventListene
 		this.model = model;
 		model.addModelChangedListener(this);
 	}
-	
 
 	public void handleStateChangeEvent(int event, ITargetControl from) {
-		
-		ControlInfo info = (ControlInfo) controls.get(from);
+
+		ControlInfo info = controls.get(from);
 		model.fireElementEvent(event, info.getElement());
-		
+
 	}
-	
+
 	public void elementAdded(TargetElement element) {
-		
+
 		try {
 			ITargetControl control = element.getControl();
 			ITargetControlEventProvider provider = null;
-			
-			if(IAdaptable.class.isAssignableFrom(control.getClass())) {
-				provider = (ITargetControlEventProvider) ((IAdaptable)control).getAdapter(ITargetControlEventProvider.class);
+
+			if (IAdaptable.class.isAssignableFrom(control.getClass())) {
+				provider = (ITargetControlEventProvider) ((IAdaptable) control).getAdapter(ITargetControlEventProvider.class);
 			}
-			
+
 			if (provider == null) {
 				provider = defaultProvider;
 			}
-			
-			controls.put(control, new ControlInfo(element,provider));
-			provider.registerControlAndListener(control,this);
-			
+
+			controls.put(control, new ControlInfo(element, provider));
+			provider.registerControlAndListener(control, this);
+
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-	}
 
+	}
 
 	public void elementRemoved(ITargetElement element) {
-		
+
 		try {
-			
+
 			ITargetControl control = element.getControl();
-			ControlInfo info = (ControlInfo) controls.get(control);
+			ControlInfo info = controls.get(control);
 			ITargetControlEventProvider provider = info.getProvider();
-			provider.unregisterControlAndListener(control,this);
+			provider.unregisterControlAndListener(control, this);
 			controls.remove(control);
-			
+
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	class ControlInfo {
-		
-		private TargetElement element;
-		private ITargetControlEventProvider provider;
-		
+
+	private class ControlInfo {
+
+		private final TargetElement element;
+		private final ITargetControlEventProvider provider;
+
 		public ControlInfo(TargetElement element, ITargetControlEventProvider provider) {
 			this.element = element;
 			this.provider = provider;
 		}
-		
+
 		public TargetElement getElement() {
 			return element;
 		}
-		
-		public void setElement(TargetElement element) {
-			this.element = element;
-		}
-		
+
 		public ITargetControlEventProvider getProvider() {
 			return provider;
 		}
-		
-		public void setProvider(ITargetControlEventProvider provider) {
-			this.provider = provider;
-		}
-		
+
 	}
 
-	
 }

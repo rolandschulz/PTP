@@ -2,14 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.remotetools.preferences;singleton:=true
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.remotetools.preferences.PreferencesPlugin
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.remotetools.preferences,
- org.eclipse.ptp.remotetools.preferences.events,
- org.eclipse.ptp.remotetools.preferences.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.eclipse.ptp.remotetools.preferences.ui;x-friends:="org.eclipse.ptp.remotetools.environment.generichost"

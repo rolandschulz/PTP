@@ -13,9 +13,11 @@ package org.eclipse.ptp.remotetools.utils.verification;
 
 public class IllegalAttributeException extends Exception {
 
+	private static final long serialVersionUID = -4569682337785839337L;
+
 	String name;
 	String value;
-	
+
 	public IllegalAttributeException() {
 	}
 
@@ -61,7 +63,5 @@ public class IllegalAttributeException extends Exception {
 	public String getValue() {
 		return value;
 	}
-	
-	
 
 }
