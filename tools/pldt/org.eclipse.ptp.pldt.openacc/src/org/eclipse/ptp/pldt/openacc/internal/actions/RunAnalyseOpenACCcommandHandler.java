@@ -69,4 +69,13 @@ public class RunAnalyseOpenACCcommandHandler extends RunAnalyseHandlerBase {
 	protected void activateArtifactView() {
 		ViewActivator.activateView(VIEW_ID);
 	}
+	@Override
+	/*
+	 * Bug 393260 make prefix-only match of artifacts work correctly
+	 */
+	public boolean areIncludePathsNeeded() {
+		boolean allowPrefixOnlyMatch = Activator.getDefault().getPreferenceStore()
+				.getBoolean(IDs.PREF_RECOGNIZE_APIS_BY_PREFIX_ALONE);
+		return !allowPrefixOnlyMatch;
+	}
 }
