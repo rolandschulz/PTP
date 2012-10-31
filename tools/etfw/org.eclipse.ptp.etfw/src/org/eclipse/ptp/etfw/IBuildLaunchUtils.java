@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
+
 //import org.eclipse.core.filesystem.IFileStore;
 
 /**
@@ -113,10 +114,15 @@ public interface IBuildLaunchUtils {
 	public void runVis(List<String> tool, Map<String, String> env, String directory);
 
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory);
-	
+
+	/**
+	 * @since 6.0
+	 */
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory, boolean showErr);
-	
-	
+
+	/**
+	 * @since 6.0
+	 */
 	public boolean isRemote();
 
 }
