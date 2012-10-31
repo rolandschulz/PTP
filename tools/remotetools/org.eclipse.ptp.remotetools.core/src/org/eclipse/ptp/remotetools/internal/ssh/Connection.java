@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jsch.core.IJSchService;
 import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
 import org.eclipse.ptp.remotetools.core.IAuthInfo;
+import org.eclipse.ptp.remotetools.core.IConnectionInfo;
 import org.eclipse.ptp.remotetools.core.IRemoteConnection;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteOperation;
@@ -226,13 +227,11 @@ public class Connection implements IRemoteConnection {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remotetools.core.IRemoteConnection#connect(org.eclipse
-	 * .ptp.remotetools.core.AuthToken, java.lang.String, int, java.lang.String,
-	 * int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteConnection#connect(org.eclipse.ptp.remotetools.core.IAuthInfo,
+	 * org.eclipse.ptp.remotetools.core.IConnectionInfo, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public synchronized void connect(IAuthInfo authInfo, String hostname, int port, String cipherType, int timeout,
-			IProgressMonitor monitor) throws RemoteConnectionException {
+	public synchronized void connect(IAuthInfo authInfo, IConnectionInfo connInfo, IProgressMonitor monitor)
+			throws RemoteConnectionException {
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 
 		try {
@@ -250,32 +249,24 @@ public class Connection implements IRemoteConnection {
 				}
 			}
 
-			fHostname = hostname;
+			fHostname = connInfo.getConnectionAddress();
 
-			fPort = port;
+			fPort = connInfo.getConnectionPort();
 			if (fPort == 0) {
 				fPort = ConnectionProperties.defaultPort;
 			}
 
-			// FIXME: The UseLoginShell flag piggybacks on cipherType to avoid API change
-			if (cipherType.contains("+")) {
-				int pos = cipherType.indexOf('+');
-				if (pos > 0) {
-					fCipherType = cipherType.substring(0, pos);
-				}
-				fUseLoginShell = cipherType.substring(pos + 1, cipherType.length()).equalsIgnoreCase("true");
-			} else {
-				fCipherType = cipherType;
-				fUseLoginShell = false;
-			}
+			fCipherType = connInfo.getCipherType();
 			if (fCipherType == null) {
 				fCipherType = CipherTypes.CIPHER_DEFAULT;
 			}
 
-			fTimeout = timeout;
+			fTimeout = connInfo.getConnectionTimeout() * 1000;
 			if (fTimeout == 0) {
 				fTimeout = ConnectionProperties.defaultTimeout;
 			}
+
+			fUseLoginShell = connInfo.getUseLoginShell();
 
 			/*
 			 * Create session.

@@ -18,13 +18,13 @@ import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
  * NOTE: this interface should not normally be used directly but called via the
  * org.eclipse.ptp.remote.core interfaces.
  * 
- * A connection to a remote host. Serves as a starting point for creating
- * {@link IRemoteExecutionManager}, that to operations on the remote host.
+ * A connection to a remote host. Serves as a starting point for creating {@link IRemoteExecutionManager}, that to operations on the
+ * remote host.
  * 
  * It is the responsibility of the caller to check that a remote connection is
  * open before using it. If the connection was open, but has been closed for
- * some reason, {@link #disconnect()} must be called before
- * {@link #connect(AuthToken, String, int, String, int, IProgressMonitor)} is
+ * some reason, {@link #disconnect()} must be called before {@link #connect(AuthToken, String, int, String, int, IProgressMonitor)}
+ * is
  * called again.
  * 
  * @author Richard Maciel, Daniel Felix Ferber
@@ -39,27 +39,19 @@ public interface IRemoteConnection {
 	 * 
 	 * @param authInfo
 	 *            authentication information for connection
-	 * @param hostname
-	 *            host to connect to
-	 * @param port
-	 *            port number of remote host or 0 for default port
-	 * @param cipherType
-	 *            cipher type or null for default cypher
-	 * @param timeout
-	 *            connection timeout or 0 for default timeout
+	 * @param connInfo
+	 *            connection information
 	 * @param monitor
 	 *            progress monitor
 	 * @throws RemoteConnectionException
-	 * @since 4.0
+	 * @since 6.0
 	 */
-	public void connect(IAuthInfo authInfo, String hostname, int port, String cipherType, int timeout, IProgressMonitor monitor)
-			throws RemoteConnectionException;
+	public void connect(IAuthInfo authInfo, IConnectionInfo connInfo, IProgressMonitor monitor) throws RemoteConnectionException;
 
 	/**
 	 * Terminate connection to remote machine.
 	 * <p>
-	 * TODO: Decide: Block until all pending operations are finished or cancels
-	 * pending operations?
+	 * TODO: Decide: Block until all pending operations are finished or cancels pending operations?
 	 */
 	public void disconnect();
 

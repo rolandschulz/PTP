@@ -9,62 +9,51 @@
  *     IBM Corporation - Initial Implementation
  *
  */
-package org.eclipse.ptp.remotetools.environment.control;
-
-import org.eclipse.ptp.remotetools.core.IConnectionInfo;
-import org.eclipse.ptp.remotetools.utils.verification.ControlAttributes;
+package org.eclipse.ptp.remotetools.core;
 
 /**
- * Describes a target created from the environment.
+ * Configuration information for a connection
  * 
- * @since 2.0
+ * @since 6.0
+ * 
  */
-public interface ITargetConfig extends IConnectionInfo {
-	/**
-	 * Get all the attributes for this configuration
-	 * 
-	 * @return control attributes
-	 */
-	public ControlAttributes getAttributes();
+public interface IConnectionInfo {
 
 	/**
-	 * Get the passphrase for the connection.
+	 * Get cipher type for connection
 	 * 
-	 * Only valid if {@link #isPasswordAuth()} returns false.
-	 * 
-	 * @return connection passphrase
+	 * @return cipher type
 	 */
-	public String getKeyPassphrase();
+	public String getCipherType();
 
 	/**
-	 * Get path to key file. Note that this path is on the local machine.
+	 * Get the connection address (hostname)
 	 * 
-	 * @return path
+	 * @return connection address
 	 */
-	public String getKeyPath();
+	public String getConnectionAddress();
 
 	/**
-	 * Get the password for the connection.
+	 * Get the connection port number
 	 * 
-	 * Only valid if {@link #isPasswordAuth()} returns true.
-	 * 
-	 * @return connection password
+	 * @return connection port number
 	 */
-	public String getLoginPassword();
+	public int getConnectionPort();
 
 	/**
-	 * Get the username for the connection
+	 * Get the timeout for the connection (seconds)
 	 * 
-	 * @return connection username
+	 * @return connection timeout
 	 */
-	public String getLoginUsername();
+	public int getConnectionTimeout();
 
 	/**
-	 * Check if this connection should use password authentication.
+	 * Get the login shell flag. If true, the connection will attempt to start a login shell so that the user's environment is
+	 * properly configured.
 	 * 
-	 * @return true if password authentication is used
+	 * @return login shell flag
 	 */
-	public boolean isPasswordAuth();
+	public boolean getUseLoginShell();
 
 	/**
 	 * Set the value for the give attribute

@@ -41,8 +41,7 @@ public class ConfigFactory {
 	public static final String ATTR_IS_PASSWORD_AUTH = PREFIX + ".is-passwd-auth"; //$NON-NLS-1$
 	public static final String ATTR_CONNECTION_TIMEOUT = PREFIX + ".connection-timeout"; //$NON-NLS-1$
 	public static final String ATTR_CIPHER_TYPE = PREFIX + ".cipher-type"; //$NON-NLS-1$
-
-	private static final String ATTR_USE_LOGIN_SHELL = PREFIX + ".use-login-shell"; //$NON-NLS-1$
+	public static final String ATTR_USE_LOGIN_SHELL = PREFIX + ".use-login-shell"; //$NON-NLS-1$
 
 	public final static String[] KEY_ARRAY = { ATTR_LOCALHOST_SELECTION, ATTR_LOGIN_USERNAME, ATTR_CONNECTION_PORT,
 			ATTR_CONNECTION_ADDRESS, ATTR_KEY_PATH, ATTR_IS_PASSWORD_AUTH, ATTR_CONNECTION_TIMEOUT, ATTR_CIPHER_TYPE,

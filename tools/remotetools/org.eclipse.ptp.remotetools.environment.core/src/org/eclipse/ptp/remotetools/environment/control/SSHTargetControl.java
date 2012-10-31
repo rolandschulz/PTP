@@ -72,9 +72,6 @@ public abstract class SSHTargetControl implements ITargetControl {
 	private ITargetConfig fConfig = null;
 	private IAuthInfo fAuthInfo = null;
 
-	// FIXME: Required to avoid API change
-	private final String USE_LOGIN_SHELL_ATTR = "org.eclipse.ptp.remotetools.environment.generichost.use-login-shell";
-
 	/**
 	 * Create the remote target environment by opening a SSH connection to it.
 	 * First, {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)
@@ -187,16 +184,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 			remoteConnection = RemotetoolsPlugin.createSSHConnection();
 		}
 		try {
-			// FIXME: Piggyback the UseLoginShell on cipherType to avoid API change
-			String cipherType = ""; //$NON-NLS-1$
-			if (fConfig.getCipherType() != null) {
-				cipherType = fConfig.getCipherType();
-			}
-			if (fConfig.getAttributes().getBoolean(USE_LOGIN_SHELL_ATTR)) {
-				cipherType += "+true";
-			}
-			remoteConnection.connect(fAuthInfo, fConfig.getConnectionAddress(), fConfig.getConnectionPort(), cipherType,
-					fConfig.getConnectionTimeout() * 1000, monitor);
+			remoteConnection.connect(fAuthInfo, fConfig, monitor);
 		} catch (RemoteConnectionException e) {
 			disconnect();
 			throw e;

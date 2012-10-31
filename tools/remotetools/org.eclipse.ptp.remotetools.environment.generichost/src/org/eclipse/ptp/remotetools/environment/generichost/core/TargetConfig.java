@@ -82,6 +82,15 @@ public class TargetConfig implements ITargetConfig {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.remotetools.core.IConnectionInfo#getUseLoginShell()
+	 */
+	public boolean getUseLoginShell() {
+		return fAttrs.getBoolean(ConfigFactory.ATTR_USE_LOGIN_SHELL);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.environment.control.ITargetConfig#
 	 * getKeyPassphrase()
 	 */

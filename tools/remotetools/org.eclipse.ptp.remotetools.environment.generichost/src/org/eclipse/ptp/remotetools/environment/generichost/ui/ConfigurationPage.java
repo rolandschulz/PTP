@@ -60,24 +60,8 @@ public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 	private AuthenticationFrame remoteAuthFrame;
 	private Button fUseLoginShellButton;
 
-	// FIXME: Required because interfaces are not allowed to change
-	private final String USE_LOGIN_SHELL_ATTR = ConfigFactory.KEY_ARRAY[ConfigFactory.KEY_ARRAY.length - 1];
-
-	class DataModifyListener implements ModifyListener {
-		int counter = 0;
-
-		public synchronized void enable() {
-			counter++;
-		}
-
-		public synchronized void disable() {
-			counter--;
-		}
-
+	private class DataModifyListener implements ModifyListener {
 		public synchronized void modifyText(ModifyEvent e) {
-			if (counter < 0) {
-				return;
-			}
 			readControls();
 
 			// updateButtons() will call is Valid(), that will call
@@ -150,8 +134,8 @@ public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 
 		Composite comp = remoteAuthFrame.getBottomUserReservedComposite();
 		fUseLoginShellButton = new Button(comp, SWT.CHECK);
-		fUseLoginShellButton.setText("Use login shell");
-		fUseLoginShellButton.setSelection(attributes.getBoolean(USE_LOGIN_SHELL_ATTR));
+		fUseLoginShellButton.setText(Messages.ConfigurationPage_UseLoginShell);
+		fUseLoginShellButton.setSelection(attributes.getBoolean(ConfigFactory.ATTR_USE_LOGIN_SHELL));
 		fUseLoginShellButton.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -174,7 +158,7 @@ public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 		attributes.setString(ConfigFactory.ATTR_CONNECTION_TIMEOUT, Integer.toString(remoteAuthFrame.getTimeout()));
 		attributes.setBoolean(ConfigFactory.ATTR_IS_PASSWORD_AUTH, remoteAuthFrame.isPasswordBased());
 		attributes.setString(ConfigFactory.ATTR_CIPHER_TYPE, remoteAuthFrame.getSelectedCipherType().getId());
-		attributes.setBoolean(USE_LOGIN_SHELL_ATTR, fUseLoginShellButton.getSelection());
+		attributes.setBoolean(ConfigFactory.ATTR_USE_LOGIN_SHELL, fUseLoginShellButton.getSelection());
 	}
 
 	private void createAuthControl(Composite topControl) {

@@ -55,6 +55,8 @@ public class Messages extends NLS {
 	public static String ConfigurationPage_DialogTitle;
 	public static String ConfigurationPage_LabelTargetName;
 	public static String ConfigurationPage_CipherType;
+
+	public static String ConfigurationPage_UseLoginShell;
 	public static String Environment_Info;
 
 	public static String Environment_Warning;
