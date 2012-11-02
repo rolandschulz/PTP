@@ -14,7 +14,10 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.ModelManager;
+import org.eclipse.ptp.core.Preferences;
+import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.JAXBExtensionUtils;
+import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 
 public class LaunchControllerManager {
 
@@ -58,7 +61,9 @@ public class LaunchControllerManager {
 				ModelManager.getInstance().addJobControl(controller);
 				ModelManager.getInstance().getUniverse().addResourceManager(configName, controlId);
 			}
-			if (!controller.isInitialized()) {
+			boolean reload = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(),
+					JAXBRMPreferenceConstants.FORCE_XML_RELOAD);
+			if (!controller.isInitialized() || reload) {
 				controller.initialize();
 			}
 			return controller;
