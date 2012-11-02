@@ -11,16 +11,40 @@
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.internal.common;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
+
 public class Debug {
+	private static boolean fDebug = false;
+
+	public static void setDebug(boolean debug) {
+		fDebug = debug;
+	}
+
+	private static void log(IStatus status) {
+		RemotetoolsPlugin.getDefault().getLog().log(status);
+	}
+
+	private static void log(int status, String msg) {
+		log(new Status(IStatus.ERROR, RemotetoolsPlugin.getDefault().getBundle().getSymbolicName(), status, msg, null));
+	}
+
 	public static void println(String s) {
-//		System.out.println(s);
+		if (fDebug) {
+			log(IStatus.INFO, s);
+		}
 	}
 
 	public static void printErrorln(String s) {
-//		System.err.println(s);
+		if (fDebug) {
+			log(IStatus.ERROR, s);
+		}
 	}
 
 	public static void println2(String s) {
-//		System.out.println(s);
+		if (fDebug) {
+			log(IStatus.INFO, s);
+		}
 	}
 }

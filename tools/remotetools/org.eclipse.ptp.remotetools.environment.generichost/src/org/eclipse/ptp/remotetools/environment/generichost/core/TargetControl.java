@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.remotetools.core.IAuthInfo;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.environment.control.ITargetConfig;
@@ -25,6 +26,7 @@ import org.eclipse.ptp.remotetools.environment.control.SSHTargetControl;
 import org.eclipse.ptp.remotetools.environment.generichost.Activator;
 import org.eclipse.ptp.remotetools.environment.generichost.messages.Messages;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
+import org.eclipse.ptp.remotetools.internal.common.Debug;
 
 /**
  * Controls an instance of a target created from the Environment.
@@ -87,6 +89,10 @@ public class TargetControl extends SSHTargetControl implements ITargetControl {
 	@Override
 	public boolean create(IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.TargetControl_create_MonitorConnecting, 1);
+
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		Debug.setDebug(store.getBoolean("logging"));
+
 		/*
 		 * Connect to the remote temote target
 		 */
