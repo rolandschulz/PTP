@@ -67,15 +67,17 @@ Thread::~Thread()
 void Thread::start()
 {
     if (!launched) {
-		sigset_t sigs_to_block;
-		sigset_t old_sigs;
-		sigfillset(&sigs_to_block);
-		pthread_sigmask(SIG_SETMASK, &sigs_to_block, &old_sigs);
-		if (pthread_create(&(thread), NULL, init, this) != 0) {
-			running = false;
-			throw ThreadException(ThreadException::ERR_CREATE);
-		}
-		pthread_sigmask(SIG_SETMASK, &old_sigs, NULL);
+        sigset_t sigs_to_block;
+        sigset_t old_sigs;
+        sigfillset(&sigs_to_block);
+        pthread_sigmask(SIG_SETMASK, &sigs_to_block, &old_sigs);
+        
+        if (pthread_create(&(thread), NULL, init, this) != 0) {
+            running = false;
+            pthread_sigmask(SIG_SETMASK, &old_sigs, NULL);
+            throw ThreadException(ThreadException::ERR_CREATE);
+        }
+        pthread_sigmask(SIG_SETMASK, &old_sigs, NULL);
     } else {
         throw ThreadException(ThreadException::ERR_LAUNCH);
     }

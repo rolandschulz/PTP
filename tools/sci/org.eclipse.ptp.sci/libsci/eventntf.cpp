@@ -58,6 +58,8 @@ int EventNotify::allocate()
     } while (serialTest[serialNum].used == true);
     num = serialNum;
     serialTest[serialNum].used = true;
+    serialTest[serialNum].notified = false; 
+    serialTest[serialNum].freezed = false;
     unlock();
 
     return num;

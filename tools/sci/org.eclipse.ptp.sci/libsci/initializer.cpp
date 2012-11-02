@@ -90,9 +90,6 @@ int Initializer::init()
     char *envp = NULL; 
     int hndl = -1;
 
-    if (SSHFUNC == NULL)
-        return SCI_ERR_SSHAUTH;
-
     envp = ::getenv("SCI_LOG_DIRECTORY"); 
     if (envp != NULL) {
         ::strncpy(dir, envp, sizeof(dir));
@@ -101,18 +98,21 @@ int Initializer::init()
     if (envp != NULL)
         level = ::atoi(envp);
     
-    if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
-        Log::getInstance()->init(dir, "fe.log", level);
-        log_debug("I am a front end, my handle is %d", gCtrlBlock->getMyHandle());
-    } else if (gCtrlBlock->getMyRole() == CtrlBlock::AGENT) {
-        Log::getInstance()->init(dir, "scia.log", level);
-        log_debug("I am an agent, my handle is %d", gCtrlBlock->getMyHandle());
-    } else {
-        Log::getInstance()->init(dir, "be.log", level);
-        log_debug("I am a back end, my handle is %d", gCtrlBlock->getMyHandle());
-    }
-
     try {
+        if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
+            Log::getInstance()->init(dir, "fe.log", level);
+            log_debug("I am a front end, my handle is %d", gCtrlBlock->getMyHandle());
+        } else if (gCtrlBlock->getMyRole() == CtrlBlock::AGENT) {
+            Log::getInstance()->init(dir, "scia.log", level);
+            log_debug("I am an agent, my handle is %d", gCtrlBlock->getMyHandle());
+        } else {
+            Log::getInstance()->init(dir, "be.log", level);
+            log_debug("I am a back end, my handle is %d", gCtrlBlock->getMyHandle());
+        }
+
+        if (SSHFUNC == NULL)
+            return SCI_ERR_SSHAUTH;
+
         if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
             rc = initFE();
         } else if (gCtrlBlock->getMyRole() == CtrlBlock::AGENT) {
@@ -202,7 +202,7 @@ int Initializer::initFE()
     routerInQ->produce(flistMsg);
     Message *topoMsg = topo->packMsg();
     routerInQ->produce(topoMsg);
-    feAgent->syncWait();
+    rc = feAgent->syncWait();
     delete topo;
 
     return rc;

@@ -251,25 +251,33 @@ int Launcher::launch()
         tree = ::atoi(envp);
     }
 
-    switch (tree) {
-        case 1:
-            rc = launch_tree1();
-            break;
-        case 2:
-            rc = launch_tree2();
-            break;
-        case 3:
-            rc = launch_tree3();
-            break;
-        case 4:
-            rc = launch_tree4();
-            break;
-        default:
-            return -1;
-    }
-    envp = getenv("SCI_ENABLE_LISTENER");
-    if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
-        gInitializer->initListener();
+    try {
+        switch (tree) {
+            case 1:
+                rc = launch_tree1();
+                break;
+            case 2:
+                rc = launch_tree2();
+                break;
+            case 3:
+                rc = launch_tree3();
+                break;
+            case 4:
+                rc = launch_tree4();
+                break;
+            default:
+                return -1;
+        }
+        if (rc != SCI_SUCCESS) {
+            return rc;
+        }
+        envp = getenv("SCI_ENABLE_LISTENER");
+        if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
+            gInitializer->initListener();
+        }
+    } catch (std::bad_alloc) {
+        log_error("Launcher: out of memory");
+        return SCI_ERR_NO_MEM;
     }
     if ((mode == REGISTER) || !shell.empty()) {
         while (!topology.routingList->allRouted()) {
@@ -394,6 +402,10 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m, 
                 psec_free_signature(&sign);
             } else {
                 int sockfd = conn(host.c_str());
+                if (sockfd < 0) {
+                    log_error("Launcher: invalid return sockfd(%d) of the connection handler.", sockfd);
+                    return SCI_ERR_LAUNCH_FAILED;
+                }
                 stream->init(sockfd);
             }
             if (m == REGISTER) {
@@ -406,7 +418,7 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m, 
                 rc = topology.routingList->startRouting(hndl, stream);
             }
         } catch (SocketException &e) {
-            rc = -1;
+            rc = SCI_ERR_LAUNCH_FAILED;
             log_error("Launcher: socket exception: %s", e.getErrMsg().c_str());
         }
     } else {
