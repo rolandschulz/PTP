@@ -17,7 +17,6 @@ import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICResourceDescription;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractSingleBuildPage;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
 import org.eclipse.ptp.ems.ui.EnvManagerConfigWidget;
 import org.eclipse.ptp.ems.ui.IErrorListener;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
@@ -88,9 +87,9 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		}
 	}
 
-	private EnvManagerProjectProperties getProjectProperties() {
+	private EnvManagerConfigSync getProjectProperties() {
 		try {
-			return new EnvManagerProjectProperties(getProject());
+			return new EnvManagerConfigSync(getCfg());
 		} catch (final Error e) {
 			setErrorMessage(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage()); //$NON-NLS-1$
 			RDTSyncUIPlugin.log(e);
@@ -127,7 +126,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 
 	private Set<String> computeSelectedItems() {
 		try {
-			final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
+			final EnvManagerConfigSync projectProperties = new EnvManagerConfigSync(getCfg());
 			if (projectProperties.getConnectionName().equals(ui.getConnectionName())) {
 				return projectProperties.getConfigElements();
 			} else {
@@ -192,7 +191,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 
 	private void storeProjectProperties() {
 		try {
-			final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
+			final EnvManagerConfigSync projectProperties = new EnvManagerConfigSync(getCfg());
 			ui.saveConfiguration(projectProperties);
 		} catch (final Error e) {
 			RDTSyncCorePlugin.log(e);
