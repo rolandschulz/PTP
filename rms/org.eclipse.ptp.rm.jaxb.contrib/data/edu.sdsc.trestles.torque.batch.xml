@@ -14,9 +14,9 @@
 	xmlns="org.eclipse.ptp" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
-	name="edu.sdsc.trestles.pbs.batch">
+	name="edu.sdsc.trestles.torque.batch">
 	<control-data>
-		<!-- Set the default value of this attribute if PBS is installed in a non-standard location -->
+		<!-- Set the default value of this attribute if Torque is installed in a non-standard location -->
 		<attribute name="bindir" visible="false">
 			<default>/opt/torque/bin/</default>
 		</attribute>
@@ -274,7 +274,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 		<script insertEnvironmentAfter="35">
 			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 			<line>
-				<arg>#!/bin/bash</arg>
+				<arg>#!/bin/bash --login</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#PBS -A">#PBS -A ${ptp_rm:Account_Name#value}</arg>
@@ -382,6 +382,9 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<arg isUndefinedIfMatches="#PBS">#PBS ${ptp_rm:export_all#value}</arg>
 			</line>
 			<line>
+				<arg isUndefinedIfMatches="">${ptp_rm:ems#value}</arg>
+			</line>
+			<line>
 				<arg>MPI_ARGS="-np ${ptp_rm:mpiNumberOfProcesses#value}"</arg>
 			</line>
 			<line>
@@ -442,24 +445,12 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<stdout-parser delim="\n" all="true" save="1">
 				<target ref="@jobId">
 					<match>
-						<expression>([\d]+)([.])(.+)[\s]+.*</expression>
+						<expression>([\d]+)([.])(.*)</expression>
 						<append field="name">
 							<entry valueGroup="1"/>
 							<entry valueGroup="2"/>
 							<entry valueGroup="3"/>
 						</append>
-						<set field="default">
-							<entry valueGroup="1"/>
-						</set>
-						<set field="value">
-							<entry value="SUBMITTED"/>
-						</set>
-					</match>
-					<match>
-						<expression>([\d]+)[.].+</expression>
-						<set field="name">
-							<entry valueGroup="0"/>
-						</set>
 						<set field="default">
 							<entry valueGroup="1"/>
 						</set>
@@ -558,7 +549,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 		</terminate-job>
 		<launch-tab>
 			<dynamic>
-				<title>Basic PBS Settings</title>
+				<title>Basic Settings</title>
 				<layout>
 					<grid-layout/>
 				</layout>
@@ -759,7 +750,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				</composite>
 			</dynamic>
 			<dynamic>
-				<title>Advanced PBS Settings</title>
+				<title>Advanced Settings</title>
 				<layout>
 					<grid-layout/>
 				</layout>
@@ -813,7 +804,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					</viewer>
 				</composite>
 			</dynamic>
-			<import title="Import PBS Script">
+			<import title="Import Script">
 				<export-for-override name="exportedEnv" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table" initialAllChecked="true" tooltipEnabled="true">
 					<layout-data>
 						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true" heightHint="80"/>

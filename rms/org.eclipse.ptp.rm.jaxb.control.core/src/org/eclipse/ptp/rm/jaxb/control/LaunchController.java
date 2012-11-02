@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -33,6 +35,10 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
+import org.eclipse.ptp.ems.core.EnvManagerRegistry;
+import org.eclipse.ptp.ems.core.IEnvManager;
+import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
@@ -1348,9 +1354,49 @@ public class LaunchController implements ILaunchController {
 			a.setValue(attr);
 		}
 
+		IEnvManagerConfig envMgrConfig = getEnvManagerConfig(configuration);
+		if (envMgrConfig != null) {
+			IEnvManager envManager = EnvManagerRegistry.getEnvManager(progress.newChild(1),
+					fRemoteServicesDelegate.getRemoteConnection());
+			if (envManager != null) {
+				String emsStr = envManager.getBashConcatenation("\n", false, envMgrConfig, null);
+				AttributeType a = getEnvironment().get(JAXBControlConstants.EMS_ATTR);
+				if (a == null) {
+					a = new AttributeType();
+					getEnvironment().put(JAXBControlConstants.EMS_ATTR, a);
+				}
+				a.setValue(emsStr);
+			}
+		}
+
 		launchEnv.clear();
 		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));
 		appendLaunchEnv = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, appendLaunchEnv);
+	}
+
+	/**
+	 * Get the environment manager configuration associated with the project that was specified in the launch configuration. If no
+	 * launchConfiguration was specified then this CommandJob does not need to use environment management so we can safely return
+	 * null.
+	 * 
+	 * @return environment manager configuration or null if no configuration can be found
+	 */
+	private IEnvManagerConfig getEnvManagerConfig(ILaunchConfiguration configuration) {
+		try {
+			String projectName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
+			if (projectName != null) {
+				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+				if (project != null) {
+					final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(project);
+					if (projectProperties.isEnvMgmtEnabled()) {
+						return projectProperties;
+					}
+				}
+			}
+		} catch (CoreException e) {
+			// Ignore
+		}
+		return null;
 	}
 
 	/**
