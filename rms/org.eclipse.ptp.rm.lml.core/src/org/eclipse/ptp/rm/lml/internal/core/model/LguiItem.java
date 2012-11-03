@@ -819,7 +819,7 @@ public class LguiItem implements ILguiItem {
 				if (jobId != null) {
 					final JobStatusData status = fJobMap.get(jobId);
 					if (status != null) {
-						if (!status.isRemoved() && !status.isCompleted()) {
+						if (!status.isRemoved()) {
 							/*
 							 * job exists in both map and LML, so update the map with the oid and latest status
 							 */

@@ -18,24 +18,27 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
+import org.eclipse.ptp.ems.core.EnvManagerRegistry;
+import org.eclipse.ptp.ems.core.IEnvManager;
+import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
@@ -60,9 +63,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
-import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
-import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
@@ -72,9 +73,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.SiteType;
 import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.IProgressConstants;
-import org.eclipse.ui.progress.UIJob;
 
 /**
  * The part of the JAXB framework responsible for handling job submission, termination, suspension and resumption. Also provides
@@ -139,7 +138,7 @@ public class LaunchController implements ILaunchController {
 			new RemoteConnectionException(Messages.RemoteConnectionError + connection);
 		}
 	}
-	
+
 	private final ConnectionChangeListener connectionListener = new ConnectionChangeListener();
 	private final Map<String, String> launchEnv = new TreeMap<String, String>();
 
@@ -417,6 +416,31 @@ public class LaunchController implements ILaunchController {
 		return getRMVariableMap();
 	}
 
+	/**
+	 * Get the environment manager configuration associated with the project that was specified in the launch configuration. If no
+	 * launchConfiguration was specified then this CommandJob does not need to use environment management so we can safely return
+	 * null.
+	 * 
+	 * @return environment manager configuration or null if no configuration can be found
+	 */
+	private IEnvManagerConfig getEnvManagerConfig(ILaunchConfiguration configuration) {
+		try {
+			String projectName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
+			if (projectName != null) {
+				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+				if (project != null) {
+					final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(project);
+					if (projectProperties.isEnvMgmtEnabled()) {
+						return projectProperties;
+					}
+				}
+			}
+		} catch (CoreException e) {
+			// Ignore
+		}
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -537,10 +561,6 @@ public class LaunchController implements ILaunchController {
 			}
 		}
 	}
-
-	/*
-	 * return JAXBInitializationUtils.getRMConfigurationXML(url);
-	 */
 
 	/*
 	 * (non-Javadoc)
@@ -802,13 +822,6 @@ public class LaunchController implements ILaunchController {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#getJobStatus(java.lang.String, boolean,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-
 	/**
 	 * If job is interactive, kill the process directly rather than issuing a remote command.
 	 * 
@@ -896,35 +909,18 @@ public class LaunchController implements ILaunchController {
 	 *             or URL exceptions
 	 */
 	private void realizeRMDataFromXML() throws CoreException {
-		String xml = getRMConfigurationXML();
-		boolean force = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.FORCE_XML_RELOAD);
-		if (xml == null || force) {
-			if (configURL != null) {
-				try {
-					xml = JAXBInitializationUtils.getRMConfigurationXML(new URL(configURL));
-					configXML = xml;
-					configData = null;
-				} catch (Throwable t) {
-					if (xml != null) {
-						new UIJob(Messages.LaunchController_usingCachedDefinition) {
-							@Override
-							public IStatus runInUIThread(IProgressMonitor monitor) {
-								MessageDialog.openWarning(Display.getDefault().getActiveShell(),
-										Messages.LaunchController_usingCachedDefinition, Messages.LaunchController_missingURL);
-								return Status.OK_STATUS;
-							}
-						}.schedule();
-					}
-				}
+		if (configURL != null) {
+			try {
+				configXML = JAXBInitializationUtils.getRMConfigurationXML(new URL(configURL));
+				configData = null;
+			} catch (Exception e) {
+				throw CoreExceptionUtils.newException(e.getLocalizedMessage(), e.getCause());
 			}
-		}
-		if (xml == null) {
-			throw CoreExceptionUtils.newException(Messages.LaunchController_unableToLoad, null);
-		}
-		try {
-			configData = JAXBInitializationUtils.initializeRMData(xml);
-		} catch (Exception e) {
-			throw CoreExceptionUtils.newException(e.getLocalizedMessage(), e.getCause());
+			try {
+				configData = JAXBInitializationUtils.initializeRMData(configXML);
+			} catch (Exception e) {
+				throw CoreExceptionUtils.newException(e.getLocalizedMessage(), e.getCause());
+			}
 		}
 	}
 
@@ -1371,6 +1367,21 @@ public class LaunchController implements ILaunchController {
 				getEnvironment().put(JAXBControlConstants.DIRECTORY, a);
 			}
 			a.setValue(attr);
+		}
+
+		IEnvManagerConfig envMgrConfig = getEnvManagerConfig(configuration);
+		if (envMgrConfig != null) {
+			IEnvManager envManager = EnvManagerRegistry.getEnvManager(progress.newChild(1),
+					fRemoteServicesDelegate.getRemoteConnection());
+			if (envManager != null) {
+				String emsStr = envManager.getBashConcatenation("\n", false, envMgrConfig, null);
+				AttributeType a = getEnvironment().get(JAXBControlConstants.EMS_ATTR);
+				if (a == null) {
+					a = new AttributeType();
+					getEnvironment().put(JAXBControlConstants.EMS_ATTR, a);
+				}
+				a.setValue(emsStr);
+			}
 		}
 
 		launchEnv.clear();

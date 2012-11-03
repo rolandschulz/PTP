@@ -65,6 +65,9 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 	public static final String DISCATTR = "DiscoverAttributes";//$NON-NLS-1$
 	public static final String JOBSTATUS = "GetJobStatus";//$NON-NLS-1$
 
+	/*
+	 * Predefined attributes
+	 */
 	public static final String JOB_ATTRIBUTE = "jobAttribute";//$NON-NLS-1$
 	public static final String ATTRIBUTE = "attribute";//$NON-NLS-1$
 	public static final String PROPERTY = "property";//$NON-NLS-1$
@@ -84,6 +87,7 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 	public static final String DEBUGGER_LAUNCHER = "debuggerLauncher";//$NON-NLS-1$
 	public static final String PTP_DIRECTORY = "ptpDirectory";//$NON-NLS-1$
 	public static final String LAUNCH_MODE = "launchMode";//$NON-NLS-1$
+	public static final String EMS_ATTR = "ems";//$NON-NLS-1$
 
 	public static final String CASE_INSENSITIVE = "CASE_INSENSITIVE";//$NON-NLS-1$
 	public static final String MULTILINE = "MULTILINE";//$NON-NLS-1$

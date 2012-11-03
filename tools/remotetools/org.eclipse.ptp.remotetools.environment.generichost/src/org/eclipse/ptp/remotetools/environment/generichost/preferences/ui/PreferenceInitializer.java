@@ -38,6 +38,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ConfigFactory.ATTR_LOGIN_USERNAME, DefaultValues.LOGIN_USERNAME);
 		store.setDefault(ConfigFactory.ATTR_CONNECTION_ADDRESS, DefaultValues.CONNECTION_ADDRESS);
 		store.setDefault(ConfigFactory.ATTR_CONNECTION_PORT, DefaultValues.CONNECTION_PORT);
+		store.setDefault("logging", false);
 	}
 
 }

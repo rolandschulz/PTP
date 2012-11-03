@@ -32,8 +32,12 @@
             name="edu.illinois.ncsa.forge.pbs.interactive.openmpi">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
-            configurationFile="data/edu.sdsc.trestles.pbs.batch.xml"
-            name="edu.sdsc.trestles.pbs.batch">
+            configurationFile="data/edu.sdsc.trestles.torque.batch.xml"
+            name="edu.sdsc.trestles.torque.batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.sdsc.trestles.torque.interactive.xml"
+            name="edu.sdsc.trestles.torque.interactive">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/edu.utexas.tacc.lonestar.sge.batch.xml"

@@ -11,6 +11,7 @@
  */
 package org.eclipse.ptp.remotetools.environment.generichost.preferences.ui;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -29,6 +30,7 @@ import org.eclipse.ui.IWorkbench;
  * @since 1.2.1
  */
 public class PreferencePage extends AbstractBaseFieldEditorPreferencePage {
+	private static String LOGGING_PREF = "logging";
 
 	public PreferencePage() {
 		super(GRID);
@@ -62,7 +64,8 @@ public class PreferencePage extends AbstractBaseFieldEditorPreferencePage {
 		userfield.setEmptyStringAllowed(true);
 		addField(userfield);
 
-		addField(new LabelFieldEditor(Messages.PreferencePage_HeaderLaunch, getFieldEditorParent()));
+		BooleanFieldEditor loggingField = new BooleanFieldEditor(LOGGING_PREF, "Enable logging", getFieldEditorParent());
+		addField(loggingField);
 	}
 
 	@Override

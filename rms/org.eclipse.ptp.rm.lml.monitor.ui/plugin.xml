@@ -21,31 +21,26 @@
       </category>
       <command
             categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
-            defaultHandler="org.eclipse.ptp.rm.lml.monitor.ui.handlers.AddMonitorHandler"
             id="org.eclipse.ptp.rm.lml.monitor.ui.addMonitor"
             name="Add Monitor">
       </command>
       <command
             categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
-            defaultHandler="org.eclipse.ptp.rm.lml.monitor.ui.handlers.RemoveMonitorHandler"
             id="org.eclipse.ptp.rm.lml.monitor.ui.removeMonitor"
             name="Remove Monitor">
       </command>
       <command
             categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
-            defaultHandler="org.eclipse.ptp.rm.lml.monitor.ui.handlers.StartMonitorHandler"
             id="org.eclipse.ptp.rm.lml.monitor.ui.startMonitor"
             name="Start Monitor">
       </command>
       <command
             categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
-            defaultHandler="org.eclipse.ptp.rm.lml.monitor.ui.handlers.StopMonitorHandler"
             id="org.eclipse.ptp.rm.lml.monitor.ui.stopMonitor"
             name="Stop Monitor">
       </command>
       <command
             categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
-            defaultHandler="org.eclipse.ptp.rm.lml.monitor.ui.handlers.RefreshMonitorHandler"
             id="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor"
             name="Refresh Monitor">
       </command>
