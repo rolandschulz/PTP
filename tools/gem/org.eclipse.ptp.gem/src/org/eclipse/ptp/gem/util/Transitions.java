@@ -49,6 +49,7 @@ public class Transitions {
 	private boolean deadlock;
 	private boolean assertionViolation;
 	private boolean resourceLeak;
+	private boolean fib;
 
 	/**
 	 * Constructor
@@ -376,11 +377,11 @@ public class Transitions {
 	}
 
 	/**
-	 * Returns and ArrayList of Envelopes that holds each envelope that contains
+	 * Returns and HashMap of Envelopes that holds each envelope that contains
 	 * a resource leak.
 	 * 
 	 * @param none
-	 * @return ArrayList<Envelope> The list of resource leaks.
+	 * @return HashMap<Integer, Envelope> The set of resource leaks.
 	 */
 	public HashMap<Integer, Envelope> getResourceLeaks() {
 		return this.resourceLeaks;
@@ -463,6 +464,16 @@ public class Transitions {
 	}
 
 	/**
+	 * Returns whether or not a functionally irrelevant barrier was detected.
+	 * 
+	 * @param none
+	 * @return boolean True if a functionally irrelevant barrier was detected, false otherwise.
+	 */
+	public boolean hasFIB() {
+		return this.fib;
+	}
+
+	/**
 	 * Returns a boolean representing whether or not there is a next
 	 * interleaving from the currentInterleaving.
 	 * 
@@ -510,10 +521,10 @@ public class Transitions {
 	}
 
 	/**
-	 * Returns a boolean representing whether or not there is a resource leak.
+	 * Returns a boolean representing whether or not a resource leak was detected.
 	 * 
 	 * @param none
-	 * @return boolean True if there was a resource leak, false otherwise.
+	 * @return boolean True if a resource leak was detected, false otherwise.
 	 */
 	public boolean hasResourceLeak() {
 		return this.resourceLeak;
@@ -637,6 +648,7 @@ public class Transitions {
 
 				// If this line indicates FIB, process all of them
 				if (line.equalsIgnoreCase("[FIB]")) { //$NON-NLS-1$
+					this.fib = true;
 					this.irrelevantBarriers = new HashMap<Integer, String>();
 					line = scanner.nextLine();
 
