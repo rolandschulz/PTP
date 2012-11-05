@@ -36,7 +36,7 @@
             name="edu.sdsc.trestles.torque.batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
-            configurationFile="data/edu.sdsc.trestles.torque.interactive.xml"
+            configurationFile="data/edu.sdsc.trestles.torque.interactive.openmpi.xml"
             name="edu.sdsc.trestles.torque.interactive">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration

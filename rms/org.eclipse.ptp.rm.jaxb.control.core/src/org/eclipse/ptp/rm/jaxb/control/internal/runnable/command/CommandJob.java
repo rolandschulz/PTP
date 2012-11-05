@@ -93,9 +93,7 @@ import org.eclipse.ui.progress.IProgressConstants;
 public class CommandJob extends Job implements ICommandJob {
 
 	public enum JobMode {
-		BATCH,
-		STATUS,
-		INTERACTIVE
+		BATCH, STATUS, INTERACTIVE
 	}
 
 	/**
@@ -190,8 +188,7 @@ public class CommandJob extends Job implements ICommandJob {
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(JAXBControlCorePlugin.PLUGIN_ID,
 				JAXBControlConstants.TOKENIZER_EXT_PT);
 		IConfigurationElement[] elements = extensionPoint.getConfigurationElements();
-		for (int i = 0; i < elements.length; i++) {
-			IConfigurationElement element = elements[i];
+		for (IConfigurationElement element : elements) {
 			try {
 				if (element.getAttribute(JAXBControlConstants.ID).equals(type)) {
 					return (IStreamParserTokenizer) element.createExecutableExtension(JAXBControlConstants.CLASS);
