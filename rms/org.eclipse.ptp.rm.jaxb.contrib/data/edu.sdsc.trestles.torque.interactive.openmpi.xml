@@ -54,6 +54,22 @@ in bytes or words (word size of the host): b (bytes),
 w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<default>20gb</default>
 		</attribute>
+		<attribute name="Resource_List.nodes" type="string">
+			<description>Number and/or type of nodes to be reserved for exclusive use by the job.
+[usage hint] number_nodes:ppn=N</description>
+			<tooltip><![CDATA[The value is one or more node_specs joined with 
+the '+' character, "node_spec[+node_spec...]. Each node_spec is
+a number of nodes required of the type declared in the node_spec
+and a name or one or more properity or properities desired for 
+the nodes. The number, the name, and each properity in the 
+node_spec are separated by a colon ':'. If no number is specified, 
+one (1) is assumed. Units: string. The name of a node is its 
+hostname. The properties of nodes are: ppn=# requested; defaults 
+to 1; or an arbitrary string defined by system administrator. 
+Example: To ask for 2 processors on each of two blue nodes and 
+three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
+			<default>1:ppn=1</default>
+		</attribute>
 		<attribute name="Resource_List.walltime" type="string">
 			<description>Maximum amount of real time during which the job can be in the running state.</description>
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
@@ -83,9 +99,10 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<arg>${ptp_rm:bindir#value}qsub</arg>
 			<arg>-I</arg>
 			<arg>-q ${ptp_rm:destination#value}</arg>
-			<arg>-l nodes=1,mem=${ptp_rm:Resource_List.mem#value},walltime=${ptp_rm:Resource_List.walltime#value}</arg>
+			<arg>-l nodes=${ptp_rm:Resource_List.nodes#value},mem=${ptp_rm:Resource_List.mem#value},walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			<arg isUndefinedIfMatches="-A">-A ${ptp_rm:Account_Name#value}</arg>
 			<arg>-V</arg>
+			<input isUndefinedIfMatches=";">${ptp_rm:ems#value};</input>
 			<input isUndefinedIfMatches=".+ -np">${ptp_rm:mpiPrefix#value}</input>
 			<input>${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</input>
 			<stdout-parser delim="\n">
@@ -139,6 +156,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<arg>-l nodes=1,mem=${ptp_rm:Resource_List.mem#value},walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			<arg isUndefinedIfMatches="-A">-A ${ptp_rm:Account_Name#value}</arg>
 			<arg>-V</arg>
+			<input isUndefinedIfMatches=";">${ptp_rm:ems#value};</input>
 			<input>cd ${ptp_rm:executableDirectory#value} &amp;&amp; perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_job.pl</input>
 			<input>mpirun</input>
 			<input isUndefinedIfMatches="-np">-np ${ptp_rm:mpiNumberOfProcesses#value}</input>
@@ -337,6 +355,25 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 					<!-- row 2 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:Resource_List.nodes#tooltip}</tooltip>
+						<fixed-text>Number of nodes: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.nodes">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:Resource_List.nodes#description}</fixed-text>
+					</widget>
+					<!-- row 3 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
@@ -353,7 +390,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>${ptp_rm:Resource_List.mem#description}</fixed-text>
 					</widget>
-					<!-- row 3 -->
+					<!-- row 4 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -372,7 +409,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>${ptp_rm:Resource_List.walltime#description}</fixed-text>
 					</widget>
-					<!-- row 4 -->
+					<!-- row 5 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -390,7 +427,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>${ptp_rm:mpiCommand#description}</fixed-text>
 					</widget>
-					<!-- row 5 -->
+					<!-- row 6 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>

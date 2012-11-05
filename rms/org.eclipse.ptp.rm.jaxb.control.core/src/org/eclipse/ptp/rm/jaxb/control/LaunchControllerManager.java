@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.CoreException;
@@ -22,6 +24,7 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 public class LaunchControllerManager {
 
 	private static final LaunchControllerManager fInstance = new LaunchControllerManager();
+	private static final Map<String, ILaunchController> fControllers = new HashMap<String, ILaunchController>();
 
 	public static String generateControlId(String remoteServicesId, String connectionName, String configName) {
 		String controlBytes = remoteServicesId + "/" + connectionName + "/" + configName; //$NON-NLS-1$ //$NON-NLS-2$
@@ -49,7 +52,7 @@ public class LaunchControllerManager {
 			throws CoreException {
 		if (remoteServicesId != null && connectionName != null && configName != null) {
 			String controlId = generateControlId(remoteServicesId, connectionName, configName);
-			ILaunchController controller = (ILaunchController) ModelManager.getInstance().getJobControl(controlId);
+			ILaunchController controller = fControllers.get(controlId);
 			if (controller == null) {
 				controller = new LaunchController();
 				controller.setRMConfigurationURL(JAXBExtensionUtils.getConfigurationURL(configName));
@@ -58,6 +61,7 @@ public class LaunchControllerManager {
 					controller.setRemoteServicesId(remoteServicesId);
 				}
 				controller.initialize();
+				fControllers.put(controlId, controller);
 				ModelManager.getInstance().addJobControl(controller);
 				ModelManager.getInstance().getUniverse().addResourceManager(configName, controlId);
 			}

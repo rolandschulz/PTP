@@ -45,8 +45,10 @@ public class InfoView extends ViewPart {
 
 	public class LMLListener implements ILMLListener {
 
+		@Override
 		public void handleEvent(ILguiAddedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					if (parent != null && content == null) {
 						setNewLabelText(ILMLUIConstants.INFO_MOTD, null);
@@ -55,8 +57,10 @@ public class InfoView extends ViewPart {
 			});
 		}
 
+		@Override
 		public void handleEvent(ILguiRemovedEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					if (parent != null && content != null) {
 						removeLabelText();
@@ -65,8 +69,10 @@ public class InfoView extends ViewPart {
 			});
 		}
 
+		@Override
 		public void handleEvent(final IMarkObjectEvent event) {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					if (parent != null) {
 						removeLabelText();
@@ -76,21 +82,27 @@ public class InfoView extends ViewPart {
 			});
 		}
 
+		@Override
 		public void handleEvent(final ISelectObjectEvent event) {
 		}
 
+		@Override
 		public void handleEvent(ITableFilterEvent event) {
 		}
 
+		@Override
 		public void handleEvent(ITableSortedEvent event) {
 		}
 
+		@Override
 		public void handleEvent(IUnmarkObjectEvent event) {
 		}
 
+		@Override
 		public void handleEvent(IUnselectedObjectEvent event) {
 		}
 
+		@Override
 		public void handleEvent(IViewUpdateEvent event) {
 		}
 
@@ -139,7 +151,7 @@ public class InfoView extends ViewPart {
 	}
 
 	public void removeLabelText() {
-		if (!content.isDisposed()) {
+		if (content != null && !content.isDisposed()) {
 			content.dispose();
 		}
 		content = null;
