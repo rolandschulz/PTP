@@ -41,7 +41,6 @@ import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
 import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
-import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
@@ -244,7 +243,6 @@ public class ModelManager implements IModelManager {
 	private final ListenerList fResourceManagerListeners = new ListenerList();
 	private final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
 	private final Map<String, IResourceManager> fResourceManagers = new ConcurrentHashMap<String, IResourceManager>();
-	private final Map<String, IJobControl> fJobControllers = new ConcurrentHashMap<String, IJobControl>();
 	private final IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
 
 	private final IPUniverse fUniverse = new PUniverse();
@@ -258,18 +256,6 @@ public class ModelManager implements IModelManager {
 		fServiceManager.addEventListener(fServiceEventListener, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED
 				| IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED | IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED
 				| IServiceModelEvent.SERVICE_PROVIDER_CHANGED);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.IModelManager#addJobControl(org.eclipse.ptp.core.jobs.IJobControl)
-	 */
-	/**
-	 * @since 6.0
-	 */
-	public void addJobControl(IJobControl control) {
-		fJobControllers.put(control.getControlId(), control);
 	}
 
 	/*
@@ -407,22 +393,6 @@ public class ModelManager implements IModelManager {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.IModelManager#getJobControl(java.lang.String)
-	 */
-	/**
-	 * @since 6.0
-	 */
-	public IJobControl getJobControl(String id) {
-		IJobControl control = fJobControllers.get(id);
-		if (control == null) {
-			control = fResourceManagers.get(id);
-		}
-		return control;
-	}
-
 	/**
 	 * @param rmId
 	 * @return
@@ -500,18 +470,6 @@ public class ModelManager implements IModelManager {
 		if (Preferences.getBoolean(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START_RMS)) {
 			startResourceManagers(rmsNeedStarting.toArray(new IResourceManager[0]));
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.IModelManager#removeJobControl(org.eclipse.ptp.core.jobs.IJobControl)
-	 */
-	/**
-	 * @since 6.0
-	 */
-	public void removeJobControl(IJobControl control) {
-		fJobControllers.remove(control.getControlId());
 	}
 
 	/*

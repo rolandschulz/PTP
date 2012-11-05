@@ -19,20 +19,12 @@
 package org.eclipse.ptp.core;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.services.core.ServiceModelManager;
 
 @Deprecated
 public interface IModelManager extends IModelPresentation {
-	/**
-	 * Add a job controller to the model.
-	 * 
-	 * @param control
-	 * @since 6.0
-	 */
-	public void addJobControl(IJobControl control);
-
 	/**
 	 * Add a listener for resource manager events.
 	 * 
@@ -58,16 +50,6 @@ public interface IModelManager extends IModelPresentation {
 	public void addResourceManagers(IResourceManager[] addedManagers);
 
 	/**
-	 * Get the job controller corresponding to the supplied ID
-	 * 
-	 * @param id
-	 *            control id
-	 * @return
-	 * @since 6.0
-	 */
-	public IJobControl getJobControl(String id);
-
-	/**
 	 * Find the resource manager with the supplied unique name
 	 * 
 	 * @param rmUniqueName
@@ -91,14 +73,6 @@ public interface IModelManager extends IModelPresentation {
 	 * @throws CoreException
 	 */
 	public void loadResourceManagers() throws CoreException;
-
-	/**
-	 * Remove a job controller from the model.
-	 * 
-	 * @param controll
-	 * @since 6.0
-	 */
-	public void removeJobControl(IJobControl control);
 
 	/**
 	 * Remove listener for resource manager events.

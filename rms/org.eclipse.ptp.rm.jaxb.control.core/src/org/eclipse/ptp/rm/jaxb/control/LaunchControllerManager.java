@@ -62,7 +62,6 @@ public class LaunchControllerManager {
 				}
 				controller.initialize();
 				fControllers.put(controlId, controller);
-				ModelManager.getInstance().addJobControl(controller);
 				ModelManager.getInstance().getUniverse().addResourceManager(configName, controlId);
 			}
 			boolean reload = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(),
