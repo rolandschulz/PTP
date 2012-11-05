@@ -1659,6 +1659,7 @@ public class GemAnalyzer extends ViewPart {
 		final Display display = this.parent.getShell().getDisplay();
 		final Color RED = new Color(display, new RGB(255, 0, 0));
 		final Color GREEN = new Color(display, new RGB(0, 200, 0));
+		final Color BLUE = new Color(display, new RGB(0, 0, 255));
 
 		// Interleaving label
 		this.interleavingsGroup.setText("Interleaving: " + this.transitions.getCurrentInterleaving() + "/" //$NON-NLS-1$ //$NON-NLS-2$
@@ -1690,8 +1691,13 @@ public class GemAnalyzer extends ViewPart {
 			this.errorMessageLabel.setForeground(RED);
 			this.errorMessageLabel.setText(Messages.GemAnalyzer_92);
 		} else {
-			this.errorMessageLabel.setForeground(GREEN);
-			this.errorMessageLabel.setText(Messages.GemAnalyzer_93);
+			if (this.transitions.hasResourceLeak() || this.transitions.hasFIB()) {
+				this.errorMessageLabel.setForeground(BLUE);
+				this.errorMessageLabel.setText(Messages.GemAnalyzer_93);
+			} else {
+				this.errorMessageLabel.setForeground(GREEN);
+				this.errorMessageLabel.setText(Messages.GemAnalyzer_31);
+			}
 		}
 	}
 
