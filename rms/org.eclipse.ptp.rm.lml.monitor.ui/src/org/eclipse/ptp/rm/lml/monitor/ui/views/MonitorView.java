@@ -10,11 +10,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.monitor.ui.views;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
@@ -26,6 +33,7 @@ import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.ptp.rm.lml.monitor.core.listeners.IMonitorChangedListener;
 import org.eclipse.ptp.rm.lml.monitor.ui.ExtensionUtils;
 import org.eclipse.ptp.rm.lml.monitor.ui.MonitorImages;
+import org.eclipse.ptp.rm.lml.monitor.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -36,6 +44,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.UIJob;
 
 /**
  * @since 6.0
@@ -142,6 +151,33 @@ public class MonitorView extends ViewPart {
 		fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				MonitorControlManager.getInstance().fireSelectionChanged(event);
+			}
+		});
+		fViewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(final DoubleClickEvent event) {
+				UIJob job = new UIJob(Messages.MonitorView_Start_Stop_Monitor) {
+					@Override
+					public IStatus runInUIThread(IProgressMonitor progress) {
+						if (event.getSelection() instanceof IStructuredSelection) {
+							IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+							if (!sel.isEmpty()) {
+								IMonitorControl monitor = (IMonitorControl) sel.getFirstElement();
+								try {
+									if (!monitor.isActive()) {
+										monitor.start(progress);
+									} else {
+										monitor.stop();
+									}
+								} catch (CoreException e) {
+									return e.getStatus();
+								}
+							}
+						}
+						return Status.OK_STATUS;
+					}
+
+				};
+				job.schedule();
 			}
 		});
 

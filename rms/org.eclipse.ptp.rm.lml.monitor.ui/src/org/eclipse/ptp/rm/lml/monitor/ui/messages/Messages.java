@@ -29,7 +29,10 @@ public class Messages extends NLS {
 	public static String LMLRMMonitorConfigurationWizardPage_Description;
 
 	public static String LMLRMMonitorConfigurationWizardPage_sameAsControl;
+
 	public static String LMLRMMonitorConfigurationWizardPage_Title;
+
+	public static String MonitorView_Start_Stop_Monitor;
 
 	public static String RemoveMonitorHandler_Are_you_sure_1;
 
