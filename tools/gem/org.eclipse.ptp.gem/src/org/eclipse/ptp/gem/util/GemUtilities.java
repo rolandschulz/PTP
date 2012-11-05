@@ -710,7 +710,7 @@ public class GemUtilities {
 		final StringTokenizer st = new StringTokenizer(ispVersion, ".", false); //$NON-NLS-1$
 		st.nextToken();
 		final int majorVersionNum = Integer.parseInt(st.nextToken());
-//		final int minorVersionNum = Integer.parseInt(st.nextToken());
+		// final int minorVersionNum = Integer.parseInt(st.nextToken());
 
 		// we need a compatible version of ISP, e.g. v0.3.0+
 		if (majorVersionNum == 3) {
