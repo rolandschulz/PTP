@@ -52,10 +52,8 @@ public class LaunchControllerManager {
 			throws CoreException {
 		if (remoteServicesId != null && connectionName != null && configName != null) {
 			String controlId = generateControlId(remoteServicesId, connectionName, configName);
-			System.out.println("checking id=" + controlId);
 			ILaunchController controller = fControllers.get(controlId);
 			if (controller == null) {
-				System.out.println("not found");
 				controller = new LaunchController();
 				controller.setRMConfigurationURL(JAXBExtensionUtils.getConfigurationURL(configName));
 				if (connectionName != null && remoteServicesId != null) {
