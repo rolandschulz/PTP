@@ -35,22 +35,17 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
-import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerConfiguration;
-import org.eclipse.ptp.rm.jaxb.control.JAXBResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.control.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
-import org.eclipse.ptp.rm.lml.monitor.core.LMLResourceManagerMonitor;
-import org.eclipse.ptp.rm.lml_jaxb.core.LMLJAXBResourceManager;
-import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.ResourceManagerServiceProvider;
 
 public class RMLaunchTest extends TestCase {
 
@@ -250,8 +245,7 @@ public class RMLaunchTest extends TestCase {
 	}
 
 	private static final String xml = JAXBCoreConstants.DATA + "tabbed-example.xml"; //$NON-NLS-1$
-	private JAXBResourceManagerConfiguration rmConfig;
-	private LMLJAXBResourceManager rm;
+	private ILaunchController rm;
 	private ILaunchConfiguration launchConfig;
 
 	@Override
@@ -272,9 +266,6 @@ public class RMLaunchTest extends TestCase {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					emulateConfigureWizard();
-					rm = new LMLJAXBResourceManager(rmConfig, new JAXBResourceManagerControl(rmConfig),
-							new LMLResourceManagerMonitor(rmConfig));
-					ModelManager.getInstance().addResourceManager(rm);
 					rm.start(monitor);
 					try {
 						Thread.sleep(2000);
@@ -312,21 +303,20 @@ public class RMLaunchTest extends TestCase {
 	 * We do here what is done through the wizard.
 	 */
 	private void emulateConfigureWizard() throws Throwable {
-		rmConfig = new JAXBResourceManagerConfiguration(AbstractResourceManagerConfiguration.BASE,
-				new ResourceManagerServiceProvider());
-		// JAXBRMConfigurationSelectionWizardPage
-		rmConfig.setRMConfigurationURL(JAXBTestsPlugin.getURL(xml));
-		// JAXBRMControlConfigurationWizardPage
-		rmConfig.getResourceManagerData();
-		// use remote = local
 		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 		assert (localServices != null);
 		IRemoteConnectionManager localConnectionManager = localServices.getConnectionManager();
 		assert (localConnectionManager != null);
 		IRemoteConnection localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
 		assert (localConnection != null);
-		rmConfig.setRemoteServicesId(localServices.getId());
-		rmConfig.setConnectionName(localConnection.getName());
+		rm = LaunchControllerManager.getInstance().getLaunchController(localServices.getId(), localConnection.getName(), xml);
+		// JAXBRMConfigurationSelectionWizardPage
+		rm.setRMConfigurationURL(JAXBTestsPlugin.getURL(xml));
+		// JAXBRMControlConfigurationWizardPage
+		rm.getConfiguration();
+		// use remote = local
+		rm.setRemoteServicesId(localServices.getId());
+		rm.setConnectionName(localConnection.getName());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -348,8 +338,8 @@ public class RMLaunchTest extends TestCase {
 		env.put("export_all", true); //$NON-NLS-1$
 		env.put(JAXBControlConstants.MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
 		env.put(JAXBControlConstants.MPI_ARGS, "-machinefile $PBS_NODEFILE -np 8"); //$NON-NLS-1$ 
-		IVariableMap rmVarMap = rm.getJAXBConfiguration().getRMVariableMap();
-		AttributeType queues = (AttributeType) rmVarMap.getAttributes().get("available_queues"); //$NON-NLS-1$ 
+		IVariableMap rmVarMap = rm.getEnvironment();
+		AttributeType queues = rmVarMap.getAttributes().get("available_queues"); //$NON-NLS-1$ 
 		if (queues != null) {
 			List<String> q = (List<String>) queues.getValue();
 			env.put("destination", q.get(0)); //$NON-NLS-1$
