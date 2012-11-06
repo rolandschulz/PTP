@@ -23,6 +23,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    02/10/09 nieyy      Initial code (D153875)
+   07/19/12 ronglli    Optimize the user query
 
 ****************************************************************************/
 
@@ -65,11 +66,14 @@
 #include "allocator.hpp"
 #include "filterlist.hpp"
 
+#include "tools.hpp"
+
 Initializer* Initializer::instance = NULL;
 
 Initializer::Initializer()
-    : listener(NULL), inStream(NULL), handle(-1)
+    : listener(NULL), inStream(NULL), handle(-1), parentAddr(""), parentPort(-1), parentID(-1), pInfoUpdated(false)
 {
+    notifyID = gNotifier->allocate();
 }
 
 Initializer::~Initializer()
@@ -86,7 +90,8 @@ int Initializer::init()
 {
     int rc = SCI_SUCCESS;
     int level = Log::INFORMATION;
-    char dir[MAX_PATH_LEN] = "/opt/sci/log";
+    int mode = Log::DISABLE;
+    char dir[MAX_PATH_LEN] = "/tmp";
     char *envp = NULL; 
     int hndl = -1;
 
@@ -97,16 +102,21 @@ int Initializer::init()
     envp = ::getenv("SCI_LOG_LEVEL"); 
     if (envp != NULL)
         level = ::atoi(envp);
-    
+   
+    envp = ::getenv("SCI_LOG_ENABLE");
+    if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
+        mode = Log::ENABLE;
+    }
+
     try {
         if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
-            Log::getInstance()->init(dir, "fe.log", level);
+            Log::getInstance()->init(dir, "fe.log", level, mode);
             log_debug("I am a front end, my handle is %d", gCtrlBlock->getMyHandle());
         } else if (gCtrlBlock->getMyRole() == CtrlBlock::AGENT) {
-            Log::getInstance()->init(dir, "scia.log", level);
+            Log::getInstance()->init(dir, "scia.log", level, mode);
             log_debug("I am an agent, my handle is %d", gCtrlBlock->getMyHandle());
         } else {
-            Log::getInstance()->init(dir, "be.log", level);
+            Log::getInstance()->init(dir, "be.log", level, mode);
             log_debug("I am a back end, my handle is %d", gCtrlBlock->getMyHandle());
         }
 
@@ -150,6 +160,11 @@ Stream * Initializer::getInStream()
     return inStream;
 }
 
+void Initializer::setInStream(Stream * s)
+{
+    inStream = s;
+}
+
 Listener * Initializer::initListener()
 {
     if (listener)
@@ -167,12 +182,16 @@ int Initializer::initFE()
     char *envp = NULL;
     handle = gCtrlBlock->getMyHandle();
     EmbedAgent *feAgent = NULL;
-    
+
     Topology *topo = new Topology(handle);
     int rc = topo->init();
     if (rc != SCI_SUCCESS)
         return rc;
     gCtrlBlock->enable();
+
+    rc = gCtrlBlock->setUsername();
+    if (rc != SCI_SUCCESS)
+        return rc;
 
     feAgent = new EmbedAgent();
     feAgent->init(-1, NULL, NULL);
@@ -210,12 +229,14 @@ int Initializer::initFE()
 
 int Initializer::initAgent()
 { 
-    string nodeAddr;
-    int port = -1;
     int hndl = -1;
     EmbedAgent *agent = NULL;
     char *envp;
     int rc;
+
+    rc = gCtrlBlock->setUsername();
+    if (rc != SCI_SUCCESS)
+        return rc;
 
     envp = ::getenv("SCI_REMOTE_SHELL");
     if (envp != NULL) {
@@ -235,22 +256,24 @@ int Initializer::initAgent()
 
     envp = ::getenv("SCI_PARENT_HOSTNAME");
     if (envp != NULL) {
-        nodeAddr = envp;
+        parentAddr = envp;
     }
 
     envp = ::getenv("SCI_PARENT_PORT");
     if (envp != NULL) {
-        port = ::atoi(envp);
+        parentPort = ::atoi(envp);
     }
     hndl = gCtrlBlock->getMyHandle();
-    log_debug("My parent host is %s, parent port id %d, my ID is %d", nodeAddr.c_str(), port, hndl);
+    log_debug("My parent host is %s, parent port is %d, my ID is %d", parentAddr.c_str(), parentPort, hndl);
 
     agent = new EmbedAgent();
     agent->init(hndl, inStream, NULL);
     gCtrlBlock->enable();
-    agent->work();
+    agent->getRoutingList()->getTopology()->setInitID();
+    rc = agent->work();
+    rc = agent->syncWait();
 
-    return SCI_SUCCESS;
+    return rc;
 }
 
 Stream * Initializer::initStream()
@@ -278,6 +301,9 @@ Stream * Initializer::initStream()
 int Initializer::parseEnvStr(string &envStr)
 {  
      char *envp;
+     char dir[MAX_PATH_LEN];
+     int level = -1;
+     int mode = Log::INVALID;
      int hndl = -1;
      int jobkey;
      
@@ -340,53 +366,80 @@ int Initializer::parseEnvStr(string &envStr)
     if ((envp != NULL) && (strcasecmp(envp, "yes") == 0) && (hndl < 0)) {
         gCtrlBlock->setMyRole(CtrlBlock::BACK_AGENT);
     }
+    envp = ::getenv("SCI_FLOWCTL_THRESHOLD");
+    if (envp != NULL) {
+        long long th = ::atoll(envp);
+        if (th > 0) {
+            gCtrlBlock->setFlowctlThreshold(th);
+        }
+    }
+    envp = ::getenv("SCI_LOG_LEVEL"); 
+    if (envp != NULL)
+        level = ::atoi(envp);
+    envp = ::getenv("SCI_LOG_ENABLE");
+    if (envp != NULL) {
+        if (strcasecmp(envp, "yes") == 0) {
+            mode = Log::ENABLE;
+        } else if (strcasecmp(envp, "no") == 0) {
+            mode = Log::DISABLE;
+        }
+    }
+    envp = ::getenv("SCI_LOG_DIRECTORY");
+    if (envp != NULL) {
+        ::strncpy(dir, envp, MAX_PATH_LEN-1);
+        dir[MAX_PATH_LEN-1] = '\0';
+        log_rename(dir, level, mode);
+    } else {
+        log_rename(NULL, level, mode);
+    }
 
     return 0;
 }
 
 int Initializer::connectBack()
 {
-	int pID; 
 	struct iovec sign = {0};
-    string nodeAddr;
-    int port = -1;
     int hndl = -1;
 	char *envp = NULL;
 
     handle = gCtrlBlock->getMyHandle();
-	if (gCtrlBlock->getRecoverMode() ||
-            (!getenv("SCI_PARENT_HOSTNAME") || !getenv("SCI_PARENT_PORT") || !getenv("SCI_PARENT_ID"))) {
-		int rc = initExtBE(handle);
-		if (rc != 0)
+    if ((!getenv("SCI_PARENT_HOSTNAME") || !getenv("SCI_PARENT_PORT") || !getenv("SCI_PARENT_ID"))
+            && (::getenv("SCI_REMOTE_SHELL") == NULL)) {
+        int rc = initExtBE(handle);
+        if (rc != 0)
 			return rc;
-	}
+    } 
+
 	envp = ::getenv("SCI_PARENT_HOSTNAME");
 	if (envp != NULL) {
-		nodeAddr = envp;
+		parentAddr = envp;
 	}
 	envp = ::getenv("SCI_PARENT_PORT");
 	if (envp != NULL) {
-		port = ::atoi(envp);
+		parentPort = ::atoi(envp);
 	}
 	envp = ::getenv("SCI_PARENT_ID");
 	if (envp != NULL) {
-		pID = ::atoi(envp);
+		parentID = ::atoi(envp);
 	}
 
-	hndl = gCtrlBlock->getMyHandle();       // hndl may change
+    hndl = gCtrlBlock->getMyHandle();       // hndl may change
+    handle = hndl; 
 	inStream = new Stream();
-	inStream->init(nodeAddr.c_str(), port);
-	psec_sign_data(&sign, "%d%d%d", gCtrlBlock->getJobKey(), hndl, pID);
-	*inStream << gCtrlBlock->getJobKey() << hndl << pID << sign << endl;
+	inStream->init(parentAddr.c_str(), parentPort);
+	psec_sign_data(&sign, "%d%d%d", gCtrlBlock->getJobKey(), hndl, parentID);
+	*inStream << gCtrlBlock->getJobKey() << hndl << parentID << sign << endl;
+    *inStream >> endl;
 	psec_free_signature(&sign);
-    log_debug("My parent host is %s, parent port id %d", nodeAddr.c_str(), port);
+    log_debug("My parent host is %s, parent port is %d, parent id is %d", parentAddr.c_str(), parentPort, parentID);
 
 	return 0;
 }
 
 int Initializer::initBE()
 {
-    int hndl, rc;
+    int hndl;
+    int rc = SCI_SUCCESS;
     char *envp = ::getenv("SCI_USE_EXTLAUNCHER");
     if (((envp != NULL) && (::strcasecmp(envp, "yes") == 0))
 			|| (::getenv("SCI_REMOTE_SHELL") != NULL)) {
@@ -427,11 +480,16 @@ int Initializer::initBE()
     }
 
     if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_AGENT) {
+        rc = gCtrlBlock->setUsername();
+        if (rc != SCI_SUCCESS)
+            return rc;
+
         EmbedAgent *beAgent = new EmbedAgent();
         beAgent->init(hndl, inStream, NULL);
+        gCtrlBlock->setMyEmbedHandle(hndl);
         beAgent->getRoutingList()->getTopology()->setInitID();
-        beAgent->work();
-        beAgent->syncWait();
+        rc = beAgent->work();
+        rc = beAgent->syncWait();
     } else {
         MessageQueue *userQ = new MessageQueue();
         userQ->setName("userQ");
@@ -448,7 +506,7 @@ int Initializer::initBE()
         writer->start();
     }
 
-    return SCI_SUCCESS;
+    return rc;
 }
 
 int Initializer::initExtBE(int hndl)
@@ -457,9 +515,8 @@ int Initializer::initExtBE(int hndl)
     char hostname[256];
 
     Stream stream;
+    string username;
     psec_idbuf_desc &usertok = SSHFUNC->get_token();
-    struct passwd *pwd = ::getpwuid(::getuid());
-    string username = pwd->pw_name;
     struct iovec sign = {0};
     struct iovec token = {0};
     int rc, tmp0, tmp1, tmp2;
@@ -469,6 +526,11 @@ int Initializer::initExtBE(int hndl)
     struct servent *serv = NULL;
     char *envp = getenv("SCI_DAEMON_NAME");
     char fmt[32] = {0};
+
+    rc = gCtrlBlock->setUsername();
+    if (rc != SCI_SUCCESS)
+        return rc;
+    username = gCtrlBlock->getUsername();
 
     if (envp != NULL) {
         serv = getservbyname(envp, "tcp");
@@ -491,12 +553,58 @@ int Initializer::initExtBE(int hndl)
     SSHFUNC->set_user_token(&token);
     delete [] (char *)sign.iov_base;
     if (rc != 0)
-        return -1;
-    
+        return -1; 
     parseEnvStr(envStr);
-    
     return 0;
 }
+
+void Initializer::setParentAddr(char * addr)
+{
+    parentAddr = addr;
+}
+
+string & Initializer::getParentAddr()
+{
+    return parentAddr;
+}
+
+int Initializer::updateParentInfo(char * addr, int port)
+{
+    while (pInfoUpdated == true) {
+        if ((gCtrlBlock->getTermState()) || (!gCtrlBlock->getRecoverMode()) || (!gCtrlBlock->getParentInfoWaitState())) {
+            return SCI_ERR_INVALID_CALLER;
+        }
+        SysUtil::sleep(WAIT_INTERVAL);
+    }
+    parentAddr = addr;
+    parentPort = port;
+    pInfoUpdated = true;
+    gNotifier->freeze(notifyID);
+    notifyID = gNotifier->allocate();
+
+    return SCI_SUCCESS;
+}
+
+void Initializer::setParentPort(int port)
+{
+    parentPort = port;
+}
+
+int Initializer::getParentPort()
+{
+    return parentPort;
+}
+
+int Initializer::getParentID()
+{
+    return parentID;
+}
+
+int Initializer::getOrgHandle()
+{
+    return handle;
+}
+
 
 void Initializer::setEnvStr(string env)
 {

@@ -20,6 +20,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    10/06/08 tuhongj      Initial code (D153875)
+   07/23/12 ronglli      Detect error message type 
 
 ****************************************************************************/
 
@@ -146,6 +147,47 @@ int & Message::getRefCount()
     return refCount;
 }
 
+bool Message::isValidType(int type)
+{
+    bool flag = false;
+    switch (type) {
+        case Message::UNKNOWN:
+        case Message::CONFIG:
+        case Message::COMMAND:
+        case Message::FILTER_LOAD:
+        case Message::FILTER_UNLOAD:
+        case Message::GROUP_CREATE:
+        case Message::GROUP_FREE:
+        case Message::GROUP_OPERATE:
+        case Message::GROUP_OPERATE_EXT:
+        case Message::QUIT:
+        case Message::DATA:
+        case Message::BE_REMOVE:
+        case Message::BE_ADD:
+        case Message::FILTER_LIST:
+        case Message::RELEASE:
+        case Message::UNCLE:
+        case Message::UNCLE_LIST:
+        case Message::PARENT:
+        case Message::ERROR_EVENT:
+        case Message::GROUP_MERGE:
+        case Message::GROUP_DROP:
+        case Message::SHUTDOWN:
+        case Message::KILLNODE:
+        case Message::INVALID_POLL:
+        case Message::SOCKET_BROKEN:
+        case Message::ERROR_DATA:
+        case Message::ERROR_THREAD:
+        case Message::SEGMENT:
+            flag = true;
+            break;
+        default:
+            flag = false;
+            break;
+    }
+    return flag;
+}
+
 Stream & operator >> (Stream &stream, Message &msg)
 {  
     int rc;
@@ -155,6 +197,11 @@ Stream & operator >> (Stream &stream, Message &msg)
 
     // receive message header
     stream >> (int &) msg.type;
+    if (!msg.isValidType(msg.type)) {
+        log_error("message: invalid message type %d", msg.type);
+        throw SocketException(SocketException::NET_ERR_DATA);
+    }
+
     stream >> msg.msgID;
     stream >> msg.filterID;
     stream >> (int &) msg.group;

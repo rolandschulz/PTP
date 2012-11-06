@@ -24,6 +24,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    05/08/09 nieyy        Initial code (F156654)
+   01/16/12 ronglli      Add codes to retrieve BE list
 
 ****************************************************************************/
 
@@ -98,6 +99,7 @@ class DistributedGroup
         
         void retrieveBEList(sci_group_t group, int *ret_val);
         void retrieveSuccessorList(sci_group_t, int *ret_val);
+        void retrieveBEListOfSuccessor(int successor_id, int * ret_val);
 
         int querySuccessorId(int be_id);
 

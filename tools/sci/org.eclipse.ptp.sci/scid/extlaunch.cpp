@@ -20,6 +20,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    01/06/09 tuhongj      Initial code (D155101)
+   10/10/12 ronglli      Add oom_adj codes
 
 ****************************************************************************/
 
@@ -32,8 +33,10 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <errno.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "tools.hpp"
 #include "sshfunc.hpp"
@@ -45,13 +48,51 @@
 
 #include "extlaunch.hpp"
 
-
 const int MAX_FD = 256;
 
 vector<ExtLauncher *> launcherList;
 
 const int MAX_PWD_BUF_SIZE = 1024;
 const int MAX_ENV_VAR_NUM = 1024;
+
+void set_oom_adj(int s)
+{
+#ifdef _SCI_LINUX
+    char oomfname[256] = "";
+    char oomadjstr[16] = "";
+    int oomfd = -1;
+    struct stat oomadjst = {0};
+    int nbytes = -1;
+
+    int score = s;
+    score = (score < -1000) ? (-1000) : (score);
+    score = (score > 1000) ? (1000) : (score);
+    
+    ::sprintf(oomfname, "/proc/%d/oom_score_adj", getpid());
+    if (::stat(oomfname, &oomadjst) != 0) {
+        /* could not find oom_score_adj, will try oom_adj instead */
+        ::sprintf(oomfname, "/proc/%d/oom_adj", getpid());
+        double oomadjval = (score < 0) ? (((double) score/1000.0)*17.0) : (((double) score/1000.0)*15.0);
+        ::sprintf(oomadjstr, "%.0f", oomadjval);
+    } else {
+        ::sprintf(oomadjstr, "%d", score);
+    }
+
+    oomfd = ::open(oomfname, O_WRONLY, 0);
+    if (oomfd < 0) {
+        log_error("open() failed for %s: errno = %d\n", oomfname, errno);
+        return;
+    }
+
+    nbytes = ::write(oomfd, oomadjstr, strlen(oomadjstr));
+    if (nbytes < 0) {
+        log_error("write() failed for %s: errno = %d", oomfname, errno);
+    } else {
+        log_crit("wrote %d bytes to %s: %s", nbytes, oomfname, oomadjstr);
+    }
+    ::close(oomfd);
+#endif
+}
 
 ExtLauncher::ExtLauncher(Stream *s, bool auth)
     : stream(s)
@@ -74,7 +115,7 @@ int ExtLauncher::verifyToken(bool suser)
     while (1) {
         rc = ::getpwnam_r(userName.c_str(), &pwd, pwdBuf, MAX_PWD_BUF_SIZE, &result);
         if ((rc == EINTR) || (rc == EMFILE) || (rc == ENFILE)) {
-            SysUtil::sleep(1000);
+            SysUtil::sleep(WAIT_INTERVAL);
             continue;
         }
         if (NULL == result) {
@@ -146,14 +187,13 @@ void ExtLauncher::run()
                     rc = -1;
                     while ((rc != 0) && ((SysUtil::microseconds() - starttm) < FIVE_MINUTES)) {
                         rc = launchReq(jobKey, id);
-                        SysUtil::sleep(1000);
+                        SysUtil::sleep(WAIT_INTERVAL);
                     }
                 }
                 break;
             default:
                 break;
         }
-        delete stream;
     } catch (SocketException &e) {
         log_error("socket exception %s", e.getErrMsg().c_str());
     } catch (Exception &e) {
@@ -162,6 +202,7 @@ void ExtLauncher::run()
         log_error("unknown exception");
     }
 
+    delete stream;
     delete [] (char *)usertok.iov_base;
     setState(false);
 
@@ -226,6 +267,8 @@ int ExtLauncher::launchInt(int jobkey, int id, char *path, char *envStr, struct 
         for (i = STDERR_FILENO + 1; i < MAX_FD; i++) {
             ::close(i);
         }
+        set_oom_adj(1000);
+
         try {
             rc = putSessionKey(-1, signature, jobkey, id, path, envStr, true);
             if (rc != 0) {

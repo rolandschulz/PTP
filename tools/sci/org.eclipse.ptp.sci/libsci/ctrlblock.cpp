@@ -25,6 +25,8 @@
    -------- --- ---   -----------
    10/06/08 tuhongj      Initial code (D153875)
    11/27/10 ronglli      Add SCI Version
+   01/16/12 ronglli      Add codes to detect SOCKET_BROKEN
+   07/19/12 ronglli      Optimize the user query 
 
 ****************************************************************************/
 
@@ -32,12 +34,15 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pwd.h>
+#include <errno.h>
 
 #include "stream.hpp"
 #include "exception.hpp"
 #include "group.hpp"
 #include "log.hpp"
 #include "tools.hpp"
+#include "packer.hpp"
 
 #include "eventntf.hpp"
 #include "handlerproc.hpp"
@@ -53,6 +58,7 @@
 #include "routerproc.hpp"
 #include "filterproc.hpp"
 #include "observer.hpp"
+#include "initializer.hpp"
 
 const long long FLOWCTL_THRESHOLD = 1024 * 1024 * 128LL;
 
@@ -63,7 +69,14 @@ extern void *gParam;
 CtrlBlock::CtrlBlock()
     : role(INVALID)
 {
+    char *envp = NULL;
     version = SCI_VERSION;
+    userName = "";
+    flowctlState = true;
+    childHealthState = HEALTH;
+    errChildren.clear();
+    cnt_disable = 0;
+
     endInfo = NULL;
     
     routerProc = NULL;
@@ -80,7 +93,9 @@ CtrlBlock::CtrlBlock()
     pollQueue = NULL;
     monitorInQueue = NULL;
     errorQueue = NULL;
-    recoverMode = false;
+    termState = false; // enter into term state
+    recoverMode = 0; 
+    waitParentInfo = false; //whether to wait for parent info updating
 
     parentStream = NULL;
     embedAgents.clear();
@@ -88,10 +103,23 @@ CtrlBlock::CtrlBlock()
 
     // flow control threshold
     thresHold = FLOWCTL_THRESHOLD;
-    char *envp = getenv("SCI_FLOWCTL_THRESHOLD");
+    envp = getenv("SCI_FLOWCTL_THRESHOLD");
     if(envp != NULL) {
         thresHold = ::atoll(envp);
     } 
+
+    envp = ::getenv("SCI_DISABLE_IPV6");
+    if (envp && (::strcasecmp(envp, "yes") == 0)) {
+        Socket::setDisableIPv6(1);
+    }
+    envp = ::getenv("SCI_CONNECT_TIMES");
+    if (envp != NULL) {
+        int cnt = ::atoi(envp);
+        if (cnt > 0) {
+            Socket::setConnTimes(cnt);
+        }
+    }
+
     ::pthread_mutex_init(&mtx, NULL); 
 }
 
@@ -99,6 +127,36 @@ CtrlBlock::~CtrlBlock()
 {
     instance = NULL;
     ::pthread_mutex_destroy(&mtx);
+}
+
+void CtrlBlock::setRecoverMode(int mo)
+{
+    recoverMode = mo;
+}
+
+int CtrlBlock::getRecoverMode()
+{
+    return recoverMode;
+}
+
+void CtrlBlock::setTermState(bool mo)
+{
+    termState = mo;
+}
+
+bool CtrlBlock::getTermState()
+{
+    return termState;
+}
+
+void CtrlBlock::setParentInfoWaitState(bool mo)
+{
+    waitParentInfo = mo;
+}
+
+bool CtrlBlock::getParentInfoWaitState()
+{
+    return waitParentInfo;
 }
 
 CtrlBlock::ROLE CtrlBlock::getMyRole() 
@@ -111,16 +169,6 @@ void CtrlBlock::setMyRole(CtrlBlock::ROLE ro)
     role = ro; 
 }
 
-void CtrlBlock::setRecoverMode(bool mo) 
-{
-    recoverMode = mo;
-}
-
-bool CtrlBlock::getRecoverMode() 
-{ 
-    return recoverMode; 
-}
-
 int CtrlBlock::getMyHandle() 
 { 
     return handle; 
@@ -129,6 +177,16 @@ int CtrlBlock::getMyHandle()
 void CtrlBlock::setMyHandle(int hndl) 
 { 
     handle = hndl;
+}
+
+int CtrlBlock::getMyEmbedHandle() 
+{ 
+    return embed_handle; 
+}
+
+void CtrlBlock::setMyEmbedHandle(int hndl) 
+{ 
+    embed_handle = hndl;
 }
 
 sci_info_t * CtrlBlock::getEndInfo() 
@@ -164,7 +222,7 @@ int CtrlBlock::init(sci_info_t * info)
     char *envp = NULL;
 
     if (info == NULL) {
-		initClient(AGENT);
+        initClient(AGENT);
         return SCI_SUCCESS;
     } 
     if ((info->sci_version != 0) && (info->sci_version != version)) {
@@ -173,6 +231,10 @@ int CtrlBlock::init(sci_info_t * info)
 
     if (info->disable_sshauth == 1) { 
         ::setenv("SCI_ENABLE_SSHAUTH", "no", 1);
+    }
+
+    if (info->enable_recover == 1) { 
+        recoverMode = 1; 
     }
 
     endInfo = (sci_info_t *) ::malloc(sizeof(sci_info_t));
@@ -216,7 +278,7 @@ int CtrlBlock::numOfChildrenFds()
     if (purifierProc) {
         while (!purifierProc->isLaunched()) {
             // before join, this thread should have been launched
-            SysUtil::sleep(1000);
+            SysUtil::sleep(WAIT_INTERVAL);
         } 
     } */
     lock();
@@ -238,7 +300,7 @@ int CtrlBlock::getChildrenSockfds(int *fds)
     if (purifierProc) {
         while (!purifierProc->isLaunched()) {
             // before join, this thread should have been launched
-            SysUtil::sleep(1000);
+            SysUtil::sleep(WAIT_INTERVAL);
         } 
     } */
     lock();
@@ -252,9 +314,78 @@ int CtrlBlock::getChildrenSockfds(int *fds)
     return pos;
 }
 
+bool CtrlBlock::allRouted()
+{
+    bool flag = false;
+    int streams = 0;
+    int queues = 0;
+
+    RoutingList *rtList = NULL;
+
+    lock();
+    AGENT_MAP::iterator it;
+    for (it = embedAgents.begin(); it != embedAgents.end(); it++) {
+        rtList = it->second->getRoutingList();
+        streams += rtList->numOfStreams();
+        queues += rtList->numOfQueues();
+    }
+
+    if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_AGENT) {
+        flag = (queues == (streams + embedAgents.size())); // queueInfo contains the embed agent itself
+    } else {
+        flag = (queues == streams);
+    }
+    unlock();
+
+    return flag;
+}
+
+int CtrlBlock::isActiveSockfd(int fd)
+{
+    int isSocket = 0;
+    RoutingList *rtList = NULL;
+    
+    lock();
+    AGENT_MAP::iterator it;
+    for (it = embedAgents.begin(); it != embedAgents.end(); it++) {
+        rtList = it->second->getRoutingList();
+        isSocket = rtList->isActiveSockfd(fd);
+        if (isSocket)
+            break;
+    }
+    Stream * s = gInitializer->getInStream();
+    if ((s != NULL) && (s->getSocket() == fd)) {
+        if ((s->isReadActive()) || (s->isWriteActive())) {
+            isSocket = 1;
+        }
+    }
+    unlock();
+
+    return isSocket;
+}
+
+bool CtrlBlock::allActive()
+{
+    bool active = true;
+    RoutingList *rtList = NULL;
+    
+    lock();
+    AGENT_MAP::iterator it;
+    for (it = embedAgents.begin(); it != embedAgents.end(); it++) {
+        rtList = it->second->getRoutingList();
+        active = rtList->allActive();
+        if (!active)
+            break;
+    }
+    unlock();
+
+    return active;
+}
+
 void CtrlBlock::term()
 {
     gNotifier->freeze(enableID, NULL);
+    termState = true;
     if (purifierProc) {
         purifierProc->release();
         delete purifierProc;
@@ -265,6 +396,7 @@ void CtrlBlock::term()
         delete it->second;
     }
     embedAgents.clear();
+    errChildren.clear();
     unlock();
     if (handlerProc) {
         handlerProc->release();
@@ -322,6 +454,15 @@ void CtrlBlock::disable()
     if (!isEnabled())
         return;
 
+    lock();
+    if (getMyRole() == BACK_AGENT) {
+        cnt_disable++;
+        if (cnt_disable < (embedAgents.size() + 1)) {
+            unlock();
+            return;
+        }
+    }
+    unlock();
     gNotifier->notify(enableID);
 }
 
@@ -334,9 +475,191 @@ void CtrlBlock::releasePollQueue()
 {
     // so far, valid for polling mode only
     assert(role != AGENT);
-    observer->notify();
-    Message *msg = new Message(Message::INVALID_POLL);
-    pollQueue->produce(msg);
+    try {
+        if(observer != NULL) {
+            observer->notify();
+        } else {
+            log_error("CtrlBlock: releasePollQueue: observer is NULL");
+        }
+        if(pollQueue != NULL) {
+            Message *msg = new Message(Message::INVALID_POLL);
+            pollQueue->produce(msg);
+        } else {
+            log_error("CtrlBlock: releasePollQueue: pollQueue is NULL");
+        }
+    } catch (Exception &e) {
+        log_error("releasePollQueue: exception %s", e.getErrMsg());
+    } catch (std::bad_alloc) {
+        log_error("releasePollQueue: out of memory");
+    } catch (...) {
+        log_error("releasePollQueue: unknown exception");
+    }
+}
+
+void CtrlBlock::notifyChildHealthState(int hndl, int hState)
+{
+    int num = 0;
+    int *cList = NULL;
+    bool found = false;
+    Message::Type typ = getErrMsgType(hState);
+    if (typ == Message::UNKNOWN)
+        return;
+
+    lock();
+    RoutingList *rtList = NULL;
+    AGENT_MAP::iterator it;
+    for (it = embedAgents.begin(); it != embedAgents.end(); it++) {
+        rtList = it->second->getRoutingList();
+        if (rtList->isSuccessorExist(hndl)) {
+            if (hndl < 0) {
+                num = rtList->numOfBEOfSuccessor(hndl);
+                assert(num);
+                cList = (int *) malloc(num * sizeof(int));
+                rtList->retrieveBEListOfSuccessor(hndl, cList);
+            } else {
+                num = 1;
+                cList = (int *) malloc(sizeof(int));
+                cList[0] = hndl;
+            }
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        unlock();
+        return;
+    }
+    assert(cList != NULL);
+
+    try {
+        for (int i = 0; i < num; i++) {
+            errChildren.insert(cList[i]);
+        }
+
+        // if not fe, it should forward the broken msg to its parent
+        if (getMyRole() != FRONT_END) { 
+            Message *msg = new Message();
+            Packer packer;
+            packer.packInt(num);
+            for (int i = 0; i < num; i++) {
+                packer.packInt(cList[i]);
+            }
+
+            char *bufs[1];
+            int sizes[1];
+            bufs[0] = packer.getPackedMsg();
+            sizes[0] = packer.getPackedMsgLen();
+            msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 1, bufs, sizes, typ);
+            delete [] bufs[0];
+            getUpQueue()->produce(msg);
+        }
+
+        // so far, valid for polling mode only
+        if (getMyRole() != AGENT) {
+            sci_mode_t mode;
+            if (getMyRole() == FRONT_END)
+                mode = getEndInfo()->fe_info.mode;
+            else
+                mode = getEndInfo()->be_info.mode;
+            if (mode == SCI_POLLING) {
+                observer->notify();
+                Message *msg = new Message(typ);
+                pollQueue->produce(msg);
+            }
+        }
+    } catch (Exception &e) {
+        log_error("notifyChildHealthState: exception %s", e.getErrMsg());
+    } catch (std::bad_alloc) {
+        log_error("notifyChildHealthState: out of memory");
+    } catch (...) {
+        log_error("notifyChildHealthState: unknown exception");
+    }
+    unlock();
+    setChildHealthState(hState);
+    free(cList);
+}
+
+void CtrlBlock::notifyChildHealthState(Message * msg)
+{
+    int num = 0;
+    int *cList = NULL;
+    Message::Type typ = msg->getType();
+    int hState = getErrState(typ);
+    if (hState == UNKNOWN) {
+        delete msg;
+        return;
+    }
+
+    lock();
+    // upqueue can be deleted when it is terminating
+    if (getTermState()) {
+        delete msg;
+        unlock();
+        return;
+    }
+
+    Packer packer(msg->getContentBuf());
+    num = packer.unpackInt();
+    cList = (int *) malloc(num * sizeof(int));
+    assert(cList != NULL);
+
+    try {
+        for (int i = 0; i < num; i++) {
+            cList[i] = packer.unpackInt();
+            errChildren.insert(cList[i]);
+        }
+
+        // if not fe, it should forward the broken msg to its parent
+        if (getMyRole() != FRONT_END) { 
+            getUpQueue()->produce(msg);
+        } else {
+            delete msg;
+        }
+
+        // so far, valid for polling mode only
+        if (getMyRole() != AGENT) {
+            sci_mode_t mode;
+            if (getMyRole() == FRONT_END)
+                mode = getEndInfo()->fe_info.mode;
+            else
+                mode = getEndInfo()->be_info.mode;
+            if (mode == SCI_POLLING) {
+                observer->notify();
+                Message *tmpmsg = new Message(typ);
+                pollQueue->produce(tmpmsg);
+            }
+        }
+    } catch (Exception &e) {
+        log_error("notifyChildHealthState: exception %s", e.getErrMsg());
+    } catch (std::bad_alloc) {
+        log_error("notifyChildHealthState: out of memory");
+    } catch (...) {
+        log_error("notifyChildHealthState: unknown exception");
+    }
+    unlock();
+    setChildHealthState(hState);
+    free(cList);
+}
+
+int CtrlBlock::getErrChildren(int * num, int **list)
+{
+    lock();
+    ERRORCHILDREN_LIST tmpErrChildren = errChildren;
+    unlock();
+
+    *num = tmpErrChildren.size();
+    *list = (int *) malloc(sizeof(int) * (*num));
+    ::memset(*list, 0, sizeof(int) * (*num));
+    log_debug("getErrChildren: err Children: size = %d", *num);
+
+    ERRORCHILDREN_LIST::iterator it;
+    int i = 0;
+    for (it = tmpErrChildren.begin(); it != tmpErrChildren.end(); it++) {
+        (*list)[i] = *it;
+        log_debug("getErrChildren: err Children: list[%d] = %d", i, (*list)[i]);
+        i++;
+    }
+    return 0;
 }
 
 void CtrlBlock::setObserver(Observer *ob) 
@@ -493,6 +816,39 @@ int CtrlBlock::getVersion()
     return version;
 }
 
+int CtrlBlock::setUsername()
+{
+    if (userName == "") {
+        int rc = 0;
+        long size = sysconf(_SC_GETPW_R_SIZE_MAX);
+        struct passwd pwd;
+        struct passwd *result = NULL;
+        char *pwdBuf = new char[size];
+        while(1) {
+            rc = getpwuid_r(::getuid(), &pwd, pwdBuf, size, &result);
+            if ((rc == EINTR) || (rc == EMFILE) || (rc == ENFILE)) {
+                SysUtil::sleep(WAIT_INTERVAL);
+                continue;
+            }
+            if (NULL == result) {
+                delete []pwdBuf;
+                log_error("CtrlBlock: fail to get the user info! errno = %d.", errno);
+                return SCI_ERR_INVALID_USER;
+            } else {
+                break;
+            }
+        }
+        userName = pwd.pw_name; 
+        delete []pwdBuf;
+    }
+    return SCI_SUCCESS;
+}
+
+string & CtrlBlock::getUsername()
+{
+    return userName;
+}
+
 RoutingList * CtrlBlock::getRoutingList()
 {
     PrivateData *pData = getPrivateData();
@@ -514,5 +870,89 @@ void CtrlBlock::lock()
 void CtrlBlock::unlock()
 {
     ::pthread_mutex_unlock(&mtx);
+}
+
+void CtrlBlock::setFlowctlState(bool state)
+{
+    flowctlState = state;
+}
+
+bool CtrlBlock::getFlowctlState()
+{
+    return flowctlState;
+}
+
+void CtrlBlock::setChildHealthState(int state)
+{
+    childHealthState = state;
+}
+
+int CtrlBlock::checkChildHealthState()
+{
+    int rc = SCI_SUCCESS;
+    switch (childHealthState) {
+        case HEALTH:
+            rc = SCI_SUCCESS;
+            break;
+        case ERROR_CHILD_BROKEN:
+            rc = SCI_ERR_CHILD_BROKEN; 
+            break;
+        case ERROR_DATA:
+            rc = SCI_ERR_DATA; 
+            break;
+        case ERROR_THREAD:
+            rc = SCI_ERR_THREAD; 
+            break;
+        default:
+            rc = SCI_ERR_THREAD; 
+            break;
+    }
+    return rc;
+}
+
+Message::Type CtrlBlock::getErrMsgType(int hState)
+{
+    Message::Type typ;
+    switch (hState) {
+        case HEALTH:
+        case UNKNOWN:
+            // If it is in health/unknown state, should not produce notify msg
+            typ = Message::UNKNOWN;
+            break;
+        case ERROR_CHILD_BROKEN:
+            typ = Message::SOCKET_BROKEN;
+            break;
+        case ERROR_DATA:
+            typ = Message::ERROR_DATA;
+            break;
+        case ERROR_THREAD:
+            typ = Message::ERROR_THREAD;
+            break;
+        default:
+            typ = Message::ERROR_THREAD;
+            break;
+    }
+    return typ;
+}
+
+int CtrlBlock::getErrState(Message::Type typ)
+{
+    int hState;
+    switch (typ) {
+        case Message::SOCKET_BROKEN:
+            hState = ERROR_CHILD_BROKEN;
+            break;
+        case Message::ERROR_DATA:
+            hState = ERROR_DATA;
+            break;
+        case Message::ERROR_THREAD:
+            hState = ERROR_THREAD;
+            break;
+        default:
+            // If it is incorrect msg type
+            hState = UNKNOWN;
+            break;
+    }
+    return hState;
 }
 

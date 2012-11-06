@@ -23,6 +23,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    02/25/09 nieyy      Initial code (D153875)
+   01/16/12 ronglli    Add codes to detect SOCKET_BROKEN
 
 ****************************************************************************/
 
@@ -44,6 +45,10 @@
 #include "filter.hpp"
 #include "filterlist.hpp"
 #include "writerproc.hpp"
+#include "initializer.hpp"
+#include "eventntf.hpp"
+#include "tools.hpp"
+#include "sshfunc.hpp"
 
 PurifierProcessor::PurifierProcessor(int hndl) 
     : Processor(hndl), inStream(NULL), outErrorQueue(NULL), peerProcessor(NULL), observer(NULL), joinSegs(false)
@@ -142,6 +147,8 @@ void PurifierProcessor::process(Message * msg)
             break;
         case Message::BE_REMOVE:
         case Message::QUIT:
+            gCtrlBlock->setTermState(true);
+            gCtrlBlock->setRecoverMode(0);
             setState(false);
             break;
         default:
@@ -160,6 +167,84 @@ void PurifierProcessor::write(Message * msg)
     inQueue->remove();
 }
 
+int PurifierProcessor::recover()
+{
+    int rc = -1;
+
+    if ((gCtrlBlock->getTermState()) || (!gCtrlBlock->getRecoverMode())) {
+        return rc;
+    }
+
+    log_debug("Purifier: begin to do the recover.");
+    if (gCtrlBlock->getParentInfoWaitState()) {
+        while (gInitializer->pInfoUpdated == false) {
+            if (gCtrlBlock->getTermState()) {
+                log_debug("Purifier: incorrect state");
+                return rc;
+            }
+            SysUtil::sleep(WAIT_INTERVAL);
+        }
+    }
+
+    while ((rc != 0) && (!gCtrlBlock->getTermState())) {
+        log_debug("Purifier: begin to do the reconnect...");
+        try {
+            struct iovec sign = {0};
+            int hndl = gInitializer->getOrgHandle();
+            int pID = gInitializer->getParentID();
+            string pAddr = gInitializer->getParentAddr();
+            int pPort = gInitializer->getParentPort();
+
+            inStream->stopRead();
+
+            WriterProcessor * writer = getPeerProcessor();
+            while(!(writer->isLaunched())) {
+                SysUtil::sleep(WAIT_INTERVAL);
+            }
+            if (!writer->getRecoverState()) {
+                Message *msg = new Message(); 
+                // The writer thread may be in consume, which will not enter into recover. Need to send a notification msg to it
+                msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 0, NULL, NULL, Message::RELEASE);
+
+                log_debug("Purifier: begin to set the writer release state to false, and produce rel msg to writer");
+                writer->setReleaseState(true);
+                writer->getInQueue()->produce(msg);
+            }
+            while(!(writer->getRecoverState())) {
+                SysUtil::sleep(WAIT_INTERVAL);
+            }
+            
+            rc = inStream->init(pAddr.c_str(), pPort);
+            log_debug("Purifier: Recover: rc = %d, My parent host is %s, parent port is %d, parent id is %d", rc, pAddr.c_str(), pPort, pID);
+            if (rc != 0) {
+                SysUtil::sleep(WAIT_INTERVAL);
+                continue;
+            }
+            log_debug("Purifier: begin to send jobkey %d, hndl %d, pID %d", gCtrlBlock->getJobKey(), hndl, pID);
+            psec_sign_data(&sign, "%d%d%d", gCtrlBlock->getJobKey(), hndl, pID);
+            *inStream << gCtrlBlock->getJobKey() << hndl << pID << sign << endl;
+            *inStream >> endl;
+
+            psec_free_signature(&sign);
+            log_debug("Purifier: after sending the jobkey, hndl, pID");
+
+            writer->setOutStream(inStream);
+
+            if ((rc == 0) && (gCtrlBlock->getParentInfoWaitState())) {           
+                gInitializer->pInfoUpdated = false; 
+                gCtrlBlock->setParentInfoWaitState(false); 
+                gNotifier->notify(gInitializer->notifyID);
+            }
+        } catch (SocketException &e) {
+            rc = -1;
+            log_error("Purifier: recover exception: socket exception: %s", e.getErrMsg().c_str());
+            SysUtil::sleep(WAIT_INTERVAL);
+        }
+    }
+
+    return rc;
+}
+
 void PurifierProcessor::seize()
 {
     setState(false);
@@ -169,8 +254,16 @@ void PurifierProcessor::clean()
 {
     if (inStream)
         inStream->stopRead();
-    if (observer)
-        gCtrlBlock->releasePollQueue();
+    if (observer) {
+        try {
+            gCtrlBlock->releasePollQueue();
+        } catch (std::bad_alloc) {
+            log_error("Processor Purifier: out of memory");
+            // To do; add correct error handling
+        }
+    }
+    gCtrlBlock->setFlowctlState(false);
+
     gCtrlBlock->disable();
     if (peerProcessor) {
         peerProcessor->release();
@@ -183,9 +276,19 @@ void PurifierProcessor::setInStream(Stream * stream)
     inStream = stream;
 }
 
+Stream * PurifierProcessor::getInStream()
+{
+    return inStream;
+}
+
 void PurifierProcessor::setInQueue(MessageQueue * queue)
 {
     inQueue = queue;
+}
+
+MessageQueue * PurifierProcessor::getInQueue()
+{
+    return inQueue;
 }
 
 void PurifierProcessor::setOutQueue(MessageQueue * queue)
@@ -201,6 +304,11 @@ void PurifierProcessor::setOutErrorQueue(MessageQueue * queue)
 void PurifierProcessor::setPeerProcessor(WriterProcessor * processor)
 {
     peerProcessor =  processor;
+}
+
+WriterProcessor * PurifierProcessor::getPeerProcessor()
+{
+    return peerProcessor;
 }
 
 void PurifierProcessor::setObserver(Observer * ob)

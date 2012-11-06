@@ -34,6 +34,7 @@
 
 #include "thread.hpp"
 
+#define WAIT_INTERVAL 1000  // 1000 usec
 #define FIVE_MINUTES 5000000 * 60
 
 using namespace std;
@@ -90,6 +91,8 @@ typedef map<int, TASK_INFO> JOB_INFO;
 extern JOB_INFO jobInfo;
 extern vector<ExtLauncher *> launcherList;
 extern struct sigaction oldSa;
+
+void set_oom_adj(int s);
 
 #endif
 

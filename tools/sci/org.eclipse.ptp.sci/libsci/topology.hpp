@@ -35,18 +35,12 @@ using namespace std;
 #include "general.hpp"
 #include "stream.hpp"
 #include "envvar.hpp"
+#include "bemap.hpp"
 
 class Message;
 class Launcher;
 class RoutingList;
 class FilterList;
-
-class BEMap : public map<int, string> 
-{
-    public:
-        int input(const char *filename, int num);
-        int input(const char *hostlist[], int num);
-};
 
 class Topology 
 {        

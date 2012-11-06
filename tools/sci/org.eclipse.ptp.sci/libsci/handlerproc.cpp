@@ -110,7 +110,13 @@ void HandlerProcessor::write(Message * msg)
 
 void HandlerProcessor::seize()
 {
-    setState(false);
+    setState(false); 
+}
+
+int HandlerProcessor::recover()
+{
+    // TODO
+    return -1;
 }
 
 void HandlerProcessor::clean()

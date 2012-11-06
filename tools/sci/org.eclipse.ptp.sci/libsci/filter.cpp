@@ -102,12 +102,12 @@ void Filter::unpackMsg(Message &msg)
 
 int Filter::load()
 {
-#if defined(_SCI_LINUX) // Linux
-    file = ::dlopen(info.so_file, RTLD_NOW | RTLD_GLOBAL | RTLD_DEEPBIND);
+#if defined(_SCI_LINUX)
+    file = ::dlopen(info.so_file, RTLD_NOW | RTLD_LOCAL);
 #elif defined(__APPLE__)
-    file = ::dlopen(info.so_file, RTLD_NOW | RTLD_GLOBAL);
+    file = ::dlopen(info.so_file, RTLD_NOW | RTLD_LOCAL);
 #else // aix
-    file = ::dlopen(info.so_file, RTLD_NOW | RTLD_GLOBAL | RTLD_MEMBER);
+    file = ::dlopen(info.so_file, RTLD_NOW | RTLD_LOCAL | RTLD_MEMBER);
 #endif
     if (file == NULL) {
         log_error("Loading filter failed %s", ::dlerror());

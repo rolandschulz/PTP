@@ -59,6 +59,7 @@ class MessageQueue
         string                          name;
         volatile long long              thresHold;
         bool                            flowCtl;
+        bool                            state;
 
     public:
         MessageQueue(bool ctl = false);
@@ -72,12 +73,14 @@ class MessageQueue
         void remove();
 
         int getSize();
+        bool getState();
 
         void setName(char *str); 
         string getName();
 
     private:
         int sem_wait_i(int usecs);
+        int sem_getvalue_i();
 
         void lock();
         void unlock();

@@ -50,7 +50,10 @@ class Listener : public Thread
 
         int getBindPort() { return bindPort; }
 		string & getBindName() { return bindName; }
-        
+
+        int numOfSockFds() { return socket->numOfListenFds(); }
+        int getSockFds(int *fds) { return socket->getListenSockfds(fds); }
+
         virtual void run();
 };
 

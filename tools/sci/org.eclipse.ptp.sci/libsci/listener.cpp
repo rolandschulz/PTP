@@ -52,6 +52,9 @@ Listener:: Listener(int hndl)
     socket = new Socket();
 	::gethostname(tmp, sizeof(tmp));
 	bindName = SysUtil::get_hostname(tmp);
+    if (bindName == "") {
+        bindName = tmp;
+    }
 }
 
 Listener::~Listener()
@@ -70,10 +73,14 @@ int Listener::init()
     if (envp) {
         IPConverter converter;
         string ifname = envp;
-        socket->iflisten(bindPort, ifname);
-        converter.getIP(ifname, true, bindName);
+        if (converter.getIP(ifname, true, bindName) == 0) {
+            socket->iflisten(bindPort, ifname);
+        } else {
+            log_error("Listener: invalid device name(%s). Will use the localhost", ifname.c_str());
+            socket->listen(bindPort, NULL);
+        }
     } else {
-        socket->listen(bindPort, (char *)bindName.c_str());
+        socket->listen(bindPort, NULL);
     }
     
     log_debug("listener binded to port %d", bindPort);
@@ -98,13 +105,25 @@ void Listener::run()
     int key;
     int rc;
     struct iovec sign = {0};
+    bool state = true;
 
     while (getState()) {
+        child = -1;
         try {
+            if (!state) {
+                init();
+                state = true;
+            }
             child = socket->accept();
         } catch (SocketException &e) {
             log_warn("Listener: socket broken: %s", e.getErrMsg().c_str());
-            break;
+            if (child >= 0) {
+                shutdown(child, SHUT_RDWR);
+                close(child);
+            }
+            state = false;
+            SysUtil::sleep(WAIT_INTERVAL);
+            continue;
         } catch (...) {
             log_warn("Listener: unknown exception: %s");
             break;
@@ -120,41 +139,66 @@ void Listener::run()
 
         log_debug("Listener: accepted a child agent sockfd %d", child);
 
-        try {
-            Stream *stream = new Stream();
-            stream->init(child);
-            *stream >> key;
-            if (key != gCtrlBlock->getJobKey()) {
-                log_warn("Listener: client with invalid credential is trying to connect.");
-                stream->stop();
-                delete stream;
+        if (gCtrlBlock->getRecoverMode()) {
+            rc = gCtrlBlock->isActiveSockfd(child);
+            if (rc != 0) {
+                log_warn("Listener: the fd %d is already used", child);
+                shutdown(child, SHUT_RDWR);
+                close(child);
+                log_warn("Listener: closed the fd %d", child);
                 continue;
             }
+        }
 
-            *stream >> hndl >> pID >> sign >> endl;
-            if (hndl >= 0) {
-                log_debug("Listener: back end %d is connected", hndl); 
-            } else {
-                log_debug("Listener: agent %d is connected", hndl); 
+        Stream *stream = NULL;
+        try {
+            stream = new Stream();
+            stream->init(child);
+
+            *stream >> key >> hndl;
+            if (key != gCtrlBlock->getJobKey()) {
+                log_warn("Listener: client with invalid credential is trying to connect. key = %d, JobKey = %d, hndl = %d",
+                        key, gCtrlBlock->getJobKey(), hndl);
+                stream->stop();
+                delete stream;
+                stream = NULL;
+                continue;
             }
+            if (hndl >= 0) {
+                log_debug("Listener: back end %d is connected. Parent ID is %d", hndl, pID); 
+            } else {
+                log_debug("Listener: agent %d is connected. Parent ID is %d", hndl, pID); 
+            }
+
+            log_debug("Listener: begin to get pID and sign");
+            *stream >> pID >> sign >> endl;
+
             rc = psec_verify_data(&sign, "%d%d%d", key, hndl, pID);
             delete [] (char *)sign.iov_base;
             if (rc != 0) {
                 log_warn("Misleading message comes.");
                 stream->stop();
                 delete stream;
+                stream = NULL;
                 continue;
             }
-            gCtrlBlock->getAgent(pID)->getRoutingList()->startRouting(hndl, stream);
+            log_debug("Listener: begin to send back endl");
+            *stream << endl;
+            rc = gCtrlBlock->getAgent(pID)->getRoutingList()->startRouting(hndl, stream);
         } catch (Exception &e) {
             log_error("Listener: exception %s", e.getErrMsg());
             break;
         } catch (ThreadException &e) {
             log_error("Listener: thread exception %d", e.getErrCode());
-            break;
+            continue; // sometimes, the writer thread is starting
         } catch (SocketException &e) {
             log_error("Listener: socket exception: %s", e.getErrMsg().c_str());
-            break;
+            if (stream != NULL) {
+                stream->stop();
+                delete stream;
+                stream = NULL;
+            }
+            continue;
         } catch (std::bad_alloc) {
             log_error("Listener: out of memory");
             break;

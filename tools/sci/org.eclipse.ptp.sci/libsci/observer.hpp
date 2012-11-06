@@ -32,7 +32,7 @@ class Observer
 {
     private:
         int             pipeFd[2];
-        int             count;
+        long long       count;
         bool            hasChar;
 
         pthread_mutex_t mtx;
@@ -45,7 +45,8 @@ class Observer
         void unnotify();
 
         // access 
-        int  getPollFd();
+        int getPollFd();
+        int getPipeWriteFd();
 
     private:
         void async(int fd);

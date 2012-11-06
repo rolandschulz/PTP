@@ -19,7 +19,9 @@
  History:
    Date     Who ID    Description
    -------- --- ---   -----------
-   06/21/10 tuhongj        Initial code (D153875)
+   06/21/10 tuhongj   Initial code (D153875)
+   07/19/12 ronglli   Fix tree4 external launching mode support
+   07/19/12 ronglli   Optimize tree launching   
 
 ****************************************************************************/
 
@@ -64,12 +66,25 @@
 extern char **environ;
 #endif
 
+#define WAIT_TIMES 600 // 600s
+
 Launcher::Launcher(Topology &topo)
-	: topology(topo), shell(""), scidPort(SCID_PORT), mode(INTERNAL), embedMode(false)
+	: topology(topo), shell(""), localName(""), scidPort(SCID_PORT), mode(INTERNAL), embedMode(false), waitTimes(WAIT_TIMES)
+{
+}
+
+Launcher::~Launcher()
+{
+    env.unsetAll();
+    childMap.clear();
+}
+
+int Launcher::initEnv()
 {
     char *envp = NULL;
     string envStr;
     struct servent *serv = NULL;
+    childMap.clear();
 
     envp = getenv("SCI_DAEMON_NAME");
     if (envp != NULL) {
@@ -84,13 +99,20 @@ Launcher::Launcher(Topology &topo)
     if (envp) {
         IPConverter converter;
         string ifname = envp;
-        converter.getIP(ifname, true, localName);
-
-        env.set("SCI_DEVICE_NAME", envp);
-    } else {
+        if (converter.getIP(ifname, true, localName) != 0) {
+            localName = "";
+            log_error("Launcher: invalid device name(%s). Will use the localhost", ifname.c_str());
+        } else {
+            env.set("SCI_DEVICE_NAME", envp);
+        }
+    } 
+    if (localName == "") {
         char tmp[256] = {0};
         ::gethostname(tmp, sizeof(tmp));
         localName = SysUtil::get_hostname(tmp);
+        if (localName == "") {
+            localName = tmp;
+        }
     }
     int jobKey = gCtrlBlock->getJobKey();
 
@@ -105,7 +127,7 @@ Launcher::Launcher(Topology &topo)
         embedMode = true;
         env.set("SCI_EMBED_AGENT", envp);
     }
-    env.set("SCI_AGENT_PATH", topo.agentPath);
+    env.set("SCI_AGENT_PATH", topology.agentPath);
     envp = ::getenv("SCI_LIB_PATH");
     if (envp) {
         env.set("SCI_LIB_PATH", envp);
@@ -133,6 +155,12 @@ Launcher::Launcher(Topology &topo)
     
     env.set("SCI_LOG_DIRECTORY", ::getenv("SCI_LOG_DIRECTORY"));
     env.set("SCI_LOG_LEVEL", ::getenv("SCI_LOG_LEVEL"));
+    env.set("SCI_LOG_ENABLE", ::getenv("SCI_LOG_ENABLE"));
+    envp = ::getenv("SCI_WAIT_TIMES");
+    if (envp) {
+        waitTimes = atoi(envp);
+		env.set("SCI_WAIT_TIMES", waitTimes);
+    }
     envp = ::getenv("SCI_REMOTE_SHELL");
     if (envp) {
         shell = envp;
@@ -166,8 +194,7 @@ Launcher::Launcher(Topology &topo)
             while (*tool_envp) {
                 // filter out SCI_ and library path.
                 if (::strncmp(*tool_envp, "SCI_", 4) && 
-                        ::strncmp(*tool_envp, library_path, ::strlen(library_path))) 
-                {
+                        ::strncmp(*tool_envp, library_path, ::strlen(library_path))) {
                     char *envstr = strdup(*tool_envp);
                     char *value = ::strchr(envstr, '=');
                     if (value) {
@@ -179,7 +206,7 @@ Launcher::Launcher(Topology &topo)
                 tool_envp++;
             }
         }
-    } else{
+    } else { 
         string savedEnv = gInitializer->getEnvStr();
         int size = savedEnv.size();
         char *st =  strdup(savedEnv.c_str());
@@ -188,57 +215,50 @@ Launcher::Launcher(Topology &topo)
         const char *delim = ";";
         char *savePtr1 = NULL;
         key=strtok_r(st,delim,&savePtr1);
-        if((key!= NULL) && (key < (st + size))) 
-        {
+        if((key!= NULL) && (key < (st + size))) {
             if (::strncmp(key, "SCI_", 4) && 
-                ::strncmp(key, library_path, ::strlen(library_path))) 
-            { 
-               value = strchr(key,'=');
-               if(value != NULL)
-               {
-                   (*value) = '\0';
-                   if((value!= key)&&((value + 1) != NULL) && ((value+1) < (st + size))) 
-                   {
-                     if((*(value+1)) == '\0')
-                        env.set(key,"");
-                     else
-                        env.set(key,value+1);
-                   }
-               }
-               else{
-                  env.set(key,"");
-               }
-           }
-           while(key = strtok_r(NULL,delim,&savePtr1)) 
-           {
-              if (::strncmp(key, "SCI_", 4) && 
-                  ::strncmp(key, library_path, ::strlen(library_path))) 
-              {
-                   value = strchr(key,'=');
-                   if(value != NULL)
-                   {
-                      (*value) = '\0';
-                      if((value != key)&&((value + 1) != NULL) && ((value+1) < (st + size))){
-                         if((*(value+1)) == '\0')
+                    ::strncmp(key, library_path, ::strlen(library_path))) {
+                value = strchr(key,'=');
+                if(value != NULL) {
+                    (*value) = '\0';
+                    if((value!= key)&&((value + 1) != NULL) && ((value+1) < (st + size))) { 
+                        if((*(value+1)) == '\0')
                             env.set(key,"");
-                         else
+                        else
                             env.set(key,value+1);
-                      }
-                   }
-                   else{
-                       env.set(key,"");
-                   }
-              }
-           }
+                    }
+                } else {
+                    env.set(key,"");
+                }
+            }
+            while(key = strtok_r(NULL,delim,&savePtr1)) { 
+                if (::strncmp(key, "SCI_", 4) && 
+                        ::strncmp(key, library_path, ::strlen(library_path))) { 
+                    value = strchr(key,'=');
+                    if(value != NULL) {
+                        (*value) = '\0';
+                        if((value != key)&&((value + 1) != NULL) && ((value+1) < (st + size))) {
+                            if((*(value+1)) == '\0')
+                                env.set(key,"");
+                            else
+                                env.set(key,value+1);
+                        }
+                    } else {
+                        env.set(key,"");
+                    }
+                }
+            }
         }
         free(st);
     }
+    env.set("SCI_PARENT_HOSTNAME", localName);
+    env.set("SCI_ENABLE_LISTENER", ::getenv("SCI_ENABLE_LISTENER"));
+    env.set("SCI_PARENT_ID", topology.agentID);
+    // flow control threshold
+    env.set("SCI_FLOWCTL_THRESHOLD", gCtrlBlock->getFlowctlThreshold());
+    
     log_debug("Launcher: env(%s)", env.getEnvString().c_str());
-}
-
-Launcher::~Launcher()
-{
-    env.unsetAll();
+    return SCI_SUCCESS;
 }
 
 int Launcher::launch()
@@ -252,6 +272,7 @@ int Launcher::launch()
     }
 
     try {
+        initEnv();
         switch (tree) {
             case 1:
                 rc = launch_tree1();
@@ -271,6 +292,13 @@ int Launcher::launch()
         if (rc != SCI_SUCCESS) {
             return rc;
         }
+
+        if ((shell.empty()) && (childMap.size() > 0)) {
+            rc = startAll();
+            if (rc != SCI_SUCCESS) {
+                return rc;
+            }
+        }
         envp = getenv("SCI_ENABLE_LISTENER");
         if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
             gInitializer->initListener();
@@ -278,14 +306,64 @@ int Launcher::launch()
     } catch (std::bad_alloc) {
         log_error("Launcher: out of memory");
         return SCI_ERR_NO_MEM;
+    } catch (SocketException &e) {
+        log_error("Launcher: socket exception: %s", e.getErrMsg().c_str());
+        return SCI_ERR_LAUNCH_FAILED;
+    } catch (ThreadException &e) {
+        log_error("Launcher: thread exception %d", e.getErrCode());
+        return SCI_ERR_LAUNCH_FAILED;
+    } catch (...) {
+        log_error("Launcher: unknown exception");
+        return SCI_ERR_LAUNCH_FAILED;
     }
     if ((mode == REGISTER) || !shell.empty()) {
+        int times = 0;
         while (!topology.routingList->allRouted()) {
-            SysUtil::sleep(1000);
+            if (times >= (waitTimes * 1000000  / WAIT_INTERVAL))
+                return SCI_ERR_LAUNCH_FAILED;
+            times++;
+            SysUtil::sleep(WAIT_INTERVAL);
         }
     }
-    if (rc == SCI_SUCCESS)
-        rc = topology.routingList->startReaders();
+   
+    /*Moved the reader start into startRouting*/ 
+    /* if (rc == SCI_SUCCESS)
+       rc = topology.routingList->startReaders();
+    }*/
+ 
+    return rc;
+}
+
+int Launcher::startAll()
+{
+    int rc = SCI_SUCCESS;
+    CHILD_MAP::iterator it;
+    int hndl;
+    Stream *stream;
+
+    try {
+        for (it = childMap.begin(); it != childMap.end(); ++it) {
+            struct iovec sign = {0};
+            psec_idbuf_desc &usertok = SSHFUNC->get_token();
+            hndl = it->first;
+            stream = it->second;
+
+            env.set("SCI_CLIENT_ID", hndl);
+            log_debug("Launcher: start client(%d)", hndl); 
+            psec_sign_data(&sign, "%s", env.getEnvString().c_str());
+            *stream << usertok << env.getEnvString() << sign << endl;
+            psec_free_signature(&sign);
+            rc = topology.routingList->startRouting(hndl, stream);
+            if (rc != SCI_SUCCESS) {
+                childMap.clear();
+                return rc;
+            }
+        }
+    } catch (SocketException &e) {
+        rc = SCI_ERR_LAUNCH_FAILED;
+        log_warn("Launcher: socket exception: %s", e.getErrMsg().c_str());
+    }
+    childMap.clear();
 
     return rc;
 }
@@ -296,6 +374,7 @@ int Launcher::launchBE(int beID, const char * hostname)
     char queueName[32];
     Message *flistMsg = topology.filterList->getFlistMsg();
 
+    initEnv();
     topology.routingList->addBE(SCI_GROUP_ALL, VALIDBACKENDIDS, beID, true);
     topology.routingList->queryQueue(beID)->produce(flistMsg);
 
@@ -304,11 +383,16 @@ int Launcher::launchBE(int beID, const char * hostname)
         topology.routingList->removeBE(beID);
     } else {
         if (mode == REGISTER) {
+            int times = 0;
             while (!topology.routingList->allRouted()) {
-                SysUtil::sleep(1000);
+                if (times >= (waitTimes * 1000000  / WAIT_INTERVAL))
+                    return SCI_ERR_LAUNCH_FAILED;
+                times++;
+                SysUtil::sleep(WAIT_INTERVAL);
             }
         }
-        topology.routingList->startReading(beID);
+        /*Moved the reader start into startRouting*/
+        //topology.routingList->startReading(beID);
     }
 
     return rc;
@@ -318,6 +402,7 @@ int Launcher::launchAgent(int beID, const char * hostname)
 {
     int rc;
     
+    initEnv();
     Topology *childTopo = new Topology(topology.nextAgentID--);
     childTopo->fanOut = topology.fanOut;
     childTopo->level = topology.level + 1;
@@ -339,7 +424,8 @@ int Launcher::launchAgent(int beID, const char * hostname)
         }
         queue->produce(topoMsg);
         topology.incWeight(childTopo->agentID);
-        topology.routingList->startReading(childTopo->agentID);
+        /*Moved the reader start into startRouting*/
+        //topology.routingList->startReading(childTopo->agentID);
     } else {
         topology.routingList->removeBE(beID);
     }
@@ -348,7 +434,7 @@ int Launcher::launchAgent(int beID, const char * hostname)
     return rc;
 }
 
-int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m, int beID)
+int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m, bool batch, int beID)
 {
     int rc = 0;
     Listener *listener = NULL;
@@ -362,25 +448,16 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m, 
             port = listener->getBindPort();
             if (port > 0)
                 break;
-            SysUtil::sleep(1000);
+            SysUtil::sleep(WAIT_INTERVAL);
         }
 
-		localName = listener->getBindName();
         env.set("SCI_PARENT_PORT", port);
     } 
-    env.set("SCI_PARENT_HOSTNAME", localName);
-    env.set("SCI_ENABLE_LISTENER", ::getenv("SCI_ENABLE_LISTENER"));
     env.set("SCI_CLIENT_ID", ID);
-    env.set("SCI_PARENT_ID", topology.agentID);
-    // flow control threshold
-    env.set("SCI_FLOWCTL_THRESHOLD", gCtrlBlock->getFlowctlThreshold());
-
     log_debug("Launch client: %s: %s", host.c_str(), path.c_str());
     
     if (shell.empty()) {
-        struct passwd *pwd = ::getpwuid(::getuid());
-        string usernam = pwd->pw_name;
-
+        string username = gCtrlBlock->getUsername();
         try {
             int hndl = ID;
             struct iovec sign = {0};
@@ -398,7 +475,7 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m, 
                 }
                 rc = psec_sign_data(&sign, "%d%d%d%s%s", m, jobKey, cID, path.c_str(), env.getEnvString().c_str());
                 stream->init(host.c_str(), scidPort);
-                *stream << usernam << usertok << sign << (int)m << jobKey << cID << path << env.getEnvString() << endl;
+                *stream << username << usertok << sign << (int)m << jobKey << cID << path << env.getEnvString() << endl;
                 psec_free_signature(&sign);
             } else {
                 int sockfd = conn(host.c_str());
@@ -412,18 +489,24 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m, 
                 stream->stop();
                 delete stream;
             } else {
-                psec_sign_data(&sign, "%s", env.getEnvString().c_str());
-                *stream << usertok << env.getEnvString() << sign << endl;
-                psec_free_signature(&sign);
-                rc = topology.routingList->startRouting(hndl, stream);
+                if (batch) {
+                    childMap[hndl] = stream;
+                } else {
+                    psec_sign_data(&sign, "%s", env.getEnvString().c_str());
+                    *stream << usertok << env.getEnvString() << sign << endl;
+                    psec_free_signature(&sign);
+                    rc = topology.routingList->startRouting(hndl, stream);
+                }
             }
         } catch (SocketException &e) {
             rc = SCI_ERR_LAUNCH_FAILED;
             log_error("Launcher: socket exception: %s", e.getErrMsg().c_str());
         }
     } else {
-        string cmd = shell + " " + host + " -n '" + env.getExportcmd() + path + " >&- 2>&- <&- &'";
-        rc = system(cmd.c_str());
+        if ((strcasecmp(shell.c_str(), "rsh") == 0) || (strcasecmp(shell.c_str(), "ssh") == 0)) {
+            string cmd = shell + " " + host + " -n '" + env.getExportcmd() + path + " >&- 2>&- <&- &'";
+            rc = system(cmd.c_str());
+        }
     }
 
     return rc;
@@ -453,7 +536,7 @@ int Launcher::launch_tree1()
             MessageQueue *queue = topology.routingList->queryQueue((*it).first);
             queue->produce(flistMsg); 
 
-            rc = launchClient((*it).first, topology.bePath, (*it).second, mode);
+            rc = launchClient((*it).first, topology.bePath, (*it).second, mode, true);
             if (rc != SCI_SUCCESS) {
                 return rc;
             }
@@ -512,7 +595,7 @@ int Launcher::launch_tree1()
             ++it;
         }
 
-        rc = launchClient(childTopo->agentID, topology.agentPath, hostname);
+        rc = launchClient(childTopo->agentID, topology.agentPath, hostname, INTERNAL, true);
         if (rc == SCI_SUCCESS) {
             Message *msg = childTopo->packMsg();
             MessageQueue *queue = topology.routingList->queryQueue(childTopo->agentID);
@@ -532,18 +615,20 @@ int Launcher::launch_tree2()
 {
     // this tree will have maximum agents but supposed to have better performance
     // after evaluated by HongJun
-    int i, rc;
+    int i, rc = SCI_SUCCESS;
     int left = 0;
     int totalSize = topology.beMap.size();
     int step;
     int size = 0;
     int out = topology.fanOut;
     Message *flistMsg = topology.filterList->getFlistMsg();
-    int ref = 0; 
+    int ref = 0;
+    bool bottom = false; 
 
     if (totalSize == 0)
         return SCI_SUCCESS;
 
+    bottom = ((totalSize + out - 1) / out) > 1 ? false : true;
     ref = (totalSize > out) ? out : totalSize;
     if (flistMsg != NULL)
         flistMsg->setRefCount(ref + totalSize);  // Keep it undeleted
@@ -565,13 +650,31 @@ int Launcher::launch_tree2()
                 gCtrlBlock->setMyHandle(it->first);
                 gCtrlBlock->getPurifierProcessor()->start();
             } else {
-                rc = launchClient(it->first, topology.bePath, it->second, mode);
+                rc = launchClient(it->first, topology.bePath, it->second, mode, true);
                 if (rc != SCI_SUCCESS) {
                     topology.routingList->removeBE(it->first);
                     return rc;
                 }
             }
             it++;
+            // do the notify when it is back agent.
+            if ((size == (totalSize-1)) && bottom && (gCtrlBlock->getMyRole() == CtrlBlock::BACK_AGENT)) {
+                int tmp_hndl = gCtrlBlock->getMyEmbedHandle();
+                int tmp_initID = gCtrlBlock->getAgent(tmp_hndl)->getRoutingList()->getTopology()->getInitID();
+                if ((mode == REGISTER) || !shell.empty()) {
+                    int times = 0;
+                    while (!gCtrlBlock->allRouted()) {
+                        if (times >= (waitTimes * 1000000  / WAIT_INTERVAL)) {
+                            rc = SCI_ERR_LAUNCH_FAILED;
+                            *(int *)gNotifier->getRetVal(tmp_initID) = rc;
+                            break;
+                        }
+                        times++;
+                        SysUtil::sleep(WAIT_INTERVAL);
+                    }
+                }
+                gNotifier->notify(tmp_initID);
+            }
         } else {
             int auxID = it->first;
             string &hostname = it->second;
@@ -602,7 +705,7 @@ int Launcher::launch_tree2()
                 MODE m = INTERNAL;
                 if (embedMode)
                     m = mode;
-                rc = launchClient(childTopo->agentID, topology.agentPath, hostname, m, auxID);
+                rc = launchClient(childTopo->agentID, topology.agentPath, hostname, m, true, auxID);
             }
             if (rc == SCI_SUCCESS) {
                 Message *msg = childTopo->packMsg();
@@ -617,14 +720,14 @@ int Launcher::launch_tree2()
         size += step;
     }
 
-    return SCI_SUCCESS;
+    return rc;
 }
 
 int Launcher::launch_tree3()
 {
     // this tree will have maximum agents but supposed to have better performance
     // after evaluated by HongJun
-    int i, rc;
+    int i, rc = SCI_SUCCESS;
     int left = 0;
     int totalSize = topology.beMap.size();
     int step;
@@ -633,10 +736,12 @@ int Launcher::launch_tree3()
     Message *flistMsg = topology.filterList->getFlistMsg();
     int ref = 0; 
     bool shift = true;
+    bool bottom = false;
 
     if (totalSize == 0)
         return SCI_SUCCESS;
 
+    bottom = ((totalSize + out - 1) / out) > 1 ? false : true;
     ref = (totalSize > out) ? out : totalSize;
     if (flistMsg != NULL)
         flistMsg->setRefCount(ref + totalSize);  // Keep it undeleted
@@ -658,13 +763,31 @@ int Launcher::launch_tree3()
                 gCtrlBlock->setMyHandle(it->first);
                 gCtrlBlock->getPurifierProcessor()->start();
             } else {
-                rc = launchClient(it->first, topology.bePath, it->second, mode);
+                rc = launchClient(it->first, topology.bePath, it->second, mode, true);
                 if (rc != SCI_SUCCESS) {
                     topology.routingList->removeBE(it->first);
                     return rc;
                 }
             }
             it++;
+            // do the notify when it is back agent.
+            if ((size == (totalSize-1)) && bottom && (gCtrlBlock->getMyRole() == CtrlBlock::BACK_AGENT)) {
+                int tmp_hndl = gCtrlBlock->getMyEmbedHandle();
+                int tmp_initID = gCtrlBlock->getAgent(tmp_hndl)->getRoutingList()->getTopology()->getInitID();
+                if ((mode == REGISTER) || !shell.empty()) {
+                    int times = 0;
+                    while (!gCtrlBlock->allRouted()) {
+                        if (times >= (waitTimes * 1000000  / WAIT_INTERVAL)) {
+                            rc = SCI_ERR_LAUNCH_FAILED;
+                            *(int *)gNotifier->getRetVal(tmp_initID) = rc;
+                            break;
+                        }
+                        times++;
+                        SysUtil::sleep(WAIT_INTERVAL);
+                    }
+                }
+                gNotifier->notify(tmp_initID);
+            }
         } else {
             string &hostname = it->second;
             if (shift) {
@@ -707,7 +830,7 @@ int Launcher::launch_tree3()
                 beAgent->init(childTopo->agentID, NULL, queue, gCtrlBlock->getUpQueue());
                 rc = beAgent->work();
             } else {
-                rc = launchClient(childTopo->agentID, topology.agentPath, hostname);
+                rc = launchClient(childTopo->agentID, topology.agentPath, hostname, INTERNAL, true);
             }
             if (rc == SCI_SUCCESS) {
                 Message *msg = childTopo->packMsg();
@@ -722,14 +845,14 @@ int Launcher::launch_tree3()
         size += step;
     }
 
-    return SCI_SUCCESS;
+    return rc;
 }
 
 int Launcher::launch_tree4()
 {
     // this tree will have maximum agents but supposed to have better performance
     // after evaluated by HongJun
-    int i, rc;
+    int i, rc = SCI_SUCCESS;
     int left = 0;
     int totalSize = topology.beMap.size();
     int step = 1;
@@ -760,7 +883,7 @@ int Launcher::launch_tree4()
                 gCtrlBlock->setMyHandle(it->first);
                 gCtrlBlock->getPurifierProcessor()->start();
             } else {
-                rc = launchClient(it->first, topology.bePath, it->second, mode);
+                rc = launchClient(it->first, topology.bePath, it->second, mode, true);
                 if (rc != SCI_SUCCESS) {
                     topology.routingList->removeBE(it->first);
                     return rc;
@@ -768,6 +891,7 @@ int Launcher::launch_tree4()
             }
             it++;
         } else {
+            int auxID = it->first;
             string &hostname = it->second;
             Topology *childTopo = new Topology(topology.nextAgentID--);
             childTopo->fanOut  = topology.fanOut;
@@ -791,7 +915,10 @@ int Launcher::launch_tree4()
                     && (fEnt == topology.beMap.begin())) {
                 assert(!"should not come here");
             } else {
-                rc = launchClient(childTopo->agentID, topology.agentPath, hostname);
+                MODE m = INTERNAL;
+                if (embedMode)
+                    m = mode;
+                rc = launchClient(childTopo->agentID, topology.agentPath, hostname, m, true, auxID);
             }
             if (rc == SCI_SUCCESS) {
                 Message *msg = childTopo->packMsg();
@@ -804,13 +931,32 @@ int Launcher::launch_tree4()
             }
         }
         size += step;
-        if (size >= totalSize)
+        if (size >= totalSize) {
+            // do the notify when it is back agent.
+            if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_AGENT) {
+                int tmp_hndl = gCtrlBlock->getMyEmbedHandle();
+                int tmp_initID = gCtrlBlock->getAgent(tmp_hndl)->getRoutingList()->getTopology()->getInitID();
+                if ((mode == REGISTER) || !shell.empty()) {
+                    int times = 0;
+                    while (!gCtrlBlock->allRouted()) {
+                        if (times >= (waitTimes * 1000000  / WAIT_INTERVAL)) {
+                            rc = SCI_ERR_LAUNCH_FAILED;
+                            *(int *)gNotifier->getRetVal(tmp_initID) = rc;
+                            break;
+                        }
+                        times++;
+                        SysUtil::sleep(WAIT_INTERVAL);
+                    }
+                }
+                gNotifier->notify(tmp_initID);
+            }
             break;
+        }
         left = totalSize - size; 
         step = (left + out - 1) / out;
         out--;
     }
 
-    return SCI_SUCCESS;
+    return rc;
 }
 

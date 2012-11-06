@@ -29,8 +29,8 @@
 #include <assert.h>
 #include <pthread.h>
 
-#define VALIDBACKENDIDS (-1024*1024)
-#define INVLIDSUCCESSORID (-999999)
+#define VALIDBACKENDIDS (-1024*1024*1024)
+#define INVLIDSUCCESSORID (-999999999)
 
 #endif
 

@@ -58,82 +58,9 @@
 #include "purifierproc.hpp"
 #include "embedagent.hpp"
 
-const int ONE_KK = 1024 * 1024;
-
-int BEMap::input(const char *hostlist[], int num)
-{
-    int i = 0;
-
-    while (hostlist[i] != NULL) {
-        if (i >= num) {
-            break;
-        }
-        (*this)[i] = hostlist[i];
-        i++;
-    }
-  
-    return 0;
-}
-
 #ifdef __APPLE__
 extern char **environ;
 #endif
-
-int BEMap::input(const char * filename, int num)
-{
-    FILE *fp = NULL;
-    fp = ::fopen(filename,"r");
-    if (NULL == fp) {
-        return SCI_ERR_INVALID_HOSTFILE;
-    }
-    int rc = ::fseek(fp, 0, SEEK_END); //go to end
-    if (rc != 0) {
-        return SCI_ERR_INVALID_HOSTFILE;
-    }
-    long len = ::ftell(fp); //get position at end (length)
-    if (len <= 0) {
-        return SCI_ERR_INVALID_HOSTFILE;
-    }
-    rc = ::fseek(fp, 0, SEEK_SET); //go to begin
-    if (rc != 0) {
-        return SCI_ERR_INVALID_HOSTFILE;
-    }
-    char *text = new char[len+1]; //allocate buffer
-    ::fread(text, len, 1, fp); //read into buffer
-    ::fclose(fp);
-
-    // mark end with '\n\0'
-    text[len-1] = '\n'; // mark end
-    text[len] = '\0';
-
-    log_debug("Hostlist is: ");
-    int index = 0;
-    char *pPrev = text, *pNext = text;
-    while (pNext < (text + len)) {
-        if (index >= num) {
-            break;
-        }
-        pNext++;
-        if ((*pNext) == '\n') {
-            *pNext = '\0';
-            // ignore tabs
-            while (((*pPrev) == ' ') || ((*pPrev) == '\t')) {
-                pPrev++;
-            }
-            // ignore line with '#' as its first char
-            if (((*pPrev) != '\0') && ((*pPrev) != '\n') && ((*pPrev) != '#')) {
-                log_debug("%s", pPrev);
-                (*this)[index++] = pPrev;
-            }
-            
-            pPrev = pNext+1;
-        }
-    }
-    
-    delete [] text;
-    
-    return SCI_SUCCESS;
-}
 
 Topology::Topology(int id)
     : agentID(id), initID(-1)
@@ -213,11 +140,16 @@ int Topology::init()
 {
     int rc;
     char *envp = NULL;
-    int numItem = ONE_KK;
+    int numItem = -1;
     char **hostlist = gCtrlBlock->getEndInfo()->fe_info.host_list;
 
     if ((envp = ::getenv("SCI_BACKEND_NUM")) != NULL) {
-        numItem = ::atoi(envp);
+        int n = ::atoi(envp);
+        if (n > 0) {
+            numItem = n;
+        } else {
+            log_warn("Ignore invalid SCI_BACKEND_NUM value(%d)", n);
+        }
     }
     if (hostlist != NULL) {
         rc = beMap.input((const char **)hostlist, numItem);
@@ -287,7 +219,7 @@ int Topology::deploy()
     nextAgentID = (agentID + 1) * fanOut - 2; // A formular to calculate the agentID of the first child
     
     int rc = launcher.launch();
-    if (initID != -1) {
+    if ((initID != -1) && ((gCtrlBlock->getMyRole() != CtrlBlock::BACK_AGENT))){ 
         *(int *)gNotifier->getRetVal(initID) = rc;
         gNotifier->notify(initID);   
     }
@@ -355,6 +287,7 @@ int Topology::removeBE(Message *msg)
     routingList->removeBE(id);
     if (aID == VALIDBACKENDIDS) {
         routingList->ucast(id, msg);
+        routingList->stopRouting(id);
     } else {
         routingList->ucast(aID, msg);
         decWeight(aID);

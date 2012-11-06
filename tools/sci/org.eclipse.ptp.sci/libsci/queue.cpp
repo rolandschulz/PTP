@@ -20,6 +20,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    10/06/08 tuhongj      Initial code (D153875)
+   01/16/12 ronglli      Fix the issue of semaphore overflow
 
 ****************************************************************************/
 
@@ -44,6 +45,7 @@
 MessageQueue::MessageQueue(bool ctl)
     : thresHold(0), flowCtl(ctl)
 {
+    state = true;
     ::pthread_mutex_init(&mtx, NULL);
 #ifndef __APPLE__
     ::sem_init(&sem, 0, 0);
@@ -68,9 +70,9 @@ MessageQueue::~MessageQueue()
     ::pthread_mutex_destroy(&mtx);
 #ifndef __APPLE__
     ::sem_destroy(&sem);
-#else /* !__APPLE__ */
+#else /* __APPLE__ */
     ::semaphore_destroy(task, sem);
-#endif /* !__APPLE__ */
+#endif /* __APPLE__ */
 }
 
 int MessageQueue::flowControl(int size)
@@ -79,8 +81,8 @@ int MessageQueue::flowControl(int size)
 
     if(flowCtl) {
         if ((gCtrlBlock->getMyRole() != CtrlBlock::BACK_END) && (size > 0)) {
-            while (thresHold > flowctlThreshold) {
-                SysUtil::sleep(1000);
+            while ((thresHold > flowctlThreshold) && (gCtrlBlock->getFlowctlState())) {
+                SysUtil::sleep(WAIT_INTERVAL);
             }   
         }
     }
@@ -101,14 +103,12 @@ int MessageQueue::multiProduce(Message **msgs, int num)
     lock();
     for (i = 0; i < num; i++) {
         queue.push_back(msgs[i]);
-        release();
+        
     }
-    
-    if(flowCtl) {
-        thresHold += len;
-    }
-
+    thresHold += len;
     unlock();
+
+    release();
     flowControl(len);
 
     return 0;
@@ -116,17 +116,32 @@ int MessageQueue::multiProduce(Message **msgs, int num)
 
 void MessageQueue::release()
 {
+    int cnt = 0;
 #ifndef __APPLE__
-	::sem_post(&sem);
-#else /* !__APPLE__ */
-	/*
-	 * We must use semaphore_signal and not semaphore_signal_all
-	 * here as this may be called before sem_wait_i. This is
-	 * because semaphore_signal_all only sets the semaphore
-	 * to 0, it does not increment it.
-	 */
-	::semaphore_signal(sem);
-#endif /* !__APPLE__ */
+    while (::sem_post(&sem) != 0) {
+#else /* __APPLE__ */
+    while (::semaphore_signal(sem) != 0) {
+#endif /* __APPLE__ */    
+        if (!state)
+            break;
+        if (!gCtrlBlock->getFlowctlState()) {
+            if (cnt > 10) {
+                state = false;
+                break;
+            }
+            cnt++;
+        }
+        SysUtil::sleep(WAIT_INTERVAL);
+    } 
+}
+
+int MessageQueue::sem_getvalue_i()
+{
+    int i = -1;
+#ifndef __APPLE__
+    ::sem_getvalue(&sem, &i);
+#endif /* __APPLE__ */
+    return i;
 }
 
 void MessageQueue::produce(Message *msg)
@@ -139,11 +154,16 @@ void MessageQueue::produce(Message *msg)
     len = msg->getContentLen();
     lock();
     queue.push_back(msg);
-    if(flowCtl) {
-        thresHold += len;
-    }
+
+    thresHold += len;
 
     unlock();
+#ifdef _SCI_DEBUG
+#ifndef __APPLE__
+    int val = sem_getvalue_i();
+    log_debug("queue %s: produce: sem value = %ld, thresHold = %ld", name.c_str(), val, thresHold);
+#endif /* __APPLE__ */
+#endif
     release();
     flowControl(len);
 
@@ -166,9 +186,7 @@ int  MessageQueue::multiConsume(Message **msgs, int num)
         queue.pop_front();
         len += msgs[i]->getContentLen();
     }
-    if (flowCtl) {
-        thresHold -= len;
-    }
+    thresHold -= len;
 
     unlock();
 
@@ -189,9 +207,7 @@ Message* MessageQueue::consume(int millisecs)
     if (!queue.empty()) {
         msg = queue.front();
         len = msg->getContentLen();
-        if (flowCtl) {
-            thresHold -= len;
-        }
+        thresHold -= len;
     }
     unlock();
 
@@ -227,6 +243,11 @@ int MessageQueue::getSize()
     return size;
 }
 
+bool MessageQueue::getState()
+{
+    return state;
+}
+
 void MessageQueue::setName(char *str)
 {
     name = str;
@@ -244,6 +265,13 @@ int MessageQueue::sem_wait_i(int usecs)
 {
     int rc = 0;
 
+#ifdef _SCI_DEBUG
+#ifndef __APPLE__
+    int val = sem_getvalue_i();
+    log_debug("queue %s: sem value = %ld, thresHold = %ld", name.c_str(), val, thresHold);
+#endif /* __APPLE__ */
+#endif
+
 #ifndef __APPLE__
     if (usecs < 0) {
         while (((rc = ::sem_wait(&sem)) != 0) && (errno == EINTR));
@@ -259,7 +287,7 @@ int MessageQueue::sem_wait_i(int usecs)
         while (((rc=::sem_timedwait(&sem, &ts))!=0) && (errno == EINTR));
         return rc;
     }
-#else /* !__APPLE__ */
+#else /* __APPLE__ */
     if (usecs < 0) {
         ::semaphore_wait(sem);
     } else {
@@ -274,7 +302,7 @@ int MessageQueue::sem_wait_i(int usecs)
         ::semaphore_timedwait(sem, ts);
     }
     return 0;
-#endif /* !__APPLE__ */
+#endif /* __APPLE__ */
 }
 
 void MessageQueue::lock()

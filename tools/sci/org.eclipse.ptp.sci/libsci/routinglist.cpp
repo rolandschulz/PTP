@@ -20,6 +20,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    05/08/09 nieyy        Initial code (D156654)
+   01/16/12 ronglli      Add codes to retrieve BE list
 
 ****************************************************************************/
 
@@ -339,11 +340,11 @@ int RoutingList::startReaders()
 
     for (pit = routers.begin(); pit != routers.end(); ++pit) {
         while (pit->second.processor == NULL) {
-            SysUtil::sleep(1000);
+            SysUtil::sleep(WAIT_INTERVAL);
         }
         reader = pit->second.processor->getPeerProcessor();
         while (reader == NULL) {
-            SysUtil::sleep(1000);
+            SysUtil::sleep(WAIT_INTERVAL);
             reader = pit->second.processor->getPeerProcessor();
         }
         reader->start();
@@ -354,7 +355,11 @@ int RoutingList::startReaders()
 
 int RoutingList::numOfStreams()
 {
-    return routers.size();
+    int size;
+    lock();
+    size = routers.size();
+    unlock();
+    return size;
 }
 
 int RoutingList::getStreamsSockfds(int *fds)
@@ -362,12 +367,60 @@ int RoutingList::getStreamsSockfds(int *fds)
     int i = 0;
     ROUTING_MAP::iterator it;
 
+    lock();
     for (it = routers.begin(); it != routers.end(); ++it) {
         fds[i] = it->second.stream->getSocket();
         i++;
     }
+    unlock();
 
     return i;
+}
+
+int RoutingList::isActiveSockfd(int fd)
+{
+    int isSocket = 0;
+    ROUTING_MAP::iterator it;
+
+    lock();
+    for (it = routers.begin(); it != routers.end(); ++it) {
+        if (fd == it->second.stream->getSocket()) {
+            if ((it->second.stream->isReadActive()) || (it->second.stream->isWriteActive()) ){
+                isSocket = 1;
+                break;
+            }
+        }
+    }
+    unlock();
+
+    return isSocket;
+}
+
+bool RoutingList::allActive()
+{
+    bool active = true;
+    ROUTING_MAP::iterator it;
+
+    lock();
+    for (it = routers.begin(); it != routers.end(); ++it) {
+        if ((!(it->second.stream->isReadActive())) || (!(it->second.stream->isWriteActive())) ){
+            active = false;
+            break;
+        }
+    }
+    unlock();
+
+    return active;
+}
+
+void RoutingList::mapRouters(int hndl, WriterProcessor *writer, Stream *stream)
+{
+    lock();
+    if (writer != NULL) {
+        routers[hndl].processor = writer;
+    }
+    routers[hndl].stream = stream;
+    unlock();
 }
 
 int RoutingList::startRouting(int hndl, Stream *stream)
@@ -375,18 +428,34 @@ int RoutingList::startRouting(int hndl, Stream *stream)
     char name[64] = {0};
     MessageQueue *inQ = queryQueue(hndl);
     while (inQ == NULL) {
-        SysUtil::sleep(1000);
+        SysUtil::sleep(WAIT_INTERVAL);
         inQ = queryQueue(hndl);
     }
 
-    routers[hndl].stream = stream;
+    WriterProcessor *writer = NULL;
+    if ((routers.find(hndl) != routers.end()) && (routers[hndl].stream != NULL)) {
+        if (!gCtrlBlock->getRecoverMode()) {
+            log_error("Duplicated client are trying to connect!!!");
+            return -1;
+        }
+        writer = routers[hndl].processor;
+        while(!(writer->getRecoverState())) {
+            SysUtil::sleep(WAIT_INTERVAL);
+        }
+
+        writer->setOutStream(stream);
+        mapRouters(hndl, NULL, stream);
+        return 0;
+    }
+
+    log_debug("routers[%d].stream = %p", hndl, stream);
     ReaderProcessor *reader = new ReaderProcessor(hndl);
     reader->setInStream(stream);
     reader->setOutQueue(filterProc->getInQueue());
     ::sprintf(name, "Reader%d", hndl);
     reader->setName(name);
 
-    WriterProcessor *writer = new WriterProcessor(hndl);
+    writer = new WriterProcessor(hndl);
     writer->setInQueue(inQ);
     writer->setOutStream(stream);
     ::sprintf(name, "Writer%d", hndl);
@@ -394,9 +463,26 @@ int RoutingList::startRouting(int hndl, Stream *stream)
 
     // reader is a peer processor of writer
     writer->setPeerProcessor(reader);
-    routers[hndl].processor = writer;
+    reader->setPeerProcessor(writer);
+    mapRouters(hndl, writer, stream);
 
-    writer->start(); 
+    log_debug("The Reader%d thread has been newed!", hndl);
+    writer->start();
+    reader->start(); 
+
+    return 0;
+}
+
+int RoutingList::stopRouting(int hndl)
+{
+    ROUTING_MAP::iterator pit = routers.find(hndl);
+    if (pit != routers.end()) {
+        pit->second.processor->release();
+        delete pit->second.processor;
+
+        routers.erase(hndl);
+        queueInfo.erase(hndl);
+    }
 
     return 0;
 }
@@ -421,11 +507,11 @@ bool RoutingList::allRouted()
     if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_AGENT) {
         char *envp = getenv("SCI_EMBED_AGENT");
         if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
-            return (queueInfo.size() == (routers.size() + 1));  // queueInfo contains itself
+            return (numOfQueues() == (numOfStreams() + 1));  // queueInfo contains itself
         }
     }
 
-    return (queueInfo.size() == routers.size()); 
+    return (numOfQueues() == numOfStreams()); 
 }
 
 void RoutingList::addBE(sci_group_t group, int successor_id, int be_id, bool init)
@@ -513,6 +599,12 @@ void RoutingList::retrieveSuccessorList(sci_group_t group, int * ret_val)
     myDistriGroup->retrieveSuccessorList(group, ret_val);
 }
 
+void RoutingList::retrieveBEListOfSuccessor(int successor_id, int * ret_val)
+{
+    assert(ret_val);
+    myDistriGroup->retrieveBEListOfSuccessor(successor_id, ret_val);
+}
+
 void RoutingList::mapQueue(int hndl, MessageQueue *queue)
 {
     lock();
@@ -532,6 +624,15 @@ MessageQueue * RoutingList::queryQueue(int hndl)
     unlock();
 
     return queue;
+}
+
+int RoutingList::numOfQueues()
+{
+    int size;
+    lock();
+    size = queueInfo.size();
+    unlock();
+    return size;
 }
 
 void RoutingList::lock()

@@ -24,6 +24,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    05/08/09 nieyy        Initial code (F156654)
+   01/16/12 ronglli      Add codes to retrieve BE list
 
 ****************************************************************************/
 
@@ -692,6 +693,23 @@ void DistributedGroup::retrieveSuccessorList(sci_group_t group, int * ret_val)
     if (it != successorListInfo.end()) {
         for (int i=0; i<(int) (*it).second.size(); i++) {
             ret_val[i] = ((*it).second)[i];
+        }
+    }
+    unlock();
+}
+
+void DistributedGroup::retrieveBEListOfSuccessor(int successor_id, int * ret_val)
+{
+    lock();
+    GRP_MAP_MAP::iterator it = generalInfo.find(SCI_GROUP_ALL);
+    if (it != generalInfo.end()) {
+        GRP_MAP::iterator git = (*it).second.find(successor_id);
+        if (git != (*it).second.end()) {
+            int i = 0;
+            Group::iterator ggit = (*git).second->begin();
+            for (; ggit != (*git).second->end(); ggit++) {
+                ret_val[i++] = (*ggit);
+            }
         }
     }
     unlock();

@@ -4,13 +4,13 @@ SOURCES = \
     api.cpp          eventntf.cpp    handlerproc.cpp  observer.cpp   queue.cpp         \
     ctrlblock.cpp    filter.cpp      initializer.cpp  readerproc.cpp    topology.cpp launcher.cpp \
     dgroup.cpp       filterlist.cpp  listener.cpp     processor.cpp  routerproc.cpp    writerproc.cpp \
-    embedagent.cpp   privatedata.cpp
+    embedagent.cpp   privatedata.cpp bemap.cpp
 
 noinst_HEADERS = \
     allocator.hpp  filterproc.hpp listener.hpp processor.hpp routerproc.hpp writerproc.hpp \
     atomic.hpp      eventntf.hpp    general.hpp      message.hpp   purifierproc.hpp  routinglist.hpp \
     ctrlblock.hpp   filter.hpp      handlerproc.hpp  observer.hpp  queue.hpp   embedagent.hpp       \
-    dgroup.hpp      filterlist.hpp  initializer.hpp  readerproc.hpp    topology.hpp privatedata.hpp
+    dgroup.hpp      filterlist.hpp  initializer.hpp  readerproc.hpp    topology.hpp privatedata.hpp bemap.hpp
 
 include_HEADERS = ../include/sci.h
 

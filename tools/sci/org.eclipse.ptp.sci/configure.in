@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(SCI, 2.0, tuhongj@cn.ibm.com)
+AC_INIT(SCI, 2.0, ronglli@cn.ibm.com)
 AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE(SCI, 2.0)
 

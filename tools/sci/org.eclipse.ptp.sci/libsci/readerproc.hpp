@@ -42,6 +42,9 @@ class ReaderProcessor : public Processor
     private:
         Stream              *inStream;
         MessageQueue        *outErrorQueue;
+        int                 recoverID;
+        int                 notifyID;
+        WriterProcessor     *peerProcessor;
 
     public:
         ReaderProcessor(int hndl = -1);
@@ -51,12 +54,17 @@ class ReaderProcessor : public Processor
         virtual void process(Message *msg);
         virtual void write(Message *msg);
         virtual void seize();
+        virtual int recover();
         virtual void clean();
 
         void setInStream(Stream *stream);
         void setOutQueue(MessageQueue *queue);
 
         void setOutErrorQueue(MessageQueue *queue);
+
+        void setPeerProcessor(WriterProcessor* processor);
+        WriterProcessor *getPeerProcessor();
+
 };
 
 #endif

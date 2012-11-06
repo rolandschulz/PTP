@@ -84,8 +84,6 @@ void ExtListener::run()
         } else {
             log_error("Wrong value of \"SCI_ENABLE_SSHAUTH\": %s\n", out_val.c_str());
         }
-    } else {
-        log_error("Failed to read config file!\n");
     }
 
     try {
@@ -93,11 +91,11 @@ void ExtListener::run()
     }catch (SocketException &e) {
         log_error("socket exception %s", e.getErrMsg().c_str());
         setState(false);
-        exit(-1);
+        exit(1);
     } catch (...) {
         log_error("unknown exception");
         setState(false);
-        exit(-1);
+        exit(1);
     }
     log_crit("Extended listener is running");
 

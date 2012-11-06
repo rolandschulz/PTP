@@ -20,6 +20,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    10/06/08 tuhongj      Initial code (D153875)
+   01/16/12 ronglli      Add codes to detect SOCKET_BROKEN
 
 ****************************************************************************/
 
@@ -58,6 +59,7 @@ class Message
             BE_REMOVE = -1011,
             BE_ADD = -1012,
             FILTER_LIST = -1013,
+            RELEASE = -1014,
             // used for error handling
             UNCLE = -2001,
             UNCLE_LIST = -2002,
@@ -70,6 +72,9 @@ class Message
             KILLNODE = -3002,
             // used for polling mode
             INVALID_POLL = -4001,
+            SOCKET_BROKEN = -4002,
+            ERROR_DATA = -4003,
+            ERROR_THREAD = -4004,
             // used for message segmentation
             SEGMENT = -5001
         };
@@ -97,6 +102,7 @@ class Message
             int id = DEFAULT_MSG_ID);
         void setRefCount(int cnt);
         int & getRefCount();
+        bool isValidType(int type);
 
         void setID(int id) { msgID = id; }
         void setFilterID(int id) { filterID = id; }

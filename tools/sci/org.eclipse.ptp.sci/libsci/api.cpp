@@ -20,6 +20,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    10/06/08 lwbjcdl      Initial code (D153875)
+   01/16/12 ronglli      Add codes to detect SOCKET_BROKEN
 
 ****************************************************************************/
 
@@ -28,6 +29,7 @@
 #include <math.h>
 #include <string.h>
 #include <vector>
+#include <sys/socket.h>
 
 #include "sci.h"
 
@@ -53,6 +55,7 @@
 #include "routerproc.hpp"
 #include "allocator.hpp"
 #include "sshfunc.hpp"
+#include "exception.hpp"
 
 const char * ErrRetMsg[] = {
     "Succeeded.",
@@ -84,12 +87,15 @@ const char * ErrRetMsg[] = {
     "Error occurred when searching the agent.",
     "Invalid version number.",              
     "Error occurred when doing the SSH-based authentication.",
+    "Exception occurred",    
     "Invalid error message number.",                  
 
     "The parent is broken.",
     "The child is broken.",
     "Error occurred when doing the recovery.",
     "Recover failed.",
+    "Received incorrect data.",
+    "Error occurred in the threads.",
 };
 
 SCI_msg_hndlr *gHndlr = NULL;
@@ -134,6 +140,88 @@ int SCI_Terminate()
     return SCI_SUCCESS;
 }
 
+int SCI_Release()
+{
+    if (gCtrlBlock->getMyRole() == CtrlBlock::INVALID) {
+        return SCI_ERR_UNINTIALIZED;
+    }
+    try {
+        int role = gCtrlBlock->getMyRole();
+        
+        int num_fds = gCtrlBlock->numOfChildrenFds();
+        log_debug("there are total %d children", num_fds);
+        if (num_fds > 0) {
+            int * fd_list = (int *)malloc(num_fds * sizeof(int));
+            gCtrlBlock->getChildrenSockfds(fd_list);
+            for(int i=0; i < num_fds; i++) {
+                log_debug("close child fd %d", fd_list[i]);
+                ::shutdown(fd_list[i], SHUT_RDWR);
+                ::close(fd_list[i]);
+            }
+            free(fd_list);
+        }
+        if (role != CtrlBlock::FRONT_END) {
+            if (gInitializer->getInStream() != NULL) {
+                int p_fd = gInitializer->getInStream()->getSocket();
+                log_debug("close parent fd %d", p_fd);
+                ::shutdown(p_fd, SHUT_RDWR);
+                ::close(p_fd);
+            }
+        }
+        if (role == CtrlBlock::FRONT_END) { 
+            Message *msg = new Message();
+            msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 0, NULL, NULL, Message::RELEASE); 
+            gCtrlBlock->getRouterInQueue()->produce(msg); 
+        }
+        gCtrlBlock->term();
+
+        delete gNotifier;
+        delete gInitializer;
+        delete gCtrlBlock;
+    } catch (std::bad_alloc) {
+        return SCI_ERR_NO_MEM;
+    }
+
+    return SCI_SUCCESS;
+}
+
+int SCI_Parentinfo_update(char * parentAddr, int port)
+{
+    int rc = -1;
+    if ((NULL == parentAddr) || (port <= 0))
+        return SCI_ERR_UNKNOWN_INFO;
+
+    if ((gCtrlBlock->getTermState()) || (!gCtrlBlock->getRecoverMode()) 
+            || (!gCtrlBlock->getParentInfoWaitState()))
+        return SCI_ERR_INVALID_CALLER;
+
+    log_debug("Parentinfo_update: addr = %s, port = %d", parentAddr, port);
+    rc = gInitializer->updateParentInfo(parentAddr, port);
+    if (rc != SCI_SUCCESS) {
+        log_debug("Parentinfo_update: failed to update info, rc = %d", rc);
+        return rc;
+    }
+
+    return SCI_SUCCESS;
+}
+
+int SCI_Parentinfo_wait()
+{
+    if ((gCtrlBlock->getTermState()) || (!gCtrlBlock->getRecoverMode()))
+        return SCI_ERR_INVALID_CALLER;
+
+    gCtrlBlock->setParentInfoWaitState(true);
+    log_debug("Parentinfo_wait: set the parentInfoWait state to true");
+
+    return SCI_SUCCESS;
+}
+
+int SCI_Recover_setmode(int mode)
+{
+    gCtrlBlock->setRecoverMode(mode);
+    log_debug("Recover_setmode: set the recover mode to %d", mode);
+    return SCI_SUCCESS;
+}
 
 // Information Query
 
@@ -174,6 +262,14 @@ int SCI_Query(sci_query_t query, void *ret_val)
             else
                 *p = gCtrlBlock->getObserver()->getPollFd();
             break;
+        case PIPEWRITE_FD:
+            if (gCtrlBlock->getMyRole() == CtrlBlock::AGENT)
+                return SCI_ERR_INVALID_CALLER;
+            if (!gCtrlBlock->getObserver())
+                return SCI_ERR_MODE;
+            else
+                *p = gCtrlBlock->getObserver()->getPipeWriteFd();
+            break;
         case NUM_FILTERS:
             *p = gCtrlBlock->getFilterList()->numOfFilters();
             break;
@@ -210,7 +306,23 @@ int SCI_Query(sci_query_t query, void *ret_val)
         case LISTENER_PORT:
             if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END)
                 return SCI_ERR_INVALID_CALLER;
+            if (gInitializer->getListener() == NULL)
+                return SCI_ERR_INVALID_CALLER;
             *p = gInitializer->getListener()->getBindPort();
+            break;
+        case NUM_LISTENER_FDS:
+            if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END)
+                return SCI_ERR_INVALID_CALLER;
+            if (gInitializer->getListener() == NULL)
+                return SCI_ERR_INVALID_CALLER;
+            *p = gInitializer->getListener()->numOfSockFds();
+            break;
+        case LISTENER_FDLIST:
+            if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END)
+                return SCI_ERR_INVALID_CALLER;
+            if (gInitializer->getListener() == NULL)
+                return SCI_ERR_INVALID_CALLER;
+            gInitializer->getListener()->getSockFds(p);
             break;
         case PARENT_SOCKFD:
             if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END)
@@ -219,6 +331,16 @@ int SCI_Query(sci_query_t query, void *ret_val)
             break;
         case NUM_CHILDREN_FDS:
             *p = gCtrlBlock->numOfChildrenFds();
+            break;
+        case CHILDREN_FDLIST:
+            gCtrlBlock->getChildrenSockfds(p);
+            break;
+        case RECOVER_STATUS:
+            if (gCtrlBlock->allActive()) {
+                *p = 1; 
+            } else {
+                *p = 0; 
+            }
             break;
         default:
             return SCI_ERR_UNKNOWN_INFO;
@@ -239,20 +361,25 @@ int SCI_Error(int err_code, char *err_msg, int msg_size)
         return SCI_SUCCESS;
     }
 
-    if ((err_code <= -2001) && (err_code >= -2029)){
+    if ((err_code <= -2001) && (err_code >= -2030)){
         int index = err_code * (-1) % 2000;
         strncpy(err_msg, ErrRetMsg[index], msg_size);
         return SCI_SUCCESS;
     }
 
-    if ((err_code <= -5000) && (err_code >= -5003)){
+    if ((err_code <= -5000) && (err_code >= -5005)){
         int index = err_code * (-1) % 5000;
-        strncpy(err_msg, ErrRetMsg[index + 30], msg_size);
+        strncpy(err_msg, ErrRetMsg[index + 31], msg_size);
         return SCI_SUCCESS;
     }
 
     return SCI_ERR_MSG;
 
+}
+
+int SCI_Query_errchildren(int *num, int **id_list)
+{
+    return gCtrlBlock->getErrChildren(num, id_list);
 }
 
 // Communication
@@ -273,6 +400,11 @@ int SCI_Bcast(int filter_id, sci_group_t group, int num_bufs, void *bufs[], int 
             return SCI_ERR_GROUP_NOTFOUND;
     }
 
+    int rc = SCI_SUCCESS;
+    rc = gCtrlBlock->checkChildHealthState();
+    if (rc != SCI_SUCCESS)
+        return rc;
+
     try {
         Message *msg = new Message();
         msg->build(filter_id, group, num_bufs, (char **)bufs, sizes, Message::COMMAND);
@@ -280,10 +412,10 @@ int SCI_Bcast(int filter_id, sci_group_t group, int num_bufs, void *bufs[], int 
             (int) group, msg->getContentLen());
         gCtrlBlock->getRouterInQueue()->produce(msg);
     } catch (std::bad_alloc) {
-        return SCI_ERR_NO_MEM;
+        rc = SCI_ERR_NO_MEM;
     }
   
-    return SCI_SUCCESS;
+    return rc;
 }
 
 int SCI_Upload(int filter_id, sci_group_t group, int num_bufs, void *bufs[], int sizes[])
@@ -329,6 +461,10 @@ int SCI_Poll(int timeout)
     }
 */
     int rc = SCI_SUCCESS;
+    rc = gCtrlBlock->checkChildHealthState();
+    if (rc != SCI_SUCCESS)
+        return rc;
+
     Message *msg = gCtrlBlock->getPollQueue()->consume(timeout);
     if (msg) {
         switch(msg->getType()) {
@@ -346,8 +482,25 @@ int SCI_Poll(int timeout)
                 rc = SCI_ERR_POLL_INVALID;
                 gCtrlBlock->getObserver()->unnotify();
                 break;
+            case Message::SOCKET_BROKEN:
+                rc = SCI_ERR_CHILD_BROKEN;
+                log_debug("SCI_Poll: received msg SOCKET_BROKEN");
+                gCtrlBlock->getObserver()->unnotify();
+                break;
+            case Message::ERROR_DATA:
+                rc = SCI_ERR_DATA;
+                log_debug("SCI_Poll: received msg ERROR_DATA");
+                gCtrlBlock->getObserver()->unnotify();
+                break;
+            case Message::ERROR_THREAD:
+                rc = SCI_ERR_THREAD;
+                log_debug("SCI_Poll: received msg ERROR_THREAD");
+                gCtrlBlock->getObserver()->unnotify();
+                break;
             default:
+                rc = SCI_ERR_UNKNOWN_INFO;
                 log_error("SCI_Poll: received unknown command");
+                gCtrlBlock->getObserver()->unnotify();
                 break;
         }
 
@@ -678,6 +831,8 @@ int SCI_Filter_upload(int filter_id, sci_group_t group, int num_bufs, void *bufs
         } else {    
             gCtrlBlock->getFilterProcessor()->deliever(msg);
         }
+    } catch (Exception &e) {
+        return SCI_ERR_EXCEPTION;
     } catch (std::bad_alloc) {
         return SCI_ERR_NO_MEM;
     }

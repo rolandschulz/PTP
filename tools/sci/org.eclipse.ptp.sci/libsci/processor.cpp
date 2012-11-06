@@ -32,6 +32,7 @@
 #include "processor.hpp"
 #include <assert.h>
 
+#include "ctrlblock.hpp"
 #include "log.hpp"
 #include "tools.hpp"
 #include "exception.hpp"
@@ -41,7 +42,7 @@
 #include "queue.hpp"
 
 Processor::Processor(int hndl) 
-    : Thread(hndl), inQueue(NULL), outQueue(NULL)
+    : Thread(hndl), inQueue(NULL), outQueue(NULL), hState(CtrlBlock::HEALTH)
 {
     name = "Processor";
 
@@ -80,20 +81,41 @@ void Processor::run()
                 log_warn("Receives a misleading message");
                 continue;
             }
+            hState = CtrlBlock::ERROR_THREAD;
             seize();
             log_error("Processor %s: exception %s", name.c_str(), e.getErrMsg());
+            break;
         } catch (SocketException &e) {
+            if (e.getErrCode() == SocketException::NET_ERR_DATA) {
+                hState = CtrlBlock::ERROR_DATA;
+            } else {
+                if (recover() == 0) {
+                    continue;
+                }
+                hState = CtrlBlock::ERROR_CHILD_BROKEN;
+            }
             seize();
-            log_error("Processor %s: socket exception %s", name.c_str(), e.getErrMsg().c_str());
+            if (e.getErrCode() == SocketException::NET_ERR_CLOSED) {
+                log_warn("Processor %s: socket exception %s", name.c_str(), e.getErrMsg().c_str());
+            } else {
+                log_error("Processor %s: socket exception %s", name.c_str(), e.getErrMsg().c_str());
+            }
+            break;
         } catch (ThreadException &e) {
+            hState = CtrlBlock::ERROR_THREAD;
             seize();
-            log_error("Processor %s: thread exception %d", e.getErrCode());
+            log_error("Processor %s: thread exception %d", name.c_str(), e.getErrCode());
+            break;
         } catch (std::bad_alloc) {
+            hState = CtrlBlock::ERROR_THREAD;
             seize();
             log_error("Processor %s: out of memory", name.c_str());
+            break;
         } catch (...) {
+            hState = CtrlBlock::ERROR_THREAD;
             seize();
             log_error("Processor %s: unknown exception", name.c_str());
+            break;
         }
     }
 
@@ -107,7 +129,7 @@ void Processor::release()
 {
     while (!isLaunched()) {
         // before join, this thread should have been launched
-        SysUtil::sleep(1000);
+        SysUtil::sleep(WAIT_INTERVAL);
     } 
     setState(false);
     if (inQueue)
@@ -117,7 +139,7 @@ void Processor::release()
 
 bool Processor::isActive()
 {
-    if (inQueue)
+    if ((inQueue) && (inQueue->getState()))
         return (inQueue->getSize() > 0);
     return false;
 }

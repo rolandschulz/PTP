@@ -20,6 +20,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    01/06/09 tuhongj      Initial code (D155101)
+   09/04/12 ronglli      Update the logging
 
 ****************************************************************************/
 
@@ -128,27 +129,39 @@ int checkPidFile(string &pidf)
     return 0;
 }
 
-void usage()
+void usage(char * pName)
 {
-    printf("scidv1 [-p pidDir] [-l logDir] [-s severity]\n");
+    printf("%s [-p pidDir] [-l logDir] [-s severity] [-e] \n\n", pName);
+    printf("    -p pidDir\t\tSpecify the pid directory. Default is: \"/var/run/\"(Linux) and \"/var/opt/\"(AIX)\n");
+    printf("    -l logDir\t\tSpecify the log directory. Default is: \"/tmp/\"\n");
+    printf("    -s severity\t\tSpecify the log severity. Default is: \"'3'(INFORMATION)\"\n");
+    printf("    -e \t\t\tEnable the log. Default is: disabled\n");
 }
 
 int initService(int argc, char *argv[])
 {
     int i;
-    char *optpattern = "hl:p:s:";
+    char *optpattern = "hl:p:s:e";
     char *prog = argv[0];
     char *p = NULL;
     string logDir = "/tmp";
-    int logLevel = -1;
+    int logLevel = Log::INFORMATION;
+    int logMode = Log::DISABLE;
 #if defined(_SCI_LINUX) || defined(__APPLE__)
     string pidDir = "/var/run/";
 #else
     string pidDir = "/var/opt/";
 #endif
+    string logFile;
 
     extern char *optarg;
     extern int  optind;
+    p = strrchr(prog, '/');
+    if (p != NULL) 
+        p++;
+    else
+        p = prog;
+    
     while ((i = getopt(argc, argv, optpattern)) != EOF) {
         switch (i) {
             case 'l':
@@ -160,17 +173,15 @@ int initService(int argc, char *argv[])
             case 's':
                 logLevel = atoi(optarg);
                 break;
+            case 'e':
+                logMode = Log::ENABLE;
+                break;
             case 'h':
-                usage();
+                usage(p);
                 exit(0);
                 break;
         }
     }
-    p = strrchr(prog, '/');
-    if (p != NULL) 
-        p++;
-    else
-        p = prog;
     pidFile = pidDir + "/" + p + ".pid";
     if (checkPidFile(pidFile) < 0) {
         printf("%s is already running...\n", p);
@@ -183,15 +194,24 @@ int initService(int argc, char *argv[])
     daemonInit();
     writePidFile(pidFile);
 
-    Log::getInstance()->init(logDir.c_str(), "scidv1.log", logLevel);
+    logFile = string(p) + ".log"; 
+    Log::getInstance()->init(logDir.c_str(), logFile.c_str(), logLevel, logMode);
 
     return 0;
 }
 
 int main(int argc, char *argv[])
 {
+    char *envp = NULL;
+
+    set_oom_adj(-1000);
     if (initService(argc, argv) != 0)
         return -1;
+
+    envp = ::getenv("SCI_DISABLE_IPV6");
+    if (envp && (::strcasecmp(envp, "yes") == 0)) {
+        Socket::setDisableIPv6(1);
+    }
 
     ExtListener *listener = new ExtListener();
     listener->start();
@@ -206,7 +226,7 @@ int main(int argc, char *argv[])
         for (lc = launcherList.begin(); lc != launcherList.end(); lc++) {
             while (!(*lc)->isLaunched()) {
                 // before join, this thread should have been launched
-                SysUtil::sleep(1000);
+                SysUtil::sleep(WAIT_INTERVAL);
             }
             (*lc)->join();
             delete (*lc);

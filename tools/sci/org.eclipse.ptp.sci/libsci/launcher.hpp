@@ -44,32 +44,38 @@ class Launcher
             REGISTER,
             REQUEST
         };
+        typedef map<int, Stream *> CHILD_MAP;
         
     private:
         Topology        &topology;
         EnvVar          env;
         string          shell;
-		string			localName;
+        string          localName;
         int             scidPort;
         MODE            mode;
         bool            embedMode;
+        CHILD_MAP       childMap;
+        int             waitTimes;
 
     public:    
         Launcher(Topology &topy);
         ~Launcher();
-        
+
+        int initEnv();        
         int launch();
         
         int launchBE(int beID, const char *hostname);
         int launchAgent(int beID, const char *hostname);
 
     private:
-        int launchClient(int ID, string &path, string host, MODE m = INTERNAL, int beID = -1);
+        int launchClient(int ID, string &path, string host, MODE m = INTERNAL, bool batch = false, int beID = -1);
 
         int launch_tree1(); // mininum agents
         int launch_tree2(); // maximum agents
         int launch_tree3(); // maximum agents
         int launch_tree4(); // maximum agents
+
+        int startAll();
 };
 
 #endif

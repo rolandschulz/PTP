@@ -24,6 +24,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    02/10/09 nieyy      Initial code (D153875)
+   01/16/12 ronglli    Add codes to detect SOCKET_BROKEN
 
 ****************************************************************************/
 
@@ -48,9 +49,13 @@
 #include "topology.hpp"
 #include "eventntf.hpp"
 #include "privatedata.hpp"
+#include "initializer.hpp"
+#include "sshfunc.hpp"
+#include "writerproc.hpp"
+#include "tools.hpp"
 
 RouterProcessor::RouterProcessor(int hndl, RoutingList *rlist, FilterList *flist) 
-    : Processor(hndl), curFilterID(SCI_FILTER_NULL), curGroup(SCI_GROUP_ALL), inStream(NULL), routingList(rlist), filterList(flist), joinSegs(false)
+    : Processor(hndl), curFilterID(SCI_FILTER_NULL), curGroup(SCI_GROUP_ALL), inStream(NULL), routingList(rlist), filterList(flist), joinSegs(false), peerProcessor(NULL)
 {
     name = "Router";
     PrivateData *pData = new PrivateData(routingList, filterList, NULL, this);
@@ -160,7 +165,12 @@ void RouterProcessor::process(Message * msg)
             }
             break;
         case Message::QUIT:
+            gCtrlBlock->setTermState(true);
+            gCtrlBlock->setRecoverMode(0);
             routingList->bcast(SCI_GROUP_ALL, msg);
+            setState(false);
+            break;
+        case Message::RELEASE:
             setState(false);
             break;
         case Message::UNCLE_LIST:
@@ -189,20 +199,107 @@ void RouterProcessor::write(Message * msg)
 
 void RouterProcessor::seize()
 {
-    Message *msg = new Message();
-
-    if (inStream) {
-        gCtrlBlock->setRecoverMode(true);
+    try {
+        Message *msg = new Message();
+        msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 0, NULL, NULL, Message::QUIT);
+        routingList->bcast(SCI_GROUP_ALL, msg);
+    } catch (std::bad_alloc) {
+        log_error("Processor Router: out of memory");
+        // To do; add correct error handling
     }
-    msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 0, NULL, NULL, Message::QUIT);
-    routingList->bcast(SCI_GROUP_ALL, msg);
+    gCtrlBlock->setTermState(true); // do not need to notify the parent the error children
     setState(false);
+}
+
+int RouterProcessor::recover()
+{
+    int rc = -1;
+
+    if ((gCtrlBlock->getTermState()) || (!gCtrlBlock->getRecoverMode())) {
+        return rc;
+    }
+
+    if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
+        return rc;
+    }
+
+    log_debug("Routerproc: begin to do the recover");
+    if (gCtrlBlock->getParentInfoWaitState()) {
+        while (gInitializer->pInfoUpdated == false) { 
+            if (gCtrlBlock->getTermState()) {
+                log_debug("Routerproc: incorrect state");
+                return rc;
+            }
+            SysUtil::sleep(WAIT_INTERVAL);
+        }
+    }
+
+    while ((rc != 0) && (!gCtrlBlock->getTermState())) {
+        try {
+            struct iovec sign = {0};
+            int hndl = gInitializer->getOrgHandle(); 
+            int pID = gInitializer->getParentID();
+            string pAddr = gInitializer->getParentAddr();
+            int pPort = gInitializer->getParentPort();
+
+            inStream->stopRead();
+
+            WriterProcessor * writer = getPeerProcessor();
+            while(!(writer->isLaunched())) {
+                SysUtil::sleep(WAIT_INTERVAL);
+            }
+            
+            if (!writer->getRecoverState()) {
+                Message *msg = new Message(); 
+                msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 0, NULL, NULL, Message::RELEASE);
+
+                log_debug("Routerproc: begin to set the writer release state to false");
+                writer->setReleaseState(true);
+                writer->getInQueue()->produce(msg);
+            }
+            while(!(writer->getRecoverState())) {
+                SysUtil::sleep(WAIT_INTERVAL);
+            }
+            
+            log_debug("Routerproc: Begin to do Recover: My parent host is %s, parent port is %d, parent id is %d", pAddr.c_str(), pPort, pID);
+            rc = inStream->init(pAddr.c_str(), pPort);
+            if (rc != 0) {
+                SysUtil::sleep(WAIT_INTERVAL);
+                continue;
+            }
+            gInitializer->setInStream(inStream);
+            psec_sign_data(&sign, "%d%d%d", gCtrlBlock->getJobKey(), hndl, pID);
+            *inStream << gCtrlBlock->getJobKey() << hndl << pID << sign << endl;
+            *inStream >> endl;
+
+            psec_free_signature(&sign);
+            log_debug("Routerproc: Recover: My parent host is %s, parent port is %d, parent id is %d", pAddr.c_str(), pPort, pID);
+
+            writer->setOutStream(inStream);
+
+            if ((rc == 0) && (gCtrlBlock->getParentInfoWaitState())) {
+                log_debug("Routerproc: begin to notify %d", gInitializer->notifyID);
+                gInitializer->pInfoUpdated = false;
+                gCtrlBlock->setParentInfoWaitState(false);
+                gNotifier->notify(gInitializer->notifyID);
+                log_debug("Routerproc: finish notify %d", gInitializer->notifyID);
+            }
+
+        } catch (SocketException &e) {
+            rc = -1;
+            log_error("Routerproc: socket exception: %s", e.getErrMsg().c_str());
+            SysUtil::sleep(WAIT_INTERVAL);
+        }
+    }
+
+    return rc;
 }
 
 void RouterProcessor::clean()
 {
     if (inStream)
         inStream->stopRead();
+    gCtrlBlock->setFlowctlState(false);
     routingList->stopRouting();
     gCtrlBlock->disable();
 }
@@ -235,5 +332,15 @@ void RouterProcessor::setInStream(Stream * stream)
 RoutingList * RouterProcessor::getRoutingList()
 {
     return routingList;
+}
+
+void RouterProcessor::setPeerProcessor(WriterProcessor * processor)
+{
+        peerProcessor =  processor;
+}
+
+WriterProcessor *RouterProcessor::getPeerProcessor()
+{
+        return peerProcessor;
 }
 

@@ -61,11 +61,11 @@ int main()
     int rc;
 
 #if defined(_SCI_LINUX)
-    dlopen_file = ::dlopen(SCI_LIB_PATH, RTLD_NOW | RTLD_GLOBAL | RTLD_DEEPBIND);
+    dlopen_file = ::dlopen(SCI_LIB_PATH, RTLD_NOW | RTLD_LOCAL);
 #elif defined(__APPLE__)
-    dlopen_file = ::dlopen(SCI_LIB_PATH, RTLD_NOW | RTLD_GLOBAL);
+    dlopen_file = ::dlopen(SCI_LIB_PATH, RTLD_NOW | RTLD_LOCAL);
 #else  // aix
-    dlopen_file = ::dlopen(SCI_LIB_PATH, RTLD_NOW|RTLD_GLOBAL|RTLD_MEMBER);
+    dlopen_file = ::dlopen(SCI_LIB_PATH, RTLD_NOW | RTLD_LOCAL | RTLD_MEMBER);
 #endif
     if (!dlopen_file) {
         ::fprintf (stderr, "%s\n", ::dlerror());

@@ -39,6 +39,8 @@ class Stream;
 class RoutingList;
 class FilterList;
 
+class WriterProcessor;
+
 class RouterProcessor : public Processor 
 {
     private:
@@ -50,6 +52,8 @@ class RouterProcessor : public Processor
         sci_group_t         curGroup;
         bool                joinSegs;
 
+        WriterProcessor     *peerProcessor; 
+
     public:
         RouterProcessor(int hndl, RoutingList *rlist, FilterList *flist);
         ~RouterProcessor();
@@ -58,6 +62,7 @@ class RouterProcessor : public Processor
         virtual void process(Message *msg);
         virtual void write(Message *msg);
         virtual void seize();
+        virtual int recover();
         virtual void clean();
 
         int getCurFilterID();
@@ -67,6 +72,9 @@ class RouterProcessor : public Processor
         MessageQueue * getInQueue();
         void setInStream(Stream * stream);
         RoutingList * getRoutingList();
+
+        void setPeerProcessor(WriterProcessor * processor);
+        WriterProcessor * getPeerProcessor();
 };
 
 #endif

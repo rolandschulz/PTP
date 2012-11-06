@@ -51,6 +51,7 @@ class Processor : public Thread
         int                 totalSize;
         MessageQueue        *inQueue;
         MessageQueue        *outQueue;
+        int                 hState;
 
     public:
         Processor(int hndl = -1);
@@ -61,6 +62,7 @@ class Processor : public Thread
         virtual void process(Message *msg) = 0;
         virtual void write(Message *msg) = 0;
         virtual void seize() = 0;
+        virtual int recover() = 0;
         virtual void clean() = 0;
 
         virtual bool isActive();

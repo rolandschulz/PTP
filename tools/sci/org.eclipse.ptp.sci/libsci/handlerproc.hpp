@@ -49,6 +49,7 @@ class HandlerProcessor : public Processor
         virtual void process(Message *msg);
         virtual void write(Message *msg);
         virtual void seize();
+        virtual int recover();
         virtual void clean();
 
         void setInQueue(MessageQueue *queue);

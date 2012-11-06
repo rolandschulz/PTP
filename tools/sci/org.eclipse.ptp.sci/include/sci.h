@@ -51,12 +51,15 @@
 #define SCI_ERR_AGENT_NOTFOUND       (-2026)
 #define SCI_ERR_VERSION              (-2027)
 #define SCI_ERR_SSHAUTH              (-2028)
-#define SCI_ERR_MSG                  (-2029) 
+#define SCI_ERR_EXCEPTION            (-2029)
+#define SCI_ERR_MSG                  (-2030) 
 
 #define SCI_ERR_PARENT_BROKEN        (-5000)
 #define SCI_ERR_CHILD_BROKEN         (-5001)
 #define SCI_ERR_RECOVERED            (-5002)
 #define SCI_ERR_RECOVER_FAILED       (-5003)
+#define SCI_ERR_DATA                 (-5004)
+#define SCI_ERR_THREAD               (-5005)
 
 /*
 ** SCI Structures and typedefs
@@ -145,6 +148,7 @@ typedef struct {
 #define be_info _u.be_info
     int              sci_version;
     int              disable_sshauth;
+    int              enable_recover;
 } sci_info_t;
 
 typedef struct {
@@ -168,7 +172,12 @@ typedef enum {
     SCI_LISTENER_PORT,
     SCI_PARENT_SOCKFD,
     SCI_NUM_CHILDREN_FDS,
-    SCI_CURRENT_VERSION
+    SCI_CURRENT_VERSION,
+    SCI_PIPEWRITE_FD,
+    SCI_CHILDREN_FDLIST,
+    SCI_NUM_LISTENER_FDS,
+    SCI_LISTENER_FDLIST,
+    SCI_RECOVER_STATUS
 #define JOB_KEY              SCI_JOB_KEY
 #define NUM_BACKENDS         SCI_NUM_BACKENDS
 #define BACKEND_ID           SCI_BACKEND_ID
@@ -184,6 +193,11 @@ typedef enum {
 #define PARENT_SOCKFD        SCI_PARENT_SOCKFD
 #define NUM_CHILDREN_FDS     SCI_NUM_CHILDREN_FDS
 #define CURRENT_VERSION      SCI_CURRENT_VERSION
+#define PIPEWRITE_FD         SCI_PIPEWRITE_FD
+#define CHILDREN_FDLIST      SCI_CHILDREN_FDLIST
+#define NUM_LISTENER_FDS     SCI_NUM_LISTENER_FDS
+#define LISTENER_FDLIST      SCI_LISTENER_FDLIST
+#define RECOVER_STATUS       SCI_RECOVER_STATUS
 } sci_query_t;
 
 typedef enum {
@@ -213,7 +227,13 @@ extern "C" {
 */
 int SCI_Initialize(sci_info_t *info);
 int SCI_Terminate();
+int SCI_Release();
+int SCI_Parentinfo_update(char * parentAddr, int port);
+int SCI_Parentinfo_wait();
+int SCI_Recover_setmode(int mode);
+
 int SCI_Query(sci_query_t query, void *ret_val);
+int SCI_Query_errchildren(int *num, int **id_list);
 int SCI_Error(int err_code, char *err_msg, int msg_size);
 
 /*

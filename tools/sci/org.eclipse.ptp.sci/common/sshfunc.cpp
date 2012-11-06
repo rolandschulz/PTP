@@ -70,8 +70,6 @@ SshFunc::SshFunc()
         } else {
             log_warn("Wrong value of \"SCI_ENABLE_SSHAUTH\": %s\n", out_val.c_str());
         }
-    } else {
-        log_warn("Failed to read config file!\n");
     }
 
     envp = ::getenv("SCI_ENABLE_SSHAUTH");
@@ -145,11 +143,11 @@ int SshFunc::load(char * libPath)
     }
 
 #if defined(_SCI_LINUX)
-    dlopen_file = ::dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL | RTLD_DEEPBIND);
+    dlopen_file = ::dlopen(path.c_str(), RTLD_NOW | RTLD_LOCAL);
 #elif defined(__APPLE__)
-    dlopen_file = ::dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL);
+    dlopen_file = ::dlopen(path.c_str(), RTLD_NOW | RTLD_LOCAL);
 #else // aix
-    dlopen_file = ::dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL | RTLD_MEMBER);
+    dlopen_file = ::dlopen(path.c_str(), RTLD_NOW | RTLD_LOCAL | RTLD_MEMBER);
 #endif
     if (NULL == dlopen_file) {
         return -1;

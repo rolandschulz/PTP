@@ -43,14 +43,22 @@ class Listener;
 
 class Initializer
 {
+    public:
+        bool        pInfoUpdated;
+        int         notifyID;
     private:
         Initializer();
         static Initializer *instance;
         Listener    *listener;
         Stream      *inStream;
+    
         int         handle;
-        string initEnv;
-        
+        string      parentAddr;
+        int         parentPort;
+        int         parentID;
+
+        string      initEnv;
+
     public:
         ~Initializer();
         static Initializer* getInstance() {
@@ -60,11 +68,20 @@ class Initializer
         }
 
         int init();
+        string getEnvStr();
         Listener * initListener();
         Listener * getListener();
         Stream * getInStream();
-        string getEnvStr();
+        void setInStream(Stream * s);
 
+        int updateParentInfo(char * addr, int port);
+        void setParentAddr(char * addr);
+        string & getParentAddr();
+        void setParentPort(int port);
+        int getParentPort();
+        int getParentID();
+        int getOrgHandle();
+		
     private:
         int initFE();
         int initAgent();
@@ -73,7 +90,7 @@ class Initializer
         int initExtBE(int hndl);
         int getIntToken();
         int parseEnvStr(string &envStr);
-		int connectBack();
+        int connectBack();
         void setEnvStr(string env);
 };
 

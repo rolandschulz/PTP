@@ -23,6 +23,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    05/25/09 nieyy      Initial code (F156654)
+   01/16/12 ronglli    Add codes to detect SOCKET_BROKEN
 
 ****************************************************************************/
 
@@ -40,8 +41,11 @@
 #include "queue.hpp"
 #include "readerproc.hpp"
 
+#include "eventntf.hpp"
+#include "tools.hpp"
+
 WriterProcessor::WriterProcessor(int hndl) 
-    : Processor(hndl), peerProcessor(NULL)
+    : Processor(hndl), peerProcessor(NULL), recoverID(-1), notifyID(-1), recoverState(false), releaseState(false)
 {
     name = "Writer";
 
@@ -76,9 +80,27 @@ void WriterProcessor::process(Message * msg)
 void WriterProcessor::write(Message * msg)
 {
     assert(outStream);
-        
-    *outStream << *msg;
-    inQueue->remove();
+
+    switch (msg->getType()) {
+        case Message::RELEASE:
+            inQueue->remove();
+            if (getReleaseState()) {
+                throw (SocketException(SocketException::NET_ERR_CLOSED));
+            }
+            break;
+        default:
+            try {    
+                *outStream << *msg;
+            } catch (SocketException &e) {
+                inQueue->release();
+                throw;
+            } catch (...) {
+                inQueue->release();
+                throw;
+            }
+            inQueue->remove();
+            break;
+    }
 }
 
 void WriterProcessor::seize()
@@ -86,12 +108,42 @@ void WriterProcessor::seize()
     setState(false);
 }
 
+int WriterProcessor::recover()
+{
+    if ((gCtrlBlock->getTermState()) || (!gCtrlBlock->getRecoverMode())) {
+        return -1;
+    }
+
+    outStream->stopWrite(); 
+
+    if (recoverID == -1) {
+        recoverID = gNotifier->allocate();
+    }
+    setRecoverState(true); 
+    Stream *st;
+    if (gNotifier->freeze_i(recoverID, &st) != 0) {
+        return -1;
+    }
+    log_debug("writer%d: have set the outStream to st %p, recoverID %d", handle, st, recoverID);
+    recoverID = gNotifier->allocate();
+    outStream = st;
+    setReleaseState(false);
+    setRecoverState(false);
+    log_debug("writer%d: begin to notify notifyID %d", handle, notifyID);
+    if (gNotifier->notify_i(notifyID) != 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
 void WriterProcessor::clean()
 {
     outStream->stopWrite();
+    gCtrlBlock->setFlowctlState(false);
     if (peerProcessor) {
         while (!peerProcessor->isLaunched()) {
-            SysUtil::sleep(1000);
+            SysUtil::sleep(WAIT_INTERVAL);
         }  
         peerProcessor->join(); // ReaderProcessor
         delete peerProcessor;
@@ -105,7 +157,27 @@ void WriterProcessor::setInQueue(MessageQueue * queue)
 
 void WriterProcessor::setOutStream(Stream * stream)
 {
-    outStream = stream;
+    if (outStream == NULL) {
+        outStream = stream;
+    } else {
+        log_debug("writer%d: begin to notify the stream %p, recoverID = %d", handle, stream, recoverID);
+        if (peerProcessor) {
+            peerProcessor->setInStream(stream);
+        }
+        while (recoverID == -1) {
+            SysUtil::sleep(WAIT_INTERVAL);
+        }
+        if (notifyID == -1) {
+            notifyID = gNotifier->allocate();
+        }
+        *(Stream **)gNotifier->getRetVal(recoverID) = stream;
+        gNotifier->notify(recoverID);
+        log_debug("writer%d: finish notify the recoverID %d", handle, recoverID);
+        log_debug("writer%d: begin to freeze the notifyID %d", handle, notifyID);
+        gNotifier->freeze(notifyID, NULL);
+        log_debug("writer%d: finish freeze the notifyID %d", handle, notifyID);
+        notifyID = gNotifier->allocate();
+    }
 }
 
 MessageQueue * WriterProcessor::getInQueue()

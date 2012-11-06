@@ -31,7 +31,7 @@
 
 #include "socket.hpp"
 
-const int  BUFFER_SIZE = 5840;
+const int  BUFFER_SIZE = 16384;
 const int MAX_NETWORK_SIZE = 1024 * 1024 * 8; // Max length = 8M
 const char END_OF_LINE = '\n';
 
@@ -152,7 +152,15 @@ bool Stream::isWriteActive()
 
 Stream & Stream::flush()
 {
-    socket->send(buffer, cursor - buffer);
+    try {
+        socket->send(buffer, cursor - buffer);
+    } catch (SocketException &e) {
+        cursor = buffer;;
+        throw;
+    } catch (...) {
+        cursor = buffer;
+        throw;
+    }
     cursor = buffer;
 
     return *this;
@@ -212,7 +220,7 @@ Stream & Stream::operator >> (string &value)
     char *buf = NULL;
     *this >> len;
     
-    if (len > MAX_NETWORK_SIZE)
+    if ((len < 0) || (len > MAX_NETWORK_SIZE))
         throw SocketException(SocketException::NET_ERR_DATA);
 
     buf = new char[len];
@@ -345,4 +353,13 @@ void Stream::checkBuffer(int size)
 {
     if ((cursor - buffer + size) >= BUFFER_SIZE)
         flush();
+}
+
+int Stream::getSocket() 
+{
+   if (socket != NULL) {
+       return socket->getFd(); 
+   } else {
+       return -1;
+   }
 }

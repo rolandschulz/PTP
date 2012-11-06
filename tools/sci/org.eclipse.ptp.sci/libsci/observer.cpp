@@ -62,25 +62,40 @@ Observer::~Observer()
 void Observer::notify()
 {
     lock();
-    count++;
-    check();
+    try {
+        count++;
+        check();
+    } catch (...) {
+        unlock();
+        throw;
+    }
     unlock();
 }
 
 void Observer::unnotify()
 {
     lock();
-    if (hasChar) {
-        readChar();
-        hasChar = false;
+    try {
+        if (hasChar) {
+            readChar();
+            hasChar = false;
+        }
+        check();
+    } catch (...) {
+        unlock();
+        throw;
     }
-    check();
     unlock();
 }
 
 int Observer::getPollFd()
 {
     return pipeFd[0];
+}
+
+int Observer::getPipeWriteFd()
+{
+    return pipeFd[1];
 }
 
 void Observer::async(int fd)

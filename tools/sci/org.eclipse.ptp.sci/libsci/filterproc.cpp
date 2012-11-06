@@ -111,6 +111,12 @@ void FilterProcessor::seize()
     setState(false);
 }
 
+int FilterProcessor::recover()
+{
+    // TODO
+    return -1;
+}
+
 void FilterProcessor::clean()
 {
 }

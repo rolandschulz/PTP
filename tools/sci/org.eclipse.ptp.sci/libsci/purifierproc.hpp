@@ -63,13 +63,17 @@ class PurifierProcessor : public Processor
         virtual void process(Message *msg);
         virtual void write(Message *msg);
         virtual void seize();
+        virtual int recover();
         virtual void clean();
 
         void setInStream(Stream *stream);
+        Stream * getInStream();
         void setOutQueue(MessageQueue *queue);
         void setInQueue(MessageQueue *queue);
+        MessageQueue * getInQueue();
         void setOutErrorQueue(MessageQueue *queue);
         void setPeerProcessor(WriterProcessor *processor);
+        WriterProcessor * getPeerProcessor();
         void setObserver(Observer *ob);
         RoutingList * getRoutingList();
         FilterList * getFilterList();

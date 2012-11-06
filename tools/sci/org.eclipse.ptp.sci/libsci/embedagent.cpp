@@ -97,6 +97,8 @@ int EmbedAgent::init(int hndl, Stream *stream, MessageQueue *inQ, MessageQueue *
         writerProc->setName("WriterP");
         writerProc->setInQueue(filterOutQ);
         writerProc->setOutStream(stream);
+
+        routerProc->setPeerProcessor(writerProc);
     } else if (inQ) {
         routerProc->setInQueue(inQ);
     } else {

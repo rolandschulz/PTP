@@ -85,7 +85,7 @@ am__libsci_la_SOURCES_DIST = allocator.cpp filterproc.cpp message.cpp \
 	filter.cpp initializer.cpp readerproc.cpp topology.cpp \
 	launcher.cpp dgroup.cpp filterlist.cpp listener.cpp \
 	processor.cpp routerproc.cpp writerproc.cpp embedagent.cpp \
-	privatedata.cpp
+	privatedata.cpp bemap.cpp
 am__objects_1 = libsci_la-allocator.lo libsci_la-filterproc.lo \
 	libsci_la-message.lo libsci_la-purifierproc.lo \
 	libsci_la-routinglist.lo libsci_la-api.lo \
@@ -97,7 +97,8 @@ am__objects_1 = libsci_la-allocator.lo libsci_la-filterproc.lo \
 	libsci_la-dgroup.lo libsci_la-filterlist.lo \
 	libsci_la-listener.lo libsci_la-processor.lo \
 	libsci_la-routerproc.lo libsci_la-writerproc.lo \
-	libsci_la-embedagent.lo libsci_la-privatedata.lo
+	libsci_la-embedagent.lo libsci_la-privatedata.lo \
+	libsci_la-bemap.lo
 @SYSTEM_DARWIN_FALSE@@SYSTEM_LINUX_TRUE@am_libsci_la_OBJECTS =  \
 @SYSTEM_DARWIN_FALSE@@SYSTEM_LINUX_TRUE@	$(am__objects_1)
 @SYSTEM_DARWIN_TRUE@am_libsci_la_OBJECTS = $(am__objects_1)
@@ -255,13 +256,13 @@ SOURCES = \
     api.cpp          eventntf.cpp    handlerproc.cpp  observer.cpp   queue.cpp         \
     ctrlblock.cpp    filter.cpp      initializer.cpp  readerproc.cpp    topology.cpp launcher.cpp \
     dgroup.cpp       filterlist.cpp  listener.cpp     processor.cpp  routerproc.cpp    writerproc.cpp \
-    embedagent.cpp   privatedata.cpp
+    embedagent.cpp   privatedata.cpp bemap.cpp
 
 noinst_HEADERS = \
     allocator.hpp  filterproc.hpp listener.hpp processor.hpp routerproc.hpp writerproc.hpp \
     atomic.hpp      eventntf.hpp    general.hpp      message.hpp   purifierproc.hpp  routinglist.hpp \
     ctrlblock.hpp   filter.hpp      handlerproc.hpp  observer.hpp  queue.hpp   embedagent.hpp       \
-    dgroup.hpp      filterlist.hpp  initializer.hpp  readerproc.hpp    topology.hpp privatedata.hpp
+    dgroup.hpp      filterlist.hpp  initializer.hpp  readerproc.hpp    topology.hpp privatedata.hpp bemap.hpp
 
 include_HEADERS = ../include/sci.h
 OBJECTS = $(addsuffix .o, $(basename $(SOURCES)))
@@ -389,6 +390,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsci_la-allocator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsci_la-api.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsci_la-bemap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsci_la-ctrlblock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsci_la-dgroup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsci_la-embedagent.Plo@am__quote@
@@ -622,6 +624,13 @@ libsci_la-privatedata.lo: privatedata.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='privatedata.cpp' object='libsci_la-privatedata.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsci_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsci_la-privatedata.lo `test -f 'privatedata.cpp' || echo '$(srcdir)/'`privatedata.cpp
+
+libsci_la-bemap.lo: bemap.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsci_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsci_la-bemap.lo -MD -MP -MF $(DEPDIR)/libsci_la-bemap.Tpo -c -o libsci_la-bemap.lo `test -f 'bemap.cpp' || echo '$(srcdir)/'`bemap.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libsci_la-bemap.Tpo $(DEPDIR)/libsci_la-bemap.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='bemap.cpp' object='libsci_la-bemap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsci_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsci_la-bemap.lo `test -f 'bemap.cpp' || echo '$(srcdir)/'`bemap.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

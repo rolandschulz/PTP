@@ -24,6 +24,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    05/25/09 nieyy      Initial code (F156654)
+   01/16/12 ronglli    Add codes to detect SOCKET_BROKEN
 
 ****************************************************************************/
 
@@ -41,8 +42,11 @@
 #include "queue.hpp"
 #include "writerproc.hpp"
 
+#include "eventntf.hpp"
+#include "tools.hpp"
+
 ReaderProcessor::ReaderProcessor(int hndl) 
-    : Processor(hndl)
+    : Processor(hndl), recoverID(-1), notifyID(-1), peerProcessor(NULL) 
 {
     name = "Reader";
 
@@ -95,6 +99,13 @@ void ReaderProcessor::write(Message * msg)
                 delete msg;
             }
             break;
+        case Message::SOCKET_BROKEN:
+        case Message::ERROR_DATA:
+        case Message::ERROR_THREAD:
+            {
+                gCtrlBlock->notifyChildHealthState(msg);
+            }
+            break;
         default:
             outQueue->produce(msg);
             break;
@@ -104,7 +115,50 @@ void ReaderProcessor::write(Message * msg)
 void ReaderProcessor::seize()
 {    
     // exit the peer relay processor thread related to the same socket
-    setState(false);    
+    setState(false);  
+    if (!gCtrlBlock->getTermState()) {
+        gCtrlBlock->notifyChildHealthState(handle, hState); 
+    }
+}
+
+int ReaderProcessor::recover()
+{    
+    // exit the peer relay processor thread related to the same socket
+    if ((gCtrlBlock->getTermState()) || (!gCtrlBlock->getRecoverMode())) {
+        return -1;
+    }
+    inStream->stopRead(); 
+
+    WriterProcessor * writer = getPeerProcessor(); 
+    while(!(writer->isLaunched())) {
+        SysUtil::sleep(WAIT_INTERVAL);
+    }
+    if (!(writer->getRecoverState())) {
+        Message *msg = new Message(); 
+        msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 0, NULL, NULL, Message::RELEASE);
+        writer->setReleaseState(true);
+        writer->getInQueue()->produce(msg);
+    }
+
+    if (recoverID == -1) {
+        recoverID = gNotifier->allocate();
+    }
+
+    Stream *st;
+    if (gNotifier->freeze_i(recoverID, &st) != 0) {
+        log_debug("reader%d: recover error: freeze_i failed for the stream %p, recoverID = %d", handle, st, recoverID);
+        return -1;
+    }
+    log_debug("reader%d: finish freeze for the stream %p, recoverID = %d", handle, st, recoverID);
+    recoverID = gNotifier->allocate();
+    log_debug("reader%d: begin to notify notifyID %d", handle, notifyID);
+    if (gNotifier->notify_i(notifyID) != 0) {
+        log_debug("reader%d: recover error: notify_i failed for the stream %p, recoverID = %d", handle, st, recoverID);
+        return -1;
+    }
+    
+    inStream = st;
+    return 0; 
 }
 
 void ReaderProcessor::clean()
@@ -115,7 +169,26 @@ void ReaderProcessor::clean()
 
 void ReaderProcessor::setInStream(Stream * stream)
 {
-    inStream = stream;
+    if (inStream == NULL) {
+        log_debug("reader%d: begin to set the stream. Original is NULL", handle);
+        inStream = stream;
+    } else {
+        log_debug("reader%d: begin to notify the stream %p, recoverID = %d", handle, stream, recoverID);
+        while (recoverID == -1) {
+            SysUtil::sleep(WAIT_INTERVAL);
+        }
+        if (notifyID == -1) {
+            notifyID = gNotifier->allocate();
+        }
+        *(Stream **)gNotifier->getRetVal(recoverID) = stream;
+        gNotifier->notify(recoverID);
+        log_debug("reader%d: finish notify the recoverID %d", handle, recoverID);
+        log_debug("reader%d: begin to freeze the notifyID %d", handle, notifyID);
+        gNotifier->freeze(notifyID, NULL);
+        log_debug("reader%d: finish freeze the notifyID %d", handle, notifyID);
+        notifyID = gNotifier->allocate();
+    }
+
 }
 
 void ReaderProcessor::setOutQueue(MessageQueue * queue)
@@ -127,3 +200,14 @@ void ReaderProcessor::setOutErrorQueue(MessageQueue * queue)
 {
     outErrorQueue = queue;
 }
+
+void ReaderProcessor::setPeerProcessor(WriterProcessor* processor)
+{
+    peerProcessor =  processor;
+}
+
+WriterProcessor *ReaderProcessor::getPeerProcessor()
+{
+    return peerProcessor;
+}
+

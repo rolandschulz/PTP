@@ -25,6 +25,7 @@
    -------- --- ---   -----------
    10/06/08 tuhongj      Initial code (D153875)
    11/27/10 ronglli      Add SCI version
+   01/16/12 ronglli      Add codes to detect SOCKET_BROKEN
 
 ****************************************************************************/
 
@@ -33,9 +34,13 @@
 
 #include <pthread.h>
 #include <map>
+#include <set>
 
 #include "sci.h"
 #include "general.hpp"
+#include "message.hpp" 
+
+#define WAIT_INTERVAL 1000  // 1000 usec
 
 using namespace std;
 
@@ -63,8 +68,17 @@ class CtrlBlock
             BACK_END,
             BACK_AGENT
         };
+
+        enum HEALTH_STATE{
+            HEALTH,
+            ERROR_CHILD_BROKEN,
+            ERROR_DATA,
+            ERROR_THREAD,
+            UNKNOWN
+        };
         
         typedef map<int, EmbedAgent *> AGENT_MAP;
+        typedef set<int> ERRORCHILDREN_LIST;
 
     private:
         // SCI Version
@@ -73,14 +87,21 @@ class CtrlBlock
         // basic information
         ROLE                 role;
         int                  handle;
+        int                  embed_handle;
         int                  jobKey;
         int                  enableID;
+        string               userName;
+
+        bool                 flowctlState;
+        bool                 childHealthState;
         pthread_mutex_t      mtx;
 
         sci_info_t           *endInfo;
 
         Observer             *observer;
         AGENT_MAP            embedAgents;
+        ERRORCHILDREN_LIST   errChildren;
+        int                  cnt_disable;
 
         // flow control threshold
         long long            thresHold;
@@ -102,7 +123,9 @@ class CtrlBlock
         HandlerProcessor     *handlerProc;
 
         Stream               *parentStream;
-        bool                 recoverMode;
+        int                  recoverMode;
+        bool                 waitParentInfo;
+        bool                 termState;
 
         CtrlBlock();
         static CtrlBlock *instance;
@@ -115,12 +138,20 @@ class CtrlBlock
             return instance;
         }
 
+        void setRecoverMode(int mo);
+        int getRecoverMode();
+        void setParentInfoWaitState(bool mo);
+        bool getParentInfoWaitState();
+        void setTermState(bool mo);
+        bool getTermState();
+
         ROLE getMyRole();
         void setMyRole(CtrlBlock::ROLE ro); 
         int getMyHandle();
         void setMyHandle(int hndl);
-        void setRecoverMode(bool mo);
-        bool getRecoverMode(); 
+        // embeded agent
+        int getMyEmbedHandle();
+        void setMyEmbedHandle(int hndl);
         sci_info_t * getEndInfo();
         int getJobKey();
         void setJobKey(int key);
@@ -166,10 +197,26 @@ class CtrlBlock
         int getChildrenSockfds(int *fds);
         int numOfChildrenFds();
 
+        bool allRouted();
+        int isActiveSockfd(int fd);
+        bool allActive();
+
         void setFlowctlThreshold(long long th);
         long long getFlowctlThreshold();
         
         int getVersion();
+        int setUsername();
+        string & getUsername();
+
+        void setFlowctlState(bool state);
+        bool getFlowctlState();
+        void setChildHealthState(int state);
+        int checkChildHealthState();
+        int getErrState(Message::Type typ);
+        Message::Type getErrMsgType(int hState);
+        void notifyChildHealthState(int hndl, int hState);
+        void notifyChildHealthState(Message * msg);
+        int getErrChildren(int * num, int **list);
 
         void genSelfInfo(MessageQueue *queue, bool isUncle);
         void clean();

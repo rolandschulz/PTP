@@ -44,13 +44,16 @@ class Socket
         
     private:
         int socket;
-		int accSockets[32];
+        int accSockets[32];
+        int numListenfds;
+        static int disableIpv6;
+        static int connTimes;
 
     public:
         Socket(int sockfd = -1);
         ~Socket();
 
-        int setNonBlock(int sockfd); // blocking or non-blocking
+        int setMode(int sockfd, bool mode); // blocking or non-blocking
         int setFd(int fd);
         int getFd() { return socket; }
         
@@ -62,6 +65,12 @@ class Socket
         int send(const char *buf, int len);
         int recv(char *buf, int len);
         void close(DIRECTION how);
+
+        static int getDisableIPv6();
+        static void setDisableIPv6(int flag);
+        static void setConnTimes(int cnt);
+        int numOfListenFds();
+        int getListenSockfds(int *fds);
 };
 
 class SocketException 

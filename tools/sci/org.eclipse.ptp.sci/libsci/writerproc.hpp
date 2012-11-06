@@ -40,6 +40,11 @@ class WriterProcessor : public Processor
     private:
         Stream              *outStream;
         ReaderProcessor     *peerProcessor;
+        int                 recoverID;
+        int                 notifyID;
+
+        bool                recoverState;
+        bool                releaseState;
 
     public:
         WriterProcessor(int hndl = -1);
@@ -49,6 +54,7 @@ class WriterProcessor : public Processor
         virtual void process(Message *msg);
         virtual void write(Message *msg);
         virtual void seize();
+        virtual int recover();
         virtual void clean();
 
         void setInQueue(MessageQueue *queue);
@@ -56,6 +62,11 @@ class WriterProcessor : public Processor
         void setOutStream(Stream *stream);
         void setPeerProcessor(ReaderProcessor *processor);
         ReaderProcessor *getPeerProcessor();
+
+        bool getRecoverState() { return recoverState; }
+        void setRecoverState(bool state) { recoverState = state; }
+        bool getReleaseState() { return releaseState; }
+        void setReleaseState(bool state) { releaseState = state; }
 };
 
 #endif
