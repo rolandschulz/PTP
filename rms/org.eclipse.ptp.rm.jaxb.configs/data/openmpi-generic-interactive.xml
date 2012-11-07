@@ -175,6 +175,7 @@
 					</match>
 				</target>
 			</stderr-parser>
+			<pre-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master --routing_file=routes_@jobId ${ptp_rm:debuggerArgs#value}" wait="false"/>
 		</submit-interactive-debug>		
 		<launch-tab>
 			<dynamic includeWidgetValuesFrom="Advanced Options">

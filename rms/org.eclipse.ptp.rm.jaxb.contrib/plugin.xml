@@ -37,7 +37,7 @@
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/edu.sdsc.trestles.torque.interactive.openmpi.xml"
-            name="edu.sdsc.trestles.torque.interactive">
+            name="edu.sdsc.trestles.torque.interactive.openmpi">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/edu.utexas.tacc.lonestar.sge.batch.xml"

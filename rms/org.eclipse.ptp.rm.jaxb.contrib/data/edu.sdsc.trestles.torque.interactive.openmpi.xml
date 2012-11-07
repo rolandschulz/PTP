@@ -153,7 +153,7 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 			<arg>${ptp_rm:bindir#value}qsub</arg>
 			<arg>-I</arg>
 			<arg>-q ${ptp_rm:destination#value}</arg>
-			<arg>-l nodes=1,mem=${ptp_rm:Resource_List.mem#value},walltime=${ptp_rm:Resource_List.walltime#value}</arg>
+			<arg>-l nodes=${ptp_rm:Resource_List.nodes#value},mem=${ptp_rm:Resource_List.mem#value},walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			<arg isUndefinedIfMatches="-A">-A ${ptp_rm:Account_Name#value}</arg>
 			<arg>-V</arg>
 			<input isUndefinedIfMatches=";">${ptp_rm:ems#value};</input>
@@ -161,8 +161,6 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 			<input>mpirun</input>
 			<input isUndefinedIfMatches="-np">-np ${ptp_rm:mpiNumberOfProcesses#value}</input>
 			<input>-hostfile $PBS_NODEFILE</input>
-			<input>${ptp_rm:debuggerExecutablePath#value}</input>
-			<input>${ptp_rm:debuggerArgs#value}</input>
 			<environment name="PTP_JOBID" value="@jobId"/>
 			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
 			<environment name="PTP_DEBUGGER_EXECUTABLE_PATH" value="${ptp_rm:debuggerExecutablePath#value}"/>
@@ -212,6 +210,7 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 					</match>
 				</target>
 			</stderr-parser>
+			<pre-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master --routing_file=routes_@jobId ${ptp_rm:debuggerArgs#value}" wait="false"/>
 		</submit-interactive-debug>
 		<get-job-status name="get-job-status" ignoreExitStatus="true">
 			<arg>${ptp_rm:bindir#value}qstat</arg>

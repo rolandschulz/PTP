@@ -973,7 +973,7 @@ public class CommandJob extends Job implements ICommandJob {
 			progress.worked(25);
 
 			for (SimpleCommandType cmd : command.getPreLaunchCmd()) {
-				Job job = new SimpleCommandJob(null, cmd, command.getDirectory(), control);
+				Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control);
 				job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 				job.schedule();
 				if (cmd.isWait()) {

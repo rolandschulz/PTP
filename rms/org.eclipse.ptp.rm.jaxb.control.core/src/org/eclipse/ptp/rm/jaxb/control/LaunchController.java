@@ -62,7 +62,6 @@ import org.eclipse.ptp.rm.jaxb.control.internal.utils.JobIdPinTable;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
@@ -155,7 +154,6 @@ public class LaunchController implements ILaunchController {
 	private boolean isActive = false;
 	private boolean isInitialized = false;
 	private String configURL;
-	private String configXML;
 	private RemoteServicesDelegate fRemoteServicesDelegate;
 
 	private ResourceManagerData configData;
@@ -607,16 +605,6 @@ public class LaunchController implements ILaunchController {
 	}
 
 	/**
-	 * @return the configuration XML used to construct the data tree.
-	 */
-	private String getRMConfigurationXML() {
-		if (JAXBCoreConstants.ZEROSTR.equals(configXML)) {
-			return null;
-		}
-		return configXML;
-	}
-
-	/**
 	 * Get the variable map. Returns an initialized map if one doesn't already exist.
 	 * 
 	 * @return initialized variable map
@@ -648,31 +636,29 @@ public class LaunchController implements ILaunchController {
 	public void initialize() throws CoreException {
 		try {
 			realizeRMDataFromXML();
-			if (configData != null) {
-				controlData = configData.getControlData();
-				if (servicesId == null && connectionName == null) {
-					/*
-					 * Set connection information from the site configuration. This may get overidden by the launch configuration
-					 * later
-					 */
-					SiteType site = configData.getSiteData();
-					if (site != null) {
-						servicesId = site.getRemoteServices();
-						if (servicesId == null) {
-							servicesId = IRemotePreferenceConstants.REMOTE_TOOLS_REMOTE_SERVICES_ID;
-						}
-						connectionName = site.getConnectionName();
+			controlData = configData.getControlData();
+			if (servicesId == null && connectionName == null) {
+				/*
+				 * Set connection information from the site configuration. This may get overidden by the launch configuration
+				 * later
+				 */
+				SiteType site = configData.getSiteData();
+				if (site != null) {
+					servicesId = site.getRemoteServices();
+					if (servicesId == null) {
+						servicesId = IRemotePreferenceConstants.REMOTE_TOOLS_REMOTE_SERVICES_ID;
 					}
-				}
-				if (servicesId == null || connectionName == null) {
-					throw new Throwable(Messages.LaunchController_missingServicesOrConnectionName);
+					connectionName = site.getConnectionName();
 				}
 			}
+			if (servicesId == null || connectionName == null) {
+				throw new Throwable(Messages.LaunchController_missingServicesOrConnectionName);
+			}
+			fControlId = LaunchControllerManager.generateControlId(servicesId, connectionName, configData.getName());
 		} catch (Throwable t) {
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
 		}
 
-		fControlId = LaunchControllerManager.generateControlId(servicesId, connectionName, configData.getName());
 		isInitialized = true;
 	}
 
@@ -900,10 +886,7 @@ public class LaunchController implements ILaunchController {
 	}
 
 	/**
-	 * Unmarshals the XML into the JAXB data tree.<br>
-	 * <br>
-	 * If the current xml is <code>null</code>, or if the "force reload" preference is set, a fresh attempt is made to store the xml
-	 * from the location. Otherwise, the cached xml is used.
+	 * Unmarshals the XML into the JAXB data tree.
 	 * 
 	 * @throws unmarshaling
 	 *             or URL exceptions
@@ -911,12 +894,7 @@ public class LaunchController implements ILaunchController {
 	private void realizeRMDataFromXML() throws CoreException {
 		if (configURL != null) {
 			try {
-				configXML = JAXBInitializationUtils.getRMConfigurationXML(new URL(configURL));
-				configData = null;
-			} catch (Exception e) {
-				throw CoreExceptionUtils.newException(e.getLocalizedMessage(), e.getCause());
-			}
-			try {
+				String configXML = JAXBInitializationUtils.getRMConfigurationXML(new URL(configURL));
 				configData = JAXBInitializationUtils.initializeRMData(configXML);
 			} catch (Exception e) {
 				throw CoreExceptionUtils.newException(e.getLocalizedMessage(), e.getCause());
