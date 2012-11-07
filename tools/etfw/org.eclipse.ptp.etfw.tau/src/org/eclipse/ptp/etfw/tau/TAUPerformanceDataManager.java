@@ -217,7 +217,7 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 	
 	@Override
 	public void process(String projname, ILaunchConfiguration configuration, String directory) throws CoreException {
-		String projectDirectory = directory;
+		//String projectDirectory = directory;
 		boolean profsummary = configuration.getAttribute(ITAULaunchConfigurationConstants.PROFSUMMARY, false);
 		IBuildLaunchUtils tmpub = new BuildLaunchUtils();
 		String pppath = tmpub.checkToolEnvPath("paraprof");
@@ -392,10 +392,10 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 
 		if (keepprofs || !hasdb || profsummary) {
 			if (ppkFile != null) {
-				movePakFile(projectDirectory, projtype, projtrial, ppkFile);
+				movePakFile(directory, projtype, projtrial, ppkFile);
 			}
 			if (xmlFile != null) {
-				movePakFile(projectDirectory, projtype, projtrial, xmlFile);
+				movePakFile(directory, projtype, projtrial, xmlFile);
 			}
 		} else {
 			if (ppkFile != null) {
