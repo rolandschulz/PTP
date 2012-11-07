@@ -24,11 +24,12 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.TaskSet;
@@ -856,7 +857,11 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 				try {
 					fRemoteConnection.removePortForwarding(fForwardedPort);
 				} catch (RemoteConnectionException e) {
-					PTPCorePlugin.log(e);
+					SDMDebugCorePlugin
+							.getDefault()
+							.getLog()
+							.log(new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e
+									.getLocalizedMessage(), null));
 				}
 				fForwardedPort = -1;
 			}
