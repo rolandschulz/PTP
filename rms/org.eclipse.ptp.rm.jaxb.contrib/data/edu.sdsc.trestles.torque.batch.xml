@@ -715,7 +715,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<fixed-text>MPI Number of Cores: </fixed-text>
+						<fixed-text>MPI Number of Processes: </fixed-text>
 					</widget>
 					<widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="mpiNumberOfProcesses">
 						<layout-data>
