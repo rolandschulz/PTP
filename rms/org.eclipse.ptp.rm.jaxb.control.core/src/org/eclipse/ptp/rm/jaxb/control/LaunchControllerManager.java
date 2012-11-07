@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -54,20 +55,22 @@ public class LaunchControllerManager {
 			String controlId = generateControlId(remoteServicesId, connectionName, configName);
 			ILaunchController controller = fControllers.get(controlId);
 			if (controller == null) {
-				controller = new LaunchController();
-				controller.setRMConfigurationURL(JAXBExtensionUtils.getConfigurationURL(configName));
-				if (connectionName != null && remoteServicesId != null) {
-					controller.setConnectionName(connectionName);
-					controller.setRemoteServicesId(remoteServicesId);
+				URL url = JAXBExtensionUtils.getConfigurationURL(configName);
+				if (url != null) {
+					controller = new LaunchController();
+					controller.setRMConfigurationURL(url);
+					if (connectionName != null && remoteServicesId != null) {
+						controller.setConnectionName(connectionName);
+						controller.setRemoteServicesId(remoteServicesId);
+					}
+					controller.initialize();
+					fControllers.put(controlId, controller);
+					ModelManager.getInstance().getUniverse().addResourceManager(configName, controlId);
 				}
-				controller.initialize();
-				fControllers.put(controlId, controller);
-				ModelManager.getInstance().addJobControl(controller);
-				ModelManager.getInstance().getUniverse().addResourceManager(configName, controlId);
 			}
 			boolean reload = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(),
 					JAXBRMPreferenceConstants.FORCE_XML_RELOAD);
-			if (!controller.isInitialized() || reload) {
+			if (controller != null && (!controller.isInitialized() || reload)) {
 				controller.initialize();
 			}
 			return controller;
