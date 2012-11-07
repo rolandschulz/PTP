@@ -768,15 +768,16 @@ public class PerfDMFView extends ViewPart {
 
 		Object[] objs;
 		objs = vcp.getChildren(vcp.getRoot());
+		final String def="default";
 
 		for (int i = 0; i < objs.length; i++) {
 			TreeNode node = (TreeNode) objs[i];
-			if (node.tt.name.equals(project)) {
+			if (node.tt.name.equals(project)||(objs.length==1&&node.tt.name.equals(def))) {
 				viewer.setExpandedState(node, true);
 				Object[] expObjs = node.getChildren();
 				for (int j = 0; j < expObjs.length; j++) {
 					TreeNode expNode = (TreeNode) expObjs[j];
-					if (expNode.getName().equals(projectType)) {
+					if (expNode.getName().equals(projectType)||(expObjs.length==1&&expNode.getName().equals(def))) {
 						viewer.setExpandedState(expNode, true);
 
 						Object[] trialObjs = expNode.getChildren();
@@ -785,6 +786,7 @@ public class PerfDMFView extends ViewPart {
 							if (trialNode.getName().equals(trialName)) {
 								StructuredSelection selection = new StructuredSelection(trialNode);
 								viewer.setSelection(selection);
+								return true;
 							}
 						}
 					}
