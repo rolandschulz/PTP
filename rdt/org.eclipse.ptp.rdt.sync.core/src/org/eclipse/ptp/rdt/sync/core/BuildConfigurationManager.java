@@ -60,6 +60,7 @@ import org.osgi.service.prefs.Preferences;
  */
 public class BuildConfigurationManager {
 	private static final String configSyncDataStorageName = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
+	private static final String configEnvPropertiesStorageName = "org.eclipse.ptp.ems.core"; //$NON-NLS-1$
 	private static final String projectLocationPathVariable = "${project_loc}"; //$NON-NLS-1$
 	private static final String localConfigAnnotation = "_local"; //$NON-NLS-1$
 	private static final String remoteConfigAnnotation = "_remote"; //$NON-NLS-1$
@@ -515,7 +516,7 @@ public class BuildConfigurationManager {
 	}
 	
 	/**
-	 * Store a simple java map as data in a configuration.
+	 * Store a simple java map as data in a configuration under the given storage name.
 	 * 
 	 * @param config
 	 * @param map
@@ -830,5 +831,72 @@ public class BuildConfigurationManager {
 	 */
 	public void shutdown(IProject project) {
 		provider.close(project);
+	}
+
+	/**
+	 * Set a single environment property for the given project.
+	 * @param project
+	 *           cannot be null
+	 * @param key
+	 *           cannot be null
+	 * @param value
+	 * @throws CoreException on problems saving the data
+	 */
+	public void setEnvProperty(IConfiguration config, String key, String value) throws CoreException {
+		Map<String, String> props = this.getEnvProperties(config);
+		// Error reading data
+		if (props == null) {
+			return;
+		}
+		props.put(key, value);
+		this.setEnvProperties(config, props);
+	}
+
+	/**
+	 * Set all environment properties for the given project.
+	 * (All previous properties are erased.)
+	 * @param project
+	 *			cannot be null
+	 * @param props
+	 * 			cannot be null
+	 * @throws CoreException on problems saving the data
+	 */
+	public void setEnvProperties(IConfiguration config, Map<String, String> props) throws CoreException {
+		this.setConfigData((Configuration) config, props, configEnvPropertiesStorageName);
+	}
+
+	/**
+	 * Get a single environment property for the given project.
+	 * @param project
+	 *           cannot be null
+	 * @param key
+	 *           cannot be null
+	 * @return the property value
+	 * @throws CoreException on problems reading the data
+	 */
+	public String getEnvProperty(IConfiguration config, String key) throws CoreException {
+		Map<String, String> props = this.getEnvProperties(config);
+		if (props == null) {
+			return null;
+		} else {
+			return props.get(key);
+		}
+	}
+
+	/**
+	 * Get all environment properties for the given project.
+	 * @param project
+	 * 			cannot be null
+	 * @return properties - never null but an empty map if no properties yet stored.
+	 * @throws CoreException on problems reading the data
+	 */
+	public Map<String, String> getEnvProperties(IConfiguration config) throws CoreException {
+		Map<String, String> props = this.getConfigData((Configuration) config, configEnvPropertiesStorageName);
+		if (props == null) {
+			return new HashMap<String, String>();
+		} else {
+			return props;
+		}
+
 	}
 }

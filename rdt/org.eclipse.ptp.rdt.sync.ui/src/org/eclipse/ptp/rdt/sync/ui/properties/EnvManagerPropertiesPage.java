@@ -7,26 +7,37 @@
  *
  * Contributors:
  *    Jeff Overbey (Illinois) - Initial API and implementation
+ *    John Eblen (ORNL) - Altered to handle multiple configurations and save them
+ *                        inside synchronized project's core (bug 393244)
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui.properties;
 
 import java.net.URI;
 import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICResourceDescription;
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.ui.properties.AbstractSingleBuildPage;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.ems.core.EnvManagerConfigMap;
 import org.eclipse.ptp.ems.ui.EnvManagerConfigWidget;
 import org.eclipse.ptp.ems.ui.IErrorListener;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
-import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
+import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * The Environment Management property page, which is available under the C/C++ Build category for synchronized remote projects.
@@ -34,8 +45,13 @@ import org.eclipse.swt.widgets.Composite;
  * @author Jeff Overbey
  */
 public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
-
 	private EnvManagerConfigWidget ui = null;
+	private final Map<String, EnvManagerConfigMap> configToPropertiesMap = new HashMap<String, EnvManagerConfigMap>();
+	// This set consists of configs that are successfully loaded in "loadSettings". Ideally, it would only consist of changed
+	// configs, but the widgets do not currently support listening for modifications.
+	private final Set<IConfiguration> configsToSave = new HashSet<IConfiguration>();
+	private IConfiguration configBeforeSwitched = null;
+	private boolean widgetsReady = false;
 
 	/*
 	 * (non-Javadoc)
@@ -59,10 +75,14 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 			}
 		});
 
-		this.ui.setUseEMSCheckbox(isEnvConfigSupportEnabled());
-		this.ui.setManualConfigCheckbox(isManualConfigEnabled());
-		this.ui.setManualConfigText(getManualConfigText());
-		this.ui.configurationChanged(getSyncURI(), remoteConnection, computeSelectedItems());
+		IConfiguration initialConfig = getCfg();
+		EnvManagerConfigMap initialMap = this.loadSettings(initialConfig);
+		this.ui.setUseEMSCheckbox(initialMap.isEnvMgmtEnabled());
+		this.ui.setManualConfigCheckbox(initialMap.isManualConfigEnabled());
+		this.ui.setManualConfigText(initialMap.getManualConfigText());
+		this.ui.configurationChanged(getSyncURI(), remoteConnection, initialMap.getConfigElements());
+		configBeforeSwitched = initialConfig;
+		widgetsReady = true;
 	}
 
 	private IRemoteConnection getConnection() {
@@ -83,40 +103,6 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		}
 	}
 
-	private boolean isEnvConfigSupportEnabled() {
-		try {
-			return getProjectProperties().isEnvMgmtEnabled();
-		} catch (final Error e) {
-			return false;
-		}
-	}
-
-	private EnvManagerProjectProperties getProjectProperties() {
-		try {
-			return new EnvManagerProjectProperties(getProject());
-		} catch (final Error e) {
-			setErrorMessage(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage()); //$NON-NLS-1$
-			RDTSyncUIPlugin.log(e);
-			throw e;
-		}
-	}
-
-	private boolean isManualConfigEnabled() {
-		try {
-			return getProjectProperties().isManualConfigEnabled();
-		} catch (final Error e) {
-			return false;
-		}
-	}
-
-	private String getManualConfigText() {
-		try {
-			return getProjectProperties().getManualConfigText();
-		} catch (final Error e) {
-			return ""; //$NON-NLS-1$
-		}
-	}
-
 	private URI getSyncURI() {
 		final BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		try {
@@ -128,22 +114,6 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		}
 	}
 
-	private List<String> computeSelectedItems() {
-		try {
-			final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
-			if (projectProperties.getConnectionName().equals(ui.getConnectionName())) {
-				return projectProperties.getConfigElements();
-			} else {
-				// If the stored connection name is different,
-				// then the stored list of modules is probably for a different machine,
-				// so don't try to select those modules, since they're probably incomplete or invalid for this connection
-				return null; // Revert to default selection
-			}
-		} catch (final Error e) {
-			return null; // Revert to default selection
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -152,9 +122,23 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 	@Override
 	protected void cfgChanged(ICConfigurationDescription cfgd) {
 		super.cfgChanged(cfgd);
+		// This method is called before createWidgets, so ignore this initial call.
+		if (widgetsReady == false) {
+			return;
+		}
+
+		// Update settings for previous configuration first
+		// Do not update unless config really changed. This prevents a problem at creation where config settings are erased
+		// because they are stored before the UI has been fully created.
+		if (configBeforeSwitched != getCfg()) {
+			this.storeSettings(configBeforeSwitched);
+			configBeforeSwitched = getCfg();
+		}
+		
 		if (ui != null) {
 			IRemoteConnection connection = getConnection();
-			ui.configurationChanged(getSyncURI(), connection, computeSelectedItems());
+			List<String> settings = this.loadSettings(getCfg()).getConfigElements();
+			ui.configurationChanged(getSyncURI(), connection, settings);
 		}
 	}
 
@@ -179,7 +163,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 	 */
 	@Override
 	protected void performApply(ICResourceDescription src, ICResourceDescription dst) {
-		storeProjectProperties();
+		this.performOk();
 	}
 
 	/*
@@ -188,18 +172,60 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 	 * @see org.eclipse.cdt.ui.newui.AbstractSinglePage#performOk()
 	 */
 	@Override
+	// Slight modification of same function from BuildRemotePropertiesPage
 	public boolean performOk() {
-		storeProjectProperties();
-		return super.performOk();
+		if (!super.performOk()) {
+			return false;
+		}
+		if (widgetsReady == false) {
+			return true;
+		}
+
+		// Disable sync auto while changing config files but make sure the previous setting is restored before exiting.
+		boolean syncAutoSetting = SyncManager.getSyncAuto();
+		SyncManager.setSyncAuto(false);
+		try {
+			// Don't forget to save changes made to the current configuration before proceeding
+			this.storeSettings(configBeforeSwitched);
+			for (IConfiguration config : configsToSave) {
+				BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+				bcm.setEnvProperties(config, this.loadSettings(config).getAllProperties());
+			}
+		} catch (CoreException e) {
+			IStatus status = new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, Messages.EnvManagerPropertiesPage_0, e);
+			StatusManager.getManager().handle(status, StatusManager.SHOW);
+			return false;
+		} finally {
+			SyncManager.setSyncAuto(syncAutoSetting);
+		}
+		return true;
 	}
 
-	private void storeProjectProperties() {
-		try {
-			final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
-			ui.saveConfiguration(projectProperties);
-		} catch (final Error e) {
-			RDTSyncCorePlugin.log(e);
-			setErrorMessage(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage()); //$NON-NLS-1$
+	// Load configuration properties to temporary storage
+	// Never returns null - returns empty map on error reading data.
+	private EnvManagerConfigMap loadSettings(IConfiguration config) {
+		if (!configToPropertiesMap.containsKey(config.getId())) {
+			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+			try {
+				configToPropertiesMap.put(config.getId(), new EnvManagerConfigMap(bcm.getEnvProperties(config)));
+			} catch (CoreException e) {
+				IStatus status = new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, Messages.EnvManagerPropertiesPage_0, e);
+				StatusManager.getManager().handle(status, StatusManager.SHOW);
+				return new EnvManagerConfigMap();
+			}
+		}
+		return configToPropertiesMap.get(config.getId());
+	}
+
+	// Save configuration properties to temporary storage
+	private void storeSettings(IConfiguration config) {
+		EnvManagerConfigMap map = this.loadSettings(config);
+		EnvManagerConfigMap mapCopy = new EnvManagerConfigMap(map);
+		ui.saveConfiguration(map);
+		if (!map.equals(mapCopy)) {
+			// Make sure settings are actually stored. They may not be if there was an exception while loading settings.
+			configToPropertiesMap.put(config.getId(), map);
+			configsToSave.add(config);
 		}
 	}
 }
