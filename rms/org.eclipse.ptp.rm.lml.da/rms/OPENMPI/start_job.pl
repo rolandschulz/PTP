@@ -101,17 +101,6 @@ sub generate_routing_file {
 	close(OUT);
 }
 
-sub start_sdm_master {
-	my ($path, @args) = @_;
-	
-	my $pid = fork();
-	if ($pid == 0) {
-		exec($path, @args, "--master");
-		exit(1);
-	}
-	push(@child_pids, $pid);
-}
-
 if ($#ARGV < 1) {
   die " Usage: $0 mpi_cmd [mpi_args ...]\n";
 }
@@ -124,7 +113,7 @@ if ($launchMode eq 'debug') {
 	$debuggerId = $ENV{'PTP_DEBUGGER_ID'};
 	$debuggerPath = $ENV{'PTP_DEBUGGER_EXECUTABLE_PATH'};
 	@debuggerArgs = shellwords($ENV{'PTP_DEBUGGER_ARGS'});
-	$ROUTING_FILE = getcwd() . "/route." . $$;
+	$ROUTING_FILE = getcwd() . "/routes_" . $ENV{'PTP_JOBID'};
 	push(@ARGV, "-mca", "orte_show_resolved_nodenames", "1", "-display-map");
 	push(@debuggerArgs, "--routing_file=$ROUTING_FILE");
 }
@@ -158,10 +147,6 @@ if ( $pid == 0 ) {
 	}
 }
 push(@child_pids, $pid);
-
-if ($launchMode eq 'debug') {
-	start_sdm_master($debuggerPath, @debuggerArgs);
-}
 
 foreach (@child_pids) {
 	waitpid($_, 0);
