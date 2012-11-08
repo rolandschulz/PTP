@@ -32,10 +32,19 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.util.LaunchUtils;
+import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
+import org.eclipse.ptp.ems.core.EnvManagerRegistry;
+import org.eclipse.ptp.ems.core.IEnvManager;
+import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
@@ -47,6 +56,7 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -61,6 +71,8 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	IRemoteConnectionManager connMgr = null;
 	IRemoteUIFileManager fileManagerUI = null;
 	IRemoteFileManager fileManager = null;
+	IEnvManagerConfig envMgrConfig=null;
+	private IEnvManager envManager=null;
 
 	public RemoteBuildLaunchUtils(ILaunchConfiguration config) {
 		this.config = config;
@@ -70,7 +82,15 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		conn = connMgr.getConnection(LaunchUtils.getConnectionName(config));
 		fileManagerUI = remoteUIServices.getUIFileManager();
 		fileManager = remoteServices.getFileManager(conn);
-
+		envMgrConfig = getEnvManagerConfig(config);
+		if (envMgrConfig != null) {
+			envManager = EnvManagerRegistry.getEnvManager(null,	conn);
+//			if (envManager != null) {
+//				//moduleSetup = envManager.getBashConcatenation(";", false, envMgrConfig, null);
+//				moduleSetup = envManager.createBashScript(null, false, config, commandToExecuteAfterward)
+//				
+//			}
+		}
 		// this.selshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
 	}
 
@@ -250,6 +270,32 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			}
 		}
 	}
+	
+	
+	/**
+	 * Get the environment manager configuration associated with the project that was specified in the launch configuration. If no
+	 * launchConfiguration was specified then this CommandJob does not need to use environment management so we can safely return
+	 * null.
+	 * 
+	 * @return environment manager configuration or null if no configuration can be found
+	 */
+	private IEnvManagerConfig getEnvManagerConfig(ILaunchConfiguration configuration) {
+		try {
+			String projectName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
+			if (projectName != null) {
+				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+				if (project != null) {
+					final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(project);
+					if (projectProperties.isEnvMgmtEnabled()) {
+						return projectProperties;
+					}
+				}
+			}
+		} catch (CoreException e) {
+			// Ignore
+		}
+		return null;
+	}
 
 	/**
 	 * This locates name of the parent of the directory containing the given tool.
@@ -266,19 +312,46 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		String pPath = null;
 		try {
 			IRemoteProcessBuilder rpb = remoteServices.getProcessBuilder(conn);
-			rpb.command("which", toolname);//$NON-NLS-1$
+			if(envManager!=null){
+				String com="";
+				try {
+					com = envManager.createBashScript(null, false, envMgrConfig, "which "+toolname);
+					IFileStore envScript = fileManager.getResource(com);
+					IFileInfo envInfo=envScript.fetchInfo();
+					envInfo.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
+					envScript.putInfo(envInfo,EFS.SET_ATTRIBUTES,null);
+					
+					
+				} catch (RemoteConnectionException e) {
+					e.printStackTrace();
+					return null;
+				} catch (CoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				rpb.command(com);
+			}
+			else{
+				rpb.command("which", toolname);//$NON-NLS-1$
+			}
 			// rpb.
 			IRemoteProcess p = rpb.start();
 			//Process p = new ProcessBuilder("which", toolname).start();//Runtime.getRuntime().exec("which "+toolname); //$NON-NLS-1$
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			pPath = reader.readLine();
-			//String line;
-			while ((reader.readLine()) != null) {
+			String line=null;//= reader.readLine();
+			
+			
+			while ((line=reader.readLine()) != null) {
 				//System.out.println(line);
+				IFileStore test =fileManager.getResource(line);
+				if(test.fetchInfo().exists())
+				{
+					pPath=line;
+				}
 			}
 			reader.close();
 			reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			while ((reader.readLine()) != null) {
+			while ((line=reader.readLine()) != null) {
 				//System.out.println(line);
 			}
 		} catch (IOException e) {
@@ -466,7 +539,35 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 
 	private IRemoteProcess getProcess(List<String> tool, Map<String, String> env, String directory,boolean mergeOutput) throws IOException {
 
-		IRemoteProcessBuilder pb = remoteServices.getProcessBuilder(conn, tool);// new IRemoteProcessBuilder(tool);
+		IRemoteProcessBuilder pb;
+		
+		if(envManager!=null){
+			String com="";
+			String concat="";
+			try {
+				concat="";
+				for(int i=0;i<tool.size();i++){
+					concat+=" "+tool.get(i);
+				}
+				com = envManager.createBashScript(null, false, envMgrConfig, concat);
+				IFileStore envScript = fileManager.getResource(com);
+				IFileInfo envInfo=envScript.fetchInfo();
+				envInfo.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
+				envScript.putInfo(envInfo,EFS.SET_ATTRIBUTES,null);
+				
+				
+			} catch (RemoteConnectionException e) {
+				e.printStackTrace();
+				return null;
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			pb = remoteServices.getProcessBuilder(conn, concat);
+		}
+		else{
+			pb = remoteServices.getProcessBuilder(conn, tool);// new IRemoteProcessBuilder(tool);
+		}
 		if (directory != null) {
 			pb.directory(fileManager.getResource(directory));
 		}
