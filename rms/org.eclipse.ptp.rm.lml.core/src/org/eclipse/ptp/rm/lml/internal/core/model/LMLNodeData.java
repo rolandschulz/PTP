@@ -572,28 +572,34 @@ public class LMLNodeData {
 			rootJob = getDataElement().getOid();
 		}
 		jobMap.put(rootJob, getLowestElementsCount());
-		// Generate a map with all jobs directly found in all children of this node
-		final HashMap<String, Integer> directChildMap = new HashMap<String, Integer>();
-		final List<LMLNodeData> lowerNodes = getLowerNodes();
-		for (final LMLNodeData node : lowerNodes) {
-			// Insert root node job of all lower nodes
-			String jobName = node.getDataElement().getOid();
-			if (jobName == null) {// Avoid null jobnames
-				jobName = emptyJobName;
-			}
-			int cpuCount = node.getLowestElementsCount();
-			if (directChildMap.containsKey(jobName)) {
-				cpuCount += directChildMap.get(jobName);
-			}
-			directChildMap.put(jobName, cpuCount);
-		}
 
-		mergeJobMaps(rootJob, jobMap, directChildMap);
+		// Traverse children only, if there are lower data elements within the LML model
+		if (isRootNode() || LMLCheck.getLowerDataElements(getDataElement()).size() > 0) {
 
-		// Do recursive merging of the jobMaps of each child
-		for (final LMLNodeData node : lowerNodes) {
-			// Merge the child map into the output map jobMap
-			mergeJobMaps(node.getDataElement().getOid(), jobMap, node.getJobMap());
+			// Generate a map with all jobs directly found in all children of this node
+			final HashMap<String, Integer> directChildMap = new HashMap<String, Integer>();
+			final List<LMLNodeData> lowerNodes = getLowerNodes();
+			for (final LMLNodeData node : lowerNodes) {
+				// Insert root node job of all lower nodes
+				String jobName = node.getDataElement().getOid();
+				if (jobName == null) {// Avoid null jobnames
+					jobName = emptyJobName;
+				}
+				int cpuCount = node.getLowestElementsCount();
+				if (directChildMap.containsKey(jobName)) {
+					cpuCount += directChildMap.get(jobName);
+				}
+				directChildMap.put(jobName, cpuCount);
+			}
+
+			mergeJobMaps(rootJob, jobMap, directChildMap);
+
+			// Do recursive merging of the jobMaps of each child
+			for (final LMLNodeData node : lowerNodes) {
+				// Merge the child map into the output map jobMap
+				mergeJobMaps(node.getDataElement().getOid(), jobMap, node.getJobMap());
+			}
+
 		}
 
 		// If this node's data-tag is a leave, check if it has a usagetag.

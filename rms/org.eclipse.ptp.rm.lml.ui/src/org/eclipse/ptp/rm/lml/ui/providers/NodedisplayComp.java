@@ -688,6 +688,10 @@ public class NodedisplayComp extends LguiWidget implements Updatable, JobDetecto
 			public void widgetDisposed(DisposeEvent e) {
 				removeUpdatable();
 
+				if (rectanglePaintListener != null) {
+					rectanglePaintListener.dispose();
+				}
+
 				if (titleLabel != null) {
 					titleLabel.dispose();
 				}

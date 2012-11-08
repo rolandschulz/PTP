@@ -114,6 +114,7 @@ public class NodedisplayViewZoomButtons extends NodedisplayViewZoomable {
 	 */
 	@Override
 	public void dispose() {
+		super.dispose();
 		font.dispose();
 	}
 
@@ -127,6 +128,7 @@ public class NodedisplayViewZoomButtons extends NodedisplayViewZoomable {
 		// Fill this composite with a white rectangle surrounded by a black border
 		rectangleSizeComp.addPaintListener(new PaintListener() {
 
+			@Override
 			public void paintControl(PaintEvent e) {
 				final int width = rectangleSizeComp.getSize().x;
 				final int height = rectangleSizeComp.getSize().y;

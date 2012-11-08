@@ -60,20 +60,63 @@
 		</perspectiveExtension>
 		<perspectiveExtension
 			targetID="org.eclipse.ptp.rm.lml.ui.SystemMonitoringPerspective">
-			<perspectiveShortcut
-				id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
-			</perspectiveShortcut>
-			<perspectiveShortcut
-				id="org.eclipse.debug.ui.DebugPerspective">
-			</perspectiveShortcut>
 			<actionSet
 				id="org.eclipse.debug.ui.launchActionSet">
 			</actionSet>
-			<actionSet
-				id="org.eclipse.ptp.ui.actionSets">
-			</actionSet>
+   			<hiddenToolBarItem
+         		id="org.eclipse.cdt.ui.navigate.opentype">
+   			</hiddenToolBarItem>
 		</perspectiveExtension>
 	</extension>
+    <extension
+          point="org.eclipse.ui.activities">
+       <activity
+             id="org.eclipse.ptp.rm.lml.ui.systemMonitoringActivity"
+             name="SystemMonitoringActivity">
+          <enabledWhen>
+             <with
+                   variable="activeWorkbenchWindow.activePerspective">
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+                   <equals
+                         value="org.eclipse.ptp.rm.lml.ui.SystemMonitoringPerspective">
+                   </equals>
+                </iterate>
+             </with>
+          </enabledWhen>
+       </activity>
+       <activityPatternBinding
+             activityId="org.eclipse.ptp.rm.lml.ui.systemMonitoringActivity"
+             isEqualityPattern="true"
+             pattern="org.eclipse.ui.externaltools.ExternalToolMenuDelegateToolbar">
+       </activityPatternBinding>
+       <activityPatternBinding
+             activityId="org.eclipse.ptp.rm.lml.ui.systemMonitoringActivity"
+             isEqualityPattern="false"
+             pattern="org\.eclipse\.debug\.ui\..*/.*">
+       </activityPatternBinding>
+       <activityPatternBinding
+             activityId="org.eclipse.ptp.rm.lml.ui.systemMonitoringActivity"
+             isEqualityPattern="false"
+             pattern="org\.eclipse\.ui\.edit\..*/.*">
+       </activityPatternBinding>
+       <activityPatternBinding
+             activityId="org.eclipse.ptp.rm.lml.ui.systemMonitoringActivity"
+             isEqualityPattern="false"
+             pattern="org\.eclipse\.search\..*/.*">
+       </activityPatternBinding>
+       <activityPatternBinding
+             activityId="org.eclipse.ptp.rm.lml.ui.systemMonitoringActivity"
+             isEqualityPattern="false"
+             pattern="org\.eclipse\.navigate\..*/.*">
+       </activityPatternBinding>
+        <activityPatternBinding
+             activityId="org.eclipse.ptp.rm.lml.ui.systemMonitoringActivity"
+             isEqualityPattern="false"
+             pattern="org\.eclipse\.mylyn\.tasks\..*/.*">
+       </activityPatternBinding>
+    </extension>
    
 
 </plugin>

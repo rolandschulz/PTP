@@ -12,8 +12,10 @@
 package org.eclipse.ptp.rm.lml.ui.views;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -58,6 +60,7 @@ import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.ui.providers.FilterDialog;
+import org.eclipse.ptp.rm.lml.ui.providers.support.ColorConversion;
 import org.eclipse.ptp.rm.lml.ui.providers.support.EventForwarder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -88,6 +91,77 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
 public class TableView extends ViewPart {
+
+	/**
+	 * Provides images for the first column of the table.
+	 * Ensures correct disposal.
+	 * 
+	 * @author Carsten Karbach
+	 * 
+	 */
+	private final class FirstColumnLabelProvider extends ColumnLabelProvider {
+		/**
+		 * Saves a generated image for each color.
+		 */
+		private final Map<Color, Image> generatedImages = new HashMap<Color, Image>();
+
+		/**
+		 * Disposes and removes all images created so far.
+		 */
+		public void clearImages() {
+			for (final Image img : generatedImages.values()) {
+				img.dispose();
+			}
+			generatedImages.clear();
+		}
+
+		@Override
+		public void dispose() {
+			super.dispose();
+			clearImages();
+		}
+
+		@Override
+		public Image getImage(Object element) {
+			final Display display = treeColumns[0].getDisplay();
+
+			Color backgroundColor = null;
+			if (((Row) element).oid != null) {
+				LMLColor color = ((Row) element).color;
+				if (color == null) {
+					color = LMLColor.LIGHT_GRAY;
+				}
+				backgroundColor = ColorConversion.getColor(color);
+			} else {
+				backgroundColor = display.getSystemColor(SWT.COLOR_WHITE);
+			}
+
+			Image image = null;
+			// Was image generated before?
+			if (generatedImages.containsKey(backgroundColor)) {
+				image = generatedImages.get(backgroundColor);
+			}
+			else {
+				// Generate new image for new color
+				image = new Image(display, 12, 12);
+				final GC gc = new GC(image);
+				gc.setBackground(backgroundColor);
+				gc.fillRectangle(image.getBounds().x, image.getBounds().y, image.getBounds().width, image.getBounds().height);
+				gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+				gc.drawRectangle(image.getBounds().x, image.getBounds().y, image.getBounds().width - 1,
+						image.getBounds().height - 1);
+				gc.dispose();
+				generatedImages.put(backgroundColor, image);
+			}
+
+			return image;
+		}
+
+		@Override
+		public String getText(Object element) {
+			return null;
+		}
+	};
 
 	private final class LMLTableListListener implements ILMLListener {
 
@@ -309,6 +383,7 @@ public class TableView extends ViewPart {
 				@Override
 				public void run() throws Exception {
 					if (composite != null && viewCreated) {
+						firstColumnlabelProvider.clearImages();
 						if (selectedItem != null && !selectedItem.isDisposed()) {
 							lmlManager.unmarkObject(selectedItem.getData().toString());
 							selectedItem = null;
@@ -363,6 +438,12 @@ public class TableView extends ViewPart {
 	private final EventForwarder eventForwarder = new EventForwarder();
 
 	private boolean updateAfterLastFilter = true;
+
+	/**
+	 * Stores the label provider, which generates images for the first column.
+	 * Has to be stored in order to dispose the generated images.
+	 */
+	private FirstColumnLabelProvider firstColumnlabelProvider;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -501,7 +582,9 @@ public class TableView extends ViewPart {
 
 	@Override
 	public void dispose() {
+		super.dispose();
 		lmlManager.removeListener(lmlListener);
+		ColorConversion.disposeColors();
 	}
 
 	@Override
@@ -565,34 +648,12 @@ public class TableView extends ViewPart {
 
 		// first column with color rectangle
 		TreeViewerColumn treeViewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
-		treeViewerColumn.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public Image getImage(Object element) {
-				final Display display = treeColumns[0].getDisplay();
-				final Image image = new Image(display, 12, 12);
-				final GC gc = new GC(image);
-				if (((Row) element).oid != null) {
-					LMLColor color = ((Row) element).color;
-					if (color == null) {
-						color = LMLColor.LIGHT_GRAY;
-					}
-					gc.setBackground(new Color(display, color.getRed(), color.getGreen(), color.getBlue()));
-				} else {
-					gc.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
-				}
-				gc.fillRectangle(image.getBounds().x, image.getBounds().y, image.getBounds().width, image.getBounds().height);
-				gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
-				gc.drawRectangle(image.getBounds().x, image.getBounds().y, image.getBounds().width - 1,
-						image.getBounds().height - 1);
-				gc.dispose();
-				return image;
-			}
+		if (firstColumnlabelProvider != null) {
+			firstColumnlabelProvider.dispose();
+		}
+		firstColumnlabelProvider = new FirstColumnLabelProvider();
 
-			@Override
-			public String getText(Object element) {
-				return null;
-			}
-		});
+		treeViewerColumn.setLabelProvider(firstColumnlabelProvider);
 		TreeColumn treeColumn = treeViewerColumn.getColumn();
 		treeColumn.setMoveable(false);
 		treeColumn.setResizable(false);
@@ -852,6 +913,9 @@ public class TableView extends ViewPart {
 			oldColumn.dispose();
 		}
 		treeColumns = new TreeColumn[0];
+		if (firstColumnlabelProvider != null) {
+			firstColumnlabelProvider.dispose();
+		}
 
 		/*
 		 * Remove menu items
