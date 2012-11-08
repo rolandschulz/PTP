@@ -38,10 +38,13 @@ import org.eclipse.ptp.rm.lml.internal.core.model.LMLNodeData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Node;
 import org.eclipse.ptp.rm.lml.internal.core.model.NodedisplayAccess;
 import org.eclipse.ptp.rm.lml.internal.core.model.TreeExpansion;
+import org.eclipse.ptp.rm.lml.ui.providers.support.ColorConversion;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
@@ -85,6 +88,86 @@ public class NodedisplayView extends AbstractNodedisplayView {
 			paintCount = 0;
 		}
 
+	}
+
+	/**
+	 * This class listens for object mark events. Tries to scroll jobs
+	 * to visible area in the nodes view as soon as a job is marked.
+	 * 
+	 * @author karbach
+	 * 
+	 */
+	private class JobsVisibleListener implements ILMLListener {
+
+		@Override
+		public void handleEvent(ILguiAddedEvent event) {
+		}
+
+		@Override
+		public void handleEvent(ILguiRemovedEvent event) {
+		}
+
+		@Override
+		public void handleEvent(IMarkObjectEvent event) {
+			if (root != null) {
+				final String jobId = event.getOid();
+				final Set<Point> points = new HashSet<Point>();
+				root.detectJobPositions(points, jobId);
+
+				final Point scrollSize = scrollComp.getSize();
+
+				boolean visible = false;
+				Point minPoint = null;
+				for (final Point p : points) {
+					if (p.x >= 0 && p.x < scrollSize.x
+							&& p.y >= 0 && p.y < scrollSize.y) {
+						visible = true;
+					}
+					if (minPoint == null || p.x < minPoint.x || (p.x == minPoint.x && p.y < minPoint.y)) {
+						minPoint = p;
+					}
+				}
+
+				if (!visible) {
+					if (minPoint != null) {
+						final Point origin = scrollComp.getOrigin();
+						origin.x += minPoint.x - 5;
+						origin.y += minPoint.y - 5;
+						if (origin.x < 0) {
+							origin.x = 0;
+						}
+						if (origin.y < 0) {
+							origin.y = 0;
+						}
+						scrollComp.setOrigin(origin);
+					}
+				}
+			}
+		}
+
+		@Override
+		public void handleEvent(ISelectObjectEvent event) {
+		}
+
+		@Override
+		public void handleEvent(ITableFilterEvent event) {
+		}
+
+		@Override
+		public void handleEvent(ITableSortedEvent event) {
+		}
+
+		@Override
+		public void handleEvent(IUnmarkObjectEvent event) {
+		}
+
+		@Override
+		public void handleEvent(IUnselectedObjectEvent event) {
+		}
+
+		@Override
+		public void handleEvent(IViewUpdateEvent event) {
+		}
 	}
 
 	/**
@@ -181,6 +264,11 @@ public class NodedisplayView extends AbstractNodedisplayView {
 	private final FirstPaintListener firstPaintListener;
 
 	/**
+	 * Reacts on job mark events. Tries to make jobs visible by scrolling.
+	 */
+	private final JobsVisibleListener jobsListener;
+
+	/**
 	 * Minimal size of width and height of painted rectangles
 	 * Is only used, if minSizeRectangles is true
 	 */
@@ -234,78 +322,23 @@ public class NodedisplayView extends AbstractNodedisplayView {
 
 		scrollComp = new ScrolledComposite(this, SWT.H_SCROLL | SWT.V_SCROLL);
 
-		LMLManager.getInstance().addListener(new ILMLListener() {
+		this.addDisposeListener(new DisposeListener() {
 
 			@Override
-			public void handleEvent(ILguiAddedEvent event) {
-			}
-
-			@Override
-			public void handleEvent(ILguiRemovedEvent event) {
-			}
-
-			@Override
-			public void handleEvent(IMarkObjectEvent event) {
-				if (root != null) {
-					final String jobId = event.getOid();
-					final Set<Point> points = new HashSet<Point>();
-					root.detectJobPositions(points, jobId);
-
-					final Point scrollSize = scrollComp.getSize();
-
-					boolean visible = false;
-					Point minPoint = null;
-					for (final Point p : points) {
-						if (p.x >= 0 && p.x < scrollSize.x
-								&& p.y >= 0 && p.y < scrollSize.y) {
-							visible = true;
-						}
-						if (minPoint == null || p.x < minPoint.x || (p.x == minPoint.x && p.y < minPoint.y)) {
-							minPoint = p;
-						}
-					}
-
-					if (!visible) {
-						if (minPoint != null) {
-							final Point origin = scrollComp.getOrigin();
-							origin.x += minPoint.x - 5;
-							origin.y += minPoint.y - 5;
-							if (origin.x < 0) {
-								origin.x = 0;
-							}
-							if (origin.y < 0) {
-								origin.y = 0;
-							}
-							scrollComp.setOrigin(origin);
-						}
-					}
+			public void widgetDisposed(DisposeEvent e) {
+				disposeNodedisplay();
+				getDisplay().removeFilter(SWT.Paint, firstPaintListener);
+				if (jobsListener != null) {
+					LMLManager.getInstance().removeListener(jobsListener);
+				}
+				if (waitCursor != null) {
+					waitCursor.dispose();
 				}
 			}
+		});
 
-			@Override
-			public void handleEvent(ISelectObjectEvent event) {
-			}
-
-			@Override
-			public void handleEvent(ITableFilterEvent event) {
-			}
-
-			@Override
-			public void handleEvent(ITableSortedEvent event) {
-			}
-
-			@Override
-			public void handleEvent(IUnmarkObjectEvent event) {
-			}
-
-			@Override
-			public void handleEvent(IUnselectedObjectEvent event) {
-			}
-
-			@Override
-			public void handleEvent(IViewUpdateEvent event) {
-			}
-		}, null);
+		jobsListener = new JobsVisibleListener();
+		LMLManager.getInstance().addListener(jobsListener, null);
 
 		// Listen for the first paints of every new nodedisplay
 		// and adjust it to the new size
@@ -323,6 +356,20 @@ public class NodedisplayView extends AbstractNodedisplayView {
 
 		addResizeListenerForScrollPane();
 		checkEmptyScreen();
+	}
+
+	/**
+	 * Disposes and sets root nodedisplay to null.
+	 * This can be called to release the data hold by
+	 * the currently active nodedisplay. Also releases
+	 * created colors.
+	 */
+	public void disposeNodedisplay() {
+		ColorConversion.disposeColors();
+		if (root != null) {
+			root.dispose();
+			root = null;
+		}
 	}
 
 	@Override
@@ -439,7 +486,7 @@ public class NodedisplayView extends AbstractNodedisplayView {
 
 		if (root != null) {
 			root.dispose();// Delete old root-element
-			System.gc();
+			root = null;
 		}
 
 		if (impName != null) {

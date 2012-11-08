@@ -236,6 +236,18 @@ public class RectanglePaintListener implements PaintListener, JobDetector {
 	}
 
 	/**
+	 * Disposes all resources used by this painter, but not released so far
+	 */
+	public void dispose() {
+		for (final RectanglePaintListener childPainter : this.innerListener.values()) {
+			childPainter.dispose();
+		}
+		if (doubleBuffer != null) {
+			doubleBuffer.dispose();
+		}
+	}
+
+	/**
 	 * This function is similar to <code>getNodeAtPos</code>. It is used in mouse-interactions.
 	 * It returns the connected ObjectType-instance for the node, which includes the point (px,py)
 	 * within this PaintListener's paintings. Mainly this function calls <code>getNodeAtPos</code> to retrieve the connected Node
@@ -392,48 +404,51 @@ public class RectanglePaintListener implements PaintListener, JobDetector {
 	 */
 	@Override
 	public void paintControl(PaintEvent event) {
-		updateRectangleSize();
+		// Avoid parallel disposal of image resources
+		synchronized (this) {
+			updateRectangleSize();
 
-		// Do not paint, if rectangle is invisible
-		if (!isPaintAreaVisible()) {
-			return;
-		}
-		GC eventGC = null;
-		GC doubleBufGC = null;
+			// Do not paint, if rectangle is invisible
+			if (!isPaintAreaVisible()) {
+				return;
+			}
+			GC eventGC = null;
+			GC doubleBufGC = null;
 
-		if (doDoubleBuffering()) {
-			// Init double buffering
-			eventGC = event.gc;
-			doubleBufGC = new GC(doubleBuffer);
-			doubleBufGC.setForeground(eventGC.getForeground());
-			doubleBufGC.setFont(eventGC.getFont());
-			event.gc = doubleBufGC;
-		}
+			if (doDoubleBuffering()) {
+				// Init double buffering
+				eventGC = event.gc;
+				doubleBufGC = new GC(doubleBuffer);
+				doubleBufGC.setForeground(eventGC.getForeground());
+				doubleBufGC.setFont(eventGC.getFont());
+				event.gc = doubleBufGC;
+			}
 
-		// Paint background color
-		final Color backgroundColor = ColorConversion.getColor(LMLColor.stringToColor(layout.getBackground()));
+			// Paint background color
+			final Color backgroundColor = ColorConversion.getColor(LMLColor.stringToColor(layout.getBackground()));
 
-		event.gc.setBackground(backgroundColor);
-		event.gc.fillRectangle(paintArea);
+			event.gc.setBackground(backgroundColor);
+			event.gc.fillRectangle(paintArea);
 
-		for (int x = 0; x < columnCount; x++) {
+			for (int x = 0; x < columnCount; x++) {
 
-			for (int y = 0; y < rowCount; y++) {
-				paintChild(event, x, y);
+				for (int y = 0; y < rowCount; y++) {
+					paintChild(event, x, y);
+				}
+
+			}
+
+			if (doDoubleBuffering()) {
+				// Finish double buffering
+				if (eventGC != null) {
+					eventGC.drawImage(doubleBuffer, 0, 0);
+				}
+				if (doubleBufGC != null) {
+					doubleBufGC.dispose();
+				}
 			}
 
 		}
-
-		if (doDoubleBuffering()) {
-			// Finish double buffering
-			if (eventGC != null) {
-				eventGC.drawImage(doubleBuffer, 0, 0);
-			}
-			if (doubleBufGC != null) {
-				doubleBufGC.dispose();
-			}
-		}
-
 	}
 
 	/**
@@ -888,7 +903,7 @@ public class RectanglePaintListener implements PaintListener, JobDetector {
 			}
 			if (doubleBuffer == null ||
 					doubleBuffer.getBounds().width != imgWidth ||
-					doubleBuffer.getBounds().height != imgHeight) {
+					doubleBuffer.getBounds().height != imgHeight || doubleBuffer.isDisposed()) {
 				// Delete the old image if necessary
 				if (doubleBuffer != null) {
 					doubleBuffer.dispose();

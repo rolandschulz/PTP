@@ -39,6 +39,7 @@ public class ColorConversion {
 		for (final Color color : colorMap.values()) {
 			color.dispose();
 		}
+		colorMap.clear();
 	}
 
 	/**
