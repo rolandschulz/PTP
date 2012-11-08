@@ -164,55 +164,63 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				}
 
 				if (!subMon.isCanceled()) {
-					doCompleteJobLaunch(fLaunch, fDebugger);
-
-					fSubLock.lock();
+					boolean running = false;
 					try {
-						while (!fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
-								&& !subMon.isCanceled()) {
-							try {
-								fSubCondition.await(1000, TimeUnit.MILLISECONDS);
-							} catch (InterruptedException e) {
-								// Expect to be interrupted if monitor is
-								// canceled
-							}
-						}
-					} catch (CoreException e) {
-					} finally {
-						fSubLock.unlock();
+						running = fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.RUNNING);
+					} catch (CoreException e1) {
+						// getJobStatus failed, so assume it didn't run
 					}
 
-					if (!subMon.isCanceled()) {
-						/*
-						 * When the job terminates, do any post launch data synchronization.
-						 */
-						// If needed, copy data back.
+					if (running) {
+						doCompleteJobLaunch(fLaunch, fDebugger);
+
+						fSubLock.lock();
 						try {
-							// Get the list of paths to be copied back.
-							doPostLaunchSynchronization(fLaunch.getLaunchConfiguration());
-						} catch (CoreException e) {
-							RMLaunchPlugin.log(e);
-						}
-
-						/*
-						 * Clean up any launch activities.
-						 */
-						doCleanupLaunch(fLaunch);
-
-						try {
-							fLaunchControl.stop();
-						} catch (CoreException e) {
-							// Nothing we can do now
-						}
-
-						/*
-						 * Remove job submission
-						 */
-						synchronized (jobSubmissions) {
-							jobSubmissions.remove(jobId);
-							if (jobSubmissions.size() == 0) {
-								JobManager.getInstance().removeListener(fJobListener);
+							while (!fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
+									&& !subMon.isCanceled()) {
+								try {
+									fSubCondition.await(1000, TimeUnit.MILLISECONDS);
+								} catch (InterruptedException e) {
+									// Expect to be interrupted if monitor is
+									// canceled
+								}
 							}
+						} catch (CoreException e) {
+						} finally {
+							fSubLock.unlock();
+						}
+
+						if (!subMon.isCanceled()) {
+							/*
+							 * When the job terminates, do any post launch data synchronization.
+							 */
+							// If needed, copy data back.
+							try {
+								// Get the list of paths to be copied back.
+								doPostLaunchSynchronization(fLaunch.getLaunchConfiguration());
+							} catch (CoreException e) {
+								RMLaunchPlugin.log(e);
+							}
+						}
+					}
+					/*
+					 * Clean up any launch activities.
+					 */
+					doCleanupLaunch(fLaunch);
+
+					try {
+						fLaunchControl.stop();
+					} catch (CoreException e) {
+						// Nothing we can do now
+					}
+
+					/*
+					 * Remove job submission
+					 */
+					synchronized (jobSubmissions) {
+						jobSubmissions.remove(jobId);
+						if (jobSubmissions.size() == 0) {
+							JobManager.getInstance().removeListener(fJobListener);
 						}
 					}
 				}
