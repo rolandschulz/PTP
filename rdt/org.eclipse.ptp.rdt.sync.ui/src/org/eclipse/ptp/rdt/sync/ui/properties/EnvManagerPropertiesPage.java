@@ -125,9 +125,14 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		if (widgetsReady == false) {
 			return;
 		}
+
 		// Update settings for previous configuration first
-		this.storeSettings(configBeforeSwitched);
-		configBeforeSwitched = getCfg();		
+		// Do not update unless config really changed. This prevents a problem at creation where config settings are erased
+		// because they are stored before the UI has been fully created.
+		if (configBeforeSwitched != getCfg()) {
+			this.storeSettings(configBeforeSwitched);
+			configBeforeSwitched = getCfg();
+		}
 		
 		if (ui != null) {
 			IRemoteConnection connection = getConnection();
