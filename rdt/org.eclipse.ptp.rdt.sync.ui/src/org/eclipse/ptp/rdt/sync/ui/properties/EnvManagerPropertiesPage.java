@@ -188,7 +188,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 			this.storeSettings(configBeforeSwitched);
 			for (IConfiguration config : configsToSave) {
 				BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-				bcm.setEnvProperties(config, configToPropertiesMap.get(config.getId()).getAllProperties());
+				bcm.setEnvProperties(config, this.loadSettings(config).getAllProperties());
 			}
 		} catch (CoreException e) {
 			IStatus status = new Status(IStatus.ERROR, RDTSyncUIPlugin.PLUGIN_ID, Messages.EnvManagerPropertiesPage_0, e);
@@ -222,6 +222,8 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		EnvManagerConfigMap mapCopy = new EnvManagerConfigMap(map);
 		ui.saveConfiguration(map);
 		if (!map.equals(mapCopy)) {
+			// Make sure settings are actually stored. They may not be if there was an exception while loading settings.
+			configToPropertiesMap.put(config.getId(), map);
 			configsToSave.add(config);
 		}
 	}
