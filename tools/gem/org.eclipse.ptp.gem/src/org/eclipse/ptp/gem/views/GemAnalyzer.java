@@ -788,7 +788,7 @@ public class GemAnalyzer extends ViewPart {
 				if (sourceFile != null) {
 					if (GemUtilities.isRemoteProject(GemAnalyzer.this.activeFile)
 							|| GemUtilities.isSynchronizedProject(GemAnalyzer.this.activeFile)) {
-						GemUtilities.showInformationDialog(Messages.GemAnalyzer_23);
+//						GemUtilities.showInformationDialog(Messages.GemAnalyzer_23);
 						return;
 					}
 
@@ -797,7 +797,7 @@ public class GemAnalyzer extends ViewPart {
 				} else {
 					// There was a local error while creating the log file.
 					final String message = Messages.GemAnalyzer_13;
-					GemUtilities.showErrorDialog(message);
+//					GemUtilities.showErrorDialog(message);
 				}
 			}
 		});
