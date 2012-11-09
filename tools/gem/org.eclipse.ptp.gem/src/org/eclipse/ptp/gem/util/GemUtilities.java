@@ -406,16 +406,6 @@ public class GemUtilities {
 
 		return exitStatus;
 	}
-	
-	/**
-	 * Returns whether or not the current project has active resources yet.
-	 * 
-	 * @param none
-	 * @return boolean Ture if the current project has active resource, false otherwise.
-	 */
-	public static boolean isProjectActive() {
-		return gemActiveResource != null;
-	}
 
 	/**
 	 * Returns the current project being verified.
@@ -890,6 +880,16 @@ public class GemUtilities {
 		} catch (final IOException e) {
 			return false;
 		}
+	}
+
+	/**
+	 * Returns whether or not the current project has active resources yet.
+	 * 
+	 * @param none
+	 * @return boolean Ture if the current project has active resource, false otherwise.
+	 */
+	public static boolean isProjectActive() {
+		return gemActiveResource != null;
 	}
 
 	//
