@@ -83,7 +83,7 @@ public class GemHandler extends AbstractHandler {
 		boolean isSourceFileExtension = false;
 
 		if (editor == null) {
-			GemUtilities.showErrorDialog(Messages.GemHandler_0);
+			// do nothing here as there really is nothing to do
 			return null;
 		}
 
