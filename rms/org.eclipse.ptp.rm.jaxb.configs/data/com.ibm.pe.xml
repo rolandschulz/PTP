@@ -1871,7 +1871,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:MP_CKPTDIR_ATTR#description}</fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" attribute="MP_EUILIBPATH_ATTR"
+					<browse textStyle="SWT.BORDER" attribute="MP_CKPTDIR_ATTR"
 						title="Browse" directory="true">
 						<text-layout-data>
 							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>

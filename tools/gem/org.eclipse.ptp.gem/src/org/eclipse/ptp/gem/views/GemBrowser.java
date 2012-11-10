@@ -342,6 +342,10 @@ public class GemBrowser extends ViewPart {
 				if (inputLocation != null) {
 					path = new Path(inputLocation.getPath());
 				}
+				if (!GemUtilities.isProjectActive()) {
+					GemUtilities.setTaskStatus(GemUtilities.TaskStatus.ABORTED);
+					return;
+				}
 				final IFile file = GemUtilities.getCurrentProject().getFile(path.lastSegment());
 				path = file.getFullPath();
 				final String extension = file.getFileExtension();

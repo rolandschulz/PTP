@@ -373,7 +373,7 @@ public class ToolPane implements IAppInput, IToolUITab {
 				updateOptField(options[i].numopt);
 			}
 
-			if (options[i].combopt != null) {
+			if (options[i].combopt != null && options[i].combopt.getSelectionIndex() > -1) {
 				configuration.setAttribute(options[i].confArgString, options[i].items[options[i].combopt.getSelectionIndex()]);
 				updateOptField(options[i].combopt);
 			}

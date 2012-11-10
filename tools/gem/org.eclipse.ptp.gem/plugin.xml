@@ -304,28 +304,4 @@
       </view>
    </extension>
    
-   
-   <!-- PerspectiveExtension extension point -->
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension 
-      		targetID="org.eclipse.cdt.ui.CPerspective">
-            <view
-            	id="org.eclipse.ptp.gem.views.GemBrowser"
-            	relative="org.eclipse.ui.console.ConsoleView"
-            	relationship="stack">
-            </view>
-            <view
-            	id="org.eclipse.ptp.gem.views.GemAnalyzer"
-            	relative="org.eclipse.ptp.gem.views.GemBrowser"
-            	relationship="stack">
-            </view>
-            <view
-            	id="org.eclipse.ptp.gem.views.GemConsole"
-            	relative="org.eclipse.ptp.gem.views.GemAnalyzer"
-            	relationship="stack">
-            </view>
-      </perspectiveExtension>
-   </extension>    
-   
  </plugin>

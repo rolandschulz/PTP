@@ -193,7 +193,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						} catch (CoreException e) {
 							RMLaunchPlugin.log(e);
 						}
-
+						
 						/*
 						 * Clean up any launch activities.
 						 */

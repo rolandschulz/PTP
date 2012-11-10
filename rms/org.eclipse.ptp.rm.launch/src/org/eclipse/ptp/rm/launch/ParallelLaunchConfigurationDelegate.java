@@ -30,12 +30,16 @@ import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.IPSession;
+import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.launch.PreferenceConstants;
 import org.eclipse.ptp.rm.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.rm.launch.internal.messages.Messages;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -84,6 +88,84 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				throw new InvocationTargetException(e, e.getLocalizedMessage());
 			} finally {
 				monitor.done();
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
+	 * doCleanupLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch)
+	 */
+	@Override
+	protected void doCleanupLaunch(IPLaunch launch) {
+		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
+			try {
+				terminateDebugSession(launch.getJobId());
+				IPDebugConfiguration debugConfig = getDebugConfig(launch.getLaunchConfiguration());
+				IPDebugger debugger = debugConfig.getDebugger();
+				debugger.cleanup(launch);
+			} catch (CoreException e) {
+				RMLaunchPlugin.log(e);
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
+	 * doCompleteJobLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.ptp.debug.core.IPDebugger)
+	 */
+	@Override
+	protected void doCompleteJobLaunch(final IPLaunch launch, final IPDebugger debugger) {
+		final String jobId = launch.getJobId();
+		final ILaunchConfiguration configuration = launch.getLaunchConfiguration();
+
+		/*
+		 * Used by org.eclipse.ptp.ui.IJobManager#removeJob
+		 */
+		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), jobId);
+
+		/*
+		 * Create process that is used by the DebugPlugin for handling console output. This process gets added to the debug session
+		 * so that it is also displayed in the Debug View as the system process.
+		 */
+		new RuntimeProcess(launch, null);
+
+		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
+			try {
+				setDefaultSourceLocator(launch, configuration);
+				final IProject project = verifyProject(configuration);
+
+				final DebuggerSession session = new DebuggerSession(jobId, launch, project, debugger);
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							new ProgressMonitorDialog(RMLaunchPlugin.getActiveWorkbenchShell()).run(true, true, session);
+						} catch (InterruptedException e) {
+							terminateJob(launch);
+						} catch (InvocationTargetException e) {
+							RMLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_0, e.getTargetException());
+							RMLaunchPlugin.log(e.getCause());
+							terminateJob(launch);
+						}
+					}
+				});
+			} catch (final CoreException e) {
+				/*
+				 * Completion of launch fails, then terminate the job and display error message.
+				 */
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						RMLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_1, e.getStatus());
+						RMLaunchPlugin.log(e);
+						terminateJob(launch);
+					}
+				});
 			}
 		}
 	}
@@ -173,98 +255,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	}
 
 	/**
-	 * Terminate a job.
-	 * 
-	 * @param job
-	 *            job to terminate
-	 */
-	private void terminateJob(IPLaunch launch) {
-		try {
-			launch.getJobControl().control(launch.getJobId(), IJobControl.TERMINATE_OPERATION, null);
-		} catch (CoreException e1) {
-			// Ignore, but log
-			RMLaunchPlugin.log(e1);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
-	 * doCleanupLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch)
-	 */
-	@Override
-	protected void doCleanupLaunch(IPLaunch launch) {
-		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
-			try {
-				IPDebugConfiguration debugConfig = getDebugConfig(launch.getLaunchConfiguration());
-				IPDebugger debugger = debugConfig.getDebugger();
-				debugger.cleanup(launch);
-			} catch (CoreException e) {
-				RMLaunchPlugin.log(e);
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
-	 * doCompleteJobLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.ptp.debug.core.IPDebugger)
-	 */
-	@Override
-	protected void doCompleteJobLaunch(final IPLaunch launch, final IPDebugger debugger) {
-		final String jobId = launch.getJobId();
-		final ILaunchConfiguration configuration = launch.getLaunchConfiguration();
-
-		/*
-		 * Used by org.eclipse.ptp.ui.IJobManager#removeJob
-		 */
-		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), jobId);
-
-		/*
-		 * Create process that is used by the DebugPlugin for handling console output. This process gets added to the debug session
-		 * so that it is also displayed in the Debug View as the system process.
-		 */
-		new RuntimeProcess(launch, null);
-
-		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
-			try {
-				setDefaultSourceLocator(launch, configuration);
-				final IProject project = verifyProject(configuration);
-
-				final DebuggerSession session = new DebuggerSession(jobId, launch, project, debugger);
-				Display.getDefault().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							new ProgressMonitorDialog(RMLaunchPlugin.getActiveWorkbenchShell()).run(true, true, session);
-						} catch (InterruptedException e) {
-							terminateJob(launch);
-						} catch (InvocationTargetException e) {
-							RMLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_0, e.getTargetException());
-							RMLaunchPlugin.log(e.getCause());
-							terminateJob(launch);
-						}
-					}
-				});
-			} catch (final CoreException e) {
-				/*
-				 * Completion of launch fails, then terminate the job and display error message.
-				 */
-				Display.getDefault().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						RMLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_1, e.getStatus());
-						RMLaunchPlugin.log(e);
-						terminateJob(launch);
-					}
-				});
-			}
-		}
-	}
-
-	/**
 	 * Show the PTP Debug view
 	 * 
 	 * @param viewID
@@ -290,6 +280,41 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					}
 				}
 			});
+		}
+	}
+
+	/**
+	 * Terminates a debug session
+	 * 
+	 * @param jobId id of the session to terminate
+	 * @throws CoreException
+	 */
+	private void terminateDebugSession(String jobId) throws CoreException {
+		PDebugModel model = PTPDebugCorePlugin.getDebugModel();
+		IPSession session = model.getSession(jobId);
+		if (session != null) {
+			TaskSet tasks = model.getTasks(session, IElementHandler.SET_ROOT_ID);
+			try {
+				session.getPDISession().terminate(tasks);
+			} catch (PDIException e) {
+				throw new CoreException(new Status(IStatus.ERROR, RMLaunchPlugin.getUniqueIdentifier(), IStatus.ERROR,
+						e.getMessage(), null));
+			}
+		}
+	}
+
+	/**
+	 * Terminate a job.
+	 * 
+	 * @param job
+	 *            job to terminate
+	 */
+	private void terminateJob(IPLaunch launch) {
+		try {
+			launch.getJobControl().control(launch.getJobId(), IJobControl.TERMINATE_OPERATION, null);
+		} catch (CoreException e1) {
+			// Ignore, but log
+			RMLaunchPlugin.log(e1);
 		}
 	}
 

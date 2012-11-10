@@ -46,8 +46,9 @@ Click on a project or a folder, then select the
 <br> <img src="images/accMenu.png">
 <p>
 <li><b>Hover Help</b><br>
-In the editor, hover over an OpenSHMEM api and a popup box shows details of that API.
-<!--  fixme need image-->
+In the editor, hover over an OpenACC api and a popup box shows details of that API.
+<br>
+<img src="images/accHoverHelp.png">
 <p>
 <li><b>Content Assist</b><br>
 Type an incomplete OpenACC function name e.g. "acc_get_"
@@ -58,8 +59,35 @@ specific information about actual OpenACC functions
 where appropriate, and a yellow popup with additional 
 textual descriptive information about the function.
 Pick the one you want with the arrow keys or the mouse, to add the API to your source file.
-<br><img src="images/accContentAssist.gif">
+<br><img src="images/accCodeCompletion_c.png">
+
 <p>
+<li><b>Code Templates</b><br>
+Code templates provide help with common patterns of OpenACC programming.
+See also <a href="mpiTemplates.html">MPI Code Templates</a>.
+<p>To use code templates for OpenACC, type acc, then hit ctrl-space <i>twice</i>.
+The first time you will see completions for OpenACC APIs (Content Assist described above).  
+The second time
+you will see a choice of useful OpenACC programming items include #pragmas.
+(Note: Fortran puts content assist and code templates together in the same place.)
+The yellow popup on the right includes an example of the code that will be
+added.
+<br>
+<img src="images/accCodeTemplates1.png">
+<p>Use the cursor to navigate up and down and select the one you want,
+or keep typing to cull the list to the ones that interest you.  
+<br>
+<img src="images/accCodeTemplates2.png">
+
+<p>Click or hit Enter to select it, and it is inserted into your file at that point.
+<br>
+<img src="images/accCodeTemplates3.png">
+
+<p>Similarly, for Fortran programs:
+<br><img src="images/accContentAssist.gif">
+
+
+
 <li><b>Context sensitive help</b><br>
 Also, if F1 is pressed when the cursor is within
 a function name, a help view appears which shows additional information.
@@ -78,8 +106,6 @@ a function name, a help view appears which shows additional information.
 <br><img src="images/helpContSensHitF1click.gif"-->
 
 </ol>
-
-<!-- p>See also <a href="mpiTemplates.html">MPI Code Templates</a>. -->
 
 <p>&nbsp;<p>&nbsp;<p>&nbsp;
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
