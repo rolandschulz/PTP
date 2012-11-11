@@ -122,6 +122,7 @@ public class LCVariableMap implements IVariableMap {
 		this.linkedTo = Collections.synchronizedMap(new TreeMap<String, AttributeType>());
 		this.temp = Collections.synchronizedMap(new TreeMap<String, AttributeType>());
 		this.hidden = new HashSet<String>();
+		this.rmPrefix = JAXBUIConstants.ZEROSTR;
 	}
 
 	/*
@@ -325,8 +326,6 @@ public class LCVariableMap implements IVariableMap {
 		clear();
 		if (rmId != null) {
 			rmPrefix = rmId + JAXBUIConstants.DOT;
-		} else {
-			rmPrefix = JAXBControlConstants.ZEROSTR;
 		}
 		for (String s : rmVars.getAttributes().keySet()) {
 			loadValues(s, rmVars.getAttributes().get(s), false);
