@@ -151,7 +151,7 @@ my %mapping = (
     "Submitting_Cluster"                     => "",
     "Submitting_Host"                        => "",
     "Submitting_User"                        => "",
-    "System_Priority"                        => "",
+    "System_Priority"                        => "sysprio",
     "Task_Affinity"                          => "",
     "Unix_Group"                             => "",
     "User_Hold_Time"                         => "",
@@ -191,6 +191,11 @@ my %mapping = (
     "Stripe_Min_Networks"                    => "",
     "Topology_Requirement"                   => "",
     "Trace"                                  => "",
+    "Shell"                                  => "",
+    "exec_host"                              => "",
+    "group"                                  => "",
+    "spec"                                   => "",
+    "totaltasks"                             => "",
     
     "status"                                 => "status",
     "detailedstatus"                         => "detailedstatus",
@@ -251,7 +256,7 @@ foreach $jobid (sort(keys(%jobs))) {
 	if(exists($mapping{$key})) {
 	    if($mapping{$key} ne "") {
 		$value=&modify($key,$mapping{$key},$jobs{$jobid}{$key});
-		if($value) {
+		if($value ne "") {
 		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",$value);
 		}
 	    } else {
@@ -289,9 +294,7 @@ sub get_state {
 	$detailed_state="USER_ON_HOLD";
     }
     if($job_state eq "System Hold") {
-	$state="SUBMITTED";
-	$detailed_state="SYSTEM_ON_HOLD";
-    }
+	$state="SUBMITTED";	$detailed_state="SYSTEM_ON_HOLD";    }
     if($job_state eq "Removed") {
 	$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
     }    
@@ -313,6 +316,8 @@ sub modify {
     my($key,$mkey,$value)=@_;
     my $ret=$value;
 
+    
+
     if(($mkey eq "wall") || ($mkey eq "wallsoft")) {
 	if($value=~/\($patint seconds\)/) {
 	    $ret=$1;
@@ -332,11 +337,9 @@ sub modify {
 		    $newnodelist.="," if($newnodelist);
 		    $newnodelist.=sprintf("R%02d%02d-%s",&Rack_ord($1),&Rack_ord($2),$3);
 		}
-		print "WF: $node $newnodelist\n";
 	    }
 	    $ret=$newnodelist;
 	}
-	print "WF: $ret\n";
     }
 
     if($mkey eq "nodelist_boards") {
@@ -349,11 +352,9 @@ sub modify {
 		    $newnodelist.="," if($newnodelist);
 		    $newnodelist.=sprintf("R%02d%02d-%s",&Rack_ord($1),&Rack_ord($2),$3);
 		}
-		print "WF: $node $newnodelist\n";
 	    }
 	    $ret=$newnodelist;
 	}
-	print "WF: $ret\n";
     }
 
 
@@ -363,6 +364,8 @@ sub modify {
     if(($mkey eq "bgp_state")) {
 	$ret=~s/\<unknown\>/unknown/gs;
     }
+
+    $ret=~s/\&/\&amp;/gs;
 
     return($ret);
 }
