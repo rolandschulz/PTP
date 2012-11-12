@@ -925,6 +925,33 @@ public class TableView extends ViewPart {
 		}
 	}
 
+	/**
+	 * Changes the width of a tree column in order to send an
+	 * SWT resize event. Thus, the table columns obtain the correct heights.
+	 * Tries to decrease and increase the width of the last column by one.
+	 * As a result, the width does not change overall.
+	 */
+	private void fixRowHeight() {
+		if (tree == null || tree.getColumns() == null) {
+			return;
+		}
+		final int lastItem = tree.getColumns().length - 1;
+		if (lastItem >= 0) {
+			final TreeColumn lastColumn = tree.getColumn(lastItem);
+			if (lastColumn == null) {
+				return;
+			}
+			final int width = lastColumn.getWidth();
+			// Try to decrease the width by one
+			int newWidth = width - 1;
+			if (newWidth < 0) {
+				newWidth = width + 1;
+			}
+			lastColumn.setWidth(newWidth);
+			lastColumn.setWidth(width);
+		}
+	}
+
 	private int getColumnAlignment(String alignment) {
 		if (alignment.equals(ITableColumnLayout.COLUMN_STYLE_LEFT)) {
 			return SWT.LEAD;
@@ -1073,6 +1100,10 @@ public class TableView extends ViewPart {
 			if (!composite.isDisposed()) {
 				viewer.setInput(input);
 				viewer.setChildCount(input, input.length);
+				// Fixes squished rows issue documented in bug 349994, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=349994
+				if (org.eclipse.jface.util.Util.isGtk()) {
+					fixRowHeight();
+				}
 			}
 		}
 	}
