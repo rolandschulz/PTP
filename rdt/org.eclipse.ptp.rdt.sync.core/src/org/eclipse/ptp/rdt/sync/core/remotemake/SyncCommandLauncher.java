@@ -36,9 +36,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.ptp.ems.core.EnvManagerConfigMap;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
-import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
 import org.eclipse.ptp.ems.core.IEnvManager;
+import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
@@ -170,7 +171,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		}
 
 		// Set process's command and environment
-		List<String> command = constructCommand(commandPath, args, connection, monitor);
+		List<String> command = constructCommand(commandPath, args, connection, configuration, monitor);
 
 		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
 
@@ -221,7 +222,8 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		return fProcess;
 	}
 
-	private List<String> constructCommand(IPath commandPath, String[] args, IRemoteConnection connection, IProgressMonitor monitor) throws CoreException {
+	private List<String> constructCommand(IPath commandPath, String[] args, IRemoteConnection connection, IConfiguration config,
+			IProgressMonitor monitor) throws CoreException {
 		/*
 		 * Prior to Modules/SoftEnv support, this was the following:
 		 * 
@@ -232,8 +234,9 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		 * }
 		 */
 
-		final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
-		if (projectProperties.isEnvMgmtEnabled()) {
+		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+		final IEnvManagerConfig configProperties = new EnvManagerConfigMap(bcm.getEnvProperties(config));
+		if (configProperties.isEnvMgmtEnabled()) {
 			// Environment management is enabled for the build.  Issue custom Modules/SoftEnv commands to configure the environment.
 			IEnvManager envManager = EnvManagerRegistry.getEnvManager(monitor, connection);
 			try {
@@ -241,7 +244,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 				final List<String> command = new LinkedList<String>();
 				command.add("bash"); //$NON-NLS-1$
 				command.add("-l"); //$NON-NLS-1$
-				final String bashScriptFilename = envManager.createBashScript(monitor, true, projectProperties, getCommandAsString(commandPath, args));
+				final String bashScriptFilename = envManager.createBashScript(monitor, true, configProperties, getCommandAsString(commandPath, args));
 				command.add(bashScriptFilename);
 				return command;
 			} catch (final Exception e) {
@@ -251,7 +254,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 				command.add("bash"); //$NON-NLS-1$
 				command.add("-l"); //$NON-NLS-1$
 				command.add("-c"); //$NON-NLS-1$
-				final String bashCommand = envManager.getBashConcatenation("; ", true, projectProperties, getCommandAsString(commandPath, args)); //$NON-NLS-1$
+				final String bashCommand = envManager.getBashConcatenation("; ", true, configProperties, getCommandAsString(commandPath, args)); //$NON-NLS-1$
 				command.add(bashCommand);
 				return command;
 			}
