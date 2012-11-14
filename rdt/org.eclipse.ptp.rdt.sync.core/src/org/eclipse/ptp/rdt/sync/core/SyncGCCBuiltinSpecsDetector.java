@@ -23,6 +23,9 @@ import org.eclipse.cdt.managedbuilder.core.ManagedBuilderCorePlugin;
 import org.eclipse.cdt.managedbuilder.internal.core.ManagedMakeMessages;
 import org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuiltinSpecsDetector;
 import org.eclipse.cdt.utils.CommandLineUtil;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -33,6 +36,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.rdt.sync.core.remotemake.SyncCommandLauncher;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
 /**
  * Language settings provider to detect built-in compiler settings for GCC compiler.
@@ -60,7 +65,11 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		}
 		@Override
 		public boolean processLine(String line) {
-			return SyncGCCBuiltinSpecsDetector.this.processLine(line);
+			if (detectedSettingEntries == null) {
+				return false;
+			} else {
+				return SyncGCCBuiltinSpecsDetector.this.processLine(line);
+			}
 		}
 		@Override
 		public void shutdown() {
@@ -134,6 +143,16 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 
 	@Override
 	protected String getSpecFile(String languageId) {
+		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+		BuildScenario bs = bcm.getBuildScenarioForProject(currentProject);
+		IRemoteConnection conn = null;
+		try {
+			conn = bs.getRemoteConnection();
+		} catch (MissingConnectionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} 
+		final IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
 		String specExt = getSpecFileExtension(languageId);
 		String ext = ""; //$NON-NLS-1$
 		if (specExt != null) {
@@ -141,21 +160,22 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		}
 
 		String specFileName = SPEC_FILE_BASE + ext;
-		IPath workingLocation = ManagedBuilderCorePlugin.getDefault().getStateLocation();
-		IPath fileLocation = workingLocation.append(specFileName);
-
-		specFile = new java.io.File(fileLocation.toOSString());
-		// will preserve spec file if it was already there otherwise will delete upon finishing
-		preserveSpecFile = specFile.exists();
-		if (!preserveSpecFile) {
+		IPath workingLocation = new Path(bs.getLocation(currentProject));
+		IPath fileLocation = workingLocation.append(".ptp-sync" + specFileName); //$NON-NLS-1$
+		final IFileStore fileStore = fileManager.getResource(fileLocation.toString());
+		final IFileInfo fileInfo = fileStore.fetchInfo();
+		if (!fileInfo.exists()) {
+			OutputStream os;
 			try {
-				// In the typical case it is sufficient to have an empty file.
-				specFile.createNewFile();
+				os = fileStore.openOutputStream(EFS.NONE, null);
+				os.write(10);
+				os.close();
+			} catch (CoreException e) {
+				RDTSyncCorePlugin.log(e);
 			} catch (IOException e) {
-				ManagedBuilderCorePlugin.log(e);
+				RDTSyncCorePlugin.log(e);
 			}
 		}
-
 		return fileLocation.toString();
 	}
 
