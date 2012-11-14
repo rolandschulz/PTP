@@ -65,11 +65,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		}
 		@Override
 		public boolean processLine(String line) {
-			if (detectedSettingEntries == null) {
-				return false;
-			} else {
-				return SyncGCCBuiltinSpecsDetector.this.processLine(line);
-			}
+			return SyncGCCBuiltinSpecsDetector.this.processLine(line);
 		}
 		@Override
 		public void shutdown() {
@@ -161,7 +157,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 
 		String specFileName = SPEC_FILE_BASE + ext;
 		IPath workingLocation = new Path(bs.getLocation(currentProject));
-		IPath fileLocation = workingLocation.append(".ptp-sync" + specFileName); //$NON-NLS-1$
+		IPath fileLocation = workingLocation.append(".ptp-sync").append(specFileName); //$NON-NLS-1$
 		final IFileStore fileStore = fileManager.getResource(fileLocation.toString());
 		final IFileInfo fileInfo = fileStore.fetchInfo();
 		if (!fileInfo.exists()) {
