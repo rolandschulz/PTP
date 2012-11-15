@@ -423,7 +423,7 @@ public class JAXBUtil {
 				}
 			} else if (object instanceof ComponentlayoutType) {
 				if (((ComponentlayoutType) object).isActive()) {
-					addComponentLayoutElement(result, (ComponentlayoutType) object);
+					result.getObjectsAndRelationsAndInformation().add(element);
 					components.add(((ComponentlayoutType) object).getGid());
 				}
 			}
