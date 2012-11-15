@@ -7,7 +7,7 @@
 #* http://www.eclipse.org/legal/epl-v10.html
 #*
 #* Contributors:
-#*    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
+#*    Wolfgang Frings, Carsten Karbach (Forschungszentrum Juelich GmbH) 
 #*******************************************************************************/ 
 use strict;
 use Getopt::Long;
@@ -82,15 +82,19 @@ if( $opt_dbdir ne "" ) {
 
 print STDERR "processing objs  ...\n" if($opt_verbose); 
 {
-    my ($key,$type,$color);
+    my ($key,$type,$color,$colorkey);
     foreach $key (keys(%{$filehandler->{DATA}->{OBJECT}})) {
 	next if(!exists($filehandler->{DATA}->{OBJECT}->{$key}->{type}));
+	$colorkey=$key;
+	if(exists( $filehandler->{DATA}->{OBJECT}->{$key}->{name} )){
+		$colorkey=$filehandler->{DATA}->{OBJECT}->{$key}->{name};
+	}
 	$type=$filehandler->{DATA}->{OBJECT}->{$key}->{type};
-	$color=$colormanager->get_color($type,$key);
+	$color=$colormanager->get_color($type,$colorkey);
 	if($color) {
 	    $filehandler->{DATA}->{OBJECT}->{$key}->{color}=$color;
 	}
-	push(@{$knownids{$type}},$key);
+	push(@{$knownids{$type}},$colorkey);
     }
 
 }
