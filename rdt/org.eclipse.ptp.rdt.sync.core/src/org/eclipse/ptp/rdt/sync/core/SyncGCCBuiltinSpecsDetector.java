@@ -3,6 +3,7 @@ package org.eclipse.ptp.rdt.sync.core;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,9 @@ import org.eclipse.cdt.core.language.settings.providers.IWorkingDirectoryTracker
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.LanguageManager;
 import org.eclipse.cdt.core.resources.IConsole;
+import org.eclipse.cdt.core.settings.model.CIncludePathEntry;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
+import org.eclipse.cdt.core.settings.model.ICLanguageSettingEntry;
 import org.eclipse.cdt.internal.core.BuildRunnerHelper;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuilderCorePlugin;
 import org.eclipse.cdt.managedbuilder.internal.core.ManagedMakeMessages;
@@ -26,6 +29,7 @@ import org.eclipse.cdt.utils.CommandLineUtil;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -138,6 +142,40 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	}
 
 	@Override
+	protected List<String> parseOptions(String line) {
+		// TODO: This is a bit much to do for every single line
+		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+		BuildScenario bs = bcm.getBuildScenarioForProject(currentProject);
+		if (bs.getSyncProvider() == null) {
+			return super.parseOptions(line);
+		}
+		IRemoteConnection conn = null;
+		try {
+			conn = bs.getRemoteConnection();
+		} catch (MissingConnectionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} 
+		List<String> originalOptions = super.parseOptions(line);
+		if (originalOptions == null) {
+			return null;
+		}
+		List<String> newOptions = new ArrayList<String>();
+		for (String o : originalOptions) {
+			// Skip the line that signals the beginning of includes, which looks very much like an include.
+			if (o.contains("<...>")) { //$NON-NLS-1$
+				continue;
+			}
+			if (o.startsWith("#include <") && o.endsWith(">")) { //$NON-NLS-1$ //$NON-NLS-2$
+				o = o.replaceFirst("^#include <", "#include <" + "//" + conn.getName()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			} else if (o.startsWith("#include \"") && o.endsWith("\"")) { //$NON-NLS-1$ //$NON-NLS-2$
+				o = o.replaceFirst("^#include \\\"", "#include \"" + "//" + conn.getName()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
+			newOptions.add(o);
+		}
+		return newOptions;
+	}
+	@Override
 	protected String getSpecFile(String languageId) {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		BuildScenario bs = bcm.getBuildScenarioForProject(currentProject);
@@ -209,5 +247,31 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		}
 
 		return console;
+	}
+	
+	@Override
+	// This is a hack to work around the missing slash problem for remote includes (bug 393737)
+	// Simply intercept the include path entries and add the slash.
+	protected void shutdownForLanguage() {
+		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+		BuildScenario bs = bcm.getBuildScenarioForProject(currentProject);
+		if (bs.getSyncProvider() == null) {
+			super.shutdownForLanguage();
+			return;
+		}
+		List<ICLanguageSettingEntry> newEntries = new ArrayList<ICLanguageSettingEntry>();
+		for (ICLanguageSettingEntry entry : detectedSettingEntries) {
+			if (entry instanceof CIncludePathEntry) {
+				String oldPath = ((CIncludePathEntry) entry).getValue();
+				IPath newPath = new Path("/" + oldPath); //$NON-NLS-1$
+				ICLanguageSettingEntry newEntry = new CIncludePathEntry(newPath, entry.getFlags());
+				newEntries.add(newEntry);
+			} else {
+				newEntries.add(entry);
+			}
+		}
+		detectedSettingEntries.clear();
+		detectedSettingEntries.addAll(newEntries);
+		super.shutdownForLanguage();
 	}
 }
