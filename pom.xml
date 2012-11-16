@@ -121,7 +121,6 @@
 		<module>releng/org.eclipse.ptp.rm.jaxb-feature</module>
 		<module>releng/org.eclipse.ptp.rm.jaxb.contrib-feature</module>
 		<module>releng/org.eclipse.ptp.rm.lml-feature</module>
-		<module>releng/org.eclipse.ptp.rm.lml_jaxb-feature</module>
 		<module>releng/org.eclipse.ptp.rm.slurm-feature</module>
 		<module>releng/org.eclipse.ptp.sci-feature</module>
 		<module>releng/org.eclipse.ptp.sdk-feature</module>
@@ -143,7 +142,6 @@
 		<module>rms/org.eclipse.ptp.rm.lml.core</module>
 		<module>rms/org.eclipse.ptp.rm.lml.da</module>
 		<module>rms/org.eclipse.ptp.rm.lml.da.server</module>
-		<module>rms/org.eclipse.ptp.rm.lml_jaxb</module>
 		<module>rms/org.eclipse.ptp.rm.lml.monitor.core</module>
 		<module>rms/org.eclipse.ptp.rm.lml.monitor.ui</module>
 		<module>rms/org.eclipse.ptp.rm.lml.ui</module>

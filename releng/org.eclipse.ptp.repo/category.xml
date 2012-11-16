@@ -14,7 +14,6 @@
    <feature url="features/org.eclipse.ptp.rm.ibm.pe_0.0.0.jar" id="org.eclipse.ptp.rm.ibm.pe" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rm.jaxb_0.0.0.jar" id="org.eclipse.ptp.rm.jaxb" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rm.jaxb.contrib_0.0.0.jar" id="org.eclipse.ptp.rm.jaxb.contrib" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.rm.lml_jaxb_0.0.0.jar" id="org.eclipse.ptp.rm.lml_jaxb" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rm.lml_0.0.0.jar" id="org.eclipse.ptp.rm.lml" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rm.slurm_0.0.0.jar" id="org.eclipse.ptp.rm.slurm" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.services_0.0.0.jar" id="org.eclipse.ptp.services" version="0.0.0"/>
