@@ -127,6 +127,16 @@ public class Messages extends NLS {
 	public static String SyncFileFilter_1;
 
 	public static String SyncFileFilter_2;
+
+	public static String SyncGCCBuiltinSpecsDetector_0;
+
+	public static String SyncGCCBuiltinSpecsDetector_1;
+
+	public static String SyncGCCBuiltinSpecsDetector_2;
+
+	public static String SyncGCCBuiltinSpecsDetector_3;
+
+	public static String SyncGCCBuiltinSpecsDetector_4;
  
 	public static String SyncManager_0;
  

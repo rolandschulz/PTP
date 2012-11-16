@@ -1,9 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Oak Ridge National Laboratory and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    John Eblen - initial implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +38,6 @@ import org.eclipse.cdt.utils.CommandLineUtil;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -39,14 +47,17 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.remotemake.SyncCommandLauncher;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
 /**
- * Language settings provider to detect built-in compiler settings for GCC compiler.
- *
- * @since 8.1
+ * Language settings provider to detect built-in compiler settings for GCC compiler, modified to work with synchronized projects.
+ * The goal of this class is to rely on superclasses as much as possible and minimize code copying while modifying the code to:
+ * 1) Run processes on the remote machine for the current build configuration
+ * 2) Convert paths to UNC notation with connection name prepended:
+ *    syntax: //<connection name>/<discovered path> 
  */
 public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector implements ILanguageSettingsEditableProvider {
 	private static final String CDT_MANAGEDBUILDER_UI_PLUGIN_ID = "org.eclipse.cdt.managedbuilder.ui"; //$NON-NLS-1$
@@ -61,6 +72,9 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	
 	/**
 	 * Internal ICConsoleParser to handle individual run for one language.
+	 * This is basically a copy of:
+	 * {@link org.eclipse.cdt.managedbuilder.language.settings.providers.AbstractBuiltinSpecsDetector.ConsoleParserAdapter()}
+	 * necessary because that class is private.
 	 */
 	private class ConsoleParserAdapter implements ICBuildOutputParser {
 		@Override
@@ -77,22 +91,27 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		}
 	}
 
+	/**
+	 * A copy of:
+	 * {@link org.eclipse.cdt.managedbuilder.language.settings.providers.AbstractBuiltinSpecsDetector#runForLanguage()}
+	 * modified to use the sync command launcher. Note that this method is called by "runForLanguage," it does not override it.
+	 * Thus, all of the setup for running is done twice. Specifically, a BuildRunnerHelper is built twice,
+	 * Ideally, CDT would provide an extension point to change the command launcher, as it does for builds.
+	 *
+	 * @return ICommandLauncher status of run
+	 */
 	@Override
-	public void execute() {
-		RDTSyncCorePlugin.log("Executing sync scanner discovery"); //$NON-NLS-1$
-		super.execute();
-	}
-	
-	@Override
-	protected int runProgramForLanguage(String languageId, String command, String[] envp, URI workingDirectoryURI, OutputStream consoleOut, OutputStream consoleErr, IProgressMonitor monitor) throws CoreException, IOException {
+	protected int runProgramForLanguage(String languageId, String command, String[] envp, URI workingDirectoryURI,
+			OutputStream consoleOut, OutputStream consoleErr, IProgressMonitor monitor) throws CoreException, IOException {
 		BuildRunnerHelper buildRunnerHelper = new BuildRunnerHelper(currentProject);
 
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		int retval = 0;
+		int retval = ICommandLauncher.COMMAND_CANCELED;
+		boolean closeAttempted = false;
 		try {
-			monitor.beginTask(ManagedMakeMessages.getFormattedString("AbstractBuiltinSpecsDetector.RunningScannerDiscovery",  getName()), //$NON-NLS-1$
+			monitor.beginTask(ManagedMakeMessages.getFormattedString(Messages.SyncGCCBuiltinSpecsDetector_0,  getName()),
 					TICKS_EXECUTE_COMMAND + TICKS_OUTPUT_PARSING);
 
 			IConsole console;
@@ -119,8 +138,9 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 			}
 
 			// Using GMAKE_ERROR_PARSER_ID as it can handle generated error messages
-			// TODO: Add marker generator
-			ErrorParserManager epm = new ErrorParserManager(currentProject, buildDirURI, null, new String[] {GMAKE_ERROR_PARSER_ID});
+			// TODO: Add marker generator - superclass marker generator is private.
+			ErrorParserManager epm = new ErrorParserManager(currentProject, buildDirURI, null,
+					new String[] {GMAKE_ERROR_PARSER_ID});
 			ConsoleParserAdapter consoleParser = new ConsoleParserAdapter();
 			consoleParser.startup(currentCfgDescription, epm);
 			List<IConsoleParser> parsers = new ArrayList<IConsoleParser>();
@@ -129,40 +149,60 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 			buildRunnerHelper.setLaunchParameters(launcher, program, args, buildDirURI, envp);
 			buildRunnerHelper.prepareStreams(epm, parsers, console, new SubProgressMonitor(monitor, TICKS_OUTPUT_PARSING));
 
-			buildRunnerHelper.greeting(ManagedMakeMessages.getFormattedString("AbstractBuiltinSpecsDetector.RunningScannerDiscovery",  getName())); //$NON-NLS-1$
-			retval = buildRunnerHelper.build(new SubProgressMonitor(monitor, TICKS_EXECUTE_COMMAND, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+			buildRunnerHelper.greeting(ManagedMakeMessages.getFormattedString(Messages.SyncGCCBuiltinSpecsDetector_1,  getName()));
+			retval = buildRunnerHelper.build(new SubProgressMonitor(monitor, TICKS_EXECUTE_COMMAND, 
+					SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+			closeAttempted = true;
 			buildRunnerHelper.close();
 			buildRunnerHelper.goodbye();
 		} catch (Exception e) {
-			ManagedBuilderCorePlugin.log(new CoreException(new Status(IStatus.ERROR, ManagedBuilderCorePlugin.PLUGIN_ID, "Error running Builtin Specs Detector" , e))); //$NON-NLS-1$
-		} finally {
-			monitor.done();
+			if (closeAttempted) {
+				ManagedBuilderCorePlugin.log(e);
+			} else {
+				ManagedBuilderCorePlugin.log(new CoreException(new Status(IStatus.ERROR, ManagedBuilderCorePlugin.PLUGIN_ID,
+						Messages.SyncGCCBuiltinSpecsDetector_2 , e)));
+				try {
+					buildRunnerHelper.close();
+				} catch (IOException e1) {
+					ManagedBuilderCorePlugin.log(e1);
+				}
+			}
 		}
+		monitor.done();
 		return retval;
 	}
 
+	/**
+	 * This method intercepts and modifies the output from the superclass call. It changes include paths to UNC notation with the
+	 * correct connection name prepended.
+	 *
+	 * @return list of options
+	 */
 	@Override
 	protected List<String> parseOptions(String line) {
-		// TODO: This is a bit much to do for every single line
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		BuildScenario bs = bcm.getBuildScenarioForProject(currentProject);
+		// For local configurations, we can fall back to the original implementation.
 		if (bs.getSyncProvider() == null) {
 			return super.parseOptions(line);
 		}
+
 		IRemoteConnection conn = null;
 		try {
 			conn = bs.getRemoteConnection();
 		} catch (MissingConnectionException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			// Impossible to build includes properly without connection name
+			return new ArrayList<String>();
 		} 
+
 		List<String> originalOptions = super.parseOptions(line);
 		if (originalOptions == null) {
 			return null;
 		}
 		List<String> newOptions = new ArrayList<String>();
 		for (String o : originalOptions) {
-			// Skip the line that signals the beginning of includes, which looks very much like an include.
+			// Skip the line that signals the beginning of includes, which looks very much like an include and matches the other
+			// filters. This is important, because modifying this line seems to wreak havoc on the entire parsing process.
 			if (o.contains("<...>")) { //$NON-NLS-1$
 				continue;
 			}
@@ -175,34 +215,48 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		}
 		return newOptions;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.cdt.managedbuilder.language.settings.providers.AbstractBuiltinSpecsDetector#getSpecFile(java.lang.String)
+	 */
 	@Override
 	protected String getSpecFile(String languageId) {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		BuildScenario bs = bcm.getBuildScenarioForProject(currentProject);
+		// For local configurations, we can fall back to the original implementation.
+		if (bs.getSyncProvider() == null) {
+			return super.getSpecFile(languageId);
+		}
+
+		// Build spec file name
+		String specFileName = SPEC_FILE_BASE;
+		String ext = getSpecFileExtension(languageId);
+		if (ext != null) {
+			specFileName = specFileName + '.' + ext;
+		}
+		IPath workingLocation = new Path(bs.getLocation(currentProject));
+		// TODO: Get rid of .ptp-sync string literal.
+		// TODO: What if .ptp-sync does not exist?
+		// TODO: What if remote system does not use '/' path separator? (assumed by IPath.toString())
+		IPath fileLocation = workingLocation.append(".ptp-sync").append(specFileName); //$NON-NLS-1$
+
+		// Create spec file if it doesn't exist
 		IRemoteConnection conn = null;
 		try {
 			conn = bs.getRemoteConnection();
 		} catch (MissingConnectionException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			return fileLocation.toString();
 		} 
-		final IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
-		String specExt = getSpecFileExtension(languageId);
-		String ext = ""; //$NON-NLS-1$
-		if (specExt != null) {
-			ext = '.' + specExt;
-		}
 
-		String specFileName = SPEC_FILE_BASE + ext;
-		IPath workingLocation = new Path(bs.getLocation(currentProject));
-		IPath fileLocation = workingLocation.append(".ptp-sync").append(specFileName); //$NON-NLS-1$
+		final IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
 		final IFileStore fileStore = fileManager.getResource(fileLocation.toString());
 		final IFileInfo fileInfo = fileStore.fetchInfo();
 		if (!fileInfo.exists()) {
 			OutputStream os;
 			try {
 				os = fileStore.openOutputStream(EFS.NONE, null);
-				os.write(10);
+				os.write('\n');
 				os.close();
 			} catch (CoreException e) {
 				RDTSyncCorePlugin.log(e);
@@ -215,6 +269,10 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 
 	/**
 	 * Create and start the provider console.
+	 * This is basically a copy of:
+	 * {@link org.eclipse.cdt.managedbuilder.language.settings.providers.AbstractBuiltinSpecsDetector#startProviderConsole()}
+	 * necessary because that class is private.
+	 * 
 	 * @return CDT console.
 	 */
 	private IConsole startProviderConsole() {
@@ -233,7 +291,8 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 				String consoleName = getName() + ", " + ld.getName(); //$NON-NLS-1$
 				URL defaultIcon = Platform.getBundle(CDT_MANAGEDBUILDER_UI_PLUGIN_ID).getEntry(DEFAULT_CONSOLE_ICON);
 				if (defaultIcon == null) {
-					String msg = "Unable to find icon " + DEFAULT_CONSOLE_ICON + " in plugin " + CDT_MANAGEDBUILDER_UI_PLUGIN_ID; //$NON-NLS-1$ //$NON-NLS-2$
+					String msg = Messages.SyncGCCBuiltinSpecsDetector_3 + DEFAULT_CONSOLE_ICON
+							+ Messages.SyncGCCBuiltinSpecsDetector_4 + CDT_MANAGEDBUILDER_UI_PLUGIN_ID;
 					ManagedBuilderCorePlugin.log(new Status(IStatus.ERROR, ManagedBuilderCorePlugin.PLUGIN_ID, msg));
 				}
 
@@ -249,13 +308,18 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		return console;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.cdt.managedbuilder.language.settings.providers.AbstractBuiltinSpecsDetector#shutdownForLanguage()
+	 */
 	@Override
-	// This is a hack to work around the missing slash problem for remote includes (bug 393737)
-	// Simply intercept the include path entries and add the slash.
 	protected void shutdownForLanguage() {
+		// This override is a hack to work around the missing slash problem for remote includes (bug 393737).
+		// Simply intercept the final include path entries and add the slash.
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		BuildScenario bs = bcm.getBuildScenarioForProject(currentProject);
 		if (bs.getSyncProvider() == null) {
+			// For local configurations, no special processing is needed.
 			super.shutdownForLanguage();
 			return;
 		}
@@ -263,7 +327,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		for (ICLanguageSettingEntry entry : detectedSettingEntries) {
 			if (entry instanceof CIncludePathEntry) {
 				String oldPath = ((CIncludePathEntry) entry).getValue();
-				IPath newPath = new Path("/" + oldPath); //$NON-NLS-1$
+				String newPath = '/' + oldPath;
 				ICLanguageSettingEntry newEntry = new CIncludePathEntry(newPath, entry.getFlags());
 				newEntries.add(newEntry);
 			} else {
