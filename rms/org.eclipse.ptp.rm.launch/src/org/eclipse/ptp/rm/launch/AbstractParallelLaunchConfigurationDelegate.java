@@ -193,7 +193,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						} catch (CoreException e) {
 							RMLaunchPlugin.log(e);
 						}
-						
+
 						/*
 						 * Clean up any launch activities.
 						 */
@@ -566,32 +566,27 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			control.start(subMon.newChild(10));
 
 			if (!mode.equals(ILaunchManager.DEBUG_MODE)) {
-				String monitorType = control.getConfiguration().getMonitorData().getSchedulerType();
-				if (monitorType != null) {
-					IMonitorControl monitor = MonitorControlManager.getInstance().getMonitorControl(control.getRemoteServicesId(),
-							control.getConnectionName(), monitorType);
-					if (monitor == null) {
+				IMonitorControl monitor = MonitorControlManager.getInstance().getMonitorControl(control.getControlId());
+				if (monitor == null) {
+					if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
+							Messages.AbstractParallelLaunchConfigurationDelegate_launchType1,
+							PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, true)) {
+
+						monitor = MonitorControlManager.getInstance().createMonitorControl(control);
+						monitor.start(subMon.newChild(10));
+					}
+				} else {
+					if (!monitor.isActive()) {
 						if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
-								Messages.AbstractParallelLaunchConfigurationDelegate_launchType1,
+								Messages.AbstractParallelLaunchConfigurationDelegate_launchType2,
 								PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, true)) {
 
-							monitor = MonitorControlManager.getInstance().createMonitorControl(monitorType,
-									control.getRemoteServicesId(), control.getConnectionName());
 							monitor.start(subMon.newChild(10));
 						}
 					} else {
-						if (!monitor.isActive()) {
-							if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
-									Messages.AbstractParallelLaunchConfigurationDelegate_launchType2,
-									PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, true)) {
-
-								monitor.start(subMon.newChild(10));
-							}
-						} else {
-							switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
-									Messages.AbstractParallelLaunchConfigurationDelegate_launchType3,
-									PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, false);
-						}
+						switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
+								Messages.AbstractParallelLaunchConfigurationDelegate_launchType3,
+								PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, false);
 					}
 				}
 			}

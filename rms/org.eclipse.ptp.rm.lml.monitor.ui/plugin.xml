@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="monitors" name="monitors" schema="schema/monitors.exsd"/>
    <extension
          point="org.eclipse.ui.views">
       <view
@@ -15,34 +14,34 @@
    <extension
          point="org.eclipse.ui.commands">
       <category
-            description="Monitor Comands"
+            description="%Commands.description"
             id="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
-            name="Monitor Commands">
+            name="%Commands.name">
       </category>
       <command
             categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
             id="org.eclipse.ptp.rm.lml.monitor.ui.addMonitor"
-            name="Add Monitor">
+            name="%AddMonitorCommand.name">
       </command>
       <command
             categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
             id="org.eclipse.ptp.rm.lml.monitor.ui.removeMonitor"
-            name="Remove Monitor">
+            name="%RemoveMonitorCommand.name">
       </command>
       <command
             categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
             id="org.eclipse.ptp.rm.lml.monitor.ui.startMonitor"
-            name="Start Monitor">
+            name="%StartMonitorCommand.name">
       </command>
       <command
             categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
             id="org.eclipse.ptp.rm.lml.monitor.ui.stopMonitor"
-            name="Stop Monitor">
+            name="%StopMonitorCommand.name">
       </command>
       <command
             categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
             id="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor"
-            name="Refresh Monitor">
+            name="%RefreshMonitorCommand.name">
       </command>
    </extension>
    <extension
@@ -112,55 +111,93 @@
          </separator>
       </menuContribution>
    </extension>
-   <extension
-         point="org.eclipse.ptp.rm.lml.monitor.ui.monitors">
-      <monitor
-            name="Cobalt (Blue Gene)"
-            type="COBALT_BG">
-      </monitor>
-      <monitor
-            name="Grid Engine"
-            type="GRIDENGINE">
-      </monitor>
-      <monitor
-            name="IBM LoadLeveler"
-            type="LL">
-      </monitor>
-      <monitor
-            name="IBM LoadLeveler (Blue Gene)"
-            type="LL_BG">
-      </monitor>
-      <monitor
-            name="Open MPI"
-            type="OPENMPI">
-      </monitor>
-      <monitor
-            name="PBS"
-            type="PBS">
-      </monitor>
-      <monitor
-            name="IBM Parallel Environment"
-            type="PE">
-      </monitor>
-      <monitor
-            name="SLURM"
-            type="SLURM">
-      </monitor>
-      <monitor
-            name="SLURM (ALPS)"
-            type="SLURM_ALPS">
-      </monitor>
-      <monitor
-            name="TORQUE Resource Manager"
-            type="TORQUE">
-      </monitor>
-      <monitor
-            name="TORQUE Resource Manager (ALPS)"
-            type="TORQUE_ALPS">
-      </monitor>
-      <monitor
-            name="Auto Select"
-            type="DEFAULT">
-      </monitor>
+      <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="false"
+            id="org.eclipse.ptp.rm.lml.ui.persistentStatusContribution"
+            objectClass="org.eclipse.ptp.rm.lml.internal.core.model.Row">
+         <action
+               class="org.eclipse.ptp.rm.lml.monitor.ui.actions.SuspendJob"
+               enablesFor="+"
+               icon="icons/eview16/job_suspended.gif"
+               id="org.eclipse.ptp.rm.lml.monitor.ui.actions.SuspendJob"
+               label="%action.label"
+               menubarPath="job"
+               tooltip="%action.tooltip">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.monitor.ui.actions.GetOutput"
+               enablesFor="+"
+               icon="icons/eview16/refresh.gif"
+               id="org.eclipse.ptp.rm.lml.monitor.ui.actions.GetOutput"
+               label="%action.label.0"
+               menubarPath="file"
+               tooltip="%action.tooltip.0">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.monitor.ui.actions.GetError"
+               enablesFor="+"
+               icon="icons/eview16/refresh.gif"
+               id="org.eclipse.ptp.rm.lml.monitor.ui.actions.GetError"
+               label="%action.label.1"
+               menubarPath="file"
+               tooltip="%action.tooltip.1">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.monitor.ui.actions.RefreshJobStatus"
+               enablesFor="+"
+               icon="icons/eview16/view-refresh.png"
+               id="org.eclipse.ptp.rm.lml.monitor.ui.actions.RefreshJobStatus"
+               label="%action.label.2"
+               menubarPath="status"
+               tooltip="%action.tooltip.2">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.monitor.ui.actions.ReleaseJob"
+               enablesFor="+"
+               icon="icons/eview16/job_starting.gif"
+               id="org.eclipse.ptp.rm.lml.monitor.ui.actions.ReleaseJob"
+               label="%action.label.3"
+               menubarPath="job"
+               tooltip="%action.tooltip.3">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.monitor.ui.actions.HoldJob"
+               enablesFor="+"
+               icon="icons/eview16/job_suspended.gif"
+               id="org.eclipse.ptp.rm.lml.monitor.ui.actions.HoldJob"
+               label="%action.label.4"
+               menubarPath="job"
+               tooltip="%action.tooltip.4">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.monitor.ui.actions.CancelJob"
+               enablesFor="+"
+               icon="icons/eview16/job_completed.gif"
+               id="org.eclipse.ptp.rm.lml.monitor.ui.actions.CancelJob"
+               label="%action.label.5"
+               menubarPath="job"
+               tooltip="%action.tooltip.5">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.monitor.ui.actions.RemoveJob"
+               enablesFor="+"
+               icon="icons/eview16/delete.gif"
+               id="org.eclipse.ptp.rm.lml.monitor.ui.actions.RemoveJob"
+               label="%action.label.6"
+               menubarPath="table"
+               tooltip="%action.tooltip.6">
+         </action>
+         <action
+               class="org.eclipse.ptp.rm.lml.monitor.ui.actions.ResumeJob"
+               enablesFor="+"
+               icon="icons/eview16/job_running.gif"
+               id="org.eclipse.ptp.rm.lml.monitor.ui.actions.ResumeJob"
+               label="%action.label.7"
+               menubarPath="job"
+               tooltip="%action.tooltip.7">
+         </action>
+      </objectContribution>
    </extension>
 </plugin>

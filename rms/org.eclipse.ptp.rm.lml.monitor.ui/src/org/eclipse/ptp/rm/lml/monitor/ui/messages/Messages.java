@@ -17,36 +17,33 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.lml.monitor.ui.messages.messages"; //$NON-NLS-1$
 
 	public static String AddMonitorDialog_Add_Monitor;
-
 	public static String AddMonitorDialog_Choose_a_monitor_type;
-
 	public static String AddMonitorDialog_Monitor_Type;
-
 	public static String AddMonitorDialog_Please_select_a_monitor_type;
-
 	public static String AddMonitorDialog_Select_new_monitor;
-
 	public static String LMLRMMonitorConfigurationWizardPage_Description;
-
 	public static String LMLRMMonitorConfigurationWizardPage_sameAsControl;
-
 	public static String LMLRMMonitorConfigurationWizardPage_Title;
-
-	public static String MonitorView_Start_Stop_Monitor;
-
 	public static String RemoveMonitorHandler_Are_you_sure_1;
-
 	public static String RemoveMonitorHandler_Are_you_sure_2;
-
 	public static String RemoveMonitorHandler_Remove_Monitor;
-
 	public static String StartMonitorHandler_Start_Monitor;
-
 	public static String StartMonitorHandler_Unable_to_start_monitor;
-
 	public static String StopMonitorHandler_Stop_Monitors;
-
 	public static String StopMonitorHandler_Unable_to_stop_monitor;
+	public static String MonitorView_AreYouSure;
+	public static String MonitorView_Status;
+	public static String MonitorView_StopMonitor;
+	public static String MonitorView_ConnectionName;
+	public static String MonitorView_SystemType;
+	public static String MonitorView_ToggleMonitor;
+	public static String RemoveJobWarning;
+	public static String CannotUndoOperation;
+	public static String RefreshJobStatusError;
+	public static String RefreshJobStatus;
+	public static String CancelJob;
+	public static String CancelJobError;
+	public static String RemoveFiles;
 
 	static {
 		// initialize resource bundle

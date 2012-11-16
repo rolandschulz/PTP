@@ -19,72 +19,83 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public interface IMonitorControl {
 	/**
-	 * Dispose of monitor and any saved state.
+	 * Dispose of control and any saved state.
 	 */
 	public void dispose();
 
 	/**
-	 * Get the connection name for the monitor
+	 * Get the connection name for the control
 	 * 
 	 * @return connection name
 	 */
 	public String getConnectionName();
 
 	/**
-	 * Get an ID that uniquely identifies this monitor. The ID is unique for each tuple <remoteServicesId, connectionName,
-	 * systemType>
+	 * Get an ID that uniquely identifies this control. The ID is unique for
+	 * each tuple <remoteServicesId, connectionName, systemType>
 	 * 
 	 * @return unique ID
 	 */
-	public String getMonitorId();
+	public String getControlId();
 
 	/**
-	 * Get the ID of the remote services used by the monitor for remote connections
+	 * Get the ID of the remote services used by the control for remote
+	 * connections
 	 * 
 	 * @return remote services ID
 	 */
 	public String getRemoteServicesId();
 
 	/**
-	 * Get the system type for this monitor
+	 * Get the system type for this control
 	 * 
 	 * @return system type
 	 */
 	public String getSystemType();
 
 	/**
-	 * Check if the monitor is active. An active monitor is connected to the remote system and is polling the system for updates.
+	 * Get the monitor type for this control
 	 * 
-	 * @return true if the monitor is active
+	 * @return monitor type
+	 */
+	public String getMonitorType();
+
+	/**
+	 * Check if the control is active. An active control is connected to the
+	 * remote system and is polling the system for updates.
+	 * 
+	 * @return true if the control is active
 	 */
 	public boolean isActive();
 
 	/**
-	 * Load persisted monitor information.
+	 * Load persisted control information.
 	 * 
-	 * @return true if the monitor was active when saved
+	 * @return true if the control was active when saved
 	 */
 	public boolean load() throws CoreException;
 
 	/**
-	 * Force the monitor to refresh its data. This will typically cause a command to be run on the target system.
+	 * Force the control to refresh its data. This will typically cause a
+	 * command to be run on the target system.
 	 */
 	public void refresh();
 
 	/**
-	 * Save monitor data to persisted store.
+	 * Save control data to persisted store.
 	 */
 	public void save();
 
 	/**
-	 * Set the connection name for the monitor
+	 * Set the connection name for the control
 	 * 
 	 * @param connName
 	 */
 	public void setConnectionName(String connName);
 
 	/**
-	 * Set the ID of the remote services used by the monitor for remote connections
+	 * Set the ID of the remote services used by the control for remote
+	 * connections
 	 * 
 	 * @param id
 	 *            remote services ID
@@ -92,7 +103,7 @@ public interface IMonitorControl {
 	public void setRemoteServicesId(String id);
 
 	/**
-	 * Set the system type for the monitor
+	 * Set the system type for the control
 	 * 
 	 * @param type
 	 *            system type
@@ -100,7 +111,8 @@ public interface IMonitorControl {
 	public void setSystemType(String type);
 
 	/**
-	 * Start the monitor. This will open a connection to the target system (if necessary) and start the monitoring job.
+	 * Start the control. This will open a connection to the target system (if
+	 * necessary) and start the monitoring job.
 	 * 
 	 * @param monitor
 	 *            progress monitor
@@ -109,7 +121,7 @@ public interface IMonitorControl {
 	public void start(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Stop the monitor. Will terminate any running jobs.
+	 * Stop the control. Will terminate any running jobs.
 	 * 
 	 * @throws CoreException
 	 */

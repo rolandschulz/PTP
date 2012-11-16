@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
@@ -37,9 +38,15 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.server.RemoteServerManager;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
+import org.eclipse.ptp.rm.jaxb.control.LaunchControllerManager;
+import org.eclipse.ptp.rm.jaxb.core.data.MonitorDriverType;
+import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
+import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
+import org.eclipse.ptp.rm.lml.internal.core.elements.CommandType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.DriverType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin;
@@ -63,7 +70,8 @@ public class MonitorControl implements IMonitorControl {
 	}
 
 	/**
-	 * Job for running the LML DA server. This job gets run periodically based on the JOB_SCHEDULE_FREQUENCY.
+	 * Job for running the LML DA server. This job gets run periodically based
+	 * on the JOB_SCHEDULE_FREQUENCY.
 	 */
 	private class MonitorJob extends Job {
 		private final LMLDAServer fServer;
@@ -91,7 +99,7 @@ public class MonitorControl implements IMonitorControl {
 					if (!subMon.isCanceled()) {
 						fServer.waitForServerStart(subMon.newChild(20));
 						if (!subMon.isCanceled()) {
-							LMLManager.getInstance().update(getMonitorId(), fServer.getInputStream(), fServer.getOutputStream());
+							LMLManager.getInstance().update(getControlId(), fServer.getInputStream(), fServer.getOutputStream());
 						}
 					}
 				} catch (final Exception e) {
@@ -122,7 +130,7 @@ public class MonitorControl implements IMonitorControl {
 
 	private MonitorJob fMonitorJob;
 
-	private final String fMonitorId;
+	private final String fControlId;
 	private final LMLManager fLMLManager = LMLManager.getInstance();
 	private final JobListener fJobListener = new JobListener();
 	private final StringBuffer fSavedLayout = new StringBuffer();
@@ -143,8 +151,28 @@ public class MonitorControl implements IMonitorControl {
 	private static final String CONNECTION_NAME_ATTR = "connectionName";//$NON-NLS-1$;
 	private static final String MONITOR_ATTR = "monitor";//$NON-NLS-1$
 
-	public MonitorControl(String monitorId) {
-		fMonitorId = monitorId;
+	public MonitorControl(String controlId) {
+		fControlId = controlId;
+	}
+
+	private void addJob(IJobStatus status) {
+		String monitorId = getControlId(status);
+		if (monitorId != null && monitorId.equals(getControlId())) {
+			ILaunchConfiguration configuration = status.getLaunchConfiguration();
+			String controlName = LaunchUtils.getTemplateName(configuration);
+			String[][] attrs = { { JobStatusData.JOB_ID_ATTR, status.getJobId() },
+					{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
+					{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() }, { JobStatusData.CONTROL_TYPE_ATTR, controlName },
+					{ JobStatusData.MONITOR_TYPE_ATTR, getMonitorType() },
+					{ JobStatusData.QUEUE_NAME_ATTR, status.getQueueName() }, { JobStatusData.OWNER_ATTR, status.getOwner() },
+					{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, status.getOutputPath() },
+					{ JobStatusData.STDERR_REMOTE_FILE_ATTR, status.getErrorPath() },
+					{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(status.isInteractive()) } };
+			final JobStatusData data = new JobStatusData(attrs);
+			data.setState(status.getState());
+			data.setStateDetail(status.getStateDetail());
+			fLMLManager.addUserJob(getControlId(), status.getJobId(), data);
+		}
 	}
 
 	/*
@@ -163,7 +191,8 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getConnectionName()
+	 * @see
+	 * org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getConnectionName()
 	 */
 	public String getConnectionName() {
 		return fConnectionName;
@@ -172,19 +201,82 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getMonitorId()
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getControlId()
 	 */
-	public String getMonitorId() {
-		return fMonitorId;
+	public String getControlId() {
+		return fControlId;
+	}
+
+	private String getControlId(IJobStatus status) {
+		ILaunchConfiguration configuration = status.getLaunchConfiguration();
+		if (configuration != null) {
+			String connectionName = LaunchUtils.getConnectionName(configuration);
+			String remoteServicesId = LaunchUtils.getRemoteServicesId(configuration);
+			String monitorType = LaunchUtils.getSystemType(configuration);
+			if (connectionName != null && remoteServicesId != null && monitorType != null) {
+				return MonitorControlManager.generateMonitorId(remoteServicesId, connectionName, monitorType);
+			}
+		}
+		return null;
+	}
+
+	private RequestType getMonitorConfigurationRequestType(ILaunchController controller) {
+		RequestType request = new RequestType();
+		final DriverType driver = new DriverType();
+		driver.setName(getMonitorType());
+		MonitorType monitor = controller.getConfiguration().getMonitorData();
+		if (monitor != null) {
+			List<CommandType> driverCommands = driver.getCommand();
+			for (MonitorDriverType monitorDriver : monitor.getDriver()) {
+				for (SimpleCommandType monitorCmd : monitorDriver.getCmd()) {
+					CommandType cmd = new CommandType();
+					cmd.setName(monitorCmd.getName());
+					cmd.setExec(monitorCmd.getExec());
+					driverCommands.add(cmd);
+				}
+			}
+		}
+		request.getDriver().add(driver);
+		return request;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getRemoteServicesId()
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getMonitorType()
+	 */
+	public String getMonitorType() {
+		return MonitorControlManager.getMonitorType(fSystemType);
+	}
+
+	/**
+	 * Get the remote connection specified by the monitor configuration.
+	 * 
+	 * @param monitor
+	 *            progress monitor
+	 * @return connection for the monitor
+	 */
+	private IRemoteConnection getRemoteConnection(IProgressMonitor monitor) throws CoreException {
+		final IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(getRemoteServicesId(), monitor);
+		if (services != null) {
+			final IRemoteConnectionManager connMgr = services.getConnectionManager();
+			return connMgr.getConnection(getConnectionName());
+		}
+		throw CoreExceptionUtils.newException(Messages.MonitorControl_unableToOpenRemoteConnection, null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getRemoteServicesId()
 	 */
 	public String getRemoteServicesId() {
 		return fRemoteServicesId;
+	}
+
+	private File getSaveLocation() {
+		return LMLMonitorCorePlugin.getDefault().getStateLocation().append(getControlId()).addFileExtension(XML).toFile();
 	}
 
 	/*
@@ -235,6 +327,35 @@ public class MonitorControl implements IMonitorControl {
 		return active;
 	}
 
+	private void loadJobs(IMemento memento, List<JobStatusData> jobs) {
+		if (memento != null) {
+			final IMemento[] children = memento.getChildren(JOB_ATTR);
+			for (final IMemento child : children) {
+				String[][] attrs = { { JobStatusData.JOB_ID_ATTR, child.getID() },
+						{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
+						{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() },
+						{ JobStatusData.CONTROL_TYPE_ATTR, child.getString(JobStatusData.CONTROL_TYPE_ATTR) },
+						{ JobStatusData.MONITOR_TYPE_ATTR, getMonitorType() },
+						{ JobStatusData.STATE_ATTR, child.getString(JobStatusData.STATE_ATTR) },
+						{ JobStatusData.STATE_DETAIL_ATTR, child.getString(JobStatusData.STATE_DETAIL_ATTR) },
+						{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, child.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR) },
+						{ JobStatusData.STDERR_REMOTE_FILE_ATTR, child.getString(JobStatusData.STDERR_REMOTE_FILE_ATTR) },
+						{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(child.getBoolean(JobStatusData.INTERACTIVE_ATTR)) },
+						{ JobStatusData.QUEUE_NAME_ATTR, child.getString(JobStatusData.QUEUE_NAME_ATTR) },
+						{ JobStatusData.OWNER_ATTR, child.getString(JobStatusData.OWNER_ATTR) },
+						{ JobStatusData.OID_ATTR, child.getString(JobStatusData.OID_ATTR) } };
+				jobs.add(new JobStatusData(attrs));
+			}
+		}
+	}
+
+	private boolean loadState(IMemento memento) {
+		setRemoteServicesId(memento.getString(JobStatusData.REMOTE_SERVICES_ID_ATTR));
+		setConnectionName(memento.getString(JobStatusData.CONNECTION_NAME_ATTR));
+		fSystemType = memento.getString(SYSTEM_TYPE_ATTR);
+		return memento.getBoolean(MONITOR_STATE);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -252,8 +373,8 @@ public class MonitorControl implements IMonitorControl {
 	public void save() {
 		final XMLMemento memento = XMLMemento.createWriteRoot(MONITOR_ATTR);
 
-		final String layout = fLMLManager.getCurrentLayout(getMonitorId());
-		final JobStatusData[] jobs = fLMLManager.getUserJobs(getMonitorId());
+		final String layout = fLMLManager.getCurrentLayout(getControlId());
+		final JobStatusData[] jobs = fLMLManager.getUserJobs(getControlId());
 
 		saveState(memento);
 
@@ -280,10 +401,32 @@ public class MonitorControl implements IMonitorControl {
 
 	}
 
+	private void saveJob(JobStatusData job, IMemento memento) {
+		final IMemento jobMemento = memento.createChild(JOB_ATTR, job.getJobId());
+		jobMemento.putString(JobStatusData.CONTROL_TYPE_ATTR, job.getControlType());
+		jobMemento.putString(JobStatusData.STATE_ATTR, job.getState());
+		jobMemento.putString(JobStatusData.STATE_DETAIL_ATTR, job.getStateDetail());
+		jobMemento.putString(JobStatusData.STDOUT_REMOTE_FILE_ATTR, job.getOutputPath());
+		jobMemento.putString(JobStatusData.STDERR_REMOTE_FILE_ATTR, job.getErrorPath());
+		jobMemento.putBoolean(JobStatusData.INTERACTIVE_ATTR, job.isInteractive());
+		jobMemento.putString(JobStatusData.QUEUE_NAME_ATTR, job.getQueueName());
+		jobMemento.putString(JobStatusData.OWNER_ATTR, job.getOwner());
+		jobMemento.putString(JobStatusData.OID_ATTR, job.getOid());
+	}
+
+	private void saveState(IMemento memento) {
+		memento.putString(REMOTE_SERVICES_ID_ATTR, getRemoteServicesId());
+		memento.putString(CONNECTION_NAME_ATTR, getConnectionName());
+		memento.putString(SYSTEM_TYPE_ATTR, getSystemType());
+		memento.putBoolean(MONITOR_STATE, isActive());
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setConnectionName(java.lang.String)
+	 * @see
+	 * org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setConnectionName
+	 * (java.lang.String)
 	 */
 	public void setConnectionName(String connName) {
 		fConnectionName = connName;
@@ -292,7 +435,9 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setRemoteServicesId(java.lang.String)
+	 * @see
+	 * org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setRemoteServicesId
+	 * (java.lang.String)
 	 */
 	public void setRemoteServicesId(String id) {
 		fRemoteServicesId = id;
@@ -301,7 +446,9 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setSystemType(java.lang.String)
+	 * @see
+	 * org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setSystemType(java
+	 * .lang.String)
 	 */
 	public void setSystemType(String type) {
 		fSystemType = type;
@@ -310,23 +457,41 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.monitors.IMonitorControl#start(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see
+	 * org.eclipse.ptp.core.monitors.IMonitorControl#start(org.eclipse.core.
+	 * runtime.IProgressMonitor)
 	 */
 	public void start(IProgressMonitor monitor) throws CoreException {
 		if (!isActive()) {
 			SubMonitor progress = SubMonitor.convert(monitor, 30);
 			try {
+				ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(getRemoteServicesId(),
+						getConnectionName(), getSystemType());
+
+				if (controller == null) {
+					throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
+							"Unable to locate launch controller"));
+				}
+
 				try {
 					load();
 				} catch (CoreException e) {
 					/*
-					 * Can find monitor data for some reason, so just log a message but allow the monitor to be started anyway
+					 * Can't find monitor data for some reason, so just log a
+					 * message but allow the monitor to be started anyway
 					 */
 					LMLMonitorCorePlugin.log(e.getLocalizedMessage());
 				}
 
 				final IRemoteConnection conn = getRemoteConnection(progress.newChild(10));
-				if (progress.isCanceled()) {
+
+				if (conn == null) {
+					throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(), NLS.bind(
+							Messages.MonitorControl_UnableToLocateConnection, getConnectionName())));
+
+				}
+
+				if (conn == null || progress.isCanceled()) {
 					return;
 				}
 
@@ -346,7 +511,7 @@ public class MonitorControl implements IMonitorControl {
 				/*
 				 * Initialize LML classes
 				 */
-				fLMLManager.openLgui(getMonitorId(), conn.getUsername(), getMonitorConfigurationRequestType(),
+				fLMLManager.openLgui(getControlId(), conn.getUsername(), getMonitorConfigurationRequestType(controller),
 						fSavedLayout.toString(), fSavedJobs.toArray(new JobStatusData[0]));
 
 				fActive = true;
@@ -354,8 +519,9 @@ public class MonitorControl implements IMonitorControl {
 				MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { this });
 
 				/*
-				 * Start monitoring job. Note that the monitoring job can fail, in which case the monitor is considered to be
-				 * stopped and the active flag set appropriately.
+				 * Start monitoring job. Note that the monitoring job can fail,
+				 * in which case the monitor is considered to be stopped and the
+				 * active flag set appropriately.
 				 */
 				synchronized (this) {
 					if (fMonitorJob == null) {
@@ -384,7 +550,7 @@ public class MonitorControl implements IMonitorControl {
 
 			save();
 
-			fLMLManager.closeLgui(getMonitorId());
+			fLMLManager.closeLgui(getControlId());
 
 			synchronized (this) {
 				if (fMonitorJob != null) {
@@ -399,120 +565,10 @@ public class MonitorControl implements IMonitorControl {
 		}
 	}
 
-	private void addJob(IJobStatus status) {
-		String monitorId = getMonitorId(status);
-		if (monitorId != null && monitorId.equals(getMonitorId())) {
-			ILaunchConfiguration configuration = status.getLaunchConfiguration();
-			String controlName = LaunchUtils.getTemplateName(configuration);
-			String[][] attrs = { { JobStatusData.JOB_ID_ATTR, status.getJobId() },
-					{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
-					{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() }, { JobStatusData.CONTROL_TYPE_ATTR, controlName },
-					{ JobStatusData.MONITOR_TYPE_ATTR, getSystemType() }, { JobStatusData.QUEUE_NAME_ATTR, status.getQueueName() },
-					{ JobStatusData.OWNER_ATTR, status.getOwner() },
-					{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, status.getOutputPath() },
-					{ JobStatusData.STDERR_REMOTE_FILE_ATTR, status.getErrorPath() },
-					{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(status.isInteractive()) } };
-			final JobStatusData data = new JobStatusData(attrs);
-			data.setState(status.getState());
-			data.setStateDetail(status.getStateDetail());
-			fLMLManager.addUserJob(getMonitorId(), status.getJobId(), data);
-		}
-	}
-
-	private RequestType getMonitorConfigurationRequestType() {
-		RequestType request = new RequestType();
-		final DriverType driver = new DriverType();
-		driver.setName(getSystemType());
-		request.getDriver().add(driver);
-		return request;
-	}
-
-	private String getMonitorId(IJobStatus status) {
-		ILaunchConfiguration configuration = status.getLaunchConfiguration();
-		if (configuration != null) {
-			String connectionName = LaunchUtils.getConnectionName(configuration);
-			String remoteServicesId = LaunchUtils.getRemoteServicesId(configuration);
-			String monitorType = LaunchUtils.getSystemType(configuration);
-			if (connectionName != null && remoteServicesId != null && monitorType != null) {
-				return MonitorControlManager.generateMonitorId(remoteServicesId, connectionName, monitorType);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Get the remote connection specified by the monitor configuration.
-	 * 
-	 * @param monitor
-	 *            progress monitor
-	 * @return connection for the monitor
-	 */
-	private IRemoteConnection getRemoteConnection(IProgressMonitor monitor) throws CoreException {
-		final IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(getRemoteServicesId(), monitor);
-		if (services != null) {
-			final IRemoteConnectionManager connMgr = services.getConnectionManager();
-			return connMgr.getConnection(getConnectionName());
-		}
-		throw CoreExceptionUtils.newException(Messages.MonitorControl_unableToOpenRemoteConnection, null);
-	}
-
-	private File getSaveLocation() {
-		return LMLMonitorCorePlugin.getDefault().getStateLocation().append(getMonitorId()).addFileExtension(XML).toFile();
-	}
-
-	private void loadJobs(IMemento memento, List<JobStatusData> jobs) {
-		if (memento != null) {
-			final IMemento[] children = memento.getChildren(JOB_ATTR);
-			for (final IMemento child : children) {
-				String[][] attrs = { { JobStatusData.JOB_ID_ATTR, child.getID() },
-						{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
-						{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() },
-						{ JobStatusData.CONTROL_TYPE_ATTR, child.getString(JobStatusData.CONTROL_TYPE_ATTR) },
-						{ JobStatusData.MONITOR_TYPE_ATTR, getSystemType() },
-						{ JobStatusData.STATE_ATTR, child.getString(JobStatusData.STATE_ATTR) },
-						{ JobStatusData.STATE_DETAIL_ATTR, child.getString(JobStatusData.STATE_DETAIL_ATTR) },
-						{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, child.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR) },
-						{ JobStatusData.STDERR_REMOTE_FILE_ATTR, child.getString(JobStatusData.STDERR_REMOTE_FILE_ATTR) },
-						{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(child.getBoolean(JobStatusData.INTERACTIVE_ATTR)) },
-						{ JobStatusData.QUEUE_NAME_ATTR, child.getString(JobStatusData.QUEUE_NAME_ATTR) },
-						{ JobStatusData.OWNER_ATTR, child.getString(JobStatusData.OWNER_ATTR) },
-						{ JobStatusData.OID_ATTR, child.getString(JobStatusData.OID_ATTR) } };
-				jobs.add(new JobStatusData(attrs));
-			}
-		}
-	}
-
-	private boolean loadState(IMemento memento) {
-		setRemoteServicesId(memento.getString(JobStatusData.REMOTE_SERVICES_ID_ATTR));
-		setConnectionName(memento.getString(JobStatusData.CONNECTION_NAME_ATTR));
-		fSystemType = memento.getString(SYSTEM_TYPE_ATTR);
-		return memento.getBoolean(MONITOR_STATE);
-	}
-
-	private void saveJob(JobStatusData job, IMemento memento) {
-		final IMemento jobMemento = memento.createChild(JOB_ATTR, job.getJobId());
-		jobMemento.putString(JobStatusData.CONTROL_TYPE_ATTR, job.getControlType());
-		jobMemento.putString(JobStatusData.STATE_ATTR, job.getState());
-		jobMemento.putString(JobStatusData.STATE_DETAIL_ATTR, job.getStateDetail());
-		jobMemento.putString(JobStatusData.STDOUT_REMOTE_FILE_ATTR, job.getOutputPath());
-		jobMemento.putString(JobStatusData.STDERR_REMOTE_FILE_ATTR, job.getErrorPath());
-		jobMemento.putBoolean(JobStatusData.INTERACTIVE_ATTR, job.isInteractive());
-		jobMemento.putString(JobStatusData.QUEUE_NAME_ATTR, job.getQueueName());
-		jobMemento.putString(JobStatusData.OWNER_ATTR, job.getOwner());
-		jobMemento.putString(JobStatusData.OID_ATTR, job.getOid());
-	}
-
-	private void saveState(IMemento memento) {
-		memento.putString(REMOTE_SERVICES_ID_ATTR, getRemoteServicesId());
-		memento.putString(CONNECTION_NAME_ATTR, getConnectionName());
-		memento.putString(SYSTEM_TYPE_ATTR, getSystemType());
-		memento.putBoolean(MONITOR_STATE, isActive());
-	}
-
 	private void updateJob(IJobStatus status) {
-		String monitorId = getMonitorId(status);
-		if (monitorId != null && monitorId.equals(getMonitorId())) {
-			fLMLManager.updateUserJob(getMonitorId(), status.getJobId(), status.getState(), status.getStateDetail());
+		String monitorId = getControlId(status);
+		if (monitorId != null && monitorId.equals(getControlId())) {
+			fLMLManager.updateUserJob(getControlId(), status.getJobId(), status.getState(), status.getStateDetail());
 		}
 	}
 }

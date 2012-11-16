@@ -7,6 +7,7 @@ public class Messages extends NLS {
 	public static String LMLResourceManagerMonitor_LMLMonitorJob;
 	public static String LMLResourceManagerMonitor_RMSelectionJob;
 	public static String LMLResourceManagerMonitor_unableToOpenConnection;
+	public static String MonitorControl_UnableToLocateConnection;
 	public static String MonitorControl_unableToOpenRemoteConnection;
 	public static String MonitorControlManager_monitorAddedJobName;
 	public static String MonitorControlManager_monitorRemovedJobName;

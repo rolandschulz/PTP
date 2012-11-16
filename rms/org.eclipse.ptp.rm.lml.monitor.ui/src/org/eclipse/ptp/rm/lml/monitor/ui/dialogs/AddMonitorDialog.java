@@ -10,13 +10,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.lml.monitor.ui.dialogs;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
+import org.eclipse.ptp.rm.jaxb.control.LaunchControllerManager;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
-import org.eclipse.ptp.rm.lml.monitor.ui.ExtensionUtils;
 import org.eclipse.ptp.rm.lml.monitor.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -42,7 +43,8 @@ public class AddMonitorDialog extends TitleAreaDialog {
 	}
 
 	/**
-	 * Get the remote connection selected in the dialog, or null if no connection selected
+	 * Get the remote connection selected in the dialog, or null if no
+	 * connection selected
 	 * 
 	 * @return remote connection, or null
 	 */
@@ -51,7 +53,8 @@ public class AddMonitorDialog extends TitleAreaDialog {
 	}
 
 	/**
-	 * Get the system type selected in the dialog, or null if no system type selected
+	 * Get the system type selected in the dialog, or null if no system type
+	 * selected
 	 * 
 	 * @return system type or null
 	 */
@@ -63,7 +66,11 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		Boolean valid = false;
 		fRemoteConnection = fRemoteConnectionWidget.getConnection();
 		if (fRemoteConnection != null) {
-			valid = (MonitorControlManager.getInstance().getMonitorControl(fRemoteConnection, getSystemType()) == null);
+			try {
+				valid = (LaunchControllerManager.getInstance().getLaunchController(fRemoteConnection.getRemoteServices().getId(),
+						fRemoteConnection.getName(), getSystemType()) != null);
+			} catch (CoreException e) {
+			}
 		}
 		fRemoteConnectionWidget.setEnabled(fSystemTypeCombo.getSelectionIndex() > 0);
 		Button button = getButton(IDialogConstants.OK_ID);
@@ -75,7 +82,9 @@ public class AddMonitorDialog extends TitleAreaDialog {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#createContents(org.eclipse.swt.widgets.Composite)
+	 * @see
+	 * org.eclipse.jface.dialogs.TitleAreaDialog#createContents(org.eclipse.
+	 * swt.widgets.Composite)
 	 */
 	@Override
 	protected Control createContents(Composite parent) {
@@ -87,7 +96,9 @@ public class AddMonitorDialog extends TitleAreaDialog {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 * @see
+	 * org.eclipse.jface.dialogs.TitleAreaDialog#createDialogArea(org.eclipse
+	 * .swt.widgets.Composite)
 	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
@@ -107,7 +118,7 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		fSystemTypeCombo = new Combo(composite, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		fSystemTypeCombo.setLayoutData(gd);
-		fSystemTypeCombo.setItems(ExtensionUtils.getMonitorNames());
+		fSystemTypeCombo.setItems(MonitorControlManager.getSystemTypes());
 		fSystemTypeCombo.add(Messages.AddMonitorDialog_Please_select_a_monitor_type, 0);
 		fSystemTypeCombo.select(0);
 		fSystemTypeCombo.addSelectionListener(new SelectionListener() {
@@ -116,7 +127,7 @@ public class AddMonitorDialog extends TitleAreaDialog {
 
 			public void widgetSelected(SelectionEvent e) {
 				if (fSystemTypeCombo.getSelectionIndex() > 0) {
-					fSystemType = ExtensionUtils.getMonitorType(fSystemTypeCombo.getItem(fSystemTypeCombo.getSelectionIndex()));
+					fSystemType = fSystemTypeCombo.getItem(fSystemTypeCombo.getSelectionIndex());
 				}
 				updateEnablement();
 			}
