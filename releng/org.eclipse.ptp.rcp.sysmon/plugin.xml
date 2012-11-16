@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
    <extension
          id="application"
          point="org.eclipse.core.runtime.applications">
@@ -29,6 +28,26 @@
                name="applicationCSSResources" 
                value="platform:/plugin/org.eclipse.platform/images/"> 
          </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+         <property
+               name="startupForegroundColor"
+               value="4A95FF">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="20,365,510,20">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="20,385,510,10">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/icon_16.png,icons/icon_32.png,icons/icon_48.png,icons/icon_64.png,icons/icon_128.png">
+         </property>
       </product>
    </extension>
 
@@ -50,4 +69,11 @@
          </menu>
       </menuContribution>
    </extension>
+   
+   <extension point="org.eclipse.core.runtime.adapters">
+ 		<factory class="org.eclipse.core.runtime.IAdaptable"
+           adaptableType="org.eclipse.core.resources.IResource">
+     		<adapter type="org.eclipse.debug.ui.actions.ILaunchable"/>
+		</factory>
+	</extension>
 </plugin>

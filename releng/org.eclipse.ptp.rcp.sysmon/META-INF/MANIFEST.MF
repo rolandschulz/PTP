@@ -7,6 +7,8 @@ Bundle-Activator: org.eclipse.ptp.rcp.sysmon.Activator
 Bundle-Vendor: Eclipse.org
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.ui.views.log
+ org.eclipse.ui.views.log,
+ org.eclipse.debug.core,
+ org.eclipse.debug.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

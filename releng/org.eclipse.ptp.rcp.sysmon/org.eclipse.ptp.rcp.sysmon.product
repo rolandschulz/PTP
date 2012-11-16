@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="System Monitor" uid="org.eclipse.ptp.rcp.sysmon.product" id="org.eclipse.ptp.rcp.sysmon.product" application="org.eclipse.ptp.rcp.sysmon.application" version="1.0.0" useFeatures="false" includeLaunchers="true">
+<product name="System Monitor" uid="org.eclipse.ptp.rcp.sysmon.product" id="org.eclipse.ptp.rcp.sysmon.product" application="org.eclipse.ptp.rcp.sysmon.application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="true">
+
 
    <configIni use="default">
    </configIni>
@@ -10,16 +11,26 @@
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
-   <windowImages/>
+   <windowImages i16="/org.eclipse.ptp.rcp.sysmon/icons/icon_16.png" i32="/org.eclipse.ptp.rcp.sysmon/icons/icon_32.png" i48="/org.eclipse.ptp.rcp.sysmon/icons/icon_48.png" i64="/org.eclipse.ptp.rcp.sysmon/icons/icon_64.png" i128="/org.eclipse.ptp.rcp.sysmon/icons/icon_128.png"/>
 
-   <launcher>
+   <splash
+      location="org.eclipse.ptp.rcp.sysmon"
+      startupProgressRect="20,385,510,10"
+      startupMessageRect="20,365,510,20"
+      startupForegroundColor="4A95FF" />
+   <launcher name="SysMon">
       <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
    </launcher>
 
+
    <vm>
+      <linux include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</linux>
+      <macos include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</macos>
+      <solaris include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</solaris>
+      <windows include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</windows>
    </vm>
 
    <plugins>
@@ -27,10 +38,28 @@
       <plugin id="com.jcraft.jsch"/>
       <plugin id="javax.annotation"/>
       <plugin id="javax.inject"/>
+      <plugin id="javax.xml"/>
       <plugin id="org.apache.batik.css"/>
       <plugin id="org.apache.batik.util"/>
       <plugin id="org.apache.batik.util.gui"/>
       <plugin id="org.eclipse.cdt.core"/>
+      <plugin id="org.eclipse.cdt.core.aix" fragment="true"/>
+      <plugin id="org.eclipse.cdt.core.linux" fragment="true"/>
+      <plugin id="org.eclipse.cdt.core.linux.ia64" fragment="true"/>
+      <plugin id="org.eclipse.cdt.core.linux.ppc" fragment="true"/>
+      <plugin id="org.eclipse.cdt.core.linux.ppc64" fragment="true"/>
+      <plugin id="org.eclipse.cdt.core.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.cdt.core.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.cdt.core.macosx" fragment="true"/>
+      <plugin id="org.eclipse.cdt.core.qnx" fragment="true"/>
+      <plugin id="org.eclipse.cdt.core.solaris" fragment="true"/>
+      <plugin id="org.eclipse.cdt.core.win32" fragment="true"/>
+      <plugin id="org.eclipse.cdt.core.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.cdt.core.win32.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.cdt.debug.core"/>
+      <plugin id="org.eclipse.cdt.debug.ui"/>
+      <plugin id="org.eclipse.cdt.ui"/>
+      <plugin id="org.eclipse.compare"/>
       <plugin id="org.eclipse.compare.core"/>
       <plugin id="org.eclipse.core.commands"/>
       <plugin id="org.eclipse.core.contenttype"/>
@@ -40,9 +69,22 @@
       <plugin id="org.eclipse.core.expressions"/>
       <plugin id="org.eclipse.core.filebuffers"/>
       <plugin id="org.eclipse.core.filesystem"/>
+      <plugin id="org.eclipse.core.filesystem.aix.ppc" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.hpux.ia64_32" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.solaris.sparc" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.jobs"/>
       <plugin id="org.eclipse.core.net"/>
+      <plugin id="org.eclipse.core.net.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.net.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.core.net.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.net.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.resources"/>
+      <plugin id="org.eclipse.core.resources.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
       <plugin id="org.eclipse.core.variables"/>
@@ -64,6 +106,7 @@
       <plugin id="org.eclipse.e4.ui.workbench"/>
       <plugin id="org.eclipse.e4.ui.workbench.addons.swt"/>
       <plugin id="org.eclipse.e4.ui.workbench.renderers.swt"/>
+      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt.cocoa" fragment="true"/>
       <plugin id="org.eclipse.e4.ui.workbench.swt"/>
       <plugin id="org.eclipse.e4.ui.workbench3"/>
       <plugin id="org.eclipse.emf.common"/>
@@ -82,6 +125,9 @@
       <plugin id="org.eclipse.equinox.preferences"/>
       <plugin id="org.eclipse.equinox.registry"/>
       <plugin id="org.eclipse.equinox.security"/>
+      <plugin id="org.eclipse.equinox.security.macosx" fragment="true"/>
+      <plugin id="org.eclipse.equinox.security.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.equinox.security.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.equinox.util"/>
       <plugin id="org.eclipse.help"/>
       <plugin id="org.eclipse.jface"/>
@@ -89,13 +135,24 @@
       <plugin id="org.eclipse.jface.text"/>
       <plugin id="org.eclipse.jsch.core"/>
       <plugin id="org.eclipse.ltk.core.refactoring"/>
+      <plugin id="org.eclipse.ltk.ui.refactoring"/>
       <plugin id="org.eclipse.osgi"/>
       <plugin id="org.eclipse.osgi.services"/>
       <plugin id="org.eclipse.platform"/>
+      <plugin id="org.eclipse.ptp.aix.ppc" fragment="true"/>
       <plugin id="org.eclipse.ptp.core"/>
+      <plugin id="org.eclipse.ptp.debug.core"/>
+      <plugin id="org.eclipse.ptp.debug.ui"/>
       <plugin id="org.eclipse.ptp.ems.core"/>
       <plugin id="org.eclipse.ptp.ems.ui"/>
+      <plugin id="org.eclipse.ptp.launch"/>
+      <plugin id="org.eclipse.ptp.linux.ppc" fragment="true"/>
+      <plugin id="org.eclipse.ptp.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.ptp.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.ptp.macosx.ppc" fragment="true"/>
+      <plugin id="org.eclipse.ptp.macosx.x86" fragment="true"/>
       <plugin id="org.eclipse.ptp.proxy.protocol"/>
+      <plugin id="org.eclipse.ptp.rcp.sysmon"/>
       <plugin id="org.eclipse.ptp.remote.core"/>
       <plugin id="org.eclipse.ptp.remote.remotetools.core"/>
       <plugin id="org.eclipse.ptp.remote.remotetools.ui"/>
@@ -113,6 +170,7 @@
       <plugin id="org.eclipse.ptp.rm.jaxb.control.ui"/>
       <plugin id="org.eclipse.ptp.rm.jaxb.core"/>
       <plugin id="org.eclipse.ptp.rm.jaxb.ui"/>
+      <plugin id="org.eclipse.ptp.rm.launch"/>
       <plugin id="org.eclipse.ptp.rm.lml.core"/>
       <plugin id="org.eclipse.ptp.rm.lml.da"/>
       <plugin id="org.eclipse.ptp.rm.lml.da.server"/>
@@ -120,11 +178,30 @@
       <plugin id="org.eclipse.ptp.rm.lml.monitor.ui"/>
       <plugin id="org.eclipse.ptp.rm.lml.ui"/>
       <plugin id="org.eclipse.ptp.services.core"/>
+      <plugin id="org.eclipse.ptp.services.ui"/>
+      <plugin id="org.eclipse.ptp.ui"/>
       <plugin id="org.eclipse.ptp.utils.core"/>
       <plugin id="org.eclipse.ptp.utils.extensionpoints.core"/>
       <plugin id="org.eclipse.ptp.utils.file.core"/>
       <plugin id="org.eclipse.ptp.utils.ui"/>
+      <plugin id="org.eclipse.search"/>
       <plugin id="org.eclipse.swt"/>
+      <plugin id="org.eclipse.swt.cocoa.macosx" fragment="true"/>
+      <plugin id="org.eclipse.swt.cocoa.macosx.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.aix.ppc" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.aix.ppc64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.hpux.ia64_32" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.ppc64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.s390" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.s390x" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.solaris.sparc" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.solaris.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.win32.win32.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.team.core"/>
+      <plugin id="org.eclipse.team.ui"/>
       <plugin id="org.eclipse.text"/>
       <plugin id="org.eclipse.ui"/>
       <plugin id="org.eclipse.ui.console"/>
@@ -132,7 +209,12 @@
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.ide"/>
       <plugin id="org.eclipse.ui.intro"/>
+      <plugin id="org.eclipse.ui.navigator"/>
+      <plugin id="org.eclipse.ui.navigator.resources"/>
+      <plugin id="org.eclipse.ui.views"/>
       <plugin id="org.eclipse.ui.views.log"/>
+      <plugin id="org.eclipse.ui.views.properties.tabbed"/>
+      <plugin id="org.eclipse.ui.win32" fragment="true"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
       <plugin id="org.w3c.css.sac"/>
