@@ -4,14 +4,14 @@ Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.lml.core;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: org.eclipse.ptp.rm.lml.core;x-friends:="org.eclipse.ptp.rm.lml_jaxb,org.eclipse.ptp.rm.lml.ui,org.eclipse.ptp.rm.lml.monitor.core",
+Export-Package: org.eclipse.ptp.rm.lml.core;x-friends:="org.eclipse.ptp.rm.lml.ui,org.eclipse.ptp.rm.lml.monitor.core",
  org.eclipse.ptp.rm.lml.core.events;x-friends:="org.eclipse.ptp.rm.lml.ui",
  org.eclipse.ptp.rm.lml.core.listeners;x-friends:="org.eclipse.ptp.rm.lml.ui",
  org.eclipse.ptp.rm.lml.core.model;x-friends:="org.eclipse.ptp.rm.lml.ui",
  org.eclipse.ptp.rm.lml.core.util;x-friends:="org.eclipse.ptp.rm.lml.ui",
  org.eclipse.ptp.rm.lml.internal.core.elements;x-friends:="org.eclipse.ptp.rm.lml.ui",
  org.eclipse.ptp.rm.lml.internal.core.events;x-friends:="org.eclipse.ptp.rm.lml.ui",
- org.eclipse.ptp.rm.lml.internal.core.model;x-friends:="org.eclipse.ptp.rm.lml.ui,org.eclipse.ptp.rm.lml_jaxb"
+ org.eclipse.ptp.rm.lml.internal.core.model;x-friends:="org.eclipse.ptp.rm.lml.ui"
 Bundle-Activator: org.eclipse.ptp.rm.lml.core.LMLCorePlugin
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
