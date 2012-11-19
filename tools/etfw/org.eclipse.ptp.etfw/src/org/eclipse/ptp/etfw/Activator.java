@@ -136,7 +136,7 @@ public class Activator extends AbstractUIPlugin {
 	 * Returns an array of all of the non-virtual tool panes defined in available tool definition xml files
 	 * Panes are ordered by tool, and within each tool by compilation, execution and analysis step
 	 * @return
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public static IToolUITab[] getToolPanes()
 	{
@@ -429,7 +429,7 @@ public class Activator extends AbstractUIPlugin {
 	
 	private static ArrayList<IToolUITab> toolUITabs=null;
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public static ArrayList<IToolUITab> getToolUITabs(){
 		if(toolUITabs==null){
