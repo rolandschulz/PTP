@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.rm.ibm.ll"
       label="%featureName"
-      version="6.0.3.qualifier"
+      version="6.0.4.qualifier"
       provider-name="%providerName">
 
    <description url="http://eclipse.org/ptp">
@@ -16,27 +16,6 @@
    <license url="%licenseURL">
       %license
    </license>
-
-   <requires>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.search"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.ptp.services.core" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.proxy.protocol"/>
-      <import plugin="org.eclipse.ptp.core"/>
-      <import plugin="org.eclipse.ptp.remote.core"/>
-      <import plugin="org.eclipse.ptp.proxy"/>
-      <import plugin="org.eclipse.ptp.utils"/>
-      <import plugin="org.eclipse.ptp.ui"/>
-      <import plugin="org.eclipse.ptp.launch"/>
-      <import plugin="org.eclipse.ptp.remote.ui" version="2.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.filesystem"/>
-      <import plugin="org.eclipse.ptp.utils.ui"/>
-      <import plugin="org.eclipse.ptp.services.ui" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.rm.core" version="1.0.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.rm.ui" version="1.0.1" match="greaterOrEqual"/>
-   </requires>
 
    <plugin
          id="org.eclipse.ptp.rm.ibm.ll.help"
