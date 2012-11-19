@@ -192,9 +192,6 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			processBuilder.directory(fileManager.getResource(changeToDirectory.toString()));
 		}
 
-		// combine stdout and stderr
-		processBuilder.redirectErrorStream(true);
-
 		// Synchronize before building
 		SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10), null);
 
