@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.rm.mpich2"
       label="%featureName"
-      version="6.0.3.qualifier"
+      version="6.0.4.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.ptp.rm.mpi.mpich2.core">
 
