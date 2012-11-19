@@ -187,6 +187,7 @@
 		<module>tools/sci/org.eclipse.ptp.sci</module>
 		<module>releng/org.eclipse.ptp.repo</module>
 		<module>releng/org.eclipse.ptp.rcp.sysmon</module>
+		<module>releng/org.eclipse.ptp.rcp.sysmon-feature</module>
 	</modules>
 
 	<repositories>
