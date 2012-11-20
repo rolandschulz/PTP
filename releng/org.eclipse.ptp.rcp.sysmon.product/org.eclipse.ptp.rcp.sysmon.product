@@ -3,6 +3,7 @@
 
 <product name="System Monitor" uid="org.eclipse.ptp.rcp.sysmon.product" id="org.eclipse.ptp.rcp.sysmon.product" application="org.eclipse.ptp.rcp.sysmon.application" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
 
+
    <configIni use="default">
    </configIni>
 
@@ -10,7 +11,7 @@
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
-   <windowImages i16="/org.eclipse.ptp.rcp.sysmon/icons/icon_16.png" i32="/org.eclipse.ptp.rcp.sysmon/icons/icon_32.png" i48="/org.eclipse.ptp.rcp.sysmon/icons/icon_48.png" i64="/org.eclipse.ptp.rcp.sysmon/icons/icon_64.png" i128="/org.eclipse.ptp.rcp.sysmon/icons/icon_128.png"/>
+   <windowImages i16="/org.eclipse.ptp.rcp.sysmon.product/icons/icon_16.png" i32="/org.eclipse.ptp.rcp.sysmon.product/icons/icon_32.png" i48="/org.eclipse.ptp.rcp.sysmon.product/icons/icon_48.png" i64="/org.eclipse.ptp.rcp.sysmon.product/icons/icon_64.png" i128="/org.eclipse.ptp.rcp.sysmon.product/icons/icon_128.png"/>
 
    <splash
       location="org.eclipse.ptp.rcp.sysmon"
@@ -18,12 +19,13 @@
       startupMessageRect="20,365,510,20"
       startupForegroundColor="4A95FF" />
    <launcher name="SysMon">
-      <macosx icon="/org.eclipse.ptp.rcp.sysmon/icons/icon.icns"/>
+      <macosx icon="/org.eclipse.ptp.rcp.sysmon.product/icons/icon.icns"/>
       <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
       <linux include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</linux>
@@ -31,6 +33,7 @@
       <solaris include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</solaris>
       <windows include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</windows>
    </vm>
+
 
    <plugins>
    </plugins>

@@ -188,6 +188,7 @@
 		<module>releng/org.eclipse.ptp.rcp.sysmon</module>
 		<module>releng/org.eclipse.ptp.rcp.sysmon-feature</module>
 		<module>releng/org.eclipse.ptp.repo</module>
+		<module>releng/org.eclipse.ptp.rcp.sysmon.product</module>
 	</modules>
 
 	<repositories>

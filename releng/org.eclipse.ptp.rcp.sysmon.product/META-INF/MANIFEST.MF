@@ -1,12 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
-Bundle-SymbolicName: org.eclipse.ptp.rcp.sysmon;singleton:=true
+Bundle-SymbolicName: org.eclipse.ptp.rcp.sysmon.product
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.rcp.sysmon.Activator
 Bundle-Vendor: %pluginProvider
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
