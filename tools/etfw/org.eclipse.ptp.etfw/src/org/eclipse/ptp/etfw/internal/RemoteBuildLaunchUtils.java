@@ -306,7 +306,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	 * 
 	 */
 	public String checkToolEnvPath(String toolname) {
-		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0) {//$NON-NLS-1$
+		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0&&!this.isRemote()) {//$NON-NLS-1$
 			return null;
 		}
 		String pPath = null;
@@ -319,6 +319,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 					IFileStore envScript = fileManager.getResource(com);
 					IFileInfo envInfo=envScript.fetchInfo();
 					envInfo.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
+					envInfo.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
 					envScript.putInfo(envInfo,EFS.SET_ATTRIBUTES,null);
 					
 					
