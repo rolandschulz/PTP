@@ -173,18 +173,17 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	}
 
 	/**
-	 * This method intercepts and modifies the output from the superclass call. It changes include paths to UNC notation with the
-	 * correct connection name prepended.
-	 *
-	 * @return list of options
+	 * This method intercepts and modifies the scanner discovery entries. It changes include paths to UNC notation with the correct
+	 * connection name prepended.
 	 */
 	@Override
-	protected List<String> parseOptions(String line) {
+	protected void setSettingEntries(List<ICLanguageSettingEntry> entries) {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		BuildScenario bs = bcm.getBuildScenarioForProject(currentProject);
-		// For local configurations, we can fall back to the original implementation.
 		if (bs.getSyncProvider() == null) {
-			return super.parseOptions(line);
+			// For local configurations, no special processing is needed.
+			super.setSettingEntries(entries);
+			return;
 		}
 
 		IRemoteConnection conn = null;
@@ -192,28 +191,22 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 			conn = bs.getRemoteConnection();
 		} catch (MissingConnectionException e1) {
 			// Impossible to build includes properly without connection name
-			return new ArrayList<String>();
+			super.setSettingEntries(entries);
+			return;
 		} 
 
-		List<String> originalOptions = super.parseOptions(line);
-		if (originalOptions == null) {
-			return null;
-		}
-		List<String> newOptions = new ArrayList<String>();
-		for (String o : originalOptions) {
-			// Skip the line that signals the beginning of includes, which looks very much like an include and matches the other
-			// filters. This is important, because modifying this line seems to wreak havoc on the entire parsing process.
-			if (o.contains("<...>")) { //$NON-NLS-1$
-				continue;
+		List<ICLanguageSettingEntry> newEntries = new ArrayList<ICLanguageSettingEntry>();
+		for (ICLanguageSettingEntry entry : entries) {
+			if (entry instanceof CIncludePathEntry) {
+				String oldPath = ((CIncludePathEntry) entry).getValue();
+				String newPath = "//" +  conn.getName() + oldPath; //$NON-NLS-1$
+				ICLanguageSettingEntry newEntry = new CIncludePathEntry(newPath, entry.getFlags());
+				newEntries.add(newEntry);
+			} else {
+				newEntries.add(entry);
 			}
-			if (o.startsWith("#include <") && o.endsWith(">")) { //$NON-NLS-1$ //$NON-NLS-2$
-				o = o.replaceFirst("^#include <", "#include <" + "//" + conn.getName()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			} else if (o.startsWith("#include \"") && o.endsWith("\"")) { //$NON-NLS-1$ //$NON-NLS-2$
-				o = o.replaceFirst("^#include \\\"", "#include \"" + "//" + conn.getName()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			}
-			newOptions.add(o);
 		}
-		return newOptions;
+		super.setSettingEntries(newEntries);
 	}
 
 	/*
@@ -306,36 +299,5 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		}
 
 		return console;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.cdt.managedbuilder.language.settings.providers.AbstractBuiltinSpecsDetector#shutdownForLanguage()
-	 */
-	@Override
-	protected void shutdownForLanguage() {
-		// This override is a hack to work around the missing slash problem for remote includes (bug 393737).
-		// Simply intercept the final include path entries and add the slash.
-		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-		BuildScenario bs = bcm.getBuildScenarioForProject(currentProject);
-		if (bs.getSyncProvider() == null) {
-			// For local configurations, no special processing is needed.
-			super.shutdownForLanguage();
-			return;
-		}
-		List<ICLanguageSettingEntry> newEntries = new ArrayList<ICLanguageSettingEntry>();
-		for (ICLanguageSettingEntry entry : detectedSettingEntries) {
-			if (entry instanceof CIncludePathEntry) {
-				String oldPath = ((CIncludePathEntry) entry).getValue();
-				String newPath = '/' + oldPath;
-				ICLanguageSettingEntry newEntry = new CIncludePathEntry(newPath, entry.getFlags());
-				newEntries.add(newEntry);
-			} else {
-				newEntries.add(entry);
-			}
-		}
-		detectedSettingEntries.clear();
-		detectedSettingEntries.addAll(newEntries);
-		super.shutdownForLanguage();
 	}
 }
