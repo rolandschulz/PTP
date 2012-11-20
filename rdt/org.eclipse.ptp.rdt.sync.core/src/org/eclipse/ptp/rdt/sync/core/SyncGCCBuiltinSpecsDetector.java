@@ -30,6 +30,7 @@ import org.eclipse.cdt.core.resources.IConsole;
 import org.eclipse.cdt.core.settings.model.CIncludePathEntry;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICLanguageSettingEntry;
+import org.eclipse.cdt.core.settings.model.ICSettingEntry;
 import org.eclipse.cdt.internal.core.BuildRunnerHelper;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuilderCorePlugin;
 import org.eclipse.cdt.managedbuilder.internal.core.ManagedMakeMessages;
@@ -197,7 +198,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 
 		List<ICLanguageSettingEntry> newEntries = new ArrayList<ICLanguageSettingEntry>();
 		for (ICLanguageSettingEntry entry : entries) {
-			if (entry instanceof CIncludePathEntry) {
+			if ((entry instanceof CIncludePathEntry) && ((entry.getFlags() & ICSettingEntry.VALUE_WORKSPACE_PATH) == 0)) {
 				String oldPath = ((CIncludePathEntry) entry).getValue();
 				String newPath = "//" +  conn.getName() + oldPath; //$NON-NLS-1$
 				ICLanguageSettingEntry newEntry = new CIncludePathEntry(newPath, entry.getFlags());

@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.cdt.core.language.settings.providers.ILanguageSettingsEditableProvider;
 import org.eclipse.cdt.core.settings.model.CIncludePathEntry;
 import org.eclipse.cdt.core.settings.model.ICLanguageSettingEntry;
+import org.eclipse.cdt.core.settings.model.ICSettingEntry;
 import org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuildCommandParser;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 
@@ -52,7 +53,7 @@ public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements 
 
 		List<ICLanguageSettingEntry> newEntries = new ArrayList<ICLanguageSettingEntry>();
 		for (ICLanguageSettingEntry entry : entries) {
-			if (entry instanceof CIncludePathEntry) {
+			if ((entry instanceof CIncludePathEntry) && ((entry.getFlags() & ICSettingEntry.VALUE_WORKSPACE_PATH) == 0)) {
 				String oldPath = ((CIncludePathEntry) entry).getValue();
 				String newPath = "//" +  conn.getName() + oldPath; //$NON-NLS-1$
 				ICLanguageSettingEntry newEntry = new CIncludePathEntry(newPath, entry.getFlags());
