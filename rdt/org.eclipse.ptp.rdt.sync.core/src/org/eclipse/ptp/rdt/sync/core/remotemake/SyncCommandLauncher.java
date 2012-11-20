@@ -442,13 +442,16 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 		RemoteProcessClosure closure = new RemoteProcessClosure(fRemoteProcess, output, err);
 		closure.runNonBlocking();
-		while (!monitor.isCanceled() && closure.isAlive()) {
+		while (!monitor.isCanceled() && closure.isRunning()) {
 			try {
 				Thread.sleep(DELAY);
 			} catch (InterruptedException ie) {
 				// ignore
 			}
 		}
+		
+		// Poorly named function - actually closes streams and resets variables
+		closure.isAlive();
 
 		int state = OK;
 		final IndexBuildSequenceController projectStatus = IndexBuildSequenceController
