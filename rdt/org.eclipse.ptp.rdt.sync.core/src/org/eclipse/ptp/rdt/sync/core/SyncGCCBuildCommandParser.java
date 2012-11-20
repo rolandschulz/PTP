@@ -13,6 +13,8 @@ package org.eclipse.ptp.rdt.sync.core;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.cdt.core.language.settings.providers.ILanguageSettingsEditableProvider;
+import org.eclipse.cdt.core.settings.model.CIncludePathEntry;
+import org.eclipse.cdt.core.settings.model.ICLanguageSettingEntry;
 import org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuildCommandParser;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 
@@ -24,43 +26,41 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
  */
 public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements ILanguageSettingsEditableProvider {
 	/**
-	 * This method intercepts and modifies the output from the superclass call. It changes include paths to UNC notation with the
-	 * correct connection name prepended.
+	 * This method intercepts and modifies the scanner discovery entries. It changes include paths to UNC notation with the correct
+	 * connection name prepended.
 	 * 
-	 * This function is very similar to {@link org.eclipse.ptp.rdt.sync.core.SyncGCCBuiltinSpecsDetector#parseOptions(String)}
-	 *
-	 * @return list of options
+	 * This is an exact copy of {@link org.eclipse.ptp.rdt.sync.core.SyncGCCBuiltinSpecsDetector#setSettingEntries(List)}
 	 */
 	@Override
-	protected List<String> parseOptions(String line) {
+	protected void setSettingEntries(List<ICLanguageSettingEntry> entries) {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		BuildScenario bs = bcm.getBuildScenarioForProject(currentProject);
-		// For local configurations, we can fall back to the original implementation.
 		if (bs.getSyncProvider() == null) {
-			return super.parseOptions(line);
+			// For local configurations, no special processing is needed.
+			super.setSettingEntries(entries);
+			return;
 		}
-	
+
 		IRemoteConnection conn = null;
 		try {
 			conn = bs.getRemoteConnection();
 		} catch (MissingConnectionException e1) {
 			// Impossible to build includes properly without connection name
-			return new ArrayList<String>();
+			super.setSettingEntries(entries);
+			return;
 		} 
-	
-		List<String> originalOptions = super.parseOptions(line);
-		if (originalOptions == null) {
-			return null;
-		}
-		List<String> newOptions = new ArrayList<String>();
-		for (String o : originalOptions) {
-			if (o.startsWith("#include <") && o.endsWith(">")) { //$NON-NLS-1$ //$NON-NLS-2$
-				o = o.replaceFirst("^#include <", "#include <" + "//" + conn.getName()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			} else if (o.startsWith("#include \"") && o.endsWith("\"")) { //$NON-NLS-1$ //$NON-NLS-2$
-				o = o.replaceFirst("^#include \\\"", "#include \"" + "//" + conn.getName()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		List<ICLanguageSettingEntry> newEntries = new ArrayList<ICLanguageSettingEntry>();
+		for (ICLanguageSettingEntry entry : entries) {
+			if (entry instanceof CIncludePathEntry) {
+				String oldPath = ((CIncludePathEntry) entry).getValue();
+				String newPath = "//" +  conn.getName() + oldPath; //$NON-NLS-1$
+				ICLanguageSettingEntry newEntry = new CIncludePathEntry(newPath, entry.getFlags());
+				newEntries.add(newEntry);
+			} else {
+				newEntries.add(entry);
 			}
-			newOptions.add(o);
 		}
-		return newOptions;
+		super.setSettingEntries(newEntries);
 	}
 }
