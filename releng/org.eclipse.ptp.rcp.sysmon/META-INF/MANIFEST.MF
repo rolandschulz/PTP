@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Monitor RCP Application
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rcp.sysmon;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rcp.sysmon.Activator
-Bundle-Vendor: Eclipse.org
+Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.views.log,

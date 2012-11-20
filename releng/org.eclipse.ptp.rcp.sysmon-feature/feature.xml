@@ -68,6 +68,9 @@
 
    <plugin
          id="org.eclipse.ptp.rcp.sysmon"
+         os="linux,macosx,win32"
+         ws="cocoa,gtk,win32"
+         arch="x86,x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -380,6 +383,7 @@
 
    <plugin
          id="org.eclipse.cdt.core.linux"
+         os="linux"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -388,6 +392,8 @@
 
    <plugin
          id="org.eclipse.cdt.core.linux.x86_64"
+         os="linux"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -395,6 +401,7 @@
 
    <plugin
          id="org.eclipse.cdt.core.macosx"
+         os="macosx"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -403,6 +410,7 @@
 
    <plugin
          id="org.eclipse.cdt.core.win32"
+         os="win32"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -411,6 +419,8 @@
 
    <plugin
          id="org.eclipse.cdt.core.win32.x86"
+         os="win32"
+         arch="x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -418,6 +428,8 @@
 
    <plugin
          id="org.eclipse.cdt.core.win32.x86_64"
+         os="win32"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -516,6 +528,8 @@
 
    <plugin
          id="org.eclipse.core.filesystem.linux.x86_64"
+         os="linux"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -524,6 +538,7 @@
 
    <plugin
          id="org.eclipse.core.filesystem.macosx"
+         os="macosx"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -532,6 +547,8 @@
 
    <plugin
          id="org.eclipse.core.filesystem.win32.x86"
+         os="win32"
+         arch="x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -540,6 +557,8 @@
 
    <plugin
          id="org.eclipse.core.filesystem.win32.x86_64"
+         os="win32"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -562,6 +581,8 @@
 
    <plugin
          id="org.eclipse.core.net.linux.x86_64"
+         os="linux"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -570,6 +591,8 @@
 
    <plugin
          id="org.eclipse.core.net.win32.x86"
+         os="win32"
+         arch="x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -578,6 +601,8 @@
 
    <plugin
          id="org.eclipse.core.net.win32.x86_64"
+         os="win32"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -593,6 +618,8 @@
 
    <plugin
          id="org.eclipse.core.resources.win32.x86"
+         os="win32"
+         arch="x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -755,6 +782,7 @@
 
    <plugin
          id="org.eclipse.e4.ui.workbench.renderers.swt.cocoa"
+         ws="cocoa"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -889,6 +917,7 @@
 
    <plugin
          id="org.eclipse.equinox.security.macosx"
+         os="macosx"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -897,6 +926,8 @@
 
    <plugin
          id="org.eclipse.equinox.security.win32.x86"
+         ws="win32"
+         arch="x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -905,6 +936,8 @@
 
    <plugin
          id="org.eclipse.equinox.security.win32.x86_64"
+         ws="win32"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1003,6 +1036,9 @@
 
    <plugin
          id="org.eclipse.swt.cocoa.macosx"
+         os="macosx"
+         ws="cocoa"
+         arch="ppc,x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1011,6 +1047,9 @@
 
    <plugin
          id="org.eclipse.swt.cocoa.macosx.x86_64"
+         os="macosx"
+         ws="cocoa"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1019,6 +1058,9 @@
 
    <plugin
          id="org.eclipse.swt.gtk.linux.x86"
+         os="linux"
+         ws="gtk"
+         arch="x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1027,6 +1069,9 @@
 
    <plugin
          id="org.eclipse.swt.gtk.linux.x86_64.source"
+         os="linux"
+         ws="gtk"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1034,6 +1079,9 @@
 
    <plugin
          id="org.eclipse.swt.win32.win32.x86"
+         os="win32"
+         ws="win32"
+         arch="x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1042,6 +1090,9 @@
 
    <plugin
          id="org.eclipse.swt.win32.win32.x86_64"
+         os="win32"
+         ws="win32"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1148,6 +1199,7 @@
 
    <plugin
          id="org.eclipse.ui.win32"
+         os="win32"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1191,6 +1243,8 @@
 
    <plugin
          id="org.eclipse.core.net.linux.x86"
+         os="linux"
+         arch="x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1199,6 +1253,8 @@
 
    <plugin
          id="org.eclipse.core.filesystem.linux.x86"
+         os="linux"
+         arch="x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1207,6 +1263,8 @@
 
    <plugin
          id="org.eclipse.cdt.core.linux.x86"
+         os="linux"
+         arch="x86"
          download-size="0"
          install-size="0"
          version="0.0.0"
