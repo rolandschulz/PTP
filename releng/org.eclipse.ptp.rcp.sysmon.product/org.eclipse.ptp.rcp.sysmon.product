@@ -3,7 +3,6 @@
 
 <product name="System Monitor" uid="org.eclipse.ptp.rcp.sysmon.product" id="org.eclipse.ptp.rcp.sysmon.product" application="org.eclipse.ptp.rcp.sysmon.application" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
 
-
    <configIni use="default">
    </configIni>
 
@@ -19,13 +18,12 @@
       startupMessageRect="20,365,510,20"
       startupForegroundColor="4A95FF" />
    <launcher name="SysMon">
-      <macosx icon="/org.eclipse.ptp.rcp.sysmon.product/icons/icon.icns"/>
+      <macosx icon="/icons/icon.icns"/>
       <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
       <linux include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</linux>
@@ -33,7 +31,6 @@
       <solaris include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</solaris>
       <windows include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</windows>
    </vm>
-
 
    <plugins>
    </plugins>
