@@ -42,5 +42,8 @@
       <feature id="org.eclipse.ptp.rcp.sysmon"/>
    </features>
 
+   <configurations>
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
+   </configurations>
 
 </product>
