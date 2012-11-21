@@ -18,7 +18,7 @@
 		<profile>
 			<id>production</id>
 			<properties>
-				<ptp-install-dir>/home/data/httpd/download.eclipse.org/tools/ptp/builds/${eclipse-release}/nightly</ptp-install-dir>
+				<ptp-install>/home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-nightly</ptp-install>
 			</properties>
 			<build>
 				<plugins>
@@ -33,16 +33,15 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<copy file="${basedir}/../../releng/org.eclipse.ptp.rcp.sysmon.product/target/products/org.eclipse.ptp.rcp.sysmon.product-linux.gtk.x86.zip"
-											tofile="${ptp-install-dir}/sysmon-linux-gtk.${unqualifiedVersion}.${buildQualifier}.zip"/>
-										<copy file="${basedir}/../../releng/org.eclipse.ptp.rcp.sysmon.product/target/products/org.eclipse.ptp.rcp.sysmon.product-linux.gtk.x86_64.zip"
-											tofile="${ptp-install-dir}/sysmon-linux-gtk-x86_64.${unqualifiedVersion}.${buildQualifier}.zip"/>
-										<copy file="${basedir}/../../releng/org.eclipse.ptp.rcp.sysmon.product/target/products/org.eclipse.ptp.rcp.sysmon.product-win32.win32.x86.zip"
-											tofile="${ptp-install-dir}/sysmon-win32-x86.${unqualifiedVersion}.${buildQualifier}.zip"/>
-										<copy file="${basedir}/../../releng/org.eclipse.ptp.rcp.sysmon.product/target/products/org.eclipse.ptp.rcp.sysmon.product-win32.win32.x86_64.zip"
-											tofile="${ptp-install-dir}/sysmon-win32-x86_64.${unqualifiedVersion}.${buildQualifier}.zip"/>
-										<copy file="${basedir}/../../releng/org.eclipse.ptp.rcp.sysmon.product/target/products/org.eclipse.ptp.rcp.sysmon.product-macosx.cocoa.x86_64.zip"
-											tofile="${ptp-install-dir}/sysmon-macosx-cocoa-x86_64.${unqualifiedVersion}.${buildQualifier}.zip"/>
+										<copy todir="${ptp-install}">
+											<fileset dir="${basedir}/../../releng/org.eclipse.ptp.rcp.sysmon.product/target/products">
+												<include name="org.eclipse.ptp.rcp.sysmon.product-linux.gtk.x86.zip"/>
+												<include name="org.eclipse.ptp.rcp.sysmon.product-linux.gtk.x86_64.zip"/>
+												<include name="org.eclipse.ptp.rcp.sysmon.product-win32.win32.x86.zip"/>
+												<include name="org.eclipse.ptp.rcp.sysmon.product-win32.win32.x86_64.zip"/>
+												<include name="org.eclipse.ptp.rcp.sysmon.product-macosx.cocoa.x86_64.zip"/>
+											</fileset>
+										</copy>
 									</tasks>
 								</configuration>
 							</execution>
