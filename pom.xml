@@ -14,6 +14,7 @@
 	<name>PTP Parent</name>
 
 	<properties>
+		<eclipse-release>kepler</eclipse-release>
 		<tycho-version>0.15.0</tycho-version>
 		<platform-version>4.2</platform-version>
 		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>

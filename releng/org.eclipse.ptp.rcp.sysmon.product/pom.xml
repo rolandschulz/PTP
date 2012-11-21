@@ -14,6 +14,45 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
 	
+		<profiles>
+		<profile>
+			<id>production</id>
+			<properties>
+				<ptp-install-dir>/home/data/httpd/download.eclipse.org/tools/ptp/builds/${eclipse-release}/nightly</ptp-install-dir>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>deploy</id>
+								<phase>install</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<copy file="${basedir}/../../releng/org.eclipse.ptp.rcp.sysmon.product/target/products/org.eclipse.ptp.rcp.sysmon.product-linux.gtk.x86.zip"
+											tofile="${ptp-install-dir}/sysmon-linux-gtk.${unqualifiedVersion}.${buildQualifier}.zip"/>
+										<copy file="${basedir}/../../releng/org.eclipse.ptp.rcp.sysmon.product/target/products/org.eclipse.ptp.rcp.sysmon.product-linux.gtk.x86_64.zip"
+											tofile="${ptp-install-dir}/sysmon-linux-gtk-x86_64.${unqualifiedVersion}.${buildQualifier}.zip"/>
+										<copy file="${basedir}/../../releng/org.eclipse.ptp.rcp.sysmon.product/target/products/org.eclipse.ptp.rcp.sysmon.product-win32.win32.x86.zip"
+											tofile="${ptp-install-dir}/sysmon-win32-x86.${unqualifiedVersion}.${buildQualifier}.zip"/>
+										<copy file="${basedir}/../../releng/org.eclipse.ptp.rcp.sysmon.product/target/products/org.eclipse.ptp.rcp.sysmon.product-win32.win32.x86_64.zip"
+											tofile="${ptp-install-dir}/sysmon-win32-x86_64.${unqualifiedVersion}.${buildQualifier}.zip"/>
+										<copy file="${basedir}/../../releng/org.eclipse.ptp.rcp.sysmon.product/target/products/org.eclipse.ptp.rcp.sysmon.product-macosx.cocoa.x86_64.zip"
+											tofile="${ptp-install-dir}/sysmon-macosx-cocoa-x86_64.${unqualifiedVersion}.${buildQualifier}.zip"/>
+									</tasks>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
 	<build>
 		<plugins>
 			<plugin>
