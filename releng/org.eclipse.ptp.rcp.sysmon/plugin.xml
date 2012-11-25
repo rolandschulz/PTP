@@ -44,7 +44,7 @@
             name="System Monitor">
          <property
                name="windowImages"
-               value="platform:/plugin/org.eclipse.ptp.rcp.sysmon.product/icons/icon_16.png,platform:/plugin/org.eclipse.ptp.rcp.sysmon.product/icons/icon_32.png,platform:/plugin/org.eclipse.ptp.rcp.sysmon.product/icons/icon_48.png,platform:/plugin/org.eclipse.ptp.rcp.sysmon.product/icons/icon_64.png,platform:/plugin/org.eclipse.ptp.rcp.sysmon.product/icons/icon_128.png">
+               value="/icons/icon_16.png,/icons/icon_32.png,/icons/icon_48.png,/icons/icon_64.png,/icons/icon_128.png">
          </property>
          <property
                name="startupForegroundColor"
@@ -52,15 +52,27 @@
          </property>
          <property
                name="startupProgressRect"
-               value="20,385,510,10">
+               value="10,385,530,10">
          </property>
          <property
                name="startupMessageRect"
-               value="20,365,510,20">
+               value="10,365,530,20">
          </property>
          <property
                name="appName"
                value="System Monitor">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+         <property 
+               name="cssTheme"
+               value="org.eclipse.e4.ui.css.theme.e4_default">
+         </property>
+         <property
+               name="applicationCSSResources" 
+               value="platform:/plugin/org.eclipse.platform/images/"> 
          </property>
       </product>
    </extension>
