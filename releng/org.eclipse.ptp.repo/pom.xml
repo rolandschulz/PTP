@@ -39,17 +39,20 @@
 												<include name="**/*"/>
 											</fileset>
 										</delete>
-										<copy todir="${ptp-install}">
-											<fileset dir="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars">
-												<include name="rdt-server-aix-${unqualifiedVersion}.tar"/>
-												<include name="rdt-server-linux-${unqualifiedVersion}.tar"/>
-												<include name="rdt-server-linux.ppc64-${unqualifiedVersion}.tar"/>
-												<include name="rdt-server-linux.x86-${unqualifiedVersion}.tar"/>
-												<include name="rdt-server-macosx-${unqualifiedVersion}.tar"/>
-												<include name="rdt-server-unix-${unqualifiedVersion}.tar"/>
-												<include name="rdt-server-windows-${unqualifiedVersion}.zip"/>
-											</fileset>
-										</copy>
+										<copy file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-aix-${unqualifiedVersion}.tar"
+											tofile="${ptp-install}/rdt-server-aix-${unqualifiedVersion}.${buildQualifier}.tar"/>
+										<copy file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-linux-${unqualifiedVersion}.tar"
+											tofile="${ptp-install}/rdt-server-linux-${unqualifiedVersion}.${buildQualifier}.tar"/>
+										<copy file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-linux.ppc64-${unqualifiedVersion}.tar"
+											tofile="${ptp-install}/rdt-server-linux-ppc64-${unqualifiedVersion}.${buildQualifier}.tar"/>
+										<copy file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-linux.x86-${unqualifiedVersion}.tar"
+											tofile="${ptp-install}/rdt-server-linux-x86-${unqualifiedVersion}.${buildQualifier}.tar"/>
+										<copy file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-macosx-${unqualifiedVersion}.tar"
+											tofile="${ptp-install}/rdt-server-macosx-${unqualifiedVersion}.${buildQualifier}.tar"/>
+										<copy file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-unix-${unqualifiedVersion}.tar"
+											tofile="${ptp-install}/rdt-server-unix-${unqualifiedVersion}.${buildQualifier}.tar"/>
+										<copy file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-windows-${unqualifiedVersion}.tar"
+											tofile="${ptp-install}/rdt-server-windows-${unqualifiedVersion}.${buildQualifier}.tar"/>
 										<copy file="${project.build.directory}/${project.build.finalName}.zip"
 											tofile="${ptp-install}/org.eclipse.ptp.repo.${unqualifiedVersion}.${buildQualifier}.zip"/>
 										<unzip src="${project.build.directory}/${project.build.finalName}.zip"
@@ -72,7 +75,7 @@
 											dest="${ptp-install}/proxy/org.eclipse.ptp.proxy_${unqualifiedVersion}.${buildQualifier}"/>
 										<unzip src="${basedir}/../../core/org.eclipse.ptp.utils/target/org.eclipse.ptp.utils-${project.version}.jar"
 											dest="${ptp-install}/proxy/org.eclipse.ptp.utils_${unqualifiedVersion}.${buildQualifier}"/>
-										<zip destfile="${ptp-install}/ptp-proxy-${unqualifiedVersion}.zip">
+										<zip destfile="${ptp-install}/ptp-proxy-${unqualifiedVersion}.${buildQualifier}.zip">
 											<fileset dir="${ptp-install}">
 												<include name="proxy/**/*"/>
 											</fileset>
