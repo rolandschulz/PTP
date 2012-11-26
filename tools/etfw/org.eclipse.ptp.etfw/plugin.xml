@@ -56,12 +56,6 @@
        </actionSet>
     </perspectiveExtension>
     <perspectiveExtension
-          targetID="org.eclipse.ptp.rm.lml.ui.LMLRunPerspective">
-       <actionSet
-             id="org.eclipse.debug.ui.profileActionSet">
-       </actionSet>
-    </perspectiveExtension>
-    <perspectiveExtension
           targetID="org.eclipse.ptp.rm.lml.ui.SystemMonitoringPerspective">
        <actionSet
              id="org.eclipse.debug.ui.profileActionSet">
