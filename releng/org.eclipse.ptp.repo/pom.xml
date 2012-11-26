@@ -51,8 +51,8 @@
 											tofile="${ptp-install}/rdt-server-macosx-${unqualifiedVersion}.${buildQualifier}.tar"/>
 										<copy file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-unix-${unqualifiedVersion}.tar"
 											tofile="${ptp-install}/rdt-server-unix-${unqualifiedVersion}.${buildQualifier}.tar"/>
-										<copy file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-windows-${unqualifiedVersion}.tar"
-											tofile="${ptp-install}/rdt-server-windows-${unqualifiedVersion}.${buildQualifier}.tar"/>
+										<copy file="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars/rdt-server-windows-${unqualifiedVersion}.zip"
+											tofile="${ptp-install}/rdt-server-windows-${unqualifiedVersion}.${buildQualifier}.zip"/>
 										<copy file="${project.build.directory}/${project.build.finalName}.zip"
 											tofile="${ptp-install}/org.eclipse.ptp.repo.${unqualifiedVersion}.${buildQualifier}.zip"/>
 										<unzip src="${project.build.directory}/${project.build.finalName}.zip"
