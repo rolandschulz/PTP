@@ -22,7 +22,6 @@
    <feature url="features/org.eclipse.ptp.remote.rse_0.0.0.jar" id="org.eclipse.ptp.remote.rse" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.pldt.upc_0.0.0.jar" id="org.eclipse.ptp.pldt.upc" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.etfw.tau_0.0.0.jar" id="org.eclipse.ptp.etfw.tau" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.etfw.ppw_0.0.0.jar" id="org.eclipse.ptp.etfw.ppw" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.sci_0.0.0.jar" id="org.eclipse.ptp.sci" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.sdk_0.0.0.jar" id="org.eclipse.ptp.sdk" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rdt_0.0.0.jar" id="org.eclipse.ptp.rdt" version="0.0.0"/>

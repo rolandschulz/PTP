@@ -91,7 +91,6 @@
 		<module>releng/org.eclipse.ptp.aix.ppc</module>
 		<module>releng/org.eclipse.ptp.core-feature</module>
 		<module>releng/org.eclipse.ptp.etfw-feature</module>
-		<module>releng/org.eclipse.ptp.etfw.ppw-feature</module>
 		<module>releng/org.eclipse.ptp.etfw.tau-feature</module>
 		<module>releng/org.eclipse.ptp.etfw.tau.fortran-feature</module>
 		<module>releng/org.eclipse.ptp.external-feature</module>
@@ -177,7 +176,6 @@
 		<module>tools/pldt/org.eclipse.ptp.pldt.openshmem</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.upc</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.wizards</module>
-		<module>tools/ppw/org.eclipse.ptp.etfw.ppw</module>
 		<module>tools/remotetools/org.eclipse.ptp.remotetools.core</module>
 		<module>tools/remotetools/org.eclipse.ptp.remotetools.environment.core</module>
 		<module>tools/remotetools/org.eclipse.ptp.remotetools.environment.generichost</module>
