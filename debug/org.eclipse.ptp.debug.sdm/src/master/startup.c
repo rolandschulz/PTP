@@ -185,7 +185,7 @@ main(int argc, char *argv[])
 		if (cp == NULL) {
 			if (strcmp(argv[n], "--master") == 0 ||
 				strncmp(argv[n], "--server", 8) == 0 ||
-				strncmp(argv[n], "--generate_routes", 17) == 0) ||
+				strncmp(argv[n], "--generate_routes", 17) == 0 ||
 				strncmp(argv[n], "--routing_file", 14) == 0) {
 				/* No action required */
 #ifdef DEBUG
