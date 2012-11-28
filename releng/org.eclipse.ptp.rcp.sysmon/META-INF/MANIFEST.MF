@@ -6,7 +6,13 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rcp.sysmon.Activator
 Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.debug.ui,
+ org.eclipse.ptp.core,
+ org.eclipse.ptp.launch,
+ org.eclipse.ptp.rm.launch,
+ org.eclipse.ptp.remote.core,
+ org.eclipse.ptp.remote.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
