@@ -23,7 +23,8 @@ Export-Package: org.eclipse.ptp.rm.jaxb.control;
    org.eclipse.ptp.rm.jaxb.tests,
    org.eclipse.ptp.rm.lml.monitor.core,
    org.eclipse.ptp.rm.lml_jaxb,
-   org.eclipse.ptp.rm.launch",
+   org.eclipse.ptp.rm.launch,
+   org.eclipse.ptp.rm.lml.monitor.ui",
  org.eclipse.ptp.rm.jaxb.control.data;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.launch",
  org.eclipse.ptp.rm.jaxb.control.exceptions;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.tests",
  org.eclipse.ptp.rm.jaxb.control.internal;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
@@ -33,6 +34,10 @@ Export-Package: org.eclipse.ptp.rm.jaxb.control;
  org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.launch",
  org.eclipse.ptp.rm.jaxb.control.internal.utils;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
  org.eclipse.ptp.rm.jaxb.control.internal.variables;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.launch",
- org.eclipse.ptp.rm.jaxb.control.runnable;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.lml_jaxb,org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.launch"
+ org.eclipse.ptp.rm.jaxb.control.runnable;
+  x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,
+   org.eclipse.ptp.rm.lml_jaxb,
+   org.eclipse.ptp.rm.jaxb.tests,
+   org.eclipse.ptp.rm.launch"
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin

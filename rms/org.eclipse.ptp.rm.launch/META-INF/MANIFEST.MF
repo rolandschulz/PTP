@@ -32,6 +32,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.rm.launch;x-friends:="org.eclipse.ptp.etfw.parallel",
- org.eclipse.ptp.rm.launch.ui;x-friends:="org.eclipse.ptp.etfw.parallel"
+Export-Package: org.eclipse.ptp.rm.launch;x-friends:="org.eclipse.ptp.etfw.parallel,org.eclipse.ptp.rcp.sysmon",
+ org.eclipse.ptp.rm.launch.ui;x-friends:="org.eclipse.ptp.etfw.parallel,org.eclipse.ptp.rcp.sysmon"
 
