@@ -104,12 +104,6 @@ public class NavigationTests extends CPPSelectionTestsAnyIndexer {
 		return "org.eclipse.ptp.rdt.ui.editor.CEditor";
 	}
 
-	@Override
-	protected void waitUntilFileIsIndexed(IIndex index, IFile file, int maxmillis) throws Exception {
-		Thread.sleep(10000);
-        CCorePlugin.getIndexManager().joinIndexer(MAX_WAIT_TIME, new NullProgressMonitor());
-	}
-
 	public NavigationTests(String name) {
 		super(name, RemoteFastIndexer.ID);
 	}
