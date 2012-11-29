@@ -12,6 +12,5 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.6.1",
 Bundle-Vendor: %pluginProvider
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.rm.lml.ui.LMLUIPlugin
-Bundle-ClassPath: lmlui.jar
 Export-Package: org.eclipse.ptp.rm.lml.ui;x-friends:="org.eclipse.ptp.rm.launch",
  org.eclipse.ptp.rm.lml.ui.views;x-friends:="org.eclipse.ptp.rm.lml.monitor.ui"

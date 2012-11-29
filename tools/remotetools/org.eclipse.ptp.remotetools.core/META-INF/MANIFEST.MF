@@ -18,8 +18,6 @@ Export-Package: org.eclipse.ptp.remotetools,
  org.eclipse.ptp.remotetools.core,
  org.eclipse.ptp.remotetools.exception,
  org.eclipse.ptp.remotetools.internal.common;x-friends:="org.eclipse.ptp.remotetools.environment.generichost"
-Bundle-ClassPath: 
- .
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: com.ibm.icu.text,
  org.eclipse.ptp.utils.file.core
