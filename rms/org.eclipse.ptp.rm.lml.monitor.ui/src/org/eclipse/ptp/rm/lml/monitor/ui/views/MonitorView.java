@@ -52,8 +52,7 @@ import org.eclipse.ui.part.ViewPart;
  * @since 6.0
  */
 public class MonitorView extends ViewPart {
-	private abstract class CenterImageLabelProvider extends
-			OwnerDrawLabelProvider {
+	private abstract class CenterImageLabelProvider extends OwnerDrawLabelProvider {
 
 		protected abstract Image getImage(Object element);
 
@@ -67,8 +66,7 @@ public class MonitorView extends ViewPart {
 			Image img = getImage(element);
 
 			if (img != null) {
-				Rectangle bounds = ((TableItem) event.item)
-						.getBounds(event.index);
+				Rectangle bounds = ((TableItem) event.item).getBounds(event.index);
 				Rectangle imgBounds = img.getBounds();
 				bounds.width /= 2;
 				bounds.width -= imgBounds.width / 2;
@@ -85,14 +83,17 @@ public class MonitorView extends ViewPart {
 
 	private class MonitorChangedListener implements IMonitorChangedListener {
 
+		@Override
 		public void monitorAdded(IMonitorControl[] monitors) {
 			fViewer.refresh();
 		}
 
+		@Override
 		public void monitorRemoved(IMonitorControl[] monitors) {
 			fViewer.refresh();
 		}
 
+		@Override
 		public void monitorUpdated(IMonitorControl[] monitors) {
 			fViewer.refresh();
 		}
@@ -112,16 +113,15 @@ public class MonitorView extends ViewPart {
 			String name1 = null;
 			String name2 = null;
 			if (e1 instanceof IMonitorControl) {
-				name1 = ((IMonitorControl) e1).getSystemType();
+				name1 = ((IMonitorControl) e1).getConfigurationName();
 			}
 			if (e2 instanceof IMonitorControl) {
-				name2 = ((IMonitorControl) e2).getSystemType();
+				name2 = ((IMonitorControl) e2).getConfigurationName();
 			}
 			if (name1 != null && name2 != null) {
 				int res = name1.compareTo(name2);
 				if (res == 0) {
-					res = ((IMonitorControl) e1).getConnectionName().compareTo(
-							((IMonitorControl) e2).getConnectionName());
+					res = ((IMonitorControl) e1).getConnectionName().compareTo(((IMonitorControl) e2).getConnectionName());
 				}
 				return res;
 			}
@@ -134,33 +134,29 @@ public class MonitorView extends ViewPart {
 	private final MonitorChangedListener fMonitorChangedListener = new MonitorChangedListener();
 
 	private void createColumns() {
-		String[] columnTitles = { Messages.MonitorView_Status,
-				Messages.MonitorView_ConnectionName,
-				Messages.MonitorView_SystemType };
+		String[] columnTitles = { Messages.MonitorView_Status, Messages.MonitorView_ConnectionName,
+				Messages.MonitorView_ConfigurationName };
 
 		// the remaining columns
 		for (int i = 0; i < columnTitles.length; i++) {
-			TableViewerColumn tableViewerColumn = new TableViewerColumn(
-					fViewer, SWT.NONE);
+			TableViewerColumn tableViewerColumn = new TableViewerColumn(fViewer, SWT.NONE);
 			final int cellNumber = i;
 			switch (cellNumber) {
 			case 0:
-				tableViewerColumn
-						.setLabelProvider(new CenterImageLabelProvider() {
-							/*
-							 * (non-Javadoc)
-							 * 
-							 * @see
-							 * org.eclipse.jface.viewers.ColumnLabelProvider
-							 * #getImage(java.lang.Object)
-							 */
-							@Override
-							public Image getImage(Object element) {
-								IMonitorControl monitor = (IMonitorControl) element;
-								return monitor.isActive() ? MonitorImages
-										.get(MonitorImages.IMG_STARTED) : null;
-							}
-						});
+				tableViewerColumn.setLabelProvider(new CenterImageLabelProvider() {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see
+					 * org.eclipse.jface.viewers.ColumnLabelProvider
+					 * #getImage(java.lang.Object)
+					 */
+					@Override
+					public Image getImage(Object element) {
+						IMonitorControl monitor = (IMonitorControl) element;
+						return monitor.isActive() ? MonitorImages.get(MonitorImages.IMG_STARTED) : null;
+					}
+				});
 				break;
 			case 1:
 			case 2:
@@ -180,7 +176,7 @@ public class MonitorView extends ViewPart {
 						case 1:
 							return monitor.getConnectionName();
 						case 2:
-							return monitor.getSystemType();
+							return monitor.getConfigurationName();
 						}
 						return null;
 					}
@@ -190,8 +186,7 @@ public class MonitorView extends ViewPart {
 			tableViewerColumn.getColumn().setText(columnTitles[i]);
 			tableViewerColumn.getColumn().pack();
 			int width = tableViewerColumn.getColumn().getWidth();
-			fTableColumnLayout.setColumnData(tableViewerColumn.getColumn(),
-					new ColumnWeightData((i > 0) ? 100 : 0, width));
+			fTableColumnLayout.setColumnData(tableViewerColumn.getColumn(), new ColumnWeightData((i > 0) ? 100 : 0, width));
 		}
 	}
 
@@ -199,26 +194,25 @@ public class MonitorView extends ViewPart {
 	public void createPartControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.None);
 		composite.setLayout(fTableColumnLayout);
-		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1,
-				1));
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		fViewer = new TableViewer(composite, SWT.SINGLE | SWT.FULL_SELECTION);
 		fViewer.setContentProvider(ArrayContentProvider.getInstance());
 		fViewer.setComparator(new SystemsViewSorter());
 		fViewer.setUseHashlookup(true);
 		fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				MonitorControlManager.getInstance().fireSelectionChanged(event);
 			}
 		});
 		fViewer.addDoubleClickListener(new IDoubleClickListener() {
 
+			@Override
 			public void doubleClick(DoubleClickEvent event) {
-				IStructuredSelection selection = (IStructuredSelection) event
-						.getSelection();
+				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 				if (!selection.isEmpty()) {
-					final IMonitorControl control = (IMonitorControl) selection
-							.getFirstElement();
+					final IMonitorControl control = (IMonitorControl) selection.getFirstElement();
 					Job job = new Job(Messages.MonitorView_ToggleMonitor) {
 						@Override
 						protected IStatus run(IProgressMonitor monitor) {
@@ -228,12 +222,10 @@ public class MonitorView extends ViewPart {
 								} else {
 									final boolean[] stop = new boolean[1];
 									Display.getDefault().syncExec(new Runnable() {
+										@Override
 										public void run() {
-											stop[0] = MessageDialog
-													.openQuestion(fViewer.getControl()
-															.getShell(),
-															Messages.MonitorView_StopMonitor,
-															Messages.MonitorView_AreYouSure);
+											stop[0] = MessageDialog.openQuestion(fViewer.getControl().getShell(),
+													Messages.MonitorView_StopMonitor, Messages.MonitorView_AreYouSure);
 										}
 
 									});
@@ -245,9 +237,10 @@ public class MonitorView extends ViewPart {
 								final String message = e.getLocalizedMessage();
 								final IStatus status = e.getStatus();
 								Display.getDefault().syncExec(new Runnable() {
+									@Override
 									public void run() {
-										ErrorDialog.openError(fViewer.getControl()
-												.getShell(), Messages.MonitorView_ToggleMonitor, message, status);
+										ErrorDialog.openError(fViewer.getControl().getShell(), Messages.MonitorView_ToggleMonitor,
+												message, status);
 									}
 
 								});
@@ -263,8 +256,7 @@ public class MonitorView extends ViewPart {
 
 		createColumns();
 
-		fViewer.setInput(MonitorControlManager.getInstance()
-				.getMonitorControls());
+		fViewer.setInput(MonitorControlManager.getInstance().getMonitorControls());
 
 		fViewer.getTable().setLinesVisible(true);
 		fViewer.getTable().setHeaderVisible(true);
@@ -277,8 +269,7 @@ public class MonitorView extends ViewPart {
 		 */
 		getSite().setSelectionProvider(fViewer);
 
-		MonitorControlManager.getInstance().addMonitorChangedListener(
-				fMonitorChangedListener);
+		MonitorControlManager.getInstance().addMonitorChangedListener(fMonitorChangedListener);
 	}
 
 	/*
@@ -288,8 +279,7 @@ public class MonitorView extends ViewPart {
 	 */
 	@Override
 	public void dispose() {
-		MonitorControlManager.getInstance().removeMonitorChangedListener(
-				fMonitorChangedListener);
+		MonitorControlManager.getInstance().removeMonitorChangedListener(fMonitorChangedListener);
 		super.dispose();
 	}
 

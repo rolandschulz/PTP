@@ -24,6 +24,13 @@ public interface IMonitorControl {
 	public void dispose();
 
 	/**
+	 * Get the configuration name for this control
+	 * 
+	 * @return configuration name
+	 */
+	public String getConfigurationName();
+
+	/**
 	 * Get the connection name for the control
 	 * 
 	 * @return connection name
@@ -54,13 +61,6 @@ public interface IMonitorControl {
 	public String getSystemType();
 
 	/**
-	 * Get the monitor type for this control
-	 * 
-	 * @return monitor type
-	 */
-	public String getMonitorType();
-
-	/**
 	 * Check if the control is active. An active control is connected to the
 	 * remote system and is polling the system for updates.
 	 * 
@@ -87,6 +87,14 @@ public interface IMonitorControl {
 	public void save();
 
 	/**
+	 * Set the configuration name for the control
+	 * 
+	 * @param name
+	 *            configuration name
+	 */
+	public void setConfigurationName(String name);
+
+	/**
 	 * Set the connection name for the control
 	 * 
 	 * @param connName
@@ -101,14 +109,6 @@ public interface IMonitorControl {
 	 *            remote services ID
 	 */
 	public void setRemoteServicesId(String id);
-
-	/**
-	 * Set the system type for the control
-	 * 
-	 * @param type
-	 *            system type
-	 */
-	public void setSystemType(String type);
 
 	/**
 	 * Start the control. This will open a connection to the target system (if

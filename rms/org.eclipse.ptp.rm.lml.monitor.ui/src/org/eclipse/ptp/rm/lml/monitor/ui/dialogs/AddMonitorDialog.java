@@ -33,9 +33,9 @@ import org.eclipse.swt.widgets.Shell;
 
 public class AddMonitorDialog extends TitleAreaDialog {
 
-	private Combo fSystemTypeCombo;
+	private Combo fConfigNameCombo;
 	private RemoteConnectionWidget fRemoteConnectionWidget;
-	private String fSystemType;
+	private String fConfigName;
 	private IRemoteConnection fRemoteConnection;
 
 	public AddMonitorDialog(Shell parentShell) {
@@ -53,13 +53,13 @@ public class AddMonitorDialog extends TitleAreaDialog {
 	}
 
 	/**
-	 * Get the system type selected in the dialog, or null if no system type
+	 * Get the configuration name selected in the dialog, or null if no configuration
 	 * selected
 	 * 
 	 * @return system type or null
 	 */
-	public String getSystemType() {
-		return fSystemType;
+	public String getConfigurationName() {
+		return fConfigName;
 	}
 
 	private void updateEnablement() {
@@ -68,14 +68,14 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		if (fRemoteConnection != null) {
 			try {
 				valid = (LaunchControllerManager.getInstance().getLaunchController(fRemoteConnection.getRemoteServices().getId(),
-						fRemoteConnection.getName(), getSystemType()) != null);
+						fRemoteConnection.getName(), getConfigurationName()) != null);
 			} catch (CoreException e) {
 			}
 		}
-		fRemoteConnectionWidget.setEnabled(fSystemTypeCombo.getSelectionIndex() > 0);
+		fRemoteConnectionWidget.setEnabled(fConfigNameCombo.getSelectionIndex() > 0);
 		Button button = getButton(IDialogConstants.OK_ID);
 		if (button != null) {
-			button.setEnabled(valid && fSystemTypeCombo.getSelectionIndex() > 0 && fRemoteConnectionWidget.getConnection() != null);
+			button.setEnabled(valid && fConfigNameCombo.getSelectionIndex() > 0 && fRemoteConnectionWidget.getConnection() != null);
 		}
 	}
 
@@ -115,19 +115,21 @@ public class AddMonitorDialog extends TitleAreaDialog {
 
 		new Label(composite, SWT.NONE).setText(Messages.AddMonitorDialog_Monitor_Type);
 
-		fSystemTypeCombo = new Combo(composite, SWT.READ_ONLY);
+		fConfigNameCombo = new Combo(composite, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		fSystemTypeCombo.setLayoutData(gd);
-		fSystemTypeCombo.setItems(MonitorControlManager.getSystemTypes());
-		fSystemTypeCombo.add(Messages.AddMonitorDialog_Please_select_a_monitor_type, 0);
-		fSystemTypeCombo.select(0);
-		fSystemTypeCombo.addSelectionListener(new SelectionListener() {
+		fConfigNameCombo.setLayoutData(gd);
+		fConfigNameCombo.setItems(MonitorControlManager.getConfigurationNames());
+		fConfigNameCombo.add(Messages.AddMonitorDialog_Please_select_a_monitor_type, 0);
+		fConfigNameCombo.select(0);
+		fConfigNameCombo.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (fSystemTypeCombo.getSelectionIndex() > 0) {
-					fSystemType = fSystemTypeCombo.getItem(fSystemTypeCombo.getSelectionIndex());
+				if (fConfigNameCombo.getSelectionIndex() > 0) {
+					fConfigName = fConfigNameCombo.getItem(fConfigNameCombo.getSelectionIndex());
 				}
 				updateEnablement();
 			}
@@ -136,9 +138,11 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		fRemoteConnectionWidget = new RemoteConnectionWidget(composite, SWT.NONE, null, null);
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 		fRemoteConnectionWidget.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateEnablement();
 			}

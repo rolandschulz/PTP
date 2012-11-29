@@ -99,10 +99,6 @@
             modes="run"
             name="%ParallelLaunchDelegate.name"
             type="org.eclipse.ptp.launch.parallelLaunch">
-         <modeCombination
-               modes="run"
-               perspective="org.eclipse.ptp.rm.lml.ui.systemMonitoringPerspective">
-         </modeCombination>
       </launchDelegate>
    </extension>
 
@@ -118,7 +114,7 @@
       <tab
             class="org.eclipse.ptp.rm.launch.ui.ResourcesTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.rm.launch.applicationLaunch.resourcesTab"
+            id="org.eclipse.ptp.rcp.sysmon.resourcesTab"
             name="%ResourcesLaunchTab.name">
          <associatedDelegate
                delegate="org.eclipse.ptp.rcp.sysmon.launch">
@@ -139,7 +135,7 @@
       <tab
             class="org.eclipse.ptp.rm.launch.ui.ArgumentsTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.rm.launch.applicationLaunch.argumentsTab"
+            id="org.eclipse.ptp.rcp.sysmon.argumentsTab"
             name="%ArgumentsLaunchTab.name">
          <associatedDelegate
                delegate="org.eclipse.ptp.rcp.sysmon.launch">
@@ -151,7 +147,7 @@
       <tab
             class="org.eclipse.ptp.launch.ui.EnvironmentTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.rm.environmentTab"
+            id="org.eclipse.ptp.rcp.sysmon.environmentTab"
             name="%EnvironmentLaunchTab.name">
          <associatedDelegate
                delegate="org.eclipse.ptp.rcp.sysmon.launch">
@@ -163,7 +159,7 @@
       <tab
             class="org.eclipse.ptp.launch.ui.EnhancedSynchronizeTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.rm.synchronizeTab"
+            id="org.eclipse.ptp.rcp.sysmon.synchronizeTab"
             name="%SynchronizeLaunchTab.name">
          <associatedDelegate
                delegate="org.eclipse.ptp.rcp.sysmon.launch">
@@ -175,7 +171,7 @@
       <tab
             class="org.eclipse.debug.ui.CommonTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.rm.commonTab"
+            id="org.eclipse.ptp.rcp.sysmon.commonTab"
             name="%CommonLaunchTab.name">
          <associatedDelegate
                delegate="org.eclipse.ptp.rcp.sysmon.launch">

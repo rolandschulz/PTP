@@ -34,7 +34,7 @@ public class Messages extends NLS {
 	public static String MonitorView_Status;
 	public static String MonitorView_StopMonitor;
 	public static String MonitorView_ConnectionName;
-	public static String MonitorView_SystemType;
+	public static String MonitorView_ConfigurationName;
 	public static String MonitorView_ToggleMonitor;
 	public static String RemoveJob_Cannot_undo;
 	public static String RemoveJob_Permanently_remove_job_entry;

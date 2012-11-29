@@ -56,27 +56,25 @@ public class MonitorControlManager {
 	private static final String MONITORS_SAVED_STATE = "monitors.xml";//$NON-NLS-1$
 	private static final String MONITORS_ATTR = "monitors";//$NON-NLS-1$
 	private static final String MONITOR_ID_ATTR = "monitor";//$NON-NLS-1$
-	private static Map<String, String> fSystemTypesByName = new TreeMap<String, String>();
+	private static Map<String, String> fSystemTypesByConfigName = new TreeMap<String, String>();
 
-	public static String generateMonitorId(String remoteServicesId,
-			String connectionName, String monitorType) {
-		return LaunchControllerManager.generateControlId(remoteServicesId,
-				connectionName, monitorType);
+	public static String generateMonitorId(String remoteServicesId, String connectionName, String monitorType) {
+		return LaunchControllerManager.generateControlId(remoteServicesId, connectionName, monitorType);
 	}
 
 	public static MonitorControlManager getInstance() {
 		return fInstance;
 	}
 
-	public static String getMonitorType(String systemType) {
+	public static String getSystemType(String configName) {
 		loadSystemTypes();
-		return fSystemTypesByName.get(systemType);
+		return fSystemTypesByConfigName.get(configName);
 	}
 
-	public static String[] getSystemTypes() {
+	public static String[] getConfigurationNames() {
 		loadSystemTypes();
 		Set<String> set = new TreeSet<String>();
-		set.addAll(fSystemTypesByName.keySet());
+		set.addAll(fSystemTypesByConfigName.keySet());
 		return set.toArray(new String[0]);
 	}
 
@@ -89,13 +87,12 @@ public class MonitorControlManager {
 		for (String name : configNames) {
 			URL url = JAXBExtensionUtils.getConfigurationURL(name);
 			try {
-				ResourceManagerData data = JAXBInitializationUtils
-						.initializeRMData(url);
+				ResourceManagerData data = JAXBInitializationUtils.initializeRMData(url);
 				MonitorType monitorType = data.getMonitorData();
 				if (monitorType != null) {
 					String type = monitorType.getSchedulerType();
 					if (type != null) {
-						fSystemTypesByName.put(name, type);
+						fSystemTypesByConfigName.put(name, type);
 					}
 				}
 			} catch (Exception e) {
@@ -129,19 +126,16 @@ public class MonitorControlManager {
 	}
 
 	public IMonitorControl createMonitorControl(ILaunchController controller) {
-		return createMonitorControl(controller.getRemoteServicesId(),
-				controller.getConnectionName(), controller.getConfiguration()
-						.getName());
+		return createMonitorControl(controller.getRemoteServicesId(), controller.getConnectionName(), controller.getConfiguration()
+				.getName());
 	}
 
-	public IMonitorControl createMonitorControl(String remoteServicesId,
-			String connectionName, String systemType) {
-		String controlId = LaunchControllerManager.generateControlId(
-				remoteServicesId, connectionName, systemType);
+	public IMonitorControl createMonitorControl(String remoteServicesId, String connectionName, String configName) {
+		String controlId = LaunchControllerManager.generateControlId(remoteServicesId, connectionName, configName);
 		IMonitorControl monitor = new MonitorControl(controlId);
 		monitor.setRemoteServicesId(remoteServicesId);
 		monitor.setConnectionName(connectionName);
-		monitor.setSystemType(systemType);
+		monitor.setConfigurationName(configName);
 		monitor.save();
 		addMonitorControl(monitor);
 		saveMonitors();
@@ -149,8 +143,7 @@ public class MonitorControlManager {
 	}
 
 	public void fireMonitorAdded(final IMonitorControl[] monitors) {
-		UIJob job = new UIJob(
-				Messages.MonitorControlManager_monitorAddedJobName) {
+		UIJob job = new UIJob(Messages.MonitorControlManager_monitorAddedJobName) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -165,8 +158,7 @@ public class MonitorControlManager {
 	}
 
 	public void fireMonitorRefresh(final IMonitorControl[] monitors) {
-		UIJob job = new UIJob(
-				Messages.MonitorControlManager_monitoRefreshJobName) {
+		UIJob job = new UIJob(Messages.MonitorControlManager_monitoRefreshJobName) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -181,14 +173,12 @@ public class MonitorControlManager {
 	}
 
 	public void fireMonitorRemoved(final IMonitorControl[] monitors) {
-		UIJob job = new UIJob(
-				Messages.MonitorControlManager_monitorRemovedJobName) {
+		UIJob job = new UIJob(Messages.MonitorControlManager_monitorRemovedJobName) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				for (Object listener : fMonitorChangedListeners.getListeners()) {
-					((IMonitorChangedListener) listener)
-							.monitorRemoved(monitors);
+					((IMonitorChangedListener) listener).monitorRemoved(monitors);
 				}
 				return Status.OK_STATUS;
 			}
@@ -198,14 +188,12 @@ public class MonitorControlManager {
 	}
 
 	public void fireMonitorUpdated(final IMonitorControl[] monitors) {
-		UIJob job = new UIJob(
-				Messages.MonitorControlManager_monitorUpdatedJobName) {
+		UIJob job = new UIJob(Messages.MonitorControlManager_monitorUpdatedJobName) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor progress) {
 				for (Object listener : fMonitorChangedListeners.getListeners()) {
-					((IMonitorChangedListener) listener)
-							.monitorUpdated(monitors);
+					((IMonitorChangedListener) listener).monitorUpdated(monitors);
 				}
 				return Status.OK_STATUS;
 			}
@@ -215,23 +203,18 @@ public class MonitorControlManager {
 	}
 
 	public void fireSelectionChanged(final SelectionChangedEvent event) {
-		UIJob job = new UIJob(
-				Messages.MonitorControlManager_monitorSelectionChangedJobName) {
+		UIJob job = new UIJob(Messages.MonitorControlManager_monitorSelectionChangedJobName) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				for (Object listener : fSelectionChangedListeners
-						.getListeners()) {
-					((ISelectionChangedListener) listener)
-							.selectionChanged(event);
+				for (Object listener : fSelectionChangedListeners.getListeners()) {
+					((ISelectionChangedListener) listener).selectionChanged(event);
 				}
 				String monitorId = null;
 				if (event.getSelection() instanceof IStructuredSelection) {
-					IStructuredSelection sel = (IStructuredSelection) event
-							.getSelection();
+					IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 					if (!sel.isEmpty()) {
-						monitorId = ((IMonitorControl) sel.getFirstElement())
-								.getControlId();
+						monitorId = ((IMonitorControl) sel.getFirstElement()).getControlId();
 					}
 				}
 				LMLManager.getInstance().selectLgui(monitorId);
@@ -251,8 +234,7 @@ public class MonitorControlManager {
 	}
 
 	private File getSaveLocation() {
-		return LMLMonitorCorePlugin.getDefault().getStateLocation()
-				.append(MONITORS_SAVED_STATE).toFile();
+		return LMLMonitorCorePlugin.getDefault().getStateLocation().append(MONITORS_SAVED_STATE).toFile();
 	}
 
 	/**
@@ -308,8 +290,7 @@ public class MonitorControlManager {
 		fMonitorRefreshListeners.remove(listener);
 	}
 
-	public void removeSelectionChangedListener(
-			ISelectionChangedListener listener) {
+	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
 		fSelectionChangedListeners.remove(listener);
 	}
 

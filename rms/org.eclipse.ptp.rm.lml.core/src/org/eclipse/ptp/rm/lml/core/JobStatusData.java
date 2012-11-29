@@ -29,8 +29,8 @@ public class JobStatusData {
 	public static final String CANCELED = "CANCELED";//$NON-NLS-1$
 
 	public static final String JOB_ID_ATTR = "jobId";//$NON-NLS-1$
-	public static final String CONTROL_TYPE_ATTR = "controlType";//$NON-NLS-1$
-	public static final String MONITOR_TYPE_ATTR = "monitorType";//$NON-NLS-1$
+	public static final String CONFIGURATION_NAME_ATTR = "configurationName";//$NON-NLS-1$
+	public static final String SYSTEM_TYPE_ATTR = "systemType";//$NON-NLS-1$
 	public static final String STDOUT_REMOTE_FILE_ATTR = "stdoutRemotePath";//$NON-NLS-1$
 	public static final String STDERR_REMOTE_FILE_ATTR = "stderrRemotePath";//$NON-NLS-1$
 	public static final String INTERACTIVE_ATTR = "interactive";//$NON-NLS-1$;
@@ -72,10 +72,10 @@ public class JobStatusData {
 	}
 
 	/**
-	 * @return control type
+	 * @return configuration name
 	 */
-	public String getControlType() {
-		return fAttrs.get(CONTROL_TYPE_ATTR);
+	public String getConfigurationName() {
+		return fAttrs.get(CONFIGURATION_NAME_ATTR);
 	}
 
 	/**
@@ -100,10 +100,10 @@ public class JobStatusData {
 	}
 
 	/**
-	 * @return monitor type
+	 * @return system type
 	 */
-	public String getMonitorType() {
-		return fAttrs.get(MONITOR_TYPE_ATTR);
+	public String getSystemType() {
+		return fAttrs.get(SYSTEM_TYPE_ATTR);
 	}
 
 	public String getOid() {

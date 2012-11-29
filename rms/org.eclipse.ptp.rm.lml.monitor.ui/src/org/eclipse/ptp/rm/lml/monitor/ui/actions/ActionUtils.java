@@ -146,7 +146,7 @@ public class ActionUtils {
 		SubMonitor progress = SubMonitor.convert(monitor, 20);
 		try {
 			ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(status.getRemoteId(),
-					status.getConnectionName(), status.getControlType());
+					status.getConnectionName(), status.getConfigurationName());
 			if (controller != null) {
 				controller.start(progress.newChild(10));
 				controller.control(status.getJobId(), operation, progress.newChild(10));
@@ -189,7 +189,7 @@ public class ActionUtils {
 		SubMonitor progress = SubMonitor.convert(monitor, 20);
 		try {
 			ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(status.getRemoteId(),
-					status.getConnectionName(), status.getControlType());
+					status.getConnectionName(), status.getConfigurationName());
 			if (controller != null) {
 				controller.start(progress.newChild(10));
 				maybeUpdateJobState(controller, status, progress.newChild(10));
@@ -209,7 +209,7 @@ public class ActionUtils {
 			status.updateState(refreshed.getState(), refreshed.getStateDetail());
 			maybeCheckFiles(status);
 			String monitorId = MonitorControlManager.generateMonitorId(status.getRemoteId(), status.getConnectionName(),
-					status.getMonitorType());
+					status.getConfigurationName());
 			LMLManager.getInstance().updateUserJob(monitorId, status.getJobId(), status.getState(), status.getStateDetail());
 		} finally {
 			if (monitor != null) {

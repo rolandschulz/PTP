@@ -87,7 +87,7 @@ public abstract class AbstractStatusAction implements IObjectActionDelegate {
 	protected static boolean operationSupported(JobStatusData status, String operation, IViewPart targetPart) {
 		try {
 			IJobController jobController = LaunchControllerManager.getInstance().getLaunchController(status.getRemoteId(),
-					status.getConnectionName(), status.getControlType());
+					status.getConnectionName(), status.getConfigurationName());
 			if (jobController != null) {
 				ResourceManagerData data = jobController.getConfiguration();
 				if (data != null) {

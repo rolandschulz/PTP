@@ -39,7 +39,7 @@ public class RemoveJob extends AbstractStatusAction {
 				JobStatusData status = row.status;
 				data.add(status);
 				String monitorId = MonitorControlManager.generateMonitorId(status.getRemoteId(), status.getConnectionName(),
-						status.getMonitorType());
+						status.getConfigurationName());
 				LMLManager.getInstance().removeUserJob(monitorId, status.getJobId());
 			}
 			view.refresh();

@@ -60,10 +60,12 @@ import org.eclipse.ui.XMLMemento;
 @SuppressWarnings("restriction")
 public class MonitorControl implements IMonitorControl {
 	private class JobListener implements IJobListener {
+		@Override
 		public void jobAdded(IJobStatus status) {
 			addJob(status);
 		}
 
+		@Override
 		public void jobChanged(IJobStatus status) {
 			updateJob(status);
 		}
@@ -135,7 +137,7 @@ public class MonitorControl implements IMonitorControl {
 	private final JobListener fJobListener = new JobListener();
 	private final StringBuffer fSavedLayout = new StringBuffer();
 	private final List<JobStatusData> fSavedJobs = new ArrayList<JobStatusData>();
-	private String fSystemType;
+	private String fConfigurationName;
 	private boolean fActive;
 	private String fRemoteServicesId;
 	private String fConnectionName;
@@ -145,10 +147,7 @@ public class MonitorControl implements IMonitorControl {
 	private static final String JOB_ATTR = "job";//$NON-NLS-1$ 
 	private static final String LAYOUT_ATTR = "layout";//$NON-NLS-1$
 	private static final String LAYOUT_STRING_ATTR = "layoutString";//$NON-NLS-1$
-	private static final String SYSTEM_TYPE_ATTR = "systemType";//$NON-NLS-1$;
 	private static final String MONITOR_STATE = "monitorState";//$NON-NLS-1$;
-	private static final String REMOTE_SERVICES_ID_ATTR = "remoteServicesId";//$NON-NLS-1$;
-	private static final String CONNECTION_NAME_ATTR = "connectionName";//$NON-NLS-1$;
 	private static final String MONITOR_ATTR = "monitor";//$NON-NLS-1$
 
 	public MonitorControl(String controlId) {
@@ -156,23 +155,19 @@ public class MonitorControl implements IMonitorControl {
 	}
 
 	private void addJob(IJobStatus status) {
-		String monitorId = getControlId(status);
-		if (monitorId != null && monitorId.equals(getControlId())) {
-			ILaunchConfiguration configuration = status.getLaunchConfiguration();
-			String controlName = LaunchUtils.getTemplateName(configuration);
-			String[][] attrs = { { JobStatusData.JOB_ID_ATTR, status.getJobId() },
-					{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
-					{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() }, { JobStatusData.CONTROL_TYPE_ATTR, controlName },
-					{ JobStatusData.MONITOR_TYPE_ATTR, getMonitorType() },
-					{ JobStatusData.QUEUE_NAME_ATTR, status.getQueueName() }, { JobStatusData.OWNER_ATTR, status.getOwner() },
-					{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, status.getOutputPath() },
-					{ JobStatusData.STDERR_REMOTE_FILE_ATTR, status.getErrorPath() },
-					{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(status.isInteractive()) } };
-			final JobStatusData data = new JobStatusData(attrs);
-			data.setState(status.getState());
-			data.setStateDetail(status.getStateDetail());
-			fLMLManager.addUserJob(getControlId(), status.getJobId(), data);
-		}
+		ILaunchConfiguration configuration = status.getLaunchConfiguration();
+		String configName = LaunchUtils.getTemplateName(configuration);
+		String[][] attrs = { { JobStatusData.JOB_ID_ATTR, status.getJobId() },
+				{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
+				{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() }, { JobStatusData.CONFIGURATION_NAME_ATTR, configName },
+				{ JobStatusData.QUEUE_NAME_ATTR, status.getQueueName() }, { JobStatusData.OWNER_ATTR, status.getOwner() },
+				{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, status.getOutputPath() },
+				{ JobStatusData.STDERR_REMOTE_FILE_ATTR, status.getErrorPath() },
+				{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(status.isInteractive()) } };
+		final JobStatusData data = new JobStatusData(attrs);
+		data.setState(status.getState());
+		data.setStateDetail(status.getStateDetail());
+		fLMLManager.addUserJob(getControlId(), status.getJobId(), data);
 	}
 
 	/*
@@ -180,6 +175,7 @@ public class MonitorControl implements IMonitorControl {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#dispose()
 	 */
+	@Override
 	public void dispose() {
 		try {
 			getSaveLocation().delete();
@@ -194,6 +190,7 @@ public class MonitorControl implements IMonitorControl {
 	 * @see
 	 * org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getConnectionName()
 	 */
+	@Override
 	public String getConnectionName() {
 		return fConnectionName;
 	}
@@ -203,6 +200,7 @@ public class MonitorControl implements IMonitorControl {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getControlId()
 	 */
+	@Override
 	public String getControlId() {
 		return fControlId;
 	}
@@ -212,9 +210,9 @@ public class MonitorControl implements IMonitorControl {
 		if (configuration != null) {
 			String connectionName = LaunchUtils.getConnectionName(configuration);
 			String remoteServicesId = LaunchUtils.getRemoteServicesId(configuration);
-			String monitorType = LaunchUtils.getSystemType(configuration);
-			if (connectionName != null && remoteServicesId != null && monitorType != null) {
-				return MonitorControlManager.generateMonitorId(remoteServicesId, connectionName, monitorType);
+			String conifigurationName = LaunchUtils.getTemplateName(configuration);
+			if (connectionName != null && remoteServicesId != null && conifigurationName != null) {
+				return MonitorControlManager.generateMonitorId(remoteServicesId, connectionName, conifigurationName);
 			}
 		}
 		return null;
@@ -223,7 +221,7 @@ public class MonitorControl implements IMonitorControl {
 	private RequestType getMonitorConfigurationRequestType(ILaunchController controller) {
 		RequestType request = new RequestType();
 		final DriverType driver = new DriverType();
-		driver.setName(getMonitorType());
+		driver.setName(getSystemType());
 		MonitorType monitor = controller.getConfiguration().getMonitorData();
 		if (monitor != null) {
 			List<CommandType> driverCommands = driver.getCommand();
@@ -243,10 +241,11 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getMonitorType()
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getConfigurationName()
 	 */
-	public String getMonitorType() {
-		return MonitorControlManager.getMonitorType(fSystemType);
+	@Override
+	public String getConfigurationName() {
+		return fConfigurationName;
 	}
 
 	/**
@@ -271,6 +270,7 @@ public class MonitorControl implements IMonitorControl {
 	 * @see
 	 * org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getRemoteServicesId()
 	 */
+	@Override
 	public String getRemoteServicesId() {
 		return fRemoteServicesId;
 	}
@@ -284,8 +284,9 @@ public class MonitorControl implements IMonitorControl {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getSystemType()
 	 */
+	@Override
 	public String getSystemType() {
-		return fSystemType;
+		return MonitorControlManager.getSystemType(fConfigurationName);
 	}
 
 	/*
@@ -293,6 +294,7 @@ public class MonitorControl implements IMonitorControl {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#isActive()
 	 */
+	@Override
 	public boolean isActive() {
 		return fActive;
 	}
@@ -302,6 +304,7 @@ public class MonitorControl implements IMonitorControl {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#load()
 	 */
+	@Override
 	public boolean load() throws CoreException {
 		fSavedLayout.setLength(0);
 		fSavedJobs.clear();
@@ -334,8 +337,7 @@ public class MonitorControl implements IMonitorControl {
 				String[][] attrs = { { JobStatusData.JOB_ID_ATTR, child.getID() },
 						{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
 						{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() },
-						{ JobStatusData.CONTROL_TYPE_ATTR, child.getString(JobStatusData.CONTROL_TYPE_ATTR) },
-						{ JobStatusData.MONITOR_TYPE_ATTR, getMonitorType() },
+						{ JobStatusData.CONFIGURATION_NAME_ATTR, child.getString(JobStatusData.CONFIGURATION_NAME_ATTR) },
 						{ JobStatusData.STATE_ATTR, child.getString(JobStatusData.STATE_ATTR) },
 						{ JobStatusData.STATE_DETAIL_ATTR, child.getString(JobStatusData.STATE_DETAIL_ATTR) },
 						{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, child.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR) },
@@ -352,7 +354,7 @@ public class MonitorControl implements IMonitorControl {
 	private boolean loadState(IMemento memento) {
 		setRemoteServicesId(memento.getString(JobStatusData.REMOTE_SERVICES_ID_ATTR));
 		setConnectionName(memento.getString(JobStatusData.CONNECTION_NAME_ATTR));
-		fSystemType = memento.getString(SYSTEM_TYPE_ATTR);
+		setConfigurationName(memento.getString(JobStatusData.CONFIGURATION_NAME_ATTR));
 		return memento.getBoolean(MONITOR_STATE);
 	}
 
@@ -361,6 +363,7 @@ public class MonitorControl implements IMonitorControl {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#refresh()
 	 */
+	@Override
 	public void refresh() {
 		fMonitorJob.refresh();
 	}
@@ -370,6 +373,7 @@ public class MonitorControl implements IMonitorControl {
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#save()
 	 */
+	@Override
 	public void save() {
 		final XMLMemento memento = XMLMemento.createWriteRoot(MONITOR_ATTR);
 
@@ -403,7 +407,7 @@ public class MonitorControl implements IMonitorControl {
 
 	private void saveJob(JobStatusData job, IMemento memento) {
 		final IMemento jobMemento = memento.createChild(JOB_ATTR, job.getJobId());
-		jobMemento.putString(JobStatusData.CONTROL_TYPE_ATTR, job.getControlType());
+		jobMemento.putString(JobStatusData.CONFIGURATION_NAME_ATTR, job.getConfigurationName());
 		jobMemento.putString(JobStatusData.STATE_ATTR, job.getState());
 		jobMemento.putString(JobStatusData.STATE_DETAIL_ATTR, job.getStateDetail());
 		jobMemento.putString(JobStatusData.STDOUT_REMOTE_FILE_ATTR, job.getOutputPath());
@@ -415,9 +419,9 @@ public class MonitorControl implements IMonitorControl {
 	}
 
 	private void saveState(IMemento memento) {
-		memento.putString(REMOTE_SERVICES_ID_ATTR, getRemoteServicesId());
-		memento.putString(CONNECTION_NAME_ATTR, getConnectionName());
-		memento.putString(SYSTEM_TYPE_ATTR, getSystemType());
+		memento.putString(JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId());
+		memento.putString(JobStatusData.CONNECTION_NAME_ATTR, getConnectionName());
+		memento.putString(JobStatusData.CONFIGURATION_NAME_ATTR, getConfigurationName());
 		memento.putBoolean(MONITOR_STATE, isActive());
 	}
 
@@ -428,6 +432,7 @@ public class MonitorControl implements IMonitorControl {
 	 * org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setConnectionName
 	 * (java.lang.String)
 	 */
+	@Override
 	public void setConnectionName(String connName) {
 		fConnectionName = connName;
 	}
@@ -439,6 +444,7 @@ public class MonitorControl implements IMonitorControl {
 	 * org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setRemoteServicesId
 	 * (java.lang.String)
 	 */
+	@Override
 	public void setRemoteServicesId(String id) {
 		fRemoteServicesId = id;
 	}
@@ -446,12 +452,11 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setSystemType(java
-	 * .lang.String)
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setConfigurationName(java.lang.String)
 	 */
-	public void setSystemType(String type) {
-		fSystemType = type;
+	@Override
+	public void setConfigurationName(String name) {
+		fConfigurationName = name;
 	}
 
 	/*
@@ -461,12 +466,13 @@ public class MonitorControl implements IMonitorControl {
 	 * org.eclipse.ptp.core.monitors.IMonitorControl#start(org.eclipse.core.
 	 * runtime.IProgressMonitor)
 	 */
+	@Override
 	public void start(IProgressMonitor monitor) throws CoreException {
 		if (!isActive()) {
 			SubMonitor progress = SubMonitor.convert(monitor, 30);
 			try {
 				ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(getRemoteServicesId(),
-						getConnectionName(), getSystemType());
+						getConnectionName(), getConfigurationName());
 
 				if (controller == null) {
 					throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
@@ -544,6 +550,7 @@ public class MonitorControl implements IMonitorControl {
 	 * 
 	 * @see org.eclipse.ptp.core.monitors.IMonitorControl#stop()
 	 */
+	@Override
 	public void stop() throws CoreException {
 		if (isActive()) {
 			JobManager.getInstance().removeListener(fJobListener);

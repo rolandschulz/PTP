@@ -21,11 +21,12 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class AddMonitorHandler extends AbstractHandler implements IHandler {
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		AddMonitorDialog dialog = new AddMonitorDialog(HandlerUtil.getActiveShell(event));
 		if (dialog.open() == Dialog.OK) {
 			MonitorControlManager.getInstance().createMonitorControl(dialog.getRemoteConnection().getRemoteServices().getId(),
-					dialog.getRemoteConnection().getName(), dialog.getSystemType());
+					dialog.getRemoteConnection().getName(), dialog.getConfigurationName());
 		}
 		return null;
 	}
