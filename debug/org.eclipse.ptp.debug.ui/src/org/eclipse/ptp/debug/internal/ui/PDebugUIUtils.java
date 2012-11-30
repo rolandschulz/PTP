@@ -44,7 +44,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
-import org.eclipse.ptp.core.resources.FileStorage;
 import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
@@ -238,7 +237,7 @@ public class PDebugUIUtils {
 				return new FileEditorInput(file);
 			}
 		}
-		if (element instanceof FileStorage || element instanceof LocalFileStorage) {
+		if (element instanceof LocalFileStorage) {
 			return new ExternalEditorInput(((IStorage) element).getFullPath());
 		}
 		if (element instanceof PSourceNotFoundElement) {

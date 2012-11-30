@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
@@ -124,11 +123,4 @@ public interface IJobManager extends IElementManager {
 	 *            the current job to set
 	 */
 	public void setJob(IPJob job);
-
-	/**
-	 * Terminate the currently selected job.
-	 * 
-	 * @throws CoreException
-	 */
-	public void terminateJob() throws CoreException;
 }

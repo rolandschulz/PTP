@@ -21,10 +21,10 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
             class="org.eclipse.ptp.rm.jaxb.ui.JAXBRMPreferencesPage"
             id="org.eclipse.ptp.rm.jaxb.ui.JAXBRMPreferencesPage"
-            name="Configurable Resource Manager (JAXB)">
+            name="%PreferencePage.name">
       </page>
    </extension>
 

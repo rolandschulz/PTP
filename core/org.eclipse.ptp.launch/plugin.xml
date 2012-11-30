@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-   <extension-point id="rmLaunchConfigurations" name="Resource Manager Launch Configurations" schema="schema/rmLaunchConfigurations.exsd"/>
 	<extension
 		point="org.eclipse.debug.core.launchConfigurationTypes">
 		<launchConfigurationType
@@ -12,25 +11,6 @@
 	        sourcePathComputerId="org.eclipse.ptp.debug.core.sourcePathComputer">
 		</launchConfigurationType>
 	</extension>
-	
-   <extension
-         point="org.eclipse.debug.core.launchDelegates">
-      <launchDelegate
-            delegate="org.eclipse.ptp.launch.ParallelLaunchConfigurationDelegate"
-            delegateDescription="%ParallelLaunchDelegate.desc"
-            id="org.eclipse.ptp.launch.parallelLaunch.legacy"
-            name="%ParallelLaunchDelegate.name"
-            type="org.eclipse.ptp.launch.parallelLaunch">
-         <modeCombination
-               modes="run"
-               perspective="org.eclipse.ptp.ui.PTPRunPerspective">
-         </modeCombination>
-         <modeCombination
-               modes="debug"
-               perspective="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
-         </modeCombination>
-      </launchDelegate>
-   </extension>
 
 	<extension
 		point="org.eclipse.debug.ui.launchConfigurationTypeImages">
@@ -76,60 +56,86 @@
    </extension>
    
    <extension
+         point="org.eclipse.debug.core.launchDelegates">
+      <launchDelegate
+            delegate="org.eclipse.ptp.launch.ParallelLaunchConfigurationDelegate"
+            delegateDescription="%ParallelLaunchDelegate.desc"
+            id="org.eclipse.ptp.launch.parallelLaunch"
+            modes="run,debug"
+            name="%ParallelLaunchDelegate.name"
+            type="org.eclipse.ptp.launch.parallelLaunch">
+         <modeCombination
+               modes="run"
+               perspective="org.eclipse.ptp.rm.lml.ui.systemMonitoringPerspective">
+         </modeCombination>
+         <modeCombination
+               modes="debug"
+               perspective="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+         </modeCombination>
+      </launchDelegate>
+   </extension>
+
+   <!-- 
+        Tab ID's specified in the extension must be unique (across plugins), even if they are 
+        not the same as the ID specified by the getId() method in the class. However, the 
+        'placement' element MUST use the ID specified by the class. It all seems a bit clunky, 
+        but it seems to work.
+   -->
+   <extension
          point="org.eclipse.debug.ui.launchConfigurationTabs">
-      <!-- run mode tabs -->
+      <!-- Tabs for run mode -->
       <tab
-            class="org.eclipse.ptp.launch.ui.ResourcesTab"
+            class="org.eclipse.ptp.launch.ui.tabs.ResourcesTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.launch.applicationLaunch.resourcesTab"
             name="%ResourcesLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
-       </tab>
+      </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.ApplicationTab"
+            class="org.eclipse.ptp.launch.ui.tabs.ApplicationTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.applicationTab"
+            id="org.eclipse.ptp.rm.launch.applicationLaunch.applicationTab"
             name="%ApplicationLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.resourcesTab">
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.ArgumentsTab"
+            class="org.eclipse.ptp.launch.ui.tabs.ArgumentsTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.argumentsTab"
+            id="org.eclipse.ptp.rm.launch.applicationLaunch.argumentsTab"
             name="%ArgumentsLaunchTab.name">
-          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+         <associatedDelegate
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.applicationTab">
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.EnvironmentTab"
+            class="org.eclipse.ptp.launch.ui.tabs.EnvironmentTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.environmentTab"
+            id="org.eclipse.ptp.launch.rm.environmentTab"
             name="%EnvironmentLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.argumentsTab">
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.EnhancedSynchronizeTab"
+            class="org.eclipse.ptp.launch.ui.tabs.EnhancedSynchronizeTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.synchronizeTab"
+            id="org.eclipse.ptp.launch.rm.synchronizeTab"
             name="%SynchronizeLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.environmentTab">
@@ -138,80 +144,80 @@
       <tab
             class="org.eclipse.debug.ui.CommonTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.commonTab"
+            id="org.eclipse.ptp.launch.commonTab"
             name="%CommonLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.synchronizeTab">
          </placement>
       </tab>
-      <!-- debug mode tabs -->
+      <!-- tabs for debug mode -->
       <tab
-            class="org.eclipse.ptp.launch.ui.ResourcesTab"
+            class="org.eclipse.ptp.launch.ui.tabs.ResourcesTab"
             group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.launch.applicationLaunch.resourcesTab"
             name="%ResourcesLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.ApplicationTab"
+            class="org.eclipse.ptp.launch.ui.tabs.ApplicationTab"
             group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.applicationTab"
+            id="org.eclipse.ptp.rm.launch.applicationLaunch.applicationTab"
             name="%ApplicationLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.resourcesTab">
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.ArgumentsTab"
+            class="org.eclipse.ptp.launch.ui.tabs.ArgumentsTab"
             group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.argumentsTab"
+            id="org.eclipse.ptp.rm.launch.applicationLaunch.argumentsTab"
             name="%ArgumentsLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.applicationTab">
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.ApplicationDebuggerTab"
+            class="org.eclipse.ptp.launch.ui.tabs.ApplicationDebuggerTab"
             group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.debuggerTab"
+            id="org.eclipse.ptp.launch.debuggerTab"
             name="%DebuggerLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.argumentsTab">
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.EnvironmentTab"
+            class="org.eclipse.ptp.launch.ui.tabs.EnvironmentTab"
             group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.launch.applicationLaunch.environmentTab"
             name="%EnvironmentLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.debuggerTab">
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.EnhancedSynchronizeTab"
+            class="org.eclipse.ptp.launch.ui.tabs.EnhancedSynchronizeTab"
             group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.synchronizeTab"
+            id="org.eclipse.ptp.launch.synchronizeTab"
             name="%SynchronizeLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.environmentTab">
@@ -220,10 +226,10 @@
       <tab
             class="org.eclipse.debug.ui.sourcelookup.SourceLookupTab"
             group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
-            id="org.eclipse.debug.ui.sourceLookupTab"
+            id="org.eclipse.ptp.launch.sourceLookupTab"
             name="%SourceLookupLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.synchronizeTab">
@@ -232,16 +238,17 @@
       <tab
             class="org.eclipse.debug.ui.CommonTab"
             group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.commonTabDebug"
+            id="org.eclipse.ptp.launch.commonTab"
             name="%CommonLaunchTab.name">
          <associatedDelegate
-               delegate="org.eclipse.ptp.launch.parallelLaunch.legacy">
+               delegate="org.eclipse.ptp.launch.parallelLaunch">
          </associatedDelegate>
          <placement
                after="org.eclipse.debug.ui.sourceLookupTab">
          </placement>
       </tab>
    </extension>
+   
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer

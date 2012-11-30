@@ -20,14 +20,7 @@ package org.eclipse.ptp.internal.ui.adapters;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.internal.ui.ParallelImages;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.ui.IRuntimeModelPresentation;
-import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.ptp.utils.ui.ImageImageDescriptor;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.WorkbenchAdapter;
 
 public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
@@ -51,20 +44,6 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
-		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(
-				((IPResourceManager) object).getControlId());
-		if (rm != null) {
-			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
-					rm.getResourceManagerId());
-			if (presentation != null) {
-				final Image image = presentation.getImage(object);
-				if (image != null) {
-					return new ImageImageDescriptor(image);
-				}
-			}
-			final String state = rm.getState();
-			return new ImageImageDescriptor(ParallelImages.rmImages.get(state));
-		}
 		return null;
 	}
 
@@ -75,23 +54,6 @@ public class PResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	 */
 	@Override
 	public String getLabel(Object object) {
-		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(
-				((IPResourceManager) object).getControlId());
-		if (rm != null) {
-			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
-					rm.getResourceManagerId());
-			if (presentation != null) {
-				final String label = presentation.getText(object);
-				if (label != null) {
-					return label;
-				}
-			}
-			final String type = rm.getConfiguration().getType();
-			if (type == null) {
-				return rm.getName();
-			}
-			return rm.getName() + " (" + type + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
 		return null;
 	}
 

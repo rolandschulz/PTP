@@ -24,8 +24,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.ptp.core.IModelPresentation;
-import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.listeners.ISetListener;
@@ -40,7 +38,6 @@ import org.eclipse.swt.graphics.Image;
  * 
  */
 public abstract class AbstractElementManager implements IElementManager {
-	protected IModelPresentation modelPresentation = null;
 	protected String cur_set_id = EMPTY_ID;
 	protected ListenerList setListeners = new ListenerList();
 	protected ListenerList jListeners = new ListenerList();
@@ -50,7 +47,6 @@ public abstract class AbstractElementManager implements IElementManager {
 	 * Constructor
 	 */
 	public AbstractElementManager() {
-		modelPresentation = ModelManager.getInstance();
 	}
 
 	/*
@@ -122,8 +118,8 @@ public abstract class AbstractElementManager implements IElementManager {
 	 */
 	public void fireJobChangedEvent(final int type, final String cur_job_id, final String pre_job_id) {
 		Object[] array = jListeners.getListeners();
-		for (int i = 0; i < array.length; i++) {
-			final IJobChangedListener listener = (IJobChangedListener) array[i];
+		for (Object element : array) {
+			final IJobChangedListener listener = (IJobChangedListener) element;
 			SafeRunner.run(new SafeRunnable() {
 				public void run() {
 					listener.jobChangedEvent(type, cur_job_id, pre_job_id);
@@ -140,8 +136,8 @@ public abstract class AbstractElementManager implements IElementManager {
 	 */
 	public void fireSetEvent(final int eventType, final IElement[] elements, final IElementSet cur_set, final IElementSet pre_set) {
 		Object[] array = setListeners.getListeners();
-		for (int i = 0; i < array.length; i++) {
-			final ISetListener setListener = (ISetListener) array[i];
+		for (Object element : array) {
+			final ISetListener setListener = (ISetListener) element;
 			SafeRunner.run(new SafeRunnable() {
 				public void run() {
 					switch (eventType) {

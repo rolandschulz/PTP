@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
@@ -38,11 +37,7 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.model.PProcessUI;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 import org.eclipse.ptp.ui.IJobManager;
-import org.eclipse.ptp.ui.IRuntimeModelPresentation;
-import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.Element;
@@ -151,10 +146,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 		}
 		IPJob job = getJob();
 		if (job != null) {
-			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
-			if (rm != null) {
-				return rm.getName() + ": " + job.getName(); //$NON-NLS-1$
-			}
+			return job.getName(); //$NON-NLS-1$
 		}
 		return ""; //$NON-NLS-1$
 	}
@@ -268,17 +260,6 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public Image getImage(IElement element) {
 		IPJob job = getJob();
 		if (job != null) {
-			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
-			if (rm != null) {
-				final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
-						rm.getResourceManagerId());
-				if (presentation != null) {
-					final Image image = presentation.getImage(element);
-					if (image != null) {
-						return image;
-					}
-				}
-			}
 			IPElement pElement = element.getPElement();
 			// FIXME PProcessUI goes away when we address UI scalability. See
 			// Bug 311057
@@ -474,7 +455,6 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	@Override
 	public void shutdown() {
 		clear();
-		modelPresentation = null;
 		super.shutdown();
 	}
 
@@ -485,24 +465,6 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 */
 	public int size() {
 		return jobList.size();
-	}
-
-	/*******************************************************************************************************************************************************************************************************************************************************************************************************
-	 * terminate action
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.ui.IJobManager#terminateJob()
-	 */
-	public void terminateJob() throws CoreException {
-		IPJob job = getJob();
-		if (job != null) {
-			IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(job.getControlId());
-			if (rm != null) {
-				rm.control(job.getID(), IResourceManagerControl.TERMINATE_OPERATION, null);
-			}
-		}
 	}
 
 	/**

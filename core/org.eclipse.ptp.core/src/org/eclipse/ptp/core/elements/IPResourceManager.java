@@ -25,14 +25,13 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 
 /**
  * Resource manager in the IP* hierarchy
  * 
  * @since 5.0
  */
-public interface IPResourceManager extends IPElement, IAdaptable, IResourceManagerMenuContribution {
+public interface IPResourceManager extends IPElement, IAdaptable {
 
 	/**
 	 * Add a listener for child events.

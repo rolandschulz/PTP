@@ -26,7 +26,7 @@ Export-Package: org.eclipse.ptp.rm.jaxb.core;
    org.eclipse.ptp.rm.lml.monitor.core,
    org.eclipse.ptp.rm.lml.monitor.ui,
    org.eclipse.ptp.rm.lml.ui,
-   org.eclipse.ptp.rm.launch",
+   org.eclipse.ptp.launch",
  org.eclipse.ptp.rm.jaxb.core.data;
   x-friends:="org.eclipse.ptp.rm.jaxb.control.core,
    org.eclipse.ptp.rm.jaxb.control.ui,
@@ -37,4 +37,4 @@ Export-Package: org.eclipse.ptp.rm.jaxb.core;
    org.eclipse.ptp.rm.lml.monitor.core,
    org.eclipse.ptp.rm.lml.monitor.ui,
    org.eclipse.ptp.rm.lml.ui,
-   org.eclipse.ptp.rm.launch"
+   org.eclipse.ptp.launch"

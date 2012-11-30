@@ -30,8 +30,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.ui.managers.JobManager;
-import org.eclipse.ptp.ui.managers.MachineManager;
-import org.eclipse.ptp.ui.managers.RMManager;
 import org.eclipse.ptp.ui.utils.DebugUtil;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
@@ -136,9 +134,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 
 	// Resource bundle.
 	private final HashMap<String, IRuntimeModelPresentation> runtimeModelPresentations = new HashMap<String, IRuntimeModelPresentation>();
-	private IMachineManager machineManager = null;
 	private IJobManager jobManager = null;
-	private RMManager rmManager = null;
 
 	public PTPUIPlugin() {
 		super();
@@ -155,30 +151,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 			jobManager = new JobManager();
 		}
 		return jobManager;
-	}
-
-	/**
-	 * Get the machine manager instance
-	 * 
-	 * @return machine manager
-	 */
-	public IMachineManager getMachineManager() {
-		if (machineManager == null) {
-			machineManager = new MachineManager();
-		}
-		return machineManager;
-	}
-
-	/**
-	 * Get the RM manager instance
-	 * 
-	 * @return RM manager
-	 */
-	public RMManager getRMManager() {
-		if (rmManager == null) {
-			rmManager = new RMManager();
-		}
-		return rmManager;
 	}
 
 	/**
@@ -216,12 +188,8 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
-		getMachineManager().shutdown();
 		getJobManager().shutdown();
-		getRMManager().shutdown();
-		machineManager = null;
 		jobManager = null;
-		rmManager = null;
 		plugin = null;
 	}
 

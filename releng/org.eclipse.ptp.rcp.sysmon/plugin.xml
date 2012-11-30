@@ -93,7 +93,7 @@
    <extension
          point="org.eclipse.debug.core.launchDelegates">
       <launchDelegate
-            delegate="org.eclipse.ptp.rm.launch.ParallelLaunchConfigurationDelegate"
+            delegate="org.eclipse.ptp.launch.ParallelLaunchConfigurationDelegate"
             delegateDescription="%ParallelLaunchDelegate.desc"
             id="org.eclipse.ptp.rcp.sysmon.launch"
             modes="run"
@@ -112,7 +112,7 @@
          point="org.eclipse.debug.ui.launchConfigurationTabs">
       <!-- Tabs for run mode -->
       <tab
-            class="org.eclipse.ptp.rm.launch.ui.ResourcesTab"
+            class="org.eclipse.ptp.launch.ui.tabs.ResourcesTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.rcp.sysmon.resourcesTab"
             name="%ResourcesLaunchTab.name">
@@ -129,11 +129,11 @@
                delegate="org.eclipse.ptp.rcp.sysmon.launch">
          </associatedDelegate>
          <placement
-               after="org.eclipse.ptp.rm.launch.applicationLaunch.resourcesTab">
+               after="org.eclipse.ptp.launch.applicationLaunch.resourcesTab">
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.rm.launch.ui.ArgumentsTab"
+            class="org.eclipse.ptp.launch.ui.tabs.ArgumentsTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.rcp.sysmon.argumentsTab"
             name="%ArgumentsLaunchTab.name">
@@ -145,7 +145,7 @@
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.EnvironmentTab"
+            class="org.eclipse.ptp.launch.ui.tabs.EnvironmentTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.rcp.sysmon.environmentTab"
             name="%EnvironmentLaunchTab.name">
@@ -153,11 +153,11 @@
                delegate="org.eclipse.ptp.rcp.sysmon.launch">
          </associatedDelegate>
          <placement
-               after="org.eclipse.ptp.rm.launch.applicationLaunch.argumentsTab">
+               after="org.eclipse.ptp.launch.applicationLaunch.argumentsTab">
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.EnhancedSynchronizeTab"
+            class="org.eclipse.ptp.launch.ui.tabs.EnhancedSynchronizeTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.rcp.sysmon.synchronizeTab"
             name="%SynchronizeLaunchTab.name">

@@ -15,7 +15,7 @@ import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.PreferencesAdapter;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.PreferenceConstants;
-import org.eclipse.ptp.launch.messages.Messages;
+import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;

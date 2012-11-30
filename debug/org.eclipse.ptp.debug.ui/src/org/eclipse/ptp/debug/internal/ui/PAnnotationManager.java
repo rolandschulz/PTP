@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +48,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.ptp.core.resources.FileStorage;
 import org.eclipse.ptp.debug.core.IPDebugEventListener;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -138,8 +136,8 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 */
 	protected void clearAllAnnotations() {
 		synchronized (LOCK) {
-			for (Iterator<AnnotationGroup> i = annotationMap.values().iterator(); i.hasNext();) {
-				i.next().removeAnnotations();
+			for (AnnotationGroup annotationGroup : annotationMap.values()) {
+				annotationGroup.removeAnnotations();
 			}
 			annotationMap.clear();
 		}
@@ -532,9 +530,6 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			}
 			if (object instanceof LocalFileStorage) {
 				return ((LocalFileStorage) object).getFullPath();
-			}
-			if (object instanceof FileStorage) {
-				return ((FileStorage) object).getFullPath();
 			}
 		}
 		return new Path(filename);
@@ -1161,8 +1156,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			try {
 				session.getPDISession().getEventRequestManager().addEventRequest(request);
 				Map<TaskSet, Object> map = request.getResultMap(tasks);
-				for (Iterator<TaskSet> i = map.keySet().iterator(); i.hasNext();) {
-					TaskSet sTasks = i.next();
+				for (TaskSet sTasks : map.keySet()) {
 					Object value = map.get(sTasks);
 					if (value instanceof ProxyDebugStackFrame[]) {
 						ProxyDebugStackFrame[] frames = (ProxyDebugStackFrame[]) value;

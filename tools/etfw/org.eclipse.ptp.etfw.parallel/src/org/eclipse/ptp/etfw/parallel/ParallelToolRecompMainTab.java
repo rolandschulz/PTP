@@ -29,7 +29,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.parallel.messages.Messages;
-import org.eclipse.ptp.rm.launch.ui.ApplicationTab;
+import org.eclipse.ptp.launch.ui.tabs.ApplicationTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -193,8 +193,8 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 
 		IConfiguration[] confs = info.getManagedProject().getConfigurations();
 
-		for (int i = 0; i < confs.length; i++) {
-			buildConfCombo.add(confs[i].getName());
+		for (IConfiguration conf : confs) {
+			buildConfCombo.add(conf.getName());
 		}
 	}
 

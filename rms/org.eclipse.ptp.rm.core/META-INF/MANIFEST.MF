@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.core;singleton:=true
-Bundle-Version: 4.0.0.qualifier
+Bundle-Version: 5.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.core.RMCorePlugin
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -16,9 +16,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.proxy.protocol;bundle-version="2.0.0"
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.rm.core,
- org.eclipse.ptp.rm.core.proxy,
- org.eclipse.ptp.rm.core.rmsystem,
- org.eclipse.ptp.rm.core.rtsystem,
  org.eclipse.ptp.rm.core.utils
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

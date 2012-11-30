@@ -153,8 +153,7 @@ public class PTPCorePlugin extends Plugin {
 			String arch = Platform.getOSArch();
 			String frag_os_arch = fragment + "." + os + "." + arch; //$NON-NLS-1$ //$NON-NLS-2$
 
-			for (int i = 0; i < frags.length; i++) {
-				Bundle frag = frags[i];
+			for (Bundle frag : frags) {
 				URL path = frag.getEntry("/"); //$NON-NLS-1$
 				try {
 					URL local_path = FileLocator.toFileURL(path);
@@ -207,7 +206,6 @@ public class PTPCorePlugin extends Plugin {
 			public void doneSaving(ISaveContext saveContext) {
 			}
 		});
-		ModelManager.getInstance().start();
 	}
 
 	/**
@@ -216,7 +214,6 @@ public class PTPCorePlugin extends Plugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		try {
-			ModelManager.getInstance().shutdown();
 			Preferences.savePreferences(getUniqueIdentifier());
 			ResourcesPlugin.getWorkspace().removeSaveParticipant(getUniqueIdentifier());
 		} finally {

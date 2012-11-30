@@ -40,7 +40,7 @@
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.ArgumentsTab"
+            class="org.eclipse.ptp.rm.launch.ui.ArgumentsTab"
             group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.argumentsTab"
             name="%ArgumentsLaunchTab.name">

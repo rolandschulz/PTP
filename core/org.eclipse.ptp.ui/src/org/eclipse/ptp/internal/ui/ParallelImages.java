@@ -19,11 +19,8 @@
 package org.eclipse.ptp.internal.ui;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.utils.ui.ImageManager;
 import org.eclipse.swt.graphics.Image;
@@ -235,15 +232,4 @@ public class ParallelImages {
 	public static Image[] machineImages = { ImageManager.getImage(ParallelImages.IMG_MACHINE_UP),
 			ImageManager.getImage(ParallelImages.IMG_MACHINE_DOWN), ImageManager.getImage(ParallelImages.IMG_MACHINE_ALERT),
 			ImageManager.getImage(ParallelImages.IMG_MACHINE_ERROR), ImageManager.getImage(ParallelImages.IMG_MACHINE_UNKNOWN) };
-
-	// RESOURCE MANAGERS
-	@SuppressWarnings("serial")
-	public static Map<String, Image> rmImages = new HashMap<String, Image>() {
-		{
-			put(IResourceManager.STOPPED_STATE, ImageManager.getImage(ParallelImages.IMG_RM_STOPPED));
-			put(IResourceManager.STARTED_STATE, ImageManager.getImage(ParallelImages.IMG_RM_STARTED));
-			put(IResourceManager.STARTING_STATE, ImageManager.getImage(ParallelImages.IMG_RM_STARTING));
-			put(IResourceManager.ERROR_STATE, ImageManager.getImage(ParallelImages.IMG_RM_ERROR));
-		}
-	};
 }

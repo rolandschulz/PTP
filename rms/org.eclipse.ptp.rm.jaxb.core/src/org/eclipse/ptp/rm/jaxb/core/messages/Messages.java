@@ -14,15 +14,11 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.jaxb.core.messages.messages"; //$NON-NLS-1$
 
-	public static String FailedToCreateRmData;
 	public static String PublicId;
 	public static String SystemId;
 	public static String LineNumber;
 	public static String ColumnNumber;
 	public static String Message;
-
-	public static String UsingCachedDefinition;
-	public static String CachedDefinitionWarning;
 
 	public static String ForceXmlReload;
 	public static String ShowSegmentPattern;

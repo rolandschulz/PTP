@@ -36,7 +36,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
-import org.eclipse.ptp.launch.messages.Messages;
+import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 

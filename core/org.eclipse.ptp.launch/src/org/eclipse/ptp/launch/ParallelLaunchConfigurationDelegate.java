@@ -1,20 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California.
- * This material was produced under U.S. Government contract W-7405-ENG-36
- * for Los Alamos National Laboratory, which is operated by the University
- * of California for the U.S. Department of Energy. The U.S. Government has
- * rights to use, reproduce, and distribute this software. NEITHER THE
- * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly marked,
- * so as not to confuse it with the version available from LANL.
- *
- * Additionally, this program and the accompanying materials
+ * Copyright (c) 2012 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * LA-CC 04-115
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 package org.eclipse.ptp.launch;
 
@@ -29,33 +21,28 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
+import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.IPSession;
+import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.launch.internal.RuntimeProcess;
-import org.eclipse.ptp.launch.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.launch.internal.messages.Messages;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
 
 /**
  * A launch configuration delegate for launching jobs via the PTP resource manager mechanism.
@@ -89,8 +76,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				String cwd = LaunchUtils.getWorkingDirectory(fLaunch.getLaunchConfiguration());
 				String[] args = LaunchUtils.getProgramArguments(fLaunch.getLaunchConfiguration());
 
-				switchPerspective(DebugUITools.getLaunchPerspective(fLaunch.getLaunchConfiguration().getType(),
-						fLaunch.getLaunchMode()));
+				switchPerspective(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG,
+						Messages.ParallelLaunchConfigurationDelegate_OpenDebugPerspective,
+						PreferenceConstants.PREF_SWITCH_TO_DEBUG_PERSPECTIVE, false);
 
 				session.connectToDebugger(subMon.newChild(8), app, path, cwd, args);
 			} catch (CoreException e) {
@@ -105,9 +93,90 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
+	 * doCleanupLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch)
+	 */
+
+	@Override
+	protected void doCleanupLaunch(IPLaunch launch) {
+		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
+			try {
+				terminateDebugSession(launch.getJobId());
+				IPDebugConfiguration debugConfig = getDebugConfig(launch.getLaunchConfiguration());
+				IPDebugger debugger = debugConfig.getDebugger();
+				debugger.cleanup(launch);
+			} catch (CoreException e) {
+				PTPLaunchPlugin.log(e);
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
+	 * doCompleteJobLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.ptp.debug.core.IPDebugger)
+	 */
+
+	@Override
+	protected void doCompleteJobLaunch(final IPLaunch launch, final IPDebugger debugger) {
+		final String jobId = launch.getJobId();
+		final ILaunchConfiguration configuration = launch.getLaunchConfiguration();
+
+		/*
+		 * Used by org.eclipse.ptp.ui.IJobManager#removeJob
+		 */
+		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), jobId);
+
+		/*
+		 * Create process that is used by the DebugPlugin for handling console output. This process gets added to the debug session
+		 * so that it is also displayed in the Debug View as the system process.
+		 */
+		new RuntimeProcess(launch, null);
+
+		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
+			try {
+				setDefaultSourceLocator(launch, configuration);
+				final IProject project = verifyProject(configuration);
+
+				final DebuggerSession session = new DebuggerSession(jobId, launch, project, debugger);
+				Display.getDefault().asyncExec(new Runnable() {
+
+					public void run() {
+						try {
+							new ProgressMonitorDialog(PTPLaunchPlugin.getActiveWorkbenchShell()).run(true, true, session);
+						} catch (InterruptedException e) {
+							terminateJob(launch);
+						} catch (InvocationTargetException e) {
+							PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_0, e.getTargetException());
+							PTPLaunchPlugin.log(e.getCause());
+							terminateJob(launch);
+						}
+					}
+				});
+			} catch (final CoreException e) {
+				/*
+				 * Completion of launch fails, then terminate the job and display error message.
+				 */
+				Display.getDefault().asyncExec(new Runnable() {
+
+					public void run() {
+						PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_1, e.getStatus());
+						PTPLaunchPlugin.log(e);
+						terminateJob(launch);
+					}
+				});
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org. eclipse.debug.core.ILaunchConfiguration,
 	 * java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
 	 */
+
 	public void launch(final ILaunchConfiguration configuration, String mode, ILaunch launch, final IProgressMonitor monitor)
 			throws CoreException {
 		try {
@@ -123,48 +192,23 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				return;
 			}
 
-			/*
-			 * Allow user to start resource manager if not running.
-			 */
-			final IResourceManager rm = LaunchUtils.getResourceManager(configuration);
-			if (rm == null) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
-			}
-			if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
-				if (!Preferences.getBoolean(PTPLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START)) {
-					Display.getDefault().syncExec(new Runnable() {
-						public void run() {
-							MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(Display.getDefault()
-									.getActiveShell(), Messages.ParallelLaunchConfigurationDelegate_Confirm_start, NLS.bind(
-									Messages.ParallelLaunchConfigurationDelegate_RM_currently_stopped, configuration.getName()),
-									Messages.ParallelLaunchConfigurationDelegate_Always_start, false, null, null);
-							if (dialog.getReturnCode() == IDialogConstants.OK_ID) {
-								startRM(rm);
-							}
-							if (dialog.getToggleState()) {
-								Preferences.setBoolean(PTPLaunchPlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START,
-										dialog.getReturnCode() == IDialogConstants.OK_ID);
-							}
-						}
-
-					});
-				} else {
-					startRM(rm);
-				}
-				if (!rm.getState().equals(IResourceManager.STARTED_STATE)) {
-					return;
-				}
-			}
-
 			progress.worked(10);
 			progress.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
 
-			verifyLaunchAttributes(configuration, mode, progress.newChild(10));
+			if (!verifyLaunchAttributes(configuration, mode, progress.newChild(10)) || progress.isCanceled()) {
+				return;
+			}
 
 			// All copy pre-"job submission" occurs here
 			copyExecutable(configuration, progress.newChild(10));
+			if (progress.isCanceled()) {
+				return;
+			}
+
 			doPreLaunchSynchronization(configuration, progress.newChild(10));
+			if (progress.isCanceled()) {
+				return;
+			}
 
 			IPDebugger debugger = null;
 
@@ -187,9 +231,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					if (progress.isCanceled()) {
 						return;
 					}
-				} else {
-					// switch perspective
-					switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
 				}
 
 				progress.worked(10);
@@ -214,99 +255,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	}
 
 	/**
-	 * Terminate a job.
-	 * 
-	 * @param job
-	 *            job to terminate
-	 */
-	private void terminateJob(IPLaunch launch) {
-		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(launch.getJobControl().getControlId());
-		if (rm != null) {
-			try {
-				rm.control(launch.getJobId(), IResourceManagerControl.TERMINATE_OPERATION, null);
-			} catch (CoreException e1) {
-				// Ignore, but log
-				PTPLaunchPlugin.log(e1);
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
-	 * doCleanupLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch)
-	 */
-	@Override
-	protected void doCleanupLaunch(IPLaunch launch) {
-		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
-			try {
-				IPDebugConfiguration debugConfig = getDebugConfig(launch.getLaunchConfiguration());
-				IPDebugger debugger = debugConfig.getDebugger();
-				debugger.cleanup(launch);
-			} catch (CoreException e) {
-				PTPLaunchPlugin.log(e);
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
-	 * doCompleteJobLaunch(org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.ptp.debug.core.IPDebugger)
-	 */
-	@Override
-	protected void doCompleteJobLaunch(final IPLaunch launch, final IPDebugger debugger) {
-		final String jobId = launch.getJobId();
-		final ILaunchConfiguration configuration = launch.getLaunchConfiguration();
-
-		/*
-		 * Used by org.eclipse.ptp.ui.IJobManager#removeJob
-		 */
-		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), jobId);
-
-		/*
-		 * Create process that is used by the DebugPlugin for handling console output. This process gets added to the debug session
-		 * so that it is also displayed in the Debug View as the system process.
-		 */
-		new RuntimeProcess(launch, null);
-
-		if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
-			try {
-				setDefaultSourceLocator(launch, configuration);
-				final IProject project = verifyProject(configuration);
-
-				final DebuggerSession session = new DebuggerSession(jobId, launch, project, debugger);
-				Display.getDefault().asyncExec(new Runnable() {
-					public void run() {
-						try {
-							new ProgressMonitorDialog(PTPLaunchPlugin.getActiveWorkbenchShell()).run(true, true, session);
-						} catch (InterruptedException e) {
-							terminateJob(launch);
-						} catch (InvocationTargetException e) {
-							PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_0, e.getTargetException());
-							PTPLaunchPlugin.log(e.getCause());
-							terminateJob(launch);
-						}
-					}
-				});
-			} catch (final CoreException e) {
-				/*
-				 * Completion of launch fails, then terminate the job and display error message.
-				 */
-				Display.getDefault().asyncExec(new Runnable() {
-					public void run() {
-						PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_1, e.getStatus());
-						PTPLaunchPlugin.log(e);
-						terminateJob(launch);
-					}
-				});
-			}
-		}
-	}
-
-	/**
 	 * Show the PTP Debug view
 	 * 
 	 * @param viewID
@@ -318,6 +266,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		}
 		if (display != null && !display.isDisposed()) {
 			display.syncExec(new Runnable() {
+
 				public void run() {
 					IWorkbenchWindow window = PTPLaunchPlugin.getActiveWorkbenchWindow();
 					if (window != null) {
@@ -335,64 +284,39 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	}
 
 	/**
-	 * Used to force switching to the PTP Debug perspective
+	 * Terminates a debug session
 	 * 
-	 * @param perspectiveID
+	 * @param jobId
+	 *            id of the session to terminate
+	 * @throws CoreException
 	 */
-	protected void switchPerspective(final String perspectiveID) {
-		if (perspectiveID != null) {
-			Display display = Display.getCurrent();
-			if (display == null) {
-				display = Display.getDefault();
-			}
-			if (display != null && !display.isDisposed()) {
-				display.syncExec(new Runnable() {
-					public void run() {
-						IWorkbenchWindow window = PTPLaunchPlugin.getActiveWorkbenchWindow();
-						if (window != null) {
-							IWorkbenchPage page = window.getActivePage();
-							if (page != null) {
-								if (page.getPerspective().getId().equals(perspectiveID)) {
-									return;
-								}
-
-								try {
-									window.getWorkbench().showPerspective(perspectiveID, window);
-								} catch (WorkbenchException e) {
-								}
-							}
-						}
-					}
-				});
+	private void terminateDebugSession(String jobId) throws CoreException {
+		PDebugModel model = PTPDebugCorePlugin.getDebugModel();
+		IPSession session = model.getSession(jobId);
+		if (session != null) {
+			TaskSet tasks = model.getTasks(session, IElementHandler.SET_ROOT_ID);
+			try {
+				session.getPDISession().terminate(tasks);
+			} catch (PDIException e) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), IStatus.ERROR,
+						e.getMessage(), null));
 			}
 		}
 	}
 
-	private void startRM(final IResourceManager rm) {
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				try {
-					rm.start(monitor);
-				} catch (CoreException e) {
-					throw new InvocationTargetException(e);
-				}
-				if (monitor.isCanceled()) {
-					throw new InterruptedException();
-				}
-			}
-		};
+	/**
+	 * Terminate a job.
+	 * 
+	 * @param job
+	 *            job to terminate
+	 */
+	private void terminateJob(IPLaunch launch) {
 		try {
-			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
-		} catch (InvocationTargetException e) {
-			Throwable t = e.getCause();
-			IStatus status = null;
-			if (t != null && t instanceof CoreException) {
-				status = ((CoreException) t).getStatus();
-			}
-			ErrorDialog.openError(Display.getDefault().getActiveShell(), Messages.ParallelLaunchConfigurationDelegate_Start_rm,
-					Messages.ParallelLaunchConfigurationDelegate_Failed_to_start, status);
-		} catch (InterruptedException e) {
-			// Do nothing. Operation has been canceled.
+			launch.getJobControl().control(launch.getJobId(), IJobControl.TERMINATE_OPERATION, null);
+		} catch (CoreException e1) {
+			// Ignore, but log
+			PTPLaunchPlugin.log(e1);
 		}
 	}
+
 }

@@ -20,6 +20,6 @@ Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.rm.lml.monitor.core;
   x-friends:="org.eclipse.ptp.rm.jaxb.tests,
    org.eclipse.ptp.rm.lml.monitor.ui,
-   org.eclipse.ptp.rm.launch,
+   org.eclipse.ptp.launch,
    org.eclipse.ptp.rm.lml_jaxb",
  org.eclipse.ptp.rm.lml.monitor.core.listeners;x-friends:="org.eclipse.ptp.rm.lml.monitor.ui"

@@ -1,20 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California.
- * This material was produced under U.S. Government contract W-7405-ENG-36
- * for Los Alamos National Laboratory, which is operated by the University
- * of California for the U.S. Department of Energy. The U.S. Government has
- * rights to use, reproduce, and distribute this software. NEITHER THE
- * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly marked,
- * so as not to confuse it with the version available from LANL.
- *
- * Additionally, this program and the accompanying materials
+ * Copyright (c) 2012 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * LA-CC 04-115
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 package org.eclipse.ptp.launch;
 
@@ -46,8 +38,12 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.ModelManager;
+import org.eclipse.ptp.core.PreferencesAdapter;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
@@ -58,7 +54,7 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.launch.messages.Messages;
+import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 import org.eclipse.ptp.launch.rulesengine.RuleActionFactory;
@@ -68,9 +64,15 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
+import org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl;
+import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
+import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 
 /**
  *
@@ -78,6 +80,7 @@ import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 public abstract class AbstractParallelLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 	private final class JobListener implements IJobListener {
+
 		public void jobAdded(IJobStatus status) {
 			// Nothing to do
 		}
@@ -111,12 +114,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	private class JobSubmission extends Job {
 		private final IPLaunch fLaunch;
 		private final IPDebugger fDebugger;
+		private final ILaunchController fLaunchControl;
 		private final ReentrantLock fSubLock = new ReentrantLock();
 		private final Condition fSubCondition = fSubLock.newCondition();
 
-		public JobSubmission(IPLaunch launch, IPDebugger debugger) {
+		public JobSubmission(IPLaunch launch, ILaunchController control, IPDebugger debugger) {
 			super(launch.getJobId());
 			fLaunch = launch;
+			fLaunchControl = control;
 			fDebugger = debugger;
 			setSystem(true);
 		}
@@ -135,25 +140,23 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		 * 
 		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime. IProgressMonitor)
 		 */
+
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor subMon = SubMonitor.convert(monitor, 100);
 			try {
-				IResourceManagerControl rm = ModelManager.getInstance().getResourceManagerFromUniqueName(
-						fLaunch.getJobControl().getControlId());
 				String jobId = fLaunch.getJobId();
 				fSubLock.lock();
 				try {
-					while (rm.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
+					while (fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
 							&& !subMon.isCanceled()) {
 						try {
-							fSubCondition.await(100, TimeUnit.MILLISECONDS);
+							fSubCondition.await(500, TimeUnit.MILLISECONDS);
 						} catch (InterruptedException e) {
 							// Expect to be interrupted if monitor is canceled
 						}
 					}
 				} catch (CoreException e) {
-					// getJobStatus failed, so assume it is finished
 				} finally {
 					fSubLock.unlock();
 				}
@@ -163,7 +166,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 
 					fSubLock.lock();
 					try {
-						while (!rm.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
+						while (!fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
 								&& !subMon.isCanceled()) {
 							try {
 								fSubCondition.await(1000, TimeUnit.MILLISECONDS);
@@ -173,7 +176,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 							}
 						}
 					} catch (CoreException e) {
-						// getJobStatus failed, so assume it is finished
 					} finally {
 						fSubLock.unlock();
 					}
@@ -195,13 +197,19 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						 */
 						doCleanupLaunch(fLaunch);
 
+						try {
+							fLaunchControl.stop();
+						} catch (CoreException e) {
+							// Nothing we can do now
+						}
+
 						/*
 						 * Remove job submission
 						 */
 						synchronized (jobSubmissions) {
 							jobSubmissions.remove(jobId);
 							if (jobSubmissions.size() == 0) {
-								JobManager.getInstance().removeListener(rm.getControlConfiguration().getUniqueName(), fJobListener);
+								JobManager.getInstance().removeListener(fJobListener);
 							}
 						}
 					}
@@ -231,24 +239,16 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * @since 5.0
+	 * @param configuration
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
 	 */
 	public static IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
 			throws CoreException {
-		IResourceManager rm = LaunchUtils.getResourceManager(configuration);
-		if (rm != null) {
-			IResourceManagerComponentConfiguration conf = rm.getControlConfiguration();
-			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault()
-					.getRemoteServices(conf.getRemoteServicesId(), monitor);
-			if (remoteServices != null) {
-				IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
-				if (rconnMgr != null) {
-					IRemoteConnection rconn = rconnMgr.getConnection(conf.getConnectionName());
-					if (rconn != null && rconn.isOpen()) {
-						return remoteServices.getFileManager(rconn);
-					}
-				}
-			}
+		IRemoteConnection conn = RMLaunchUtils.getRemoteConnection(configuration, monitor);
+		if (conn != null) {
+			return conn.getRemoteServices().getFileManager(conn);
 		}
 		return null;
 	}
@@ -275,6 +275,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @see org.eclipse.debug.core.model.LaunchConfigurationDelegate#getLaunch(org .eclipse.debug.core.ILaunchConfiguration,
 	 * java.lang.String)
 	 */
+
 	@Override
 	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
 		return new PLaunch(configuration, mode, null);
@@ -479,6 +480,29 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
+	 * Returns the (possible empty) list of synchronization rule objects according to the rules described in the configuration.
+	 * 
+	 * @since 5.0
+	 */
+	protected ISynchronizationRule[] getSynchronizeRules(ILaunchConfiguration configuration) throws CoreException {
+		List<?> ruleStrings = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, new ArrayList<String>());
+		List<ISynchronizationRule> result = new ArrayList<ISynchronizationRule>();
+
+		for (Object ruleObj : ruleStrings) {
+			String element = (String) ruleObj;
+			try {
+				ISynchronizationRule rule = RuleFactory.createRuleFromString(element);
+				result.add(rule);
+			} catch (RuntimeException e) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_Error_converting_rules));
+			}
+		}
+
+		return result.toArray(new ISynchronizationRule[result.size()]);
+	}
+
+	/**
 	 * Create a source locator from the ID specified in the configuration, or create a default one if it hasn't been specified.
 	 * 
 	 * @param launch
@@ -530,32 +554,117 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @since 5.0
 	 */
 	protected void submitJob(ILaunchConfiguration configuration, String mode, IPLaunch launch, IPDebugger debugger,
-			IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 10);
+			IProgressMonitor progress) throws CoreException {
+		SubMonitor subMon = SubMonitor.convert(progress, 50);
 		try {
-			final IResourceManager rm = LaunchUtils.getResourceManager(configuration);
-			if (rm == null) {
+			final ILaunchController control = RMLaunchUtils.getLaunchController(configuration);
+			if (control == null) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
+						Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
 			}
-			JobManager.getInstance().addListener(rm.getControlConfiguration().getUniqueName(), fJobListener);
-			String jobId = rm.submitJob(configuration, mode, progress.newChild(5));
-			if (rm.getJobStatus(jobId, progress.newChild(50)).equals(IJobStatus.UNDETERMINED)) {
+			control.start(subMon.newChild(10));
+
+			if (!mode.equals(ILaunchManager.DEBUG_MODE)) {
+				IMonitorControl monitor = MonitorControlManager.getInstance().getMonitorControl(control.getControlId());
+				if (monitor == null) {
+					if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
+							Messages.AbstractParallelLaunchConfigurationDelegate_launchType1,
+							PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, true)) {
+
+						monitor = MonitorControlManager.getInstance().createMonitorControl(control);
+						monitor.start(subMon.newChild(10));
+					}
+				} else {
+					if (!monitor.isActive()) {
+						if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
+								Messages.AbstractParallelLaunchConfigurationDelegate_launchType2,
+								PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, true)) {
+
+							monitor.start(subMon.newChild(10));
+						}
+					} else {
+						switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
+								Messages.AbstractParallelLaunchConfigurationDelegate_launchType3,
+								PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, false);
+					}
+				}
+			}
+
+			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
+
+			String jobId = control.submitJob(configuration, mode, subMon.newChild(10));
+			if (subMon.isCanceled()) {
+				control.stop();
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), "Launch was cancelled"));
+			}
+			if (control.getJobStatus(jobId, subMon.newChild(10)).equals(IJobStatus.UNDETERMINED)) {
+				control.stop();
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus));
 			}
-			launch.setJobControl(rm);
+			launch.setJobControl(control);
 			launch.setJobId(jobId);
-			JobSubmission jobSub = new JobSubmission(launch, debugger);
+			JobSubmission jobSub = new JobSubmission(launch, control, debugger);
 			synchronized (jobSubmissions) {
 				jobSubmissions.put(jobId, jobSub);
 			}
 			jobSub.schedule();
 		} finally {
-			if (monitor != null) {
-				monitor.done();
+			if (progress != null) {
+				progress.done();
 			}
 		}
+	}
+
+	/**
+	 * Used to force switching to the supplied perspective
+	 * 
+	 * @param perspectiveID
+	 */
+	protected boolean switchPerspective(final String perspectiveId, final String message, final String preferenceKey,
+			final boolean alwaysDisplayMessage) {
+		final boolean[] result = new boolean[1];
+		result[0] = false;
+		if (perspectiveId != null) {
+			final Display display = Display.getDefault();
+			if (display != null && !display.isDisposed()) {
+				display.syncExec(new Runnable() {
+
+					public void run() {
+						IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+						if (window != null) {
+							IWorkbenchPage page = window.getActivePage();
+							if (page != null) {
+								if (!alwaysDisplayMessage && page.getPerspective().getId().equals(perspectiveId)) {
+									result[0] = true;
+									return;
+								}
+
+								IPreferenceStore store = new PreferencesAdapter(PTPLaunchPlugin.getUniqueIdentifier());
+								result[0] = !store.getString(PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE).equals(
+										MessageDialogWithToggle.NEVER);
+								if (store.getString(PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE).equals(
+										MessageDialogWithToggle.PROMPT)) {
+									MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(
+											display.getActiveShell(),
+											Messages.AbstractParallelLaunchConfigurationDelegate_ConfirmActions, message, null,
+											false, store, preferenceKey);
+									result[0] = (dialog.getReturnCode() == IDialogConstants.YES_ID);
+								}
+
+								if (result[0]) {
+									try {
+										PlatformUI.getWorkbench().showPerspective(perspectiveId, window);
+									} catch (WorkbenchException e) {
+									}
+								}
+							}
+						}
+					}
+				});
+			}
+		}
+		return result[0];
 	}
 
 	/**
@@ -569,18 +678,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 *             if the path is invalid or the monitor was canceled.
 	 * @since 5.0
 	 */
-	protected void verifyDebuggerPath(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+	protected IPath verifyDebuggerPath(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		String dbgPath = LaunchUtils.getDebuggerExePath(configuration);
 		if (dbgPath == null) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 					Messages.AbstractParallelLaunchConfigurationDelegate_debuggerPathNotSpecified));
 		}
 		try {
-			verifyResource(dbgPath, configuration, monitor);
-			if (monitor.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
-			}
+			return verifyResource(dbgPath, configuration, monitor);
 		} catch (CoreException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 					Messages.AbstractParallelLaunchConfigurationDelegate_Debugger_path_not_found, new FileNotFoundException(
@@ -607,12 +712,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		} else {
 			String exePath = LaunchUtils.getExecutablePath(configuration);
 			try {
-				IPath path = verifyResource(exePath, configuration, monitor);
-				if (monitor.isCanceled()) {
-					throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-							Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
-				}
-				return path;
+				return verifyResource(exePath, configuration, monitor);
 			} catch (CoreException e) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
@@ -624,7 +724,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	/**
 	 * @since 5.0
 	 */
-	protected void verifyLaunchAttributes(final ILaunchConfiguration configuration, String mode, final IProgressMonitor monitor)
+	protected boolean verifyLaunchAttributes(final ILaunchConfiguration configuration, String mode, final IProgressMonitor monitor)
 			throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 30);
 
@@ -632,23 +732,29 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			/*
 			 * Verify executable path
 			 */
-			verifyExecutablePath(configuration, progress.newChild(10));
+			IPath path = verifyExecutablePath(configuration, progress.newChild(10));
+			if (progress.isCanceled() || path == null) {
+				return false;
+			}
 
 			/*
 			 * Verify working directory. Use the executable path if no working directory has been set.
 			 */
 			String workPath = LaunchUtils.getWorkingDirectory(configuration);
 			if (workPath != null) {
-				verifyResource(workPath, configuration, monitor);
-			}
-			if (progress.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
+				path = verifyResource(workPath, configuration, progress.newChild(10));
+				if (progress.isCanceled() || path == null) {
+					return false;
+				}
 			}
 
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				verifyDebuggerPath(configuration, progress.newChild(10));
+				path = verifyDebuggerPath(configuration, progress.newChild(10));
+				if (progress.isCanceled() || path == null) {
+					return false;
+				}
 			}
+			return true;
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -687,7 +793,19 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @since 5.0
 	 */
 	protected IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		return PTPLaunchPlugin.getDefault().verifyResource(path, configuration, monitor);
+		IRemoteFileManager fileManager = getRemoteFileManager(configuration, monitor);
+		if (monitor.isCanceled()) {
+			return null;
+		}
+		if (fileManager == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+					Messages.AbstractParallelLaunchConfigurationDelegate_unableToObtainConnectionInfo));
+		}
+		if (!fileManager.getResource(path).fetchInfo().exists()) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), NLS.bind(
+					Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] { path })));
+		}
+		return new Path(path);
 	}
 
 	/**
@@ -697,24 +815,17 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 *            launch configuration
 	 * @param monitor
 	 *            progress monitor
-	 * @return path of working directory
+	 * @return path of working directory or null if the monitor was canceled
 	 * @throws CoreException
-	 *             if the working directory is invalid or the monitor was canceled.
+	 *             if the working directory is invalid.
 	 * @since 5.0
 	 */
-	protected String verifyWorkDirectory(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		IPath path;
+	protected IPath verifyWorkDirectory(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		String workPath = LaunchUtils.getWorkingDirectory(configuration);
 		if (workPath == null) {
-			path = verifyExecutablePath(configuration, monitor).removeLastSegments(1);
-		} else {
-			path = verifyResource(workPath, configuration, monitor);
+			return verifyExecutablePath(configuration, monitor).removeLastSegments(1);
 		}
-		if (monitor.isCanceled()) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-					Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
-		}
-		return path.toString();
+		return verifyResource(workPath, configuration, monitor);
 	}
 
 }

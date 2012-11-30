@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.launch; singleton:=true
-Bundle-Version: 6.0.0.qualifier
+Bundle-Version: 7.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.launch.PTPLaunchPlugin
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
@@ -20,10 +20,17 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.utils.ui,
  org.eclipse.ptp.utils.core,
  org.eclipse.ptp.services.core,
- org.eclipse.ptp.ui
+ org.eclipse.ptp.ui,
+ org.eclipse.ptp.rm.jaxb.control.core,
+ org.eclipse.ptp.rm.jaxb.control.ui,
+ org.eclipse.ptp.rm.jaxb.core,
+ org.eclipse.ptp.rm.jaxb.ui,
+ org.eclipse.ptp.ems.core,
+ org.eclipse.ptp.ems.ui,
+ org.eclipse.ptp.rm.lml.monitor.core,
+ org.eclipse.ptp.rm.lml.ui
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.launch,
- org.eclipse.ptp.launch.rulesengine,
- org.eclipse.ptp.launch.ui,
- org.eclipse.ptp.launch.ui.extensions
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.eclipse.ptp.launch;x-friends:="org.eclipse.ptp.etfw.parallel,org.eclipse.ptp.rcp.sysmon",
+ org.eclipse.ptp.launch.ui;x-friends:="org.eclipse.ptp.rcp.sysmon",
+ org.eclipse.ptp.launch.ui.tabs;x-friends:="org.eclipse.ptp.etfw.parallel,org.eclipse.ptp.rcp.sysmon"

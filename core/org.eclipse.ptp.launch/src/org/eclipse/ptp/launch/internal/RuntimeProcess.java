@@ -13,13 +13,13 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
+import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
-import org.eclipse.ptp.launch.messages.Messages;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
+import org.eclipse.ptp.launch.internal.messages.Messages;
 
 public class RuntimeProcess implements IProcess, IJobListener {
 	private IPLaunch fLaunch = null;
@@ -86,7 +86,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 			return fExitValue;
 		}
 		throw new DebugException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), IStatus.ERROR,
-				Messages.RuntimeProcess_0, null));
+				Messages.RuntimeProcess_Exit_value_not_available, null));
 	}
 
 	/*
@@ -175,7 +175,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	public void terminate() throws DebugException {
 		if (!isTerminated()) {
 			try {
-				fLaunch.getJobControl().control(fLaunch.getJobId(), IResourceManagerControl.TERMINATE_OPERATION, null);
+				fLaunch.getJobControl().control(fLaunch.getJobId(), IJobControl.TERMINATE_OPERATION, null);
 			} catch (CoreException e) {
 				throw new DebugException(e.getStatus());
 			}

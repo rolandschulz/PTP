@@ -44,7 +44,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -65,19 +64,11 @@ import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.core.events.IResourceManagerAddedEvent;
-import org.eclipse.ptp.core.events.IResourceManagerChangedEvent;
-import org.eclipse.ptp.core.events.IResourceManagerErrorEvent;
-import org.eclipse.ptp.core.events.IResourceManagerRemovedEvent;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
-import org.eclipse.ptp.core.listeners.IResourceManagerListener;
-import org.eclipse.ptp.internal.ui.actions.JobFocusAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
-import org.eclipse.ptp.internal.ui.actions.TerminateJobAction;
 import org.eclipse.ptp.internal.ui.model.PProcessUI;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.IJobManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
@@ -286,62 +277,6 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		}
 	};
 
-	private final class RMListener implements IResourceManagerListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IModelManagerListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IResourceManagerAddedEvent)
-		 */
-		public void handleEvent(IResourceManagerAddedEvent e) {
-			/*
-			 * Add resource manager child listener so we get notified when new machines are added to the model.
-			 */
-			final IPResourceManager rm = ModelManager.getInstance().getUniverse()
-					.getResourceManager(e.getResourceManager().getControlId());
-			rm.addChildListener(resourceManagerChildListener);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IResourceManagerChangedEvent)
-		 */
-		public void handleEvent(IResourceManagerChangedEvent e) {
-			IResourceManager rm = e.getSource();
-			if (rm.getState().equals(IResourceManager.STARTED_STATE)) {
-				JobManager.getInstance().addListener(rm.getUniqueName(), jobListener);
-			} else if (rm.getState().equals(IResourceManager.STOPPED_STATE) || rm.getState().equals(IResourceManager.ERROR_STATE)) {
-				JobManager.getInstance().removeListener(rm.getUniqueName(), jobListener);
-			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IResourceManagerListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IResourceManagerErrorEvent)
-		 */
-		public void handleEvent(IResourceManagerErrorEvent e) {
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.core.listeners.IModelManagerListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IResourceManagerRemovedEvent)
-		 */
-		public void handleEvent(IResourceManagerRemovedEvent e) {
-			/*
-			 * Removed resource manager child listener when resource manager is removed.
-			 */
-			final IPResourceManager rm = ModelManager.getInstance().getUniverse()
-					.getResourceManager(e.getResourceManager().getControlId());
-			rm.removeChildListener(resourceManagerChildListener);
-		}
-	}
-
 	class JobViewUpdateWorkbenchJob extends WorkbenchJob {
 		private final ReentrantLock waitLock = new ReentrantLock();
 		private final List<ISelection> refreshJobList = new ArrayList<ISelection>();
@@ -453,7 +388,6 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 * Model listeners
 	 */
 	private final IResourceManagerChildListener resourceManagerChildListener = new RMChildListener();
-	private final IResourceManagerListener resourceManagerListener = new RMListener();
 	private final IJobChildListener jobChildListener = new JobChildListener();
 	private final IJobListener jobListener = new JobListener();
 
@@ -467,7 +401,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 */
 	private ISelection selection = null;
 	private final ListenerList listeners = new ListenerList();
-	private Action jobFocusAction = null;
+	private final Action jobFocusAction = null;
 
 	protected String cur_selected_element_id = IElementManager.EMPTY_ID;
 	/*
@@ -543,15 +477,11 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	@Override
 	public void dispose() {
 		JobManager.getInstance().removeListener(jobListener);
-		IModelManager mm = ModelManager.getInstance();
-		synchronized (mm) {
-			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
-				for (IPJob job : rm.getJobs()) {
-					job.removeChildListener(jobChildListener);
-				}
-				rm.removeChildListener(resourceManagerChildListener);
+		for (IPResourceManager rm : ModelManager.getInstance().getUniverse().getResourceManagers()) {
+			for (IPJob job : rm.getJobs()) {
+				job.removeChildListener(jobChildListener);
 			}
-			mm.removeListener(resourceManagerListener);
+			rm.removeChildListener(resourceManagerChildListener);
 		}
 		elementViewComposite.dispose();
 		super.dispose();
@@ -766,8 +696,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	public void setSelection(ISelection selection) {
 		final SelectionChangedEvent e = new SelectionChangedEvent(this, selection);
 		Object[] array = listeners.getListeners();
-		for (int i = 0; i < array.length; i++) {
-			final ISelectionChangedListener l = (ISelectionChangedListener) array[i];
+		for (Object element : array) {
+			final ISelectionChangedListener l = (ISelectionChangedListener) element;
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
 					l.selectionChanged(e);
@@ -846,11 +776,6 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 */
 	@Override
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
-		terminateAllAction = new TerminateJobAction(this);
-		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);
-		jobFocusAction = new JobFocusAction(this);
-		toolBarMgr.add(new Separator(IPTPUIConstants.IUIJOBGROUP));
-		toolBarMgr.appendToGroup(IPTPUIConstants.IUIJOBGROUP, jobFocusAction);
 		super.buildInToolBarActions(toolBarMgr);
 	}
 
@@ -934,16 +859,12 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * Wait until the view has been created before registering for events
 		 */
-		IModelManager mm = ModelManager.getInstance();
-		synchronized (mm) {
-			/*
-			 * Add us to any existing RM's. I guess it's possible we could miss a RM if a new event arrives while we're doing this,
-			 * but is it a problem?
-			 */
-			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
-				rm.addChildListener(resourceManagerChildListener);
-			}
-			mm.addListener(resourceManagerListener);
+		/*
+		 * Add us to any existing RM's. I guess it's possible we could miss a RM if a new event arrives while we're doing this,
+		 * but is it a problem?
+		 */
+		for (IPResourceManager rm : ModelManager.getInstance().getUniverse().getResourceManagers()) {
+			rm.addChildListener(resourceManagerChildListener);
 		}
 	}
 

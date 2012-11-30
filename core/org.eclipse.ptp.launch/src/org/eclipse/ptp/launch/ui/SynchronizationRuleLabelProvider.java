@@ -16,18 +16,20 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.launch.internal.rulesengine.DownloadRule;
 import org.eclipse.ptp.launch.internal.rulesengine.UploadRule;
-import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 
 /**
  * TODO: NEEDS TO BE DOCUMENTED
+ * 
+ * @since 7.0
  */
-class SynchronizationRuleLabelProvider implements ILabelProvider {
+public class SynchronizationRuleLabelProvider implements ILabelProvider {
 	Image uploadRuleImage = null;
 	Image downloadRuleImage = null;
-	
+
 	String remoteWorkingDir;
 
 	public SynchronizationRuleLabelProvider() {
@@ -61,34 +63,50 @@ class SynchronizationRuleLabelProvider implements ILabelProvider {
 			} else if (rule.getRemoteFileCount() == 1) {
 				result += Messages.EnhancedSynchronizeTab_DownloadLabel_OneFile;
 			} else {
-				result += NLS.bind(Messages.EnhancedSynchronizeTab_DownloadLabel_MultipleFiles, new Integer(rule.getRemoteFileCount()));
+				result += NLS.bind(Messages.EnhancedSynchronizeTab_DownloadLabel_MultipleFiles,
+						new Integer(rule.getRemoteFileCount()));
 			}
 			if (rule.getRemoteFileCount() >= 1) {
 				result += '\n' + Messages.EnhancedSynchronizeTab_DownloadLabel_FromLabel;
 				String files[] = rule.getRemoteFilesAsStringArray();
 				for (int i = 0; i < files.length; i++) {
 					String file = files[i];
-					if (i != 0) file += Messages.EnhancedSynchronizeTab_DownloadLabel_FileListSeparator;
+					if (i != 0) {
+						file += Messages.EnhancedSynchronizeTab_DownloadLabel_FileListSeparator;
+					}
 					result += file;
 				}
 				result += '\n';
 				if (rule.getLocalDirectory() == null) {
 					result += Messages.EnhancedSynchronizeTab_DownloadLabel_DestinationMissing;
 				} else {
-					result += Messages.EnhancedSynchronizeTab_DownloadLabel_DestinationLabel + rule.getLocalDirectory();							
+					result += Messages.EnhancedSynchronizeTab_DownloadLabel_DestinationLabel + rule.getLocalDirectory();
 				}
-				if (rule.isAsExecutable() || rule.isAsReadOnly() || rule.isPreserveTimeStamp()) {							result += '\n' + Messages.EnhancedSynchronizeTab_DownloadLabel_OptionsLabel;			
+				if (rule.isAsExecutable() || rule.isAsReadOnly() || rule.isPreserveTimeStamp()) {
+					result += '\n' + Messages.EnhancedSynchronizeTab_DownloadLabel_OptionsLabel;
 					boolean comma = false;
 					if (rule.isAsExecutable()) {
-						if (comma) result += Messages.EnhancedSynchronizeTab_DownloadLabel_OptionsSeparator; else comma = true;
+						if (comma) {
+							result += Messages.EnhancedSynchronizeTab_DownloadLabel_OptionsSeparator;
+						} else {
+							comma = true;
+						}
 						result += Messages.EnhancedSynchronizeTab_DownloadLabel_Options_Executable;
 					}
 					if (rule.isAsReadOnly()) {
-						if (comma) result += Messages.EnhancedSynchronizeTab_DownloadLabel_OptionsSeparator; else comma = true;
-						result += Messages.EnhancedSynchronizeTab_DownloadLabel_Options_Readonly;								
+						if (comma) {
+							result += Messages.EnhancedSynchronizeTab_DownloadLabel_OptionsSeparator;
+						} else {
+							comma = true;
+						}
+						result += Messages.EnhancedSynchronizeTab_DownloadLabel_Options_Readonly;
 					}
 					if (rule.isPreserveTimeStamp()) {
-						if (comma) result += Messages.EnhancedSynchronizeTab_DownloadLabel_OptionsSeparator; else comma = true;
+						if (comma) {
+							result += Messages.EnhancedSynchronizeTab_DownloadLabel_OptionsSeparator;
+						} else {
+							comma = true;
+						}
 						result += Messages.EnhancedSynchronizeTab_DownloadLabel_Options_PreserveTimeStamp;
 					}
 				}
@@ -102,61 +120,83 @@ class SynchronizationRuleLabelProvider implements ILabelProvider {
 			} else if (rule.getRemoteFileCount() == 1) {
 				result += Messages.EnhancedSynchronizeTab_UploadLabel_OneFile;
 			} else {
-				result += NLS.bind(Messages.EnhancedSynchronizeTab_UploadLabel_MultipleFiles, new Integer(rule.getRemoteFileCount()) );
+				result += NLS.bind(Messages.EnhancedSynchronizeTab_UploadLabel_MultipleFiles,
+						new Integer(rule.getRemoteFileCount()));
 			}
 			if (rule.getRemoteFileCount() >= 1) {
 				result += '\n' + Messages.EnhancedSynchronizeTab_UploadLabel_FromLabel;
 				String files[] = rule.getLocalFilesAsStringArray();
 				for (int i = 0; i < files.length; i++) {
 					String file = files[i];
-					if (i != 0) file += Messages.EnhancedSynchronizeTab_UploadLabel_FileListSeparator;
+					if (i != 0) {
+						file += Messages.EnhancedSynchronizeTab_UploadLabel_FileListSeparator;
+					}
 					result += file;
 				}
 				result += '\n';
 				if ((rule.getRemoteDirectory() == null) || rule.isDefaultRemoteDirectory()) {
-					result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationLabel+remoteWorkingDir;
+					result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationLabel + remoteWorkingDir;
 				} else {
 					IPath remoteWorkingPath = new Path(remoteWorkingDir);
 					IPath remotePath = new Path(rule.getRemoteDirectory());
-					if (! remotePath.isAbsolute()) {
+					if (!remotePath.isAbsolute()) {
 						remotePath = remoteWorkingPath.append(remotePath);
 					}
-					result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationLabel+remotePath.toOSString();
+					result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationLabel + remotePath.toOSString();
 				}
 				if (rule.isAsExecutable() || rule.isAsReadOnly() || rule.isPreserveTimeStamp() || rule.isDownloadBack()) {
-					result += '\n' + Messages.EnhancedSynchronizeTab_UploadLabel_OptionsLabel;			
+					result += '\n' + Messages.EnhancedSynchronizeTab_UploadLabel_OptionsLabel;
 					boolean comma = false;
 					if (rule.isAsExecutable()) {
-						if (comma) result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationSeparator; else comma = true;
+						if (comma) {
+							result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationSeparator;
+						} else {
+							comma = true;
+						}
 						result += Messages.EnhancedSynchronizeTab_UploadLabel_Options_Executable;
 					}
 					if (rule.isAsReadOnly()) {
-						if (comma) result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationSeparator; else comma = true;
-						result += Messages.EnhancedSynchronizeTab_UploadLabel_Options_Readonly;								
+						if (comma) {
+							result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationSeparator;
+						} else {
+							comma = true;
+						}
+						result += Messages.EnhancedSynchronizeTab_UploadLabel_Options_Readonly;
 					}
 					if (rule.isPreserveTimeStamp()) {
-						if (comma) result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationSeparator; else comma = true;
+						if (comma) {
+							result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationSeparator;
+						} else {
+							comma = true;
+						}
 						result += Messages.EnhancedSynchronizeTab_UploadLabel_Options_PreserveTimeStamp;
 					}
 					if (rule.isDownloadBack()) {
-						if (comma) result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationSeparator; else comma = true;
+						if (comma) {
+							result += Messages.EnhancedSynchronizeTab_UploadLabel_DestinationSeparator;
+						} else {
+							comma = true;
+						}
 						result += Messages.EnhancedSynchronizeTab_UploadLabel_Options_DownloadBack;
 					}
 				}
 			}
-			return result;					
+			return result;
 		} else {
 			return null;
 		}
 	}
 
-
 	public void addListener(ILabelProviderListener listener) {
 	}
 
 	public void dispose() {
-		if (uploadRuleImage != null) uploadRuleImage.dispose();
-		if (downloadRuleImage != null) downloadRuleImage.dispose();
+		if (uploadRuleImage != null) {
+			uploadRuleImage.dispose();
+		}
+		if (downloadRuleImage != null) {
+			downloadRuleImage.dispose();
+		}
 		uploadRuleImage = null;
 		downloadRuleImage = null;
 	}

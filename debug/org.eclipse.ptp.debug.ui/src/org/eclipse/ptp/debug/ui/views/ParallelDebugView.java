@@ -173,14 +173,6 @@ public class ParallelDebugView extends ParallelJobsView {
 		return launchViewer;
 	}
 
-	/*
-	 * FIXME does not work if create a new set. Currently we can task id to identify icon, but viewer is using order private void
-	 * selectElements(final Object[] objects) { SafeRunnable.run(new SafeRunnable() { public void run() { if (!canvas.isDisposed())
-	 * { canvas.unselectAllElements(); for (int i=0; i<objects.length; i++) { Object obj = objects[i]; int id = ((UIDebugManager)
-	 * manager).getSelectedRegisteredTasks(obj); if (id > -1) { if (!canvas.isSelected(id)) canvas.selectElement(id); } }
-	 * canvas.redraw(); canvas.setCurrentSelection(false); } } }); }
-	 */
-
 	/**
 	 * Sets the event handler for this view
 	 * 

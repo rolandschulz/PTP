@@ -10,10 +10,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
@@ -213,23 +211,6 @@ public class LaunchUtils {
 			return null;
 		}
 		return type;
-	}
-
-	/**
-	 * Find the resource manager that corresponds to the unique name specified in the configuration
-	 * 
-	 * @param configuration
-	 *            launch configuration
-	 * @return resource manager
-	 * @throws CoreException
-	 * @since 5.0
-	 */
-	public static IResourceManager getResourceManager(ILaunchConfiguration configuration) {
-		String rmUniqueName = getResourceManagerUniqueName(configuration);
-		if (rmUniqueName != null) {
-			return ModelManager.getInstance().getResourceManagerFromUniqueName(rmUniqueName);
-		}
-		return null;
 	}
 
 	/**

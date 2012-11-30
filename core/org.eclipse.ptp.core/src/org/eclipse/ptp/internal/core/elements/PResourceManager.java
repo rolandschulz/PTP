@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -46,10 +45,8 @@ import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
@@ -63,7 +60,6 @@ import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.core.listeners.IResourceManagerListener;
 import org.eclipse.ptp.internal.core.elements.events.ChangedMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.ChangedQueueEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewJobEvent;
@@ -72,8 +68,6 @@ import org.eclipse.ptp.internal.core.elements.events.NewQueueEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveJobEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveQueueEvent;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 /**
  * @author rsqrd
@@ -83,16 +77,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 
 	private static IAttribute<?, ?, ?>[] getDefaultAttributes(String id) {
 		ArrayList<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
-		IResourceManager rm = ModelManager.getInstance().getResourceManagerFromUniqueName(id);
-		if (rm != null) {
-			IResourceManagerConfiguration config = rm.getConfiguration();
-			attrs.add(ElementAttributes.getNameAttributeDefinition().create(config.getName()));
-			attrs.add(ElementAttributes.getIdAttributeDefinition().create(config.getUniqueName()));
-			attrs.add(ResourceManagerAttributes.getDescriptionAttributeDefinition().create(config.getDescription()));
-			attrs.add(ResourceManagerAttributes.getTypeAttributeDefinition().create(config.getType()));
-			attrs.add(ResourceManagerAttributes.getStateAttributeDefinition().create(ResourceManagerAttributes.State.STOPPED));
-			attrs.add(ResourceManagerAttributes.getRmIDAttributeDefinition().create(config.getUniqueName()));
-		}
 		return attrs.toArray(new IAttribute<?, ?, ?>[0]);
 	}
 
@@ -100,7 +84,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	private final String fControlId;
 	private final String fName;
 
-	private final ListenerList listeners = new ListenerList();
 	private final IMachineChildListener machineNodeListener;
 
 	private final Map<String, IPJob> jobsById = Collections.synchronizedMap(new HashMap<String, IPJob>());
@@ -143,16 +126,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	 */
 	public void addChildListener(IResourceManagerChildListener listener) {
 		childListeners.add(listener);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.elements.IPResourceManager#addElementListener(org
-	 * .eclipse.ptp.core.elements.listeners.IResourceManagerListener)
-	 */
-	public void addElementListener(IResourceManagerListener listener) {
-		listeners.add(listener);
 	}
 
 	/*
@@ -308,7 +281,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	}
 
 	public void dispose() {
-		listeners.clear();
 		childListeners.clear();
 	}
 
@@ -325,16 +297,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 		}
 		if (adapter == IPResourceManager.class) {
 			return this;
-		}
-		if (adapter == IResourceManager.class) {
-			return getResourceManager();
-		}
-		if (adapter == IResourceManagerConfiguration.class) {
-			IResourceManager rm = getResourceManager();
-			if (rm != null) {
-				return rm.getConfiguration();
-			}
-			return null;
 		}
 		return super.getAdapter(adapter);
 	}
@@ -420,10 +382,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	 */
 	@Override
 	public String getName() {
-		IResourceManager rm = getResourceManager();
-		if (rm != null) {
-			return rm.getConfiguration().getName();
-		}
 		return fName;
 	}
 
@@ -516,15 +474,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.IResourceManager#removeResourceManagerListener(org .eclipse.ptp.rm.IResourceManagerListener)
-	 */
-	public void removeElementListener(IResourceManagerListener listener) {
-		listeners.remove(listener);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.core.elements.IPResourceManager#removeJobs(java.util. Collection)
 	 */
 	public void removeJobs(Collection<IPJob> jobs) {
@@ -607,10 +556,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 		removeJobs(terminatedJobs);
 	}
 
-	private IResourceManager getResourceManager() {
-		return ModelManager.getInstance().getResourceManagerFromUniqueName(fControlId);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -618,14 +563,6 @@ public class PResourceManager extends Parent implements IPResourceManager {
 	 */
 	@Override
 	protected void doAddAttributeHook(AttributeManager attrs) {
-		/*
-		 * The resource manager name is stored in the configuration so that it persists. Map name attributes to the configuration.
-		 */
-		StringAttribute nameAttr = attrs.getAttribute(ElementAttributes.getNameAttributeDefinition());
-		IResourceManager rm = getResourceManager();
-		if (nameAttr != null && rm != null) {
-			rm.getConfiguration().setName(nameAttr.getValue());
-		}
 	}
 
 	/**

@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.sdm.core.messages.Messages;
@@ -19,15 +20,10 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.rmsystem.IResourceManagerControl;
 
 public class SDMRunner extends Job {
 	public enum SDMMasterState {
-		UNKNOWN,
-		STARTING,
-		RUNNING,
-		FINISHED,
-		ERROR
+		UNKNOWN, STARTING, RUNNING, FINISHED, ERROR
 	};
 
 	private List<String> command;
@@ -206,7 +202,7 @@ public class SDMRunner extends Job {
 			try {
 				if (launch != null) {
 					DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_21, launch.getJobId());
-					launch.getJobControl().control(launch.getJobId(), IResourceManagerControl.TERMINATE_OPERATION, null);
+					launch.getJobControl().control(launch.getJobId(), IJobControl.TERMINATE_OPERATION, null);
 				}
 			} catch (CoreException e1) {
 				PTPDebugCorePlugin.log(e1);

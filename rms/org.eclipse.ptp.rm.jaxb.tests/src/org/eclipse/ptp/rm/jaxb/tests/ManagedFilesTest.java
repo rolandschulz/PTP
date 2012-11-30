@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.jobs.IJobStatus;
-import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
@@ -28,7 +27,6 @@ import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
-import org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
@@ -37,9 +35,8 @@ import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
-import org.eclipse.ptp.rmsystem.IResourceManagerComponentConfiguration;
 
-public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerControl, IJobController {
+public class ManagedFilesTest extends TestCase implements IJobController {
 
 	private static final String xml = JAXBControlConstants.DATA + "pbs-test-local.xml"; //$NON-NLS-1$
 	private static ControlType controlData;
@@ -56,15 +53,6 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	 */
 	@Override
 	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#dispose()
-	 */
-	@Override
-	public void dispose() {
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -91,16 +79,6 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	@Override
 	public String getConnectionName() {
 		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#getControlConfiguration ()
-	 */
-	@Override
-	public IResourceManagerComponentConfiguration getControlConfiguration() {
 		return null;
 	}
 
@@ -152,32 +130,9 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#
-	 * getRemoteServicesDelegate(org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	public RemoteServicesDelegate getRemoteServicesDelegate(IProgressMonitor monitor) throws CoreException {
-		RemoteServicesDelegate d = new RemoteServicesDelegate(null, null);
-		d.initialize(monitor);
-		return d;
-	}
-
 	@Override
 	public String getRemoteServicesId() {
 		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getState()
-	 */
-	@Override
-	public String getState() {
 		return null;
 	}
 
@@ -185,12 +140,6 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 	public ICommandJobStatusMap getStatusMap() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void initialize(IProgressMonitor monitor) throws CoreException {
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -239,24 +188,6 @@ public class ManagedFilesTest extends TestCase implements IJAXBResourceManagerCo
 			fail(t.getMessage());
 		}
 		setTestValues();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#start(org.eclipse.core .runtime.IProgressMonitor)
-	 */
-	@Override
-	public void start(IProgressMonitor monitor) throws CoreException {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#stop()
-	 */
-	@Override
-	public void stop() throws CoreException {
 	}
 
 	/*
