@@ -10,6 +10,14 @@
             modes="run,debug"
             name="%ParallelLaunchDelegate.name"
             type="org.eclipse.ptp.launch.parallelLaunch">
+         <modeCombination
+               modes="run"
+               perspective="org.eclipse.ptp.rm.lml.ui.systemMonitoringPerspective">
+         </modeCombination>
+         <modeCombination
+               modes="debug"
+               perspective="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+         </modeCombination>
       </launchDelegate>
    </extension>
 
