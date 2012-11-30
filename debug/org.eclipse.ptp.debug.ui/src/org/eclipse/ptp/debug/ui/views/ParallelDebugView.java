@@ -137,9 +137,8 @@ public class ParallelDebugView extends ParallelJobsView {
 	 */
 	@Override
 	public void dispose() {
-		Viewer viewer = getDebugViewer();
-		if (viewer != null) {
-			viewer.removeSelectionChangedListener(debugViewSelectChangedListener);
+		if (launchViewer != null) {
+			launchViewer.removeSelectionChangedListener(debugViewSelectChangedListener);
 		}
 		if (getEventHandler() != null) {
 			getEventHandler().dispose();
