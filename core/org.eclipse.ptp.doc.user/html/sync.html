@@ -15,6 +15,7 @@
 <li><a href="#file-filter">Changing which files are synchronized</a>
 <li><a href="#conversion-wizard">Converting a project to a Synchronized Project</a>
 <li><a href="#merge-conflict">Resolving merge conflicts</a>
+<li><a href="#remote-discovery">Discovering the remote environment (remote includes and code analysis)</a>
 </ul>
 <p>Synchronized projects consist of files that are mirrored on the local system as well as on one or more remote systems.
 Editing occurs locally and each file is synchronized with the currently active remote system when it is changed, created, or deleted.  
@@ -142,35 +143,37 @@ In the compare editor, editing the left pane edits the local version of the file
 <p>
 After a merge conflict, the local file has markers and annotation added to show the differing content on the local and remote sites. This is useful for editing the file by itself, but not so much for using the compare editor. Select "Reset to version before merge" in the context menu to revert the local file to its prior version. Now the compare editor will show clearly the differences between local and remote. Sometimes you may simply want the remote version of the file. Selecting "Resolve as remote" makes the local file identical to the remote version and then marks it as resolved.
 
-<h2 id="includes">Remote Include Paths</h2>
-<p>At the time of the PTP 5.0 release (June 2011),
- the  mechanism for supporting remote includes in CDT  
- does not work automatically with synchronized projects yet, as it 
- requires some integration with the remote scanner discovery (which discovers what includes/defines 
- are set on the remote system). 
+<h2 id="remote-discovery">Discovering the remote environment (remote includes and code analysis)</h2>
+<h3>Introduction</h3>
+Modern software projects almost always depend on external code, macros, and variables, which are introduced into source code through include directives and various compiler commands and settings. We refer to all of these external elements as the project's "environment." Detecting this environment is a difficult problem but essential in order for Eclipse to provide useful code assistance (bug highlighting, code navigation, etc.) It is difficult because this environment is partially built into the compiler and partially "discovered" by the compiler while building. CDT has a long history of developing "scanner discovery" to solve this problem and recently unveiled a redesign of the discovery mechanism. Synchronized projects extends this new redesign so that discovery can reflect the environment of the current remote machine (as specified by the active build configuration). At the moment, only the GCC compiler is supported. Note that CDT still makes available the old method of scanner discovery, but it has not been extended to work with synchronized projects.
+<p>
+The elements discovered by scanner discovery are used by the CDT "indexer" and the CDT "Codan (CODe ANalysis)" tool. The former is a potentially long-running tasks that gathers information about all of the source code components (variables, functions, classes, etc.) Codan then uses this information to analyze and potentially markup source files with various bug reports and warnings. Each of these three components, discovery, indexing, and Codan, run independently and at different times. In addition, the build process may produce markings for compiler errors. Codan uses an icon that resembles a bug, which distinguishes it from the more traditional icons used by the build system. (Due to the complexity of analyzing C++, it frequently occurs that programs will compile while still showing Codan markings. This can be due to problems in discovery, indexing, or code analysis.)
+<p>
+<h3>Setup</h3>
+By default, a synchronized project uses the normal CDT discovery mechanism, which reads the local environment. To configure the new discovery elements, follow these instructions after creating a new synchronized project.
 
-<p>You can currently manually configure remote include files as follows:
-<ol>
-<li>Open the project properties
-<p><br></p></li>
-<li>Open the <b>C/C++ General > Paths and Symbols</b> page
-<p><br></p></li>
-<li>Choose the build configuration you want to use
-<p><br></p></li>
-<li>Click on <b>GNU C</b> and remove the existing paths
+Go to <b>Project > Properties > C/C++ General > Preprocessor Include Paths, Macros etc.</b> Make sure the remote configuration is selected at the top of the dialog. Under the Providers tab, deselect all CDT providers, except for "CDT User Setting Entries" if you would like to enter your own paths. Next, select the two Sync providers, "Sync GCC Build Output Parser" and "Sync GCC Builtin Compiler Settings." The latter provider runs a specially-crafted compiler command to get compiler-specific settings. It will run immediately after "OK" is selected. The former provider will execute simultaneously with builds. It intercepts the build output and attempts to find environment information. Thus, a build must be run before this provider is useful.
+<p>
+Now, make sure that indexing is enabled and invoke a remote build. In order for the build output parser to be useful, builds must produce verbose output. The method for setting up such a build varies per project, but see the <a href="https://developer.mozilla.org/en-US/docs/Eclipse_CDT">Mozilla Project CDT setup page</a> for a good example. Repeat these steps for each remote build configuration. For local configurations, both the standard CDT or new Sync providers should work. If you would like the environment to update automatically when build configurations are switched, go to <b>Project > Properties > C/C++ General > Indexer</b> and select "Use active build configuration" for "Build configuration for the indexer." The downside of this is that the indexer will run each time you switch configurations.
+
 <p><br></p>
-</li>
-<li>Add new paths to the remote include directories using 
- UNC notation <code>//connection_name/usr/include</code> where 'connnection_name' is the name of the connection you specified 
- for the Remote Tools service provider
- <p><br></p>
- For example, to add the include path <code>/usr/include</code> using the connection <code>lincoln.ncsa.uiuc.edu</code> that you
- previously configured, you would use the path <code>//lincoln.ncsa.uiuc.edu/usr/include</code>
- <p><br></p>
-</li>
-<li>Click OK then OK again. You may be asked if you want to rebuild the index. Click Yes.
-</li>
-</ol> 
+<p><img src="images/sync-discoveryDialog.png">
+<p><br></p>
+
+<h3>Results</h3>
+The list of discovered paths and macros can be found under the Entries tab on the above page. Note that the connection name is prepended for remote includes (UNC notation). When adding your own entries, you can use this same notation to specify a path on a remote machine or a local path by leaving off the connection name. (Thus, remote configurations can use local paths and vice versa.)
+<p>
+By default, the build output parser discovers entries per file. This can be changed under the provider's tab (see above figure). If discovery is per file, though, the list of includes and macros will be empty if accessed from the project menu or by right-clicking on the project or a folder and selecting "Properties." Instead, right-click on an individual file and select "Properties" to see the entries for that particular file.
+
+<h3>Tips</h3>
+<dl>
+<li>The indexing of source files can take a long time. You may want to cancel the process or disable indexing altogether until the above setup is complete (<b>Project > Properties > C/C++ General > Indexer</b>)</li>
+<li>The <b>Indexer</b> page also has some useful settings for fine-tuning the indexer.</li>
+<li>To re-index, right-click on the project and select <b>Indexer > Rebuild</b></li>
+<li>In the Providers tab (not the Entries tab), use the Clear Entries button to erase entries for a specific provider. Doing this is often necessary after creating a new configuration for a different remote. The entries for the copied configuration are copied to the new configuration.</li>
+<li>The build output parser operates on build output lines containing the name of the compiler executable. Under the provider tab, change the "Compiler command pattern" (see above figure) if it does not match your executable name. For example, if you are using MPI your executable may be "mpicc," "mpic++," or "mpiCC." Be careful to mimic the regular expression format. For example, to add "mpic++" append: |(mpic\+\+) to the pattern.</li>
+<li>If switching configurations does not alter the environment, doublecheck the Indexer "Build configuration for the indexer" setting. For some reason, it will sometimes reset to use a fixed configuration, such as when Eclipse is restarted.</li>
+</dl>
 
 <p>See also 
 <a href="http://wiki.eclipse.org/PTP/sync-projects">Synchronized Projects usage info on the PTP Wiki page</a>
