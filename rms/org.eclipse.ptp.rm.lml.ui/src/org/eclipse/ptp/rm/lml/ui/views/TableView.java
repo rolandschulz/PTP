@@ -140,8 +140,7 @@ public class TableView extends ViewPart {
 			// Was image generated before?
 			if (generatedImages.containsKey(backgroundColor)) {
 				image = generatedImages.get(backgroundColor);
-			}
-			else {
+			} else {
 				// Generate new image for new color
 				image = new Image(display, 12, 12);
 				final GC gc = new GC(image);
@@ -383,7 +382,9 @@ public class TableView extends ViewPart {
 				@Override
 				public void run() throws Exception {
 					if (composite != null && viewCreated) {
-						firstColumnlabelProvider.clearImages();
+						if (firstColumnlabelProvider != null) {
+							firstColumnlabelProvider.clearImages();
+						}
 						if (selectedItem != null && !selectedItem.isDisposed()) {
 							lmlManager.unmarkObject(selectedItem.getData().toString());
 							selectedItem = null;
@@ -915,6 +916,7 @@ public class TableView extends ViewPart {
 		treeColumns = new TreeColumn[0];
 		if (firstColumnlabelProvider != null) {
 			firstColumnlabelProvider.dispose();
+			firstColumnlabelProvider = null;
 		}
 
 		/*
