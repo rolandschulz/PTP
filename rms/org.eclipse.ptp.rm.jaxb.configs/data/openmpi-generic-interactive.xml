@@ -133,7 +133,7 @@
 			<stderr-parser delim="\n">
 				<target>
 					<match>
-						<expression>.+</expression>
+						<expression>-+</expression>
 						<throw message="Unable to launch job"/>
 					</match>
 				</target>
@@ -170,7 +170,7 @@
 			<stderr-parser delim="\n">
 				<target>
 					<match>
-						<expression>.+</expression>
+						<expression>-+</expression>
 						<throw message="Unable to launch job"/>
 					</match>
 				</target>
