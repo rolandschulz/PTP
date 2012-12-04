@@ -197,12 +197,6 @@
        isAbstract="false"
        name="%tool.cpp.name"
        superClass="cdt.managedbuild.tool.xlc.cpp.compiler.abstract">
-           <inputType
-          id="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.cpp.c.compiler.input"
-          primaryInput="true"
-          scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.RemoteXLCPerFileProfile"
-          superClass="cdt.managedbuild.tool.xlc.c.compiler.input">
-          </inputType>
     <inputType
           id="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.cpp.compiler.input"
           primaryInput="true"
