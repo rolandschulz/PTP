@@ -57,10 +57,10 @@
 	<property name="dStoreBaseName" value="rseserver-3.4"/>
 
 	<!-- CDT PROPERTIES -->
-	<property name="cdtBaseUrl" value="http://download.eclipse.org/tools/cdt/builds/juno/nightly"/>
+	<property name="cdtBaseUrl" value="http://download.eclipse.org/tools/cdt/builds/kepler/nightly"/>
 	
 	<!-- CDT branch need to be added for PTP maintenance builds -->
-	<property name="cdtBranch" value="cdt_8_1"/>
+	<property name="cdtBranch" value="master"/>
 	
 	<property name="rdtXLCPropertiesPath" value="${basedir}/../org.eclipse.ptp.rdt.xlc/properties"/>
 	<property name="rdtXLCProperties" value="languages.properties"/>
