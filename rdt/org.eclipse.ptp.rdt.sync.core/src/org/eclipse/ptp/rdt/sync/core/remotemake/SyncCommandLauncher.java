@@ -177,7 +177,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		remoteEnvMap = processBuilder.environment();
 
 		for (String envVar : env) {
-			String[] splitStr = envVar.split("="); //$NON-NLS-1$
+			String[] splitStr = envVar.split("=", 2); //$NON-NLS-1$
 			if (splitStr.length > 1) {
 				remoteEnvMap.put(splitStr[0], splitStr[1]);
 			} else if (splitStr.length == 1) {
