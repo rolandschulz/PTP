@@ -55,6 +55,18 @@
             configurationFile="data/gov.anl.alcf.bgq.pbs.batch.xml"
         name="gov.anl.alcf.bgq.pbs.batch">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/de.fz-juelich.juropa.torque.batch.xml"
+            name="de.fz-juelich.juropa.torque.batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/de.fz-juelich.judge.torque.batch.xml"
+            name="de.fz-juelich.judge.torque.batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/de.fz-juelich.juqueen.ll_bg.xml"
+            name="de.fz-juelich.juqueen.ll_bg">
+      </JAXBResourceManagerConfiguration>
    </extension>
 
 </plugin>
