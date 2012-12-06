@@ -59,41 +59,58 @@ public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements 
 
 		List<ICLanguageSettingEntry> newEntries = new ArrayList<ICLanguageSettingEntry>();
 		for (ICLanguageSettingEntry entry : entries) {
-			if ((entry instanceof CIncludePathEntry) && ((entry.getFlags() & ICSettingEntry.VALUE_WORKSPACE_PATH) == 0)) {
-				String oldPath = ((CIncludePathEntry) entry).getValue();
-				String newPath = "//" +  conn.getName() + oldPath; //$NON-NLS-1$
-				ICLanguageSettingEntry newEntry = new CIncludePathEntry(newPath, entry.getFlags());
-				newEntries.add(newEntry);
+			ICLanguageSettingEntry newEntry;
+			if (!(entry instanceof CIncludePathEntry) || ((entry.getFlags() & ICSettingEntry.VALUE_WORKSPACE_PATH) == 1)) {
+				newEntry = entry;
 			} else {
-				newEntries.add(entry);
+				String remotePath = ((CIncludePathEntry) entry).getValue();
+				String workspacePath = this.getWorkspacePath(remotePath, bs.getLocation(currentProject));
+				if (workspacePath == null) {
+					newEntry = new CIncludePathEntry("//" +  conn.getName() + remotePath, entry.getFlags()); //$NON-NLS-1$
+				} else {
+					newEntry = new CIncludePathEntry(workspacePath, entry.getFlags());
+				}
 			}
+			newEntries.add(newEntry);
 		}
 		super.setSettingEntries(newEntries);
 	}
 
 	/**
-	 * This method intercepts and modifies resources found in build output. Absolute remote paths are altered to point to the
-	 * corresponding local (workspace) path, which is what CDT expects.
+	 * This method intercepts and modifies resources found in build output. Remote paths inside the remote sync location are
+	 * altered to point to the corresponding local (workspace) path, which is what CDT expects.
 	 */
 	@Override
 	public String parseResourceName(String line) {
-		line = super.parseResourceName(line);
-		if (line == null) {
-			return line;
+		// Extracts path from compiler output line
+		String compilerPath = super.parseResourceName(line);
+		if (compilerPath == null) {
+			return compilerPath;
 		}
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		BuildScenario bs = bcm.getBuildScenarioForProject(currentProject);
 		if (bs.getSyncProvider() == null) {
 			// For local configurations, no special processing is needed.
-			return line;
+			return compilerPath;
 		}
-		// Use paths to avoid OS differences and separator problems and to create a path in the format of the local platform.
-		Path resourcePath = new Path(line);
-		if (!resourcePath.isAbsolute()) {
-			return line;
+
+		String workspacePath = this.getWorkspacePath(compilerPath, bs.getLocation(currentProject));
+		if (workspacePath == null) {
+			return compilerPath;
+		} else {
+			return workspacePath;
 		}
-		Path projectActualRoot = new Path(bs.getLocation(currentProject));
-		IPath projectLocalRoot = currentProject.getLocation();
-		return resourcePath.toOSString().replaceFirst(projectActualRoot.toOSString(), projectLocalRoot.toOSString());
+	}
+
+	// Get the local workspace path for the given remote path and root directory. Neither parameter may be null.
+	// Returns the new path or null if the remote root is not a prefix of the remote path.
+	private String getWorkspacePath(String remotePathString, String remoteRootString) {
+		Path remotePath = new Path(remotePathString);
+		Path remoteRoot = new Path(remoteRootString);
+		if (!remoteRoot.isPrefixOf(remotePath)) {
+			return null;
+		}
+		IPath localRoot = currentProject.getLocation();
+		return remotePath.toOSString().replaceFirst(remoteRoot.toOSString(), localRoot.toOSString());
 	}
 }
