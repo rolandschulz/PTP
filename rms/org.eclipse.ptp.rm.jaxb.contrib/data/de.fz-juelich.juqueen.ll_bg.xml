@@ -145,6 +145,7 @@
 												
 		<attribute name="LL_STDERR" type="string">
 			<description>Specify a file to use for stderr output.</description>
+			<default>$(host).$(jobid).$(stepid).err</default>
 		</attribute>
 												
 		<attribute name="LL_STDIN" type="string">
@@ -153,6 +154,7 @@
 												
 		<attribute name="LL_STDOUT" type="string">
 			<description>Specify a file to use for stdout output.</description>
+			<default>$(host).$(jobid).$(stepid).out</default>
 		</attribute>	
 												
 		<attribute name="LL_TASK_GEOMETRY" type="string">
