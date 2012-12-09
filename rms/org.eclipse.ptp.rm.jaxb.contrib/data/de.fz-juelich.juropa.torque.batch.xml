@@ -1,0 +1,894 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011-2012 University of Illinois and others. All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- * Contributors: -->
+<!-- * Albert L. Rossi - design and implementation -->
+<!-- * Carsten Karbach - additional parameters for juropa job submission -->
+<!-- ****************************************************************************** -->
+<resource-manager-builder 
+	xmlns="org.eclipse.ptp" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	name="de.fz-juelich.juropa.torque.batch">
+	<control-data>
+		<!-- Set the default value of this attribute if MSUB is installed in a non-standard location -->
+		<attribute name="bindir" visible="false"/>
+		<!-- This is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
+		<attribute name="control.queue.name" visible="false">
+			<link-value-to>destination</link-value-to>
+		</attribute>
+		<!-- We set this to invisible because the values are not really modifiable -->
+		<attribute name="queues" visible="false"/>
+		<!-- Needed by RM internals for fetch; name is fixed by convention -->
+		<attribute name="stdout_remote_path" visible="false">
+			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o${ptp_rm:@jobId#default}</default>
+			<link-value-to>Output_Path</link-value-to>
+		</attribute>
+		<!-- Needed by RM internals for fetch; name is fixed by convention -->
+		<attribute name="stderr_remote_path" visible="false">
+			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
+			<link-value-to>Error_Path</link-value-to>
+		</attribute>
+		<attribute name="mpiCommand" type="choice">
+			<description>Which mpi command to use.</description>
+			<choice>,mpiexec</choice>
+		</attribute>
+		<attribute name="mpiNumberOfProcesses" min="1" type="integer">
+			<description>The '-np' value (Should match with nodes*ppn/tpt)</description>
+		</attribute>
+		<attribute name="threadsPerTask" min="1" type="integer">
+			<description>Number of threads per task (tpt value)</description>
+		</attribute>
+		<attribute name="processesPerNode" min="1" type="integer">
+			<description>Processes per node (ppn value)</description>
+		</attribute>
+		<attribute name="Account_Name" type="string">
+			<description>Account to which to charge this job.</description>
+			<tooltip>Format: string</tooltip>
+		</attribute>
+		<attribute name="Checkpoint" type="choice">
+			<description>Determines when checkpointing (if supported) will be performed by MSUB on behalf of the job.</description>
+			<tooltip><![CDATA[Format: the strings "n" (no checkpointing), 
+"s" (to be performed only when the server executing 
+the job is shutdown), "c"s (to be performed at the 
+default minimum time for thes servers executing the 
+job), "c=mmmm" (to be performed at an intervals 
+of minutes which is the integer number of minutes of CPUs 
+time used bys the job; values must be greater than zero); 
+defaults value: "u", which is unspecified.]]></tooltip>
+			<choice>,u,n,s,c,c=????</choice>
+			<default>u</default>
+		</attribute>
+		<attribute name="depend" type="string">
+			<description>The type of inter-job dependencies specified by the job owner.</description>
+			<tooltip>Format: "type:jobid[,jobid...]"; default value: no dependencies.</tooltip>
+		</attribute>
+		<attribute name="destination" type="string">
+			<description>Designation of the queue to which to submit the job.</description>
+			<tooltip>Format: queue[@server].</tooltip>
+		</attribute>
+		<attribute name="directive" type="string">
+			<description>Defines the prefix that declares a directive to the qsub command within the script file.</description>
+			<tooltip><![CDATA[See the paragraph on script directives in the 
+Extended Description section. If the option is presented with a
+directive_prefix argument that is the null string, qsub will 
+not scan the script file for directives.]]></tooltip>
+		</attribute>
+		<attribute name="Error_Path" type="string">
+			<description>The final path name for the file containing the job's standard error stream.</description>
+			<tooltip><![CDATA[Format: "[hostname:]pathname". If 
+the option is not specified, the default file name for the 
+standard error stream will be used. The default name has 
+the following form: job_name.eSeq_num where job_name is 
+the name of the job, see -N option, and Seq_num
+is the job number assigned when the job is submitted; 
+default value: (job_name).e(job_number).]]></tooltip>
+		</attribute>
+		<attribute name="export_all" type="boolean" translateBooleanAs="-V, ">
+			<description><![CDATA[All variables in the qsub command's environment are to be exported to the batch job.]]></description>
+			<default>-V</default>
+		</attribute>
+		<attribute name="group_list" type="string">
+			<description><![CDATA[A list of hosts under which the job is run on a given host.]]></description>
+			<tooltip><![CDATA[Format: composite-descriptor 
+group="true"_name[@host][,composite-descriptor group="true"_name[@host]...].
+When a job is to be placed into execution, the server will select a 
+composite-descriptor group="true" name according to the following ordered set 
+of rules: 1) Select the composite-descriptor group="true" name from
+the list for which the associated host name matches the name of the
+execution host; 2) Select the composite-descriptor group="true" name 
+which has no associated host name, the wildcard name; 3) Use
+the login composite-descriptor group="true" for the username under 
+which the job will be run.]]></tooltip>
+		</attribute>
+		<attribute name="Hold_Types" type="choice">
+			<description>The set of holds currently applied to the job.</description>
+			<tooltip><![CDATA[If the set is not null, the job will not be scheduled
+for execution and is said to be in the hold state. Note, the hold
+state takes precedence over the wait state. Format: string made up 
+of the letters 'u', 's', 'o'; default value: no hold.]]></tooltip>
+			<choice>,u,s,o</choice>
+		</attribute>
+		<attribute name="Job_Name" type="string">
+			<description>The name assigned to the job by the qsub or qalter command.</description>
+			<tooltip><![CDATA[Format: string up to 15 characters, 
+first character must be alphabetic; default value: 
+the base name of the job script or STDIN.]]></tooltip>
+			<default>ptp_job</default>
+			<validator>
+				<regex expression="[a-zA-Z_][0-9a-zA-Z_]*"/>
+				<error-message>must be at least one alphanumeric character</error-message>
+			</validator>
+		</attribute>
+		<attribute name="Join_Path" type="boolean">
+			<description>Merge stdout and stderr into stdout.</description>
+			<tooltip><![CDATA[Format: boolean, values accepted are "True", "TRUE",
+"true", "Y", "y", "1", "False", "FALSE", "false", "N", "n", "0";
+default value: false.]]></tooltip>
+			<default>false</default>
+		</attribute>
+		<attribute name="Keep_Files" type="choice">
+			<description>Retain these streams on the execution host upon job termination.</description>
+			<tooltip><![CDATA[Format: "o", "e", "oe" or "eo"; default value:
+no keep, return files to submission host.]]></tooltip>
+			<choice>,o,e,oe,eo</choice>
+		</attribute>
+		<attribute name="Mail_Points" type="choice">
+			<description>Identifies at which state changes the server will send mail about the job.</description>
+			<tooltip><![CDATA[Format: string made up of the letters
+'a' for abort, 'b' for beginning, and default value:
+ a', send on job abort.]]></tooltip>
+			<choice>,a,b</choice>
+			<default>a</default>
+		</attribute>
+		<attribute name="Mail_Users" type="string">
+			<description>The set of users to whom mail may be sent when the job makes certain state changes.</description>
+			<tooltip>Format: "user@host[,user@host]"; default value: job owner only.</tooltip>
+		</attribute>
+		<attribute name="Output_Path" type="string">
+			<description>The final path name for the file containing the job's standard output stream.</description>
+			<tooltip><![CDATA[Format: "[hostname:]pathname". If the option
+is not specified, the default file name for the standard error stream 
+will be used. The default name has the following form: job_name.oSeq_num
+where job_name is the name of the job, see -N option, and Seq_num
+is the job number assigned when the job is submitted; 
+default value: (job_name).o(job_number).]]></tooltip>
+		</attribute>
+		<attribute name="Priority" type="string">
+			<description>The job scheduling priority assigned by the user.</description>
+			<tooltip>Format: "[+|-]nnnnn"; default value: undefined.</tooltip>
+		</attribute>
+		<attribute name="Rerunnable" type="choice">
+			<description>The rerunnable flag assigned by the user.</description>
+			<tooltip>Format: "y" or "n", see Join_Path; default value: y, job is rerunable.</tooltip>
+			<choice>,n,y</choice>
+			<default>y</default>
+		</attribute>
+		<attribute name="Resource_List.arch" type="string">
+			<description>Specifies the administrator defined system architecture requried.</description>
+			<tooltip>This defaults to whatever the PBS_MACH string is set to in "local.mk". Units: string.</tooltip>
+		</attribute>
+		<attribute name="Resource_List.cput" type="string">
+			<description>Maximum amount of CPU time used by all processes in the job.</description>
+			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
+		</attribute>
+		<attribute name="Resource_List.file" type="string">
+			<description>The largest size of any single file that may be created by the job.</description>
+			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier 
+in bytes or words (word size of the host): b (bytes), 
+w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
+		</attribute>
+		<attribute name="Resource_List.host" type="string">
+			<description>Name of host on which job should be run.</description>
+		</attribute>
+		<attribute name="Resource_List.mem" type="string">
+			<description>Maximum amount of memory used by all concurrent processes in the job.</description>
+			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier 
+in bytes or words (word size of the host): b (bytes), 
+w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
+		</attribute>
+		<attribute name="Resource_List.nice" type="integer" min="0" max="10">
+			<description>The nice value under which the job is to be run.</description>
+			<tooltip>0 to 10.</tooltip>
+			<default>0</default>
+		</attribute>
+		<attribute name="Resource_List.nodes" type="string">
+			<description>Number and/or type of nodes to be reserved for exclusive use by the job.</description>
+			<tooltip><![CDATA[The value is one or more node_specs joined with 
+the '+' character, "node_spec[+node_spec...]. Each node_spec is
+a number of nodes required of the type declared in the node_spec
+and a name or one or more properity or properities desired for 
+the nodes. The number, the name, and each properity in the 
+node_spec are separated by a colon ':'. If no number is specified, 
+one (1) is assumed. Units: string. The name of a node is its 
+hostname. The properties of nodes are: ppn=# requested; defaults 
+to 1; or an arbitrary string defined by system administrator. 
+Example: To ask for 2 processors on each of two blue nodes and 
+three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
+			<default>1</default>
+		</attribute>
+		<attribute name="Resource_List.ompthreads" type="integer" min="1">
+			<description>Number of threads per processor for Open MP jobs.</description>
+			<default>1</default>
+		</attribute>
+		<attribute name="Resource_List.pcput" type="string">
+			<description>Maximum amount of CPU time used by any single process in the job.</description>
+			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
+		</attribute>
+		<attribute name="Resource_List.pmem" type="string">
+			<description>Maximum amount of physical memory (workingset) used by any single process of the job.</description>
+			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier
+in bytes or words (word size of the host): b (bytes), w (words), kb/kw
+(kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
+		</attribute>
+		<attribute name="Resource_List.pvmem" type="string">
+			<description>Maximum amount of virtual memory used by any single process in the job.</description>
+			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier
+in bytes or words (word size of the host): b (bytes), w (words), kb/kw
+(kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
+		</attribute>
+		<attribute name="Resource_List.vmem" type="string">
+			<description>Maximum amount of virtual memory used by all concurrent processes in the job.</description>
+			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier 
+in bytes or words (word size of the host): b (bytes), w (words), kb/kw
+(kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
+		</attribute>
+		<attribute name="Resource_List.walltime" type="string">
+			<description>Maximum amount of real time during which the job can be in the running state.</description>
+			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
+			<default>00:30:00</default>
+			<validator>
+				<regex expression="\d\d:\d\d:\d\d"/>
+				<error-message>format must be hh:mm:ss</error-message>
+			</validator>
+		</attribute>
+		<attribute name="Shell_Path_List" type="string">
+			<description>A set of absolute paths of the program to process the job's script file.</description>
+			<tooltip><![CDATA[Format: path[@host][,path[@host]...]. 
+If this is null, then the user's login shell on the host 
+of execution will be used. Default value: null, login shell.]]></tooltip>
+		</attribute>
+		<attribute name="stagein" type="string">
+			<description>The list of files to be staged in prior to job execution.</description>
+			<tooltip>Format: local_path@remote_host:remote_path.</tooltip>
+		</attribute>
+		<attribute name="stageout" type="string">
+			<description>The list of files to be staged out after job execution.</description>
+			<tooltip>Format: local_path@remote_host:remote_path.</tooltip>
+		</attribute>
+		<attribute name="User_List" type="string">
+			<description>The list of user@hosts which determines the user name under which the job is run on a given host.</description>
+			<tooltip><![CDATA[When a job is to be placed into execution, 
+the server will select a user name from the list according
+to the following ordered set of rules: 1) Select the user 
+name from the list for which the associated host name matches
+the name of the execution host; 2) Select the user name which 
+has no associated host name, the wild card name; 3) Use the 
+Job_Owner as the user name. Default value: job owner name.]]></tooltip>
+		</attribute>
+		<attribute name="Variable_List" type="string">
+			<description>This is the list of environment variables passed with the Queue Job batch request.</description>
+		</attribute>
+		<script insertEnvironmentAfter="35">
+			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
+			<line>
+				<arg>#!/bin/bash</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -A">#MSUB -A ${ptp_rm:Account_Name#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -c">#MSUB -c ${ptp_rm:Checkpoint#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -W depend=">#MSUB -W depend=${ptp_rm:depend#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -q">#MSUB -q ${ptp_rm:destination#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -C">#MSUB -C ${ptp_rm:line#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -e">#MSUB -e ${ptp_rm:Error_Path#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -W group_list=">#MSUB -W group_list=${ptp_rm:group_list#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -h">#MSUB -h ${ptp_rm:Hold_Types#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -N">#MSUB -N ${ptp_rm:Job_Name#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -j">#MSUB -j ${ptp_rm:Join_Path#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -k">#MSUB -k ${ptp_rm:Keep_Files#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -m">#MSUB -m ${ptp_rm:Mail_Points#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -M">#MSUB -M ${ptp_rm:Mail_Users#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -o">#MSUB -o ${ptp_rm:Output_Path#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -p">#MSUB -p ${ptp_rm:Priority#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -r">#MSUB -r ${ptp_rm:Rerunnable#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l arch=">#MSUB -l arch=${ptp_rm:Resource_List.arch#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l cput=">#MSUB -l cput=${ptp_rm:Resource_List.cput#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l file=">#MSUB -l file=${ptp_rm:Resource_List.file#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l host=">#MSUB -l host=${ptp_rm:Resource_List.host#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l mem=">#MSUB -l mem=${ptp_rm:Resource_List.mem#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l nice=">#MSUB -l nice=${ptp_rm:Resource_List.nice#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l nodes=">#MSUB -l nodes=${ptp_rm:Resource_List.nodes#value}:ppn=${ptp_rm:processesPerNode#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -v tpt=">#MSUB -v tpt=${ptp_rm:threadsPerTask#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l ompthreads=">#MSUB -l ompthreads=${ptp_rm:Resource_List.ompthreads#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l pcput=">#MSUB -l pcput=${ptp_rm:Resource_List.pcput#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l pmem=">#MSUB -l pmem=${ptp_rm:Resource_List.pmem#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l pvmem=">#MSUB -l pvmem=${ptp_rm:Resource_List.pvmem#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l vmem=">#MSUB -l vmem=${ptp_rm:Resource_List.vmem#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -l walltime=">#MSUB -l walltime=${ptp_rm:Resource_List.walltime#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -S">#MSUB -S ${ptp_rm:Shell_Path_List#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -W stagein=">#MSUB -W stagein=${ptp_rm:stagein#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -W stageout=">#MSUB -W stageout=${ptp_rm:stageout#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -u">#MSUB -u ${ptp_rm:User_List#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB -v">#MSUB -v ${ptp_rm:Variable_List#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="#MSUB">#MSUB ${ptp_rm:export_all#value}</arg>
+			</line>
+			<line>
+				<arg>MPI_ARGS="-np ${ptp_rm:mpiNumberOfProcesses#value}"</arg>
+			</line>
+			<line>
+				<arg resolve="false">if [ "-np" == "${MPI_ARGS}" ] ; then</arg>
+			</line>
+			<line>
+				<arg resolve="false"> MPI_ARGS=</arg>
+			</line>
+			<line>
+				<arg resolve="false">fi</arg>
+			</line>
+			<line>
+				<arg>COMMAND=${ptp_rm:mpiCommand#value}</arg>
+			</line>
+			<line>
+				<arg resolve="false">if [ -n "${COMMAND}" ] ; then</arg>
+			</line>
+			<line>
+				<arg resolve="false"> COMMAND="${COMMAND} ${MPI_ARGS}</arg>
+				<arg>${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}"</arg>
+			</line>
+			<line>
+				<arg resolve="false">else</arg>
+			</line>
+			<line>
+				<arg> COMMAND="${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}"</arg>
+			</line>
+			<line>
+				<arg resolve="false">fi</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="cd">cd ${ptp_rm:directory#value}</arg>
+			</line>
+			<line>
+				<arg resolve="false">${COMMAND}</arg>
+			</line>
+		</script>
+		<start-up-command name="get-queues">
+			<arg>${ptp_rm:bindir#value}qstat</arg>
+			<arg>-Q</arg>
+			<arg>-f</arg>
+			<stdout-parser delim="\n">
+				<target ref="queues">
+					<match>
+						<expression>Queue: ([\w\d]+)</expression>
+						<add field="value">
+							<entry valueGroup="1"/>
+						</add>
+					</match>
+				</target>
+			</stdout-parser>
+		</start-up-command>
+		<submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true">
+			<arg>${ptp_rm:bindir#value}msub</arg>
+			<arg>${ptp_rm:managed_file_for_script#value}</arg>
+			<stdout-parser delim="\n" all="true" save="1">
+				<target ref="@jobId">
+					<!-- msub returns simply a long number as ID -->
+					<match>
+						<expression>([\d]+).*</expression>
+						<set field="name">
+							<entry valueGroup="0"/>
+						</set>
+						<set field="default">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="value">
+							<entry value="SUBMITTED"/>
+						</set>
+					</match>
+					<match>
+						<expression>([\d]+)([.])(.+)[\s]+.*</expression>
+						<append field="name">
+							<entry valueGroup="1"/>
+							<entry valueGroup="2"/>
+							<entry valueGroup="3"/>
+						</append>
+						<set field="default">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="value">
+							<entry value="SUBMITTED"/>
+						</set>
+					</match>
+					<match>
+						<expression>([\d]+)[.].+</expression>
+						<set field="name">
+							<entry valueGroup="0"/>
+						</set>
+						<set field="default">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="value">
+							<entry value="SUBMITTED"/>
+						</set>
+					</match>
+				</target>
+				<target ref="@jobId">
+					<match>
+						<expression flags="DOTALL|UNIX_LINES">.*Job not submitted.*</expression>
+						<set field="value">
+							<entry value="FAILED"/>
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+			<stderr-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>.*Job not submitted.*</expression>
+						<throw message="Job Submit Failed"/>
+					</match>
+				</target>
+			</stderr-parser>
+		</submit-batch>
+		<get-job-status name="get-job-status" ignoreExitStatus="true">
+			<arg>${ptp_rm:bindir#value}qstat</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>[\d]+[.].+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+</expression>
+						<set field="value">
+							<entry valueGroup="1"/>
+						</set>
+					</match>
+					<test op="EQ">
+						<value>#value</value>
+						<value>Q</value>
+						<set field="value">
+							<entry value="QUEUED_ACTIVE"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>R</value>
+						<set field="value">
+							<entry value="RUNNING"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>S</value>
+						<set field="value">
+							<entry value="SUSPENDED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>C</value>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>E</value>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>H</value>
+						<set field="value">
+							<entry value="SYSTEM_ON_HOLD"/>
+						</set>
+					</test>
+				</target>
+			</stdout-parser>
+			<stderr-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>.+</expression>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</match>
+				</target>
+			</stderr-parser>
+		</get-job-status>
+		<terminate-job name="cancel" ignoreExitStatus="true">
+			<arg>${ptp_rm:bindir#value}qdel</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+		</terminate-job>
+		<launch-tab>
+			<dynamic>
+				<title>Basic Settings</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				<!-- ATTRIBUTES group -->
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<!-- HEADER -->
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Name</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Value</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Description</fixed-text>
+					</widget>
+					<!-- row 1 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:Job_Name#tooltip}</tooltip>
+						<fixed-text>Job Name: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="Job_Name">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:Job_Name#description}</fixed-text>
+					</widget>
+					<!-- row 2 -->
+					<widget type="label" style="SWT.LEFT">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
+                  <fixed-text>Account: </fixed-text>
+               </widget>
+               <widget type="text" style="SWT.BORDER" attribute="Account_Name">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+                  </layout-data>
+               </widget>
+               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+                  </layout-data>
+                  <fixed-text>${ptp_rm:Account_Name#description}</fixed-text>
+               </widget>
+               <!-- row 3 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
+						<fixed-text>Queue: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<items-from>queues</items-from>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:destination#description}</fixed-text>
+					</widget>
+					<!-- row 4 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:Resource_List.nodes#tooltip}</tooltip>
+						<fixed-text>Number of nodes: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.nodes">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:Resource_List.nodes#description}</fixed-text>
+					</widget>
+					<!-- row 5 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
+						<fixed-text>Total Memory Needed: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.mem">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:Resource_List.mem#description}</fixed-text>
+					</widget>
+					<!-- row 6 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
+						<fixed-text>Wallclock Time: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="Resource_List.walltime">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:Resource_List.walltime#description}</fixed-text>
+					</widget>
+					<!-- row 7 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>MPI Command: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="mpiCommand">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:mpiCommand#description}</fixed-text>
+					</widget>
+					<!-- row 8 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Processes per Node: </fixed-text>
+					</widget>
+					<widget type="spinner" style="SWT.BORDER" attribute="processesPerNode">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:processesPerNode#description}</fixed-text>
+					</widget>
+					<!-- row 9 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Threads per Task: </fixed-text>
+					</widget>
+					<widget type="spinner" style="SWT.BORDER" attribute="threadsPerTask">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:threadsPerTask#description}</fixed-text>
+					</widget>
+					<!-- row 10 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>MPI Number of Tasks: </fixed-text>
+					</widget>
+					<widget type="spinner" style="SWT.BORDER" attribute="mpiNumberOfProcesses">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
+						</layout-data>
+					</widget>
+					<widget type="text" readOnly="true" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<dynamic-text>
+							<arg>The '-np' value (Should match with nodes*ppn/tpt = ${ptp_rm:Resource_List.nodes#value}*${ptp_rm:processesPerNode#value}/${ptp_rm:threadsPerTask#value})</arg>
+						</dynamic-text>
+					</widget>
+					<!-- row 11 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:export_all#tooltip}</tooltip>
+						<fixed-text>Export Environment: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.BORDER" attribute="export_all">
+                  <layout-data>
+                     <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+                  </layout-data>
+               </widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:export_all#description}</fixed-text>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic>
+				<title>Advanced Settings</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				<!-- QUEUES remote path group -->
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3"/>
+					</layout>
+					<widget type="label" style="SWT.LEFT">
+						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
+						<fixed-text>Queue: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
+						<layout-data>
+							<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
+						</layout-data>
+						<items-from>queues</items-from>
+					</widget>
+				</composite>
+				<!-- VIEWER group -->
+				<composite group="true">
+					<layout>
+						<grid-layout/>
+					</layout>
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+					</layout-data>
+					<widget type="text" readOnly="true" style="SWT.BORDER | SWT.WRAP | SWT.V_SCROLL">
+						<layout-data>
+							<grid-data heightHint="75" horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+						</layout-data>
+						<dynamic-text>
+							<arg>${ptp_rm:allAttributes#value}</arg>
+							<arg isUndefinedIfMatches=" destination=''"> destination='${ptp_rm:destination#value}'</arg>
+						</dynamic-text>
+					</widget>
+					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table" initialAllChecked="false">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+						</layout-data>
+						<column-data name="Name" width="175" resizable="true">
+							<tooltip>Multi-select and click checkbox to apply change to all rows.</tooltip>
+						</column-data>
+						<column-data name="Value" width="200" resizable="true">
+							<tooltip>Click to activate value widget.</tooltip>
+						</column-data>
+						<items allPredefined="true">
+							<exclude>destination</exclude>
+						</items>
+						<value pattern="@name='@value'"/>
+					</viewer>
+				</composite>
+			</dynamic>
+			<import title="Import MSUB Script">
+				<export-for-override name="exportedEnv" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table"
+					initialAllChecked="true" tooltipEnabled="true">
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true" heightHint="80"/>
+					</layout-data>
+					<column-data name="Name" width="175" resizable="true">
+						<tooltip>Multi-select and click checkbox to apply change to all rows.</tooltip>
+					</column-data>
+					<column-data name="Value" width="200" resizable="true">
+						<tooltip>Click to activate value widget.</tooltip>
+					</column-data>
+					<items>
+						<include>destination</include>
+						<include>Job_Name</include>
+						<include>Output_Path</include>
+						<include>Error_Path</include>
+					</items>
+				</export-for-override>
+			</import>
+		</launch-tab>
+	</control-data>
+	<monitor-data schedulerType="TORQUE">
+	</monitor-data>
+</resource-manager-builder>

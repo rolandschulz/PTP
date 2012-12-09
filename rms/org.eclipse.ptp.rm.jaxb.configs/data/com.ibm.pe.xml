@@ -472,7 +472,7 @@
                         <description>Message passing API:</description>
                         <tooltip>Specify message passing API(s) used by application (Default: mpi) {MP_MSG_API}
                         </tooltip>
-                        <choice>"mpi,pami,lapi"</choice>
+                        <choice>mpi,pami,lapi</choice>
                 </attribute>
 
                 <attribute name="MP_MSG_ENVELOPE_BUF_ATTR" type="integer">
