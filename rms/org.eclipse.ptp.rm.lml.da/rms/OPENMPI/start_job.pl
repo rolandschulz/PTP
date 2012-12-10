@@ -79,8 +79,8 @@ sub get_job_map {
     my $line;
 	# find node/proc info
 	while ($line=<IN>) {
-	    if ($line=~/^ Data for node: Name: $patnode\s*Num procs: $patint/) {
-			($node,$nprocs) = ($1, $3);
+	    if ($line=~/^ Data for node: (Name: )?$patnode\s*Num procs: $patint/) {
+			($node,$nprocs) = ($2, $4);
 			print "found node $node, procs $nprocs\n" if ($verbose);
 			$TOTAL_PROCS += $nprocs;
 			get_node_map($node);
