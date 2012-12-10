@@ -600,6 +600,10 @@ sub free {
     my($category,$id)=@_;
     my $cat=$self->{CAT2NR}->{$category};
     my($color);
+    if(!$cat) {
+	print "unknown category $category\n";
+	return("");
+    }
     if(exists($self->{KNOWNIDS}[$cat]->{$id})) {
 	$color=$self->{KNOWNIDS}[$cat]->{$id};
 	delete($self->{KNOWNIDS}[$cat]->{$id});

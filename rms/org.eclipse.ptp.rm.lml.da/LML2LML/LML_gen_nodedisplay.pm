@@ -398,6 +398,9 @@ sub _remap_nodes_vnode {
 	    $self->{NODELASTTASKNUMBER}->{$node}=-1;
 	}
 	$start=$self->{NODELASTTASKNUMBER}->{$node}+1;
+	# Store last task number
+	$self->{NODELASTTASKNUMBER}->{$node} = $start+$number-1;
+	 
 	$generatelist=1;
 	if(exists($self->{MAXCORESCHECK})) {
 	    if($number==$self->{MAXCORESCHECK}+1) {
