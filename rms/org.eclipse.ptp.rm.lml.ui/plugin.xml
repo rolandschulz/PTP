@@ -111,11 +111,11 @@
              isEqualityPattern="false"
              pattern="org\.eclipse\.navigate\..*/.*">
        </activityPatternBinding>
-        <activityPatternBinding
+       <!--activityPatternBinding
              activityId="org.eclipse.ptp.rm.lml.ui.systemMonitoringActivity"
              isEqualityPattern="false"
              pattern="org\.eclipse\.mylyn\.tasks\..*/.*">
-       </activityPatternBinding>
+       </activityPatternBinding-->
     </extension>
    
 
