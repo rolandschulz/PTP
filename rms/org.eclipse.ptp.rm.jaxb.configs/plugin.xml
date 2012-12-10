@@ -67,5 +67,9 @@
             configurationFile="data/mpich2-generic-interactive.xml"
             name="MPICH2-Generic-Interactive">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/lsf-generic-batch.xml"
+            name="LSF-Generic-Batch">
+      </JAXBResourceManagerConfiguration>
    </extension>
 </plugin>
