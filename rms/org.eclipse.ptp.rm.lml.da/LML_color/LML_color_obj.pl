@@ -83,7 +83,7 @@ if( $opt_dbdir ne "" ) {
 print STDERR "processing objs  ...\n" if($opt_verbose); 
 {
     my ($key,$type,$color,$colorkey);
-    foreach $key (keys(%{$filehandler->{DATA}->{OBJECT}})) {
+    foreach $key (sort(keys(%{$filehandler->{DATA}->{OBJECT}}))) {
 	next if(!exists($filehandler->{DATA}->{OBJECT}->{$key}->{type}));
 	$colorkey=$key;
 	if(exists( $filehandler->{DATA}->{OBJECT}->{$key}->{name} )){
