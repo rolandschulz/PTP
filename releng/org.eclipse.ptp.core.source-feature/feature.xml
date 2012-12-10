@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.ptp.core"
+      id="org.eclipse.ptp.core.source"
       label="%featureName"
       version="6.0.4.qualifier"
-      provider-name="%providerName"
-      plugin="org.eclipse.ptp.core">
+      provider-name="%providerName">
 
    <description url="http://eclipse.org/ptp">
       %description
@@ -19,223 +18,195 @@
    </license>
 
    <plugin
-         id="org.eclipse.ptp.core"
+         id="org.eclipse.ptp.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.debug.core"
+         id="org.eclipse.ptp.debug.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.debug.ui"
+         id="org.eclipse.ptp.debug.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.core"
+         id="org.eclipse.ptp.rm.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.ui"
+         id="org.eclipse.ptp.rm.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.launch"
+         id="org.eclipse.ptp.launch.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.ui"
+         id="org.eclipse.ptp.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.doc.user"
+         id="org.eclipse.ptp.doc.user.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.proxy.protocol"
+         id="org.eclipse.ptp.proxy.protocol.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp"
+         id="org.eclipse.ptp.rm.proxy.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.proxy.core"
+         id="org.eclipse.ptp.remote.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.remote.core"
+         id="org.eclipse.ptp.remote.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.remote.ui"
+         id="org.eclipse.ptp.utils.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.utils.core"
+         id="org.eclipse.ptp.utils.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.utils.ui"
+         id="org.eclipse.ptp.services.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.services.core"
+         id="org.eclipse.ptp.services.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.services.ui"
+         id="org.eclipse.ptp.ems.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.ems.core"
+         id="org.eclipse.ptp.ems.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.ems.ui"
+         id="org.eclipse.ptp.cdt.compilers.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.cdt.compilers.core"
+         id="org.eclipse.ptp.rm.jaxb.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.jaxb.core"
+         id="org.eclipse.ptp.rm.jaxb.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.jaxb.ui"
+         id="org.eclipse.ptp.rm.jaxb.control.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.jaxb.control.core"
+         id="org.eclipse.ptp.rm.jaxb.control.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.jaxb.control.ui"
+         id="org.eclipse.ptp.rm.lml.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.jaxb.configs"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.rm.jaxb.doc.user"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.rm.lml.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.rm.lml.da"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.rm.lml.ui"
+         id="org.eclipse.ptp.rm.lml.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.lml.da.server"
+         id="org.eclipse.ptp.rm.lml.da.server.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.lml.monitor.core"
+         id="org.eclipse.ptp.rm.lml.monitor.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.lml.monitor.ui"
+         id="org.eclipse.ptp.rm.lml.monitor.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"

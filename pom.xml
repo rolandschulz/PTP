@@ -90,6 +90,7 @@
 		<module>releng/org.eclipse.ptp</module>
 		<module>releng/org.eclipse.ptp.aix.ppc</module>
 		<module>releng/org.eclipse.ptp.core-feature</module>
+		<module>releng/org.eclipse.ptp.core.source-feature</module>
 		<module>releng/org.eclipse.ptp.etfw-feature</module>
 		<module>releng/org.eclipse.ptp.etfw.tau-feature</module>
 		<module>releng/org.eclipse.ptp.etfw.tau.fortran-feature</module>
