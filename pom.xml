@@ -118,9 +118,7 @@
 		<module>releng/org.eclipse.ptp.remotetools-feature</module>
 		<module>releng/org.eclipse.ptp.rm.ibm.ll-feature</module>
 		<module>releng/org.eclipse.ptp.rm.ibm.pe-feature</module>
-		<module>releng/org.eclipse.ptp.rm.jaxb-feature</module>
 		<module>releng/org.eclipse.ptp.rm.jaxb.contrib-feature</module>
-		<module>releng/org.eclipse.ptp.rm.lml-feature</module>
 		<module>releng/org.eclipse.ptp.rm.slurm-feature</module>
 		<module>releng/org.eclipse.ptp.sci-feature</module>
 		<module>releng/org.eclipse.ptp.sdk-feature</module>

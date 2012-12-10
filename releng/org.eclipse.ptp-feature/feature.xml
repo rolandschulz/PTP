@@ -78,14 +78,6 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp.rm.jaxb"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.ptp.rm.lml"
-         version="0.0.0"/>
-
-   <includes
          id="org.eclipse.ptp.rdt.sync"
          version="0.0.0"/>
 
