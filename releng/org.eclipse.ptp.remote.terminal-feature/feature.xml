@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ptp.remote.terminal"
+      label="%featureName"
+      version="6.0.4.qualifier"
+      provider-name="%providerName">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <includes
+         id="org.eclipse.ptp.remote"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.remote.remotetools"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.remotetools"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.tm.terminal"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.tm.terminal.view"
+         version="0.0.0"/>
+
+   <requires>
+      <import plugin="org.eclipse.jgit" version="1.0.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.ptp.remote.terminal"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
