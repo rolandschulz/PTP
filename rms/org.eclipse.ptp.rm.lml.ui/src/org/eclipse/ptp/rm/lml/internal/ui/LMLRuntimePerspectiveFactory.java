@@ -43,6 +43,5 @@ public class LMLRuntimePerspectiveFactory implements IPerspectiveFactory {
 
 		miscFolder.addView(ILMLUIConstants.ID_INFO_VIEW);
 		miscFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
-		miscFolder.addView("org.eclipse.ptp.remotetools.environment.ui.views.RemoteEnvironmentsView"); //$NON-NLS-1$
 	}
 }

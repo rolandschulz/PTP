@@ -81,6 +81,10 @@
          id="org.eclipse.ptp.rdt.sync"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.ptp.remote.terminal"
+         version="0.0.0"/>
+
    <plugin
          id="org.eclipse.ptp"
          download-size="0"

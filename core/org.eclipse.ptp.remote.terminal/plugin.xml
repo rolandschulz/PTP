@@ -18,5 +18,35 @@
       id="org.eclipse.ptp.remote.internal.terminal.RemoteToolsConnector"
       class="org.eclipse.ptp.remote.internal.terminal.RemoteToolsConnector"/>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.ptp.rm.lml.ui.SystemMonitoringPerspective">
+         <view
+               id="org.eclipse.tm.terminal.view.TerminalView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView">
+         </view>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.eclipse.cdt.ui.CPerspective">
+         <view
+               id="org.eclipse.tm.terminal.view.TerminalView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView">
+         </view>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.eclipse.ptp.rdt.ui.remoteCPerspective">
+         <view
+               id="org.eclipse.tm.terminal.view.TerminalView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView">
+         </view>
+      </perspectiveExtension>
+   </extension>
 
 </plugin>

@@ -28,4 +28,5 @@
    <feature url="features/org.eclipse.ptp.rdt.remotetools_0.0.0.jar" id="org.eclipse.ptp.rdt.remotetools" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rdt.editor_0.0.0.jar" id="org.eclipse.ptp.rdt.editor" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rcp.sysmon_6.0.4.qualifier.jar" id="org.eclipse.ptp.rcp.sysmon" version="6.0.4.qualifier" os="linux" ws="gtk" arch="x86_64"/>
+   <feature url="features/org.eclipse.ptp.remote.terminal_6.0.4.qualifier.jar" id="org.eclipse.ptp.remote.terminal" version="6.0.4.qualifier"/>
 </site>

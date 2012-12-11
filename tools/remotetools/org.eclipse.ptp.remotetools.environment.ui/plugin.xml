@@ -32,12 +32,12 @@
          </view>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="org.eclipse.ptp.ui.PTPRunPerspective">
+            targetID="org.eclipse.ptp.rm.lml.ui.SystemMonitoringPerspective">
          <view
                id="org.eclipse.ptp.remotetools.environment.ui.views.RemoteEnvironmentsView"
                minimized="false"
                relationship="stack"
-               relative="org.eclipse.ui.views.PropertySheet">
+               relative="org.eclipse.ui.console.ConsoleView">
          </view>
       </perspectiveExtension>
       <perspectiveExtension

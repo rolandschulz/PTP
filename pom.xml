@@ -116,6 +116,7 @@
 		<module>releng/org.eclipse.ptp.remote-feature</module>
 		<module>releng/org.eclipse.ptp.remote.remotetools-feature</module>
 		<module>releng/org.eclipse.ptp.remote.rse-feature</module>
+		<module>releng/org.eclipse.ptp.remote.terminal-feature</module>
 		<module>releng/org.eclipse.ptp.remotetools-feature</module>
 		<module>releng/org.eclipse.ptp.rm.ibm.ll-feature</module>
 		<module>releng/org.eclipse.ptp.rm.ibm.pe-feature</module>
