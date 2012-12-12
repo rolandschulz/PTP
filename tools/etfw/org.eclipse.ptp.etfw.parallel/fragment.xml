@@ -25,10 +25,13 @@
       <extension
          point="org.eclipse.debug.ui.launchConfigurationTabs">
       <tab
-            class="org.eclipse.ptp.rm.launch.ui.ResourcesTab"
+            class="org.eclipse.ptp.launch.ui.tabs.ResourcesTab"
             group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.resourcesTab"
             name="%ResourcesLaunchTab.name">
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.parallelLaunch">
+         </associatedDelegate>
       </tab>
       <tab
             class="org.eclipse.ptp.etfw.parallel.ParallelToolRecompMainTab"
@@ -36,26 +39,35 @@
             id="org.eclipse.ptp.etfw.applicationTab"
             name="%ApplicationLaunchTab.name">
          <placement
-               after="org.eclipse.ptp.rm.launch.applicationLaunch.resourcesTab">
+               after="org.eclipse.ptp.launch.applicationLaunch.resourcesTab">
          </placement>
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.parallelLaunch">
+         </associatedDelegate>
       </tab>
       <tab
-            class="org.eclipse.ptp.rm.launch.ui.ArgumentsTab"
+            class="org.eclipse.ptp.launch.ui.tabs.ArgumentsTab"
             group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.argumentsTab"
             name="%ArgumentsLaunchTab.name">
          <placement
-               after="org.eclipse.ptp.rm.launch.applicationLaunch.applicationTab">
+               after="org.eclipse.ptp.launch.applicationLaunch.applicationTab">
          </placement>
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.parallelLaunch">
+         </associatedDelegate>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.EnvironmentTab"
+            class="org.eclipse.ptp.launch.ui.tabs.EnvironmentTab"
             group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.environmentTab"
             name="%EnvironmentLaunchTab.name">
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.argumentsTab">
          </placement>
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.parallelLaunch">
+         </associatedDelegate>
       </tab>
       <tab
             class="org.eclipse.ptp.etfw.parallel.internal.ParallelToolSelectionTab"
@@ -65,6 +77,9 @@
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.environmentTab">
          </placement>
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.parallelLaunch">
+         </associatedDelegate>
       </tab>
       <tab
     		class="org.eclipse.ptp.etfw.parallel.internal.ParallelParameterTab"
@@ -74,6 +89,9 @@
          <placement
                after="org.eclipse.ptp.etfw.parallelToolSelectionTab">
          </placement>
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.parallelLaunch">
+         </associatedDelegate>
       </tab>
       <tab
             class="org.eclipse.debug.ui.CommonTab"
@@ -83,6 +101,9 @@
          <placement
                after="org.eclipse.ptp.etfw.parametricParameterTab">
          </placement>
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.parallelLaunch">
+         </associatedDelegate>
       </tab>
    </extension>	
 </fragment>
