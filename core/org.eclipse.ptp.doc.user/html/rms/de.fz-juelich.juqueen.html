@@ -1,0 +1,62 @@
+<html>
+<head>
+<title>Running batch jobs on JUQUEEN, a supercomputer at Juelich Supercomputing Centre</title>
+<link rel="stylesheet" type="text/css" href="../help.css">
+<script type="text/javascript" src="thumb.js"> </script>
+</head>
+<body>
+
+<h1 id="top">Running batch jobs on JUQUEEN</h1>
+
+<p>In order to run a batch job on JUQUEEN from PTP, first create a C/C++/Fortran project, and build it.
+For more information, see
+<ul>
+<li><a href="../01buildMPIprog.html">Introduction to creating MPI projects</a>
+which includes information on building
+<li><a href="PLUGINS_ROOT/org.eclipse.ptp.pldt.doc.user/html/setup.html">Setting up an MPI project with PTP's PLDT</a>
+<li><a href="../sync.html">Synchronized Projects</a> - creating and building projects on remote machines
+</ul> 
+<p>As described in <a href="../03pRunConfig.html">Running Parallel Programs</a>, next create a run configuration
+via Run &gt; Run Configurations ... and create a new <b>Parallel Application</b>.
+
+<p>Choose <b>de.fz-juelich.juqueen.ll_bg</b> as target system configuration.</p>
+
+<p>JUQUEEN is an IBM Blue Gene/Q system. Its target system configuration is based on the <a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.ll.help/html/IBMLLMainHelp.html">IBM LoadLeveler (Blue Gene)</a> target system configuration.
+General Settings for a job submission on JUQUEEN are shown in the following snap shot.</p>
+<img src="../images/rms-juqueen1.png" border="1" alt="General Settings for a JUQUEEN job submission">
+
+<p>
+Except for the <b>E-mail</b> parameter used for notifications on job completions, all parameters can be found in the IBM LoadLeveler (Blue Gene) target system configuration.
+On a Blue Gene system you usually have to select job type <b>bluegene</b>. With <b>Ranks per Node</b> the number of
+processes per compute node are set.
+</p>
+
+<p>
+Moreover, the location for in- and output files can be configured as shown in the following snap shot.
+In the shown case, the standard output and standard error files are named dynamically. The variables
+<b>host</b>, <b>jobid</b> and <b>stepid</b> will be replaced with the corresponding values for each job.
+</p>
+<img src="../images/rms-juqueen2.png" border="1" alt="In/Output Settings for a JUQUEEN job submission">
+
+<p>
+The limits section allows for instance to provide a wall clock limit.  
+</p>
+<img src="../images/rms-juqueen3.png" border="1" alt="Limits Settings for a JUQUEEN job submission">
+
+<p>
+By filling in the shown parameters, the following batch script is generated.
+</p>
+<img src="../images/rms-juqueen4.png" border="1" alt="Generated batch script for a JUQUEEN job">
+
+<p>
+You can always adapt the parameter values and check the produced job script afterwards by clicking on the
+<b>View Script</b> button.
+</p>
+
+<p>
+Finally, you have to select the binary, which has to be executed, on the <b>Application</b> tab.
+Once your configuration is complete, you can click on the <b>Run</b> button to submit your job.
+</p>
+ 
+</body>
+</html>

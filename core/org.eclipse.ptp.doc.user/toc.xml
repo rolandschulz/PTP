@@ -15,6 +15,9 @@
           <anchor id="ptpRun"/>
           <topic label="Running Open MPI Jobs" href="html/rms/openMPI.html"/>
           <topic label="Running Grid Engine Jobs" href="html/rms/gridengine.html"/>
+          <topic label="Running Jobs on JSC JUDGE" href="html/rms/de.fz-juelich.judge.html"/>
+          <topic label="Running Jobs on JSC JUROPA" href="html/rms/de.fz-juelich.juropa.html"/>
+          <topic label="Running Jobs on JSC JUQUEEN" href="html/rms/de.fz-juelich.juqueen.html"/>
           </topic>
       <topic label="Monitoring Jobs and Systems" href="html/05monitoring.html"/>
       <topic label="Parallel Debugging"  href="html/06parDebugging.html"/>
