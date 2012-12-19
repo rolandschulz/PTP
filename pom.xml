@@ -145,7 +145,6 @@
 		<module>rms/org.eclipse.ptp.rm.lml.monitor.core</module>
 		<module>rms/org.eclipse.ptp.rm.lml.monitor.ui</module>
 		<module>rms/org.eclipse.ptp.rm.lml.ui</module>
-		<module>rms/org.eclipse.ptp.rm.proxy.core</module>
 		<module>rms/org.eclipse.ptp.rm.slurm.help</module>
 		<module>rms/org.eclipse.ptp.rm.ui</module>
 		<module>tools/cdt/org.eclipse.ptp.cdt.compilers.core</module>
