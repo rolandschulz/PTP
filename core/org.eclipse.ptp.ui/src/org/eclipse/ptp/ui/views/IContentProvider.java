@@ -17,21 +17,19 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
+
 /**
  * @author Clement chu
  * 
  */
 public interface IContentProvider {
-	/** Get target element
-	 * @param index element index
-	 * @return element
+	/**
+	 * Check target element exists at index
+	 * 
+	 * @param index
+	 *            element index
+	 * @return true if element exists
+	 * @since 7.0
 	 */
-	public Object getObject(int index);
-	/** Get index of left hand element
-	 * @param obj Target element
-	 * @param index element index
-	 * @return element ID
-	 */
-	public String getRulerIndex(Object obj, int index);
+	public boolean hasElement(int index);
 }
-

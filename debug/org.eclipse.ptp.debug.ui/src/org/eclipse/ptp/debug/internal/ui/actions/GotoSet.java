@@ -28,40 +28,46 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.model.IElementHandler;
-import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 
 /**
  * @author clement chu
- *
+ * 
  */
 public class GotoSet implements IViewActionDelegate {
 	private IStructuredSelection selection = null;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
 	 */
-	public void init(IViewPart view) {}
-	
-	/* (non-Javadoc)
+	public void init(IViewPart view) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
 		IPBreakpoint breakpoint = getPBreakpoint();
 		if (breakpoint != null) {
-			IViewPart view = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage().findView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
+			IViewPart view = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage()
+					.findView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 			if (view instanceof ParallelDebugView) {
-				ParallelDebugView pview = (ParallelDebugView)view;
-				try {				
+				ParallelDebugView pview = (ParallelDebugView) view;
+				try {
 					String jid = breakpoint.getJobId();
-					if (jid.equals(IPBreakpoint.GLOBAL))
+					if (jid.equals(IPBreakpoint.GLOBAL)) {
 						jid = IElementManager.EMPTY_ID;
-					
+					}
+
 					pview.doChangeJob(jid);
 					IElementHandler elementHandler = pview.getCurrentElementHandler();
 					if (elementHandler != null) {
-						pview.selectSet((IElementSet)elementHandler.getElementByID(breakpoint.getSetId()));
+						pview.selectSet(elementHandler.getSet(breakpoint.getSetId()));
 					}
 					pview.refresh(true);
 				} catch (CoreException e) {
@@ -70,28 +76,34 @@ public class GotoSet implements IViewActionDelegate {
 			}
 		}
 	}
-	
-	/** Get PTP breakpoint
+
+	/**
+	 * Get PTP breakpoint
+	 * 
 	 * @return null if there is no ptp breakpoint
 	 */
 	private IPBreakpoint getPBreakpoint() {
-		if (selection.isEmpty())
+		if (selection.isEmpty()) {
 			return null;
-		
+		}
+
 		Object obj = selection.getFirstElement();
-		if (obj instanceof IPBreakpoint)
-			return (IPBreakpoint)obj;
-		
+		if (obj instanceof IPBreakpoint) {
+			return (IPBreakpoint) obj;
+		}
+
 		return null;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		if (selection instanceof IStructuredSelection) {
-			this.selection = (IStructuredSelection)selection;
-			action.setEnabled(this.selection.size()==1 && getPBreakpoint()!=null);
+			this.selection = (IStructuredSelection) selection;
+			action.setEnabled(this.selection.size() == 1 && getPBreakpoint() != null);
 		}
 	}
 }

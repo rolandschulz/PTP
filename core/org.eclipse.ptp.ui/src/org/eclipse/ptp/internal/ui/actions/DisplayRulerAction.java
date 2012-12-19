@@ -18,10 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.actions;
 
+import java.util.BitSet;
+
 import org.eclipse.jface.action.IAction;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.messages.Messages;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
@@ -31,24 +32,35 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 public class DisplayRulerAction extends ParallelAction {
 	public static final String name = Messages.DisplayRulerAction_0;
 	private boolean checked = false;
-	
-	/** Constructor
+
+	/**
+	 * Constructor
+	 * 
 	 * @param view
 	 */
 	public DisplayRulerAction(AbstractParallelElementView view) {
 		super(name, IAction.AS_CHECK_BOX, view);
-		setEnabled(view.getCurrentID().length()>0);
+		setEnabled(view.getCurrentID().length() > 0);
 		checked = view.isDisplayRuler();
 		setChecked(checked);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(java.util.BitSet)
 	 */
-	public void run(IElement[] elements) {}
-	/* (non-Javadoc)
+	@Override
+	public void run(BitSet elements) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.action.IAction#run()
 	 */
+
+	@Override
 	public void run() {
 		getViewPart().setDisplayRuler(!checked);
 	}

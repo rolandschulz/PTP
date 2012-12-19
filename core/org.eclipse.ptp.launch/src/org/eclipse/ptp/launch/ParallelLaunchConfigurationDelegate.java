@@ -24,7 +24,6 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
@@ -122,11 +121,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	protected void doCompleteJobLaunch(final IPLaunch launch, final IPDebugger debugger) {
 		final String jobId = launch.getJobId();
 		final ILaunchConfiguration configuration = launch.getLaunchConfiguration();
-
-		/*
-		 * Used by org.eclipse.ptp.ui.IJobManager#removeJob
-		 */
-		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), jobId);
 
 		/*
 		 * Create process that is used by the DebugPlugin for handling console output. This process gets added to the debug session
@@ -236,7 +230,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				progress.worked(10);
 				progress.subTask(Messages.ParallelLaunchConfigurationDelegate_7);
 
-				submitJob(configuration, mode, (IPLaunch) launch, debugger, progress.newChild(40));
+				submitJob(mode, (IPLaunch) launch, debugger, progress.newChild(40));
 
 				progress.worked(10);
 			} catch (CoreException e) {

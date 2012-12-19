@@ -18,38 +18,49 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.actions;
 
+import java.util.BitSet;
+
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.messages.Messages;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 import org.eclipse.ptp.ui.views.AbstractParallelSetView;
 
 /**
  * @author clement chu
- *
+ * 
  */
 public class ZoomInAction extends ParallelAction {
 	public static final String name = Messages.ZoomInAction_0;
-	
-	/** Constructor
+
+	/**
+	 * Constructor
+	 * 
 	 * @param view
 	 */
 	public ZoomInAction(AbstractParallelElementView view) {
 		super(name, view);
-	    setImageDescriptor(ParallelImages.ID_ICON_ZOOMIN_NORMAL);
+		setImageDescriptor(ParallelImages.ID_ICON_ZOOMIN_NORMAL);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(java.util.BitSet)
 	 */
-	public void run(IElement[] elements) {}
-	/* (non-Javadoc)
+	@Override
+	public void run(BitSet elements) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.action.IAction#run()
 	 */
+	@Override
 	public void run() {
 		if (view instanceof AbstractParallelSetView) {
-			((AbstractParallelSetView)view).zoomIn();
+			((AbstractParallelSetView) view).zoomIn();
 		}
 	}
 }

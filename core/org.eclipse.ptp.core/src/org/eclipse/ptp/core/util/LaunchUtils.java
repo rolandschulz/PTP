@@ -10,8 +10,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
@@ -185,22 +183,6 @@ public class LaunchUtils {
 	}
 
 	/**
-	 * Get the default queue for the given resource manager
-	 * 
-	 * @param rm
-	 *            resource manager
-	 * @return default queue
-	 * @since 5.0
-	 */
-	public static IPQueue getQueueDefault(IPResourceManager rm) {
-		final IPQueue[] queues = rm.getQueues();
-		if (queues.length == 0) {
-			return null;
-		}
-		return queues[0];
-	}
-
-	/**
 	 * @since 6.0
 	 */
 	public static String getRemoteServicesId(ILaunchConfiguration configuration) {
@@ -290,13 +272,6 @@ public class LaunchUtils {
 	 */
 	public static void setConnectionName(ILaunchConfigurationWorkingCopy configuration, String name) {
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, name);
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	public static void setDebuggerNeedsLaunchHelp(ILaunchConfigurationWorkingCopy configuration, boolean flag) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_NEEDS_LAUNCH_HELP, flag);
 	}
 
 	/**

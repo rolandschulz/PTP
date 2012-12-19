@@ -18,8 +18,6 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,21 +33,10 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
-import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
-import org.eclipse.ptp.core.elements.events.INewProcessEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
-import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -65,7 +52,6 @@ import org.eclipse.ptp.rm.jaxb.control.LaunchController;
 import org.eclipse.ptp.rm.jaxb.control.data.ArgImpl;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
-import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.control.internal.IStreamParserTokenizer;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
@@ -80,7 +66,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentType;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
 import org.eclipse.ptp.utils.core.ArgumentParser;
-import org.eclipse.ptp.utils.core.BitSetIterable;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
@@ -211,7 +196,7 @@ public class CommandJob extends Job implements ICommandJob {
 	private final boolean waitForId;
 	private final JobMode jobMode;
 	private final boolean keepOpen;
-	private final ILaunchConfiguration launchConfiguration;
+	private final ILaunch launch;
 	private final String launchMode;
 	private final List<Job> cmdJobs = new ArrayList<Job>();
 
@@ -241,13 +226,13 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public CommandJob(String jobUUID, CommandType command, JobMode jobMode, IJobController control,
-			ILaunchConfiguration configuration, String launchMode) {
+	public CommandJob(String jobUUID, CommandType command, JobMode jobMode, IJobController control, ILaunch launch,
+			String launchMode) {
 		super(command.getName() + JAXBControlConstants.CO + JAXBControlConstants.SP
 				+ (jobUUID == null ? control.getConnectionName() : jobUUID));
 		this.command = command;
 		this.jobMode = jobMode;
-		this.launchConfiguration = configuration;
+		this.launch = launch;
 		this.launchMode = launchMode;
 		this.control = control;
 		this.rmVarMap = control.getEnvironment();
@@ -409,95 +394,6 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * Create a temporary debug model so that the debug view displays correctly
-	 * 
-	 * @param jobId
-	 *            job ID for this job
-	 * @param vars
-	 *            variable map
-	 */
-	private IStatus createDebugModel(String jobId, IVariableMap vars) {
-		IPResourceManager rm = ModelManager.getInstance().getUniverse().getResourceManager(control.getControlId());
-		if (rm != null) {
-			/*
-			 * Remove any old jobs with the same job ID
-			 */
-			IPJob oldJob = rm.getJobById(jobId);
-			if (oldJob != null) {
-				rm.removeJobs(Arrays.asList(oldJob));
-			}
-
-			AttributeManager attrMgr = new AttributeManager();
-			attrMgr.addAttribute(JobAttributes.getJobIdAttributeDefinition().create(jobId));
-			attrMgr.addAttribute(JobAttributes.getStateAttributeDefinition().create(JobAttributes.State.RUNNING));
-			attrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
-
-			final IPJob job = rm.newJob(jobId, attrMgr);
-
-			job.addChildListener(new IJobChildListener() {
-
-				public void handleEvent(IChangedProcessEvent e) {
-					boolean hasOutput = e.getAttributes().getAttribute(ProcessAttributes.getStderrAttributeDefinition()) != null;
-					if (hasOutput) {
-						ICommandJobStreamMonitor monitor = (ICommandJobStreamMonitor) proxy.getOutputStreamMonitor();
-						final BitSet indices = e.getProcesses();
-						for (Integer index : new BitSetIterable(indices)) {
-							StringAttribute stderr = job.getProcessAttribute(ProcessAttributes.getStderrAttributeDefinition(),
-									index);
-							if (stderr != null) {
-								monitor.append(stderr.getValueAsString());
-							}
-						}
-					}
-					hasOutput = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition()) != null;
-					if (hasOutput) {
-						ICommandJobStreamMonitor monitor = (ICommandJobStreamMonitor) proxy.getOutputStreamMonitor();
-						final BitSet indices = e.getProcesses();
-						for (Integer index : new BitSetIterable(indices)) {
-							StringAttribute stdout = job.getProcessAttribute(ProcessAttributes.getStdoutAttributeDefinition(),
-									index);
-							if (stdout != null) {
-								monitor.append(stdout.getValueAsString());
-							}
-						}
-					}
-				}
-
-				public void handleEvent(INewProcessEvent e) {
-					// TODO Auto-generated method stub
-				}
-
-				public void handleEvent(IRemoveProcessEvent e) {
-					// TODO Auto-generated method stub
-				}
-			});
-
-			attrMgr = new AttributeManager();
-			attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
-
-			Object attr = getAttributeValue(vars, JAXBControlConstants.MPI_PROCESSES);
-			if (attr != null) {
-				String numProcsStr = String.valueOf(attr);
-				int numProcs;
-				try {
-					numProcs = Integer.parseInt(numProcsStr);
-				} catch (NumberFormatException e) {
-					return new Status(IStatus.ERROR, JAXBControlCorePlugin.getUniqueIdentifier(),
-							Messages.CommandJob_UnableToDetermineTasksError);
-				}
-				BitSet procRanks = new BitSet(numProcs);
-				procRanks.set(0, numProcs, true);
-				job.addProcessesByJobRanks(procRanks, attrMgr);
-				rm.addJobs(null, Arrays.asList(job));
-				return Status.OK_STATUS;
-			}
-		}
-
-		return new Status(IStatus.ERROR, JAXBControlCorePlugin.getUniqueIdentifier(),
-				Messages.CommandJob_UnableToDetermineTasksError);
-	}
-
-	/**
 	 * Uses the IRemoteProcessBuilder to set up the command and environment. After start, the tokenizers (if any) are handled, and
 	 * stream redirection managed. Returns immediately if <code>keepOpen</code> is true; else waits for the process, then joins on
 	 * the consumers.x
@@ -525,8 +421,8 @@ public class CommandJob extends Job implements ICommandJob {
 			}
 			progress.worked(30);
 			maybeInitializeTokenizers(builder, progress.newChild(10));
-			setOutStreamRedirection(process, null);
-			setErrStreamRedirection(process, null);
+			setOutStreamRedirection(process);
+			setErrStreamRedirection(process);
 			startConsumers(process);
 
 			synchronized (this) {
@@ -838,7 +734,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param process
 	 * @throws IOException
 	 */
-	private void setErrStreamRedirection(IRemoteProcess process, IPJob job) throws IOException {
+	private void setErrStreamRedirection(IRemoteProcess process) throws IOException {
 		if (stderrTokenizer == null) {
 			proxy.setErrMonitor(new CommandJobStreamMonitor(process.getErrorStream()));
 		} else {
@@ -862,7 +758,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param process
 	 * @throws IOException
 	 */
-	private void setOutStreamRedirection(IRemoteProcess process, IPJob job) throws IOException {
+	private void setOutStreamRedirection(IRemoteProcess process) throws IOException {
 		if (stdoutTokenizer == null) {
 			proxy.setOutMonitor(new CommandJobStreamMonitor(process.getInputStream()));
 		} else {
@@ -1022,7 +918,7 @@ public class CommandJob extends Job implements ICommandJob {
 					jobStatus.setProcess(process);
 				}
 				jobStatus.setProxy(getProxy());
-				jobStatus.setLaunchConfig(launchConfiguration);
+				jobStatus.setLaunch(launch);
 				try {
 					jobStatus.waitForJobId(uuid, waitUntil, control.getStatusMap(), progress.newChild(20));
 				} catch (CoreException failed) {
@@ -1055,7 +951,7 @@ public class CommandJob extends Job implements ICommandJob {
 					jobStatus.setProcess(process);
 				}
 				jobStatus.setProxy(getProxy());
-				jobStatus.setLaunchConfig(launchConfiguration);
+				jobStatus.setLaunch(launch);
 			}
 
 			if (progress.isCanceled()) {
@@ -1067,13 +963,6 @@ public class CommandJob extends Job implements ICommandJob {
 					if (process != null && !process.isCompleted()) {
 						status = writeInputToProcess(process);
 					}
-				}
-
-				/*
-				 * Create the debug model if necessary
-				 */
-				if (status.isOK() && launchMode.equals(ILaunchManager.DEBUG_MODE)) {
-					status = createDebugModel(jobStatus.getJobId(), rmVarMap);
 				}
 
 				if (status.isOK()) {

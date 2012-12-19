@@ -10,8 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui;
 
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 
@@ -24,22 +23,14 @@ public interface IJobManager extends IElementManager {
 	public void addJobChangedListener(IJobChangedListener jobListener);
 
 	/**
-	 * Add a process to the view.
-	 * 
-	 * @param job
-	 * @param procJobRank
-	 * @since 4.0
-	 */
-	public void addProcess(IPJob job, int procJobRank);
-
-	/**
 	 * Create an element handler for the job
 	 * 
 	 * @param job
 	 *            job
 	 * @return element handler for the job
+	 * @since 7.0
 	 */
-	public IElementHandler createElementHandler(IPJob job);
+	public IElementHandler createElementHandler(IJobStatus job);
 
 	/**
 	 * Find a job give its ID.
@@ -47,8 +38,9 @@ public interface IJobManager extends IElementManager {
 	 * @param jobId
 	 *            ID of job to find
 	 * @return job with corresponding ID
+	 * @since 7.0
 	 */
-	public IPJob findJobById(String jobId);
+	public IJobStatus findJobById(String jobId);
 
 	/**
 	 * Fire job event when job is changed
@@ -64,22 +56,17 @@ public interface IJobManager extends IElementManager {
 	 * Get the currently selected job.
 	 * 
 	 * @return currently selected job
+	 * @since 7.0
 	 */
-	public IPJob getJob();
+	public IJobStatus getJob();
 
 	/**
 	 * Get Jobs that we know about.
 	 * 
 	 * @return jobs
+	 * @since 7.0
 	 */
-	public IPJob[] getJobs();
-
-	/**
-	 * Get the currently selected queue.
-	 * 
-	 * @return currently selected queue
-	 */
-	public IPQueue getQueue();
+	public IJobStatus[] getJobs();
 
 	/**
 	 * Test if there is at least one completed job.
@@ -89,16 +76,16 @@ public interface IJobManager extends IElementManager {
 	public boolean hasStoppedJob();
 
 	/**
-	 * Remove all jobs that have completed from the view
+	 * @since 7.0
 	 */
-	public void removeAllStoppedJobs();
+	public void initialize();
 
 	/**
-	 * Remove job from view.
+	 * Remove all jobs that have completed from the view
 	 * 
-	 * @param job
+	 * @since 7.0
 	 */
-	public void removeJob(IPJob job);
+	public void removeAllCompletedJobs();
 
 	/**
 	 * Remove job listener
@@ -108,19 +95,11 @@ public interface IJobManager extends IElementManager {
 	public void removeJobChangedListener(IJobChangedListener jobListener);
 
 	/**
-	 * Remove a process from the view.
-	 * 
-	 * @param job
-	 * @param procJobRank
-	 * @since 4.0
-	 */
-	public void removeProcess(IPJob job, int procJobRank);
-
-	/**
 	 * Set the current job
 	 * 
 	 * @param job
 	 *            the current job to set
+	 * @since 7.0
 	 */
-	public void setJob(IPJob job);
+	public void setJob(IJobStatus job);
 }

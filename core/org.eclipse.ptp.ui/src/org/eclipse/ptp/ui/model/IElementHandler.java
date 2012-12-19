@@ -18,48 +18,89 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.model;
 
+import java.util.BitSet;
+
 import org.eclipse.ptp.core.PreferenceConstants;
 
 /**
  * @author clement chu
- *
+ * 
  */
-public interface IElementHandler extends IElementSet {
+public interface IElementHandler {
 	public final static String SET_ROOT_ID = PreferenceConstants.SET_ROOT_ID;
-	/** Get Set root
-	 * @return root set
+
+	/**
+	 * @since 7.0
 	 */
-	IElementSet getSetRoot();
-	
-	/** Get sets included
-	 * @param id Target element ID
-	 * @return included sets
-	 */
-	IElementSet[] getSetsWithElement(String id);
-	
-	/** Is element registered
-	 * @param element Target element
-	 * @return true if element is registered
-	 */
-	boolean containsRegister(IElement element);
-	/** Add element to registered list
-	 * @param element Target element
-	 */
-	void addToRegister(IElement[] elements);
-	/** Remove element from registered list
-	 * @param element Target element
-	 */
-	void removeFromRegister(IElement[] elements);
-	/** Get registered elements
+	public IElementSet createSet(String id, String name, BitSet elements);
+
+	/**
+	 * Get registered elements
+	 * 
 	 * @return registered elements
+	 * @since 7.0
 	 */
-	IElement[] getRegistered();
-	/** 
+	public BitSet getRegistered();
+
+	/**
+	 * @param id
+	 * @return
+	 * @since 7.0
+	 */
+	public IElementSet getSet(String id);
+
+	/**
+	 * @since 7.0
+	 */
+	public IElementSet[] getSets();
+
+	/**
+	 * @since 7.0
+	 */
+	public IElementSet[] getSetsContaining(int element);
+
+	/**
+	 * @since 7.0
+	 */
+	public boolean isRegistered(int index);
+
+	/**
+	 * Add element to registered list
+	 * 
+	 * @param element
+	 *            Target element
+	 * @since 7.0
+	 */
+	public void register(BitSet elements);
+
+	/**
 	 * Remove all registered elements
 	 */
-	void removeAllRegistered();
-	/** Get total of registered elements
+	public void removeAllRegistered();
+
+	/**
+	 * @since 7.0
+	 */
+	public IElementSet removeSet(String id);
+
+	/**
+	 * @since 7.0
+	 */
+	public int size();
+
+	/**
+	 * Get total of registered elements
+	 * 
 	 * @return number of registered elements
 	 */
-	int totalRegistered();
+	public int totalRegistered();
+
+	/**
+	 * Remove element from registered list
+	 * 
+	 * @param element
+	 *            Target element
+	 * @since 7.0
+	 */
+	public void unRegister(BitSet elements);
 }

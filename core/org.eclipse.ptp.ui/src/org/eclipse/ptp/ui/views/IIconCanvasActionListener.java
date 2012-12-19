@@ -18,10 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import java.util.BitSet;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public interface IIconCanvasActionListener {
 	public static final int COPY_ACTION = 1;
@@ -29,16 +30,27 @@ public interface IIconCanvasActionListener {
 	public static final int PASTE_ACTION = 3;
 	public static final int DELETE_ACTION = 4;
 	public static final int DOUBLE_CLICK_ACTION = 5;
-	//public static final int SELECTION_ACTION = 6;
-	
-	/** Handle action
-	 * @param type action type
-	 * @param indexes element indexes
+
+	// public static final int SELECTION_ACTION = 6;
+
+	/**
+	 * Handle action
+	 * 
+	 * @param type
+	 *            action type
+	 * @param elements
+	 *            BitSet containing element indexes
+	 * @since 7.0
 	 */
-	public void handleAction(int type, int[] indexes);
-	/**Handle action
-	 * @param type action type
-	 * @param index element index
+	public void handleAction(int type, BitSet elements);
+
+	/**
+	 * Handle action
+	 * 
+	 * @param type
+	 *            action type
+	 * @param index
+	 *            element index
 	 */
 	public void handleAction(int type, int index);
 }

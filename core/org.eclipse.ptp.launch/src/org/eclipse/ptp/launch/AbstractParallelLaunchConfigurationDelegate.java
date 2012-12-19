@@ -545,7 +545,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * Submit a job to the resource manager. Keeps track of the submission so we know when the job actually starts running. When
 	 * this happens, the abstract method doCompleteJobLaunch() is invoked.
 	 * 
-	 * @param configuration
 	 * @param mode
 	 * @param launch
 	 * @param debugger
@@ -553,11 +552,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected void submitJob(ILaunchConfiguration configuration, String mode, IPLaunch launch, IPDebugger debugger,
-			IProgressMonitor progress) throws CoreException {
+	protected void submitJob(String mode, IPLaunch launch, IPDebugger debugger, IProgressMonitor progress) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(progress, 50);
 		try {
-			final ILaunchController control = RMLaunchUtils.getLaunchController(configuration);
+			final ILaunchController control = RMLaunchUtils.getLaunchController(launch.getLaunchConfiguration());
 			if (control == null) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
@@ -591,8 +589,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			}
 
 			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
-
-			String jobId = control.submitJob(configuration, mode, subMon.newChild(10));
+			String jobId = control.submitJob(launch, subMon.newChild(10));
 			if (subMon.isCanceled()) {
 				control.stop();
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), "Launch was cancelled"));

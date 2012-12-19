@@ -13,15 +13,13 @@ package org.eclipse.ptp.core.tests.suite;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.eclipse.ptp.core.tests.AttributeIndexSetTests;
 import org.eclipse.ptp.core.tests.RangeSetTests;
 
 public class CoreTestSuite {
 	public static Test suite() {
 		TestSuite suite = new TestSuite(CoreTestSuite.class.getName());
-		
+
 		suite.addTestSuite(RangeSetTests.class);
-		suite.addTestSuite(AttributeIndexSetTests.class);
 		return suite;
 	}
 

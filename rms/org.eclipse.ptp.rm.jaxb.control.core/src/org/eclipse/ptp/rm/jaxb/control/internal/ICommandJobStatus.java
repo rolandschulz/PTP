@@ -11,8 +11,8 @@ package org.eclipse.ptp.rm.jaxb.control.internal;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.ptp.core.jobs.IPJobStatus;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 
 /**
@@ -22,7 +22,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
  * @author arossi
  * 
  */
-public interface ICommandJobStatus extends IJobStatus {
+public interface ICommandJobStatus extends IPJobStatus {
 	/**
 	 * for throttling requests which may trigger remote calls
 	 */
@@ -66,9 +66,9 @@ public interface ICommandJobStatus extends IJobStatus {
 	public void maybeWaitForHandlerFiles(int blockForSecs, IProgressMonitor monitor);
 
 	/**
-	 * @param configuration
+	 * @param launch
 	 */
-	public void setLaunchConfig(ILaunchConfiguration configuration);
+	public void setLaunch(ILaunch launch);
 
 	/**
 	 * @param owner

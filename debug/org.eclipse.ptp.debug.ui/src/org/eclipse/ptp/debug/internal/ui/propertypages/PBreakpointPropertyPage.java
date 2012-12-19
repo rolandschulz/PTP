@@ -372,12 +372,13 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 		} else if (breakpoint instanceof IPWatchpoint) {
 			IPWatchpoint watchpoint = (IPWatchpoint) breakpoint;
 			String type = ""; //$NON-NLS-1$
-			if (watchpoint.isReadType() && !watchpoint.isWriteType())
+			if (watchpoint.isReadType() && !watchpoint.isWriteType()) {
 				type = Messages.PBreakpointPropertyPage_11;
-			else if (!watchpoint.isReadType() && watchpoint.isWriteType())
+			} else if (!watchpoint.isReadType() && watchpoint.isWriteType()) {
 				type = Messages.PBreakpointPropertyPage_12;
-			else
+			} else {
 				type = Messages.PBreakpointPropertyPage_13;
+			}
 
 			String expression = watchpoint.getExpression();
 			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_14, type));
@@ -408,18 +409,20 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 		// show total number of processes
 		if (!job_id.equals(IPBreakpoint.GLOBAL)) {
 			IElementHandler setManager = uiDebugManager.getElementHandler(job_id);
-			IElementSet elementSet = (IElementSet) setManager.getElementByID(set_id);
+			IElementSet elementSet = setManager.getSet(set_id);
 			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_23,
 					String.valueOf(elementSet.size())));
 			String[] setNames = elementSet.getMatchSetIDs();
 			StringBuffer buffer = new StringBuffer();
 			for (int i = 0; i < setNames.length; i++) {
 				buffer.append(setNames[i]);
-				if (i < setNames.length - 1)
+				if (i < setNames.length - 1) {
 					buffer.append(","); //$NON-NLS-1$
+				}
 			}
-			if (buffer.length() > 0)
+			if (buffer.length() > 0) {
 				addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_25, buffer.toString()));
+			}
 		}
 	}
 

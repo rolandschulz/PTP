@@ -37,32 +37,39 @@ public class EditPExpressionAction extends Action {
 	public static final String name = Messages.EditPExpressionAction_0;
 	private PVariableView view = null;
 
-	/** Constructor
+	/**
+	 * Constructor
+	 * 
 	 * @param view
 	 */
 	public EditPExpressionAction(PVariableView view) {
 		super(name, IAction.AS_PUSH_BUTTON);
-	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_VAR_EDIT_NORMAL));
-	    //setDisabledImageDescriptor(PDebugImage.ID_ICON_VAR_EDIT_DISABLE);
-	    setToolTipText(name);
-	    setId(name);
-	    setEnabled(false);
-	    this.view = view;
+		setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_VAR_EDIT_NORMAL));
+		// setDisabledImageDescriptor(PDebugImage.ID_ICON_VAR_EDIT_DISABLE);
+		setToolTipText(name);
+		setId(name);
+		setEnabled(false);
+		this.view = view;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
+	@Override
 	public void run() {
 		ISelection selection = view.getSelection();
 		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
-			PVariableInfo jVar = (PVariableInfo)((IStructuredSelection)selection).getFirstElement();
-			if (!jVar.getJob().getID().equals(view.getUIManager().getCurrentJobId())) {
-				MessageDialog.openError(view.getViewSite().getShell(), Messages.EditPExpressionAction_1, Messages.EditPExpressionAction_2);
+			PVariableInfo jVar = (PVariableInfo) ((IStructuredSelection) selection).getFirstElement();
+			if (!jVar.getJobId().equals(view.getUIManager().getCurrentJobId())) {
+				MessageDialog.openError(view.getViewSite().getShell(), Messages.EditPExpressionAction_1,
+						Messages.EditPExpressionAction_2);
 				return;
 			}
 			if (new PVariableDialog(view, PVariableDialog.EDIT_MODE).open() == Window.OK) {
 				view.refresh();
 			}
-		}		
+		}
 	}
 }

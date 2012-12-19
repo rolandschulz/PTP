@@ -26,12 +26,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
@@ -325,23 +323,23 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @param uuid
 	 *            temporary internal id for as yet unsubmitted job
-	 * @param mode
-	 *            either ILaunchManager.RUN_MODE and ILaunchManager.DEBUG_MODE
+	 * @param launch
+	 *            launch information for the job
 	 * @return job wrapper object
 	 * @throws CoreException
 	 */
-	private ICommandJob doJobSubmitCommand(String uuid, ILaunchConfiguration configuration, String mode) throws CoreException {
+	private ICommandJob doJobSubmitCommand(String uuid, ILaunch launch) throws CoreException {
 		CommandType command = null;
 		CommandJob.JobMode jobMode = CommandJob.JobMode.INTERACTIVE;
 
-		if (ILaunchManager.RUN_MODE.equals(mode)) {
+		if (ILaunchManager.RUN_MODE.equals(launch.getLaunchMode())) {
 			command = controlData.getSubmitBatch();
 			if (command != null) {
 				jobMode = CommandJob.JobMode.BATCH;
 			} else {
 				command = controlData.getSubmitInteractive();
 			}
-		} else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
+		} else if (ILaunchManager.DEBUG_MODE.equals(launch.getLaunchMode())) {
 			command = controlData.getSubmitBatchDebug();
 			if (command != null) {
 				jobMode = CommandJob.JobMode.BATCH;
@@ -352,13 +350,13 @@ public class LaunchController implements ILaunchController {
 
 		if (command == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + JAXBControlConstants.SP + uuid
-					+ JAXBControlConstants.SP + mode, null);
+					+ JAXBControlConstants.SP + launch.getLaunchMode(), null);
 		}
 
 		/*
 		 * NOTE: changed this to join, because the waitForId is now part of the run() method of the command itself (05.01.2011)
 		 */
-		return runCommand(uuid, command, jobMode, configuration, mode, true);
+		return runCommand(uuid, command, jobMode, launch, launch.getLaunchMode(), true);
 	}
 
 	/*
@@ -673,15 +671,6 @@ public class LaunchController implements ILaunchController {
 	 * org.eclipse.ptp.rmsystem.IJobStatus)
 	 */
 	public void jobStateChanged(String jobId, IJobStatus status) {
-		/*
-		 * Update any debug models associated with this job ID
-		 */
-		IPJob job = ModelManager.getInstance().getUniverse().getJob(status);
-		if (job != null) {
-			if (status.getState().equals(IJobStatus.COMPLETED)) {
-				job.getAttribute(JobAttributes.getStateAttributeDefinition()).setValue(JobAttributes.State.COMPLETED);
-			}
-		}
 		JobManager.getInstance().fireJobChanged(status);
 	}
 
@@ -977,13 +966,13 @@ public class LaunchController implements ILaunchController {
 	 * @return the runnable job object
 	 * @throws CoreException
 	 */
-	private ICommandJob runCommand(String uuid, CommandType command, CommandJob.JobMode jobMode,
-			ILaunchConfiguration configuration, String launchMode, boolean join) throws CoreException {
+	private ICommandJob runCommand(String uuid, CommandType command, CommandJob.JobMode jobMode, ILaunch launch, String launchMode,
+			boolean join) throws CoreException {
 		if (command == null) {
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
-		ICommandJob job = new CommandJob(uuid, command, jobMode, this, configuration, launchMode);
+		ICommandJob job = new CommandJob(uuid, command, jobMode, this, launch, launchMode);
 		((Job) job).setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 		job.schedule();
 		if (join) {
@@ -1155,7 +1144,7 @@ public class LaunchController implements ILaunchController {
 		}
 	}
 
-	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
+	public String submitJob(ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		/*
 		 * give submission a unique id which will in most cases be replaced by the resource-generated id for the job/process
 		 */
@@ -1176,7 +1165,7 @@ public class LaunchController implements ILaunchController {
 			/*
 			 * Overwrite attribute values based on user choices. Note that the launch can also modify attributes.
 			 */
-			updateAttributeValues(configuration, mode, progress.newChild(5));
+			updateAttributeValues(launch.getLaunchConfiguration(), launch.getLaunchMode(), progress.newChild(5));
 
 			/*
 			 * process script
@@ -1206,7 +1195,7 @@ public class LaunchController implements ILaunchController {
 			ICommandJob job = null;
 
 			try {
-				job = doJobSubmitCommand(uuid, configuration, mode);
+				job = doJobSubmitCommand(uuid, launch);
 
 				IStatus status = job.getRunStatus();
 				if (status != null && status.getSeverity() == IStatus.CANCEL) {
@@ -1248,7 +1237,7 @@ public class LaunchController implements ILaunchController {
 			 * initialize the job status while the id property is live
 			 */
 			jobStatusMap.addJobStatus(status.getJobId(), status);
-			status.setLaunchConfig(configuration);
+			status.setLaunch(launch);
 			worked(progress, 5);
 
 			/*

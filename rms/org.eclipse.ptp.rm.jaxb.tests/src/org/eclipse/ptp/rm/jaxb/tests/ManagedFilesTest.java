@@ -18,6 +18,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.IJobController;
@@ -193,11 +194,11 @@ public class ManagedFilesTest extends TestCase implements IJobController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerControl#submitJob(org.eclipse .debug.core.ILaunchConfiguration,
-	 * java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.ptp.core.jobs.IJobControl#submitJob(org.eclipse.debug.core.ILaunch,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public String submitJob(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
+	public String submitJob(ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		return null;
 	}
 

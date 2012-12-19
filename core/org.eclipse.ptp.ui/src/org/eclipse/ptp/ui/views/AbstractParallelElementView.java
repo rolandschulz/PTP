@@ -24,9 +24,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -34,7 +34,6 @@ import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.messages.Messages;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.SWT;
@@ -47,8 +46,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
- *
+ * 
  * @author clement chu
+ * @since 7.0
  * 
  */
 public abstract class AbstractParallelElementView extends AbstractParallelView implements IIconCanvasActionListener,
@@ -63,35 +63,36 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	// title
 	protected final String EMPTY_TITLE = " "; //$NON-NLS-1$
 	protected Color registerColor = null;
-	
+
 	protected IconRefreshWorkbenchJob iconreFreshJob = new IconRefreshWorkbenchJob();
-	
-	private boolean debug = false;
+
+	private final boolean debug = false;
 
 	/**
-	 * update preference setting 
+	 * update preference setting
 	 */
 	protected IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			final String preferenceType = event.getProperty();
 			final Object value = event.getNewValue();
 			if (value != null) {
 				showWhile(new Runnable() {
+					@Override
 					public void run() {
 						if (!canvas.isDisposed()) {
 							if (preferenceType.startsWith("icon")) { //$NON-NLS-1$
 								IPreferenceStore store = PTPUIPlugin.getDefault().getPreferenceStore();
-								canvas.setIconSpace(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X), store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
-								canvas.setIconSize(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH), store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
-							}
-							else if (preferenceType.equals(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME)) {
-								canvas.showTooltipAllthetime(new Boolean((String)value).booleanValue());
-							}
-							else if (preferenceType.equals(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT)) {
-								canvas.setTooltipTimeout(new Long((String)value).longValue());
-							}
-							else if (preferenceType.equals(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP)) {
-								canvas.setTooltipWrap(new Boolean((String)value).booleanValue());
+								canvas.setIconSpace(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X),
+										store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
+								canvas.setIconSize(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH),
+										store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
+							} else if (preferenceType.equals(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME)) {
+								canvas.showTooltipAllthetime(new Boolean((String) value).booleanValue());
+							} else if (preferenceType.equals(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT)) {
+								canvas.setTooltipTimeout(new Long((String) value).longValue());
+							} else if (preferenceType.equals(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP)) {
+								canvas.setTooltipWrap(new Boolean((String) value).booleanValue());
 							}
 							canvas.resetCanvas();
 						}
@@ -101,14 +102,17 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			}
 		}
 	};
-	
+
 	public AbstractParallelElementView(IElementManager manager) {
 		this.manager = manager;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		registerPartListener();
 		PTPUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
@@ -116,53 +120,81 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		setContentDescription(EMPTY_TITLE);
 		registerColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BORDER);
 	}
-	/** Set the color of registered element
+
+	/**
+	 * Set the color of registered element
+	 * 
 	 * @param color
 	 */
 	public void setRegisterColor(Color color) {
 		this.registerColor = color;
 	}
-	/** Create Element View
+
+	/**
+	 * Create Element View
+	 * 
 	 * @param parent
 	 */
 	protected void createView(Composite parent) {
 		createElementView(parent);
 	}
-	/** Get IElementManager
+
+	/**
+	 * Get IElementManager
+	 * 
 	 * @return IElementManager
 	 */
 	public IElementManager getUIManager() {
 		return manager;
 	}
+
 	public IElementHandler getElementHandler(String id) {
 		return manager.getElementHandler(id);
 	}
-	/** Get current element handler
+
+	/**
+	 * Get current element handler
+	 * 
 	 * @return IElementHandler
 	 */
 	public IElementHandler getCurrentElementHandler() {
 		return getElementHandler(getCurrentID());
 	}
-	/** Change view title
-	 * @param title title
-	 * @param setName set name
-	 * @param size element size
+
+	/**
+	 * Change view title
+	 * 
+	 * @param title
+	 *            title
+	 * @param setName
+	 *            set name
+	 * @param size
+	 *            element size
 	 */
 	protected void changeTitle(String title, String setName, int size) {
 		changeTitle(" " + title + " - " + setName + " [" + size + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
-	/** Change view title
-	 * @param message Message of title
+
+	/**
+	 * Change view title
+	 * 
+	 * @param message
+	 *            Message of title
 	 */
 	protected void changeTitle(final String message) {
 		asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				setContentDescription(message);
 			}
 		});
 	}
-	/** Create element videw
-	 * @param parent parent composite
+
+	/**
+	 * Create element videw
+	 * 
+	 * @param parent
+	 *            parent composite
 	 * @return composite
 	 */
 	protected Composite createElementView(Composite parent) {
@@ -176,12 +208,16 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		canvas.setToolTipProvider(this);
 		canvas.addActionListener(this);
 		canvas.addSelectionChangedListener(this);
-		//getSite().setSelectionProvider(canvas);
+		// getSite().setSelectionProvider(canvas);
 		return composite;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
+	@Override
 	public void dispose() {
 		canvas.removeActionListener(this);
 		canvas.removeSelectionChangedListener(this);
@@ -190,27 +226,43 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		deregisterPartListener();
 		super.dispose();
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
 	 */
+	@Override
 	public void setFocus() {
 		canvas.setFocus();
 	}
-	/** Get current set ID
+
+	/**
+	 * Get current set ID
+	 * 
 	 * @return current set ID
 	 */
 	public String getCurrentSetID() {
 		return manager.getCurrentSetId();
 	}
-	/** Fire set change event
-	 * @param cur_set current set 
-	 * @param pre_set previous set
+
+	/**
+	 * Fire set change event
+	 * 
+	 * @param cur_set
+	 *            current set
+	 * @param pre_set
+	 *            previous set
 	 */
 	public void fireSetChangeEvent(IElementSet cur_set, IElementSet pre_set) {
 		manager.fireSetEvent(IElementManager.CHANGE_SET_TYPE, null, cur_set, pre_set);
 	}
-	/** Select set
-	 * @param set Target set
+
+	/**
+	 * Select set
+	 * 
+	 * @param set
+	 *            Target set
 	 */
 	public void selectSet(IElementSet set) {
 		if (!canvas.isDisposed()) {
@@ -221,144 +273,193 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			}
 			canvas.setElementSet(set);
 			// send event if current viewer is visible
-			if (isVisible())
+			if (isVisible()) {
 				fireSetChangeEvent(set, cur_element_set);
+			}
 			cur_element_set = set;
 		}
-		//updateAction();
+		// updateAction();
 	}
-	/** Get current set
+
+	/**
+	 * Get current set
+	 * 
 	 * @return current set
 	 */
 	public IElementSet getCurrentSet() {
 		return cur_element_set;
 	}
+
 	public void build() {
 		initialView();
 	}
+
 	/**
 	 * Refresh view
 	 */
 	public void refresh(boolean all, boolean force) {
-		if (isVisible())
+		if (isVisible()) {
 			iconreFreshJob.schedule(all, force);
+		}
 	}
+
 	public void refresh(boolean all) {
 		refresh(all, false);
 	}
+
 	public abstract void updateAction();
+
 	// Set element info
-	/** Initial view setting
+	/**
+	 * Initial view setting
 	 * 
 	 */
 	protected abstract void initialView();
+
 	// Set element to display
-	/** Initial elements setting
+	/**
+	 * Initial elements setting
 	 * 
 	 */
 	protected abstract void initialElement();
+
 	// set update view details
-	/** Update view details
+	/**
+	 * Update view details
 	 * 
 	 */
 	public abstract void update();
-	/** Update view title
+
+	/**
+	 * Update view title
 	 * 
 	 */
 	public abstract void updateTitle();
-	/** Get current ID
+
+	/**
+	 * Get current ID
+	 * 
 	 * @return element ID
 	 */
 	public abstract String getCurrentID();
-	/** Double click action
-	 * @param element Target element
+
+	/**
+	 * Double click action
+	 * 
+	 * @param element
+	 *            Target element
+	 * @since 7.0
 	 */
-	protected abstract void doubleClick(IElement element);
-	/** Get tooltip text
-	 * @param obj Selected element
+	protected abstract void doubleClick(int element);
+
+	/**
+	 * Get tooltip text
+	 * 
+	 * @param element
+	 *            Selected element
 	 * @return text of tooltip
+	 * @since 7.0
 	 */
-	protected abstract String[] getToolTipText(Object obj);
-	/** Find actual object
-	 * @param element Target element
-	 * @return object represent of element
+	protected abstract String[] getToolTipText(int element);
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.views.IContentProvider#hasElement(int)
 	 */
-	protected abstract Object convertElementObject(IElement element);
-	/*******************************************************************************************************************************************************************************************************************************************************************************************************
-	 * IContentProvider
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.IContentProvider#getObject(int)
+	/**
+	 * @since 7.0
 	 */
-	public Object getObject(int index) {
+	@Override
+	public boolean hasElement(int index) {
 		if (canvas != null && manager != null) {
-			return canvas.getElement(index);
+			return canvas.hasElement(index);
+		}
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.views.IToolTipProvider#toolTipText(int)
+	 */
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public String[] toolTipText(int index) {
+		return getToolTipText(index);
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.views.IToolTipProvider#update(int, java.lang.String)
+	 */
+	@Override
+	public void update(int index, String content) {
+		canvas.updateToolTipText(content);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.views.IImageProvider#getStatusIcon(int, boolean)
+	 */
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public Image getStatusIcon(int index, boolean isSelected) {
+		if (cur_element_set != null) {
+			return manager.getImage(index, isSelected);
 		}
 		return null;
 	}
-	public String getRulerIndex(Object obj, int index) {
-		return String.valueOf(index);
-	}
-	/*******************************************************************************************************************************************************************************************************************************************************************************************************
-	 * IToolTipProvider
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.IToolTipProvider#toolTipText(java.lang.Object)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.views.IImageProvider#drawSpecial(int, org.eclipse.swt.graphics.GC, int, int, int, int)
 	 */
-	public String[] toolTipText(Object obj) {
-		if (obj instanceof IElement) {			
-			return getToolTipText(convertElementObject((IElement)obj));
-		}
-		return new String[] { "" }; //$NON-NLS-1$
-	}
-	public void update(Object obj, String content) {
-		canvas.updateToolTipText(obj, content);
-	}
-	/*******************************************************************************************************************************************************************************************************************************************************************************************************
-	 * Image Provider
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.IImageProvider#getStatusIcon(java.lang.Object, boolean)
+	/**
+	 * @since 7.0
 	 */
-	public Image getStatusIcon(Object obj, int index, boolean isSelected) {
-		if (cur_element_set != null && obj instanceof IElement) {
-			return manager.getImage((IElement)obj);
-		}
-		return null;
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.IImageProvider#drawSpecial(java.lang.Object, org.eclipse.swt.graphics.GC, int, int, int, int)
-	 */
-	public void drawSpecial(Object obj, int index, GC gc, int x_loc, int y_loc, int width, int height) {
-		if (cur_element_set != null && obj instanceof IElement) {
-			if (((IElement)obj).isRegistered()) {
+	@Override
+	public void drawSpecial(int index, GC gc, int x_loc, int y_loc, int width, int height) {
+		if (cur_element_set != null) {
+			if (getCurrentElementHandler().isRegistered(index)) {
 				gc.setForeground(registerColor);
 				gc.drawRectangle(x_loc, y_loc, width, height);
 				gc.setForeground(canvas.getForeground());
 			}
 		}
 	}
-	/*******************************************************************************************************************************************************************************************************************************************************************************************************
-	 * IIconCanvasActionListener
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int, int)
 	 */
+	@Override
 	public void handleAction(int type, int index) {
-		if (index > -1) {
-			IElement element = canvas.getElement(index);
-			switch (type) {
-				case IIconCanvasActionListener.DOUBLE_CLICK_ACTION:
-					doubleClick(element);
-					break;
-			}
+		if (index > -1 && type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION) {
+			doubleClick(index);
 		}
 	}
-	/** Show ruler
-	 * @param showRuler true if show ruler
+
+	/**
+	 * Show ruler
+	 * 
+	 * @param showRuler
+	 *            true if show ruler
 	 */
 	public void setDisplayRuler(final boolean showRuler) {
 		asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!canvas.isDisposed()) {
 					canvas.setDisplayRuler(showRuler);
@@ -367,7 +468,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			}
 		});
 	}
-	/** Is ruler displayed
+
+	/**
+	 * Is ruler displayed
+	 * 
 	 * @return true if ruler is displayed
 	 */
 	public boolean isDisplayRuler() {
@@ -376,17 +480,20 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		}
 		return false;
 	}
-	
+
 	public ISelection getSelection() {
 		return canvas.getSelection();
 	}
-    
+
 	class IconRefreshWorkbenchJob extends WorkbenchJob {
-		private final ReentrantLock	waitLock = new ReentrantLock();
-		private List<Boolean> refreshList = new ArrayList<Boolean>();
+		private final ReentrantLock waitLock = new ReentrantLock();
+		private final List<Boolean> refreshList = new ArrayList<Boolean>();
+
 		public IconRefreshWorkbenchJob() {
 			super(Messages.AbstractParallelElementView_1);
 		}
+
+		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			boolean refreshAll = isRefreshAll();
 			if (debug) {
@@ -396,8 +503,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			if (!canvas.isDisposed()) {
 				canvas.redraw();
 			}
-			
-			//if last refresh object is true and previous refresh is false, then refresh again 
+
+			// if last refresh object is true and previous refresh is false, then refresh again
 			boolean lastValue = isRefreshAll();
 			waitLock.lock();
 			try {
@@ -406,12 +513,13 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 					refreshList.add(new Boolean(true));
 					schedule();
 				}
-			}
-			finally {
+			} finally {
 				waitLock.unlock();
 			}
 			return Status.OK_STATUS;
 		}
+
+		@Override
 		public boolean shouldSchedule() {
 			int size = size();
 			if (debug) {
@@ -419,32 +527,33 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			}
 			return (size > 0);
 		}
+
 		private int size() {
 			waitLock.lock();
 			try {
 				return refreshList.size();
-			}
-			finally {
+			} finally {
 				waitLock.unlock();
 			}
 		}
+
 		private boolean isRefreshAll() {
 			waitLock.lock();
 			try {
-				return refreshList.get(refreshList.size()-1).booleanValue();
-			}
-			finally {
+				return refreshList.get(refreshList.size() - 1).booleanValue();
+			} finally {
 				waitLock.unlock();
 			}
 		}
+
 		public void schedule(boolean refresh_all, boolean force) {
 			waitLock.lock();
 			try {
-				if (force)
+				if (force) {
 					refreshList.clear();
+				}
 				refreshList.add(new Boolean(refresh_all));
-			}
-			finally {
+			} finally {
 				waitLock.unlock();
 			}
 			schedule();

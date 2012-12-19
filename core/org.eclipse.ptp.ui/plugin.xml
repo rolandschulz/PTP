@@ -34,27 +34,13 @@
  <extension
        point="org.eclipse.core.runtime.adapters">
     <factory
-          adaptableType="org.eclipse.ptp.core.elements.IPElement"
+          adaptableType="org.eclipse.ptp.core.jobs.IJobStatus"
           class="org.eclipse.ptp.internal.ui.adapters.WorkbenchAdapterAdapterFactory">
        <adapter
              type="org.eclipse.ui.model.IWorkbenchAdapter">
        </adapter>
        <adapter
              type="org.eclipse.ui.model.IWorkbenchAdapter2">
-       </adapter>
-    </factory>
-    <factory
-          adaptableType="org.eclipse.ptp.core.elements.IPElement"
-          class="org.eclipse.ptp.internal.ui.adapters.PropertyAdapterFactory">
-       <adapter
-             type="org.eclipse.ui.views.properties.IPropertySource">
-       </adapter>
-    </factory>
-    <factory
-          adaptableType="org.eclipse.ptp.ui.model.IElement"
-          class="org.eclipse.ptp.internal.ui.adapters.PropertyAdapterFactory">
-       <adapter
-             type="org.eclipse.ui.views.properties.IPropertySource">
        </adapter>
     </factory>
  </extension>

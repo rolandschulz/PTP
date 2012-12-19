@@ -19,149 +19,158 @@
 package org.eclipse.ptp.ui.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.BitSet;
 import java.util.List;
-import java.util.Map;
+
 /**
  * @author clement chu
- *
+ * 
  */
-public class ElementSet extends Element implements IElementSet {
-	private Map<String,IElement> elementMap = new HashMap<String,IElement>();
-	private List<IElement> elementList = new ArrayList<IElement>();
-	private List<String> matchSetList = new ArrayList<String>();
-	private int number_of_elements = 0;
-	
-	public ElementSet(IElement parent, String id, String name) {
-		super(parent, id, name, null);
-	}
-	public boolean isRootSet() {
-		return (id.equals(IElementHandler.SET_ROOT_ID));
-	}
-	public void addElements(IElement[] elements) {
-		for (IElement element : elements) {
-			if (element != null) {
-				if (contains(element.getID()))
-					continue;
-	
-				if (!isRootSet()) {
-					IElementSet[] sets = ((IElementHandler)getParent()).getSetsWithElement(element.getID());
-					for (IElementSet set : sets) {
-						set.addMatchSet(getID());
-						addMatchSet(set.getID());
-					}
-				}
-				elementMap.put(element.getID(), element);
-				elementList.add(element);
-				number_of_elements++;
-			}
-		}
-		sorting();
-	}
-	private void sorting() {
-		Collections.sort(elementList);
-	}
-	public IElement getElement(int index) {
-		if (index < 0 || index >= size())
-			return null;
-		return elementList.get(index);
-	}
-	private int binarySearch(String name) {
-		int lo = 0;
-		int hi = number_of_elements - 1;
-		int mid = 0;
-		while (lo <= hi) {
-			mid = (lo + hi) / 2;
-			int comp_res = compare(getElement(mid), name);
-			if (comp_res == 0)
-				return mid;
-			else if (comp_res > 0)
-				hi = mid - 1;
-			else
-				lo = ++mid;
-		}
-		return -mid - 1;
-	}
-	public IElement getElementByID(String id) {
-		return elementMap.get(id);
-	}
-	public IElement getElementByName(String name) {
-		int index = binarySearch(name);
-		if (index < number_of_elements)
-			return elementList.get(index);
-		return null;
-	}
-	public int findIndexByID(String id) {
-		IElement element = getElementByID(id);
-		if (element != null) {
-			return findIndexByName(element.getName());
-		}
-		return -1;
-	}
-	public int findIndexByName(String name) {
-		int index = binarySearch(name);
-		if (index < number_of_elements)
-			return index;
-		return -1;
-	}
-	public IElement[] getElements() {
-		return elementList.toArray(new IElement[0]);
-	}
-	public void removeElements(IElement[] elements) {
-		for (IElement element : elements) {
-			if (element != null) {
-				removeElement(element.getID());
-			}
-		}
-	}
-	public void removeElement(String id) {
-		IElement elmenet = elementMap.remove(id);
-		elementList.remove(elmenet);
-		number_of_elements--;
+public class ElementSet implements IElementSet {
+	private final String fId;
+	private final String fName;
+	private final BitSet fElements = new BitSet();
+	private final BitSet fSelectedElements = new BitSet();
 
-		if (!isRootSet()) {
-			IElementSet[] sets = ((IElementHandler)getParent()).getSetsWithElement(id);
-			for (IElementSet set : sets) {
-				set.removeMatchSet(getID());
-				removeMatchSet(set.getID());
-			}
-		}
+	private final List<String> matchSetList = new ArrayList<String>();
+
+	/**
+	 * @since 7.0
+	 */
+	public ElementSet(String id, String name) {
+		fId = id;
+		fName = name;
 	}
-	private int compare(IElement e1, String val) {
-		return compareTo(e1.getName(), val);
+
+	/**
+	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.model.IElementSet#addElements(org.eclipse.ptp.utils.core.RangeSet)
+	 */
+	@Override
+	public void addElements(BitSet elements) {
+		fElements.or(elements);
 	}
-	public int compareTo(String s1, String s2) {
-		return s1.compareTo(s2);
-	}
-	public int size() {
-		return number_of_elements;
-	}
-	public void clean() {
-		elementMap.clear();
-		elementList.clear();
-		matchSetList.clear();
-		number_of_elements = 0;
-	}
-	public boolean contains(IElement element) {
-		return contains(element.getID());
-	}
-	public boolean contains(String id) {
-		return elementMap.containsKey(id);
-	}
-	
+
+	@Override
 	public void addMatchSet(String setID) {
 		if (!containsMatchSet(setID)) {
 			matchSetList.add(setID);
 		}
 	}
-	public void removeMatchSet(String setID) {
-		matchSetList.remove(setID);
+
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public BitSet contains(BitSet elements) {
+		BitSet result = (BitSet) fElements.clone();
+		result.and(elements);
+		return result;
 	}
+
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public boolean contains(int element) {
+		return fElements.get(element);
+	}
+
+	@Override
 	public boolean containsMatchSet(String setID) {
 		return matchSetList.contains(setID);
 	}
+
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public String getID() {
+		return fId;
+	}
+
+	@Override
 	public String[] getMatchSetIDs() {
 		return matchSetList.toArray(new String[0]);
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public String getName() {
+		return fName;
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public BitSet getSelected() {
+		return (BitSet) fSelectedElements.clone();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.model.IElementSet#isRootSet()
+	 */
+	@Override
+	public boolean isRootSet() {
+		return (fId.equals(IElementHandler.SET_ROOT_ID));
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public boolean isSelected(int index) {
+		return fSelectedElements.get(index);
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public void removeElement(int index) {
+		fElements.clear(index);
+		fSelectedElements.clear(index);
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public void removeElements(BitSet elements) {
+		fElements.andNot(elements);
+		fSelectedElements.andNot(elements);
+	}
+
+	@Override
+	public void removeMatchSet(String setID) {
+		matchSetList.remove(setID);
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public void setSelected(int index, boolean selected) {
+		if (fElements.get(index)) {
+			if (selected) {
+				fSelectedElements.set(index);
+			} else {
+				fSelectedElements.clear(index);
+			}
+		}
+	}
+
+	@Override
+	public int size() {
+		return fElements.cardinality();
 	}
 }

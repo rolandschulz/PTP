@@ -18,85 +18,107 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.actions;
 
+import java.util.BitSet;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.ui.UIUtils;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author clement chu
- *
+ * 
  */
 public abstract class ParallelAction extends Action {
 	protected AbstractParallelElementView view = null;
-	
-	/** Constructor
-	 * @param text name of action
+
+	/**
+	 * Constructor
+	 * 
+	 * @param text
+	 *            name of action
 	 * @param view
 	 */
 	public ParallelAction(String text, AbstractParallelElementView view) {
 		this(text, IAction.AS_PUSH_BUTTON, view);
 	}
-	
-	/** Constructor
-	 * @param text name of action
-	 * @param style style of action
+
+	/**
+	 * Constructor
+	 * 
+	 * @param text
+	 *            name of action
+	 * @param style
+	 *            style of action
 	 * @param view
 	 */
 	public ParallelAction(String text, int style, AbstractParallelElementView view) {
 		super(text, style);
 		this.view = view;
-	    setToolTipText(text);
-	    setEnabled(false);
-	    setId(text);
+		setToolTipText(text);
+		setEnabled(false);
+		setId(text);
 	}
-	
-	/** Get view part
+
+	/**
+	 * Get view part
+	 * 
 	 * @return
 	 */
 	public AbstractParallelElementView getViewPart() {
-        return view;
-    }
-    
-    /** Get Shell
-     * @return
-     */
-    public Shell getShell() {
-        return view.getViewSite().getShell();
-    }
-    
-    /** run action
-     * @param elements action acts with these elements
-     */
-    public abstract void run(IElement[] elements);
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IAction#run()
-     */
-    public void run() {
-    	IElement[] elements = new IElement[0];
-    	ISelection selection = getViewPart().getSelection();
-    	if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
-        	Object[] objs = ((IStructuredSelection)selection).toArray();
-        	if (objs.length > 0 && objs[0] instanceof IElement) {
-	        	elements = new IElement[objs.length];
-	        	System.arraycopy(objs, 0, elements, 0, objs.length);
-        	}
-    	}
+		return view;
+	}
 
-    	run(elements);
-    }
-    
-	/** Validation of given elements
-	 * @param elements elements to be doing validation
-	 * @return true if valid
+	/**
+	 * Get Shell
+	 * 
+	 * @return
 	 */
-	protected boolean validation(IElement[] elements) {
-		if (elements == null || elements.length == 0) {
+	public Shell getShell() {
+		return view.getViewSite().getShell();
+	}
+
+	/**
+	 * run action
+	 * 
+	 * @param elements
+	 *            action acts with these elements
+	 * @since 7.0
+	 */
+	public abstract void run(BitSet elements);
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
+	@Override
+	public void run() {
+		BitSet elements = new BitSet();
+		ISelection selection = getViewPart().getSelection();
+		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
+			Object[] objs = ((IStructuredSelection) selection).toArray();
+			if (objs.length > 0 && objs[0] instanceof BitSet) {
+				elements.or((BitSet) objs[0]);
+			}
+		}
+
+		run(elements);
+	}
+
+	/**
+	 * Validation of given elements
+	 * 
+	 * @param elements
+	 *            elements to be doing validation
+	 * @return true if valid
+	 * @since 7.0
+	 */
+	protected boolean validation(BitSet elements) {
+		if (elements == null || elements.isEmpty()) {
 			UIUtils.showErrorDialog("No selected elements", "Please select some elements first", null); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}

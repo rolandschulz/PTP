@@ -10,7 +10,10 @@
 package org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;
 
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -18,9 +21,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.IPJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
@@ -31,6 +35,7 @@ import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
+import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamsProxy;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
@@ -127,25 +132,63 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
+	private class PProcesses {
+		private final Map<String, BitSet> fProcState = new HashMap<String, BitSet>();
+		private final int fNumProcs;
+
+		public PProcesses(int nprocs) {
+			fNumProcs = nprocs;
+			fProcState.put(IPJobStatus.COMPLETED, new BitSet(nprocs));
+			fProcState.put(IPJobStatus.RUNNING, new BitSet(nprocs));
+			fProcState.put(IPJobStatus.SUSPENDED, new BitSet(nprocs));
+		}
+
+		public int getNumberOfProcesses() {
+			return fNumProcs;
+		}
+
+		public String getProcessState(int proc) {
+			for (String state : fProcState.keySet()) {
+				if (fProcState.get(state).get(proc)) {
+					return state;
+				}
+			}
+			return IPJobStatus.UNDETERMINED;
+		}
+
+		public void setProcessOutput(BitSet procs, String output) {
+			ICommandJobStreamMonitor monitor = (ICommandJobStreamMonitor) getStreamsProxy().getOutputStreamMonitor();
+			monitor.append(output);
+		}
+
+		public void setProcessState(BitSet procs, String newState) {
+			for (String state : fProcState.keySet()) {
+				if (state.equals(newState)) {
+					fProcState.get(state).or(procs);
+				} else {
+					fProcState.get(state).andNot(procs);
+				}
+			}
+		}
+	}
+
 	private final IJobController control;
 	private final IVariableMap varMap;
-
 	private final ICommandJob open;
 
 	private String jobId;
 	private String owner;
-
 	private String queue;
-	private ILaunchConfiguration launchConfig;
+	private ILaunch launch;
 	private String state;
 	private String stateDetail;
 	private String remoteOutputPath;
 	private String remoteErrorPath;
 	private ICommandJobStreamsProxy proxy;
 	private IRemoteProcess process;
+	private PProcesses fProcesses;
 	private boolean initialized;
 	private boolean waitEnabled;
-
 	private boolean dirty;
 	private boolean fFilesChecked;
 	private long lastRequestedUpdate;
@@ -227,6 +270,86 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
+	/**
+	 * Implicitly describes the legal state transitions.
+	 * 
+	 * @param newState
+	 * @return transition is legal
+	 */
+	private boolean canUpdateState(String newState) {
+		int prevRank = getStateRank(stateDetail);
+		int currRank = getStateRank(newState);
+		if (prevRank >= currRank) {
+			if (prevRank == 0) {
+				return true;
+			}
+			if (prevRank != 4 || currRank != 3) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Checks for file existence, then waits 3 seconds to compare file length. If block is false, the listeners may be notified that
+	 * the file is still not ready; else the listeners will receive a ready = true notification when the file does finally
+	 * stabilize. (non-Javadoc)
+	 * 
+	 * @param path
+	 * @param blockInSeconds
+	 * @param monitor
+	 * @return thread running the check
+	 */
+	private FileReadyChecker checkForReady(String path, int block, IProgressMonitor monitor) {
+		FileReadyChecker t = new FileReadyChecker(path);
+		t.block = block;
+		t.path = path;
+		t.callerMonitor = monitor;
+		t.schedule();
+		return t;
+	}
+
+	/**
+	 * If interactive, check to see if the process has completed.
+	 */
+	private void checkProcessStateForTermination() {
+		if (process != null) {
+			if (process.isCompleted()) {
+				setState(process.exitValue() == 0 ? COMPLETED : FAILED);
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings("rawtypes")
+	public Object getAdapter(Class adapter) {
+		if (adapter == IPJobStatus.class) {
+			if (fProcesses != null) {
+				return this;
+			}
+			if (jobId != null && control != null) {
+				AttributeType nProcsAttr = control.getEnvironment().get(JAXBControlConstants.MPI_PROCESSES);
+				if (nProcsAttr != null) {
+					int nProcs = 0;
+					try {
+						nProcs = Integer.parseInt(nProcsAttr.getValue().toString());
+					} catch (Exception e) {
+					}
+					if (nProcs > 0) {
+						fProcesses = new PProcesses(nProcs);
+						return this;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -260,10 +383,19 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
-	 * @return configuration used for this submission.
+	 * @return launch used for this submission.
 	 */
-	public ILaunchConfiguration getLaunchConfiguration() {
-		return launchConfig;
+	public ILaunch getLaunch() {
+		return launch;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IPJobStatus#getNumberOfProcesses()
+	 */
+	public int getNumberOfProcesses() {
+		return fProcesses != null ? fProcesses.getNumberOfProcesses() : 0;
 	}
 
 	/*
@@ -282,6 +414,15 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public String getOwner() {
 		return owner;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IPJobStatus#getProcessState(int)
+	 */
+	public String getProcessState(int proc) {
+		return fProcesses != null ? fProcesses.getProcessState(proc) : ""; //$NON-NLS-1$
 	}
 
 	/*
@@ -311,6 +452,45 @@ public class CommandJobStatus implements ICommandJobStatus {
 			checkProcessStateForTermination();
 		}
 		return stateDetail;
+	}
+
+	/**
+	 * Gives ordering of states.
+	 * 
+	 * @param state
+	 * @return the ordering of the state
+	 */
+	private int getStateRank(String state) {
+		if (SUBMITTED.equals(state)) {
+			return 1;
+		} else if (RUNNING.equals(state)) {
+			return 4;
+		} else if (SUSPENDED.equals(state)) {
+			return 3;
+		} else if (COMPLETED.equals(state)) {
+			return 5;
+		} else if (QUEUED_ACTIVE.equals(state)) {
+			return 2;
+		} else if (SYSTEM_ON_HOLD.equals(state)) {
+			return 3;
+		} else if (USER_ON_HOLD.equals(state)) {
+			return 3;
+		} else if (USER_SYSTEM_ON_HOLD.equals(state)) {
+			return 3;
+		} else if (SYSTEM_SUSPENDED.equals(state)) {
+			return 3;
+		} else if (USER_SUSPENDED.equals(state)) {
+			return 3;
+		} else if (USER_SYSTEM_SUSPENDED.equals(state)) {
+			return 3;
+		} else if (FAILED.equals(state)) {
+			return 6;
+		} else if (CANCELED.equals(state)) {
+			return 6;
+		} else if (JOB_OUTERR_READY.equals(state)) {
+			return 7;
+		}
+		return 0;
 	}
 
 	/**
@@ -359,6 +539,30 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public boolean isInteractive() {
 		return process != null;
+	}
+
+	/**
+	 * @param state
+	 *            current
+	 * @param waitUntil
+	 *            state to reach
+	 * @return true if the current state has reached the indicated state
+	 */
+	private boolean isReached(String state, String waitUntil) {
+		int i = getStateRank(state);
+		int j = getStateRank(waitUntil);
+		return i >= j;
+	}
+
+	/**
+	 * @return under synchronization
+	 */
+	private boolean isWaitEnabled() {
+		boolean w = true;
+		synchronized (this) {
+			w = waitEnabled;
+		}
+		return w;
 	}
 
 	/*
@@ -411,11 +615,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/**
-	 * @param launchConfig
-	 *            configuration used for this submission.
+	 * @param launch
+	 *            launch used for this submission.
 	 */
-	public void setLaunchConfig(ILaunchConfiguration launchConfig) {
-		this.launchConfig = launchConfig;
+	public void setLaunch(ILaunch launch) {
+		this.launch = launch;
 	}
 
 	/*
@@ -433,6 +637,28 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public void setProcess(IRemoteProcess process) {
 		this.process = process;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IPJobStatus#setProcessOutput(java.util.BitSet, java.lang.String)
+	 */
+	public void setProcessOutput(BitSet procs, String output) {
+		if (fProcesses != null) {
+			fProcesses.setProcessOutput(procs, output);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IPJobStatus#setProcessState(java.util.BitSet, java.lang.String)
+	 */
+	public void setProcessState(BitSet procs, String state) {
+		if (fProcesses != null) {
+			fProcesses.setProcessState(procs, state);
+		}
 	}
 
 	/**
@@ -619,119 +845,5 @@ public class CommandJobStatus implements ICommandJobStatus {
 				control.jobStateChanged(jobId, this);
 			}
 		}
-	}
-
-	/**
-	 * Implicitly describes the legal state transitions.
-	 * 
-	 * @param newState
-	 * @return transition is legal
-	 */
-	private boolean canUpdateState(String newState) {
-		int prevRank = getStateRank(stateDetail);
-		int currRank = getStateRank(newState);
-		if (prevRank >= currRank) {
-			if (prevRank == 0) {
-				return true;
-			}
-			if (prevRank != 4 || currRank != 3) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Checks for file existence, then waits 3 seconds to compare file length. If block is false, the listeners may be notified that
-	 * the file is still not ready; else the listeners will receive a ready = true notification when the file does finally
-	 * stabilize. (non-Javadoc)
-	 * 
-	 * @param path
-	 * @param blockInSeconds
-	 * @param monitor
-	 * @return thread running the check
-	 */
-	private FileReadyChecker checkForReady(String path, int block, IProgressMonitor monitor) {
-		FileReadyChecker t = new FileReadyChecker(path);
-		t.block = block;
-		t.path = path;
-		t.callerMonitor = monitor;
-		t.schedule();
-		return t;
-	}
-
-	/**
-	 * If interactive, check to see if the process has completed.
-	 */
-	private void checkProcessStateForTermination() {
-		if (process != null) {
-			if (process.isCompleted()) {
-				setState(process.exitValue() == 0 ? COMPLETED : FAILED);
-			}
-		}
-	}
-
-	/**
-	 * Gives ordering of states.
-	 * 
-	 * @param state
-	 * @return the ordering of the state
-	 */
-	private int getStateRank(String state) {
-		if (SUBMITTED.equals(state)) {
-			return 1;
-		} else if (RUNNING.equals(state)) {
-			return 4;
-		} else if (SUSPENDED.equals(state)) {
-			return 3;
-		} else if (COMPLETED.equals(state)) {
-			return 5;
-		} else if (QUEUED_ACTIVE.equals(state)) {
-			return 2;
-		} else if (SYSTEM_ON_HOLD.equals(state)) {
-			return 3;
-		} else if (USER_ON_HOLD.equals(state)) {
-			return 3;
-		} else if (USER_SYSTEM_ON_HOLD.equals(state)) {
-			return 3;
-		} else if (SYSTEM_SUSPENDED.equals(state)) {
-			return 3;
-		} else if (USER_SUSPENDED.equals(state)) {
-			return 3;
-		} else if (USER_SYSTEM_SUSPENDED.equals(state)) {
-			return 3;
-		} else if (FAILED.equals(state)) {
-			return 6;
-		} else if (CANCELED.equals(state)) {
-			return 6;
-		} else if (JOB_OUTERR_READY.equals(state)) {
-			return 7;
-		}
-		return 0;
-	}
-
-	/**
-	 * @param state
-	 *            current
-	 * @param waitUntil
-	 *            state to reach
-	 * @return true if the current state has reached the indicated state
-	 */
-	private boolean isReached(String state, String waitUntil) {
-		int i = getStateRank(state);
-		int j = getStateRank(waitUntil);
-		return i >= j;
-	}
-
-	/**
-	 * @return under synchronization
-	 */
-	private boolean isWaitEnabled() {
-		boolean w = true;
-		synchronized (this) {
-			w = waitEnabled;
-		}
-		return w;
 	}
 }

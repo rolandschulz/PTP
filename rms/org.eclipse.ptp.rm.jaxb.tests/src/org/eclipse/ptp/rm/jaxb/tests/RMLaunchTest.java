@@ -36,6 +36,7 @@ import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -272,7 +273,8 @@ public class RMLaunchTest extends TestCase {
 					} catch (InterruptedException ignored) {
 					}
 					emulateLaunchTab();
-					String jobId = rm.submitJob(launchConfig, ILaunchManager.RUN_MODE, monitor);
+					ILaunch launch = new PLaunch(launchConfig, ILaunchManager.RUN_MODE, null);
+					String jobId = rm.submitJob(launch, monitor);
 					System.out.println("SUBMITTED: " + jobId); //$NON-NLS-1$
 					IJobStatus status = rm.getJobStatus(jobId, null);
 					System.out.println("STATUS: " + status.getState()); //$NON-NLS-1$

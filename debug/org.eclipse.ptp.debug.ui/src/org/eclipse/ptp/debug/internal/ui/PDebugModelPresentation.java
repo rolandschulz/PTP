@@ -101,8 +101,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	private static final String DUMMY_STACKFRAME_LABEL = "..."; //$NON-NLS-1$
 
 	public static PDebugModelPresentation getDefault() {
-		if (instance == null)
+		if (instance == null) {
 			instance = new PDebugModelPresentation();
+		}
 		return instance;
 	}
 
@@ -116,8 +117,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	 */
 	public PDebugModelPresentation() {
 		// make sure using the one created by start up
-		if (instance == null)
+		if (instance == null) {
 			instance = this;
+		}
 	}
 
 	public boolean addAnnotations(IEditorPart editorPart, IStackFrame frame) {
@@ -195,12 +197,15 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 					break;
 				}
 			}
-			if (element instanceof IWatchExpression && ((IWatchExpression) element).hasErrors())
+			if (element instanceof IWatchExpression && ((IWatchExpression) element).hasErrors()) {
 				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVRS_ERROR);
-			if (element instanceof IPVariable && ((IPVariable) element).isArgument())
+			}
+			if (element instanceof IPVariable && ((IPVariable) element).isArgument()) {
 				overlays[OverlayImageDescriptor.TOP_RIGHT] = PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVRS_ARGUMENT);
-			if (element instanceof IPGlobalVariable && !(element instanceof IRegister))
+			}
+			if (element instanceof IPGlobalVariable && !(element instanceof IRegister)) {
 				overlays[OverlayImageDescriptor.TOP_RIGHT] = PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVRS_GLOBAL);
+			}
 
 			return getImageCache().getImageFor(new OverlayImageDescriptor(baseImage, overlays));
 		}
@@ -215,8 +220,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	@Override
 	public String getText(Object element) {
 		String bt = getBaseText(element);
-		if (bt == null)
+		if (bt == null) {
 			return null;
+		}
 		StringBuffer baseText = new StringBuffer(bt);
 		if (element instanceof IPDebugElementStatus && !((IPDebugElementStatus) element).isOK()) {
 			baseText.append(NLS.bind(" <{0}>", new Object[] { ((IPDebugElementStatus) element).getMessage() })); //$NON-NLS-1$
@@ -245,8 +251,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	 * , java.lang.Object)
 	 */
 	public void setAttribute(String attribute, Object value) {
-		if (value == null)
+		if (value == null) {
 			return;
+		}
 		getAttributes().put(attribute, value);
 	}
 
@@ -393,10 +400,11 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			if (element instanceof IBreakpoint) {
 				return getBreakpointText((IBreakpoint) element, showQualified);
 			}
-			if (element instanceof IDebugTarget)
+			if (element instanceof IDebugTarget) {
 				label.append(getTargetText((IDebugTarget) element, showQualified));
-			else if (element instanceof IThread)
+			} else if (element instanceof IThread) {
 				label.append(getThreadText((IThread) element, showQualified));
+			}
 			if (label.length() > 0) {
 				return label.toString();
 			}
@@ -501,8 +509,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 
 	protected Image getBreakpointImage(IPBreakpoint breakpoint) {
 		try {
-			if (breakpoint instanceof IPLineBreakpoint)
+			if (breakpoint instanceof IPLineBreakpoint) {
 				return getLineBreakpointImage((IPLineBreakpoint) breakpoint);
+			}
 			if (breakpoint instanceof IPWatchpoint) {
 				return getWatchpointImage((IPWatchpoint) breakpoint);
 			}
@@ -527,27 +536,29 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		String job_id = breakpoint.getJobId();
 		String cur_job_id = getUIDebugManager().getCurrentJobId();
 		// Display nothing if the breakpoint is not in current job
-		if (!job_id.equals(IPBreakpoint.GLOBAL) && !job_id.equals(cur_job_id))
+		if (!job_id.equals(IPBreakpoint.GLOBAL) && !job_id.equals(cur_job_id)) {
 			return new Image(null, 1, 1);
+		}
 		String descriptor = null;
 		IElementHandler setManager = getUIDebugManager().getElementHandler(job_id);
-		if (setManager == null) // no job running
+		if (setManager == null) {
 			descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_BPTCURSET_EN : PDebugImage.IMG_DEBUG_BPTCURSET_DI;
-		else { // created job
+		} else { // created job
 			String cur_set_id = getUIDebugManager().getCurrentSetId();
 			String bpt_set_id = breakpoint.getSetId();
 			if (bpt_set_id.equals(cur_set_id)) {
 				descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_BPTCURSET_EN : PDebugImage.IMG_DEBUG_BPTCURSET_DI;
 			} else {
-				IElementSet set = (IElementSet) setManager.getElementByID(bpt_set_id);
-				if (set == null)
+				IElementSet set = setManager.getSet(bpt_set_id);
+				if (set == null) {
 					descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_BPTCURSET_EN : PDebugImage.IMG_DEBUG_BPTCURSET_DI;
-				else {
-					if (set.containsMatchSet(cur_set_id))
+				} else {
+					if (set.containsMatchSet(cur_set_id)) {
 						descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_BPTMULTISET_EN
 								: PDebugImage.IMG_DEBUG_BPTMULTISET_DI;
-					else
+					} else {
 						descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_BPTNOSET_EN : PDebugImage.IMG_DEBUG_BPTNOSET_DI;
+					}
 				}
 			}
 		}
@@ -592,8 +603,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 
 	protected Image getRegisterGroupImage(IRegisterGroup element) {
 		IEnableDisableTarget target = (IEnableDisableTarget) element.getAdapter(IEnableDisableTarget.class);
-		if (target != null && !target.isEnabled())
+		if (target != null && !target.isEnabled()) {
 			return PDebugImage.getImage(PDebugImage.IMG_DEBUG_REGISTER_GROUP_DISABLED);
+		}
 		return PDebugImage.getImage(PDebugImage.IMG_DEBUG_REGISTER_GROUP);
 	}
 
@@ -648,8 +660,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 						if (!path.isEmpty()) {
 							label.append((qualified ? path.toOSString() : path.lastSegment()));
 							label.append(':');
-							if (frame.getFrameLineNumber() != 0)
+							if (frame.getFrameLineNumber() != 0) {
 								label.append(frame.getFrameLineNumber());
+							}
 						}
 					}
 				}
@@ -746,8 +759,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 				if (valueString != null) {
 					valueString = valueString.trim();
 					if (aif != null && aif instanceof IAIFTypeChar) {
-						if (valueString.length() == 0)
+						if (valueString.length() == 0) {
 							valueString = "."; //$NON-NLS-1$
+						}
 						label.append(valueString);
 					} else if (aif == null
 							|| (!(aif.getType() instanceof IAIFTypeArray) && !(aif.getType() instanceof IAIFTypeAggregate))) {
@@ -770,19 +784,21 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			} catch (DebugException e) {
 				// use default image
 			}
-			if (aif == null)
+			if (aif == null) {
 				return PDebugImage.getImage((((IPVariable) element).isEnabled()) ? PDebugImage.IMG_DEBUG_VARIABLE_SIMPLE
 						: PDebugImage.IMG_DEBUG_VARIABLE_SIMPLE_DISABLED);
+			}
 			IAIFType type = aif.getType();
-			if (type instanceof IAIFTypePointer || type instanceof IAIFTypeReference)
+			if (type instanceof IAIFTypePointer || type instanceof IAIFTypeReference) {
 				return PDebugImage.getImage((((IPVariable) element).isEnabled()) ? PDebugImage.IMG_DEBUG_VARIABLE_POINTER
 						: PDebugImage.IMG_DEBUG_VARIABLE_POINTER_DISABLED);
-			else if (type instanceof IAIFTypeArray || type instanceof IAIFTypeAggregate)
+			} else if (type instanceof IAIFTypeArray || type instanceof IAIFTypeAggregate) {
 				return PDebugImage.getImage((((IPVariable) element).isEnabled()) ? PDebugImage.IMG_DEBUG_VARIABLE_AGGREGATE
 						: PDebugImage.IMG_DEBUG_VARIABLE_AGGREGATE_DISABLED);
-			else
+			} else {
 				return PDebugImage.getImage((((IPVariable) element).isEnabled()) ? PDebugImage.IMG_DEBUG_VARIABLE_SIMPLE
 						: PDebugImage.IMG_DEBUG_VARIABLE_SIMPLE_DISABLED);
+			}
 		}
 		return null;
 	}
@@ -803,8 +819,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 				}
 			}
 			String name = var.getName();
-			if (name != null)
+			if (name != null) {
 				label.append(name.trim());
+			}
 			String valueString = getValueText(var.getValue());
 			if (!isEmpty(valueString)) {
 				label.append(" = "); //$NON-NLS-1$
@@ -851,19 +868,21 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	protected Image getWatchpointImage(IPWatchpoint watchpoint) throws CoreException {
 		String descriptor = null;
 		if (watchpoint.isEnabled()) {
-			if (watchpoint.isReadType() && !watchpoint.isWriteType())
+			if (watchpoint.isReadType() && !watchpoint.isWriteType()) {
 				descriptor = PDebugImage.IMG_DEBUG_READ_WATCHPOINT_ENABLED;
-			else if (!watchpoint.isReadType() && watchpoint.isWriteType())
+			} else if (!watchpoint.isReadType() && watchpoint.isWriteType()) {
 				descriptor = PDebugImage.IMG_DEBUG_WRITE_WATCHPOINT_ENABLED;
-			else
+			} else {
 				descriptor = PDebugImage.IMG_DEBUG_WATCHPOINT_ENABLED;
+			}
 		} else {
-			if (watchpoint.isReadType() && !watchpoint.isWriteType())
+			if (watchpoint.isReadType() && !watchpoint.isWriteType()) {
 				descriptor = PDebugImage.IMG_DEBUG_READ_WATCHPOINT_DISABLED;
-			else if (!watchpoint.isReadType() && watchpoint.isWriteType())
+			} else if (!watchpoint.isReadType() && watchpoint.isWriteType()) {
 				descriptor = PDebugImage.IMG_DEBUG_WRITE_WATCHPOINT_DISABLED;
-			else
+			} else {
 				descriptor = PDebugImage.IMG_DEBUG_WATCHPOINT_DISABLED;
+			}
 		}
 		return getImageCache().getImageFor(
 				new OverlayImageDescriptor(PDebugImage.getImage(descriptor), computeBreakpointOverlays(watchpoint)));

@@ -149,13 +149,6 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String ATTR_DEBUGGER_ARGS = PTP_LAUNCH_ID + ".DEBUGGER_ARGS"; //$NON-NLS-1$
 
 	/**
-	 * Launch configuration attribute key. The value is true if the debugger needs special help to launch
-	 * 
-	 * @since 6.0
-	 */
-	public static final String ATTR_DEBUGGER_NEEDS_LAUNCH_HELP = PTP_LAUNCH_ID + ".DEBUGGER_NEEDS_LAUNCH_HELP"; //$NON-NLS-1$
-
-	/**
 	 * Launch configuration attribute key. The value is a global variables' memento.
 	 */
 	public static final String ATTR_DEBUGGER_GLOBAL_VARIABLES = PTP_LAUNCH_ID + ".GLOBAL_VARIABLES"; //$NON-NLS-1$

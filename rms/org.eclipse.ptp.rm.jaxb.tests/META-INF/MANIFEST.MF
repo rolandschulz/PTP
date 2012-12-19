@@ -14,13 +14,14 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.core,
  org.eclipse.ptp.rm.core,
  org.eclipse.cdt.debug.core,
- org.junit;bundle-version="3.8",
+ org.junit,
  org.eclipse.ptp.rm.jaxb.core,
  org.eclipse.ptp.rm.jaxb.ui,
  org.eclipse.core.variables,
  org.eclipse.ptp.rm.jaxb.control.core,
  org.eclipse.ptp.rm.lml.monitor.core,
- org.eclipse.ptp.ems.core
+ org.eclipse.ptp.ems.core,
+ org.eclipse.ptp.debug.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %pluginProvider

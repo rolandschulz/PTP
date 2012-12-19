@@ -10,13 +10,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.jobs;
 
-import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IStreamsProxy;
 
 /**
  * @since 6.0
  */
-public interface IJobStatus {
+public interface IJobStatus extends IAdaptable {
 	/*********** PRIMARY JOB STATES ********/
 	/**
 	 * Job status cannot be determined
@@ -110,11 +111,12 @@ public interface IJobStatus {
 	public String getJobId();
 
 	/**
-	 * Get the launch configuration used to launch this job
+	 * Get the launch used for this job
 	 * 
-	 * @return
+	 * @return launch
+	 * @since 7.0
 	 */
-	public ILaunchConfiguration getLaunchConfiguration();
+	public ILaunch getLaunch();
 
 	/**
 	 * @return path to remote file

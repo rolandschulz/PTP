@@ -3,7 +3,6 @@ package org.eclipse.ptp.debug.ui;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -17,8 +16,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.jobs.IPJobStatus;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.TaskSet;
@@ -45,26 +43,34 @@ public class PVariableManager {
 
 	public PVariableInfo[] getPVariableInfo() {
 		List<PVariableInfo> aList = new ArrayList<PVariableInfo>();
-		for (Iterator<List<PVariableInfo>> i = jobVariableMap.values().iterator(); i.hasNext();) {
-			aList.addAll(i.next());
+		for (List<PVariableInfo> list : jobVariableMap.values()) {
+			aList.addAll(list);
 		}
 		return aList.toArray(new PVariableInfo[0]);
 	}
 
-	public PVariableInfo[] getPVariableInfo(IPJob job) {
-		List<PVariableInfo> infoList = jobVariableMap.get(job.getID());
-		if (infoList == null)
+	/**
+	 * @since 5.0
+	 */
+	public PVariableInfo[] getPVariableInfo(String jobId) {
+		List<PVariableInfo> infoList = jobVariableMap.get(jobId);
+		if (infoList == null) {
 			return new PVariableInfo[0];
+		}
 
 		return infoList.toArray(new PVariableInfo[0]);
 	}
 
-	public boolean isPVariableEnable(IPJob job, String varname) {
-		List<PVariableInfo> infoList = jobVariableMap.get(job.getID());
+	/**
+	 * @since 5.0
+	 */
+	public boolean isPVariableEnable(String jobId, String varname) {
+		List<PVariableInfo> infoList = jobVariableMap.get(jobId);
 		if (infoList != null) {
 			for (PVariableInfo info : infoList.toArray(new PVariableInfo[0])) {
-				if (info.getName().equals(varname))
+				if (info.getName().equals(varname)) {
 					return info.isEnabled();
+				}
 			}
 		}
 		return false;
@@ -72,82 +78,96 @@ public class PVariableManager {
 
 	public void updateVariableStatus(PVariableInfo info, boolean enabled) throws CoreException {
 		info.setEnabled(enabled);
-		getSession(info.getJob().getID()).getPDISession().getExpressionManager()
-				.updateStatusMultiExpressions(info.getName(), enabled);
+		getSession(info.getJobId()).getPDISession().getExpressionManager().updateStatusMultiExpressions(info.getName(), enabled);
 	}
 
-	public void updateVariableStatus(IPJob job, String varname, boolean enabled) throws CoreException {
-		PVariableInfo info = findVariableInfo(job, varname);
-		if (info == null)
+	/**
+	 * @since 5.0
+	 */
+	public void updateVariableStatus(String jobId, String varname, boolean enabled) throws CoreException {
+		PVariableInfo info = findVariableInfo(jobId, varname);
+		if (info == null) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, NLS.bind(
 					Messages.PVariableManager_0, varname), null));
+		}
 
 		updateVariableStatus(info, enabled);
 	}
 
-	public void addVariable(IPJob job, String varname, boolean enabled) throws CoreException {
-		if (findVariableInfo(job, varname) != null)
+	/**
+	 * @since 5.0
+	 */
+	public void addVariable(String jobId, String varname, boolean enabled) throws CoreException {
+		if (findVariableInfo(jobId, varname) != null) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, NLS.bind(
 					Messages.PVariableManager_1, varname), null));
+		}
 
-		List<PVariableInfo> infoList = jobVariableMap.get(job.getID());
+		List<PVariableInfo> infoList = jobVariableMap.get(jobId);
 		if (infoList == null) {
 			infoList = new ArrayList<PVariableInfo>();
-			jobVariableMap.put(job.getID(), infoList);
+			jobVariableMap.put(jobId, infoList);
 		}
-		IPSession session = getSession(job.getID());
+		IPSession session = getSession(jobId);
 		session.getPDISession().getExpressionManager().createMutliExpressions(session.getTasks(), varname, enabled);
-		infoList.add(new PVariableInfo(job, varname, enabled));
-	}
-
-	public void removeVariable(IPJob job) {
-		removeVariable(job.getID());
+		infoList.add(new PVariableInfo(jobId, varname, enabled));
 	}
 
 	public void removeVariable(String job_id) {
 		jobVariableMap.remove(job_id);
 	}
 
-	public void removeVariable(IPJob job, String varname) throws CoreException {
-		PVariableInfo info = findVariableInfo(job, varname);
-		if (info == null)
+	/**
+	 * @since 5.0
+	 */
+	public void removeVariable(String jobId, String varname) throws CoreException {
+		PVariableInfo info = findVariableInfo(jobId, varname);
+		if (info == null) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, NLS.bind(
 					Messages.PVariableManager_0, varname), null));
+		}
 
-		jobVariableMap.get(job.getID()).remove(info);
-		getSession(job.getID()).getPDISession().getExpressionManager().removeMutliExpressions(varname);
+		jobVariableMap.get(jobId).remove(info);
+		getSession(jobId).getPDISession().getExpressionManager().removeMutliExpressions(varname);
 	}
 
-	public void updateVariable(IPJob job, String varname, String newvarname, boolean enabled) throws CoreException {
+	/**
+	 * @since 5.0
+	 */
+	public void updateVariable(String jobId, String varname, String newvarname, boolean enabled) throws CoreException {
 		if (newvarname != null) {
-			removeVariable(job, varname);
-			addVariable(job, newvarname, enabled);
+			removeVariable(jobId, varname);
+			addVariable(jobId, newvarname, enabled);
 		} else {
-			updateVariableStatus(job, varname, enabled);
+			updateVariableStatus(jobId, varname, enabled);
 		}
 	}
 
-	public void updateValues(IPJob job) {
+	/**
+	 * @since 5.0
+	 */
+	public void updateValues(String jobId) {
 		try {
-			updateValues(job, getSession(job.getID()).getTasks());
+			updateValues(jobId, getSession(jobId).getTasks());
 		} catch (CoreException ce) {
 			ce.printStackTrace();
 		}
 	}
 
 	/**
-	 * @since 3.0
+	 * @since 5.0
 	 */
-	public void updateValues(final IPJob job, final TaskSet tasks) {
+	public void updateValues(final String jobId, final TaskSet tasks) {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				try {
-					IPDISession session = getSession(job.getID()).getPDISession();
+					IPDISession session = getSession(jobId).getPDISession();
 					TaskSet targetTasks = session.getTaskManager().getSuspendedTasks(tasks);
-					if (targetTasks.isEmpty())
+					if (targetTasks.isEmpty()) {
 						monitor.done();
-					else
+					} else {
 						session.getExpressionManager().updateMultiExpressions(targetTasks, monitor);
+					}
 				} catch (CoreException ce) {
 					throw new InterruptedException(ce.getMessage());
 				} catch (PDIException e) {
@@ -164,16 +184,21 @@ public class PVariableManager {
 		}
 	}
 
-	public String getValue(final IPJob job, final int task, final IToolTipProvider provider) {
+	/**
+	 * @since 5.0
+	 */
+	public String getValue(final IPJobStatus job, final int task, final IToolTipProvider provider) {
 		try {
-			IPSession session = getSession(job.getID());
+			IPSession session = getSession(job.getJobId());
 			IPDIExpression[] expressions = session.getPDISession().getExpressionManager().getMultiExpressions(task);
-			if (expressions == null || expressions.length == 0)
+			if (expressions == null || expressions.length == 0) {
 				return ""; //$NON-NLS-1$
+			}
 
-			final ProcessAttributes.State pState = job.getProcessState(task);
-			if (pState == null || pState != ProcessAttributes.State.SUSPENDED)
+			final String pState = job.getProcessState(task);
+			if (!pState.equals(IPJobStatus.SUSPENDED)) {
 				return ""; //$NON-NLS-1$
+			}
 
 			StringBuffer display = new StringBuffer();
 			for (IPDIExpression expression : expressions) {
@@ -187,7 +212,7 @@ public class PVariableManager {
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 								try {
-									IPSession session = getSession(job.getID());
+									IPSession session = getSession(job.getJobId());
 									session.getPDISession().getExpressionManager()
 											.updateMultiExpressions(session.getTasks(task), monitor);
 								} catch (CoreException ce) {
@@ -196,8 +221,9 @@ public class PVariableManager {
 									// throw new
 									// InterruptedException(e.getMessage());
 								}
-								if (provider != null)
-									provider.update(null, getValue(job, task, null));
+								if (provider != null) {
+									provider.update(task, getValue(job, task, null));
+								}
 							}
 						};
 						queueRunnable(runnable);
@@ -256,8 +282,8 @@ public class PVariableManager {
 		queueRunnable(runnable);
 	}
 
-	private PVariableInfo findVariableInfo(IPJob job, String varname) {
-		List<PVariableInfo> infoList = jobVariableMap.get(job.getID());
+	private PVariableInfo findVariableInfo(String jobId, String varname) {
+		List<PVariableInfo> infoList = jobVariableMap.get(jobId);
 		if (infoList != null) {
 			for (PVariableInfo info : infoList.toArray(new PVariableInfo[0])) {
 				if (info.getName().equals(varname)) {
@@ -270,26 +296,33 @@ public class PVariableManager {
 
 	private IPSession getSession(String jobId) throws CoreException {
 		IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(jobId);
-		if (session == null)
+		if (session == null) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR,
 					Messages.PVariableManager_3, null));
+		}
 
 		return session;
 	}
 
 	public class PVariableInfo {
-		private final IPJob job;
+		private final String jobId;
 		private final String name;
 		private boolean enabled;
 
-		public PVariableInfo(IPJob job, String name, boolean enabled) {
-			this.job = job;
+		/**
+		 * @since 5.0
+		 */
+		public PVariableInfo(String jobId, String name, boolean enabled) {
+			this.jobId = jobId;
 			this.name = name;
 			this.enabled = enabled;
 		}
 
-		public IPJob getJob() {
-			return job;
+		/**
+		 * @since 5.0
+		 */
+		public String getJobId() {
+			return jobId;
 		}
 
 		public String getName() {
@@ -351,17 +384,19 @@ public class PVariableManager {
 				try {
 					runnable.run(monitor);
 				} catch (Exception e) {
-					if (failed == null)
+					if (failed == null) {
 						failed = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR,
 								Messages.PVariableManager_5, null);
+					}
 					failed.add(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(),
 							PTPDebugCorePlugin.INTERNAL_ERROR, Messages.PVariableManager_5, e));
 				}
 				monitor.worked(1);
 			}
 			monitor.done();
-			if (failed == null)
+			if (failed == null) {
 				return Status.OK_STATUS;
+			}
 
 			return failed;
 		}

@@ -18,14 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.views;
 
-import java.util.ArrayList;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.event.IPDebugErrorInfo;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
@@ -37,7 +35,6 @@ import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugViewEventHandler;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.messages.Messages;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 
 /**
@@ -80,17 +77,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 				if (refresh) {
 					IElementHandler elementHandler = getPView().getElementHandler(jobId);
 					if (elementHandler != null) {
-						ArrayList<IElement> regElementArray = new ArrayList<IElement>();
-						for (int j = 0; j < c_regTask_array.length; j++) {
-							String procId = getProcessId(info.getLaunch(), c_regTask_array[j]);
-							if (procId != null) {
-								IElement element = elementHandler.getSetRoot().getElementByID(procId);
-								if (element != null) {
-									regElementArray.add(element);
-								}
-							}
-						}
-						elementHandler.addToRegister(regElementArray.toArray(new IElement[regElementArray.size()]));
+						elementHandler.register(info.getAllTasks());
 					}
 					refresh();
 				}
@@ -99,7 +86,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 				}
 				break;
 			case IPDebugEvent.DEBUGGER:
-				IPJob job = ModelManager.getInstance().getUniverse().getJob(info.getLaunch().getJobControl(), jobId);
+				IJobStatus job = JobManager.getInstance().getJob(info.getLaunch().getJobControl().getControlId(), jobId);
 				if (job != null) {
 					getPView().changeJobRefresh(job);
 				}
@@ -113,7 +100,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 			switch (event.getDetail()) {
 			case IPDebugEvent.DEBUGGER:
 				if (elementHandler != null) {
-					elementHandler.removeElements(elementHandler.getRegistered());
+					elementHandler.removeAllRegistered();
 				}
 				refresh(true);
 				break;
@@ -124,15 +111,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 				}
 				if (refresh) {
 					if (elementHandler != null) {
-						int[] t_regTask_array = info.getAllTasks().toArray();
-						IElement[] regElementArray = new IElement[t_regTask_array.length];
-						for (int j = 0; j < t_regTask_array.length; j++) {
-							String procId = getProcessId(info.getLaunch(), t_regTask_array[j]);
-							if (procId != null) {
-								regElementArray[j] = elementHandler.getSetRoot().getElementByID(procId);
-							}
-						}
-						elementHandler.removeFromRegister(regElementArray);
+						elementHandler.unRegister(info.getAllTasks());
 					}
 					refresh();
 				}
@@ -218,17 +197,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 				if (event.getDetail() == IPDebugEvent.ERR_FATAL) {
 					IElementHandler eHandler = getPView().getElementHandler(jobId);
 					if (eHandler != null) {
-						int[] e_regTask_array = info.getAllRegisteredTasks().toArray();
-						if (e_regTask_array.length > 0) {
-							IElement[] regElementArray = new IElement[e_regTask_array.length];
-							for (int j = 0; j < e_regTask_array.length; j++) {
-								String procId = getProcessId(info.getLaunch(), e_regTask_array[j]);
-								if (procId != null) {
-									regElementArray[j] = eHandler.getSetRoot().getElementByID(procId);
-								}
-							}
-							eHandler.removeFromRegister(regElementArray);
-						}
+						eHandler.unRegister(info.getAllRegisteredTasks());
 					}
 					refresh(true);
 				}
@@ -238,10 +207,6 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 	}
 
 	private String getProcessId(IPLaunch launch, int task) {
-		IPJob job = ModelManager.getInstance().getUniverse().getJob(launch.getJobControl(), launch.getJobId());
-		if (job != null) {
-			return job.getProcessName(task);
-		}
-		return null;
+		return Integer.toString(task);
 	}
 }

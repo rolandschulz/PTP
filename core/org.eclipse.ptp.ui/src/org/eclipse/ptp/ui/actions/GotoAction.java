@@ -18,47 +18,64 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.actions;
 
+import java.util.BitSet;
+
 import org.eclipse.jface.action.IAction;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public abstract class GotoAction extends ParallelAction {
 	protected String id = ""; //$NON-NLS-1$
 	protected GotoDropDownAction action = null;
 	protected Object data;
-	
-	
-	/** Constructor
-	 * @param name name of action
-	 * @param id action ID
-	 * @param view view
-	 * @param action drop down action
+
+	/**
+	 * Constructor
+	 * 
+	 * @param name
+	 *            name of action
+	 * @param id
+	 *            action ID
+	 * @param view
+	 *            view
+	 * @param action
+	 *            drop down action
 	 */
 	public GotoAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action, Object data) {
 		this(name, id, view, IAction.AS_CHECK_BOX, action, data);
 	}
-	/** Constructor
-	 * @param name name of action
-	 * @param id action ID
-	 * @param view view
-	 * @param style style of action
-	 * @param action drop down action
+
+	/**
+	 * Constructor
+	 * 
+	 * @param name
+	 *            name of action
+	 * @param id
+	 *            action ID
+	 * @param view
+	 *            view
+	 * @param style
+	 *            style of action
+	 * @param action
+	 *            drop down action
 	 */
 	public GotoAction(String name, String id, AbstractParallelElementView view, int style, GotoDropDownAction action, Object data) {
 		super(name, style, view);
 		this.id = id;
-		this.action = action;	
+		this.action = action;
 		this.data = data;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(java.util.BitSet)
 	 */
-	public void run(IElement[] elements) {
+	@Override
+	public void run(BitSet elements) {
 		action.run(elements, id, data);
 	}
 }

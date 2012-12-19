@@ -16,59 +16,78 @@ import java.util.NoSuchElementException;
 
 /**
  * Represents a range of numbers inclusive of max and min.
- *
+ * 
  */
 public class Range implements Iterable<String> {
 	private Integer min;
 	private Integer max;
 	private Integer curr;
-	
+	private boolean empty;
+
+	/**
+	 * @since 4.0
+	 */
+	public Range() {
+		empty = true;
+	}
+
 	public Range(int val) {
 		this(val, val);
 	}
-	
+
 	public Range(int min, int max) throws IllegalArgumentException {
 		if (min > max) {
 			throw new IllegalArgumentException();
 		}
 		this.min = min;
 		this.max = max;
+		this.empty = false;
 	}
-	
-	public int getMinValue() {
-		return min;
+
+	/**
+	 * @since 4.0
+	 */
+	public void clear() {
+		empty = true;
 	}
-	
+
+	/**
+	 * @since 4.0
+	 */
+	public boolean contains(int val) {
+		return !empty && val >= min && val <= max;
+	}
+
+	/**
+	 * @since 4.0
+	 */
+	public Range contains(Range r) {
+		Range newRange = new Range();
+		if (r.getMaxValue() >= min && r.getMinValue() <= max) {
+			newRange.setMinValue(r.getMinValue() < min ? min : r.getMinValue());
+			newRange.setMaxValue(r.getMaxValue() > max ? max : r.getMaxValue());
+		}
+		return newRange;
+	}
+
 	public int getMaxValue() {
 		return max;
 	}
-	
-	public void setMinValue(int val) {
-		min = val;
+
+	public int getMinValue() {
+		return min;
 	}
-	
-	public void setMaxValue(int val) {
-		max = val;
-	}
-	
-	public boolean inRange(int val) {
-		return val >= min && val <= max;
-	}
-	
-	public int size() {
-		return max - min + 1;
-	}
-	
-	public String toString() {
-		if (min == max)
-			return "" + min; //$NON-NLS-1$
-		
-		return min + "-" + max; //$NON-NLS-1$
+
+	/**
+	 * @since 4.0
+	 */
+	public boolean isEmpty() {
+		return empty;
 	}
 
 	public Iterator<String> iterator() {
 		curr = min;
-		
+
 		return new Iterator<String>() {
 			public boolean hasNext() {
 				return curr <= max;
@@ -87,5 +106,27 @@ public class Range implements Iterable<String> {
 			}
 		};
 	}
-}
 
+	public void setMaxValue(int val) {
+		max = val;
+		empty = false;
+	}
+
+	public void setMinValue(int val) {
+		min = val;
+		empty = false;
+	}
+
+	public int size() {
+		return empty ? 0 : max - min + 1;
+	}
+
+	@Override
+	public String toString() {
+		if (min == max) {
+			return "" + min; //$NON-NLS-1$
+		}
+
+		return min + "-" + max; //$NON-NLS-1$
+	}
+}

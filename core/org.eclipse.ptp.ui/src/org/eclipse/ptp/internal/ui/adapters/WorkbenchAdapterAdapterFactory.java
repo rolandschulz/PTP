@@ -22,49 +22,26 @@
 package org.eclipse.ptp.internal.ui.adapters;
 
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.IWorkbenchAdapter2;
 
 public class WorkbenchAdapterAdapterFactory implements IAdapterFactory {
 
-	private static final UniverseWorkbenchAdapter UNIVERSE_WORKBENCH_ADAPTER = new UniverseWorkbenchAdapter();
-	private static final PResourceManagerWorkbenchAdapter RESOURCE_MANAGER_WORKBENCH_ADAPTER = new PResourceManagerWorkbenchAdapter();
-	private static final PMachineWorkbenchAdapter MACHINE_WORKBENCH_ADAPTER = new PMachineWorkbenchAdapter();
-	private static final PQueueWorkbenchAdapter QUEUE_WORKBENCH_ADAPTER = new PQueueWorkbenchAdapter();
-	private static final PNodeWorkbenchAdapter NODE_WORKBENCH_ADAPTER = new PNodeWorkbenchAdapter();
 	private static final PJobWorkbenchAdapter JOB_WORKBENCH_ADAPTER = new PJobWorkbenchAdapter();
 
+	@Override
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType == IWorkbenchAdapter.class || adapterType == IWorkbenchAdapter2.class) {
-			if (adaptableObject instanceof IPUniverse) {
-				return UNIVERSE_WORKBENCH_ADAPTER;
-			}
-			if (adaptableObject instanceof IPResourceManager) {
-				return RESOURCE_MANAGER_WORKBENCH_ADAPTER;
-			}
-			if (adaptableObject instanceof IPMachine) {
-				return MACHINE_WORKBENCH_ADAPTER;
-			}
-			if (adaptableObject instanceof IPNode) {
-				return NODE_WORKBENCH_ADAPTER;
-			}
-			if (adaptableObject instanceof IPQueue) {
-				return QUEUE_WORKBENCH_ADAPTER;
-			}
-			if (adaptableObject instanceof IPJob) {
+			if (adaptableObject instanceof IJobStatus) {
 				return JOB_WORKBENCH_ADAPTER;
 			}
 		}
 		return null;
 	}
 
+	@Override
 	@SuppressWarnings("rawtypes")
 	public Class[] getAdapterList() {
 		return new Class[] { IWorkbenchAdapter.class, IWorkbenchAdapter2.class };

@@ -18,37 +18,47 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.actions;
 
+import java.util.BitSet;
+
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.IJobManager;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.messages.Messages;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class RemoveAllTerminatedAction extends ParallelAction {
 	public static final String name = Messages.RemoveAllTerminatedAction_0;
-	
-	/** Constructor
+
+	/**
+	 * Constructor
+	 * 
 	 * @param view
 	 */
 	public RemoveAllTerminatedAction(AbstractParallelElementView view) {
 		super(name, view);
-	    setImageDescriptor(ParallelImages.ID_ICON_REMOVEALLTERMINATED_NORMAL);
+		setImageDescriptor(ParallelImages.ID_ICON_REMOVEALLTERMINATED_NORMAL);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(java.util.BitSet)
 	 */
-	public void run(IElement[] elements) {}
-	
-	/* (non-Javadoc)
+	@Override
+	public void run(BitSet elements) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.action.IAction#run()
 	 */
+	@Override
 	public void run() {
-		((IJobManager) view.getUIManager()).removeAllStoppedJobs();
+		((IJobManager) view.getUIManager()).removeAllCompletedJobs();
 	}
 }

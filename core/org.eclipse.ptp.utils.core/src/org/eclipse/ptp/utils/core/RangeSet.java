@@ -14,6 +14,8 @@ package org.eclipse.ptp.utils.core;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 /**
@@ -59,6 +61,14 @@ public class RangeSet implements Iterable<String> {
 		add(low, high);
 	}
 
+	public RangeSet(int val) {
+		this(val, val);
+	}
+
+	public RangeSet(int min, int max) {
+		rangeList.add(new Range(min, max));
+	}
+
 	public RangeSet(String str) {
 		if (str != null) {
 			String[] ranges = str.split(","); //$NON-NLS-1$
@@ -73,22 +83,31 @@ public class RangeSet implements Iterable<String> {
 		}
 	}
 
-	public RangeSet(int val) {
-		this(val, val);
+	/**
+	 * @since 4.0
+	 */
+	public BitSet getBits() {
+		BitSet bits = new BitSet(size());
+		for (Range r : rangeList) {
+			bits.set(r.getMinValue(), r.getMaxValue());
+		}
+		return bits;
 	}
 
-	public RangeSet(int min, int max) {
-		rangeList.add(new Range(min, max));
-	}
-
+	/**
+	 * Add value to the set
+	 * 
+	 * @param val
+	 */
 	public void add(int val) {
 		int pos = 0;
 
 		if (rangeList.size() > 0) {
 			pos = findIndex(val);
 
-			if (pos >= 0)
+			if (pos >= 0) {
 				return;
+			}
 
 			pos = -(pos + 1);
 		}
@@ -97,7 +116,121 @@ public class RangeSet implements Iterable<String> {
 		fixupRanges();
 	}
 
+	/**
+	 * Add values in the range [min, max] to the set
+	 * 
+	 * @param min
+	 * @param max
+	 */
 	public void add(int min, int max) {
+		internalAdd(min, max);
+		fixupRanges();
+	}
+
+	/**
+	 * Add all the values contained in the RangeSet to this set
+	 * 
+	 * @param set
+	 * @since 4.0
+	 */
+	public void add(RangeSet set) {
+		for (Range range : set.getRanges()) {
+			add(range.getMinValue(), range.getMaxValue());
+		}
+		fixupRanges();
+	}
+
+	/**
+	 * @since 4.0
+	 */
+	public void clear() {
+		rangeList.clear();
+	}
+
+	/**
+	 * Check if val is in the set
+	 * 
+	 * @param val
+	 * @return true if val is in the set
+	 * @since 4.0
+	 */
+	public boolean contains(int val) {
+		return findIndex(val) >= 0;
+	}
+
+	private void contains(Range val, RangeSet set) {
+		for (Range r : rangeList) {
+			Range nr = r.contains(val);
+			set.add(nr.getMinValue(), nr.getMaxValue());
+		}
+	}
+
+	/**
+	 * Find the common values between the supplied set and this set.
+	 * 
+	 * @param set
+	 * @return RangeSet containing common values
+	 * @since 4.0
+	 */
+	public RangeSet contains(RangeSet set) {
+		RangeSet newSet = new RangeSet();
+		for (Range r : set.getRanges()) {
+			contains(r, newSet);
+		}
+		return newSet;
+	}
+
+	/**
+	 * Find the index position of val in the list of ranges using a binary search. Returns a positive value if val is already in the
+	 * list, or a negative number representing the position+1 in the list that val would be located.
+	 * 
+	 * @param val
+	 * @return
+	 */
+	private int findIndex(int val) {
+		int low = 0;
+		int high = rangeList.size() - 1;
+
+		while (low <= high) {
+			int pos = (low == high) ? low : ((low + high) / 2);
+			Range r = rangeList.get(pos);
+
+			if (r.contains(val)) {
+				return pos;
+			} else if (val < r.getMinValue()) {
+				high = pos - 1;
+			} else if (val > r.getMaxValue()) {
+				low = pos + 1;
+			}
+		}
+
+		return -(low + 1);
+	}
+
+	private void fixupRanges() {
+		for (int pos = rangeList.size() - 2; pos >= 0; pos--) {
+			Range r1 = rangeList.get(pos);
+			Range r2 = rangeList.get(pos + 1);
+			if (r1.getMaxValue() >= r2.getMinValue() - 1) {
+				r1.setMaxValue(r2.getMaxValue());
+				rangeList.remove(pos + 1);
+			}
+		}
+	}
+
+	/**
+	 * Get the list of ranges in this set. These ranges are guaranteed to be sorted and non-overlapping. i.e. there will always be
+	 * at least one element between each range in the list.
+	 * 
+	 * @return sorted list of non-overlapping ranges in this set
+	 * 
+	 * @since 4.0
+	 */
+	public List<Range> getRanges() {
+		return rangeList;
+	}
+
+	private void internalAdd(int min, int max) {
 		if (min == max) {
 			add(min);
 			return;
@@ -189,96 +322,16 @@ public class RangeSet implements Iterable<String> {
 				}
 			}
 		}
-
-		fixupRanges();
-	}
-
-	private void fixupRanges() {
-		for (int pos = rangeList.size() - 2; pos >= 0; pos--) {
-			Range r1 = rangeList.get(pos);
-			Range r2 = rangeList.get(pos + 1);
-			if (r1.getMaxValue() >= r2.getMinValue() - 1) {
-				r1.setMaxValue(r2.getMaxValue());
-				rangeList.remove(pos + 1);
-			}
-		}
-	}
-
-	public void remove(int val) {
-
-	}
-
-	public void remove(int min, int max) {
-
-	}
-
-	public boolean inRange(int val) {
-		return findIndex(val) >= 0;
-	}
-
-	public int size() {
-		int nels = 0;
-
-		for (Range r : rangeList) {
-			nels += r.size();
-		}
-
-		return nels;
-	}
-
-	public int[] toArray() {
-		int elt = 0;
-		int[] vals = new int[size()];
-
-		for (Range r : rangeList) {
-			for (int i = r.getMinValue(); i <= r.getMaxValue(); i++) {
-				vals[elt++] = i;
-			}
-		}
-
-		return vals;
-	}
-
-	@Override
-	public String toString() {
-		String str = ""; //$NON-NLS-1$
-
-		for (int i = 0; i < rangeList.size(); i++) {
-			if (i > 0)
-				str += ","; //$NON-NLS-1$
-			str += rangeList.get(i).toString();
-		}
-
-		return str;
-	}
-
-	public int findIndex(int val) {
-		int low = 0;
-		int high = rangeList.size() - 1;
-
-		while (low <= high) {
-			int pos = (low == high) ? low : ((low + high) / 2);
-			Range r = rangeList.get(pos);
-
-			if (r.inRange(val)) {
-				return pos;
-			} else if (val < r.getMinValue()) {
-				high = pos - 1;
-			} else if (val > r.getMaxValue()) {
-				low = pos + 1;
-			}
-		}
-
-		return -(low + 1);
 	}
 
 	public Iterator<String> iterator() {
 		rangeListIter = rangeList.iterator();
 
-		if (rangeListIter.hasNext())
+		if (rangeListIter.hasNext()) {
 			rangeIter = rangeListIter.next().iterator();
-		else
+		} else {
 			rangeIter = null;
+		}
 
 		return new Iterator<String>() {
 			public boolean hasNext() {
@@ -300,5 +353,91 @@ public class RangeSet implements Iterable<String> {
 				throw new UnsupportedOperationException();
 			}
 		};
+	}
+
+	public void remove(int val) {
+		int pos = findIndex(val);
+		if (pos >= 0) {
+			Range r = rangeList.get(pos);
+			int min = r.getMinValue();
+			int max = r.getMaxValue();
+			if (max == min) {
+				rangeList.remove(pos);
+			} else if (min == val) {
+				r.setMinValue(val + 1);
+			} else {
+				r.setMaxValue(val - 1);
+				if (max > val) {
+					Range r2 = new Range(val + 1, max);
+					rangeList.add(pos + 1, r2);
+				}
+			}
+		}
+	}
+
+	public void remove(int from, int to) {
+		ListIterator<Range> it = rangeList.listIterator();
+		while (it.hasNext()) {
+			Range r = it.next();
+			int min = r.getMinValue();
+			int max = r.getMaxValue();
+			if (min >= from && max <= to) {
+				it.remove();
+			} else if (r.contains(from) || r.contains(to)) {
+				if (from > min) {
+					r.setMaxValue(from - 1);
+					if (to < max) {
+						Range r2 = new Range(to + 1, max);
+						it.add(r2);
+					}
+				} else if (to < max) {
+					r.setMinValue(to + 1);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @since 4.0
+	 */
+	public void remove(RangeSet set) {
+		for (Range r : set.getRanges()) {
+			remove(r.getMinValue(), r.getMaxValue());
+		}
+	}
+
+	public int size() {
+		int nels = 0;
+		for (Range r : rangeList) {
+			nels += r.size();
+		}
+		return nels;
+	}
+
+	public int[] toArray() {
+		int elt = 0;
+		int[] vals = new int[size()];
+
+		for (Range r : rangeList) {
+			for (int i = r.getMinValue(); i <= r.getMaxValue(); i++) {
+				vals[elt++] = i;
+			}
+		}
+
+		return vals;
+	}
+
+	@Override
+	public String toString() {
+		String str = ""; //$NON-NLS-1$
+
+		for (int i = 0; i < rangeList.size(); i++) {
+			if (i > 0) {
+				str += ","; //$NON-NLS-1$
+			}
+			str += rangeList.get(i).toString();
+		}
+
+		return str;
 	}
 }

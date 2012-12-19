@@ -31,8 +31,7 @@ import org.eclipse.debug.ui.actions.IToggleBreakpointsTargetExtension;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PDebugUtils;
@@ -190,14 +189,12 @@ public class ToggleBreakpointsTarget implements IToggleBreakpointsTargetExtensio
 						if (lineNumber == -1) {
 							errorMessage = Messages.ToggleBreakpointAdapter_Invalid_line_1;
 						} else {
-							IPJob job = uiDebugManager.getJob();
+							IJobStatus job = uiDebugManager.getJob();
 							String jobId = IPBreakpoint.GLOBAL;
-							String jobName = IPBreakpoint.GLOBAL;
-							if (job != null && job.getState() != JobAttributes.State.COMPLETED) {
-								IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job.getID());
+							if (job != null && job.getState().equals(IJobStatus.CANCELED)) {
+								IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job.getJobId());
 								if (session != null) {
-									jobId = job.getID();
-									jobName = job.getName();
+									jobId = job.getJobId();
 								}
 							}
 							String sid = uiDebugManager.getCurrentSetId();
@@ -209,23 +206,22 @@ public class ToggleBreakpointsTarget implements IToggleBreakpointsTargetExtensio
 							 * current job
 							 */
 							if (breakpoints.length > 0) {
-								IPLineBreakpoint breakpoint = PDebugModel.lineBreakpointExists(breakpoints, job);
+								IPLineBreakpoint breakpoint = PDebugModel.lineBreakpointExists(breakpoints, job.getJobId());
 								if (breakpoint != null) {
 									if (breakpoint.isGlobal() && job == null) {
 										DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
 									} else {
-										IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job.getID());
+										IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job.getJobId());
 										if (session != null) {
 											session.getBreakpointManager().deleteBreakpoint(breakpoint);
 										}
 									}
 								} else {// create a new breakpoint
 									PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0,
-											"", true, sid, jobId, jobName); //$NON-NLS-1$
+											"", true, sid, jobId); //$NON-NLS-1$
 								}
 							} else {// no breakpoint found and create a new one
-								PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0,
-										"", true, sid, jobId, jobName); //$NON-NLS-1$
+								PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jobId); //$NON-NLS-1$
 							}
 							return;
 						}

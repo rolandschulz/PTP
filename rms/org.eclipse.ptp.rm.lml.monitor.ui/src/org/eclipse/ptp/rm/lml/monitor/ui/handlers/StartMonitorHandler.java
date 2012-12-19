@@ -49,6 +49,7 @@ public class StartMonitorHandler extends AbstractHandler implements IHandler, IS
 	 * 
 	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
 	 */
+	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 		ISelection sel = event.getSelection();
 		if (!sel.isEmpty() && sel instanceof IStructuredSelection) {
@@ -73,6 +74,7 @@ public class StartMonitorHandler extends AbstractHandler implements IHandler, IS
 		super.dispose();
 	}
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
@@ -86,6 +88,7 @@ public class StartMonitorHandler extends AbstractHandler implements IHandler, IS
 			try {
 				HandlerUtil.getActiveWorkbenchWindow(event).run(true, true, new IRunnableWithProgress() {
 
+					@Override
 					public void run(IProgressMonitor progress) throws InvocationTargetException, InterruptedException {
 						SubMonitor subMon = SubMonitor.convert(progress, monitors.size());
 						try {
@@ -95,7 +98,7 @@ public class StartMonitorHandler extends AbstractHandler implements IHandler, IS
 										monitor.start(subMon.newChild(1));
 									}
 								} catch (CoreException e) {
-									throw new InvocationTargetException(e.getCause());
+									throw new InvocationTargetException(e);
 								}
 							}
 						} finally {
@@ -106,8 +109,10 @@ public class StartMonitorHandler extends AbstractHandler implements IHandler, IS
 					}
 				});
 			} catch (InvocationTargetException e) {
-				ErrorDialog.openError(HandlerUtil.getActiveShell(event), Messages.StartMonitorHandler_Start_Monitor, Messages.StartMonitorHandler_Unable_to_start_monitor, new Status(
-						IStatus.WARNING, LMLMonitorUIPlugin.getUniqueIdentifier(), e.getLocalizedMessage()));
+				ErrorDialog.openError(HandlerUtil.getActiveShell(event), Messages.StartMonitorHandler_Start_Monitor,
+						Messages.StartMonitorHandler_Unable_to_start_monitor,
+						new Status(IStatus.WARNING, LMLMonitorUIPlugin.getUniqueIdentifier(), e.getTargetException()
+								.getLocalizedMessage(), e.getTargetException()));
 			} catch (InterruptedException e) {
 				// Ignore
 			}

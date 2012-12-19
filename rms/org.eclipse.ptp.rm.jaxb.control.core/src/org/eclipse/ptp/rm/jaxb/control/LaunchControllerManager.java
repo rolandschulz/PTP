@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.ModelManager;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
 import org.eclipse.ptp.rm.jaxb.core.JAXBExtensionUtils;
@@ -65,7 +64,6 @@ public class LaunchControllerManager {
 					}
 					controller.initialize();
 					fControllers.put(controlId, controller);
-					ModelManager.getInstance().getUniverse().addResourceManager(configName, controlId);
 				}
 			}
 			boolean reload = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(),

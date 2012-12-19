@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.actions;
 
+import java.util.BitSet;
+
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
@@ -26,57 +28,64 @@ import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.messages.Messages;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
  * @author clement chu
- *
+ * 
  */
 public class RemoveElementAction extends ParallelAction {
 	public static final String name = Messages.RemoveElementAction_0;
-	
-	/** Constructor
+
+	/**
+	 * Constructor
+	 * 
 	 * @param view
 	 */
 	public RemoveElementAction(AbstractParallelElementView view) {
 		super(name, view);
-	    setImageDescriptor(ParallelImages.ID_ICON_DELETEELEMENT_NORMAL);
+		setImageDescriptor(ParallelImages.ID_ICON_DELETEELEMENT_NORMAL);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(java.util.BitSet)
 	 */
-	public void run(IElement[] elements) {
+	@Override
+	public void run(BitSet elements) {
 		if (validation(elements)) {
 			IElementSet set = view.getCurrentSet();
-			if (set.size() == elements.length) {
+			if (set.size() == elements.cardinality()) {
 				callDeleteGroupAction();
 			} else {
 				IElementHandler setManager = view.getCurrentElementHandler();
-				if (setManager == null)
+				if (setManager == null) {
 					return;
+				}
 
-				if (UIUtils.showQuestionDialog(Messages.RemoveElementAction_1, NLS.bind(Messages.RemoveElementAction_2, elements.length)))	{			
+				if (UIUtils.showQuestionDialog(Messages.RemoveElementAction_1,
+						NLS.bind(Messages.RemoveElementAction_2, elements.cardinality()))) {
 					view.getUIManager().removeFromSet(elements, set.getID(), setManager);
-					view.selectSet((IElementSet)setManager.getElementByID(set.getID()));
+					view.selectSet(setManager.getSet(set.getID()));
 					view.updateTitle();
 					view.refresh(false);
 				}
 			}
-		}		
+		}
 	}
-	
-	/** Call delete group action
+
+	/**
+	 * Call delete group action
 	 * 
 	 */
 	private void callDeleteGroupAction() {
 		IToolBarManager manager = view.getViewSite().getActionBars().getToolBarManager();
 		IContributionItem item = manager.find(DeleteSetAction.name);
 		if (item != null && item instanceof ActionContributionItem) {
-			((ActionContributionItem)item).getAction().run();
+			((ActionContributionItem) item).getAction().run();
 		}
 	}
 }

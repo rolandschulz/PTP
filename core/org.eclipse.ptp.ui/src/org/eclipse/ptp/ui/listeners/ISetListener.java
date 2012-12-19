@@ -18,36 +18,63 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.listeners;
 
-import org.eclipse.ptp.ui.model.IElement;
+import java.util.BitSet;
+
 import org.eclipse.ptp.ui.model.IElementSet;
 
 /**
  * @author clement chu
- *
+ * 
  */
 public interface ISetListener {
-	/** Change set event
-	 * @param currentSet current Set
-	 * @param preSet previous Set
+	/**
+	 * Add element to set event
+	 * 
+	 * @param set
+	 *            Set
+	 * @param elements
+	 *            elements to add to set
+	 * @since 7.0
+	 */
+	public void addElementsEvent(IElementSet set, BitSet elements);
+
+	/**
+	 * Change set event
+	 * 
+	 * @param currentSet
+	 *            current Set
+	 * @param preSet
+	 *            previous Set
 	 */
 	public void changeSetEvent(IElementSet currentSet, IElementSet preSet);
-	/** Create set event
-	 * @param set new Set
-	 * @param elements add elements into a given Set
+
+	/**
+	 * Create set event
+	 * 
+	 * @param set
+	 *            new Set
+	 * @param elements
+	 *            add elements into a given Set
+	 * @since 7.0
 	 */
-	public void createSetEvent(IElementSet set, IElement[] elements);
-	/** Delete set event
-	 * @param set Set
+	public void createSetEvent(IElementSet set, BitSet elements);
+
+	/**
+	 * Delete set event
+	 * 
+	 * @param set
+	 *            Set
 	 */
 	public void deleteSetEvent(IElementSet set);
-	/** Add element to set event
-	 * @param set Set
-	 * @param elements elements to add to set
+
+	/**
+	 * Remove elements event
+	 * 
+	 * @param set
+	 *            Set
+	 * @param elements
+	 *            elements to remove from set
+	 * @since 7.0
 	 */
-	public void addElementsEvent(IElementSet set, IElement[] elements);
-	/** Remove elements event
-	 * @param set Set  
-	 * @param elements elements to remove from set
-	 */
-	public void removeElementsEvent(IElementSet set, IElement[] elements);
+	public void removeElementsEvent(IElementSet set, BitSet elements);
 }

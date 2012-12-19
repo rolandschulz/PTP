@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.event.PDebugEvent;
@@ -147,10 +146,10 @@ public class PDebugModel {
 	 * @param jobId
 	 * @return
 	 * @throws CoreException
-	 * @since 5.0
+	 * @since 7.0
 	 */
 	public static IPLineBreakpoint createLineBreakpoint(String sourceHandle, IResource resource, int lineNumber, boolean enabled,
-			int ignoreCount, String condition, boolean register, String setId, String jobId, String jobName) throws CoreException {
+			int ignoreCount, String condition, boolean register, String setId, String jobId) throws CoreException {
 		HashMap<String, Object> attributes = new HashMap<String, Object>(10);
 		attributes.put(IBreakpoint.ID, getPluginIdentifier());
 		attributes.put(IMarker.LINE_NUMBER, new Integer(lineNumber));
@@ -159,7 +158,7 @@ public class PDebugModel {
 		attributes.put(IPBreakpoint.IGNORE_COUNT, new Integer(ignoreCount));
 		attributes.put(IPBreakpoint.CONDITION, condition);
 		attributes.put(IPBreakpoint.CUR_SET_ID, setId);
-		attributes.put(IPBreakpoint.JOB_NAME, jobName);
+		attributes.put(IPBreakpoint.JOB_NAME, jobId);
 		return new PLineBreakpoint(resource, attributes, jobId, setId, register);
 	}
 
@@ -251,11 +250,12 @@ public class PDebugModel {
 	 * @param job
 	 * @return
 	 * @throws CoreException
+	 * @since 7.0
 	 */
-	public static IPLineBreakpoint lineBreakpointExists(IPLineBreakpoint[] breakpoints, IPJob job) throws CoreException {
+	public static IPLineBreakpoint lineBreakpointExists(IPLineBreakpoint[] breakpoints, String jid) throws CoreException {
 		for (IPLineBreakpoint breakpoint : breakpoints) {
 			String jobId = breakpoint.getJobId();
-			if (jobId.equals(IPBreakpoint.GLOBAL) || (job != null && jobId.equals(job.getID()))) {
+			if (jobId.equals(IPBreakpoint.GLOBAL) || jobId.equals(jid)) {
 				return breakpoint;
 			}
 		}
@@ -423,12 +423,14 @@ public class PDebugModel {
 	 * @return
 	 */
 	private static boolean sameSourceHandle(String handle1, String handle2) {
-		if (handle1 == null || handle2 == null)
+		if (handle1 == null || handle2 == null) {
 			return false;
+		}
 		IPath path1 = new Path(handle1);
 		IPath path2 = new Path(handle2);
-		if (path1.isValidPath(handle1) && path2.isValidPath(handle2))
+		if (path1.isValidPath(handle1) && path2.isValidPath(handle2)) {
 			return path1.equals(path2);
+		}
 		return handle1.equals(handle2);
 	}
 
@@ -452,8 +454,9 @@ public class PDebugModel {
 				boolean allowTerminate = true;
 				boolean allowDisconnect = false;
 				IPSession session = getSession(launch.getJobId());
-				if (session == null)
+				if (session == null) {
 					return Status.CANCEL_STATUS;
+				}
 				for (IPDITarget pdiTarget : pdiTargets) {
 					IPDebugTarget target = new PDebugTarget(session, launch.getProcesses()[0], pdiTarget, allowTerminate,
 							allowDisconnect);
@@ -569,13 +572,14 @@ public class PDebugModel {
 	 */
 	public TaskSet getTasks(IPSession session, String setId) {
 		TaskSet tasks = session.getSetManager().getTasks(setId);
-		if (tasks != null)
+		if (tasks != null) {
 			return tasks.copy();
+		}
 		return null;
 	}
 
 	/**
-	 * Remove a debug target from a launch. Œ
+	 * Remove a debug target from a launch. ï¿½
 	 * 
 	 * @param launch
 	 * @param tasks

@@ -18,124 +18,129 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.model;
 
+import java.util.BitSet;
+
 /**
  * @author clement chu
- *
+ * 
  */
-public interface IElementSet extends IElement {
+public interface IElementSet {
+
 	/**
-	 * Removes Element from this set
-	 * @param element id 
+	 * @since 7.0
 	 */
-	public void removeElement(String id);
-	
+	public String getID();
+
+	/**
+	 * @since 7.0
+	 */
+	public String getName();
+
 	/**
 	 * Adds given elements to this set
+	 * 
 	 * @param elements
+	 * @since 7.0
 	 */
-	public void addElements(IElement[] elements);
+	public void addElements(BitSet elements);
 
 	/**
-	 * Removes given elements from this set
-	 * @param elements
+	 * Store a list which set also contains the same element
+	 * Adds to match set of given set id
+	 * 
+	 * @param setID
+	 *            set id
 	 */
-	public void removeElements(IElement[] elements);
+	public void addMatchSet(String setID);
 
 	/**
-	 * Returns an array of elements of this set
-	 * @return an array of elements
+	 * Returns whether this set contains given element
+	 * 
+	 * @param element
+	 * @return whether this set contains given element
+	 * @since 7.0
 	 */
-	public IElement[] getElements();
+	public boolean contains(int element);
+
+	/**
+	 * Returns the set of elements contained in this set
+	 * 
+	 * @since 7.0
+	 */
+	public BitSet contains(BitSet elements);
+
+	/**
+	 * Returns whether given set id contains in match list
+	 * 
+	 * @param setID
+	 * @return true if given set id contains in match list
+	 */
+	public boolean containsMatchSet(String setID);
+
+	/**
+	 * Returns an array of match set id
+	 * 
+	 * @return an array of match set id
+	 */
+	public String[] getMatchSetIDs();
 
 	/**
 	 * Returns whether this set is root or not
+	 * 
 	 * @return true if this set is root
 	 */
 	public boolean isRootSet();
 
 	/**
-	 * Returns element by given element id
-	 * @param id element id
-	 * @return element 
+	 * Test if element is selected
+	 * 
+	 * @return true if element is selected
+	 * @since 7.0
 	 */
-	public IElement getElementByID(String id);
-	
-	/**
-	 * Returns element by given element name
-	 * @param name element name
-	 * @return element
-	 */
-	public IElement getElementByName(String name);
+	public boolean isSelected(int index);
 
 	/**
-	 * Returns element by given index
-	 * @param index 
-	 * @return element
+	 * @since 7.0
 	 */
-	public IElement getElement(int index);
-	
+	public BitSet getSelected();
+
+	/**
+	 * Removes Element from this set
+	 * 
+	 * @param index
+	 *            remove the element at index from the set
+	 * @since 7.0
+	 */
+	public void removeElement(int index);
+
+	/**
+	 * Removes given elements from this set
+	 * 
+	 * @param elements
+	 * @since 7.0
+	 */
+	public void removeElements(BitSet elements);
+
+	/**
+	 * Removes match sets of given set id
+	 * 
+	 * @param setID
+	 *            set id
+	 */
+	public void removeMatchSet(String setID);
+
+	/**
+	 * Set element state to selected
+	 * 
+	 * @param selected
+	 * @since 7.0
+	 */
+	public void setSelected(int index, boolean selected);
+
 	/**
 	 * Returns total elements of this set
+	 * 
 	 * @return total elements of this set
 	 */
 	public int size();
-	
-	/**
-	 * Remove all the elements in this set
-	 */
-	public void clean();
-	
-	/**
-	 * Returns whether this set contains given element
-	 * @param element
-	 * @return whether this set contains given element
-	 */
-	public boolean contains(IElement element);
-	
-	/**
-	 * Returns whether this set contains given element id
-	 * @param id
-	 * @return whether this set contains given element id
-	 */
-	public boolean contains(String id);
-	
-	/**
-	 * Store a list which set also contains the same element 
-	 * Adds to match set of given set id
-	 * @param setID set id
-	 */
-	public void addMatchSet(String setID);
-	
-	/**
-	 * Removes match sets of given set id
-	 * @param setID set id
-	 */
-	public void removeMatchSet(String setID);
-	
-	/**
-	 * Returns whether given set id contains in match list
-	 * @param setID
-	 * @return true if given set id contains in match list
-	 */
-	public boolean containsMatchSet(String setID);
-	
-	/**
-	 * Returns an array of match set id
-	 * @return an array of match set id
-	 */
-	public String[] getMatchSetIDs();
-	
-	/**
-	 * Returns position of given element id
-	 * @param id element id
-	 * @return position of given element id
-	 */
-	public int findIndexByID(String id);
-
-	/**
-	 * Returns position of given element name
-	 * @param name element name
-	 * @return position of given element name
-	 */
-	public int findIndexByName(String name);
 }

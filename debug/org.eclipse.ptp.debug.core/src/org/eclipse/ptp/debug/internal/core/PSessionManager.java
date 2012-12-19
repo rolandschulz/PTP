@@ -24,7 +24,6 @@ import java.util.Map;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.debug.core.IPSession;
 
 /**
@@ -64,12 +63,6 @@ public class PSessionManager implements IDebugEventSetListener {
 	 * .debug.core.DebugEvent[])
 	 */
 	public void handleDebugEvents(DebugEvent[] events) {
-	}
-
-	public void removeSession(IPJob job) {
-		synchronized (sessionMap) {
-			sessionMap.remove(job);
-		}
 	}
 
 	public void shutdown() {

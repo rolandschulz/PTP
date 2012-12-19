@@ -18,17 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui;
 
-import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.ui.listeners.ISetListener;
-import org.eclipse.ptp.ui.model.IElement;
+import java.util.BitSet;
+
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.graphics.Image;
 
 /**
  * @author clement chu
- *
+ * 
  */
 public interface IElementManager {
 	public static final String EMPTY_ID = ""; //$NON-NLS-1$
@@ -36,156 +34,154 @@ public interface IElementManager {
 	public static final int DELETE_SET_TYPE = 1;
 	public static final int CHANGE_SET_TYPE = 2;
 	public static final int ADD_ELEMENT_TYPE = 3;
-	public static final int REMOVE_ELEMENT_TYPE = 4;	
-	
-	/** 
-	 * Add Set Listener
+	public static final int REMOVE_ELEMENT_TYPE = 4;
+
+	/**
+	 * Add elements to a set
 	 * 
-	 * @param setListener ISetListener
+	 * @param setID
+	 * @param elementHandler
+	 * @param elements
+	 * @since 7.0
 	 */
-	public void addSetListener(ISetListener setListener);
-	
-	/** 
-	 * Add elements to set
-	 * 
-	 * @param elements selected elements
-	 * @param set Set
-	 */
-	public void addToSet(IElement[] elements, IElementSet set);
-	
-	/** 
-	 * Add elements to set
-	 * 
-	 * @param elements selected elements
-	 * @param setID set ID
-	 * @param elementHandler IElementHandler
-	 */
-	public void addToSet(IElement[] elements, String setID, IElementHandler elementHandler);
-	
+	public void addToSet(String setID, IElementHandler elementHandler, BitSet elements);
+
 	/**
 	 * clean all setting
 	 */
 	public void clear();
-	
-	/** 
+
+	/**
 	 * Create a Set
 	 * 
-	 * @param elements selected elements
-	 * @param setID set ID
-	 * @param setName set Name
-	 * @param elementHandler IElementHandler
+	 * @param setID
+	 *            set ID
+	 * @param setName
+	 *            set Name
+	 * @param elementHandler
+	 *            IElementHandler
+	 * @param elements
+	 *            selected elements
 	 * @return set ID
+	 * @since 7.0
 	 */
-	public String createSet(IElement[] elements, String setID, String setName, IElementHandler elementHandler);
-	
-	/** 
+	public String createSet(String setID, String setName, IElementHandler elementHandler, BitSet elements);
+
+	/**
 	 * Fire Event for set change
 	 * 
-	 * @param eventType the type of event
-	 * @param elements the selected elements
-	 * @param cur_set the current set
-	 * @param pre_set the previous set
+	 * @param eventType
+	 *            the type of event
+	 * @param elements
+	 *            the selected elements
+	 * @param cur_set
+	 *            the current set
+	 * @param pre_set
+	 *            the previous set
+	 * @since 7.0
 	 */
-	public void fireSetEvent(int eventType, IElement[] elements, IElementSet cur_set, IElementSet pre_set);
+	public void fireSetEvent(int eventType, BitSet elements, IElementSet cur_set, IElementSet pre_set);
 
-	/** 
+	/**
 	 * Get current set ID
 	 * 
 	 * @return current set ID
 	 */
 	public String getCurrentSetId();
-	
-	/** 
+
+	/**
 	 * Get element handler
 	 * 
-	 * @param id element ID
+	 * @param id
+	 *            element ID
 	 * @return IElementHandler
 	 */
 	public IElementHandler getElementHandler(String id);
-	
-	/** 
+
+	/**
 	 * Get fully qualified name of element
 	 * 
-	 * @param id element ID
+	 * @param id
+	 *            element ID
 	 * @return fully quallified name of element
 	 */
 	public String getFullyQualifiedName(String id);
 
-	/** 
-	 * Get element image
+	/**
+	 * Get image for element with given index
 	 * 
-	 * @param element IElement
+	 * @param index
+	 *            element index
+	 * @param isSelected
+	 *            flag indicating element is selected
 	 * @return element image
+	 * @since 7.0
 	 */
-	public Image getImage(IElement element);
-	
-	/** 
+	public Image getImage(int index, boolean isSelected);
+
+	/**
 	 * Get name of element
 	 * 
-	 * @param id element ID
+	 * @param id
+	 *            element ID
 	 * @return name of element
 	 */
 	public String getName(String id);
-	
-	/** 
-	 * initial elements
-	 * 
-	 * @return first element name
-	 */
-	public IPElement initial(IPUniverse universe);
-	
+
 	/**
 	 * Remove the element handler
 	 * 
-	 * @param id element handler to remove
+	 * @param id
+	 *            element handler to remove
 	 */
 	public void removeElementHandler(String id);
-	
-	/** 
+
+	/**
 	 * Remove elements in specific Set
 	 * 
-	 * @param elements selected elements
-	 * @param setID set ID
-	 * @param elementHandler IElementHandler
+	 * @param elements
+	 *            selected elements
+	 * @param setID
+	 *            set ID
+	 * @param elementHandler
+	 *            IElementHandler
+	 * @since 7.0
 	 */
-	public void removeFromSet(IElement[] elements, String setID, IElementHandler elementHandler);
-	
-	/** 
+	public void removeFromSet(BitSet elements, String setID, IElementHandler elementHandler);
+
+	/**
 	 * Remove Set
 	 * 
-	 * @param setID set ID
-	 * @param elementHandler IElementHandler
+	 * @param setID
+	 *            set ID
+	 * @param elementHandler
+	 *            IElementHandler
 	 */
 	public void removeSet(String setID, IElementHandler elementHandler);
-	
-	/** 
-	 * Remove Set Listener
-	 * 
-	 * @param setListener ISetListener
-	 */
-	public void removeSetListener(ISetListener setListener);
-	
-	/** 
+
+	/**
 	 * set current set ID
 	 * 
-	 * @param set_id set ID
+	 * @param set_id
+	 *            set ID
 	 */
 	public void setCurrentSetId(String set_id);
-	
-	/** 
+
+	/**
 	 * Set element handler
 	 * 
-	 * @param id element ID
-	 * param IElementHandler
+	 * @param id
+	 *            element ID
+	 *            param IElementHandler
 	 */
 	public void setElementHandler(String id, IElementHandler handler);
-	
+
 	/**
 	 * Shutdown the manager
 	 */
 	public void shutdown();
-	
-	/** 
+
+	/**
 	 * Get element size
 	 * 
 	 * @return size of element

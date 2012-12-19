@@ -17,17 +17,28 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
+
 /**
  * @author Clement chu
- *
+ * 
  */
 public interface IToolTipProvider {
 	public final String[] NO_TOOLTIP = new String[] { "" }; //$NON-NLS-1$
-	/** Get tooltip content
-	 * @param obj Selected element
+
+	/**
+	 * Get tooltip content
+	 * 
+	 * @param index
+	 *            Selected element
 	 * @return content of tooltip
+	 * @since 7.0
 	 */
-	public String[] toolTipText(Object obj);
-	
-	public void update(Object obj, String content);
+	public String[] toolTipText(int index);
+
+	/**
+	 * @param index
+	 * @param content
+	 * @since 7.0
+	 */
+	public void update(int index, String content);
 }

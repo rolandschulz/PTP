@@ -18,8 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.adapters;
 
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.utils.ui.ImageImageDescriptor;
 import org.eclipse.ui.model.WorkbenchAdapter;
@@ -32,8 +33,24 @@ public class PJobWorkbenchAdapter extends WorkbenchAdapter {
 	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
-		IPJob job = (IPJob) object;
-		return new ImageImageDescriptor(ParallelImages.jobImages[job.getState().ordinal()][job.isDebug() ? 1 : 0]);
+		IJobStatus job = (IJobStatus) object;
+		int state = 0;
+		switch (job.getState()) {
+		case IJobStatus.SUBMITTED:
+			state = 0;
+			break;
+		case IJobStatus.RUNNING:
+			state = 1;
+			break;
+		case IJobStatus.SUSPENDED:
+			state = 2;
+			break;
+		case IJobStatus.COMPLETED:
+			state = 3;
+			break;
+		}
+		return new ImageImageDescriptor(ParallelImages.jobImages[state][job.getLaunch().getLaunchMode()
+				.equals(ILaunchManager.DEBUG_MODE) ? 1 : 0]);
 	}
 
 	/*
@@ -43,7 +60,7 @@ public class PJobWorkbenchAdapter extends WorkbenchAdapter {
 	 */
 	@Override
 	public String getLabel(Object object) {
-		IPJob job = (IPJob) object;
-		return job.getName();
+		IJobStatus job = (IJobStatus) object;
+		return job.getJobId();
 	}
 }

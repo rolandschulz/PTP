@@ -10,8 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.BitSet;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -22,7 +21,6 @@ import org.eclipse.ptp.debug.internal.ui.views.locations.PLocationView;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ui.IViewPart;
@@ -69,8 +67,9 @@ public class CreateLocationSetAction extends Action {
 		try {
 			IWorkbenchPage page = view.getViewSite().getPage();
 			IViewPart part = page.showView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
-			if (part instanceof ParallelDebugView)
+			if (part instanceof ParallelDebugView) {
 				parallelDebugView = (ParallelDebugView) part;
+			}
 		} catch (NullPointerException e) {
 		} catch (PartInitException e) {
 		}
@@ -86,30 +85,25 @@ public class CreateLocationSetAction extends Action {
 		IPLocationSet[] locations = (IPLocationSet[]) selection.toList().toArray(new IPLocationSet[0]);
 		IElementHandler setManager = parallelDebugView.getCurrentElementHandler();
 		for (IPLocationSet locationSet : locations) {
-			IElementSet rootSet = setManager.getSetRoot();
-			List<IElement> elementsMatchingTasks = new ArrayList<IElement>();
-			int[] tasks = locationSet.getTasks().toArray();
-			for (int taskID : tasks) {
-				IElement element = rootSet.getElementByName(Integer.toString(taskID));
-				elementsMatchingTasks.add(element);
-			}
+			IElementSet rootSet = setManager.getSet(IElementHandler.SET_ROOT_ID);
+			BitSet elementsMatchingTasks = rootSet.contains(locationSet.getTasks());
 
 			String name = locationSet.getFunction() + ":" + locationSet.getFile() + ":" + locationSet.getLineNumber(); //$NON-NLS-1$ //$NON-NLS-2$
 			/*
 			 * The set already exists, destroy and recreate it
 			 */
-			if (setManager.getElementByID(name) instanceof IElementSet) {
+			if (setManager.getSet(name) != null) {
 				parallelDebugView.getUIManager().removeSet(name, setManager);
 			}
-			setID = parallelDebugView.getUIManager().createSet(elementsMatchingTasks.toArray(new IElement[0]), name, name,
-					setManager);
+			setID = parallelDebugView.getUIManager().createSet(name, name, setManager, elementsMatchingTasks);
 		}
 
-		if (setID != null)
+		if (setID != null) {
 			/*
 			 * Select the last set created, if any
 			 */
-			parallelDebugView.selectSet((IElementSet) setManager.getElementByID(setID));
+			parallelDebugView.selectSet(setManager.getSet(setID));
+		}
 		parallelDebugView.refresh(false);
 	}
 }

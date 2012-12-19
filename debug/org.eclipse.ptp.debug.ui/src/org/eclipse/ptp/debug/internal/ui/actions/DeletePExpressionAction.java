@@ -37,31 +37,36 @@ public class DeletePExpressionAction extends Action {
 	public static final String name = Messages.DeletePExpressionAction_0;
 	private PVariableView view = null;
 
-	/** Constructor
+	/**
+	 * Constructor
+	 * 
 	 * @param view
 	 */
 	public DeletePExpressionAction(PVariableView view) {
 		super(name, IAction.AS_PUSH_BUTTON);
-	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_VAR_DELETE_NORMAL));
-	    //setDisabledImageDescriptor(PDebugImage.ID_ICON_VAR_DELETE_DISABLE);
-	    setToolTipText(name);
-	    setId(name);
-	    setEnabled(false);
-	    this.view = view;
+		setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_VAR_DELETE_NORMAL));
+		// setDisabledImageDescriptor(PDebugImage.ID_ICON_VAR_DELETE_DISABLE);
+		setToolTipText(name);
+		setId(name);
+		setEnabled(false);
+		this.view = view;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
+	@Override
 	public void run() {
 		ISelection selection = view.getSelection();
 		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
-			IStructuredSelection structSelection = (IStructuredSelection)selection;
-			for (Iterator<?> i=structSelection.iterator(); i.hasNext();) {
-				PVariableInfo jVar = (PVariableInfo)i.next();
+			IStructuredSelection structSelection = (IStructuredSelection) selection;
+			for (Iterator<?> i = structSelection.iterator(); i.hasNext();) {
+				PVariableInfo jVar = (PVariableInfo) i.next();
 				try {
-					view.getUIManager().getJobVariableManager().removeVariable(jVar.getJob(), jVar.getName());
-				}
-				catch (CoreException e) {
+					view.getUIManager().getJobVariableManager().removeVariable(jVar.getJobId(), jVar.getName());
+				} catch (CoreException e) {
 					e.printStackTrace();
 				}
 				view.refresh();

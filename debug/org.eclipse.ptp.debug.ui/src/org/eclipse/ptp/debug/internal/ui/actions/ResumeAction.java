@@ -18,43 +18,53 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
+import java.util.BitSet;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.messages.Messages;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.IElementManager;
-import org.eclipse.ptp.ui.model.IElement;
+
 /**
  * @author clement chu
- *
+ * 
  */
 public class ResumeAction extends DebugAction {
 	public static final String name = Messages.ResumeAction_0;
 
-	/** Constructor
+	/**
+	 * Constructor
+	 * 
 	 * @param view
 	 */
 	public ResumeAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_RESUME_GROUP_NORMAL));
-	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_RESUME_GROUP_DISABLE));
+		setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_RESUME_GROUP_NORMAL));
+		setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_RESUME_GROUP_DISABLE));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(java.util.BitSet)
 	 */
-	public void run(IElement[] elements) {}
-	
-	/* (non-Javadoc)
+	public void run(BitSet elements) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.action.IAction#run()
 	 */
+	@Override
 	public void run() {
 		IElementManager manager = view.getUIManager();
 		if (manager instanceof UIDebugManager) {
 			try {
 				setEnabled(false);
-				((UIDebugManager)manager).resume();
+				((UIDebugManager) manager).resume();
 			} catch (CoreException e) {
 				setEnabled(true);
 			}

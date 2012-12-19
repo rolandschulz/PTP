@@ -31,7 +31,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.PVariableManager;
@@ -172,8 +172,8 @@ public class PVariableDialog extends Dialog {
 			public void keyReleased(KeyEvent e) {
 				if (varText.getText().length() > 0) {
 					TableItem[] items = varTable.getItems();
-					for (int i = 0; i < items.length; i++) {
-						items[i].setChecked(false);
+					for (TableItem item : items) {
+						item.setChecked(false);
 					}
 				}
 				updateButtons();
@@ -266,10 +266,10 @@ public class PVariableDialog extends Dialog {
 	protected String[] getSelectedVariables() {
 		List<String> vars = new ArrayList<String>();
 		TableItem[] items = varTable.getItems();
-		for (int i = 0; i < items.length; i++) {
-			if (items[i].getChecked()) {
-				vars.add(items[i].getText());
-				items[i].setChecked(mode == NEW_MODE);
+		for (TableItem item : items) {
+			if (item.getChecked()) {
+				vars.add(item.getText());
+				item.setChecked(mode == NEW_MODE);
 			}
 		}
 		if (vars.size() == 0) {
@@ -313,16 +313,16 @@ public class PVariableDialog extends Dialog {
 	@Override
 	protected void okPressed() {
 		PVariableManager jobMgr = view.getUIManager().getJobVariableManager();
-		IPJob job = view.getUIManager().getJob();
+		IJobStatus job = view.getUIManager().getJob();
 		if (job != null) {
 			String[] vars = getSelectedVariables();
 			boolean checked = checkBtn.getSelection();
 			switch (mode) {
 			case NEW_MODE:
 				// check duplicate variable
-				for (int i = 0; i < vars.length; i++) {
+				for (String var : vars) {
 					try {
-						jobMgr.addVariable(job, vars[i], checked);
+						jobMgr.addVariable(job.getJobId(), var, checked);
 					} catch (CoreException e) {
 						PTPDebugUIPlugin.errorDialog(Messages.PVariableDialog_7, e.getStatus());
 					}
@@ -335,7 +335,7 @@ public class PVariableDialog extends Dialog {
 					for (String var : vars) {
 						String newvar = jVar.getName().equals(var) ? null : var;
 						try {
-							jobMgr.updateVariable(job, jVar.getName(), newvar, checked);
+							jobMgr.updateVariable(job.getJobId(), jVar.getName(), newvar, checked);
 						} catch (CoreException e) {
 
 						}

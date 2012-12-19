@@ -53,9 +53,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		/**
 		 * @since 5.0
 		 */
-		STOPPED,
-		STARTING,
-		RUNNING
+		STOPPED, STARTING, RUNNING
 	}
 
 	private static String LAUNCH_COMMAND_VAR = "launch_command"; //$NON-NLS-1$
@@ -889,54 +887,41 @@ public abstract class AbstractRemoteServerRunner extends Job {
 						}
 					}
 				}, "server stdout").start(); //$NON-NLS-1$
+			}
 
-				final BufferedReader stderr = new BufferedReader(new InputStreamReader(fRemoteProcess.getErrorStream()));
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							while (getServerState() != ServerState.STOPPED) {
-								String output = stderr.readLine();
-								if (output != null) {
-									if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStderr(output)) {
-										if (!doServerStarted(subMon.newChild(10))) {
-											fRemoteProcess.destroy();
-										}
-										setServerState(ServerState.RUNNING);
+			final BufferedReader stderr = new BufferedReader(new InputStreamReader(fRemoteProcess.getErrorStream()));
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						while (getServerState() != ServerState.STOPPED) {
+							String output = stderr.readLine();
+							if (output != null) {
+								if (fContinuous && getServerState() == ServerState.STARTING
+										&& doVerifyServerRunningFromStderr(output)) {
+									if (!doServerStarted(subMon.newChild(10))) {
+										fRemoteProcess.destroy();
 									}
-									PTPRemoteCorePlugin
-											.getDefault()
-											.getLog()
-											.log(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), fServerName
-													+ ": " + output)); //$NON-NLS-1$
+									setServerState(ServerState.RUNNING);
 								}
+								if (DebugUtil.SERVER_TRACING) {
+									System.out.println("SERVER: " + output); //$NON-NLS-1$
+								}
+								PTPRemoteCorePlugin
+										.getDefault()
+										.getLog()
+										.log(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), fServerName
+												+ ": " + output)); //$NON-NLS-1$
 							}
-							stderr.close();
-						} catch (IOException e) {
-							// Ignore
 						}
+						stderr.close();
+					} catch (IOException e) {
+						// Ignore
 					}
-				}, "server stderr").start(); //$NON-NLS-1$
-			} else {
-				if (DebugUtil.SERVER_TRACING) {
-					final BufferedReader stderr = new BufferedReader(new InputStreamReader(fRemoteProcess.getErrorStream()));
-					new Thread(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								while (getServerState() != ServerState.STOPPED) {
-									String output = stderr.readLine();
-									if (output != null) {
-										System.err.println("SERVER: " + output); //$NON-NLS-1$
-									}
-								}
-								stderr.close();
-							} catch (IOException e) {
-								// Ignore
-							}
-						}
-					}, "server stderr").start(); //$NON-NLS-1$
 				}
+			}, "server stderr").start(); //$NON-NLS-1$
+
+			if (!fContinuous) {
 				setServerState(ServerState.RUNNING);
 			}
 

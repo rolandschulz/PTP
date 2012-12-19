@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.views;
 
+import java.util.BitSet;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -42,8 +44,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.model.IPDebugElement;
@@ -61,10 +62,8 @@ import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.messages.Messages;
-import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.IIconCanvasActionListener;
@@ -102,8 +101,8 @@ public class ParallelDebugView extends ParallelJobsView {
 					if (element instanceof IPDebugElement) {
 						if (canvas != null && !canvas.isDisposed()) {
 							if (getCurrentSet() != null) {
-								int index = getCurrentSet().findIndexByName(String.valueOf(((IPDebugElement) element).getID()));
-								if (index > -1) {
+								int index = ((IPDebugElement) element).getID();
+								if (!getCurrentSet().contains(index)) {
 									canvas.unselectAllElements();
 									canvas.selectElement(index);
 									canvas.setCurrentSelection(false);
@@ -117,11 +116,6 @@ public class ParallelDebugView extends ParallelJobsView {
 		}
 	};
 
-	/*
-	 * private MouseAdapter debugViewMouseAdapter = new MouseAdapter() { public void mouseUp(MouseEvent event) { Object test =
-	 * event.getSource(); if (test instanceof Tree) { TreeItem[] items = ((Tree)test).getSelection(); Object[] targets = new
-	 * Object[items.length]; for (int i=0; i<items.length; i++) { targets[i] = items[i].getData(); } selectElements(targets); } } };
-	 */
 	public ParallelDebugView(IElementManager manager) {
 		super(manager);
 	}
@@ -293,9 +287,8 @@ public class ParallelDebugView extends ParallelJobsView {
 	 */
 	@Override
 	public void handleAction(int type, int index) {
-		IElement element = canvas.getElement(index);
 		if (type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION) {
-			doubleClick(element);
+			doubleClick(index);
 		}
 	}
 
@@ -304,10 +297,13 @@ public class ParallelDebugView extends ParallelJobsView {
 	 * 
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org. eclipse.ptp.ui.model.IElement)
 	 */
+	/**
+	 * @since 5.0
+	 */
 	@Override
-	public void doubleClick(IElement element) {
+	public void doubleClick(int index) {
 		try {
-			registerElement(element);
+			registerElement(index);
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.errorDialog(getViewSite().getShell(), Messages.ParallelDebugView_0, e.getStatus());
 		}
@@ -316,18 +312,12 @@ public class ParallelDebugView extends ParallelJobsView {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java .lang.Object)
+	 * @see org.eclipse.ptp.ui.views.ParallelJobsView#getToolTipText(int)
 	 */
 	@Override
-	public String[] getToolTipText(Object obj) {
-		if (obj == null) {
-			return new String[] { "", "" }; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		String[] header = super.getToolTipText(obj);
-		// FIXME PProcessUI goes away when we address UI scalability. See Bug
-		// 311057
-		PProcessUI proc = (PProcessUI) obj;
-		String variableText = ((UIDebugManager) manager).getValueText(proc.getJobRank(), this);
+	public String[] getToolTipText(int element) {
+		String[] header = super.getToolTipText(element);
+		String variableText = ((UIDebugManager) manager).getValueText(element, this);
 		if (variableText != null && variableText.length() > 0) {
 			return new String[] { header[0], variableText };
 		}
@@ -339,12 +329,15 @@ public class ParallelDebugView extends ParallelJobsView {
 	 * 
 	 * @param element
 	 * @throws CoreException
+	 * @since 5.0
 	 */
-	public void registerElement(IElement element) throws CoreException {
-		if (element.isRegistered()) {
-			((UIDebugManager) manager).unregisterElements(new IElement[] { element });
+	public void registerElement(int element) throws CoreException {
+		BitSet set = new BitSet();
+		set.set(element);
+		if (getCurrentElementHandler().isRegistered(element)) {
+			((UIDebugManager) manager).unregisterElements(set);
 		} else {
-			((UIDebugManager) manager).registerElements(new IElement[] { element });
+			((UIDebugManager) manager).registerElements(set);
 		}
 	}
 
@@ -379,7 +372,7 @@ public class ParallelDebugView extends ParallelJobsView {
 	@Override
 	public void updateAction() {
 		super.updateAction();
-		IPJob job = ((UIDebugManager) manager).findJobById(getCurrentID());
+		IJobStatus job = ((UIDebugManager) manager).findJobById(getCurrentID());
 		boolean isDebugMode = ((UIDebugManager) manager).isDebugMode(job);
 		boolean isRunning = ((UIDebugManager) manager).isRunning(job);
 		registerAction.setEnabled(isRunning && isDebugMode);
@@ -482,12 +475,13 @@ public class ParallelDebugView extends ParallelJobsView {
 		ISelection selection = event.getSelection();
 		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
 			IStructuredSelection structSelection = (IStructuredSelection) selection;
-			if (structSelection.size() == 1 && structSelection.getFirstElement() instanceof IElement) {
-				IElement element = (IElement) structSelection.getFirstElement();
-				IPJob job = getJobManager().getJob();
-				if (job != null && element.isRegistered()) {
+			if (structSelection.size() == 1 && structSelection.getFirstElement() instanceof BitSet) {
+				BitSet set = (BitSet) structSelection.getFirstElement();
+				IJobStatus job = getJobManager().getJob();
+				int element = set.nextSetBit(0);
+				if (job != null && element >= 0 && getCurrentElementHandler().isRegistered(element)) {
 					try {
-						focusOnDebugTarget(job.getID(), Integer.parseInt(element.getName()));
+						focusOnDebugTarget(job.getJobId(), element);
 					} catch (NumberFormatException e) {
 						// The element name had better be the process number
 					}
@@ -637,9 +631,9 @@ public class ParallelDebugView extends ParallelJobsView {
 	 * @see org.eclipse.ptp.ui.views.ParallelJobsView#changeJobRefresh(org.eclipse .ptp.core.elements.IPJob, boolean)
 	 */
 	@Override
-	public void changeJobRefresh(IPJob job, boolean force) {
-		if (job != null && job.getState() == JobAttributes.State.COMPLETED) {
-			IPSession session = ((UIDebugManager) manager).getDebugSession(job.getID());
+	public void changeJobRefresh(IJobStatus job, boolean force) {
+		if (job != null && job.getState().equals(IJobStatus.COMPLETED)) {
+			IPSession session = ((UIDebugManager) manager).getDebugSession(job.getJobId());
 			if (session != null) {
 				TaskSet tasks = session.getTasks();
 				if (!session.getPDISession().getTaskManager().isAllTerminated(tasks)) {

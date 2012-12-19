@@ -19,56 +19,172 @@
 package org.eclipse.ptp.ui.model;
 
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author clement chu
- *
+ * 
  */
-public class ElementHandler extends ElementSet implements IElementHandler {
-	private List<IElement> registerList = new ArrayList<IElement>();
-	
+public class ElementHandler implements IElementHandler {
+	private final BitSet fRegisteredElements = new BitSet();
+	private final Map<String, IElementSet> fSets = new HashMap<String, IElementSet>();
+
 	public ElementHandler() {
-		super(null, SET_ROOT_ID, SET_ROOT_ID);
-		//create root 
-		addElements(new IElement[] { new ElementSet(this, SET_ROOT_ID, SET_ROOT_ID) });
+		fSets.put(SET_ROOT_ID, new ElementSet(SET_ROOT_ID, SET_ROOT_ID));
 	}
-	public IElementSet getSetRoot() {
-		return (IElementSet)getElementByID(SET_ROOT_ID);
+
+	/**
+	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.model.IElementHandler#createSet(java.lang.String, java.lang.String, java.util.BitSet)
+	 */
+	@Override
+	public IElementSet createSet(String id, String name, BitSet elements) {
+		IElementSet set = fSets.get(id);
+		if (set == null) {
+			set = new ElementSet(id, name);
+			set.addElements(elements);
+			fSets.put(id, set);
+		}
+		return set;
 	}
-	public IElementSet[] getSetsWithElement(String id) {
-		List<IElementSet> aList = new ArrayList<IElementSet>();
-		for (IElement element : getElements()) {
-			if (((IElementSet)element).getElementByID(id) != null) {
-				aList.add((IElementSet)element);
+
+	/**
+	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.model.IElementHandler#getRegistered()
+	 */
+	@Override
+	public BitSet getRegistered() {
+		return (BitSet) fRegisteredElements.clone();
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.model.IElementHandler#getSet(java.lang.String)
+	 */
+	@Override
+	public IElementSet getSet(String id) {
+		return fSets.get(id);
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public IElementSet[] getSets() {
+		return fSets.values().toArray(new IElementSet[0]);
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.model.IElementHandler#getSetsContaining(int)
+	 */
+	@Override
+	public IElementSet[] getSetsContaining(int element) {
+		List<IElementSet> sets = new ArrayList<IElementSet>();
+		for (IElementSet set : fSets.values()) {
+			if (set.contains(element)) {
+				sets.add(set);
 			}
 		}
-		return (IElementSet[])aList.toArray(new IElementSet[0]);
+		return sets.toArray(new IElementSet[0]);
 	}
-	public boolean containsRegister(IElement element) {
-		return registerList.contains(element);
+
+	/**
+	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.model.IElementHandler#isRegistered(int)
+	 */
+	@Override
+	public boolean isRegistered(int index) {
+		return fRegisteredElements.get(index);
 	}
-	public void addToRegister(IElement[] elements) {
-		for (IElement element : elements) {
-			if (!containsRegister(element)) {
-				element.setRegistered(true);
-				registerList.add(element);
-			}
-		}
+
+	/**
+	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.model.IElementHandler#register(java.util.BitSet)
+	 */
+	@Override
+	public void register(BitSet elements) {
+		fRegisteredElements.or(elements);
 	}
-	public void removeFromRegister(IElement[] elements) {
-		for (IElement element : elements) {
-			if (registerList.remove(element))
-				element.setRegistered(false);
-		}
-	}
-	public IElement[] getRegistered() {
-		return registerList.toArray(new IElement[0]);
-	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.model.IElementHandler#removeAllRegistered()
+	 */
+	@Override
 	public void removeAllRegistered() {
-		registerList.clear();
+		fRegisteredElements.clear();
 	}
+
+	/**
+	 * @since 7.0
+	 */
+	@Override
+	public IElementSet removeSet(String id) {
+		return fSets.remove(id);
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.model.IElementHandler#size()
+	 */
+	@Override
+	public int size() {
+		return fSets.size();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.model.IElementHandler#totalRegistered()
+	 */
+	@Override
 	public int totalRegistered() {
-		return registerList.size();
+		return fRegisteredElements.size();
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.model.IElementHandler#unRegister(java.util.BitSet)
+	 */
+	@Override
+	public void unRegister(BitSet elements) {
+		fRegisteredElements.andNot(elements);
 	}
 }

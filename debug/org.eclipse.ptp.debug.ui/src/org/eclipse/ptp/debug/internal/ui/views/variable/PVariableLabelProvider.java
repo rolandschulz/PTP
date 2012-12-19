@@ -29,21 +29,23 @@ import org.eclipse.swt.graphics.Image;
 public class PVariableLabelProvider extends LabelProvider implements ITableLabelProvider, ICheckProvider {
 	public boolean isCheck(Object element) {
 		if (element instanceof PVariableInfo) {
-			return ((PVariableInfo)element).isEnabled();
+			return ((PVariableInfo) element).isEnabled();
 		}
 		return false;
 	}
+
 	public Image getColumnImage(Object element, int columnIndex) {
 		return null;
 	}
+
 	public String getColumnText(Object element, int columnIndex) {
 		if (element instanceof PVariableInfo) {
-			PVariableInfo jVar = (PVariableInfo)element;
-			switch(columnIndex) {
+			PVariableInfo jVar = (PVariableInfo) element;
+			switch (columnIndex) {
 			case 1:
 				return jVar.getName();
 			case 2:
-				return jVar.getJob().getName();
+				return "XXX PVariableLabelProvider"; // jVar.getJob().getName();
 			}
 		}
 		return null;

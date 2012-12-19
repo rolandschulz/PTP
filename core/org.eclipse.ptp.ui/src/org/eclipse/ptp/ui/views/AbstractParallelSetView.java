@@ -19,6 +19,7 @@
 package org.eclipse.ptp.ui.views;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,26 +36,22 @@ import org.eclipse.ptp.internal.ui.actions.DisplayRulerAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveElementAction;
 import org.eclipse.ptp.internal.ui.actions.ZoomInAction;
 import org.eclipse.ptp.internal.ui.actions.ZoomOutAction;
-import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
-import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.PartInitException;
 
 /**
  * @author Clement chu
  * 
  */
 public abstract class AbstractParallelSetView extends AbstractParallelElementView {
-	protected List<IElement[]> clipboard = new ArrayList<IElement[]>();
+	protected List<BitSet> clipboard = new ArrayList<BitSet>();
 
 	// selected element
 	protected String cur_selected_element_id = IElementManager.EMPTY_ID;
@@ -164,6 +161,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		MenuManager menuMgr = new MenuManager("#popupmenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				fillContextMenu(manager);
 			}
@@ -211,10 +209,11 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	 */
 	@Override
 	public void updateTitle() {
-		if (cur_element_set != null)
+		if (cur_element_set != null) {
 			changeTitle(manager.getFullyQualifiedName(getCurrentID()), cur_element_set.getID(), cur_set_size);
-		else
+		} else {
 			changeTitle(manager.getFullyQualifiedName(getCurrentID()));
+		}
 	}
 
 	/**
@@ -235,84 +234,57 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		zoomOutAction.setEnabled(cur_set_size > 0 && zoom_depth < Zoom.max_depth);
 	}
 
-	/**
-	 * Open process viewer
-	 * 
-	 * @param element
-	 *            Target PProcessUI (PProcessUI goes away when we address UI
-	 *            scalability. See Bug 311057)
-	 * @since 4.0
-	 */
-	// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
-	protected void openProcessViewer(final PProcessUI element) {
-		if (element == null)
-			return;
-		showWhile(new Runnable() {
-			public void run() {
-				try {
-					PTPUIPlugin.getActivePage().openEditor(new ProcessEditorInput(element), IPTPUIConstants.VIEW_PARALLELProcess);
-				} catch (PartInitException e) {
-					PTPUIPlugin.log(e);
-				}
-			}
-		});
-	}
-
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * IIconCanvasActionListener
+	 * 
+	 * @since 7.0
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int,
-	 * int[])
+	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int, java.util.BitSet)
 	 */
-	public void handleAction(int type, int[] indexes) {
-		if (cur_element_set == null)
+	@Override
+	public void handleAction(int type, BitSet elements) {
+		if (cur_element_set == null) {
 			return;
+		}
 
-		IElement[] elements = canvas.getElements(indexes);
 		switch (type) {
 		case IIconCanvasActionListener.COPY_ACTION:
-			if (elements.length > 0) {
+			if (!elements.isEmpty()) {
 				clipboard.clear();
 				clipboard.add(elements);
 			}
 			break;
 		case IIconCanvasActionListener.CUT_ACTION:
-			if (elements.length > 0) {
+			if (!elements.isEmpty()) {
 				if (!cur_element_set.isRootSet()) {
 					clipboard.clear();
 					clipboard.add(elements);
 					last_action = type;
 					last_element_set = cur_element_set;
-					// manager.removeFromSet(elements, cur_element_set.getID(),
-					// cur_element_set.getElementHandler());
-					// selectSet(cur_element_set.getElementHandler().getSet(cur_element_set.getID()));
-					// updateTitle();
-					// refresh(false);
 				}
 			}
 			break;
 		case IIconCanvasActionListener.PASTE_ACTION:
 			if (clipboard.size() > 0) {
-				IElement[] clipElements = clipboard.get(0);
+				BitSet clipElements = clipboard.get(0);
 				if (last_action == IIconCanvasActionListener.CUT_ACTION) {
 					if (last_element_set != null && !last_element_set.getID().equals(cur_element_set.getID())) {
-						if (last_element_set.size() == clipElements.length) {
-							manager.removeSet(last_element_set.getID(), (IElementHandler) last_element_set.getParent());
+						if (last_element_set.size() == clipElements.cardinality()) {
+							manager.removeSet(last_element_set.getID(), getCurrentElementHandler());
 						} else {
-							manager.removeFromSet(clipElements, last_element_set.getID(),
-									(IElementHandler) last_element_set.getParent());
+							last_element_set.removeElements(clipElements);
 						}
 					}
 				}
 
-				if (cur_element_set.isRootSet())
+				if (cur_element_set.isRootSet()) {
 					createSetAction.run(clipElements);
-				else {
-					manager.addToSet(clipElements, cur_element_set.getID(), (IElementHandler) cur_element_set.getParent());
-					selectSet((IElementSet) ((IElementHandler) cur_element_set.getParent()).getElementByID(cur_element_set.getID()));
+				} else {
+					cur_element_set.addElements(clipElements);
+					selectSet(cur_element_set);
 					// update();
 					refresh(false);
 				}
@@ -321,7 +293,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 			}
 			break;
 		case IIconCanvasActionListener.DELETE_ACTION:
-			if (elements.length > 0) {
+			if (!elements.isEmpty()) {
 				if (!cur_element_set.isRootSet()) {
 					deleteProcessAction.run(elements);
 				}
@@ -363,16 +335,21 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getStatusIcon(int, boolean)
+	 */
 	@Override
-	public Image getStatusIcon(Object obj, int index, boolean isSelected) {
-		Image img = super.getStatusIcon(obj, index, isSelected);
+	public Image getStatusIcon(int index, boolean isSelected) {
+		Image img = super.getStatusIcon(index, isSelected);
 		if (img != null) {
 			return zoom.getImage(img, zoom_depth);
 		}
 		return null;
 	}
 
-	class Zoom {
+	private class Zoom {
 		protected static final int max_depth = 3;
 		protected Map<Image, Image[]> zoomImageMap = new HashMap<Image, Image[]>();
 
@@ -381,8 +358,9 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		}
 
 		public Image getImage(Image image, int depth) {
-			if (depth == 0)
+			if (depth == 0) {
 				return image;
+			}
 
 			Image[] images = zoomImageMap.get(image);
 			if (images == null) {

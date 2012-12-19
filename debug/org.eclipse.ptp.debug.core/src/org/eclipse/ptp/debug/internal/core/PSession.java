@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.internal.core;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -30,13 +29,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.ModelManager;
-import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
-import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
+import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.jobs.IPJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.debug.core.IPBreakpointManager;
 import org.eclipse.ptp.debug.core.IPLocationSetManager;
 import org.eclipse.ptp.debug.core.IPMemoryManager;
@@ -231,7 +226,7 @@ public class PSession implements IPSession, IPDIEventListener {
 	 */
 	public void forceStoppedDebugger(boolean isError) {
 		TaskSet tasks = getTasks();
-		changeProcessState(tasks, ProcessAttributes.State.COMPLETED);
+		changeProcessState(tasks, IPJobStatus.COMPLETED);
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(
 				new PDebugEvent(getSession(), IPDebugEvent.TERMINATE, IPDebugEvent.DEBUGGER, getDebugInfo(tasks)));
 		dispose(true);
@@ -473,15 +468,13 @@ public class PSession implements IPSession, IPDIEventListener {
 	 * @param tasks
 	 * @param state
 	 */
-	private void changeProcessState(TaskSet tasks, State state) {
-		IPJob job = ModelManager.getInstance().getUniverse().getJob(getLaunch().getJobControl(), getLaunch().getJobId());
+	private void changeProcessState(TaskSet tasks, String state) {
+		IJobStatus job = JobManager.getInstance().getJob(getLaunch().getJobControl().getControlId(), getLaunch().getJobId());
 		if (job != null) {
-			BitSet processIndices = new BitSet();
-			for (int task : tasks.toArray()) {
-				processIndices.set(task);
+			IPJobStatus pJob = (IPJobStatus) job.getAdapter(IPJobStatus.class);
+			if (pJob != null) {
+				pJob.setProcessState(tasks, state);
 			}
-			EnumeratedAttribute<State> attr = ProcessAttributes.getStateAttributeDefinition().create(state);
-			job.addProcessAttributes(processIndices, new AttributeManager(attr));
 		}
 	}
 
@@ -566,19 +559,19 @@ public class PSession implements IPSession, IPDIEventListener {
 			IPDebugInfo errInfo = new PDebugErrorInfo(baseInfo, ((IPDIErrorInfo) reason).getMessage(),
 					((IPDIErrorInfo) reason).getDetailMessage(), ((IPDIErrorInfo) reason).getCode());
 			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.ERROR, errInfo);
-			changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED);
+			changeProcessState(event.getTasks(), IPJobStatus.COMPLETED);
 		} else if (reason instanceof IPDIExitInfo) {
 			deleteDebugTarget(baseInfo.getAllRegisteredTasks().copy(), true, true);
 			IPDebugInfo exitInfo = new PDebugExitInfo(baseInfo, ((IPDIExitInfo) reason).getCode(), Messages.PSession_2,
 					Messages.PSession_3);
 			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.PROCESS_SPECIFIC, exitInfo);
-			changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED);
+			changeProcessState(event.getTasks(), IPJobStatus.COMPLETED);
 		} else if (reason instanceof IPDISignalInfo) {
 			deleteDebugTarget(baseInfo.getAllRegisteredTasks().copy(), true, true);
 			IPDebugInfo exitInfo = new PDebugExitInfo(baseInfo, 0, ((IPDISignalInfo) reason).getDescription(),
 					((IPDISignalInfo) reason).getName());
 			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.PROCESS_SPECIFIC, exitInfo);
-			changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED);
+			changeProcessState(event.getTasks(), IPJobStatus.COMPLETED);
 		} else if (reason instanceof IPDISharedLibraryInfo) {
 			// Nothing currently required
 		} else if (reason instanceof IPDIThreadInfo) {
@@ -604,11 +597,11 @@ public class PSession implements IPSession, IPDIEventListener {
 			case IPDIErrorInfo.DBG_FATAL:
 				detail = IPDebugEvent.ERR_FATAL;
 				// only fatal error reports process error
-				changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED); // TODO:
-																							// how
-																							// to
-																							// report
-																							// error?
+				changeProcessState(event.getTasks(), IPJobStatus.COMPLETED); // TODO:
+																				// how
+																				// to
+																				// report
+																				// error?
 				break;
 			case IPDIErrorInfo.DBG_WARNING:
 				detail = IPDebugEvent.ERR_WARNING;
@@ -650,7 +643,7 @@ public class PSession implements IPSession, IPDIEventListener {
 			break;
 		}
 
-		changeProcessState(event.getTasks(), ProcessAttributes.State.RUNNING);
+		changeProcessState(event.getTasks(), IPJobStatus.RUNNING);
 
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.RESUME, detail, baseInfo));
 	}
@@ -707,7 +700,7 @@ public class PSession implements IPSession, IPDIEventListener {
 		} else if (reason instanceof IPDIWatchpointTriggerInfo) {
 			// Not currently implemented
 		}
-		changeProcessState(event.getTasks(), ProcessAttributes.State.SUSPENDED);
+		changeProcessState(event.getTasks(), IPJobStatus.SUSPENDED);
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(
 				new PDebugEvent(getSession(), IPDebugEvent.SUSPEND, detail, new PDebugSuspendInfo(baseInfo, fileName, lineNumber,
 						level, depth)));
@@ -720,14 +713,12 @@ public class PSession implements IPSession, IPDIEventListener {
 	 * @param output
 	 */
 	private void setProcessOutput(TaskSet tasks, String output) {
-		IPJob job = ModelManager.getInstance().getUniverse().getJob(getLaunch().getJobControl(), getLaunch().getJobId());
+		IJobStatus job = JobManager.getInstance().getJob(getLaunch().getJobControl().getControlId(), getLaunch().getJobId());
 		if (job != null) {
-			BitSet processIndices = new BitSet();
-			for (int task : tasks.toArray()) {
-				processIndices.set(task);
+			IPJobStatus pJob = (IPJobStatus) job.getAdapter(IPJobStatus.class);
+			if (pJob != null) {
+				pJob.setProcessOutput(tasks, output);
 			}
-			StringAttribute attr = ProcessAttributes.getStdoutAttributeDefinition().create(output);
-			job.addProcessAttributes(processIndices, new AttributeManager(attr));
 		}
 	}
 }

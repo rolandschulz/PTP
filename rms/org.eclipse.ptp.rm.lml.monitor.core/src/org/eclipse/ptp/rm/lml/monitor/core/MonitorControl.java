@@ -155,7 +155,7 @@ public class MonitorControl implements IMonitorControl {
 	}
 
 	private void addJob(IJobStatus status) {
-		ILaunchConfiguration configuration = status.getLaunchConfiguration();
+		ILaunchConfiguration configuration = status.getLaunch().getLaunchConfiguration();
 		String configName = LaunchUtils.getTemplateName(configuration);
 		String[][] attrs = { { JobStatusData.JOB_ID_ATTR, status.getJobId() },
 				{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
@@ -206,7 +206,7 @@ public class MonitorControl implements IMonitorControl {
 	}
 
 	private String getControlId(IJobStatus status) {
-		ILaunchConfiguration configuration = status.getLaunchConfiguration();
+		ILaunchConfiguration configuration = status.getLaunch().getLaunchConfiguration();
 		if (configuration != null) {
 			String connectionName = LaunchUtils.getConnectionName(configuration);
 			String remoteServicesId = LaunchUtils.getRemoteServicesId(configuration);

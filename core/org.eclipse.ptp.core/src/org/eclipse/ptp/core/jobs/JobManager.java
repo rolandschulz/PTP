@@ -10,7 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.jobs;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -28,11 +31,32 @@ public class JobManager {
 		return fInstance;
 	}
 
-	private final Map<String, ListenerList> fJobListeners = new HashMap<String, ListenerList>();
+	private final Map<String, IJobStatus> fJobs = Collections.synchronizedMap(new HashMap<String, IJobStatus>());
+	private final Map<String, ListenerList> fJobListeners = Collections.synchronizedMap(new HashMap<String, ListenerList>());
 
 	private JobManager() {
 	}
 
+	private void addJob(IJobStatus jobStatus) {
+		fJobs.put(jobStatus.getControlId() + "+" + jobStatus.getJobId(), jobStatus); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param listener
+	 */
+	public void addListener(IJobListener listener) {
+		ListenerList listeners = fJobListeners.get(ALL_JOBS);
+		if (listeners == null) {
+			listeners = new ListenerList();
+			fJobListeners.put(ALL_JOBS, listeners);
+		}
+		listeners.add(listener);
+	}
+
+	/**
+	 * @param qualifier
+	 * @param listener
+	 */
 	public void addListener(String qualifier, IJobListener listener) {
 		ListenerList listeners = fJobListeners.get(qualifier);
 		if (listeners == null) {
@@ -42,13 +66,19 @@ public class JobManager {
 		listeners.add(listener);
 	}
 
-	public void addListener(IJobListener listener) {
-		ListenerList listeners = fJobListeners.get(ALL_JOBS);
-		if (listeners == null) {
-			listeners = new ListenerList();
-			fJobListeners.put(ALL_JOBS, listeners);
+	/**
+	 * Locate any completed jobs and remove them from the hash
+	 */
+	private void cleanUpJobs() {
+		List<String> completedJobs = new ArrayList<String>();
+		for (IJobStatus job : fJobs.values()) {
+			if (job.getState().equals(IJobStatus.COMPLETED)) {
+				completedJobs.add(job.getJobId());
+			}
 		}
-		listeners.add(listener);
+		for (String jobId : completedJobs) {
+			fJobs.remove(jobId);
+		}
 	}
 
 	/**
@@ -61,6 +91,7 @@ public class JobManager {
 	 * @since 5.0
 	 */
 	public void fireJobAdded(IJobStatus jobStatus) {
+		addJob(jobStatus);
 		ListenerList listeners = fJobListeners.get(jobStatus.getControlId());
 		if (listeners != null) {
 			for (Object listener : listeners.getListeners()) {
@@ -95,6 +126,29 @@ public class JobManager {
 				((IJobListener) listener).jobChanged(jobStatus);
 			}
 		}
+		cleanUpJobs();
+	}
+
+	/**
+	 * Find a job given the job controller ID and the job ID. Note, completed jobs are not kept by the JobManager, so it's possible
+	 * the job may no longer exist.
+	 * 
+	 * @return IJobStatus or null
+	 * 
+	 * @since 7.0
+	 */
+	public IJobStatus getJob(String controlId, String jobId) {
+		return fJobs.get(controlId + "+" + jobId);
+	}
+
+	/**
+	 * Get all the jobs we know about.
+	 * 
+	 * @return array containing known jobs
+	 * @since 7.0
+	 */
+	public IJobStatus[] getJobs() {
+		return fJobs.values().toArray(new IJobStatus[0]);
 	}
 
 	/**
