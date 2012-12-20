@@ -10,6 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.ui.tabs;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.core.sourcelookup.ISourcePathComputer;
+
 /**
  * @since 4.0
  */
@@ -31,5 +36,17 @@ public class ApplicationDebuggerTab extends DebuggerTab {
 	@Override
 	public String getId() {
 		return TAB_ID;
+	}
+
+	@Override
+	public void initializeFrom(ILaunchConfiguration config) {
+		try {
+			// Reset sourcePathComputer in case it was modified by another tab. See bug 397019.
+			ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
+			wc.setAttribute(ISourcePathComputer.ATTR_SOURCE_PATH_COMPUTER_ID, "org.eclipse.ptp.debug.core.sourcePathComputer");
+			wc.doSave();
+		} catch (CoreException e) {
+		}
+		super.initializeFrom(config);
 	}
 }
