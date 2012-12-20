@@ -38,6 +38,8 @@ my $maxtopdogs = -1;
 
 my %mapping = (
     "NodeName"        => "id",
+    "RackMidplane"	  => "id",
+    "Location"		  => "location",
     "CoresPerSocket"  => "",
     "CPUAlloc"        => "",
     "CPUErr"          => "",
@@ -101,12 +103,30 @@ open( IN, "$cmd show node |" );
 # Count Cluster nodes or Blue Gene midplanes
 my $name = "";
 my $mem  = "";
+my $rmd  = "";
+my ( $location, $a, $b, $c, $d );
+my $row  = 0;
+my $rack = 0;
+my $mid  = 0;
 $count = 0;
 while ( $line = <IN> ) {
     chomp($line);
     if ( $line =~ /^NodeName=([\w]+).*$/ ) {
         $name = $1;
         $nodes{$name}{NodeName} = $name;
+        if ( $bgq eq "true" ) {
+			$nodes{$name}{RackMidplane} = "";
+        	if ( $line =~ /.*RackMidplane=([\w]+-[\w]+).*$/ ) {
+        		$rmd = $1;
+        		$rmd =~ /R(\d)(\d)-M(\d)/s;
+        		( $row, $rack, $mid ) = ( $1, $2, $3 );
+        		$nodes{$name}{RackMidplane} = sprintf( "R%02d%02d-M%01d", $row, $rack, $mid );
+        	}
+       		$location = $name;
+    		$location =~ /[\w]+(\d)(\d)(\d)(\d)/s;
+    		( $a, $b, $c, $d ) = ( $1, $2, $3, $4 );
+        	$nodes{$name}{Location} = sprintf( "(%d,%d,%d,%d)", $a, $b, $c, $d );
+        }	
         $count++;
     }
     elsif ( $line =~ /^\s+RealMemory=([\w]+).*$/ ) {
@@ -129,7 +149,7 @@ printf( OUT "    xsi:schemaLocation=\"http://www.llview.de lgui.xsd\"\n" );
 printf( OUT "    version=\"0.7\"\>\n" );
 printf( OUT "<objects>\n" );
 
-if ( $bgp eq "true" || $bgq eq "true" ) {
+if ( $bgp eq "true" ) {
     # Calculate number of node cards or psets (resolution of Blue Gene display)
     # and cores per node card
     $nodecardspermidplane = $nodespermidplane / $nodespernodecard;
@@ -147,15 +167,19 @@ if ( $bgp eq "true" || $bgq eq "true" ) {
         $nodes{$node}{CPUTot} = $corespernodecard;
         $nodes{$node}{RealMemory} = $mempernodecard;
     }
-
+}
+if ( $bgp eq "true" || $bgq eq "true" ) {
     # Ouptut Blue Gene partition (midplane) information
+    # And determine dimensions of the system
     $count = 0;
     my ( $a, $x, $y, $z );
     $maxx = 0;
     $maxy = 0;
     $maxz = 0;
     foreach $node ( sort( keys(%nodes) ) ) {
-        printf( OUT "<object id=\"bgbp%06d\" name=\"%s\" type=\"partition\"/>\n", $count, $node );
+    	if ( $bgp eq "true" ) {
+        	printf( OUT "<object id=\"bgbp%06d\" name=\"%s\" type=\"partition\"/>\n", $count, $node );
+    	}
         $count++;
         $x = substr $node, -3, 1;
         $y = substr $node, -2, 1;
@@ -177,32 +201,39 @@ if ( $bgp eq "true" || $bgq eq "true" ) {
 
 # Output Cluster or Blue Gene nodes (node cards) information
 $count = 0;
-my $row = 0;
-my $rack = 0;
-my $mid = 0;
+$row = 0;
+$rack = 0;
+$mid = 0;
 my $nodecard = 0;
 foreach $node ( sort( keys(%nodes) ) ) {
 	if ( $bgp eq "true" || $bgq eq "true" ) {
-		for ( $nodecard = 0 ; $nodecard < $nodecardspermidplane ; $nodecard++ ) {
-	        if ( $bgp eq "true" ) {
-                $nodeid = sprintf( "R%01d%01d-M%01d-N%02d", $row, $rack, $mid, $nodecard );
-   	        }
-  	        if ( $bgq eq "true" ) {
-                $nodeid = sprintf( "R%02d%02d-M%01d-N%02d", $row, $rack, $mid, $nodecard );
-            }
-            $nodenr{$nodeid}{num} = $count;
-            $nodenr{$nodeid}{midplane} = $node;
-            printf( OUT "<object id=\"nd%06d\" name=\"%s\" type=\"node\"/>\n", $count, $nodeid );
-            $count++;
-        }
+		if ( $bgp eq "true" ) {
+			for ( $nodecard = 0 ; $nodecard < $nodecardspermidplane ; $nodecard++ ) {
+	        	$nodeid = sprintf( "R%02d%02d-M%01d-N%02d", $row, $rack, $mid, $nodecard );
+            	$nodenr{$nodeid}{num} = $count;
+            	$nodenr{$nodeid}{midplane} = $node;
+            	printf( OUT "<object id=\"nd%06d\" name=\"%s\" type=\"node\"/>\n", $count, $nodeid );
+            	$count++;
+        	}
+		}
+		if ( $bgq eq "true" ) {
+			# Blue Gene/Q defines each midplane as a node
+			$nodeid = $nodes{$node}{RackMidplane};
+			if ( $nodeid eq "" ) {
+				$nodeid = sprintf( "R%02d%02d-M%01d", $row, $rack, $mid );
+				$nodes{$node}{RackMidplane} = $nodeid;
+			}
+       		printf( OUT "<object id=\"%s\" name=\"%s\" type=\"node\"/>\n", $node, $nodeid );    		
+        	$nodenr{$node}{node} = $node;
+		}
         $mid++;
         if ( $mid > $maxz ) {
-            $mid = 0;
-            $rack++;
+           	$mid = 0;
+           	$rack++;
         }
         if ( $rack > $maxy ) {
-            $rack = 0;
-            $row++;
+           	$rack = 0;
+           	$row++;
         }
 	}
 	else {
@@ -216,7 +247,7 @@ foreach $node ( sort( keys(%nodes) ) ) {
 printf( OUT "</objects>\n" );
 printf( OUT "<information>\n" );
 
-if ( $bgp eq "true" || $bgq eq "true" ) {
+if ( $bgp eq "true" ) {
     # Output Blue Gene partition (midplane) details
     $count = 0;
     my $row   = 0;
@@ -244,17 +275,24 @@ if ( $bgp eq "true" || $bgq eq "true" ) {
 }
 
 # Output Cluster or Blue Gene node (node card) details
+my $nodenum = "";
 foreach $nodeid ( sort( keys(%nodenr) ) ) {
-    printf( OUT "<info oid=\"nd%06d\" type=\"short\">\n", $nodenr{$nodeid}{num} );
-    if ( $bgp eq "true" || $bgq eq "true" ) {
-        $node = $nodenr{$nodeid}{midplane};
-    }
-    else {
+	if ( $bgq eq "true") {
+		$nodenum = $nodenr{$nodeid}{node};	
+	}
+	else {
+		$nodenum = sprintf( "nd%06d", $nodenr{$nodeid}{num} );
+	}
+   	printf( OUT "<info oid=\"%s\" type=\"short\">\n", $nodenum );
+   	if ( $bgp eq "true" ) {
+       	$node = $nodenr{$nodeid}{midplane};
+   	}
+   	else {
     	$node = $nodenr{$nodeid}{node};
     }
     foreach $key ( sort( keys( %{ $nodes{$node} } ) ) ) {
         if ( exists( $mapping{$key} ) ) {
-            if ( $mapping{$key} ne "" ) {
+          	if ( $mapping{$key} ne "" ) {
                 $value = &modify( $key, $mapping{$key}, $nodes{$node}{$key}, $nodeid );
                 if ($value) {
                     printf( OUT " <data %-20s value=\"%s\"/>\n", "key=\"" . $mapping{$key} . "\"", $value );
@@ -285,7 +323,14 @@ sub modify {
     my $ret = $value;
 
     if ( $mkey eq "id" ) {
-        $ret = $node;
+    	if ( $bgq eq "true" ) {
+    		if ( $key ne "RackMidplane" ) {
+    			$ret = "";
+    		}
+    	}
+    	else {
+        	$ret = $node;
+    	}
     }
 
     if ( $mkey eq "state" ) {
