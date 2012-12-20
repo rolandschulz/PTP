@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.etfw"
       label="%featureName"
-      version="6.0.4.qualifier"
+      version="7.0.qualifier"
       provider-name="%providerName">
 
    <description>
