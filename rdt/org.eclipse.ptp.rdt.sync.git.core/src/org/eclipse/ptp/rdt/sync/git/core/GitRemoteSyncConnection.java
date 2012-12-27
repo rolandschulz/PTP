@@ -131,10 +131,10 @@ public class GitRemoteSyncConnection {
 			
 			// Build repo, creating it if it is not already present.
 			try {
-				subMon.subTask(Messages.GitRemoteSyncConnection_20);
-				buildRepo(subMon.newChild(80));
 				subMon.subTask(Messages.GitRemoteSyncConnection_21);
 				remoteGitVersion = getRemoteGitVersion(subMon.newChild(10));
+				subMon.subTask(Messages.GitRemoteSyncConnection_20);
+				buildRepo(subMon.newChild(80));
 			} catch (final IOException e) {
 				throw new RemoteSyncException(e);
 			} catch (final RemoteExecutionException e) {
@@ -1131,7 +1131,10 @@ public class GitRemoteSyncConnection {
 		CommandResults commandResults = null;
 	
 		try {
-			commandResults = this.executeRemoteCommand(command, monitor);
+			// Skip class execute function, which attempts to run the command in the remote directory.
+			// (This directory may not yet exist, since reading the Git version is one of the first operations.)
+			IRemoteConnection conn = buildScenario.getRemoteConnection();
+			commandResults = CommandRunner.executeRemoteCommand(conn, command, null, monitor);
 		} catch (final InterruptedException e) {
 			throw new RemoteExecutionException(e);
 		} catch (RemoteConnectionException e) {
