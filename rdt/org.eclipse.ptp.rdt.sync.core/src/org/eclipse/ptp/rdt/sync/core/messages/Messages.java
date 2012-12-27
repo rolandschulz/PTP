@@ -100,6 +100,10 @@ public class Messages extends NLS {
 
 	public static String BCM_GetBuildInfoError;
 
+	public static String CommandRunner_0;
+
+	public static String CommandRunner_1;
+
 	public static String PathResourceMatcher_0;
 
 	public static String RegexResourceMatcher_0;
