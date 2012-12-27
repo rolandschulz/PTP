@@ -23,6 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -99,6 +101,7 @@ public class GitRemoteSyncConnection {
 	
 	private boolean mergeMapInitialized = false; // Call "readMergeConflictFiles" at least once before using the map.
 	private Map<IPath, String[]> FileToMergePartsMap = new HashMap<IPath, String[]>();
+	private int remoteGitVersion;
 
 
 	/**
@@ -125,9 +128,10 @@ public class GitRemoteSyncConnection {
 			localDirectory = localDir;
 			buildScenario = bs;
 			fileFilter = filter;
-
+			
 			// Build repo, creating it if it is not already present.
 			try {
+				remoteGitVersion = getRemoteGitVersion(subMon.newChild(1));
 				buildRepo(subMon.newChild(10));
 			} catch (final IOException e) {
 				throw new RemoteSyncException(e);
@@ -275,11 +279,12 @@ public class GitRemoteSyncConnection {
 	MissingConnectionException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
-			String command = "git --git-dir=" + gitDir + " init"; //$NON-NLS-1$ //$NON-NLS-2$
+			String commands = "git --git-dir=" + gitDir + " init && " + //$NON-NLS-1$ //$NON-NLS-2$
+					"git --git-dir=" + gitDir + " config core.preloadindex true"; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = null;
 
 			try {
-				commandResults = this.executeRemoteCommand(command, subMon.newChild(10));
+				commandResults = this.executeRemoteCommand(commands, subMon.newChild(10));
 			} catch (final InterruptedException e) {
 				throw new RemoteExecutionException(e);
 			} catch (RemoteConnectionException e) {
@@ -472,11 +477,20 @@ public class GitRemoteSyncConnection {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		subMon.subTask(Messages.GitRemoteSyncConnection_getting_remote_file_status);
 		try {
-			final String command;
-			if (includeUntrackedFiles) {
-				command = gitCommand + " ls-files -t --modified --others --deleted"; //$NON-NLS-1$
+			final String command, deletePrefix;
+			final int fileNamePos;
+			if (remoteGitVersion>=10700) {
+				command = gitCommand + " status --porcelain"; //$NON-NLS-1$
+				deletePrefix = " D"; //$NON-NLS-1$
+				fileNamePos = 3;
 			} else {
-				command = gitCommand + " ls-files -t --modified --deleted"; //$NON-NLS-1$
+				if (includeUntrackedFiles) {
+					command = gitCommand + " ls-files -t --modified --others --deleted"; //$NON-NLS-1$
+				} else {
+					command = gitCommand + " ls-files -t --modified --deleted"; //$NON-NLS-1$
+				}
+				deletePrefix = "R "; //$NON-NLS-1$
+				fileNamePos = 2;
 			}
 			CommandResults commandResults = null;
 
@@ -494,14 +508,13 @@ public class GitRemoteSyncConnection {
 			BufferedReader statusReader = new BufferedReader(new StringReader(commandResults.getStdout()));
 			String line = null;
 			while ((line = statusReader.readLine()) != null) {
-				if (line.charAt(0) == ' ' || line.charAt(1) != ' ') {
+				if (remoteGitVersion<10700 && (line.charAt(0) == ' ' || line.charAt(1) != ' ')) {
 					continue;
 				}
-				char status = line.charAt(0);
-				String fn = line.substring(2);
+				String fn = line.substring(fileNamePos);
 				fn = QuotedString.GIT_PATH.dequote(fn);
 				if (!(fileFilter.shouldIgnore(project.getFile(fn)))) {
-					if (status == 'R') {
+					if (line.substring(0, 2).equals(deletePrefix)) {
 						filesToDelete.add(fn);
 					} else {
 						filesToAdd.add(fn);
@@ -1083,6 +1096,35 @@ public class GitRemoteSyncConnection {
 		}
 	}
 
+	
+	public int getRemoteGitVersion(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
+			MissingConnectionException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		String command = "git --version"; //$NON-NLS-1$
+		CommandResults commandResults = null;
+	
+		try {
+			commandResults = this.executeRemoteCommand(command, subMon.newChild(10));
+		} catch (final InterruptedException e) {
+			throw new RemoteExecutionException(e);
+		} catch (RemoteConnectionException e) {
+			throw new RemoteExecutionException(e);
+		}
+	
+		if (commandResults.getExitCode() != 0) {
+			throw new RemoteExecutionException(Messages.GRSC_GitInitFailure + commandResults.getStderr());
+		}
+		
+		Matcher m = Pattern.compile("git version ([0-9]+)\\.([0-9]+)\\.([0-9]+).*").matcher(commandResults.getStdout().trim()); //$NON-NLS-1$
+				
+		if (m.matches()) {
+			return Integer.parseInt(m.group(1)) * 10000 +
+					Integer.parseInt(m.group(2)) * 100 + Integer.parseInt(m.group(3));
+		} else {
+			return 0;
+		}
+	}
+	
 	/**
 	 * Replace given file with the most recent version in the repository
 	 *
