@@ -111,7 +111,8 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 		/* remote folder (just delete - is created by GitRemoteSyncConnection) */
 		fileManager.getResource(remoteFolder).delete(EFS.NONE, null);
 
-		BuildScenario buildScenario = new BuildScenario("Git", fRemoteConnection, remoteFolder);
+		// TODO: Get correct location of git binary.
+		BuildScenario buildScenario = new BuildScenario("Git", "/usr/bin/git", fRemoteConnection, remoteFolder);
 		fGITConn = new GitRemoteSyncConnection(null, localFolder.getRoot().getPath(), buildScenario,
 				SyncFileFilter.createBuiltInDefaultFilter(), null);
 	}
