@@ -18,12 +18,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -100,10 +103,11 @@ public class GitParticipant implements ISynchronizeParticipant {
 	
 	private boolean fGitValidated = false;
 	private boolean fGitHasBeenTested = false;
-	private String specificGitError = "";
+	private String specificGitError = null;
 	private boolean fRemoteValidated = false;
 	private boolean fRemoteHasBeenTested = false;
 	private String specificRemoteError = "";
+	private String specificGitWarning = null;
 	
 	// If false, automatically select "Remote Tools" provider instead of letting the user select the provider.
 	private boolean showProviderCombo = false;
@@ -356,7 +360,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		fGitLocationValidationButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				setGitIsValid(isGitValid());
+				setGitIsValid(validateGit());
 				fGitHasBeenTested = true;
 				update();
 			}
@@ -428,6 +432,25 @@ public class GitParticipant implements ISynchronizeParticipant {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * @see ISynchronizeParticipant#getMessage()
+	 */
+	public String getMessage() {
+		if (fGitHasBeenTested) {
+			return specificGitWarning;
+		}
+
+		return null;
+	}
+
+	/**
+	 * @see ISynchronizeParticipant#getMessageType()
+	 */
+	public int getMessageType() {
+		// Currently all messages are warning messages.
+		return IMessageProvider.WARNING;
 	}
 
 	/*
@@ -586,7 +609,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 			// Git location found
 			} else {
 				fGitLocationText.setText(cr.getStdout().trim());
-				this.setGitIsValid(true);
+				this.setGitIsValid(validateGit());
+				fGitHasBeenTested = true;
 				fGitLocationText.setEnabled(false);
 			}
 		}
@@ -674,8 +698,11 @@ public class GitParticipant implements ISynchronizeParticipant {
 		}
 	}
 
-	// Check if the Git location is valid (does not actually set it as valid)
-	private boolean isGitValid() {
+	// Check if the Git location is valid (does not actually set it as valid).
+	// Also sets Git error and warning messages.
+	private boolean validateGit() {
+		specificGitError = null;
+		specificGitWarning = null;
 		IPath gitPath = new Path(fGitLocationText.getText());
 		if (gitPath.isEmpty()) {
 			specificGitError = "Git path is empty";
@@ -685,7 +712,7 @@ public class GitParticipant implements ISynchronizeParticipant {
     		specificGitError = "Git path must be absolute";
     		return false;
     	}
-    	List<String> args = Arrays.asList(gitPath.toString());
+    	List<String> args = Arrays.asList(gitPath.toString(), "--version");
 		String errorMessage = null;
 		CommandResults cr = null;
 		try {
@@ -704,11 +731,23 @@ public class GitParticipant implements ISynchronizeParticipant {
 		} else if (cr.getExitCode() == 127) {
 			specificGitError = "Git file invalid - not found";
 			return false;
-		// Prefer false positives to false negatives.
-		// Return true for unhandled exit codes.
-		} else {
+		}
+
+		int version = parseGitVersionAsInt(cr.getStdout());
+		String versionString = parseGitVersionAsString(cr.getStdout());
+		if (cr.getExitCode() != 0 || version == 0) {
+			specificGitWarning = "Git file found but version check failed - may not be a Git executable.";
 			return true;
 		}
+
+		if (version < 10600) {
+			specificGitWarning = "Git version " + versionString + " is not supported. Version 1.6.0 is supported and 1.7.0 is recommended.";
+		} else if (version < 10700) {
+			specificGitWarning = "Git version " + versionString + " is supported but 1.7.0 is recommended for best performance.";
+		}
+
+		// Prefer false positives to false negatives. Return true by default.
+		return true;
 	}
 	
 	// Set the Git location as valid
@@ -775,5 +814,34 @@ public class GitParticipant implements ISynchronizeParticipant {
 		}
 
 		return errorMessage;
+	}
+
+	/**
+	 * Parse raw output of "git --version" and return an integer representation of the version, suitable for comparisons.
+	 * @param versionCommandOutput
+	 * @return version integer or 0 on failure to parse
+	 */
+	public static int parseGitVersionAsInt(String versionCommandOutput) {
+		Matcher m = Pattern.compile("git version ([0-9]+)\\.([0-9]+)\\.([0-9]+).*").matcher(versionCommandOutput.trim()); //$NON-NLS-1$
+		if (m.matches()) {
+			return Integer.parseInt(m.group(1)) * 10000 +
+					Integer.parseInt(m.group(2)) * 100 + Integer.parseInt(m.group(3));
+		} else {
+			return 0;
+		}
+	}
+
+	/**
+	 * Parse raw output of "git --version" and return the version string, suitable for displaying to users.
+	 * @param versionCommandOutput
+	 * @return version string or null on failure to parse
+	 */
+	public static String parseGitVersionAsString(String versionCommandOutput) {
+		Matcher m = Pattern.compile("git version ([0-9]+\\.[0-9]+\\.[0-9]+).*").matcher(versionCommandOutput.trim()); //$NON-NLS-1$
+		if (m.matches()) {
+			return m.group(1);
+		} else {
+			return null;
+		}
 	}
 }

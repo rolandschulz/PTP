@@ -37,6 +37,20 @@ public interface ISynchronizeParticipant {
 	public String getErrorMessage();
 
 	/**
+	 * Returns the current message for this participant.
+	 * 
+	 * @return the message, or <code>null</code> if none
+	 */
+	public String getMessage();
+
+	/**
+	 * Returns the current message type for this participant.
+	 *
+	 * @return message type
+	 */
+	public int getMessageType();
+
+	/**
 	 * Get the configured sync service provider for the supplied project. Only
 	 * valid if {@link isConfigComplete()} is true.
 	 * 
