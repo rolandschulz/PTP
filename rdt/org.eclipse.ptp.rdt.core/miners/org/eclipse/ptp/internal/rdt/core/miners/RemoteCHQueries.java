@@ -38,6 +38,7 @@ import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IMethod;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.ClassTypeHelper;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
@@ -57,7 +58,7 @@ public class RemoteCHQueries {
 	 * Version: 1.20
 	 */
 	//copied from private static void findCalledBy(ICElement callee, int linkageID, IIndex index, CalledByResult result) 
-	public static CalledByResult findCalledBy(ICElement callee, String path, IIndex project_index, IIndex serach_scope_index, String scheme, String hostName, CalledByResult result, DataStore _dataStore, IIndexLocationConverterFactory converter) 
+	public static CalledByResult findCalledBy(ICElement callee, String path, IIndex project_index, IIndex serach_scope_index, String scheme, String hostName, CalledByResult result, DataStore _dataStore, IIndexLocationConverterFactory converter, DataElement status) 
 	throws CoreException, URISyntaxException, InterruptedException {
 		
 		final ICProject project = callee.getCProject();
@@ -78,11 +79,16 @@ public class RemoteCHQueries {
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock for serach_scope_index", _dataStore); //$NON-NLS-1$
 			serach_scope_index.acquireReadLock();
 			try{
-				findCalledBy1(serach_scope_index, calleeBinding, true, project, scheme, hostName, result, _dataStore, converter);
+				findCalledBy1(serach_scope_index, calleeBinding, true, project, scheme, hostName, result, _dataStore, converter, status);
 				if (calleeBinding instanceof ICPPMethod) {
 					IBinding[] overriddenBindings= ClassTypeHelper.findOverridden((ICPPMethod) calleeBinding, null);
 					for (IBinding overriddenBinding : overriddenBindings) {
-						findCalledBy1(serach_scope_index, overriddenBinding, false, project, scheme, hostName, result, _dataStore, converter);
+						
+						if(CDTMiner.isCancelled(status)) {
+							break;
+						}
+						
+						findCalledBy1(serach_scope_index, overriddenBinding, false, project, scheme, hostName, result, _dataStore, converter, status);
 					}
 				}
 			} finally{
@@ -94,21 +100,31 @@ public class RemoteCHQueries {
 	}
 	
 	private static void findCalledBy1(IIndex index, IBinding callee, boolean includeOrdinaryCalls,
-			ICProject project, String scheme, String hostName, CalledByResult result, DataStore _dataStore, IIndexLocationConverterFactory converter) throws CoreException, URISyntaxException {
+			ICProject project, String scheme, String hostName, CalledByResult result, DataStore _dataStore, IIndexLocationConverterFactory converter, DataElement status) throws CoreException, URISyntaxException {
 		
-		findCalledBy2(index, callee, includeOrdinaryCalls, project, scheme, hostName, result, _dataStore, converter);
+		findCalledBy2(index, callee, includeOrdinaryCalls, project, scheme, hostName, result, _dataStore, converter, status);
 		List<? extends IBinding> specializations = IndexQueries.findSpecializations(callee);
 		for (IBinding spec : specializations) {
-			findCalledBy2(index, spec, includeOrdinaryCalls, project, scheme, hostName, result, _dataStore, converter);
+			
+			if(CDTMiner.isCancelled(status)) {
+				break;
+			}
+			
+			findCalledBy2(index, spec, includeOrdinaryCalls, project, scheme, hostName, result, _dataStore, converter, status);
 		}
 	}
 
 	
 	
-	private static void findCalledBy2(IIndex index, IBinding callee, boolean includeOrdinaryCalls, ICProject project, String scheme, String hostName, CalledByResult result,  DataStore _dataStore, IIndexLocationConverterFactory converter) 
+	private static void findCalledBy2(IIndex index, IBinding callee, boolean includeOrdinaryCalls, ICProject project, String scheme, String hostName, CalledByResult result,  DataStore _dataStore, IIndexLocationConverterFactory converter, DataElement status) 
 		throws CoreException, URISyntaxException {
 		IIndexName[] names= index.findNames(callee, IIndex.FIND_REFERENCES | IIndex.SEARCH_ACROSS_LANGUAGE_BOUNDARIES);
 		for (IIndexName rname : names) {
+			
+			if(CDTMiner.isCancelled(status)) {
+				break;
+			}
+			
 			if (includeOrdinaryCalls || rname.couldBePolymorphicMethodCall()) {
 				IIndexName caller= rname.getEnclosingDefinition();
 				if (caller != null) {
@@ -125,10 +141,11 @@ public class RemoteCHQueries {
 	
 	/**
 	 * Searches for all calls that are made within a given range.
+	 * @param status 
 	 * @throws InterruptedException 
 	 * @throws URISyntaxException 
 	 */
-	public static CallsToResult findCalls(ICElement caller, String path, IIndex project_index, IIndex workspace_scope_index, String scheme, String hostName, DataStore _dataStore, IIndexLocationConverterFactory converter) 
+	public static CallsToResult findCalls(ICElement caller, String path, IIndex project_index, IIndex workspace_scope_index, String scheme, String hostName, DataStore _dataStore, IIndexLocationConverterFactory converter, DataElement status) 
 			throws CoreException, InterruptedException, URISyntaxException {
 		
 		CallsToResult result = new CallsToResult();
@@ -155,9 +172,19 @@ public class RemoteCHQueries {
 				final ICProject project = caller.getCProject();
 				ICProjectFactory projectFactory = new RemoteCProjectFactory();
 				for (IIndexName name : refs) {
+					
+					if (CDTMiner.isCancelled(status)) {
+						break;
+					}
+					
 					IBinding binding= workspace_scope_index.findBinding(name);
 					if (isRelevantForCallHierarchy(binding)) {
 						for(;;) {
+							
+							if (CDTMiner.isCancelled(status)) {
+								break;
+							}
+							
 							ICElement[] defs= null;
 							if (binding instanceof ICPPMethod) {
 								defs = findOverriders(workspace_scope_index, (ICPPMethod) binding, converter, project, projectFactory);

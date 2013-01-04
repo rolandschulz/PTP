@@ -25,17 +25,30 @@ import org.eclipse.ptp.internal.rdt.core.search.RemoteSearchTextSelectionQuery;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
 
 public class RemoteSearchPatternQueryAdapter extends RemoteSearchQueryAdapter {
+	
+	private RemoteSearchPatternQueryAdapter() {
+		throw new IllegalStateException();
+	}
+	
 	public RemoteSearchPatternQueryAdapter(ICIndexSubsystem subsystem, Scope scope, RemoteSearchPatternQuery query) {
 		super(subsystem, scope, query);
 	}
 
 	@Override
 	public String getLabel() {
+		if(fQuery == null) {
+			return null;
+		}
+		
 		return Messages.format(CSearchMessages.PDOMSearchPatternQuery_PatternQuery_labelPatternInScope, super.getLabel(), ((RemoteSearchPatternQuery) fQuery).getPattern(), ((RemoteSearchPatternQuery) fQuery).getScopeDescription()); 
 	}
 	
 	@Override
 	public String getResultLabel(int numMatches) {
+		if(fQuery == null) {
+			return org.eclipse.ptp.rdt.ui.messages.Messages.getString("RemoteSearchPatternQueryAdapter_0"); //$NON-NLS-1$
+		}
+		
 		return getResultLabel(((RemoteSearchPatternQuery) fQuery).getPatternStr(), ((RemoteSearchPatternQuery) fQuery).getScopeDescription(), numMatches); 
 
 	}

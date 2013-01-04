@@ -25,6 +25,10 @@ import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
 
 public class RemoteSearchElementQueryAdapter extends RemoteSearchQueryAdapter {
 
+	
+	private RemoteSearchElementQueryAdapter() {
+		throw new IllegalStateException();
+	}
 
 	public RemoteSearchElementQueryAdapter(ICIndexSubsystem subsystem, Scope scope, RemoteSearchElementQuery query) {
 		super(subsystem, scope, query);
@@ -33,6 +37,10 @@ public class RemoteSearchElementQueryAdapter extends RemoteSearchQueryAdapter {
 	
 	@Override
 	public String getLabel() {
+		if(fQuery == null) {
+			return null;
+		}
+		
 		ISourceReference element = ((RemoteSearchElementQuery) fQuery).getSourceReference();
 		if (element instanceof ICElement)
 			return super.getLabel() + " " + ((ICElement)element).getElementName(); //$NON-NLS-1$
@@ -42,6 +50,10 @@ public class RemoteSearchElementQueryAdapter extends RemoteSearchQueryAdapter {
 	
 	@Override
 	public String getResultLabel(int numMatches) {
+		if(fQuery == null) {
+			return null;
+		}
+		
 		ISourceReference element = ((RemoteSearchElementQuery) fQuery).getSourceReference();
 		String label = (element instanceof ICElement) ?
 				((ICElement) element).getElementName() : CSearchMessages.PDOMSearchElementQuery_something;
