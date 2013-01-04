@@ -82,16 +82,28 @@ public abstract class RemoteSearchQueryAdapter implements ISearchQuery {
 		CElementLabels.ALL_FULLY_QUALIFIED |
 		CElementLabels.TEMPLATE_ARGUMENTS;
 
-
+	protected RemoteSearchQueryAdapter() {
+		throw new IllegalStateException();
+	}
 
 	public RemoteSearchQueryAdapter(ICIndexSubsystem subsystem, Scope scope, RemoteSearchQuery query) {
 		fSubsystem = subsystem;
 		fScope = scope;
+		
+		if(query == null) {
+			throw new IllegalArgumentException("Query must not be null."); //$NON-NLS-1$
+		}
+			
+		
 		fQuery = query;
 		fResult = new RemoteSearchResult(this);
 	}
 	
 	protected String labelForBinding(String defaultLabel) {
+		if(fQuery == null) {
+			return null;
+		}
+		
 		ICElement elem = fQuery.getcElement();
 	
 		if (elem != null) {
@@ -130,11 +142,11 @@ public abstract class RemoteSearchQueryAdapter implements ISearchQuery {
 	}
 	
 	public boolean canRerun() {
-		return fQuery.canRerun();
+		return fQuery != null ? fQuery.canRerun() : true;
 	}
 
 	public boolean canRunInBackground() {
-		return fQuery.canRunInBackground();
+		return fQuery != null ? fQuery.canRunInBackground() : true;
 	}
 	
 	public abstract String getResultLabel(int matchCount);
@@ -144,6 +156,11 @@ public abstract class RemoteSearchQueryAdapter implements ISearchQuery {
 	}
 	
 	public String getResultLabel(String pattern, String scope, int matchCount) {
+		
+		if(fQuery == null) {
+			return org.eclipse.ptp.rdt.ui.messages.Messages.getString("RemoteSearchPatternQueryAdapter_0"); //$NON-NLS-1$
+		}
+		
 		// Report pattern and number of matches
 		String label;
 		final int kindFlags= fQuery.getFlags() & RemoteSearchQuery.FIND_ALL_OCCURRENCES;
@@ -174,6 +191,10 @@ public abstract class RemoteSearchQueryAdapter implements ISearchQuery {
 	}
 
 	public String getLabel() {
+		if(fQuery == null) {
+			return null;
+		}
+		
 		String type;
 		if ((fQuery.getFlags() & RemoteSearchQuery.FIND_REFERENCES) != 0)
 			type = CSearchMessages.PDOMSearchQuery_refs_label; 
@@ -220,6 +241,9 @@ public abstract class RemoteSearchQueryAdapter implements ISearchQuery {
 	}
 	
 	private void postProcessQuery(){
+		if(fQuery == null) {
+			return;
+		}
 		
 		List<RemoteSearchMatch> remoteSearchMatches = fQuery.getMatches();
 		Map<IIndexFile, Set<RemoteLineSearchElementMatch>> remoteLineSearchElementMatches = fQuery.getRemoteLineSearchElementMatchs();
