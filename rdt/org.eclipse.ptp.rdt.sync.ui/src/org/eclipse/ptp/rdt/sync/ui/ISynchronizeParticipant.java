@@ -13,6 +13,8 @@ package org.eclipse.ptp.rdt.sync.ui;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -73,4 +75,56 @@ public interface ISynchronizeParticipant {
 	 * @param projectName
 	 */
 	public void setProjectName(String projectName);
+
+	// Juno SR2 - allow participant to be read and written so that it can be used on property pages.
+	// Eight additional functions added to get/set four common properties for all remotes.
+	// Note: Currently we are assuming no tool-specific data exists that needs to be get or set.
+
+	/**
+	 * Get the remote sync location entered by the user
+	 * @return remote location
+	 */
+	public String getLocation();
+
+	/**
+	 * Get the tool binary location entered by the user
+	 * @return tool location
+	 */
+	public String getToolLocation();
+
+	/**
+	 * Get the connection selected by the user
+	 * @return connection
+	 */
+	public IRemoteConnection getRemoteConnection();
+
+	/**
+	 * Get the remote provider
+	 * @return remote provider
+	 */
+	public IRemoteServices getRemoteProvider();
+
+	/**
+	 * Set the remote sync location
+	 * @param remote location
+	 */
+	public void setLocation(String location);
+
+	/**
+	 * Set the tool binary location
+	 * @param tool location
+	 */
+	public void setToolLocation(String location);
+
+	/**
+	 * Set the remote connection
+	 * @param connection
+	 */
+	public void setRemoteConnection(IRemoteConnection connection);
+
+	/**
+	 * Set the remote provider
+	 * @param provider
+	 */
+	public void setRemoteProvider(IRemoteServices provider);
 }

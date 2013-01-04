@@ -844,4 +844,61 @@ public class GitParticipant implements ISynchronizeParticipant {
 			return null;
 		}
 	}
+
+	@Override
+	public String getLocation() {
+		return fLocationText.getText();
+	}
+
+	@Override
+	public String getToolLocation() {
+		return fGitLocationText.getText();
+	}
+
+	@Override
+	public IRemoteConnection getRemoteConnection() {
+		return fSelectedConnection;
+	}
+
+	@Override
+	public IRemoteServices getRemoteProvider() {
+		return fSelectedProvider;
+	}
+
+	@Override
+	public void setLocation(String location) {
+		fLocationText.setText(location);
+		// Assume automatic settings are correct.
+		this.setRemoteIsValid(true);
+	}
+
+	@Override
+	public void setToolLocation(String location) {
+		fGitLocationText.setText(location);
+		// Assume automatic settings are correct.
+		this.setGitIsValid(true);
+	}
+
+	@Override
+	public void setRemoteConnection(IRemoteConnection connection) {
+		for (Map.Entry<Integer, IRemoteConnection> entry : fComboIndexToRemoteConnectionMap.entrySet()) {
+			if (entry.getValue().getName().equals(connection.getName())) {
+				fConnectionCombo.select(entry.getKey());
+				handleConnectionSelected();
+			}
+		}
+	}
+
+	@Override
+	public void setRemoteProvider(IRemoteServices provider) {
+		if (!showProviderCombo) {
+			return;
+		}
+		for (Map.Entry<Integer, IRemoteServices> entry : fComboIndexToRemoteServicesProviderMap.entrySet()) {
+			if (entry.getValue().getId().equals(provider.getId())) {
+				fProviderCombo.select(entry.getKey());
+				handleServicesSelected();
+			}
+		}
+	}
 }
