@@ -36,6 +36,10 @@
             name="PBS-BGQ-Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
+            configurationFile="data/slurm-alps-generic-batch.xml"
+            name="SLURM-ALPS-Generic-Batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
             configurationFile="data/slurm-generic-batch.xml"
             name="SLURM-Generic-Batch">
       </JAXBResourceManagerConfiguration>
