@@ -1,0 +1,25 @@
+<html>
+<head>
+<title>Running batch jobs on SLURM ALPS systems</title>
+<link rel="stylesheet" type="text/css" href="../help.css">
+<script type="text/javascript" src="thumb.js"> </script>
+</head>
+<body>
+
+<h1 id="top">Running and monitoring batch jobs on SLURM ALPS systems</h1>
+
+<p>
+In order to monitor target systems, which run a combination of SLURM and ALPS as batch system,
+the target system configuration <b>SLURM-ALPS-Generic-Batch</b> has to be chosen. This configuration
+is derived from the <b>SLURM-Generic-Batch</b> configuration. It only includes additional status
+information provided by ALPS into the monitoring results of the <a href="../05monitoring.html">System Monitoring Perspective</a>.
+Note that the attempt of monitoring a SLURM ALPS system by using the monitoring type <b>SLURM</b> configured
+in SLURM-Generic-Batch will fail.
+</p>
+
+<p>
+Running batch jobs with this target system configuration is identical to running jobs on a plain <a href="PLUGINS_ROOT/org.eclipse.ptp.rm.slurm.help/html/toc.html">SLURM system</a>.
+</p>
+ 
+</body>
+</html>
