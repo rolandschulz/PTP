@@ -1,15 +1,25 @@
 #!/usr/bin/perl -w
 #*******************************************************************************
-#* Copyright (c) 2011 Forschungszentrum Juelich GmbH.
+#* Copyright (c) 2011-2013 Forschungszentrum Juelich GmbH.
 #* All rights reserved. This program and the accompanying materials
 #* are made available under the terms of the Eclipse Public License v1.0
 #* which accompanies this distribution, and is available at
 #* http://www.eclipse.org/legal/epl-v10.html
 #*
 #* Contributors:
-#*    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
+#*    Wolfgang Frings, Carsten Karbach (Forschungszentrum Juelich GmbH) 
 #*******************************************************************************/ 
 use strict;
+
+my $srcDir = $0;
+if($srcDir =~ /\// ){
+	$srcDir =~ s/[^\/]+\.pl$//;
+}
+else{
+	$srcDir = "./";
+}
+
+require $srcDir."../LSF/"."helper_functions.pl";#Include shared helper functions
 
 use lib ".";
 
@@ -112,7 +122,7 @@ sub modify {
     my $ret=$value;
 
     if($mkey eq "motd") {
-#	$ret=~s/\&/&amp;/gs;
+	$ret = escapeForXML($ret);
 	$ret=~s/\n/\&\#10;/gs;
     }
 

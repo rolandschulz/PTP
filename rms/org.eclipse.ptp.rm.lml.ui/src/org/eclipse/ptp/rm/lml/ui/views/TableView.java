@@ -383,7 +383,9 @@ public class TableView extends ViewPart {
 				@Override
 				public void run() throws Exception {
 					if (composite != null && viewCreated) {
-						firstColumnlabelProvider.clearImages();
+						if (firstColumnlabelProvider != null) {
+							firstColumnlabelProvider.clearImages();
+						}
 						if (selectedItem != null && !selectedItem.isDisposed()) {
 							lmlManager.unmarkObject(selectedItem.getData().toString());
 							selectedItem = null;
@@ -686,7 +688,12 @@ public class TableView extends ViewPart {
 			treeViewerColumn.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(ViewerCell cell) {
-					cell.setText(((Row) cell.getElement()).cells[cellNumber].value);
+					String value = "-"; //$NON-NLS-1$
+					final Row row = (Row) cell.getElement();
+					if (row != null && row.cells.length > cellNumber) {
+						value = row.cells[cellNumber].value;
+					}
+					cell.setText(value);
 				}
 			});
 			final TreeColumn treeColumnI = treeViewerColumn.getColumn();

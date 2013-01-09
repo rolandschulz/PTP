@@ -1,12 +1,12 @@
 #*******************************************************************************
-#* Copyright (c) 2011 Forschungszentrum Juelich GmbH.
+#* Copyright (c) 2011-2013 Forschungszentrum Juelich GmbH.
 #* All rights reserved. This program and the accompanying materials
 #* are made available under the terms of the Eclipse Public License v1.0
 #* which accompanies this distribution, and is available at
 #* http://www.eclipse.org/legal/epl-v10.html
 #*
 #* Contributors:
-#*    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
+#*    Wolfgang Frings, Carsten Karbach (Forschungszentrum Juelich GmbH) 
 #*******************************************************************************/ 
 package LML_ndtree;
 use strict;
@@ -181,7 +181,12 @@ sub get_xml_tree {
 		next if(!defined($self->{ATTR}->{$subid}));
 		$xmldata.=" $subid=\"".$self->{ATTR}->{$subid}."\"";
 	    }
-	    $xmldata.=">\n";
+	    if($elname eq "img"){#img tag has to be finished directly
+	    	$xmldata.="/>\n";
+	    }
+	    else{
+	    	$xmldata.=">\n";
+	    }
 	}
 	
 	# handling of special usage attribute _JOBUSAGE
@@ -208,9 +213,11 @@ sub get_xml_tree {
 	}
 	
 	# epilog
-	if($level>=$fromlevel) {
-	    $xmldata.="    "x$level;
-	    $xmldata.="</$elname>\n";
+	if($elname ne "img"){#Add final tag only for non-img tags
+		if($level>=$fromlevel) {
+		    $xmldata.="    "x$level;
+		    $xmldata.="</$elname>\n";
+		}
 	}
 	
     }
