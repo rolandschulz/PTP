@@ -687,7 +687,12 @@ public class TableView extends ViewPart {
 			treeViewerColumn.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(ViewerCell cell) {
-					cell.setText(((Row) cell.getElement()).cells[cellNumber].value);
+					String value = "-"; //$NON-NLS-1$
+					final Row row = (Row) cell.getElement();
+					if (row != null && row.cells.length > cellNumber) {
+						value = row.cells[cellNumber].value;
+					}
+					cell.setText(value);
 				}
 			});
 			final TreeColumn treeColumnI = treeViewerColumn.getColumn();
