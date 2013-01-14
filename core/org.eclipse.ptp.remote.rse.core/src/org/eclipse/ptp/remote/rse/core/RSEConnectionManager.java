@@ -44,7 +44,18 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	public IRemoteConnection getConnection(String name) {
 		refreshConnections();
 		if (name != null) {
-			return fConnections.get(name);
+			IRemoteConnection connection = fConnections.get(name);
+			
+			// RSE may have upper cased the name on us
+			if(connection == null) {
+				connection = fConnections.get(name.toLowerCase());
+			}
+			
+			if(connection == null) {
+				connection = fConnections.get(name.toUpperCase());
+			}
+			
+			return connection;
 		}
 		return null;
 	}
