@@ -865,26 +865,33 @@ public class GitParticipant implements ISynchronizeParticipant {
 		return fSelectedProvider;
 	}
 
+	// Functions to set various UI elements.
+	// Note that this is a lower-level interface than when users set values from the dialog. Thus, it assumes values are valid and
+	// bypasses checks and extra function calls. We expect these functions are usually called to load stored settings that were
+	// previously verified.
 	@Override
 	public void setLocation(String location) {
 		fLocationText.setText(location);
-		// Assume automatic settings are correct.
 		this.setRemoteIsValid(true);
 	}
 
 	@Override
 	public void setToolLocation(String location) {
 		fGitLocationText.setText(location);
-		// Assume automatic settings are correct.
 		this.setGitIsValid(true);
 	}
 
+	// TODO: If we ever allow multiple remote service providers again, these two functions will fail, because the
+	// list of connections may not correspond to the provider. Fixing this, though, requires some careful coding
+	// to maintain the low-level interface and still make sure the provider and connection list are consistent.
+	// In summary, beware if "setRemoteProvider" should be changed to be non-trivial.
 	@Override
 	public void setRemoteConnection(IRemoteConnection connection) {
 		for (Map.Entry<Integer, IRemoteConnection> entry : fComboIndexToRemoteConnectionMap.entrySet()) {
 			if (entry.getValue().getName().equals(connection.getName())) {
 				fConnectionCombo.select(entry.getKey());
-				handleConnectionSelected();
+				int selectionIndex = fConnectionCombo.getSelectionIndex();
+				fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
 			}
 		}
 	}
@@ -897,7 +904,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 		for (Map.Entry<Integer, IRemoteServices> entry : fComboIndexToRemoteServicesProviderMap.entrySet()) {
 			if (entry.getValue().getId().equals(provider.getId())) {
 				fProviderCombo.select(entry.getKey());
-				handleServicesSelected();
+				int selectionIndex = fProviderCombo.getSelectionIndex();
+				fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
 			}
 		}
 	}
