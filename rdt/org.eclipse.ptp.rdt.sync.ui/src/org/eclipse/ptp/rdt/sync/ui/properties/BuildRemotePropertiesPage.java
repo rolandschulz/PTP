@@ -135,12 +135,21 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// TODO: Assumes a single sync provider
-				setParticipant(0);
+				if (fSyncToggleButton.getSelection()) {
+					setParticipant(0);
+				} else {
+					setNoParticipant();
+				}
 				update();
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				setNoParticipant();
+				// TODO: Assumes a single sync provider
+				if (fSyncToggleButton.getSelection()) {
+					setParticipant(0);
+				} else {
+					setNoParticipant();
+				}
 				update();
 			}
 		});
@@ -157,6 +166,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
 		for (ISynchronizeParticipantDescriptor desc : providers) {
 			ISynchronizeParticipant participant = desc.getParticipant();
+			participant.setIsPropertyPage(true);
 			fProviders.add(participant);
 			fProviderControls.add(this.createControl(participant));
 		}
@@ -384,11 +394,13 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	private void setParticipant(int index) {
 		fSelectedParticipant = fProviders.get(index);
 		fProviderStack.topControl = fProviderControls.get(index);
+		fProviderArea.layout();
 	}
 
 	private void setNoParticipant() {
 		fSelectedParticipant = null;
 		fProviderStack.topControl = fLocalProviderComposite;
+		fProviderArea.layout();
 	}
 	
 	/**

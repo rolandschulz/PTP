@@ -127,4 +127,12 @@ public interface ISynchronizeParticipant {
 	 * @param provider
 	 */
 	public void setRemoteProvider(IRemoteServices provider);
+	
+	/**
+	 * Set whether the participant is being used in a property page, as opposed to a wizard page. Thus, certain
+	 * operations, such as setting initial field values, are not necessary.
+	 * By default, participants should assume they are being used in a wizard.
+	 * @param isPropertyPage
+	 */
+	public void setIsPropertyPage(boolean isPropertyPage);
 }
