@@ -417,7 +417,11 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	public String getErrorMessage() {
 		if (super.getErrorMessage() != null) 
 			return super.getErrorMessage();
-		return fSelectedParticipant.getErrorMessage();
+		if (fSelectedParticipant == null) {
+			return null;
+		} else {
+			return fSelectedParticipant.getErrorMessage();
+		}
 	}
 	
 	public boolean isValid() {
@@ -461,12 +465,12 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 
 		@Override
 		public void updateButtons() {
-			BuildRemotePropertiesPage.this.updateButtons();
+			BuildRemotePropertiesPage.this.getContainer().updateButtons();
 		}
 
 		@Override
 		public void updateMessage() {
-			BuildRemotePropertiesPage.this.updateMessage();	
+			BuildRemotePropertiesPage.this.getContainer().updateMessage();	
 		}
 	}
 }
