@@ -87,6 +87,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 //	private Control fDialogControl;
 //	private Point fDialogSize;
 //	private Text fNameText;
+	private boolean isPropertyPage = false;
 	private IRunnableContext fContext;
 	private Button fRemoteLocationBrowseButton;
 	private Button fRemoteLocationValidationButton;
@@ -366,7 +367,9 @@ public class GitParticipant implements ISynchronizeParticipant {
 			}
 		});
 		
-		handleConnectionSelected();
+		if (!isPropertyPage) {
+			handleConnectionSelected();
+		}
 	}
 
 	/**
@@ -908,5 +911,10 @@ public class GitParticipant implements ISynchronizeParticipant {
 				fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
 			}
 		}
+	}
+	
+	@Override
+	public void setIsPropertyPage(boolean isPropPage) {
+		this.isPropertyPage = isPropPage;
 	}
 }
