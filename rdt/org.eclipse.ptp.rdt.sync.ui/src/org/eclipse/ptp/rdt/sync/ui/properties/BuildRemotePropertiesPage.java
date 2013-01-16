@@ -477,12 +477,14 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 
 		@Override
 		public void updateButtons() {
-			BuildRemotePropertiesPage.this.getContainer().updateButtons();
+			// Update everything. This is a hack to work around not having an "update" callback from the participant.
+			BuildRemotePropertiesPage.this.update();
 		}
 
 		@Override
 		public void updateMessage() {
-			BuildRemotePropertiesPage.this.getContainer().updateMessage();	
+			// Update everything. This is a hack to work around not having an "update" callback from the participant.
+			BuildRemotePropertiesPage.this.update();	
 		}
 	}
 }
