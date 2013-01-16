@@ -186,7 +186,7 @@ public class RemoteCHQueries {
 							}
 							
 							ICElement[] defs= null;
-							if (binding instanceof ICPPMethod) {
+							if (binding instanceof ICPPMethod && name.couldBePolymorphicMethodCall()) {
 								defs = findOverriders(workspace_scope_index, (ICPPMethod) binding, converter, project, projectFactory);
 							}
 							if (defs == null) {
