@@ -295,8 +295,8 @@ sub _init_trees_bgq  {
 
     $treenode=$treenode->new_child();
     $treenode->add_attr({ tagname => 'computecard',
-			  min     => 4,
-			  max     => 35,
+			  min     => 0,
+			  max     => 31,
 			  mask    => '-C%02d' });
 
     $treenode=$treenode->new_child();

@@ -218,7 +218,7 @@ sub _insert_jobnode_nodedisplay {
 		print "_insert_jobnode_nodedisplay: $xspace  -> adjust range      with (",($lmin),"..",($max),"), inserting subnodes ...\n" if($debug>=2); 
 		$self->_insert_jobnode_nodedisplay($child,\@newlist, \@newsizelist, $oid) ;
 	    }
- 	    for($i=$min;$i<=$lmin;$i++) {$covered[$i]=0}
+ 	    for($i=$lmin;$i<=$max;$i++) {$covered[$i]=0}
 	} elsif(($min>=$lmin) && ($max>$lmax)) {
 	    print "_insert_jobnode_nodedisplay: $xspace  -> child not full covered: high overlap #subchilds=$subchilds\n" if($debug>=2); 
 	    if($min>$lmin) {             # overlap low
@@ -240,7 +240,20 @@ sub _insert_jobnode_nodedisplay {
 		$self->_insert_jobnode_nodedisplay($child,\@newlist, \@newsizelist, $oid) ;
 	    }
  	    for($i=$min;$i<=$lmax;$i++) {$covered[$i]=0}
-	}
+	} elsif(($min<$lmin) && ($max>$lmax)) {
+	    print "_insert_jobnode_nodedisplay: $xspace  -> child not full covered: middle overlap #subchilds=$subchilds\n" if($debug>=2); 
+	    if($isleaf) {
+		$dataref->remove_child($child); # replace subtree
+		print "_insert_jobnode_nodedisplay: $xspace     remove old child\n" if($debug>=2); 
+		$newchild=$dataref->new_child();
+		$newchild->add_attr({ oid => $oid, min => $lmin, max => $lmax });
+		print "_insert_jobnode_nodedisplay: $xspace  -> insert new child  with (",($lmin),"..",($lmax),")\n" if($debug>=2); 
+	    } else {
+		print "_insert_jobnode_nodedisplay: $xspace  -> adjust range      with (",($lmin),"..",($lmax),"), inserting subnodes ...\n" if($debug>=2); 
+		$self->_insert_jobnode_nodedisplay($child,\@newlist, \@newsizelist, $oid) ;
+	    }
+ 	    for($i=$lmin;$i<=$lmax;$i++) {$covered[$i]=0}
+    }
     }
 
     # build entries for not already covered childs
@@ -253,7 +266,6 @@ sub _insert_jobnode_nodedisplay {
 	for $subspec (split(',',$newlist)) {
 	    if($subspec=~/(\d+)\-(\d+)/) {$min=$1;$max=$2;  } 
 	    else                         {$min=$max=$subspec;}
-	}
 	$newchild=$dataref->new_child();
 	if($isleaf) {
 	    print "_insert_jobnode_nodedisplay: $xspace  -> insert new child with (",($min),"..",($max),")\n" if($debug>=2); 
@@ -262,6 +274,7 @@ sub _insert_jobnode_nodedisplay {
 	    $newchild->add_attr({ min => $min, max => $max, oid => $dataref->{ATTR}->{oid} });
 	    print "_insert_jobnode_nodedisplay: $xspace  -> insert new child with (",($min),"..",($max),"), inserting subnodes ...\n" if($debug>=2); 
 	    $self->_insert_jobnode_nodedisplay($newchild,\@newlist, \@newsizelist, $oid) ;
+	}
 	}
 	
     }
@@ -527,8 +540,8 @@ sub _get_size_for_node  {
     $allsize=0;
     if($subchilds>0) {
 	foreach $child (@{$schemeref->{_childs}}) {
-	    next if($nodenum<$child->{ATTR}->{min});
-	    next if($nodenum>$child->{ATTR}->{max});
+	    next if($nodenum<$schemeref->{ATTR}->{min});
+	    next if($nodenum>$schemeref->{ATTR}->{max});
 	    $allsize+=$self->_get_size_of_node($child);
 	}
     } else {

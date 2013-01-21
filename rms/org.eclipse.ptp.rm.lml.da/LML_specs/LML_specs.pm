@@ -93,6 +93,10 @@ $LML_specs::LMLattributes = {
 		 "bgp_shape_req"      => ["s","O",undef, ""],
 		 "bgp_state"          => ["s","O",undef, ""],
 		 "bgp_type"           => ["s","O",undef, ""],
+# SLURM optional
+         "account"            => ["s","O",undef, "SLURM usage account"],
+         "command"            => ["s","O",undef, "SLURM running batch command"],
+         "runtime"            => ["d","O",undef, "SLURM current job runtime"],
    },
     "node" => {
 	         "id"             => ["s","M", undef, ""],

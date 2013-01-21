@@ -22,8 +22,8 @@ my $patbl = "\\s+";                 # Pattern for blank space (variable length)
 my $UserID = getpwuid($<);
 my $Hostname = `hostname`;
 my $verbose = 1;
-my ( $cmd, $line, %jobs, %jobnr, %midplanes, %nodenr, $nodecardspermidplane,
-    $numpsets, $bgp, $bgq, @nodes, $node, $key, $value, $count, %notmappedkeys,
+my ( $cmd, $line, %jobs, %steps, %jobnr, %midplanes, %nodenr, $nodecardspermidplane,
+    $numpsets, $bgp, $bgq, $subblockjobs, @nodes, $node, $key, $value, $count, %notmappedkeys,
     %notfoundkeys );
 
 #####################################################################
@@ -43,7 +43,7 @@ my %mapping = (
     "UserId"            => "owner",
     "GroupId"           => "group",
     "Priority"          => "",
-    "Account"           => "",
+    "Account"           => "account",
     "QOS"               => "",
     "JobState"          => "state",
     "Reason"            => "",
@@ -53,7 +53,7 @@ my %mapping = (
     "BatchFlag"         => "",
     "ExitCode"          => "",
     "DerivedExitCode"   => "",
-    "RunTime"           => "",
+    "RunTime"           => "runtime",
     "TimeLimit"         => "wall",
     "TimeMin"           => "",
     "SubmitTime"        => "queuedate",
@@ -89,7 +89,7 @@ my %mapping = (
     "Contiguous"        => "",
     "Licenses"          => "",
     "Network"           => "",
-    "Command"           => "",
+    "Command"           => "command",
     "WorkDir"           => "",
     "Block_ID"          => "",
     "Connection"        => "",
@@ -104,8 +104,10 @@ my %mapping = (
 
     # unknown attributes
 );
-
 # BlueGene/Q SLURM to Nodecard mappings
+# with no sub-block jobs
+# Column order is A-X-Y-Z-E
+# Increment order is Y-Z-A-X-E
 my %startnc = (
     "00000" => 0,
     "00200" => 1,
@@ -142,6 +144,45 @@ my %endnc = (
     "33311" => 13,
     "33131" => 14,
     "33331" => 15,
+);
+
+# BlueGene/Q Computecard mappings
+# for sub-block jobs
+# Column order is A-X-Y-Z-E
+# Increment order is Y-Z-A-X-E
+my %computecard = (
+	"00000" => 0,
+	"00100" => 1,
+	"00010" => 2,
+	"00110" => 3,
+	"10000" => 4,
+	"10100" => 5,
+	"10010" => 6,
+	"10110" => 7,
+	"01000" => 8,
+	"01100" => 9,
+	"01010" => 10,
+	"01110" => 11,
+	"11000" => 12,
+	"11100" => 13,
+	"11010" => 14,
+	"11110" => 15,
+	"00001" => 16,
+	"00101" => 17,
+	"00011" => 18,
+	"00111" => 19,
+	"10001" => 20,
+	"10101" => 21,
+	"10011" => 22,
+	"10111" => 23,
+	"01001" => 24,
+	"01101" => 25,
+	"01011" => 26,
+	"01111" => 27,
+	"11001" => 28,
+	"11101" => 29,
+	"11011" => 30,
+	"11111" => 31,
 );
 
 $cmd = "/usr/bin/scontrol";
@@ -206,6 +247,76 @@ foreach $jobid ( sort( keys(%jobs) ) ) {
         &get_state( $jobs{$jobid}{JobState}, $jobs{$jobid}{Reason} );
 }
 
+# add job step details
+foreach $jobid ( sort( keys(%jobs) ) ) {
+	open( IN, "$cmd show step " . $jobid . " |" );
+	%steps = ();
+	my $stepid   = "-";
+	$lastkey = "-";
+	$pair = "";
+	while ( $line = <IN> ) {
+    	chomp($line);
+    	if ( $line =~ /Job step .* not found/ ) {
+        	last;
+    	}
+	    if ( $line =~ /^StepId=([\w]+\.[\w]+).*$/ ) {
+    	    $stepid = $1;
+        	$steps{$stepid}{StepId} = $stepid;
+    	}
+    	if ( $line =~ /^$/ ) {
+        	$steps{$stepid}{$lastkey} .= $line;
+    	}
+    	else {
+        	$line =~ s/^\s+//;
+        	@pairs = split( /\s+/, $line );
+        	# For Clusters - get list of nodes and CPUs
+        	if ( $pairs[0] =~ /^NodeList=.*/ ) {
+        		$value = substr( $pairs[0], 9 );
+        		if ( $value ne "(null)" ) {
+        	   		$steps{$stepid}{NodeList} = &expand_node_list( substr( $pairs[0], 9 ) );
+        		}
+        	} 
+        	elsif ( $pairs[0] =~ /^Nodes=.*/ ) {
+        		@nodes = split( / /, &expand_node_list( substr( $pairs[0], 6 ) ) );
+        		foreach $pair (@pairs[1,-1]) {
+        			( $key, $value ) = split( /=/, $pair );
+        			if ( $key eq "CPU_IDs") {
+        				foreach $node (@nodes) {
+                        	$steps{$stepid}{$node} = $value;
+        				}
+        			}
+        		}
+        	}
+        	else {
+            	foreach $pair (@pairs) {
+                	( $key, $value ) = split( /=/, $pair );
+                	$lastkey = $key;
+                	if ( $value ne "(null)" ) {
+                    	$steps{$stepid}{$key} = $value;
+                	}
+            	}
+       		}
+    	}
+	}
+	close(IN);
+	
+	if ( keys( %steps ) > 1 ) {
+		# Have job steps so create copies of original job details for each step
+		# and modify each for step details
+		foreach $stepid ( sort( keys( %steps ) ) ) {
+			foreach $key ( sort( keys( % {$jobs{$jobid} } ) ) ) {
+				$jobs{$stepid}{$key} = $jobs{$jobid}{$key};
+			}
+			$jobs{$stepid}{JobId} = $stepid;
+			$jobs{$stepid}{StartTime} = $steps{$stepid}{StartTime};
+			$jobs{$stepid}{MidplaneList} = $steps{$stepid}{MidplaneList};
+			$jobs{$stepid}{Command} = $steps{$stepid}{Name};					
+		}
+		# Remove original parent job details
+		delete $jobs{$jobid};
+	}
+}
+
 # Get details of nodes
 &generate_bgnode_list();
 
@@ -239,13 +350,7 @@ foreach $jobid ( sort( keys(%jobs) ) ) {
             }
         }
         else {
-        	#if ( exists( $jobs{$jobid}{NodeList}{$key} ) ) {
-        	   # Found $key in node list - this value defines CPUs allocated for node
-        	   # Do nothing as already handled by "modify" routine for "nodelist" above
-        	#}
-        	#else {
-                $notfoundkeys{$key}++;
-        	#}
+            $notfoundkeys{$key}++;
         }
     }
     printf( OUT "</info>\n" );
@@ -265,7 +370,7 @@ sub get_state {
     my ( $state, $detailed_state );
 
     $state = "UNDETERMINED";
-    $detailed_state = "";
+    $detailed_state = "QUEUED_ACTIVE";
 
     if ( $job_state eq "PENDING" || $job_state eq "SUSPENDED" ) {
         $state = "SUBMITTED";
@@ -274,19 +379,23 @@ sub get_state {
     }
     if ( $job_state eq "CONFIGURING" ) {
         $state = "SUBMITTED";
-        $detailed_state = "";
     }
     if ( $job_state eq "RUNNING" || $job_state eq "COMPLETING" ) {
         $state = "RUNNING";
-        $detailed_state = "";
     }
-    if ( $job_state eq "COMPLETED"
-        || $job_state eq "CANCELLED"
-        || $job_state eq "FAILED"
+    if ( $job_state eq "COMPLETED" ) {
+        $state = "COMPLETED";
+        $detailed_state = "JOB_OUTERR_READY";
+    }
+    if ( $job_state eq "CANCELLED" ) {
+        $state = "COMPLETED";
+        $detailed_state = "CANCELED";
+    }    
+    if ( $job_state eq "FAILED"
         || $job_state eq "NODE_FAIL"
         || $job_state eq "TIMEOUT" ) {
         $state = "COMPLETED";
-        $detailed_state = "JOB_OUTERR_READY";
+        $detailed_state = "FAILED";
     }
 
     return ( $state, $detailed_state );
@@ -313,7 +422,7 @@ sub modify {
         $ret = "Failed"    if ( $value eq "TIMEOUT" );
     }
 
-    if ( $mkey eq "wall" ) {
+    if ( $mkey eq "wall" || $mkey eq "runtime" ) {
         if ( $value =~ /\($patint seconds\)/ ) {
             $ret = $1;
         }
@@ -339,8 +448,11 @@ sub modify {
 
     if ( $mkey eq "nodelist" ) {
         if ( $ret ne "-" ) {
-        	if ( $bgp eq "true" || $bgq eq "true" ) {
-                $ret = &get_bgnode_list($ret);
+        	if ( $bgp eq "true" ) {
+                $ret = &get_bgpnode_list($ret);
+        	}
+        	elsif ( $bgq eq "true" ) {
+                $ret = &get_bgqnode_list($ret);
         	}
         	else {
         		$ret = &get_node_list($jobid, $ret);
@@ -425,6 +537,7 @@ sub generate_bgnode_list() {
     $numpsets = 0;
     $bgp = "false";
     $bgq = "false";
+    $subblockjobs = "false";
     my $nodespermidplane = 0;
     my $nodespernodecard = 0;
     while ( $line = <IN> ) {
@@ -446,6 +559,9 @@ sub generate_bgnode_list() {
         elsif ( $line =~ /^Bluegene\/Q configuration$/ ) {
             $bgq = "true";
         }
+        elsif ( $line =~ /^AllowSubBlockAllocations\s+=\s+Yes$/ ) {
+        	$subblockjobs = "true";
+        }
     }
     close(IN);
 
@@ -455,7 +571,7 @@ sub generate_bgnode_list() {
 
         # Count Blue Gene midplanes
         my $name = "";
-        my ( $y, $z, $maxy, $maxz );
+        my ( $y, $z, $maxy, $maxz, $rmd, $row, $rack, $mid );
         $maxy = 0;
         $maxz = 0;
         while ( $line = <IN> ) {
@@ -463,8 +579,18 @@ sub generate_bgnode_list() {
             if ( $line =~ /^NodeName=([\w]+).*$/ ) {
                 $name = $1;
                 $midplanes{$name}{NodeName} = $name;
-                $y = substr $name, -2, 1;
-                $z = substr $name, -1, 1;
+        		if ( $bgq eq "true" && $line =~ /.*RackMidplane=([\w]+-[\w]+).*$/ ) {
+        			$rmd = $1;
+        			$rmd =~ /R(\d)(\d)-M(\d)/s;
+        			( $row, $rack, $mid ) = ( $1, $2, $3 );
+        			$midplanes{$name}{RackMidplane} = sprintf( "R%02d%02d-M%01d", $row, $rack, $mid );
+        			$y = $rack;
+        			$z = $mid;
+        		}
+        		else {
+                	$y = substr $name, -2, 1;
+                	$z = substr $name, -1, 1;
+        		}
                 $y = 10 + ( ord($y) - ord('A') ) if ( $y =~ /[A-Z]/ );
                 $z = 10 + ( ord($z) - ord('A') ) if ( $y =~ /[A-Z]/ );
                 $maxy = $y if ( $y > $maxy );
@@ -487,20 +613,15 @@ sub generate_bgnode_list() {
             $nodecardspermidplane = $numpsets;
         }
 
-        my $row = 0;
-        my $rack = 0;
-        my $mid = 0;
+        $row = 0;
+        $rack = 0;
+        $mid = 0;
         my $nodecard = 0;
         my $nodeid = "";
         my $midplane = "";
         foreach $midplane ( sort( keys(%midplanes) ) ) {
             for ( $nodecard = 0 ; $nodecard < $nodecardspermidplane ; $nodecard++ ) {
-                if ( $bgp eq "true" ) {
-                    $nodeid = sprintf( "R%01d%01d-M%01d-N%02d", $row, $rack, $mid, $nodecard );
-                }
-                if ( $bgq eq "true" ) {
-                    $nodeid = sprintf( "R%02d%02d-M%01d-N%02d", $row, $rack, $mid, $nodecard );
-                }
+                $nodeid = sprintf( "R%02d%02d-M%01d-N%02d", $row, $rack, $mid, $nodecard );
                 $nodenr{$midplane}[$nodecard] = $nodeid;
             }
             $mid++;
@@ -516,7 +637,7 @@ sub generate_bgnode_list() {
     }
 }
 
-sub get_bgnode_list {
+sub get_bgpnode_list {
     my ( $nodes ) = @_;
     my ( $ret, $prefix, $suffix, $n );
 
@@ -529,22 +650,13 @@ sub get_bgnode_list {
         }
     }
     elsif ( exists $midplanes{$prefix} ) {
-        # sub-block partition
-        my ( $n, $n1, $n2, $cnr1, $cnr2 );
+        # sub-midplane partition
+        my ( $n1, $n2 );
         $n1 = 0;
         $n2 = 0;
-        if ( $bgq eq "true" ) {
-            ( $cnr1, $cnr2 ) = split( /x/, $suffix );
-            #$n1 = $startnc{$cnr1};
-            #$n2 = $endnc{$cnr2};
-            $n1 = &floor_nc( $cnr1 );
-            $n2 = &ceil_nc( $cnr2 );
-        }
-        elsif ( $bgp eq "true" ) {
-            ( $n1, $n2 ) = split( /-/, $suffix );
-        }
+        ( $n1, $n2 ) = split( /-/, $suffix );
         $n2 = $n1 if ( $n2 == 0 );
-        if ( ( $bgp eq "true" ) && ( $nodecardspermidplane > $numpsets ) ) {
+        if ( $nodecardspermidplane > $numpsets ) {
             my $factor = $nodecardspermidplane / $numpsets;
             $n1 *= $factor;
             $n2 = ( ( $n2 + 1 ) * $factor ) - 1;
@@ -555,29 +667,111 @@ sub get_bgnode_list {
     }
     else {
         # more than one midplane
-        my ( $cnr1, $cnr2, @dim1, @dim2, $i, $j, $k, $l, $midplane );
+        my ( $mdlist, $cnr1, $cnr2, @dim1, @dim2, $i, $j, $k, $midplane );
+        foreach $mdlist ( split( /,/, $suffix ) ) {
+            ( $cnr1, $cnr2 ) = split( /x/, $mdlist );
+            for ( $i = 0 ; $i < length($cnr1) ; $i++ ) {
+                $dim1[$i] = substr( $cnr1, $i, 1 );
+            }
+            for ( $i = 0 ; $i < length($cnr2) ; $i++ ) {
+                $dim2[$i] = substr( $cnr2, $i, 1 );
+            }
+            for ( $i = $dim1[0] ; $i <= $dim2[0] ; $i++ ) {
+                for ( $j = $dim1[1] ; $j <= $dim2[1] ; $j++ ) {
+                    for ( $k = $dim1[2] ; $k <= $dim2[2] ; $k++ ) {
+                        $midplane = $prefix . $i . $j . $k;
+                        for ( $n = 0 ; $n < $nodecardspermidplane ; $n++ ) {
+                            $ret .= "," . $nodenr{$midplane}[$n];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return ( substr( $ret, 1 ) );
+}
+
+sub get_bgqnode_list {
+    my ( $nodes ) = @_;
+    my ( $ret, $prefix, $suffix, $n );
+
+    ( $prefix, $suffix ) = split( /\[(.*)\]/, $nodes );
+
+    if ( $prefix eq $nodes ) {
+        # single midplane
+        for ( $n = 0 ; $n < $nodecardspermidplane ; $n++ ) {
+            $ret .= "," . $nodenr{$prefix}[$n];
+        }
+    }
+    elsif ( exists $midplanes{$prefix} ) {
+        # sub-midplane partition
+        my ( $n1, $n2, $cnr1, $cnr2, $startcnr, $endcnr );
+        $n1 = 0;
+        $n2 = 0;
+        $cnr1 = "";
+        $cnr2 = "";
         ( $cnr1, $cnr2 ) = split( /x/, $suffix );
-        for ( $i = 0 ; $i < length($cnr1) ; $i++ ) {
-            $dim1[$i] = substr( $cnr1, $i, 1 );
+        $cnr2 = $cnr1 if ( $cnr2 eq "" );
+        $startcnr = &floor_nc( $cnr1 );
+        $endcnr = &ceil_nc( $cnr2 );
+        $n1 = $startnc{$startcnr};
+        $n2 = $endnc{$endcnr};
+        $n2 = $n1 if ( $n2 == 0 );
+        #print "cnr1=" . $cnr1 . " cnr2=" . $cnr2 . " startcnr=" . $startcnr . " endcnr=" . $endcnr . " n1=" . $n1 . " n2=" . $n2 . "\n";
+        if ( $subblockjobs eq "true" ) {
+        	my ( $geom, $a, $x, $y, $z, $e, $adim, $xdim, $ydim, $zdim, $edim, $c, $cc, $snc, $nc );
+        	$geom = sprintf( "%05d", $cnr2 - $cnr1 );
+        	$geom =~ /(\d)(\d)(\d)(\d)(\d)/s;
+        	# Column order of Geometry is A-X-Y-Z-E
+			# Increment order is Y-Z-A-X-E
+        	( $a, $x, $y, $z, $e ) = ( $1, $2, $3, $4, $5 );
+        	#print "geom=" . $geom . " a=" . $a . " x=" . $x . " y=" . $y . " z=" . $z . " e=" . $e . "\n";
+        	for ( $edim = 0; $edim <= $e; $edim++ ) {
+        		for ( $xdim = 0; $xdim <= $x; $xdim++ ) {
+        			for ( $adim = 0; $adim <= $a; $adim++ ) {
+        				for ( $zdim = 0; $zdim <= $z; $zdim++ ) {
+        					for ( $ydim = 0; $ydim <= $y; $ydim++ ) {
+        						$c = sprintf( "%05d", $cnr1 + ( $adim . $xdim . $ydim . $zdim . $edim ) );
+        						$snc = &floor_nc( $c );
+        						$cc = $computecard{sprintf( "%05d", $c - $snc)};
+        						$nc = $startnc{$snc};
+        						#print "nc=" . $nc . " snc=" . $snc . " c=" . $c . " cc=" . $cc . "\n";
+        						$ret .= "," . $nodenr{$prefix}[$nc] . sprintf( "-C%02d", $cc );        						
+        					}
+        				}
+        			}
+        		}
+        	}
         }
-        for ( $i = 0 ; $i < length($cnr2) ; $i++ ) {
-            $dim2[$i] = substr( $cnr2, $i, 1 );
+        else {
+        	# Whole nodecard partition
+        	for ( $n = $n1 ; $n <= $n2 ; $n++ ) {
+        		$ret .= "," . $nodenr{$prefix}[$n];
+        	}
         }
-        for ( $i = $dim1[0] ; $i <= $dim2[0] ; $i++ ) {
-            for ( $j = $dim1[1] ; $j <= $dim2[1] ; $j++ ) {
-                for ( $k = $dim1[2] ; $k <= $dim2[2] ; $k++ ) {
-                    if ( $bgq eq "true" ) {
+    }
+    else {
+        # more than one midplane
+        my ( $mdlist, $cnr1, $cnr2, @dim1, @dim2, $i, $j, $k, $l, $midplane );
+        foreach $mdlist ( split( /,/, $suffix ) ) {
+            ( $cnr1, $cnr2 ) = split( /x/, $mdlist );
+            for ( $i = 0 ; $i < length($cnr1) ; $i++ ) {
+                $dim1[$i] = substr( $cnr1, $i, 1 );
+            }
+            for ( $i = 0 ; $i < length($cnr2) ; $i++ ) {
+                $dim2[$i] = substr( $cnr2, $i, 1 );
+            }
+        	# Column order of midplane dimensions is A-X-Y-Z
+			# Increment order is Z-Y-A-X
+            for ( $i = $dim1[1] ; $i <= $dim2[1] ; $i++ ) {
+                for ( $j = $dim1[0] ; $j <= $dim2[0] ; $j++ ) {
+                    for ( $k = $dim1[2] ; $k <= $dim2[2] ; $k++ ) {
                         for ( $l = $dim1[3] ; $l <= $dim2[3] ; $l++ ) {
                             $midplane = $prefix . $i . $j . $k . $l;
                             for ( $n = 0 ; $n < $nodecardspermidplane ; $n++ ) {
                                 $ret .= "," . $nodenr{$midplane}[$n];
                             }
-                        }
-                    }
-                    elsif ( $bgp eq "true" ) {
-                        $midplane = $prefix . $i . $j . $k;
-                        for ( $n = 0 ; $n < $nodecardspermidplane ; $n++ ) {
-                            $ret .= "," . $nodenr{$midplane}[$n];
                         }
                     }
                 }
@@ -602,13 +796,13 @@ sub floor_nc {
         }
     }
     
-    return ( $startnc{$newnc} );
+    return ( $newnc );
 }
 
 sub ceil_nc {
     my ( $nc ) = @_;
     my ( $i, $n, $newnc );
-    
+
     for ($i = 0; $i < length($nc); $i++ ) {
         $n = substr( $nc, $i, 1 );
         if ( $n == 0 || $n == 2 ) {
@@ -619,5 +813,5 @@ sub ceil_nc {
         }
     }
     
-    return ( $endnc{$newnc} );
+    return ( $newnc );
 }

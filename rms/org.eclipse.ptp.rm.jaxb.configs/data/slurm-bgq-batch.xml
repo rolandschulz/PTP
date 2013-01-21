@@ -319,8 +319,12 @@ job to each node of a pre-existing allocation as one step in a larger job script
             <tooltip><![CDATA[The command line arguments for executable will be the command and 
 arguments of the job step.  If executable is "none", then no prolog will be run.
 This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></attribute>
+        <attribute name="srun.runjobopts" type="string">
+            <description>Options to the runjob command.</description>
+            <tooltip><![CDATA[Options to the runjob command.  For use only on IBM BlueGene/Q systems.]]></tooltip>
+        </attribute>
         
-        <script insertEnvironmentAfter="30" deleteAfterSubmit="true">
+        <script insertEnvironmentAfter="31" deleteAfterSubmit="true">
             <!-- <file-staging-location>${ptp_rm:directory#value}</file-staging-location> -->
             <line>
                 <arg>#!/bin/bash</arg>
@@ -414,6 +418,10 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
             <line>
                 <arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:bgq.reboot#value}</arg>
             </line>
+            <!--  Always set overcommit to allow multiple tasks/threads per core -->
+            <line>
+                <arg>#SBATCH --overcommit</arg>
+            </line>
             <line>
                 <arg># Set srun arguments</arg></line>
             <line>
@@ -430,14 +438,12 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                 <arg resolve="false">SRUN_ARGS="${EPILOG} ${LABEL} ${NTASKS} ${NTASKS_PER_NODE} ${PROLOG}"</arg>
             </line>
             <line>
-                <arg>COMMAND="${ptp_rm:srun.command#value}</arg>
-                <arg resolve="false">${SRUN_ARGS}</arg>
-                <arg resolve="true">${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}"</arg>
-            </line>
-            <line>
                 <arg isUndefinedIfMatches="cd">cd ${ptp_rm:workdir#value}</arg></line>
             <line>
-                <arg resolve="false">${COMMAND}</arg>
+                <arg resolve="true">${ptp_rm:srun.command#value}</arg>
+                <arg resolve="false">${SRUN_ARGS}</arg>
+                <arg resolve="true" isUndefinedIfMatches='--runjob-opts=""'>--runjob-opts="${ptp_rm:srun.runjobopts#value}"</arg>
+                <arg resolve="true">${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</arg>
             </line>
         </script>
         <start-up-command name="get-queues">
@@ -576,11 +582,6 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                             <entry value="SYSTEM_SUSPENDED" />
                         </set>
                         </test>
-                        
-                        
-                        
-                        
-                        
                     </test>
                     <test op="EQ">
                         <value>#value</value>
@@ -665,9 +666,8 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
         <release-job name="release" ignoreExitStatus="true">
             <arg>scontrol</arg>
             <arg>release</arg>
-            <arg>${ptp_rm:@jobId#name}</arg></release-job>
-        
-        
+            <arg>${ptp_rm:@jobId#name}</arg>
+        </release-job>        
         <launch-tab>
             <dynamic>
                 <title>Basic Settings</title>
@@ -866,6 +866,25 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                             <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                         </layout-data>
                         <fixed-text>${ptp_rm:srun.ntasks_per_node#description}</fixed-text>
+                    </widget>
+                    <!--row 9 -->
+                    <widget type="label" style="SWT.LEFT">
+                        <layout-data>
+                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                        </layout-data>
+                        <tooltip>${ptp_rm:srun.runjobopts#tooltip}</tooltip>
+                        <fixed-text>Runjob options:</fixed-text>
+                    </widget>
+                    <widget type="text" style="SWT.BORDER" attribute="srun.runjobopts">
+                        <layout-data>
+                            <grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+                        </layout-data>
+                    </widget>
+                    <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+                        <layout-data>
+                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+                        </layout-data>
+                        <fixed-text>${ptp_rm:srun.runjobopts#description}</fixed-text>
                     </widget>
                 </composite>
             </dynamic>
