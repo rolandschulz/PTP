@@ -18,7 +18,7 @@
 		<profile>
 			<id>production</id>
 			<properties>
-				<ptp-install>/home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-nightly</ptp-install>
+				<ptp-install>/home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-release</ptp-install>
 			</properties>
 			<build>
 				<plugins>

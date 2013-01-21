@@ -24,7 +24,7 @@
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/nightly</cdt-site>	
 		<egit-version>nightly</egit-version>
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
-		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-photran-nightly</photran-site>
+		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-photran-release</photran-site>
 	</properties>
 	
 	<licenses>
