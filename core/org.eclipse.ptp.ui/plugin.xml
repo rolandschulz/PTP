@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-	<extension-point id="rmConfigurationWizards" name="Resource Manager Configuration Wizards" schema="schema/rmConfigurationWizards.exsd"/>
- <extension-point id="rmConfigurationSelections" name="Resource Manager Selection Extensions" schema="schema/rmConfigurationSelections.exsd"/>
- <extension-point id="runtimeModelPresentations" name="Runtime Model Presentations" schema="schema/runtimeModelPresentations.exsd"/>
-	
-
 	<!-- create preference page //-->
 	<extension
 		point="org.eclipse.ui.preferencePages">
@@ -14,14 +9,6 @@
 			class="org.eclipse.ptp.ui.preferences.PTPPreferencesPage"
 			id="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
 		</page>
-		<!--      
-		<page
-			name="%SimulationpreferencePage.name"
-			class="org.eclipse.ptp.ui.preferences.SimulationPreferencesPage"
-			id="org.eclipse.ptp.ui.preferences.simulationPreferencesPage"
-			category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
-		</page>
-		-->
 	</extension>
 	<extension
 		point="org.eclipse.core.runtime.preferences">
@@ -31,19 +18,18 @@
 	</extension>
    
 	<!-- add buttons to editor action toolbar //-->
- <extension
-       point="org.eclipse.core.runtime.adapters">
-    <factory
-          adaptableType="org.eclipse.ptp.core.jobs.IJobStatus"
-          class="org.eclipse.ptp.internal.ui.adapters.WorkbenchAdapterAdapterFactory">
-       <adapter
-             type="org.eclipse.ui.model.IWorkbenchAdapter">
-       </adapter>
-       <adapter
-             type="org.eclipse.ui.model.IWorkbenchAdapter2">
-       </adapter>
-    </factory>
- </extension>
-
+	<extension
+	   point="org.eclipse.core.runtime.adapters">
+		<factory
+			adaptableType="org.eclipse.ptp.core.jobs.IJobStatus"
+			class="org.eclipse.ptp.internal.ui.adapters.WorkbenchAdapterAdapterFactory">
+			<adapter
+				type="org.eclipse.ui.model.IWorkbenchAdapter">
+			</adapter>
+			<adapter
+				type="org.eclipse.ui.model.IWorkbenchAdapter2">
+		   	</adapter>
+		</factory>
+	</extension>
 
 </plugin>

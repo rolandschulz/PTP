@@ -283,19 +283,6 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Test if the current perspective is one supplied by PTP
-	 * 
-	 * @return true if the current perspective is supplied by PTP
-	 */
-	public static boolean isPTPPerspective() {
-		String curID = getCurrentPerspectiveID();
-		if (curID == null) {
-			return false;
-		}
-		return (curID.equals(IPTPUIConstants.PERSPECTIVE_RUN) || curID.equals(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG));
-	}
-
-	/**
 	 * Log
 	 * 
 	 * @param status
@@ -343,6 +330,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		}
 		return list;
 	}
+
 	// Resource bundle.
 	private ResourceBundle resourceBundle;
 
@@ -434,9 +422,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(PLUGIN_ID,
 				PDEBUGGERCONFIGURATION_EXTENSION_POINT_ID);
 		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
-		for (int i = 0; i < infos.length; i++) {
-			String id = infos[i].getAttribute(DEBUGGERID_ELEMENT);
-			fDebuggerPageMap.put(id, infos[i]);
+		for (IConfigurationElement info : infos) {
+			String id = info.getAttribute(DEBUGGERID_ELEMENT);
+			fDebuggerPageMap.put(id, info);
 		}
 	}
 

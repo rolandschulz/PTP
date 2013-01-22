@@ -19,15 +19,7 @@
 
 package org.eclipse.ptp.ui;
 
-import java.util.HashMap;
-
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.utils.DebugUtil;
@@ -133,7 +125,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	}
 
 	// Resource bundle.
-	private final HashMap<String, IRuntimeModelPresentation> runtimeModelPresentations = new HashMap<String, IRuntimeModelPresentation>();
 	private IJobManager jobManager = null;
 
 	public PTPUIPlugin() {
@@ -153,17 +144,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		return jobManager;
 	}
 
-	/**
-	 * Get the runtime model presentation for the given resource manager
-	 * 
-	 * @param id
-	 *            resource manager ID
-	 * @return runtime model presentation
-	 */
-	public IRuntimeModelPresentation getRuntimeModelPresentation(String id) {
-		return runtimeModelPresentations.get(id);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -175,7 +155,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		DebugUtil.configurePluginDebugOptions();
-		retrieveRuntimeModelPresentations();
 	}
 
 	/*
@@ -191,30 +170,5 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		getJobManager().shutdown();
 		jobManager = null;
 		plugin = null;
-	}
-
-	/**
-	 * Locate and load runtime model presentation extensions
-	 */
-	private void retrieveRuntimeModelPresentations() {
-		runtimeModelPresentations.clear();
-
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extWizardPoint = registry.getExtensionPoint(PLUGIN_ID, RUNTIME_MODEL_PRESENTATION_EXTENSION_POINT_ID);
-		final IExtension[] extWizardExtensions = extWizardPoint.getExtensions();
-
-		for (IExtension ext : extWizardExtensions) {
-			final IConfigurationElement[] elements = ext.getConfigurationElements();
-
-			for (IConfigurationElement ce : elements) {
-				try {
-					IRuntimeModelPresentation presentation = (IRuntimeModelPresentation) ce.createExecutableExtension("class"); //$NON-NLS-1$
-					String id = ce.getAttribute("id"); //$NON-NLS-1$
-					runtimeModelPresentations.put(id, presentation);
-				} catch (CoreException e) {
-					log(e);
-				}
-			}
-		}
 	}
 }
