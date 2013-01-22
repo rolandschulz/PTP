@@ -138,6 +138,10 @@
             type="LL_BG">
       </monitor>
       <monitor
+            name="IBM Platform LSF"
+            type="LSF">
+      </monitor>
+      <monitor
             name="Open MPI"
             type="OPENMPI">
       </monitor>
