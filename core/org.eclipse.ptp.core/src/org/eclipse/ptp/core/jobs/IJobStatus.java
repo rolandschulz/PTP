@@ -138,7 +138,7 @@ public interface IJobStatus {
 	/**
 	 * Get job state. This is the primary state of the job, and is one of UNDETERMINED, SUBMITTED, RUNNING, SUSPENDED or COMPLETED.
 	 * 
-	 * Note that UNDERTERMINED will only be returned if no other valid job state has been reach. Implementations MUST return the
+	 * Note that UNDETERMINED will only be returned if no other valid job state has been reach. Implementations MUST return the
 	 * last valid job state if one is available.
 	 * 
 	 * @return state of the job

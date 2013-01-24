@@ -100,7 +100,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Wait for job to begin running, then perform post launch operations. The job is guaranteed not to be in the UNDERTERMINED
+	 * Wait for job to begin running, then perform post launch operations. The job is guaranteed not to be in the UNDETERMINED
 	 * state.
 	 * 
 	 * <pre>
