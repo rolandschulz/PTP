@@ -35,19 +35,14 @@ public class PJobWorkbenchAdapter extends WorkbenchAdapter {
 	public ImageDescriptor getImageDescriptor(Object object) {
 		IJobStatus job = (IJobStatus) object;
 		int state = 0;
-		switch (job.getState()) {
-		case IJobStatus.SUBMITTED:
+		if (job.getState() == IJobStatus.SUBMITTED) {
 			state = 0;
-			break;
-		case IJobStatus.RUNNING:
+		} else if (job.getState() == IJobStatus.RUNNING) {
 			state = 1;
-			break;
-		case IJobStatus.SUSPENDED:
+		} else if (job.getState() == IJobStatus.SUSPENDED) {
 			state = 2;
-			break;
-		case IJobStatus.COMPLETED:
+		} else if (job.getState() == IJobStatus.COMPLETED) {
 			state = 3;
-			break;
 		}
 		return new ImageImageDescriptor(ParallelImages.jobImages[state][job.getLaunch().getLaunchMode()
 				.equals(ILaunchManager.DEBUG_MODE) ? 1 : 0]);

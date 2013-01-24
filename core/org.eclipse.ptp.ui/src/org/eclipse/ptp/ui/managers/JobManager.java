@@ -163,12 +163,14 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 		if (job != null) {
 			IPJobStatus pJob = (IPJobStatus) job.getAdapter(IPJobStatus.class);
 			if (pJob != null) {
-				switch (pJob.getProcessState(index)) {
-				case IPJobStatus.RUNNING:
+				String state = pJob.getProcessState(index);
+				if (state == IPJobStatus.RUNNING) {
 					return ParallelImages.procImages[1][isSelected ? 1 : 0];
-				case IPJobStatus.SUSPENDED:
+				}
+				if (state == IPJobStatus.SUSPENDED) {
 					return ParallelImages.procImages[2][isSelected ? 1 : 0];
-				case IPJobStatus.COMPLETED:
+				}
+				if (state == IPJobStatus.COMPLETED) {
 					return ParallelImages.procImages[3][isSelected ? 1 : 0];
 				}
 			}
