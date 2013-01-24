@@ -768,7 +768,7 @@ sub get_bgqnode_list {
                 for ( $j = $dim1[0] ; $j <= $dim2[0] ; $j++ ) {
                     for ( $k = $dim1[2] ; $k <= $dim2[2] ; $k++ ) {
                         for ( $l = $dim1[3] ; $l <= $dim2[3] ; $l++ ) {
-                            $midplane = $prefix . $i . $j . $k . $l;
+                            $midplane = $prefix . $j . $i . $k . $l;
                             for ( $n = 0 ; $n < $nodecardspermidplane ; $n++ ) {
                                 $ret .= "," . $nodenr{$midplane}[$n];
                             }
