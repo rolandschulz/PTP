@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2012 QNX Software Systems and others.
+ * Copyright (c) 2006, 2013 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ package org.eclipse.ptp.internal.rdt.ui.search;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
@@ -33,8 +32,8 @@ import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.Keywords;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
-import org.eclipse.cdt.internal.ui.search.CSearchUtil;
 import org.eclipse.cdt.internal.ui.search.CSearchPatternQuery;
+import org.eclipse.cdt.internal.ui.search.CSearchUtil;
 import org.eclipse.cdt.internal.ui.util.Messages;
 import org.eclipse.cdt.internal.ui.util.RowLayouter;
 import org.eclipse.cdt.ui.CUIPlugin;
@@ -214,7 +213,93 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 	    String patternStr = patternCombo.getText();
 
 	    // Get search flags
-	    int searchFlags = 0;
+	    int searchFlags = getSearchFlags();
+	    
+		// get the list of elements for the scope
+		Set<ICElement> elements = new HashSet<ICElement>();
+		String scopeDescription = getScopeDescriptionFromElements(elements);
+		
+		// get scope
+		ICElement[] scope = elements.isEmpty() ? null : elements.toArray(new ICElement[elements.size()]);
+		
+		try {
+			List<ISearchQuery> jobs = new ArrayList<ISearchQuery>();
+			Set<String> visitedHost = new HashSet<String>();
+			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+			
+			for (IProject project : projects) {
+				try {
+					if (project.isOpen() && project.hasNature(RemoteNature.REMOTE_NATURE_ID)) {
+						String hostName = new Scope(project).getHost();
+						if (visitedHost.contains(hostName)) {
+							continue;
+						}
+						
+						visitedHost.add(hostName);
+						
+						// get remote index service for a qualified project
+						IServiceModelManager smm = ServiceModelManager.getInstance();
+						IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
+						IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
+						IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
+						if (!(serviceProvider instanceof IIndexServiceProvider2)) {
+							return false;
+						}
+						ISearchService service = ((IIndexServiceProvider2) serviceProvider).getSearchService();
+						
+						// create a query job and add it into job queue
+						ISearchQuery job = service.createSearchPatternQuery(Scope.WORKSPACE_ROOT_SCOPE, scope, scopeDescription, patternStr, isCaseSensitive, searchFlags);
+						jobs.add(job);
+					}
+				} catch (CoreException e) {
+					UIPlugin.log(e);
+				}
+			}
+			
+			if (jobs.size() == 0) {
+				return false;
+			}
+			
+			// create a query adapter including multiple queries and pass that adapter to Eclipse Search framework.
+			ISearchQuery bigJob = new GroupRemoteSearchQueryAdapter(jobs);
+			NewSearchUI.activateSearchResultView();
+			NewSearchUI.runQueryInBackground(bigJob);
+		} catch (PatternSyntaxException e) {
+			fLineManager.setErrorMessage(CSearchMessages.PDOMSearch_query_pattern_error); 
+			return false;
+		}
+
+		// Save our settings
+		IDialogSettings settings = getDialogSettings();
+		settings.put(STORE_CASE_SENSITIVE, isCaseSensitive);
+		
+		if (previousPatterns == null)
+			previousPatterns = new String[] { patternStr };
+		else {
+			// Add only if we don't have it already
+			boolean addit = true;
+			for (int i = 0; i < previousPatterns.length; ++i) {
+				if (patternStr.equals(previousPatterns[i])) {
+					addit = false;
+					break;
+				}
+			}
+			if (addit) {
+				// Insert it into the beginning of the list
+				String[] newPatterns = new String[previousPatterns.length + 1];
+				System.arraycopy(previousPatterns, 0, newPatterns, 1, previousPatterns.length);
+				newPatterns[0] = patternStr;
+				previousPatterns = newPatterns;
+			}
+		}
+
+		settings.put(STORE_PREVIOUS_PATTERNS, previousPatterns);
+		settings.put(STORE_SEARCH_FLAGS, searchFlags);
+		return true;
+	}
+
+	private int getSearchFlags() {
+		int searchFlags = 0;
 	    if (searchForButtons[searchAllButtonIndex].getSelection())
 	    	searchFlags |= CSearchPatternQuery.FIND_ALL_TYPES;
 	    else {
@@ -227,9 +312,15 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 	    	if (limitToButtons[i].getSelection())
     			searchFlags |= ((Integer)limitToButtons[i].getData()).intValue();
 	    }
-	    
-		// get the list of elements for the scope
-		Set<ICElement> elements = new HashSet<ICElement>();
+		return searchFlags;
+	}
+
+	/**
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	private String getScopeDescriptionFromElements(Set<ICElement> elements) {
 		String scopeDescription = ""; //$NON-NLS-1$
 		switch (getContainer().getSelectedScope()) {
 		case ISearchPageContainer.SELECTED_PROJECTS_SCOPE:
@@ -303,78 +394,7 @@ public class RemoteSearchPage extends DialogPage implements ISearchPage {
 			}
 			break;
 		}
-		
-		ICElement[] scope = elements.isEmpty() ?
-				null : elements.toArray(new ICElement[elements.size()]);
-		
-		
-		try {
-			// TODO: Where are we going to find an IProject when doing a global search?
-			IProject project = null;
-			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-			for (IProject p : projects) {
-				try {
-					if (p.isOpen() && p.hasNature(RemoteNature.REMOTE_NATURE_ID)) {
-						project = p;
-					}
-				} catch (CoreException e) {
-					CUIPlugin.log(e);
-				}
-			}
-			if (project == null) {
-				return false;
-			}
-			
-			IServiceModelManager smm = ServiceModelManager.getInstance();
-			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
-
-			IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
-
-			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
-
-			if (!(serviceProvider instanceof IIndexServiceProvider2)) {
-				return false;
-			}
-			ISearchService service = ((IIndexServiceProvider2) serviceProvider).getSearchService();
-			ISearchQuery job = service.createSearchPatternQuery(Scope.WORKSPACE_ROOT_SCOPE, scope, scopeDescription, patternStr, isCaseSensitive, searchFlags);
-
-			NewSearchUI.activateSearchResultView();
-		
-			NewSearchUI.runQueryInBackground(job);
-		} catch (PatternSyntaxException e) {
-			fLineManager.setErrorMessage(CSearchMessages.PDOMSearch_query_pattern_error); 
-			return false;
-		}
-
-		// Save our settings
-		IDialogSettings settings = getDialogSettings();
-		settings.put(STORE_CASE_SENSITIVE, isCaseSensitive);
-		
-		if (previousPatterns == null)
-			previousPatterns = new String[] { patternStr };
-		else {
-			// Add only if we don't have it already
-			boolean addit = true;
-			for (int i = 0; i < previousPatterns.length; ++i) {
-				if (patternStr.equals(previousPatterns[i])) {
-					addit = false;
-					break;
-				}
-			}
-			if (addit) {
-				// Insert it into the beginning of the list
-				String[] newPatterns = new String[previousPatterns.length + 1];
-				System.arraycopy(previousPatterns, 0, newPatterns, 1, previousPatterns.length);
-				newPatterns[0] = patternStr;
-				previousPatterns = newPatterns;
-			}
-		}
-
-		settings.put(STORE_PREVIOUS_PATTERNS, previousPatterns);
-		
-		settings.put(STORE_SEARCH_FLAGS, searchFlags);
-
-		return true;
+		return scopeDescription;
 	}
 
 	public void createControl(Composite parent) {
