@@ -325,7 +325,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
         </attribute>
         
         <script insertEnvironmentAfter="31" deleteAfterSubmit="true">
-            <!-- <file-staging-location>${ptp_rm:directory#value}</file-staging-location> -->
+            <file-staging-location>${ptp_rm:directory#value}</file-staging-location>
             <line>
                 <arg>#!/bin/bash</arg>
             </line>
