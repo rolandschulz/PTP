@@ -105,7 +105,7 @@ public class NewRemoteSyncProjectWizardOperation {
 		// Create a local build scenario
 		BuildScenario localBuildScenario = null;
 		try {
-			localBuildScenario = bcm.createLocalBuildScenario(project);
+			localBuildScenario = bcm.createLocalBuildScenario();
 		} catch (CoreException e) {
 			// TODO: What to do here?
 		}

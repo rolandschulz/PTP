@@ -175,6 +175,22 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		fConfigBeforeSwitch = getCfg();
 		this.setValues(getCfg());
 		fWidgetsReady = true;
+		
+		// Setup local settings for non-remote configurations
+		try {
+			IProject project = fConfigBeforeSwitch.getOwner().getProject();
+			BuildScenario bs = BuildConfigurationManager.getInstance().createLocalBuildScenario();
+			fLocalSettings.connection = bs.getRemoteConnection();
+			fLocalSettings.remoteProvider = bs.getRemoteProvider();
+			fLocalSettings.rootLocation = bs.getLocation(project);
+			fLocalSettings.syncProvider = bs.getSyncProvider();
+			fLocalSettings.syncProviderPath = bs.getSyncProviderPath();
+		} catch (CoreException e) {
+			// TODO What to do here?
+			RDTSyncUIPlugin.log(Messages.BuildRemotePropertiesPage_17, e);
+		} catch (MissingConnectionException e) {
+			// nothing to do
+		}
 	}
 
 	/**
@@ -192,7 +208,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			}
 			// Don't forget to save changes made to the current configuration before proceeding
 			this.storeSettings(fConfigBeforeSwitch);
-			IProject project = getProject();
+			IProject project = fConfigBeforeSwitch.getOwner().getProject();
 			for (ICConfigurationDescription desc : getCfgsReadOnly(project)) {
 				IConfiguration config = getCfg(desc);
 				if (config == null || config instanceof MultiConfiguration) {
@@ -210,7 +226,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 							if (settings.syncProvider == null) {
 								bcm.modifyConfigurationAsSyncLocal(config);
 								try {
-									BuildScenario localBuildScenario = bcm.createLocalBuildScenario(project);
+									BuildScenario localBuildScenario = bcm.createLocalBuildScenario();
 									bcm.setBuildScenarioForBuildConfiguration(localBuildScenario, config);
 								} catch (CoreException e) {
 									RDTSyncUIPlugin.log(Messages.BuildRemotePropertiesPage_2, e);
@@ -351,8 +367,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	protected void performApply(ICResourceDescription src, ICResourceDescription dst) {
 		this.performOk();
 	}
-	
-
 
 	/**
 	 * Store the current page values as the settings for the passed configuration
