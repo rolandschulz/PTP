@@ -103,7 +103,7 @@ public class BuildConfigurationManager {
 	 * @throws CoreException
 	 *             on problems getting local resources, either the local connection or local services
 	 */
-	public BuildScenario createLocalBuildScenario(IProject project) throws CoreException {
+	public BuildScenario createLocalBuildScenario() throws CoreException {
 		IRemoteServices localService = PTPRemoteCorePlugin.getDefault().getRemoteServices(
 				"org.eclipse.ptp.remote.LocalServices", null); //$NON-NLS-1$
 
@@ -132,7 +132,7 @@ public class BuildConfigurationManager {
 	public IConfiguration createLocalConfiguration(IProject project, String configName) {
 		checkProject(project);
 		try {
-			BuildScenario localBuildScenario = this.createLocalBuildScenario(project);
+			BuildScenario localBuildScenario = this.createLocalBuildScenario();
 			if (localBuildScenario != null) {
 				return this.createConfiguration(project, localBuildScenario, configName, Messages.BCM_WorkspaceConfigDes);
 			}

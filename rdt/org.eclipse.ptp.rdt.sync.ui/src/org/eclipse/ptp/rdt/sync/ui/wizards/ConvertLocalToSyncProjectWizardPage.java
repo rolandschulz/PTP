@@ -320,7 +320,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 
 			// Initialize project with a local build scenario, which is applied to all configurations
-			bcm.setBuildScenarioForAllBuildConfigurations(project, bcm.createLocalBuildScenario(project));
+			bcm.setBuildScenarioForAllBuildConfigurations(project, bcm.createLocalBuildScenario());
 
 			// Create a remote build scenario
 			ISyncServiceProvider provider = participant.getProvider(project);
