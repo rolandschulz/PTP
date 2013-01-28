@@ -112,6 +112,22 @@
 		be capable of connecting directly to a system-wide (web-based)
 		deployment.
 	</p>
+	
+	<p>
+		The "control" component of the target configuration is associated with a remote connection
+		when the user configures a "Parallel Application" run configuration using the standard Eclipse launch
+		configuration mechanism. This remote connection is the used whenever the control system 
+		needs to send or receive data, such as when running a command, or copying a file.
+	</p>
+	
+	<p>
+		The "monitor" component of the target configuration is associated with a remote connection
+		via the "Monitors" view in the "System Monitoring" perspective. This connection is used for
+		sending and receiving data required to perform the monitoring activities. Note that the
+		"control" and "monitor" component's remote connections are independent, although they can
+		both share the same connection (which is the normal case).
+	</p>
+		
 	<p>
 		<b>The following is a guide to the target system configuration XML
 			definition. Those interested only in using configurations
@@ -782,6 +798,10 @@
 
 	<img alt="Line" src="images/07line-arg.png" />
 
+	<h4>
+		<a name="Arguments">Arguments</a>
+	</h4>
+
 	<p>
 		An
 		<code>arg-type</code>
@@ -1035,19 +1055,22 @@
 	</table>
 	
 	<p>
-		A
-		configuration may only define either a batch or an interactive launch mode. 
-		Each launch mode
+		<b>Note: A
+		configuration may only define either a batch or an interactive launch mode, although
+		each launch mode
 		may have only two submission modes, run and debug.
 		(Future versions may allow batch and interactive to coexist in a single
-		configuration.) 
+		configuration.) </b>
 	</p>
 	
 	<h4>
 		<a name="CommandTypes">Command Type</A>
 	</h4>
-
-	<img alt="CommandType" src="images/08command.jpeg" />
+	<p>
+		A <code>command-type</code> element is used to define a command. 
+	</p>
+	
+	<img alt="CommandType" src="images/08command.png" />
 
 	<p>
 		The following properties are available for a
@@ -1059,6 +1082,14 @@
 			<th>Property</th>
 			<th>Description</th>
 			<th>Default</th>
+		</tr>
+		<tr>
+			<td><i>name</i></td>
+			<td>
+				Specifies
+				a name for the command.
+			</td>
+			<td>N/A</td>
 		</tr>
 		<tr>
 			<td><i>directory</i></td>
@@ -1085,7 +1116,7 @@
 				Specifies
 				the buffer limit for stream readers.
 			</td>
-			<td>BUFSIZ</td>
+			<td>-1 (use system defined)</td>
 		</tr>
 		<tr>
 			<td><i>replaceEnvironment</i></td>
@@ -1141,70 +1172,41 @@
 	</table>
 
 	<p>
-		As <a href="#CommandTypes">previously</a> described, there are two
-		basic types of commands, <b>(uu)id</b> commands which are related to a
-		specific job, and generic (non-uuid) commands.
-		<code>submit-</code>
-		and
-		<code>-job-</code>
-		commands fall into the former category; those in the latter category
-		are usually simple interactive commands, and their output is not
-		redirected to the console, but uuid-commands have several subclasses:
+		Commands that set the <i>waitForId</i> property to true are treated specially. These are
+		job submission commands which produce a job id to replace the internally generated uuid, and
+		are responsible for setting the <i>status</i> property of the @jobId attribute.
 	</p>
 	<br>
 	<table align="CENTER" border="1" cellpadding="5" rules="all">
 		<tr>
 			<th>COMMAND TYPE</th>
-			<th>WAIT FOR ID</th>
 			<th>TOKENIZER STATES</th>
 		</tr>
 		<tr>
 			<td>batch</td>
-			<td>yes</td>
 			<td>SUBMITTED</td>
 		</tr>
 		<tr>
 			<td>interactive</td>
-			<td>no</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>interactive</td>
-			<td>yes</td>
 			<td>RUNNING</td>
 		</tr>
 		<tr>
-			<td>interactive, open</td>
-			<td>no</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>interactive, open</td>
-			<td>yes</td>
-			<td>(SUBMITTED,) RUNNING</td>
-		</tr>
-		<tr>
-			<td>interactive, open, pseudo-terminal</td>
-			<td>no</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>interactive, open, pseudo-terminal</td>
-			<td>yes</td>
-			<td>(SUBMITTED,) RUNNING</td>
+			<td>interactive, keepOpen</td>
+			<td>SUBMITTED, RUNNING</td>
 		</tr>
 	</table>
 	<br>
 	<p>
-		This table shows the various combinations that are feasible between
-		command type and waiting states. Simple interactive commands, whether
-		held open for further input or not, can wait or not wait, but in the
-		case of waiting, they should be provided with a <a
-			href="#StreamParsers">stream tokenizer</a> which recognizes and sets
-		the RUNNING state. Batch jobs, on the other hand, will usually have a
-		tokenizer which recognizes and sets SUBMITTED. In the case of some
-		open-process jobs (e.g.,
-		<code>qsub -I</code>
+		This table shows the various states that must be set depending on
+		whether the command is interactive or batch. Commands that wait for
+		an id must be provided with a <a href="#StreamParsers">stream tokenizer</a> 
+		which recognizes and sets the @jobId state. Batch jobs will usually have a
+		tokenizer which recognizes and sets the state to SUBMITTED when the job is
+		submitted. The monitoring system will normally handle setting the job state
+		to RUNNING (although this may also be done by the get-job-status command.)
+		Interactive jobs, which just run the command as soon as possible,
+		can set the job status directly to RUNNING. In the case of interactive
+		jobs that set keepOpen=true (e.g., <code>qsub -I</code>
 		for PBS, which also requires a pseudo-terminal to connect remotely),
 		there will usually be a pause before the terminal job is actually
 		scheduled. In order to allow the user to see that the job has been
@@ -1213,10 +1215,8 @@
 	</p>
 
 	<p>
-		We have discussed the
-		<code>arg</code>
-		type <a href="#LineArg">above</a>. Note that the command arguments,
-		input and even environment variables make use of this element. For the
+		Command <code>arg</code> elements, the <code>input</code> element, and the <code>environment</code> element all 
+		make use of the <a href="Arguments"><code>arg-type</code></a> type for specifying arguments. For the
 		<code>name-value-pair</code>
 		type comprising the latter one can as simple alternative set the <i>value</i>
 		attribute to a string (which will be resolved first in the current
@@ -1234,28 +1234,54 @@
 		instance, for continuous testing of an interactive job in the same
 		interactive session.
 	</p>
+	
+	<h4>
+		Execution Environment
+	</h4>
+	
+	<p>
+		The <code>environment</code> element allows attribute values to be passed to the command's environment
+		prior to execution. 
+	</p>
+
+	<img alt="EnvironmentType" src="images/092environment.png" />
+
+	<p>
+		In the simplest form, the <i>name</i> and <i>value</i> properties are used to specify
+		the name of the environment variable, and a corresponding value that can be resolved from the attribute
+		map. Finer control of the environment variable can be obtained by using the <code>arg-type</code> type.
+	</p>
+	
+	<p>
+		The <i>preserve</i> property can be used to override the <code>command-type</code> <i>replaceEnvironment</i> property.
+		If this property is set to true, this environment variable will be passed to the remote command regardless
+		of the <i>replaceEnvironment</i> property setting.
+	</p>
 
 	<h4>
 		<a name="StreamParsers">Stream Parsers</a>
 	</h4>
 
 	<p>
-		One can attach parsers (which we also refer to as tokenizers) to the
+		It is possible to attach a parser (which we also refer to as a tokenizer) to the
 		output and error streams of any
-		<code>command</code>
+		<code>command-type</code>
 		in order to capture information and use it to side-effect existing
 		attributes, or to generate new ones on the fly. While
 		the parser is not completely general, it is capable of a wide range of
 		tasks which would typically be required in the handling of output from
-		batch and runtime systems. We here explain the main elements (
-		<code>target, match, test</code>
-		) used by the tokenizer; one should further consult the <a
+		batch and runtime systems.
+	</p>
+	
+	<img alt="TokenizerType" src="images/090tokenizer.png" />
+
+	<p>
+	  	The main parser elements used by the tokenizer are
+		<code>target</code>, <code>match</code>, and <code>test</code>.
+		See the <a
 			href="#TokenizerExamples">tokenizer examples</a> demonstrating
 		various usage scenarios.
 	</p>
-
-	<img alt="TokenizerType" src="images/090tokenizer.png" />
-
 	<p>
 		The
 		<code>type</code>
