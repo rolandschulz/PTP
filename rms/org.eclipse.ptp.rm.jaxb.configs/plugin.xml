@@ -75,5 +75,9 @@
             configurationFile="data/lsf-generic-batch.xml"
             name="LSF-Generic-Batch">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/lsf-batch.xml"
+            name="IBM Platform LSF">
+      </JAXBResourceManagerConfiguration>
    </extension>
 </plugin>
