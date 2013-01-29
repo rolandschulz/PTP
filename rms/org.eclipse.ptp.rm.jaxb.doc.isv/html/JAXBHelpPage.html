@@ -2,12 +2,12 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>The PTP Configurable Resource Manager</title>
+<title>PTP Target System Configuration</title>
 <link rel="stylesheet" type="text/css" href="help.css">
 </head>
 <body>
 	<br>
-	<h1>The JAXB Configurable Resource Manager</h1>
+	<h1>Target System Configuration</h1>
 
 	<h3>
 		<a name="PTP600">PTP 6.0.0 Changes</a>
@@ -27,6 +27,9 @@
 		<li>The <code>saveValueTo</code> attribute on a <a href="#Widget">widget</a> has been renamed to simply
                        <code>attribute</code>. This is to reflect the fact that an widget can read from and
                        save to an <a href="#AttributeType"><code>attribute</code></a>.</li>
+        <li>The <a href="#LineArg"><code>arg</code></a> element now has an <a href="#AttributeType"><code>attribute</code></a> attribute. If
+        				supplied, this will be compared to the <code>isUndefIfMatches</code> string rather than the element content in
+        				order to determine if the argument is defined or not.
 	</ol>
 	
 	<h3>
@@ -69,24 +72,24 @@
 	</h2>
 
 	<p>
-		The JAXB Resource Manager plug-ins allow you to launch and monitor
-		applications on local or remote resources using resource managers
+		PTP allows you to launch and monitor
+		applications on local or remote resources using systems
 		which are configured from an XML file via JAXB (
 		<code>javax.xml.bind</code>
 		) technology.<br>
 	</p>
 
-	<p>There are two main motivations for providing this class of
-		resource managers:</p>
+	<p>The target system configuration files:</p>
 	<ol>
-		<li>To allow for maximum adaptability. Often job schedulers (PBS,
+		<li>Allow for maximum adaptability. Often job schedulers (PBS,
 			LSF, LoadLeveler, etc.) or interactive runtime systems (OpenMPI, PE,
 			SLURM, etc.) are set up by system administrators in special or
 			non-standard ways which make it difficult to use a generic tool. The
 			configuration file allows a user or community of users to fit the
 			resource manager to a class of systems, to a single host, or even to
 			special application usage.</li>
-		<li>Building the resource manager and its UI presentation from an
+		<li>Simplify adding support for new systems. Building the resource manager 
+			control system and its UI presentation from an
 			XML configuration means that in most cases no special Java coding is
 			necessary. Users should be able to accommodate new systems, at least
 			on the client-end, without writing and loading additional Eclipse
@@ -95,46 +98,50 @@
 			following paragraphs.)</li>
 	</ol>
 
-	<p>Additional considerations in designing a generically
-		configurable resource manager were to partition the client
-		functionality so as to eliminate the need for special server-side
-		proxies and to scale more successfully in the updating of job and
-		resource information.</p>
-
 	<p>
-		To this end, JAXB resource managers now consist of two components, a
-		"control", which governs the configuration, launch and cancellation of
-		individual jobs entirely from the client end, and a "monitor", which
+		A target system configuration consist of two components, a
+		"control" component, which governs the configuration, launch and cancellation of
+		individual jobs entirely from the client end, and a "monitoring" component, which
 		displays job status as well as global information about the HPC
-		resource. In most cases, the monitor will be a pre-built type provided
-		by the PTP distribution, implemented using <a
-			href="http://www2.fz-juelich.de/jsc/llview">LLview</a>. Since <b>LLview</b>
-		already supports a good number of the standard scheduler types, adding
-		a new resource manager type will normally entail only the specific
-		configuration of its control part. The default mode of usage is that
-		the client stages the necessary LLview components (mostly Perl
+		resource. The monitoring system uses built-in types provided
+		by the PTP distribution which support most standard scheduler types. Adding
+		a new configuration will normally entail only the specification of
+		its control part. The default mode of usage is that
+		the client stages the necessary components (mostly Perl
 		scripts) automatically, but in a future release, the monitor will also
 		be capable of connecting directly to a system-wide (web-based)
 		deployment.
 	</p>
+	
 	<p>
-		<b>The following is a guide to the resource manager XML
-			definition. Those interested only in using the JAXB resource managers
+		The "control" component of the target configuration is associated with a remote connection
+		when the user configures a "Parallel Application" run configuration using the standard Eclipse launch
+		configuration mechanism. This remote connection is the used whenever the control system 
+		needs to send or receive data, such as when running a command, or copying a file.
+	</p>
+	
+	<p>
+		The "monitor" component of the target configuration is associated with a remote connection
+		via the "Monitors" view in the "System Monitoring" perspective. This connection is used for
+		sending and receiving data required to perform the monitoring activities. Note that the
+		"control" and "monitor" component's remote connections are independent, although they can
+		both share the same connection (which is the normal case).
+	</p>
+		
+	<p>
+		<b>The following is a guide to the target system configuration XML
+			definition. Those interested only in using configurations
 			already provided with the PTP distribution should consult the User
-			pages under the relevant scheduler (currently only the PBS resource
-			managers are JAXB-configurable; please see the <a
-			href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.pbs.doc.user/html/toc.html">PBS
-				Res Mgr help</a>).</b>
+			Guide under the relevant scheduler section.</b>
 	</p>
 	<hr>
 	<h2>
-		<a name="Customizing"></a><a href="http://download.eclipse.org/tools/ptp/docs/JAXBDemo.pdf">Configuring/Customizing
-			the Resource Manager</a>
+		<a name="Customizing"></a>Getting Started</a>
 	</h2>
 
 	<p>
-		We provide here an introductory tutorial slide set demonstrating some
-		simple additions to a pre-existing resource manager definition file.
+		We provide <a href="http://download.eclipse.org/tools/ptp/docs/JAXBDemo.pdf">here</a> an introductory tutorial slide set demonstrating some
+		simple additions to a pre-existing configuration file.
 		For some example XML illustrating various aspects of the schema
 		(particularly UI features), we also provide a <a
 			href="http://download.eclipse.org/tools/ptp/docs/JAXBExamples_5.0.1.1.zip">.zip file (for PTP release 5.0.1)</a>.
@@ -145,12 +152,9 @@
 	</h3>
 
 	<p>The preference options are aids for debugging configuration
-		changes. The first has to do with altering the default behavior of the
-		resource manager, which is to cache its XML definition file; this can
-		be overridden to reread the file every time you start the Resource
-		Manager. This way, if you make changes, they will automatically be
-		picked up without having to reboot the application or recreate the
-		Resource Manager.</p>
+		changes. The first turns off configuration file caching. This will ensure
+		that when you make changes to the configuration, they will automatically be
+		picked up by PTP.</p>
 
 	<p>The other options are useful if you are writing a new stream
 		tokenizer for a command; checking all four options usually produces
@@ -166,35 +170,32 @@
 	<hr>
 
 	<h2>
-		<a name="XSD"></a><a href="resource_manager_type.xsd">The JAXB
-			Configurable Resource Manager XML Schema</a><br>
+		<a name="XSD"></a>Target System Configuration XML Schema<br>
 	</h2>
 
 	<p>
-		The JAXB Resource Manager is <b><i>model-driven</i> </b>; this means
+		PTP is <b><i>model-driven</i> </b>; this means
 		that its functioning and appearance are determined by a set of
 		definitions provided via an XML file. What follows is a detailed
 		explanation of the schema governing the resource manager XML
-		definition.
+		definition. The latest version of the target configuration schema is available at the URL <a href="http://eclipse.org/ptp/schemas/rm">http://eclipse.org/ptp/schemas/rm</a>.
 	</p>
 
-	<h3>
-		<a name="ResourceManagerData">The Resource Manager Data Type</a>
-	</h3>
-
+	<p>
+		The top level of the XML configuration is the <code>resource-manager-data</code> type as shown in the diagram below.
+		This type specifies all the information needed in order to submit, control, and monitor jobs on a target system.
+	</p>
+	
 	<img alt="ResourceManagerData" src="images/01rm-data.png" />
 
 	<p>
-		The top-level of the definition tree consists of three elements: <b>site-</b>,
-		<b>control-</b> and <b>monitor-data</b>. In addition, a resource
-		manager should be given a name which sufficiently distinguishes it
-		from others of a similar type; e.g., <i>pbs-torque-v_2.3.7_abe</i> is
-		specific to an installation on the host abe, <i>ll-v_4.0</i> suits all
-		installations of LoadLeveler version 4, etc.
+		The <code>resource-manager-data</code> comprises three elements: <code>site-data</code>,
+		<code>control-data</code> and <code>monitor-data</code>. In addition, a configuration name 
+		is specified using the <i>name</i> property. This name must be unique.
 	</p>
 
 	<p>
-		The <b>site-data</b> element provides an optional place to set fixed
+		The <code>site-data</code> element provides an optional place to set fixed
 		or default remote site information. The connection strings are URIs
 		which are specific to the PTP RemoteServices definitions. The scheme
 		for these URIs will usually name the specific remote service (e.g,
@@ -209,32 +210,89 @@
 
 	<p>
 		The principal section of the schema is devoted to defining the
-		resource manager's <b>control</b> part. The top-level control elements
+		target system <code>control-data</code> part. The top-level control elements
 		include attributes, files to be staged, job script to
 		be generated (if any), commands specific to the resource manager, and
-		the layout of the Launch Tab.
+		the layout of the launch configuration Resources tab.
+	</p>
+	
+	<p>
+		The <code>monitor-data</code> section of the schema specifies the type of monitoring
+		to be used for the target system, and any monitoring system specific information
+		that might be necessary. If the <code>monitor-data</code> section is omitted, monitoring
+		for the target system will be disabled. This is typically the case when 
+		configuring direct access to runtime systems such as MPICH2 or Open MPI.
+	</p>
+	
+	<h3>
+		<a name="SiteData">Site Data Element</a>
+	</h3>
+	
+	<h3>
+		<a name="ControlType">Control Data Element</a>
+	</h3>
+	
+	<p>
+		The <code>control-data</code> element is used to specify the control information necessary to submit and
+		control jobs to the target system, and is of type <code>control-type</code>. This type is defined as follows:
 	</p>
 
+	<img alt="ControlData" src="images/02control.png" />
+
+	<p>The <code>control-type</code> type is divided into four main sections:</p>
+
+	<ol>
+		<li>Attribute Definitions (i.e. the <i>environment</i>)</li>
+		<li>Files and Scripts</li>
+		<li>Commands and Stream Parsers</li>
+		<li>Launch Configuration</li>
+	</ol>
+
+	These sections are discussed in more detail below.
+	
+	<h3>
+		<a name="AttributeType">Attribute Definitions</a>
+	</h3>
+	<p>
+		An attribute is a variable that contains specific information used to control
+		the target system. Attributes are often (but not necessarily)
+		visible in the user interface. The value of an attribute can be any Java primitive type, a list of strings,
+		or a map of strings.
+	</p>
+
+	<p>
+		[TODO: Check if this is still correct]
+		If
+		<code>stdout</code>
+		and
+		<code>stderr</code>
+		from a scheduled job is to be delivered to the client, the attributes
+		<i>stdout_remote_path</i> and <i>stderr_remote_path</i> should be
+		included in the resource manager attribute set. Similarly, the native
+		designation for the selected queue, if used, should be linked to <i>control.queue.name</i>.
+	</p>
+
+	<img alt="Attribute" src="images/040attribute.jpeg" />
+
 	<h4>
-		<a name="Environment">Resource Manager Environment</a>
+		<a name="AttributeMap">Attribute Map</a>
 	</h4>
 	<p>
-		The resource manager implementation constructs a variable map from the
-		defined attributes which serves as the resource manager
-		"environment". Some elements directly reference these by name; a
-		text/string representation of attribute fields can be
-		obtained via the Eclipse variable resolver syntax, with the namespace
-		prefix set to <i>ptp_rm</i>:
+		Each target system configuration constructs an "attribute map" which contains all the
+		attributes known by the system. Attributes are either defined in the configuration file or
+		are created dynamically as the result of processing the output from commands.
+		Other configuration elements reference attributes by obtaining a
+		string representation of attribute fields using the Eclipse variable resolver syntax:
 		<code>
-			${ptp_rm:name#<i>fieldName</i>}
-		</code>, e.g.,
-		<code>${ptp_rm:queues#value}</code>
+			${ptp_rm:name#element}
+		</code> where <i>name</i> is the name of the attribute and <i>element</i>
+		is the name of an attribute element
 		(see further <a href="#AttributeType">below</a> on the
-		specific fields for attributes).
+		specific elements for attributes.) 
 	</p>
 	<p>
-		All attributes defined in the configuration are mapped.
-		The following hard-coded attributes are also added at runtime: <br>
+		All attributes defined in the configuration are included in the map.
+		The following pre-defined attributes are also added at runtime: <br>
 		<br>
 		<code>control.user.name</code>
 		<br>
@@ -247,10 +305,10 @@
 		<code>progArgs</code>
 		<br>
 		<code>directory</code>
-		<br> <br> In addition, these attributes may be linked (see <a
+		<br> <br> In addition, the following attributes may be linked (see <a
 			href="#AttributeType">below</a>) to other attributes to
-		furnish the resource manager with an implementation-independent
-		variable for the queue and for any remote output files produced in
+		provide an implementation-independent
+		mechanism for referencing the queue and for any remote output files produced in
 		connection with the job submission. <br> <br>
 		<code>control.queue.name</code>
 		<br>
@@ -260,163 +318,182 @@
 		<br>
 	</p>
 
-	<h4>
-		<a name="CommandTypes">Resource Manager Command Types</a>
-	</h4>
-	<p>
-		<i>Commands</i> are system calls, either to a local or remote OS,
-		depending on the connection defined for the resource manager. The <b>start-up-</b>
-		and <b>shut-down-command</b>s are arbitrary commands to be run
-		(serially in order) when the resource manager is started or stopped.
-		The <b>submit</b> commands are those used to launch jobs. Currently a
-		configuration may have only a batch or an interactive mode. Thus it
-		may have only two submission modes, a run and a debug, for the given
-		type. In the future we may allow all four to coexist in a single
-		configuration. <b>get-job-status</b> is a user-initiated (on-demand)
-		request to refresh the status information for a submission. Normal
-		(polled) updates, on the other hand, are the responsibility of the
-		<code>monitor</code>
-		component. The status command nevertheless needs to be implemented in
-		most cases, as it will be called internally just after submission. The
-		remaining "-job" commands are operations which can be executed on
-		submitted jobs; with the exception of <i>terminate</i>, the rest of
-		these have to do with schedulers (batch-systems) and do not apply to
-		resource managers which connect to interactive runtime-systems such as
-		OpenMPI or PE. <b>Note</b>: if the submission type is interactive, the
-		<b>terminate-job</b> command usually does not need to be implemented,
-		as the process termination will be handled internally. However, in
-		some cases (such as PBS -I) which require the interactive job to run
-		as a pseudo-terminal, one may need this command in order to force its
-		termination externally. Finally, a <b>button-action</b> is an
-		arbitrary command associated with a button exposed through the
-		<code>Launch Tab</code>
-		(see further <a href="#Action">below</a>).
-	</p>
-
-	<h3>
-		<a name="ControlType">The Control Data Type</a>
-	</h3>
-
-	<img alt="ControlData" src="images/02control.jpeg" />
-
-	<p>The majority of the XML definition is given over to the set-up
-		of the resource manager control. One can think of this section as
-		having four subdivisions:</p>
-
-	<ol>
-		<li>Configuration Variable Definitions (the <i>Environment</i>i)</li>
-		<li>Files and Scripts</li>
-		<li>External Commands and their Stream Parsers</li>
-		<li>UI Configuration (Launch Tab)</li>
-	</ol>
-
-	<p>We will look at these each in turn.</p>
 
 	<h4>
-		<a name="AttributeType">1. Attribute Types</a>
+		Attribute Properties
 	</h4>
 	<p>
-		An attribute is any variable necessary for the functioning of the
-		resource manager. Attributes are often (but not necessarily)
-		visible. The value for attributes can be any primitive type, or lists
-		or maps of strings. If
-		<code>stdout</code>
-		and
-		<code>stderr</code>
-		from a scheduled job is to be delivered to the client, the attributes
-		<i>stdout_remote_path</i> and <i>stderr_remote_path</i> should be
-		included in the resource manager attribute set. Similarly, the native
-		designation for the selected queue, if used, should be linked to <i>control.queue.name</i>.
+		The following properties are available when defining new attributes:
 	</p>
-
-	<img alt="Attribute" src="images/040attribute.jpeg" />
-
+	<table cellpadding="5" border="1" rules="all">
+		<tr>
+			<th>Property</th>
+			<th>Description</th>
+			<th>Default</th>
+		</tr>
+		<tr>
+			<td><i>name</i></td>
+			<td>
+				Used to specify the name of an attribute. This name
+				can then be used to look up the values of the attribute's elements.
+			</td>
+			<td>none</td>
+		</tr>
+		<tr>
+			<td><i>type</i></td>
+			<td>
+				Specifies the type of the attribute value. The type is primarily used by the user
+				interface elements to determine how values are to be input. Values can always be accessed as strings
+				regardless of their type.
+			</td>
+			<td>String</td>
+		</tr>
+		<tr>
+			<td><i>visible</i></td>
+			<td>
+				Indicates that the user will not be directly changing the value of the
+				attribute via the user interface. Certain widgets (such as
+				the
+				<code>attribute viewer</code>
+				) check this to see if the attribute should be included
+				automatically in its list.
+				<br>
+				Always mark attributes which are the targets of <i>attribute</i>
+				(see <a href="#Widget">below</a>) as <i>visible</i>="true"; if this
+				value is false, the attribute will <i>always</i> be passed to the
+				configuration/environment of the resource manager; selection/exclusion
+				of sets of attributes pertains only to those marked
+				visible.			
+			</td>
+			<td>true</td>
+		</tr>
+		<tr>
+			<td><i>status</i></td>
+			<td>
+				An optional property for capturing the validity of the
+				attribute at runtime or for a particular installation, if such
+				information is made available by the system.
+			</td>
+			<td>true</td>
+		</tr>
+		<tr>
+			<td><i>readOnly</i></td>
+			<td>
+				Used to mark the attribute as read-only. The value of a read-only attribute
+				will always remain the default value.
+			</td>
+			<td>true</td>
+		</tr>
+		<tr>
+			<td><i>translateBooleanAs</i></td>
+			<td>
+				Can be applied to
+				boolean values which should be represented as strings rather than
+				"true" and "false". A comma-delimited pair is used to indicate the string
+				equivalent to the boolean value. e.g., "YES,NO" would mean true yields the
+				string "YES" and false the string "NO".
+			</td>
+			<td>null</td>
+		</tr>
+		<tr>
+			<td><i>min</i> and <i>max</i></td>
+			<td>
+				Used to give the upper and lower bounds for integer attributes. UI
+				elements such as the spinner widget will use this information. 
+			</td>
+			<td>null</td>
+		</tr>
+	</table>
+	
+	<h4>
+		Attribute Elements
+	</h4>
+	
 	<p>
-		The <i>visible</i> property is a way of indicating to the resource
-		manager that the user will not be directly changing the value of the
-		attribute via the user interface. Certain widgets (such as
-		the
-		<code>attribute viewer</code>
-		) check this to see if the attribute should be included
-		automatically in its list.
+		Attributes are structured objects that carry more information than just a value. This information
+		is specified using elements in the XML specification. Elements can be accessed using the Eclipse variable
+		syntax described in the <a href="#AttributeMap">Attribute Map</a> section.
 	</p>
 
-	<hr>
-	<h5>
-		<a name="Note1">BEST PRACTICE: VISIBLE vs INVISIBLE</a>
-	</h5>
-	<p>
-		Always mark attributes which are the targets of <i>attribute</i>
-		(see <a href="#Widget">below</a>) as <i>visible</i>="true"; if this
-		value is false, the attribute will <i>always</i> be passed to the
-		configuration/environment of the resource manager; selection/exclusion
-		of sets ofattributes pertains only to those marked
-		visible.
-	</p>
-	<hr>
-	<p>
-		<i>status</i> is an optional field for capturing the validity of the
-		attribute at runtime or for a particular installation, if such
-		information is made available by the system. The <i>readOnly</i>
-		property can be defined here, but more often will be enforced directly
-		on the widget which is connected to the attribute. <i>min</i>
-		and <i>max</i> give the boundaries for integer values, usually
-		represented by spinner widgets. <i>translateBooleanAs</i> applies to
-		boolean values which should be represented as strings other than
-		"true" and "false"; use a comma-delimited pair to indicate the string
-		equivalent for the boolean; e.g., "YES,NO" would mean true yields the
-		first string and false the second.
-	</p>
-
-	<p>
-		<code>description</code>
-		is meant to be a brief one-sentence definition; most of the time
-		detailed information will go into the
-		<code>tooltip</code>
-		element.
-		<code>choice</code>
-		is a predetermined, fixed set of values to choose from; these are
-		comma-delimited and will appear as the items of a combo-box.
-		<code>items-from</code>
-		instead links the combo items (choice) to another
-		attribute value (whose type must be
-		<code>java.util.Collection</code>
-		).
-	</p>
-
-	<h4 align="center">
-		<a name="PAValueLink">Attribute Values</a>
+	<table cellpadding="5" border="1" rules="all">
+		<tr>
+			<th>Element</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td><code>description</code></td>
+			<td>
+				Provides a brief one-sentence definition of the attribute. This information
+				is displayed by the user interface.
+			</td>
+		</tr>
+		<tr>
+			<td><code>tooltip</code></td>
+			<td>
+				Provides a string that will be displayed when
+				the mouse hovers over the attribute in the user interface.
+			</td>
+		</tr>
+		<tr>
+			<td><code>choice</code></td>
+			<td>
+				Provides a predetermined, fixed set of values to choose from. These are
+				specified as a comma-delimited string and will appear as the items of a combo-box.
+			</td>
+		</tr>
+		<tr>
+			<td><code>items-from</code></td>
+			<td>
+				Links the combo items specified in a <code>choice</code> element to another
+				attribute value (whose type must be
+				<code>java.util.Collection</code>).
+			</td>
+		</tr>
+		<tr>
+			<td><code>default</code></td>
+			<td>
+				Specifies a default value for the attribute. Default values
+				must be primitive types. If no default value is specified, then the
+				value of the attribute will be <code>null</code>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>value</code></td>
+			<td>
+				Represents the current value of the attribute. Only used to fetch
+				the value of an attribute.
+			</td>
+		</tr>
+		<tr>
+			<td><code>link-value-to</code></td>
+			<td>
+				If provided, the attribute gets its value from the
+				attribute specified, unless that attribute has
+				an undefined (empty) value. In this case, any default defined on
+				the present attribute will be used. This feature is
+				primarily intended for defining dependent attributes
+				whose values are not directly modified by the user.
+			</td>
+		</tr>
+		<tr>
+			<td><code>validator</code></td>
+			<td>
+				Specifies a validator for the attribute. Used to enforce semantics of the attribute value.
+			</td>
+		</tr>
+	</table>
+	
+	<h4>
+		<a name="Regex">Validators</a>
 	</h4>
 
 	<p>
-		The untyped
-		<code>value</code>
-		element on attributes is for internal use only; to give
-		a predefined (primitive) value, use the
-		<code>default</code>
-		element along with the <i>type</i> property.
-	</p>
-
-	<p>
-		<code>link-value-to</code>
-		works as follows: the attribute gets its value from the
-		attribute linked to, unless that attribute has
-		an undefined (empty) value; in the latter case, any default defined on
-		the present attribute will be used. This feature is
-		primarily intended for defining dependent attributes
-		whose values are not directly modified by the user.
-	</p>
-
-	<p>Attributes also carry optional validators which allow you to
+		Attributes carry optional validators which allow you to
 		enforce syntactic rules, numerical ranges (each with one or both
 		boundaries; these are OR'd) or file-system semantics on the value when
 		the user enters text.</p>
 
 	<img alt="Validator" src="images/041validator.jpeg" />
-
-	<h4 align="center">
-		<a name="Regex">Regex and File Match Types</a>
-	</h4>
 
 	<p>
 		The validator makes use of the
@@ -425,8 +502,8 @@
 			href="#StreamParsers">below</a>), along with a special
 		<code>file-match</code>
 		type. A regex can be used to match by setting the <i>expression</i>
-		field; to split the segment into tokens on the basis of the
-		expression, set the <i>split</i> field to true (this applies only to
+		property. To split the segment into tokens on the basis of the
+		expression, set the <i>split</i> property to true (this applies only to
 		the
 		<code>match</code>
 		type discussed <a href="#MatchType">below</a>). The expression should
@@ -455,10 +532,10 @@
 	</p>
 
 	<p>
-		<code>file-match</code>
-		exports the attributes pertaining to
-		<code>org.eclipse.core.filesystem.IFileInfo</code>
-		; <i>efsAttributes</i> is an OR'd string of the EFS constants:
+		The <code>file-match</code> type
+		specifies the attributes pertaining to
+		<code>org.eclipse.core.filesystem.IFileInfo</code>. The
+		<i>efsAttributes</i> property is an OR'd string of the EFS constants:
 	</p>
 
 	<ul>
@@ -481,197 +558,312 @@
 	</ul>
 
 	<p>
-		The <i>lastModified...</i> fields require the format
-		<code>yyyy/MM/dd HH:mm:ss</code>
-		.
+		The <i>lastModifiedBefore</i> and <i>lastModifiedAfter</i> properties are specified using the format
+		<code>yyyy/MM/dd HH:mm:ss</code>.
 	</p>
 
+	<h3>
+		Files and Scripts
+	</h3>
+	
+	This section is used to define the files and scripts that are necessary for submitting a job
+	to the target system.
+	
 	<h4>
-		<a name="Files">2. Managed Files</a>
+		<a name="Files">Managed Files</a>
 	</h4>
 
 	<p>
-		By "managed file" is meant a local file required by the executable but
-		which may not be present on the host on which the job will run; hence,
-		these files may either be external or may actually be generated from
-		the resource manager environment in conjunction with the job
-		submission, but in any case need to be copied to that host just prior
-		to it. The
-		<code>script</code>
-		file used in connection with scheduler (batch) jobs is a special
-		category of the
-		<code>managed-file</code>
-		type, and will be discussed in the next sub-section.
+		A "managed file" is a file that may be required for the job, but
+		which may not be present on the host on which the job will run.
+		These files may either be external to Eclipse or may be generated from
+		the environment in conjunction with the job
+		submission, but in either case need to be copied to the target system just prior
+		to it. 
 	</p>
 
 	<img alt="ManagedFiles" src="images/05managed-files.jpeg" />
 
 	<p>
 		Managed files are added to the definition in groups determined by
-		their shared staging location, which is a path relative to the working
-		directory of the connection. (The batch script is by default staged to
-		<i> .eclipsesettings</i> in the user home directory, since it is by
-		default temporary and deleted after the submit call returns; however,
-		one can use the
+		their shared staging location, specified using the <code>file-staging-location</code> element, 
+		which is a path relative to the working
+		directory of the connection. Managed file properties are as follows:
+	</p>
+	
+	<table cellpadding="5" border="1" rules="all">
+		<tr>
+			<th>Property</th>
+			<th>Description</th>
+			<th>Default</th>
+		</tr>
+		<tr>
+			<td><i>name</i></td>
+			<td>
+				A mandatory name for the managed file.
+			</td>
+			<td>N/A</td>
+		</tr>
+		<tr>
+			<td><i>uniqueIdPrefix</i></td>
+			<td>
+				Specify that multiple copies of a generated file should be distinguishable.
+			</td>
+			<td>false</td>
+		</tr>
+		<tr>
+			<td><i>resolveContents</i></td>
+			<td>
+				Pass the <code>contents</code> element through the attribute resolver (see below).
+			</td>
+			<td>true</td>
+		</tr>
+		<tr>
+			<td><i>deleteSourceAfterUse</i></td>
+			<td>
+				Specify that local copies of generated files should be retained.
+			</td>
+			<td>false</td>
+		</tr>
+		<tr>
+			<td><i>deleteTargetAfterUse</i></td>
+			<td>
+				Specify that the file should be deleted from the target system after use (not currently
+				implemented in the general case).
+			</td>
+			<td>false</td>
+		</tr>
+	</table>
+	
+	<p>
+		<b>Note:</b> The batch script is staged by default to
+		<i>.eclipsesettings</i> in the user's home directory and deleted after the submit call returns.
+		However,
+		it is possible to use the
 		<code>file-staging-location</code>
 		on the
 		<code>script</code>
-		element to set the path explicitly.) The file itself can be set to be
-		deleted after submission (<i>deleteTargetAfterUse</i>; this is
-		currently not implemented in the general case) and if the file is
-		actually generated by the resource manager, the local temporary copy
-		can be deleted or retained (<i>deleteSourceAfterUse</i>). In the
-		latter case, one can also distinguish multiple copies of the generated
-		file by setting <i>uniqueIdPrefix</i> to true.
+		element to set the batch script path explicitly.
 	</p>
 
-	<p>The managed file definition allows one of three possibilities as
-		to specifying content.</p>
-	<ol>
-		<li>If it is an external file or one edited perhaps through the
-			workspace, one can use the <code>path</code> element to indicate
-			location; this can be either a hard-coded path or a reference to an 
-			attribute value.</li>
-		<li>The <code>contents</code> element is a string which literally
-			represents the file contents. The <i>resolveContents</i> attribute in
-			this case is used to indicate whether to pass this string through the
-			variable resolver, substituting any references to 
-			attribute values it may contain. However, caution should be exercised
-			here in that this string should not contain "${...}" sequences which
-			do not actually refer to Eclipse variables (such as batch script
-			variables), or the resolution will fail. If <i>resolveContents</i> is
-			set to false, you can still provide this text element with a single
-			reference to an attribute, in which case the value of that
-			attribute will be used <i>as is</i>, without further
-			dereferencing.</li>
-		<li>The preferred, and most flexible way to represent the
-			contents of a file to be generated, however, is to use the <code>line</code>
-			type which is discussed <a href="#LineArg">below</a> in connection
-			with the <code>script</code> type.</li>
+	<p>
+		A managed file definition allows one of three possibilities as
+		to specifying content:
+	</p>
+		
+	<table cellpadding="5" border="1" rules="all">
+		<tr>
+			<th>Element</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td><code>path</code></td>
+			<td>
+				Specifies the location of an external file, which can be either a hard-coded path or a reference to an 
+				attribute value.
+			</td>
+		</tr>
+		<tr>
+			<td><code>contents</code></td>
+			<td>
+				Specifies the file contents as a string. 
+				In this case the <i>resolveContents</i> property is used to indicate whether to pass this string through the
+				attribute resolver, substituting any references to 
+				attribute values it may contain. However, this string should not contain "${...}" sequences which
+				do not actually refer to Eclipse variables (such as batch script
+				variables), or the resolution will fail. If <i>resolveContents</i> is
+				set to false, you can still provide this text element with a single
+				reference to an attribute, in which case the value of that
+				attribute will be used <i>as is</i>, without further
+				dereferencing.
+			</td>
+		</tr>
+		<tr>
+			<td><code>line</code></td>
+			<td>
+				Specifies the file contents using <code>line-type</code> elements.
+				This is the preferred and most flexible way to represent the
+				contents of a file to be generated. The <code>line-type</code> type is discussed in more detail
+				<a href="#LineArg">below</a>.
+			</td>
+		</tr>
+	</table>
 
-	</ol>
-
-	<p>When the submit call is executed, managed files are written out,
-		if so indicated, and then their target paths are determined as
-		follows:</p>
+	<p>When the submit call is executed, managed files are generated if necessary,
+		then their target paths are determined as follows:</p>
 
 	<ul>
 		<li>If the <code>path</code> element is used, the target path
-			becomes <i>staging directory / name of pre-existing file</i>;</li>
+			becomes <i>staging_directory / name_of_pre-existing_file</i>.</li>
 		<li>If the <code>content</code> or <code>line</code> elements are
-			used, the target path becomes <i>staging directory/
-				[uniqueIdPrefix]managed-file-name</i>);</li>
+			used, the target path becomes <i>staging_directory/
+				[uniqueIdPrefix]managed-file-name</i>).</li>
 		<li>An attribute is placed in the environment whose <i>name</i> is
 			the managed-file <i>name</i> and whose <i>value</i> is this target
 			path.</li>
 	</ul>
 
-	<h4 align="center">
-		<a name="Script">The (Batch) Script Element</a>
+	<h4>
+		<a name="Script">Scripts</a>
 	</h4>
 
-	<p>A resource manager definition for a scheduler system such as PBS
-		or LoadLeveler can be instrumented to work without a batch script (by
-		setting command-line flags or passing all the job control information
-		as environment variables, for instance), but most frequently the use
-		of a script allows more flexibility in configuring the job
-		(interactive managers of course have no need of a script).</p>
-
-	<img alt="ScriptType" src="images/06script.jpeg" />
-
 	<p>
-		If the script is specified in the XML definition, its path is
-		automatically added to the list of managed files to be staged to the
-		appropriate directory (by default <i>.eclipsesettings</i>, or
-		whereever indicated by the
-		<code>file-staging-location</code>
-		element), and so there is no need to include a script entry explicitly
-		under the
-		<code>managed-files</code>
-		element. As with the
-		<code>managed-file</code> <i>deleteAfterSubmit</i> indicates that the script target should not
-		be retained (this is the default behavior); unlike the
-		<code>managed-file</code>, however, the local copy of the generated script is always deleted. A
-		reserved attribute,
-		<code>managed_file_for_script</code>, should be used to reference the script's path on the target
-		resource; for instance, in the PBS submit command:
+		Schedulers such as PBS
+		or LoadLeveler normally use a job script in order to specify the resources
+		required to launch a job (although they can be configured to work without a batch script.) 
+		Using a script file generally provides the most flexibility in configuring the job submission.
+		A
+		<code>script-type</code>
+		file is just a special
+		case of the
+		<code>managed-file-type</code>
+		type
 	</p>
 
-	<code>
-		&lt;arg&gt;qsub&lt;/arg&gt;<br>
-		&lt;arg&gt;${ptp_rm:managed_file_for_script#value}&lt;/arg&gt;
-	</code>
-	<br>
+	<img alt="ScriptType" src="images/06script.png" />
+
+	<p>
+		If the script is specified in the configuration, its path is
+		automatically added to the list of managed files to be staged to the
+		appropriate directory (by default <i>.eclipsesettings</i>, or
+		as indicated by the
+		<code>file-staging-location</code>
+		element), so there is no need to include a script entry explicitly
+		under the
+		<code>managed-files</code>
+		element. The following properties are available for scripts:
+	</p>
+	
+	<table cellpadding="5" border="1" rules="all">
+		<tr>
+			<th>Property</th>
+			<th>Description</th>
+			<th>Default</th>
+		</tr>
+		<tr>
+			<td><i>insertEnvironmentAfter</i></td>
+			<td>
+				Supplies a line number indicating where in the
+				script to add any extra environment variables set through the <b>Environment</b>
+				tab provided in the launch configuration. This provides
+				control over whether these should overwrite previously
+				defined environment variable values.
+			</td>
+			<td>-1 (don't insert)</td>
+		</tr>
+		<tr>
+			<td><i>deleteAfterSubmit</i></td>
+			<td>
+				Indicates that the script target should not
+				be retained. Unlike the
+				<code>managed-file-type</code>, however, the local copy of the generated script is always deleted.
+			</td>
+			<td>true</td>
+		</tr>
+	</table>
+
+ 	<p>
+ 		A reserved attribute,
+				<code>managed_file_for_script</code>, is used to reference the script's path on the target
+				resource in the submit command, e.g.:
+	</p>
+	<p>
+		<code>
+			&lt;arg&gt;qsub&lt;/arg&gt;<br>
+			&lt;arg&gt;${ptp_rm:managed_file_for_script#value}&lt;/arg&gt;
+		</code>
+	</p>
 
 	<p>
 		<b>Note</b>: If the
 		<code>import</code>
 		tab (see <a href="#LaunchTab">below</a>) is used to provide an
 		external or workspace edited batch script to the run, nothing extra
-		need be done in the definition XML, as the presence of any external
-		path for the script is handled under the covers.
+		need be done in the configuration. The
+		path for the script is handled automatically.
 	</p>
 
-	<p>
-		<i>insertEnvironmentAfter</i> is a line number indicating where in the
-		script to add any extra environment variables set through the <b>Environment</b>
-		tab provided as part of the <b>Run Configuration</b> wizard. This way
-		the user has control over whether these should overwrite previously
-		defined environment variable values.
-	</p>
-
-	<p></p>
-
-	<h4 align="center">
-		<a name="LineArg"><code>line</code> and <code>arg</code> types</a>
+	<h4>
+		<a name="LineArg">Lines</a>
 	</h4>
 
 	<p>
-		The
-		<code>line</code>
-		element was mentioned <a href="#Files">above</a> in connection with
-		managed file content; it is essentially a wrapper around a series of
-		whitespace separated
-		<code>arg</code>
-		elements, all of which are placed on a single line (that is, the group
-		is terminated by a line separator).
+		The <code>line-type</code> is used to explictly specify lines for a script or managed file. Each
+		<code>line-type</code>
+		element contains zero or more
+		<code>arg-type</code>
+		elements. The text specified by the <code>arg-type</code> elements is placed on a single line, separated by
+		whitespace. The sequence is terminated by a line separator.
 	</p>
 
-	<img alt="Line" src="images/07line-arg.jpeg" />
+	<img alt="Line" src="images/07line-arg.png" />
+
+	<h4>
+		<a name="Arguments">Arguments</a>
+	</h4>
 
 	<p>
-		The
-		<code>arg</code>
+		An
+		<code>arg-type</code>
 		element is used for script and managed file content as well as in the
-		definition of commands. Its text element can contain variable
-		references to be resolved against the environment, but also allows for
-		the entire string to be treated as a literal by setting <i>resolve</i>
-		to false (default is true). This is useful inasmuch as it allows for
-		the presence of batch-type variables (e.g., ${HOME}) which should be
-		resolved by the remote shell and not inside the Eclipse client.
+		definition of commands. Its text element contains the actual argument
+		string which is passed to the attribute resolver before being written
+		out. The default behavior of the argument resolver is not to 
+		include arguments whose values are <code>null</code>.
+		The <code>arg-type</code> type provides the following properties:
 	</p>
-	<p>
-		The default behavior of the argument resolver is not to write out or
-		include arguments whose value is undefined (either
-		<code>null</code>
-		or zero-length). <i>isUndefinedIfMatches</i> affords more nuanced
-		control over whether an argument should be so eliminated. If the
-		argument references attribute values, but also has
-		text-literal segments, a regex can be provided to define what an
-		"empty" argument would be in this case. For instance, if an argument
-		flag should not appear when the value it precedes is an empty string,
-		one could write:
-	</p>
-
-	<code> &lt;arg isUndefinedIfMatches="-f"&gt;-f
-		${ptp_rm:flag#value}&lt;/arg&gt; </code>
-	<br>
-
-	<p>For the purposes of matching, trailing whitespace is trimmed
-		from the resolved argument, so there is no need to specify this as
-		part of the regex used to match.</p>
-
-	<h4 align="center">
+	
+	<table cellpadding="5" border="1" rules="all">
+		<tr>
+			<th>Property</th>
+			<th>Description</th>
+			<th>Default</th>
+		</tr>
+		<tr>
+			<td><i>attribute</i></td>
+			<td>
+				<p>
+				Apply the match to the value of the referenced attribute 
+				rather than the content of the element. For example,
+				a boolean attribute could be used to control the inclusion/exclusion of the argument as
+				follows:</p>
+				</p>
+				<code> &lt;arg attribute="useFlags" isUndefinedIfMatches="false"&gt;${ptp_rm:flag#value}&lt;/arg&gt; </code>
+			</td>
+			<td>""</td>
+		</tr>
+		<tr>
+			<td><i>isUndefinedIfMatches</i></td>
+			<td>
+				<p>
+				 Specifies a regular
+				expression that is compared to the argument after resolution. If the regular
+				expression matches, then the argument will be omitted from the result. For instance, if a
+				flag should not appear when the value it precedes is an empty string,
+				one could write:
+				</p>
+				<code> &lt;arg isUndefinedIfMatches="-f"&gt;-f
+					${ptp_rm:flag#value}&lt;/arg&gt; </code>
+			
+				<p>For the purposes of matching, trailing whitespace is trimmed
+					from the resolved argument, so there is no need to specify this as
+					part of the regex used to match.</p>
+			</td>
+			<td>""</td>
+		</tr>
+		<tr>
+			<td><i>resolve</i></td>
+			<td>
+				Indicates that the text element should be treated as a literal and no
+				attribute resolution performed on the string.. The <i>resolve</i> property must be set
+				to false if the string contains batch-type variables (e.g., ${HOME}) which should be
+				resolved by the remote shell and not inside the Eclipse client.
+			</td>
+			<td>true</td>
+		</tr>
+	</table>
+	
+	<h4>
 		<a name="JustInTimeEval">"Just-in-time" resolution of <i>@jobId</i>
 			and <code>managed-file</code> paths</a>
 	</h4>
@@ -679,12 +871,12 @@
 	<p>
 		<i>@jobId</i> is a special attribute name designating the runtime id
 		for a job instance. In the lifecycle of the run/launch (submit) call,
-		this value begins as an internally generated unique id which then is
-		swapped for the id returned by the scheduler or runtime system.
+		this value begins as an internally generated unique id (uuid) which then is
+		replaced by the real job id <i>after</i> the job has been submitted.
 	</p>
 
 	<p>
-		The <i>@jobId</i>, along with the target paths for
+		The <i>@jobId</i> attribute, along with the target paths for
 		<code>managed-file</code>
 		elements, are not known at configuration time (i.e., before the user
 		hits "Run"). While the former is made visible to the parsers and the
@@ -698,14 +890,14 @@
 	<p>
 		If the
 		<code>script</code>
-		needs to refer to the <i>@jobId</i>, it must do so via the variable
+		needs to refer to the <i>@jobId</i>, it must do so via an environment variable
 		made available by the particular scheduler it is written for. An
 		example of how to reference the target path of a
 		<code>managed-file</code>
 		inside the
 		<code>script</code>
-		is included in the <a href="http://download.eclipse.org/tools/ptp/docs/JAXBDemo.pdf">tutorial slides</a>; this
-		essentially involves defining a variable in the submission command's
+		is included in the <a href="http://download.eclipse.org/tools/ptp/docs/JAXBDemo.pdf">tutorial slides</a>. This
+		essentially involves defining an environment variable in the submission command's
 		environment, with a reference to the
 		<code>managed-file</code>
 		path attribute as its value, and then using this environment variable
@@ -714,152 +906,317 @@
 		.
 	</p>
 
-	<h4>
-		<a name="CommandsParsers">3. Commands</a>
-	</h4>
+	<h3>
+		<a name="CommandsParsers">Commands and Stream Parsers</a>
+	</h3>
 
 	<p>
-		As mentioned <a href="#CommandTypes">above</a>, the resource manager
-		<code>command</code>
-		denotes a [UNIX-type] system call made on the resource manager's
-		remote (target) connection (PTP does not generally support execution
-		on Windows systems). The command is always configured and executed
-		through a Java API (the "process builder") which bottoms out in a
-		<code>bash -c</code>
-		command. The first argument of the command thus must be the name/path
-		of the executable only. Its own arguments can then be subsequently
+		Commands are used by various parts of the control system in order to communicate with and control
+		aspects of the target system resource manager. Commands are system calls, either to a local or remote OS,
+		depending on the connection defined for the target system. 	A command is always 
+		executed through a Java API (the "process builder") which typically results in a
+		<code>bash -c</code> command (possibly via an ssh connection.) The first argument of 
+		the command is the name/path of the executable. Arguments are then
 		specified by an arbitrary number of
-		<code>arg</code>
+		<code>arg-type</code>
 		elements.
 	</p>
-
-	<img alt="CommandType" src="images/08command.jpeg" />
+		
+	<p>
+		The following commands are supported by the <code>control-data-type</code>:
+	</p>
+	<table cellpadding="5" border="1" rules="all">
+		<tr>
+			<th>Element</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td><code>start-up-command</code></td>
+			<td>
+				<p>
+					A command that is run to initialize the configuration. This command is usually used
+					to check for correct versions and to obtain dynamic configuration information (e.g.
+					the list of available queues) from the target system
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td><code>submit-interactive</code></td>
+			<td>
+				<p>
+					Command to submit a purely interactive job to the target system. An interactive job
+					is defined as one that the user would normally run from a login shell.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td><code>submit-interactive-debug</code></td>
+			<td>
+				<p>
+					Debug version of the <code>submit-interactive</code> command.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td><code>submit-batch</code></td>
+			<td>
+				<p>
+					Command to submit a batch job to the target system. This type of job
+					submission is normally asynchronous, i.e. the user submits a job and
+					at some later point the job will be run.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td><code>submit-batch-debug</code></td>
+			<td>
+				<p>
+					Debug version of the <code>submit-batch</code> command.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td><code>get-job-status</code></td>
+			<td>
+				<p>
+					A user-initiated (on-demand)
+					request to refresh the status information for a submission. Normal
+					(polled) updates, on the other hand, are the responsibility of the
+					<code>monitor-type</code>
+					component. The status command nevertheless needs to be implemented in
+					most cases, as it will be called internally just after submission. 
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td><code>terminate-job</code></td>
+			<td>
+				<p>
+					A command to remove a job from the target system (terminating
+					a running job if necessary). <b>Note</b>: if the submission type is interactive, the
+					<code>terminate-job</code> command usually does not need to be implemented,
+					as the process termination will be handled internally. However, in
+					some cases (such as PBS -I) which require the interactive job to run
+					as a pseudo-terminal, one may need this command in order to force its
+					termination externally.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td><code>suspend-job</code></td>
+			<td>
+				<p>
+					An optional command to suspend a running job.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td><code>resume-job</code></td>
+			<td>
+				<p>
+					An optional command to resume a suspended job.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td><code>hold-job</code></td>
+			<td>
+				<p>
+					An optional command to place a job on hold.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td><code>release-job</code></td>
+			<td>
+				<p>
+					An optional command to release a held job.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td><code>shut-down-command</code></td>
+			<td>
+				<p>
+					A command that is run to clean up after a job has been launched.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td><code>button-action</code></td>
+			<td>
+				<p>
+					An arbitrary command that can be associated with a button exposed through the
+					launch configuration Resources tab
+					(see further <a href="#Action">below</a>).
+				</p>
+			</td>
+		</tr>
+	</table>
+	
+	<p>
+		<b>Note: A
+		configuration may only define either a batch or an interactive launch mode, although
+		each launch mode
+		may have only two submission modes, run and debug.
+		(Future versions may allow batch and interactive to coexist in a single
+		configuration.) </b>
+	</p>
+	
+	<h4>
+		<a name="CommandTypes">Command Type</A>
+	</h4>
+	<p>
+		A <code>command-type</code> element is used to define a command. 
+	</p>
+	
+	<img alt="CommandType" src="images/08command.png" />
 
 	<p>
-		There are a number of important attributes on the
+		The following properties are available for a
 		<code>command-type</code>
-		element which bear detailed discussion here. <i>directory</i> of
-		course refers to where the command will be executed; <b>this
-			defaults to the "home" or working directory of the remote control
-			connection (the <code>control.working.dir</code> attribute)</b>; also as
-		expected, <i>redirectStderr</i> means that both output and error
-		streams are sent back on
-		<code>stdout</code>
-		. One can, if necessary, tune the buffer sizes on the stream readers
-		via the <i>streamBufferLimit</i>. If the environment set on the
-		command should entirely replace the shell environment (the default
-		behavior is to append the command environment), set <i>replaceEnvironment</i>
-		to true.
+		element:
 	</p>
+	<table cellpadding="5" border="1" rules="all">
+		<tr>
+			<th>Property</th>
+			<th>Description</th>
+			<th>Default</th>
+		</tr>
+		<tr>
+			<td><i>name</i></td>
+			<td>
+				Specifies
+				a name for the command.
+			</td>
+			<td>N/A</td>
+		</tr>
+		<tr>
+			<td><i>directory</i></td>
+			<td>
+				Specifies
+				where the command will be executed. <b>This
+				defaults to the "home" or working directory of the remote control
+				connection (the <code>control.working.dir</code> attribute)</b>.
+			</td>
+			<td><code>control.working.dir</code></td>
+		</tr>
+		<tr>
+			<td><i>redirectStderr</i></td>
+			<td>
+				Specifies
+				that both output and error
+				streams are sent back on <code>stdout</code>.
+			</td>
+			<td>false</td>
+		</tr>
+		<tr>
+			<td><i>streamBufferLimit</i></td>
+			<td>
+				Specifies
+				the buffer limit for stream readers.
+			</td>
+			<td>-1 (use system defined)</td>
+		</tr>
+		<tr>
+			<td><i>replaceEnvironment</i></td>
+			<td>
+				Specifies that the environment set on the
+				command should entirely replace the shell environment
+			</td>
+			<td>false (append the command environment)</td>
+		</tr>
+		<tr>
+			<td><i>waitForId</i></td>
+			<td>
+				Specifies that the output stream
+				for the command is being parsed for an id which will appear as an
+				attribute in the environment during the command execution, and that the
+				execution should not return until it sees this id. Most
+				submit commands will have these semantics.
+			</td>
+			<td>false</td>
+		</tr>
+		<tr>
+			<td><i>ignoreExitStatus</i></td>
+			<td>
+				Prevents an error being thrown 
+				in the case of non-zero exit of the command. This is usually used in the case of 
+				a command that incorrectly returns a non-zero exit status.
+			</td>
+			<td>false</td>
+		</tr>
+		<tr>
+			<td><i>keepOpen</i></td>
+			<td>
+				Specifies that the command should be held open for potentially repeated
+				redirection of input, such as when sending commands to an interactive
+				partition that has been allocated by a batch scheduler. There can only be one such
+				command open at a time.
+			</td>
+			<td>false</td>
+		</tr>
+		<tr>
+			<td><i>flags</i></td>
+			<td>
+				Specifies additional flags that will be passed to the remote connection.
+				The <i>flags</i> property is an OR'd string of three possible values:
+				<ul>
+					<li>NONE</li>
+					<li>ALLOCATE_PTY - allocates a pseudo-terminal</li>
+					<li>FORWARD_X11 - enables X11 forwarding on the connection</li>
+				</ul>
+			</td>
+			<td>NONE</td>
+		</tr>
+	</table>
 
 	<p>
-		If you do not wish an error to be thrown in the case of non-zero exit
-		of the command, set <i>ignoreExitStatus</i> to true. The <i>flags</i>
-		attribute is an OR'd string of three possible values:
-	</p>
-
-	<ul>
-		<li>NONE (default)</li>
-		<li>ALLOCATE_PTY (allocates a pseudo-terminal)</li>
-		<li>FORWARD_X11</li>
-	</ul>
-
-	<p>
-		Two crucial fields for command control are <i>waitForId</i> and <i>keepOpen</i>.
-		The former indicates to the resource manager that the output stream
-		for the command is being parsed for an id which will appear as an
-		attribute in the environment during the command execution, and that the
-		execution should not return until it sees this id. Very often the
-		submit commands will have these semantics. The latter field indicates
-		that the command should be held open for potentially repeated
-		redirection of input (see next paragraph). There can only be one such
-		process open inside the resource manager at a time (these semantics
-		will usually pertain to interactive managers using a pseudo-terminal
-		mode to control job submission).
-	</p>
-
-	<hr>
-	<h5>
-		<a name="Note2">BEST PRACTICE: WAIT-FOR-ID</a>
-	</h5>
-	<p>
-		As <a href="#CommandTypes">previously</a> described, there are two
-		basic types of commands, <b>(uu)id</b> commands which are related to a
-		specific job, and generic (non-uuid) commands.
-		<code>submit-</code>
-		and
-		<code>-job-</code>
-		commands fall into the former category; those in the latter category
-		are usually simple interactive commands, and their output is not
-		redirected to the console, but uuid-commands have several subclasses:
+		Commands that set the <i>waitForId</i> property to true are treated specially. These are
+		job submission commands which produce a job id to replace the internally generated uuid, and
+		are responsible for setting the <i>status</i> property of the @jobId attribute.
 	</p>
 	<br>
-	<table align="CENTER" rules="all">
+	<table align="CENTER" border="1" cellpadding="5" rules="all">
 		<tr>
 			<th>COMMAND TYPE</th>
-			<th>WAIT FOR ID</th>
 			<th>TOKENIZER STATES</th>
 		</tr>
 		<tr>
 			<td>batch</td>
-			<td>yes</td>
 			<td>SUBMITTED</td>
 		</tr>
 		<tr>
 			<td>interactive</td>
-			<td>no</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>interactive</td>
-			<td>yes</td>
 			<td>RUNNING</td>
 		</tr>
 		<tr>
-			<td>interactive, open</td>
-			<td>no</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>interactive, open</td>
-			<td>yes</td>
-			<td>(SUBMITTED,) RUNNING</td>
-		</tr>
-		<tr>
-			<td>interactive, open, pseudo-terminal</td>
-			<td>no</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>interactive, open, pseudo-terminal</td>
-			<td>yes</td>
-			<td>(SUBMITTED,) RUNNING</td>
+			<td>interactive, keepOpen</td>
+			<td>SUBMITTED, RUNNING</td>
 		</tr>
 	</table>
 	<br>
 	<p>
-		This table shows the various combinations that are feasible between
-		command type and waiting states. Simple interactive commands, whether
-		held open for further input or not, can wait or not wait, but in the
-		case of waiting, they should be provided with a <a
-			href="#StreamParsers">stream tokenizer</a> which recognizes and sets
-		the RUNNING state. Batch jobs, on the other hand, will usually have a
-		tokenizer which recognizes and sets SUBMITTED. In the case of some
-		open-process jobs (e.g.,
-		<code>qsub -I</code>
+		This table shows the various states that must be set depending on
+		whether the command is interactive or batch. Commands that wait for
+		an id must be provided with a <a href="#StreamParsers">stream tokenizer</a> 
+		which recognizes and sets the @jobId state. Batch jobs will usually have a
+		tokenizer which recognizes and sets the state to SUBMITTED when the job is
+		submitted. The monitoring system will normally handle setting the job state
+		to RUNNING (although this may also be done by the get-job-status command.)
+		Interactive jobs, which just run the command as soon as possible,
+		can set the job status directly to RUNNING. In the case of interactive
+		jobs that set keepOpen=true (e.g., <code>qsub -I</code>
 		for PBS, which also requires a pseudo-terminal to connect remotely),
 		there will usually be a pause before the terminal job is actually
-		scheduled; in order to allow the user to see that the job has been
+		scheduled. In order to allow the user to see that the job has been
 		accepted and is pending, the tokenizer needs to set both SUBMITTED and
 		RUNNING states, the latter when the job has actually started.
 	</p>
-	<hr>
 
 	<p>
-		We have discussed the
-		<code>arg</code>
-		type <a href="#LineArg">above</a>. Note that the command arguments,
-		input and even environment variables make use of this element. For the
+		Command <code>arg</code> elements, the <code>input</code> element, and the <code>environment</code> element all 
+		make use of the <a href="Arguments"><code>arg-type</code></a> type for specifying arguments. For the
 		<code>name-value-pair</code>
 		type comprising the latter one can as simple alternative set the <i>value</i>
 		attribute to a string (which will be resolved first in the current
@@ -877,28 +1234,54 @@
 		instance, for continuous testing of an interactive job in the same
 		interactive session.
 	</p>
+	
+	<h4>
+		Execution Environment
+	</h4>
+	
+	<p>
+		The <code>environment</code> element allows attribute values to be passed to the command's environment
+		prior to execution. 
+	</p>
 
-	<h4 align="center">
+	<img alt="EnvironmentType" src="images/092environment.png" />
+
+	<p>
+		In the simplest form, the <i>name</i> and <i>value</i> properties are used to specify
+		the name of the environment variable, and a corresponding value that can be resolved from the attribute
+		map. Finer control of the environment variable can be obtained by using the <code>arg-type</code> type.
+	</p>
+	
+	<p>
+		The <i>preserve</i> property can be used to override the <code>command-type</code> <i>replaceEnvironment</i> property.
+		If this property is set to true, this environment variable will be passed to the remote command regardless
+		of the <i>replaceEnvironment</i> property setting.
+	</p>
+
+	<h4>
 		<a name="StreamParsers">Stream Parsers</a>
 	</h4>
 
 	<p>
-		One can attach parsers (which we also refer to as tokenizers) to the
+		It is possible to attach a parser (which we also refer to as a tokenizer) to the
 		output and error streams of any
-		<code>command</code>
+		<code>command-type</code>
 		in order to capture information and use it to side-effect existing
 		attributes, or to generate new ones on the fly. While
 		the parser is not completely general, it is capable of a wide range of
 		tasks which would typically be required in the handling of output from
-		batch and runtime systems. We here explain the main elements (
-		<code>target, match, test</code>
-		) used by the tokenizer; one should further consult the <a
+		batch and runtime systems.
+	</p>
+	
+	<img alt="TokenizerType" src="images/090tokenizer.png" />
+
+	<p>
+	  	The main parser elements used by the tokenizer are
+		<code>target</code>, <code>match</code>, and <code>test</code>.
+		See the <a
 			href="#TokenizerExamples">tokenizer examples</a> demonstrating
 		various usage scenarios.
 	</p>
-
-	<img alt="TokenizerType" src="images/090tokenizer.png" />
-
 	<p>
 		The
 		<code>type</code>
@@ -960,8 +1343,8 @@
 		pattern, but should first apply the current segment to its targets.
 	</p>
 
-	<h5 align="CENTER">
-		<a name="TargetType">TARGET</a>
+	<h5>
+		<a name="TargetType">Target Type</a>
 	</h5>
 
 	<img alt="TargetType" src="images/091target.png" />
@@ -1058,8 +1441,8 @@
 	<p>When a match is found, the set of action types it contains are
 		all applied.</p>
 
-	<h5 align="CENTER">
-		<a name="MatchType">MATCH</a>
+	<h5>
+		<a name="MatchType">Match Type</a>
 	</h5>
 
 	<img alt="MatchType" src="images/10match.jpeg" />
@@ -1067,7 +1450,11 @@
 	<p>Each of these types corresponds to an action to be taken on the
 		indicated field of the target object.</p>
 
-	<table align="center" rules="all">
+	<table border="1" cellpadding="5" align="center" rules="all">
+		<tr>
+			<th>Element</th>
+			<th>Description</th>
+		<tr>
 		<tr>
 			<td><code>set</code></td>
 			<td>sets the value of that field</td>
@@ -1105,8 +1492,8 @@
 		for successive actions in the match.
 	</p>
 
-	<h5 align="CENTER">
-		<a name="EntryType">ENTRY</a>
+	<h5>
+		<a name="EntryType">Entry Type</a>
 	</h5>
 
 	<img alt="EntryType" src="images/11entry.jpeg" />
@@ -1121,8 +1508,8 @@
 		referring to the entire match.
 	</p>
 
-	<h5 align="CENTER">
-		<a name="TestType">TEST</a>
+	<h5>
+		<a name="TestType">Test Type</a>
 	</h5>
 
 	<img alt="TestType" src="images/12test.jpeg" />
@@ -1193,7 +1580,7 @@
 		of course must bottom out in a comparison operation.
 	</p>
 
-	<h4 align="center">
+	<h4>
 		<a name="TokenizerExamples"></a><b>Contents of Tokenizer Examples
 			(</b><a href="tokenizer-examples.xml">tokenizer-examples.xml</a>)
 	</h4>
@@ -1268,8 +1655,12 @@
 	</table>
 	<br>
 
+	<h3>
+		UI Configuration
+	</h3>
+	
 	<h4>
-		<a name="LaunchTab">4. The Launch Tab</a>
+		<a name="LaunchTab">The Resources Tab</a>
 	</h4>
 
 	<p>
@@ -1347,7 +1738,7 @@
 			PBS Script</a> tab.
 	</p>
 
-	<h4 align="CENTER">
+	<h4>
 		<a name="TabController">Tab Controller</a>
 	</h4>
 
@@ -1387,7 +1778,9 @@
 		visible one, will also include <i>all the attributes
 			valid for the listed but currently invisible controllers</i>.
 	</p>
-	<hr>
+	
+	<blockquote>
+	<div style="border: 1px solid ;">
 	<h5>
 		<a name="Note3">ATTRIBUTE NAMES vs VALUES</a>
 	</h5>
@@ -1411,7 +1804,9 @@
 		local settings (visibility, selection, enablement) still determine
 		whether they belong in the set of valid attribute names.
 	</p>
-	<hr>
+	</div>
+	</blockquote>
+	
 	<p>
 		The <i>showViewConfig</i> and <i>showViewExcluded</i> fields allow
 		control over whether the "View Configuration" and "View Excluded"
@@ -1430,7 +1825,7 @@
 		do not persist across resource manager sessions.
 	</p>
 	<br>
-	<h4 align="CENTER">
+	<h4>
 		<a name="TabFolders">Tab Folders and Tab Items</a>
 	</h4>
 
@@ -1470,16 +1865,16 @@
 		again to the relevant Javadocs.
 	</p>
 
-	<h4 align="CENTER">
+	<h4>
 		<a name="Layout">Layout</a>
 	</h4>
 	<img alt="Layout" src="images/17layout.jpeg" />
-	<h4 align="CENTER">
+	<h4>
 		<a name="LayoutData">Layout Data</a>
 	</h4>
 	<img alt="LayoutData" src="images/18layout-data.jpeg" />
 
-	<h4 align="CENTER">
+	<h4>
 		<a name="Composite">Composite/Group</a>
 	</h4>
 
@@ -1496,7 +1891,7 @@
 	<img alt="Composite" src="images/16composite.jpeg" />
 	<br>
 
-	<h4 align="CENTER">
+	<h4>
 		<a name="ControlState">Control State Wiring</a>
 	</h4>
 
@@ -1592,7 +1987,8 @@
 		cycles; the building of the UI tab will be aborted if such a cycle is
 		discovered.</p>
 
-	<hr>
+	<blockquote>
+	<div style="border: 1px solid ;">
 	<h5>
 		<a name="Note4">BEST PRACTICE: CONTROL STATE</a>
 	</h5>
@@ -1603,8 +1999,10 @@
 		correctly when it is rebuilt or re-initialized.
 	</p>
 	<br>
-	<hr>
-	<h4 align="CENTER">
+	</div>
+	</blockquote>
+	
+	<h4>
 		<a name="Widget">Widget</a>
 	</h4>
 
@@ -1711,7 +2109,7 @@
 		will appear on the widget whereever it usually does.</p>
 	<br>
 
-	<h4 align="CENTER">
+	<h4>
 		<a name="ButtonGroup">Button Group</a>
 	</h4>
 
@@ -1745,7 +2143,7 @@
 	<br>
 	<br>
 
-	<h4 align="CENTER">
+	<h4>
 		<a name="Browse">Browse</a>
 	</h4>
 
@@ -1786,7 +2184,7 @@
 	</p>
 	<br>
 
-	<h4 align="CENTER">
+	<h4>
 		<a name="Action">Action Button</a>
 	</h4>
 
@@ -1816,7 +2214,7 @@
 	</p>
 	<br>
 
-	<h4 align="CENTER">
+	<h4>
 		<a name="AttributeViewer">Attribute Viewer</a>
 	</h4>
 

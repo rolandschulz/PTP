@@ -8,7 +8,7 @@
 <!-- * Contributors: -->
 <!-- * Albert L. Rossi - design and implementation -->
 <!-- ****************************************************************************** -->
-<xs:schema targetNamespace="http://org.eclipse.ptp/rm" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rm="http://org.eclipse.ptp/rm"
+<xs:schema targetNamespace="org.eclipse.ptp" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rm="org.eclipse.ptp"
 	elementFormDefault="qualified">
 	<xs:element name="resource-manager-builder" type="rm:resource-manager-data"/>
 	<xs:complexType name="resource-manager-data">
@@ -21,13 +21,15 @@
 	</xs:complexType>
 	<xs:complexType name="site-type">
 		<xs:sequence>
+			<xs:element minOccurs="0" name="remote-services" type="xs:string"/>
+			<xs:element minOccurs="0" name="connection-name" type="xs:string"/>
+			<!--  The following elements are deprecated. Do not use. -->
 			<xs:element minOccurs="0" name="control-connection" type="xs:string"/>
 			<xs:element minOccurs="0" name="monitor-connection" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="control-type">
 		<xs:sequence>
-			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property-type"/>
 			<xs:element name="attribute" minOccurs="0" maxOccurs="unbounded" type="rm:attribute-type"/>
 			<xs:element name="managed-files" minOccurs="0" maxOccurs="unbounded" type="rm:managed-files-type"/>
 			<xs:element name="script" minOccurs="0" type="rm:script-type"/>
@@ -52,18 +54,6 @@
 			<xs:element name="button-action" minOccurs="0" maxOccurs="unbounded" type="rm:command-type"/>
 			<xs:element name="launch-tab" minOccurs="0" type="rm:launch-tab-type"/>
 		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="property-type">
-		<xs:sequence>
-			<xs:element name="default" minOccurs="0" type="xs:string"/>
-			<xs:element name="value" minOccurs="0"/>
-			<xs:element name="link-value-to" minOccurs="0" type="xs:string"/>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="type" type="xs:string" default="java.lang.String"/>
-		<xs:attribute name="visible" type="xs:boolean" default="true"/>
-		<xs:attribute name="readOnly" type="xs:boolean" default="false"/>
-		<xs:attribute name="translateBooleanAs" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="attribute-type">
 		<xs:sequence>
@@ -108,7 +98,7 @@
 		<xs:sequence>
 			<xs:element name="arg" maxOccurs="unbounded" type="rm:arg-type"/>
 			<xs:element name="input" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type"/>
-			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:name-value-pair-type"/>
+			<xs:element name="environment" minOccurs="0" maxOccurs="unbounded" type="rm:environment-type"/>
 			<xs:element name="stdout-parser" minOccurs="0" type="rm:tokenizer-type"/>
 			<xs:element name="stderr-parser" minOccurs="0" type="rm:tokenizer-type"/>
 			<xs:element name="redirect-parser" minOccurs="0" type="rm:tokenizer-type"/>
@@ -188,12 +178,13 @@
      <xs:attribute name="greaterThan" type="xs:string"/>
      <xs:attribute name="greaterThanOrEqualTo" type="xs:string"/>
    </xs:complexType>
-	<xs:complexType name="name-value-pair-type">
+	<xs:complexType name="environment-type">
 		<xs:sequence>
 			<xs:element name="arg" minOccurs="0" maxOccurs="unbounded" type="rm:arg-type"/>
 		</xs:sequence>
 		<xs:attribute name="name" use="required" type="xs:string"/>
 		<xs:attribute name="value" type="xs:string"/>
+		<xs:attribute name="preserve" type="xs:boolean"/>
 	</xs:complexType>
 	<xs:complexType name="tab-controller-type">
 		<xs:sequence>
@@ -223,6 +214,7 @@
 		<xs:attribute name="expression" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType mixed="true" name="arg-type">
+		<xs:attribute name="attribute" type="xs:string"/>
 		<xs:attribute name="isUndefinedIfMatches" type="xs:string"/>
 		<xs:attribute name="resolve" type="xs:boolean" default="true"/>
 	</xs:complexType>
@@ -546,14 +538,6 @@
 			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="ref" type="xs:string"/>
-		<xs:attribute name="type" default="property">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="property"/>
-					<xs:enumeration value="attribute"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
 		<xs:attribute name="matchAll" type="xs:boolean" default="false"/>
 		<xs:attribute name="allowOverwrites" type="xs:boolean" default="false"/>
 	</xs:complexType>
@@ -708,7 +692,6 @@
 	</xs:complexType>
 	<xs:complexType name="monitor-type">
 		<xs:sequence>
-			<xs:element name="property" minOccurs="0" maxOccurs="unbounded" type="rm:property-type"/>
 			<xs:element name="driver" minOccurs="0" maxOccurs="unbounded" type="rm:monitor-driver-type"/>
 			<xs:element name="workflow" minOccurs="0" maxOccurs="unbounded" type="rm:workflow-type"/>
 		</xs:sequence>

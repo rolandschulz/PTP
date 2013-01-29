@@ -105,7 +105,7 @@ my %mapping = (
 my $cmd="/usr/bin/bjobs";
 $cmd=$ENV{"CMD_JOBINFO"} if($ENV{"CMD_JOBINFO"}); 
 
-open(IN,"$cmd -u all -r -p -l |");
+open(IN,"$cmd -u all -r -p -s -l |");
 my $jobid="-";
 my $lastkey="-";
 my $data="";
@@ -303,34 +303,34 @@ sub get_state {
     my $job_state=shift;
     my($state,$detailed_state);
 
-    $state="UNDETERMINED";$detailed_state="-";
+    $state="UNDETERMINED";$detailed_state="";
 
 	if($job_state eq "EXIT") {
-	$state="COMPLETED";$detailed_state="EXIT";
+	$state="COMPLETED";$detailed_state="FAILED";
     }
     if($job_state eq "DONE") {
 	$state="COMPLETED";$detailed_state="JOB_OUTERR_READY";
     }
     if($job_state eq "SSUSP") {
-	$state="COMPLETED";$detailed_state="SSUSP";
+	$state="SUSPENDED";$detailed_state="SYSTEM_SUSPENDED";
     }
     if($job_state eq "ZOMBI") {
-	$state="COMPLETED";$detailed_state="ZOMBI";
+	$state="COMPLETED";$detailed_state="FAILED";
     }
-    if($job_state eq " PSUSP") {
-	$state="SUBMITTED";$detailed_state="suspended";
+    if($job_state eq "PSUSP") {
+	$state="SUBMITTED";$detailed_state="USER_ON_HOLD";
     }    
     if($job_state eq "PEND") {
-	$state="SUBMITTED";$detailed_state="-";
+	$state="SUBMITTED";$detailed_state="QUEUED_ACTIVE";
     }
     if($job_state eq "WAIT") {
-	$state="SUBMITTED";$detailed_state="WAIT";
+	$state="SUBMITTED";$detailed_state="QUEUED_ACTIVE";
     }      
     if($job_state eq "USUSP") {
-	$state="RUNNING";$detailed_state="suspended";
+	$state="SUSPENDED";$detailed_state="USER_SUSPENDED";
     }    
     if($job_state eq "RUN") {
-	$state="RUNNING";$detailed_state="-";
+	$state="RUNNING";$detailed_state="";
     }    
 
    
