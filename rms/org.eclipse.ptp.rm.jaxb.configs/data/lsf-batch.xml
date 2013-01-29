@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2013 IBM Corporation and others. All rights reserved. 
+	This program and the accompanying materials are made available under the 
+	terms of the Eclipse Public License v1.0s which accompanies this distribution, 
+	and is available at http://www.eclipse.org/legal/epl-v10.html -->
+<resource-manager-builder xmlns="org.eclipse.ptp"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd"
+	name="IBM Platform LSF">
+	<!-- Make sure XML editor line length is set long enough (160) to avoid 
+		wrapping text so messages don't get wrapped when reformatting -->
+	<control-data>
+		<!-- This is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
+		<attribute name="control.queue.name" visible="false">
+			<link-value-to>LSF_QUEUE_NAMR</link-value-to>
+		</attribute>
+		<!-- We set this to invisible because the values are not really modifiable -->
+		<attribute name="queues" visible="false"/>
+		<!-- Needed by RM internals for fetch; name is fixed by convention -->
+		<attribute name="stdout_remote_path" visible="false">
+			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o${ptp_rm:@jobId#default}</default>
+			<link-value-to>LSF_STDOUT_PATH_NEW</link-value-to>
+		</attribute>
+		<!-- Needed by RM internals for fetch; name is fixed by convention -->
+		<attribute name="stderr_remote_path" visible="false">
+			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
+			<link-value-to>LSF_STDERR_PATH_NEW</link-value-to>
+		</attribute>
+		<attribute name="mpiCommand" type="choice">
+			<description>Optional MPI command to run job.</description>
+			<choice>,poe,mpiexec,mpirun</choice>
+		</attribute>
+				
+		<!-- -ar option -->
+		<!--  This is a boolean option with no argument. Use datatype boolean so
+		      we can take advantage of remapping user's choice to something that
+		      can be used as a conditional expansion for '<arg isUndefinedAsMatches ...'
+		-->
+		<attribute name="LSF_JOB_RESIZABLE" type="boolean"
+			translateBooleanAs=" ,no">
+			<description>Job Is Resizable:</description>
+			<tooltip>Specifies that job is auto-resizable. (-ar)</tooltip>
+			<default>no</default>
+		</attribute>
+		
+		<!-- -B option -->
+		<!--  This is a boolean option with no argument. Use datatype boolean so
+		      we can take advantage of remapping user's choice to something that
+		      can be used as a conditional expansion for '<arg isUndefinedAsMatches ...'
+		-->
+		<attribute name="LSF_NOTIFY_DISPATCH" type="boolean"
+			translateBooleanAs=" ,no">
+			<description>Dispatch_Notification:</description>
+			<tooltip>Send you email when your job is dispatched. (-B)</tooltip>
+			<default>no</default>
+		</attribute>
+		
+		<!-- -N option -->
+		<!--  This is a boolean option with no argument. Use datatype boolean so
+		      we can take advantage of remapping user's choice to something that
+		      can be used as a conditional expansion for '<arg isUndefinedAsMatches ...'
+		-->
+		<attribute name="LSF_NOTIFY_COMPLETION" type="boolean"
+			translateBooleanAs=" ,no">
+			<description>Completion_Notification:</description>
+			<tooltip>Send you email when your job completes. (-N)</tooltip>
+			<default>no</default>
+		</attribute>
+		
+		<!-- -r option -->
+		<!--  This is a boolean option with no argument. Use datatype boolean so
+		      we can take advantage of remapping user's choice to something that
+		      can be used as a conditional expansion for '<arg isUndefinedAsMatches ...'
+		-->
+		<attribute name="LSF_RERUN_SYS_FAILURE" type="boolean"
+			translateBooleanAs=" ,no">
+			<description>Rerun on System Failure:</description>
+			<tooltip>Rerun job if host or system fails. (-r)</tooltip>
+			<default>no</default>
+		</attribute>
+				
+		<!-- -rn option -->
+		<!--  This is a boolean option with no argument. Use datatype boolean so
+		      we can take advantage of remapping user's choice to something that
+		      can be used as a conditional expansion for '<arg isUndefinedAsMatches ...'
+		-->
+		<attribute name="LSF_NORERUN_SYS_FAILURE" type="boolean"
+			translateBooleanAs=" ,no">
+			<description>Don't Rerun on System Failure:</description>
+			<tooltip>Don't rerun job if host or system fails. (-rn)</tooltip>
+			<default>no</default>
+		</attribute>
+						
+		<!-- -ul option -->
+		<!--  This is a boolean option with no argument. Use datatype boolean so
+		      we can take advantage of remapping user's choice to something that
+		      can be used as a conditional expansion for '<arg isUndefinedAsMatches ...'
+		-->
+		<attribute name="LSF_PASS_USER_LIMITS" type="boolean"
+			translateBooleanAs=" ,no">
+			<description>Pass User Limits:</description>
+			<tooltip>Pass user shell limits to execution host. (-ul)</tooltip>
+			<default>no</default>
+		</attribute>
+								
+		<!-- -x option -->
+		<!--  This is a boolean option with no argument. Use datatype boolean so
+		      we can take advantage of remapping user's choice to something that
+		      can be used as a conditional expansion for '<arg isUndefinedAsMatches ...'
+		-->
+		<attribute name="LSF_EXCLUSIVE_EXECUTION" type="boolean"
+			translateBooleanAs=" ,no">
+			<description>Exclusive Execution:</description>
+			<tooltip>Submit job in exclusive execution mode. (-x)</tooltip>
+			<default>no</default>
+		</attribute>
+				
+		<!-- -app option -->
+		<attribute name="LSF_APP_PROFILE" type="string">
+			<description>Application Profile:</description>
+			<tooltip>Specify the name of an application profile. (-app)</tooltip>
+		</attribute>
+				
+		<!-- -b option -->
+		<attribute name="LSF_DISPATCH_AT" type="string">
+			<description>Dispatch At:</description>
+			<tooltip>Dispatch the job at or after the specified time. (-b)</tooltip>
+            <validator>
+            	<!-- Validate time spec where time can be blank, yyyy:mm:dd:hh:mm, mm:dd:hh:mm, dd:hh:mm or hh:mm -->
+            	<regex expression=" *|(?:[\d]{4}:[\d]{2}:[\d]{2}:|[\d]{2}:[\d]{2}:|[\d]{2}:)?[\d]{2}:[\d]{2}"/>
+                <error-message>Dispatch At Time format is incorrect.
+                </error-message>
+            </validator>
+		</attribute>
+						
+		<!-- -C option -->
+		<attribute name="LSF_COREFILE_LIMIT" type="string">
+			<description>Core File Limit:</description>
+			<tooltip>Specify core file size limit. (-C)</tooltip>
+            <validator>
+            	<regex expression=" *|[\d]+"/>
+                <error-message>Core file limit must be a numeric value.
+                </error-message>
+            </validator>
+		</attribute>
+								
+		<!-- -c option -->
+		<attribute name="LSF_CPUTIME_LIMIT" type="string">
+			<description>CPU Time Limit:</description>
+			<tooltip>Specify CPU time limit. (-c)</tooltip>
+		</attribute>
+								
+		<!-- -D option -->
+		<attribute name="LSF_DATA_LIMIT" type="string">
+			<description>Data Limit:</description>
+			<tooltip>Specify data segment size limit. (-D)</tooltip>
+            <validator>
+            	<regex expression=" *|[\d]+"/>
+                <error-message>Data segment limit must be a numeric value.
+                </error-message>
+            </validator>
+		</attribute>
+										
+		<!-- -e option -->
+		<attribute name="LSF_STDERR_PATH_APPEND" type="string">
+			<description>STDERR Path (Append):</description>
+			<tooltip>Specify path for application to append STDERR output. (-e)</tooltip>
+		</attribute>
+												
+		<!-- -eo option -->
+		<attribute name="LSF_STDERR_PATH_NEW" type="string">
+			<description>STDERR Path (New):</description>
+			<tooltip>Specify path for application to write STDERR output. (-eo)</tooltip>
+		</attribute>
+										
+		<!-- -F option -->
+		<attribute name="LSF_FILESIZE_LIMIT" type="string">
+			<description>File Size Limit:</description>
+			<tooltip>Specify file size limit. (-F)</tooltip>
+            <validator>
+            	<regex expression=" *|[\d]+"/>
+                <error-message>File size limit must be a numeric value.
+                </error-message>
+            </validator>
+		</attribute>
+												
+		<!-- -i option -->
+		<attribute name="LSF_STDIN_PATH" type="string">
+			<description>STDIN Path:</description>
+			<tooltip>Specify path name for application STDIN. (-i)</tooltip>
+		</attribute>
+														
+		<!-- -is option -->
+		<attribute name="LSF_STDIN_EDITABLE_PATH" type="string">
+			<description>STDIN Path (Editable):</description>
+			<tooltip>Specify path name for application STDIN. File may be edited or deleted after job submission. (-is)</tooltip>
+		</attribute>
+											
+		<!-- -J option -->
+		<attribute name="LSF_JOB_NAME" type="string">
+			<description>Job Name:</description>
+			<tooltip>Specify job name.</tooltip>
+		</attribute>
+													
+		<!-- -L option -->
+		<attribute name="LSF_LOGIN_SHELL" type="string">
+			<description>Login Shell:</description>
+			<tooltip>Specify login shell path name. (-L)</tooltip>
+		</attribute>
+															
+		<!-- -Lp option -->
+		<attribute name="LSF_LICENSE_SCHEDULER_PROJECT" type="string">
+			<description>License Scheduler Project:</description>
+			<tooltip>Specify License Scheduler project name. (-Lp)</tooltip>
+		</attribute>
+																	
+		<!-- -M option -->
+		<attribute name="LSF_MEMORY_LIMIT" type="string">
+			<description>Memory Limit:</description>
+			<tooltip>Specify memory limit. (-m)</tooltip>
+            <validator>
+            	<regex expression=" *|[\d]+"/>
+                <error-message>Memory limit must be a numeric value.
+                </error-message>
+            </validator>
+		</attribute>
+																			
+		<!-- -m option -->
+		<attribute name="LSF_HOST_NAMES" type="string">
+			<description>Execution Host Name(s):</description>
+			<tooltip>Specify hosts or hosts groups where job should run. (-m)</tooltip>
+		</attribute>
+																					
+		<!-- -mig option -->
+		<attribute name="LSF_MIGRATION" type="string">
+			<description>Migration Threshold:</description>
+			<tooltip>Specify migration threhshold for checkpointable and rerunnable jobs.</tooltip>
+		</attribute>
+																				
+		<!-- -n option -->
+		<attribute name="LSF_NUM_PROCS" type="string">
+			<description>Number of Processors:</description>
+			<tooltip>Specify minimum and optional maximum number of processors to run the job. (-n)</tooltip>
+            <validator>
+            	<!--  Validate # of processors as  blank, n, or m,n where m and n must be integers-->
+            	<regex expression=" *|[\d]+(?:,[\d]+)?"/>
+                <error-message>Number of processors must be numeric or numeric pair.
+                </error-message>
+            </validator>
+		</attribute>
+														
+		<!-- -network option -->
+		<attribute name="LSF_NETWORK" type="string">
+			<description>Network Attributes:</description>
+			<tooltip>Specify network attributes (type, protocol, mode, usage, instance, etc). (-network)</tooltip>
+		</attribute>
+												
+		<!-- -o option -->
+		<attribute name="LSF_STDOUT_PATH_APPEND" type="string">
+			<description>STDOUT Path (Append):</description>
+			<tooltip>Specify path for application to append STDOUT output. (-o)</tooltip>
+		</attribute>
+												
+		<!-- -oo option -->
+		<attribute name="LSF_STDOUT_PATH_NEW" type="string">
+			<description>STDOUT Path (New):</description>
+			<tooltip>Specify path for application to write STDOUT output. (-oo)</tooltip>
+		</attribute>
+														
+		<!-- -P option -->
+		<attribute name="LSF_PROJECT_NAME" type="string">
+			<description>Project Name:</description>
+			<tooltip>Specify project name. (-P)</tooltip>
+		</attribute>
+																
+		<!-- -p option -->
+		<attribute name="LSF_PROCESS_LIMIT" type="string">
+			<description>Process Limit:</description>
+			<tooltip>Specify process limit. (-p)</tooltip>
+            <validator>
+            	<regex expression=" *|[\d]+"/>
+                <error-message>Process limit must be a numeric value.
+                </error-message>
+            </validator>
+		</attribute>
+																		
+		<!-- -Q option -->
+		<attribute name="LSF_REQUEUE_CODES" type="string">
+			<description>Auto Requeue Exit Codes:</description>
+			<tooltip>Specify automatic job requeue exit codes. (-Q)</tooltip>
+		</attribute>
+		
+		<!-- -q option -->
+		<attribute name="LSF_QUEUE" type="string">
+			<description>Job Queue:</description>
+			<tooltip>Specify the name of the batch job queue. (-q)</tooltip>
+			<items-from>queues</items-from>
+		</attribute>
+				
+		<!-- -R option -->
+		<attribute name="LSF_RESOURCES" type="string">
+			<description>Resource Requirements:</description>
+			<tooltip>Specify resource requirements for job. (-R)</tooltip>
+		</attribute>
+						
+		<!-- -S option -->
+		<attribute name="LSF_STACK_LIMIT" type="string">
+			<description>Stack Limit:</description>
+			<tooltip>Specify stack limit. (-S)</tooltip>
+            <validator>
+            	<regex expression=" *|[\d]+"/>
+                <error-message>Stack limit must be a numeric value.
+                </error-message>
+            </validator>
+		</attribute>
+								
+		<!-- -sla option -->
+		<attribute name="LSF_SERVICE_CLASS" type="string">
+			<description>Service Class:</description>
+			<tooltip>Specify service class for job. (-sla)</tooltip>
+		</attribute>
+										
+		<!-- -sp option -->
+		<attribute name="LSF_JOB_PRIORITY" type="string">
+			<description>Job Priority:</description>
+			<tooltip>Specify job priority. (-sp)</tooltip>
+		</attribute>
+											
+		<!-- -T option -->
+		<attribute name="LSF_THREAD_LIMIT" type="string">
+			<description>Thread Limit:</description>
+			<tooltip>Specify thread limit. (-T)</tooltip>
+            <validator>
+            	<regex expression=" *|[\d]+"/>
+                <error-message>Thread limit must be a numeric value.
+                </error-message>
+            </validator>
+		</attribute>
+												
+		<!-- -t option -->
+		<attribute name="LSF_TERMINATION_DEADLINE" type="string">
+			<description>Termination Deadline:</description>
+			<tooltip>Specify job termination deadline. (-t)</tooltip>
+            <validator>
+            	<!-- Validate time spec where time can be blank, yyyy:mm:dd:hh:mm, mm:dd:hh:mm, dd:hh:mm or hh:mm -->
+            	<regex expression=" *|(?:[\d]{4}:[\d]{2}:[\d]{2}:|[\d]{2}:[\d]{2}:|[\d]{2}:)?[\d]{2}:[\d]{2}"/>
+                <error-message>Termination Deadline format is incorrect.
+                </error-message>
+            </validator>
+			
+		</attribute>
+														
+		<!-- -U option -->
+		<attribute name="LSF_RESERVATION_ID" type="string">
+			<description>Reservation ID:</description>
+			<tooltip>Specify reservation id. (-U)</tooltip>
+		</attribute>
+														
+		<!-- -u option -->
+		<attribute name="LSF_EMAIL_ID" type="string">
+			<description>Email ID:</description>
+			<tooltip>Specify email address to receive notifications. (-u)</tooltip>
+		</attribute>
+																
+		<!-- -v option -->
+		<attribute name="LSF_SWAP_LIMIT" type="string">
+			<description>Swap Limit:</description>
+			<tooltip>Specify virtual memory limit for job. (-v)</tooltip>
+            <validator>
+            	<regex expression=" *|[\d]+"/>
+                <error-message>Swap limit must be a numeric value.
+                </error-message>
+            </validator>
+		</attribute>
+																		
+		<!-- -W option -->
+		<attribute name="LSF_RUNTIME_LIMIT" type="string">
+			<description>Runtime Limit:</description>
+			<tooltip>Specify runtime limit for job. (-W)</tooltip>
+		</attribute>
+																				
+		<!-- -We option -->
+		<attribute name="LSF_RUNTIME_ESTIMATE" type="string">
+			<description>Estimated Runtime:</description>
+			<tooltip>Specify estimated runtime for job. (-We)</tooltip>
+		</attribute>
+																						
+		<!-- -w option -->
+		<attribute name="LSF_DEPENDENCIES" type="string">
+			<description>Job Dependencies:</description>
+			<tooltip>Specify dependencies for job. (-w)</tooltip>
+		</attribute>
+		
+		<!-- Other options -->
+		<attribute name="LSF_OTHER_OPTIONS" type="string">
+			<description>Other Options:</description>
+			<tooltip>Specify LSF options that don't appear elsewhere in list.</tooltip>
+		</attribute>
+		
+		<start-up-command name="get-queues">
+			<arg>perl</arg>
+			<arg>${ptp_rm:ptpDirectory#value}/rms/LSF/query_queues.pl</arg>
+			<stdout-parser delim="\n">
+				<target ref="queues">
+					<match>
+						<expression>^([^\s]+)*$</expression>
+						<add field="value">
+							<entry valueGroup="1"/>
+						</add>
+					</match>
+				</target>
+			</stdout-parser>
+		</start-up-command>
+		
+		<!-- Invocation command definition -->
+		<submit-batch name="LSF job submission"
+			waitForId="true"  directory="${ptp_rm:directory#value}">
+			<arg>bsub</arg>
+			<arg isUndefinedIfMatches="-ar no">-ar ${ptp_rm:LSF_JOB_RESIZABLE#value}</arg>
+			<arg isUndefinedIfMatches="-B no">-B ${ptp_rm:LSF_NOTIFY_DISPATCH#value}</arg>
+			<arg isUndefinedIfMatches="-N no">-N ${ptp_rm:LSF_NOTIFY_COMPLETION#value}</arg>
+			<arg isUndefinedIfMatches="-r no">-r ${ptp_rm:LSF_RERUN_SYS_FAILURE#value}</arg>
+			<arg isUndefinedIfMatches="-rn no">-rn ${ptp_rm:LSF_NORERUN_SYS_FAILURE#value}</arg>
+			<arg isUndefinedIfMatches="-ul no">-ul ${ptp_rm:LSF_PASS_USER_LIMITS#value}</arg>
+			<arg isUndefinedIfMatches="-x no">-x ${ptp_rm:LSF_EXCLUSIVE_EXECUTION#value}</arg>
+			<arg isUndefinedIfMatches="-app">-app ${ptp_rm:LSF_APPLICATION_PROFILE#value}</arg>
+			<arg isUndefinedIfMatches="-b">-b ${ptp_rm:LSF_DISPATCH_AT#value}</arg>
+			<arg isUndefinedIfMatches="-C">-C ${ptp_rm:LSF_COREFILE_LIMIT#value}</arg>
+			<arg isUndefinedIfMatches="-c">-c ${ptp_rm:LSF_CPUTIME_LIMIT#value}</arg>
+			<arg isUndefinedIfMatches="-D">-D ${ptp_rm:LSF_DATA_LIMIT#value}</arg>
+			<arg isUndefinedIfMatches="-e">-e ${ptp_rm:LSF_STDERR_PATH_APPEND#value}</arg>
+			<arg isUndefinedIfMatches="-eo">-eo ${ptp_rm:LSF_STDERR_PATH_NEW#value}</arg>
+			<arg isUndefinedIfMatches="-F">-F ${ptp_rm:LSF_FILESIZE_LIMIT#value}</arg>
+			<arg isUndefinedIfMatches="-i">-i ${ptp_rm:LSF_STDIN_PATH#value}</arg>
+			<arg isUndefinedIfMatches="-is">-is ${ptp_rm:LSF_STDIN_EDITABLE_PATH#value}</arg>
+			<arg isUndefinedIfMatches="-J">-J ${ptp_rm:LSF_JOB_NAME#value}</arg>
+			<arg isUndefinedIfMatches="-L">-L ${ptp_rm:LSF_LOGIN_SHELL#value}</arg>
+			<arg isUndefinedIfMatches="-Lp">-Lp ${ptp_rm:LSF_LICENSE_SCHEDULER_PROJECT#value}</arg>
+			<arg isUndefinedIfMatches="-M">-M ${ptp_rm:LSF_MEMORY_LIMIT#value}</arg>
+			<arg isUndefinedIfMatches="-m">-m ${ptp_rm:LSF_HOST_NAMES#value}</arg>
+			<arg isUndefinedIfMatches="-mig">-mig ${ptp_rm:LSF_MIGRATION#value}</arg>
+			<arg isUndefinedIfMatches="-n">-n ${ptp_rm:LSF_NUM_PROCS#value}</arg>
+			<arg isUndefinedIfMatches="-network">-network ${ptp_rm:LSF_NETWORK#value}</arg>
+			<arg isUndefinedIfMatches="-o">-o ${ptp_rm:LSF_STDOUT_PATH_APPEND#value}</arg>
+			<arg isUndefinedIfMatches="-oo">-oo ${ptp_rm:LSF_STDOUT_PATH_NEW#value}</arg>
+			<arg isUndefinedIfMatches="-P">-P ${ptp_rm:LSF_PROJECT_NAME#value}</arg>
+			<arg isUndefinedIfMatches="-Q">-Q ${ptp_rm:LSF_REQUEUE_CODES#value}</arg>
+			<arg isUndefinedIfMatches="-p">-p ${ptp_rm:LSF_PROCESS_LIMIT#value}</arg>
+			<arg isUndefinedIfMatches="-q">-q ${ptp_rm:LSF_QUEUE#value}</arg>
+			<arg isUndefinedIfMatches="-R">-R ${ptp_rm:LSF_RESOURCES#value}</arg>
+			<arg isUndefinedIfMatches="-S">-S ${ptp_rm:LSF_STACK_LIMIT#value}</arg>
+			<arg isUndefinedIfMatches="-sla">-sla ${ptp_rm:LSF_SERVICE_CLASS#value}</arg>
+			<arg isUndefinedIfMatches="-sp">-sp ${ptp_rm:LSF_JOB_PRIORITY#value}</arg>
+			<arg isUndefinedIfMatches="-T">-T ${ptp_rm:LSF_THREAD_LIMIT#value}</arg>
+			<arg isUndefinedIfMatches="-t">-t ${ptp_rm:LSF_TERMINATION_DEADLINE#value}</arg>
+			<arg isUndefinedIfMatches="-U">-U ${ptp_rm:LSF_RESERVATION_ID#value}</arg>
+			<arg isUndefinedIfMatches="-u">-u ${ptp_rm:LSF_EMAIL_ID#value}</arg>
+			<arg isUndefinedIfMatches="-v">-v ${ptp_rm:LSF_SWAP_LIMIT#value}</arg>
+			<arg isUndefinedIfMatches="-W">-W ${ptp_rm:LSF_RUNTIME_LIMIT#value}</arg>
+			<arg isUndefinedIfMatches="-We">-We ${ptp_rm:LSF_RUNTIME_ESTIMATE#value}</arg>
+			<arg isUndefinedIfMatches="-w">-w ${ptp_rm:LSF_DEPENDENCIES#value}</arg>
+			<arg>${ptp_rm:LSF_OTHER_OPTIONS#value}</arg>
+			<arg>${ptp_rm:executablePath#value}</arg>
+			<arg>${ptp_rm:progArgs#value}</arg>
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>Job &lt;([\d]+)&gt; is submitted.*</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
+						<set field="value">
+							<entry value="SUBMITTED" />
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+		</submit-batch>	
+
+		<get-job-status name="get-job-status" ignoreExitStatus="true">
+			<arg>${ptp_rm:bindir#value}bjobs</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<!-- Match and discard heading line -->
+					<match>
+						<expression>^JOBID.*$</expression>
+					</match>
+					<match>
+						<expression>^[\s]*$</expression>
+					</match>
+					<!--  Match job status line like '219     wootton RUN   short      hpcvictim.p hpcvictim.p sleep 360  Jan 28 11:10' -->
+					<match>
+						<expression>^[\d]+[\s]+[\S]+[\s]+RUN[\s]+.*$</expression>
+						<set field="value">
+							<entry value="RUNNING"/>
+						</set>
+					</match>
+					<!--  Match job status line like '219     wootton USUSP short      hpcvictim.p hpcvictim.p sleep 360  Jan 28 11:10' -->
+					<match>
+						<expression>^[\d]+[\s]+[\S]+[\s]+USUSP[\s]+.*$</expression>
+						<set field="value">
+							<entry value="SUSPENDED"/>
+						</set>
+					</match>
+					<!--  Match job status line like '219     wootton PEND  short      hpcvictim.p hpcvictim.p sleep 360  Jan 28 11:10' -->
+					<match>
+						<expression>^[\d]+[\s]+[\S]+[\s]+PEND[\s]+.*$</expression>
+						<set field="value">
+							<entry value="SUBMITTED"/>
+						</set>
+					</match>
+					<!--  Match job status line like '219     wootton WAIT  short      hpcvictim.p hpcvictim.p sleep 360  Jan 28 11:10' -->
+					<match>
+						<expression>^[\d]+[\s]+[\S]+[\s]+WAIT[\s]+.*$</expression>
+						<set field="value">
+							<entry value="SUBMITTED"/>
+						</set>
+					</match>
+					<!--  Match job status line like '219     wootton EXIT  short      hpcvictim.p hpcvictim.p sleep 360  Jan 28 11:10' -->
+					<match>
+						<expression>^[\d]+[\s]+[\S]+[\s]+EXIT[\s]+.*$</expression>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</match>
+					<!--  Match job status line like '219     wootton DONE  short      hpcvictim.p hpcvictim.p sleep 360  Jan 28 11:10' -->
+					<match>
+						<expression>^[\d]+[\s]+[\S]+[\s]+DONE[\s]+.*$</expression>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</match>
+					<!--  Match job status line like '219     wootton PSUSP  short      hpcvictim.p hpcvictim.p sleep 360  Jan 28 11:10' -->
+					<match>
+						<expression>^[\d]+[\s]+[\S]+[\s]+PSUSP[\s]+.*$</expression>
+						<set field="value">
+							<entry value="SUBMITTED"/>
+						</set>
+					</match>
+					<!--  Match job status line like '219     wootton SSUSP short      hpcvictim.p hpcvictim.p sleep 360  Jan 28 11:10' -->
+					<match>
+						<expression>^[\d]+[\s]+[\S]+[\s]+SSUSP[\s]+.*$</expression>
+						<set field="value">
+							<entry value="SUSPENDED"/>
+						</set>
+					</match>
+					<!--  Match job status line like '219     wootton ZOMBI short      hpcvictim.p hpcvictim.p sleep 360  Jan 28 11:10' -->
+					<match>
+						<expression>^[\d]+[\s]+[\S]+[\s]+ZOMBI[\s]+.*$</expression>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+		</get-job-status>
+					
+		<terminate-job name="cancel">
+			<arg>bkill</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+		</terminate-job>
+					
+		<suspend-job name="suspend">
+			<arg>bstop</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+		</suspend-job>
+					
+		<resume-job name="resume">
+			<arg>bresume</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+		</resume-job>
+
+		<!-- Tasks Tab -->
+		<launch-tab>
+			<!-- Advanced Tab -->
+			<dynamic>
+				<title>Job Submission</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="1" />
+					</layout>
+					<viewer name="LSFOptionsAdvanced" style="SWT.BORDER"
+						sort="true" initialAllChecked="true" type="table">
+						<layout-data>
+							<grid-data widthHint="600" heightHint="400"
+								horizontalSpan="1" />
+						</layout-data>
+						<!-- These are the 6 attribute fields mappable to columns. In a "table 
+							viewer" the order of the columns is entirely arbitrary -->
+						<column-data name="Description" width="300" />
+						<column-data name="Value" width="300" />
+						<items>
+							<include>LSF_QUEUE</include>
+							<include>LSF_EXCLUSIVE_EXECUTION</include>
+							<include>LSF_NUM_PROCS</include>
+							<include>LSF_HOST_NAMES</include>
+							<include>LSF_RESOURCES</include>
+							<include>LSF_HOST_NAMES</include>
+							<include>LSF_RESERVATION_ID</include>
+							<include>LSF_NETWORK</include>
+							<include>LSF_JOB_RESIZABLE</include>
+							<include>LSF_LICENSE_SCHEDULER_PROJECT</include>
+							<include>LSF_PROJECT_NAME</include>
+							<include>LSF_SERVICE_CLASS</include>
+							<include>LSF_JOB_NAME</include>
+							<include>LSF_JOB_PRIORITY</include>
+							<include>LSF_LOGIN_SHELL</include>
+							<include>LSF_DISPATCH_AT</include>
+							<include>LSF_TERMINATION_DEADLINE</include>
+							<include>LSF_RUNTIME_ESTIMATE</include>
+							<include>LSF_MIGRATION</include>
+							<include>LSF_PASS_USER_LIMITS</include>
+							<include>LSF_COREFILE_LIMIT</include>
+							<include>LSF_CPUTIME_LIMIT</include>
+							<include>LSF_DATA_LIMIT</include>
+							<include>LSF_FILESIZE_LIMIT</include>
+							<include>LSF_MEMORY_LIMIT</include>
+							<include>LSF_PROCESS_LIMIT</include>
+							<include>LSF_STACK_LIMIT</include>
+							<include>LSF_THREAD_LIMIT</include>
+							<include>LSF_RUNTIME_LIMIT</include>
+							<include>LSF_SWAP_LIMIT</include>
+							<include>LSF_STDIN_PATH</include>
+							<include>LSF_STDIN_EDITABLE_PATH</include>
+							<include>LSF_STDOUT_PATH_NEW</include>
+							<include>LSF_STDOUT_PATH_APPEND</include>
+							<include>LSF_STDERR_PATH_NEW</include>
+							<include>LSF_STDERR_PATH_APPEND</include>
+							<include>LSF_RERUN_SYS_FAILURE</include>
+							<include>LSF_NORERUN_SYS_FAILURE</include>
+							<include>LSF_REQUEUE_CODES</include>
+							<include>LSF_NOTIFY_DISPATCH</include>
+							<include>LSF_NOTIFY_COMPLETION</include>
+							<include>LSF_EMAIL_ID</include>
+							<include>LSF_OTHER_OPTIONS</include>
+						</items>
+					</viewer>
+				</composite>
+			</dynamic>
+
+		</launch-tab>
+	</control-data>
+	<monitor-data schedulerType="LSF">
+	</monitor-data>
+</resource-manager-builder>
