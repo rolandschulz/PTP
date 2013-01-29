@@ -105,7 +105,7 @@ my %mapping = (
 my $cmd="/usr/bin/bjobs";
 $cmd=$ENV{"CMD_JOBINFO"} if($ENV{"CMD_JOBINFO"}); 
 
-open(IN,"$cmd -u all -r -p -l |");
+open(IN,"$cmd -u all -r -p -s -l |");
 my $jobid="-";
 my $lastkey="-";
 my $data="";
