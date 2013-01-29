@@ -51,7 +51,7 @@ digittoint(int c)
  */
 
 int
-vasprintf(char **strp, const char *fmt, va_list ap)
+vasprintf(char **ret, const char *fmt, va_list ap)
 {
 	va_list ac;
 	size_t len;
