@@ -47,14 +47,17 @@ dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(strings.h sys/time.h unistd.h)
 
+dnl Checks for typedefs, structures, and compiler characteristics.
 os=`uname -s`
 if test "x$os" = "xAIX" ; then
-        CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt"
+    CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt"
+    AIX=1
 else
-        CFLAGS="$CFLAGS -Wall"
+    CFLAGS="$CFLAGS -Wall"
+    AIX=0
 fi
+AM_CONDITIONAL([AIX], [test "$AIX" = 1])
 
-dnl Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
 AC_STRUCT_TM
 

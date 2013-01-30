@@ -1,4 +1,7 @@
-noinst_PROGRAMS =			test_mi
+if !AIX
+  noinst_PROGRAMS =			test_mi
+endif
+
 noinst_LIBRARIES =			libmi.a
 
 libmi_a_SOURCES =			CLICommand.c \
@@ -34,7 +37,9 @@ libmi_a_SOURCES =			CLICommand.c \
 					
 libmi_a_CFLAGS =			$(AM_CFLAGS) 
 
-test_mi_SOURCES =			test_mi.c
-test_mi_CFLAGS =			$(AM_CFLAGS) -g
-test_mi_LDFLAGS = 			-g
-test_mi_LDADD =				libmi.a
+if !AIX
+  test_mi_SOURCES =			test_mi.c
+  test_mi_CFLAGS =			$(AM_CFLAGS) -g
+  test_mi_LDFLAGS = 			-g
+  test_mi_LDADD =				libmi.a
+endif

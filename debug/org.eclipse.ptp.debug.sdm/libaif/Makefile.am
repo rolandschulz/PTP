@@ -1,4 +1,6 @@
-noinst_PROGRAMS =			testaif
+if !AIX
+  noinst_PROGRAMS =			testaif
+endif
 noinst_LIBRARIES =			libaif.a
 
 libaif_a_SOURCES =			aif.c \
@@ -16,7 +18,9 @@ libaif_a_SOURCES =			aif.c \
 					
 libaif_a_CFLAGS =			$(AM_CFLAGS) 
 
-testaif_SOURCES =			testaif.c
-testaif_CFLAGS =			-I. $(AM_CFLAGS) -g
-testaif_LDFLAGS = 			-g
-testaif_LDADD =				libaif.a
+if !AIX
+  testaif_SOURCES =			testaif.c
+  testaif_CFLAGS =			-I. $(AM_CFLAGS) -g
+  testaif_LDFLAGS = 			-g
+  testaif_LDADD =				libaif.a
+endif
