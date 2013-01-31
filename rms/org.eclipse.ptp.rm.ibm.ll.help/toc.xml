@@ -6,6 +6,8 @@
 <!-- which accompanies this distribution, and is available at                -->
 <!-- http://www.eclipse.org/legal/epl-v10.html                               -->
 
+<!-- ** UNUSED *** superceded by more recent info in org.eclipse.ptp.doc.user, this info is no longer
+   put in toc - extension point removed from plugin.xml    -->
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="Running IBM LoadLeveler Batch Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpRun">
