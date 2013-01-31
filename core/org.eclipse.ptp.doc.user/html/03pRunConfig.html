@@ -37,7 +37,8 @@ A description of how to debug an application is provided in
 <ol>
 	<li><a href="#create">Creating a <b>Parallel Application</b>
 	run configuration</a></li>
-	<li><a href="#resources">Completing the <b>Resources tab</b></a></li>
+	<li><a href="#resources">Completing the <b>Resources tab</b></a> - selecting the target system configuration
+	</li>
 	<li><a href="#application">Completing the <b>Application
 	tab</b></a></li>
 	<li><a href="#arguments">Completing the <b>Arguments tab</b></a></li>
@@ -52,11 +53,11 @@ configuration</h2>
 
 <ol>
 	<li>
-	<p>To set up a run configuration, open the <b>Run Configuration</b>
+	<p>To set up a run configuration, open the <b>Run Configurations</b>
 	dialog using <b>Run &gt; Run Configurations...</b> 
 	<p><img src="images/03runMenu.png">
 	<br>or click the run
-	icon menu on the tool bar and select <b>Run Configuration...</b>.
+	icon's context menu on the tool bar (small triangle next to the icon) and select <b>Run Configurations...</b>.
 	<p><img src="images/03runMenu2.png">
 	</p>
 	</p>
@@ -84,8 +85,8 @@ configuration</h2>
 
 <h2 id="resources">Step 2: Complete the Resources tab</h2>
 <p>The <b>Resources tab</b> is used to specify the resources
-required for the job execution. The contents of this tab will vary for
-different target configurations. PTP includes a number of target configurations
+required for the job execution. After selecting the <b>target system configuration</b>, the contents of this tab will vary for
+different target configurations, and your installation may have added others. PTP includes a number of target configurations
 for different systems. The following table lists the common configurations along with 
 links to additional help documentation.
 <blockquote>
@@ -94,18 +95,36 @@ links to additional help documentation.
    <th scope="col">Target Configuration</th>
    <th scope="col">Description</th>
    </tr>
+   <tr>
+    <td><a href="rms/gridengine.html">Grid Engine-Generic-Batch</a></td>
+    <td>Batch exectuion using Grid Engine</td>
+  </tr>
   <tr>
-    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.ll.help/html/IBMLLMainHelp.html">IBM LoadLeveler</a></td>
+    <td><a href="rms/ibm-ll.html">IBM LoadLeveler</a></td>
 	<td>Generic IBM LoadLeveler batch systems</td>
   </tr>
   <tr>
+  <!-- FIXME LL/BG doc -->
     <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.ll.help/html/IBMLLMainHelp.html">IBM LoadLeveler (Blue Gene)</a></td>
 	<td>IBM LoadLeveler on Blue Gene systems</td>
   </tr>
   <tr>
-    <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.pe.help/html/PEMainHelp.html">IBM Parallel Environment</a></td>
+    <td><a href="rms/ibm-pe.html">IBM Parallel Environment</a></td>
     <td>Interactive execution using IBM Parallel Environment</td>
   </tr>
+    <tr>
+    <td><a href="rms/lsf.html">LSF-Generic-Batch</a></td>
+    <td>Batch execution on LSF systems</td>
+  </tr>
+      <tr>
+    <td>MPICH2-Generic-Interactive</td>
+    <td>Interactive execution on MPICH2 systems</td>
+  </tr>
+  <tr>
+    <td><a href="rms/openMPI.html">Open MPI-Generic-Interactive</a></td>
+    <td>Interactive execution on Open MPI systems</td>
+  </tr>
+
   <tr>
     <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.slurm.help/html/toc.html">SLURM-Generic-Batch</a></td>
     <td>Generic SLURM batch systems</td>
@@ -146,18 +165,7 @@ links to additional help documentation.
     <td><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.doc.user/html/PBSHelpPage.html">Torque-Generic-Interactive</a></td>
     <td>Interactive job execution using Torque batch systems</td>
   </tr>
-  <tr>
-    <td><a href="rms/gridengine.html">Grid Engine-Generic-Batch</a></td>
-    <td>Batch exectuion using Grid Engine</td>
-  </tr>
-  <tr>
-    <td><a href="rms/openMPI.html">Open MPI-Generic-Interactive</a></td>
-    <td>Interactive execution on Open MPI systems</td>
-  </tr>
-  <tr>
-    <td>MPICH2-Generic-Interactive</td>
-    <td>Interactive execution on MPICH2 systems</td>
-  </tr>
+
   <tr>
     <td>Remote-Generic-Interactive</td>
     <td>Simple (non-parallel) interactive execution on remote systems</td>
@@ -207,8 +215,12 @@ links to additional help documentation.
 	<li>
 	<p>
 	Once you select the connection, you may be prompted to open the connection if it is not already open. The contents of the <b>Resources</b>
-	tab will then populate with controls that allow you to configure the necessary launch information for the target system. Fill in the information 
-	required by the target system configuration.<br>
+	tab will then populate with controls that allow you to configure the necessary launch information for the target system. 
+	
+	This area usually (depending on the target system configuration) includes further tabs to
+    segment the other information you can provide.
+    Fill in the information required by the target system configuration.
+	<br>
 	</p>
 	</li>
 
@@ -328,11 +340,15 @@ environment with the variables specified in the tab.</p>
 
 <h2 id="synchronize">Step 6: Complete the <b>Synchronize</b> tab</h2>
 <p>The <b>Synchronize tab</b> is used in scenarios where the
-resource manager is connected to a remote target. The tab specifies
+connection refers to a remote target. The tab specifies
 rules that describe files or directories that need to be copied (<i>uploaded</i>)
 to the remote target before starting the parallel application execution.
 Typically, this feature is used to upload dependencies (like dynamic
 libraries) or input data for test cases.</p>
+<p>Note that this may not be necessary for <a href="sync.html">Synchronized Projects</a>,
+in which files are copied back and forth to the remote system independently of the
+launching mechanism.
+
 <p>This tab also allows to specify rules describing files on the
 remote host to be retrieved back (<i>downloaded</i>) to the local host
 after the parallel application finishes execution, as output data

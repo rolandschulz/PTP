@@ -12,7 +12,7 @@
 <li><a href="#create">Creating a new Synchronized Project</a>
 <li><a href="#work">Working with a Synchronized Project</a>
 <li><a href="#context-menu">Changing sync behavior with the Sync Context Menu</a>
-<li><a href="#file-filter">Changing which files are synchronized</a>
+<li><a href="#file-filter">Changing which files are synchronized</a> - sync filtering
 <li><a href="#conversion-wizard">Converting a project to a Synchronized Project</a>
 <li><a href="#merge-conflict">Resolving merge conflicts</a>
 <li><a href="#remote-discovery">Discovering the remote environment (remote includes and code analysis)</a>
@@ -45,7 +45,8 @@ Now fill out the dialog shown.
 As for any Eclipse project, give the project name and location, which must be a local directory for a Synchronized Project.
 Then give a remote location by specifying a <a href="#connection">connection</a> and remote directory.
 Next, specify the project type. Finally, select toolchains to be used for remote and local sites.
-Normally, you will select only one toolchain for both, but it is possible to select additional toolchains.
+Normally, you will select only one toolchain for each, but it is possible to select additional toolchains.
+<i>Note that a local toolchain is not required if you do not need to build locally.</i>
 <p>
 Select <b>Next</b> to scroll through the remaining pages, which differ based on the selected project types and toolchains.
 At some point, you should see the configuration page, which will list a separate build configuration for each toolchain selected earlier.

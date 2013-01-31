@@ -7,6 +7,7 @@
       <topic label="Prerequisites" href="html/00prereqs.html"/>
       <topic label="New and Noteworthy"  href="html/00newNoteworthy.html"/> 
       <topic label="Introduction to PTP Project Types"  href="html/localVsRemote.html"/>
+      <topic label="Remote Tools" href="html/remoteTools.html"/>
       <topic label="Introduction to Creating MPI Projects" href="html/01buildMPIprog.html"/> 
       <topic label="Synchronized Projects" href="html/sync.html"/>
       <topic label="Configuring Environment Modules" href="html/modules.html"/>
@@ -16,6 +17,8 @@
           <topic label="Running Open MPI Jobs" href="html/rms/openMPI.html"/>
           <topic label="Running SLURM ALPS Jobs" href="html/rms/slurmalps.html"/>
           <topic label="Running Grid Engine Jobs" href="html/rms/gridengine.html"/>
+          <topic label="Running IBM PE Jobs" href="html/rms/ibm-pe.html"/>
+          <topic label="Running IBM LoadLeveler Jobs FIXME" href="html/rms/ibm-ll.html"/>
           <topic label="Running Jobs on JSC JUDGE" href="html/rms/de.fz-juelich.judge.html"/>
           <topic label="Running Jobs on JSC JUROPA" href="html/rms/de.fz-juelich.juropa.html"/>
           <topic label="Running Jobs on JSC JUQUEEN" href="html/rms/de.fz-juelich.juqueen.html"/>
