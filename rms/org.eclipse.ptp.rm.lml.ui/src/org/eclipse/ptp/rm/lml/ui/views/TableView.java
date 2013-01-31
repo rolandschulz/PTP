@@ -939,6 +939,11 @@ public class TableView extends ViewPart {
 	 * As a result, the width does not change overall.
 	 */
 	private void fixRowHeight() {
+		// Fixes squished rows issue documented in bug 349994, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=349994
+		if (!org.eclipse.jface.util.Util.isGtk()) {
+			return;
+		}
+
 		if (tree == null || tree.getColumns() == null) {
 			return;
 		}
@@ -1107,10 +1112,7 @@ public class TableView extends ViewPart {
 			if (!composite.isDisposed()) {
 				viewer.setInput(input);
 				viewer.setChildCount(input, input.length);
-				// Fixes squished rows issue documented in bug 349994, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=349994
-				if (org.eclipse.jface.util.Util.isGtk()) {
-					fixRowHeight();
-				}
+				fixRowHeight();
 			}
 		}
 	}
@@ -1131,6 +1133,7 @@ public class TableView extends ViewPart {
 			if (!composite.isDisposed()) {
 				viewer.setInput(input);
 				viewer.setChildCount(input, input.length);
+				fixRowHeight();
 			}
 		}
 	}
