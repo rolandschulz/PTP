@@ -22,16 +22,17 @@ presented to the user and the user's interaction with those views. The second pa
 responsible for communicating with the PTP SLURM plugin code, invoking the parallel application, and reporting application
 status to the PTP SLURM plugin.</p>
 
-
-<!-- NEEDS UPDATING FOR PTP 6.0 -->
+<!----------- caveat for PTP 6.0 ------------>
 <p><b>Note:</b> PTP 6.0 does not require the creation of separate <i>Resource Managers</i>
 and instead, the target configuration is specified on the Run Configuration dialog.
-This document has not yet been updated for PTP 6.0, but the Resources tab on the
-new Run Configuration menu should have approximately the same information as 
-the Resource manager setup dialog described here, but this can vary depending on the 
-target configuration / resource manager.
-<!--  -------------------------- -->
 
+This document describes the legacy (proxy-based) Resource Managers supported in versions of PTP
+prior to PTP 6.0.  Target System Configurations replace Resource Managers in PTP 6.0 and beyond.
+<ul>
+<li>For more up-to-date information on launching PTP jobs with SLURM, see
+      <a href="PLUGINS_ROOT/org.eclipse.ptp.doc.user/html/rms/slurm.html">Launching jobs with SLURM</a>
+</ul>
+<!--  ------------------------------------- -->
 
 <p>
 Table of Contents:
