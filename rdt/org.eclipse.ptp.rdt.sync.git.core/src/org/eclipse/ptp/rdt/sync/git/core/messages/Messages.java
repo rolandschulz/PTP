@@ -30,32 +30,8 @@ public class Messages extends NLS {
 	public static String GSP_SyncTaskName;
 	public static String GitRemoteSyncConnection_0;
 	public static String GitRemoteSyncConnection_1;
-	public static String GitRemoteSyncConnection_10;
-	public static String GitRemoteSyncConnection_11;
-	public static String GitRemoteSyncConnection_12;
-	public static String GitRemoteSyncConnection_13;
-	public static String GitRemoteSyncConnection_14;
-	public static String GitRemoteSyncConnection_15;
-	public static String GitRemoteSyncConnection_16;
-	public static String GitRemoteSyncConnection_17;
-	public static String GitRemoteSyncConnection_18;
-	public static String GitRemoteSyncConnection_19;
 	public static String GitRemoteSyncConnection_2;
-	public static String GitRemoteSyncConnection_20;
-	public static String GitRemoteSyncConnection_21;
-	public static String GitRemoteSyncConnection_22;
-	public static String GitRemoteSyncConnection_23;
-	public static String GitRemoteSyncConnection_24;
-	public static String GitRemoteSyncConnection_25;
-	public static String GitRemoteSyncConnection_26;
-	public static String GitRemoteSyncConnection_27;
 	public static String GitRemoteSyncConnection_3;
-	public static String GitRemoteSyncConnection_4;
-	public static String GitRemoteSyncConnection_5;
-	public static String GitRemoteSyncConnection_6;
-	public static String GitRemoteSyncConnection_7;
-	public static String GitRemoteSyncConnection_8;
-	public static String GitRemoteSyncConnection_9;
 	public static String GitRemoteSyncConnection_adding_files;
 	public static String GitRemoteSyncConnection_building_repo;
 	public static String GitRemoteSyncConnection_committing_remote;
@@ -64,15 +40,10 @@ public class Messages extends NLS {
 	public static String GitRemoteSyncConnection_sync_remote_to_local;
 	public static String GitServiceProvider_0;
 	public static String GitServiceProvider_1;
-	public static String GitServiceProvider_10;
 	public static String GitServiceProvider_2;
 	public static String GitServiceProvider_3;
 	public static String GitServiceProvider_4;
 	public static String GitServiceProvider_5;
-	public static String GitServiceProvider_6;
-	public static String GitServiceProvider_7;
-	public static String GitServiceProvider_8;
-	public static String GitServiceProvider_9;
 
 	static {
 		// initialize resource bundle

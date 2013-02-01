@@ -25,12 +25,10 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
  */
 public class BuildScenario {
 	private static final String ATTR_SYNC_PROVIDER = "sync-provider"; //$NON-NLS-1$
-	private static final String ATTR_SYNC_PROVIDER_PATH = "sync-provider-path"; //$NON-NLS-1$
 	private static final String ATTR_REMOTE_CONNECTION_ID = "remote-connection-id"; //$NON-NLS-1$
 	private static final String ATTR_LOCATION = "location"; //$NON-NLS-1$
 	private static final String ATTR_REMOTE_SERVICES_ID = "remote-services-id"; //$NON-NLS-1$
 	final String syncProvider;
-	final String syncProviderPath;
 	final String remoteConnection;
 	final IRemoteServices remoteServices;
 	final String location;
@@ -40,18 +38,13 @@ public class BuildScenario {
 	 * 
 	 * @param sp
 	 *           Name of sync provider
-	 * @param spp
-	 *           Path to sync provider
 	 * @param rc
 	 * 			 Remote connection to use - cannot be null
 	 * @param l
 	 * 			 Location (directory) on remote host
 	 */
-	public BuildScenario(String sp, String spp, IRemoteConnection rc, String l) {
-		// If sync provider specified, a path must also be given.
-		assert(sp == null || spp != null);
+	public BuildScenario(String sp, IRemoteConnection rc, String l) {
 		syncProvider = sp;
-		syncProviderPath = spp;
 		remoteConnection = rc.getName();
 		remoteServices = rc.getRemoteServices();
 		location = l;
@@ -62,8 +55,6 @@ public class BuildScenario {
 	 *
 	 * @param sp
 	 * 			Name of sync provider
-	 * @param spp
-	 * 			Path to sync provider
 	 * @param rc
 	 * 			Name of remote connection
 	 * @param rs
@@ -71,11 +62,8 @@ public class BuildScenario {
 	 * @param l
 	 * 			Location (directory) on remote host
 	 */
-	public BuildScenario(String sp, String spp, String rc, String rs, String l) {
-		// If sync provider specified, a path must also be given.
-		assert(sp == null || spp != null);
+	public BuildScenario(String sp, String rc, String rs, String l) {
 		syncProvider = sp;
-		syncProviderPath = spp;
 		remoteConnection = rc;
 		remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rs);
 		if (remoteServices == null) {
@@ -90,14 +78,6 @@ public class BuildScenario {
 	 */
 	public String getSyncProvider() {
 		return syncProvider;
-	}
-	
-	/**
-	 * Get sync provider path
-	 * @return sync provider path
-	 */
-	public String getSyncProviderPath() {
-		return syncProviderPath;
 	}
 
 	/**
@@ -191,7 +171,6 @@ public class BuildScenario {
 	public void saveScenario(Map<String, String> map) {
 		if (syncProvider != null) {
 			map.put(ATTR_SYNC_PROVIDER, syncProvider);
-			map.put(ATTR_SYNC_PROVIDER_PATH, syncProviderPath);
 		}
 		map.put(ATTR_REMOTE_CONNECTION_ID, remoteConnection);
 		map.put(ATTR_LOCATION, location);
@@ -207,14 +186,13 @@ public class BuildScenario {
 	 */
 	public static BuildScenario loadScenario(Map<String, String> map) {
 		String sp = map.get(ATTR_SYNC_PROVIDER);
-		String spp = map.get(ATTR_SYNC_PROVIDER_PATH);
 		String rc = map.get(ATTR_REMOTE_CONNECTION_ID);
 		String rs = map.get(ATTR_REMOTE_SERVICES_ID);
 		String l = map.get(ATTR_LOCATION);
 		if (rc == null || l == null || rs == null) { // null is okay for sync provider
 			return null;
 		} else {
-			return new BuildScenario(sp, spp, rc, rs, l);
+			return new BuildScenario(sp, rc, rs, l);
 		}
 	}
 
@@ -231,8 +209,6 @@ public class BuildScenario {
 				+ ((remoteServices == null) ? 0 : remoteServices.hashCode());
 		result = prime * result
 				+ ((syncProvider == null) ? 0 : syncProvider.hashCode());
-		result = prime * result
-				+ ((syncProviderPath == null) ? 0 : syncProviderPath.hashCode());
 		return result;
 	}
 
@@ -264,11 +240,6 @@ public class BuildScenario {
 			if (other.syncProvider != null)
 				return false;
 		} else if (!syncProvider.equals(other.syncProvider))
-			return false;
-		if (syncProviderPath == null) {
-			if (other.syncProviderPath != null)
-				return false;
-		} else if (!syncProviderPath.equals(other.syncProviderPath))
 			return false;
 		return true;
 	}

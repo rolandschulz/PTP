@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CommitCommand;
@@ -67,7 +68,6 @@ import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner;
 import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
-import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
@@ -86,11 +86,12 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
  * 
  */
 public class GitRemoteSyncConnection {
+
 	private final int MAX_FILES = 100;
 	private static final String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
 	private static final String commitMessage = Messages.GRSC_CommitMessage;
 	public static final String gitDir = ".ptp-sync"; //$NON-NLS-1$
-	private static final String gitArgs = "--git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String gitCommand = "git --git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 	private final String localDirectory;
 	private final BuildScenario buildScenario;
@@ -122,7 +123,7 @@ public class GitRemoteSyncConnection {
 	 */
 	public GitRemoteSyncConnection(IProject proj, String localDir, BuildScenario bs, SyncFileFilter filter,
 			IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
+		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
 			project = proj;
 			localDirectory = localDir;
@@ -131,10 +132,8 @@ public class GitRemoteSyncConnection {
 			
 			// Build repo, creating it if it is not already present.
 			try {
-				subMon.subTask(Messages.GitRemoteSyncConnection_21);
-				remoteGitVersion = getRemoteGitVersion(subMon.newChild(10));
-				subMon.subTask(Messages.GitRemoteSyncConnection_20);
-				buildRepo(subMon.newChild(80));
+				remoteGitVersion = getRemoteGitVersion(subMon.newChild(1));
+				buildRepo(subMon.newChild(10));
 			} catch (final IOException e) {
 				throw new RemoteSyncException(e);
 			} catch (final RemoteExecutionException e) {
@@ -143,8 +142,7 @@ public class GitRemoteSyncConnection {
 
 			// Build transport
 			final RemoteConfig remoteConfig = buildRemoteConfig(git.getRepository().getConfig());
-			subMon.subTask(Messages.GitRemoteSyncConnection_4);
-			buildTransport(remoteConfig, subMon.newChild(10));
+			buildTransport(remoteConfig);
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -202,7 +200,8 @@ public class GitRemoteSyncConnection {
 	 */
 	private Git buildRepo(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
 	MissingConnectionException {
-		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
+		final SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		subMon.subTask(Messages.GitRemoteSyncConnection_building_repo);
 		try {
 			final File localDir = new File(localDirectory);
 			final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
@@ -215,13 +214,11 @@ public class GitRemoteSyncConnection {
 				repository.create(false);
 
 				// An initial commit to create the master branch.
-				subMon.subTask(Messages.GitRemoteSyncConnection_22);
-				doCommit(subMon.newChild(4));
+				doCommit();
 			}
 
 			// Refresh project 
-			subMon.subTask(Messages.GitRemoteSyncConnection_23);
-			final Thread refreshThread = this.doRefresh(subMon.newChild(1));
+			final Thread refreshThread = this.doRefresh(subMon.newChild(5));
 			
 			// Set git repo as derived, which can only be done after refresh completes.
 			// This prevents user-level operations, such as searching, from considering the repo directory.
@@ -241,7 +238,6 @@ public class GitRemoteSyncConnection {
 
 			// Create remote directory if necessary.
 			try {
-				subMon.subTask(Messages.GitRemoteSyncConnection_24);
 				CommandRunner.createRemoteDirectory(buildScenario.getRemoteConnection(), buildScenario.getLocation(project),
 						subMon.newChild(5));
 			} catch (final CoreException e) {
@@ -249,17 +245,14 @@ public class GitRemoteSyncConnection {
 			}
 
 			// Initialize remote directory if necessary
-			subMon.subTask(Messages.GitRemoteSyncConnection_25);
 			boolean existingGitRepo = doRemoteInit(subMon.newChild(5));
 
 			// Prepare remote site for committing (stage files using git) and
 			// then commit remote files if necessary
 			// Include untracked files for new git
-			subMon.subTask(Messages.GitRemoteSyncConnection_26);
 			boolean needToCommitRemote = prepareRemoteForCommit(subMon.newChild(85), !existingGitRepo);
 			// repos
 			if (needToCommitRemote) {
-				subMon.subTask(Messages.GitRemoteSyncConnection_27);
 				commitRemoteFiles(subMon.newChild(5));
 			}
 
@@ -285,13 +278,14 @@ public class GitRemoteSyncConnection {
 	 */
 	private boolean doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
 	MissingConnectionException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
 			String commands = "git --git-dir=" + gitDir + " init && " + //$NON-NLS-1$ //$NON-NLS-2$
 					"git --git-dir=" + gitDir + " config core.preloadindex true"; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = null;
 
 			try {
-				commandResults = this.executeRemoteCommand(commands, monitor);
+				commandResults = this.executeRemoteCommand(commands, subMon.newChild(10));
 			} catch (final InterruptedException e) {
 				throw new RemoteExecutionException(e);
 			} catch (RemoteConnectionException e) {
@@ -331,27 +325,24 @@ public class GitRemoteSyncConnection {
 	 */
 	private boolean prepareRemoteForCommit(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException,
 	MissingConnectionException {
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
 			Set<String> filesToAdd = new HashSet<String>();
 			Set<String> filesToDelete = new HashSet<String>();
 			boolean needToCommit = false;
 
-			subMon.subTask(Messages.GitRemoteSyncConnection_5);
-			getRemoteFileStatus(filesToAdd, filesToDelete, subMon.newChild(50), includeUntrackedFiles);
+			getRemoteFileStatus(filesToAdd, filesToDelete, subMon.newChild(5), includeUntrackedFiles);
 			for (String fileName : filesToDelete) {
 				if (filesToAdd.contains(fileName)) {
 					filesToAdd.remove(fileName);
 				}
 			}
-			subMon.subTask(Messages.GitRemoteSyncConnection_6);
 			if (filesToAdd.size() > 0) {
-				addRemoteFiles(filesToAdd, subMon.newChild(25));
+				addRemoteFiles(filesToAdd, subMon.newChild(90));
 				needToCommit = true;
 			}
-			subMon.subTask(Messages.GitRemoteSyncConnection_7);
 			if (filesToDelete.size() > 0) {
-				deleteRemoteFiles(filesToDelete, subMon.newChild(25));
+				deleteRemoteFiles(filesToDelete, subMon.newChild(5));
 				needToCommit = true;
 			}
 
@@ -371,12 +362,14 @@ public class GitRemoteSyncConnection {
 	 * Do a "git commit" on the remote host
 	 */
 	private void commitRemoteFiles(IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		subMon.subTask(Messages.GitRemoteSyncConnection_committing_remote);
 		try {
-			final String command = gitCommand() + " commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+			final String command = gitCommand + " commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = null;
 
 			try {
-				commandResults = this.executeRemoteCommand(command, monitor);
+				commandResults = this.executeRemoteCommand(command, subMon.newChild(10));
 			} catch (final InterruptedException e) {
 				throw new RemoteSyncException(e);
 			} catch (RemoteConnectionException e) {
@@ -400,9 +393,10 @@ public class GitRemoteSyncConnection {
 	 */
 	private void deleteRemoteFiles(Set<String> filesToDelete, IProgressMonitor monitor) throws IOException,
 			RemoteExecutionException, RemoteSyncException, MissingConnectionException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
 			while (!filesToDelete.isEmpty()) {
-				List<String> commandList = stringToList(gitCommand() + " rm --"); //$NON-NLS-1$
+				List<String> commandList = stringToList(gitCommand + " rm --"); //$NON-NLS-1$
 				int count = 1;
 				for (String fileName : filesToDelete.toArray(new String[0])) {
 					if (count++ % MAX_FILES == 0) {
@@ -414,7 +408,7 @@ public class GitRemoteSyncConnection {
 
 				CommandResults commandResults = null;
 				try {
-				commandResults = this.executeRemoteCommand(commandList, monitor);
+				commandResults = this.executeRemoteCommand(commandList, subMon.newChild(10));
 				} catch (final InterruptedException e) {
 					throw new RemoteExecutionException(e);
 				} catch (RemoteConnectionException e) {
@@ -440,9 +434,11 @@ public class GitRemoteSyncConnection {
 	 */
 	private void addRemoteFiles(Set<String> filesToAdd, IProgressMonitor monitor) throws IOException, RemoteExecutionException,
 			RemoteSyncException, MissingConnectionException {
+		SubMonitor subMon = SubMonitor.convert(monitor, filesToAdd.size());
+		subMon.subTask(Messages.GitRemoteSyncConnection_adding_files);
 		try {
 			while (!filesToAdd.isEmpty()) {
-				List<String> commandList = stringToList(gitCommand() + " add -f --"); //$NON-NLS-1$
+				List<String> commandList = stringToList(gitCommand + " add -f --"); //$NON-NLS-1$
 				int count = 1;
 				for (String fileName : filesToAdd.toArray(new String[0])) {
 					if (count++ % MAX_FILES == 0) {
@@ -454,7 +450,7 @@ public class GitRemoteSyncConnection {
 
 				CommandResults commandResults = null;
 				try {
-					commandResults = this.executeRemoteCommand(commandList, monitor);
+					commandResults = this.executeRemoteCommand(commandList, subMon.newChild(10));
 				} catch (final InterruptedException e) {
 					throw new RemoteExecutionException(e);
 				} catch (RemoteConnectionException e) {
@@ -479,18 +475,20 @@ public class GitRemoteSyncConnection {
 	private void getRemoteFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, IProgressMonitor monitor,
 			boolean includeUntrackedFiles) throws IOException, RemoteExecutionException, RemoteSyncException,
 			MissingConnectionException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		subMon.subTask(Messages.GitRemoteSyncConnection_getting_remote_file_status);
 		try {
 			final String command, deletePrefix;
 			final int fileNamePos;
 			if (remoteGitVersion>=10700) {
-				command = gitCommand() + " status --porcelain"; //$NON-NLS-1$
+				command = gitCommand + " status --porcelain"; //$NON-NLS-1$
 				deletePrefix = " D"; //$NON-NLS-1$
 				fileNamePos = 3;
 			} else {
 				if (includeUntrackedFiles) {
-					command = gitCommand() + " ls-files -t --modified --others --deleted"; //$NON-NLS-1$
+					command = gitCommand + " ls-files -t --modified --others --deleted"; //$NON-NLS-1$
 				} else {
-					command = gitCommand() + " ls-files -t --modified --deleted"; //$NON-NLS-1$
+					command = gitCommand + " ls-files -t --modified --deleted"; //$NON-NLS-1$
 				}
 				deletePrefix = "R "; //$NON-NLS-1$
 				fileNamePos = 2;
@@ -498,7 +496,7 @@ public class GitRemoteSyncConnection {
 			CommandResults commandResults = null;
 
 			try {
-				commandResults = this.executeRemoteCommand(command, monitor);
+				commandResults = this.executeRemoteCommand(command, subMon.newChild(10));
 			} catch (final InterruptedException e) {
 				throw new RemoteExecutionException(e);
 			} catch (RemoteConnectionException e) {
@@ -611,20 +609,14 @@ public class GitRemoteSyncConnection {
 	 * @throws RuntimeException
 	 *             if the requested transport is not supported by JGit.
 	 */
-	private void buildTransport(RemoteConfig remoteConfig, IProgressMonitor monitor) {
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
+	private void buildTransport(RemoteConfig remoteConfig) {
 		final URIish uri = buildURI();
 		try {
-			subMon.subTask(Messages.GitRemoteSyncConnection_8);
 			transport = (TransportGitSsh) Transport.open(git.getRepository(), uri);
 		} catch (NotSupportedException e) {
 			throw new RuntimeException(e);
 		} catch (TransportException e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
 		}
 
 		// Set the transport to use our own means of executing remote commands.
@@ -671,15 +663,13 @@ public class GitRemoteSyncConnection {
 	 *             on problems committing.
 	 * @return whether any changes were committed
 	 */
-	private boolean doCommit(IProgressMonitor monitor) throws RemoteSyncException {
-		RecursiveSubMonitor subMon  = RecursiveSubMonitor.convert(monitor, 100);
+	private boolean doCommit() throws RemoteSyncException {
 		Set<String> filesToAdd = new HashSet<String>();
 		Set<String> filesToRemove = new HashSet<String>();
 		Status status = this.getFileStatus(filesToAdd, filesToRemove, true);
 		boolean addedOrRemovedFiles = false;
 
 		try {
-			subMon.subTask(Messages.GitRemoteSyncConnection_9);
 			if (!filesToAdd.isEmpty()) {
 				final AddCommand addCommand = git.add();
 				for (String fileName : filesToAdd) {
@@ -688,9 +678,7 @@ public class GitRemoteSyncConnection {
 				addCommand.call();
 				addedOrRemovedFiles = true;
 			}
-			subMon.worked(10);
 
-			subMon.subTask(Messages.GitRemoteSyncConnection_10);
 			if (!filesToRemove.isEmpty()) {
 				final RmCommandCached rmCommand = new RmCommandCached(git.getRepository());
 				for (String fileName : filesToRemove) {
@@ -699,12 +687,10 @@ public class GitRemoteSyncConnection {
 				rmCommand.call();
 				addedOrRemovedFiles = true;
 			}
-			subMon.worked(10);
 			
 			// Check if a commit is required.
 			// Note that we need the "addedOrRemovedFiles" boolean too because the status object reflects the repository state
 			// before files were added or removed.
-			subMon.subTask(Messages.GitRemoteSyncConnection_11);
 			boolean indexHasNewFiles = !status.getAdded().isEmpty();
 			boolean indexHasModifiedFiles = !status.getChanged().isEmpty();
 			boolean indexHasDeletedFiles = !status.getRemoved().isEmpty();
@@ -720,10 +706,6 @@ public class GitRemoteSyncConnection {
 			throw new RemoteSyncException(e);
 		} catch (IOException e) {
 			throw new RemoteSyncException(e);
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
 		}
 	}
 	
@@ -853,11 +835,11 @@ public class GitRemoteSyncConnection {
 	 *             possible platform dependency.
 	 */
 	public void syncLocalToRemote(IProgressMonitor monitor) throws RemoteSyncException {
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
+		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		subMon.subTask(Messages.GitRemoteSyncConnection_sync_local_to_remote);
 		try {
 			// First commit changes to the local repository.
-			doCommit(subMon.newChild(1));
+			doCommit();
 
 			// Then push them to the remote site.
 			try {
@@ -869,7 +851,7 @@ public class GitRemoteSyncConnection {
 	
 					// Now remotely merge changes with master branch
 					CommandResults mergeResults;
-					final String command = gitCommand() + " merge " + remotePushBranch; //$NON-NLS-1$
+					final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
 	
 					mergeResults = this.executeRemoteCommand(command, subMon.newChild(5));
 	
@@ -924,7 +906,7 @@ public class GitRemoteSyncConnection {
 		// } catch (CanceledException e) {
 		// throw new RemoteSyncException(e);
 		// }
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
+		SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		subMon.subTask(Messages.GitRemoteSyncConnection_sync_remote_to_local);
 		try {
 			// First, commit in case any changes have occurred remotely.
@@ -992,26 +974,21 @@ public class GitRemoteSyncConnection {
 	 *             exceptions, embedded in a RemoteSyncException.
 	 */
 	public void sync(IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
+		SubMonitor subMon = SubMonitor.convert(monitor, 25);
+		subMon.subTask(Messages.GitRemoteSyncConnection_1);
+
 		try {
 			// Commit local and remote changes
-			subMon.subTask(Messages.GitRemoteSyncConnection_12);
-			doCommit(subMon.newChild(5));
-			subMon.subTask(Messages.GitRemoteSyncConnection_13);
-			if (prepareRemoteForCommit(subMon.newChild(18),includeUntrackedFiles)) {
-				subMon.subTask(Messages.GitRemoteSyncConnection_14);
-				commitRemoteFiles(subMon.newChild(18));
-			} else {
-				subMon.worked(18);
+			doCommit();
+			if (prepareRemoteForCommit(subMon.newChild(5),includeUntrackedFiles)) {
+				commitRemoteFiles(subMon.newChild(5));
 			}
 
 			try {
 				// Fetch the remote repository
-				subMon.subTask(Messages.GitRemoteSyncConnection_15);
-				transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(18)), null);
+				transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
 
 				// Merge it with local
-				subMon.subTask(Messages.GitRemoteSyncConnection_16);
 				Ref remoteMasterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
 				final MergeCommand mergeCommand = git.merge().include(remoteMasterRef);
 				mergeCommand.call();
@@ -1032,23 +1009,19 @@ public class GitRemoteSyncConnection {
 				} else {
 					throw new RemoteSyncException(e);
 				}
-			} finally {
-				subMon.setWorkRemaining(100-64);
 			}
 
 			// Push local repository to remote
 			if (git.branchList().call().size()>0) { //check whether master was already created
-				subMon.subTask(Messages.GitRemoteSyncConnection_17);
-				transport.push(new EclipseGitProgressTransformer(subMon.newChild(18)), null);
+				transport.push(new EclipseGitProgressTransformer(subMon.newChild(5)), null);
 
 				// Now remotely merge changes with master branch
 				CommandResults mergeResults;
 				// ff-only prevents accidental corruption of the remote repository but is supported only in recent Git versions.
 				// final String command = gitCommand + " merge --ff-only " + remotePushBranch; //$NON-NLS-1$
-				final String command = gitCommand() + " merge " + remotePushBranch; //$NON-NLS-1$
+				final String command = gitCommand + " merge " + remotePushBranch; //$NON-NLS-1$
 
-				subMon.subTask(Messages.GitRemoteSyncConnection_18);
-				mergeResults = this.executeRemoteCommand(command, subMon.newChild(18));
+				mergeResults = this.executeRemoteCommand(command, subMon.newChild(5));
 				if (mergeResults.getExitCode() != 0) {
 					throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
 							+ mergeResults.getStderr()));
@@ -1127,22 +1100,16 @@ public class GitRemoteSyncConnection {
 	
 	public int getRemoteGitVersion(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
 			MissingConnectionException {
-		String command = gitCommand() + " --version"; //$NON-NLS-1$
+		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		String command = "git --version"; //$NON-NLS-1$
 		CommandResults commandResults = null;
 	
 		try {
-			// Skip class execute function, which attempts to run the command in the remote directory.
-			// (This directory may not yet exist, since reading the Git version is one of the first operations.)
-			IRemoteConnection conn = buildScenario.getRemoteConnection();
-			commandResults = CommandRunner.executeRemoteCommand(conn, command, null, monitor);
+			commandResults = this.executeRemoteCommand(command, subMon.newChild(10));
 		} catch (final InterruptedException e) {
 			throw new RemoteExecutionException(e);
 		} catch (RemoteConnectionException e) {
 			throw new RemoteExecutionException(e);
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
 		}
 	
 		if (commandResults.getExitCode() != 0) {
@@ -1204,7 +1171,7 @@ public class GitRemoteSyncConnection {
 	// Refresh the workspace after creating new local files
 	// Bug 374409 - run refresh in a separate thread to avoid possible deadlock from locking both the sync lock and the
 	// workspace lock.
-	private Thread doRefresh(final IProgressMonitor subMon) {
+	private Thread doRefresh(final SubMonitor subMon) {
 		Thread refreshWorkspaceThread = new Thread(new Runnable() {
 			public void run() {
 				try {
@@ -1218,27 +1185,17 @@ public class GitRemoteSyncConnection {
 		return refreshWorkspaceThread;
 	}
 	
-	private CommandResults executeRemoteCommand(String command, IProgressMonitor monitor) throws RemoteSyncException, IOException,
+	private CommandResults executeRemoteCommand(String command, SubMonitor monitor) throws RemoteSyncException, IOException,
 	InterruptedException, RemoteConnectionException, MissingConnectionException {
 		IRemoteConnection conn = buildScenario.getRemoteConnection();
 		String remoteDirectory = buildScenario.getLocation(project);
 		return CommandRunner.executeRemoteCommand(conn, command, remoteDirectory, monitor);
 	}
 	
-	private CommandResults executeRemoteCommand(List<String> command, IProgressMonitor monitor) throws RemoteSyncException, IOException,
+	private CommandResults executeRemoteCommand(List<String> command, SubMonitor monitor) throws RemoteSyncException, IOException,
 	InterruptedException, RemoteConnectionException, MissingConnectionException {
 		IRemoteConnection conn = buildScenario.getRemoteConnection();
 		String remoteDirectory = buildScenario.getLocation(project);
 		return CommandRunner.executeRemoteCommand(conn, command, remoteDirectory, monitor);
-	}
-	
-	// Get the base git command for this system, includes the git binary plus sync-specific arguments.
-	private String gitCommand() {
-		String gitPath = buildScenario.getSyncProviderPath();
-		if (gitPath == null) {
-			return "git " + gitArgs; //$NON-NLS-1$
-		} else {
-			return gitPath + " " + gitArgs;  //$NON-NLS-1$
-		}
 	}
 }

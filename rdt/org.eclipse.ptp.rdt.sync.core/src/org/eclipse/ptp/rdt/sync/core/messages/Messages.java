@@ -104,12 +104,6 @@ public class Messages extends NLS {
 
 	public static String CommandRunner_1;
 
-	public static String CommandRunner_2;
-
-	public static String CommandRunner_3;
-
-	public static String CommandRunner_4;
-
 	public static String PathResourceMatcher_0;
 
 	public static String RegexResourceMatcher_0;

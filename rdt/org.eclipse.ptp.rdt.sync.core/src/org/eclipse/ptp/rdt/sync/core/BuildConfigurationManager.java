@@ -110,7 +110,7 @@ public class BuildConfigurationManager {
 		if (localService != null) {
 			IRemoteConnection localConnection = localService.getConnectionManager().getConnection("Local"); //$NON-NLS-1$
 			if (localConnection != null) {
-				return new BuildScenario(null, null, localConnection, projectLocationPathVariable);
+				return new BuildScenario(null, localConnection, projectLocationPathVariable);
 			} else {
 				throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.sync.core", //$NON-NLS-1$
 						Messages.BCM_LocalConnectionError));
