@@ -32,7 +32,7 @@ public class EnvironmentVariableUtils {
 	 * Add variable to env after resolving against the resource-manager environment (used by the CommandJob).
 	 * 
 	 * @param uuid
-	 *            an internal or resource-specific job id.
+	 *            an internal or resource-specific job id (can be <code>null</code>)
 	 * @param var
 	 *            environment name-value pair
 	 * @param env

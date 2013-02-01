@@ -78,7 +78,7 @@ public interface IVariableMap {
 	 * the uuid prior to evaluating the expression.
 	 * 
 	 * @param uuid
-	 *            internal identifier associate with a job submission
+	 *            internal identifier associate with a job submission (can be <code>null</code>)
 	 * @param value
 	 *            expression to resolve.
 	 * @return resolved expression
